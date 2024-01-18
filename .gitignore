@@ -50,3 +50,24 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Compiled C code
+obj/*
+!obj/readme.md
+bin/*
+!bin/readme.md
+
+# Add below lines to exclude OS settings and caches
+.trash/
+.DS_Store
+
+# Ignore local note taking tools.
+.obsidian/
+.obsidian.vimrc
+
+# ignore exported compile commands.
+.cache/
+build/
+.gdb_history
+.gdbinit
+save

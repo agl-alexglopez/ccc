@@ -1,0 +1,36 @@
+---
+Checks: >
+   *,
+   -altera-*,
+   -llvmlibc-*,
+   -llvm-header-guard,
+   -llvm-include-order,
+   -google-*,
+   -abseil-*,
+   -fuchsia-*,
+   -android-*,
+   -modernize-*,
+   -hicpp*,
+   -cppcoreguidelines-*,
+   -readability-implicit-bool-conversion,
+   -readability-named-parameter,
+   -readability-isolate-declaration,
+   -readability-braces-around-statements,
+   -readability-identifier-length,
+   -performance-no-int-to-ptr,
+   -*-non-private-member-variables-in-classes,
+   -*-magic-numbers,
+   -concurrency-*
+
+WarningsAsErrors: "*"
+
+CheckOptions:
+   - { key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals, value: true }
+   - { key: readability-identifier-naming.FunctionCase, value: lower_case }
+   - { key: readability-identifier-naming.VariableCase, value: lower_case }
+   - { key: readability-identifier-naming.EnumCase, value: lower_case }
+   - { key: readability-identifier-naming.MacroDefinitionCase, value: UPPER_CASE }
+   - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
+
+FormatStyle: file
+---
