@@ -1,4 +1,4 @@
-.PHONY: default rel deb test-rel test-deb clean
+.PHONY: default build rel deb test-rel test-deb clean
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
