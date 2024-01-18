@@ -228,6 +228,18 @@ splay (struct tree *t, struct node *root, const struct node *elem,
   return root;
 }
 
+size_t
+count_dups (struct tree *t, struct node *n)
+{
+  if (n->dups == as_dupnode (&t->nil))
+    return 0;
+  size_t dups = 1;
+  for (struct dupnode *cur = n->dups->links[N]; cur != n->dups;
+       cur = cur->links[N])
+    ++dups;
+  return dups;
+}
+
 /* Simple Morris iterative traversal. The only downside is that we
    modify the links of the tree while iterating. Incorrectly,
    guarding from interrupts would be catastrophic. Perhaps we
@@ -257,8 +269,8 @@ size (struct tree *const t)
       if (&t->nil == iter->links[L])
         {
           /* This is where we climb back up a link if it exists */
+          s += count_dups (t, iter) + 1;
           iter = iter->links[R];
-          ++s;
           continue;
         }
       inorder_pred = iter->links[L];
@@ -273,7 +285,7 @@ size (struct tree *const t)
           continue;
         }
       /* Here is our last chance to count this value. */
-      ++s;
+      s += count_dups (t, iter) + 1;
       /* Here is our last chance to repair our wreckage */
       inorder_pred->links[R] = &t->nil;
       /* This is how we get to a right subtree if any exists. */

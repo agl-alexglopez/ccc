@@ -7,8 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUM_TESTS 3
-
 /* Set this breakpoint on any line where you wish
    execution to stop. Under normal program runs the program
    will simply exit. If triggered in GDB execution will stop
@@ -38,13 +36,15 @@ struct val
 static bool pq_test_empty (void);
 static bool pq_test_insert_one (void);
 static bool pq_test_insert_three (void);
+static bool pq_test_struct_getter (void);
+static bool pq_test_insert_three_dups (void);
 static int run_tests (void);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
+#define NUM_TESTS 5
 const test_fn all_tests[NUM_TESTS] = {
-  pq_test_empty,
-  pq_test_insert_one,
-  pq_test_insert_three,
+  pq_test_empty,         pq_test_insert_one,        pq_test_insert_three,
+  pq_test_struct_getter, pq_test_insert_three_dups,
 };
 
 int
@@ -109,6 +109,61 @@ pq_test_insert_three (void)
         }
     }
   return true;
+}
+
+static bool
+pq_test_struct_getter (void)
+{
+  printf ("pq_test_getter_macro");
+  pqueue pq;
+  pq_init (&pq);
+  pqueue pq_tester_clone;
+  pq_init (&pq_tester_clone);
+  struct val vals[10];
+  struct val tester_clone[10];
+  for (int i = 0; i < 10; ++i)
+    {
+      vals[i].val = i;
+      tester_clone[i].val = i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      pq_insert (&pq_tester_clone, &tester_clone[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+      /* Because the getter returns a pointer, if the casting returned
+         misaligned data and we overwrote something we need to compare our get
+         to uncorrupted data. */
+      const struct val *get
+          = tree_entry (&tester_clone[i].elem, struct val, elem);
+      if (get->val != vals[i].val)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  return true;
+}
+
+static bool
+pq_test_insert_three_dups (void)
+{
+  printf ("pq_test_insert_three_duplicates");
+  pqueue pq;
+  pq_init (&pq);
+  struct val three_vals[3];
+  for (int i = 0; i < 3; ++i)
+    {
+      three_vals[i].val = 0;
+      pq_insert (&pq, &three_vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  return pq_size (&pq) == 3;
 }
 
 static threeway_cmp
