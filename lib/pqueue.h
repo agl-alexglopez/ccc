@@ -3,6 +3,7 @@
 
 #include "tree.h"
 #include <stdbool.h>
+#include <stddef.h>
 
 /* Together the following form what you would normally expect for
    an embedded data structure. In this case a priority queue.
@@ -21,8 +22,23 @@
 typedef struct node pq_elem;
 typedef struct tree pqueue;
 
+/* To implement three way comparison in C you can try something
+   like this:
+
+     return (a > b) - (a < b);
+
+   If such a comparison is not possible for your type you can simply
+   return the value of the cmp enum directly with conditionals switch
+   statements or whatever other comparison logic you choose. */
+typedef tree_cmp_fn pq_cmp_fn;
+
 void pq_init (pqueue *);
 
-bool pq_empty (pqueue *);
+bool pq_empty (const pqueue *);
+void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *fn, void *aux);
+pq_elem *pq_root (const pqueue *);
+
+/* O(n) iterative traversal */
+size_t pq_size (const pqueue *);
 
 #endif
