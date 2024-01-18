@@ -35,8 +35,12 @@ typedef tree_cmp_fn pq_cmp_fn;
 void pq_init (pqueue *);
 
 bool pq_empty (const pqueue *);
+
 void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+
 pq_elem *pq_root (const pqueue *);
+
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 

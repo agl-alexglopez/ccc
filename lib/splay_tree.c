@@ -39,9 +39,13 @@ static void init_node (struct tree *, struct node *);
 static bool empty (const struct tree *);
 static void multiset_insert (struct tree *, struct node *, tree_cmp_fn *,
                              void *);
-static pq_elem *root (const struct tree *);
-static struct node *max (const struct tree *t);
-static struct node *min (const struct tree *t);
+static struct node *multiset_erase (struct tree *, struct node *,
+                                    tree_cmp_fn *, void *);
+static struct node *delete_oldest_duplicate (struct tree *, struct node *,
+                                             tree_cmp_fn *);
+static struct node *root (const struct tree *);
+static struct node *max (const struct tree *);
+static struct node *min (const struct tree *);
 static size_t size (struct tree *);
 static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
@@ -87,6 +91,12 @@ void
 pq_insert (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
   multiset_insert (pq, elem, fn, aux);
+}
+
+pq_elem *
+pq_erase (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+{
+  return multiset_erase (pq, elem, fn, aux);
 }
 
 size_t
@@ -190,7 +200,7 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
   /* This is a circular doubly linked list with O(1) append to back
      to maintain round robin fairness for any use of this queue.
      the oldest duplicate should be in the tree so we will add new dup
-     to the back. Get the last element and link its new next to new dup
+     to the back. Get the last element and link its new next to new dup,
      link the head to this new tail. New elem wraps back to head.
      This operation still works if we previously had size 1 list. */
   if (tree_node->dups == as_dupnode (&t->nil))
@@ -207,6 +217,54 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
   add->links[P] = list_head->links[P];
   list_head->links[P] = add;
   add->links[N] = list_head;
+}
+
+static struct node *
+multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
+{
+  (void)aux;
+  struct node *ret = splay (t, t->root, node, cmp);
+  assert (ret == node);
+  t->root = ret;
+
+  if (ret->dups != as_dupnode (&t->nil))
+    {
+      t->root->dups->parent = &t->nil;
+      return delete_oldest_duplicate (t, node, cmp);
+    }
+
+  if (ret->links[L] == &t->nil)
+    t->root = ret->links[R];
+  else
+    {
+      t->root = splay (t, ret->links[L], node, cmp);
+      give_parent_subtree (t, t->root, R, ret->links[R]);
+    }
+  if (t->root != &t->nil && t->root->dups != as_dupnode (&t->nil))
+    t->root->dups->parent = &t->nil;
+  return ret;
+}
+
+static struct node *
+delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
+{
+  struct node *parent = old->dups->parent;
+  struct dupnode *new_list_head = old->dups->links[N];
+  struct dupnode *list_tail = old->dups->links[P];
+  struct node *tree_replacement = as_node (old->dups);
+  threeway_cmp size_relation = cmp (old, parent, NULL);
+  parent->links[GRT == size_relation] = tree_replacement;
+  tree_replacement->links[L] = old->links[L];
+  tree_replacement->links[R] = old->links[R];
+  if (new_list_head == old->dups)
+    {
+      tree_replacement->dups = as_dupnode (&t->nil);
+      return old;
+    }
+  tree_replacement->dups = new_list_head;
+  new_list_head->links[P] = list_tail;
+  new_list_head->parent = parent;
+  return old;
 }
 
 static struct node *
@@ -255,7 +313,8 @@ splay (struct tree *t, struct node *root, const struct node *elem,
 
 /* This function has proven to be VERY important. The nil node often
    has garbage values associated with real nodes in our tree and if we access
-   them by mistake it's bad! */
+   them by mistake it's bad! But the nil is also helpful for some invariant
+   coding patters and reducing if checks all over the place. */
 static inline void
 give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
                      struct node *subtree)
@@ -278,7 +337,7 @@ count_dups (struct tree *t, struct node *n)
 }
 
 /* Simple Morris iterative traversal. The only downside is that we
-   modify the links of the tree while iterating. Incorrectly,
+   modify the links of the tree while iterating. Incorrectly
    guarding from interrupts would be catastrophic. Perhaps we
    could keep a size of the queue if needed for O(1) checks but
    we don't need size that often with a priority queue. Also

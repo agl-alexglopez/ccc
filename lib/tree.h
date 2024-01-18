@@ -63,6 +63,12 @@ as_dupnode (const struct node *d)
   return (struct dupnode *)(d);
 }
 
+static inline struct node *
+as_node (const struct dupnode *d)
+{
+  return (struct node *)(d);
+}
+
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of
    interface. */

@@ -1,5 +1,6 @@
 #include "pqueue.h"
 
+#include <assert.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -40,14 +41,22 @@ static bool pq_test_struct_getter (void);
 static bool pq_test_insert_three_dups (void);
 static bool pq_test_read_max_min (void);
 static bool pq_test_insert_shuffle (void);
+static bool pq_test_insert_erase_shuffled (void);
 static int run_tests (void);
+static void insert_shuffled (pqueue *, struct val[], int, int);
+static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS 7
+#define NUM_TESTS 8
 const test_fn all_tests[NUM_TESTS] = {
-  pq_test_empty,          pq_test_insert_one,        pq_test_insert_three,
-  pq_test_struct_getter,  pq_test_insert_three_dups, pq_test_read_max_min,
+  pq_test_empty,
+  pq_test_insert_one,
+  pq_test_insert_three,
+  pq_test_struct_getter,
+  pq_test_insert_three_dups,
+  pq_test_read_max_min,
   pq_test_insert_shuffle,
+  pq_test_insert_erase_shuffled,
 };
 
 int
@@ -215,25 +224,8 @@ pq_test_insert_shuffle (void)
   /* Math magic ahead... */
   const int size = 50;
   const int prime = 53;
-  int shuffled_index = prime % size;
   struct val vals[size];
-  for (int i = 0; i < size; ++i)
-    {
-      vals[shuffled_index].val = shuffled_index;
-      pq_insert (&pq, &vals[shuffled_index].elem, val_cmp, NULL);
-      if (!validate_tree (&pq, val_cmp))
-        {
-          breakpoint ();
-          return false;
-        }
-      shuffled_index = (shuffled_index + prime) % size;
-    }
-  const size_t catch_size = size;
-  if (catch_size != pq_size (&pq))
-    {
-      breakpoint ();
-      return false;
-    }
+  insert_shuffled (&pq, vals, size, prime);
   const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
   if (max->val != size - 1)
     {
@@ -246,7 +238,115 @@ pq_test_insert_shuffle (void)
       breakpoint ();
       return false;
     }
+  int sorted_check[size];
+  inorder_fill (sorted_check, size, &pq);
+  for (int i = 0; i < size; ++i)
+    if (vals[i].val != sorted_check[i])
+      return false;
   return true;
+}
+
+static bool
+pq_test_insert_erase_shuffled (void)
+{
+  printf ("pq_test_insert_erase_shuffle");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  const int prime = 53;
+  struct val vals[size];
+  insert_shuffled (&pq, vals, size, prime);
+  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  if (max->val != size - 1)
+    {
+      breakpoint ();
+      return false;
+    }
+  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  if (min->val != 0)
+    {
+      breakpoint ();
+      return false;
+    }
+  int sorted_check[size];
+  inorder_fill (sorted_check, size, &pq);
+  for (int i = 0; i < size; ++i)
+    if (vals[i].val != sorted_check[i])
+      {
+        breakpoint ();
+        return false;
+      }
+
+  for (int i = 0; i < size; ++i)
+    {
+      const struct val *removed = tree_entry (
+          pq_erase (&pq, &vals[i].elem, val_cmp, NULL), struct val, elem);
+      if (removed->val != vals[i].val)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!pq_empty (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  return true;
+}
+
+static void
+insert_shuffled (pqueue *pq, struct val vals[], const int size,
+                 const int larger_prime)
+{
+  /* Math magic ahead... */
+  int shuffled_index = larger_prime % size;
+  for (int i = 0; i < size; ++i)
+    {
+      vals[shuffled_index].val = shuffled_index;
+      pq_insert (pq, &vals[shuffled_index].elem, val_cmp, NULL);
+      assert (validate_tree (pq, val_cmp));
+      shuffled_index = (shuffled_index + larger_prime) % size;
+    }
+  const size_t catch_size = size;
+  assert (catch_size == pq_size (pq));
+}
+
+/* Iterative inorder traversal to check the heap is sorted. */
+static void
+inorder_fill (int vals[], size_t size, pqueue *pq)
+{
+  assert (pq_size (pq) == size);
+  struct node *iter = pq->root;
+  struct node *inorder_pred = iter;
+  size_t s = 0;
+  while (iter != &pq->nil)
+    {
+      if (&pq->nil == iter->links[L])
+        {
+          /* This is where we climb back up a link if it exists */
+          vals[s++] = tree_entry (iter, struct val, elem)->val;
+          iter = iter->links[R];
+          continue;
+        }
+      inorder_pred = iter->links[L];
+      while (&pq->nil != inorder_pred->links[R]
+             && iter != inorder_pred->links[R])
+        inorder_pred = inorder_pred->links[R];
+      if (&pq->nil == inorder_pred->links[R])
+        {
+          /* The right field is a temporary traversal helper. */
+          inorder_pred->links[R] = iter;
+          iter = iter->links[L];
+          continue;
+        }
+      /* Here is our last chance to count this value. */
+      vals[s++] = tree_entry (iter, struct val, elem)->val;
+      /* Here is our last chance to repair our wreckage */
+      inorder_pred->links[R] = &pq->nil;
+      /* This is how we get to a right subtree if any exists. */
+      iter = iter->links[R];
+    }
 }
 
 static threeway_cmp
