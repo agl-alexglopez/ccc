@@ -49,8 +49,8 @@ typedef enum
    If such a comparison is not possible for your type you can simply
    return the value of the cmp enum directly with conditionals switch
    statements or whatever other comparison logic you choose. */
-typedef threeway_cmp tree_cmp_fn (const struct node *key,
-                                  const struct node *found, void *aux);
+typedef threeway_cmp tree_cmp_fn (const struct node *key, const struct node *n,
+                                  void *aux);
 
 /* NOLINTNEXTLINE */
 #define tree_entry(TREE_ELEM, STRUCT, MEMBER)                                 \

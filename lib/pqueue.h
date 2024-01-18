@@ -35,8 +35,10 @@ typedef tree_cmp_fn pq_cmp_fn;
 void pq_init (pqueue *);
 
 bool pq_empty (const pqueue *);
-void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *fn, void *aux);
+void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 pq_elem *pq_root (const pqueue *);
+pq_elem *pq_max (const pqueue *);
+pq_elem *pq_min (const pqueue *);
 
 /* O(n) time O(1) space iterative traversal count of nodes. */
 size_t pq_size (pqueue *);

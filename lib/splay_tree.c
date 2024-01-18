@@ -40,6 +40,8 @@ static bool empty (const struct tree *);
 static void multiset_insert (struct tree *, struct node *, tree_cmp_fn *,
                              void *);
 static pq_elem *root (const struct tree *);
+static struct node *max (const struct tree *t);
+static struct node *min (const struct tree *t);
 static size_t size (struct tree *);
 static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
@@ -48,7 +50,8 @@ static void add_duplicate (struct tree *, struct node *, struct dupnode *,
 static struct node *splay (struct tree *, struct node *, const struct node *,
                            tree_cmp_fn *);
 
-/* Priority Queue Interface */
+/* Priority Queue Interface is are just simple wrappers around the
+   core splay tree operations. */
 
 void
 pq_init (pqueue *pq)
@@ -57,15 +60,27 @@ pq_init (pqueue *pq)
 }
 
 bool
-pq_empty (const pqueue *pq)
+pq_empty (const pqueue *const pq)
 {
   return empty (pq);
 }
 
 pq_elem *
-pq_root (const pqueue *pq)
+pq_root (const pqueue *const pq)
 {
   return root (pq);
+}
+
+pq_elem *
+pq_max (const pqueue *const pq)
+{
+  return max (pq);
+}
+
+pq_elem *
+pq_min (const pqueue *const pq)
+{
+  return min (pq);
 }
 
 void
@@ -104,17 +119,39 @@ init_node (struct tree *t, struct node *n)
 }
 
 static bool
-empty (const struct tree *t)
+empty (const struct tree *const t)
 {
   assert (t != NULL);
   return t->root == &t->nil;
 }
 
-static pq_elem *
-root (const struct tree *t)
+static struct node *
+root (const struct tree *const t)
 {
   assert (t != NULL);
   return t->root;
+}
+
+static struct node *
+max (const struct tree *const t)
+{
+  assert (t != NULL);
+  assert (!empty (t));
+  struct node *m = t->root;
+  for (; m->links[R] != &t->nil; m = m->links[R])
+    ;
+  return m;
+}
+
+static struct node *
+min (const struct tree *t)
+{
+  assert (t != NULL);
+  assert (!empty (t));
+  struct node *m = t->root;
+  for (; m->links[L] != &t->nil; m = m->links[L])
+    ;
+  return m;
 }
 
 static void
@@ -172,18 +209,6 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
   add->links[N] = list_head;
 }
 
-/* This function has proven to be VERY important. The nil node often
-   has garbage values associated with real nodes in our tree and if we access
-   them by mistake it's bad! */
-static inline void
-give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
-                     struct node *subtree)
-{
-  parent->links[dir] = subtree;
-  if (subtree != &t->nil && subtree->dups != as_dupnode (&t->nil))
-    subtree->dups->parent = parent;
-}
-
 static struct node *
 splay (struct tree *t, struct node *root, const struct node *elem,
        tree_cmp_fn *cmp)
@@ -226,6 +251,18 @@ splay (struct tree *t, struct node *root, const struct node *elem,
   give_parent_subtree (t, root, L, t->nil.links[R]);
   give_parent_subtree (t, root, R, t->nil.links[L]);
   return root;
+}
+
+/* This function has proven to be VERY important. The nil node often
+   has garbage values associated with real nodes in our tree and if we access
+   them by mistake it's bad! */
+static inline void
+give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
+                     struct node *subtree)
+{
+  parent->links[dir] = subtree;
+  if (subtree != &t->nil && subtree->dups != as_dupnode (&t->nil))
+    subtree->dups->parent = parent;
 }
 
 size_t
