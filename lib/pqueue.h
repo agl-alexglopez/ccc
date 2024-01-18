@@ -38,7 +38,7 @@ bool pq_empty (const pqueue *);
 void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *fn, void *aux);
 pq_elem *pq_root (const pqueue *);
 
-/* O(n) iterative traversal */
-size_t pq_size (const pqueue *);
+/* O(n) time O(1) space iterative traversal count of nodes. */
+size_t pq_size (pqueue *);
 
 #endif

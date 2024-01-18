@@ -5,25 +5,55 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-static void init (struct tree *);
+/// Text coloring macros (ANSI character escapes) for printing function
+/// colorful output. Consider changing to a more portable library like
+/// ncurses.h. However, I don't want others to install ncurses just to explore
+/// the project. They already must install gnuplot. Hope this works.
+#define COLOR_BLK "\033[34;1m"
+#define COLOR_BLU_BOLD "\033[38;5;12m"
+#define COLOR_RED_BOLD "\033[38;5;9m"
+#define COLOR_RED "\033[31;1m"
+#define COLOR_CYN "\033[36;1m"
+#define COLOR_GRN "\033[32;1m"
+#define COLOR_NIL "\033[0m"
+#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
+#define PRINTER_INDENT (short)13
+
+/// PLAIN prints free block sizes, VERBOSE shows address in the heap and black
+/// height of tree.
+enum print_style
+{
+  PLAIN = 0,
+  VERBOSE = 1
+};
+
+/// Printing enum for printing red black tree structure.
+enum print_link
+{
+  BRANCH = 0, // ├──
+  LEAF = 1    // └──
+};
+
+static void init_tree (struct tree *);
+static void init_node (struct tree *, struct node *);
 static bool empty (const struct tree *);
 static void multiset_insert (struct tree *, struct node *, tree_cmp_fn *,
                              void *);
 static pq_elem *root (const struct tree *);
-static size_t size (const struct tree *);
-static void give_parent_subtree (struct tree *t, struct node *parent,
-                                 enum tree_link dir, struct node *subtree);
-static void add_duplicate (struct tree *t, struct node *tree_node,
-                           struct dupnode *add, struct node *parent);
-static struct node *splay (struct tree *t, struct node *root,
-                           const struct node *elem, tree_cmp_fn *cmp);
+static size_t size (struct tree *);
+static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
+                                 struct node *);
+static void add_duplicate (struct tree *, struct node *, struct dupnode *,
+                           struct node *);
+static struct node *splay (struct tree *, struct node *, const struct node *,
+                           tree_cmp_fn *);
 
 /* Priority Queue Interface */
 
 void
 pq_init (pqueue *pq)
 {
-  init (pq);
+  init_tree (pq);
 }
 
 bool
@@ -45,7 +75,7 @@ pq_insert (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 }
 
 size_t
-pq_size (const pqueue *pq)
+pq_size (pqueue *const pq)
 {
   return size (pq);
 }
@@ -57,17 +87,27 @@ pq_size (const pqueue *pq)
    data structure. */
 
 static void
-init (struct tree *t)
+init_tree (struct tree *t)
 {
-  t->root = t->nil;
+  t->root = &t->nil;
   (void)t;
+}
+
+static void
+init_node (struct tree *t, struct node *n)
+{
+  assert (n);
+  n->links[L] = &t->nil;
+  n->links[R] = &t->nil;
+  n->dups = as_dupnode (&t->nil);
+  (void)n;
 }
 
 static bool
 empty (const struct tree *t)
 {
   assert (t != NULL);
-  return t->root == t->nil;
+  return t->root == &t->nil;
 }
 
 static pq_elem *
@@ -83,11 +123,10 @@ multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
 {
   (void)aux;
   assert (t);
-  if (t->root == t->nil)
+  init_node (t, elem);
+
+  if (t->root == &t->nil)
     {
-      elem->links[L] = t->nil;
-      elem->links[R] = t->nil;
-      elem->dups = as_dupnode (t->nil);
       t->root = elem;
       return;
     }
@@ -95,15 +134,15 @@ multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
   const threeway_cmp root_size = cmp (elem, t->root, NULL);
   if (EQL == root_size)
     {
-      if (t->root->dups != as_dupnode (t->nil))
-        t->root->dups->parent = t->nil;
-      add_duplicate (t, t->root, as_dupnode (elem), t->nil);
+      if (t->root->dups != as_dupnode (&t->nil))
+        t->root->dups->parent = &t->nil;
+      add_duplicate (t, t->root, as_dupnode (elem), &t->nil);
       return;
     }
   enum tree_link link = GRT == root_size;
   give_parent_subtree (t, elem, link, t->root->links[link]);
   give_parent_subtree (t, elem, !link, t->root);
-  t->root->links[link] = t->nil;
+  t->root->links[link] = &t->nil;
   t->root = elem;
 }
 
@@ -117,7 +156,7 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
      to the back. Get the last element and link its new next to new dup
      link the head to this new tail. New elem wraps back to head.
      This operation still works if we previously had size 1 list. */
-  if (tree_node->dups == as_dupnode (t->nil))
+  if (tree_node->dups == as_dupnode (&t->nil))
     {
       add->parent = parent;
       tree_node->dups = add;
@@ -141,7 +180,7 @@ give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
                      struct node *subtree)
 {
   parent->links[dir] = subtree;
-  if (subtree != t->nil && subtree->dups != as_dupnode (t->nil))
+  if (subtree != &t->nil && subtree->dups != as_dupnode (&t->nil))
     subtree->dups->parent = parent;
 }
 
@@ -152,15 +191,16 @@ splay (struct tree *t, struct node *root, const struct node *elem,
   /* Pointers in an array and we can use the symmetric enum and flip it to
      choose the Left or Right subtree. Another benefit of our nil node: use it
      as our helper tree because we don't need its Left Right fields. */
-  t->nil->links[L] = t->nil;
-  t->nil->links[R] = t->nil;
-  struct node *left_right_subtrees[2] = { t->nil, t->nil };
+  t->nil.links[L] = &t->nil;
+  t->nil.links[R] = &t->nil;
+  t->nil.dups = as_dupnode (&t->nil);
+  struct node *left_right_subtrees[2] = { &t->nil, &t->nil };
   struct node *finger = NULL;
   for (;;)
     {
       const threeway_cmp root_size = cmp (elem, root, NULL);
       const enum tree_link link_to_descend = GRT == root_size;
-      if (EQL == root_size || root->links[link_to_descend] == t->nil)
+      if (EQL == root_size || root->links[link_to_descend] == &t->nil)
         break;
 
       const threeway_cmp child_size
@@ -173,7 +213,7 @@ splay (struct tree *t, struct node *root, const struct node *elem,
                                finger->links[!link_to_descend]);
           give_parent_subtree (t, finger, !link_to_descend, root);
           root = finger;
-          if (root->links[link_to_descend] == t->nil)
+          if (root->links[link_to_descend] == &t->nil)
             break;
         }
       give_parent_subtree (t, left_right_subtrees[!link_to_descend],
@@ -183,8 +223,8 @@ splay (struct tree *t, struct node *root, const struct node *elem,
     }
   give_parent_subtree (t, left_right_subtrees[L], R, root->links[L]);
   give_parent_subtree (t, left_right_subtrees[R], L, root->links[R]);
-  give_parent_subtree (t, root, L, t->nil->links[R]);
-  give_parent_subtree (t, root, R, t->nil->links[L]);
+  give_parent_subtree (t, root, L, t->nil.links[R]);
+  give_parent_subtree (t, root, R, t->nil.links[L]);
   return root;
 }
 
@@ -206,15 +246,15 @@ splay (struct tree *t, struct node *root, const struct node *elem,
    can go right no longer, we are done. :)
 */
 size_t
-size (const pqueue *pq)
+size (struct tree *const t)
 {
-  assert (pq);
-  struct node *iter = pq->root;
+  assert (t);
+  struct node *iter = t->root;
   struct node *inorder_pred = iter;
   size_t s = 0;
-  while (iter != pq->nil)
+  while (iter != &t->nil)
     {
-      if (pq->nil == pq->root->links[L])
+      if (&t->nil == iter->links[L])
         {
           /* This is where we climb back up a link if it exists */
           iter = iter->links[R];
@@ -222,10 +262,10 @@ size (const pqueue *pq)
           continue;
         }
       inorder_pred = iter->links[L];
-      while (pq->nil != inorder_pred->links[R]
+      while (&t->nil != inorder_pred->links[R]
              && iter != inorder_pred->links[R])
         inorder_pred = inorder_pred->links[R];
-      if (pq->nil == inorder_pred->links[R])
+      if (&t->nil == inorder_pred->links[R])
         {
           /* The right field is a temporary traversal helper. */
           inorder_pred->links[R] = iter;
@@ -235,9 +275,66 @@ size (const pqueue *pq)
       /* Here is our last chance to count this value. */
       ++s;
       /* Here is our last chance to repair our wreckage */
-      inorder_pred->links[R] = pq->nil;
+      inorder_pred->links[R] = &t->nil;
       /* This is how we get to a right subtree if any exists. */
       iter = iter->links[R];
     }
   return s;
 }
+
+/* NOLINTBEGIN(*misc-no-recursion) */
+
+static bool
+strict_bound_met (const struct node *prev, enum tree_link dir,
+                  const struct node *root, const struct node *nil,
+                  tree_cmp_fn *cmp)
+{
+  if (root == nil)
+    return true;
+  threeway_cmp size_cmp = cmp (root, prev, NULL);
+  if (dir == L && size_cmp != LES)
+    return false;
+  if (dir == R && size_cmp != GRT)
+    return false;
+  return strict_bound_met (root, L, root->links[L], nil, cmp)
+         && strict_bound_met (root, R, root->links[R], nil, cmp);
+}
+
+static bool
+are_subtrees_valid (const struct node *root, tree_cmp_fn *cmp,
+                    const struct node *nil)
+{
+  if (root == nil)
+    return true;
+  if (root->links[R] == root || root->links[L] == root)
+    return false;
+  if (!strict_bound_met (root, L, root->links[L], nil, cmp)
+      || !strict_bound_met (root, R, root->links[R], nil, cmp))
+    return false;
+  return are_subtrees_valid (root->links[L], cmp, nil)
+         && are_subtrees_valid (root->links[R], cmp, nil);
+}
+
+static bool
+is_duplicate_storing_parent (const struct node *parent,
+                             const struct node *root, const void *nil_and_tail)
+{
+  if (root == nil_and_tail)
+    return true;
+  if (root->dups != nil_and_tail && root->dups->parent != parent)
+    return false;
+  return is_duplicate_storing_parent (root, root->links[L], nil_and_tail)
+         && is_duplicate_storing_parent (root, root->links[R], nil_and_tail);
+}
+
+bool
+validate_tree (struct tree *t, tree_cmp_fn *cmp)
+{
+  if (!are_subtrees_valid (t->root, cmp, &t->nil))
+    return false;
+  if (!is_duplicate_storing_parent (&t->nil, t->root, &t->nil))
+    return false;
+  return true;
+}
+
+/* NOLINTEND(*misc-no-recursion) */

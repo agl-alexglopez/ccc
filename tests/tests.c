@@ -2,6 +2,8 @@
 
 #include <signal.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -92,30 +94,21 @@ pq_test_insert_one (void)
 static bool
 pq_test_insert_three (void)
 {
-  bool pass = false;
   printf ("pq_test_insert_three");
   pqueue pq;
   pq_init (&pq);
   struct val three_vals[3];
-  three_vals[0].val = 0;
-  three_vals[1].val = 1;
-  three_vals[2].val = 2;
-  pq_insert (&pq, &three_vals[0].elem, val_cmp, NULL);
-  pq_insert (&pq, &three_vals[1].elem, val_cmp, NULL);
-  pq_insert (&pq, &three_vals[2].elem, val_cmp, NULL);
-  pass = !pq_empty (&pq);
-  if (!pass)
+  for (int i = 0; i < 3; ++i)
     {
-      printf ("inserted element but heap is empty.\n");
-      breakpoint ();
+      three_vals[i].val = i;
+      pq_insert (&pq, &three_vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
     }
-  pass = pq_size (&pq) == 3;
-  if (!pass)
-    {
-      printf ("inserted three elements but size is %zu.\n", pq_size (&pq));
-      breakpoint ();
-    }
-  return pass;
+  return true;
 }
 
 static threeway_cmp

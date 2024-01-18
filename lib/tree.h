@@ -31,7 +31,7 @@ struct node
 struct tree
 {
   struct node *root;
-  struct node *nil;
+  struct node nil;
 };
 
 typedef enum
@@ -52,15 +52,20 @@ typedef enum
 typedef threeway_cmp tree_cmp_fn (const struct node *key,
                                   const struct node *found, void *aux);
 
-// NOLINTNEXTLINE
+/* NOLINTNEXTLINE */
 #define tree_entry(TREE_ELEM, STRUCT, MEMBER)                                 \
   ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
               - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
 
 static inline struct dupnode *
-as_dupnode (struct node *d)
+as_dupnode (const struct node *d)
 {
   return (struct dupnode *)(d);
 }
+
+/* Mostly intended for debugging. Validates the underlying tree
+   data structure with invariants that must hold regardless of
+   interface. */
+bool validate_tree (struct tree *t, tree_cmp_fn *cmp);
 
 #endif
