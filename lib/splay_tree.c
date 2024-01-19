@@ -28,7 +28,9 @@ enum print_link
   LEAF = 1    /* └── */
 };
 
-/* ======================= Function Prototypes  =========================== */
+/* =========================================================================
+   =======================        Prototypes          ======================
+   ========================================================================= */
 
 static void init_tree (struct tree *);
 static void init_node (struct tree *, struct node *);
@@ -56,7 +58,9 @@ static void add_duplicate (struct tree *, struct node *, struct dupnode *,
 static struct node *splay (struct tree *, struct node *, const struct node *,
                            tree_cmp_fn *);
 
-/* =======================  Priority Queue Interface  ====================== */
+/* =========================================================================
+   =======================  Priority Queue Interface  ======================
+   ========================================================================= */
 
 void
 pq_init (pqueue *pq)
@@ -118,7 +122,9 @@ pq_size (pqueue *const pq)
   return size (pq);
 }
 
-/* =============  Splay Tree Set and Multiset Implementation  =============
+/* =========================================================================
+   =============  Splay Tree Set and Multiset Implementation  ==============
+   =========================================================================
 
    All types that use a splay tree are simply wrapper interfaces around
    the core splay tree operations. Splay trees can be used as priority
@@ -469,6 +475,10 @@ force_find_les (const struct node *a, const struct node *b,
 }
 
 /* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
+
+/* =========================================================================
+   =======================        Debugging           ======================
+   ========================================================================= */
 
 /* This section has recursion so it should probably not be used in
    a custom operating system environment with constrained stack space.
