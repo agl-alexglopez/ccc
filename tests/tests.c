@@ -1,4 +1,5 @@
 #include "pqueue.h"
+#include "tree.h"
 
 #include <assert.h>
 #include <signal.h>
@@ -505,7 +506,7 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
 {
   assert (pq_size (pq) == size);
   struct node *iter = pq->root;
-  struct node *inorder_pred = iter;
+  struct node *inorder_pred = NULL;
   size_t s = 0;
   while (iter != &pq->nil)
     {

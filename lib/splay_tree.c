@@ -387,7 +387,7 @@ size (struct tree *const t)
 {
   assert (t);
   struct node *iter = t->root;
-  struct node *inorder_pred = iter;
+  struct node *inorder_pred = NULL;
   size_t s = 0;
   while (iter != &t->nil)
     {
@@ -423,7 +423,8 @@ size (struct tree *const t)
    without any input from the user. Our seach evaluates a threeway
    comparison to decide which branch to take in the tree or if we
    found the desired element. Simply force the function to always
-   return one or the other and we will end up at the max or min */
+   return one or the other and we will end up at the max or min
+   NOLINTBEGIN(*swappable-parameters)*/
 
 static threeway_cmp
 force_find_grt (const struct node *a, const struct node *b,
@@ -445,7 +446,7 @@ force_find_les (const struct node *a, const struct node *b,
   return LES;
 }
 
-/* NOLINTBEGIN(*misc-no-recursion) */
+/* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
 
 /* This section has recursion so it should probably not be used in
    a custom operating system environment with constrained stack space.
@@ -568,12 +569,13 @@ print_inner_tree (const struct node *root, size_t parent_size,
   print_node (root, nil);
 
   char *str = NULL;
-  int string_length = snprintf (NULL, 0, "%s%s%s", prefix, prefix_branch_color,
-                                node_type == LEAF ? "     " : " │   ");
+  int string_length
+      = snprintf (NULL, 0, "%s%s%s", prefix, prefix_branch_color, // NOLINT
+                  node_type == LEAF ? "     " : " │   ");
   if (string_length > 0)
     {
-      str = malloc (string_length + 1); // NOLINT
-      (void)snprintf (str, string_length, "%s%s%s", prefix,
+      str = malloc (string_length + 1);                     // NOLINT
+      (void)snprintf (str, string_length, "%s%s%s", prefix, // NOLINT
                       prefix_branch_color,
                       node_type == LEAF ? "     " : " │   ");
     }

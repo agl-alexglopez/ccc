@@ -2,6 +2,7 @@
 #define TREE
 #include <stdbool.h>
 #include <stddef.h>
+/* NOLINTNEXTLINE(misc-include-cleaner) */
 #include <stdint.h>
 
 enum tree_link
