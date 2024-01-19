@@ -46,12 +46,13 @@ static bool pq_test_insert_erase_shuffled (void);
 static bool pq_test_pop_max (void);
 static bool pq_test_pop_min (void);
 static bool pq_test_max_round_robin (void);
+static bool pq_test_min_round_robin (void);
 static int run_tests (void);
 static void insert_shuffled (pqueue *, struct val[], int, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS 11
+#define NUM_TESTS 12
 const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
@@ -64,6 +65,7 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_pop_max,
   pq_test_pop_min,
   pq_test_max_round_robin,
+  pq_test_min_round_robin,
 };
 
 int
@@ -414,7 +416,46 @@ pq_test_max_round_robin (void)
   pq_init (&pq);
   const int size = 50;
   struct val vals[size];
-  for (int i = 0; i < size; ++i)
+  vals[0].id = 0;
+  vals[0].val = 0;
+  for (int i = 1; i < size; ++i)
+    {
+      vals[i].val = 99;
+      vals[i].id = i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      assert (validate_tree (&pq, val_cmp));
+    }
+
+  /* Now let's make sure we pop round robin. */
+  for (int i = 1; i < size; ++i)
+    {
+      const struct val *front
+          = tree_entry (pq_pop_max (&pq), struct val, elem);
+      if (front->id != vals[i].id)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!pq_empty (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  return true;
+}
+
+static bool
+pq_test_min_round_robin (void)
+{
+  printf ("pq_test_min_round_robin");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  struct val vals[size];
+  vals[0].id = 99;
+  vals[0].val = 99;
+  for (int i = 1; i < size; ++i)
     {
       vals[i].val = 0;
       vals[i].id = i;
@@ -423,10 +464,10 @@ pq_test_max_round_robin (void)
     }
 
   /* Now let's make sure we pop round robin. */
-  for (int i = 0; i < size; ++i)
+  for (int i = 1; i < size; ++i)
     {
       const struct val *front
-          = tree_entry (pq_pop_max (&pq), struct val, elem);
+          = tree_entry (pq_pop_min (&pq), struct val, elem);
       if (front->id != vals[i].id)
         {
           breakpoint ();
