@@ -31,6 +31,8 @@
 #include "tree.h"
 #include <stdbool.h>
 #include <stddef.h>
+/* NOLINTNEXTLINE */
+#include <stdint.h>
 
 /* =============================================================
    ====================  PRIORITY QUEUE ========================
@@ -140,12 +142,17 @@ typedef struct tree pqueue;
       val_cmp (const pq_elem *a, const pq_elem *b, void *aux)
       {
         (void)aux;
-        struct val *lhs = tree_entry (a, struct val, elem);
-        struct val *rhs = tree_entry (b, struct val, elem);
+        struct val *lhs = pq_entry (a, struct val, elem);
+        struct val *rhs = pq_entry (b, struct val, elem);
         return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 */
 typedef tree_cmp_fn pq_cmp_fn;
+
+/* NOLINTNEXTLINE */
+#define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
+  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
+              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
 
 void pq_init (pqueue *);
 

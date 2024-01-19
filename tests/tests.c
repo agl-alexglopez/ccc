@@ -112,7 +112,7 @@ pq_test_insert_one (void)
   single.val = 0;
   pq_insert (&pq, &single.elem, val_cmp, NULL);
   return !pq_empty (&pq)
-         && tree_entry (pq_root (&pq), struct val, elem)->val == single.val;
+         && pq_entry (pq_root (&pq), struct val, elem)->val == single.val;
 }
 
 static bool
@@ -160,7 +160,7 @@ pq_test_struct_getter (void)
          misaligned data and we overwrote something we need to compare our get
          to uncorrupted data. */
       const struct val *get
-          = tree_entry (&tester_clone[i].elem, struct val, elem);
+          = pq_entry (&tester_clone[i].elem, struct val, elem);
       if (get->val != vals[i].val)
         {
           breakpoint ();
@@ -212,13 +212,13 @@ pq_test_read_max_min (void)
       breakpoint ();
       return false;
     }
-  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  const struct val *max = pq_entry (pq_max (&pq), struct val, elem);
   if (max->val != 9)
     {
       breakpoint ();
       return false;
     }
-  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  const struct val *min = pq_entry (pq_min (&pq), struct val, elem);
   if (min->val != 0)
     {
       breakpoint ();
@@ -238,13 +238,13 @@ pq_test_insert_shuffle (void)
   const int prime = 53;
   struct val vals[size];
   insert_shuffled (&pq, vals, size, prime);
-  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  const struct val *max = pq_entry (pq_max (&pq), struct val, elem);
   if (max->val != size - 1)
     {
       breakpoint ();
       return false;
     }
-  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  const struct val *min = pq_entry (pq_min (&pq), struct val, elem);
   if (min->val != 0)
     {
       breakpoint ();
@@ -268,13 +268,13 @@ pq_test_insert_erase_shuffled (void)
   const int prime = 53;
   struct val vals[size];
   insert_shuffled (&pq, vals, size, prime);
-  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  const struct val *max = pq_entry (pq_max (&pq), struct val, elem);
   if (max->val != size - 1)
     {
       breakpoint ();
       return false;
     }
-  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  const struct val *min = pq_entry (pq_min (&pq), struct val, elem);
   if (min->val != 0)
     {
       breakpoint ();
@@ -293,7 +293,7 @@ pq_test_insert_erase_shuffled (void)
 
   for (int i = 0; i < size; ++i)
     {
-      const struct val *removed = tree_entry (
+      const struct val *removed = pq_entry (
           pq_erase (&pq, &vals[i].elem, val_cmp, NULL), struct val, elem);
       if (removed->val != vals[i].val)
         {
@@ -319,13 +319,13 @@ pq_test_pop_max (void)
   const int prime = 53;
   struct val vals[size];
   insert_shuffled (&pq, vals, size, prime);
-  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  const struct val *max = pq_entry (pq_max (&pq), struct val, elem);
   if (max->val != size - 1)
     {
       breakpoint ();
       return false;
     }
-  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  const struct val *min = pq_entry (pq_min (&pq), struct val, elem);
   if (min->val != 0)
     {
       breakpoint ();
@@ -344,8 +344,7 @@ pq_test_pop_max (void)
 
   for (int i = size - 1; i >= 0; --i)
     {
-      const struct val *front
-          = tree_entry (pq_pop_max (&pq), struct val, elem);
+      const struct val *front = pq_entry (pq_pop_max (&pq), struct val, elem);
       if (front->val != vals[i].val)
         {
           breakpoint ();
@@ -370,13 +369,13 @@ pq_test_pop_min (void)
   const int prime = 53;
   struct val vals[size];
   insert_shuffled (&pq, vals, size, prime);
-  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  const struct val *max = pq_entry (pq_max (&pq), struct val, elem);
   if (max->val != size - 1)
     {
       breakpoint ();
       return false;
     }
-  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  const struct val *min = pq_entry (pq_min (&pq), struct val, elem);
   if (min->val != 0)
     {
       breakpoint ();
@@ -395,8 +394,7 @@ pq_test_pop_min (void)
 
   for (int i = 0; i < size; ++i)
     {
-      const struct val *front
-          = tree_entry (pq_pop_min (&pq), struct val, elem);
+      const struct val *front = pq_entry (pq_pop_min (&pq), struct val, elem);
       if (front->val != vals[i].val)
         {
           breakpoint ();
@@ -434,8 +432,7 @@ pq_test_max_round_robin (void)
   int last_id = 0;
   while (!pq_empty (&pq))
     {
-      const struct val *front
-          = tree_entry (pq_pop_max (&pq), struct val, elem);
+      const struct val *front = pq_entry (pq_pop_max (&pq), struct val, elem);
       if (last_id >= front->id)
         {
           breakpoint ();
@@ -469,8 +466,7 @@ pq_test_min_round_robin (void)
   int last_id = 0;
   while (!pq_empty (&pq))
     {
-      const struct val *front
-          = tree_entry (pq_pop_min (&pq), struct val, elem);
+      const struct val *front = pq_entry (pq_pop_min (&pq), struct val, elem);
       if (last_id >= front->id)
         {
           breakpoint ();
@@ -553,7 +549,7 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
       if (&pq->nil == iter->links[L])
         {
           /* This is where we climb back up a link if it exists */
-          vals[s++] = tree_entry (iter, struct val, elem)->val;
+          vals[s++] = pq_entry (iter, struct val, elem)->val;
           iter = iter->links[R];
           continue;
         }
@@ -569,7 +565,7 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
           continue;
         }
       /* Here is our last chance to count this value. */
-      vals[s++] = tree_entry (iter, struct val, elem)->val;
+      vals[s++] = pq_entry (iter, struct val, elem)->val;
       /* Here is our last chance to repair our wreckage */
       inorder_pred->links[R] = &pq->nil;
       /* This is how we get to a right subtree if any exists. */
@@ -581,7 +577,7 @@ static threeway_cmp
 val_cmp (const pq_elem *a, const pq_elem *b, void *aux)
 {
   (void)aux;
-  struct val *lhs = tree_entry (a, struct val, elem);
-  struct val *rhs = tree_entry (b, struct val, elem);
+  struct val *lhs = pq_entry (a, struct val, elem);
+  struct val *rhs = pq_entry (b, struct val, elem);
   return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

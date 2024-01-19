@@ -1,9 +1,6 @@
 #ifndef TREE
 #define TREE
 #include <stdbool.h>
-#include <stddef.h>
-/* NOLINTNEXTLINE(misc-include-cleaner) */
-#include <stdint.h>
 
 enum tree_link
 {
@@ -52,11 +49,6 @@ typedef enum
    statements or whatever other comparison logic you choose. */
 typedef threeway_cmp tree_cmp_fn (const struct node *key, const struct node *n,
                                   void *aux);
-
-/* NOLINTNEXTLINE */
-#define tree_entry(TREE_ELEM, STRUCT, MEMBER)                                 \
-  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
-              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
 
 static inline struct dupnode *
 as_dupnode (const struct node *d)
