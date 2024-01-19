@@ -48,12 +48,13 @@ static bool pq_test_pop_max (void);
 static bool pq_test_pop_min (void);
 static bool pq_test_max_round_robin (void);
 static bool pq_test_min_round_robin (void);
+static bool pq_test_delete_rand_duplicates (void);
 static int run_tests (void);
 static void insert_shuffled (pqueue *, struct val[], int, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS 12
+#define NUM_TESTS 13
 const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
@@ -67,6 +68,7 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_pop_min,
   pq_test_max_round_robin,
   pq_test_min_round_robin,
+  pq_test_delete_rand_duplicates,
 };
 
 int
@@ -417,8 +419,9 @@ pq_test_max_round_robin (void)
   pq_init (&pq);
   const int size = 50;
   struct val vals[size];
-  vals[0].id = 0;
+  vals[0].id = 99;
   vals[0].val = 0;
+  pq_insert (&pq, &vals[0].elem, val_cmp, NULL);
   for (int i = 1; i < size; ++i)
     {
       vals[i].val = 99;
@@ -428,20 +431,17 @@ pq_test_max_round_robin (void)
     }
 
   /* Now let's make sure we pop round robin. */
-  for (int i = 1; i < size; ++i)
+  int last_id = 0;
+  while (!pq_empty (&pq))
     {
       const struct val *front
           = tree_entry (pq_pop_max (&pq), struct val, elem);
-      if (front->id != vals[i].id)
+      if (last_id >= front->id)
         {
           breakpoint ();
           return false;
         }
-    }
-  if (!pq_empty (&pq))
-    {
-      breakpoint ();
-      return false;
+      last_id = front->id;
     }
   return true;
 }
@@ -456,29 +456,69 @@ pq_test_min_round_robin (void)
   struct val vals[size];
   vals[0].id = 99;
   vals[0].val = 99;
+  pq_insert (&pq, &vals[0].elem, val_cmp, NULL);
   for (int i = 1; i < size; ++i)
     {
-      vals[i].val = 0;
+      vals[i].val = 1;
       vals[i].id = i;
       pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
       assert (validate_tree (&pq, val_cmp));
     }
 
   /* Now let's make sure we pop round robin. */
-  for (int i = 1; i < size; ++i)
+  int last_id = 0;
+  while (!pq_empty (&pq))
     {
       const struct val *front
           = tree_entry (pq_pop_min (&pq), struct val, elem);
-      if (front->id != vals[i].id)
+      if (last_id >= front->id)
         {
           breakpoint ();
           return false;
         }
+      last_id = front->id;
     }
-  if (!pq_empty (&pq))
+  return true;
+}
+
+static bool
+pq_test_delete_rand_duplicates (void)
+{
+  printf ("pq_test_remove_from_dup_list");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  const int prime = 53;
+  struct val vals[size];
+  vals[0].id = 0;
+  vals[0].val = 0;
+  pq_insert (&pq, &vals[0].elem, val_cmp, NULL);
+  for (int i = 1; i < size; ++i)
     {
-      breakpoint ();
-      return false;
+      vals[i].val = 99;
+      vals[i].id = i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      assert (validate_tree (&pq, val_cmp));
+    }
+
+  int shuffled_index = prime % size;
+  size_t cur_size = size;
+  for (int i = 0; i < size; ++i)
+    {
+      pq_erase (&pq, &vals[shuffled_index].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+      --cur_size;
+      const size_t cur_get_size = pq_size (&pq);
+      if (cur_get_size != cur_size)
+        {
+          breakpoint ();
+          return false;
+        }
+      shuffled_index = (shuffled_index + prime) % size;
     }
   return true;
 }

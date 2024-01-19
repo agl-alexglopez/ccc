@@ -253,6 +253,22 @@ static struct node *
 multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
 {
   (void)aux;
+  assert (t != NULL);
+  assert (node != NULL);
+  assert (cmp != NULL);
+
+  /* Special case that this must be a duplicate that is in the
+     linked list but it is not the special head node. So, it
+     is a quick snip to get it out. Don't splay because if
+     they keep asking for this size it is either O(1) or
+     will eventually splay to root anyway. */
+  if (NULL == node->dups)
+    {
+      node->links[P]->links[N] = node->links[N];
+      node->links[N]->links[P] = node->links[P];
+      return node;
+    }
+
   struct node *ret = splay (t, t->root, node, cmp);
   assert (ret != NULL);
 
@@ -285,6 +301,9 @@ delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
 
   struct dupnode *new_list_head = old->dups->links[N];
   struct dupnode *list_tail = old->dups->links[P];
+  /* Circular linked lists are tricky to detect when empty */
+  const bool circular_list_empty = new_list_head->links[N] == new_list_head;
+
   new_list_head->links[P] = list_tail;
   new_list_head->parent = parent;
   list_tail->links[N] = new_list_head;
@@ -293,6 +312,9 @@ delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
   tree_replacement->links[L] = old->links[L];
   tree_replacement->links[R] = old->links[R];
   tree_replacement->dups = new_list_head;
+
+  if (circular_list_empty)
+    tree_replacement->dups = as_dupnode (&t->nil);
   return old;
 }
 

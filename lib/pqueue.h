@@ -167,7 +167,8 @@ pq_elem *pq_pop_min (pqueue *);
    not modify the tree so multiple threads could call them
    at the same time. However, all other operations are
    most definitely not safe in a splay tree for concurrency.
-   Worst case O(lgN). If you have just */
+   Worst case O(lgN). If you have just removed an element
+   it will be at the root. */
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 
