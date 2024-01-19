@@ -45,6 +45,15 @@
       pq_elem nil;
    };
 
+   Embed a pq_elem in your struct:
+
+   struct val {
+      int val;
+      pq_elem elem;
+   };
+
+   If interested how these elems are implemented see tree.h
+
    I have the additional space taken by the nil to afford some
    nice conveniences in implementation. You could technically
    get rid of it but that would make things harder and add
