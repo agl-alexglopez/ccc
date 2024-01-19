@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/// Text coloring macros (ANSI character escapes) for printing function
-/// colorful output. Consider changing to a more portable library like
-/// ncurses.h. However, I don't want others to install ncurses just to explore
-/// the project. They already must install gnuplot. Hope this works.
+/* Text coloring macros (ANSI character escapes) for printing function
+   colorful output. Consider changing to a more portable library like
+   ncurses.h. However, I don't want others to install ncurses just to explore
+   the project. They already must install gnuplot. Hope this works. */
 #define COLOR_BLK "\033[34;1m"
 #define COLOR_BLU_BOLD "\033[38;5;12m"
 #define COLOR_RED_BOLD "\033[38;5;9m"
@@ -21,20 +21,14 @@
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 #define PRINTER_INDENT (short)13
 
-/// PLAIN prints free block sizes, VERBOSE shows address in the heap and black
-/// height of tree.
-enum print_style
-{
-  PLAIN = 0,
-  VERBOSE = 1
-};
-
-/// Printing enum for printing red black tree structure.
+/* Printing enum for printing tree structures if heap available. */
 enum print_link
 {
-  BRANCH = 0, // ├──
-  LEAF = 1    // └──
+  BRANCH = 0, /* ├── */
+  LEAF = 1    /* └── */
 };
+
+/* ======================= Function Prototypes  =========================== */
 
 static void init_tree (struct tree *);
 static void init_node (struct tree *, struct node *);
@@ -50,10 +44,10 @@ static struct node *max (const struct tree *);
 static struct node *pop_max (struct tree *);
 static struct node *pop_min (struct tree *);
 static struct node *min (const struct tree *);
-static threeway_cmp max_dummy_cmp (const struct node *, const struct node *,
-                                   void *);
-static threeway_cmp min_dummy_cmp (const struct node *, const struct node *,
-                                   void *);
+static threeway_cmp force_find_grt (const struct node *, const struct node *,
+                                    void *);
+static threeway_cmp force_find_les (const struct node *, const struct node *,
+                                    void *);
 static size_t size (struct tree *);
 static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
@@ -62,8 +56,7 @@ static void add_duplicate (struct tree *, struct node *, struct dupnode *,
 static struct node *splay (struct tree *, struct node *, const struct node *,
                            tree_cmp_fn *);
 
-/* Priority Queue Interface is are just simple wrappers around the
-   core splay tree operations. */
+/* =======================  Priority Queue Interface  ====================== */
 
 void
 pq_init (pqueue *pq)
@@ -125,11 +118,15 @@ pq_size (pqueue *const pq)
   return size (pq);
 }
 
-/* All types that use a splay tree are simply wrapper interfaces around
+/* =============  Splay Tree Set and Multiset Implementation  =============
+
+   All types that use a splay tree are simply wrapper interfaces around
    the core splay tree operations. Splay trees can be used as priority
    queues, sets, and probably much more but we can implement all the
    needed functionality here rather than multiple times for each
-   data structure. */
+   data structure. Through the use of typedefs we only have to write the
+   actual code once and then just hand out interfaces as needed.
+*/
 
 static void
 init_tree (struct tree *t)
@@ -187,13 +184,13 @@ min (const struct tree *t)
 static struct node *
 pop_max (struct tree *t)
 {
-  return multiset_erase (t, &t->nil, max_dummy_cmp, NULL);
+  return multiset_erase (t, &t->nil, force_find_grt, NULL);
 }
 
 static struct node *
 pop_min (struct tree *t)
 {
-  return multiset_erase (t, &t->nil, min_dummy_cmp, NULL);
+  return multiset_erase (t, &t->nil, force_find_les, NULL);
 }
 
 static void
@@ -373,7 +370,8 @@ count_dups (struct tree *t, struct node *n)
    guarding from interrupts would be catastrophic. Perhaps we
    could keep a size of the queue if needed for O(1) checks but
    we don't need size that often with a priority queue. Also
-   we need to save on stack space so recursion is out.
+   we need to save on stack space so recursion is out for user
+   facing library.
 
    Iterate through the tree by sending a node to the inorder predecessor in the
    left subtree. The inorder predecessor creates a link back up to the root we
@@ -383,8 +381,7 @@ count_dups (struct tree *t, struct node *n)
    predecessor is now pointing back to the traversal root. Add the value at
    root because this is our last chance before descending into the right
    subtree. Send the root traversal node into the right subtree. When the root
-   can go right no longer, we are done. :)
-*/
+   can go right no longer, we are done. :) */
 size_t
 size (struct tree *const t)
 {
@@ -422,8 +419,15 @@ size (struct tree *const t)
   return s;
 }
 
+/* We can trick our splay tree into giving us the max via splaying
+   without any input from the user. Our seach evaluates a threeway
+   comparison to decide which branch to take in the tree or if we
+   found the desired element. Simply force the function to always
+   return one or the other and we will end up at the max or min */
+
 static threeway_cmp
-max_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+force_find_grt (const struct node *a, const struct node *b,
+                void *aux) // NOLINT
 {
   (void)a;
   (void)b;
@@ -432,7 +436,8 @@ max_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
 }
 
 static threeway_cmp
-min_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+force_find_les (const struct node *a, const struct node *b,
+                void *aux) // NOLINT
 {
   (void)a;
   (void)b;
@@ -441,6 +446,11 @@ min_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
 }
 
 /* NOLINTBEGIN(*misc-no-recursion) */
+
+/* This section has recursion so it should probably not be used in
+   a custom operating system environment with constrained stack space.
+   Needless to mention the stdlib.h heap implementation that would need
+   to be replaced with the custom drop in. */
 
 static bool
 strict_bound_met (const struct node *prev, enum tree_link dir,
@@ -538,7 +548,7 @@ print_node (const struct node *root, const void *nil_and_tail)
 }
 
 /* I know this function is rough but it's tricky to focus on edge color rather
- * than node color. */
+   than node color. */
 static void
 print_inner_tree (const struct node *root, size_t parent_size,
                   const char *prefix, const char *prefix_branch_color,
@@ -573,8 +583,6 @@ print_inner_tree (const struct node *root, size_t parent_size,
       return;
     }
 
-  // With this print style the only continuing prefix we need colored is the
-  // left, the unicode vertical bar.
   const char *left_edge_color
       = get_edge_color (root->links[L], subtree_size, nil);
   if (root->links[R] == nil)
@@ -602,8 +610,6 @@ print_tree (const struct node *root, const void *nil_and_tail)
   printf ("%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
   print_node (root, nil_and_tail);
 
-  // With this print style the only continuing prefix we need colored is the
-  // left.
   const char *left_edge_color
       = get_edge_color (root->links[L], subtree_size, nil_and_tail);
   if (root->links[R] == nil_and_tail)
@@ -620,4 +626,5 @@ print_tree (const struct node *root, const void *nil_and_tail)
                         LEAF, L, nil_and_tail);
     }
 }
+
 /* NOLINTEND(*misc-no-recursion) */
