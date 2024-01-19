@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /// Text coloring macros (ANSI character escapes) for printing function
 /// colorful output. Consider changing to a more portable library like
@@ -260,7 +262,8 @@ multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
   t->root = ret;
   if (ret->dups != as_dupnode (&t->nil))
     {
-      return delete_oldest_duplicate (t, node, cmp);
+      ret->dups->parent = &t->nil;
+      return delete_oldest_duplicate (t, ret, cmp);
     }
 
   if (ret->links[L] == &t->nil)
@@ -278,24 +281,21 @@ multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
 static struct node *
 delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
 {
-  /* This list has become completely circular by the time
-     you get here! ERRORRRRRRRRRRRRRRR */
   struct node *parent = old->dups->parent;
+  struct node *tree_replacement = as_node (old->dups);
+  if (old == t->root)
+    t->root = tree_replacement;
+
   struct dupnode *new_list_head = old->dups->links[N];
   struct dupnode *list_tail = old->dups->links[P];
-  struct node *tree_replacement = as_node (old->dups);
+  new_list_head->links[P] = list_tail;
+  new_list_head->parent = parent;
+  list_tail->links[N] = new_list_head;
   threeway_cmp size_relation = cmp (old, parent, NULL);
   parent->links[GRT == size_relation] = tree_replacement;
   tree_replacement->links[L] = old->links[L];
   tree_replacement->links[R] = old->links[R];
-  if (new_list_head == old->dups)
-    {
-      tree_replacement->dups = as_dupnode (&t->nil);
-      return old;
-    }
   tree_replacement->dups = new_list_head;
-  new_list_head->links[P] = list_tail;
-  new_list_head->parent = parent;
   return old;
 }
 
@@ -422,6 +422,24 @@ size (struct tree *const t)
   return s;
 }
 
+static threeway_cmp
+max_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+{
+  (void)a;
+  (void)b;
+  (void)aux;
+  return GRT;
+}
+
+static threeway_cmp
+min_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+{
+  (void)a;
+  (void)b;
+  (void)aux;
+  return LES;
+}
+
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static bool
@@ -477,22 +495,129 @@ validate_tree (struct tree *t, tree_cmp_fn *cmp)
   return true;
 }
 
-static threeway_cmp
-max_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+static size_t
+get_subtree_size (const struct node *root, const void *nil)
 {
-  (void)a;
-  (void)b;
-  (void)aux;
-  return GRT;
+  if (root == nil)
+    return 0;
+  return 1 + get_subtree_size (root->links[L], nil)
+         + get_subtree_size (root->links[R], nil);
 }
 
-static threeway_cmp
-min_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+static const char *
+get_edge_color (const struct node *root, size_t parent_size,
+                const struct node *nil)
 {
-  (void)a;
-  (void)b;
-  (void)aux;
-  return LES;
+  if (root == nil)
+    return "";
+  return get_subtree_size (root, nil) <= parent_size / 2 ? COLOR_BLU_BOLD
+                                                         : COLOR_RED_BOLD;
 }
 
+static void
+print_node (const struct node *root, const void *nil_and_tail)
+{
+  printf ("%p", root);
+  printf (COLOR_CYN);
+  /* If a node is a duplicate, we will give it a special mark among nodes. */
+  if (root->dups != nil_and_tail)
+    {
+      int duplicates = 1;
+      const struct dupnode *head = root->dups;
+      if (head != nil_and_tail)
+        {
+          printf ("%p", head);
+          for (struct dupnode *i = head->links[N]; i != head;
+               i = i->links[N], ++duplicates)
+            printf ("-%p", i);
+        }
+      printf ("(+%d)", duplicates);
+    }
+  printf (COLOR_NIL);
+  printf ("\n");
+}
+
+/* I know this function is rough but it's tricky to focus on edge color rather
+ * than node color. */
+static void
+print_inner_tree (const struct node *root, size_t parent_size,
+                  const char *prefix, const char *prefix_branch_color,
+                  const enum print_link node_type, const enum tree_link dir,
+                  const struct node *nil)
+{
+  if (root == nil)
+    return;
+  size_t subtree_size = get_subtree_size (root, nil);
+  printf ("%s", prefix);
+  printf ("%s%s%s",
+          subtree_size <= parent_size / 2 ? COLOR_BLU_BOLD : COLOR_RED_BOLD,
+          node_type == LEAF ? " └──" : " ├──", COLOR_NIL);
+  printf (COLOR_CYN);
+  printf ("(%zu)", subtree_size);
+  dir == L ? printf ("L:" COLOR_NIL) : printf ("R:" COLOR_NIL);
+  print_node (root, nil);
+
+  char *str = NULL;
+  int string_length = snprintf (NULL, 0, "%s%s%s", prefix, prefix_branch_color,
+                                node_type == LEAF ? "     " : " │   ");
+  if (string_length > 0)
+    {
+      str = malloc (string_length + 1); // NOLINT
+      (void)snprintf (str, string_length, "%s%s%s", prefix,
+                      prefix_branch_color,
+                      node_type == LEAF ? "     " : " │   ");
+    }
+  if (str == NULL)
+    {
+      printf (COLOR_ERR "memory exceeded. Cannot display tree." COLOR_NIL);
+      return;
+    }
+
+  // With this print style the only continuing prefix we need colored is the
+  // left, the unicode vertical bar.
+  const char *left_edge_color
+      = get_edge_color (root->links[L], subtree_size, nil);
+  if (root->links[R] == nil)
+    print_inner_tree (root->links[L], subtree_size, str, left_edge_color, LEAF,
+                      L, nil);
+  else if (root->links[L] == nil)
+    print_inner_tree (root->links[R], subtree_size, str, left_edge_color, LEAF,
+                      R, nil);
+  else
+    {
+      print_inner_tree (root->links[R], subtree_size, str, left_edge_color,
+                        BRANCH, R, nil);
+      print_inner_tree (root->links[L], subtree_size, str, left_edge_color,
+                        LEAF, L, nil);
+    }
+  free (str);
+}
+
+void
+print_tree (const struct node *root, const void *nil_and_tail)
+{
+  if (root == nil_and_tail)
+    return;
+  size_t subtree_size = get_subtree_size (root, nil_and_tail);
+  printf ("%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
+  print_node (root, nil_and_tail);
+
+  // With this print style the only continuing prefix we need colored is the
+  // left.
+  const char *left_edge_color
+      = get_edge_color (root->links[L], subtree_size, nil_and_tail);
+  if (root->links[R] == nil_and_tail)
+    print_inner_tree (root->links[L], subtree_size, "", left_edge_color, LEAF,
+                      L, nil_and_tail);
+  else if (root->links[L] == nil_and_tail)
+    print_inner_tree (root->links[R], subtree_size, "", left_edge_color, LEAF,
+                      R, nil_and_tail);
+  else
+    {
+      print_inner_tree (root->links[R], subtree_size, "", left_edge_color,
+                        BRANCH, R, nil_and_tail);
+      print_inner_tree (root->links[L], subtree_size, "", left_edge_color,
+                        LEAF, L, nil_and_tail);
+    }
+}
 /* NOLINTEND(*misc-no-recursion) */

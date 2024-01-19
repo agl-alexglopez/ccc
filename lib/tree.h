@@ -73,5 +73,6 @@ as_node (const struct dupnode *d)
    data structure with invariants that must hold regardless of
    interface. */
 bool validate_tree (struct tree *t, tree_cmp_fn *cmp);
+void print_tree (const struct node *root, const void *nil_and_tail);
 
 #endif

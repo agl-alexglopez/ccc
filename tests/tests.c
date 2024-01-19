@@ -427,7 +427,7 @@ pq_test_max_round_robin (void)
     {
       const struct val *front
           = tree_entry (pq_pop_max (&pq), struct val, elem);
-      if (front->val != vals[i].id)
+      if (front->id != vals[i].id)
         {
           breakpoint ();
           return false;
