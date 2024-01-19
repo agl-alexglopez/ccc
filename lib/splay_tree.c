@@ -45,7 +45,13 @@ static struct node *delete_oldest_duplicate (struct tree *, struct node *,
                                              tree_cmp_fn *);
 static struct node *root (const struct tree *);
 static struct node *max (const struct tree *);
+static struct node *pop_max (struct tree *);
+static struct node *pop_min (struct tree *);
 static struct node *min (const struct tree *);
+static threeway_cmp max_dummy_cmp (const struct node *, const struct node *,
+                                   void *);
+static threeway_cmp min_dummy_cmp (const struct node *, const struct node *,
+                                   void *);
 static size_t size (struct tree *);
 static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
@@ -97,6 +103,18 @@ pq_elem *
 pq_erase (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
   return multiset_erase (pq, elem, fn, aux);
+}
+
+pq_elem *
+pq_pop_max (pqueue *pq)
+{
+  return pop_max (pq);
+}
+
+pq_elem *
+pq_pop_min (pqueue *pq)
+{
+  return pop_min (pq);
 }
 
 size_t
@@ -164,6 +182,18 @@ min (const struct tree *t)
   return m;
 }
 
+static struct node *
+pop_max (struct tree *t)
+{
+  return multiset_erase (t, &t->nil, max_dummy_cmp, NULL);
+}
+
+static struct node *
+pop_min (struct tree *t)
+{
+  return multiset_erase (t, &t->nil, min_dummy_cmp, NULL);
+}
+
 static void
 multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
                  void *aux)
@@ -213,10 +243,11 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
     }
   add->parent = NULL;
   struct dupnode *list_head = tree_node->dups;
-  list_head->links[P]->links[N] = add;
-  add->links[P] = list_head->links[P];
+  struct dupnode *tail = list_head->links[P];
+  tail->links[N] = add;
   list_head->links[P] = add;
   add->links[N] = list_head;
+  add->links[P] = tail;
 }
 
 static struct node *
@@ -224,12 +255,11 @@ multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
 {
   (void)aux;
   struct node *ret = splay (t, t->root, node, cmp);
-  assert (ret == node);
-  t->root = ret;
+  assert (ret != NULL);
 
+  t->root = ret;
   if (ret->dups != as_dupnode (&t->nil))
     {
-      t->root->dups->parent = &t->nil;
       return delete_oldest_duplicate (t, node, cmp);
     }
 
@@ -248,6 +278,8 @@ multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
 static struct node *
 delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
 {
+  /* This list has become completely circular by the time
+     you get here! ERRORRRRRRRRRRRRRRR */
   struct node *parent = old->dups->parent;
   struct dupnode *new_list_head = old->dups->links[N];
   struct dupnode *list_tail = old->dups->links[P];
@@ -443,6 +475,24 @@ validate_tree (struct tree *t, tree_cmp_fn *cmp)
   if (!is_duplicate_storing_parent (&t->nil, t->root, &t->nil))
     return false;
   return true;
+}
+
+static threeway_cmp
+max_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+{
+  (void)a;
+  (void)b;
+  (void)aux;
+  return GRT;
+}
+
+static threeway_cmp
+min_dummy_cmp (const struct node *a, const struct node *b, void *aux) // NOLINT
+{
+  (void)a;
+  (void)b;
+  (void)aux;
+  return LES;
 }
 
 /* NOLINTEND(*misc-no-recursion) */

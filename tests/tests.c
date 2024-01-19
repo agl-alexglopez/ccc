@@ -30,6 +30,7 @@ typedef bool (*test_fn) (void);
 
 struct val
 {
+  int id;
   int val;
   pq_elem elem;
 };
@@ -42,12 +43,15 @@ static bool pq_test_insert_three_dups (void);
 static bool pq_test_read_max_min (void);
 static bool pq_test_insert_shuffle (void);
 static bool pq_test_insert_erase_shuffled (void);
+static bool pq_test_pop_max (void);
+static bool pq_test_pop_min (void);
+static bool pq_test_max_round_robin (void);
 static int run_tests (void);
 static void insert_shuffled (pqueue *, struct val[], int, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS 8
+#define NUM_TESTS 11
 const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
@@ -57,6 +61,9 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_read_max_min,
   pq_test_insert_shuffle,
   pq_test_insert_erase_shuffled,
+  pq_test_pop_max,
+  pq_test_pop_min,
+  pq_test_max_round_robin,
 };
 
 int
@@ -277,11 +284,150 @@ pq_test_insert_erase_shuffled (void)
         return false;
       }
 
+  /* Now let's delete everything with no errors. */
+
   for (int i = 0; i < size; ++i)
     {
       const struct val *removed = tree_entry (
           pq_erase (&pq, &vals[i].elem, val_cmp, NULL), struct val, elem);
       if (removed->val != vals[i].val)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!pq_empty (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  return true;
+}
+
+static bool
+pq_test_pop_max (void)
+{
+  printf ("pq_test_pop_max");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  const int prime = 53;
+  struct val vals[size];
+  insert_shuffled (&pq, vals, size, prime);
+  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  if (max->val != size - 1)
+    {
+      breakpoint ();
+      return false;
+    }
+  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  if (min->val != 0)
+    {
+      breakpoint ();
+      return false;
+    }
+  int sorted_check[size];
+  inorder_fill (sorted_check, size, &pq);
+  for (int i = 0; i < size; ++i)
+    if (vals[i].val != sorted_check[i])
+      {
+        breakpoint ();
+        return false;
+      }
+
+  /* Now let's pop from the front of the queue until empty. */
+
+  for (int i = size - 1; i >= 0; --i)
+    {
+      const struct val *front
+          = tree_entry (pq_pop_max (&pq), struct val, elem);
+      if (front->val != vals[i].val)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!pq_empty (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  return true;
+}
+
+static bool
+pq_test_pop_min (void)
+{
+  printf ("pq_test_pop_min");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  const int prime = 53;
+  struct val vals[size];
+  insert_shuffled (&pq, vals, size, prime);
+  const struct val *max = tree_entry (pq_max (&pq), struct val, elem);
+  if (max->val != size - 1)
+    {
+      breakpoint ();
+      return false;
+    }
+  const struct val *min = tree_entry (pq_min (&pq), struct val, elem);
+  if (min->val != 0)
+    {
+      breakpoint ();
+      return false;
+    }
+  int sorted_check[size];
+  inorder_fill (sorted_check, size, &pq);
+  for (int i = 0; i < size; ++i)
+    if (vals[i].val != sorted_check[i])
+      {
+        breakpoint ();
+        return false;
+      }
+
+  /* Now let's pop from the front of the queue until empty. */
+
+  for (int i = 0; i < size; ++i)
+    {
+      const struct val *front
+          = tree_entry (pq_pop_min (&pq), struct val, elem);
+      if (front->val != vals[i].val)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!pq_empty (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  return true;
+}
+
+static bool
+pq_test_max_round_robin (void)
+{
+  printf ("pq_test_max_round_robin");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  struct val vals[size];
+  for (int i = 0; i < size; ++i)
+    {
+      vals[i].val = 0;
+      vals[i].id = i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      assert (validate_tree (&pq, val_cmp));
+    }
+
+  /* Now let's make sure we pop round robin. */
+  for (int i = 0; i < size; ++i)
+    {
+      const struct val *front
+          = tree_entry (pq_pop_max (&pq), struct val, elem);
+      if (front->val != vals[i].id)
         {
           breakpoint ();
           return false;
