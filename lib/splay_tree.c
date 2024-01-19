@@ -37,10 +37,16 @@ static void init_node (struct tree *, struct node *);
 static bool empty (const struct tree *);
 static void multiset_insert (struct tree *, struct node *, tree_cmp_fn *,
                              void *);
-static struct node *multiset_erase (struct tree *, struct node *,
-                                    tree_cmp_fn *, void *);
-static struct node *delete_oldest_duplicate (struct tree *, struct node *,
-                                             tree_cmp_fn *);
+static struct node *multiset_erase_max_or_min (struct tree *, struct node *,
+                                               tree_cmp_fn *, void *);
+static struct node *multiset_erase_node (struct tree *t, struct node *node,
+                                         tree_cmp_fn *cmp, void *aux);
+static struct node *pop_dup_node (struct tree *t, struct node *dup,
+                                  tree_cmp_fn *cmp, struct node *splayed);
+static struct node *pop_front_dup (struct tree *, struct node *,
+                                   tree_cmp_fn *);
+static struct node *remove_from_tree (struct tree *t, struct node *ret,
+                                      tree_cmp_fn *cmp);
 static struct node *root (const struct tree *);
 static struct node *max (const struct tree *);
 static struct node *pop_max (struct tree *);
@@ -101,7 +107,7 @@ pq_insert (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 pq_elem *
 pq_erase (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
-  return multiset_erase (pq, elem, fn, aux);
+  return multiset_erase_node (pq, elem, fn, aux);
 }
 
 pq_elem *
@@ -125,6 +131,55 @@ pq_size (pqueue *const pq)
 /* =========================================================================
    =============  Splay Tree Set and Multiset Implementation  ==============
    =========================================================================
+
+      (40)0x7fffffffd5c8-0x7fffffffdac8(+1)
+       ├──(29)R:0x7fffffffd968
+       │   ├──(12)R:0x7fffffffd5a8-0x7fffffffdaa8(+1)
+       │   │   ├──(2)R:0x7fffffffd548-0x7fffffffda48(+1)
+       │   │   │   └──(1)R:0x7fffffffd4e8-0x7fffffffd9e8(+1)
+       │   │   └──(9)L:0x7fffffffd668
+       │   │       ├──(1)R:0x7fffffffd608
+       │   │       └──(7)L:0x7fffffffd7e8
+       │   │           ├──(3)R:0x7fffffffd728
+       │   │           │   ├──(1)R:0x7fffffffd6c8
+       │   │           │   └──(1)L:0x7fffffffd788
+       │   │           └──(3)L:0x7fffffffd8a8
+       │   │               ├──(1)R:0x7fffffffd848
+       │   │               └──(1)L:0x7fffffffd908
+       │   └──(16)L:0x7fffffffd568-0x7fffffffda68(+1)
+       │       └──(15)R:0x7fffffffd588-0x7fffffffda88(+1)
+       │           ├──(2)R:0x7fffffffd528-0x7fffffffda28(+1)
+       │           │   └──(1)R:0x7fffffffd4c8-0x7fffffffd9c8(+1)
+       │           └──(12)L:0x7fffffffd508-0x7fffffffda08(+1)
+       │               └──(11)R:0x7fffffffd828
+       │                   ├──(6)R:0x7fffffffd6a8
+       │                   │   ├──(2)R:0x7fffffffd5e8
+       │                   │   │   └──(1)L:0x7fffffffd648
+       │                   │   └──(3)L:0x7fffffffd768
+       │                   │       ├──(1)R:0x7fffffffd708
+       │                   │       └──(1)L:0x7fffffffd7c8
+       │                   └──(4)L:0x7fffffffd8e8
+       │                       ├──(1)R:0x7fffffffd888
+       │                       └──(2)L:0x7fffffffd4a8-0x7fffffffd9a8(+1)
+       │                           └──(1)R:0x7fffffffd948
+       └──(10)L:0x7fffffffd688
+           ├──(1)R:0x7fffffffd628
+           └──(8)L:0x7fffffffd808
+               ├──(3)R:0x7fffffffd748
+               │   ├──(1)R:0x7fffffffd6e8
+               │   └──(1)L:0x7fffffffd7a8
+               └──(4)L:0x7fffffffd8c8
+                   ├──(1)R:0x7fffffffd868
+                   └──(2)L:0x7fffffffd928
+                       └──(1)L:0x7fffffffd988
+
+   Pictured above is the heavy/light decomposition of a splay tree.
+   The goal of a splay tree is to take advantage of "good" edges
+   that drop half the weight of the tree, weight being the number of
+   nodes rooted at X. Blue edges are obviously advantageous so if we
+   have a mathematical bound on the cost of those edges, a splay tree
+   then amortizes the cost of the red edges, leaving a solid O(lgN) runtime.
+   You can't see the color here but check out the printing function.
 
    All types that use a splay tree are simply wrapper interfaces around
    the core splay tree operations. Splay trees can be used as priority
@@ -190,13 +245,13 @@ min (const struct tree *t)
 static struct node *
 pop_max (struct tree *t)
 {
-  return multiset_erase (t, &t->nil, force_find_grt, NULL);
+  return multiset_erase_max_or_min (t, &t->nil, force_find_grt, NULL);
 }
 
 static struct node *
 pop_min (struct tree *t)
 {
-  return multiset_erase (t, &t->nil, force_find_les, NULL);
+  return multiset_erase_max_or_min (t, &t->nil, force_find_les, NULL);
 }
 
 static void
@@ -235,8 +290,8 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
   /* This is a circular doubly linked list with O(1) append to back
      to maintain round robin fairness for any use of this queue.
      the oldest duplicate should be in the tree so we will add new dup
-     to the back. Get the last element and link its new next to new dup,
-     link the head to this new tail. New elem wraps back to head.
+     to the back. The head then needs to point to new tail and new
+     tail points to already in place head that tree points to.
      This operation still works if we previously had size 1 list. */
   if (tree_node->dups == as_dupnode (&t->nil))
     {
@@ -255,19 +310,53 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
   add->links[P] = tail;
 }
 
+/* We need to mindful of what the user is asking for. If they want any
+   max or min, we have provided a dummy node and dummy compare function
+   that will force us to return the max or min. So this operation
+   simply grabs the first node available in the tree for round robin.
+   This function expects to be passed the t->nil as the node and a
+   comparison function that forces either the max or min to be searched. */
 static struct node *
-multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
+multiset_erase_max_or_min (struct tree *t, struct node *tnil,
+                           tree_cmp_fn *force_max_or_min, void *aux)
+{
+  (void)aux;
+  assert (t != NULL);
+  assert (tnil != NULL);
+  assert (force_max_or_min != NULL);
+
+  struct node *ret = splay (t, t->root, tnil, force_max_or_min);
+  assert (ret != NULL);
+
+  t->root = ret;
+  if (ret->dups != as_dupnode (&t->nil))
+    {
+      ret->dups->parent = &t->nil;
+      return pop_front_dup (t, ret, force_max_or_min);
+    }
+
+  return remove_from_tree (t, ret, force_max_or_min);
+}
+
+/* We need to mindful of what the user is asking for. This is a request
+   to erase the exact node provided in the argument. So extra care is
+   taken to only delete that node, especially if a different node with
+   the same size is splayed to the root and we are a duplicate in the
+   list. */
+static struct node *
+multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
+                     void *aux)
 {
   (void)aux;
   assert (t != NULL);
   assert (node != NULL);
   assert (cmp != NULL);
 
+  struct node *ret = splay (t, t->root, node, cmp);
+  assert (ret != NULL);
   /* Special case that this must be a duplicate that is in the
      linked list but it is not the special head node. So, it
-     is a quick snip to get it out. Don't splay because if
-     they keep asking for this size it is either O(1) or
-     will eventually splay to root anyway. */
+     is a quick snip to get it out. */
   if (NULL == node->dups)
     {
       node->links[P]->links[N] = node->links[N];
@@ -275,30 +364,39 @@ multiset_erase (struct tree *t, struct node *node, tree_cmp_fn *cmp, void *aux)
       return node;
     }
 
-  struct node *ret = splay (t, t->root, node, cmp);
-  assert (ret != NULL);
-
   t->root = ret;
   if (ret->dups != as_dupnode (&t->nil))
     {
       ret->dups->parent = &t->nil;
-      return delete_oldest_duplicate (t, ret, cmp);
+      return pop_dup_node (t, node, cmp, ret);
     }
-
-  if (ret->links[L] == &t->nil)
-    t->root = ret->links[R];
-  else
-    {
-      t->root = splay (t, ret->links[L], node, cmp);
-      give_parent_subtree (t, t->root, R, ret->links[R]);
-    }
-  if (t->root != &t->nil && t->root->dups != as_dupnode (&t->nil))
-    t->root->dups->parent = &t->nil;
-  return ret;
+  return remove_from_tree (t, ret, cmp);
 }
 
 static struct node *
-delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
+pop_dup_node (struct tree *t, struct node *dup, tree_cmp_fn *cmp,
+              struct node *splayed)
+{
+  if (dup == splayed)
+    return pop_front_dup (t, splayed, cmp);
+  /* This is the head of the list of duplicates so no dups left. */
+  if (dup->links[N] == dup)
+    {
+      splayed->dups = as_dupnode (&t->nil);
+      return dup;
+    }
+  /* There is an arbitrary number of dups after the head so replace head */
+  const struct dupnode *head = as_dupnode (dup);
+  /* Update the tail at the back of the list. Easy to forget hard to catch. */
+  head->links[P]->links[N] = head->links[N];
+  head->links[N]->links[P] = head->links[P];
+  head->links[N]->parent = head->parent;
+  splayed->dups = head->links[N];
+  return dup;
+}
+
+static struct node *
+pop_front_dup (struct tree *t, struct node *old, tree_cmp_fn *cmp)
 {
   struct node *parent = old->dups->parent;
   struct node *tree_replacement = as_node (old->dups);
@@ -319,9 +417,28 @@ delete_oldest_duplicate (struct tree *t, struct node *old, tree_cmp_fn *cmp)
   tree_replacement->links[R] = old->links[R];
   tree_replacement->dups = new_list_head;
 
+  if (tree_replacement->links[L] != &t->nil)
+    tree_replacement->links[L]->dups->parent = tree_replacement;
+  if (tree_replacement->links[R] != &t->nil)
+    tree_replacement->links[R]->dups->parent = tree_replacement;
   if (circular_list_empty)
     tree_replacement->dups = as_dupnode (&t->nil);
   return old;
+}
+
+static struct node *
+remove_from_tree (struct tree *t, struct node *ret, tree_cmp_fn *cmp)
+{
+  if (ret->links[L] == &t->nil)
+    t->root = ret->links[R];
+  else
+    {
+      t->root = splay (t, ret->links[L], ret, cmp);
+      give_parent_subtree (t, t->root, R, ret->links[R]);
+    }
+  if (t->root != &t->nil && t->root->dups != as_dupnode (&t->nil))
+    t->root->dups->parent = &t->nil;
+  return ret;
 }
 
 static struct node *
@@ -483,7 +600,7 @@ force_find_les (const struct node *a, const struct node *b,
 /* This section has recursion so it should probably not be used in
    a custom operating system environment with constrained stack space.
    Needless to mention the stdlib.h heap implementation that would need
-   to be replaced with the custom drop in. */
+   to be replaced with the custom OS drop in. */
 
 static bool
 strict_bound_met (const struct node *prev, enum tree_link dir,

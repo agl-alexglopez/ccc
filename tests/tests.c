@@ -49,12 +49,13 @@ static bool pq_test_pop_min (void);
 static bool pq_test_max_round_robin (void);
 static bool pq_test_min_round_robin (void);
 static bool pq_test_delete_rand_duplicates (void);
+static bool pq_test_rand_queue (void);
 static int run_tests (void);
 static void insert_shuffled (pqueue *, struct val[], int, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS 13
+#define NUM_TESTS 14
 const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
@@ -69,6 +70,7 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_max_round_robin,
   pq_test_min_round_robin,
   pq_test_delete_rand_duplicates,
+  pq_test_rand_queue,
 };
 
 int
@@ -519,11 +521,58 @@ pq_test_delete_rand_duplicates (void)
   return true;
 }
 
+static bool
+pq_test_rand_queue (void)
+{
+  printf ("pq_test_rand_queue");
+  pqueue pq;
+  pq_init (&pq);
+  const int size = 50;
+  const int prime = 53;
+  /* We want the tree to have a smattering of duplicates so
+     reduce the shuffle range so it will repeat some values. */
+  int shuffled_index = prime % (size - 10);
+  struct val vals[size];
+  for (int i = 0; i < size; ++i)
+    {
+      vals[i].val = shuffled_index;
+      vals[i].id = shuffled_index;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      assert (validate_tree (&pq, val_cmp));
+      shuffled_index = (shuffled_index + prime) % (size - 10);
+    }
+
+  /* Now we go through and free all the elements in order but
+     their positions in the tree will be somewhat random */
+  size_t cur_size = size;
+  for (int i = 0; i < size; ++i)
+    {
+      pq_erase (&pq, &vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+      --cur_size;
+      const size_t cur_get_size = pq_size (&pq);
+      if (cur_get_size != cur_size)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  return true;
+}
+
 static void
 insert_shuffled (pqueue *pq, struct val vals[], const int size,
                  const int larger_prime)
 {
-  /* Math magic ahead... */
+  /* Math magic ahead so that we iterate over every index
+     eventually but in a shuffled order. Not necessarily
+     randome but a repeatable sequence that makes it
+     easier to debug if something goes wrong. Think
+     of the prime number as a random seed, kind of. */
   int shuffled_index = larger_prime % size;
   for (int i = 0; i < size; ++i)
     {
