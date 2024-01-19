@@ -144,7 +144,7 @@ void pq_init (pqueue *);
    pq_init has not been called first. */
 bool pq_empty (const pqueue *);
 
-/* Inserts the given qp_elem into an initialized pqueue
+/* Inserts the given pq_elem into an initialized pqueue
    any data in the pq_elem member will be overwritten
    The pq_elem must not already be in the queue or the
    behavior is undefined. O(lgN) */
