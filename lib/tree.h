@@ -1,6 +1,7 @@
 #ifndef TREE
 #define TREE
 #include <stdbool.h>
+#include <stddef.h>
 
 enum tree_link
 {
@@ -30,6 +31,7 @@ struct tree
 {
   struct node *root;
   struct node nil;
+  size_t size;
 };
 
 typedef enum

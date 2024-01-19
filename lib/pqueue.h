@@ -163,7 +163,9 @@ bool pq_empty (const pqueue *);
 /* Inserts the given pq_elem into an initialized pqueue
    any data in the pq_elem member will be overwritten
    The pq_elem must not already be in the queue or the
-   behavior is undefined. O(lgN) */
+   behavior is undefined. Priority queue insertion
+   shall not fail becuase priority queues support
+   round robin duplicates. O(lgN) */
 void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Erases a specified element known to be in the queue.
@@ -195,7 +197,7 @@ pq_elem *pq_pop_min (pqueue *);
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 
-/* O(n) time O(1) space iterative traversal count of nodes. */
+/* O(1) */
 size_t pq_size (pqueue *);
 /* Not very useful or significant. Helps with tests. */
 pq_elem *pq_root (const pqueue *);

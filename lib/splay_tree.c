@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -129,7 +130,7 @@ pq_size (pqueue *const pq)
 }
 
 /* =========================================================================
-   =============  Splay Tree Set and Multiset Implementation  ==============
+   =============    Splay Tree Set and Set Implementations    ==============
    =========================================================================
 
       (40)0x7fffffffd5c8-0x7fffffffdac8(+1)
@@ -192,25 +193,26 @@ pq_size (pqueue *const pq)
 static void
 init_tree (struct tree *t)
 {
+  assert (t != NULL);
   t->root = &t->nil;
-  (void)t;
+  t->size = 0;
 }
 
 static void
 init_node (struct tree *t, struct node *n)
 {
-  assert (n);
+  assert (n != NULL);
+  assert (t != NULL);
   n->links[L] = &t->nil;
   n->links[R] = &t->nil;
   n->dups = as_dupnode (&t->nil);
-  (void)n;
 }
 
 static bool
 empty (const struct tree *const t)
 {
   assert (t != NULL);
-  return t->root == &t->nil;
+  return 0 == t->size;
 }
 
 static struct node *
@@ -261,7 +263,8 @@ multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
   (void)aux;
   assert (t);
   init_node (t, elem);
-
+  t->size++;
+  assert (t->size != 0);
   if (t->root == &t->nil)
     {
       t->root = elem;
@@ -324,6 +327,8 @@ multiset_erase_max_or_min (struct tree *t, struct node *tnil,
   assert (t != NULL);
   assert (tnil != NULL);
   assert (force_max_or_min != NULL);
+  t->size--;
+  assert (t->size != ((size_t)-1));
 
   struct node *ret = splay (t, t->root, tnil, force_max_or_min);
   assert (ret != NULL);
@@ -351,6 +356,8 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
   assert (t != NULL);
   assert (node != NULL);
   assert (cmp != NULL);
+  t->size--;
+  assert (t->size != ((size_t)-1));
 
   struct node *ret = splay (t, t->root, node, cmp);
   assert (ret != NULL);
