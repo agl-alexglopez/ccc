@@ -94,7 +94,7 @@ static threeway_cmp force_find_les (const struct node *, const struct node *,
 static size_t size (struct tree *);
 static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
-static bool stores_dups (struct tree *, struct node *);
+static bool stores_dups (const struct tree *, const struct node *);
 static void add_duplicate (struct tree *, struct node *, struct node *,
                            struct node *);
 static struct node *splay (struct tree *, struct node *, const struct node *,
@@ -698,7 +698,7 @@ give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
 }
 
 static bool
-stores_dups (struct tree *t, struct node *n)
+stores_dups (const struct tree *t, const struct node *n)
 {
   return (n != &t->nil)
          && (n->parent_or_dups->parent_or_dups->links[L] == n
@@ -841,16 +841,15 @@ are_subtrees_valid (const struct node *root, tree_cmp_fn *cmp,
 }
 
 static bool
-is_duplicate_storing_parent (const struct node *parent,
-                             const struct node *root, const void *nil_and_tail)
+is_duplicate_storing_parent (const struct tree *t, const struct node *parent,
+                             const struct node *root)
 {
-  if (root == nil_and_tail)
+  if (root == &t->nil)
     return true;
-  if (root->parent_or_dups != nil_and_tail
-      && root->parent_or_dups->parent_or_dups != parent)
+  if (stores_dups (t, root) && root->parent_or_dups->parent_or_dups != parent)
     return false;
-  return is_duplicate_storing_parent (root, root->links[L], nil_and_tail)
-         && is_duplicate_storing_parent (root, root->links[R], nil_and_tail);
+  return is_duplicate_storing_parent (t, root, root->links[L])
+         && is_duplicate_storing_parent (t, root, root->links[R]);
 }
 
 bool
@@ -858,7 +857,7 @@ validate_tree (struct tree *t, tree_cmp_fn *cmp)
 {
   if (!are_subtrees_valid (t->root, cmp, &t->nil))
     return false;
-  if (!is_duplicate_storing_parent (&t->nil, t->root, &t->nil))
+  if (!is_duplicate_storing_parent (t, &t->nil, t->root))
     return false;
   return true;
 }
@@ -883,16 +882,16 @@ get_edge_color (const struct node *root, size_t parent_size,
 }
 
 static void
-print_node (const struct node *root, const void *nil_and_tail)
+print_node (const struct tree *t, const struct node *root)
 {
   printf ("%p", root);
   printf (COLOR_CYN);
   /* If a node is a duplicate, we will give it a special mark among nodes. */
-  if (root->parent_or_dups != nil_and_tail)
+  if (stores_dups (t, root))
     {
       int duplicates = 1;
       const struct node *head = root->parent_or_dups;
-      if (head != nil_and_tail)
+      if (head != &t->nil)
         {
           printf ("%p", head);
           for (struct node *i = head->links[N]; i != head;
@@ -911,11 +910,11 @@ static void
 print_inner_tree (const struct node *root, size_t parent_size,
                   const char *prefix, const char *prefix_branch_color,
                   const enum print_link node_type, const enum tree_link dir,
-                  const struct node *nil)
+                  const struct tree *t)
 {
-  if (root == nil)
+  if (root == &t->nil)
     return;
-  size_t subtree_size = get_subtree_size (root, nil);
+  size_t subtree_size = get_subtree_size (root, &t->nil);
   printf ("%s", prefix);
   printf ("%s%s%s",
           subtree_size <= parent_size / 2 ? COLOR_BLU_BOLD : COLOR_RED_BOLD,
@@ -923,7 +922,7 @@ print_inner_tree (const struct node *root, size_t parent_size,
   printf (COLOR_CYN);
   printf ("(%zu)", subtree_size);
   dir == L ? printf ("L:" COLOR_NIL) : printf ("R:" COLOR_NIL);
-  print_node (root, nil);
+  print_node (t, root);
 
   char *str = NULL;
   int string_length
@@ -943,46 +942,46 @@ print_inner_tree (const struct node *root, size_t parent_size,
     }
 
   const char *left_edge_color
-      = get_edge_color (root->links[L], subtree_size, nil);
-  if (root->links[R] == nil)
+      = get_edge_color (root->links[L], subtree_size, &t->nil);
+  if (root->links[R] == &t->nil)
     print_inner_tree (root->links[L], subtree_size, str, left_edge_color, LEAF,
-                      L, nil);
-  else if (root->links[L] == nil)
+                      L, t);
+  else if (root->links[L] == &t->nil)
     print_inner_tree (root->links[R], subtree_size, str, left_edge_color, LEAF,
-                      R, nil);
+                      R, t);
   else
     {
       print_inner_tree (root->links[R], subtree_size, str, left_edge_color,
-                        BRANCH, R, nil);
+                        BRANCH, R, t);
       print_inner_tree (root->links[L], subtree_size, str, left_edge_color,
-                        LEAF, L, nil);
+                        LEAF, L, t);
     }
   free (str);
 }
 
 void
-print_tree (const struct node *root, const void *nil_and_tail)
+print_tree (const struct tree *t, const struct node *root)
 {
-  if (root == nil_and_tail)
+  if (root == &t->nil)
     return;
-  size_t subtree_size = get_subtree_size (root, nil_and_tail);
+  size_t subtree_size = get_subtree_size (root, &t->nil);
   printf ("%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
-  print_node (root, nil_and_tail);
+  print_node (t, root);
 
   const char *left_edge_color
-      = get_edge_color (root->links[L], subtree_size, nil_and_tail);
-  if (root->links[R] == nil_and_tail)
+      = get_edge_color (root->links[L], subtree_size, &t->nil);
+  if (root->links[R] == &t->nil)
     print_inner_tree (root->links[L], subtree_size, "", left_edge_color, LEAF,
-                      L, nil_and_tail);
-  else if (root->links[L] == nil_and_tail)
+                      L, t);
+  else if (root->links[L] == &t->nil)
     print_inner_tree (root->links[R], subtree_size, "", left_edge_color, LEAF,
-                      R, nil_and_tail);
+                      R, t);
   else
     {
       print_inner_tree (root->links[R], subtree_size, "", left_edge_color,
-                        BRANCH, R, nil_and_tail);
+                        BRANCH, R, t);
       print_inner_tree (root->links[L], subtree_size, "", left_edge_color,
-                        LEAF, L, nil_and_tail);
+                        LEAF, L, t);
     }
 }
 

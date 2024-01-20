@@ -50,6 +50,6 @@ typedef threeway_cmp tree_cmp_fn (const struct node *key, const struct node *n,
    data structure with invariants that must hold regardless of
    interface. */
 bool validate_tree (struct tree *t, tree_cmp_fn *cmp);
-void print_tree (const struct node *root, const void *nil_and_tail);
+void print_tree (const struct tree *t, const struct node *root);
 
 #endif
