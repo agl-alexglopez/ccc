@@ -531,8 +531,6 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
   t->size--;
   assert (t->size != ((size_t)-1));
 
-  struct node *ret = splay (t, t->root, node, cmp);
-  assert (ret != NULL);
   /* Special case that this must be a duplicate that is in the
      linked list but it is not the special head node. So, it
      is a quick snip to get it out. */
@@ -542,6 +540,9 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
       node->links[N]->links[P] = node->links[P];
       return node;
     }
+
+  struct node *ret = splay (t, t->root, node, cmp);
+  assert (ret != NULL);
 
   t->root = ret;
   if (ret->dups != as_dupnode (&t->nil))
