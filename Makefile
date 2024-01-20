@@ -26,11 +26,13 @@ tidy:
 	cmake --build $(BUILD_DIR) --target tidy $(JOBS)
 
 test-rel: build
-	$(BUILD_DIR)rel/tests
+	$(BUILD_DIR)rel/pq_tests
+	$(BUILD_DIR)rel/set_tests
 	@echo "Ran RELEASE Tests"
 
 test-deb: build
-	$(BUILD_DIR)deb/tests
+	$(BUILD_DIR)deb/pq_tests
+	$(BUILD_DIR)deb/set_tests
 	@echo "Ran DEBUG Tests"
 
 clean:

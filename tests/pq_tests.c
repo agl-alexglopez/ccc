@@ -1,5 +1,4 @@
 #include "pqueue.h"
-#include "tree.h"
 
 #include <assert.h>
 #include <signal.h>

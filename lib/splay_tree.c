@@ -1,10 +1,36 @@
+/*
+   Author: Alexander G. Lopez
+   --------------------------
+   This is the internal implementation of a splay tree that
+   runs all the data structure interfaces provided by this
+   library.
+
+   Citations:
+   ---------------------------
+   1. This is taken from my own work and research on heap
+      allocator performance through various implementations.
+
+      https://github.com/agl-alexglopez/heap-allocator-workshop
+      /blob/main/lib/splaytree_topdown.c
+
+   2. However, I based it off of work by Daniel Sleator, Carnegie Mellon
+      University. Sleator's implementation of a topdown splay tree was
+      instrumental in starting things off, but required extensive modification.
+      I had to add the ability to track duplicates, update parent and child
+      tracking, and unite the left and right cases for fun. See the .c file
+      for my generalizable strategy to eliminate symmetric left and right cases
+      for any binary tree code which I have been working on for a while and
+      don't see very often!
+
+      https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c
+*/
 #include "pqueue.h"
+#include "set.h"
 #include "tree.h"
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,21 +64,29 @@ static void init_node (struct tree *, struct node *);
 static bool empty (const struct tree *);
 static void multiset_insert (struct tree *, struct node *, tree_cmp_fn *,
                              void *);
+static struct node *find (struct tree *, struct node *, tree_cmp_fn *, void *);
+static bool contains (struct tree *, struct node *, tree_cmp_fn *, void *);
+static struct node *erase (struct tree *, struct node *, tree_cmp_fn *,
+                           void *);
+static bool insert (struct tree *, struct node *, tree_cmp_fn *, void *);
 static struct node *multiset_erase_max_or_min (struct tree *, struct node *,
                                                tree_cmp_fn *, void *);
-static struct node *multiset_erase_node (struct tree *t, struct node *node,
-                                         tree_cmp_fn *cmp, void *aux);
-static struct node *pop_dup_node (struct tree *t, struct node *dup,
-                                  tree_cmp_fn *cmp, struct node *splayed);
+static struct node *multiset_erase_node (struct tree *, struct node *,
+                                         tree_cmp_fn *, void *);
+static struct node *pop_dup_node (struct tree *, struct node *, tree_cmp_fn *,
+                                  struct node *);
 static struct node *pop_front_dup (struct tree *, struct node *,
                                    tree_cmp_fn *);
-static struct node *remove_from_tree (struct tree *t, struct node *ret,
-                                      tree_cmp_fn *cmp);
+static struct node *remove_from_tree (struct tree *, struct node *,
+                                      tree_cmp_fn *);
+static struct node *connect_new_root (struct tree *, struct node *,
+                                      threeway_cmp);
 static struct node *root (const struct tree *);
 static struct node *max (const struct tree *);
 static struct node *pop_max (struct tree *);
 static struct node *pop_min (struct tree *);
 static struct node *min (const struct tree *);
+static struct node *end (struct tree *t);
 static threeway_cmp force_find_grt (const struct node *, const struct node *,
                                     void *);
 static threeway_cmp force_find_les (const struct node *, const struct node *,
@@ -127,6 +161,64 @@ size_t
 pq_size (pqueue *const pq)
 {
   return size (pq);
+}
+
+/* =========================================================================
+   =======================        Set Interface       ======================
+   ========================================================================= */
+
+void
+set_init (set *s)
+{
+  init_tree (s);
+}
+
+bool
+set_empty (set *s)
+{
+  return empty (s);
+}
+
+size_t
+set_size (set *s)
+{
+  return size (s);
+}
+
+bool
+set_contains (set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+{
+  return contains (s, se, cmp, aux);
+}
+
+bool
+set_insert (set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+{
+  return insert (s, se, cmp, aux);
+}
+
+set_elem *
+set_end (set *s)
+{
+  return end (s);
+}
+
+const set_elem *
+set_find (set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+{
+  return find (s, se, cmp, aux);
+}
+
+set_elem *
+set_erase (set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+{
+  return erase (s, se, cmp, aux);
+}
+
+set_elem *
+set_root (set *s)
+{
+  return root (s);
 }
 
 /* =========================================================================
@@ -256,6 +348,60 @@ pop_min (struct tree *t)
   return multiset_erase_max_or_min (t, &t->nil, force_find_les, NULL);
 }
 
+static struct node *
+end (struct tree *t)
+{
+  return &t->nil;
+}
+
+static struct node *
+find (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
+{
+  (void)aux;
+  assert (t != NULL);
+  assert (cmp != NULL);
+  init_node (t, elem);
+  t->size++;
+  assert (t->size != 0);
+  t->root = splay (t, t->root, elem, cmp);
+  const threeway_cmp root_size = cmp (elem, t->root, NULL);
+  if (EQL != root_size)
+    return &t->nil;
+  return t->root;
+}
+
+static bool
+contains (struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
+{
+  (void)aux;
+  assert (t != NULL);
+  assert (cmp != NULL);
+  init_node (t, dummy_key);
+  t->size++;
+  assert (t->size != 0);
+  t->root = splay (t, t->root, dummy_key, cmp);
+  const threeway_cmp root_size = cmp (dummy_key, t->root, NULL);
+  if (EQL == root_size)
+    return false;
+  return true;
+}
+
+static bool
+insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
+{
+  (void)aux;
+  assert (t != NULL);
+  assert (cmp != NULL);
+  init_node (t, elem);
+  t->size++;
+  assert (t->size != 0);
+  t->root = splay (t, t->root, elem, cmp);
+  const threeway_cmp root_size = cmp (elem, t->root, NULL);
+  if (EQL == root_size)
+    return false;
+  return connect_new_root (t, elem, root_size);
+}
+
 static void
 multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
                  void *aux)
@@ -279,11 +425,19 @@ multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
       add_duplicate (t, t->root, as_dupnode (elem), &t->nil);
       return;
     }
-  enum tree_link link = GRT == root_size;
-  give_parent_subtree (t, elem, link, t->root->links[link]);
-  give_parent_subtree (t, elem, !link, t->root);
+  (void)connect_new_root (t, elem, root_size);
+}
+
+static struct node *
+connect_new_root (struct tree *t, struct node *new_root,
+                  threeway_cmp cmp_result)
+{
+  enum tree_link link = GRT == cmp_result;
+  give_parent_subtree (t, new_root, link, t->root->links[link]);
+  give_parent_subtree (t, new_root, !link, t->root);
   t->root->links[link] = &t->nil;
-  t->root = elem;
+  t->root = new_root;
+  return new_root;
 }
 
 static void
@@ -311,6 +465,24 @@ add_duplicate (struct tree *t, struct node *tree_node, struct dupnode *add,
   list_head->links[P] = add;
   add->links[N] = list_head;
   add->links[P] = tail;
+}
+
+static struct node *
+erase (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
+{
+  (void)aux;
+  assert (t != NULL);
+  assert (elem != NULL);
+  assert (cmp != NULL);
+  t->size--;
+  assert (t->size != ((size_t)-1));
+  struct node *ret = splay (t, t->root, elem, cmp);
+  assert (ret != NULL);
+  const threeway_cmp found = cmp (elem, ret, NULL);
+  if (found != EQL)
+    return &t->nil;
+  t->root = ret;
+  return remove_from_tree (t, ret, cmp);
 }
 
 /* We need to mindful of what the user is asking for. If they want any

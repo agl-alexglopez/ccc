@@ -5,25 +5,6 @@
    Set. In this case we modify a Splay Tree to allow for
    a Priority Queue (aka a sorted Multi-Set). I intend to
    add a normal Set interface as well.
-
-   Citations:
-   ---------------------------
-   1. This is taken from my own work and research on heap
-      allocator performance through various implementations.
-
-      https://github.com/agl-alexglopez/heap-allocator-workshop
-      /blob/main/lib/splaytree_topdown.c
-
-   2. However, I based it off of work by Daniel Sleator, Carnegie Mellon
-      University. Sleator's implementation of a topdown splay tree was
-      instrumental in starting things off, but required extensive modification.
-      I had to add the ability to track duplicates, update parent and child
-      tracking, and unite the left and right cases for fun. See the .c file
-      for my generalizable strategy to eliminate symmetric left and right cases
-      for any binary tree code which I have been working on for a while and
-      don't see very often!
-
-      https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c
  */
 #ifndef PQUEUE
 #define PQUEUE
@@ -154,11 +135,14 @@ typedef tree_cmp_fn pq_cmp_fn;
   ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
               - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
 
+/* Initializes and empty queue with size 0. */
 void pq_init (pqueue *);
 
 /* Checks if the priority queue is empty. Undefined if
    pq_init has not been called first. */
 bool pq_empty (const pqueue *);
+/* O(1) */
+size_t pq_size (pqueue *);
 
 /* Inserts the given pq_elem into an initialized pqueue
    any data in the pq_elem member will be overwritten
@@ -197,8 +181,6 @@ pq_elem *pq_pop_min (pqueue *);
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 
-/* O(1) */
-size_t pq_size (pqueue *);
 /* Not very useful or significant. Helps with tests. */
 pq_elem *pq_root (const pqueue *);
 
