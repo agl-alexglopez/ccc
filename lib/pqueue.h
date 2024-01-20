@@ -180,7 +180,9 @@ pq_elem *pq_pop_min (pqueue *);
    at the same time. However, all other operations are
    most definitely not safe in a splay tree for concurrency.
    Worst case O(lgN). If you have just removed an element
-   it will be at the root. */
+   and it has duplicates those duplicates will remain at
+   the root O(1) until another insertion, query, or pop
+   occurs. */
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 
