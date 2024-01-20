@@ -133,8 +133,8 @@ typedef tree_cmp_fn pq_cmp_fn;
 
 /* NOLINTNEXTLINE */
 #define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
-  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
-              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
+  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                         \
+              - offsetof (STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
 void pq_init (pqueue *);

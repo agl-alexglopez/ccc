@@ -537,7 +537,11 @@ pq_test_rand_queue (void)
       vals[i].val = shuffled_index;
       vals[i].id = shuffled_index;
       pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
-      assert (validate_tree (&pq, val_cmp));
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
       shuffled_index = (shuffled_index + prime) % (size - 10);
     }
 

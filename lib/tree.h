@@ -15,16 +15,10 @@ enum list_link
   N = 1
 };
 
-struct dupnode
-{
-  struct dupnode *links[2];
-  struct node *parent;
-};
-
 struct node
 {
   struct node *links[2];
-  struct dupnode *dups;
+  struct node *parent_or_dups;
 };
 
 struct tree
@@ -51,18 +45,6 @@ typedef enum
    statements or whatever other comparison logic you choose. */
 typedef threeway_cmp tree_cmp_fn (const struct node *key, const struct node *n,
                                   void *aux);
-
-static inline struct dupnode *
-as_dupnode (const struct node *d)
-{
-  return (struct dupnode *)(d);
-}
-
-static inline struct node *
-as_node (const struct dupnode *d)
-{
-  return (struct node *)(d);
-}
 
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of

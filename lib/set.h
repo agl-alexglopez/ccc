@@ -186,8 +186,8 @@ typedef tree_cmp_fn set_cmp_fn;
 
 /* NOLINTNEXTLINE */
 #define set_entry(TREE_ELEM, STRUCT, MEMBER)                                  \
-  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
-              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
+  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                         \
+              - offsetof (STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
 
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
