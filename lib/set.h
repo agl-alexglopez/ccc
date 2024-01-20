@@ -213,10 +213,10 @@ size_t set_size (set *);
 bool set_contains (set *, set_elem *, set_cmp_fn *, void *);
 
 /* Returns true if the element you have requested to be
-   inserted is inserted false otherwise. Becuase this is
-   heap free data structure there is no need to return
-   the actual element that is inserted. You already have
-   it when you call this function.*/
+   inserted is inserted false if it was present already.
+   Becuase this is heap free data structure there is no need
+   to return the actual element that is inserted. You already
+   have it when you call this function.*/
 bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
 
 /* This is how you can tell if your set find and set erase
@@ -237,6 +237,8 @@ bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
       if (!set_insert(&s, &a.elem, cmp, NULL))
          ...Do some logic...
 
+      ... Elsewhere ...
+
       struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
       if (e != set_end(&s))
          ...Proceed with some logic...
@@ -254,7 +256,9 @@ set_elem *set_end (set *);
    to get the set entry from it is BAD. This function tries
    to enforce that you should not modify the element for
    a read only lookup. You can modify other fields you may
-   be using for your program, but please read the warning. */
+   be using for your program, but please read the warning.
+   However, there is little I can do to stop you from ruining
+   everything if you choose to do so. */
 const set_elem *set_find (set *, set_elem *, set_cmp_fn *, void *);
 
 /* Erases the element specified by key value and returns a
@@ -262,9 +266,11 @@ const set_elem *set_find (set *, set_elem *, set_cmp_fn *, void *);
    element cannot be found. It is undefined to use the set
    end element and it does not have any attachment to any
    struct you are using so trying to get the set entry from
-   it is BAD.*/
+   it will not work.*/
 set_elem *set_erase (set *, set_elem *, set_cmp_fn *, void *);
 
-/* Internal testing. Mostly useless. User at your own risk. */
+/* Internal testing. Mostly useless. User at your own risk
+   unless you wish to do some traversal of your own liking.
+   However, you should of course not modify keys or nodes. */
 set_elem *set_root (set *);
 #endif
