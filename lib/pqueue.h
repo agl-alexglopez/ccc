@@ -66,7 +66,8 @@
    guarantee that performance shall be bounded at O(lgN) for
    real-time use cases, prefer a Red-Black Tree based structure.
    This is built using a Splay Tree. I can add a Red-Black tree
-   if we see the need but this is way more boring.
+   but I think splay trees are way cooler for all they achieve
+   with far less code.
 
    Internally, the representation to acheive this is a simple
    tree with a circular doubly linked list attached.
