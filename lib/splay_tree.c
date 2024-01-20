@@ -361,13 +361,8 @@ find (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
   assert (t != NULL);
   assert (cmp != NULL);
   init_node (t, elem);
-  t->size++;
-  assert (t->size != 0);
   t->root = splay (t, t->root, elem, cmp);
-  const threeway_cmp root_size = cmp (elem, t->root, NULL);
-  if (EQL != root_size)
-    return &t->nil;
-  return t->root;
+  return cmp (elem, t->root, NULL) == EQL ? t->root : &t->nil;
 }
 
 static bool
@@ -377,13 +372,8 @@ contains (struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
   assert (t != NULL);
   assert (cmp != NULL);
   init_node (t, dummy_key);
-  t->size++;
-  assert (t->size != 0);
   t->root = splay (t, t->root, dummy_key, cmp);
-  const threeway_cmp root_size = cmp (dummy_key, t->root, NULL);
-  if (EQL == root_size)
-    return false;
-  return true;
+  return cmp (dummy_key, t->root, NULL) == EQL;
 }
 
 static bool
@@ -393,12 +383,11 @@ insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
   assert (t != NULL);
   assert (cmp != NULL);
   init_node (t, elem);
-  t->size++;
-  assert (t->size != 0);
   t->root = splay (t, t->root, elem, cmp);
   const threeway_cmp root_size = cmp (elem, t->root, NULL);
   if (EQL == root_size)
     return false;
+  t->size++;
   return connect_new_root (t, elem, root_size);
 }
 
