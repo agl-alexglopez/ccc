@@ -73,7 +73,7 @@ run_tests (void)
     }
   printf ("PASSED %d/%d %s\n\n", pass_count, NUM_TESTS,
           (pass_count == NUM_TESTS) ? "\\(*.*)/\n" : ">:(\n");
-  return 0;
+  return NUM_TESTS - pass_count;
 }
 static bool
 set_test_empty (void)

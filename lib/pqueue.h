@@ -3,8 +3,8 @@
    --------------------------
    This is the Priority Queue interface for the Splay Tree
    Set. In this case we modify a Splay Tree to allow for
-   a Priority Queue (aka a sorted Multi-Set). I intend to
-   add a normal Set interface as well.
+   a Priority Queue (aka a sorted Multi-Set). See the
+   normal set interface as well.
  */
 #ifndef PQUEUE
 #define PQUEUE
@@ -22,18 +22,18 @@
    Together the following form what you would normally expect for
    an embedded data structure. In this case a priority queue.
 
-   pqueue
-   {
-      pq_elem *root
-      pq_elem nil;
-   };
+      pqueue
+      {
+         pq_elem *root
+         pq_elem nil;
+      };
 
    Embed a pq_elem in your struct:
 
-   struct val {
-      int val;
-      pq_elem elem;
-   };
+      struct val {
+         int val;
+         pq_elem elem;
+      };
 
    If interested how these elems are implemented see tree.h
 
@@ -154,7 +154,9 @@ void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Erases a specified element known to be in the queue.
    The behavior is undefined if the element is not in
-   the queue. O(lgN). */
+   the queue. O(lgN). However, in practice you can
+   often benefit from O(1) access if that element is
+   a duplicate or you repeatedly access that value. */
 pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Pops from the front of the queue. If multiple elements

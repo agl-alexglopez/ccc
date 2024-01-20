@@ -18,6 +18,123 @@
 /* =============================================================
    ========================   SET   ============================
    =============================================================
+
+   Together the following components make a set as an embedded
+   data structure.
+
+      set
+      {
+         set_elem *root
+         set_elem nil;
+      };
+
+   Embed a set_elem in your struct:
+
+      struct val {
+         int val;
+         set_elem elem;
+      };
+
+   The nil is helpful in this case to make the Set data structure
+   align with what you would expect from a C++ like set. It is
+   the default returned node for some failed membership insertion
+   and deletion tests.
+
+   You have a few options when using the embedded set data structure
+   for lookups removal and insertion. The first option is to
+   proceed with your program logic as you would use a list or
+   queue data structure. Assume that you are responsible for
+   every value in the set.
+
+      struct val {
+         int val;
+         set_elem elem;
+      }
+
+      set s;
+      set_init(&s);
+      struct val my_val;
+      my_val.val = 0;
+
+      assert(set_insert(&s, &my_val.elem, set_cmp_fn, NULL)))
+      ...I am responsible for the set so I know this is unique...
+
+      struct set_elem *e = set_find(&s, &my_val.elem, set_cmp_fn, NULL);
+      ...This must be mine, because I am the one who made it earlier...
+
+   However, this approach is not very flexible and loses much of
+   the power of a set. The second approach is to use a static
+   global or local dummy struct as your query key whenever
+   you want to search the set. Then, you have more flexibility
+   with how you can use the data structure. For example:
+
+      static struct val set_key;
+      static set my_set;
+
+      static threeway_cmp
+      val_cmp (const set_elem *a, const set_elem *b, void *aux)
+      {
+        (void)aux;
+        struct val *lhs = set_entry (a, struct val, elem);
+        struct val *rhs = set_entry (b, struct val, elem);
+        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+      }
+
+      bool my_contains(int key)
+      {
+         set_key.val = key;
+         return set_contains (&s, &set_key, &val_cmp, NULL);
+      }
+
+
+      int main() {
+         ... Program logic of generating all values  ...
+         ... that will go in the set for later       ...
+      }
+
+   This is asking a slightly different question. We are
+   querying not to see if our specific struct is contained
+   in the set but rather if any struct with that value
+   is contained in the struct. This also works for
+   getting a specific struct back from a query. You don't
+   need to have the exact node you are searching for to
+   retrieve it. For example:
+
+      static struct val set_key;
+      static set my_set;
+
+      static threeway_cmp
+      val_cmp (const set_elem *a, const set_elem *b, void *aux)
+      {
+        (void)aux;
+        struct val *lhs = set_entry (a, struct val, elem);
+        struct val *rhs = set_entry (b, struct val, elem);
+        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+      }
+
+      struct node * my_find(int key)
+      {
+         set_key.val = key;
+         return set_find (&s, &set_key, &val_cmp, NULL);
+      }
+
+
+      int main() {
+         ... Program logic of generating all values  ...
+         ... that will go in the set for later       ...
+
+         struct node *my_query = my_find(5);
+         if (my_query != set_end(&s))
+            ... Proceed with some logic .....
+      }
+
+   Here you were able to retrieve the node that was in the
+   data structure only if it was present. This could be
+   useful as well. However, consider scope because this
+   is not a heap based data structure but rather one
+   that only makes sense if the structs stay available
+   for the lifetime of the program which is your
+   responsibility.
 */
 typedef struct node set_elem;
 typedef struct tree set;
@@ -80,100 +197,9 @@ size_t set_size (set *);
 
 /*
    =============================================================
-   ===================     Set Keys   ==========================
+   ===================     Set Methods   =======================
    =============================================================
 
-   You have a few options when using the embedded set data structure
-   for lookups removal and insertion. The first option is to
-   proceed with your program logic as you would use a list or
-   queue data structure. Assume that you are responsible for
-   every value in the set.
-
-      struct val {
-         int val;
-         set_elem elem;
-      }
-
-      set s;
-      set_init(&s);
-      struct val my_val;
-      my_val.val = 0;
-
-      assert(set_insert(&s, &my_val.elem, set_cmp_fn, NULL)))
-      ...I am responsible for the set so I know this is unique...
-
-      struct set_elem *e = set_find(&s, &my_val.elem, set_cmp_fn, NULL);
-      ...This must be mine, because I am the one who made it earlier...
-
-   However, this approach is not very flexible and loses much of
-   the power of a set. The second approach is to use a static
-   global or local dummy struct as your query key whenever
-   you want to search the set. Then, you have more flexibility
-   with how you can use the data structure. For example:
-
-      static struct val set_key;
-      static set my_set;
-
-      static threeway_cmp
-      val_cmp (const set_elem *a, const set_elem *b, void *aux)
-      {
-        (void)aux;
-        struct val *lhs = set_entry (a, struct val, elem);
-        struct val *rhs = set_entry (b, struct val, elem);
-        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-      }
-
-      bool my_contains(int key)
-      {
-         set_key.val = key;
-         return set_contains (&s, &set_key, &val_cmp, NULL);
-      }
-
-
-      int main() {
-         ... Program logic of generating all values  ...
-         ... that will go in the set for later       ...
-      }
-
-   This is asking a slightly different question. We are
-   querying to see if our specific struct is contained
-   in the set but rather if any struct with that value
-   is contained in the struct. This also works for
-   getting a specific struct back from a query. You don't
-   need to have the exact node you are searching for to
-   retrieve it. For example:
-
-      static struct val set_key;
-      static set my_set;
-
-      static threeway_cmp
-      val_cmp (const set_elem *a, const set_elem *b, void *aux)
-      {
-        (void)aux;
-        struct val *lhs = set_entry (a, struct val, elem);
-        struct val *rhs = set_entry (b, struct val, elem);
-        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-      }
-
-      struct node * my_find(int key)
-      {
-         set_key.val = key;
-         return set_find (&s, &set_key, &val_cmp, NULL);
-      }
-
-
-      int main() {
-         ... Program logic of generating all values  ...
-         ... that will go in the set for later       ...
-
-         struct node *my_query = my_find(5);
-         if (my_query == set_end(&s))
-            ... Proceed with some logic .....
-      }
-
-   Here you were able to retrieve the node that was in the
-   data structure only if it was present. This could be
-   useful as well.
 */
 
 /* Basic C++ style set operations. Contains does not return
@@ -196,8 +222,7 @@ bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
 /* This is how you can tell if your set find and set erase
    functions are successful. One should always check that
    the set element does not equal the end element as you
-   would in C++
-   For example:
+   would in C++. For example:
 
       struct val {
          int val;
@@ -209,10 +234,10 @@ bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
       struct val a;
       a.val = 0;
 
-      if (!set_insert(&s, &a.elem, set_cmp_fn, NULL))
+      if (!set_insert(&s, &a.elem, cmp, NULL))
          ...Do some logic...
 
-      struct set_elem *e = set_find(&s, &a.elem, set_cmp_fn, NULL);
+      struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
       if (e != set_end(&s))
          ...Proceed with some logic...
       else
@@ -240,6 +265,6 @@ const set_elem *set_find (set *, set_elem *, set_cmp_fn *, void *);
    it is BAD.*/
 set_elem *set_erase (set *, set_elem *, set_cmp_fn *, void *);
 
-/* Internal testing. Mostly useless. */
+/* Internal testing. Mostly useless. User at your own risk. */
 set_elem *set_root (set *);
 #endif
