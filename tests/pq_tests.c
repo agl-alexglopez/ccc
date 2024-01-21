@@ -1,27 +1,11 @@
 #include "pqueue.h"
 
 #include <assert.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* Set this breakpoint on any line where you wish
-   execution to stop. Under normal program runs the program
-   will simply exit. If triggered in GDB execution will stop
-   while able to explore the surrounding context, varialbes,
-   and stack frames. Be sure to step "(gdb) up" out of the
-   raise function to wherever it triggered. */
-#define breakpoint()                                                          \
-  do                                                                          \
-    {                                                                         \
-      (void)fprintf (stderr, "\n!!Break. Line: %d File: %s, Func: %s\n ",     \
-                     __LINE__, __FILE__, __func__);                           \
-      (void)raise (SIGTRAP);                                                  \
-    }                                                                         \
-  while (0)
 
 const char *const pass_msg = "pass";
 const char *const fail_msg = "fail";
@@ -51,12 +35,12 @@ static bool pq_test_min_round_robin (void);
 static bool pq_test_delete_rand_duplicates (void);
 static bool pq_test_rand_queue (void);
 static int run_tests (void);
-static void insert_shuffled (pqueue *, struct val[], int, int);
+static void insert_shuffled (pqueue *, struct val[], size_t, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-const size_t num_tests = 15;
-const test_fn all_tests[num_tests] = {
+#define NUM_TESTS (size_t)15
+const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
   pq_test_insert_three,
@@ -85,14 +69,14 @@ run_tests (void)
 {
   printf ("\n");
   size_t pass_count = 0;
-  for (size_t i = 0; i < num_tests; ++i)
+  for (size_t i = 0; i < NUM_TESTS; ++i)
     {
       const bool passed = all_tests[i]();
       pass_count += passed;
       passed ? printf ("...%s\n", pass_msg) : printf ("...%s\n", fail_msg);
     }
-  printf ("PASSED %zu/%zu %s\n\n", pass_count, num_tests,
-          (pass_count == num_tests) ? "\\(*.*)/\n" : ">:(\n");
+  printf ("PASSED %zu/%zu %s\n\n", pass_count, NUM_TESTS,
+          (pass_count == NUM_TESTS) ? "\\(*.*)/\n" : ">:(\n");
   return 0;
 }
 
@@ -134,6 +118,8 @@ pq_test_insert_three (void)
           breakpoint ();
           return false;
         }
+      const size_t size = i + 1;
+      assert (pq_size (&pq) == size);
     }
   return pq_size (&pq) == 3;
 }
@@ -189,6 +175,8 @@ pq_test_insert_three_dups (void)
           breakpoint ();
           return false;
         }
+      const size_t size = i + 1;
+      assert (pq_size (&pq) == size);
     }
   return pq_size (&pq) == 3;
 }
@@ -209,6 +197,8 @@ pq_test_read_max_min (void)
           breakpoint ();
           return false;
         }
+      const size_t size = i + 1;
+      assert (pq_size (&pq) == size);
     }
   if (10 != pq_size (&pq))
     {
@@ -277,6 +267,8 @@ pq_test_insert_remove_four_dups (void)
           breakpoint ();
           return false;
         }
+      const size_t size = i + 1;
+      assert (pq_size (&pq) == size);
     }
   if (pq_size (&pq) != 4)
     {
@@ -605,7 +597,7 @@ pq_test_rand_queue (void)
 }
 
 static void
-insert_shuffled (pqueue *pq, struct val vals[], const int size,
+insert_shuffled (pqueue *pq, struct val vals[], const size_t size,
                  const int larger_prime)
 {
   /* Math magic ahead so that we iterate over every index
@@ -613,12 +605,15 @@ insert_shuffled (pqueue *pq, struct val vals[], const int size,
      randome but a repeatable sequence that makes it
      easier to debug if something goes wrong. Think
      of the prime number as a random seed, kind of. */
-  int shuffled_index = larger_prime % size;
-  for (int i = 0; i < size; ++i)
+  size_t shuffled_index = larger_prime % size;
+  for (size_t i = 0; i < size; ++i)
     {
-      vals[shuffled_index].val = shuffled_index;
+      vals[shuffled_index].val = (int)shuffled_index;
       pq_insert (pq, &vals[shuffled_index].elem, val_cmp, NULL);
-      assert (validate_tree (pq, val_cmp));
+      if (pq_size (pq) != i + 1)
+        breakpoint ();
+      if (!validate_tree (pq, val_cmp))
+        breakpoint ();
       shuffled_index = (shuffled_index + larger_prime) % size;
     }
   const size_t catch_size = size;
@@ -633,9 +628,9 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
   struct node *iter = pq->root;
   struct node *inorder_pred = NULL;
   size_t s = 0;
-  while (iter != &pq->nil)
+  while (iter != &pq->end)
     {
-      if (&pq->nil == iter->links[L])
+      if (&pq->end == iter->links[L])
         {
           /* This is where we climb back up a link if it exists */
           vals[s++] = pq_entry (iter, struct val, elem)->val;
@@ -643,10 +638,10 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
           continue;
         }
       inorder_pred = iter->links[L];
-      while (&pq->nil != inorder_pred->links[R]
+      while (&pq->end != inorder_pred->links[R]
              && iter != inorder_pred->links[R])
         inorder_pred = inorder_pred->links[R];
-      if (&pq->nil == inorder_pred->links[R])
+      if (&pq->end == inorder_pred->links[R])
         {
           /* The right field is a temporary traversal helper. */
           inorder_pred->links[R] = iter;
@@ -656,7 +651,7 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
       /* Here is our last chance to count this value. */
       vals[s++] = pq_entry (iter, struct val, elem)->val;
       /* Here is our last chance to repair our wreckage */
-      inorder_pred->links[R] = &pq->nil;
+      inorder_pred->links[R] = &pq->end;
       /* This is how we get to a right subtree if any exists. */
       iter = iter->links[R];
     }

@@ -19,12 +19,13 @@ struct node
 {
   struct node *links[2];
   struct node *parent_or_dups;
+  bool dups;
 };
 
 struct tree
 {
   struct node *root;
-  struct node nil;
+  struct node end;
   size_t size;
 };
 

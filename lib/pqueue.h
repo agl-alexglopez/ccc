@@ -133,8 +133,8 @@ typedef tree_cmp_fn pq_cmp_fn;
 
 /* NOLINTNEXTLINE */
 #define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
-  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                         \
-              - offsetof (STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
+  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
+              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
 void pq_init (pqueue *);
@@ -188,5 +188,23 @@ pq_elem *pq_min (const pqueue *);
 
 /* Not very useful or significant. Helps with tests. */
 pq_elem *pq_root (const pqueue *);
+
+/* NOLINTNEXTLINE(*-include-cleaner) */
+#include <signal.h>
+#include <stdio.h>
+/* Set this breakpoint on any line where you wish
+   execution to stop. Under normal program runs the program
+   will simply exit. If triggered in GDB execution will stop
+   while able to explore the surrounding context, varialbes,
+   and stack frames. Be sure to step "(gdb) up" out of the
+   raise function to wherever it triggered. */
+#define breakpoint()                                                          \
+  do                                                                          \
+    {                                                                         \
+      (void)fprintf (stderr, "\n!!Break. Line: %d File: %s, Func: %s\n ",     \
+                     __LINE__, __FILE__, __func__);                           \
+      (void)raise (SIGTRAP);                                                  \
+    }                                                                         \
+  while (0)
 
 #endif

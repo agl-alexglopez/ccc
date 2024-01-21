@@ -245,9 +245,9 @@ inorder_fill (int vals[], size_t size, set *s)
   struct node *iter = s->root;
   struct node *inorder_pred = NULL;
   size_t sz = 0;
-  while (iter != &s->nil)
+  while (iter != &s->end)
     {
-      if (&s->nil == iter->links[L])
+      if (&s->end == iter->links[L])
         {
           /* This is where we climb back up a link if it exists */
           vals[sz++] = set_entry (iter, struct val, elem)->val;
@@ -255,10 +255,10 @@ inorder_fill (int vals[], size_t size, set *s)
           continue;
         }
       inorder_pred = iter->links[L];
-      while (&s->nil != inorder_pred->links[R]
+      while (&s->end != inorder_pred->links[R]
              && iter != inorder_pred->links[R])
         inorder_pred = inorder_pred->links[R];
-      if (&s->nil == inorder_pred->links[R])
+      if (&s->end == inorder_pred->links[R])
         {
           /* The right field is a temporary traversal helper. */
           inorder_pred->links[R] = iter;
@@ -268,7 +268,7 @@ inorder_fill (int vals[], size_t size, set *s)
       /* Here is our last chance to count this value. */
       vals[sz++] = set_entry (iter, struct val, elem)->val;
       /* Here is our last chance to repair our wreckage */
-      inorder_pred->links[R] = &s->nil;
+      inorder_pred->links[R] = &s->end;
       /* This is how we get to a right subtree if any exists. */
       iter = iter->links[R];
     }
