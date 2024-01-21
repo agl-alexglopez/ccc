@@ -510,24 +510,36 @@ pq_test_min_round_robin (void)
 static bool
 pq_test_delete_rand_duplicates (void)
 {
-  printf ("pq_test_remove_from_dup_list");
+  printf ("pq_test_delete_rand_duplicates");
   pqueue pq;
   pq_init (&pq);
-  const int size = 50;
-  const int prime = 53;
+  const int size = 99;
+  const int prime = 101;
+  /* Make the prime shuffle shorter than size for many duplicates. */
+  const int less = 77;
   struct val vals[size];
-  vals[0].id = 0;
-  vals[0].val = 0;
-  pq_insert (&pq, &vals[0].elem, val_cmp, NULL);
-  for (int i = 1; i < size; ++i)
+  int shuffled_index = prime % (size - less);
+  for (int i = 0; i < size; ++i)
     {
-      vals[i].val = 99;
+      vals[i].val = shuffled_index;
       vals[i].id = i;
       pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
-      assert (validate_tree (&pq, val_cmp));
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+      const size_t s = i + 1;
+      if (pq_size (&pq) != s)
+        {
+          breakpoint ();
+          return false;
+        }
+      /* Shuffle like this only on insertions to create more dups. */
+      shuffled_index = (shuffled_index + prime) % (size - less);
     }
 
-  int shuffled_index = prime % size;
+  shuffled_index = prime % (size - less);
   size_t cur_size = size;
   for (int i = 0; i < size; ++i)
     {
@@ -544,6 +556,7 @@ pq_test_delete_rand_duplicates (void)
           breakpoint ();
           return false;
         }
+      /* Shuffle normally here so we only remove each elem once. */
       shuffled_index = (shuffled_index + prime) % size;
     }
   return true;

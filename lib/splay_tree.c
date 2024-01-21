@@ -685,9 +685,6 @@ count_dups (struct node *n)
   if (!n->dups)
     return 0;
   size_t dups = 1;
-  /* TODO this function is broken because we loop infinitely
-     when we try to count duplicates insert or delete duplicates
-     is broken somewhere! */
   for (struct node *cur = n->parent_or_dups->links[N];
        cur != n->parent_or_dups; cur = cur->links[N])
     ++dups;
