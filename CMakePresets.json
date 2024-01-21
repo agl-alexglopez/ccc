@@ -9,7 +9,6 @@
         {
             "name": "gcc-deb",
             "binaryDir": "${sourceDir}/build",
-            "hidden": true,
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_C_STANDARD": "11",
@@ -23,7 +22,6 @@
         {
             "name": "gcc-rel",
             "binaryDir": "${sourceDir}/build",
-            "hidden": true,
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_C_STANDARD": "11",
