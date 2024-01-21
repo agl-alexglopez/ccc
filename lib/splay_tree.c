@@ -86,7 +86,7 @@ static struct node *max (const struct tree *);
 static struct node *pop_max (struct tree *);
 static struct node *pop_min (struct tree *);
 static struct node *min (const struct tree *);
-static struct node *end (struct tree *t);
+const static struct node *end (const struct tree *);
 static threeway_cmp force_find_grt (const struct node *, const struct node *,
                                     void *);
 static threeway_cmp force_find_les (const struct node *, const struct node *,
@@ -198,8 +198,8 @@ set_insert (set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
   return insert (s, se, cmp, aux);
 }
 
-set_elem *
-set_end (set *s)
+const set_elem *
+set_end (const set *s)
 {
   return end (s);
 }
@@ -350,8 +350,8 @@ pop_min (struct tree *t)
   return multiset_erase_max_or_min (t, &t->nil, force_find_les, NULL);
 }
 
-static struct node *
-end (struct tree *t)
+const static struct node *
+end (const struct tree *t)
 {
   return &t->nil;
 }
@@ -363,8 +363,8 @@ find (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
   assert (t != NULL);
   assert (cmp != NULL);
   init_node (t, elem);
-  t->root = splay (t, t->root, elem, cmp);
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups
+      = splay (t, t->root, elem, cmp);
   return cmp (elem, t->root, NULL) == EQL ? t->root : &t->nil;
 }
 
@@ -375,8 +375,8 @@ contains (struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
   assert (t != NULL);
   assert (cmp != NULL);
   init_node (t, dummy_key);
-  t->root = splay (t, t->root, dummy_key, cmp);
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups
+      = splay (t, t->root, dummy_key, cmp);
   return cmp (dummy_key, t->root, NULL) == EQL;
 }
 
@@ -387,8 +387,8 @@ insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
   assert (t != NULL);
   assert (cmp != NULL);
   init_node (t, elem);
-  t->root = splay (t, t->root, elem, cmp);
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups
+      = splay (t, t->root, elem, cmp);
   const threeway_cmp root_size = cmp (elem, t->root, NULL);
   if (EQL == root_size)
     return false;
@@ -411,13 +411,15 @@ multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
       t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
       return;
     }
-  t->root = splay (t, t->root, elem, cmp);
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root
+      = splay (t, t->root, elem, cmp);
   const threeway_cmp root_size = cmp (elem, t->root, NULL);
   if (EQL == root_size)
     {
       if (stores_dups (t, t->root))
         t->root->parent_or_dups->parent_or_dups = &t->nil;
+      else
+        t->root->parent_or_dups = &t->nil;
       add_duplicate (t, t->root, elem, &t->nil);
       return;
     }
@@ -433,8 +435,8 @@ connect_new_root (struct tree *t, struct node *new_root,
   give_parent_subtree (t, new_root, link, t->root->links[link]);
   give_parent_subtree (t, new_root, !link, t->root);
   t->root->links[link] = &t->nil;
-  t->root = new_root;
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups
+      = new_root;
   return new_root;
 }
 
@@ -448,7 +450,7 @@ add_duplicate (struct tree *t, struct node *tree_node, struct node *add,
      to the back. The head then needs to point to new tail and new
      tail points to already in place head that tree points to.
      This operation still works if we previously had size 1 list. */
-  if (stores_dups (t, tree_node))
+  if (!stores_dups (t, tree_node))
     {
       add->parent_or_dups = parent;
       tree_node->parent_or_dups = add;
@@ -479,8 +481,7 @@ erase (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
   const threeway_cmp found = cmp (elem, ret, NULL);
   if (found != EQL)
     return &t->nil;
-  t->root = ret;
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = ret;
   return remove_from_tree (t, ret, cmp);
 }
 
@@ -504,8 +505,7 @@ multiset_erase_max_or_min (struct tree *t, struct node *tnil,
   struct node *ret = splay (t, t->root, tnil, force_max_or_min);
   assert (ret != NULL);
 
-  t->root = ret;
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = ret;
   if (stores_dups (t, ret))
     {
       ret->parent_or_dups->parent_or_dups = &t->nil;
@@ -544,8 +544,7 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
   struct node *ret = splay (t, t->root, node, cmp);
   assert (ret != NULL);
 
-  t->root = ret;
-  t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+  t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = ret;
   if (stores_dups (t, ret))
     {
       ret->parent_or_dups->parent_or_dups = &t->nil;
@@ -583,9 +582,8 @@ pop_front_dup (struct tree *t, struct node *old, tree_cmp_fn *cmp)
   struct node *parent = old->parent_or_dups->parent_or_dups;
   struct node *tree_replacement = old->parent_or_dups;
   if (old == t->root)
-    {
-      t->root = tree_replacement;
-    }
+    t->root = t->nil.links[R] = t->nil.links[L] = t->nil.parent_or_dups
+        = tree_replacement;
 
   struct node *new_list_head = old->parent_or_dups->links[N];
   struct node *list_tail = old->parent_or_dups->links[P];
@@ -601,14 +599,10 @@ pop_front_dup (struct tree *t, struct node *old, tree_cmp_fn *cmp)
   tree_replacement->links[R] = old->links[R];
   tree_replacement->parent_or_dups = new_list_head;
 
-  if (stores_dups (t, tree_replacement->links[L]))
-    tree_replacement->links[L]->parent_or_dups->parent_or_dups
-        = tree_replacement;
-  if (stores_dups (t, tree_replacement->links[R]))
-    tree_replacement->links[R]->parent_or_dups->parent_or_dups
-        = tree_replacement;
+  give_parent_subtree (t, tree_replacement, L, tree_replacement->links[L]);
+  give_parent_subtree (t, tree_replacement, R, tree_replacement->links[R]);
   if (circular_list_empty)
-    tree_replacement->parent_or_dups = &t->nil;
+    tree_replacement->parent_or_dups = parent;
 
   tree_replacement->links[L]->parent_or_dups = tree_replacement;
   tree_replacement->links[R]->parent_or_dups = tree_replacement;
@@ -620,20 +614,20 @@ static struct node *
 remove_from_tree (struct tree *t, struct node *ret, tree_cmp_fn *cmp)
 {
   if (ret->links[L] == &t->nil)
-    {
-      t->root = ret->links[R];
-      t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
-    }
+    t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups
+        = ret->links[R];
   else
     {
-      t->root = splay (t, ret->links[L], ret, cmp);
-      t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
+      t->root = t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups
+          = splay (t, ret->links[L], ret, cmp);
       give_parent_subtree (t, t->root, R, ret->links[R]);
     }
+
   if (stores_dups (t, t->root))
     t->root->parent_or_dups->parent_or_dups = &t->nil;
   else
     t->root->parent_or_dups = &t->nil;
+
   t->nil.links[L] = t->nil.links[R] = t->nil.parent_or_dups = t->root;
   return ret;
 }
@@ -693,7 +687,7 @@ give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
   parent->links[dir] = subtree;
   if (stores_dups (t, subtree))
     subtree->parent_or_dups->parent_or_dups = parent;
-  else
+  else if (subtree != &t->nil)
     subtree->parent_or_dups = parent;
 }
 
@@ -708,67 +702,35 @@ stores_dups (const struct tree *t, const struct node *n)
 size_t
 count_dups (struct tree *t, struct node *n)
 {
-  if (n->parent_or_dups == &t->nil)
+  if (!stores_dups (t, n))
     return 0;
   size_t dups = 1;
+  /* TODO this function is broken because we loop infinitely 
+     when we try to count duplicates insert or delete duplicates
+     is broken somewhere! */
   for (struct node *cur = n->parent_or_dups->links[N];
        cur != n->parent_or_dups; cur = cur->links[N])
     ++dups;
   return dups;
 }
 
-/* Simple Morris iterative traversal. The only downside is that we
-   modify the links of the tree while iterating. Incorrectly
-   guarding from interrupts would be catastrophic. Perhaps we
-   could keep a size of the queue if needed for O(1) checks but
-   we don't need size that often with a priority queue. Also
-   we need to save on stack space so recursion is out for user
-   facing library.
+/* NOLINTBEGIN(*misc-no-recursion) */
 
-   Iterate through the tree by sending a node to the inorder predecessor in the
-   left subtree. The inorder predecessor creates a link back up to the root we
-   dispatched the search from. When the root reaches a leaf add the value and
-   use the link to go back up the tree. On the second pass with the inorder
-   predecessor we will know it is time to clean up because the inorder
-   predecessor is now pointing back to the traversal root. Add the value at
-   root because this is our last chance before descending into the right
-   subtree. Send the root traversal node into the right subtree. When the root
-   can go right no longer, we are done. :) */
+static size_t
+recursive_size (struct tree *const t, struct node *r)
+{
+  if (r == &t->nil)
+    return 0;
+  size_t s = 1;
+  if (stores_dups(t, r))
+    s += count_dups(t, r); 
+  return s + recursive_size(t, r->links[R]) + recursive_size(t, r->links[L]);
+}
+
 size_t
 size (struct tree *const t)
 {
-  assert (t);
-  struct node *iter = t->root;
-  struct node *inorder_pred = NULL;
-  size_t s = 0;
-  while (iter != &t->nil)
-    {
-      if (&t->nil == iter->links[L])
-        {
-          /* This is where we climb back up a link if it exists */
-          s += count_dups (t, iter) + 1;
-          iter = iter->links[R];
-          continue;
-        }
-      inorder_pred = iter->links[L];
-      while (&t->nil != inorder_pred->links[R]
-             && iter != inorder_pred->links[R])
-        inorder_pred = inorder_pred->links[R];
-      if (&t->nil == inorder_pred->links[R])
-        {
-          /* The right field is a temporary traversal helper. */
-          inorder_pred->links[R] = iter;
-          iter = iter->links[L];
-          continue;
-        }
-      /* Here is our last chance to count this value. */
-      s += count_dups (t, iter) + 1;
-      /* Here is our last chance to repair our wreckage */
-      inorder_pred->links[R] = &t->nil;
-      /* This is how we get to a right subtree if any exists. */
-      iter = iter->links[R];
-    }
-  return s;
+  return recursive_size(t, t->root);
 }
 
 /* We can trick our splay tree into giving us the max via splaying
@@ -777,7 +739,6 @@ size (struct tree *const t)
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters)*/
-
 static threeway_cmp
 force_find_grt (const struct node *a, const struct node *b,
                 void *aux) // NOLINT
@@ -798,7 +759,7 @@ force_find_les (const struct node *a, const struct node *b,
   return LES;
 }
 
-/* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
+/* NOLINTEND(*swappable-parameters) */
 
 /* =========================================================================
    =======================        Debugging           ======================

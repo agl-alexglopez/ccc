@@ -40,6 +40,7 @@ static bool pq_test_insert_one (void);
 static bool pq_test_insert_three (void);
 static bool pq_test_struct_getter (void);
 static bool pq_test_insert_three_dups (void);
+static bool pq_test_insert_remove_four_dups (void);
 static bool pq_test_read_max_min (void);
 static bool pq_test_insert_shuffle (void);
 static bool pq_test_insert_erase_shuffled (void);
@@ -54,13 +55,14 @@ static void insert_shuffled (pqueue *, struct val[], int, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS 14
-const test_fn all_tests[NUM_TESTS] = {
+const size_t num_tests = 15;
+const test_fn all_tests[num_tests] = {
   pq_test_empty,
   pq_test_insert_one,
   pq_test_insert_three,
   pq_test_struct_getter,
   pq_test_insert_three_dups,
+  pq_test_insert_remove_four_dups,
   pq_test_read_max_min,
   pq_test_insert_shuffle,
   pq_test_insert_erase_shuffled,
@@ -82,15 +84,15 @@ static int
 run_tests (void)
 {
   printf ("\n");
-  int pass_count = 0;
-  for (int i = 0; i < NUM_TESTS; ++i)
+  size_t pass_count = 0;
+  for (size_t i = 0; i < num_tests; ++i)
     {
       const bool passed = all_tests[i]();
       pass_count += passed;
       passed ? printf ("...%s\n", pass_msg) : printf ("...%s\n", fail_msg);
     }
-  printf ("PASSED %d/%d %s\n\n", pass_count, NUM_TESTS,
-          (pass_count == NUM_TESTS) ? "\\(*.*)/\n" : ">:(\n");
+  printf ("PASSED %zu/%zu %s\n\n", pass_count, num_tests,
+          (pass_count == num_tests) ? "\\(*.*)/\n" : ">:(\n");
   return 0;
 }
 
@@ -257,6 +259,41 @@ pq_test_insert_shuffle (void)
     if (vals[i].val != sorted_check[i])
       return false;
   return true;
+}
+
+static bool
+pq_test_insert_remove_four_dups (void)
+{
+  printf ("pq_test_insert_remove_four_duplicates");
+  pqueue pq;
+  pq_init (&pq);
+  struct val three_vals[4];
+  for (int i = 0; i < 4; ++i)
+    {
+      three_vals[i].val = 0;
+      pq_insert (&pq, &three_vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (pq_size (&pq) != 4)
+    {
+      breakpoint ();
+      return false;
+    }
+  for (int i = 0; i < 4; ++i)
+    {
+      three_vals[i].val = 0;
+      pq_pop_max (&pq);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  return pq_empty (&pq);
 }
 
 static bool

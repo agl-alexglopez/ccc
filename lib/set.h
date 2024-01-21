@@ -245,7 +245,7 @@ bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
       else
          ...Do something else...
 */
-set_elem *set_end (set *);
+const set_elem *set_end (const set *);
 
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
