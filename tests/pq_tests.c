@@ -557,9 +557,10 @@ pq_test_rand_queue (void)
   pq_init (&pq);
   const int size = 50;
   const int prime = 53;
+  const int less = 10;
   /* We want the tree to have a smattering of duplicates so
      reduce the shuffle range so it will repeat some values. */
-  int shuffled_index = prime % (size - 10);
+  int shuffled_index = prime % (size - less);
   struct val vals[size];
   for (int i = 0; i < size; ++i)
     {
@@ -571,7 +572,7 @@ pq_test_rand_queue (void)
           breakpoint ();
           return false;
         }
-      shuffled_index = (shuffled_index + prime) % (size - 10);
+      shuffled_index = (shuffled_index + prime) % (size - less);
     }
 
   /* Now we go through and free all the elements in order but

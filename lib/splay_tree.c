@@ -612,7 +612,10 @@ remove_from_tree (struct tree *t, struct node *ret, tree_cmp_fn *cmp)
   if (ret->links[L] == &t->end)
     t->root = ret->links[R];
   else
-    t->root = splay (t, ret->links[L], ret, cmp);
+    {
+      t->root = splay (t, ret->links[L], ret, cmp);
+      give_parent_subtree (t, t->root, R, ret->links[R]);
+    }
   give_parent_subtree (t, &t->end, 0, t->root);
   return ret;
 }
@@ -672,7 +675,7 @@ give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
   parent->links[dir] = subtree;
   if (subtree != &t->end && subtree->dups)
     subtree->parent_or_dups->parent_or_dups = parent;
-  else
+  else if (subtree != &t->end)
     subtree->parent_or_dups = parent;
 }
 
