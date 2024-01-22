@@ -86,14 +86,17 @@ static struct node *max (const struct tree *);
 static struct node *pop_max (struct tree *);
 static struct node *pop_min (struct tree *);
 static struct node *min (const struct tree *);
-static const struct node *end (const struct tree *);
+static struct node *begin (struct tree *);
+static struct node *end (struct tree *);
+static struct node *next (struct tree *, struct node *);
 static threeway_cmp force_find_grt (const struct node *, const struct node *,
                                     void *);
 static threeway_cmp force_find_les (const struct node *, const struct node *,
                                     void *);
 static size_t size (struct tree *);
-static void give_parent_subtree (struct tree *t, struct node *, enum tree_link,
+static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
+static struct node *get_parent (struct node *);
 static void add_duplicate (struct node *, struct node *, struct node *);
 static struct node *splay (struct tree *, struct node *, const struct node *,
                            tree_cmp_fn *);
@@ -130,6 +133,24 @@ pq_elem *
 pq_min (const pqueue *const pq)
 {
   return min (pq);
+}
+
+pq_elem *
+pq_begin (pqueue *pq)
+{
+  return begin (pq);
+}
+
+pq_elem *
+pq_end (pqueue *pq)
+{
+  return end (pq);
+}
+
+pq_elem *
+pq_next (pqueue *pq, pq_elem *e)
+{
+  return next (pq, e);
 }
 
 void
@@ -196,10 +217,22 @@ set_insert (set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
   return insert (s, se, cmp, aux);
 }
 
-const set_elem *
-set_end (const set *s)
+set_elem *
+set_begin (set *s)
+{
+  return begin (s);
+}
+
+set_elem *
+set_end (set *s)
 {
   return end (s);
+}
+
+set_elem *
+set_next (set *s, set_elem *e)
+{
+  return next (s, e);
 }
 
 const set_elem *
@@ -331,7 +364,6 @@ static struct node *
 min (const struct tree *t)
 {
   assert (t != NULL);
-  assert (!empty (t));
   struct node *m = t->root;
   for (; m->links[L] != &t->end; m = m->links[L])
     ;
@@ -350,10 +382,40 @@ pop_min (struct tree *t)
   return multiset_erase_max_or_min (t, &t->end, force_find_les, NULL);
 }
 
-static const struct node *
-end (const struct tree *t)
+static struct node *
+begin (struct tree *t)
+{
+  return min (t);
+}
+
+static struct node *
+end (struct tree *t)
 {
   return &t->end;
+}
+
+static struct node *
+next (struct tree *t, struct node *n)
+{
+  assert (get_parent (t->root) == &t->end);
+  t->end.links[L] = t->root;
+  t->end.links[R] = &t->end;
+  if (n->links[R] != &t->end)
+    {
+      n = n->links[R];
+      while (n->links[L] != &t->end)
+        n = n->links[L];
+      return n;
+    }
+  struct node *p = get_parent (n);
+  while (n == p->links[R])
+    {
+      n = p;
+      p = get_parent (p);
+    }
+  if (n->links[R] != p)
+    n = p;
+  return n;
 }
 
 static struct node *
@@ -412,9 +474,6 @@ multiset_insert (struct tree *t, struct node *elem, tree_cmp_fn *cmp,
     }
   t->root = splay (t, t->root, elem, cmp);
   give_parent_subtree (t, &t->end, 0, t->root);
-
-  if (!validate_tree (t, cmp))
-    breakpoint ();
 
   const threeway_cmp root_size = cmp (elem, t->root, NULL);
   if (EQL == root_size)
@@ -481,7 +540,9 @@ erase (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     return &t->end;
   t->root = ret;
   give_parent_subtree (t, &t->end, 0, t->root);
-  return remove_from_tree (t, ret, cmp);
+  ret = remove_from_tree (t, ret, cmp);
+  ret->links[L] = ret->links[R] = ret->parent_or_dups = NULL;
+  return ret;
 }
 
 /* We need to mindful of what the user is asking for. If they want any
@@ -498,17 +559,20 @@ multiset_erase_max_or_min (struct tree *t, struct node *tnil,
   assert (t != NULL);
   assert (tnil != NULL);
   assert (force_max_or_min != NULL);
+  assert (!empty (t));
   t->size--;
   assert (t->size != ((size_t)-1));
 
   struct node *ret = splay (t, t->root, tnil, force_max_or_min);
-  assert (ret != NULL);
 
   t->root = ret;
   give_parent_subtree (t, &t->end, 0, t->root);
   if (ret->dups)
-    return pop_front_dup (t, ret, force_max_or_min);
-  return remove_from_tree (t, ret, force_max_or_min);
+    ret = pop_front_dup (t, ret, force_max_or_min);
+  else
+    ret = remove_from_tree (t, ret, force_max_or_min);
+  ret->links[L] = ret->links[R] = ret->parent_or_dups = NULL;
+  return ret;
 }
 
 /* We need to mindful of what the user is asking for. This is a request
@@ -524,6 +588,7 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
   assert (t != NULL);
   assert (node != NULL);
   assert (cmp != NULL);
+  assert (!empty (t));
   t->size--;
   assert (t->size != ((size_t)-1));
 
@@ -538,13 +603,15 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
     }
 
   struct node *ret = splay (t, t->root, node, cmp);
-  assert (ret != NULL);
 
   t->root = ret;
   give_parent_subtree (t, &t->end, 0, t->root);
   if (ret->dups)
-    return pop_dup_node (t, node, cmp, ret);
-  return remove_from_tree (t, ret, cmp);
+    ret = pop_dup_node (t, node, cmp, ret);
+  else
+    ret = remove_from_tree (t, ret, cmp);
+  ret->links[L] = ret->links[R] = ret->parent_or_dups = NULL;
+  return ret;
 }
 
 static struct node *
@@ -677,6 +744,12 @@ give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
     subtree->parent_or_dups->parent_or_dups = parent;
   else if (subtree != &t->end)
     subtree->parent_or_dups = parent;
+}
+
+static struct node *
+get_parent (struct node *n)
+{
+  return n->dups ? n->parent_or_dups->parent_or_dups : n->parent_or_dups;
 }
 
 static size_t

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 const char *const pass_msg = "pass";
 const char *const fail_msg = "fail";
@@ -32,14 +33,16 @@ static bool pq_test_pop_max (void);
 static bool pq_test_pop_min (void);
 static bool pq_test_max_round_robin (void);
 static bool pq_test_min_round_robin (void);
-static bool pq_test_delete_rand_duplicates (void);
-static bool pq_test_rand_queue (void);
+static bool pq_test_delete_prime_shuffle_duplicates (void);
+static bool pq_test_prime_shuffle (void);
+static bool pq_test_weak_srand (void);
+static bool pq_test_forward_iter_unique_vals (void);
 static int run_tests (void);
 static void insert_shuffled (pqueue *, struct val[], size_t, int);
 static void inorder_fill (int vals[], size_t size, pqueue *pq);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS (size_t)15
+#define NUM_TESTS (size_t)17
 const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
@@ -54,8 +57,10 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_pop_min,
   pq_test_max_round_robin,
   pq_test_min_round_robin,
-  pq_test_delete_rand_duplicates,
-  pq_test_rand_queue,
+  pq_test_delete_prime_shuffle_duplicates,
+  pq_test_prime_shuffle,
+  pq_test_weak_srand,
+  pq_test_forward_iter_unique_vals,
 };
 
 int
@@ -508,9 +513,9 @@ pq_test_min_round_robin (void)
 }
 
 static bool
-pq_test_delete_rand_duplicates (void)
+pq_test_delete_prime_shuffle_duplicates (void)
 {
-  printf ("pq_test_delete_rand_duplicates");
+  printf ("pq_test_delete_prime_shuffle_duplicates");
   pqueue pq;
   pq_init (&pq);
   const int size = 99;
@@ -563,7 +568,7 @@ pq_test_delete_rand_duplicates (void)
 }
 
 static bool
-pq_test_rand_queue (void)
+pq_test_prime_shuffle (void)
 {
   printf ("pq_test_rand_queue");
   pqueue pq;
@@ -602,6 +607,94 @@ pq_test_rand_queue (void)
       --cur_size;
       const size_t cur_get_size = pq_size (&pq);
       if (cur_get_size != cur_size)
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  return true;
+}
+
+static bool
+pq_test_weak_srand (void)
+{
+  printf ("pq_test_weak_srand");
+  pqueue pq;
+  pq_init (&pq);
+  /* Seed the test with any integer for reproducible randome test sequence
+     currently this will change every test. NOLINTNEXTLINE */
+  srand (time (NULL));
+  const int num_nodes = 1000;
+  struct val vals[num_nodes];
+  for (int i = 0; i < num_nodes; ++i)
+    {
+      vals[i].val = rand (); // NOLINT
+      vals[i].id = i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  for (int i = 0; i < num_nodes; ++i)
+    {
+      pq_erase (&pq, &vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!pq_empty (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  return true;
+}
+
+static bool
+pq_test_forward_iter_unique_vals (void)
+{
+  printf ("pq_test_forward_iter_unique_vals");
+  pqueue pq;
+  pq_init (&pq);
+
+  /* We should have the expected behavior iteration over empty tree. */
+  int j = 0;
+  for (pq_elem *e = pq_begin (&pq); e != pq_end (&pq);
+       e = pq_next (&pq, e), ++j)
+    ;
+  if (j != 0)
+    {
+      breakpoint ();
+      return false;
+    }
+
+  const int num_nodes = 33;
+  const int prime = 37;
+  struct val vals[num_nodes];
+  size_t shuffled_index = prime % num_nodes;
+  for (int i = 0; i < num_nodes; ++i)
+    {
+      vals[i].val = shuffled_index; // NOLINT
+      vals[i].id = i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+      shuffled_index = (shuffled_index + prime) % num_nodes;
+    }
+  int val_keys_inorder[num_nodes];
+  inorder_fill (val_keys_inorder, num_nodes, &pq);
+  for (pq_elem *e = pq_begin (&pq); e != pq_end (&pq);
+       e = pq_next (&pq, e), ++j)
+    {
+      const struct val *v = pq_entry (e, struct val, elem);
+      if (v->val != val_keys_inorder[j])
         {
           breakpoint ();
           return false;

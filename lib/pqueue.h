@@ -186,6 +186,10 @@ pq_elem *pq_pop_min (pqueue *);
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 
+pq_elem *pq_begin (pqueue *);
+pq_elem *pq_next (pqueue *, pq_elem *);
+pq_elem *pq_end (pqueue *);
+
 /* Not very useful or significant. Helps with tests. */
 pq_elem *pq_root (const pqueue *);
 
