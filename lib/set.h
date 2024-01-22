@@ -30,7 +30,8 @@
 
    Embed a set_elem in your struct:
 
-      struct val {
+      struct val
+      {
          int val;
          set_elem elem;
       };
@@ -46,7 +47,8 @@
    queue data structure. Assume that you are responsible for
    every value in the set.
 
-      struct val {
+      struct val
+      {
          int val;
          set_elem elem;
       }
@@ -72,22 +74,24 @@
       static set my_set;
 
       static threeway_cmp
-      val_cmp (const set_elem *a, const set_elem *b, void *aux)
+      val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
         (void)aux;
-        struct val *lhs = set_entry (a, struct val, elem);
-        struct val *rhs = set_entry (b, struct val, elem);
+        struct val *lhs = set_entry(a, struct val, elem);
+        struct val *rhs = set_entry(b, struct val, elem);
         return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-      bool my_contains(int key)
+      bool
+      my_contains(int key)
       {
          set_key.val = key;
-         return set_contains (&s, &set_key, &val_cmp, NULL);
+         return set_contains(&s, &set_key, &val_cmp, NULL);
       }
 
 
-      int main() {
+      int
+      main() {
          ... Program logic of generating all values  ...
          ... that will go in the set for later       ...
       }
@@ -104,22 +108,24 @@
       static set my_set;
 
       static threeway_cmp
-      val_cmp (const set_elem *a, const set_elem *b, void *aux)
+      val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
         (void)aux;
-        struct val *lhs = set_entry (a, struct val, elem);
-        struct val *rhs = set_entry (b, struct val, elem);
+        struct val *lhs = set_entry(a, struct val, elem);
+        struct val *rhs = set_entry(b, struct val, elem);
         return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-      struct node * my_find(int key)
+      struct node *
+      my_find(int key)
       {
          set_key.val = key;
-         return set_find (&s, &set_key, &val_cmp, NULL);
+         return set_find(&s, &set_key, &val_cmp, NULL);
       }
 
 
-      int main() {
+      int
+      main() {
          ... Program logic of generating all values  ...
          ... that will go in the set for later       ...
 
@@ -174,7 +180,7 @@ typedef struct tree set;
       };
 
       static threeway_cmp
-      val_cmp (const set_elem *a, const set_elem *b, void *aux)
+      val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
         (void)aux;
         struct val *lhs = set_entry (a, struct val, elem);

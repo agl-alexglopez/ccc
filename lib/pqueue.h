@@ -30,7 +30,8 @@
 
    Embed a pq_elem in your struct:
 
-      struct val {
+      struct val
+      {
          int val;
          pq_elem elem;
       };
@@ -130,11 +131,11 @@ typedef pq_elem dup_elem;
       };
 
       static threeway_cmp
-      val_cmp (const pq_elem *a, const pq_elem *b, void *aux)
+      val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
       {
         (void)aux;
-        struct val *lhs = pq_entry (a, struct val, elem);
-        struct val *rhs = pq_entry (b, struct val, elem);
+        struct val *lhs = pq_entry(a, struct val, elem);
+        struct val *rhs = pq_entry(b, struct val, elem);
         return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 */
@@ -227,13 +228,15 @@ pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
       static pqueue pq;
 
-      bool has_priority (int priority)
+      bool
+      has_priority(int priority)
       {
          struct priority key = { .priority = priority };
-         return pq_has_priority (&pq, my_cmp, NULL);
+         return pq_has_priority(&pq, my_cmp, NULL);
       }
 
-      int main ()
+      int
+      main()
       {
          pq_init(&pq);
          ...
@@ -262,16 +265,18 @@ bool pq_has(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
    static pqueue q;
 
-   for (struct pq_iter i = pq_begin (&q); !pq_end (&q, &i); pq_next (&q, &i))
+   int
+   main ()
+   {
+      pq_init(&q);
+
+      ...Fill the container with program logic...
+
+      for (struct pq_iter i = pq_begin(&q); !pq_end(&q, &i); pq_next(&q, &i))
       {
-         struct val *cur = pq_entry (pq_from_iter (&i), struct val, elem);
+         struct val *cur = pq_entry(pq_from_iter(&i), struct val, elem);
          printf("%d", cur->val);
       }
-
-   int main ()
-   {
-      pq_init (&q);
-      ...
    }
 
    The pq_iter is created once in this case and only lives for the scope
@@ -319,16 +324,19 @@ bool pq_end(pqueue *, struct pq_iter *);
          pq_elem elem;
       };
       static pqueue q;
-      for (pq_elem *e = pq_uniq_begin (&q); e != pq_uniq_end (&q);
-           e = pq_uniq_next (&q, e))
-        {
-          struct val *v = pq_entry (e, struct val, elem)->val;
-          printf ("%d", v->val);
-        }
-      int main ()
+      int
+      main ()
       {
          pq_init (&q);
-         ...
+
+         ...Fill container with program logic...
+
+         for (pq_elem *e = pq_uniq_begin (&q); e != pq_uniq_end (&q);
+              e = pq_uniq_next (&q, e))
+        {
+            struct val *v = pq_entry (e, struct val, elem)->val;
+            printf ("%d", v->val);
+        }
       }
 */
 pq_elem *pq_uniq_begin(pqueue *);
