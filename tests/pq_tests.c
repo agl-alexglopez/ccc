@@ -1,6 +1,7 @@
 #include "pqueue.h"
 
 #include <assert.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -67,6 +68,21 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_forward_iter_all_vals,
   pq_test_insert_iterate_pop,
 };
+
+/* Set this breakpoint on any line where you wish
+   execution to stop. Under normal program runs the program
+   will simply exit. If triggered in GDB execution will stop
+   while able to explore the surrounding context, varialbes,
+   and stack frames. Be sure to step "(gdb) up" out of the
+   raise function to wherever it triggered. */
+#define breakpoint()                                                          \
+  do                                                                          \
+    {                                                                         \
+      (void)fprintf (stderr, "\n!!Break. Line: %d File: %s, Func: %s\n ",     \
+                     __LINE__, __FILE__, __func__);                           \
+      (void)raise (SIGTRAP);                                                  \
+    }                                                                         \
+  while (0)
 
 int
 main ()
@@ -717,8 +733,8 @@ pq_test_forward_iter_all_vals (void)
 
   /* We should have the expected behavior iteration over empty tree. */
   int j = 0;
-  for (struct pq_iter i = pq_all_begin (&pq); !pq_all_end (&pq, &i);
-       pq_all_next (&pq, &i), ++j)
+  for (struct pq_iter i = pq_begin (&pq); !pq_end (&pq, &i);
+       pq_next (&pq, &i), ++j)
     {
     }
   if (j != 0)
@@ -748,10 +764,10 @@ pq_test_forward_iter_all_vals (void)
       }
   int val_keys_inorder[num_nodes];
   inorder_fill (val_keys_inorder, num_nodes, &pq);
-  for (struct pq_iter i = pq_all_begin (&pq); !pq_all_end (&pq, &i);
-       pq_all_next (&pq, &i), ++j)
+  for (struct pq_iter i = pq_begin (&pq); !pq_end (&pq, &i);
+       pq_next (&pq, &i), ++j)
     {
-      const struct val *v = pq_entry (pq_all_entry (&i), struct val, elem);
+      const struct val *v = pq_entry (pq_from_iter (&i), struct val, elem);
       if (v->val != val_keys_inorder[j])
         {
           breakpoint ();
@@ -767,13 +783,14 @@ pq_test_insert_iterate_pop (void)
   printf ("pq_test_insert_iterate_pop");
   pqueue pq;
   pq_init (&pq);
-  /* Seed the test with any integer for reproducible randome test sequence
+  /* Seed the test with any integer for reproducible random test sequence
      currently this will change every test. NOLINTNEXTLINE */
   srand (time (NULL));
   const size_t num_nodes = 1000;
   struct val vals[num_nodes];
   for (size_t i = 0; i < num_nodes; ++i)
     {
+      /* Force duplicates. */
       vals[i].val = rand () % (1000 + 1); // NOLINT
       vals[i].id = (int)i;
       pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
@@ -794,7 +811,10 @@ pq_test_insert_iterate_pop (void)
       pq_pop_max (&pq);
       ++pop_count;
       if (!validate_tree (&pq, val_cmp))
-        breakpoint ();
+        {
+          breakpoint ();
+          return false;
+        }
       if (pop_count % 200 && !iterate_check (&pq))
         {
           breakpoint ();
@@ -863,8 +883,7 @@ static bool
 iterate_check (pqueue *pq)
 {
   size_t iter_count = 0;
-  for (struct pq_iter e = pq_all_begin (pq); !pq_all_end (pq, &e);
-       pq_all_next (pq, &e))
+  for (struct pq_iter e = pq_begin (pq); !pq_end (pq, &e); pq_next (pq, &e))
     ++iter_count;
   return iter_count == pq_size (pq);
 }

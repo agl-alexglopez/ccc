@@ -147,13 +147,13 @@ pq_uniq_begin (pqueue *pq)
 }
 
 struct pq_iter
-pq_all_begin (pqueue *pq)
+pq_begin (pqueue *pq)
 {
   return (struct pq_iter){ min (pq), &pq->end, START };
 }
 
 bool
-pq_all_end (pqueue *pq, struct pq_iter *i)
+pq_end (pqueue *pq, struct pq_iter *i)
 {
   return i->el == &pq->end;
 }
@@ -177,7 +177,7 @@ is_head (struct pq_iter *i)
 }
 
 void
-pq_all_next (pqueue *pq, struct pq_iter *i)
+pq_next (pqueue *pq, struct pq_iter *i)
 {
   if (completed_lap (i))
     {
@@ -221,7 +221,7 @@ pq_all_next (pqueue *pq, struct pq_iter *i)
 }
 
 pq_elem *
-pq_all_entry (struct pq_iter *i)
+pq_from_iter (struct pq_iter *i)
 {
   return i->flag != 0 ? i->dup : i->el;
 }
