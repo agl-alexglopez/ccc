@@ -185,15 +185,15 @@ typedef struct tree set;
 typedef tree_cmp_fn set_cmp_fn;
 
 /* NOLINTNEXTLINE */
-#define set_entry(TREE_ELEM, STRUCT, MEMBER)                                  \
-  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
-              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
+#define set_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
+    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                  \
+                - offsetof(STRUCT, MEMBER.dups))) /* NOLINT */
 
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
-void set_init (set *);
-bool set_empty (set *);
-size_t set_size (set *);
+void set_init(set *);
+bool set_empty(set *);
+size_t set_size(set *);
 
 /*
    =============================================================
@@ -210,14 +210,14 @@ size_t set_size (set *);
    wiht the same key. Do not assume your element is the
    one that is found unless you know it is only one you
    have created. */
-bool set_contains (set *, set_elem *, set_cmp_fn *, void *);
+bool set_contains(set *, set_elem *, set_cmp_fn *, void *);
 
 /* Returns true if the element you have requested to be
    inserted is inserted false if it was present already.
    Becuase this is heap free data structure there is no need
    to return the actual element that is inserted. You already
    have it when you call this function.*/
-bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
+bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
 
 /* This is how you can tell if your set find and set erase
    functions are successful. One should always check that
@@ -245,7 +245,10 @@ bool set_insert (set *, set_elem *, set_cmp_fn *, void *);
       else
          ...Do something else...
 */
-set_elem *set_end (set *);
+set_elem *set_end(set *);
+
+set_elem *set_begin(set *);
+set_elem *set_next(set *, set_elem *);
 
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
@@ -259,7 +262,7 @@ set_elem *set_end (set *);
    be using for your program, but please read the warning.
    However, there is little I can do to stop you from ruining
    everything if you choose to do so. */
-const set_elem *set_find (set *, set_elem *, set_cmp_fn *, void *);
+const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -267,10 +270,10 @@ const set_elem *set_find (set *, set_elem *, set_cmp_fn *, void *);
    end element and it does not have any attachment to any
    struct you are using so trying to get the set entry from
    it will not work.*/
-set_elem *set_erase (set *, set_elem *, set_cmp_fn *, void *);
+set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes. */
-set_elem *set_root (set *);
+set_elem *set_root(set *);
 #endif
