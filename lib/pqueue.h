@@ -154,24 +154,24 @@ typedef tree_cmp_fn pq_cmp_fn;
 
 struct pq_iter
 {
-  pq_elem *el;
-  pq_elem *dup;
-  uint8_t flag;
+    pq_elem *el;
+    pq_elem *dup;
+    uint8_t flag;
 };
 
 /* NOLINTNEXTLINE */
-#define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
-  ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                   \
-              - offsetof (STRUCT, MEMBER.dups))) /* NOLINT */
+#define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                    \
+    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                  \
+                - offsetof(STRUCT, MEMBER.dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
-void pq_init (pqueue *);
+void pq_init(pqueue *);
 
 /* Checks if the priority queue is empty. Undefined if
    pq_init has not been called first. */
-bool pq_empty (const pqueue *);
+bool pq_empty(const pqueue *);
 /* O(1) */
-size_t pq_size (pqueue *);
+size_t pq_size(pqueue *);
 
 /* Inserts the given pq_elem into an initialized pqueue
    any data in the pq_elem member will be overwritten
@@ -179,7 +179,7 @@ size_t pq_size (pqueue *);
    behavior is undefined. Priority queue insertion
    shall not fail becuase priority queues support
    round robin duplicates. O(lgN) */
-void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+void pq_insert(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
@@ -192,9 +192,9 @@ void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
    to its same value after having removed the element from
    the tree it is considered new and returns to the back
    of the queue of duplicates. */
-pq_elem *pq_pop_max (pqueue *);
+pq_elem *pq_pop_max(pqueue *);
 /* Same promises as pop_max except for the minimum values. */
-pq_elem *pq_pop_min (pqueue *);
+pq_elem *pq_pop_min(pqueue *);
 
 /* Read only peek at the max and min these operations do
    not modify the tree so multiple threads could call them
@@ -204,15 +204,15 @@ pq_elem *pq_pop_min (pqueue *);
    and it has duplicates those duplicates will remain at
    the root O(1) until another insertion, query, or pop
    occurs. */
-pq_elem *pq_max (const pqueue *);
-pq_elem *pq_min (const pqueue *);
+pq_elem *pq_max(const pqueue *);
+pq_elem *pq_min(const pqueue *);
 
 /* Erases a specified element known to be in the queue.
    The behavior is undefined if the element is not in
    the queue. O(lgN). However, in practice you can
    often benefit from O(1) access if that element is
    a duplicate or you repeatedly access that value. */
-pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Returns true if this priority value is in the queue.
    you need not search with any specific struct you have
@@ -243,7 +243,7 @@ pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
    is present regardless of how many round robin duplicates
    are present. Returns the result in O(lgN).
 */
-bool pq_has (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+bool pq_has(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /*
    =============================================================
@@ -285,25 +285,25 @@ bool pq_has (pqueue *, pq_elem *, pq_cmp_fn *, void *);
    queue. It is simply two pointers and a byte so it is not very
    expensive and is only allocated on the stack once. Use the
    following methods to progress through the priority queue. */
-struct pq_iter pq_begin (pqueue *);
+struct pq_iter pq_begin(pqueue *);
 
 /* YOU MUST USE THIS METHOD TO PROGRESS THE ITERATOR. It is
    non trivial to iterate through this queue and you will not get
    the desired results if you attempt to do so yourself. Pass
    a pointer to the queue and iterator and use the provided
    from iterator method to access your data. */
-void pq_next (pqueue *, struct pq_iter *);
+void pq_next(pqueue *, struct pq_iter *);
 
 /* How to access your expected elem you have embedded in your struct.
    Use this method to follow the standard iterator pattern in the
    example above. Then use the pq_entry macro to get back your struct. */
-pq_elem *pq_from_iter (struct pq_iter *);
+pq_elem *pq_from_iter(struct pq_iter *);
 
 /* Returns true if the iterator has reached the end of the queue.
    The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end
    is reached. */
-bool pq_end (pqueue *, struct pq_iter *);
+bool pq_end(pqueue *, struct pq_iter *);
 
 /* It is sometimes convenient for testing or other reasons to iterate
    only through the unique elements in the queue. Because the queue
@@ -331,11 +331,11 @@ bool pq_end (pqueue *, struct pq_iter *);
          ...
       }
 */
-pq_elem *pq_uniq_begin (pqueue *);
-pq_elem *pq_uniq_next (pqueue *, pq_elem *);
-pq_elem *pq_uniq_end (pqueue *);
+pq_elem *pq_uniq_begin(pqueue *);
+pq_elem *pq_uniq_next(pqueue *, pq_elem *);
+pq_elem *pq_uniq_end(pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
-pq_elem *pq_root (const pqueue *);
+pq_elem *pq_root(const pqueue *);
 
 #endif
