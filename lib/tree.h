@@ -17,7 +17,7 @@ enum list_link
 
 struct node
 {
-  struct node *links[2];
+  struct node *link[2];
   struct node *parent_or_dups;
   bool dups;
 };
@@ -51,6 +51,9 @@ typedef threeway_cmp tree_cmp_fn (const struct node *key, const struct node *n,
    data structure with invariants that must hold regardless of
    interface. */
 bool validate_tree (struct tree *t, tree_cmp_fn *cmp);
+
+/* Use this function in gdb or a terminal for some pretty colors.
+   Intended for debuggin use. */
 void print_tree (const struct tree *t, const struct node *root);
 
 #endif

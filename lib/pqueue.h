@@ -52,8 +52,8 @@
    you access the min or max for removal any future access
    to duplicates of that priority are guaranteed to be O(1).
    This may be an important consideration for Priority Queues.
-   However, any other removals or insertions reduce performance
-   back to O(lgN) for the first access.
+   However, any other removals or insertions of different values
+   reduce performance back to O(lgN) for the first access.
 
    This Priority Queue also guarantees Round-Robin Fairness
    among duplicate priorities. However, if you remove a node
@@ -66,8 +66,7 @@
    guarantee that performance shall be bounded at O(lgN) for
    real-time use cases, prefer a Red-Black Tree based structure.
    This is built using a Splay Tree. I can add a Red-Black tree
-   but I think splay trees are way cooler for all they achieve
-   with far less code.
+   but I prefer splay trees for all they achieve with far less code.
 
    Internally, the representation to acheive this is a simple
    tree with a circular doubly linked list attached.
@@ -83,7 +82,15 @@
    =============================================================
    =============================================================
 */
+
+/* An element stored in a priority queue with Round Robin
+   fairness if a duplicate. */
 typedef struct node pq_elem;
+
+/* A priority queue that offers all of the expected operations
+   of a priority queue with the additional benefits of an
+   iterator and removal by node id if you remember your
+   values that are present in the queue. */
 typedef struct tree pqueue;
 
 /*
@@ -129,6 +136,18 @@ typedef struct tree pqueue;
         return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 */
+
+/* A comparison function that returns one of the threeway comparison
+   values. To use this data structure you must be able to determine
+   these three comparison values for two of your type. See example
+   above.
+      typedef enum
+      {
+         LES = -1,
+         EQL = 0,
+         GRT = 1
+      } threeway_cmp;
+*/
 typedef tree_cmp_fn pq_cmp_fn;
 
 /* NOLINTNEXTLINE */
@@ -152,13 +171,6 @@ size_t pq_size (pqueue *);
    shall not fail becuase priority queues support
    round robin duplicates. O(lgN) */
 void pq_insert (pqueue *, pq_elem *, pq_cmp_fn *, void *);
-
-/* Erases a specified element known to be in the queue.
-   The behavior is undefined if the element is not in
-   the queue. O(lgN). However, in practice you can
-   often benefit from O(1) access if that element is
-   a duplicate or you repeatedly access that value. */
-pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
@@ -186,11 +198,49 @@ pq_elem *pq_pop_min (pqueue *);
 pq_elem *pq_max (const pqueue *);
 pq_elem *pq_min (const pqueue *);
 
+/* Erases a specified element known to be in the queue.
+   The behavior is undefined if the element is not in
+   the queue. O(lgN). However, in practice you can
+   often benefit from O(1) access if that element is
+   a duplicate or you repeatedly access that value. */
+pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+
+/* Returns true if this priority value is in the queue.
+   you need not search with any specific struct you have
+   previously created. For example using a global static
+   or local dummy struct can be sufficent for this check:
+
+      struct priority
+      {
+         int priority;
+         pq_elem elem;
+      };
+
+      static pqueue pq;
+
+      bool has_priority (int priority)
+      {
+         struct priority key = { .priority = priority };
+         return pq_has_priority (&pq, my_cmp, NULL);
+      }
+
+      int main ()
+      {
+         pq_init(&pq);
+         ...
+      }
+
+   This can be helpful if you need to know if such a priority
+   is present regardless of how many round robin duplicates
+   are present. Returns the result in O(lgN).
+*/
+bool pq_has (pqueue *, pq_elem *, pq_cmp_fn *, void *);
+
 pq_elem *pq_begin (pqueue *);
 pq_elem *pq_next (pqueue *, pq_elem *);
 pq_elem *pq_end (pqueue *);
 
-/* Not very useful or significant. Helps with tests. */
+/* Not very useful or significant. Helps with tests. Explore at own risk. */
 pq_elem *pq_root (const pqueue *);
 
 /* NOLINTNEXTLINE(*-include-cleaner) */

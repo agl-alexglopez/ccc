@@ -70,7 +70,7 @@ static struct node *erase (struct tree *, struct node *, tree_cmp_fn *,
                            void *);
 static bool insert (struct tree *, struct node *, tree_cmp_fn *, void *);
 static struct node *multiset_erase_max_or_min (struct tree *, struct node *,
-                                               tree_cmp_fn *, void *);
+                                               tree_cmp_fn *);
 static struct node *multiset_erase_node (struct tree *, struct node *,
                                          tree_cmp_fn *, void *);
 static struct node *pop_dup_node (struct tree *, struct node *, tree_cmp_fn *,
@@ -165,6 +165,12 @@ pq_erase (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
   return multiset_erase_node (pq, elem, fn, aux);
 }
 
+bool
+pq_has (pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+{
+  return contains (pq, elem, fn, aux);
+}
+
 pq_elem *
 pq_pop_max (pqueue *pq)
 {
@@ -254,7 +260,7 @@ set_root (set *s)
 }
 
 /* =========================================================================
-   =============    Splay Tree Set and Set Implementations    ==============
+   ===========    Splay Tree Multiset and Set Implementations    ===========
    =========================================================================
 
       (40)0x7fffffffd5c8-0x7fffffffdac8(+1)
@@ -301,7 +307,7 @@ set_root (set *s)
    Pictured above is the heavy/light decomposition of a splay tree.
    The goal of a splay tree is to take advantage of "good" edges
    that drop half the weight of the tree, weight being the number of
-   nodes rooted at X. Blue edges are obviously advantageous so if we
+   nodes rooted at X. Blue edges are "good" edges so if we
    have a mathematical bound on the cost of those edges, a splay tree
    then amortizes the cost of the red edges, leaving a solid O(lgN) runtime.
    You can't see the color here but check out the printing function.
@@ -329,8 +335,8 @@ init_node (struct tree *t, struct node *n)
 {
   assert (n != NULL);
   assert (t != NULL);
-  n->links[L] = &t->end;
-  n->links[R] = &t->end;
+  n->link[L] = &t->end;
+  n->link[R] = &t->end;
   n->parent_or_dups = &t->end;
   n->dups = false;
 }
@@ -355,7 +361,7 @@ max (const struct tree *const t)
   assert (t != NULL);
   assert (!empty (t));
   struct node *m = t->root;
-  for (; m->links[R] != &t->end; m = m->links[R])
+  for (; m->link[R] != &t->end; m = m->link[R])
     ;
   return m;
 }
@@ -365,7 +371,7 @@ min (const struct tree *t)
 {
   assert (t != NULL);
   struct node *m = t->root;
-  for (; m->links[L] != &t->end; m = m->links[L])
+  for (; m->link[L] != &t->end; m = m->link[L])
     ;
   return m;
 }
@@ -373,13 +379,13 @@ min (const struct tree *t)
 static struct node *
 pop_max (struct tree *t)
 {
-  return multiset_erase_max_or_min (t, &t->end, force_find_grt, NULL);
+  return multiset_erase_max_or_min (t, &t->end, force_find_grt);
 }
 
 static struct node *
 pop_min (struct tree *t)
 {
-  return multiset_erase_max_or_min (t, &t->end, force_find_les, NULL);
+  return multiset_erase_max_or_min (t, &t->end, force_find_les);
 }
 
 static struct node *
@@ -398,22 +404,27 @@ static struct node *
 next (struct tree *t, struct node *n)
 {
   assert (get_parent (t->root) == &t->end);
-  t->end.links[L] = t->root;
-  t->end.links[R] = &t->end;
-  if (n->links[R] != &t->end)
+  /* Using a helper node simplifies the code greatly. */
+  t->end.link[L] = t->root;
+  t->end.link[R] = &t->end;
+  /* The node is a parent backtracked to or the end. */
+  if (n->link[R] != &t->end)
     {
-      n = n->links[R];
-      while (n->links[L] != &t->end)
-        n = n->links[L];
+      /* The goal is to get far left ASAP in any inorder traverse. */
+      n = n->link[R];
+      while (n->link[L] != &t->end)
+        n = n->link[L];
       return n;
     }
+  /* A leaf. Work our way back up skpping nodes we already visited. */
   struct node *p = get_parent (n);
-  while (n == p->links[R])
+  while (n == p->link[R])
     {
       n = p;
       p = get_parent (p);
     }
-  if (n->links[R] != p)
+  /* Consider how the end and root work together help complete traversal. */
+  if (n->link[R] != p)
     n = p;
   return n;
 }
@@ -489,9 +500,9 @@ connect_new_root (struct tree *t, struct node *new_root,
                   threeway_cmp cmp_result)
 {
   const enum tree_link link = GRT == cmp_result;
-  give_parent_subtree (t, new_root, link, t->root->links[link]);
+  give_parent_subtree (t, new_root, link, t->root->link[link]);
   give_parent_subtree (t, new_root, !link, t->root);
-  t->root->links[link] = &t->end;
+  t->root->link[link] = &t->end;
   t->root = new_root;
   give_parent_subtree (t, &t->end, 0, t->root);
   return new_root;
@@ -510,18 +521,18 @@ add_duplicate (struct node *tree_node, struct node *add, struct node *parent)
     {
       add->parent_or_dups = parent;
       tree_node->parent_or_dups = add;
-      add->links[N] = add;
-      add->links[P] = add;
+      add->link[N] = add;
+      add->link[P] = add;
       tree_node->dups = true;
       return;
     }
   add->parent_or_dups = NULL;
   struct node *list_head = tree_node->parent_or_dups;
-  struct node *tail = list_head->links[P];
-  tail->links[N] = add;
-  list_head->links[P] = add;
-  add->links[N] = list_head;
-  add->links[P] = tail;
+  struct node *tail = list_head->link[P];
+  tail->link[N] = add;
+  list_head->link[P] = add;
+  add->link[N] = list_head;
+  add->link[P] = tail;
 }
 
 static struct node *
@@ -541,7 +552,7 @@ erase (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
   t->root = ret;
   give_parent_subtree (t, &t->end, 0, t->root);
   ret = remove_from_tree (t, ret, cmp);
-  ret->links[L] = ret->links[R] = ret->parent_or_dups = NULL;
+  ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
   return ret;
 }
 
@@ -553,9 +564,8 @@ erase (struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
    comparison function that forces either the max or min to be searched. */
 static struct node *
 multiset_erase_max_or_min (struct tree *t, struct node *tnil,
-                           tree_cmp_fn *force_max_or_min, void *aux)
+                           tree_cmp_fn *force_max_or_min)
 {
-  (void)aux;
   assert (t != NULL);
   assert (tnil != NULL);
   assert (force_max_or_min != NULL);
@@ -571,7 +581,7 @@ multiset_erase_max_or_min (struct tree *t, struct node *tnil,
     ret = pop_front_dup (t, ret, force_max_or_min);
   else
     ret = remove_from_tree (t, ret, force_max_or_min);
-  ret->links[L] = ret->links[R] = ret->parent_or_dups = NULL;
+  ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
   return ret;
 }
 
@@ -597,8 +607,8 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
      is a quick snip to get it out. */
   if (NULL == node->parent_or_dups)
     {
-      node->links[P]->links[N] = node->links[N];
-      node->links[N]->links[P] = node->links[P];
+      node->link[P]->link[N] = node->link[N];
+      node->link[N]->link[P] = node->link[P];
       return node;
     }
 
@@ -610,7 +620,7 @@ multiset_erase_node (struct tree *t, struct node *node, tree_cmp_fn *cmp,
     ret = pop_dup_node (t, node, cmp, ret);
   else
     ret = remove_from_tree (t, ret, cmp);
-  ret->links[L] = ret->links[R] = ret->parent_or_dups = NULL;
+  ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
   return ret;
 }
 
@@ -621,7 +631,7 @@ pop_dup_node (struct tree *t, struct node *dup, tree_cmp_fn *cmp,
   if (dup == splayed)
     return pop_front_dup (t, splayed, cmp);
   /* This is the head of the list of duplicates so no dups left. */
-  if (dup->links[N] == dup)
+  if (dup->link[N] == dup)
     {
       splayed->parent_or_dups = &t->end;
       splayed->dups = false;
@@ -630,10 +640,10 @@ pop_dup_node (struct tree *t, struct node *dup, tree_cmp_fn *cmp,
   /* There is an arbitrary number of dups after the head so replace head */
   const struct node *head = dup;
   /* Update the tail at the back of the list. Easy to forget hard to catch. */
-  head->links[P]->links[N] = head->links[N];
-  head->links[N]->links[P] = head->links[P];
-  head->links[N]->parent_or_dups = head->parent_or_dups;
-  splayed->parent_or_dups = head->links[N];
+  head->link[P]->link[N] = head->link[N];
+  head->link[N]->link[P] = head->link[P];
+  head->link[N]->parent_or_dups = head->parent_or_dups;
+  splayed->parent_or_dups = head->link[N];
   return dup;
 }
 
@@ -649,22 +659,22 @@ pop_front_dup (struct tree *t, struct node *old, tree_cmp_fn *cmp)
       give_parent_subtree (t, &t->end, 0, t->root);
     }
 
-  struct node *new_list_head = old->parent_or_dups->links[N];
-  struct node *list_tail = old->parent_or_dups->links[P];
+  struct node *new_list_head = old->parent_or_dups->link[N];
+  struct node *list_tail = old->parent_or_dups->link[P];
   /* Circular linked lists are tricky to detect when empty */
-  const bool circular_list_empty = new_list_head->links[N] == new_list_head;
+  const bool circular_list_empty = new_list_head->link[N] == new_list_head;
 
-  new_list_head->links[P] = list_tail;
+  new_list_head->link[P] = list_tail;
   new_list_head->parent_or_dups = parent;
-  list_tail->links[N] = new_list_head;
+  list_tail->link[N] = new_list_head;
   threeway_cmp size_relation = cmp (old, parent, NULL);
-  parent->links[GRT == size_relation] = tree_replacement;
-  tree_replacement->links[L] = old->links[L];
-  tree_replacement->links[R] = old->links[R];
+  parent->link[GRT == size_relation] = tree_replacement;
+  tree_replacement->link[L] = old->link[L];
+  tree_replacement->link[R] = old->link[R];
   tree_replacement->parent_or_dups = new_list_head;
 
-  give_parent_subtree (t, tree_replacement, L, tree_replacement->links[L]);
-  give_parent_subtree (t, tree_replacement, R, tree_replacement->links[R]);
+  give_parent_subtree (t, tree_replacement, L, tree_replacement->link[L]);
+  give_parent_subtree (t, tree_replacement, R, tree_replacement->link[R]);
   if (circular_list_empty)
     {
       tree_replacement->parent_or_dups = parent;
@@ -676,12 +686,12 @@ pop_front_dup (struct tree *t, struct node *old, tree_cmp_fn *cmp)
 static struct node *
 remove_from_tree (struct tree *t, struct node *ret, tree_cmp_fn *cmp)
 {
-  if (ret->links[L] == &t->end)
-    t->root = ret->links[R];
+  if (ret->link[L] == &t->end)
+    t->root = ret->link[R];
   else
     {
-      t->root = splay (t, ret->links[L], ret, cmp);
-      give_parent_subtree (t, t->root, R, ret->links[R]);
+      t->root = splay (t, ret->link[L], ret, cmp);
+      give_parent_subtree (t, t->root, R, ret->link[R]);
     }
   give_parent_subtree (t, &t->end, 0, t->root);
   return ret;
@@ -694,40 +704,40 @@ splay (struct tree *t, struct node *root, const struct node *elem,
   /* Pointers in an array and we can use the symmetric enum and flip it to
      choose the Left or Right subtree. Another benefit of our nil node: use it
      as our helper tree because we don't need its Left Right fields. */
-  t->end.links[L] = &t->end;
-  t->end.links[R] = &t->end;
+  t->end.link[L] = &t->end;
+  t->end.link[R] = &t->end;
   t->end.parent_or_dups = &t->end;
   struct node *left_right_subtrees[2] = { &t->end, &t->end };
-  struct node *finger = NULL;
+  struct node *pivot = NULL;
   for (;;)
     {
       const threeway_cmp root_size = cmp (elem, root, NULL);
       const enum tree_link link_to_descend = GRT == root_size;
-      if (EQL == root_size || root->links[link_to_descend] == &t->end)
+      if (EQL == root_size || root->link[link_to_descend] == &t->end)
         break;
 
       const threeway_cmp child_size
-          = cmp (elem, root->links[link_to_descend], NULL);
+          = cmp (elem, root->link[link_to_descend], NULL);
       const enum tree_link link_to_descend_from_child = GRT == child_size;
       if (EQL != child_size && link_to_descend == link_to_descend_from_child)
         {
-          finger = root->links[link_to_descend];
+          pivot = root->link[link_to_descend];
           give_parent_subtree (t, root, link_to_descend,
-                               finger->links[!link_to_descend]);
-          give_parent_subtree (t, finger, !link_to_descend, root);
-          root = finger;
-          if (root->links[link_to_descend] == &t->end)
+                               pivot->link[!link_to_descend]);
+          give_parent_subtree (t, pivot, !link_to_descend, root);
+          root = pivot;
+          if (root->link[link_to_descend] == &t->end)
             break;
         }
       give_parent_subtree (t, left_right_subtrees[!link_to_descend],
                            link_to_descend, root);
       left_right_subtrees[!link_to_descend] = root;
-      root = root->links[link_to_descend];
+      root = root->link[link_to_descend];
     }
-  give_parent_subtree (t, left_right_subtrees[L], R, root->links[L]);
-  give_parent_subtree (t, left_right_subtrees[R], L, root->links[R]);
-  give_parent_subtree (t, root, L, t->end.links[R]);
-  give_parent_subtree (t, root, R, t->end.links[L]);
+  give_parent_subtree (t, left_right_subtrees[L], R, root->link[L]);
+  give_parent_subtree (t, left_right_subtrees[R], L, root->link[R]);
+  give_parent_subtree (t, root, L, t->end.link[R]);
+  give_parent_subtree (t, root, R, t->end.link[L]);
   return root;
 }
 
@@ -739,7 +749,7 @@ static inline void
 give_parent_subtree (struct tree *t, struct node *parent, enum tree_link dir,
                      struct node *subtree)
 {
-  parent->links[dir] = subtree;
+  parent->link[dir] = subtree;
   if (subtree != &t->end && subtree->dups)
     subtree->parent_or_dups->parent_or_dups = parent;
   else if (subtree != &t->end)
@@ -758,8 +768,8 @@ count_dups (struct node *n)
   if (!n->dups)
     return 0;
   size_t dups = 1;
-  for (struct node *cur = n->parent_or_dups->links[N];
-       cur != n->parent_or_dups; cur = cur->links[N])
+  for (struct node *cur = n->parent_or_dups->link[N]; cur != n->parent_or_dups;
+       cur = cur->link[N])
     ++dups;
   return dups;
 }
@@ -772,7 +782,7 @@ recursive_size (struct tree *const t, struct node *r)
   if (r == &t->end)
     return 0;
   size_t s = count_dups (r) + 1;
-  return s + recursive_size (t, r->links[R]) + recursive_size (t, r->links[L]);
+  return s + recursive_size (t, r->link[R]) + recursive_size (t, r->link[L]);
 }
 
 size_t
@@ -836,8 +846,8 @@ strict_bound_met (const struct node *prev, enum tree_link dir,
     return false;
   if (dir == R && size_cmp != GRT)
     return false;
-  return strict_bound_met (root, L, root->links[L], nil, cmp)
-         && strict_bound_met (root, R, root->links[R], nil, cmp);
+  return strict_bound_met (root, L, root->link[L], nil, cmp)
+         && strict_bound_met (root, R, root->link[R], nil, cmp);
 }
 
 static bool
@@ -846,13 +856,13 @@ are_subtrees_valid (const struct node *root, tree_cmp_fn *cmp,
 {
   if (root == nil)
     return true;
-  if (root->links[R] == root || root->links[L] == root)
+  if (root->link[R] == root || root->link[L] == root)
     return false;
-  if (!strict_bound_met (root, L, root->links[L], nil, cmp)
-      || !strict_bound_met (root, R, root->links[R], nil, cmp))
+  if (!strict_bound_met (root, L, root->link[L], nil, cmp)
+      || !strict_bound_met (root, R, root->link[R], nil, cmp))
     return false;
-  return are_subtrees_valid (root->links[L], cmp, nil)
-         && are_subtrees_valid (root->links[R], cmp, nil);
+  return are_subtrees_valid (root->link[L], cmp, nil)
+         && are_subtrees_valid (root->link[R], cmp, nil);
 }
 
 static struct parent_status
@@ -880,8 +890,8 @@ is_duplicate_storing_parent (const struct tree *t, const struct node *parent,
     return true;
   if (!child_tracks_parent (parent, root).correct)
     return false;
-  return is_duplicate_storing_parent (t, root, root->links[L])
-         && is_duplicate_storing_parent (t, root, root->links[R]);
+  return is_duplicate_storing_parent (t, root, root->link[L])
+         && is_duplicate_storing_parent (t, root, root->link[R]);
 }
 
 bool
@@ -899,8 +909,8 @@ get_subtree_size (const struct node *root, const void *nil)
 {
   if (root == nil)
     return 0;
-  return 1 + get_subtree_size (root->links[L], nil)
-         + get_subtree_size (root->links[R], nil);
+  return 1 + get_subtree_size (root->link[L], nil)
+         + get_subtree_size (root->link[R], nil);
 }
 
 static const char *
@@ -931,8 +941,8 @@ print_node (const struct tree *t, const struct node *parent,
       if (head != &t->end)
         {
           printf ("%p-", head);
-          for (struct node *i = head->links[N]; i != head;
-               i = i->links[N], ++duplicates)
+          for (struct node *i = head->link[N]; i != head;
+               i = i->link[N], ++duplicates)
             printf ("-%p", i);
         }
       printf ("(+%d)", duplicates);
@@ -981,18 +991,18 @@ print_inner_tree (const struct node *root, size_t parent_size,
     }
 
   const char *left_edge_color
-      = get_edge_color (root->links[L], subtree_size, &t->end);
-  if (root->links[R] == &t->end)
-    print_inner_tree (root->links[L], subtree_size, root, str, left_edge_color,
+      = get_edge_color (root->link[L], subtree_size, &t->end);
+  if (root->link[R] == &t->end)
+    print_inner_tree (root->link[L], subtree_size, root, str, left_edge_color,
                       LEAF, L, t);
-  else if (root->links[L] == &t->end)
-    print_inner_tree (root->links[R], subtree_size, root, str, left_edge_color,
+  else if (root->link[L] == &t->end)
+    print_inner_tree (root->link[R], subtree_size, root, str, left_edge_color,
                       LEAF, R, t);
   else
     {
-      print_inner_tree (root->links[R], subtree_size, root, str,
+      print_inner_tree (root->link[R], subtree_size, root, str,
                         left_edge_color, BRANCH, R, t);
-      print_inner_tree (root->links[L], subtree_size, root, str,
+      print_inner_tree (root->link[L], subtree_size, root, str,
                         left_edge_color, LEAF, L, t);
     }
   free (str);
@@ -1010,19 +1020,19 @@ print_tree (const struct tree *t, const struct node *root)
   print_node (t, &t->end, root);
 
   const char *left_edge_color
-      = get_edge_color (root->links[L], subtree_size, &t->end);
-  if (root->links[R] == &t->end)
-    print_inner_tree (root->links[L], subtree_size, root, "", left_edge_color,
+      = get_edge_color (root->link[L], subtree_size, &t->end);
+  if (root->link[R] == &t->end)
+    print_inner_tree (root->link[L], subtree_size, root, "", left_edge_color,
                       LEAF, L, t);
-  else if (root->links[L] == &t->end)
-    print_inner_tree (root->links[R], subtree_size, root, "", left_edge_color,
+  else if (root->link[L] == &t->end)
+    print_inner_tree (root->link[R], subtree_size, root, "", left_edge_color,
                       LEAF, R, t);
   else
     {
-      print_inner_tree (root->links[R], subtree_size, root, "",
-                        left_edge_color, BRANCH, R, t);
-      print_inner_tree (root->links[L], subtree_size, root, "",
-                        left_edge_color, LEAF, L, t);
+      print_inner_tree (root->link[R], subtree_size, root, "", left_edge_color,
+                        BRANCH, R, t);
+      print_inner_tree (root->link[L], subtree_size, root, "", left_edge_color,
+                        LEAF, L, t);
     }
 }
 

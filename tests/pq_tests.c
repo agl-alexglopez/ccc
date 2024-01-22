@@ -737,30 +737,30 @@ inorder_fill (int vals[], size_t size, pqueue *pq)
   size_t s = 0;
   while (iter != &pq->end)
     {
-      if (&pq->end == iter->links[L])
+      if (&pq->end == iter->link[L])
         {
           /* This is where we climb back up a link if it exists */
           vals[s++] = pq_entry (iter, struct val, elem)->val;
-          iter = iter->links[R];
+          iter = iter->link[R];
           continue;
         }
-      inorder_pred = iter->links[L];
-      while (&pq->end != inorder_pred->links[R]
-             && iter != inorder_pred->links[R])
-        inorder_pred = inorder_pred->links[R];
-      if (&pq->end == inorder_pred->links[R])
+      inorder_pred = iter->link[L];
+      while (&pq->end != inorder_pred->link[R]
+             && iter != inorder_pred->link[R])
+        inorder_pred = inorder_pred->link[R];
+      if (&pq->end == inorder_pred->link[R])
         {
           /* The right field is a temporary traversal helper. */
-          inorder_pred->links[R] = iter;
-          iter = iter->links[L];
+          inorder_pred->link[R] = iter;
+          iter = iter->link[L];
           continue;
         }
       /* Here is our last chance to count this value. */
       vals[s++] = pq_entry (iter, struct val, elem)->val;
       /* Here is our last chance to repair our wreckage */
-      inorder_pred->links[R] = &pq->end;
+      inorder_pred->link[R] = &pq->end;
       /* This is how we get to a right subtree if any exists. */
-      iter = iter->links[R];
+      iter = iter->link[R];
     }
 }
 
