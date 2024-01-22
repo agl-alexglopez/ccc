@@ -548,13 +548,13 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp);
     give_parent_subtree(t, &t->end, 0, t->root);
-    const threeway_cmp root_size = cmp(elem, t->root, NULL);
-    if (EQL == root_size)
+    const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
+    if (EQL == root_cmp)
     {
         return false;
     }
     t->size++;
-    return connect_new_root(t, elem, root_size);
+    return connect_new_root(t, elem, root_cmp);
 }
 
 static void
@@ -573,13 +573,13 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     t->root = splay(t, t->root, elem, cmp);
     give_parent_subtree(t, &t->end, 0, t->root);
 
-    const threeway_cmp root_size = cmp(elem, t->root, NULL);
-    if (EQL == root_size)
+    const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
+    if (EQL == root_cmp)
     {
         add_duplicate(t->root, elem, &t->end);
         return;
     }
-    (void)connect_new_root(t, elem, root_size);
+    (void)connect_new_root(t, elem, root_cmp);
 }
 
 static struct node *
@@ -811,17 +811,17 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     struct node *pivot = NULL;
     for (;;)
     {
-        const threeway_cmp root_size = cmp(elem, root, NULL);
-        const enum tree_link link_to_descend = GRT == root_size;
-        if (EQL == root_size || root->link[link_to_descend] == &t->end)
+        const threeway_cmp root_cmp = cmp(elem, root, NULL);
+        const enum tree_link link_to_descend = GRT == root_cmp;
+        if (EQL == root_cmp || root->link[link_to_descend] == &t->end)
         {
             break;
         }
 
-        const threeway_cmp child_size
+        const threeway_cmp child_cmp
             = cmp(elem, root->link[link_to_descend], NULL);
-        const enum tree_link link_to_descend_from_child = GRT == child_size;
-        if (EQL != child_size && link_to_descend == link_to_descend_from_child)
+        const enum tree_link link_to_descend_from_child = GRT == child_cmp;
+        if (EQL != child_cmp && link_to_descend == link_to_descend_from_child)
         {
             pivot = root->link[link_to_descend];
             give_parent_subtree(t, root, link_to_descend,
@@ -1094,7 +1094,7 @@ print_node(const struct tree *t, const struct node *parent,
 }
 
 /* I know this function is rough but it's tricky to focus on edge color rather
-   than node color. */
+   than node color. Don't care about pretty code here, need thorough debug. */
 static void
 print_inner_tree(const struct node *root, size_t parent_size,
                  const struct node *parent, const char *prefix,
@@ -1119,8 +1119,9 @@ print_inner_tree(const struct node *root, size_t parent_size,
 
     char *str = NULL;
     /* NOLINTNEXTLINE */
-    int string_length = snprintf(NULL, 0, "%s%s%s", prefix, prefix_branch_color,
-                                 node_type == LEAF ? "     " : " │   ");
+    const int string_length
+        = snprintf(NULL, 0, "%s%s%s", prefix, prefix_branch_color,
+                   node_type == LEAF ? "     " : " │   ");
     if (string_length > 0)
     {
         /* NOLINTNEXTLINE */
