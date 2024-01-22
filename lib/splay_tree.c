@@ -93,7 +93,6 @@ static threeway_cmp force_find_grt (const struct node *, const struct node *,
                                     void *);
 static threeway_cmp force_find_les (const struct node *, const struct node *,
                                     void *);
-static size_t size (struct tree *);
 static void give_parent_subtree (struct tree *, struct node *, enum tree_link,
                                  struct node *);
 static struct node *get_parent (struct node *);
@@ -186,7 +185,7 @@ pq_pop_min (pqueue *pq)
 size_t
 pq_size (pqueue *const pq)
 {
-  return size (pq);
+  return pq->size;
 }
 
 /* =========================================================================
@@ -208,7 +207,7 @@ set_empty (set *s)
 size_t
 set_size (set *s)
 {
-  return size (s);
+  return s->size;
 }
 
 bool
@@ -762,35 +761,6 @@ get_parent (struct node *n)
   return n->dups ? n->parent_or_dups->parent_or_dups : n->parent_or_dups;
 }
 
-static size_t
-count_dups (struct node *n)
-{
-  if (!n->dups)
-    return 0;
-  size_t dups = 1;
-  for (struct node *cur = n->parent_or_dups->link[N]; cur != n->parent_or_dups;
-       cur = cur->link[N])
-    ++dups;
-  return dups;
-}
-
-/* NOLINTBEGIN(*misc-no-recursion) */
-
-static size_t
-recursive_size (struct tree *const t, struct node *r)
-{
-  if (r == &t->end)
-    return 0;
-  size_t s = count_dups (r) + 1;
-  return s + recursive_size (t, r->link[R]) + recursive_size (t, r->link[L]);
-}
-
-size_t
-size (struct tree *const t)
-{
-  return recursive_size (t, t->root);
-}
-
 /* We can trick our splay tree into giving us the max via splaying
    without any input from the user. Our seach evaluates a threeway
    comparison to decide which branch to take in the tree or if we
@@ -817,7 +787,7 @@ force_find_les (const struct node *a, const struct node *b,
   return LES;
 }
 
-/* NOLINTEND(*swappable-parameters) */
+/* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
 
 /* =========================================================================
    =======================        Debugging           ======================
@@ -833,6 +803,27 @@ struct parent_status
   bool correct;
   const struct node *parent;
 };
+
+static size_t
+count_dups (struct node *n)
+{
+  if (!n->dups)
+    return 0;
+  size_t dups = 1;
+  for (struct node *cur = n->parent_or_dups->link[N]; cur != n->parent_or_dups;
+       cur = cur->link[N])
+    ++dups;
+  return dups;
+}
+
+static size_t
+recursive_size (struct tree *const t, struct node *r)
+{
+  if (r == &t->end)
+    return 0;
+  size_t s = count_dups (r) + 1;
+  return s + recursive_size (t, r->link[R]) + recursive_size (t, r->link[L]);
+}
 
 static bool
 strict_bound_met (const struct node *prev, enum tree_link dir,
@@ -900,6 +891,8 @@ validate_tree (struct tree *t, tree_cmp_fn *cmp)
   if (!are_subtrees_valid (t->root, cmp, &t->end))
     return false;
   if (!is_duplicate_storing_parent (t, &t->end, t->root))
+    return false;
+  if (recursive_size (t, t->root) != t->size)
     return false;
   return true;
 }
