@@ -1,7 +1,6 @@
 #include "pqueue.h"
 #include "tree.h"
 
-#include <assert.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -43,7 +42,7 @@ static bool pq_test_forward_iter_all_vals(void);
 static bool pq_test_insert_iterate_pop(void);
 static int run_tests(void);
 static void insert_shuffled(pqueue *, struct val[], size_t, int);
-static void inorder_fill(int vals[], size_t, pqueue *);
+static size_t inorder_fill(int vals[], size_t, pqueue *);
 static bool iterate_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
 
@@ -145,7 +144,11 @@ pq_test_insert_three(void)
             return false;
         }
         const size_t size = i + 1;
-        assert(pq_size(&pq) == size);
+        if (pq_size(&pq) != size)
+        {
+            breakpoint();
+            return false;
+        }
     }
     return pq_size(&pq) == 3;
 }
@@ -202,7 +205,11 @@ pq_test_insert_three_dups(void)
             return false;
         }
         const size_t size = i + 1;
-        assert(pq_size(&pq) == size);
+        if (pq_size(&pq) != size)
+        {
+            breakpoint();
+            return false;
+        }
     }
     return pq_size(&pq) == 3;
 }
@@ -224,7 +231,11 @@ pq_test_read_max_min(void)
             return false;
         }
         const size_t size = i + 1;
-        assert(pq_size(&pq) == size);
+        if (pq_size(&pq) != size)
+        {
+            breakpoint();
+            return false;
+        }
     }
     if (10 != pq_size(&pq))
     {
@@ -253,12 +264,13 @@ pq_test_insert_shuffle(void)
     pqueue pq;
     pq_init(&pq);
     /* Math magic ahead... */
-    const int size = 50;
+    const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
     const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
-    if (max->val != size - 1)
+    const size_t max_catch = max->val;
+    if (max_catch != size - 1)
     {
         breakpoint();
         return false;
@@ -270,8 +282,12 @@ pq_test_insert_shuffle(void)
         return false;
     }
     int sorted_check[size];
-    inorder_fill(sorted_check, size, &pq);
-    for (int i = 0; i < size; ++i)
+    if (inorder_fill(sorted_check, size, &pq) != size)
+    {
+        breakpoint();
+        return false;
+    }
+    for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
@@ -298,7 +314,11 @@ pq_test_insert_remove_four_dups(void)
             return false;
         }
         const size_t size = i + 1;
-        assert(pq_size(&pq) == size);
+        if (pq_size(&pq) != size)
+        {
+            breakpoint();
+            return false;
+        }
     }
     if (pq_size(&pq) != 4)
     {
@@ -324,12 +344,13 @@ pq_test_insert_erase_shuffled(void)
     printf("pq_test_insert_erase_shuffle");
     pqueue pq;
     pq_init(&pq);
-    const int size = 50;
+    const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
     const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
-    if (max->val != size - 1)
+    const size_t max_catch = max->val;
+    if (max_catch != size - 1)
     {
         breakpoint();
         return false;
@@ -341,8 +362,12 @@ pq_test_insert_erase_shuffled(void)
         return false;
     }
     int sorted_check[size];
-    inorder_fill(sorted_check, size, &pq);
-    for (int i = 0; i < size; ++i)
+    if (inorder_fill(sorted_check, size, &pq) != size)
+    {
+        breakpoint();
+        return false;
+    }
+    for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
@@ -353,7 +378,7 @@ pq_test_insert_erase_shuffled(void)
 
     /* Now let's delete everything with no errors. */
 
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         const struct val *removed = pq_entry(
             pq_erase(&pq, &vals[i].elem, val_cmp, NULL), struct val, elem);
@@ -377,12 +402,13 @@ pq_test_pop_max(void)
     printf("pq_test_pop_max");
     pqueue pq;
     pq_init(&pq);
-    const int size = 50;
+    const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
     const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
-    if (max->val != size - 1)
+    const size_t max_catch = max->val;
+    if (max_catch != size - 1)
     {
         breakpoint();
         return false;
@@ -394,8 +420,12 @@ pq_test_pop_max(void)
         return false;
     }
     int sorted_check[size];
-    inorder_fill(sorted_check, size, &pq);
-    for (int i = 0; i < size; ++i)
+    if (inorder_fill(sorted_check, size, &pq) != size)
+    {
+        breakpoint();
+        return false;
+    }
+    for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
@@ -406,7 +436,7 @@ pq_test_pop_max(void)
 
     /* Now let's pop from the front of the queue until empty. */
 
-    for (int i = size - 1; i >= 0; --i)
+    for (size_t i = size - 1; i != (size_t)-1; --i)
     {
         const struct val *front = pq_entry(pq_pop_max(&pq), struct val, elem);
         if (front->val != vals[i].val)
@@ -429,12 +459,13 @@ pq_test_pop_min(void)
     printf("pq_test_pop_min");
     pqueue pq;
     pq_init(&pq);
-    const int size = 50;
+    const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
     const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
-    if (max->val != size - 1)
+    const size_t max_catch = max->val;
+    if (max_catch != size - 1)
     {
         breakpoint();
         return false;
@@ -446,8 +477,12 @@ pq_test_pop_min(void)
         return false;
     }
     int sorted_check[size];
-    inorder_fill(sorted_check, size, &pq);
-    for (int i = 0; i < size; ++i)
+    if (inorder_fill(sorted_check, size, &pq) != size)
+    {
+        breakpoint();
+        return false;
+    }
+    for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
@@ -458,7 +493,7 @@ pq_test_pop_min(void)
 
     /* Now let's pop from the front of the queue until empty. */
 
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         const struct val *front = pq_entry(pq_pop_min(&pq), struct val, elem);
         if (front->val != vals[i].val)
@@ -491,7 +526,11 @@ pq_test_max_round_robin(void)
         vals[i].val = 99;
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        assert(validate_tree(&pq, val_cmp));
+        if (!validate_tree(&pq, val_cmp))
+        {
+            breakpoint();
+            return false;
+        }
     }
 
     /* Now let's make sure we pop round robin. */
@@ -525,7 +564,11 @@ pq_test_min_round_robin(void)
         vals[i].val = 1;
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        assert(validate_tree(&pq, val_cmp));
+        if (!validate_tree(&pq, val_cmp))
+        {
+            breakpoint();
+            return false;
+        }
     }
 
     /* Now let's make sure we pop round robin. */
@@ -720,7 +763,11 @@ pq_test_forward_iter_unique_vals(void)
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
-    inorder_fill(val_keys_inorder, num_nodes, &pq);
+    if (inorder_fill(val_keys_inorder, num_nodes, &pq) != pq_size(&pq))
+    {
+        breakpoint();
+        return false;
+    }
     for (pq_elem *e = pq_uniq_begin(&pq); e != pq_uniq_end(&pq);
          e = pq_uniq_next(&pq, e), ++j)
     {
@@ -865,7 +912,10 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     const size_t catch_size = size;
-    assert(catch_size == pq_size(pq));
+    if (pq_size(pq) != catch_size)
+    {
+        breakpoint();
+    }
 }
 
 static void
@@ -885,10 +935,13 @@ fill_dups(size_t size, int vals[], size_t *i, struct node *n)
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-static void
+static size_t
 inorder_fill(int vals[], size_t size, pqueue *pq)
 {
-    assert(pq_size(pq) == size);
+    if (pq_size(pq) != size)
+    {
+        return 0;
+    }
     size_t i = 0;
     for (pq_elem *e = pq_uniq_begin(pq); e != pq_uniq_end(pq);
          e = pq_uniq_next(pq, e))
@@ -896,6 +949,7 @@ inorder_fill(int vals[], size_t size, pqueue *pq)
         vals[i++] = pq_entry(e, struct val, elem)->val;
         fill_dups(size, vals, &i, e);
     }
+    return i;
 }
 
 static bool

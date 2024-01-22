@@ -1118,14 +1118,15 @@ print_inner_tree(const struct node *root, size_t parent_size,
     print_node(t, parent, root);
 
     char *str = NULL;
-    int string_length = snprintf(NULL, 0, "%s%s%s", prefix,
-                                 prefix_branch_color, // NOLINT
+    /* NOLINTNEXTLINE */
+    int string_length = snprintf(NULL, 0, "%s%s%s", prefix, prefix_branch_color,
                                  node_type == LEAF ? "     " : " │   ");
     if (string_length > 0)
     {
-        str = malloc(string_length + 1); // NOLINT
-        (void)snprintf(str, string_length, "%s%s%s",
-                       prefix, // NOLINT
+        /* NOLINTNEXTLINE */
+        str = malloc(string_length + 1);
+        /* NOLINTNEXTLINE */
+        (void)snprintf(str, string_length, "%s%s%s", prefix,
                        prefix_branch_color,
                        node_type == LEAF ? "     " : " │   ");
     }

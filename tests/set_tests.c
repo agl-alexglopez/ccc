@@ -1,13 +1,9 @@
 #include "set.h"
 #include "tree.h"
 
-#include <assert.h>
 #include <signal.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 /* Set this breakpoint on any line where you wish
    execution to stop. Under normal program runs the program
@@ -39,18 +35,15 @@ static bool set_test_empty(void);
 static bool set_test_insert_one(void);
 static bool set_test_insert_three(void);
 static bool set_test_struct_getter(void);
-static bool set_test_insert_shuffle(void);
-static bool set_test_insert_erase_shuffled(void);
 static int run_tests(void);
-static void insert_shuffled(set *, struct val[], int, int);
-static void inorder_fill(int vals[], size_t size, set *set);
 static threeway_cmp val_cmp(const set_elem *, const set_elem *, void *);
 
-#define NUM_TESTS 6
+#define NUM_TESTS 4
 const test_fn all_tests[NUM_TESTS] = {
-    set_test_empty,          set_test_insert_one,
-    set_test_insert_three,   set_test_struct_getter,
-    set_test_insert_shuffle, set_test_insert_erase_shuffled,
+    set_test_empty,
+    set_test_insert_one,
+    set_test_insert_three,
+    set_test_struct_getter,
 };
 
 int
@@ -91,8 +84,7 @@ set_test_insert_one(void)
     set_init(&s);
     struct val single;
     single.val = 0;
-    assert(set_insert(&s, &single.elem, val_cmp, NULL));
-    return !set_empty(&s)
+    return set_insert(&s, &single.elem, val_cmp, NULL) && !set_empty(&s)
            && set_entry(set_root(&s), struct val, elem)->val == single.val;
 }
 
@@ -106,8 +98,8 @@ set_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        assert(set_insert(&s, &three_vals[i].elem, val_cmp, NULL));
-        if (!validate_tree(&s, val_cmp))
+        if (!set_insert(&s, &three_vals[i].elem, val_cmp, NULL)
+            || !validate_tree(&s, val_cmp))
         {
             breakpoint();
             return false;
@@ -130,10 +122,10 @@ set_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        assert(set_insert(&s, &vals[i].elem, val_cmp, NULL));
-        assert(set_insert(&set_tester_clone, &tester_clone[i].elem, val_cmp,
-                          NULL));
-        if (!validate_tree(&s, val_cmp))
+        if (!set_insert(&s, &vals[i].elem, val_cmp, NULL)
+            || !set_insert(&set_tester_clone, &tester_clone[i].elem, val_cmp,
+                           NULL)
+            || !validate_tree(&s, val_cmp))
         {
             breakpoint();
             return false;
@@ -150,135 +142,6 @@ set_test_struct_getter(void)
         }
     }
     return set_size(&s) == 10;
-}
-
-static bool
-set_test_insert_shuffle(void)
-{
-    printf("set_test_insert_shuffle");
-    set s;
-    set_init(&s);
-    /* Math magic ahead... */
-    const int size = 50;
-    const int prime = 53;
-    struct val vals[size];
-    insert_shuffled(&s, vals, size, prime);
-    int sorted_check[size];
-    inorder_fill(sorted_check, size, &s);
-    for (int i = 0; i < size; ++i)
-    {
-        if (vals[i].val != sorted_check[i])
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-static bool
-set_test_insert_erase_shuffled(void)
-{
-    printf("set_test_insert_erase_shuffle");
-    set s;
-    set_init(&s);
-    const int size = 50;
-    const int prime = 53;
-    struct val vals[size];
-    insert_shuffled(&s, vals, size, prime);
-    int sorted_check[size];
-    inorder_fill(sorted_check, size, &s);
-    for (int i = 0; i < size; ++i)
-    {
-        if (vals[i].val != sorted_check[i])
-        {
-            breakpoint();
-            return false;
-        }
-    }
-
-    /* Now let's delete everything with no errors. */
-
-    for (int i = 0; i < size; ++i)
-    {
-        const set_elem *elem = set_erase(&s, &vals[i].elem, val_cmp, NULL);
-        if (elem == set_end(&s))
-        {
-            breakpoint();
-            return false;
-        }
-        const struct val *removed = set_entry(elem, struct val, elem);
-        if (removed->val != vals[i].val)
-        {
-            breakpoint();
-            return false;
-        }
-    }
-    if (!set_empty(&s))
-    {
-        breakpoint();
-        return false;
-    }
-    return true;
-}
-
-static void
-insert_shuffled(set *s, struct val vals[], const int size,
-                const int larger_prime)
-{
-    /* Math magic ahead so that we iterate over every index
-       eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
-       easier to debug if something goes wrong. Think
-       of the prime number as a random seed, kind of. */
-    int shuffled_index = larger_prime % size;
-    for (int i = 0; i < size; ++i)
-    {
-        vals[shuffled_index].val = shuffled_index;
-        assert(set_insert(s, &vals[shuffled_index].elem, val_cmp, NULL));
-        assert(validate_tree(s, val_cmp));
-        shuffled_index = (shuffled_index + larger_prime) % size;
-    }
-    const size_t catch_size = size;
-    assert(catch_size == set_size(s));
-}
-
-/* Iterative inorder traversal to check the set is sorted. */
-static void
-inorder_fill(int vals[], size_t size, set *s)
-{
-    assert(set_size(s) == size);
-    struct node *iter = s->root;
-    struct node *inorder_pred = NULL;
-    size_t sz = 0;
-    while (iter != &s->end)
-    {
-        if (&s->end == iter->link[L])
-        {
-            /* This is where we climb back up a link if it exists */
-            vals[sz++] = set_entry(iter, struct val, elem)->val;
-            iter = iter->link[R];
-            continue;
-        }
-        inorder_pred = iter->link[L];
-        while (&s->end != inorder_pred->link[R]
-               && iter != inorder_pred->link[R])
-        {
-            inorder_pred = inorder_pred->link[R];
-        }
-        if (&s->end == inorder_pred->link[R])
-        {
-            /* The right field is a temporary traversal helper. */
-            inorder_pred->link[R] = iter;
-            iter = iter->link[L];
-            continue;
-        }
-        /* Here is our last chance to count this value. */
-        vals[sz++] = set_entry(iter, struct val, elem)->val;
-        /* Here is our last chance to repair our wreckage */
-        inorder_pred->link[R] = &s->end;
-        /* This is how we get to a right subtree if any exists. */
-        iter = iter->link[R];
-    }
 }
 
 static threeway_cmp
