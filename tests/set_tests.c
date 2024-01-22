@@ -166,8 +166,12 @@ set_test_insert_shuffle(void)
     int sorted_check[size];
     inorder_fill(sorted_check, size, &s);
     for (int i = 0; i < size; ++i)
+    {
         if (vals[i].val != sorted_check[i])
+        {
             return false;
+        }
+    }
     return true;
 }
 
@@ -184,11 +188,13 @@ set_test_insert_erase_shuffled(void)
     int sorted_check[size];
     inorder_fill(sorted_check, size, &s);
     for (int i = 0; i < size; ++i)
+    {
         if (vals[i].val != sorted_check[i])
         {
             breakpoint();
             return false;
         }
+    }
 
     /* Now let's delete everything with no errors. */
 
@@ -256,7 +262,9 @@ inorder_fill(int vals[], size_t size, set *s)
         inorder_pred = iter->link[L];
         while (&s->end != inorder_pred->link[R]
                && iter != inorder_pred->link[R])
+        {
             inorder_pred = inorder_pred->link[R];
+        }
         if (&s->end == inorder_pred->link[R])
         {
             /* The right field is a temporary traversal helper. */

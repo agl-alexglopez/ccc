@@ -447,7 +447,7 @@ max(const struct tree *const t)
     assert(!empty(t));
     struct node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
-        ;
+    {}
     return m;
 }
 
@@ -457,7 +457,7 @@ min(const struct tree *t)
     assert(t != NULL);
     struct node *m = t->root;
     for (; m->link[L] != &t->end; m = m->link[L])
-        ;
+    {}
     return m;
 }
 
@@ -498,7 +498,9 @@ next(struct tree *t, struct node *n)
         /* The goal is to get far left ASAP in any inorder traverse. */
         n = n->link[R];
         while (n->link[L] != &t->end)
+        {
             n = n->link[L];
+        }
         return n;
     }
     /* A leaf. Work our way back up skpping nodes we already visited. */
@@ -548,7 +550,9 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     give_parent_subtree(t, &t->end, 0, t->root);
     const threeway_cmp root_size = cmp(elem, t->root, NULL);
     if (EQL == root_size)
+    {
         return false;
+    }
     t->size++;
     return connect_new_root(t, elem, root_size);
 }
@@ -630,7 +634,9 @@ erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     assert(ret != NULL);
     const threeway_cmp found = cmp(elem, ret, NULL);
     if (found != EQL)
+    {
         return &t->end;
+    }
     t->root = ret;
     give_parent_subtree(t, &t->end, 0, t->root);
     ret = remove_from_tree(t, ret, cmp);
@@ -660,9 +666,13 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
     t->root = ret;
     give_parent_subtree(t, &t->end, 0, t->root);
     if (ret->dups)
+    {
         ret = pop_front_dup(t, ret, force_max_or_min);
+    }
     else
+    {
         ret = remove_from_tree(t, ret, force_max_or_min);
+    }
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
     return ret;
 }
@@ -699,9 +709,13 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
     t->root = ret;
     give_parent_subtree(t, &t->end, 0, t->root);
     if (ret->dups)
+    {
         ret = pop_dup_node(t, node, cmp, ret);
+    }
     else
+    {
         ret = remove_from_tree(t, ret, cmp);
+    }
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
     return ret;
 }
@@ -711,7 +725,9 @@ pop_dup_node(struct tree *t, struct node *dup, tree_cmp_fn *cmp,
              struct node *splayed)
 {
     if (dup == splayed)
+    {
         return pop_front_dup(t, splayed, cmp);
+    }
     /* This is the head of the list of duplicates so no dups left. */
     if (dup->link[N] == dup)
     {
@@ -769,7 +785,9 @@ static struct node *
 remove_from_tree(struct tree *t, struct node *ret, tree_cmp_fn *cmp)
 {
     if (ret->link[L] == &t->end)
+    {
         t->root = ret->link[R];
+    }
     else
     {
         t->root = splay(t, ret->link[L], ret, cmp);
@@ -796,7 +814,9 @@ splay(struct tree *t, struct node *root, const struct node *elem,
         const threeway_cmp root_size = cmp(elem, root, NULL);
         const enum tree_link link_to_descend = GRT == root_size;
         if (EQL == root_size || root->link[link_to_descend] == &t->end)
+        {
             break;
+        }
 
         const threeway_cmp child_size
             = cmp(elem, root->link[link_to_descend], NULL);
@@ -809,7 +829,9 @@ splay(struct tree *t, struct node *root, const struct node *elem,
             give_parent_subtree(t, pivot, !link_to_descend, root);
             root = pivot;
             if (root->link[link_to_descend] == &t->end)
+            {
                 break;
+            }
         }
         give_parent_subtree(t, left_right_subtrees[!link_to_descend],
                             link_to_descend, root);
@@ -833,9 +855,13 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
 {
     parent->link[dir] = subtree;
     if (subtree != &t->end && subtree->dups)
+    {
         subtree->parent_or_dups->parent_or_dups = parent;
+    }
     else if (subtree != &t->end)
+    {
         subtree->parent_or_dups = parent;
+    }
 }
 
 static struct node *
@@ -891,11 +917,15 @@ static size_t
 count_dups(struct node *n)
 {
     if (!n->dups)
+    {
         return 0;
+    }
     size_t dups = 1;
     for (struct node *cur = n->parent_or_dups->link[N];
          cur != n->parent_or_dups; cur = cur->link[N])
+    {
         ++dups;
+    }
     return dups;
 }
 
@@ -903,7 +933,9 @@ static size_t
 recursive_size(struct tree *const t, struct node *r)
 {
     if (r == &t->end)
+    {
         return 0;
+    }
     size_t s = count_dups(r) + 1;
     return s + recursive_size(t, r->link[R]) + recursive_size(t, r->link[L]);
 }
@@ -914,12 +946,18 @@ strict_bound_met(const struct node *prev, enum tree_link dir,
                  tree_cmp_fn *cmp)
 {
     if (root == nil)
+    {
         return true;
+    }
     threeway_cmp size_cmp = cmp(root, prev, NULL);
     if (dir == L && size_cmp != LES)
+    {
         return false;
+    }
     if (dir == R && size_cmp != GRT)
+    {
         return false;
+    }
     return strict_bound_met(root, L, root->link[L], nil, cmp)
            && strict_bound_met(root, R, root->link[R], nil, cmp);
 }
@@ -929,12 +967,18 @@ are_subtrees_valid(const struct node *root, tree_cmp_fn *cmp,
                    const struct node *nil)
 {
     if (root == nil)
+    {
         return true;
+    }
     if (root->link[R] == root || root->link[L] == root)
+    {
         return false;
+    }
     if (!strict_bound_met(root, L, root->link[L], nil, cmp)
         || !strict_bound_met(root, R, root->link[R], nil, cmp))
+    {
         return false;
+    }
     return are_subtrees_valid(root->link[L], cmp, nil)
            && are_subtrees_valid(root->link[R], cmp, nil);
 }
@@ -946,7 +990,9 @@ child_tracks_parent(const struct node *parent, const struct node *root)
     {
         struct node *p = root->parent_or_dups->parent_or_dups;
         if (p != parent)
+        {
             return (struct parent_status){false, p};
+        }
     }
     else if (root->parent_or_dups != parent)
     {
@@ -961,9 +1007,13 @@ is_duplicate_storing_parent(const struct tree *t, const struct node *parent,
                             const struct node *root)
 {
     if (root == &t->end)
+    {
         return true;
+    }
     if (!child_tracks_parent(parent, root).correct)
+    {
         return false;
+    }
     return is_duplicate_storing_parent(t, root, root->link[L])
            && is_duplicate_storing_parent(t, root, root->link[R]);
 }
@@ -972,11 +1022,17 @@ bool
 validate_tree(struct tree *t, tree_cmp_fn *cmp)
 {
     if (!are_subtrees_valid(t->root, cmp, &t->end))
+    {
         return false;
+    }
     if (!is_duplicate_storing_parent(t, &t->end, t->root))
+    {
         return false;
+    }
     if (recursive_size(t, t->root) != t->size)
+    {
         return false;
+    }
     return true;
 }
 
@@ -984,7 +1040,9 @@ static size_t
 get_subtree_size(const struct node *root, const void *nil)
 {
     if (root == nil)
+    {
         return 0;
+    }
     return 1 + get_subtree_size(root->link[L], nil)
            + get_subtree_size(root->link[R], nil);
 }
@@ -994,7 +1052,9 @@ get_edge_color(const struct node *root, size_t parent_size,
                const struct node *nil)
 {
     if (root == nil)
+    {
         return "";
+    }
     return get_subtree_size(root, nil) <= parent_size / 2 ? COLOR_BLU_BOLD
                                                           : COLOR_RED_BOLD;
 }
@@ -1005,9 +1065,13 @@ print_node(const struct tree *t, const struct node *parent,
 {
     struct parent_status stat = child_tracks_parent(parent, root);
     if (!stat.correct)
+    {
         printf("%s%p-%p-%s", COLOR_RED, root, stat.parent, COLOR_NIL);
+    }
     else
+    {
         printf("%p", root);
+    }
     printf(COLOR_CYN);
     /* If a node is a duplicate, we will give it a special mark among nodes. */
     if (root->dups)
@@ -1019,7 +1083,9 @@ print_node(const struct tree *t, const struct node *parent,
             printf("%p-", head);
             for (struct node *i = head->link[N]; i != head;
                  i = i->link[N], ++duplicates)
+            {
                 printf("-%p", i);
+            }
         }
         printf("(+%d)", duplicates);
     }
@@ -1037,7 +1103,9 @@ print_inner_tree(const struct node *root, size_t parent_size,
                  const struct tree *t)
 {
     if (root == &t->end)
+    {
         return;
+    }
     size_t subtree_size = get_subtree_size(root, &t->end);
     printf("%s", prefix);
     printf("%s%s%s",
@@ -1070,11 +1138,15 @@ print_inner_tree(const struct node *root, size_t parent_size,
     const char *left_edge_color
         = get_edge_color(root->link[L], subtree_size, &t->end);
     if (root->link[R] == &t->end)
+    {
         print_inner_tree(root->link[L], subtree_size, root, str,
                          left_edge_color, LEAF, L, t);
+    }
     else if (root->link[L] == &t->end)
+    {
         print_inner_tree(root->link[R], subtree_size, root, str,
                          left_edge_color, LEAF, R, t);
+    }
     else
     {
         print_inner_tree(root->link[R], subtree_size, root, str,
@@ -1091,7 +1163,9 @@ void
 print_tree(const struct tree *t, const struct node *root)
 {
     if (root == &t->end)
+    {
         return;
+    }
     size_t subtree_size = get_subtree_size(root, &t->end);
     printf("\n%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
     print_node(t, &t->end, root);
@@ -1099,11 +1173,15 @@ print_tree(const struct tree *t, const struct node *root)
     const char *left_edge_color
         = get_edge_color(root->link[L], subtree_size, &t->end);
     if (root->link[R] == &t->end)
+    {
         print_inner_tree(root->link[L], subtree_size, root, "", left_edge_color,
                          LEAF, L, t);
+    }
     else if (root->link[L] == &t->end)
+    {
         print_inner_tree(root->link[R], subtree_size, root, "", left_edge_color,
                          LEAF, R, t);
+    }
     else
     {
         print_inner_tree(root->link[R], subtree_size, root, "", left_edge_color,

@@ -1,4 +1,5 @@
 #include "pqueue.h"
+#include "tree.h"
 
 #include <assert.h>
 #include <signal.h>
@@ -271,8 +272,12 @@ pq_test_insert_shuffle(void)
     int sorted_check[size];
     inorder_fill(sorted_check, size, &pq);
     for (int i = 0; i < size; ++i)
+    {
         if (vals[i].val != sorted_check[i])
+        {
             return false;
+        }
+    }
     return true;
 }
 
@@ -338,11 +343,13 @@ pq_test_insert_erase_shuffled(void)
     int sorted_check[size];
     inorder_fill(sorted_check, size, &pq);
     for (int i = 0; i < size; ++i)
+    {
         if (vals[i].val != sorted_check[i])
         {
             breakpoint();
             return false;
         }
+    }
 
     /* Now let's delete everything with no errors. */
 
@@ -389,11 +396,13 @@ pq_test_pop_max(void)
     int sorted_check[size];
     inorder_fill(sorted_check, size, &pq);
     for (int i = 0; i < size; ++i)
+    {
         if (vals[i].val != sorted_check[i])
         {
             breakpoint();
             return false;
         }
+    }
 
     /* Now let's pop from the front of the queue until empty. */
 
@@ -439,11 +448,13 @@ pq_test_pop_min(void)
     int sorted_check[size];
     inorder_fill(sorted_check, size, &pq);
     for (int i = 0; i < size; ++i)
+    {
         if (vals[i].val != sorted_check[i])
         {
             breakpoint();
             return false;
         }
+    }
 
     /* Now let's pop from the front of the queue until empty. */
 
@@ -685,7 +696,7 @@ pq_test_forward_iter_unique_vals(void)
     int j = 0;
     for (pq_elem *e = pq_uniq_begin(&pq); e != pq_uniq_end(&pq);
          e = pq_uniq_next(&pq, e), ++j)
-        ;
+    {}
     if (j != 0)
     {
         breakpoint();
@@ -748,6 +759,7 @@ pq_test_forward_iter_all_vals(void)
     pq_insert(&pq, &vals[0].elem, val_cmp, NULL);
     /* This will test iterating through every possible length list. */
     for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
+    {
         for (int repeats = 0, index = i; repeats < i && index < num_nodes;
              ++repeats, ++index)
         {
@@ -760,6 +772,7 @@ pq_test_forward_iter_all_vals(void)
                 return false;
             }
         }
+    }
     int val_keys_inorder[num_nodes];
     inorder_fill(val_keys_inorder, num_nodes, &pq);
     for (struct pq_iter i = pq_begin(&pq); !pq_end(&pq, &i);
@@ -842,9 +855,13 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         pq_insert(pq, &vals[shuffled_index].elem, val_cmp, NULL);
         if (pq_size(pq) != i + 1)
+        {
             breakpoint();
+        }
         if (!validate_tree(pq, val_cmp))
+        {
             breakpoint();
+        }
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     const size_t catch_size = size;
@@ -855,12 +872,16 @@ static void
 fill_dups(size_t size, int vals[], size_t *i, struct node *n)
 {
     if (!n->dups)
+    {
         return;
+    }
     const pq_elem *start = n->parent_or_dups;
     vals[(*i)++] = pq_entry(start, struct val, elem)->val;
     for (struct node *cur = start->link[N]; *i < size && cur != start;
          cur = cur->link[N])
+    {
         vals[(*i)++] = pq_entry(cur, struct val, elem)->val;
+    }
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
@@ -882,7 +903,9 @@ iterate_check(pqueue *pq)
 {
     size_t iter_count = 0;
     for (struct pq_iter e = pq_begin(pq); !pq_end(pq, &e); pq_next(pq, &e))
+    {
         ++iter_count;
+    }
     return iter_count == pq_size(pq);
 }
 
