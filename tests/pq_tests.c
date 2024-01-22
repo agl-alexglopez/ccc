@@ -43,7 +43,7 @@ static bool pq_test_forward_iter_all_vals(void);
 static bool pq_test_insert_iterate_pop(void);
 static int run_tests(void);
 static void insert_shuffled(pqueue *, struct val[], size_t, int);
-static void inorder_fill(int vals[], size_t, pqueue *);
+static size_t inorder_fill(int vals[], size_t, pqueue *);
 static bool iterate_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
 
@@ -429,12 +429,13 @@ pq_test_pop_min(void)
     printf("pq_test_pop_min");
     pqueue pq;
     pq_init(&pq);
-    const int size = 50;
+    const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
     const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
-    if (max->val != size - 1)
+    const size_t max_s = max->val;
+    if (max_s != size - 1)
     {
         breakpoint();
         return false;
@@ -446,8 +447,12 @@ pq_test_pop_min(void)
         return false;
     }
     int sorted_check[size];
-    inorder_fill(sorted_check, size, &pq);
-    for (int i = 0; i < size; ++i)
+    if (inorder_fill(sorted_check, size, &pq) != size)
+    {
+        breakpoint();
+        return false;
+    }
+    for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
@@ -457,8 +462,7 @@ pq_test_pop_min(void)
     }
 
     /* Now let's pop from the front of the queue until empty. */
-
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         const struct val *front = pq_entry(pq_pop_min(&pq), struct val, elem);
         if (front->val != vals[i].val)
@@ -885,10 +889,13 @@ fill_dups(size_t size, int vals[], size_t *i, struct node *n)
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-static void
+static size_t
 inorder_fill(int vals[], size_t size, pqueue *pq)
 {
-    assert(pq_size(pq) == size);
+    if (pq_size(pq) != size)
+    {
+        return 0;
+    }
     size_t i = 0;
     for (pq_elem *e = pq_uniq_begin(pq); e != pq_uniq_end(pq);
          e = pq_uniq_next(pq, e))
@@ -896,6 +903,7 @@ inorder_fill(int vals[], size_t size, pqueue *pq)
         vals[i++] = pq_entry(e, struct val, elem)->val;
         fill_dups(size, vals, &i, e);
     }
+    return i;
 }
 
 static bool
