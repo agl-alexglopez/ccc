@@ -37,12 +37,15 @@ static bool pq_test_delete_prime_shuffle_duplicates (void);
 static bool pq_test_prime_shuffle (void);
 static bool pq_test_weak_srand (void);
 static bool pq_test_forward_iter_unique_vals (void);
+static bool pq_test_forward_iter_all_vals (void);
+static bool pq_test_insert_iterate_pop (void);
 static int run_tests (void);
 static void insert_shuffled (pqueue *, struct val[], size_t, int);
-static void inorder_fill (int vals[], size_t size, pqueue *pq);
+static void inorder_fill (int vals[], size_t, pqueue *);
+static bool iterate_check (pqueue *);
 static threeway_cmp val_cmp (const pq_elem *, const pq_elem *, void *);
 
-#define NUM_TESTS (size_t)17
+#define NUM_TESTS (size_t)19
 const test_fn all_tests[NUM_TESTS] = {
   pq_test_empty,
   pq_test_insert_one,
@@ -61,6 +64,8 @@ const test_fn all_tests[NUM_TESTS] = {
   pq_test_prime_shuffle,
   pq_test_weak_srand,
   pq_test_forward_iter_unique_vals,
+  pq_test_forward_iter_all_vals,
+  pq_test_insert_iterate_pop,
 };
 
 int
@@ -663,8 +668,8 @@ pq_test_forward_iter_unique_vals (void)
 
   /* We should have the expected behavior iteration over empty tree. */
   int j = 0;
-  for (pq_elem *e = pq_begin (&pq); e != pq_end (&pq);
-       e = pq_next (&pq, e), ++j)
+  for (pq_elem *e = pq_uniq_begin (&pq); e != pq_uniq_end (&pq);
+       e = pq_uniq_next (&pq, e), ++j)
     ;
   if (j != 0)
     {
@@ -690,8 +695,8 @@ pq_test_forward_iter_unique_vals (void)
     }
   int val_keys_inorder[num_nodes];
   inorder_fill (val_keys_inorder, num_nodes, &pq);
-  for (pq_elem *e = pq_begin (&pq); e != pq_end (&pq);
-       e = pq_next (&pq, e), ++j)
+  for (pq_elem *e = pq_uniq_begin (&pq); e != pq_uniq_end (&pq);
+       e = pq_uniq_next (&pq, e), ++j)
     {
       const struct val *v = pq_entry (e, struct val, elem);
       if (v->val != val_keys_inorder[j])
@@ -699,6 +704,107 @@ pq_test_forward_iter_unique_vals (void)
           breakpoint ();
           return false;
         }
+    }
+  return true;
+}
+
+static bool
+pq_test_forward_iter_all_vals (void)
+{
+  printf ("pq_test_forward_iter_all_vals");
+  pqueue pq;
+  pq_init (&pq);
+
+  /* We should have the expected behavior iteration over empty tree. */
+  int j = 0;
+  for (struct pq_iter i = pq_all_begin (&pq); !pq_all_end (&pq, &i);
+       pq_all_next (&pq, &i), ++j)
+    {
+    }
+  if (j != 0)
+    {
+      breakpoint ();
+      return false;
+    }
+
+  const int num_nodes = 33;
+  struct val vals[num_nodes];
+  vals[0].val = 0; // NOLINT
+  vals[0].id = 0;
+  pq_insert (&pq, &vals[0].elem, val_cmp, NULL);
+  /* This will test iterating through every possible length list. */
+  for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
+    for (int repeats = 0, index = i; repeats < i && index < num_nodes;
+         ++repeats, ++index)
+      {
+        vals[index].val = val; // NOLINT
+        vals[index].id = index;
+        pq_insert (&pq, &vals[index].elem, val_cmp, NULL);
+        if (!validate_tree (&pq, val_cmp))
+          {
+            breakpoint ();
+            return false;
+          }
+      }
+  int val_keys_inorder[num_nodes];
+  inorder_fill (val_keys_inorder, num_nodes, &pq);
+  for (struct pq_iter i = pq_all_begin (&pq); !pq_all_end (&pq, &i);
+       pq_all_next (&pq, &i), ++j)
+    {
+      const struct val *v = pq_entry (pq_all_entry (&i), struct val, elem);
+      if (v->val != val_keys_inorder[j])
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  return true;
+}
+
+static bool
+pq_test_insert_iterate_pop (void)
+{
+  printf ("pq_test_insert_iterate_pop");
+  pqueue pq;
+  pq_init (&pq);
+  /* Seed the test with any integer for reproducible randome test sequence
+     currently this will change every test. NOLINTNEXTLINE */
+  srand (time (NULL));
+  const size_t num_nodes = 1000;
+  struct val vals[num_nodes];
+  for (size_t i = 0; i < num_nodes; ++i)
+    {
+      vals[i].val = rand () % (1000 + 1); // NOLINT
+      vals[i].id = (int)i;
+      pq_insert (&pq, &vals[i].elem, val_cmp, NULL);
+      if (!validate_tree (&pq, val_cmp))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (!iterate_check (&pq))
+    {
+      breakpoint ();
+      return false;
+    }
+  size_t pop_count = 0;
+  while (!pq_empty (&pq))
+    {
+      pq_pop_max (&pq);
+      ++pop_count;
+      if (!validate_tree (&pq, val_cmp))
+        breakpoint ();
+      if (pop_count % 200 && !iterate_check (&pq))
+        {
+          breakpoint ();
+          return false;
+        }
+    }
+  if (pop_count != num_nodes)
+    {
+      breakpoint ();
+      return false;
     }
   return true;
 }
@@ -727,41 +833,40 @@ insert_shuffled (pqueue *pq, struct val vals[], const size_t size,
   assert (catch_size == pq_size (pq));
 }
 
+static void
+fill_dups (size_t size, int vals[], size_t *i, struct node *n)
+{
+  if (!n->dups)
+    return;
+  const pq_elem *start = n->parent_or_dups;
+  vals[(*i)++] = pq_entry (start, struct val, elem)->val;
+  for (struct node *cur = start->link[N]; *i < size && cur != start;
+       cur = cur->link[N])
+    vals[(*i)++] = pq_entry (cur, struct val, elem)->val;
+}
+
 /* Iterative inorder traversal to check the heap is sorted. */
 static void
 inorder_fill (int vals[], size_t size, pqueue *pq)
 {
   assert (pq_size (pq) == size);
-  struct node *iter = pq->root;
-  struct node *inorder_pred = NULL;
-  size_t s = 0;
-  while (iter != &pq->end)
+  size_t i = 0;
+  for (pq_elem *e = pq_uniq_begin (pq); e != pq_uniq_end (pq);
+       e = pq_uniq_next (pq, e))
     {
-      if (&pq->end == iter->link[L])
-        {
-          /* This is where we climb back up a link if it exists */
-          vals[s++] = pq_entry (iter, struct val, elem)->val;
-          iter = iter->link[R];
-          continue;
-        }
-      inorder_pred = iter->link[L];
-      while (&pq->end != inorder_pred->link[R]
-             && iter != inorder_pred->link[R])
-        inorder_pred = inorder_pred->link[R];
-      if (&pq->end == inorder_pred->link[R])
-        {
-          /* The right field is a temporary traversal helper. */
-          inorder_pred->link[R] = iter;
-          iter = iter->link[L];
-          continue;
-        }
-      /* Here is our last chance to count this value. */
-      vals[s++] = pq_entry (iter, struct val, elem)->val;
-      /* Here is our last chance to repair our wreckage */
-      inorder_pred->link[R] = &pq->end;
-      /* This is how we get to a right subtree if any exists. */
-      iter = iter->link[R];
+      vals[i++] = pq_entry (e, struct val, elem)->val;
+      fill_dups (size, vals, &i, e);
     }
+}
+
+static bool
+iterate_check (pqueue *pq)
+{
+  size_t iter_count = 0;
+  for (struct pq_iter e = pq_all_begin (pq); !pq_all_end (pq, &e);
+       pq_all_next (pq, &e))
+    ++iter_count;
+  return iter_count == pq_size (pq);
 }
 
 static threeway_cmp

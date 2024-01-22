@@ -93,6 +93,8 @@ typedef struct node pq_elem;
    values that are present in the queue. */
 typedef struct tree pqueue;
 
+typedef pq_elem dup_elem;
+
 /*
    =============================================================
    ===================   Comparisons  ==========================
@@ -149,6 +151,13 @@ typedef struct tree pqueue;
       } threeway_cmp;
 */
 typedef tree_cmp_fn pq_cmp_fn;
+
+struct pq_iter
+{
+  pq_elem *el;
+  pq_elem *dup;
+  uint8_t flag;
+};
 
 /* NOLINTNEXTLINE */
 #define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
@@ -236,9 +245,14 @@ pq_elem *pq_erase (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 */
 bool pq_has (pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
-pq_elem *pq_begin (pqueue *);
-pq_elem *pq_next (pqueue *, pq_elem *);
-pq_elem *pq_end (pqueue *);
+struct pq_iter pq_all_begin (pqueue *);
+bool pq_all_end (pqueue *, struct pq_iter *);
+void pq_all_next (pqueue *, struct pq_iter *);
+pq_elem *pq_all_entry (struct pq_iter *);
+
+pq_elem *pq_uniq_begin (pqueue *);
+pq_elem *pq_uniq_next (pqueue *, pq_elem *);
+pq_elem *pq_uniq_end (pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
 pq_elem *pq_root (const pqueue *);

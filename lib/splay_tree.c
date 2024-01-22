@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,6 +48,11 @@
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 #define PRINTER_INDENT (short)13
+
+#define START (uint8_t)0
+#define COMPLETED_LAP (uint8_t)2
+#define SEEN_HEAD (uint8_t)4
+#define JUMPED_IN_LIST (uint8_t)1
 
 /* Printing enum for printing tree structures if heap available. */
 enum print_link
@@ -135,19 +141,99 @@ pq_min (const pqueue *const pq)
 }
 
 pq_elem *
-pq_begin (pqueue *pq)
+pq_uniq_begin (pqueue *pq)
 {
   return begin (pq);
 }
 
+struct pq_iter
+pq_all_begin (pqueue *pq)
+{
+  return (struct pq_iter){ min (pq), &pq->end, START };
+}
+
+bool
+pq_all_end (pqueue *pq, struct pq_iter *i)
+{
+  return i->el == &pq->end;
+}
+
+static inline bool
+in_list (struct pq_iter *i)
+{
+  return NULL == i->dup->parent_or_dups;
+}
+
+static inline bool
+completed_lap (struct pq_iter *i)
+{
+  return i->flag & SEEN_HEAD && i->dup->parent_or_dups != NULL;
+}
+
+static inline bool
+is_head (struct pq_iter *i)
+{
+  return i->flag & JUMPED_IN_LIST && i->dup->parent_or_dups != NULL;
+}
+
+void
+pq_all_next (pqueue *pq, struct pq_iter *i)
+{
+  if (completed_lap (i))
+    {
+      i->flag = 0;
+      i->dup = &pq->end;
+      i->el = next (pq, i->el);
+      return;
+    }
+  if (is_head (i))
+    {
+      i->flag |= SEEN_HEAD;
+      if (i->dup->link[N] == i->dup)
+        {
+          i->flag = 0;
+          i->dup = &pq->end;
+          i->el = next (pq, i->el);
+          return;
+        }
+      i->dup = i->dup->link[N];
+      return;
+    }
+  if (in_list (i))
+    {
+      if (i->dup->link[N]->parent_or_dups != NULL)
+        {
+          i->flag = 0;
+          i->dup = &pq->end;
+          i->el = next (pq, i->el);
+          return;
+        }
+      i->dup = i->dup->link[N];
+      return;
+    }
+  if (i->el->dups)
+    {
+      i->flag |= JUMPED_IN_LIST;
+      i->dup = i->el->parent_or_dups;
+      return;
+    }
+  i->el = next (pq, i->el);
+}
+
 pq_elem *
-pq_end (pqueue *pq)
+pq_all_entry (struct pq_iter *i)
+{
+  return i->flag != 0 ? i->dup : i->el;
+}
+
+pq_elem *
+pq_uniq_end (pqueue *pq)
 {
   return end (pq);
 }
 
 pq_elem *
-pq_next (pqueue *pq, pq_elem *e)
+pq_uniq_next (pqueue *pq, pq_elem *e)
 {
   return next (pq, e);
 }
@@ -325,6 +411,8 @@ init_tree (struct tree *t)
   assert (t != NULL);
   t->root = &t->end;
   t->root->parent_or_dups = &t->end;
+  t->root->link[L] = &t->end;
+  t->root->link[R] = &t->end;
   t->root->dups = false;
   t->size = 0;
 }
@@ -406,7 +494,7 @@ next (struct tree *t, struct node *n)
   /* Using a helper node simplifies the code greatly. */
   t->end.link[L] = t->root;
   t->end.link[R] = &t->end;
-  /* The node is a parent backtracked to or the end. */
+  /* The node is a parent, backtracked to, or the end. */
   if (n->link[R] != &t->end)
     {
       /* The goal is to get far left ASAP in any inorder traverse. */
@@ -417,14 +505,13 @@ next (struct tree *t, struct node *n)
     }
   /* A leaf. Work our way back up skpping nodes we already visited. */
   struct node *p = get_parent (n);
-  while (n == p->link[R])
+  while (p->link[R] == n)
     {
       n = p;
       p = get_parent (p);
     }
   /* Consider how the end and root work together help complete traversal. */
-  if (n->link[R] != p)
-    n = p;
+  n = p;
   return n;
 }
 
