@@ -54,6 +54,7 @@ enum print_link
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 #define PRINTER_INDENT (short)13
+#define LR 2
 
 const enum tree_link inorder_traversal = L;
 const enum tree_link reverse_inorder_traversal = R;
@@ -762,6 +763,7 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
     return ret;
 }
 
+/* This function assumes that splayed is the new root of the tree */
 static struct node *
 pop_dup_node(struct tree *t, struct node *dup, tree_cmp_fn *cmp,
              struct node *splayed)
@@ -797,7 +799,7 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
     }
     else
     {
-        /* Comparing sizes with the root parent is undefined */
+        /* Comparing sizes with the root's parent is undefined. */
         parent->link[GRT == cmp(old, parent, NULL)] = tree_replacement;
     }
 
@@ -848,39 +850,35 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     t->end.link[L] = &t->end;
     t->end.link[R] = &t->end;
     t->end.parent_or_dups = &t->end;
-    struct node *left_right_subtrees[2] = {&t->end, &t->end};
+    struct node *l_r_subtrees[LR] = {&t->end, &t->end};
     struct node *pivot = NULL;
     for (;;)
     {
-        const threeway_cmp root_cmp = cmp(elem, root, NULL);
-        const enum tree_link link_to_descend = GRT == root_cmp;
-        if (EQL == root_cmp || root->link[link_to_descend] == &t->end)
+        const threeway_cmp cur_cmp = cmp(elem, root, NULL);
+        const enum tree_link next_link = GRT == cur_cmp;
+        if (EQL == cur_cmp || root->link[next_link] == &t->end)
         {
             break;
         }
-
-        const threeway_cmp child_cmp
-            = cmp(elem, root->link[link_to_descend], NULL);
-        const enum tree_link link_to_descend_from_child = GRT == child_cmp;
-        if (EQL != child_cmp && link_to_descend == link_to_descend_from_child)
+        const threeway_cmp child_cmp = cmp(elem, root->link[next_link], NULL);
+        const enum tree_link next_link_from_child = GRT == child_cmp;
+        if (EQL != child_cmp && next_link == next_link_from_child)
         {
-            pivot = root->link[link_to_descend];
-            give_parent_subtree(t, root, link_to_descend,
-                                pivot->link[!link_to_descend]);
-            give_parent_subtree(t, pivot, !link_to_descend, root);
+            pivot = root->link[next_link];
+            give_parent_subtree(t, root, next_link, pivot->link[!next_link]);
+            give_parent_subtree(t, pivot, !next_link, root);
             root = pivot;
-            if (root->link[link_to_descend] == &t->end)
+            if (root->link[next_link] == &t->end)
             {
                 break;
             }
         }
-        give_parent_subtree(t, left_right_subtrees[!link_to_descend],
-                            link_to_descend, root);
-        left_right_subtrees[!link_to_descend] = root;
-        root = root->link[link_to_descend];
+        give_parent_subtree(t, l_r_subtrees[!next_link], next_link, root);
+        l_r_subtrees[!next_link] = root;
+        root = root->link[next_link];
     }
-    give_parent_subtree(t, left_right_subtrees[L], R, root->link[L]);
-    give_parent_subtree(t, left_right_subtrees[R], L, root->link[R]);
+    give_parent_subtree(t, l_r_subtrees[L], R, root->link[L]);
+    give_parent_subtree(t, l_r_subtrees[R], L, root->link[R]);
     give_parent_subtree(t, root, L, t->end.link[R]);
     give_parent_subtree(t, root, R, t->end.link[L]);
     return root;
