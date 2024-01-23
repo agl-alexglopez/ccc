@@ -847,9 +847,7 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
        as our helper tree because we don't need its Left Right fields. */
-    t->end.link[L] = &t->end;
-    t->end.link[R] = &t->end;
-    t->end.parent_or_dups = &t->end;
+    t->end.link[L] = t->end.link[R] = t->end.parent_or_dups = &t->end;
     struct node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
