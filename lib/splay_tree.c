@@ -861,7 +861,7 @@ splay(struct tree *t, struct node *root, const struct node *elem,
         }
         const threeway_cmp child_cmp = cmp(elem, root->link[next_link], NULL);
         const enum tree_link next_link_from_child = GRT == child_cmp;
-        if (EQL != child_cmp && next_link == next_link_from_child)
+        if (child_cmp != EQL && next_link == next_link_from_child)
         {
             struct node *pivot = root->link[next_link];
             give_parent_subtree(t, root, next_link, pivot->link[!next_link]);
