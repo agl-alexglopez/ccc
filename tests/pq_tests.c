@@ -40,13 +40,16 @@ static bool pq_test_weak_srand(void);
 static bool pq_test_forward_iter_unique_vals(void);
 static bool pq_test_forward_iter_all_vals(void);
 static bool pq_test_insert_iterate_pop(void);
+static bool pq_test_priority_update(void);
+static bool pq_test_priority_removal(void);
 static int run_tests(void);
 static void insert_shuffled(pqueue *, struct val[], size_t, int);
 static size_t inorder_fill(int vals[], size_t, pqueue *);
 static bool iterate_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
+static void val_update(pq_elem *a, void *aux);
 
-#define NUM_TESTS (size_t)19
+#define NUM_TESTS (size_t)21
 const test_fn all_tests[NUM_TESTS] = {
     pq_test_empty,
     pq_test_insert_one,
@@ -67,6 +70,8 @@ const test_fn all_tests[NUM_TESTS] = {
     pq_test_forward_iter_unique_vals,
     pq_test_forward_iter_all_vals,
     pq_test_insert_iterate_pop,
+    pq_test_priority_update,
+    pq_test_priority_removal,
 };
 
 /* Set this breakpoint on any line where you wish
@@ -380,9 +385,8 @@ pq_test_insert_erase_shuffled(void)
 
     for (size_t i = 0; i < size; ++i)
     {
-        const struct val *removed = pq_entry(
-            pq_erase(&pq, &vals[i].elem, val_cmp, NULL), struct val, elem);
-        if (removed->val != vals[i].val)
+        (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&pq, val_cmp))
         {
             breakpoint();
             return false;
@@ -622,7 +626,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        pq_erase(&pq, &vals[shuffled_index].elem, val_cmp, NULL);
+        (void)pq_erase(&pq, &vals[shuffled_index].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
             breakpoint();
@@ -672,7 +676,7 @@ pq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
+        (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
             breakpoint();
@@ -713,7 +717,7 @@ pq_test_weak_srand(void)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
+        (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
             breakpoint();
@@ -737,8 +741,7 @@ pq_test_forward_iter_unique_vals(void)
 
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (pq_elem *e = pq_uniq_begin(&pq); e != pq_uniq_end(&pq);
-         e = pq_uniq_next(&pq, e), ++j)
+    for (pq_elem *e = pq_begin(&pq); e != pq_end(&pq); e = pq_next(&pq, e), ++j)
     {}
     if (j != 0)
     {
@@ -768,8 +771,9 @@ pq_test_forward_iter_unique_vals(void)
         breakpoint();
         return false;
     }
-    for (pq_elem *e = pq_uniq_begin(&pq); e != pq_uniq_end(&pq);
-         e = pq_uniq_next(&pq, e), ++j)
+    j = num_nodes - 1;
+    for (pq_elem *e = pq_begin(&pq); e != pq_end(&pq) && j >= 0;
+         e = pq_next(&pq, e), --j)
     {
         const struct val *v = pq_entry(e, struct val, elem);
         if (v->val != val_keys_inorder[j])
@@ -790,8 +794,7 @@ pq_test_forward_iter_all_vals(void)
 
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct pq_iter i = pq_begin(&pq); !pq_end(&pq, &i);
-         pq_next(&pq, &i), ++j)
+    for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq); i = pq_next(&pq, i), ++j)
     {}
     if (j != 0)
     {
@@ -822,10 +825,11 @@ pq_test_forward_iter_all_vals(void)
     }
     int val_keys_inorder[num_nodes];
     inorder_fill(val_keys_inorder, num_nodes, &pq);
-    for (struct pq_iter i = pq_begin(&pq); !pq_end(&pq, &i);
-         pq_next(&pq, &i), ++j)
+    j = num_nodes - 1;
+    for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq) && j >= 0;
+         i = pq_next(&pq, i), --j)
     {
-        const struct val *v = pq_entry(pq_from_iter(&i), struct val, elem);
+        const struct val *v = pq_entry(i, struct val, elem);
         if (v->val != val_keys_inorder[j])
         {
             breakpoint();
@@ -849,7 +853,7 @@ pq_test_insert_iterate_pop(void)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].val = rand() % (1000 + 1); // NOLINT
+        vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
@@ -887,6 +891,106 @@ pq_test_insert_iterate_pop(void)
     return true;
 }
 
+static bool
+pq_test_priority_removal(void)
+{
+    printf("pq_test_priority_removal");
+    pqueue pq;
+    pq_init(&pq);
+    /* Seed the test with any integer for reproducible random test sequence
+       currently this will change every test. NOLINTNEXTLINE */
+    srand(time(NULL));
+    const size_t num_nodes = 1000;
+    struct val vals[num_nodes];
+    for (size_t i = 0; i < num_nodes; ++i)
+    {
+        /* Force duplicates. */
+        vals[i].val = rand() % (num_nodes + 1); // NOLINT
+        vals[i].id = (int)i;
+        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&pq, val_cmp))
+        {
+            return false;
+        }
+    }
+    if (!iterate_check(&pq))
+    {
+        return false;
+    }
+    const int limit = 400;
+    for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq);)
+    {
+        struct val *cur = pq_entry(i, struct val, elem);
+        if (cur->val > limit)
+        {
+            i = pq_erase(&pq, i, val_cmp, NULL);
+            if (!validate_tree(&pq, val_cmp))
+            {
+                breakpoint();
+                return false;
+            }
+        }
+        else
+        {
+            i = pq_next(&pq, i);
+        }
+    }
+    return true;
+}
+
+static bool
+pq_test_priority_update(void)
+{
+    printf("pq_test_priority_update");
+    pqueue pq;
+    pq_init(&pq);
+    /* Seed the test with any integer for reproducible random test sequence
+       currently this will change every test. NOLINTNEXTLINE */
+    srand(time(NULL));
+    const size_t num_nodes = 1000;
+    struct val vals[num_nodes];
+    for (size_t i = 0; i < num_nodes; ++i)
+    {
+        /* Force duplicates. */
+        vals[i].val = rand() % (num_nodes + 1); // NOLINT
+        vals[i].id = (int)i;
+        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&pq, val_cmp))
+        {
+            breakpoint();
+            return false;
+        }
+    }
+    if (!iterate_check(&pq))
+    {
+        return false;
+    }
+    const int limit = 400;
+    for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq);)
+    {
+        struct val *cur = pq_entry(i, struct val, elem);
+        int backoff = cur->val / 2;
+        if (cur->val > limit)
+        {
+            i = pq_update(&pq, i, val_cmp, val_update, &backoff);
+            if (!validate_tree(&pq, val_cmp))
+            {
+                breakpoint();
+                return false;
+            }
+        }
+        else
+        {
+            i = pq_next(&pq, i);
+        }
+    }
+    if (pq_size(&pq) != num_nodes)
+    {
+        return false;
+    }
+    return true;
+}
+
 static void
 insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
                 const int larger_prime)
@@ -918,22 +1022,6 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
     }
 }
 
-static void
-fill_dups(size_t size, int vals[], size_t *i, pqueue *pq, pq_elem *n)
-{
-    if (!pq_has_dups(pq, n))
-    {
-        return;
-    }
-    const pq_elem *start = n->parent_or_dups;
-    vals[(*i)++] = pq_entry(start, struct val, elem)->val;
-    for (struct node *cur = start->link[N]; *i < size && cur != start;
-         cur = cur->link[N])
-    {
-        vals[(*i)++] = pq_entry(cur, struct val, elem)->val;
-    }
-}
-
 /* Iterative inorder traversal to check the heap is sorted. */
 static size_t
 inorder_fill(int vals[], size_t size, pqueue *pq)
@@ -943,11 +1031,9 @@ inorder_fill(int vals[], size_t size, pqueue *pq)
         return 0;
     }
     size_t i = 0;
-    for (pq_elem *e = pq_uniq_begin(pq); e != pq_uniq_end(pq);
-         e = pq_uniq_next(pq, e))
+    for (pq_elem *e = pq_rbegin(pq); e != pq_end(pq); e = pq_rnext(pq, e))
     {
         vals[i++] = pq_entry(e, struct val, elem)->val;
-        fill_dups(size, vals, &i, pq, e);
     }
     return i;
 }
@@ -956,7 +1042,16 @@ static bool
 iterate_check(pqueue *pq)
 {
     size_t iter_count = 0;
-    for (struct pq_iter e = pq_begin(pq); !pq_end(pq, &e); pq_next(pq, &e))
+    for (pq_elem *e = pq_begin(pq); e != pq_end(pq); e = pq_next(pq, e))
+    {
+        ++iter_count;
+    }
+    if (iter_count != pq_size(pq))
+    {
+        return false;
+    }
+    iter_count = 0;
+    for (pq_elem *e = pq_rbegin(pq); e != pq_end(pq); e = pq_rnext(pq, e))
     {
         ++iter_count;
     }
@@ -970,4 +1065,11 @@ val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
     struct val *lhs = pq_entry(a, struct val, elem);
     struct val *rhs = pq_entry(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+}
+
+static void
+val_update(pq_elem *a, void *aux)
+{
+    struct val *old = pq_entry(a, struct val, elem);
+    old->val = *(int *)aux;
 }

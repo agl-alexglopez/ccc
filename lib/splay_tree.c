@@ -31,9 +31,15 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+/* Printing enum for printing tree structures if heap available. */
+enum print_link
+{
+    BRANCH = 0, /* ├── */
+    LEAF = 1    /* └── */
+};
 
 /* Text coloring macros (ANSI character escapes) for printing function
    colorful output. Consider changing to a more portable library like
@@ -49,17 +55,8 @@
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 #define PRINTER_INDENT (short)13
 
-#define START (uint8_t)0
-#define COMPLETED_LAP (uint8_t)2
-#define SEEN_HEAD (uint8_t)4
-#define JUMPED_IN_LIST (uint8_t)1
-
-/* Printing enum for printing tree structures if heap available. */
-enum print_link
-{
-    BRANCH = 0, /* ├── */
-    LEAF = 1    /* └── */
-};
+const enum tree_link inorder_traversal = L;
+const enum tree_link reverse_inorder_traversal = R;
 
 /* =========================================================================
    =======================        Prototypes          ======================
@@ -92,14 +89,15 @@ static struct node *pop_min(struct tree *);
 static struct node *min(const struct tree *);
 static struct node *begin(struct tree *);
 static struct node *end(struct tree *);
-static struct node *next(struct tree *, struct node *);
+static struct node *next(struct tree *, struct node *, enum tree_link);
+static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
 static threeway_cmp force_find_grt(const struct node *, const struct node *,
                                    void *);
 static threeway_cmp force_find_les(const struct node *, const struct node *,
                                    void *);
 static void give_parent_subtree(struct tree *, struct node *, enum tree_link,
                                 struct node *);
-static inline bool has_dups(struct tree *, const struct node *);
+static inline bool has_dups(const struct node *, const struct node *);
 static struct node *get_parent(struct tree *, struct node *);
 static void add_duplicate(struct tree *, struct node *, struct node *,
                           struct node *);
@@ -141,101 +139,33 @@ pq_min(const pqueue *const pq)
 }
 
 pq_elem *
-pq_uniq_begin(pqueue *pq)
-{
-    return begin(pq);
-}
-
-struct pq_iter
 pq_begin(pqueue *pq)
 {
-    return (struct pq_iter){min(pq), &pq->end, START};
-}
-
-bool
-pq_end(pqueue *pq, struct pq_iter *i)
-{
-    return i->el == &pq->end;
-}
-
-static inline bool
-in_list(struct pq_iter *i)
-{
-    return NULL == i->dup->parent_or_dups;
-}
-
-static inline bool
-completed_lap(struct pq_iter *i)
-{
-    return i->flag & SEEN_HEAD && i->dup->parent_or_dups != NULL;
-}
-
-static inline bool
-is_head(struct pq_iter *i)
-{
-    return i->flag & JUMPED_IN_LIST && i->dup->parent_or_dups != NULL;
-}
-
-void
-pq_next(pqueue *pq, struct pq_iter *i)
-{
-    if (completed_lap(i))
-    {
-        i->flag = 0;
-        i->dup = &pq->end;
-        i->el = next(pq, i->el);
-        return;
-    }
-    if (is_head(i))
-    {
-        i->flag |= SEEN_HEAD;
-        if (i->dup->link[N] == i->dup)
-        {
-            i->flag = 0;
-            i->dup = &pq->end;
-            i->el = next(pq, i->el);
-            return;
-        }
-        i->dup = i->dup->link[N];
-        return;
-    }
-    if (in_list(i))
-    {
-        if (i->dup->link[N]->parent_or_dups != NULL)
-        {
-            i->flag = 0;
-            i->dup = &pq->end;
-            i->el = next(pq, i->el);
-            return;
-        }
-        i->dup = i->dup->link[N];
-        return;
-    }
-    if (has_dups(pq, i->el))
-    {
-        i->flag |= JUMPED_IN_LIST;
-        i->dup = i->el->parent_or_dups;
-        return;
-    }
-    i->el = next(pq, i->el);
+    return max(pq);
 }
 
 pq_elem *
-pq_from_iter(struct pq_iter *i)
+pq_rbegin(pqueue *pq)
 {
-    return i->flag != 0 ? i->dup : i->el;
+    return min(pq);
 }
 
 pq_elem *
-pq_uniq_end(pqueue *pq)
+pq_end(pqueue *pq)
 {
-    return end(pq);
+    return &pq->end;
 }
 
 pq_elem *
-pq_uniq_next(pqueue *pq, pq_elem *e)
+pq_next(pqueue *pq, pq_elem *i)
 {
-    return next(pq, e);
+    return multiset_next(pq, i, reverse_inorder_traversal);
+}
+
+pq_elem *
+pq_rnext(pqueue *pq, pq_elem *i)
+{
+    return multiset_next(pq, i, inorder_traversal);
 }
 
 void
@@ -247,11 +177,27 @@ pq_insert(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 pq_elem *
 pq_erase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
-    return multiset_erase_node(pq, elem, fn, aux);
+    pq_elem *ret = pq_next(pq, elem);
+    assert(multiset_erase_node(pq, elem, fn, aux) != &pq->end);
+    return ret;
+}
+
+pq_elem *
+pq_update(pqueue *pq, pq_elem *elem, pq_cmp_fn *cmp, pq_update_fn *fn,
+          void *aux)
+{
+    assert(NULL != elem->link[L] && NULL != elem->link[R]
+           && NULL != elem->parent_or_dups);
+    pq_elem *ret = pq_next(pq, elem);
+    pq_elem *e = multiset_erase_node(pq, elem, cmp, aux);
+    assert(e != &pq->end);
+    fn(e, aux);
+    multiset_insert(pq, e, cmp, aux);
+    return ret;
 }
 
 bool
-pq_has(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+pq_contains(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
     return contains(pq, elem, fn, aux);
 }
@@ -277,7 +223,7 @@ pq_size(pqueue *const pq)
 bool
 pq_has_dups(pqueue *const pq, pq_elem *e)
 {
-    return has_dups(pq, e);
+    return has_dups(&pq->end, e);
 }
 
 /* =========================================================================
@@ -329,7 +275,7 @@ set_end(set *s)
 set_elem *
 set_next(set *s, set_elem *e)
 {
-    return next(s, e);
+    return next(s, e, inorder_traversal);
 }
 
 const set_elem *
@@ -450,7 +396,6 @@ static struct node *
 max(const struct tree *const t)
 {
     assert(t != NULL);
-    assert(!empty(t));
     struct node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
     {}
@@ -491,27 +436,86 @@ end(struct tree *t)
     return &t->end;
 }
 
+static inline bool
+is_dup_head_next(struct node *i)
+{
+    return i->link[R]->parent_or_dups != NULL;
+}
+
+static inline struct node *
+return_to_tree_from_head(struct tree *t, struct node *head,
+                         const enum tree_link traversal)
+{
+    if (head->parent_or_dups == &t->end)
+    {
+        return next(t, t->root, traversal);
+    }
+    const pq_elem *parent = head->parent_or_dups;
+    if (parent->link[L] != &t->end && parent->link[L]->parent_or_dups == head)
+    {
+        return next(t, parent->link[L], traversal);
+    }
+    if (parent->link[R] != &t->end && parent->link[R]->parent_or_dups == head)
+    {
+        return next(t, parent->link[R], traversal);
+    }
+    breakpoint();
+    exit(1);
+}
+
+static inline bool
+is_dup_head(struct node *end, struct node *i)
+{
+    return i != end && i->link[P] != end && i->link[P]->link[N] == i;
+}
+
 static struct node *
-next(struct tree *t, struct node *n)
+multiset_next(struct tree *t, struct node *i, const enum tree_link traversal)
+{
+    if (NULL == i->parent_or_dups)
+    {
+        if (is_dup_head_next(i))
+        {
+            return return_to_tree_from_head(t, i->link[N], traversal);
+        }
+        return i->link[N];
+    }
+    if (is_dup_head(&t->end, i))
+    {
+        if (is_dup_head_next(i))
+        {
+            return return_to_tree_from_head(t, i, traversal);
+        }
+        return i->link[N];
+    }
+    if (has_dups(&t->end, i))
+    {
+        return i->parent_or_dups;
+    }
+    return next(t, i, traversal);
+}
+
+static struct node *
+next(struct tree *t, struct node *n, const enum tree_link traversal)
 {
     assert(get_parent(t, t->root) == &t->end);
     /* Using a helper node simplifies the code greatly. */
-    t->end.link[L] = t->root;
-    t->end.link[R] = &t->end;
+    t->end.link[traversal] = t->root;
+    t->end.link[!traversal] = &t->end;
     /* The node is a parent, backtracked to, or the end. */
-    if (n->link[R] != &t->end)
+    if (n->link[!traversal] != &t->end)
     {
-        /* The goal is to get far left ASAP in any inorder traverse. */
-        n = n->link[R];
-        while (n->link[L] != &t->end)
+        /* The goal is to get far left ASAP in any traversal. */
+        n = n->link[!traversal];
+        while (n->link[traversal] != &t->end)
         {
-            n = n->link[L];
+            n = n->link[traversal];
         }
         return n;
     }
     /* A leaf. Work our way back up skpping nodes we already visited. */
     struct node *p = get_parent(t, n);
-    while (p->link[R] == n)
+    while (p->link[!traversal] == n)
     {
         n = p;
         p = get_parent(t, p);
@@ -610,7 +614,7 @@ add_duplicate(struct tree *t, struct node *tree_node, struct node *add,
        to the back. The head then needs to point to new tail and new
        tail points to already in place head that tree points to.
        This operation still works if we previously had size 1 list. */
-    if (!has_dups(t, tree_node))
+    if (!has_dups(&t->end, tree_node))
     {
         add->parent_or_dups = parent;
         tree_node->parent_or_dups = add;
@@ -663,7 +667,10 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
     assert(t != NULL);
     assert(tnil != NULL);
     assert(force_max_or_min != NULL);
-    assert(!empty(t));
+    if (empty(t))
+    {
+        return &t->end;
+    }
     t->size--;
     assert(t->size != ((size_t)-1));
 
@@ -671,7 +678,7 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
 
     t->root = ret;
     give_parent_subtree(t, &t->end, 0, t->root);
-    if (has_dups(t, ret))
+    if (has_dups(&t->end, ret))
     {
         ret = pop_front_dup(t, ret, force_max_or_min);
     }
@@ -696,10 +703,17 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
     assert(t != NULL);
     assert(node != NULL);
     assert(cmp != NULL);
-    assert(!empty(t));
+    if (empty(t))
+    {
+        return &t->end;
+    }
+    if (NULL == node->link[R] || NULL == node->link[L]
+        || NULL == node->parent_or_dups)
+    {
+        return &t->end;
+    }
     t->size--;
     assert(t->size != ((size_t)-1));
-
     /* Special case that this must be a duplicate that is in the
        linked list but it is not the special head node. So, it
        is a quick snip to get it out. */
@@ -709,12 +723,14 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
         node->link[N]->link[P] = node->link[P];
         return node;
     }
-
     struct node *ret = splay(t, t->root, node, cmp);
-
     t->root = ret;
+    if (cmp(node, ret, NULL) != EQL)
+    {
+        return &t->end;
+    }
     give_parent_subtree(t, &t->end, 0, t->root);
-    if (has_dups(t, ret))
+    if (has_dups(&t->end, ret))
     {
         ret = pop_dup_node(t, node, cmp, ret);
     }
@@ -857,29 +873,57 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
                     struct node *subtree)
 {
     parent->link[dir] = subtree;
-    if (has_dups(t, subtree))
+    if (has_dups(&t->end, subtree))
     {
         subtree->parent_or_dups->parent_or_dups = parent;
     }
-    else if (subtree != &t->end)
+    else
     {
         subtree->parent_or_dups = parent;
     }
 }
 
+/* This is tricky but because how we store our nodes we always have an O(1)
+   check available to us to tell whether a node in a tree is storing
+   duplicates without any auxiliary data structures or struct fields.
+
+   All nodes are in the tree tracking their parent. If we add duplicates,
+   duplicates form a circular doubly linked list and the tree node
+   uses its parent pointer to track the duplicate. The duplicate then
+   tracks the parent for the tree node. Therefore, we will always know
+   how to identify a tree node that stores a duplicate. A tree node with
+   a duplicate uses its parent field to point to a node that can
+   find itself by checking its doubly linked list. A node in a tree
+   could never do this because there is no route back to a node from
+   its children by definition of a binary tree. However, we must be
+   careful not to access the end helper becuase it can store any pointers
+   in its fields that should not be accessed for directions.
+
+                             *<<<<<<<<<
+                           //  \      ^>>>>v
+                          *      *----*----*
+                        // \\  // \\  ^<<<<v
+                       *    *  *   *
+
+   Consider the above tree where one node is tracking duplicates. It
+   sacrifices its parent field to track a duplicate. The duplicate
+   tracks the parent and uses its left/right fields to track previous/next
+   in a circular list. So, we always know via pointers if we find a
+   duplicate.
+ */
 static inline bool
-has_dups(struct tree *const t, const struct node *const n)
+has_dups(const struct node *const end, const struct node *const n)
 {
-    return n != &t->end && n->parent_or_dups != &t->end
-           && n->parent_or_dups->link[L] != &t->end
-           && n->parent_or_dups->link[L]->link[R] == n->parent_or_dups;
+    return n != end && n->parent_or_dups != end
+           && n->parent_or_dups->link[L] != end
+           && n->parent_or_dups->link[P]->link[N] == n->parent_or_dups;
 }
 
 static struct node *
 get_parent(struct tree *t, struct node *n)
 {
-    return has_dups(t, n) ? n->parent_or_dups->parent_or_dups
-                          : n->parent_or_dups;
+    return has_dups(&t->end, n) ? n->parent_or_dups->parent_or_dups
+                                : n->parent_or_dups;
 }
 
 /* We can trick our splay tree into giving us the max via splaying
@@ -928,7 +972,7 @@ struct parent_status
 static size_t
 count_dups(struct tree *t, struct node *n)
 {
-    if (!has_dups(t, n))
+    if (!has_dups(&t->end, n))
     {
         return 0;
     }
@@ -999,7 +1043,7 @@ static struct parent_status
 child_tracks_parent(struct tree *const t, const struct node *parent,
                     const struct node *root)
 {
-    if (has_dups(t, root))
+    if (has_dups(&t->end, root))
     {
         struct node *p = root->parent_or_dups->parent_or_dups;
         if (p != parent)
@@ -1087,7 +1131,7 @@ print_node(struct tree *const t, const struct node *parent,
     }
     printf(COLOR_CYN);
     /* If a node is a duplicate, we will give it a special mark among nodes. */
-    if (has_dups(t, root))
+    if (has_dups(&t->end, root))
     {
         int duplicates = 1;
         const struct node *head = root->parent_or_dups;
@@ -1107,7 +1151,8 @@ print_node(struct tree *const t, const struct node *parent,
 }
 
 /* I know this function is rough but it's tricky to focus on edge color rather
-   than node color. Don't care about pretty code here, need thorough debug. */
+   than node color. Don't care about pretty code here, need thorough debug.
+   I want to convert to iterative stack when I get the chance. */
 static void
 print_inner_tree(const struct node *root, size_t parent_size,
                  const struct node *parent, const char *prefix,
@@ -1173,7 +1218,8 @@ print_inner_tree(const struct node *root, size_t parent_size,
 }
 
 /* Should be pretty straightforward output. Red node means there
-   is an error in parent tracking. The child does not track the parent. */
+   is an error in parent tracking. The child does not track the parent
+   correctly if this occurs and this will cause subtle delayed bugs. */
 void
 print_tree(struct tree *t, const struct node *root)
 {
