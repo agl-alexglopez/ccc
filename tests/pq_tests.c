@@ -919,9 +919,9 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
 }
 
 static void
-fill_dups(size_t size, int vals[], size_t *i, struct node *n)
+fill_dups(size_t size, int vals[], size_t *i, pqueue *pq, pq_elem *n)
 {
-    if (!n->dups)
+    if (!pq_has_dups(pq, n))
     {
         return;
     }
@@ -947,7 +947,7 @@ inorder_fill(int vals[], size_t size, pqueue *pq)
          e = pq_uniq_next(pq, e))
     {
         vals[i++] = pq_entry(e, struct val, elem)->val;
-        fill_dups(size, vals, &i, e);
+        fill_dups(size, vals, &i, pq, e);
     }
     return i;
 }

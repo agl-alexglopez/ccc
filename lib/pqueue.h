@@ -162,8 +162,8 @@ struct pq_iter
 
 /* NOLINTNEXTLINE */
 #define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                  \
-                - offsetof(STRUCT, MEMBER.dups))) /* NOLINT */
+    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                        \
+                - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
 void pq_init(pqueue *);
@@ -345,5 +345,6 @@ pq_elem *pq_uniq_end(pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
 pq_elem *pq_root(const pqueue *);
+bool pq_has_dups(pqueue *, pq_elem *);
 
 #endif
