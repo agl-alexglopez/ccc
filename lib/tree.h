@@ -1,9 +1,7 @@
 #ifndef TREE
 #define TREE
-#include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 
 enum tree_link
 {
@@ -56,13 +54,5 @@ bool validate_tree(struct tree *t, tree_cmp_fn *cmp);
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debuggin use. */
 void print_tree(struct tree *t, const struct node *root);
-
-#define breakpoint()                                                           \
-    do                                                                         \
-    {                                                                          \
-        (void)fprintf(stderr, "\n!!Break. Line: %d File: %s, Func: %s\n ",     \
-                      __LINE__, __FILE__, __func__);                           \
-        (void)raise(SIGTRAP);                                                  \
-    } while (0)
 
 #endif

@@ -87,7 +87,6 @@ static struct node *max(const struct tree *);
 static struct node *pop_max(struct tree *);
 static struct node *pop_min(struct tree *);
 static struct node *min(const struct tree *);
-static struct node *begin(struct tree *);
 static struct node *end(struct tree *);
 static struct node *next(struct tree *, struct node *, enum tree_link);
 static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
@@ -263,7 +262,7 @@ set_insert(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
 set_elem *
 set_begin(set *s)
 {
-    return begin(s);
+    return min(s);
 }
 
 set_elem *
@@ -425,12 +424,6 @@ pop_min(struct tree *t)
 }
 
 static struct node *
-begin(struct tree *t)
-{
-    return min(t);
-}
-
-static struct node *
 end(struct tree *t)
 {
     return &t->end;
@@ -459,7 +452,7 @@ return_to_tree_from_head(struct tree *t, struct node *head,
     {
         return next(t, parent->link[R], traversal);
     }
-    breakpoint();
+    printf("Error! Trapped in the duplicate list.\n");
     exit(1);
 }
 
@@ -472,19 +465,13 @@ is_dup_head(struct node *end, struct node *i)
 static struct node *
 multiset_next(struct tree *t, struct node *i, const enum tree_link traversal)
 {
-    if (NULL == i->parent_or_dups)
+    if (NULL == i->parent_or_dups || is_dup_head(&t->end, i))
     {
+        const bool is_head = i->parent_or_dups != NULL;
         if (is_dup_head_next(i))
         {
-            return return_to_tree_from_head(t, i->link[N], traversal);
-        }
-        return i->link[N];
-    }
-    if (is_dup_head(&t->end, i))
-    {
-        if (is_dup_head_next(i))
-        {
-            return return_to_tree_from_head(t, i, traversal);
+            return return_to_tree_from_head(t, is_head ? i : i->link[N],
+                                            traversal);
         }
         return i->link[N];
     }
