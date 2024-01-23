@@ -94,8 +94,6 @@ typedef struct node pq_elem;
    values that are present in the queue. */
 typedef struct tree pqueue;
 
-typedef pq_elem dup_elem;
-
 /*
    =============================================================
    ===================   Comparisons  ==========================
@@ -153,17 +151,51 @@ typedef pq_elem dup_elem;
 */
 typedef tree_cmp_fn pq_cmp_fn;
 
-struct pq_iter
-{
-    pq_elem *el;
-    pq_elem *dup;
-    uint8_t flag;
-};
+/* Update priorities with a function that modifies the field
+   you are using to store priorities and compare them with
+   the pq_cmp_fn. For example:
+
+      struct val
+      {
+        int val;
+        pq_elem elem;
+      };
+
+      static pqueue pq;
+
+      static void
+      priority_update(const pq_elem *a, void *new_val)
+      {
+          if (new_val == NULL)
+          {
+              ...handle errors...
+          }
+          struct val *old = pq_entry(a, struct val, elem);
+          old->val = *((int *)new_val);
+      }
+
+      int
+      main()
+      {
+         pq_init(&pq);
+         ...Insert various values...
+         struct val *my_val = retreived_val();
+         const int new_priority = generate_priority(my_val);
+         pq_update(&pq, &my_val->elem, &my_cmp_fn,
+                   &priority_update, &new_priority);
+      }
+
+   The above should be well defined because the user determines
+   how to cast the auxiliary data themselves based on the types
+   they are implementing, but care should be taking when casting
+   from void.
+*/
+typedef void pq_update_fn(pq_elem *, void *aux);
 
 /* NOLINTNEXTLINE */
 #define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->dups                                  \
-                - offsetof(STRUCT, MEMBER.dups))) /* NOLINT */
+    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                        \
+                - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
 void pq_init(pqueue *);
@@ -192,7 +224,8 @@ void pq_insert(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    round robin scheduling. Importantly, if a priority is reset
    to its same value after having removed the element from
    the tree it is considered new and returns to the back
-   of the queue of duplicates. */
+   of the queue of duplicates. Returns the end element if
+   the queue is empty. */
 pq_elem *pq_pop_max(pqueue *);
 /* Same promises as pop_max except for the minimum values. */
 pq_elem *pq_pop_min(pqueue *);
@@ -209,11 +242,26 @@ pq_elem *pq_max(const pqueue *);
 pq_elem *pq_min(const pqueue *);
 
 /* Erases a specified element known to be in the queue.
-   The behavior is undefined if the element is not in
-   the queue. O(lgN). However, in practice you can
-   often benefit from O(1) access if that element is
-   a duplicate or you repeatedly access that value. */
+   Returns the element that follows the previous value
+   of the element in round robin sorted order.
+   This may be another element or it may be the end
+   element in which case no values are greater than
+   the last. O(lgN). However, in practice you can often
+   benefit from O(1) access if that element is a duplicate
+   or you are repeatedly erasing duplicates while iterating. */
 pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+
+/* Updates the specified elem known to be in the queue with
+   a new priority in O(lgN) time. Because an update does not
+   remove elements from a queue care should be taken to avoid
+   infinite loops. For example, increasing priorities during
+   an inorder traversal should be done with care because that
+   element will be encountered again later in the queue with one
+   exception This function returns the element that followed
+   this one at its original value in ascending order. However, the
+   newly updated value will be skipped if it is placed directly
+   in front of itself with no duplicates of that same updated value. */
+pq_elem *pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
 
 /* Returns true if this priority value is in the queue.
    you need not search with any specific struct you have
@@ -232,7 +280,7 @@ pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
       has_priority(int priority)
       {
          struct priority key = { .priority = priority };
-         return pq_has_priority(&pq, my_cmp, NULL);
+         return pq_contains(&pq, my_cmp, NULL);
       }
 
       int
@@ -244,18 +292,16 @@ pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
    This can be helpful if you need to know if such a priority
    is present regardless of how many round robin duplicates
-   are present. Returns the result in O(lgN).
-*/
-bool pq_has(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+   are present. Returns the result in O(lgN). */
+bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /*
    =============================================================
    ===================    Iteration   ==========================
    =============================================================
 
-   One can iterate through the priority queue, however it takes
-   some setup if you wish to view every key, including
-   duplicates in round robin order. For example:
+   Priority queue  iterators are stable and support updates and
+   deltion while iterating. For example:
 
    struct val
    {
@@ -272,78 +318,41 @@ bool pq_has(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
       ...Fill the container with program logic...
 
-      for (struct pq_iter i = pq_begin(&q); !pq_end(&q, &i); pq_next(&q, &i))
+      for (pq_elem *i = pq_begin(&q); i != pq_end(&q, i); i = pq_next(&q, i))
       {
          struct val *cur = pq_entry(pq_from_iter(&i), struct val, elem);
          printf("%d", cur->val);
       }
    }
 
-   The pq_iter is created once in this case and only lives for the scope
-   of the for loop. It is also passed by address to the end and next
-   function so there is only the initial allocation. For best results
-   use the provided patter for iteration and element access lest you
-   break the data structure by trying to iterate yourself.
+   This is traversal in order of descending priority oby default with
+   duplicates included in round robin order.
 */
 
 /* Returns a struct by copy to aid in iteration through the priority
    queue. It is simply two pointers and a byte so it is not very
    expensive and is only allocated on the stack once. Use the
    following methods to progress through the priority queue. */
-struct pq_iter pq_begin(pqueue *);
+pq_elem *pq_begin(pqueue *);
+pq_elem *pq_rbegin(pqueue *);
 
-/* YOU MUST USE THIS METHOD TO PROGRESS THE ITERATOR. It is
-   non trivial to iterate through this queue and you will not get
-   the desired results if you attempt to do so yourself. Pass
-   a pointer to the queue and iterator and use the provided
-   from iterator method to access your data. */
-void pq_next(pqueue *, struct pq_iter *);
+/* Progresses through the queue in order of highest priority by
+   default. Use the reverse order iterator if you prefer ascending
+   order. If you plan to modify while iterating, see if the erase
+   and update functions are what you are looking for. Both iterators
+   visit duplicates in round robin order meaning oldest first so
+   that priorities can be organized round robin either ascending
+   or descending and visitation is fair. */
+pq_elem *pq_next(pqueue *, pq_elem *);
+pq_elem *pq_rnext(pqueue *, pq_elem *);
 
-/* How to access your expected elem you have embedded in your struct.
-   Use this method to follow the standard iterator pattern in the
-   example above. Then use the pq_entry macro to get back your struct. */
-pq_elem *pq_from_iter(struct pq_iter *);
-
-/* Returns true if the iterator has reached the end of the queue.
-   The end is not a valid position in the queue so it does not make
+/* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end
-   is reached. */
-bool pq_end(pqueue *, struct pq_iter *);
-
-/* It is sometimes convenient for testing or other reasons to iterate
-   only through the unique elements in the queue. Because the queue
-   stores duplicates in a round robin fashion there can be quite a
-   few duplicates depending on the use case. This provides a one
-   time access to all unique elements with no additional overhead
-   or auxiliary data structures. This follows a more traditional
-   direct reassignment loop when compared to the iterator method.
-
-      struct val
-      {
-         int val;
-         pq_elem elem;
-      };
-      static pqueue q;
-      int
-      main ()
-      {
-         pq_init (&q);
-
-         ...Fill container with program logic...
-
-         for (pq_elem *e = pq_uniq_begin (&q); e != pq_uniq_end (&q);
-              e = pq_uniq_next (&q, e))
-        {
-            struct val *v = pq_entry (e, struct val, elem)->val;
-            printf ("%d", v->val);
-        }
-      }
-*/
-pq_elem *pq_uniq_begin(pqueue *);
-pq_elem *pq_uniq_next(pqueue *, pq_elem *);
-pq_elem *pq_uniq_end(pqueue *);
+   is reached. The end is same for any iteration order. */
+pq_elem *pq_end(pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
 pq_elem *pq_root(const pqueue *);
+bool pq_has_dups(pqueue *, pq_elem *);
 
 #endif

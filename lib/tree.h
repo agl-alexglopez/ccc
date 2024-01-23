@@ -19,7 +19,6 @@ struct node
 {
     struct node *link[2];
     struct node *parent_or_dups;
-    bool dups;
 };
 
 struct tree
@@ -54,6 +53,6 @@ bool validate_tree(struct tree *t, tree_cmp_fn *cmp);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debuggin use. */
-void print_tree(const struct tree *t, const struct node *root);
+void print_tree(struct tree *t, const struct node *root);
 
 #endif
