@@ -936,7 +936,7 @@ has_dups(const struct node *const end, const struct node *const n)
            && n->parent_or_dups->link[P]->link[N] == n->parent_or_dups;
 }
 
-static struct node *
+static inline struct node *
 get_parent(struct tree *t, struct node *n)
 {
     return has_dups(&t->end, n) ? n->parent_or_dups->parent_or_dups
@@ -1092,6 +1092,12 @@ is_duplicate_storing_parent(struct tree *const t, const struct node *parent,
            && is_duplicate_storing_parent(t, root, root->link[R]);
 }
 
+/* Validate tree prefers to use recursion to examine the tree over the
+   provided iterators of any implementation so as to avoid using a
+   flawed implementation of such iterators. This should help be more
+   sure that the implementation is correct because it follows the
+   truth of the provided pointers with its own stack as backtracking
+   information. */
 bool
 validate_tree(struct tree *t, tree_cmp_fn *cmp)
 {
