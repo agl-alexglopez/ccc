@@ -45,7 +45,7 @@ static bool pq_test_priority_removal(void);
 static int run_tests(void);
 static void insert_shuffled(pqueue *, struct val[], size_t, int);
 static size_t inorder_fill(int vals[], size_t, pqueue *);
-static bool iterate_check(pqueue *);
+static bool iterator_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
 static void val_update(pq_elem *a, void *aux);
 
@@ -862,7 +862,7 @@ pq_test_insert_iterate_pop(void)
             return false;
         }
     }
-    if (!iterate_check(&pq))
+    if (!iterator_check(&pq))
     {
         breakpoint();
         return false;
@@ -877,7 +877,7 @@ pq_test_insert_iterate_pop(void)
             breakpoint();
             return false;
         }
-        if (pop_count % 200 && !iterate_check(&pq))
+        if (pop_count % 200 && !iterator_check(&pq))
         {
             breakpoint();
             return false;
@@ -913,7 +913,7 @@ pq_test_priority_removal(void)
             return false;
         }
     }
-    if (!iterate_check(&pq))
+    if (!iterator_check(&pq))
     {
         return false;
     }
@@ -961,7 +961,7 @@ pq_test_priority_update(void)
             return false;
         }
     }
-    if (!iterate_check(&pq))
+    if (!iterator_check(&pq))
     {
         return false;
     }
@@ -972,12 +972,17 @@ pq_test_priority_update(void)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            i = pq_update(&pq, i, val_cmp, val_update, &backoff);
+            pq_elem *next = pq_next(&pq, i);
+            if (!pq_update(&pq, i, val_cmp, val_update, &backoff))
+            {
+                return false;
+            }
             if (!validate_tree(&pq, val_cmp))
             {
                 breakpoint();
                 return false;
             }
+            i = next;
         }
         else
         {
@@ -1039,14 +1044,23 @@ inorder_fill(int vals[], size_t size, pqueue *pq)
 }
 
 static bool
-iterate_check(pqueue *pq)
+iterator_check(pqueue *pq)
 {
+    const size_t size = pq_size(pq);
     size_t iter_count = 0;
     for (pq_elem *e = pq_begin(pq); e != pq_end(pq); e = pq_next(pq, e))
     {
         ++iter_count;
+        if (iter_count == size && !pq_is_min(pq, e))
+        {
+            return false;
+        }
+        if (iter_count != size && pq_is_min(pq, e))
+        {
+            return false;
+        }
     }
-    if (iter_count != pq_size(pq))
+    if (iter_count != size)
     {
         return false;
     }
@@ -1054,8 +1068,16 @@ iterate_check(pqueue *pq)
     for (pq_elem *e = pq_rbegin(pq); e != pq_end(pq); e = pq_rnext(pq, e))
     {
         ++iter_count;
+        if (iter_count == size && !pq_is_max(pq, e))
+        {
+            return false;
+        }
+        if (iter_count != size && pq_is_max(pq, e))
+        {
+            return false;
+        }
     }
-    return iter_count == pq_size(pq);
+    return iter_count == size;
 }
 
 static threeway_cmp

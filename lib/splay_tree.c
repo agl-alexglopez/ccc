@@ -131,10 +131,22 @@ pq_max(const pqueue *const pq)
     return max(pq);
 }
 
+bool
+pq_is_max(pqueue *const pq, pq_elem *const e)
+{
+    return pq_rnext(pq, e) == &pq->end;
+}
+
 pq_elem *
 pq_min(const pqueue *const pq)
 {
     return min(pq);
+}
+
+bool
+pq_is_min(pqueue *const pq, pq_elem *const e)
+{
+    return pq_next(pq, e) == &pq->end;
 }
 
 pq_elem *
@@ -182,17 +194,27 @@ pq_erase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 }
 
 pq_elem *
+pq_rerase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+{
+    pq_elem *ret = pq_rnext(pq, elem);
+    assert(multiset_erase_node(pq, elem, fn, aux) != &pq->end);
+    return ret;
+}
+
+bool
 pq_update(pqueue *pq, pq_elem *elem, pq_cmp_fn *cmp, pq_update_fn *fn,
           void *aux)
 {
     assert(NULL != elem->link[L] && NULL != elem->link[R]
            && NULL != elem->parent_or_dups);
-    pq_elem *ret = pq_next(pq, elem);
     pq_elem *e = multiset_erase_node(pq, elem, cmp, aux);
-    assert(e != &pq->end);
+    if (e == &pq->end)
+    {
+        return false;
+    }
     fn(e, aux);
     multiset_insert(pq, e, cmp, aux);
-    return ret;
+    return true;
 }
 
 bool

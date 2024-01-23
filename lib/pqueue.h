@@ -241,27 +241,39 @@ pq_elem *pq_pop_min(pqueue *);
 pq_elem *pq_max(const pqueue *);
 pq_elem *pq_min(const pqueue *);
 
+/* If elem is already max this check is O(lgN) as the worst
+   case. If not, O(1). */
+bool pq_is_max(pqueue *, pq_elem *);
+
+/* If elem is already min this check is O(lgN) as the worst
+   case. If not, O(1). */
+bool pq_is_min(pqueue *, pq_elem *);
+
 /* Erases a specified element known to be in the queue.
    Returns the element that follows the previous value
-   of the element in round robin sorted order.
+   of the element in round robin sorted order (lower priority).
    This may be another element or it may be the end
-   element in which case no values are greater than
+   element in which case no values are less than
    the last. O(lgN). However, in practice you can often
    benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
 pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
+/* The same as erase but returns the next element in an
+   ascending priority order. */
+pq_elem *pq_rerase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+
 /* Updates the specified elem known to be in the queue with
    a new priority in O(lgN) time. Because an update does not
    remove elements from a queue care should be taken to avoid
    infinite loops. For example, increasing priorities during
-   an inorder traversal should be done with care because that
-   element will be encountered again later in the queue with one
-   exception This function returns the element that followed
-   this one at its original value in ascending order. However, the
-   newly updated value will be skipped if it is placed directly
-   in front of itself with no duplicates of that same updated value. */
-pq_elem *pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
+   an ascending traversal should be done with care because that
+   element will be encountered again later in the queue. This
+   function returns true if the update was successful and false
+   if it failed. Failure can only occur in the removal phase if
+   an element could not be found to be in the queue. Insert
+   does not fail in a priority queue. */
+bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
 
 /* Returns true if this priority value is in the queue.
    you need not search with any specific struct you have
@@ -318,22 +330,37 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
       ...Fill the container with program logic...
 
-      for (pq_elem *i = pq_begin(&q); i != pq_end(&q, i); i = pq_next(&q, i))
+      for (pq_elem *i = pq_begin(&q); i != pq_end(&q, i); )
       {
-         struct val *cur = pq_entry(pq_from_iter(&i), struct val, elem);
-         printf("%d", cur->val);
+         if (meets_criteria(i))
+         {
+            pq_elem *next = pq_next(&pq, i);
+            int update = generate_updated_priority(i);
+            if (!pq_update(&pq, i, val_cmp,  val_updater, &update))
+            {
+               ...handle errors...
+            }
+            i = next;
+         }
+         else
+         {
+            i = pq_next(&pq, i);
+         }
       }
    }
 
-   This is traversal in order of descending priority oby default with
-   duplicates included in round robin order.
+   By default traversal is by descending priority but ascending
+   priority is also possible. Care should be taken while updating
+   values while iterating to avoid "indefinite" loops. Also,
 */
 
-/* Returns a struct by copy to aid in iteration through the priority
-   queue. It is simply two pointers and a byte so it is not very
-   expensive and is only allocated on the stack once. Use the
-   following methods to progress through the priority queue. */
+/* Returns the maximum priority element if present and end
+   if the queue is empty. By default iteration is in descending
+   order by priority. */
 pq_elem *pq_begin(pqueue *);
+/* Returns the minimum priority element if present and end
+   if the queue is empty. This is an ascending traversal
+   starting point. */
 pq_elem *pq_rbegin(pqueue *);
 
 /* Progresses through the queue in order of highest priority by
@@ -344,6 +371,7 @@ pq_elem *pq_rbegin(pqueue *);
    that priorities can be organized round robin either ascending
    or descending and visitation is fair. */
 pq_elem *pq_next(pqueue *, pq_elem *);
+/* Progresses through the queue in ascending order */
 pq_elem *pq_rnext(pqueue *, pq_elem *);
 
 /* The end is not a valid position in the queue so it does not make
@@ -353,6 +381,5 @@ pq_elem *pq_end(pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
 pq_elem *pq_root(const pqueue *);
-bool pq_has_dups(pqueue *, pq_elem *);
 
 #endif
