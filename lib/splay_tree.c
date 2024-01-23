@@ -893,11 +893,9 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
     if (has_dups(&t->end, subtree))
     {
         subtree->parent_or_dups->parent_or_dups = parent;
+        return;
     }
-    else
-    {
-        subtree->parent_or_dups = parent;
-    }
+    subtree->parent_or_dups = parent;
 }
 
 /* This is tricky but because how of we store our nodes we always have an
