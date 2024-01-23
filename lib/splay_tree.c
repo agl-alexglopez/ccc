@@ -727,6 +727,7 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
     {
         return &t->end;
     }
+    /* This is what we set removed nodes to so this is a mistaken query */
     if (NULL == node->link[R] || NULL == node->link[L])
     {
         return &t->end;
@@ -744,11 +745,11 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
     }
     struct node *ret = splay(t, t->root, node, cmp);
     t->root = ret;
+    give_parent_subtree(t, &t->end, 0, t->root);
     if (cmp(node, ret, NULL) != EQL)
     {
         return &t->end;
     }
-    give_parent_subtree(t, &t->end, 0, t->root);
     if (has_dups(&t->end, ret))
     {
         ret = pop_dup_node(t, node, cmp, ret);
