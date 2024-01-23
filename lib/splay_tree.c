@@ -1143,9 +1143,8 @@ print_node(struct tree *const t, const struct node *parent,
 static void
 print_inner_tree(const struct node *root, size_t parent_size,
                  const struct node *parent, const char *prefix,
-                 const char *prefix_branch_color,
-                 const enum print_link node_type, const enum tree_link dir,
-                 struct tree *const t)
+                 const char *prefix_color, const enum print_link node_type,
+                 const enum tree_link dir, struct tree *const t)
 {
     if (root == &t->end)
     {
@@ -1163,17 +1162,15 @@ print_inner_tree(const struct node *root, size_t parent_size,
     print_node(t, parent, root);
 
     char *str = NULL;
-    /* NOLINTNEXTLINE */
     const int string_length
-        = snprintf(NULL, 0, "%s%s%s", prefix, prefix_branch_color,
+        = snprintf(NULL, 0, "%s%s%s", prefix, prefix_color, /* NOLINT */
                    node_type == LEAF ? "     " : " │   ");
     if (string_length > 0)
     {
         /* NOLINTNEXTLINE */
         str = malloc(string_length + 1);
         /* NOLINTNEXTLINE */
-        (void)snprintf(str, string_length, "%s%s%s", prefix,
-                       prefix_branch_color,
+        (void)snprintf(str, string_length, "%s%s%s", prefix, prefix_color,
                        node_type == LEAF ? "     " : " │   ");
     }
     if (str == NULL)
