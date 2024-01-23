@@ -24,16 +24,16 @@
 
       set
       {
-         set_elem *root
-         set_elem nil;
+          set_elem *root
+          set_elem nil;
       };
 
    Embed a set_elem in your struct:
 
       struct val
       {
-         int val;
-         set_elem elem;
+          int val;
+          set_elem elem;
       };
 
    The nil is helpful in this case to make the Set data structure
@@ -49,8 +49,8 @@
 
       struct val
       {
-         int val;
-         set_elem elem;
+          int val;
+          set_elem elem;
       }
 
       set s;
@@ -76,24 +76,25 @@
       static threeway_cmp
       val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
-        (void)aux;
-        struct val *lhs = set_entry(a, struct val, elem);
-        struct val *rhs = set_entry(b, struct val, elem);
-        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+          (void)aux;
+          struct val *lhs = set_entry(a, struct val, elem);
+          struct val *rhs = set_entry(b, struct val, elem);
+          return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
       bool
       my_contains(int key)
       {
-         set_key.val = key;
-         return set_contains(&s, &set_key, &val_cmp, NULL);
+          set_key.val = key;
+          return set_contains(&s, &set_key, &val_cmp, NULL);
       }
 
 
       int
-      main() {
-         ... Program logic of generating all values  ...
-         ... that will go in the set for later       ...
+      main()
+      {
+          ... Program logic of generating all values  ...
+          ... that will go in the set for later       ...
       }
 
    This is asking a slightly different question. We are
@@ -110,28 +111,29 @@
       static threeway_cmp
       val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
-        (void)aux;
-        struct val *lhs = set_entry(a, struct val, elem);
-        struct val *rhs = set_entry(b, struct val, elem);
-        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+          (void)aux;
+          struct val *lhs = set_entry(a, struct val, elem);
+          struct val *rhs = set_entry(b, struct val, elem);
+          return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
       struct node *
       my_find(int key)
       {
-         set_key.val = key;
-         return set_find(&s, &set_key, &val_cmp, NULL);
+          set_key.val = key;
+          return set_find(&s, &set_key, &val_cmp, NULL);
       }
 
 
       int
-      main() {
-         ... Program logic of generating all values  ...
-         ... that will go in the set for later       ...
+      main()
+      {
+          ... Program logic of generating all values  ...
+          ... that will go in the set for later       ...
 
-         struct node *my_query = my_find(5);
-         if (my_query != set_end(&s))
-            ... Proceed with some logic .....
+          struct node *my_query = my_find(5);
+          if (my_query != set_end(&s))
+             ... Proceed with some logic .....
       }
 
    Here you were able to retrieve the node that was in the
@@ -142,8 +144,15 @@
    for the lifetime of the program which is your
    responsibility.
 */
-typedef struct node set_elem;
+
+/* An embedded set data structure for storage and retrieval
+   of sorted unique elements for duplicate storage see
+   priority queue or multiset */
 typedef struct tree set;
+
+/* The element embedded withing a struct that is used to
+   store, search, and retrieve data in the tree. */
+typedef struct node set_elem;
 
 /*
    =============================================================
@@ -162,9 +171,9 @@ typedef struct tree set;
 
       typedef enum
       {
-         LES = -1,
-         EQL = 0,
-         GRT = 1
+          LES = -1,
+          EQL = 0,
+          GRT = 1
       } threeway_cmp;
 
     This is modeled after the <=> operator in C++ but it is FAR less
@@ -175,17 +184,17 @@ typedef struct tree set;
 
       struct val
       {
-        int val;
-        set_elem elem;
+          int val;
+          set_elem elem;
       };
 
       static threeway_cmp
       val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
-        (void)aux;
-        struct val *lhs = set_entry (a, struct val, elem);
-        struct val *rhs = set_entry (b, struct val, elem);
-        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+          (void)aux;
+          struct val *lhs = set_entry (a, struct val, elem);
+          struct val *rhs = set_entry (b, struct val, elem);
+          return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 */
 typedef tree_cmp_fn set_cmp_fn;
@@ -198,7 +207,9 @@ typedef tree_cmp_fn set_cmp_fn;
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
 void set_init(set *);
+/* O(1) */
 bool set_empty(set *);
+/* O(1) */
 size_t set_size(set *);
 
 /*
@@ -208,12 +219,12 @@ size_t set_size(set *);
 
 */
 
-/* Basic C++ style set operations. Contains does not return
+/* Basic C++ style set operation. Contains does not return
    an element but will tell you if an element with the same
    value you are using as your set keys is present. This is
    an important note. You are not asking if your specific
    element is in the set, simply if we already have one
-   wiht the same key. Do not assume your element is the
+   with the same key. Do not assume your element is the
    one that is found unless you know it is only one you
    have created. */
 bool set_contains(set *, set_elem *, set_cmp_fn *, void *);
@@ -224,6 +235,28 @@ bool set_contains(set *, set_elem *, set_cmp_fn *, void *);
    to return the actual element that is inserted. You already
    have it when you call this function.*/
 bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
+
+/* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
+   THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
+   Returns the element sought after if found otherwise returns
+   the set end element that can be confirmed with set_end.
+   it is undefined to use the set end element and it does not
+   have any attachment to any struct you are using so trying
+   to get the set entry from it is BAD. This function tries
+   to enforce that you should not modify the element for
+   a read only lookup. You can modify other fields you may
+   be using for your program, but please read the warning.
+   There is little I can do to stop you from ruining
+   everything if you choose to do so. */
+const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
+
+/* Erases the element specified by key value and returns a
+   pointer to the set element or set end pointer if the
+   element cannot be found. It is undefined to use the set
+   end element and it does not have any attachment to any
+   struct you are using so trying to get the set entry from
+   it will not work.*/
+set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 
 /* This is how you can tell if your set find and set erase
    functions are successful. One should always check that
@@ -253,30 +286,63 @@ bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
 */
 set_elem *set_end(set *);
 
+/*
+   =============================================================
+   ===================    Iteration   ==========================
+   =============================================================
+
+   Set iterators are stable and support deletion while iterating.
+   For example:
+
+   struct val
+   {
+       int val;
+       set_elem elem;
+   };
+
+   static set s;
+
+   int
+   main ()
+   {
+       set_init(&s);
+
+       ...Fill the container with program logic...
+
+       for (set_elem *i = set_begin(&s); i != set_end(&s, i); )
+       {
+          if (meets_criteria(i))
+          {
+              set_elem *next = set_next(&s, i);
+              assert(set_erase(&s, i) != set_end(&s);
+              i = next;
+          }
+          else
+          {
+              i = set_next(&s, i);
+          }
+       }
+   }
+
+   By default traversal is by ascending sorted value but descending
+   order is also possible.
+*/
+
+/* Provides the start for an inorder ascending order traversal
+   of the set. Equivalent to end of the set is empty. */
 set_elem *set_begin(set *);
+
+/* Provides the start for an inorder descending order traversal
+   of the set. Equivalent to end of the set is empty. */
+set_elem *set_rbegin(set *);
+
+/* Progresses the pointer to the next greatest element in
+   the set or the end if done. */
 set_elem *set_next(set *, set_elem *);
 
-/* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
-   THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
-   Returns the element sought after if found otherwise returns
-   the set end element that can be confirmed with set_end.
-   it is undefined to use the set end element and it does not
-   have any attachment to any struct you are using so trying
-   to get the set entry from it is BAD. This function tries
-   to enforce that you should not modify the element for
-   a read only lookup. You can modify other fields you may
-   be using for your program, but please read the warning.
-   However, there is little I can do to stop you from ruining
-   everything if you choose to do so. */
-const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
-
-/* Erases the element specified by key value and returns a
-   pointer to the set element or set end pointer if the
-   element cannot be found. It is undefined to use the set
-   end element and it does not have any attachment to any
-   struct you are using so trying to get the set entry from
-   it will not work.*/
-set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
+/* Progresses the pointer to the next lesser element in
+   the set or the end if done. */
+set_elem *set_rnext(set *, set_elem *);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.

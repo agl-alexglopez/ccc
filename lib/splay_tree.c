@@ -288,6 +288,12 @@ set_begin(set *s)
 }
 
 set_elem *
+set_rbegin(set *s)
+{
+    return max(s);
+}
+
+set_elem *
 set_end(set *s)
 {
     return end(s);
@@ -297,6 +303,12 @@ set_elem *
 set_next(set *s, set_elem *e)
 {
     return next(s, e, inorder_traversal);
+}
+
+set_elem *
+set_rnext(set *s, set_elem *e)
+{
+    return next(s, e, reverse_inorder_traversal);
 }
 
 const set_elem *
@@ -514,7 +526,7 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
     /* The node is a parent, backtracked to, or the end. */
     if (n->link[!traversal] != &t->end)
     {
-        /* The goal is to get far left ASAP in any traversal. */
+        /* The goal is to get far left/right ASAP in any traversal. */
         n = n->link[!traversal];
         while (n->link[traversal] != &t->end)
         {
@@ -529,7 +541,7 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
         n = p;
         p = get_parent(t, p);
     }
-    /* Consider how the end and root work together help complete traversal. */
+    /* This is where the end node is helpful. We get to it eventually. */
     n = p;
     return n;
 }
@@ -783,7 +795,11 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
     if (old == t->root)
     {
         t->root = tree_replacement;
-        give_parent_subtree(t, &t->end, 0, t->root);
+    }
+    else
+    {
+        /* Comparing sizes with the root parent is undefined */
+        parent->link[GRT == cmp(old, parent, NULL)] = tree_replacement;
     }
 
     struct node *new_list_head = old->parent_or_dups->link[N];
@@ -794,8 +810,6 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
     new_list_head->link[P] = list_tail;
     new_list_head->parent_or_dups = parent;
     list_tail->link[N] = new_list_head;
-    threeway_cmp size_relation = cmp(old, parent, NULL);
-    parent->link[GRT == size_relation] = tree_replacement;
     tree_replacement->link[L] = old->link[L];
     tree_replacement->link[R] = old->link[R];
     tree_replacement->parent_or_dups = new_list_head;

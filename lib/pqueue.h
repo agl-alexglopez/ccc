@@ -26,6 +26,7 @@
       {
          pq_elem *root
          pq_elem nil;
+         size_t size;
       };
 
    Embed a pq_elem in your struct:
@@ -37,6 +38,8 @@
       };
 
    If interested how these elems are implemented see tree.h
+   but each will occupy 24 bytes within your struct. The
+   queue itself is a one time 40 byte cost.
 
    I have the additional space taken by the nil to afford some
    nice conveniences in implementation. You could technically
@@ -53,8 +56,9 @@
    you access the min or max for removal any future access
    to duplicates of that priority are guaranteed to be O(1).
    This may be an important consideration for Priority Queues.
-   However, any other removals or insertions of different values
-   reduce performance back to O(lgN) for the first access.
+   However, any other removals, insertions, or queries of
+   different values reduce performance back to O(lgN) for the
+   first access.
 
    This Priority Queue also guarantees Round-Robin Fairness
    among duplicate priorities. However, if you remove a node
@@ -70,7 +74,7 @@
    but I prefer splay trees for all they achieve with far less code.
 
    Internally, the representation to acheive this is a simple
-   tree with a circular doubly linked list attached.
+   splay tree with a circular doubly linked list attached.
 
                               *
                             /   \
@@ -98,6 +102,7 @@ typedef struct tree pqueue;
    =============================================================
    ===================   Comparisons  ==========================
    =============================================================
+
    To implement three way comparison in C you can try something
    like this:
 
@@ -111,30 +116,30 @@ typedef struct tree pqueue;
 
       typedef enum
       {
-         LES = -1,
-         EQL = 0,
-         GRT = 1
+          LES = -1,
+          EQL = 0,
+          GRT = 1
       } threeway_cmp;
 
     This is modeled after the <=> operator in C++ but it is FAR less
-    robust and fancy. In fact it's just a fancy named wrapper around
+    robust and fancy. In fact it's just a named wrapper around
     what you are used to providing for a function like qsort in C.
 
     Example:
 
       struct val
       {
-        int val;
-        pq_elem elem;
+          int val;
+          pq_elem elem;
       };
 
       static threeway_cmp
       val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
       {
-        (void)aux;
-        struct val *lhs = pq_entry(a, struct val, elem);
-        struct val *rhs = pq_entry(b, struct val, elem);
-        return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+          (void)aux;
+          struct val *lhs = pq_entry(a, struct val, elem);
+          struct val *rhs = pq_entry(b, struct val, elem);
+          return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 */
 
@@ -144,9 +149,9 @@ typedef struct tree pqueue;
    above.
       typedef enum
       {
-         LES = -1,
-         EQL = 0,
-         GRT = 1
+          LES = -1,
+          EQL = 0,
+          GRT = 1
       } threeway_cmp;
 */
 typedef tree_cmp_fn pq_cmp_fn;
@@ -157,8 +162,8 @@ typedef tree_cmp_fn pq_cmp_fn;
 
       struct val
       {
-        int val;
-        pq_elem elem;
+          int val;
+          pq_elem elem;
       };
 
       static pqueue pq;
@@ -177,12 +182,15 @@ typedef tree_cmp_fn pq_cmp_fn;
       int
       main()
       {
-         pq_init(&pq);
-         ...Insert various values...
-         struct val *my_val = retreived_val();
-         const int new_priority = generate_priority(my_val);
-         pq_update(&pq, &my_val->elem, &my_cmp_fn,
-                   &priority_update, &new_priority);
+          pq_init(&pq);
+          ...Insert various values...
+          struct val *my_val = retreived_val();
+          const int new_priority = generate_priority(my_val);
+          if (!pq_update(&pq, &my_val->elem, &my_cmp_fn,
+                         &priority_update, &new_priority))
+          {
+              ...handle failures...
+          }
       }
 
    The above should be well defined because the user determines
@@ -192,9 +200,27 @@ typedef tree_cmp_fn pq_cmp_fn;
 */
 typedef void pq_update_fn(pq_elem *, void *aux);
 
+/* How to obtain the struct that embeds the pq_elem. For example:
+
+      struct val
+      {
+          int val;
+          pq_elem elem;
+      };
+
+      for (pq_elem *e = pq_begin(pq); e != pq_end(pq); e = pq_next(pq, e))
+      {
+          struct val *my_val = pq_entry(e, struct val, elem);
+          printf("%d\n", my_val->val);
+      }
+
+   The pq element should be passed by address not by value and the
+   struct and member macros represent the type used and the member
+   in the struct of the pq element.
+*/
 /* NOLINTNEXTLINE */
-#define pq_entry(TREE_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                        \
+#define pq_entry(PQ_ELEM, STRUCT, MEMBER)                                      \
+    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->parent_or_dups                          \
                 - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
@@ -312,8 +338,8 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    ===================    Iteration   ==========================
    =============================================================
 
-   Priority queue  iterators are stable and support updates and
-   deltion while iterating. For example:
+   Priority queue iterators are stable and support updates and
+   deletion while iterating. For example:
 
    struct val
    {
@@ -334,9 +360,9 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
       {
          if (meets_criteria(i))
          {
-            pq_elem *next = pq_next(&pq, i);
+            pq_elem *next = pq_next(&q, i);
             int update = generate_updated_priority(i);
-            if (!pq_update(&pq, i, val_cmp,  val_updater, &update))
+            if (!pq_update(&q, i, val_cmp,  val_updater, &update))
             {
                ...handle errors...
             }
@@ -344,7 +370,7 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
          }
          else
          {
-            i = pq_next(&pq, i);
+            i = pq_next(&q, i);
          }
       }
    }
@@ -352,6 +378,10 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    By default traversal is by descending priority but ascending
    priority is also possible. Care should be taken while updating
    values while iterating to avoid "indefinite" loops. Also,
+   both iteration directions visit duplicates in round robin
+   fashion. This means that the value that has been in the
+   queue the longest is visited first regardless of ascending
+   or descending order.
 */
 
 /* Returns the maximum priority element if present and end
