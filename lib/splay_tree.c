@@ -470,8 +470,8 @@ is_dup_head_next(struct node *i)
 }
 
 static inline struct node *
-return_to_tree_from_head(struct tree *t, struct node *head,
-                         const enum tree_link traversal)
+next_tree_node(struct tree *t, struct node *head,
+               const enum tree_link traversal)
 {
     if (head->parent_or_dups == &t->end)
     {
@@ -504,8 +504,7 @@ multiset_next(struct tree *t, struct node *i, const enum tree_link traversal)
         const bool is_head = i->parent_or_dups != NULL;
         if (is_dup_head_next(i))
         {
-            return return_to_tree_from_head(t, is_head ? i : i->link[N],
-                                            traversal);
+            return next_tree_node(t, is_head ? i : i->link[N], traversal);
         }
         return i->link[N];
     }
@@ -906,13 +905,13 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
     }
 }
 
-/* This is tricky but because how we store our nodes we always have an O(1)
-   check available to us to tell whether a node in a tree is storing
+/* This is tricky but because how of we store our nodes we always have an
+   O(1) check available to us to tell whether a node in a tree is storing
    duplicates without any auxiliary data structures or struct fields.
 
    All nodes are in the tree tracking their parent. If we add duplicates,
    duplicates form a circular doubly linked list and the tree node
-   uses its parent pointer to track the duplicate. The duplicate then
+   uses its parent pointer to track the duplicate(s). The duplicate then
    tracks the parent for the tree node. Therefore, we will always know
    how to identify a tree node that stores a duplicate. A tree node with
    a duplicate uses its parent field to point to a node that can
@@ -932,7 +931,9 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
    sacrifices its parent field to track a duplicate. The duplicate
    tracks the parent and uses its left/right fields to track previous/next
    in a circular list. So, we always know via pointers if we find a
-   duplicate.
+   tree node that stores duplicates. By extension this means we can
+   also identify if we ARE a duplicate but that check is not part
+   of this function.
  */
 static inline bool
 has_dups(const struct node *const end, const struct node *const n)
