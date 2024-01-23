@@ -727,8 +727,7 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
     {
         return &t->end;
     }
-    if (NULL == node->link[R] || NULL == node->link[L]
-        || NULL == node->parent_or_dups)
+    if (NULL == node->link[R] || NULL == node->link[L])
     {
         return &t->end;
     }
