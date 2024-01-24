@@ -74,12 +74,12 @@
    Internally, the representation to acheive this is a simple
    splay tree with a circular doubly linked list attached.
 
-                              *
-                            /   \
-                           *     *---------
-                          / \     \       |
-                         *   *     *     -*-*-*-*-*
-                                         |_________|
+                        *
+                      /   \
+                     *     *---------
+                    / \     \       |
+                   *   *     *     -*-*-*-*-*
+                                   |_________|
 
    =============================================================
 */
