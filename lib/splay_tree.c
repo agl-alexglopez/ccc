@@ -20,7 +20,7 @@
       tracking, and unite the left and right cases for fun. See the .c file
       for my generalizable strategy to eliminate symmetric left and right cases
       for any binary tree code which I have been working on for a while and
-      don't see very often!
+      think is quite helpful!
 
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c
 */
@@ -59,9 +59,7 @@ enum print_link
 const enum tree_link inorder_traversal = L;
 const enum tree_link reverse_inorder_traversal = R;
 
-/* =========================================================================
-   =======================        Prototypes          ======================
-   ========================================================================= */
+/* =======================        Prototypes         ====================== */
 
 static void init_tree(struct tree *);
 static void init_node(struct tree *, struct node *);
@@ -104,9 +102,7 @@ static void add_duplicate(struct tree *, struct node *, struct node *,
 static struct node *splay(struct tree *, struct node *, const struct node *,
                           tree_cmp_fn *);
 
-/* =========================================================================
-   =======================  Priority Queue Interface  ======================
-   ========================================================================= */
+/* ======================  Priority Queue Interface  ====================== */
 
 void
 pq_init(pqueue *pq)
@@ -248,9 +244,7 @@ pq_has_dups(pqueue *const pq, pq_elem *e)
     return has_dups(&pq->end, e);
 }
 
-/* =========================================================================
-   =======================        Set Interface       ======================
-   ========================================================================= */
+/* ======================        Set Interface       ====================== */
 
 void
 set_init(set *s)
@@ -330,9 +324,7 @@ set_root(const set *const s)
     return root(s);
 }
 
-/* =========================================================================
-   ===========    Splay Tree Multiset and Set Implementations    ===========
-   =========================================================================
+/* ===========    Splay Tree Multiset and Set Implementations    ===========
 
       (40)0x7fffffffd5c8-0x7fffffffdac8(+1)
        ├──(29)R:0x7fffffffd968
@@ -389,6 +381,8 @@ set_root(const set *const s)
    needed functionality here rather than multiple times for each
    data structure. Through the use of typedefs we only have to write the
    actual code once and then just hand out interfaces as needed.
+
+   =========================================================================
 */
 
 static void
@@ -971,9 +965,7 @@ force_find_les(const struct node *a, const struct node *b,
 
 /* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
 
-/* =========================================================================
-   =======================        Debugging           ======================
-   ========================================================================= */
+/* ======================        Debugging           ====================== */
 
 /* This section has recursion so it should probably not be used in
    a custom operating system environment with constrained stack space.
