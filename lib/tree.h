@@ -52,6 +52,12 @@ struct tree
     size_t size;
 };
 
+struct range
+{
+    struct node *const begin;
+    struct node *const end;
+};
+
 /* All queries must be able to compare two types utilizing the tree.
    Equality is important for duplicate tracking and speed. */
 typedef enum
@@ -60,6 +66,8 @@ typedef enum
     EQL = 0,
     GRT = 1
 } threeway_cmp;
+
+typedef void node_print_fn(const struct node *);
 
 /* To implement three way comparison in C you can try something
    like this:
@@ -79,6 +87,6 @@ bool validate_tree(struct tree *t, tree_cmp_fn *cmp);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debugging use. */
-void print_tree(struct tree *t, const struct node *root);
+void print_tree(struct tree *t, const struct node *root, node_print_fn *fn);
 
 #endif

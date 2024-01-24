@@ -1,6 +1,7 @@
 #include "pqueue.h"
 #include "tree.h"
 
+#include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -42,14 +43,17 @@ static bool pq_test_forward_iter_all_vals(void);
 static bool pq_test_insert_iterate_pop(void);
 static bool pq_test_priority_update(void);
 static bool pq_test_priority_removal(void);
+static bool pq_test_priority_valid_range(void);
+static bool pq_test_priority_invalid_range(void);
 static int run_tests(void);
 static void insert_shuffled(pqueue *, struct val[], size_t, int);
 static size_t inorder_fill(int vals[], size_t, pqueue *);
 static bool iterator_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
 static void val_update(pq_elem *a, void *aux);
+static void pq_printer_fn(const pq_elem *e);
 
-#define NUM_TESTS (size_t)21
+#define NUM_TESTS (size_t)23
 const test_fn all_tests[NUM_TESTS] = {
     pq_test_empty,
     pq_test_insert_one,
@@ -72,6 +76,8 @@ const test_fn all_tests[NUM_TESTS] = {
     pq_test_insert_iterate_pop,
     pq_test_priority_update,
     pq_test_priority_removal,
+    pq_test_priority_valid_range,
+    pq_test_priority_invalid_range,
 };
 
 /* Set this breakpoint on any line where you wish
@@ -648,7 +654,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
 static bool
 pq_test_prime_shuffle(void)
 {
-    printf("pq_test_rand_queue");
+    printf("pq_test_prime_shuffle");
     pqueue pq;
     pq_init(&pq);
     const int size = 50;
@@ -670,6 +676,9 @@ pq_test_prime_shuffle(void)
         }
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
+
+    /* One test can use our printer function as test output */
+    pq_print(&pq, pq.root, pq_printer_fn);
 
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
@@ -996,6 +1005,161 @@ pq_test_priority_update(void)
     return true;
 }
 
+static bool
+pq_test_priority_valid_range(void)
+{
+    printf("pq_priority_valid_range");
+    pqueue pq;
+    pq_init(&pq);
+
+    const int num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&pq, val_cmp))
+        {
+            return false;
+        }
+    }
+    struct val b = {.id = 0, .val = 6};
+    struct val e = {.id = 0, .val = 44};
+    /* This should be the following range [6,44). 6 should raise to
+       next value not less than 6, 10 and 44 should be the first
+       value greater than 44, 45. */
+    const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    const pq_range rev_range = pq_requal_range(&pq, &b.elem, &e.elem, val_cmp);
+    if (pq_entry(rev_range.begin, struct val, elem)->val != rev_range_vals[0]
+        || pq_entry(rev_range.end, struct val, elem)->val != rev_range_vals[7])
+    {
+        return false;
+    }
+    size_t index = 0;
+    pq_elem *i1 = rev_range.begin;
+    for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
+    {
+        const int cur_val = pq_entry(i1, struct val, elem)->val;
+        if (rev_range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i1 != rev_range.end
+        || pq_entry(i1, struct val, elem)->val != rev_range_vals[7])
+    {
+        return false;
+    }
+    b.val = 119;
+    e.val = 84;
+    /* This should be the following range [119,84). 119 should be
+       dropped to first value not greater than 119 and last should
+       be dropped to first value less than 84. */
+    const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+    if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
+        || pq_entry(range.end, struct val, elem)->val != range_vals[7])
+    {
+        return false;
+    }
+    index = 0;
+    pq_elem *i2 = range.begin;
+    for (; i2 != range.end; i2 = pq_next(&pq, i2))
+    {
+        const int cur_val = pq_entry(i2, struct val, elem)->val;
+        if (range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i2 != range.end || pq_entry(i2, struct val, elem)->val != range_vals[7])
+    {
+        return false;
+    }
+    return true;
+}
+
+static bool
+pq_test_priority_invalid_range(void)
+{
+    printf("pq_test_priotity_invalid_range");
+    pqueue pq;
+    pq_init(&pq);
+
+    const int num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&pq, val_cmp))
+        {
+            return false;
+        }
+    }
+    struct val b = {.id = 0, .val = 95};
+    struct val e = {.id = 0, .val = 999};
+    /* This should be the following range [95,999). 6 should raise to
+       next value not less than 95, 95 and 999 should be the first
+       value greater than 999, none or the end. */
+    const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
+    const pq_range rev_range = pq_requal_range(&pq, &b.elem, &e.elem, val_cmp);
+    if (pq_entry(rev_range.begin, struct val, elem)->val != rev_range_vals[0]
+        || rev_range.end != pq_end(&pq))
+    {
+        return false;
+    }
+    size_t index = 0;
+    pq_elem *i1 = rev_range.begin;
+    for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
+    {
+        const int cur_val = pq_entry(i1, struct val, elem)->val;
+        if (rev_range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i1 != rev_range.end || i1 != pq_end(&pq))
+    {
+        return false;
+    }
+    b.val = 36;
+    e.val = -999;
+    /* This should be the following range [36,-999). 36 should be
+       dropped to first value not greater than 36 and last should
+       be dropped to first value less than -999 which is end. */
+    const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
+    const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+    if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
+        || range.end != pq_end(&pq))
+    {
+        return false;
+    }
+    index = 0;
+    pq_elem *i2 = range.begin;
+    for (; i2 != range.end; i2 = pq_next(&pq, i2))
+    {
+        const int cur_val = pq_entry(i2, struct val, elem)->val;
+        if (range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i2 != range.end || i2 != pq_end(&pq))
+    {
+        return false;
+    }
+    return true;
+}
+
 static void
 insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
                 const int larger_prime)
@@ -1087,6 +1251,13 @@ val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
     struct val *lhs = pq_entry(a, struct val, elem);
     struct val *rhs = pq_entry(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+}
+
+static void
+pq_printer_fn(const pq_elem *const e)
+{
+    const struct val *const v = pq_entry(e, struct val, elem);
+    printf("{id:%d,val:%d}", v->id, v->val);
 }
 
 static void

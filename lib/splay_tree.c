@@ -87,6 +87,9 @@ static struct node *min(const struct tree *);
 static struct node *end(struct tree *);
 static struct node *next(struct tree *, struct node *, enum tree_link);
 static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
+static struct range equal_range(struct tree *t, struct node *begin,
+                                struct node *end, tree_cmp_fn *cmp,
+                                enum tree_link traversal);
 static threeway_cmp force_find_grt(const struct node *, const struct node *,
                                    void *);
 static threeway_cmp force_find_les(const struct node *, const struct node *,
@@ -174,6 +177,18 @@ pq_rnext(pqueue *pq, pq_elem *i)
     return multiset_next(pq, i, inorder_traversal);
 }
 
+pq_range
+pq_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp)
+{
+    return equal_range(pq, begin, end, cmp, reverse_inorder_traversal);
+}
+
+pq_range
+pq_requal_range(pqueue *pq, pq_elem *rbegin, pq_elem *rend, pq_cmp_fn *cmp)
+{
+    return equal_range(pq, rbegin, rend, cmp, inorder_traversal);
+}
+
 void
 pq_insert(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
@@ -240,6 +255,12 @@ bool
 pq_has_dups(pqueue *const pq, pq_elem *e)
 {
     return has_dups(&pq->end, e);
+}
+
+void
+pq_print(pqueue *pq, pq_elem *start, pq_print_fn *fn)
+{
+    print_tree(pq, start, fn);
 }
 
 /* ======================        Set Interface       ====================== */
@@ -538,6 +559,24 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
     return n;
 }
 
+static struct range
+equal_range(struct tree *t, struct node *begin, struct node *end,
+            tree_cmp_fn *cmp, const enum tree_link traversal)
+{
+    const threeway_cmp grt_or_les[2] = {GRT, LES};
+    struct node *b = splay(t, t->root, begin, cmp);
+    if (cmp(begin, b, NULL) == grt_or_les[traversal])
+    {
+        b = next(t, b, traversal);
+    }
+    struct node *e = splay(t, t->root, end, cmp);
+    if (cmp(end, e, NULL) == grt_or_les[traversal])
+    {
+        e = next(t, e, traversal);
+    }
+    return (struct range){.begin = b, .end = e};
+}
+
 static struct node *
 find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
@@ -546,7 +585,6 @@ find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     assert(cmp != NULL);
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp);
-    give_parent_subtree(t, &t->end, 0, t->root);
     return cmp(elem, t->root, NULL) == EQL ? t->root : &t->end;
 }
 
@@ -558,7 +596,6 @@ contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
     assert(cmp != NULL);
     init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, cmp);
-    give_parent_subtree(t, &t->end, 0, t->root);
     return cmp(dummy_key, t->root, NULL) == EQL;
 }
 
@@ -570,7 +607,6 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     assert(cmp != NULL);
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp);
-    give_parent_subtree(t, &t->end, 0, t->root);
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
     if (EQL == root_cmp)
     {
@@ -594,7 +630,6 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
         return;
     }
     t->root = splay(t, t->root, elem, cmp);
-    give_parent_subtree(t, &t->end, 0, t->root);
 
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
     if (EQL == root_cmp)
@@ -658,8 +693,6 @@ erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     {
         return &t->end;
     }
-    t->root = ret;
-    give_parent_subtree(t, &t->end, 0, t->root);
     ret = remove_from_tree(t, ret, cmp);
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
     t->size--;
@@ -688,9 +721,6 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
     assert(t->size != ((size_t)-1));
 
     struct node *ret = splay(t, t->root, tnil, force_max_or_min);
-
-    t->root = ret;
-    give_parent_subtree(t, &t->end, 0, t->root);
     if (has_dups(&t->end, ret))
     {
         ret = pop_front_dup(t, ret, force_max_or_min);
@@ -737,8 +767,6 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
         return node;
     }
     struct node *ret = splay(t, t->root, node, cmp);
-    t->root = ret;
-    give_parent_subtree(t, &t->end, 0, t->root);
     if (cmp(node, ret, NULL) != EQL)
     {
         return &t->end;
@@ -870,6 +898,8 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     give_parent_subtree(t, l_r_subtrees[R], L, root->link[R]);
     give_parent_subtree(t, root, L, t->end.link[R]);
     give_parent_subtree(t, root, R, t->end.link[L]);
+    t->root = root;
+    give_parent_subtree(t, &t->end, 0, t->root);
     return root;
 }
 
@@ -1131,16 +1161,15 @@ get_edge_color(const struct node *root, size_t parent_size,
 
 static void
 print_node(struct tree *const t, const struct node *parent,
-           const struct node *root)
+           const struct node *root, node_print_fn *fn)
 {
+    fn(root);
     struct parent_status stat = child_tracks_parent(t, parent, root);
     if (!stat.correct)
     {
-        printf("%s%p-%p-%s", COLOR_RED, root, stat.parent, COLOR_NIL);
-    }
-    else
-    {
-        printf("%p", root);
+        printf("%s", COLOR_RED);
+        fn(stat.parent);
+        printf("%s", COLOR_NIL);
     }
     printf(COLOR_CYN);
     /* If a node is a duplicate, we will give it a special mark among nodes. */
@@ -1150,11 +1179,11 @@ print_node(struct tree *const t, const struct node *parent,
         const struct node *head = root->parent_or_dups;
         if (head != &t->end)
         {
-            printf("%p-", head);
+            fn(head);
             for (struct node *i = head->link[N]; i != head;
                  i = i->link[N], ++duplicates)
             {
-                printf("-%p", i);
+                fn(i);
             }
         }
         printf("(+%d)", duplicates);
@@ -1170,7 +1199,8 @@ static void
 print_inner_tree(const struct node *root, size_t parent_size,
                  const struct node *parent, const char *prefix,
                  const char *prefix_color, const enum print_link node_type,
-                 const enum tree_link dir, struct tree *const t)
+                 const enum tree_link dir, struct tree *const t,
+                 node_print_fn *fn)
 {
     if (root == &t->end)
     {
@@ -1185,7 +1215,7 @@ print_inner_tree(const struct node *root, size_t parent_size,
     printf("(%zu)", subtree_size);
     dir == L ? printf("L:" COLOR_NIL) : printf("R:" COLOR_NIL);
 
-    print_node(t, parent, root);
+    print_node(t, parent, root, fn);
 
     char *str = NULL;
     const int string_length
@@ -1210,19 +1240,19 @@ print_inner_tree(const struct node *root, size_t parent_size,
     if (root->link[R] == &t->end)
     {
         print_inner_tree(root->link[L], subtree_size, root, str,
-                         left_edge_color, LEAF, L, t);
+                         left_edge_color, LEAF, L, t, fn);
     }
     else if (root->link[L] == &t->end)
     {
         print_inner_tree(root->link[R], subtree_size, root, str,
-                         left_edge_color, LEAF, R, t);
+                         left_edge_color, LEAF, R, t, fn);
     }
     else
     {
         print_inner_tree(root->link[R], subtree_size, root, str,
-                         left_edge_color, BRANCH, R, t);
+                         left_edge_color, BRANCH, R, t, fn);
         print_inner_tree(root->link[L], subtree_size, root, str,
-                         left_edge_color, LEAF, L, t);
+                         left_edge_color, LEAF, L, t, fn);
     }
     free(str);
 }
@@ -1231,7 +1261,7 @@ print_inner_tree(const struct node *root, size_t parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 void
-print_tree(struct tree *t, const struct node *root)
+print_tree(struct tree *t, const struct node *root, node_print_fn *fn)
 {
     if (root == &t->end)
     {
@@ -1239,26 +1269,26 @@ print_tree(struct tree *t, const struct node *root)
     }
     size_t subtree_size = get_subtree_size(root, &t->end);
     printf("\n%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
-    print_node(t, &t->end, root);
+    print_node(t, &t->end, root, fn);
 
     const char *left_edge_color
         = get_edge_color(root->link[L], subtree_size, &t->end);
     if (root->link[R] == &t->end)
     {
         print_inner_tree(root->link[L], subtree_size, root, "", left_edge_color,
-                         LEAF, L, t);
+                         LEAF, L, t, fn);
     }
     else if (root->link[L] == &t->end)
     {
         print_inner_tree(root->link[R], subtree_size, root, "", left_edge_color,
-                         LEAF, R, t);
+                         LEAF, R, t, fn);
     }
     else
     {
         print_inner_tree(root->link[R], subtree_size, root, "", left_edge_color,
-                         BRANCH, R, t);
+                         BRANCH, R, t, fn);
         print_inner_tree(root->link[L], subtree_size, root, "", left_edge_color,
-                         LEAF, L, t);
+                         LEAF, L, t, fn);
     }
 }
 

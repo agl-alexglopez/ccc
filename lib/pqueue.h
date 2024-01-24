@@ -94,6 +94,10 @@ typedef struct node pq_elem;
    values that are present in the queue. */
 typedef struct tree pqueue;
 
+typedef node_print_fn pq_print_fn;
+
+typedef struct range pq_range;
+
 /* ===================   Comparisons  ==========================
 
    To implement three way comparison in C you can try something
@@ -400,6 +404,22 @@ pq_elem *pq_next(pqueue *, pq_elem *);
 /* Progresses through the queue in ascending order */
 pq_elem *pq_rnext(pqueue *, pq_elem *);
 
+/* Returns the range with pointers to the first element NOT LESS
+   than the requested begin and last element GREATER than the
+   provided end element. If either portion of the range cannot
+   be found the end node is provided. It is the users responsibility
+   to use the correct iterator as the range leaves it to the user to
+   iterate. Use the next iterator from begin to end. */
+pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *);
+
+/* Returns the range with pointers to the first element NOT GREATER
+   than the requested begin and last element LESS than the
+   provided end element. If either portion of the range cannot
+   be found the end node is provided. It is the users responsibility
+   to use the correct iterator as the range leaves it to the user to
+   iterate. Use the rnext iterator from rbegin to end. */
+pq_range pq_requal_range(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *);
+
 /* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end
    is reached. The end is same for any iteration order. */
@@ -407,5 +427,7 @@ pq_elem *pq_end(pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
 const pq_elem *pq_root(const pqueue *);
+
+void pq_print(pqueue *, pq_elem *, pq_print_fn *);
 
 #endif
