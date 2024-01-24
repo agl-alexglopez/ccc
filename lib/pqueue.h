@@ -15,9 +15,7 @@
 /* NOLINTNEXTLINE */
 #include <stdint.h>
 
-/* =============================================================
-   ====================  PRIORITY QUEUE ========================
-   =============================================================
+/* ====================  PRIORITY QUEUE ========================
 
    Together the following form what you would normally expect for
    an embedded data structure. In this case a priority queue.
@@ -84,8 +82,6 @@
                                          |_________|
 
    =============================================================
-   =============================================================
-   =============================================================
 */
 
 /* An element stored in a priority queue with Round Robin
@@ -98,10 +94,7 @@ typedef struct node pq_elem;
    values that are present in the queue. */
 typedef struct tree pqueue;
 
-/*
-   =============================================================
-   ===================   Comparisons  ==========================
-   =============================================================
+/* ===================   Comparisons  ==========================
 
    To implement three way comparison in C you can try something
    like this:
@@ -153,7 +146,12 @@ typedef struct tree pqueue;
           EQL = 0,
           GRT = 1
       } threeway_cmp;
+
+   =============================================================
 */
+
+/* The compare function one must provide to perform queries
+   and other operations on the priority queue. See above. */
 typedef tree_cmp_fn pq_cmp_fn;
 
 /* Update priorities with a function that modifies the field
@@ -196,7 +194,7 @@ typedef tree_cmp_fn pq_cmp_fn;
    The above should be well defined because the user determines
    how to cast the auxiliary data themselves based on the types
    they are implementing, but care should be taking when casting
-   from void.
+   from void nonetheless.
 */
 typedef void pq_update_fn(pq_elem *, void *aux);
 
@@ -216,9 +214,7 @@ typedef void pq_update_fn(pq_elem *, void *aux);
 
    The pq element should be passed by address not by value and the
    struct and member macros represent the type used and the member
-   in the struct of the pq element.
-*/
-/* NOLINTNEXTLINE */
+   in the struct of the pq element. NOLINTNEXTLINE */
 #define pq_entry(PQ_ELEM, STRUCT, MEMBER)                                      \
     ((STRUCT *)((uint8_t *)&(PQ_ELEM)->parent_or_dups                          \
                 - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
@@ -264,14 +260,14 @@ pq_elem *pq_pop_min(pqueue *);
    and it has duplicates those duplicates will remain at
    the root O(1) until another insertion, query, or pop
    occurs. */
-pq_elem *pq_max(const pqueue *);
-pq_elem *pq_min(const pqueue *);
+const pq_elem *pq_max(const pqueue *);
+const pq_elem *pq_min(const pqueue *);
 
 /* If elem is already max this check is O(lgN) as the worst
    case. If not, O(1). */
 bool pq_is_max(pqueue *, pq_elem *);
 
-/* If elem is already min this check is O(lgN) as the worst
+/* If the element is already min this check is O(lgN) as the worst
    case. If not, O(1). */
 bool pq_is_min(pqueue *, pq_elem *);
 
@@ -280,7 +276,7 @@ bool pq_is_min(pqueue *, pq_elem *);
    of the element in round robin sorted order (lower priority).
    This may be another element or it may be the end
    element in which case no values are less than
-   the last. O(lgN). However, in practice you can often
+   the erased. O(lgN). However, in practice you can often
    benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
 pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
@@ -298,7 +294,8 @@ pq_elem *pq_rerase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    function returns true if the update was successful and false
    if it failed. Failure can only occur in the removal phase if
    an element could not be found to be in the queue. Insert
-   does not fail in a priority queue. */
+   does not fail in a priority queue. See the iteration section
+   for a pattern that might work if updating while iterating. */
 bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
 
 /* Returns true if this priority value is in the queue.
@@ -333,10 +330,7 @@ bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
    are present. Returns the result in O(lgN). */
 bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
-/*
-   =============================================================
-   ===================    Iteration   ==========================
-   =============================================================
+/* ===================    Iteration   ==========================
 
    Priority queue iterators are stable and support updates and
    deletion while iterating. For example:
@@ -381,16 +375,18 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    both iteration directions visit duplicates in round robin
    fashion. This means that the value that has been in the
    queue the longest is visited first regardless of ascending
-   or descending order.
+   or descending key order.
+
+   =============================================================
 */
 
 /* Returns the maximum priority element if present and end
    if the queue is empty. By default iteration is in descending
-   order by priority. */
+   order by priority. Equal to end if empty. */
 pq_elem *pq_begin(pqueue *);
 /* Returns the minimum priority element if present and end
    if the queue is empty. This is an ascending traversal
-   starting point. */
+   starting point. Equal to end if empty. */
 pq_elem *pq_rbegin(pqueue *);
 
 /* Progresses through the queue in order of highest priority by
@@ -410,6 +406,6 @@ pq_elem *pq_rnext(pqueue *, pq_elem *);
 pq_elem *pq_end(pqueue *);
 
 /* Not very useful or significant. Helps with tests. Explore at own risk. */
-pq_elem *pq_root(const pqueue *);
+const pq_elem *pq_root(const pqueue *);
 
 #endif

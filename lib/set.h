@@ -15,9 +15,7 @@
 /* NOLINTNEXTLINE */
 #include <stdint.h>
 
-/* =============================================================
-   ========================   SET   ============================
-   =============================================================
+/* ========================   SET   ============================
 
    Together the following components make a set as an embedded
    data structure.
@@ -131,7 +129,7 @@
           ... Program logic of generating all values  ...
           ... that will go in the set for later       ...
 
-          struct node *my_query = my_find(5);
+          set_elem *my_query = my_find(5);
           if (my_query != set_end(&s))
              ... Proceed with some logic .....
       }
@@ -143,6 +141,8 @@
    that only makes sense if the structs stay available
    for the lifetime of the program which is your
    responsibility.
+
+   =============================================================
 */
 
 /* An embedded set data structure for storage and retrieval
@@ -154,10 +154,8 @@ typedef struct tree set;
    store, search, and retrieve data in the tree. */
 typedef struct node set_elem;
 
-/*
-   =============================================================
-   ===================   Comparisons  ==========================
-   =============================================================
+/* ===================   Comparisons  ==========================
+
    To implement three way comparison in C you can try something
    like this:
 
@@ -196,6 +194,8 @@ typedef struct node set_elem;
           struct val *rhs = set_entry (b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
+
+   =============================================================
 */
 typedef tree_cmp_fn set_cmp_fn;
 
@@ -212,11 +212,7 @@ bool set_empty(set *);
 /* O(1) */
 size_t set_size(set *);
 
-/*
-   =============================================================
-   ===================     Set Methods   =======================
-   =============================================================
-*/
+/* ===================     Set Methods   ======================= */
 
 /* Basic C++ style set operation. Contains does not return
    an element but will tell you if an element with the same
@@ -254,7 +250,7 @@ const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
    element cannot be found. It is undefined to use the set
    end element and it does not have any attachment to any
    struct you are using so trying to get the set entry from
-   it will not work.*/
+   it will return garbage or worse.*/
 set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 
 /* This is how you can tell if your set find and set erase
@@ -285,10 +281,7 @@ set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 */
 set_elem *set_end(set *);
 
-/*
-   =============================================================
-   ===================    Iteration   ==========================
-   =============================================================
+/* ===================    Iteration   ==========================
 
    Set iterators are stable and support deletion while iterating.
    For example:
@@ -325,6 +318,8 @@ set_elem *set_end(set *);
 
    By default traversal is by ascending sorted value but descending
    order is also possible.
+
+   =============================================================
 */
 
 /* Provides the start for an inorder ascending order traversal
@@ -346,5 +341,5 @@ set_elem *set_rnext(set *, set_elem *);
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes. */
-set_elem *set_root(set *);
+const set_elem *set_root(const set *);
 #endif

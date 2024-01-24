@@ -120,13 +120,13 @@ pq_empty(const pqueue *const pq)
     return empty(pq);
 }
 
-pq_elem *
+const pq_elem *
 pq_root(const pqueue *const pq)
 {
     return root(pq);
 }
 
-pq_elem *
+const pq_elem *
 pq_max(const pqueue *const pq)
 {
     return max(pq);
@@ -138,7 +138,7 @@ pq_is_max(pqueue *const pq, pq_elem *const e)
     return pq_rnext(pq, e) == &pq->end;
 }
 
-pq_elem *
+const pq_elem *
 pq_min(const pqueue *const pq)
 {
     return min(pq);
@@ -324,8 +324,8 @@ set_erase(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
     return erase(s, se, cmp, aux);
 }
 
-set_elem *
-set_root(set *s)
+const set_elem *
+set_root(const set *const s)
 {
     return root(s);
 }
