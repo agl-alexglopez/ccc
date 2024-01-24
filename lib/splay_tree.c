@@ -659,8 +659,6 @@ erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     assert(t != NULL);
     assert(elem != NULL);
     assert(cmp != NULL);
-    t->size--;
-    assert(t->size != ((size_t)-1));
     struct node *ret = splay(t, t->root, elem, cmp);
     assert(ret != NULL);
     const threeway_cmp found = cmp(elem, ret, NULL);
@@ -672,6 +670,8 @@ erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     give_parent_subtree(t, &t->end, 0, t->root);
     ret = remove_from_tree(t, ret, cmp);
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
+    t->size--;
+    assert(t->size != ((size_t)-1));
     return ret;
 }
 
@@ -824,7 +824,7 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
     return old;
 }
 
-static struct node *
+static inline struct node *
 remove_from_tree(struct tree *t, struct node *ret, tree_cmp_fn *cmp)
 {
     if (ret->link[L] == &t->end)
