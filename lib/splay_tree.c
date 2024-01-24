@@ -1,5 +1,4 @@
-/*
-   Author: Alexander G. Lopez
+/* Author: Alexander G. Lopez
    --------------------------
    This is the internal implementation of a splay tree that
    runs all the data structure interfaces provided by this
@@ -22,8 +21,7 @@
       for any binary tree code which I have been working on for a while and
       think is quite helpful!
 
-      https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c
-*/
+      https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
 #include "pqueue.h"
 #include "set.h"
 #include "tree.h"

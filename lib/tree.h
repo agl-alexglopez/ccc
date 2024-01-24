@@ -1,26 +1,50 @@
+/* Author: Alexander Lopez
+   -----------------------
+   These are the base types that all interfaces typedef to implement
+   specialized data structures. Because everything is based on a tree
+   of some sort, we provide those types here and implement the core
+   functionality as if we were crafting a tree with set and multi
+   set abilities. Then we typdedef other interfaces and the user
+   can include those instead of remembering how to use the tree the
+   correct way for their data structure. */
 #ifndef TREE
 #define TREE
 #include <stdbool.h>
 #include <stddef.h>
 
+/* Instead of thinking about left and right consider only links
+   in the abstract sense. Put them in an array and then flip
+   this enum and left and right code paths can be united into one */
 enum tree_link
 {
     L = 0,
     R = 1
 };
 
+/* Trees are just a different interpretation of the same links used
+   for doubly linked lists. We take advantage of this for duplicates. */
 enum list_link
 {
     P = 0,
     N = 1
 };
 
+/* The core node of the underlying tree implementation. Using an array
+   for the nodes allows symmetric left/right cases to always be united
+   into one code path to reduce code bloat and bugs. The parent field
+   is required to track duplicates and would not be strictly necessary
+   in some interpretations of a multiset. However, the parent field
+   gives this implementation flexibility for duplicates, speed, and a
+   robust iterator for users. This is important for a priority queue. */
 struct node
 {
     struct node *link[2];
     struct node *parent_or_dups;
 };
 
+/* The size field is not strictly necessary but seems to be standard
+   practice for these types of containers for O(1) access. The end is
+   critical for this implementation, especially iterators. */
 struct tree
 {
     struct node *root;
@@ -28,6 +52,8 @@ struct tree
     size_t size;
 };
 
+/* All queries must be able to compare two types utilizing the tree.
+   Equality is important for duplicate tracking and speed. */
 typedef enum
 {
     LES = -1,
@@ -52,7 +78,7 @@ typedef threeway_cmp tree_cmp_fn(const struct node *key, const struct node *n,
 bool validate_tree(struct tree *t, tree_cmp_fn *cmp);
 
 /* Use this function in gdb or a terminal for some pretty colors.
-   Intended for debuggin use. */
+   Intended for debugging use. */
 void print_tree(struct tree *t, const struct node *root);
 
 #endif
