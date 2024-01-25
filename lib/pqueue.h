@@ -464,8 +464,11 @@ pq_elem *pq_rnext(pqueue *, pq_elem *);
           printf("%d\n", cur_val->val);
       }
 
-   Use the next iterator from begin to end. */
-pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *);
+   Use the next iterator from begin to end. If there are no values NOT GREATER
+   than begin last is returned as the begin element. Similarly if there are
+   no values LESS than end, end is returned as end element. */
+pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *,
+                        void *aux);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -483,8 +486,12 @@ pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *);
           printf("%d\n", cur_val->val);
       }
 
-   Use the rnext iterator from rbegin to end. */
-pq_rrange pq_equal_rrange(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *);
+   Use the next iterator from begin to end. If there are no values NOT LESS
+   than begin last is returned as the begin element. Similarly if there are
+   no values GREATER than end, end is returned as end element. */
+pq_rrange pq_equal_rrange(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *,
+                          void *aux);
+
 /* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end
    is reached. The end is same for any iteration order. */

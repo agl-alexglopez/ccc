@@ -44,15 +44,16 @@ static bool pq_test_priority_update(void);
 static bool pq_test_priority_removal(void);
 static bool pq_test_priority_valid_range(void);
 static bool pq_test_priority_invalid_range(void);
+static bool pq_test_priority_empty_range(void);
 static int run_tests(void);
-static void insert_shuffled(pqueue *, struct val[], size_t, int);
+static bool insert_shuffled(pqueue *, struct val[], size_t, int);
 static size_t inorder_fill(int vals[], size_t, pqueue *);
 static bool iterator_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
 static void val_update(pq_elem *a, void *aux);
 static void pq_printer_fn(const pq_elem *e);
 
-#define NUM_TESTS (size_t)23
+#define NUM_TESTS (size_t)24
 const test_fn all_tests[NUM_TESTS] = {
     pq_test_empty,
     pq_test_insert_one,
@@ -77,6 +78,7 @@ const test_fn all_tests[NUM_TESTS] = {
     pq_test_priority_removal,
     pq_test_priority_valid_range,
     pq_test_priority_invalid_range,
+    pq_test_priority_empty_range,
 };
 
 /* Set this breakpoint on any line where you wish
@@ -150,13 +152,11 @@ pq_test_insert_three(void)
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         const size_t size = i + 1;
         if (pq_size(&pq) != size)
         {
-            breakpoint();
             return false;
         }
     }
@@ -181,7 +181,6 @@ pq_test_struct_getter(void)
         pq_insert(&pq_tester_clone, &tester_clone[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         /* Because the getter returns a pointer, if the casting returned
@@ -191,7 +190,6 @@ pq_test_struct_getter(void)
             = pq_entry(&tester_clone[i].elem, struct val, elem);
         if (get->val != vals[i].val)
         {
-            breakpoint();
             return false;
         }
     }
@@ -211,13 +209,11 @@ pq_test_insert_three_dups(void)
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         const size_t size = i + 1;
         if (pq_size(&pq) != size)
         {
-            breakpoint();
             return false;
         }
     }
@@ -237,31 +233,26 @@ pq_test_read_max_min(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         const size_t size = i + 1;
         if (pq_size(&pq) != size)
         {
-            breakpoint();
             return false;
         }
     }
     if (10 != pq_size(&pq))
     {
-        breakpoint();
         return false;
     }
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     if (max->val != 9)
     {
-        breakpoint();
         return false;
     }
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
-        breakpoint();
         return false;
     }
     return true;
@@ -277,24 +268,24 @@ pq_test_insert_shuffle(void)
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    insert_shuffled(&pq, vals, size, prime);
+    if (!insert_shuffled(&pq, vals, size, prime))
+    {
+        return false;
+    }
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
-        breakpoint();
         return false;
     }
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
-        breakpoint();
         return false;
     }
     int sorted_check[size];
     if (inorder_fill(sorted_check, size, &pq) != size)
     {
-        breakpoint();
         return false;
     }
     for (size_t i = 0; i < size; ++i)
@@ -320,19 +311,16 @@ pq_test_insert_remove_four_dups(void)
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         const size_t size = i + 1;
         if (pq_size(&pq) != size)
         {
-            breakpoint();
             return false;
         }
     }
     if (pq_size(&pq) != 4)
     {
-        breakpoint();
         return false;
     }
     for (int i = 0; i < 4; ++i)
@@ -341,7 +329,6 @@ pq_test_insert_remove_four_dups(void)
         pq_pop_max(&pq);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
@@ -357,31 +344,30 @@ pq_test_insert_erase_shuffled(void)
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    insert_shuffled(&pq, vals, size, prime);
+    if (!insert_shuffled(&pq, vals, size, prime))
+    {
+        return false;
+    }
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
-        breakpoint();
         return false;
     }
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
-        breakpoint();
         return false;
     }
     int sorted_check[size];
     if (inorder_fill(sorted_check, size, &pq) != size)
     {
-        breakpoint();
         return false;
     }
     for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
-            breakpoint();
             return false;
         }
     }
@@ -393,13 +379,11 @@ pq_test_insert_erase_shuffled(void)
         (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
     if (!pq_empty(&pq))
     {
-        breakpoint();
         return false;
     }
     return true;
@@ -414,31 +398,30 @@ pq_test_pop_max(void)
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    insert_shuffled(&pq, vals, size, prime);
+    if (!insert_shuffled(&pq, vals, size, prime))
+    {
+        return false;
+    }
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
-        breakpoint();
         return false;
     }
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
-        breakpoint();
         return false;
     }
     int sorted_check[size];
     if (inorder_fill(sorted_check, size, &pq) != size)
     {
-        breakpoint();
         return false;
     }
     for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
-            breakpoint();
             return false;
         }
     }
@@ -450,13 +433,11 @@ pq_test_pop_max(void)
         const struct val *front = pq_entry(pq_pop_max(&pq), struct val, elem);
         if (front->val != vals[i].val)
         {
-            breakpoint();
             return false;
         }
     }
     if (!pq_empty(&pq))
     {
-        breakpoint();
         return false;
     }
     return true;
@@ -471,31 +452,30 @@ pq_test_pop_min(void)
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    insert_shuffled(&pq, vals, size, prime);
+    if (!insert_shuffled(&pq, vals, size, prime))
+    {
+        return false;
+    }
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
-        breakpoint();
         return false;
     }
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
-        breakpoint();
         return false;
     }
     int sorted_check[size];
     if (inorder_fill(sorted_check, size, &pq) != size)
     {
-        breakpoint();
         return false;
     }
     for (size_t i = 0; i < size; ++i)
     {
         if (vals[i].val != sorted_check[i])
         {
-            breakpoint();
             return false;
         }
     }
@@ -507,13 +487,11 @@ pq_test_pop_min(void)
         const struct val *front = pq_entry(pq_pop_min(&pq), struct val, elem);
         if (front->val != vals[i].val)
         {
-            breakpoint();
             return false;
         }
     }
     if (!pq_empty(&pq))
     {
-        breakpoint();
         return false;
     }
     return true;
@@ -537,7 +515,6 @@ pq_test_max_round_robin(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
@@ -549,7 +526,6 @@ pq_test_max_round_robin(void)
         const struct val *front = pq_entry(pq_pop_max(&pq), struct val, elem);
         if (last_id >= front->id)
         {
-            breakpoint();
             return false;
         }
         last_id = front->id;
@@ -575,7 +551,6 @@ pq_test_min_round_robin(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
@@ -587,7 +562,6 @@ pq_test_min_round_robin(void)
         const struct val *front = pq_entry(pq_pop_min(&pq), struct val, elem);
         if (last_id >= front->id)
         {
-            breakpoint();
             return false;
         }
         last_id = front->id;
@@ -614,13 +588,11 @@ pq_test_delete_prime_shuffle_duplicates(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         const size_t s = i + 1;
         if (pq_size(&pq) != s)
         {
-            breakpoint();
             return false;
         }
         /* Shuffle like this only on insertions to create more dups. */
@@ -634,14 +606,12 @@ pq_test_delete_prime_shuffle_duplicates(void)
         (void)pq_erase(&pq, &vals[shuffled_index].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         --cur_size;
         const size_t cur_get_size = pq_size(&pq);
         if (cur_get_size != cur_size)
         {
-            breakpoint();
             return false;
         }
         /* Shuffle normally here so we only remove each elem once. */
@@ -670,7 +640,6 @@ pq_test_prime_shuffle(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         shuffled_index = (shuffled_index + prime) % (size - less);
@@ -687,14 +656,12 @@ pq_test_prime_shuffle(void)
         (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         --cur_size;
         const size_t cur_get_size = pq_size(&pq);
         if (cur_get_size != cur_size)
         {
-            breakpoint();
             return false;
         }
     }
@@ -719,7 +686,6 @@ pq_test_weak_srand(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
@@ -728,13 +694,11 @@ pq_test_weak_srand(void)
         (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
     if (!pq_empty(&pq))
     {
-        breakpoint();
         return false;
     }
     return true;
@@ -753,7 +717,6 @@ pq_test_forward_iter_unique_vals(void)
     {}
     if (j != 0)
     {
-        breakpoint();
         return false;
     }
 
@@ -768,7 +731,6 @@ pq_test_forward_iter_unique_vals(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         shuffled_index = (shuffled_index + prime) % num_nodes;
@@ -776,7 +738,6 @@ pq_test_forward_iter_unique_vals(void)
     int val_keys_inorder[num_nodes];
     if (inorder_fill(val_keys_inorder, num_nodes, &pq) != pq_size(&pq))
     {
-        breakpoint();
         return false;
     }
     j = num_nodes - 1;
@@ -786,7 +747,6 @@ pq_test_forward_iter_unique_vals(void)
         const struct val *v = pq_entry(e, struct val, elem);
         if (v->val != val_keys_inorder[j])
         {
-            breakpoint();
             return false;
         }
     }
@@ -806,7 +766,6 @@ pq_test_forward_iter_all_vals(void)
     {}
     if (j != 0)
     {
-        breakpoint();
         return false;
     }
 
@@ -826,7 +785,6 @@ pq_test_forward_iter_all_vals(void)
             pq_insert(&pq, &vals[index].elem, val_cmp, NULL);
             if (!validate_tree(&pq, val_cmp))
             {
-                breakpoint();
                 return false;
             }
         }
@@ -840,7 +798,6 @@ pq_test_forward_iter_all_vals(void)
         const struct val *v = pq_entry(i, struct val, elem);
         if (v->val != val_keys_inorder[j])
         {
-            breakpoint();
             return false;
         }
     }
@@ -866,13 +823,11 @@ pq_test_insert_iterate_pop(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
     if (!iterator_check(&pq))
     {
-        breakpoint();
         return false;
     }
     size_t pop_count = 0;
@@ -882,18 +837,15 @@ pq_test_insert_iterate_pop(void)
         ++pop_count;
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
         if (pop_count % 200 && !iterator_check(&pq))
         {
-            breakpoint();
             return false;
         }
     }
     if (pop_count != num_nodes)
     {
-        breakpoint();
         return false;
     }
     return true;
@@ -934,7 +886,6 @@ pq_test_priority_removal(void)
             i = pq_erase(&pq, i, val_cmp, NULL);
             if (!validate_tree(&pq, val_cmp))
             {
-                breakpoint();
                 return false;
             }
         }
@@ -965,7 +916,6 @@ pq_test_priority_update(void)
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         if (!validate_tree(&pq, val_cmp))
         {
-            breakpoint();
             return false;
         }
     }
@@ -987,7 +937,6 @@ pq_test_priority_update(void)
             }
             if (!validate_tree(&pq, val_cmp))
             {
-                breakpoint();
                 return false;
             }
             i = next;
@@ -1030,7 +979,8 @@ pq_test_priority_valid_range(void)
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    const pq_rrange rev_range = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp);
+    const pq_rrange rev_range
+        = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
     if (pq_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
         || pq_entry(rev_range.end, struct val, elem)->val != rev_range_vals[7])
     {
@@ -1058,7 +1008,8 @@ pq_test_priority_valid_range(void)
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    const struct range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+    const struct range range
+        = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
     if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
         || pq_entry(range.end, struct val, elem)->val != range_vals[7])
     {
@@ -1108,7 +1059,8 @@ pq_test_priority_invalid_range(void)
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
-    const pq_rrange rev_range = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp);
+    const pq_rrange rev_range
+        = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
     if (pq_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
         || rev_range.end != pq_end(&pq))
     {
@@ -1135,7 +1087,7 @@ pq_test_priority_invalid_range(void)
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
     const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
-    const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+    const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
     if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
         || range.end != pq_end(&pq))
     {
@@ -1159,7 +1111,51 @@ pq_test_priority_invalid_range(void)
     return true;
 }
 
-static void
+static bool
+pq_test_priority_empty_range(void)
+{
+    printf("pq_test_priority_empty_range");
+    pqueue pq;
+    pq_init(&pq);
+
+    const int num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&pq, val_cmp))
+        {
+            return false;
+        }
+    }
+    /* Nonexistant range returns end [begin, end) in both positions.
+       which may not be the end element but a value in the tree. However,
+       Normal iteration patterns would consider this empty. */
+    struct val b = {.id = 0, .val = -50};
+    struct val e = {.id = 0, .val = -25};
+    const pq_rrange rev_range
+        = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
+    if (pq_entry(rev_range.rbegin, struct val, elem)->val != vals[0].val
+        || pq_entry(rev_range.end, struct val, elem)->val != vals[0].val)
+    {
+        return false;
+    }
+    b.val = 150;
+    e.val = 999;
+    const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
+    if (pq_entry(range.begin, struct val, elem)->val != vals[num_nodes - 1].val
+        || pq_entry(range.end, struct val, elem)->val
+               != vals[num_nodes - 1].val)
+    {
+        return false;
+    }
+    return true;
+}
+
+static bool
 insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
                 const int larger_prime)
 {
@@ -1175,19 +1171,20 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
         pq_insert(pq, &vals[shuffled_index].elem, val_cmp, NULL);
         if (pq_size(pq) != i + 1)
         {
-            breakpoint();
+            return false;
         }
         if (!validate_tree(pq, val_cmp))
         {
-            breakpoint();
+            return false;
         }
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     const size_t catch_size = size;
     if (pq_size(pq) != catch_size)
     {
-        breakpoint();
+        return false;
     }
+    return true;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

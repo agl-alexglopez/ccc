@@ -286,7 +286,7 @@ bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
+set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -296,33 +296,25 @@ const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
    it will return garbage or worse.*/
 set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 
-/* This is how you can tell if your set find and set erase
-   functions are successful. One should always check that
-   the set element does not equal the end element as you
-   would in C++. For example:
+/* Basic C++ style set operation. Contains does not return
+   an element but will tell you if an element with the same
+   value you are using as your set keys is present. This is
+   an important note. You are not asking if your specific
+   element is in the set, simply if we already have one
+   with the same key. Do not assume your element is the
+   one that is found unless you know it is only one you
+   have created. The const version does no fixups and should
+   be used only rarely. */
+bool set_const_contains(set *, set_elem *, set_cmp_fn *, void *);
 
-      struct val {
-         int val;
-         set_elem elem;
-      }
-
-      set s;
-      set_init(&s);
-      struct val a;
-      a.val = 0;
-
-      if (!set_insert(&s, &a.elem, cmp, NULL))
-         ...Do some logic...
-
-      ... Elsewhere ...
-
-      struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
-      if (e != set_end(&s))
-         ...Proceed with some logic...
-      else
-         ...Do something else...
-*/
-set_elem *set_end(set *);
+/* Read only seek into the data structure backing the set.
+   It is therefore safe for multiple threads to read with
+   const find but any other concurrent operations are not
+   safe. Also, note that the Splay Implementing this set
+   benefits from locality of reference and should be
+   allowed to repare itself with lookups with all other
+   functions whenever possible. */
+const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
 
 /* ===================    Iteration   ==========================
 
@@ -365,6 +357,34 @@ set_elem *set_end(set *);
    =============================================================
 */
 
+/* This is how you can tell if your set find and set erase
+   functions are successful. One should always check that
+   the set element does not equal the end element as you
+   would in C++. For example:
+
+      struct val {
+         int val;
+         set_elem elem;
+      }
+
+      set s;
+      set_init(&s);
+      struct val a;
+      a.val = 0;
+
+      if (!set_insert(&s, &a.elem, cmp, NULL))
+         ...Do some logic...
+
+      ... Elsewhere ...
+
+      struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
+      if (e != set_end(&s))
+         ...Proceed with some logic...
+      else
+         ...Do something else...
+*/
+set_elem *set_end(set *);
+
 /* Provides the start for an inorder ascending order traversal
    of the set. Equivalent to end of the set is empty. */
 set_elem *set_begin(set *);
@@ -397,8 +417,11 @@ set_elem *set_rnext(set *, set_elem *);
           printf("%d\n", cur_val->val);
       }
 
-   Use the next iterator from begin to end. */
-set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *);
+   Use the next iterator from begin to end. If there are no values NOT LESS
+   than begin last is returned as the begin element. Similarly if there are
+   no values GREATER than end, end is returned as end element. */
+set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *,
+                          void *aux);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -416,14 +439,18 @@ set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *);
           printf("%d\n", cur_val->val);
       }
 
-   Use the rnext iterator from begin to end in ascending order. */
+   Use the next iterator from begin to end. If there are no values NOT GREATER
+   than begin last is returned as the begin element. Similarly if there are
+   no values LESS than end, end is returned as end element. */
 set_rrange set_equal_rrange(set *, set_elem *rbegin, set_elem *end,
-                            set_cmp_fn *);
+                            set_cmp_fn *, void *aux);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
-   However, you should of course not modify keys or nodes. */
-const set_elem *set_root(const set *);
+   However, you should of course not modify keys or nodes.
+   You will need to pass this to the print function as a
+   starting node for debugging. */
+set_elem *set_root(const set *);
 
 /* Define a function to use printf for your custom struct type.
    For example:
@@ -443,15 +470,14 @@ const set_elem *set_root(const set *);
    the printer function will take care of the rest. */
 typedef node_print_fn set_print_fn;
 
-/* Prints a tree structure of the underlying queu for readability
+/* Prints a tree structure of the underlying set for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
 void set_print(set *, set_elem *, set_print_fn *);
 
-/*
-      (40){id:10,val:10}{id:10,val:10}(+1)
+/* (40){id:10,val:10}{id:10,val:10}(+1)
     ├──(29)R:{id:27,val:27}
     │   ├──(12)R:{id:37,val:37}{id:37,val:37}(+1)
     │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}(+1)
@@ -490,7 +516,6 @@ void set_print(set *, set_elem *, set_print_fn *);
             └──(4)L:{id:2,val:2}
                 ├──(1)R:{id:3,val:3}
                 └──(2)L:{id:1,val:1}
-                    └──(1)L:{id:0,val:0}
-*/
+                    └──(1)L:{id:0,val:0} */
 
 #endif

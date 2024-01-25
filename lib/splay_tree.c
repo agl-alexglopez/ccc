@@ -8,10 +8,8 @@
    ---------------------------
    1. This is taken from my own work and research on heap
       allocator performance through various implementations.
-
       https://github.com/agl-alexglopez/heap-allocator-workshop
       /blob/main/lib/splaytree_topdown.c
-
    2. However, I based it off of work by Daniel Sleator, Carnegie Mellon
       University. Sleator's implementation of a topdown splay tree was
       instrumental in starting things off, but required extensive modification.
@@ -20,7 +18,6 @@
       for my generalizable strategy to eliminate symmetric left and right cases
       for any binary tree code which I have been working on for a while and
       think is quite helpful!
-
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
 #include "pqueue.h"
 #include "set.h"
@@ -84,12 +81,14 @@ static struct node *max(const struct tree *);
 static struct node *pop_max(struct tree *);
 static struct node *pop_min(struct tree *);
 static struct node *min(const struct tree *);
+static struct node *const_seek(struct tree *, struct node *, tree_cmp_fn *,
+                               void *);
 static struct node *end(struct tree *);
 static struct node *next(struct tree *, struct node *, enum tree_link);
 static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
 static struct range equal_range(struct tree *t, struct node *begin,
                                 struct node *end, tree_cmp_fn *cmp,
-                                enum tree_link traversal);
+                                enum tree_link traversal, void *aux);
 static threeway_cmp force_find_grt(const struct node *, const struct node *,
                                    void *);
 static threeway_cmp force_find_les(const struct node *, const struct node *,
@@ -101,7 +100,7 @@ static struct node *get_parent(struct tree *, struct node *);
 static void add_duplicate(struct tree *, struct node *, struct node *,
                           struct node *);
 static struct node *splay(struct tree *, struct node *, const struct node *,
-                          tree_cmp_fn *);
+                          tree_cmp_fn *, void *aux);
 
 /* ======================  Priority Queue Interface  ====================== */
 
@@ -126,7 +125,7 @@ pq_root(const pqueue *const pq)
 pq_elem *
 pq_max(pqueue *const pq)
 {
-    return splay(pq, pq->root, &pq->end, force_find_grt);
+    return splay(pq, pq->root, &pq->end, force_find_grt, NULL);
 }
 
 const pq_elem *
@@ -144,7 +143,7 @@ pq_is_max(pqueue *const pq, pq_elem *const e)
 pq_elem *
 pq_min(pqueue *const pq)
 {
-    return splay(pq, pq->root, &pq->end, force_find_les);
+    return splay(pq, pq->root, &pq->end, force_find_les, NULL);
 }
 
 const pq_elem *
@@ -190,15 +189,17 @@ pq_rnext(pqueue *pq, pq_elem *i)
 }
 
 pq_range
-pq_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp)
+pq_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp,
+               void *aux)
 {
-    return equal_range(pq, begin, end, cmp, reverse_inorder_traversal);
+    return equal_range(pq, begin, end, cmp, reverse_inorder_traversal, aux);
 }
 
 pq_rrange
-pq_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *rend, pq_cmp_fn *cmp)
+pq_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *rend, pq_cmp_fn *cmp,
+                void *aux)
 {
-    pq_range ret = equal_range(pq, rbegin, rend, cmp, inorder_traversal);
+    pq_range ret = equal_range(pq, rbegin, rend, cmp, inorder_traversal, aux);
     return (pq_rrange){.rbegin = ret.begin, .end = ret.end};
 }
 
@@ -339,20 +340,22 @@ set_rnext(set *s, set_elem *e)
 }
 
 set_range
-set_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp)
+set_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp,
+                void *aux)
 {
-    return equal_range(pq, begin, end, cmp, inorder_traversal);
+    return equal_range(pq, begin, end, cmp, inorder_traversal, aux);
 }
 
 set_rrange
-set_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *cmp)
+set_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *cmp,
+                 void *aux)
 {
     set_range ret
-        = equal_range(pq, rbegin, end, cmp, reverse_inorder_traversal);
+        = equal_range(pq, rbegin, end, cmp, reverse_inorder_traversal, aux);
     return (set_rrange){.rbegin = ret.begin, .end = ret.end};
 }
 
-const set_elem *
+set_elem *
 set_find(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
 {
     return find(s, se, cmp, aux);
@@ -364,7 +367,19 @@ set_erase(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
     return erase(s, se, cmp, aux);
 }
 
+bool
+set_const_contains(set *s, set_elem *e, set_cmp_fn *cmp, void *aux)
+{
+    return const_seek(s, e, cmp, aux) != &s->end;
+}
+
 const set_elem *
+set_const_find(set *s, set_elem *e, set_cmp_fn *cmp, void *aux)
+{
+    return const_seek(s, e, cmp, aux);
+}
+
+set_elem *
 set_root(const set *const s)
 {
     return root(s);
@@ -487,6 +502,26 @@ min(const struct tree *t)
 }
 
 static struct node *
+const_seek(struct tree *const t, struct node *const n, tree_cmp_fn *cmp,
+           void *aux)
+{
+    assert(t != NULL);
+    assert(n != NULL);
+    assert(cmp != NULL);
+    struct node *seek = n;
+    while (seek != &t->end)
+    {
+        const threeway_cmp cur_cmp = cmp(n, seek, aux);
+        if (cur_cmp == EQL)
+        {
+            return seek;
+        }
+        seek = seek->link[GRT == cur_cmp];
+    }
+    return seek;
+}
+
+static struct node *
 pop_max(struct tree *t)
 {
     return multiset_erase_max_or_min(t, &t->end, force_find_grt);
@@ -592,7 +627,7 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
 
 static struct range
 equal_range(struct tree *t, struct node *begin, struct node *end,
-            tree_cmp_fn *cmp, const enum tree_link traversal)
+            tree_cmp_fn *cmp, const enum tree_link traversal, void *aux)
 {
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -600,12 +635,12 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
     const threeway_cmp grt_or_les[2] = {GRT, LES};
-    struct node *b = splay(t, t->root, begin, cmp);
+    struct node *b = splay(t, t->root, begin, cmp, aux);
     if (cmp(begin, b, NULL) == grt_or_les[traversal])
     {
         b = next(t, b, traversal);
     }
-    struct node *e = splay(t, t->root, end, cmp);
+    struct node *e = splay(t, t->root, end, cmp, aux);
     if (cmp(end, e, NULL) == grt_or_les[traversal])
     {
         e = next(t, e, traversal);
@@ -616,33 +651,30 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
 static struct node *
 find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    (void)aux;
     assert(t != NULL);
     assert(cmp != NULL);
     init_node(t, elem);
-    t->root = splay(t, t->root, elem, cmp);
+    t->root = splay(t, t->root, elem, cmp, aux);
     return cmp(elem, t->root, NULL) == EQL ? t->root : &t->end;
 }
 
 static bool
 contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
 {
-    (void)aux;
     assert(t != NULL);
     assert(cmp != NULL);
     init_node(t, dummy_key);
-    t->root = splay(t, t->root, dummy_key, cmp);
+    t->root = splay(t, t->root, dummy_key, cmp, aux);
     return cmp(dummy_key, t->root, NULL) == EQL;
 }
 
 static bool
 insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    (void)aux;
     assert(t != NULL);
     assert(cmp != NULL);
     init_node(t, elem);
-    t->root = splay(t, t->root, elem, cmp);
+    t->root = splay(t, t->root, elem, cmp, aux);
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
     if (EQL == root_cmp)
     {
@@ -655,7 +687,6 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 static void
 multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    (void)aux;
     assert(t);
     init_node(t, elem);
     t->size++;
@@ -665,7 +696,7 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
         t->root = elem;
         return;
     }
-    t->root = splay(t, t->root, elem, cmp);
+    t->root = splay(t, t->root, elem, cmp, aux);
 
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
     if (EQL == root_cmp)
@@ -718,11 +749,10 @@ add_duplicate(struct tree *t, struct node *tree_node, struct node *add,
 static struct node *
 erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    (void)aux;
     assert(t != NULL);
     assert(elem != NULL);
     assert(cmp != NULL);
-    struct node *ret = splay(t, t->root, elem, cmp);
+    struct node *ret = splay(t, t->root, elem, cmp, aux);
     assert(ret != NULL);
     const threeway_cmp found = cmp(elem, ret, NULL);
     if (found != EQL)
@@ -756,7 +786,7 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
     t->size--;
     assert(t->size != ((size_t)-1));
 
-    struct node *ret = splay(t, t->root, tnil, force_max_or_min);
+    struct node *ret = splay(t, t->root, tnil, force_max_or_min, NULL);
     if (has_dups(&t->end, ret))
     {
         ret = pop_front_dup(t, ret, force_max_or_min);
@@ -778,7 +808,6 @@ static struct node *
 multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
                     void *aux)
 {
-    (void)aux;
     assert(t != NULL);
     assert(node != NULL);
     assert(cmp != NULL);
@@ -802,7 +831,7 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
         node->link[N]->link[P] = node->link[P];
         return node;
     }
-    struct node *ret = splay(t, t->root, node, cmp);
+    struct node *ret = splay(t, t->root, node, cmp, aux);
     if (cmp(node, ret, NULL) != EQL)
     {
         return &t->end;
@@ -890,7 +919,7 @@ remove_from_tree(struct tree *t, struct node *ret, tree_cmp_fn *cmp)
     }
     else
     {
-        t->root = splay(t, ret->link[L], ret, cmp);
+        t->root = splay(t, ret->link[L], ret, cmp, NULL);
         give_parent_subtree(t, t->root, R, ret->link[R]);
     }
     return ret;
@@ -898,7 +927,7 @@ remove_from_tree(struct tree *t, struct node *ret, tree_cmp_fn *cmp)
 
 static struct node *
 splay(struct tree *t, struct node *root, const struct node *elem,
-      tree_cmp_fn *cmp)
+      tree_cmp_fn *cmp, void *aux)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -907,13 +936,13 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     struct node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        const threeway_cmp cur_cmp = cmp(elem, root, NULL);
+        const threeway_cmp cur_cmp = cmp(elem, root, aux);
         const enum tree_link next_link = GRT == cur_cmp;
         if (EQL == cur_cmp || root->link[next_link] == &t->end)
         {
             break;
         }
-        const threeway_cmp child_cmp = cmp(elem, root->link[next_link], NULL);
+        const threeway_cmp child_cmp = cmp(elem, root->link[next_link], aux);
         const enum tree_link next_link_from_child = GRT == child_cmp;
         if (child_cmp != EQL && next_link == next_link_from_child)
         {
