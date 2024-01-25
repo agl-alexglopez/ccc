@@ -500,7 +500,7 @@ pq_elem *pq_end(pqueue *);
 /* To view the underlying tree like structure of the priority queue
    for debugging or other purposes, provide the root of the pqueue
    to the pq_print function as the starting pq_elem. */
-const pq_elem *pq_root(const pqueue *);
+pq_elem *pq_root(const pqueue *);
 
 /* Define a function to use printf for your custom struct type.
    For example:

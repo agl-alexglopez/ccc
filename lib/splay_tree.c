@@ -116,7 +116,7 @@ pq_empty(const pqueue *const pq)
     return empty(pq);
 }
 
-const pq_elem *
+pq_elem *
 pq_root(const pqueue *const pq)
 {
     return root(pq);
