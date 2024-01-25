@@ -373,6 +373,18 @@ set_const_contains(set *s, set_elem *e, set_cmp_fn *cmp, void *aux)
     return const_seek(s, e, cmp, aux) != &s->end;
 }
 
+bool
+set_is_min(set *s, set_elem *e)
+{
+    return set_rnext(s, e) == &s->end;
+}
+
+bool
+set_is_max(set *s, set_elem *e)
+{
+    return set_next(s, e) == &s->end;
+}
+
 const set_elem *
 set_const_find(set *s, set_elem *e, set_cmp_fn *cmp, void *aux)
 {
@@ -383,6 +395,12 @@ set_elem *
 set_root(const set *const s)
 {
     return root(s);
+}
+
+void
+set_print(set *s, set_elem *root, set_print_fn *fn)
+{
+    print_tree(s, root, fn);
 }
 
 /* ===========    Splay Tree Multiset and Set Implementations    ===========

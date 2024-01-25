@@ -296,6 +296,13 @@ set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
    it will return garbage or worse.*/
 set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 
+/* If elem is already max this check is O(lgN) as the worst
+   case. If not, O(1). */
+bool set_is_min(set *, set_elem *);
+/* If elem is already max this check is O(lgN) as the worst
+   case. If not, O(1). */
+bool set_is_max(set *, set_elem *);
+
 /* Basic C++ style set operation. Contains does not return
    an element but will tell you if an element with the same
    value you are using as your set keys is present. This is
