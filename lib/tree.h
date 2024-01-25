@@ -58,6 +58,12 @@ struct range
     struct node *const end;
 };
 
+struct rrange
+{
+    struct node *const rbegin;
+    struct node *const end;
+};
+
 /* All queries must be able to compare two types utilizing the tree.
    Equality is important for duplicate tracking and speed. */
 typedef enum

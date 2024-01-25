@@ -1,7 +1,6 @@
 #include "pqueue.h"
 #include "tree.h"
 
-#include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -253,13 +252,13 @@ pq_test_read_max_min(void)
         breakpoint();
         return false;
     }
-    const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
+    const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     if (max->val != 9)
     {
         breakpoint();
         return false;
     }
-    const struct val *min = pq_entry(pq_min(&pq), struct val, elem);
+    const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
         breakpoint();
@@ -279,14 +278,14 @@ pq_test_insert_shuffle(void)
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
-    const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
+    const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
         breakpoint();
         return false;
     }
-    const struct val *min = pq_entry(pq_min(&pq), struct val, elem);
+    const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
         breakpoint();
@@ -359,14 +358,14 @@ pq_test_insert_erase_shuffled(void)
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
-    const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
+    const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
         breakpoint();
         return false;
     }
-    const struct val *min = pq_entry(pq_min(&pq), struct val, elem);
+    const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
         breakpoint();
@@ -416,14 +415,14 @@ pq_test_pop_max(void)
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
-    const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
+    const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
         breakpoint();
         return false;
     }
-    const struct val *min = pq_entry(pq_min(&pq), struct val, elem);
+    const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
         breakpoint();
@@ -473,14 +472,14 @@ pq_test_pop_min(void)
     const int prime = 53;
     struct val vals[size];
     insert_shuffled(&pq, vals, size, prime);
-    const struct val *max = pq_entry(pq_max(&pq), struct val, elem);
+    const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
     const size_t max_catch = max->val;
     if (max_catch != size - 1)
     {
         breakpoint();
         return false;
     }
-    const struct val *min = pq_entry(pq_min(&pq), struct val, elem);
+    const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
     if (min->val != 0)
     {
         breakpoint();
@@ -1031,14 +1030,14 @@ pq_test_priority_valid_range(void)
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    const pq_range rev_range = pq_requal_range(&pq, &b.elem, &e.elem, val_cmp);
-    if (pq_entry(rev_range.begin, struct val, elem)->val != rev_range_vals[0]
+    const pq_rrange rev_range = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp);
+    if (pq_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
         || pq_entry(rev_range.end, struct val, elem)->val != rev_range_vals[7])
     {
         return false;
     }
     size_t index = 0;
-    pq_elem *i1 = rev_range.begin;
+    pq_elem *i1 = rev_range.rbegin;
     for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
     {
         const int cur_val = pq_entry(i1, struct val, elem)->val;
@@ -1059,7 +1058,7 @@ pq_test_priority_valid_range(void)
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+    const struct range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
     if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
         || pq_entry(range.end, struct val, elem)->val != range_vals[7])
     {
@@ -1109,14 +1108,14 @@ pq_test_priority_invalid_range(void)
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
-    const pq_range rev_range = pq_requal_range(&pq, &b.elem, &e.elem, val_cmp);
-    if (pq_entry(rev_range.begin, struct val, elem)->val != rev_range_vals[0]
+    const pq_rrange rev_range = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp);
+    if (pq_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
         || rev_range.end != pq_end(&pq))
     {
         return false;
     }
     size_t index = 0;
-    pq_elem *i1 = rev_range.begin;
+    pq_elem *i1 = rev_range.rbegin;
     for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
     {
         const int cur_val = pq_entry(i1, struct val, elem)->val;

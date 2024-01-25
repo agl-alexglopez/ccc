@@ -94,10 +94,6 @@ typedef struct node pq_elem;
    values that are present in the queue. */
 typedef struct tree pqueue;
 
-typedef node_print_fn pq_print_fn;
-
-typedef struct range pq_range;
-
 /* ===================   Comparisons  ==========================
 
    To implement three way comparison in C you can try something
@@ -256,6 +252,17 @@ pq_elem *pq_pop_max(pqueue *);
 /* Same promises as pop_max except for the minimum values. */
 pq_elem *pq_pop_min(pqueue *);
 
+/* Reports the maximum priority element in the queue, drawing
+   it to the root via splay operations. This, is a good
+   function to use if the user wishes to bring frequently
+   queried max elements to the root for O(1) popping in
+   subsequent calls. This can be especially beneficial if
+   multiple elements are tied for the max in round robin
+   as all duplicates will be popped in O(1) time. */
+pq_elem *pq_max(pqueue *);
+/* Same promises as the max except for the minimum qu_elem */
+pq_elem *pq_min(pqueue *);
+
 /* Read only peek at the max and min these operations do
    not modify the tree so multiple threads could call them
    at the same time. However, all other operations are
@@ -264,8 +271,8 @@ pq_elem *pq_pop_min(pqueue *);
    and it has duplicates those duplicates will remain at
    the root O(1) until another insertion, query, or pop
    occurs. */
-const pq_elem *pq_max(const pqueue *);
-const pq_elem *pq_min(const pqueue *);
+const pq_elem *pq_const_max(const pqueue *);
+const pq_elem *pq_const_min(const pqueue *);
 
 /* If elem is already max this check is O(lgN) as the worst
    case. If not, O(1). */
@@ -333,6 +340,29 @@ bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
    is present regardless of how many round robin duplicates
    are present. Returns the result in O(lgN). */
 bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+
+/* A container for a simple begin and end pointer to a pq_elem.
+
+      pq_range
+      {
+         pq_elem *begin;
+         pq_elem *end;
+      };
+
+   A user can use the equal_range or equal_rrange function to
+   fill the pq_range with the expected begin and end queries.
+   The default range in a priority queue is descending order.
+   A pq_range has no sense of iterator directionality and
+   provides two typedefs simpy as a reminder to the programmer
+   to use the appropriate next function. Use next for a
+   pq_range and rnext for a pq_rrange. Otherwise, indefinite
+   loops may occur. */
+typedef struct range pq_range;
+
+/* The reverse range container for queries performed with
+   requal_range. Be sure to use the rnext function to progress
+   the iterator in this type of range. */
+typedef struct rrange pq_rrange;
 
 /* ===================    Iteration   ==========================
 
@@ -418,16 +448,83 @@ pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *);
    be found the end node is provided. It is the users responsibility
    to use the correct iterator as the range leaves it to the user to
    iterate. Use the rnext iterator from rbegin to end. */
-pq_range pq_requal_range(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *);
-
+pq_rrange pq_equal_rrange(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *);
 /* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end
    is reached. The end is same for any iteration order. */
 pq_elem *pq_end(pqueue *);
 
-/* Not very useful or significant. Helps with tests. Explore at own risk. */
+/* To view the underlying tree like structure of the priority queue
+   for debugging or other purposes, provide the root of the pqueue
+   to the pq_print function as the starting pq_elem. */
 const pq_elem *pq_root(const pqueue *);
 
+/* Define a function to use printf for your custom struct type.
+   For example:
+      struct val
+      {
+         int val;
+         pq_elem elem;
+      };
+
+      void print_my_val(pq_elem *elem)
+      {
+         const struct val *v = pq_entry(elem, struct val, elem);
+         printf("{%d}", v->val);
+      }
+
+   Output should be one line with no newline character. Then,
+   the printer function will take care of the rest. */
+typedef node_print_fn pq_print_fn;
+
+/* Prints a tree structure of the underlying queu for readability
+   of many values. Helpful for printing debugging or viewing
+   storage charactersistics in gdb. See sample output below.
+   This function currently uses heap allocation and recursion
+   so it may not be a good fit in constrained environments. */
 void pq_print(pqueue *, pq_elem *, pq_print_fn *);
+
+/*
+      (40){id:10,val:10}{id:10,val:10}(+1)
+    ├──(29)R:{id:27,val:27}
+    │   ├──(12)R:{id:37,val:37}{id:37,val:37}(+1)
+    │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}(+1)
+    │   │   │   └──(1)R:{id:39,val:39}{id:39,val:39}(+1)
+    │   │   └──(9)L:{id:35,val:35}
+    │   │       ├──(1)R:{id:36,val:36}
+    │   │       └──(7)L:{id:31,val:31}
+    │   │           ├──(3)R:{id:33,val:33}
+    │   │           │   ├──(1)R:{id:34,val:34}
+    │   │           │   └──(1)L:{id:32,val:32}
+    │   │           └──(3)L:{id:29,val:29}
+    │   │               ├──(1)R:{id:30,val:30}
+    │   │               └──(1)L:{id:28,val:28}
+    │   └──(16)L:{id:11,val:11}{id:11,val:11}(+1)
+    │       └──(15)R:{id:24,val:24}{id:24,val:24}(+1)
+    │           ├──(2)R:{id:25,val:25}{id:25,val:25}(+1)
+    │           │   └──(1)R:{id:26,val:26}{id:26,val:26}(+1)
+    │           └──(12)L:{id:12,val:12}{id:12,val:12}(+1)
+    │               └──(11)R:{id:17,val:17}
+    │                   ├──(6)R:{id:21,val:21}
+    │                   │   ├──(2)R:{id:23,val:23}
+    │                   │   │   └──(1)L:{id:22,val:22}
+    │                   │   └──(3)L:{id:19,val:19}
+    │                   │       ├──(1)R:{id:20,val:20}
+    │                   │       └──(1)L:{id:18,val:18}
+    │                   └──(4)L:{id:15,val:15}
+    │                       ├──(1)R:{id:16,val:16}
+    │                       └──(2)L:{id:13,val:13}{id:13,val:13}(+1)
+    │                           └──(1)R:{id:14,val:14}
+    └──(10)L:{id:8,val:8}
+        ├──(1)R:{id:9,val:9}
+        └──(8)L:{id:4,val:4}
+            ├──(3)R:{id:6,val:6}
+            │   ├──(1)R:{id:7,val:7}
+            │   └──(1)L:{id:5,val:5}
+            └──(4)L:{id:2,val:2}
+                ├──(1)R:{id:3,val:3}
+                └──(2)L:{id:1,val:1}
+                    └──(1)L:{id:0,val:0}
+*/
 
 #endif

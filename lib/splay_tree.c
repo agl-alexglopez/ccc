@@ -123,8 +123,14 @@ pq_root(const pqueue *const pq)
     return root(pq);
 }
 
+pq_elem *
+pq_max(pqueue *const pq)
+{
+    return splay(pq, pq->root, &pq->end, force_find_grt);
+}
+
 const pq_elem *
-pq_max(const pqueue *const pq)
+pq_const_max(const pqueue *const pq)
 {
     return max(pq);
 }
@@ -135,8 +141,14 @@ pq_is_max(pqueue *const pq, pq_elem *const e)
     return pq_rnext(pq, e) == &pq->end;
 }
 
+pq_elem *
+pq_min(pqueue *const pq)
+{
+    return splay(pq, pq->root, &pq->end, force_find_les);
+}
+
 const pq_elem *
-pq_min(const pqueue *const pq)
+pq_const_min(const pqueue *const pq)
 {
     return min(pq);
 }
@@ -183,10 +195,11 @@ pq_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp)
     return equal_range(pq, begin, end, cmp, reverse_inorder_traversal);
 }
 
-pq_range
-pq_requal_range(pqueue *pq, pq_elem *rbegin, pq_elem *rend, pq_cmp_fn *cmp)
+pq_rrange
+pq_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *rend, pq_cmp_fn *cmp)
 {
-    return equal_range(pq, rbegin, rend, cmp, inorder_traversal);
+    pq_range ret = equal_range(pq, rbegin, rend, cmp, inorder_traversal);
+    return (pq_rrange){.rbegin = ret.begin, .end = ret.end};
 }
 
 void
