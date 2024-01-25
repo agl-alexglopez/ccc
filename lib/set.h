@@ -1,12 +1,24 @@
-/*
-   Author: Alexander G. Lopez
+/* Author: Alexander G. Lopez
    --------------------------
    This is the Set interface for the Splay Tree
    Set. In this case we modify a Splay Tree to allow for
    a true set (naturally sorted unique elements). See the
    priority queue for another use case of this data
-   structure.
- */
+   structure. A set can be an interesting option for a
+   LRU cache. Any application such that there is biased
+   distribution of access via lookup, insertion, and
+   removal brings those elements closer to the root of
+   the tree, approaching constant time operations. See
+   also the multiset for great benefits of duplicates
+   being taken from a data structure. The runtime is
+   amortized O(lgN) but with the right use cases we
+   may benefit from the O(1) capabilities of the working
+   set. The anti-pattern is to seek and splay all elements
+   to the tree in sequential order. However, any random
+   variants will help maintain tree health and this interface
+   provides robust iterators that can be used if read only
+   access is required of all elements or only conditional
+   modifications. This may combat such an anti-pattern. */
 #ifndef SET
 #define SET
 #include "tree.h"
@@ -199,9 +211,40 @@ typedef struct node set_elem;
 */
 typedef tree_cmp_fn set_cmp_fn;
 
+/* A container for a simple begin and end pointer to a set_elem.
+
+      set_range
+      {
+         set_elem *begin;
+         set_elem *end;
+      };
+
+   A user can use the equal_range or equal_rrange function to
+   fill the set_range with the expected begin and end queries.
+   The default range in a priority queue is descending order.
+   A set_range has no sense of iterator directionality and
+   provides two typedefs simpy as a reminder to the programmer
+   to use the appropriate next function. Use next for a
+   set_range and rnext for a set_rrange. Otherwise, indefinite
+   loops may occur. */
+typedef struct range set_range;
+
+/* The reverse range container for queries performed with
+   requal_range.
+
+      set_rrange
+      {
+         set_elem *rbegin;
+         set_elem *end;
+      };
+
+   Be sure to use the rnext function to progress the iterator
+   in this type of range.*/
+typedef struct rrange set_rrange;
+
 /* NOLINTNEXTLINE */
-#define set_entry(TREE_ELEM, STRUCT, MEMBER)                                   \
-    ((STRUCT *)((uint8_t *)&(TREE_ELEM)->parent_or_dups                        \
+#define set_entry(SET_ELEM, STRUCT, MEMBER)                                    \
+    ((STRUCT *)((uint8_t *)&(SET_ELEM)->parent_or_dups                         \
                 - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
 
 /* Basic O(1) initialization and sanity checks for a set. Operations
@@ -338,8 +381,116 @@ set_elem *set_next(set *, set_elem *);
    the set or the end if done. */
 set_elem *set_rnext(set *, set_elem *);
 
+/* Returns the range with pointers to the first element NOT LESS
+   than the requested begin and last element GREATER than the
+   provided end element. If either portion of the range cannot
+   be found the end node is provided. It is the users responsibility
+   to use the correct iterator as the range leaves it to the user to
+   iterate.
+
+      struct val e = {.id = 0, .val = 64};
+      struct val b = {.id = 0, .val = 35};
+      const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+      for (pq_elem *i = range.begin; i != range.end; i = pq_next(&pq, i))
+      {
+          const int cur_val = pq_entry(i, struct val, elem)->val;
+          printf("%d\n", cur_val->val);
+      }
+
+   Use the next iterator from begin to end. */
+set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *);
+
+/* Returns the range with pointers to the first element NOT GREATER
+   than the requested begin and last element LESS than the
+   provided end element. If either portion of the range cannot
+   be found the end node is provided. It is the users responsibility
+   to use the correct iterator as the range leaves it to the user to
+   iterate. Use the next iterator from rbegin to end.
+
+      struct val e = {.id = 0, .val = 35};
+      struct val b = {.id = 0, .val = 64};
+      const set_range r = set_equal_range(&set, &b.elem, &e.elem, val_cmp);
+      for (set_elem *i = r.rbegin; i != r.end; i = set_rnext(&set, i))
+      {
+          const int cur_val = set_entry(i, struct val, elem)->val;
+          printf("%d\n", cur_val->val);
+      }
+
+   Use the rnext iterator from begin to end in ascending order. */
+set_rrange set_equal_rrange(set *, set_elem *rbegin, set_elem *end,
+                            set_cmp_fn *);
+
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes. */
 const set_elem *set_root(const set *);
+
+/* Define a function to use printf for your custom struct type.
+   For example:
+      struct val
+      {
+         int val;
+         pq_elem elem;
+      };
+
+      void print_my_val(set_elem *elem)
+      {
+         const struct val *v = set_entry(elem, struct val, elem);
+         printf("{%d}", v->val);
+      }
+
+   Output should be one line with no newline character. Then,
+   the printer function will take care of the rest. */
+typedef node_print_fn set_print_fn;
+
+/* Prints a tree structure of the underlying queu for readability
+   of many values. Helpful for printing debugging or viewing
+   storage charactersistics in gdb. See sample output below.
+   This function currently uses heap allocation and recursion
+   so it may not be a good fit in constrained environments. */
+void set_print(set *, set_elem *, set_print_fn *);
+
+/*
+      (40){id:10,val:10}{id:10,val:10}(+1)
+    ├──(29)R:{id:27,val:27}
+    │   ├──(12)R:{id:37,val:37}{id:37,val:37}(+1)
+    │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}(+1)
+    │   │   │   └──(1)R:{id:39,val:39}{id:39,val:39}(+1)
+    │   │   └──(9)L:{id:35,val:35}
+    │   │       ├──(1)R:{id:36,val:36}
+    │   │       └──(7)L:{id:31,val:31}
+    │   │           ├──(3)R:{id:33,val:33}
+    │   │           │   ├──(1)R:{id:34,val:34}
+    │   │           │   └──(1)L:{id:32,val:32}
+    │   │           └──(3)L:{id:29,val:29}
+    │   │               ├──(1)R:{id:30,val:30}
+    │   │               └──(1)L:{id:28,val:28}
+    │   └──(16)L:{id:11,val:11}{id:11,val:11}(+1)
+    │       └──(15)R:{id:24,val:24}{id:24,val:24}(+1)
+    │           ├──(2)R:{id:25,val:25}{id:25,val:25}(+1)
+    │           │   └──(1)R:{id:26,val:26}{id:26,val:26}(+1)
+    │           └──(12)L:{id:12,val:12}{id:12,val:12}(+1)
+    │               └──(11)R:{id:17,val:17}
+    │                   ├──(6)R:{id:21,val:21}
+    │                   │   ├──(2)R:{id:23,val:23}
+    │                   │   │   └──(1)L:{id:22,val:22}
+    │                   │   └──(3)L:{id:19,val:19}
+    │                   │       ├──(1)R:{id:20,val:20}
+    │                   │       └──(1)L:{id:18,val:18}
+    │                   └──(4)L:{id:15,val:15}
+    │                       ├──(1)R:{id:16,val:16}
+    │                       └──(2)L:{id:13,val:13}{id:13,val:13}(+1)
+    │                           └──(1)R:{id:14,val:14}
+    └──(10)L:{id:8,val:8}
+        ├──(1)R:{id:9,val:9}
+        └──(8)L:{id:4,val:4}
+            ├──(3)R:{id:6,val:6}
+            │   ├──(1)R:{id:7,val:7}
+            │   └──(1)L:{id:5,val:5}
+            └──(4)L:{id:2,val:2}
+                ├──(1)R:{id:3,val:3}
+                └──(2)L:{id:1,val:1}
+                    └──(1)L:{id:0,val:0}
+*/
+
 #endif

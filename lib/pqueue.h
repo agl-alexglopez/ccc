@@ -1,11 +1,16 @@
-/*
-   Author: Alexander G. Lopez
+/* Author: Alexander G. Lopez
    --------------------------
    This is the Priority Queue interface for the Splay Tree
    Set. In this case we modify a Splay Tree to allow for
    a Priority Queue (aka a sorted Multi-Set). See the
-   normal set interface as well.
- */
+   normal set interface as well. While a Red-Black Tree
+   would be the more optimal data structure to support
+   a priority queue the underlying implementation of a Splay Tree
+   offers some interesting tradeoffs for systems programmers.
+   They are working sets that keep frequently (Least
+   Recently Used) elements close to the root even if their
+   runtime is amortized O(lgN). With the right use cases we
+   can frequently benefit from O(1) operations. */
 #ifndef PQUEUE
 #define PQUEUE
 
@@ -134,6 +139,8 @@ typedef struct tree pqueue;
           struct val *rhs = pq_entry(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
+
+   =============================================================
 */
 
 /* A comparison function that returns one of the threeway comparison
@@ -147,10 +154,7 @@ typedef struct tree pqueue;
           GRT = 1
       } threeway_cmp;
 
-   =============================================================
-*/
-
-/* The compare function one must provide to perform queries
+   The compare function one must provide to perform queries
    and other operations on the priority queue. See above. */
 typedef tree_cmp_fn pq_cmp_fn;
 
@@ -238,7 +242,7 @@ void pq_insert(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
-   pop we guarantee O(lgN) runtime and then all subsequent
+   pop we have O(lgN) runtime and then all subsequent
    pops will be O(1). However, if any other insertions or
    deletions other than the max occur before all duplicates
    have been popped then performance degrades back to O(lgN).
@@ -260,8 +264,18 @@ pq_elem *pq_pop_min(pqueue *);
    multiple elements are tied for the max in round robin
    as all duplicates will be popped in O(1) time. */
 pq_elem *pq_max(pqueue *);
-/* Same promises as the max except for the minimum qu_elem */
+/* Same promises as the max except for the minimum pq_elem */
 pq_elem *pq_min(pqueue *);
+
+/* If elem is already max this check is O(lgN) as the worst
+   case. If not, O(1). However, if multiple  pops have occured
+   the max will be close to the root. */
+bool pq_is_max(pqueue *, pq_elem *);
+
+/* If the element is already min this check is O(lgN) as the worst
+   case. If not, O(1). However, if multiple  pops have occured
+   the max will be close to the root. */
+bool pq_is_min(pqueue *, pq_elem *);
 
 /* Read only peek at the max and min these operations do
    not modify the tree so multiple threads could call them
@@ -273,14 +287,6 @@ pq_elem *pq_min(pqueue *);
    occurs. */
 const pq_elem *pq_const_max(const pqueue *);
 const pq_elem *pq_const_min(const pqueue *);
-
-/* If elem is already max this check is O(lgN) as the worst
-   case. If not, O(1). */
-bool pq_is_max(pqueue *, pq_elem *);
-
-/* If the element is already min this check is O(lgN) as the worst
-   case. If not, O(1). */
-bool pq_is_min(pqueue *, pq_elem *);
 
 /* Erases a specified element known to be in the queue.
    Returns the element that follows the previous value
@@ -360,8 +366,16 @@ bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 typedef struct range pq_range;
 
 /* The reverse range container for queries performed with
-   requal_range. Be sure to use the rnext function to progress
-   the iterator in this type of range. */
+   requal_range.
+
+      pq_rrange
+      {
+         pq_elem *rbegin;
+         pq_elem *end;
+      };
+
+   Be sure to use the rnext function to progress the iterator
+   in this type of range.*/
 typedef struct rrange pq_rrange;
 
 /* ===================    Iteration   ==========================
@@ -434,20 +448,42 @@ pq_elem *pq_next(pqueue *, pq_elem *);
 /* Progresses through the queue in ascending order */
 pq_elem *pq_rnext(pqueue *, pq_elem *);
 
-/* Returns the range with pointers to the first element NOT LESS
-   than the requested begin and last element GREATER than the
-   provided end element. If either portion of the range cannot
-   be found the end node is provided. It is the users responsibility
-   to use the correct iterator as the range leaves it to the user to
-   iterate. Use the next iterator from begin to end. */
-pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *);
-
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
    provided end element. If either portion of the range cannot
    be found the end node is provided. It is the users responsibility
    to use the correct iterator as the range leaves it to the user to
-   iterate. Use the rnext iterator from rbegin to end. */
+   iterate.
+
+      struct val e = {.id = 0, .val = 64};
+      struct val b = {.id = 0, .val = 35};
+      const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
+      for (pq_elem *i = range.begin; i != range.end; i = pq_next(&pq, i))
+      {
+          const int cur_val = pq_entry(i, struct val, elem)->val;
+          printf("%d\n", cur_val->val);
+      }
+
+   Use the next iterator from begin to end. */
+pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *);
+
+/* Returns the range with pointers to the first element NOT LESS
+   than the requested begin and last element GREATER than the
+   provided end element. If either portion of the range cannot
+   be found the end node is provided. It is the users responsibility
+   to use the correct iterator as the range leaves it to the user to
+   iterate. Use the rnext iterator from rbegin to end.
+
+      struct val e = {.id = 0, .val = 35};
+      struct val b = {.id = 0, .val = 64};
+      const pq_rrange range = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp);
+      for (pq_elem *i = range.rbegin; i != range.end; i = pq_rnext(&pq, i))
+      {
+          const int cur_val = pq_entry(i, struct val, elem)->val;
+          printf("%d\n", cur_val->val);
+      }
+
+   Use the rnext iterator from rbegin to end. */
 pq_rrange pq_equal_rrange(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *);
 /* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end

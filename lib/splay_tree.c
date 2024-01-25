@@ -338,6 +338,20 @@ set_rnext(set *s, set_elem *e)
     return next(s, e, reverse_inorder_traversal);
 }
 
+set_range
+set_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp)
+{
+    return equal_range(pq, begin, end, cmp, inorder_traversal);
+}
+
+set_rrange
+set_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *cmp)
+{
+    set_range ret
+        = equal_range(pq, rbegin, end, cmp, reverse_inorder_traversal);
+    return (set_rrange){.rbegin = ret.begin, .end = ret.end};
+}
+
 const set_elem *
 set_find(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
 {
@@ -546,6 +560,10 @@ static struct node *
 next(struct tree *t, struct node *n, const enum tree_link traversal)
 {
     assert(get_parent(t, t->root) == &t->end);
+    if (n == &t->end)
+    {
+        return n;
+    }
     /* Using a helper node simplifies the code greatly. */
     t->end.link[traversal] = t->root;
     t->end.link[!traversal] = &t->end;
@@ -576,6 +594,11 @@ static struct range
 equal_range(struct tree *t, struct node *begin, struct node *end,
             tree_cmp_fn *cmp, const enum tree_link traversal)
 {
+    /* As with most BST code the cases are perfectly symmetrical. If we
+       are seeking an increasing or decreasing range we need to make sure
+       we follow the [inclusive, exclusive) range rule. This means double
+       checking we don't need to progress to the next greatest or next
+       lesser element depending on the direction we are traversing. */
     const threeway_cmp grt_or_les[2] = {GRT, LES};
     struct node *b = splay(t, t->root, begin, cmp);
     if (cmp(begin, b, NULL) == grt_or_les[traversal])
@@ -863,13 +886,13 @@ remove_from_tree(struct tree *t, struct node *ret, tree_cmp_fn *cmp)
     if (ret->link[L] == &t->end)
     {
         t->root = ret->link[R];
+        give_parent_subtree(t, &t->end, 0, t->root);
     }
     else
     {
         t->root = splay(t, ret->link[L], ret, cmp);
         give_parent_subtree(t, t->root, R, ret->link[R]);
     }
-    give_parent_subtree(t, &t->end, 0, t->root);
     return ret;
 }
 
@@ -945,7 +968,7 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
    a duplicate uses its parent field to point to a node that can
    find itself by checking its doubly linked list. A node in a tree
    could never do this because there is no route back to a node from
-   its children by definition of a binary tree. However, we must be
+   its child pointers by definition of a binary tree. However, we must be
    careful not to access the end helper becuase it can store any pointers
    in its fields that should not be accessed for directions.
 
@@ -961,8 +984,7 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
    in a circular list. So, we always know via pointers if we find a
    tree node that stores duplicates. By extension this means we can
    also identify if we ARE a duplicate but that check is not part
-   of this function.
- */
+   of this function. */
 static inline bool
 has_dups(const struct node *const end, const struct node *const n)
 {
@@ -983,10 +1005,9 @@ get_parent(struct tree *t, struct node *n)
    comparison to decide which branch to take in the tree or if we
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min
-   NOLINTBEGIN(*swappable-parameters)*/
+   NOLINTBEGIN(*swappable-parameters) */
 static threeway_cmp
-force_find_grt(const struct node *a, const struct node *b,
-               void *aux) // NOLINT
+force_find_grt(const struct node *a, const struct node *b, void *aux)
 {
     (void)a;
     (void)b;
@@ -995,8 +1016,7 @@ force_find_grt(const struct node *a, const struct node *b,
 }
 
 static threeway_cmp
-force_find_les(const struct node *a, const struct node *b,
-               void *aux) // NOLINT
+force_find_les(const struct node *a, const struct node *b, void *aux)
 {
     (void)a;
     (void)b;
@@ -1174,14 +1194,14 @@ get_edge_color(const struct node *root, size_t parent_size,
 
 static void
 print_node(struct tree *const t, const struct node *parent,
-           const struct node *root, node_print_fn *fn)
+           const struct node *root, node_print_fn *fn_print)
 {
-    fn(root);
+    fn_print(root);
     struct parent_status stat = child_tracks_parent(t, parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);
-        fn(stat.parent);
+        fn_print(stat.parent);
         printf("%s", COLOR_NIL);
     }
     printf(COLOR_CYN);
@@ -1192,11 +1212,11 @@ print_node(struct tree *const t, const struct node *parent,
         const struct node *head = root->parent_or_dups;
         if (head != &t->end)
         {
-            fn(head);
+            fn_print(head);
             for (struct node *i = head->link[N]; i != head;
                  i = i->link[N], ++duplicates)
             {
-                fn(i);
+                fn_print(i);
             }
         }
         printf("(+%d)", duplicates);
@@ -1213,7 +1233,7 @@ print_inner_tree(const struct node *root, size_t parent_size,
                  const struct node *parent, const char *prefix,
                  const char *prefix_color, const enum print_link node_type,
                  const enum tree_link dir, struct tree *const t,
-                 node_print_fn *fn)
+                 node_print_fn *fn_print)
 {
     if (root == &t->end)
     {
@@ -1228,7 +1248,7 @@ print_inner_tree(const struct node *root, size_t parent_size,
     printf("(%zu)", subtree_size);
     dir == L ? printf("L:" COLOR_NIL) : printf("R:" COLOR_NIL);
 
-    print_node(t, parent, root, fn);
+    print_node(t, parent, root, fn_print);
 
     char *str = NULL;
     const int string_length
@@ -1253,19 +1273,19 @@ print_inner_tree(const struct node *root, size_t parent_size,
     if (root->link[R] == &t->end)
     {
         print_inner_tree(root->link[L], subtree_size, root, str,
-                         left_edge_color, LEAF, L, t, fn);
+                         left_edge_color, LEAF, L, t, fn_print);
     }
     else if (root->link[L] == &t->end)
     {
         print_inner_tree(root->link[R], subtree_size, root, str,
-                         left_edge_color, LEAF, R, t, fn);
+                         left_edge_color, LEAF, R, t, fn_print);
     }
     else
     {
         print_inner_tree(root->link[R], subtree_size, root, str,
-                         left_edge_color, BRANCH, R, t, fn);
+                         left_edge_color, BRANCH, R, t, fn_print);
         print_inner_tree(root->link[L], subtree_size, root, str,
-                         left_edge_color, LEAF, L, t, fn);
+                         left_edge_color, LEAF, L, t, fn_print);
     }
     free(str);
 }
@@ -1274,7 +1294,7 @@ print_inner_tree(const struct node *root, size_t parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 void
-print_tree(struct tree *t, const struct node *root, node_print_fn *fn)
+print_tree(struct tree *t, const struct node *root, node_print_fn *fn_print)
 {
     if (root == &t->end)
     {
@@ -1282,26 +1302,26 @@ print_tree(struct tree *t, const struct node *root, node_print_fn *fn)
     }
     size_t subtree_size = get_subtree_size(root, &t->end);
     printf("\n%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
-    print_node(t, &t->end, root, fn);
+    print_node(t, &t->end, root, fn_print);
 
     const char *left_edge_color
         = get_edge_color(root->link[L], subtree_size, &t->end);
     if (root->link[R] == &t->end)
     {
         print_inner_tree(root->link[L], subtree_size, root, "", left_edge_color,
-                         LEAF, L, t, fn);
+                         LEAF, L, t, fn_print);
     }
     else if (root->link[L] == &t->end)
     {
         print_inner_tree(root->link[R], subtree_size, root, "", left_edge_color,
-                         LEAF, R, t, fn);
+                         LEAF, R, t, fn_print);
     }
     else
     {
         print_inner_tree(root->link[R], subtree_size, root, "", left_edge_color,
-                         BRANCH, R, t, fn);
+                         BRANCH, R, t, fn_print);
         print_inner_tree(root->link[L], subtree_size, root, "", left_edge_color,
-                         LEAF, L, t, fn);
+                         LEAF, L, t, fn_print);
     }
 }
 

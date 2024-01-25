@@ -1104,7 +1104,7 @@ pq_test_priority_invalid_range(void)
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
-    /* This should be the following range [95,999). 6 should raise to
+    /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
