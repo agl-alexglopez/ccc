@@ -34,8 +34,9 @@
 
       set
       {
-          set_elem *root
+          set_elem *root;
           set_elem nil;
+          size_t size;
       };
 
    Embed a set_elem in your struct:
@@ -286,7 +287,7 @@ bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
+const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -296,11 +297,9 @@ set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
    it will return garbage or worse.*/
 set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
 
-/* If elem is already max this check is O(lgN) as the worst
-   case. If not, O(1). */
+/* Check if the current elem is the min. O(lgN) */
 bool set_is_min(set *, set_elem *);
-/* If elem is already max this check is O(lgN) as the worst
-   case. If not, O(1). */
+/* Check if the current elem is the max. O(lgN) */
 bool set_is_max(set *, set_elem *);
 
 /* Basic C++ style set operation. Contains does not return
@@ -415,12 +414,12 @@ set_elem *set_rnext(set *, set_elem *);
    to use the correct iterator as the range leaves it to the user to
    iterate.
 
-      struct val e = {.id = 0, .val = 64};
       struct val b = {.id = 0, .val = 35};
-      const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
-      for (pq_elem *i = range.begin; i != range.end; i = pq_next(&pq, i))
+      struct val e = {.id = 0, .val = 64};
+      const set_range range = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
+      for (set_elem *i = range.begin; i != range.end; i = set_next(&s, i))
       {
-          const int cur_val = pq_entry(i, struct val, elem)->val;
+          const int cur_val = set_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 
@@ -437,10 +436,10 @@ set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *,
    to use the correct iterator as the range leaves it to the user to
    iterate. Use the next iterator from rbegin to end.
 
-      struct val e = {.id = 0, .val = 35};
       struct val b = {.id = 0, .val = 64};
-      const set_range r = set_equal_range(&set, &b.elem, &e.elem, val_cmp);
-      for (set_elem *i = r.rbegin; i != r.end; i = set_rnext(&set, i))
+      struct val e = {.id = 0, .val = 35};
+      const set_range r = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
+      for (set_elem *i = r.rbegin; i != r.end; i = set_rnext(&s, i))
       {
           const int cur_val = set_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);

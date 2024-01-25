@@ -27,6 +27,12 @@ static bool set_test_insert_shuffle(void);
 static bool set_test_insert_erase_shuffled(void);
 static bool set_test_prime_shuffle(void);
 static bool set_test_weak_srand(void);
+static bool set_test_forward_iter(void);
+static bool set_test_iterate_removal(void);
+static bool set_test_iterate_remove_reinsert(void);
+static bool set_test_valid_range(void);
+static bool set_test_invalid_range(void);
+static bool set_test_empty_range(void);
 static int run_tests(void);
 static bool insert_shuffled(set *, struct val[], size_t, int);
 static size_t inorder_fill(int vals[], size_t, set *);
@@ -34,12 +40,15 @@ static bool iterator_check(set *);
 static void set_printer_fn(const set_elem *e);
 static threeway_cmp val_cmp(const set_elem *, const set_elem *, void *);
 
-#define NUM_TESTS 8
+#define NUM_TESTS 14
 const test_fn all_tests[NUM_TESTS] = {
     set_test_empty,          set_test_insert_one,
     set_test_insert_three,   set_test_struct_getter,
     set_test_insert_shuffle, set_test_insert_erase_shuffled,
     set_test_prime_shuffle,  set_test_weak_srand,
+    set_test_forward_iter,   set_test_iterate_removal,
+    set_test_valid_range,    set_test_invalid_range,
+    set_test_empty_range,    set_test_iterate_remove_reinsert,
 };
 
 /* Set this breakpoint on any line where you wish
@@ -311,6 +320,56 @@ set_test_weak_srand(void)
 }
 
 static bool
+set_test_forward_iter(void)
+{
+    printf("pq_test_forward_iter");
+    set s;
+    set_init(&s);
+
+    /* We should have the expected behavior iteration over empty tree. */
+    int j = 0;
+    for (set_elem *e = set_begin(&s); e != set_end(&s);
+         e = set_next(&s, e), ++j)
+    {}
+    if (j != 0)
+    {
+        return false;
+    }
+
+    const int num_nodes = 33;
+    const int prime = 37;
+    struct val vals[num_nodes];
+    size_t shuffled_index = prime % num_nodes;
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        vals[i].val = (int)shuffled_index;
+        vals[i].id = i;
+        set_insert(&s, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&s, val_cmp))
+        {
+            return false;
+        }
+        shuffled_index = (shuffled_index + prime) % num_nodes;
+    }
+    int val_keys_inorder[num_nodes];
+    if (inorder_fill(val_keys_inorder, num_nodes, &s) != set_size(&s))
+    {
+        return false;
+    }
+    j = 0;
+    for (set_elem *e = set_begin(&s); e != set_end(&s) && j < num_nodes;
+         e = set_next(&s, e), ++j)
+    {
+        const struct val *v = set_entry(e, struct val, elem);
+        if (v->val != val_keys_inorder[j])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool
 insert_shuffled(set *s, struct val vals[], const size_t size,
                 const int larger_prime)
 {
@@ -381,6 +440,312 @@ iterator_check(set *s)
         }
     }
     return iter_count == size;
+}
+
+static bool
+set_test_iterate_removal(void)
+{
+    printf("set_test_iterate_removal");
+    set s;
+    set_init(&s);
+    /* Seed the test with any integer for reproducible random test sequence
+       currently this will change every test. NOLINTNEXTLINE */
+    srand(time(NULL));
+    const size_t num_nodes = 1000;
+    struct val vals[num_nodes];
+    for (size_t i = 0; i < num_nodes; ++i)
+    {
+        /* Force duplicates. */
+        vals[i].val = rand() % (num_nodes + 1); // NOLINT
+        vals[i].id = (int)i;
+        set_insert(&s, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&s, val_cmp))
+        {
+            return false;
+        }
+    }
+    if (!iterator_check(&s))
+    {
+        return false;
+    }
+    const int limit = 400;
+    for (set_elem *i = set_begin(&s), *next = i; i != set_end(&s); i = next)
+    {
+        next = set_next(&s, i);
+        struct val *cur = set_entry(i, struct val, elem);
+        if (cur->val > limit)
+        {
+            i = set_erase(&s, i, val_cmp, NULL);
+            if (!validate_tree(&s, val_cmp))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static bool
+set_test_iterate_remove_reinsert(void)
+{
+    printf("set_test_iterate_remove_reinsert");
+    set s;
+    set_init(&s);
+    /* Seed the test with any integer for reproducible random test sequence
+       currently this will change every test. NOLINTNEXTLINE */
+    srand(time(NULL));
+    const size_t num_nodes = 1000;
+    struct val vals[num_nodes];
+    for (size_t i = 0; i < num_nodes; ++i)
+    {
+        /* Force duplicates. */
+        vals[i].val = rand() % (num_nodes + 1); // NOLINT
+        vals[i].id = (int)i;
+        set_insert(&s, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&s, val_cmp))
+        {
+            return false;
+        }
+    }
+    if (!iterator_check(&s))
+    {
+        return false;
+    }
+    const size_t old_size = set_size(&s);
+    const int limit = 400;
+    int new_unique_entry_val = 1001;
+    for (set_elem *i = set_begin(&s), *next = i; i != set_end(&s); i = next)
+    {
+        next = set_next(&s, i);
+        struct val *cur = set_entry(i, struct val, elem);
+        if (cur->val < limit)
+        {
+            i = set_erase(&s, i, val_cmp, NULL);
+            struct val *v = set_entry(i, struct val, elem);
+            v->val = new_unique_entry_val;
+            if (!set_insert(&s, i, val_cmp, NULL))
+            {
+                return false;
+            }
+            if (!validate_tree(&s, val_cmp))
+            {
+                return false;
+            }
+            ++new_unique_entry_val;
+        }
+    }
+    if (set_size(&s) != old_size)
+    {
+        return false;
+    }
+    return true;
+}
+
+static bool
+set_test_valid_range(void)
+{
+    printf("set_test_valid_range");
+    set s;
+    set_init(&s);
+
+    const int num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        set_insert(&s, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&s, val_cmp))
+        {
+            return false;
+        }
+    }
+    struct val b = {.id = 0, .val = 6};
+    struct val e = {.id = 0, .val = 44};
+    /* This should be the following range [6,44). 6 should raise to
+       next value not less than 6, 10 and 44 should be the first
+       value greater than 44, 45. */
+    const int range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    const set_range range
+        = set_equal_range(&s, &b.elem, &e.elem, val_cmp, NULL);
+    if (set_entry(range.begin, struct val, elem)->val != range_vals[0]
+        || set_entry(range.end, struct val, elem)->val != range_vals[7])
+    {
+        return false;
+    }
+    size_t index = 0;
+    set_elem *i1 = range.begin;
+    for (; i1 != range.end; i1 = set_next(&s, i1))
+    {
+        const int cur_val = set_entry(i1, struct val, elem)->val;
+        if (range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i1 != range.end
+        || set_entry(i1, struct val, elem)->val != range_vals[7])
+    {
+        return false;
+    }
+    b.val = 119;
+    e.val = 84;
+    /* This should be the following range [119,84). 119 should be
+       dropped to first value not greater than 119 and last should
+       be dropped to first value less than 84. */
+    const int rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    const set_rrange rev_range
+        = set_equal_rrange(&s, &b.elem, &e.elem, val_cmp, NULL);
+    if (set_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
+        || set_entry(rev_range.end, struct val, elem)->val != rev_range_vals[7])
+    {
+        return false;
+    }
+    index = 0;
+    set_elem *i2 = rev_range.rbegin;
+    for (; i2 != rev_range.end; i2 = set_rnext(&s, i2))
+    {
+        const int cur_val = set_entry(i2, struct val, elem)->val;
+        if (rev_range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i2 != rev_range.end
+        || set_entry(i2, struct val, elem)->val != rev_range_vals[7])
+    {
+        return false;
+    }
+    return true;
+}
+
+static bool
+set_test_invalid_range(void)
+{
+    printf("set_test_invalid_range");
+    set s;
+    set_init(&s);
+
+    const int num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        set_insert(&s, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&s, val_cmp))
+        {
+            return false;
+        }
+    }
+    struct val b = {.id = 0, .val = 95};
+    struct val e = {.id = 0, .val = 999};
+    /* This should be the following range [95,999). 95 should raise to
+       next value not less than 95, 95 and 999 should be the first
+       value greater than 999, none or the end. */
+    const int forward_range_vals[6] = {95, 100, 105, 110, 115, 120};
+    const set_range rev_range
+        = set_equal_range(&s, &b.elem, &e.elem, val_cmp, NULL);
+    if (set_entry(rev_range.begin, struct val, elem)->val
+            != forward_range_vals[0]
+        || rev_range.end != set_end(&s))
+    {
+        return false;
+    }
+    size_t index = 0;
+    set_elem *i1 = rev_range.begin;
+    for (; i1 != rev_range.end; i1 = set_next(&s, i1))
+    {
+        const int cur_val = set_entry(i1, struct val, elem)->val;
+        if (forward_range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i1 != rev_range.end || i1 != set_end(&s))
+    {
+        return false;
+    }
+    b.val = 36;
+    e.val = -999;
+    /* This should be the following range [36,-999). 36 should be
+       dropped to first value not greater than 36 and last should
+       be dropped to first value less than -999 which is end. */
+    const int rev_range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
+    const set_rrange range
+        = set_equal_rrange(&s, &b.elem, &e.elem, val_cmp, NULL);
+    if (set_entry(range.rbegin, struct val, elem)->val != rev_range_vals[0]
+        || range.end != set_end(&s))
+    {
+        return false;
+    }
+    index = 0;
+    set_elem *i2 = range.rbegin;
+    for (; i2 != range.end; i2 = set_rnext(&s, i2))
+    {
+        const int cur_val = set_entry(i2, struct val, elem)->val;
+        if (rev_range_vals[index] != cur_val)
+        {
+            return false;
+        }
+        ++index;
+    }
+    if (i2 != range.end || i2 != set_end(&s))
+    {
+        return false;
+    }
+    return true;
+}
+
+static bool
+set_test_empty_range(void)
+{
+    printf("set_test_empty_range");
+    set s;
+    set_init(&s);
+
+    const int num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        set_insert(&s, &vals[i].elem, val_cmp, NULL);
+        if (!validate_tree(&s, val_cmp))
+        {
+            return false;
+        }
+    }
+    /* Nonexistant range returns end [begin, end) in both positions.
+       which may not be the end element but a value in the tree. However,
+       Normal iteration patterns would consider this empty. */
+    struct val b = {.id = 0, .val = -50};
+    struct val e = {.id = 0, .val = -25};
+    const set_range forward_range
+        = set_equal_range(&s, &b.elem, &e.elem, val_cmp, NULL);
+    if (set_entry(forward_range.begin, struct val, elem)->val != vals[0].val
+        || set_entry(forward_range.end, struct val, elem)->val != vals[0].val)
+    {
+        return false;
+    }
+    b.val = 150;
+    e.val = 999;
+    const set_rrange rev_range
+        = set_equal_rrange(&s, &b.elem, &e.elem, val_cmp, NULL);
+    if (set_entry(rev_range.rbegin, struct val, elem)->val
+            != vals[num_nodes - 1].val
+        || set_entry(rev_range.end, struct val, elem)->val
+               != vals[num_nodes - 1].val)
+    {
+        return false;
+    }
+    return true;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

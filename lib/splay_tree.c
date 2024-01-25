@@ -355,7 +355,7 @@ set_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *cmp,
     return (set_rrange){.rbegin = ret.begin, .end = ret.end};
 }
 
-set_elem *
+const set_elem *
 set_find(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
 {
     return find(s, se, cmp, aux);
