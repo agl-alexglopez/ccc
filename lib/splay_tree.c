@@ -1075,6 +1075,10 @@ force_find_les(const struct node *a, const struct node *b, void *aux)
 
 /* ======================        Debugging           ====================== */
 
+/* Validate binary tree invariants with ranges. Use a recursive method that
+   does not rely upon the implementation of iterators or any other possibly
+   buggy implementation. A pure functional range check will provide the most
+   reliable check regardless of implementation changes throughout code base. */
 struct tree_range
 {
     struct node *low;
