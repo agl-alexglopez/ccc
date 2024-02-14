@@ -1075,6 +1075,13 @@ force_find_les(const struct node *a, const struct node *b, void *aux)
 
 /* ======================        Debugging           ====================== */
 
+struct tree_range
+{
+    struct node *low;
+    struct node *root;
+    struct node *high;
+};
+
 /* This section has recursion so it should probably not be used in
    a custom operating system environment with constrained stack space.
    Needless to mention the stdlib.h heap implementation that would need
@@ -1114,46 +1121,35 @@ recursive_size(struct tree *const t, struct node *r)
 }
 
 static bool
-strict_bound_met(const struct node *prev, enum tree_link dir,
-                 const struct node *root, const struct node *nil,
-                 tree_cmp_fn *cmp)
-{
-    if (root == nil)
-    {
-        return true;
-    }
-    threeway_cmp size_cmp = cmp(root, prev, NULL);
-    if (dir == L && size_cmp != LES)
-    {
-        return false;
-    }
-    if (dir == R && size_cmp != GRT)
-    {
-        return false;
-    }
-    return strict_bound_met(root, L, root->link[L], nil, cmp)
-           && strict_bound_met(root, R, root->link[R], nil, cmp);
-}
-
-static bool
-are_subtrees_valid(const struct node *root, tree_cmp_fn *cmp,
+are_subtrees_valid(const struct tree_range r, tree_cmp_fn *cmp,
                    const struct node *nil)
 {
-    if (root == nil)
+    if (r.root == nil)
     {
         return true;
     }
-    if (root->link[R] == root || root->link[L] == root)
+    if (r.low != nil && cmp(r.root, r.low, NULL) != GRT)
     {
         return false;
     }
-    if (!strict_bound_met(root, L, root->link[L], nil, cmp)
-        || !strict_bound_met(root, R, root->link[R], nil, cmp))
+    if (r.high != nil && cmp(r.root, r.high, NULL) != LES)
     {
         return false;
     }
-    return are_subtrees_valid(root->link[L], cmp, nil)
-           && are_subtrees_valid(root->link[R], cmp, nil);
+    return are_subtrees_valid(
+               (struct tree_range){
+                   .low = r.low,
+                   .root = r.root->link[L],
+                   .high = r.root,
+               },
+               cmp, nil)
+           && are_subtrees_valid(
+               (struct tree_range){
+                   .low = r.root,
+                   .root = r.root->link[R],
+                   .high = r.high,
+               },
+               cmp, nil);
 }
 
 static struct parent_status
@@ -1201,7 +1197,13 @@ is_duplicate_storing_parent(struct tree *const t, const struct node *parent,
 bool
 validate_tree(struct tree *t, tree_cmp_fn *cmp)
 {
-    if (!are_subtrees_valid(t->root, cmp, &t->end))
+    if (!are_subtrees_valid(
+            (struct tree_range){
+                .low = &t->end,
+                .root = t->root,
+                .high = &t->end,
+            },
+            cmp, &t->end))
     {
         return false;
     }
