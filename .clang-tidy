@@ -20,13 +20,15 @@ Checks: >
    -performance-no-int-to-ptr,
    -*-non-private-member-variables-in-classes,
    -*-magic-numbers,
-   -concurrency-*
+   -concurrency-*,
+   -Wpointer-bool-conversion
 
 CheckOptions:
    - { key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals, value: true }
    - { key: readability-identifier-naming.FunctionCase, value: lower_case }
    - { key: readability-identifier-naming.VariableCase, value: lower_case }
    - { key: readability-identifier-naming.EnumCase, value: lower_case }
+   - { key: readability-function-cognitive-complexity.IgnoreMacros, value: true }
    - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
 
 FormatStyle: file

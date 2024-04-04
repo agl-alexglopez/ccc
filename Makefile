@@ -8,16 +8,16 @@ BUILD_DIR := build/
 
 default: build
 
+build:
+	cmake --build $(BUILD_DIR) $(JOBS)
+
 rel:
 	cmake --preset=rel
-	cmake --build $(BUILD_DIR) $(JOBS)
+	$(MAKE) build
 
 deb:
 	cmake --preset=deb
-	cmake --build $(BUILD_DIR) $(JOBS)
-
-build:
-	cmake --build $(BUILD_DIR) $(JOBS)
+	$(MAKE) build
 
 format:
 	cmake --build $(BUILD_DIR) --target format
@@ -25,15 +25,13 @@ format:
 tidy:
 	cmake --build $(BUILD_DIR) --target tidy $(JOBS)
 
-test-rel: build
-	$(BUILD_DIR)rel/pq_tests
-	$(BUILD_DIR)rel/set_tests
-	@echo "Ran RELEASE Tests"
-
 test-deb: build
-	$(BUILD_DIR)deb/pq_tests
-	$(BUILD_DIR)deb/set_tests
-	@echo "Ran DEBUG Tests"
+	$(BUILD_DIR)deb/run_tests $(BUILD_DIR)deb/tests/
+	@echo "RAN TESTS"
+
+test-rel: build
+	$(BUILD_DIR)rel/run_tests $(BUILD_DIR)rel/tests/
+	@echo "RAN TESTS"
 
 clean:
 	rm -rf build/

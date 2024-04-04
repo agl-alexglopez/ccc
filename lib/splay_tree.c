@@ -23,7 +23,6 @@
 #include "set.h"
 #include "tree.h"
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -212,16 +211,30 @@ pq_insert(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 pq_elem *
 pq_erase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
+    (void)fn;
+    (void)aux;
     pq_elem *ret = pq_next(pq, elem);
-    assert(multiset_erase_node(pq, elem, fn, aux) != &pq->end);
+    if (multiset_erase_node(pq, elem, fn, aux) == &pq->end)
+    {
+        (void)fprintf(stderr,
+                      "element that does not exist cannot be erased.\n");
+        return elem;
+    }
     return ret;
 }
 
 pq_elem *
 pq_rerase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
+    (void)fn;
+    (void)aux;
     pq_elem *ret = pq_rnext(pq, elem);
-    assert(multiset_erase_node(pq, elem, fn, aux) != &pq->end);
+    if (multiset_erase_node(pq, elem, fn, aux) == &pq->end)
+    {
+        (void)fprintf(stderr,
+                      "element that does not exist cannot be erased.\n");
+        return elem;
+    }
     return ret;
 }
 
@@ -229,8 +242,12 @@ bool
 pq_update(pqueue *pq, pq_elem *elem, pq_cmp_fn *cmp, pq_update_fn *fn,
           void *aux)
 {
-    assert(NULL != elem->link[L] && NULL != elem->link[R]
-           && NULL != elem->parent_or_dups);
+    if (NULL == elem->link[L] || NULL == elem->link[R]
+        || NULL == elem->parent_or_dups)
+    {
+        (void)fprintf(stderr, "attempting to update removed node.\n");
+        return false;
+    }
     pq_elem *e = multiset_erase_node(pq, elem, cmp, aux);
     if (e == &pq->end)
     {
@@ -467,7 +484,6 @@ set_print(set *s, set_elem *root, set_print_fn *fn)
 static void
 init_tree(struct tree *t)
 {
-    assert(t != NULL);
     t->root = &t->end;
     t->root->parent_or_dups = &t->end;
     t->root->link[L] = &t->end;
@@ -478,8 +494,6 @@ init_tree(struct tree *t)
 static void
 init_node(struct tree *t, struct node *n)
 {
-    assert(n != NULL);
-    assert(t != NULL);
     n->link[L] = &t->end;
     n->link[R] = &t->end;
     n->parent_or_dups = &t->end;
@@ -488,21 +502,18 @@ init_node(struct tree *t, struct node *n)
 static bool
 empty(const struct tree *const t)
 {
-    assert(t != NULL);
     return 0 == t->size;
 }
 
 static struct node *
 root(const struct tree *const t)
 {
-    assert(t != NULL);
     return t->root;
 }
 
 static struct node *
 max(const struct tree *const t)
 {
-    assert(t != NULL);
     struct node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
     {}
@@ -512,7 +523,6 @@ max(const struct tree *const t)
 static struct node *
 min(const struct tree *t)
 {
-    assert(t != NULL);
     struct node *m = t->root;
     for (; m->link[L] != &t->end; m = m->link[L])
     {}
@@ -523,9 +533,6 @@ static struct node *
 const_seek(struct tree *const t, struct node *const n, tree_cmp_fn *cmp,
            void *aux)
 {
-    assert(t != NULL);
-    assert(n != NULL);
-    assert(cmp != NULL);
     struct node *seek = n;
     while (seek != &t->end)
     {
@@ -612,7 +619,13 @@ multiset_next(struct tree *t, struct node *i, const enum tree_link traversal)
 static struct node *
 next(struct tree *t, struct node *n, const enum tree_link traversal)
 {
-    assert(get_parent(t, t->root) == &t->end);
+    if (get_parent(t, t->root) != &t->end)
+    {
+        (void)fprintf(stderr,
+                      "traversal will be broken root parent is not end.\n");
+        return &t->end;
+    }
+
     if (n == &t->end)
     {
         return n;
@@ -669,8 +682,11 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
 static struct node *
 find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    assert(t != NULL);
-    assert(cmp != NULL);
+    if (!t || !elem || !cmp)
+    {
+        (void)fprintf(stderr, "providing NULL to find.\n");
+        return NULL;
+    }
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp, aux);
     return cmp(elem, t->root, NULL) == EQL ? t->root : &t->end;
@@ -679,8 +695,11 @@ find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 static bool
 contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
 {
-    assert(t != NULL);
-    assert(cmp != NULL);
+    if (!t || !dummy_key || !cmp)
+    {
+        (void)fprintf(stderr, "providing NULL to contains.\n");
+        return false;
+    }
     init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, cmp, aux);
     return cmp(dummy_key, t->root, NULL) == EQL;
@@ -689,8 +708,11 @@ contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
 static bool
 insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    assert(t != NULL);
-    assert(cmp != NULL);
+    if (!t || !elem || !cmp)
+    {
+        (void)fprintf(stderr, "providing NULL to insert.\n");
+        return false;
+    }
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp, aux);
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
@@ -705,10 +727,13 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 static void
 multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    assert(t);
+    if (!t || !elem || !cmp)
+    {
+        (void)fprintf(stderr, "providing NULL to multiset insert.\n");
+        return;
+    }
     init_node(t, elem);
     t->size++;
-    assert(t->size != 0);
     if (t->root == &t->end)
     {
         t->root = elem;
@@ -767,11 +792,11 @@ add_duplicate(struct tree *t, struct node *tree_node, struct node *add,
 static struct node *
 erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    assert(t != NULL);
-    assert(elem != NULL);
-    assert(cmp != NULL);
+    if (!t || !elem || !cmp)
+    {
+        (void)fprintf(stderr, "providing NULL args to erase.\n");
+    }
     struct node *ret = splay(t, t->root, elem, cmp, aux);
-    assert(ret != NULL);
     const threeway_cmp found = cmp(elem, ret, NULL);
     if (found != EQL)
     {
@@ -780,7 +805,6 @@ erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     ret = remove_from_tree(t, ret, cmp);
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
     t->size--;
-    assert(t->size != ((size_t)-1));
     return ret;
 }
 
@@ -794,15 +818,17 @@ static struct node *
 multiset_erase_max_or_min(struct tree *t, struct node *tnil,
                           tree_cmp_fn *force_max_or_min)
 {
-    assert(t != NULL);
-    assert(tnil != NULL);
-    assert(force_max_or_min != NULL);
+    if (!t || !tnil || !force_max_or_min)
+    {
+        (void)fprintf(stderr,
+                      "providing NULL args to multiset_erase_max_or_min.\n");
+        return NULL;
+    }
     if (empty(t))
     {
         return &t->end;
     }
     t->size--;
-    assert(t->size != ((size_t)-1));
 
     struct node *ret = splay(t, t->root, tnil, force_max_or_min, NULL);
     if (has_dups(&t->end, ret))
@@ -826,9 +852,10 @@ static struct node *
 multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
                     void *aux)
 {
-    assert(t != NULL);
-    assert(node != NULL);
-    assert(cmp != NULL);
+    if (!t || !node || !cmp)
+    {
+        (void)fprintf(stderr, "providing NULL args to multiset_erase_node.\n");
+    }
     if (empty(t))
     {
         return &t->end;
@@ -839,7 +866,6 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
         return &t->end;
     }
     t->size--;
-    assert(t->size != ((size_t)-1));
     /* Special case that this must be a duplicate that is in the
        linked list but it is not the special head node. So, it
        is a quick snip to get it out. */

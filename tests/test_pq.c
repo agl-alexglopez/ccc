@@ -1,7 +1,7 @@
 #include "pqueue.h"
+#include "test.h"
 #include "tree.h"
 
-#include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -12,8 +12,6 @@
 const char *const pass_msg = "pass";
 const char *const fail_msg = "fail";
 
-typedef bool (*test_fn)(void);
-
 struct val
 {
     int id;
@@ -21,79 +19,66 @@ struct val
     pq_elem elem;
 };
 
-static bool pq_test_empty(void);
-static bool pq_test_insert_one(void);
-static bool pq_test_insert_three(void);
-static bool pq_test_struct_getter(void);
-static bool pq_test_insert_three_dups(void);
-static bool pq_test_insert_remove_four_dups(void);
-static bool pq_test_read_max_min(void);
-static bool pq_test_insert_shuffle(void);
-static bool pq_test_insert_erase_shuffled(void);
-static bool pq_test_pop_max(void);
-static bool pq_test_pop_min(void);
-static bool pq_test_max_round_robin(void);
-static bool pq_test_min_round_robin(void);
-static bool pq_test_delete_prime_shuffle_duplicates(void);
-static bool pq_test_prime_shuffle(void);
-static bool pq_test_weak_srand(void);
-static bool pq_test_forward_iter_unique_vals(void);
-static bool pq_test_forward_iter_all_vals(void);
-static bool pq_test_insert_iterate_pop(void);
-static bool pq_test_priority_update(void);
-static bool pq_test_priority_removal(void);
-static bool pq_test_priority_valid_range(void);
-static bool pq_test_priority_invalid_range(void);
-static bool pq_test_priority_empty_range(void);
+static enum test_result pq_test_empty(void);
+static enum test_result pq_test_insert_one(void);
+static enum test_result pq_test_insert_three(void);
+static enum test_result pq_test_struct_getter(void);
+static enum test_result pq_test_insert_three_dups(void);
+static enum test_result pq_test_insert_remove_four_dups(void);
+static enum test_result pq_test_read_max_min(void);
+static enum test_result pq_test_insert_shuffle(void);
+static enum test_result pq_test_insert_erase_shuffled(void);
+static enum test_result pq_test_pop_max(void);
+static enum test_result pq_test_pop_min(void);
+static enum test_result pq_test_max_round_robin(void);
+static enum test_result pq_test_min_round_robin(void);
+static enum test_result pq_test_delete_prime_shuffle_duplicates(void);
+static enum test_result pq_test_prime_shuffle(void);
+static enum test_result pq_test_weak_srand(void);
+static enum test_result pq_test_forward_iter_unique_vals(void);
+static enum test_result pq_test_forward_iter_all_vals(void);
+static enum test_result pq_test_insert_iterate_pop(void);
+static enum test_result pq_test_priority_update(void);
+static enum test_result pq_test_priority_removal(void);
+static enum test_result pq_test_priority_valid_range(void);
+static enum test_result pq_test_priority_invalid_range(void);
+static enum test_result pq_test_priority_empty_range(void);
 static int run_tests(void);
-static bool insert_shuffled(pqueue *, struct val[], size_t, int);
+static enum test_result insert_shuffled(pqueue *, struct val[], size_t, int);
 static size_t inorder_fill(int vals[], size_t, pqueue *);
-static bool iterator_check(pqueue *);
+static enum test_result iterator_check(pqueue *);
 static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
 static void val_update(pq_elem *a, void *aux);
 static void pq_printer_fn(const pq_elem *e);
 
 #define NUM_TESTS (size_t)24
-const test_fn all_tests[NUM_TESTS] = {
-    pq_test_empty,
-    pq_test_insert_one,
-    pq_test_insert_three,
-    pq_test_struct_getter,
-    pq_test_insert_three_dups,
-    pq_test_insert_remove_four_dups,
-    pq_test_read_max_min,
-    pq_test_insert_shuffle,
-    pq_test_insert_erase_shuffled,
-    pq_test_pop_max,
-    pq_test_pop_min,
-    pq_test_max_round_robin,
-    pq_test_min_round_robin,
-    pq_test_delete_prime_shuffle_duplicates,
-    pq_test_prime_shuffle,
-    pq_test_weak_srand,
-    pq_test_forward_iter_unique_vals,
-    pq_test_forward_iter_all_vals,
-    pq_test_insert_iterate_pop,
-    pq_test_priority_update,
-    pq_test_priority_removal,
-    pq_test_priority_valid_range,
-    pq_test_priority_invalid_range,
-    pq_test_priority_empty_range,
+const struct fn_name all_tests[NUM_TESTS] = {
+    {pq_test_empty, "pq_test_empty"},
+    {pq_test_insert_one, "pq_test_insert_one"},
+    {pq_test_insert_three, "pq_test_insert_three"},
+    {pq_test_struct_getter, "pq_test_struct_getter"},
+    {pq_test_insert_three_dups, "pq_test_insert_three_dups"},
+    {pq_test_insert_remove_four_dups, "pq_test_insert_remove_four_dups"},
+    {pq_test_read_max_min, "pq_test_read_max_min"},
+    {pq_test_insert_shuffle, "pq_test_insert_shuffle"},
+    {pq_test_insert_erase_shuffled, "pq_test_insert_erase_shuffled"},
+    {pq_test_pop_max, "pq_test_pop_max"},
+    {pq_test_pop_min, "pq_test_pop_min"},
+    {pq_test_max_round_robin, "pq_test_max_round_robin"},
+    {pq_test_min_round_robin, "pq_test_min_round_robin"},
+    {pq_test_delete_prime_shuffle_duplicates,
+     "pq_test_delete_prime_shuffle_duplicates"},
+    {pq_test_prime_shuffle, "pq_test_prime_shuffle"},
+    {pq_test_weak_srand, "pq_test_weak_srand"},
+    {pq_test_forward_iter_unique_vals, "pq_test_forward_iter_unique_vals"},
+    {pq_test_forward_iter_all_vals, "pq_test_forward_iter_all_vals"},
+    {pq_test_insert_iterate_pop, "pq_test_insert_iterate_pop"},
+    {pq_test_priority_update, "pq_test_priority_update"},
+    {pq_test_priority_removal, "pq_test_priority_removal"},
+    {pq_test_priority_valid_range, "pq_test_priority_valid_range"},
+    {pq_test_priority_invalid_range, "pq_test_priority_invalid_range"},
+    {pq_test_priority_empty_range, "pq_test_priority_empty_range"},
 };
-
-/* Set this breakpoint on any line where you wish
-   execution to stop. Under normal program runs the program
-   will simply exit. If triggered in GDB execution will stop
-   while able to explore the surrounding context, varialbes,
-   and stack frames. Be sure to step "(gdb) up" out of the
-   raise function to wherever it triggered. */
-#define breakpoint()                                                           \
-    do                                                                         \
-    {                                                                          \
-        (void)fprintf(stderr, "\n!!Break. Line: %d File: %s, Func: %s\n ",     \
-                      __LINE__, __FILE__, __func__);                           \
-        (void)raise(SIGTRAP);                                                  \
-    } while (0)
 
 int
 main()
@@ -104,45 +89,46 @@ main()
 static int
 run_tests(void)
 {
-    printf("\n");
-    size_t pass_count = 0;
+    enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool passed = all_tests[i]();
-        pass_count += passed;
-        passed ? printf("...%s\n", pass_msg) : printf("...%s\n", fail_msg);
+        const bool fail = all_tests[i].fn() == FAIL;
+        if (fail)
+        {
+            res = FAIL;
+            (void)fprintf(stderr, "failure in tests_pq.c: %s\n",
+                          all_tests[i].name);
+        }
     }
-    printf("PASSED %zu/%zu %s\n\n", pass_count, NUM_TESTS,
-           (pass_count == NUM_TESTS) ? "\\(*.*)/\n" : ">:(\n");
-    return 0;
+    return res;
 }
 
-static bool
+static enum test_result
 pq_test_empty(void)
 {
-    printf("pq_test_empty");
     pqueue pq;
     pq_init(&pq);
-    return pq_empty(&pq);
+    CHECK(pq_empty(&pq), true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_one(void)
 {
-    printf("pq_test_insert_one");
     pqueue pq;
     pq_init(&pq);
     struct val single;
     single.val = 0;
     pq_insert(&pq, &single.elem, val_cmp, NULL);
-    return !pq_empty(&pq)
-           && pq_entry(pq_root(&pq), struct val, elem)->val == single.val;
+    CHECK(pq_empty(&pq), false, bool, "%b");
+    CHECK(pq_entry(pq_root(&pq), struct val, elem)->val == single.val, true,
+          bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_three(void)
 {
-    printf("pq_test_insert_three");
     pqueue pq;
     pq_init(&pq);
     struct val three_vals[3];
@@ -150,23 +136,16 @@ pq_test_insert_three(void)
     {
         three_vals[i].val = i;
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
-        const size_t size = i + 1;
-        if (pq_size(&pq) != size)
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
-    return pq_size(&pq) == 3;
+    CHECK(pq_size(&pq), 3, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_struct_getter(void)
 {
-    printf("pq_test_getter_macro");
     pqueue pq;
     pq_init(&pq);
     pqueue pq_tester_clone;
@@ -179,27 +158,21 @@ pq_test_struct_getter(void)
         tester_clone[i].val = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         pq_insert(&pq_tester_clone, &tester_clone[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         const struct val *get
             = pq_entry(&tester_clone[i].elem, struct val, elem);
-        if (get->val != vals[i].val)
-        {
-            return false;
-        }
+        CHECK(get->val, vals[i].val, int, "%d");
     }
-    return pq_size(&pq) == 10;
+    CHECK(pq_size(&pq), 10ULL, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_three_dups(void)
 {
-    printf("pq_test_insert_three_duplicates");
     pqueue pq;
     pq_init(&pq);
     struct val three_vals[3];
@@ -207,23 +180,16 @@ pq_test_insert_three_dups(void)
     {
         three_vals[i].val = 0;
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
-        const size_t size = i + 1;
-        if (pq_size(&pq) != size)
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
-    return pq_size(&pq) == 3;
+    CHECK(pq_size(&pq), 3ULL, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_read_max_min(void)
 {
-    printf("pq_test_read_max_min");
     pqueue pq;
     pq_init(&pq);
     struct val vals[10];
@@ -231,77 +197,44 @@ pq_test_read_max_min(void)
     {
         vals[i].val = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
-        const size_t size = i + 1;
-        if (pq_size(&pq) != size)
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
-    if (10 != pq_size(&pq))
-    {
-        return false;
-    }
+    CHECK(pq_size(&pq), 10ULL, size_t, "%zu");
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
-    if (max->val != 9)
-    {
-        return false;
-    }
+    CHECK(max->val, 9, int, "%d");
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
-    if (min->val != 0)
-    {
-        return false;
-    }
-    return true;
+    CHECK(min->val, 0, int, "%d");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_shuffle(void)
 {
-    printf("pq_test_insert_shuffle");
     pqueue pq;
     pq_init(&pq);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    if (!insert_shuffled(&pq, vals, size, prime))
-    {
-        return false;
-    }
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
+          "%d");
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
-    const size_t max_catch = max->val;
-    if (max_catch != size - 1)
-    {
-        return false;
-    }
+    CHECK(max->val, size - 1, int, "%d");
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
-    if (min->val != 0)
-    {
-        return false;
-    }
+    CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
-    if (inorder_fill(sorted_check, size, &pq) != size)
-    {
-        return false;
-    }
+    CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
     for (size_t i = 0; i < size; ++i)
     {
-        if (vals[i].val != sorted_check[i])
-        {
-            return false;
-        }
+        CHECK(vals[i].val, sorted_check[i], int, "%d");
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_remove_four_dups(void)
 {
-    printf("pq_test_insert_remove_four_duplicates");
     pqueue pq;
     pq_init(&pq);
     struct val three_vals[4];
@@ -309,198 +242,114 @@ pq_test_insert_remove_four_dups(void)
     {
         three_vals[i].val = 0;
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         const size_t size = i + 1;
-        if (pq_size(&pq) != size)
-        {
-            return false;
-        }
+        CHECK(pq_size(&pq), size, size_t, "%zu");
     }
-    if (pq_size(&pq) != 4)
-    {
-        return false;
-    }
+    CHECK(pq_size(&pq), 4, size_t, "%zu");
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         pq_pop_max(&pq);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-    return pq_empty(&pq);
+    CHECK(pq_size(&pq), 0ULL, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_erase_shuffled(void)
 {
-    printf("pq_test_insert_erase_shuffle");
     pqueue pq;
     pq_init(&pq);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    if (!insert_shuffled(&pq, vals, size, prime))
-    {
-        return false;
-    }
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
+          "%d");
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
-    const size_t max_catch = max->val;
-    if (max_catch != size - 1)
-    {
-        return false;
-    }
+    CHECK(max->val, size - 1, int, "%d");
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
-    if (min->val != 0)
-    {
-        return false;
-    }
+    CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
-    if (inorder_fill(sorted_check, size, &pq) != size)
-    {
-        return false;
-    }
+    CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
     for (size_t i = 0; i < size; ++i)
     {
-        if (vals[i].val != sorted_check[i])
-        {
-            return false;
-        }
+        CHECK(vals[i].val, sorted_check[i], int, "%d");
     }
-
     /* Now let's delete everything with no errors. */
-
     for (size_t i = 0; i < size; ++i)
     {
         (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-    if (!pq_empty(&pq))
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_size(&pq), 0ULL, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_pop_max(void)
 {
-    printf("pq_test_pop_max");
     pqueue pq;
     pq_init(&pq);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    if (!insert_shuffled(&pq, vals, size, prime))
-    {
-        return false;
-    }
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
+          "%d");
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
-    const size_t max_catch = max->val;
-    if (max_catch != size - 1)
-    {
-        return false;
-    }
+    CHECK(max->val, size - 1, int, "%d");
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
-    if (min->val != 0)
-    {
-        return false;
-    }
+    CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
-    if (inorder_fill(sorted_check, size, &pq) != size)
-    {
-        return false;
-    }
+    CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
     for (size_t i = 0; i < size; ++i)
     {
-        if (vals[i].val != sorted_check[i])
-        {
-            return false;
-        }
+        CHECK(vals[i].val, sorted_check[i], int, "%d");
     }
-
     /* Now let's pop from the front of the queue until empty. */
-
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
         const struct val *front = pq_entry(pq_pop_max(&pq), struct val, elem);
-        if (front->val != vals[i].val)
-        {
-            return false;
-        }
+        CHECK(front->val, vals[i].val, int, "%d");
     }
-    if (!pq_empty(&pq))
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_empty(&pq), true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_pop_min(void)
 {
-    printf("pq_test_pop_min");
     pqueue pq;
     pq_init(&pq);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
-    if (!insert_shuffled(&pq, vals, size, prime))
-    {
-        return false;
-    }
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
+          "%d");
     const struct val *max = pq_entry(pq_const_max(&pq), struct val, elem);
-    const size_t max_catch = max->val;
-    if (max_catch != size - 1)
-    {
-        return false;
-    }
+    CHECK(max->val, size - 1, int, "%d");
     const struct val *min = pq_entry(pq_const_min(&pq), struct val, elem);
-    if (min->val != 0)
-    {
-        return false;
-    }
+    CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
-    if (inorder_fill(sorted_check, size, &pq) != size)
-    {
-        return false;
-    }
+    CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
     for (size_t i = 0; i < size; ++i)
     {
-        if (vals[i].val != sorted_check[i])
-        {
-            return false;
-        }
+        CHECK(vals[i].val, sorted_check[i], int, "%d");
     }
-
     /* Now let's pop from the front of the queue until empty. */
-
     for (size_t i = 0; i < size; ++i)
     {
         const struct val *front = pq_entry(pq_pop_min(&pq), struct val, elem);
-        if (front->val != vals[i].val)
-        {
-            return false;
-        }
+        CHECK(front->val, vals[i].val, int, "%d");
     }
-    if (!pq_empty(&pq))
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_empty(&pq), true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_max_round_robin(void)
 {
-    printf("pq_test_max_round_robin");
     pqueue pq;
     pq_init(&pq);
     const int size = 50;
@@ -513,30 +362,22 @@ pq_test_max_round_robin(void)
         vals[i].val = 99;
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-
     /* Now let's make sure we pop round robin. */
     int last_id = 0;
     while (!pq_empty(&pq))
     {
         const struct val *front = pq_entry(pq_pop_max(&pq), struct val, elem);
-        if (last_id >= front->id)
-        {
-            return false;
-        }
+        CHECK(last_id < front->id, true, bool, "%b");
         last_id = front->id;
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_min_round_robin(void)
 {
-    printf("pq_test_min_round_robin");
     pqueue pq;
     pq_init(&pq);
     const int size = 50;
@@ -549,30 +390,22 @@ pq_test_min_round_robin(void)
         vals[i].val = 1;
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-
     /* Now let's make sure we pop round robin. */
     int last_id = 0;
     while (!pq_empty(&pq))
     {
         const struct val *front = pq_entry(pq_pop_min(&pq), struct val, elem);
-        if (last_id >= front->id)
-        {
-            return false;
-        }
+        CHECK(last_id < front->id, true, bool, "%b");
         last_id = front->id;
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_delete_prime_shuffle_duplicates(void)
 {
-    printf("pq_test_delete_prime_shuffle_duplicates");
     pqueue pq;
     pq_init(&pq);
     const int size = 99;
@@ -586,15 +419,9 @@ pq_test_delete_prime_shuffle_duplicates(void)
         vals[i].val = shuffled_index;
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         const size_t s = i + 1;
-        if (pq_size(&pq) != s)
-        {
-            return false;
-        }
+        CHECK(pq_size(&pq), s, size_t, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -604,26 +431,18 @@ pq_test_delete_prime_shuffle_duplicates(void)
     for (int i = 0; i < size; ++i)
     {
         (void)pq_erase(&pq, &vals[shuffled_index].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         --cur_size;
-        const size_t cur_get_size = pq_size(&pq);
-        if (cur_get_size != cur_size)
-        {
-            return false;
-        }
+        CHECK(pq_size(&pq), cur_size, size_t, "%zu");
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_prime_shuffle(void)
 {
-    printf("pq_test_prime_shuffle");
     pqueue pq;
     pq_init(&pq);
     const int size = 50;
@@ -638,40 +457,28 @@ pq_test_prime_shuffle(void)
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-
     /* One test can use our printer function as test output */
     pq_print(&pq, pq.root, pq_printer_fn);
-
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(pq_erase(&pq, &vals[i].elem, val_cmp, NULL) != NULL, true, bool,
+              "%b");
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         --cur_size;
-        const size_t cur_get_size = pq_size(&pq);
-        if (cur_get_size != cur_size)
-        {
-            return false;
-        }
+        CHECK(pq_size(&pq), cur_size, size_t, "%zu");
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_weak_srand(void)
 {
-    printf("pq_test_weak_srand");
     pqueue pq;
     pq_init(&pq);
     /* Seed the test with any integer for reproducible randome test sequence
@@ -684,42 +491,28 @@ pq_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        (void)pq_erase(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(pq_erase(&pq, &vals[i].elem, val_cmp, NULL) != NULL, true, bool,
+              "%b");
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-    if (!pq_empty(&pq))
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_empty(&pq), true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_forward_iter_unique_vals(void)
 {
-    printf("pq_test_forward_iter_unique_vals");
     pqueue pq;
     pq_init(&pq);
-
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (pq_elem *e = pq_begin(&pq); e != pq_end(&pq); e = pq_next(&pq, e), ++j)
     {}
-    if (j != 0)
-    {
-        return false;
-    }
-
+    CHECK(j, 0, int, "%d");
     const int num_nodes = 33;
     const int prime = 37;
     struct val vals[num_nodes];
@@ -729,46 +522,32 @@ pq_test_forward_iter_unique_vals(void)
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
-    if (inorder_fill(val_keys_inorder, num_nodes, &pq) != pq_size(&pq))
-    {
-        return false;
-    }
+    CHECK(inorder_fill(val_keys_inorder, num_nodes, &pq), pq_size(&pq), size_t,
+          "%zu");
     j = num_nodes - 1;
     for (pq_elem *e = pq_begin(&pq); e != pq_end(&pq) && j >= 0;
          e = pq_next(&pq, e), --j)
     {
         const struct val *v = pq_entry(e, struct val, elem);
-        if (v->val != val_keys_inorder[j])
-        {
-            return false;
-        }
+        CHECK(v->val, val_keys_inorder[j], int, "%d");
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_forward_iter_all_vals(void)
 {
-    printf("pq_test_forward_iter_all_vals");
     pqueue pq;
     pq_init(&pq);
-
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq); i = pq_next(&pq, i), ++j)
     {}
-    if (j != 0)
-    {
-        return false;
-    }
-
+    CHECK(j, 0, int, "%d");
     const int num_nodes = 33;
     struct val vals[num_nodes];
     vals[0].val = 0; // NOLINT
@@ -783,31 +562,24 @@ pq_test_forward_iter_all_vals(void)
             vals[index].val = val; // NOLINT
             vals[index].id = index;
             pq_insert(&pq, &vals[index].elem, val_cmp, NULL);
-            if (!validate_tree(&pq, val_cmp))
-            {
-                return false;
-            }
+            CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         }
     }
     int val_keys_inorder[num_nodes];
-    inorder_fill(val_keys_inorder, num_nodes, &pq);
+    (void)inorder_fill(val_keys_inorder, num_nodes, &pq);
     j = num_nodes - 1;
     for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq) && j >= 0;
          i = pq_next(&pq, i), --j)
     {
         const struct val *v = pq_entry(i, struct val, elem);
-        if (v->val != val_keys_inorder[j])
-        {
-            return false;
-        }
+        CHECK(v->val, val_keys_inorder[j], int, "%d");
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_insert_iterate_pop(void)
 {
-    printf("pq_test_insert_iterate_pop");
     pqueue pq;
     pq_init(&pq);
     /* Seed the test with any integer for reproducible random test sequence
@@ -821,40 +593,27 @@ pq_test_insert_iterate_pop(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-    if (!iterator_check(&pq))
-    {
-        return false;
-    }
+    CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     size_t pop_count = 0;
     while (!pq_empty(&pq))
     {
         pq_pop_max(&pq);
         ++pop_count;
-        if (!validate_tree(&pq, val_cmp))
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        if (pop_count % 200)
         {
-            return false;
-        }
-        if (pop_count % 200 && !iterator_check(&pq))
-        {
-            return false;
+            CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
         }
     }
-    if (pop_count != num_nodes)
-    {
-        return false;
-    }
-    return true;
+    CHECK(pop_count, num_nodes, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_priority_removal(void)
 {
-    printf("pq_test_priority_removal");
     pqueue pq;
     pq_init(&pq);
     /* Seed the test with any integer for reproducible random test sequence
@@ -868,15 +627,9 @@ pq_test_priority_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-    if (!iterator_check(&pq))
-    {
-        return false;
-    }
+    CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     const int limit = 400;
     for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq);)
     {
@@ -884,23 +637,19 @@ pq_test_priority_removal(void)
         if (cur->val > limit)
         {
             i = pq_erase(&pq, i, val_cmp, NULL);
-            if (!validate_tree(&pq, val_cmp))
-            {
-                return false;
-            }
+            CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
         }
         else
         {
             i = pq_next(&pq, i);
         }
     }
-    return true;
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_priority_update(void)
 {
-    printf("pq_test_priority_update");
     pqueue pq;
     pq_init(&pq);
     /* Seed the test with any integer for reproducible random test sequence
@@ -914,15 +663,9 @@ pq_test_priority_update(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
-    if (!iterator_check(&pq))
-    {
-        return false;
-    }
+    CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     const int limit = 400;
     for (pq_elem *i = pq_begin(&pq); i != pq_end(&pq);)
     {
@@ -931,14 +674,9 @@ pq_test_priority_update(void)
         if (cur->val > limit)
         {
             pq_elem *next = pq_next(&pq, i);
-            if (!pq_update(&pq, i, val_cmp, val_update, &backoff))
-            {
-                return false;
-            }
-            if (!validate_tree(&pq, val_cmp))
-            {
-                return false;
-            }
+            CHECK(pq_update(&pq, i, val_cmp, val_update, &backoff), true, bool,
+                  "%b");
+            CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
             i = next;
         }
         else
@@ -946,17 +684,13 @@ pq_test_priority_update(void)
             i = pq_next(&pq, i);
         }
     }
-    if (pq_size(&pq) != num_nodes)
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_size(&pq), num_nodes, size_t, "%zu");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_priority_valid_range(void)
 {
-    printf("pq_priority_valid_range");
     pqueue pq;
     pq_init(&pq);
 
@@ -968,10 +702,7 @@ pq_test_priority_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -981,27 +712,21 @@ pq_test_priority_valid_range(void)
     const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     const pq_rrange rev_range
         = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    if (pq_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
-        || pq_entry(rev_range.end, struct val, elem)->val != rev_range_vals[7])
-    {
-        return false;
-    }
+    CHECK(pq_entry(rev_range.rbegin, struct val, elem)->val == rev_range_vals[0]
+              && pq_entry(rev_range.end, struct val, elem)->val
+                     == rev_range_vals[7],
+          true, bool, "%b");
     size_t index = 0;
     pq_elem *i1 = rev_range.rbegin;
     for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
     {
         const int cur_val = pq_entry(i1, struct val, elem)->val;
-        if (rev_range_vals[index] != cur_val)
-        {
-            return false;
-        }
+        CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    if (i1 != rev_range.end
-        || pq_entry(i1, struct val, elem)->val != rev_range_vals[7])
-    {
-        return false;
-    }
+    CHECK(i1 == rev_range.end
+              && pq_entry(i1, struct val, elem)->val == rev_range_vals[7],
+          true, bool, "%b");
     b.val = 119;
     e.val = 84;
     /* This should be the following range [119,84). 119 should be
@@ -1010,33 +735,26 @@ pq_test_priority_valid_range(void)
     const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     const struct range range
         = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
-        || pq_entry(range.end, struct val, elem)->val != range_vals[7])
-    {
-        return false;
-    }
+    CHECK(pq_entry(range.begin, struct val, elem)->val == range_vals[0]
+              && pq_entry(range.end, struct val, elem)->val == range_vals[7],
+          true, bool, "%b");
     index = 0;
     pq_elem *i2 = range.begin;
     for (; i2 != range.end; i2 = pq_next(&pq, i2))
     {
         const int cur_val = pq_entry(i2, struct val, elem)->val;
-        if (range_vals[index] != cur_val)
-        {
-            return false;
-        }
+        CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    if (i2 != range.end || pq_entry(i2, struct val, elem)->val != range_vals[7])
-    {
-        return false;
-    }
-    return true;
+    CHECK(i2 == range.end
+              && pq_entry(i2, struct val, elem)->val == range_vals[7],
+          true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_priority_invalid_range(void)
 {
-    printf("pq_test_priotity_invalid_range");
     pqueue pq;
     pq_init(&pq);
 
@@ -1048,10 +766,7 @@ pq_test_priority_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -1061,26 +776,18 @@ pq_test_priority_invalid_range(void)
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
     const pq_rrange rev_range
         = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    if (pq_entry(rev_range.rbegin, struct val, elem)->val != rev_range_vals[0]
-        || rev_range.end != pq_end(&pq))
-    {
-        return false;
-    }
+    CHECK(pq_entry(rev_range.rbegin, struct val, elem)->val == rev_range_vals[0]
+              && rev_range.end == pq_end(&pq),
+          true, bool, "%b");
     size_t index = 0;
     pq_elem *i1 = rev_range.rbegin;
     for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
     {
         const int cur_val = pq_entry(i1, struct val, elem)->val;
-        if (rev_range_vals[index] != cur_val)
-        {
-            return false;
-        }
+        CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    if (i1 != rev_range.end || i1 != pq_end(&pq))
-    {
-        return false;
-    }
+    CHECK(i1 == rev_range.end && i1 == pq_end(&pq), true, bool, "%b");
     b.val = 36;
     e.val = -999;
     /* This should be the following range [36,-999). 36 should be
@@ -1088,33 +795,24 @@ pq_test_priority_invalid_range(void)
        be dropped to first value less than -999 which is end. */
     const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    if (pq_entry(range.begin, struct val, elem)->val != range_vals[0]
-        || range.end != pq_end(&pq))
-    {
-        return false;
-    }
+    CHECK(pq_entry(range.begin, struct val, elem)->val == range_vals[0]
+              && range.end == pq_end(&pq),
+          true, bool, "%b");
     index = 0;
     pq_elem *i2 = range.begin;
     for (; i2 != range.end; i2 = pq_next(&pq, i2))
     {
         const int cur_val = pq_entry(i2, struct val, elem)->val;
-        if (range_vals[index] != cur_val)
-        {
-            return false;
-        }
+        CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    if (i2 != range.end || i2 != pq_end(&pq))
-    {
-        return false;
-    }
-    return true;
+    CHECK(i2 == range.end && i2 == pq_end(&pq), true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 pq_test_priority_empty_range(void)
 {
-    printf("pq_test_priority_empty_range");
     pqueue pq;
     pq_init(&pq);
 
@@ -1126,10 +824,7 @@ pq_test_priority_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        if (!validate_tree(&pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
@@ -1138,24 +833,21 @@ pq_test_priority_empty_range(void)
     struct val e = {.id = 0, .val = -25};
     const pq_rrange rev_range
         = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    if (pq_entry(rev_range.rbegin, struct val, elem)->val != vals[0].val
-        || pq_entry(rev_range.end, struct val, elem)->val != vals[0].val)
-    {
-        return false;
-    }
+    CHECK(pq_entry(rev_range.rbegin, struct val, elem)->val == vals[0].val
+              && pq_entry(rev_range.end, struct val, elem)->val == vals[0].val,
+          true, bool, "%b");
     b.val = 150;
     e.val = 999;
     const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    if (pq_entry(range.begin, struct val, elem)->val != vals[num_nodes - 1].val
-        || pq_entry(range.end, struct val, elem)->val
-               != vals[num_nodes - 1].val)
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_entry(range.begin, struct val, elem)->val
+                  == vals[num_nodes - 1].val
+              && pq_entry(range.end, struct val, elem)->val
+                     == vals[num_nodes - 1].val,
+          true, bool, "%b");
+    return PASS;
 }
 
-static bool
+static enum test_result
 insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
                 const int larger_prime)
 {
@@ -1169,22 +861,12 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
     {
         vals[shuffled_index].val = (int)shuffled_index;
         pq_insert(pq, &vals[shuffled_index].elem, val_cmp, NULL);
-        if (pq_size(pq) != i + 1)
-        {
-            return false;
-        }
-        if (!validate_tree(pq, val_cmp))
-        {
-            return false;
-        }
+        CHECK(pq_size(pq), i + 1, size_t, "%zu");
+        CHECK(validate_tree(pq, val_cmp), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    const size_t catch_size = size;
-    if (pq_size(pq) != catch_size)
-    {
-        return false;
-    }
-    return true;
+    CHECK(pq_size(pq), size, size_t, "%zu");
+    return PASS;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
@@ -1203,7 +885,7 @@ inorder_fill(int vals[], size_t size, pqueue *pq)
     return i;
 }
 
-static bool
+static enum test_result
 iterator_check(pqueue *pq)
 {
     const size_t size = pq_size(pq);
@@ -1211,33 +893,19 @@ iterator_check(pqueue *pq)
     for (pq_elem *e = pq_begin(pq); e != pq_end(pq); e = pq_next(pq, e))
     {
         ++iter_count;
-        if (iter_count == size && !pq_is_min(pq, e))
-        {
-            return false;
-        }
-        if (iter_count != size && pq_is_min(pq, e))
-        {
-            return false;
-        }
+        CHECK(iter_count != size || pq_is_min(pq, e), true, bool, "%b");
+        CHECK(iter_count == size || !pq_is_min(pq, e), true, bool, "%b");
     }
-    if (iter_count != size)
-    {
-        return false;
-    }
+    CHECK(iter_count, size, size_t, "%zu");
     iter_count = 0;
     for (pq_elem *e = pq_rbegin(pq); e != pq_end(pq); e = pq_rnext(pq, e))
     {
         ++iter_count;
-        if (iter_count == size && !pq_is_max(pq, e))
-        {
-            return false;
-        }
-        if (iter_count != size && pq_is_max(pq, e))
-        {
-            return false;
-        }
+        CHECK(iter_count != size || pq_is_max(pq, e), true, bool, "%b");
+        CHECK(iter_count == size || !pq_is_max(pq, e), true, bool, "%b");
     }
-    return iter_count == size;
+    CHECK(iter_count, size, size_t, "%zu");
+    return PASS;
 }
 
 static threeway_cmp
