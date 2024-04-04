@@ -1,7 +1,9 @@
 #include "set.h"
 #include "test.h"
+#include "tree.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -356,13 +358,13 @@ set_test_iterate_removal(void)
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
     const int limit = 400;
-    for (set_elem *i = set_begin(&s), *next = i; i != set_end(&s); i = next)
+    for (set_elem *i = set_begin(&s), *next = NULL; i != set_end(&s); i = next)
     {
         next = set_next(&s, i);
         struct val *cur = set_entry(i, struct val, elem);
         if (cur->val > limit)
         {
-            i = set_erase(&s, i, val_cmp, NULL);
+            (void)set_erase(&s, i, val_cmp, NULL);
             CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
         }
     }
@@ -391,13 +393,13 @@ set_test_iterate_remove_reinsert(void)
     const size_t old_size = set_size(&s);
     const int limit = 400;
     int new_unique_entry_val = 1001;
-    for (set_elem *i = set_begin(&s), *next = i; i != set_end(&s); i = next)
+    for (set_elem *i = set_begin(&s), *next = NULL; i != set_end(&s); i = next)
     {
         next = set_next(&s, i);
         struct val *cur = set_entry(i, struct val, elem);
         if (cur->val < limit)
         {
-            i = set_erase(&s, i, val_cmp, NULL);
+            (void)set_erase(&s, i, val_cmp, NULL);
             struct val *v = set_entry(i, struct val, elem);
             v->val = new_unique_entry_val;
             CHECK(set_insert(&s, i, val_cmp, NULL), true, bool, "%b");
