@@ -682,11 +682,6 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
 static struct node *
 find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    if (!t || !elem || !cmp)
-    {
-        (void)fprintf(stderr, "providing NULL to find.\n");
-        return NULL;
-    }
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp, aux);
     return cmp(elem, t->root, NULL) == EQL ? t->root : &t->end;
@@ -695,11 +690,6 @@ find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 static bool
 contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
 {
-    if (!t || !dummy_key || !cmp)
-    {
-        (void)fprintf(stderr, "providing NULL to contains.\n");
-        return false;
-    }
     init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, cmp, aux);
     return cmp(dummy_key, t->root, NULL) == EQL;
@@ -708,11 +698,6 @@ contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
 static bool
 insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    if (!t || !elem || !cmp)
-    {
-        (void)fprintf(stderr, "providing NULL to insert.\n");
-        return false;
-    }
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp, aux);
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
@@ -727,11 +712,6 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 static void
 multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    if (!t || !elem || !cmp)
-    {
-        (void)fprintf(stderr, "providing NULL to multiset insert.\n");
-        return;
-    }
     init_node(t, elem);
     t->size++;
     if (t->root == &t->end)
@@ -792,10 +772,6 @@ add_duplicate(struct tree *t, struct node *tree_node, struct node *add,
 static struct node *
 erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
-    if (!t || !elem || !cmp)
-    {
-        (void)fprintf(stderr, "providing NULL args to erase.\n");
-    }
     struct node *ret = splay(t, t->root, elem, cmp, aux);
     const threeway_cmp found = cmp(elem, ret, NULL);
     if (found != EQL)
@@ -852,10 +828,6 @@ static struct node *
 multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
                     void *aux)
 {
-    if (!t || !node || !cmp)
-    {
-        (void)fprintf(stderr, "providing NULL args to multiset_erase_node.\n");
-    }
     if (empty(t))
     {
         return &t->end;
