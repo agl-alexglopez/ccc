@@ -11,7 +11,7 @@ target_link_libraries(run_tests PRIVATE str_view test)
 # the test executable in the tests folder either in debug or release
 # depending on the build type. The run_tests program then runs all binaries.
 macro(add_pq_test TEST_NAME)
-  add_executable(${TEST_NAME} ${TEST_NAME}.c)
+  add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME} PRIVATE
     pqueue 
     test
@@ -24,10 +24,13 @@ macro(add_pq_test TEST_NAME)
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
-add_pq_test(test_pq)
+add_pq_test(test_pq_construct)
+add_pq_test(test_pq_insert)
+add_pq_test(test_pq_erase)
+add_pq_test(test_pq_iter)
 
 macro(add_set_test TEST_NAME)
-  add_executable(${TEST_NAME} ${TEST_NAME}.c)
+  add_executable(${TEST_NAME} set/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME} 
     set
     test
@@ -39,6 +42,9 @@ macro(add_set_test TEST_NAME)
   )
 endmacro()
 
-add_set_test(test_set)
+add_set_test(test_set_construct)
+add_set_test(test_set_insert)
+add_set_test(test_set_erase)
+add_set_test(test_set_iter)
 
 

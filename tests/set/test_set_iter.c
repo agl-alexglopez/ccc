@@ -2,15 +2,8 @@
 #include "test.h"
 #include "tree.h"
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
-
-const char *const pass_msg = "pass";
-const char *const fail_msg = "fail";
 
 struct val
 {
@@ -19,37 +12,18 @@ struct val
     set_elem elem;
 };
 
-static enum test_result set_test_empty(void);
-static enum test_result set_test_insert_one(void);
-static enum test_result set_test_insert_three(void);
-static enum test_result set_test_struct_getter(void);
-static enum test_result set_test_insert_shuffle(void);
-static enum test_result set_test_insert_erase_shuffled(void);
-static enum test_result set_test_prime_shuffle(void);
-static enum test_result set_test_weak_srand(void);
 static enum test_result set_test_forward_iter(void);
 static enum test_result set_test_iterate_removal(void);
 static enum test_result set_test_iterate_remove_reinsert(void);
 static enum test_result set_test_valid_range(void);
 static enum test_result set_test_invalid_range(void);
 static enum test_result set_test_empty_range(void);
-static int run_tests(void);
-static enum test_result insert_shuffled(set *, struct val[], size_t, int);
-static size_t inorder_fill(int vals[], size_t, set *);
+static size_t inorder_fill(int[], size_t, set *);
 static enum test_result iterator_check(set *);
-static void set_printer_fn(const set_elem *e);
 static threeway_cmp val_cmp(const set_elem *, const set_elem *, void *);
 
-#define NUM_TESTS ((size_t)14)
+#define NUM_TESTS ((size_t)6)
 const struct fn_name all_tests[NUM_TESTS] = {
-    {set_test_empty, "set_test_empty"},
-    {set_test_insert_one, "set_test_insert_one"},
-    {set_test_insert_three, "set_test_insert_three"},
-    {set_test_struct_getter, "set_test_struct_getter"},
-    {set_test_insert_shuffle, "set_test_insert_shuffle"},
-    {set_test_insert_erase_shuffled, "set_test_insert_erase_shuffled"},
-    {set_test_prime_shuffle, "set_test_prime_shuffle"},
-    {set_test_weak_srand, "set_test_weak_srand"},
     {set_test_forward_iter, "set_test_forward_iter"},
     {set_test_iterate_removal, "set_test_iterate_removal"},
     {set_test_valid_range, "set_test_valid_range"},
@@ -60,12 +34,6 @@ const struct fn_name all_tests[NUM_TESTS] = {
 
 int
 main()
-{
-    return run_tests();
-}
-
-static int
-run_tests(void)
 {
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
@@ -79,181 +47,6 @@ run_tests(void)
         }
     }
     return res;
-}
-static enum test_result
-set_test_empty(void)
-{
-    set s;
-    set_init(&s);
-    CHECK(set_empty(&s), true, bool, "%b");
-    return PASS;
-}
-
-static enum test_result
-set_test_insert_one(void)
-{
-    set s;
-    set_init(&s);
-    struct val single;
-    single.val = 0;
-    CHECK(set_insert(&s, &single.elem, val_cmp, NULL), true, bool, "%b");
-    CHECK(set_empty(&s), false, bool, "%b");
-    CHECK(set_entry(set_root(&s), struct val, elem)->val == single.val, true,
-          bool, "%b");
-    return PASS;
-}
-
-static enum test_result
-set_test_insert_three(void)
-{
-    set s;
-    set_init(&s);
-    struct val three_vals[3];
-    for (int i = 0; i < 3; ++i)
-    {
-        three_vals[i].val = i;
-        CHECK(set_insert(&s, &three_vals[i].elem, val_cmp, NULL), true, bool,
-              "%b");
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-    }
-    CHECK(set_size(&s), 3ULL, size_t, "%zu");
-    return PASS;
-}
-
-static enum test_result
-set_test_struct_getter(void)
-{
-    set s;
-    set_init(&s);
-    set set_tester_clone;
-    set_init(&set_tester_clone);
-    struct val vals[10];
-    struct val tester_clone[10];
-    for (int i = 0; i < 10; ++i)
-    {
-        vals[i].val = i;
-        tester_clone[i].val = i;
-        CHECK(set_insert(&s, &vals[i].elem, val_cmp, NULL), true, bool, "%b");
-        CHECK(
-            set_insert(&set_tester_clone, &tester_clone[i].elem, val_cmp, NULL),
-            true, bool, "%b");
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-        /* Because the getter returns a pointer, if the casting returned
-           misaligned data and we overwrote something we need to compare our
-           get to uncorrupted data. */
-        const struct val *get
-            = set_entry(&tester_clone[i].elem, struct val, elem);
-        CHECK(get->val, vals[i].val, int, "%d");
-    }
-    CHECK(set_size(&s), 10ULL, size_t, "%zu");
-    return PASS;
-}
-
-static enum test_result
-set_test_insert_shuffle(void)
-{
-    set s;
-    set_init(&s);
-    /* Math magic ahead... */
-    const size_t size = 50;
-    const int prime = 53;
-    struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, enum test_result, "%d");
-    int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, size_t, "%zu");
-    for (size_t i = 0; i < size; ++i)
-    {
-        CHECK(vals[i].val, sorted_check[i], int, "%d");
-    }
-    return PASS;
-}
-
-static enum test_result
-set_test_prime_shuffle(void)
-{
-    set s;
-    set_init(&s);
-    const size_t size = 50;
-    const size_t prime = 53;
-    const size_t less = 10;
-    /* We want the tree to have a smattering of duplicates so
-       reduce the shuffle range so it will repeat some values. */
-    size_t shuffled_index = prime % (size - less);
-    struct val vals[size];
-    bool repeats[size];
-    memset(repeats, false, sizeof(bool) * size);
-    for (size_t i = 0; i < size; ++i)
-    {
-        vals[i].val = (int)shuffled_index;
-        vals[i].id = (int)shuffled_index;
-        if (set_insert(&s, &vals[i].elem, val_cmp, NULL))
-        {
-            repeats[i] = true;
-        }
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-        shuffled_index = (shuffled_index + prime) % (size - less);
-    }
-    /* One test can use our printer function as test output */
-    set_print(&s, s.root, set_printer_fn);
-    CHECK(set_size(&s) < size, true, bool, "%b");
-    for (size_t i = 0; i < size; ++i)
-    {
-        const set_elem *elem = set_erase(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(elem != set_end(&s) || !repeats[i], true, bool, "%b");
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-    }
-    return PASS;
-}
-
-static enum test_result
-set_test_insert_erase_shuffled(void)
-{
-    set s;
-    set_init(&s);
-    const size_t size = 50;
-    const int prime = 53;
-    struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, enum test_result, "%d");
-    int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, size_t, "%zu");
-    for (size_t i = 0; i < size; ++i)
-    {
-        CHECK(vals[i].val, sorted_check[i], int, "%d");
-    }
-    /* Now let's delete everything with no errors. */
-    for (size_t i = 0; i < size; ++i)
-    {
-        (void)set_erase(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-    }
-    CHECK(set_empty(&s), true, bool, "%b");
-    return PASS;
-}
-
-static enum test_result
-set_test_weak_srand(void)
-{
-    set s;
-    set_init(&s);
-    /* Seed the test with any integer for reproducible randome test sequence
-       currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
-    const int num_nodes = 1000;
-    struct val vals[num_nodes];
-    for (int i = 0; i < num_nodes; ++i)
-    {
-        vals[i].val = rand(); // NOLINT
-        vals[i].id = i;
-        set_insert(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-    }
-    for (int i = 0; i < num_nodes; ++i)
-    {
-        (void)set_erase(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
-    }
-    CHECK(set_empty(&s), true, bool, "%b");
-    return PASS;
 }
 
 static enum test_result
@@ -289,52 +82,6 @@ set_test_forward_iter(void)
         const struct val *v = set_entry(e, struct val, elem);
         CHECK(v->val, val_keys_inorder[j], int, "%d");
     }
-    return PASS;
-}
-
-static enum test_result
-insert_shuffled(set *s, struct val vals[], const size_t size,
-                const int larger_prime)
-{
-    /* Math magic ahead so that we iterate over every index
-       eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
-       easier to debug if something goes wrong. Think
-       of the prime number as a random seed, kind of. */
-    size_t shuffled_index = larger_prime % size;
-    for (size_t i = 0; i < size; ++i)
-    {
-        vals[shuffled_index].val = (int)shuffled_index;
-        set_insert(s, &vals[shuffled_index].elem, val_cmp, NULL);
-        CHECK(set_size(s), i + 1, size_t, "%zu");
-        CHECK(validate_tree(s, val_cmp), true, bool, "%b");
-        shuffled_index = (shuffled_index + larger_prime) % size;
-    }
-    CHECK(iterator_check(s), PASS, enum test_result, "%d");
-    CHECK(set_size(s), size, size_t, "%zu");
-    return PASS;
-}
-
-static enum test_result
-iterator_check(set *s)
-{
-    const size_t size = set_size(s);
-    size_t iter_count = 0;
-    for (set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
-    {
-        ++iter_count;
-        CHECK(iter_count != size || set_is_max(s, e), true, bool, "%b");
-        CHECK(iter_count == size || !set_is_max(s, e), true, bool, "%b");
-    }
-    CHECK(iter_count, size, size_t, "%zu");
-    iter_count = 0;
-    for (set_elem *e = set_rbegin(s); e != set_end(s); e = set_rnext(s, e))
-    {
-        ++iter_count;
-        CHECK(iter_count != size || set_is_min(s, e), true, bool, "%b");
-        CHECK(iter_count == size || !set_is_min(s, e), true, bool, "%b");
-    }
-    CHECK(iter_count, size, size_t, "%zu");
     return PASS;
 }
 
@@ -590,11 +337,27 @@ inorder_fill(int vals[], size_t size, set *s)
     return i;
 }
 
-static void
-set_printer_fn(const set_elem *const e) // NOLINT
+static enum test_result
+iterator_check(set *s)
 {
-    const struct val *const v = set_entry(e, struct val, elem);
-    printf("{id:%d,val:%d}", v->id, v->val);
+    const size_t size = set_size(s);
+    size_t iter_count = 0;
+    for (set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
+    {
+        ++iter_count;
+        CHECK(iter_count != size || set_is_max(s, e), true, bool, "%b");
+        CHECK(iter_count == size || !set_is_max(s, e), true, bool, "%b");
+    }
+    CHECK(iter_count, size, size_t, "%zu");
+    iter_count = 0;
+    for (set_elem *e = set_rbegin(s); e != set_end(s); e = set_rnext(s, e))
+    {
+        ++iter_count;
+        CHECK(iter_count != size || set_is_min(s, e), true, bool, "%b");
+        CHECK(iter_count == size || !set_is_min(s, e), true, bool, "%b");
+    }
+    CHECK(iter_count, size, size_t, "%zu");
+    return PASS;
 }
 
 static threeway_cmp
