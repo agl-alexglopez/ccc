@@ -18,12 +18,6 @@ enum test_result
 
 typedef enum test_result (*test_fn)(void);
 
-struct fn_name
-{
-    test_fn fn;
-    const char *const name;
-};
-
 /* Set this breakpoint on any line where you wish
    execution to stop. Under normal program runs the program
    will simply exit. If triggered in GDB execution will stop
@@ -50,20 +44,21 @@ struct fn_name
 #define CHECK(RESULT, EXPECTED, TYPE, TYPE_FORMAT_SPECIFIER)                   \
     do                                                                         \
     {                                                                          \
-        const TYPE r_unique_name_macro = RESULT;                               \
-        const TYPE e_unique_name_macro = EXPECTED;                             \
-        if (r_unique_name_macro != e_unique_name_macro)                        \
+        const TYPE _result = RESULT;                                           \
+        const TYPE _expected = EXPECTED;                                       \
+        if (_result != _expected)                                              \
         {                                                                      \
+            (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,    \
+                          __func__, __LINE__);                                 \
             (void)fprintf(stderr,                                              \
-                          CYAN "--\n" GREEN "CHECK: "                          \
-                               "RESULT( %s ) == EXPECTED( %s )" NONE "\n",     \
+                          GREEN "CHECK: "                                      \
+                                "RESULT( %s ) == EXPECTED( %s )" NONE "\n",    \
                           #RESULT, #EXPECTED);                                 \
             (void)fprintf(stderr, RED "ERROR: RESULT( ");                      \
-            (void)fprintf(stderr, TYPE_FORMAT_SPECIFIER, r_unique_name_macro); \
+            (void)fprintf(stderr, TYPE_FORMAT_SPECIFIER, _result);             \
             (void)fprintf(stderr, " ) != EXPECTED( ");                         \
-            (void)fprintf(stderr, TYPE_FORMAT_SPECIFIER, e_unique_name_macro); \
+            (void)fprintf(stderr, TYPE_FORMAT_SPECIFIER, _expected);           \
             (void)fprintf(stderr, " )" CYAN "\n" NONE);                        \
-            (void)fprintf(stderr, CYAN "see line %d\n" NONE, __LINE__);        \
             return FAIL;                                                       \
         }                                                                      \
     } while (0)

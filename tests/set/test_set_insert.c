@@ -20,11 +20,11 @@ static size_t inorder_fill(int vals[], size_t, set *);
 static threeway_cmp val_cmp(const set_elem *, const set_elem *, void *);
 
 #define NUM_TESTS ((size_t)4)
-const struct fn_name all_tests[NUM_TESTS] = {
-    {set_test_insert_one, "set_test_insert_one"},
-    {set_test_insert_three, "set_test_insert_three"},
-    {set_test_struct_getter, "set_test_struct_getter"},
-    {set_test_insert_shuffle, "set_test_insert_shuffle"},
+const test_fn all_tests[NUM_TESTS] = {
+    set_test_insert_one,
+    set_test_insert_three,
+    set_test_struct_getter,
+    set_test_insert_shuffle,
 };
 
 int
@@ -33,12 +33,10 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i].fn() == FAIL;
+        const bool fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
-            (void)fprintf(stderr, "failure in tests_set.c: %s\n",
-                          all_tests[i].name);
         }
     }
     return res;

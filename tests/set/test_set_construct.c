@@ -12,8 +12,8 @@ struct val
 static enum test_result set_test_empty(void);
 
 #define NUM_TESTS ((size_t)1)
-const struct fn_name all_tests[NUM_TESTS] = {
-    {set_test_empty, "set_test_empty"},
+const test_fn all_tests[NUM_TESTS] = {
+    set_test_empty,
 };
 
 int
@@ -22,12 +22,10 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i].fn() == FAIL;
+        const bool fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
-            (void)fprintf(stderr, "failure in tests_set.c: %s\n",
-                          all_tests[i].name);
         }
     }
     return res;

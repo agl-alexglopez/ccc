@@ -23,13 +23,10 @@ static enum test_result iterator_check(set *);
 static threeway_cmp val_cmp(const set_elem *, const set_elem *, void *);
 
 #define NUM_TESTS ((size_t)6)
-const struct fn_name all_tests[NUM_TESTS] = {
-    {set_test_forward_iter, "set_test_forward_iter"},
-    {set_test_iterate_removal, "set_test_iterate_removal"},
-    {set_test_valid_range, "set_test_valid_range"},
-    {set_test_invalid_range, "set_test_invalid_range"},
-    {set_test_empty_range, "set_test_empty_range"},
-    {set_test_iterate_remove_reinsert, "set_test_iterate_remove_reinsert"},
+const test_fn all_tests[NUM_TESTS] = {
+    set_test_forward_iter, set_test_iterate_removal,
+    set_test_valid_range,  set_test_invalid_range,
+    set_test_empty_range,  set_test_iterate_remove_reinsert,
 };
 
 int
@@ -38,12 +35,10 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i].fn() == FAIL;
+        const bool fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
-            (void)fprintf(stderr, "failure in tests_set.c: %s\n",
-                          all_tests[i].name);
         }
     }
     return res;
