@@ -34,6 +34,6 @@ pq_test_empty(void)
 {
     pqueue pq;
     pq_init(&pq);
-    CHECK(pq_empty(&pq), false, bool, "%b");
+    CHECK(pq_empty(&pq), true, bool, "%b");
     return PASS;
 }

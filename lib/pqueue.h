@@ -286,6 +286,8 @@ bool pq_is_min(pqueue *, pq_elem *);
    the root O(1) until another insertion, query, or pop
    occurs. */
 const pq_elem *pq_const_max(const pqueue *);
+/* Read only peek at the min. Does not alter tree and thus
+   is thread safe. */
 const pq_elem *pq_const_min(const pqueue *);
 
 /* Erases a specified element known to be in the queue.

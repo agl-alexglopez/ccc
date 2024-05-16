@@ -588,7 +588,7 @@ next_tree_node(struct tree *t, struct node *head,
         return next(t, parent->link[R], traversal);
     }
     printf("Error! Trapped in the duplicate list.\n");
-    exit(1);
+    return &t->end;
 }
 
 static inline bool
@@ -1073,6 +1073,11 @@ force_find_les(const struct node *a, const struct node *b, void *aux)
 
 /* ======================        Debugging           ====================== */
 
+/* This section has recursion so it should probably not be used in
+   a custom operating system environment with constrained stack space.
+   Needless to mention the stdlib.h heap implementation that would need
+   to be replaced with the custom OS drop in. */
+
 /* Validate binary tree invariants with ranges. Use a recursive method that
    does not rely upon the implementation of iterators or any other possibly
    buggy implementation. A pure functional range check will provide the most
@@ -1083,11 +1088,6 @@ struct tree_range
     struct node *root;
     struct node *high;
 };
-
-/* This section has recursion so it should probably not be used in
-   a custom operating system environment with constrained stack space.
-   Needless to mention the stdlib.h heap implementation that would need
-   to be replaced with the custom OS drop in. */
 
 struct parent_status
 {
