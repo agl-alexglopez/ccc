@@ -6,7 +6,7 @@ struct val
 {
     int id;
     int val;
-    set_elem elem;
+    struct set_elem elem;
 };
 
 static enum test_result set_test_empty(void);
@@ -34,7 +34,7 @@ main()
 static enum test_result
 set_test_empty(void)
 {
-    set s;
+    struct set s;
     set_init(&s);
     CHECK(set_empty(&s), true, bool, "%b");
     return PASS;

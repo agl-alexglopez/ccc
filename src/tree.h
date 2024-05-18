@@ -52,15 +52,13 @@ struct tree
     size_t size;
 };
 
+/* The underlying tree range can serve as both an inorder and reverse
+   inorder traversal. The provided splaytree implementation shall be
+   generic enough to allow the calling API data structures to specify
+   the traversal orders. */
 struct range
 {
     struct node *const begin;
-    struct node *const end;
-};
-
-struct rrange
-{
-    struct node *const rbegin;
     struct node *const end;
 };
 

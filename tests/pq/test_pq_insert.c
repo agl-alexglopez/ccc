@@ -8,7 +8,7 @@ struct val
 {
     int id;
     int val;
-    pq_elem elem;
+    struct pq_elem elem;
 };
 
 static enum test_result pq_test_insert_one(void);
@@ -17,9 +17,11 @@ static enum test_result pq_test_insert_shuffle(void);
 static enum test_result pq_test_struct_getter(void);
 static enum test_result pq_test_insert_three_dups(void);
 static enum test_result pq_test_read_max_min(void);
-static enum test_result insert_shuffled(pqueue *, struct val[], size_t, int);
-static size_t inorder_fill(int[], size_t, pqueue *);
-static threeway_cmp val_cmp(const pq_elem *, const pq_elem *, void *);
+static enum test_result insert_shuffled(struct pqueue *, struct val[], size_t,
+                                        int);
+static size_t inorder_fill(int[], size_t, struct pqueue *);
+static threeway_cmp val_cmp(const struct pq_elem *, const struct pq_elem *,
+                            void *);
 
 #define NUM_TESTS (size_t)6
 const test_fn all_tests[NUM_TESTS] = {
@@ -45,7 +47,7 @@ main()
 static enum test_result
 pq_test_insert_one(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
     struct val single;
     single.val = 0;
@@ -59,14 +61,14 @@ pq_test_insert_one(void)
 static enum test_result
 pq_test_insert_three(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(pq_size(&pq), 3, size_t, "%zu");
@@ -76,9 +78,9 @@ pq_test_insert_three(void)
 static enum test_result
 pq_test_struct_getter(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
-    pqueue pq_tester_clone;
+    struct pqueue pq_tester_clone;
     pq_init(&pq_tester_clone);
     struct val vals[10];
     struct val tester_clone[10];
@@ -88,7 +90,7 @@ pq_test_struct_getter(void)
         tester_clone[i].val = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
         pq_insert(&pq_tester_clone, &tester_clone[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
@@ -103,14 +105,14 @@ pq_test_struct_getter(void)
 static enum test_result
 pq_test_insert_three_dups(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
         pq_insert(&pq, &three_vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(pq_size(&pq), 3ULL, size_t, "%zu");
@@ -118,7 +120,7 @@ pq_test_insert_three_dups(void)
 }
 
 static threeway_cmp
-val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
+val_cmp(const struct pq_elem *a, const struct pq_elem *b, void *aux)
 {
     (void)aux;
     struct val *lhs = pq_entry(a, struct val, elem);
@@ -129,7 +131,7 @@ val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
 static enum test_result
 pq_test_insert_shuffle(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
     /* Math magic ahead... */
     const size_t size = 50;
@@ -153,14 +155,14 @@ pq_test_insert_shuffle(void)
 static enum test_result
 pq_test_read_max_min(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
         pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(pq_size(&pq), 10ULL, size_t, "%zu");
@@ -172,7 +174,7 @@ pq_test_read_max_min(void)
 }
 
 static enum test_result
-insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
+insert_shuffled(struct pqueue *pq, struct val vals[], const size_t size,
                 const int larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -186,7 +188,7 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         pq_insert(pq, &vals[shuffled_index].elem, val_cmp, NULL);
         CHECK(pq_size(pq), i + 1, size_t, "%zu");
-        CHECK(validate_tree(pq, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&pq->t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(pq_size(pq), size, size_t, "%zu");
@@ -195,14 +197,15 @@ insert_shuffled(pqueue *pq, struct val vals[], const size_t size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 static size_t
-inorder_fill(int vals[], size_t size, pqueue *pq)
+inorder_fill(int vals[], size_t size, struct pqueue *pq)
 {
     if (pq_size(pq) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (pq_elem *e = pq_rbegin(pq); e != pq_end(pq); e = pq_rnext(pq, e))
+    for (struct pq_elem *e = pq_rbegin(pq); e != pq_end(pq);
+         e = pq_rnext(pq, e))
     {
         vals[i++] = pq_entry(e, struct val, elem)->val;
     }

@@ -6,7 +6,7 @@ struct val
 {
     int id;
     int val;
-    pq_elem elem;
+    struct pq_elem elem;
 };
 
 static enum test_result pq_test_empty(void);
@@ -32,7 +32,7 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    pqueue pq;
+    struct pqueue pq;
     pq_init(&pq);
     CHECK(pq_empty(&pq), true, bool, "%b");
     return PASS;

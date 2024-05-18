@@ -9,16 +9,18 @@ struct val
 {
     int id;
     int val;
-    set_elem elem;
+    struct set_elem elem;
 };
 
 static enum test_result set_test_insert_erase_shuffled(void);
 static enum test_result set_test_prime_shuffle(void);
 static enum test_result set_test_weak_srand(void);
-static enum test_result insert_shuffled(set *, struct val[], size_t, int);
-static size_t inorder_fill(int[], size_t, set *);
-static threeway_cmp val_cmp(const set_elem *, const set_elem *, void *);
-static void set_printer_fn(const set_elem *);
+static enum test_result insert_shuffled(struct set *, struct val[], size_t,
+                                        int);
+static size_t inorder_fill(int[], size_t, struct set *);
+static threeway_cmp val_cmp(const struct set_elem *, const struct set_elem *,
+                            void *);
+static void set_printer_fn(const struct set_elem *);
 
 #define NUM_TESTS ((size_t)3)
 const test_fn all_tests[NUM_TESTS] = {
@@ -45,7 +47,7 @@ main()
 static enum test_result
 set_test_prime_shuffle(void)
 {
-    set s;
+    struct set s;
     set_init(&s);
     const size_t size = 50;
     const size_t prime = 53;
@@ -64,17 +66,18 @@ set_test_prime_shuffle(void)
         {
             repeats[i] = true;
         }
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&s.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    set_print(&s, s.root, set_printer_fn);
+    set_print(&s, (struct set_elem *)s.t.root, set_printer_fn);
     CHECK(set_size(&s) < size, true, bool, "%b");
     for (size_t i = 0; i < size; ++i)
     {
-        const set_elem *elem = set_erase(&s, &vals[i].elem, val_cmp, NULL);
+        const struct set_elem *elem
+            = set_erase(&s, &vals[i].elem, val_cmp, NULL);
         CHECK(elem != set_end(&s) || !repeats[i], true, bool, "%b");
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&s.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
     }
     return PASS;
 }
@@ -82,7 +85,7 @@ set_test_prime_shuffle(void)
 static enum test_result
 set_test_insert_erase_shuffled(void)
 {
-    set s;
+    struct set s;
     set_init(&s);
     const size_t size = 50;
     const int prime = 53;
@@ -98,7 +101,7 @@ set_test_insert_erase_shuffled(void)
     for (size_t i = 0; i < size; ++i)
     {
         (void)set_erase(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&s.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
     }
     CHECK(set_empty(&s), true, bool, "%b");
     return PASS;
@@ -107,7 +110,7 @@ set_test_insert_erase_shuffled(void)
 static enum test_result
 set_test_weak_srand(void)
 {
-    set s;
+    struct set s;
     set_init(&s);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -119,19 +122,19 @@ set_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         set_insert(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&s.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         (void)set_erase(&s, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&s, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&s.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
     }
     CHECK(set_empty(&s), true, bool, "%b");
     return PASS;
 }
 
 static enum test_result
-insert_shuffled(set *s, struct val vals[], const size_t size,
+insert_shuffled(struct set *s, struct val vals[], const size_t size,
                 const int larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -145,7 +148,7 @@ insert_shuffled(set *s, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         set_insert(s, &vals[shuffled_index].elem, val_cmp, NULL);
         CHECK(set_size(s), i + 1, size_t, "%zu");
-        CHECK(validate_tree(s, val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&s->t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(set_size(s), size, size_t, "%zu");
@@ -153,14 +156,14 @@ insert_shuffled(set *s, struct val vals[], const size_t size,
 }
 
 static size_t
-inorder_fill(int vals[], size_t size, set *s)
+inorder_fill(int vals[], size_t size, struct set *s)
 {
     if (set_size(s) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
+    for (struct set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
     {
         vals[i++] = set_entry(e, struct val, elem)->val;
     }
@@ -168,7 +171,7 @@ inorder_fill(int vals[], size_t size, set *s)
 }
 
 static threeway_cmp
-val_cmp(const set_elem *a, const set_elem *b, void *aux)
+val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
 {
     (void)aux;
     struct val *lhs = set_entry(a, struct val, elem);
@@ -177,7 +180,7 @@ val_cmp(const set_elem *a, const set_elem *b, void *aux)
 }
 
 static void
-set_printer_fn(const set_elem *const e) // NOLINT
+set_printer_fn(const struct set_elem *const e) // NOLINT
 {
     const struct val *const v = set_entry(e, struct val, elem);
     printf("{id:%d,val:%d}", v->id, v->val);

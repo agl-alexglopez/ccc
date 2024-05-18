@@ -104,117 +104,130 @@ static struct node *splay(struct tree *, struct node *, const struct node *,
 /* ======================  Priority Queue Interface  ====================== */
 
 void
-pq_init(pqueue *pq)
+pq_init(struct pqueue *pq)
 {
-    init_tree(pq);
+    init_tree(&pq->t);
 }
 
 bool
-pq_empty(const pqueue *const pq)
+pq_empty(const struct pqueue *const pq)
 {
-    return empty(pq);
+    return empty(&pq->t);
 }
 
-pq_elem *
-pq_root(const pqueue *const pq)
+struct pq_elem *
+pq_root(const struct pqueue *const pq)
 {
-    return root(pq);
+    return (struct pq_elem *)root(&pq->t);
 }
 
-pq_elem *
-pq_max(pqueue *const pq)
+struct pq_elem *
+pq_max(struct pqueue *const pq)
 {
-    return splay(pq, pq->root, &pq->end, force_find_grt, NULL);
+    return (struct pq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
+                                   force_find_grt, NULL);
 }
 
-const pq_elem *
-pq_const_max(const pqueue *const pq)
+const struct pq_elem *
+pq_const_max(const struct pqueue *const pq)
 {
-    return max(pq);
-}
-
-bool
-pq_is_max(pqueue *const pq, pq_elem *const e)
-{
-    return pq_rnext(pq, e) == &pq->end;
-}
-
-pq_elem *
-pq_min(pqueue *const pq)
-{
-    return splay(pq, pq->root, &pq->end, force_find_les, NULL);
-}
-
-const pq_elem *
-pq_const_min(const pqueue *const pq)
-{
-    return min(pq);
+    return (struct pq_elem *)max(&pq->t);
 }
 
 bool
-pq_is_min(pqueue *const pq, pq_elem *const e)
+pq_is_max(struct pqueue *const pq, struct pq_elem *const e)
 {
-    return pq_next(pq, e) == &pq->end;
+    return pq_rnext(pq, e) == (struct pq_elem *)&pq->t.end;
 }
 
-pq_elem *
-pq_begin(pqueue *pq)
+struct pq_elem *
+pq_min(struct pqueue *const pq)
 {
-    return max(pq);
+    return (struct pq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
+                                   force_find_les, NULL);
 }
 
-pq_elem *
-pq_rbegin(pqueue *pq)
+const struct pq_elem *
+pq_const_min(const struct pqueue *const pq)
 {
-    return min(pq);
+    return (struct pq_elem *)min(&pq->t);
 }
 
-pq_elem *
-pq_end(pqueue *pq)
+bool
+pq_is_min(struct pqueue *const pq, struct pq_elem *const e)
 {
-    return &pq->end;
+    return pq_next(pq, e) == (struct pq_elem *)&pq->t.end;
 }
 
-pq_elem *
-pq_next(pqueue *pq, pq_elem *i)
+struct pq_elem *
+pq_begin(struct pqueue *pq)
 {
-    return multiset_next(pq, i, reverse_inorder_traversal);
+    return (struct pq_elem *)max(&pq->t);
 }
 
-pq_elem *
-pq_rnext(pqueue *pq, pq_elem *i)
+struct pq_elem *
+pq_rbegin(struct pqueue *pq)
 {
-    return multiset_next(pq, i, inorder_traversal);
+    return (struct pq_elem *)min(&pq->t);
 }
 
-pq_range
-pq_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp,
-               void *aux)
+struct pq_elem *
+pq_end(struct pqueue *pq)
 {
-    return equal_range(pq, begin, end, cmp, reverse_inorder_traversal, aux);
+    return (struct pq_elem *)&pq->t.end;
 }
 
-pq_rrange
-pq_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *rend, pq_cmp_fn *cmp,
-                void *aux)
+struct pq_elem *
+pq_next(struct pqueue *pq, struct pq_elem *i)
 {
-    pq_range ret = equal_range(pq, rbegin, rend, cmp, inorder_traversal, aux);
-    return (pq_rrange){.rbegin = ret.begin, .end = ret.end};
+    return (struct pq_elem *)multiset_next(&pq->t, &i->n,
+                                           reverse_inorder_traversal);
+}
+
+struct pq_elem *
+pq_rnext(struct pqueue *pq, struct pq_elem *i)
+{
+    return (struct pq_elem *)multiset_next(&pq->t, &i->n, inorder_traversal);
+}
+
+struct pq_range
+pq_equal_range(struct pqueue *pq, struct pq_elem *begin, struct pq_elem *end,
+               pq_cmp_fn *cmp, void *aux)
+{
+    struct range r = equal_range(&pq->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
+                                 reverse_inorder_traversal, aux);
+    return (struct pq_range){
+        .begin = (struct pq_elem *)r.begin,
+        .end = (struct pq_elem *)r.end,
+    };
+}
+
+struct pq_rrange
+pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend,
+                pq_cmp_fn *cmp, void *aux)
+{
+    struct range ret = equal_range(&pq->t, &rbegin->n, &rend->n,
+                                   (tree_cmp_fn *)cmp, inorder_traversal, aux);
+    return (struct pq_rrange){
+        .rbegin = (struct pq_elem *)ret.begin,
+        .end = (struct pq_elem *)ret.end,
+    };
 }
 
 void
-pq_insert(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+pq_insert(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
-    multiset_insert(pq, elem, fn, aux);
+    multiset_insert(&pq->t, &elem->n, (tree_cmp_fn *)fn, aux);
 }
 
-pq_elem *
-pq_erase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+struct pq_elem *
+pq_erase(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
     (void)fn;
     (void)aux;
-    pq_elem *ret = pq_next(pq, elem);
-    if (multiset_erase_node(pq, elem, fn, aux) == &pq->end)
+    struct pq_elem *ret = pq_next(pq, elem);
+    if (multiset_erase_node(&pq->t, &elem->n, (tree_cmp_fn *)fn, aux)
+        == &pq->t.end)
     {
         (void)fprintf(stderr,
                       "element that does not exist cannot be erased.\n");
@@ -223,13 +236,14 @@ pq_erase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
     return ret;
 }
 
-pq_elem *
-pq_rerase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+struct pq_elem *
+pq_rerase(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
     (void)fn;
     (void)aux;
-    pq_elem *ret = pq_rnext(pq, elem);
-    if (multiset_erase_node(pq, elem, fn, aux) == &pq->end)
+    struct pq_elem *ret = pq_rnext(pq, elem);
+    if (multiset_erase_node(&pq->t, &elem->n, (tree_cmp_fn *)fn, aux)
+        == &pq->t.end)
     {
         (void)fprintf(stderr,
                       "element that does not exist cannot be erased.\n");
@@ -239,185 +253,195 @@ pq_rerase(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
 }
 
 bool
-pq_update(pqueue *pq, pq_elem *elem, pq_cmp_fn *cmp, pq_update_fn *fn,
-          void *aux)
+pq_update(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *cmp,
+          pq_update_fn *fn, void *aux)
 {
-    if (NULL == elem->link[L] || NULL == elem->link[R]
-        || NULL == elem->parent_or_dups)
+    if (NULL == elem->n.link[L] || NULL == elem->n.link[R]
+        || NULL == elem->n.parent_or_dups)
     {
         (void)fprintf(stderr, "attempting to update removed node.\n");
         return false;
     }
-    pq_elem *e = multiset_erase_node(pq, elem, cmp, aux);
-    if (e == &pq->end)
+    struct pq_elem *e = (struct pq_elem *)multiset_erase_node(
+        &pq->t, &elem->n, (tree_cmp_fn *)cmp, aux);
+    if (e == (struct pq_elem *)&pq->t.end)
     {
         return false;
     }
     fn(e, aux);
-    multiset_insert(pq, e, cmp, aux);
+    multiset_insert(&pq->t, &e->n, (tree_cmp_fn *)cmp, aux);
     return true;
 }
 
 bool
-pq_contains(pqueue *pq, pq_elem *elem, pq_cmp_fn *fn, void *aux)
+pq_contains(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
-    return contains(pq, elem, fn, aux);
+    return contains(&pq->t, &elem->n, (tree_cmp_fn *)fn, aux);
 }
 
-pq_elem *
-pq_pop_max(pqueue *pq)
+struct pq_elem *
+pq_pop_max(struct pqueue *pq)
 {
-    return pop_max(pq);
+    return (struct pq_elem *)pop_max(&pq->t);
 }
 
-pq_elem *
-pq_pop_min(pqueue *pq)
+struct pq_elem *
+pq_pop_min(struct pqueue *pq)
 {
-    return pop_min(pq);
+    return (struct pq_elem *)pop_min(&pq->t);
 }
 
 size_t
-pq_size(pqueue *const pq)
+pq_size(struct pqueue *const pq)
 {
-    return pq->size;
+    return pq->t.size;
 }
 
 bool
-pq_has_dups(pqueue *const pq, pq_elem *e)
+pq_has_dups(struct pqueue *const pq, struct pq_elem *e)
 {
-    return has_dups(&pq->end, e);
+    return has_dups(&pq->t.end, &e->n);
 }
 
 void
-pq_print(pqueue *pq, pq_elem *start, pq_print_fn *fn)
+pq_print(struct pqueue *pq, struct pq_elem *start, pq_print_fn *fn)
 {
-    print_tree(pq, start, fn);
+    print_tree(&pq->t, &start->n, (node_print_fn *)fn);
 }
 
 /* ======================        Set Interface       ====================== */
 
 void
-set_init(set *s)
+set_init(struct set *s)
 {
-    init_tree(s);
+    init_tree(&s->t);
 }
 
 bool
-set_empty(set *s)
+set_empty(struct set *s)
 {
-    return empty(s);
+    return empty(&s->t);
 }
 
 size_t
-set_size(set *s)
+set_size(struct set *s)
 {
-    return s->size;
+    return s->t.size;
 }
 
 bool
-set_contains(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+set_contains(struct set *s, struct set_elem *se, set_cmp_fn *cmp, void *aux)
 {
-    return contains(s, se, cmp, aux);
+    return contains(&s->t, &se->n, (tree_cmp_fn *)cmp, aux);
 }
 
 bool
-set_insert(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+set_insert(struct set *s, struct set_elem *se, set_cmp_fn *cmp, void *aux)
 {
-    return insert(s, se, cmp, aux);
+    return insert(&s->t, &se->n, (tree_cmp_fn *)cmp, aux);
 }
 
-set_elem *
-set_begin(set *s)
+struct set_elem *
+set_begin(struct set *s)
 {
-    return min(s);
+    return (struct set_elem *)min(&s->t);
 }
 
-set_elem *
-set_rbegin(set *s)
+struct set_elem *
+set_rbegin(struct set *s)
 {
-    return max(s);
+    return (struct set_elem *)max(&s->t);
 }
 
-set_elem *
-set_end(set *s)
+struct set_elem *
+set_end(struct set *s)
 {
-    return end(s);
+    return (struct set_elem *)end(&s->t);
 }
 
-set_elem *
-set_next(set *s, set_elem *e)
+struct set_elem *
+set_next(struct set *s, struct set_elem *e)
 {
-    return next(s, e, inorder_traversal);
+    return (struct set_elem *)next(&s->t, &e->n, inorder_traversal);
 }
 
-set_elem *
-set_rnext(set *s, set_elem *e)
+struct set_elem *
+set_rnext(struct set *s, struct set_elem *e)
 {
-    return next(s, e, reverse_inorder_traversal);
+    return (struct set_elem *)next(&s->t, &e->n, reverse_inorder_traversal);
 }
 
-set_range
-set_equal_range(pqueue *pq, pq_elem *begin, pq_elem *end, pq_cmp_fn *cmp,
-                void *aux)
+struct set_range
+set_equal_range(struct set *s, struct set_elem *begin, struct set_elem *end,
+                set_cmp_fn *cmp, void *aux)
 {
-    return equal_range(pq, begin, end, cmp, inorder_traversal, aux);
+    struct range r = equal_range(&s->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
+                                 inorder_traversal, aux);
+    return (struct set_range){
+        .begin = (struct set_elem *)r.begin,
+        .end = (struct set_elem *)r.end,
+    };
 }
 
-set_rrange
-set_equal_rrange(pqueue *pq, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *cmp,
-                 void *aux)
+struct set_rrange
+set_equal_rrange(struct set *s, struct set_elem *rbegin, struct set_elem *end,
+                 set_cmp_fn *cmp, void *aux)
 {
-    set_range ret
-        = equal_range(pq, rbegin, end, cmp, reverse_inorder_traversal, aux);
-    return (set_rrange){.rbegin = ret.begin, .end = ret.end};
+    struct range r = equal_range(&s->t, &rbegin->n, &end->n, (tree_cmp_fn *)cmp,
+                                 reverse_inorder_traversal, aux);
+    return (struct set_rrange){
+        .rbegin = (struct set_elem *)r.begin,
+        .end = (struct set_elem *)r.end,
+    };
 }
 
-const set_elem *
-set_find(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+const struct set_elem *
+set_find(struct set *s, struct set_elem *se, set_cmp_fn *cmp, void *aux)
 {
-    return find(s, se, cmp, aux);
+    return (struct set_elem *)find(&s->t, &se->n, (tree_cmp_fn *)cmp, aux);
 }
 
-set_elem *
-set_erase(set *s, set_elem *se, set_cmp_fn *cmp, void *aux)
+struct set_elem *
+set_erase(struct set *s, struct set_elem *se, set_cmp_fn *cmp, void *aux)
 {
-    return erase(s, se, cmp, aux);
-}
-
-bool
-set_const_contains(set *s, set_elem *e, set_cmp_fn *cmp, void *aux)
-{
-    return const_seek(s, e, cmp, aux) != &s->end;
-}
-
-bool
-set_is_min(set *s, set_elem *e)
-{
-    return set_rnext(s, e) == &s->end;
+    return (struct set_elem *)erase(&s->t, &se->n, (tree_cmp_fn *)cmp, aux);
 }
 
 bool
-set_is_max(set *s, set_elem *e)
+set_const_contains(struct set *s, struct set_elem *e, set_cmp_fn *cmp,
+                   void *aux)
 {
-    return set_next(s, e) == &s->end;
+    return const_seek(&s->t, &e->n, (tree_cmp_fn *)cmp, aux) != &s->t.end;
 }
 
-const set_elem *
-set_const_find(set *s, set_elem *e, set_cmp_fn *cmp, void *aux)
+bool
+set_is_min(struct set *s, struct set_elem *e)
 {
-    return const_seek(s, e, cmp, aux);
+    return set_rnext(s, e) == (struct set_elem *)&s->t.end;
 }
 
-set_elem *
-set_root(const set *const s)
+bool
+set_is_max(struct set *s, struct set_elem *e)
 {
-    return root(s);
+    return set_next(s, e) == (struct set_elem *)&s->t.end;
+}
+
+const struct set_elem *
+set_const_find(struct set *s, struct set_elem *e, set_cmp_fn *cmp, void *aux)
+{
+    return (struct set_elem *)const_seek(&s->t, &e->n, (tree_cmp_fn *)cmp, aux);
+}
+
+struct set_elem *
+set_root(const struct set *const s)
+{
+    return (struct set_elem *)root(&s->t);
 }
 
 void
-set_print(set *s, set_elem *root, set_print_fn *fn)
+set_print(struct set *s, struct set_elem *root, set_print_fn *fn)
 {
-    print_tree(s, root, fn);
+    print_tree(&s->t, &root->n, (node_print_fn *)fn);
 }
 
 /* ===========    Splay Tree Multiset and Set Implementations    ===========
@@ -578,7 +602,7 @@ next_tree_node(struct tree *t, struct node *head,
     {
         return next(t, t->root, traversal);
     }
-    const pq_elem *parent = head->parent_or_dups;
+    const struct node *parent = head->parent_or_dups;
     if (parent->link[L] != &t->end && parent->link[L]->parent_or_dups == head)
     {
         return next(t, parent->link[L], traversal);
