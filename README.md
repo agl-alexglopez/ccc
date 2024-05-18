@@ -71,18 +71,23 @@ This repository contains various data structures supported by a no heap splay tr
                    *   *     *     -*-*-*-*-*
                                    |_________|
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* An element stored in a priority queue with Round Robin
    fairness if a duplicate. */
-typedef struct node pq_elem;
+struct pq_elem
+{
+    struct node n;
+};
 
 /* A priority queue that offers all of the expected operations
    of a priority queue with the additional benefits of an
    iterator and removal by node id if you remember your
    values that are present in the queue. */
-typedef struct tree pqueue;
+struct pqueue
+{
+    struct tree t;
+};
 
 /* ===================   Comparisons  ==========================
 
@@ -125,8 +130,7 @@ typedef struct tree pqueue;
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* A comparison function that returns one of the threeway comparison
    values. To use this data structure you must be able to determine
@@ -141,7 +145,26 @@ typedef struct tree pqueue;
 
    The compare function one must provide to perform queries
    and other operations on the priority queue. See above. */
-typedef tree_cmp_fn pq_cmp_fn;
+typedef threeway_cmp pq_cmp_fn(const struct pq_elem *key,
+                               const struct pq_elem *n, void *aux);
+
+/* Define a function to use printf for your custom struct type.
+   For example:
+      struct val
+      {
+         int val;
+         struct pq_elem elem;
+      };
+
+      void print_my_val(struct pq_elem *elem)
+      {
+         const struct val *v = pq_entry(elem, struct val, elem);
+         printf("{%d}", v->val);
+      }
+
+   Output should be one line with no newline character. Then,
+   the printer function will take care of the rest. */
+typedef void pq_print_fn(const struct pq_elem *);
 
 /* Update priorities with a function that modifies the field
    you are using to store priorities and compare them with
@@ -153,7 +176,7 @@ typedef tree_cmp_fn pq_cmp_fn;
           pq_elem elem;
       };
 
-      static pqueue pq;
+      static struct pqueue pq;
 
       static void
       priority_update(const pq_elem *a, void *new_val)
@@ -183,19 +206,58 @@ typedef tree_cmp_fn pq_cmp_fn;
    The above should be well defined because the user determines
    how to cast the auxiliary data themselves based on the types
    they are implementing, but care should be taking when casting
-   from void nonetheless.
-*/
-typedef void pq_update_fn(pq_elem *, void *aux);
+   from void nonetheless. */
+typedef void pq_update_fn(struct pq_elem *, void *aux);
 
-/* How to obtain the struct that embeds the pq_elem. For example:
+/* A container for a simple begin and end pointer to a struct pq_elem.
+
+      pq_range
+      {
+         struct pq_elem *begin;
+         struct pq_elem *end;
+      };
+
+   A user can use the equal_range or equal_rrange function to
+   fill the pq_range with the expected begin and end queries.
+   The default range in a priority queue is descending order.
+   A pq_range has no sense of iterator directionality and
+   provides two typedefs simpy as a reminder to the programmer
+   to use the appropriate next function. Use next for a
+   pq_range and rnext for a pq_rrange. Otherwise, indefinite
+   loops may occur. */
+struct pq_range
+{
+    struct pq_elem *begin;
+    struct pq_elem *end;
+};
+
+/* The reverse range container for queries performed with
+   requal_range.
+
+      pq_rrange
+      {
+         struct pq_elem *rbegin;
+         struct pq_elem *end;
+      };
+
+   Be sure to use the rnext function to progress the iterator
+   in this type of range. */
+struct pq_rrange
+{
+    struct pq_elem *rbegin;
+    struct pq_elem *end;
+};
+
+/* How to obtain the struct that embeds the struct pq_elem. For example:
 
       struct val
       {
           int val;
-          pq_elem elem;
+          struct pq_elem elem;
       };
 
-      for (pq_elem *e = pq_begin(pq); e != pq_end(pq); e = pq_next(pq, e))
+      for (struct pq_elem *e = pq_begin(pq); e != pq_end(pq); e = pq_next(pq,
+   e))
       {
           struct val *my_val = pq_entry(e, struct val, elem);
           printf("%d\n", my_val->val);
@@ -205,25 +267,25 @@ typedef void pq_update_fn(pq_elem *, void *aux);
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
 #define pq_entry(PQ_ELEM, STRUCT, MEMBER)                                      \
-    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->parent_or_dups                          \
-                - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
+    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->n.parent_or_dups                        \
+                - offsetof(STRUCT, MEMBER.n.parent_or_dups))) /* NOLINT */
 
 /* Initializes and empty queue with size 0. */
-void pq_init(pqueue *);
+void pq_init(struct pqueue *);
 
 /* Checks if the priority queue is empty. Undefined if
    pq_init has not been called first. */
-bool pq_empty(const pqueue *);
+bool pq_empty(const struct pqueue *);
 /* O(1) */
-size_t pq_size(pqueue *);
+size_t pq_size(struct pqueue *);
 
-/* Inserts the given pq_elem into an initialized pqueue
-   any data in the pq_elem member will be overwritten
-   The pq_elem must not already be in the queue or the
+/* Inserts the given struct pq_elem into an initialized struct pqueue
+   any data in the struct pq_elem member will be overwritten
+   The struct pq_elem must not already be in the queue or the
    behavior is undefined. Priority queue insertion
    shall not fail becuase priority queues support
    round robin duplicates. O(lgN) */
-void pq_insert(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+void pq_insert(struct pqueue *, struct pq_elem *, pq_cmp_fn *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
@@ -237,9 +299,9 @@ void pq_insert(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    the tree it is considered new and returns to the back
    of the queue of duplicates. Returns the end element if
    the queue is empty. */
-pq_elem *pq_pop_max(pqueue *);
+struct pq_elem *pq_pop_max(struct pqueue *);
 /* Same promises as pop_max except for the minimum values. */
-pq_elem *pq_pop_min(pqueue *);
+struct pq_elem *pq_pop_min(struct pqueue *);
 
 /* Reports the maximum priority element in the queue, drawing
    it to the root via splay operations. This, is a good
@@ -248,19 +310,19 @@ pq_elem *pq_pop_min(pqueue *);
    subsequent calls. This can be especially beneficial if
    multiple elements are tied for the max in round robin
    as all duplicates will be popped in O(1) time. */
-pq_elem *pq_max(pqueue *);
-/* Same promises as the max except for the minimum pq_elem */
-pq_elem *pq_min(pqueue *);
+struct pq_elem *pq_max(struct pqueue *);
+/* Same promises as the max except for the minimum struct pq_elem */
+struct pq_elem *pq_min(struct pqueue *);
 
 /* If elem is already max this check is O(lgN) as the worst
    case. If not, O(1). However, if multiple  pops have occured
    the max will be close to the root. */
-bool pq_is_max(pqueue *, pq_elem *);
+bool pq_is_max(struct pqueue *, struct pq_elem *);
 
 /* If the element is already min this check is O(lgN) as the worst
    case. If not, O(1). However, if multiple  pops have occured
    the max will be close to the root. */
-bool pq_is_min(pqueue *, pq_elem *);
+bool pq_is_min(struct pqueue *, struct pq_elem *);
 
 /* Read only peek at the max and min these operations do
    not modify the tree so multiple threads could call them
@@ -270,8 +332,10 @@ bool pq_is_min(pqueue *, pq_elem *);
    and it has duplicates those duplicates will remain at
    the root O(1) until another insertion, query, or pop
    occurs. */
-const pq_elem *pq_const_max(const pqueue *);
-const pq_elem *pq_const_min(const pqueue *);
+const struct pq_elem *pq_const_max(const struct pqueue *);
+/* Read only peek at the min. Does not alter tree and thus
+   is thread safe. */
+const struct pq_elem *pq_const_min(const struct pqueue *);
 
 /* Erases a specified element known to be in the queue.
    Returns the element that follows the previous value
@@ -281,11 +345,13 @@ const pq_elem *pq_const_min(const pqueue *);
    the erased. O(lgN). However, in practice you can often
    benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
-pq_elem *pq_erase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+struct pq_elem *pq_erase(struct pqueue *, struct pq_elem *, pq_cmp_fn *,
+                         void *);
 
 /* The same as erase but returns the next element in an
    ascending priority order. */
-pq_elem *pq_rerase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
+struct pq_elem *pq_rerase(struct pqueue *, struct pq_elem *, pq_cmp_fn *,
+                          void *);
 
 /* Updates the specified elem known to be in the queue with
    a new priority in O(lgN) time. Because an update does not
@@ -298,7 +364,8 @@ pq_elem *pq_rerase(pqueue *, pq_elem *, pq_cmp_fn *, void *);
    an element could not be found to be in the queue. Insert
    does not fail in a priority queue. See the iteration section
    for a pattern that might work if updating while iterating. */
-bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
+bool pq_update(struct pqueue *, struct pq_elem *, pq_cmp_fn *, pq_update_fn *,
+               void *);
 
 /* Returns true if this priority value is in the queue.
    you need not search with any specific struct you have
@@ -308,10 +375,10 @@ bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
       struct priority
       {
          int priority;
-         pq_elem elem;
+         struct pq_elem elem;
       };
 
-      static pqueue pq;
+      static struct pqueue pq;
 
       bool
       has_priority(int priority)
@@ -330,38 +397,7 @@ bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
    This can be helpful if you need to know if such a priority
    is present regardless of how many round robin duplicates
    are present. Returns the result in O(lgN). */
-bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
-
-/* A container for a simple begin and end pointer to a pq_elem.
-
-      pq_range
-      {
-         pq_elem *begin;
-         pq_elem *end;
-      };
-
-   A user can use the equal_range or equal_rrange function to
-   fill the pq_range with the expected begin and end queries.
-   The default range in a priority queue is descending order.
-   A pq_range has no sense of iterator directionality and
-   provides two typedefs simpy as a reminder to the programmer
-   to use the appropriate next function. Use next for a
-   pq_range and rnext for a pq_rrange. Otherwise, indefinite
-   loops may occur. */
-typedef struct range pq_range;
-
-/* The reverse range container for queries performed with
-   requal_range.
-
-      pq_rrange
-      {
-         pq_elem *rbegin;
-         pq_elem *end;
-      };
-
-   Be sure to use the rnext function to progress the iterator
-   in this type of range.*/
-typedef struct rrange pq_rrange;
+bool pq_contains(struct pqueue *, struct pq_elem *, pq_cmp_fn *, void *);
 
 /* ===================    Iteration   ==========================
 
@@ -371,10 +407,10 @@ typedef struct rrange pq_rrange;
    struct val
    {
       int val;
-      pq_elem elem;
+      struct pq_elem elem;
    };
 
-   static pqueue q;
+   static struct pqueue q;
 
    int
    main ()
@@ -383,11 +419,11 @@ typedef struct rrange pq_rrange;
 
       ...Fill the container with program logic...
 
-      for (pq_elem *i = pq_begin(&q); i != pq_end(&q, i); )
+      for (struct pq_elem *i = pq_begin(&q); i != pq_end(&q, i); )
       {
          if (meets_criteria(i))
          {
-            pq_elem *next = pq_next(&q, i);
+            struct pq_elem *next = pq_next(&q, i);
             int update = generate_updated_priority(i);
             if (!pq_update(&q, i, val_cmp,  val_updater, &update))
             {
@@ -410,17 +446,16 @@ typedef struct rrange pq_rrange;
    queue the longest is visited first regardless of ascending
    or descending key order.
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* Returns the maximum priority element if present and end
    if the queue is empty. By default iteration is in descending
    order by priority. Equal to end if empty. */
-pq_elem *pq_begin(pqueue *);
+struct pq_elem *pq_begin(struct pqueue *);
 /* Returns the minimum priority element if present and end
    if the queue is empty. This is an ascending traversal
    starting point. Equal to end if empty. */
-pq_elem *pq_rbegin(pqueue *);
+struct pq_elem *pq_rbegin(struct pqueue *);
 
 /* Progresses through the queue in order of highest priority by
    default. Use the reverse order iterator if you prefer ascending
@@ -429,9 +464,9 @@ pq_elem *pq_rbegin(pqueue *);
    visit duplicates in round robin order meaning oldest first so
    that priorities can be organized round robin either ascending
    or descending and visitation is fair. */
-pq_elem *pq_next(pqueue *, pq_elem *);
+struct pq_elem *pq_next(struct pqueue *, struct pq_elem *);
 /* Progresses through the queue in ascending order */
-pq_elem *pq_rnext(pqueue *, pq_elem *);
+struct pq_elem *pq_rnext(struct pqueue *, struct pq_elem *);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -443,7 +478,7 @@ pq_elem *pq_rnext(pqueue *, pq_elem *);
       struct val e = {.id = 0, .val = 64};
       struct val b = {.id = 0, .val = 35};
       const pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp);
-      for (pq_elem *i = range.begin; i != range.end; i = pq_next(&pq, i))
+      for (struct pq_elem *i = range.begin; i != range.end; i = pq_next(&pq, i))
       {
           const int cur_val = pq_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
@@ -452,8 +487,8 @@ pq_elem *pq_rnext(pqueue *, pq_elem *);
    Use the next iterator from begin to end. If there are no values NOT GREATER
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, end is returned as end element. */
-pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *,
-                        void *aux);
+struct pq_range pq_equal_range(struct pqueue *, struct pq_elem *begin,
+                               struct pq_elem *end, pq_cmp_fn *, void *aux);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -465,7 +500,8 @@ pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *,
       struct val e = {.id = 0, .val = 35};
       struct val b = {.id = 0, .val = 64};
       const pq_rrange range = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp);
-      for (pq_elem *i = range.rbegin; i != range.end; i = pq_rnext(&pq, i))
+      for (struct pq_elem *i = range.rbegin; i != range.end; i = pq_rnext(&pq,
+   i))
       {
           const int cur_val = pq_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
@@ -474,46 +510,27 @@ pq_range pq_equal_range(pqueue *, pq_elem *begin, pq_elem *end, pq_cmp_fn *,
    Use the next iterator from begin to end. If there are no values NOT LESS
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, end is returned as end element. */
-pq_rrange pq_equal_rrange(pqueue *, pq_elem *rbegin, pq_elem *end, pq_cmp_fn *,
-                          void *aux);
+struct pq_rrange pq_equal_rrange(struct pqueue *, struct pq_elem *rbegin,
+                                 struct pq_elem *end, pq_cmp_fn *, void *aux);
 
 /* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end
    is reached. The end is same for any iteration order. */
-pq_elem *pq_end(pqueue *);
+struct pq_elem *pq_end(struct pqueue *);
 
 /* To view the underlying tree like structure of the priority queue
-   for debugging or other purposes, provide the root of the pqueue
-   to the pq_print function as the starting pq_elem. */
-pq_elem *pq_root(const pqueue *);
-
-/* Define a function to use printf for your custom struct type.
-   For example:
-      struct val
-      {
-         int val;
-         pq_elem elem;
-      };
-
-      void print_my_val(pq_elem *elem)
-      {
-         const struct val *v = pq_entry(elem, struct val, elem);
-         printf("{%d}", v->val);
-      }
-
-   Output should be one line with no newline character. Then,
-   the printer function will take care of the rest. */
-typedef node_print_fn pq_print_fn;
+   for debugging or other purposes, provide the root of the struct pqueue
+   to the pq_print function as the starting struct pq_elem. */
+struct pq_elem *pq_root(const struct pqueue *);
 
 /* Prints a tree structure of the underlying queu for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void pq_print(pqueue *, pq_elem *, pq_print_fn *);
+void pq_print(struct pqueue *, struct pq_elem *, pq_print_fn *);
 
-/*
-      (40){id:10,val:10}{id:10,val:10}(+1)
+/* (40){id:10,val:10}{id:10,val:10}(+1)
     ├──(29)R:{id:27,val:27}
     │   ├──(12)R:{id:37,val:37}{id:37,val:37}(+1)
     │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}(+1)
@@ -686,17 +703,22 @@ void pq_print(pqueue *, pq_elem *, pq_print_fn *);
    for the lifetime of the program which is your
    responsibility.
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* An embedded set data structure for storage and retrieval
    of sorted unique elements for duplicate storage see
    priority queue or multiset */
-typedef struct tree set;
+struct set
+{
+    struct tree t;
+};
 
 /* The element embedded withing a struct that is used to
    store, search, and retrieve data in the tree. */
-typedef struct node set_elem;
+struct set_elem
+{
+    struct node n;
+};
 
 /* ===================   Comparisons  ==========================
 
@@ -739,9 +761,9 @@ typedef struct node set_elem;
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-   =============================================================
-*/
-typedef tree_cmp_fn set_cmp_fn;
+   ============================================================= */
+typedef threeway_cmp set_cmp_fn(const struct set_elem *key,
+                                const struct set_elem *n, void *aux);
 
 /* A container for a simple begin and end pointer to a set_elem.
 
@@ -759,7 +781,11 @@ typedef tree_cmp_fn set_cmp_fn;
    to use the appropriate next function. Use next for a
    set_range and rnext for a set_rrange. Otherwise, indefinite
    loops may occur. */
-typedef struct range set_range;
+struct set_range
+{
+    struct set_elem *begin;
+    struct set_elem *end;
+};
 
 /* The reverse range container for queries performed with
    requal_range.
@@ -772,20 +798,42 @@ typedef struct range set_range;
 
    Be sure to use the rnext function to progress the iterator
    in this type of range.*/
-typedef struct rrange set_rrange;
+struct set_rrange
+{
+    struct set_elem *rbegin;
+    struct set_elem *end;
+};
+
+/* Define a function to use printf for your custom struct type.
+   For example:
+      struct val
+      {
+         int val;
+         pq_elem elem;
+      };
+
+      void print_my_val(set_elem *elem)
+      {
+         const struct val *v = set_entry(elem, struct val, elem);
+         printf("{%d}", v->val);
+      }
+
+   Output should be one line with no newline character. Then,
+   the printer function will take care of the rest. */
+typedef void set_print_fn(const struct set_elem *);
 
 /* NOLINTNEXTLINE */
 #define set_entry(SET_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(SET_ELEM)->parent_or_dups                         \
-                - offsetof(STRUCT, MEMBER.parent_or_dups))) /* NOLINT */
+    ((STRUCT *)((uint8_t *)&(SET_ELEM)->n.parent_or_dups                       \
+                - offsetof(STRUCT, MEMBER.n.parent_or_dups))) /* NOLINT */
 
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
-void set_init(set *);
+void set_init(struct set *);
 /* O(1) */
-bool set_empty(set *);
+bool set_empty(struct set *);
 /* O(1) */
-size_t set_size(set *);
+size_t set_size(struct set *);
 
 /* ===================     Set Methods   ======================= */
 
@@ -797,14 +845,14 @@ size_t set_size(set *);
    with the same key. Do not assume your element is the
    one that is found unless you know it is only one you
    have created. */
-bool set_contains(set *, set_elem *, set_cmp_fn *, void *);
+bool set_contains(struct set *, struct set_elem *, set_cmp_fn *, void *);
 
 /* Returns true if the element you have requested to be
    inserted is inserted false if it was present already.
    Becuase this is heap free data structure there is no need
    to return the actual element that is inserted. You already
    have it when you call this function.*/
-bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
+bool set_insert(struct set *, struct set_elem *, set_cmp_fn *, void *);
 
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
@@ -818,7 +866,8 @@ bool set_insert(set *, set_elem *, set_cmp_fn *, void *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
+const struct set_elem *set_find(struct set *, struct set_elem *, set_cmp_fn *,
+                                void *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -826,12 +875,13 @@ const set_elem *set_find(set *, set_elem *, set_cmp_fn *, void *);
    end element and it does not have any attachment to any
    struct you are using so trying to get the set entry from
    it will return garbage or worse.*/
-set_elem *set_erase(set *, set_elem *, set_cmp_fn *, void *);
+struct set_elem *set_erase(struct set *, struct set_elem *, set_cmp_fn *,
+                           void *);
 
 /* Check if the current elem is the min. O(lgN) */
-bool set_is_min(set *, set_elem *);
+bool set_is_min(struct set *, struct set_elem *);
 /* Check if the current elem is the max. O(lgN) */
-bool set_is_max(set *, set_elem *);
+bool set_is_max(struct set *, struct set_elem *);
 
 /* Basic C++ style set operation. Contains does not return
    an element but will tell you if an element with the same
@@ -842,7 +892,7 @@ bool set_is_max(set *, set_elem *);
    one that is found unless you know it is only one you
    have created. The const version does no fixups and should
    be used only rarely. */
-bool set_const_contains(set *, set_elem *, set_cmp_fn *, void *);
+bool set_const_contains(struct set *, struct set_elem *, set_cmp_fn *, void *);
 
 /* Read only seek into the data structure backing the set.
    It is therefore safe for multiple threads to read with
@@ -851,7 +901,8 @@ bool set_const_contains(set *, set_elem *, set_cmp_fn *, void *);
    benefits from locality of reference and should be
    allowed to repare itself with lookups with all other
    functions whenever possible. */
-const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
+const struct set_elem *set_const_find(struct set *, struct set_elem *,
+                                      set_cmp_fn *, void *);
 
 /* ===================    Iteration   ==========================
 
@@ -873,11 +924,11 @@ const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
 
        ...Fill the container with program logic...
 
-       for (set_elem *i = set_begin(&s); i != set_end(&s, i); )
+       for (struct set_elem *i = set_begin(&s); i != set_end(&s, i); )
        {
           if (meets_criteria(i))
           {
-              set_elem *next = set_next(&s, i);
+              struct set_elem *next = set_next(&s, i);
               assert(set_erase(&s, i) != set_end(&s);
               i = next;
           }
@@ -891,8 +942,7 @@ const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
    By default traversal is by ascending sorted value but descending
    order is also possible.
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* This is how you can tell if your set find and set erase
    functions are successful. One should always check that
@@ -914,29 +964,28 @@ const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
 
       ... Elsewhere ...
 
-      struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
+      struct struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
       if (e != set_end(&s))
          ...Proceed with some logic...
       else
-         ...Do something else...
-*/
-set_elem *set_end(set *);
+         ...Do something else... */
+struct set_elem *set_end(struct set *);
 
 /* Provides the start for an inorder ascending order traversal
    of the set. Equivalent to end of the set is empty. */
-set_elem *set_begin(set *);
+struct set_elem *set_begin(struct set *);
 
 /* Provides the start for an inorder descending order traversal
    of the set. Equivalent to end of the set is empty. */
-set_elem *set_rbegin(set *);
+struct set_elem *set_rbegin(struct set *);
 
 /* Progresses the pointer to the next greatest element in
    the set or the end if done. */
-set_elem *set_next(set *, set_elem *);
+struct set_elem *set_next(struct set *, struct set_elem *);
 
 /* Progresses the pointer to the next lesser element in
    the set or the end if done. */
-set_elem *set_rnext(set *, set_elem *);
+struct set_elem *set_rnext(struct set *, struct set_elem *);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -948,7 +997,8 @@ set_elem *set_rnext(set *, set_elem *);
       struct val b = {.id = 0, .val = 35};
       struct val e = {.id = 0, .val = 64};
       const set_range range = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (set_elem *i = range.begin; i != range.end; i = set_next(&s, i))
+      for (struct set_elem *i = range.begin; i != range.end; i = set_next(&s,
+   i))
       {
           const int cur_val = set_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
@@ -957,8 +1007,8 @@ set_elem *set_rnext(set *, set_elem *);
    Use the next iterator from begin to end. If there are no values NOT LESS
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, end is returned as end element. */
-set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *,
-                          void *aux);
+struct set_range set_equal_range(struct set *, struct set_elem *begin,
+                                 struct set_elem *end, set_cmp_fn *, void *aux);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -970,7 +1020,7 @@ set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *,
       struct val b = {.id = 0, .val = 64};
       struct val e = {.id = 0, .val = 35};
       const set_range r = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (set_elem *i = r.rbegin; i != r.end; i = set_rnext(&s, i))
+      for (struct set_elem *i = r.rbegin; i != r.end; i = set_rnext(&s, i))
       {
           const int cur_val = set_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
@@ -979,40 +1029,23 @@ set_range set_equal_range(set *, set_elem *begin, set_elem *end, set_cmp_fn *,
    Use the next iterator from begin to end. If there are no values NOT GREATER
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, end is returned as end element. */
-set_rrange set_equal_rrange(set *, set_elem *rbegin, set_elem *end,
-                            set_cmp_fn *, void *aux);
+struct set_rrange set_equal_rrange(struct set *, struct set_elem *rbegin,
+                                   struct set_elem *end, set_cmp_fn *,
+                                   void *aux);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes.
    You will need to pass this to the print function as a
    starting node for debugging. */
-set_elem *set_root(const set *);
-
-/* Define a function to use printf for your custom struct type.
-   For example:
-      struct val
-      {
-         int val;
-         pq_elem elem;
-      };
-
-      void print_my_val(set_elem *elem)
-      {
-         const struct val *v = set_entry(elem, struct val, elem);
-         printf("{%d}", v->val);
-      }
-
-   Output should be one line with no newline character. Then,
-   the printer function will take care of the rest. */
-typedef node_print_fn set_print_fn;
+struct set_elem *set_root(const struct set *);
 
 /* Prints a tree structure of the underlying set for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void set_print(set *, set_elem *, set_print_fn *);
+void set_print(struct set *, struct set_elem *, set_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}(+1)
     ├──(29)R:{id:27,val:27}
