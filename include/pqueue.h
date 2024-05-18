@@ -86,8 +86,7 @@
                    *   *     *     -*-*-*-*-*
                                    |_________|
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* An element stored in a priority queue with Round Robin
    fairness if a duplicate. */
@@ -140,8 +139,7 @@ typedef struct tree pqueue;
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* A comparison function that returns one of the threeway comparison
    values. To use this data structure you must be able to determine
@@ -198,9 +196,57 @@ typedef tree_cmp_fn pq_cmp_fn;
    The above should be well defined because the user determines
    how to cast the auxiliary data themselves based on the types
    they are implementing, but care should be taking when casting
-   from void nonetheless.
-*/
+   from void nonetheless. */
 typedef void pq_update_fn(pq_elem *, void *aux);
+
+/* A container for a simple begin and end pointer to a pq_elem.
+
+      pq_range
+      {
+         pq_elem *begin;
+         pq_elem *end;
+      };
+
+   A user can use the equal_range or equal_rrange function to
+   fill the pq_range with the expected begin and end queries.
+   The default range in a priority queue is descending order.
+   A pq_range has no sense of iterator directionality and
+   provides two typedefs simpy as a reminder to the programmer
+   to use the appropriate next function. Use next for a
+   pq_range and rnext for a pq_rrange. Otherwise, indefinite
+   loops may occur. */
+typedef struct range pq_range;
+
+/* The reverse range container for queries performed with
+   requal_range.
+
+      pq_rrange
+      {
+         pq_elem *rbegin;
+         pq_elem *end;
+      };
+
+   Be sure to use the rnext function to progress the iterator
+   in this type of range. */
+typedef struct rrange pq_rrange;
+
+/* Define a function to use printf for your custom struct type.
+   For example:
+      struct val
+      {
+         int val;
+         pq_elem elem;
+      };
+
+      void print_my_val(pq_elem *elem)
+      {
+         const struct val *v = pq_entry(elem, struct val, elem);
+         printf("{%d}", v->val);
+      }
+
+   Output should be one line with no newline character. Then,
+   the printer function will take care of the rest. */
+typedef node_print_fn pq_print_fn;
 
 /* How to obtain the struct that embeds the pq_elem. For example:
 
@@ -349,37 +395,6 @@ bool pq_update(pqueue *, pq_elem *, pq_cmp_fn *, pq_update_fn *, void *);
    are present. Returns the result in O(lgN). */
 bool pq_contains(pqueue *, pq_elem *, pq_cmp_fn *, void *);
 
-/* A container for a simple begin and end pointer to a pq_elem.
-
-      pq_range
-      {
-         pq_elem *begin;
-         pq_elem *end;
-      };
-
-   A user can use the equal_range or equal_rrange function to
-   fill the pq_range with the expected begin and end queries.
-   The default range in a priority queue is descending order.
-   A pq_range has no sense of iterator directionality and
-   provides two typedefs simpy as a reminder to the programmer
-   to use the appropriate next function. Use next for a
-   pq_range and rnext for a pq_rrange. Otherwise, indefinite
-   loops may occur. */
-typedef struct range pq_range;
-
-/* The reverse range container for queries performed with
-   requal_range.
-
-      pq_rrange
-      {
-         pq_elem *rbegin;
-         pq_elem *end;
-      };
-
-   Be sure to use the rnext function to progress the iterator
-   in this type of range.*/
-typedef struct rrange pq_rrange;
-
 /* ===================    Iteration   ==========================
 
    Priority queue iterators are stable and support updates and
@@ -427,8 +442,7 @@ typedef struct rrange pq_rrange;
    queue the longest is visited first regardless of ascending
    or descending key order.
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* Returns the maximum priority element if present and end
    if the queue is empty. By default iteration is in descending
@@ -504,24 +518,6 @@ pq_elem *pq_end(pqueue *);
    to the pq_print function as the starting pq_elem. */
 pq_elem *pq_root(const pqueue *);
 
-/* Define a function to use printf for your custom struct type.
-   For example:
-      struct val
-      {
-         int val;
-         pq_elem elem;
-      };
-
-      void print_my_val(pq_elem *elem)
-      {
-         const struct val *v = pq_entry(elem, struct val, elem);
-         printf("{%d}", v->val);
-      }
-
-   Output should be one line with no newline character. Then,
-   the printer function will take care of the rest. */
-typedef node_print_fn pq_print_fn;
-
 /* Prints a tree structure of the underlying queu for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
@@ -529,8 +525,7 @@ typedef node_print_fn pq_print_fn;
    so it may not be a good fit in constrained environments. */
 void pq_print(pqueue *, pq_elem *, pq_print_fn *);
 
-/*
-      (40){id:10,val:10}{id:10,val:10}(+1)
+/* (40){id:10,val:10}{id:10,val:10}(+1)
     ├──(29)R:{id:27,val:27}
     │   ├──(12)R:{id:37,val:37}{id:37,val:37}(+1)
     │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}(+1)
@@ -569,7 +564,6 @@ void pq_print(pqueue *, pq_elem *, pq_print_fn *);
             └──(4)L:{id:2,val:2}
                 ├──(1)R:{id:3,val:3}
                 └──(2)L:{id:1,val:1}
-                    └──(1)L:{id:0,val:0}
-*/
+                    └──(1)L:{id:0,val:0} */
 
 #endif

@@ -155,8 +155,7 @@
    for the lifetime of the program which is your
    responsibility.
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* An embedded set data structure for storage and retrieval
    of sorted unique elements for duplicate storage see
@@ -208,8 +207,7 @@ typedef struct node set_elem;
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-   =============================================================
-*/
+   ============================================================= */
 typedef tree_cmp_fn set_cmp_fn;
 
 /* A container for a simple begin and end pointer to a set_elem.
@@ -229,6 +227,24 @@ typedef tree_cmp_fn set_cmp_fn;
    set_range and rnext for a set_rrange. Otherwise, indefinite
    loops may occur. */
 typedef struct range set_range;
+
+/* Define a function to use printf for your custom struct type.
+   For example:
+      struct val
+      {
+         int val;
+         pq_elem elem;
+      };
+
+      void print_my_val(set_elem *elem)
+      {
+         const struct val *v = set_entry(elem, struct val, elem);
+         printf("{%d}", v->val);
+      }
+
+   Output should be one line with no newline character. Then,
+   the printer function will take care of the rest. */
+typedef node_print_fn set_print_fn;
 
 /* The reverse range container for queries performed with
    requal_range.
@@ -360,8 +376,7 @@ const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
    By default traversal is by ascending sorted value but descending
    order is also possible.
 
-   =============================================================
-*/
+   ============================================================= */
 
 /* This is how you can tell if your set find and set erase
    functions are successful. One should always check that
@@ -387,8 +402,7 @@ const set_elem *set_const_find(set *, set_elem *, set_cmp_fn *, void *);
       if (e != set_end(&s))
          ...Proceed with some logic...
       else
-         ...Do something else...
-*/
+         ...Do something else... */
 set_elem *set_end(set *);
 
 /* Provides the start for an inorder ascending order traversal
@@ -457,24 +471,6 @@ set_rrange set_equal_rrange(set *, set_elem *rbegin, set_elem *end,
    You will need to pass this to the print function as a
    starting node for debugging. */
 set_elem *set_root(const set *);
-
-/* Define a function to use printf for your custom struct type.
-   For example:
-      struct val
-      {
-         int val;
-         pq_elem elem;
-      };
-
-      void print_my_val(set_elem *elem)
-      {
-         const struct val *v = set_entry(elem, struct val, elem);
-         printf("{%d}", v->val);
-      }
-
-   Output should be one line with no newline character. Then,
-   the printer function will take care of the rest. */
-typedef node_print_fn set_print_fn;
 
 /* Prints a tree structure of the underlying set for readability
    of many values. Helpful for printing debugging or viewing

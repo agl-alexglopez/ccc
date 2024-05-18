@@ -1,4 +1,2 @@
-add_executable(main main.c)
-target_link_libraries(main
-  pqueue
-)
+add_library(tree INTERFACE tree.h)
+
