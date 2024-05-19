@@ -1,5 +1,4 @@
 add_library(test INTERFACE test.h)
-add_library(str_view str_view.h str_view.c)
 
 add_executable(run_tests run_tests.c)
 target_link_libraries(run_tests PRIVATE str_view test)
