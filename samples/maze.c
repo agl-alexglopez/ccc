@@ -9,11 +9,6 @@
 #include <string.h>
 #include <time.h>
 
-const char *walls[] = {
-    "■", "╵", "╶", "└", "╷", "│", "┌", "├",
-    "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
-};
-
 enum speed
 {
     INSTANT = 0,
@@ -24,10 +19,6 @@ enum speed
     SPEED_5,
     SPEED_6,
     SPEED_7,
-};
-
-int speeds[] = {
-    0, 5000000, 2500000, 1000000, 500000, 250000, 100000, 1000,
 };
 
 struct point
@@ -51,11 +42,24 @@ struct priority_cell
     struct pq_elem elem;
 };
 
-struct point_key
+struct point_cost
 {
     struct point p;
+    int cost;
     struct set_elem elem;
 };
+
+const char *walls[] = {
+    "■", "╵", "╶", "└", "╷", "│", "┌", "├",
+    "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
+};
+
+int speeds[] = {
+    0, 5000000, 2500000, 1000000, 500000, 250000, 100000, 1000,
+};
+
+const struct point build_dirs[] = {{-2, 0}, {0, 2}, {2, 0}, {0, -2}};
+const size_t build_dirs_size = sizeof(build_dirs) / sizeof(build_dirs[0]);
 
 const str_view rows = SV("-r=");
 const str_view cols = SV("-c=");
@@ -78,8 +82,8 @@ const uint16_t west_wall = 0b1000;
 const uint16_t builder_bit = 0b0001000000000000;
 
 int convert_to_int(str_view, const char *);
-str_view int_to_string(int);
 void animate_maze(struct maze *);
+void initialize_cells(struct maze *, struct pqueue *, struct set *);
 void fill_maze_with_walls(struct maze *);
 void build_wall(struct maze *, struct point);
 void print_square(const struct maze *, struct point);
@@ -89,12 +93,19 @@ void clear_screen(void);
 void clear_and_flush_maze(const struct maze *);
 void carve_path_walls_animated(struct maze *, struct point, int);
 void set_cursor_position(struct point);
+void join_squares_animated(struct maze *, struct point, struct point, int);
 void flush_cursor_maze_coordinate(const struct maze *, struct point);
+bool can_build_new_square(const struct maze *, struct point);
+void *checked_allocation(size_t);
+
+struct point pick_rand_point(const struct maze *);
+int rand_range(int, int);
 
 threeway_cmp cmp_priority_cells(const struct pq_elem *, const struct pq_elem *,
                                 void *);
 threeway_cmp cmp_points(const struct set_elem *, const struct set_elem *,
                         void *);
+void set_destructor(struct set_elem *);
 
 int
 main(int argc, char **argv)
@@ -154,6 +165,8 @@ main(int argc, char **argv)
         return 1;
     }
     animate_maze(&maze);
+    set_cursor_position((struct point){.r = maze.rows + 1, .c = maze.cols + 1});
+    printf("\n");
 }
 
 void
@@ -164,13 +177,95 @@ animate_maze(struct maze *maze)
         (void)fprintf(stderr, "No maze provided.\n");
         return;
     }
+    /* Setting up the data structures needed should look similar to C++.
+       A set could be replaced by a 2D vector copy of the maze with costs
+       mapped but the purpose of this program is to test both the set
+       and priority queue data structures. */
+    struct pqueue cells;
+    struct set cell_costs;
+    set_init(&cell_costs);
+    pq_init(&cells);
+    struct point_cost *odd_point
+        = checked_allocation(sizeof(struct point_cost));
+    *odd_point = (struct point_cost){
+        .p = pick_rand_point(maze),
+        .cost = rand_range(0, 100),
+    };
+    (void)set_insert(&cell_costs, &odd_point->elem, cmp_points, NULL);
+    struct priority_cell *start
+        = checked_allocation(sizeof(struct priority_cell));
+    *start = (struct priority_cell){
+        .cell = odd_point->p,
+        .priority = odd_point->cost,
+    };
+    (void)pq_insert(&cells, &start->elem, cmp_priority_cells, NULL);
+
     const int animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
-    struct set cell_costs;
-    set_init(&cell_costs);
-    struct pqueue cells;
-    pq_init(&cells);
+    while (!pq_empty(&cells))
+    {
+        const struct priority_cell *const cur
+            = pq_entry(pq_max(&cells), struct priority_cell, elem);
+        *maze_at_mut(maze, cur->cell) |= builder_bit;
+        struct point min_neighbor = {0};
+        int min_weight = INT_MAX;
+        for (size_t i = 0; i < build_dirs_size; ++i)
+        {
+            const struct point next = {
+                .r = cur->cell.r + build_dirs[i].r,
+                .c = cur->cell.c + build_dirs[i].c,
+            };
+            if (!can_build_new_square(maze, next))
+            {
+                continue;
+            }
+            int cur_weight = 0;
+            struct point_cost key = {.p = next};
+            const struct set_elem *const found
+                = set_find(&cell_costs, &key.elem, cmp_points, NULL);
+            if (found == set_end(&cell_costs))
+            {
+                struct point_cost *new_cost
+                    = checked_allocation(sizeof(struct point_cost));
+                *new_cost = (struct point_cost){
+                    .p = next,
+                    .cost = rand_range(0, 100),
+                };
+                cur_weight = new_cost->cost;
+                (void)set_insert(&cell_costs, &new_cost->elem, cmp_points,
+                                 NULL);
+            }
+            else
+            {
+                cur_weight = set_entry(found, struct point_cost, elem)->cost;
+            }
+            if (cur_weight < min_weight)
+            {
+                min_weight = cur_weight;
+                min_neighbor = next;
+            }
+        }
+        if (min_neighbor.r)
+        {
+            join_squares_animated(maze, cur->cell, min_neighbor,
+                                  animation_speed);
+            struct priority_cell *new_cell
+                = checked_allocation(sizeof(struct priority_cell));
+            *new_cell = (struct priority_cell){
+                .cell = min_neighbor,
+                .priority = min_weight,
+            };
+            pq_insert(&cells, &new_cell->elem, cmp_priority_cells, NULL);
+        }
+        else
+        {
+            struct priority_cell *pc
+                = pq_entry(pq_pop_max(&cells), struct priority_cell, elem);
+            free(pc);
+        }
+    }
+    set_clear(&cell_costs, set_destructor);
 }
 
 void
@@ -333,42 +428,7 @@ clear_screen(void)
 void
 set_cursor_position(const struct point p)
 {
-    const str_view row_pos = int_to_string(p.r + 1);
-    if (sv_empty(row_pos))
-    {
-        return;
-    }
-    const str_view col_pos = int_to_string(p.c + 1);
-    if (sv_empty(col_pos))
-    {
-        return;
-    }
-    size_t buf_size = sv_len(escape) + sv_len(row_pos) + sv_len(col_pos)
-                      + sv_len(semi_colon) + sv_len(cursor_pos_specifier) + 1;
-    char *const full_sequence = malloc(buf_size);
-    if (!full_sequence)
-    {
-        (void)fprintf(stderr, "cannot redirect cursor position.\n");
-        return;
-    }
-    char *pos = full_sequence;
-    sv_fill(buf_size, pos, escape);
-    buf_size -= sv_len(escape);
-    pos += sv_len(escape);
-    sv_fill(buf_size, pos, row_pos);
-    buf_size -= sv_len(row_pos);
-    pos += sv_len(row_pos);
-    sv_fill(buf_size, pos, semi_colon);
-    buf_size -= sv_len(semi_colon);
-    pos += sv_len(semi_colon);
-    sv_fill(buf_size, pos, col_pos);
-    buf_size -= sv_len(col_pos);
-    pos += sv_len(col_pos);
-    sv_fill(buf_size, pos, cursor_pos_specifier);
-    printf("%s", full_sequence);
-    free((void *)sv_begin(row_pos));
-    free((void *)sv_begin(col_pos));
-    free(full_sequence);
+    printf("\033[%d;%df", p.r + 1, p.c + 1);
 }
 
 uint16_t *
@@ -383,21 +443,11 @@ maze_at(const struct maze *const maze, struct point p)
     return maze->maze[p.r * maze->cols + p.c];
 }
 
-str_view
-int_to_string(int x)
+bool
+can_build_new_square(const struct maze *const maze, const struct point next)
 {
-    const int length = snprintf(NULL, 0, "%d", x);
-    char *buf = malloc(length + 1);
-    if (!buf)
-    {
-        (void)fprintf(stderr, "allocation failure for to_string conversion.\n");
-        return (str_view){0};
-    }
-    (void)snprintf(buf, length, "%d", x);
-    return (str_view){
-        .s = buf,
-        .sz = length,
-    };
+    return next.r > 0 && next.r < maze->rows - 1 && next.c > 0
+           && next.c < maze->cols - 1 && !(maze_at(maze, next) & builder_bit);
 }
 
 int
@@ -449,8 +499,8 @@ threeway_cmp
 cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
 {
     (void)aux;
-    const struct point_key *const a = set_entry(key, struct point_key, elem);
-    const struct point_key *const b = set_entry(n, struct point_key, elem);
+    const struct point_cost *const a = set_entry(key, struct point_cost, elem);
+    const struct point_cost *const b = set_entry(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
         return EQL;
@@ -460,4 +510,39 @@ cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
         return (a->p.c > b->p.c) - (a->p.c < b->p.c);
     }
     return (a->p.r > b->p.r) - (a->p.r < b->p.r);
+}
+
+void
+set_destructor(struct set_elem *e)
+{
+    struct point_cost *pc = set_entry(e, struct point_cost, elem);
+    free(pc);
+}
+
+struct point
+pick_rand_point(const struct maze *const maze)
+{
+    return (struct point){
+        .r = 2 * rand_range(1, (maze->rows - 2) / 2) + 1,
+        .c = 2 * rand_range(1, (maze->cols - 2) / 2) + 1,
+    };
+}
+
+int
+rand_range(const int min, const int max)
+{
+    /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
+    return min + rand() / (RAND_MAX / (max - min + 1) + 1);
+}
+
+void *
+checked_allocation(size_t n)
+{
+    void *mem = malloc(n);
+    if (!mem)
+    {
+        (void)fprintf(stderr, "heap is exhausted, exiting program.\n");
+        exit(1);
+    }
+    return mem;
 }
