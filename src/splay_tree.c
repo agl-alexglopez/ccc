@@ -109,6 +109,19 @@ pq_init(struct pqueue *pq)
     init_tree(&pq->t);
 }
 
+void
+pq_clear(struct pqueue *pq, pq_destructor_fn *destructor)
+{
+    while (!pq_empty(pq))
+    {
+        struct pq_elem *e = pq_pop_max(pq);
+        if (e)
+        {
+            destructor(e);
+        }
+    }
+}
+
 bool
 pq_empty(const struct pqueue *const pq)
 {
@@ -315,6 +328,20 @@ void
 set_init(struct set *s)
 {
     init_tree(&s->t);
+}
+
+void
+set_clear(struct set *set, set_destructor_fn *destructor)
+{
+
+    while (!set_empty(set))
+    {
+        struct set_elem *e = (struct set_elem *)pop_min(&set->t);
+        if (e)
+        {
+            destructor(e);
+        }
+    }
 }
 
 bool

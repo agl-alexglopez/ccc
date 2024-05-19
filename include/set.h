@@ -217,6 +217,15 @@ struct set_elem
 typedef threeway_cmp set_cmp_fn(const struct set_elem *key,
                                 const struct set_elem *n, void *aux);
 
+/* Performs user specified destructor actions on a single set_elem. This
+   set_elem is assumed to be embedded in user defined structs and therefore
+   allows the user to perform any updates to their program before deleting
+   this element. The user will know if they have heap allocated their
+   own structures and therefore shall call free on the containing structure.
+   If the data structure is stack allocated, free is not necessary but other
+   updates may be specified by this function. */
+typedef void set_destructor_fn(struct set_elem *);
+
 /* A container for a simple begin and end pointer to a set_elem.
 
       set_range
@@ -282,6 +291,16 @@ typedef void set_print_fn(const struct set_elem *);
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
 void set_init(struct set *);
+
+/* Calls the destructor for each element while emptying the set.
+   Usually, this destructor function is expected to call free for each
+   struct for which a struct set_elem is embedded if they are heap allocated.
+   However, for stack allocated structures this is not required.
+   Other updates before destruction are possible to include in destructor
+   if determined necessary by the user. A set has no hidden allocations and
+   therefore the only heap memory is controlled by the user. */
+void set_clear(struct set *, set_destructor_fn *destructor);
+
 /* O(1) */
 bool set_empty(struct set *);
 /* O(1) */

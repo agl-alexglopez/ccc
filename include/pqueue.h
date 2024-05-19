@@ -224,6 +224,15 @@ typedef void pq_print_fn(const struct pq_elem *);
    from void nonetheless. */
 typedef void pq_update_fn(struct pq_elem *, void *aux);
 
+/* Performs user specified destructor actions on a single pq_elem. This
+   pq_elem is assumed to be embedded in user defined structs and therefore
+   allows the user to perform any updates to their program before deleting
+   this element. The user will know if they have heap allocated their
+   own structures and therefore shall call free on the containing structure.
+   If the data structure is stack allocated, free is not necessary but other
+   updates may be specified by this function. */
+typedef void pq_destructor_fn(struct pq_elem *);
+
 /* A container for a simple begin and end pointer to a struct pq_elem.
 
       pq_range
@@ -287,6 +296,15 @@ struct pq_rrange
 
 /* Initializes and empty queue with size 0. */
 void pq_init(struct pqueue *);
+
+/* Calls the destructor for each element while emptying the priority queue.
+   Usually, this destructor function is expected to call free for each
+   struct for which a struct pq_elem is embedded if they are heap allocated.
+   However, for stack allocated structures this is not required.
+   Other updates before destruction are possible to include in destructor
+   if determined necessary by the user. A priority queue has no hidden
+   allocations and therefore the only heap memory is controlled by the user. */
+void pq_clear(struct pqueue *, pq_destructor_fn *destructor);
 
 /* Checks if the priority queue is empty. Undefined if
    pq_init has not been called first. */
