@@ -67,7 +67,7 @@ const str_view speed = SV("-s=");
 const str_view escape = SV("\033[");
 const str_view semi_colon = SV(";");
 const str_view cursor_pos_specifier = SV("f");
-const int default_rows = 55;
+const int default_rows = 33;
 const int default_cols = 111;
 const int row_col_min = 7;
 const int speed_max = 7;
