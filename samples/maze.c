@@ -8,6 +8,7 @@
 #include "pqueue.h"
 #include "set.h"
 #include "str_view.h"
+#include <assert.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
@@ -281,8 +282,8 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                (void)set_insert(&cell_costs, &new_cost->elem, cmp_points,
-                                 NULL);
+                assert(
+                    set_insert(&cell_costs, &new_cost->elem, cmp_points, NULL));
             }
             else
             {
@@ -313,6 +314,10 @@ animate_maze(struct maze *maze)
             free(pc);
         }
     }
+    /* The priority queue does not need to be cleared because it's emptiness
+       determined the course of the maze building. It has no hidden allocations
+       either so no more work is needed if we know it's empty and the data
+       structure metadata is on the stack. */
     set_clear(&cell_costs, set_destructor);
 }
 
