@@ -226,7 +226,7 @@ sv_cmp(str_view lhs, str_view rhs)
 {
     if (!lhs.s || !rhs.s)
     {
-        return ERR;
+        return SV_ERR;
     }
     const size_t sz = sv_min(lhs.sz, rhs.sz);
     size_t i = 0;
@@ -234,13 +234,13 @@ sv_cmp(str_view lhs, str_view rhs)
     {}
     if (i == lhs.sz && i == rhs.sz)
     {
-        return EQL;
+        return SV_EQL;
     }
     if (i < lhs.sz && i < rhs.sz)
     {
-        return (uint8_t)lhs.s[i] < (uint8_t)rhs.s[i] ? LES : GRT;
+        return (uint8_t)lhs.s[i] < (uint8_t)rhs.s[i] ? SV_LES : SV_GRT;
     }
-    return (i < lhs.sz) ? GRT : LES;
+    return (i < lhs.sz) ? SV_GRT : SV_LES;
 }
 
 sv_threeway_cmp
@@ -248,7 +248,7 @@ sv_strcmp(str_view lhs, const char rhs[static const 1])
 {
     if (!lhs.s || !rhs)
     {
-        return ERR;
+        return SV_ERR;
     }
     const size_t sz = lhs.sz;
     size_t i = 0;
@@ -256,13 +256,13 @@ sv_strcmp(str_view lhs, const char rhs[static const 1])
     {}
     if (i == lhs.sz && rhs[i] == '\0')
     {
-        return EQL;
+        return SV_EQL;
     }
     if (i < lhs.sz && rhs[i] != '\0')
     {
-        return (uint8_t)lhs.s[i] < (uint8_t)rhs[i] ? LES : GRT;
+        return (uint8_t)lhs.s[i] < (uint8_t)rhs[i] ? SV_LES : SV_GRT;
     }
-    return (i < lhs.sz) ? GRT : LES;
+    return (i < lhs.sz) ? SV_GRT : SV_LES;
 }
 
 sv_threeway_cmp
@@ -270,7 +270,7 @@ sv_strncmp(str_view lhs, const char rhs[static const 1], const size_t n)
 {
     if (!lhs.s || !rhs)
     {
-        return ERR;
+        return SV_ERR;
     }
     const size_t sz = sv_min(lhs.sz, n);
     size_t i = 0;
@@ -278,14 +278,14 @@ sv_strncmp(str_view lhs, const char rhs[static const 1], const size_t n)
     {}
     if (i == lhs.sz && sz == n)
     {
-        return EQL;
+        return SV_EQL;
     }
     /* strncmp compares the first at most n bytes inclusive */
     if (i < lhs.sz && sz <= n)
     {
-        return (uint8_t)lhs.s[i] < (uint8_t)rhs[i] ? LES : GRT;
+        return (uint8_t)lhs.s[i] < (uint8_t)rhs[i] ? SV_LES : SV_GRT;
     }
-    return (i < lhs.sz) ? GRT : LES;
+    return (i < lhs.sz) ? SV_GRT : SV_LES;
 }
 
 char
@@ -529,7 +529,7 @@ sv_starts_with(str_view sv, str_view prefix)
     {
         return false;
     }
-    return sv_cmp(sv_substr(sv, 0, prefix.sz), prefix) == EQL;
+    return sv_cmp(sv_substr(sv, 0, prefix.sz), prefix) == SV_EQL;
 }
 
 str_view
@@ -546,7 +546,8 @@ sv_ends_with(str_view sv, str_view suffix)
     {
         return false;
     }
-    return sv_cmp(sv_substr(sv, sv.sz - suffix.sz, suffix.sz), suffix) == EQL;
+    return sv_cmp(sv_substr(sv, sv.sz - suffix.sz, suffix.sz), suffix)
+           == SV_EQL;
 }
 
 str_view
@@ -956,7 +957,7 @@ sv_rstrnstrn(const char *const hay, ssize_t hay_sz, const char *const needle,
 
 /* Definitions for Two-Way String-Matching taken from original authors:
 
-   CROCHEMORE M., PERRIN D., 1991, Two-way string-matching,
+   CROCHEMORE M., PSV_ERRIN D., 1991, Two-way string-matching,
    Journal of the ACM 38(3):651-675.
 
    This algorithm is used for its simplicity and low space requirement.
@@ -1114,12 +1115,12 @@ sv_maximal_suffix(const char *const needle, ssize_t needle_sz)
     {
         switch (sv_char_cmp(needle[last_rest + rest], needle[suff_pos + rest]))
         {
-        case LES:
+        case SV_LES:
             last_rest += rest;
             rest = 1;
             period = last_rest - suff_pos;
             break;
-        case EQL:
+        case SV_EQL:
             if (rest != period)
             {
                 ++rest;
@@ -1130,7 +1131,7 @@ sv_maximal_suffix(const char *const needle, ssize_t needle_sz)
                 rest = 1;
             }
             break;
-        case GRT:
+        case SV_GRT:
             suff_pos = last_rest;
             last_rest = suff_pos + 1;
             rest = period = 1;
@@ -1157,12 +1158,12 @@ sv_maximal_suffix_rev(const char *const needle, ssize_t needle_sz)
     {
         switch (sv_char_cmp(needle[last_rest + rest], needle[suff_pos + rest]))
         {
-        case GRT:
+        case SV_GRT:
             last_rest += rest;
             rest = 1;
             period = last_rest - suff_pos;
             break;
-        case EQL:
+        case SV_EQL:
             if (rest != period)
             {
                 ++rest;
@@ -1173,7 +1174,7 @@ sv_maximal_suffix_rev(const char *const needle, ssize_t needle_sz)
                 rest = 1;
             }
             break;
-        case LES:
+        case SV_LES:
             suff_pos = last_rest;
             last_rest = suff_pos + 1;
             rest = period = 1;
@@ -1354,12 +1355,12 @@ sv_rmaximal_suffix(const char *const needle, ssize_t needle_sz)
         switch (sv_char_cmp(needle[needle_sz - (last_rest + rest) - 1],
                             needle[needle_sz - (suff_pos + rest) - 1]))
         {
-        case LES:
+        case SV_LES:
             last_rest += rest;
             rest = 1;
             period = last_rest - suff_pos;
             break;
-        case EQL:
+        case SV_EQL:
             if (rest != period)
             {
                 ++rest;
@@ -1370,7 +1371,7 @@ sv_rmaximal_suffix(const char *const needle, ssize_t needle_sz)
                 rest = 1;
             }
             break;
-        case GRT:
+        case SV_GRT:
             suff_pos = last_rest;
             last_rest = suff_pos + 1;
             rest = period = 1;
@@ -1395,12 +1396,12 @@ sv_rmaximal_suffix_rev(const char *const needle, ssize_t needle_sz)
         switch (sv_char_cmp(needle[needle_sz - (last_rest + rest) - 1],
                             needle[needle_sz - (suff_pos + rest) - 1]))
         {
-        case GRT:
+        case SV_GRT:
             last_rest += rest;
             rest = 1;
             period = last_rest - suff_pos;
             break;
-        case EQL:
+        case SV_EQL:
             if (rest != period)
             {
                 ++rest;
@@ -1411,7 +1412,7 @@ sv_rmaximal_suffix_rev(const char *const needle, ssize_t needle_sz)
                 rest = 1;
             }
             break;
-        case LES:
+        case SV_LES:
             suff_pos = last_rest;
             last_rest = suff_pos + 1;
             rest = period = 1;

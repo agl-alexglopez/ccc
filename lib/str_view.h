@@ -69,10 +69,10 @@ typedef struct
    is returned if bad input is provided to any comparison. */
 typedef enum
 {
-    LES = -1,
-    EQL,
-    GRT,
-    ERR,
+    SV_LES = -1,
+    SV_EQL,
+    SV_GRT,
+    SV_ERR,
 } sv_threeway_cmp;
 
 /*==========================  Construction  ================================*/
