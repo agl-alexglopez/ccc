@@ -1,3 +1,10 @@
+/* Author: Alexander Lopez
+   File: maze.c
+   ============
+   This file provides a simple maze builder that implements Prim's algorithm
+   to randomly generate a maze. I chose this algorithm because it can use
+   both a set and a priority queue to acheive its purpose. Such data structures
+   are provided by the library offering a perfect sample program opportunity. */
 #include "pqueue.h"
 #include "set.h"
 #include "str_view.h"
