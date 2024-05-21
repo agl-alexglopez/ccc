@@ -96,32 +96,32 @@ const uint16_t north_wall = 0b0001;
 const uint16_t east_wall = 0b0010;
 const uint16_t south_wall = 0b0100;
 const uint16_t west_wall = 0b1000;
-const uint16_t builder_bit = 0b0001000000000000;
+const uint16_t cached_bit = 0b0001000000000000;
 
 /*==========================   Prototypes  ================================= */
 
-void animate_maze(struct maze *);
-void initialize_cells(struct maze *, struct pqueue *, struct set *);
-void fill_maze_with_walls(struct maze *);
-void build_wall(struct maze *, struct point);
-void print_square(const struct maze *, struct point);
-uint16_t *maze_at_mut(const struct maze *, struct point);
-uint16_t maze_at(const struct maze *, struct point);
-void clear_and_flush_maze(const struct maze *);
-void carve_path_walls_animated(struct maze *, struct point, int);
-void join_squares_animated(struct maze *, struct point, struct point, int);
-void flush_cursor_maze_coordinate(const struct maze *, struct point);
-bool can_build_new_square(const struct maze *, struct point);
-void *valid_malloc(size_t);
-void help(void);
-struct point pick_rand_point(const struct maze *);
-int rand_range(int, int);
-threeway_cmp cmp_priority_cells(const struct pq_elem *, const struct pq_elem *,
-                                void *);
-threeway_cmp cmp_points(const struct set_elem *, const struct set_elem *,
-                        void *);
-void set_destructor(struct set_elem *);
-struct int_conversion parse_digits(str_view);
+static void animate_maze(struct maze *);
+static void fill_maze_with_walls(struct maze *);
+static void build_wall(struct maze *, struct point);
+static void print_square(const struct maze *, struct point);
+static uint16_t *maze_at_mut(const struct maze *, struct point);
+static uint16_t maze_at(const struct maze *, struct point);
+static void clear_and_flush_maze(const struct maze *);
+static void carve_path_walls_animated(struct maze *, struct point, int);
+static void join_squares_animated(struct maze *, struct point, struct point,
+                                  int);
+static void flush_cursor_maze_coordinate(const struct maze *, struct point);
+static bool can_build_new_square(const struct maze *, struct point);
+static void *valid_malloc(size_t);
+static void help(void);
+static struct point pick_rand_point(const struct maze *);
+static int rand_range(int, int);
+static threeway_cmp cmp_priority_cells(const struct pq_elem *,
+                                       const struct pq_elem *, void *);
+static threeway_cmp cmp_points(const struct set_elem *, const struct set_elem *,
+                               void *);
+static void set_destructor(struct set_elem *);
+static struct int_conversion parse_digits(str_view);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -195,7 +195,7 @@ main(int argc, char **argv)
 
 /*======================      Maze Animation      ===========================*/
 
-void
+static void
 animate_maze(struct maze *maze)
 {
     /* Setting up the data structures needed should look similar to C++.
@@ -226,7 +226,7 @@ animate_maze(struct maze *maze)
     {
         const struct priority_cell *const cur
             = pq_entry(pq_max(&cells), struct priority_cell, elem);
-        *maze_at_mut(maze, cur->cell) |= builder_bit;
+        *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
         for (size_t i = 0; i < build_dirs_size; ++i)
@@ -291,7 +291,7 @@ animate_maze(struct maze *maze)
     set_clear(&cell_costs, set_destructor);
 }
 
-struct point
+static struct point
 pick_rand_point(const struct maze *const maze)
 {
     return (struct point){
@@ -300,7 +300,7 @@ pick_rand_point(const struct maze *const maze)
     };
 }
 
-int
+static int
 rand_range(const int min, const int max)
 {
     /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
@@ -309,7 +309,7 @@ rand_range(const int min, const int max)
 
 /*=========================   Maze Support Code   ===========================*/
 
-void
+static void
 fill_maze_with_walls(struct maze *maze)
 {
     for (int row = 0; row < maze->rows; ++row)
@@ -321,7 +321,7 @@ fill_maze_with_walls(struct maze *maze)
     }
 }
 
-void
+static void
 clear_and_flush_maze(const struct maze *const maze)
 {
     clear_screen();
@@ -336,7 +336,7 @@ clear_and_flush_maze(const struct maze *const maze)
     (void)fflush(stdout);
 }
 
-void
+static void
 join_squares_animated(struct maze *maze, const struct point cur,
                       const struct point next, int s)
 {
@@ -366,7 +366,7 @@ join_squares_animated(struct maze *maze, const struct point cur,
     carve_path_walls_animated(maze, next, s);
 }
 
-void
+static void
 carve_path_walls_animated(struct maze *maze, const struct point p, int s)
 {
     *maze_at_mut(maze, p) |= path_bit;
@@ -407,10 +407,10 @@ carve_path_walls_animated(struct maze *maze, const struct point p, int s)
                                      (struct point){.r = p.r, .c = p.c + 1});
         nanosleep(&ts, NULL);
     }
-    *maze_at_mut(maze, (struct point){.r = p.r, .c = p.c}) |= builder_bit;
+    *maze_at_mut(maze, (struct point){.r = p.r, .c = p.c}) |= cached_bit;
 }
 
-void
+static void
 build_wall(struct maze *m, struct point p)
 {
     uint16_t wall = 0;
@@ -434,7 +434,7 @@ build_wall(struct maze *m, struct point p)
     *maze_at_mut(m, p) &= ~path_bit;
 }
 
-void
+static void
 flush_cursor_maze_coordinate(const struct maze *maze, const struct point p)
 {
     set_cursor_position(p.r, p.c);
@@ -442,7 +442,7 @@ flush_cursor_maze_coordinate(const struct maze *maze, const struct point p)
     (void)fflush(stdout);
 }
 
-void
+static void
 print_square(const struct maze *m, struct point p)
 {
     const uint16_t square = maze_at(m, p);
@@ -460,28 +460,28 @@ print_square(const struct maze *m, struct point p)
     }
 }
 
-uint16_t *
+static uint16_t *
 maze_at_mut(const struct maze *const maze, struct point p)
 {
     return &maze->maze[p.r * maze->cols + p.c];
 }
 
-uint16_t
+static uint16_t
 maze_at(const struct maze *const maze, struct point p)
 {
     return maze->maze[p.r * maze->cols + p.c];
 }
 
-bool
+static bool
 can_build_new_square(const struct maze *const maze, const struct point next)
 {
     return next.r > 0 && next.r < maze->rows - 1 && next.c > 0
-           && next.c < maze->cols - 1 && !(maze_at(maze, next) & builder_bit);
+           && next.c < maze->cols - 1 && !(maze_at(maze, next) & cached_bit);
 }
 
 /*===================   Data Structure Comparators   ========================*/
 
-threeway_cmp
+static threeway_cmp
 cmp_priority_cells(const struct pq_elem *const key, const struct pq_elem *n,
                    void *const aux)
 {
@@ -493,7 +493,7 @@ cmp_priority_cells(const struct pq_elem *const key, const struct pq_elem *n,
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
-threeway_cmp
+static threeway_cmp
 cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
 {
     (void)aux;
@@ -510,7 +510,7 @@ cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
     return (a->p.r > b->p.r) - (a->p.r < b->p.r);
 }
 
-void
+static void
 set_destructor(struct set_elem *e)
 {
     struct point_cost *pc = set_entry(e, struct point_cost, elem);
@@ -519,7 +519,7 @@ set_destructor(struct set_elem *e)
 
 /*===========================    Misc    ====================================*/
 
-struct int_conversion
+static struct int_conversion
 parse_digits(str_view arg)
 {
     const size_t eql = sv_rfind(arg, sv_npos(arg), SV("="));
@@ -538,7 +538,7 @@ parse_digits(str_view arg)
 }
 
 /* Promises valid memory or exits the program if the heap has an error. */
-void *
+static void *
 valid_malloc(size_t n)
 {
     void *mem = malloc(n);
@@ -550,7 +550,7 @@ valid_malloc(size_t n)
     return mem;
 }
 
-void
+static void
 help(void)
 {
     (void)fprintf(stdout,
