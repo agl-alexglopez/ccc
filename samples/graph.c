@@ -25,6 +25,24 @@ struct point
     int c;
 };
 
+struct lineage
+{
+    struct point key;
+    struct point parent;
+    struct set_elem elem;
+};
+
+struct queue_point
+{
+    struct point p;
+    /* We will use a priority queue because that is the data structure
+       handy in this library. However, we will make a comparator function
+       that returns EQL every time. The priority queue promises round
+       robin fairness so this is an overly complicated standard queue under
+       such circumstances. */
+    struct pq_elem elem;
+};
+
 /* A vertex is connected via an edge to another vertex. Each vertex
    shall store a bounded list of edges representing the other vertices
    to which it is connected. The cost of this connection is the distance
@@ -75,6 +93,7 @@ const int speeds[] = {
 
 /* North, East, South, West */
 const struct point dirs[] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+const size_t dirs_size = sizeof(dirs) / sizeof(dirs[0]);
 
 const str_view rows = SV("-r=");
 const str_view cols = SV("-c=");
@@ -91,6 +110,11 @@ const int default_speed = 4;
 const int row_col_min = 7;
 const int speed_max = 7;
 const int max_vertices = 26;
+const int max_degree = 4;
+const char start_vertex_title = 'A';
+const size_t vertex_cell_title_shift = 24;
+/* This comes immediately after 'Z' on the ASCII table. */
+const char exclusive_end_vertex_title = '[';
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
@@ -99,12 +123,12 @@ const int max_vertices = 26;
    shall always be sorted alphabetically so an edge connecting vertex A and
    Z will be uint16_t=AZ. */
 
-const uint32_t wall_mask = 0b1111;
-const uint32_t floating_wall = 0b0000;
-const uint32_t north_wall = 0b0001;
-const uint32_t east_wall = 0b0010;
-const uint32_t south_wall = 0b0100;
-const uint32_t west_wall = 0b1000;
+const uint32_t path_mask = 0b1111;
+const uint32_t floating_path = 0b0000;
+const uint32_t north_path = 0b0001;
+const uint32_t east_path = 0b0010;
+const uint32_t south_path = 0b0100;
+const uint32_t west_path = 0b1000;
 const uint32_t cached_bit = 0b10000;
 const uint32_t path_bit = 0b100000;
 const uint32_t vertex_bit = 0b1000000;
@@ -113,6 +137,7 @@ const uint32_t vertex_bit = 0b1000000;
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
+static void create_edge_bfs(struct graph *, struct vertex *, struct vertex *);
 
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
@@ -120,6 +145,17 @@ static int rand_range(int, int);
 static uint32_t *grid_at_mut(const struct graph *, struct point);
 static uint32_t grid_at(const struct graph *, struct point);
 static uint16_t sort_vertices(char a, char b);
+static int vertex_degree(const struct vertex *);
+static struct vertex *choose_random_vertex_destination(struct graph *,
+                                                       const struct vertex *);
+static void build_path_outline(struct graph *graph);
+static void build_path_cell(struct graph *, struct point);
+static void flush_cursor_grid_coordinate(const struct graph *, struct point);
+static void clear_and_flush_graph(const struct graph *g);
+static void print_cell(const struct graph *, struct point);
+static char get_cell_vertex_title(uint32_t);
+static bool has_edge_with(const struct vertex *, char);
+static bool add_edge(struct vertex *, const struct edge *);
 
 static struct int_conversion parse_digits(str_view);
 static void *valid_malloc(size_t);
@@ -127,7 +163,13 @@ static void help(void);
 
 static threeway_cmp cmp_vertices(const struct set_elem *,
                                  const struct set_elem *, void *);
+static threeway_cmp cmp_queue_points(const struct pq_elem *,
+                                     const struct pq_elem *, void *);
+static threeway_cmp cmp_lineage_points(const struct set_elem *,
+                                       const struct set_elem *, void *);
 static void print_vertex(const struct set_elem *);
+static void set_vertex_destructor(struct set_elem *);
+static void set_lineage_destructor(struct set_elem *);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -217,11 +259,14 @@ main(int argc, char **argv)
 static void
 build_graph(struct graph *const graph)
 {
-    clear_screen();
-    for (int vertex = 0, vertex_title = 'A'; vertex < graph->vertices;
-         ++vertex, ++vertex_title)
+    build_path_outline(graph);
+    clear_and_flush_graph(graph);
+    for (int vertex = 0, vertex_title = start_vertex_title;
+         vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         struct point rand_point = random_vertex_placement(graph);
+        *grid_at_mut(graph, rand_point)
+            = vertex_bit | ((uint32_t)vertex_title << vertex_cell_title_shift);
         struct vertex *new_vertex = valid_malloc(sizeof(struct vertex));
         *new_vertex = (struct vertex){
             .name = (char)vertex_title,
@@ -231,17 +276,37 @@ build_graph(struct graph *const graph)
         if (!set_insert(&graph->adjacency_list, &new_vertex->elem, cmp_vertices,
                         NULL))
         {
-            (void)fprintf(
-                stderr,
-                "Error building the graph. New vertex is already present.\n");
-            exit(1);
+            quit("Error building the graph. New vertex is already present.\n");
         }
-        set_cursor_position(rand_point.r, rand_point.c);
-        printf("%c", vertex_title);
+        flush_cursor_grid_coordinate(graph, rand_point);
     }
-    for (int vertex = 0, vertex_title = 'A'; vertex < graph->vertices;
-         ++vertex, ++vertex_title)
+    struct vertex key = {0};
+    for (int vertex = 0, vertex_title = start_vertex_title;
+         vertex < graph->vertices; ++vertex, ++vertex_title)
     {
+        key.name = (char)vertex_title;
+        const struct set_elem *const e
+            = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
+        if (e == set_end(&graph->adjacency_list))
+        {
+            quit("Vertex that should be present in the set is absent.\n");
+        }
+        struct vertex *const src = set_entry(e, struct vertex, elem);
+        const int degree = vertex_degree(src);
+        if (degree == max_degree)
+        {
+            continue;
+        }
+        const int new_edges = rand_range(1, max_degree - degree);
+        for (int i = 0; i < new_edges; ++i)
+        {
+            struct vertex *dst = choose_random_vertex_destination(graph, src);
+            if (!dst)
+            {
+                break;
+            }
+            create_edge_bfs(graph, src, dst);
+        }
         /* Select a random number of out degrees. */
         /* For each out degree, choose a random vertex to try to find. */
         /* If the vertex does not already have 4 in degrees */
@@ -252,6 +317,89 @@ build_graph(struct graph *const graph)
            vertex already start the search from this vertex
            we have encountered. */
     }
+}
+
+static void
+create_edge_bfs(struct graph *const graph, struct vertex *const src,
+                struct vertex *const dst)
+{
+    const uint16_t edge_id = sort_vertices(src->name, dst->name);
+    struct set parent_map;
+    set_init(&parent_map);
+    struct pqueue bfs;
+    pq_init(&bfs);
+    struct lineage *const start = valid_malloc(sizeof(struct lineage));
+    *start = (struct lineage){
+        .key = src->pos,
+        .parent = (struct point){-1, -1},
+    };
+    (void)set_insert(&parent_map, &start->elem, cmp_lineage_points, NULL);
+    struct queue_point *start_point = valid_malloc(sizeof(struct queue_point));
+    *start_point = (struct queue_point){.p = src->pos};
+    (void)pq_insert(&bfs, &start_point->elem, cmp_queue_points, NULL);
+    bool success = false;
+    struct point cur = {0};
+    while (!pq_empty(&bfs))
+    {
+        cur = pq_entry(pq_pop_max(&bfs), struct queue_point, elem)->p;
+        const uint32_t *square = grid_at_mut(graph, cur);
+        if ((*square & vertex_bit)
+            && get_cell_vertex_title(*square) == dst->name)
+        {
+            success = true;
+            break;
+        }
+
+        for (size_t i = 0; i < dirs_size; ++i)
+        {
+            struct point next = {
+                .r = cur.r + dirs[i].r,
+                .c = cur.c + dirs[i].c,
+            };
+            struct lineage push = {.key = next, .parent = cur};
+            if (!(grid_at(graph, next) & path_bit)
+                && !set_contains(&parent_map, &push.elem, cmp_lineage_points,
+                                 NULL))
+            {
+                struct lineage *new_lineage
+                    = valid_malloc(sizeof(struct lineage));
+                *new_lineage = push;
+                (void)set_insert(&parent_map, &new_lineage->elem,
+                                 cmp_lineage_points, NULL);
+                struct queue_point *qp
+                    = valid_malloc(sizeof(struct queue_point));
+                *qp = (struct queue_point){.p = next};
+                (void)pq_insert(&bfs, &qp->elem, cmp_queue_points, NULL);
+            }
+        }
+    }
+    if (success)
+    {
+        struct lineage c = {.key = cur};
+        struct lineage *cell = set_entry(
+            set_find(&parent_map, &c.elem, cmp_lineage_points, NULL),
+            struct lineage, elem);
+        c.key = cell->parent;
+        cell = set_entry(
+            set_find(&parent_map, &c.elem, cmp_lineage_points, NULL),
+            struct lineage, elem);
+        struct edge e = {.to = dst->name, .cost = 1};
+        while (cell->parent.r > 0)
+        {
+            ++e.cost;
+            *grid_at_mut(graph, cell->key) = path_bit | (edge_id << 16);
+            build_path_cell(graph, cell->key);
+            flush_cursor_grid_coordinate(graph, cell->key);
+            c.key = cell->parent;
+            cell = set_entry(
+                set_find(&parent_map, &c.elem, cmp_lineage_points, NULL),
+                struct lineage, elem);
+        }
+        (void)add_edge(src, &e);
+        e.to = src->name;
+        (void)add_edge(dst, &e);
+    }
+    set_clear(&parent_map, set_lineage_destructor);
 }
 
 static void
@@ -278,7 +426,6 @@ random_vertex_placement(const struct graph *const graph)
             const struct point cur = {.r = row, .c = col};
             if (is_valid_vertex_pos(graph, cur))
             {
-                *grid_at_mut(graph, cur) |= vertex_bit;
                 return cur;
             }
             exhausted = (row + 1) % graph->rows == row_start
@@ -301,6 +448,58 @@ is_valid_vertex_pos(const struct graph *graph, struct point p)
            && !(grid_at(graph, (struct point){(p.r - 1), p.c}) & vertex_bit)
            && !(grid_at(graph, (struct point){p.r, (p.c - 1)}) & vertex_bit)
            && !(grid_at(graph, (struct point){p.r, (p.c + 1)}) & vertex_bit);
+}
+
+static int
+vertex_degree(const struct vertex *const v)
+{
+    int n = 0;
+    /* Vertexes are initialized with zeroed out edge array. Falsey. */
+    for (size_t i = 0; i < max_degree && v->edges[i].to; ++i, ++n)
+    {}
+    return n;
+}
+
+static struct vertex *
+choose_random_vertex_destination(struct graph *const graph,
+                                 const struct vertex *const src_vertex)
+{
+    const char last_title
+        = (char)(start_vertex_title + set_size(&graph->adjacency_list));
+    struct vertex key = {
+        .name = (char)rand_range(start_vertex_title, last_title - 1),
+    };
+    if (key.name == src_vertex->name)
+    {
+        ++key.name;
+        if (key.name >= last_title)
+        {
+            key.name = start_vertex_title;
+        }
+    }
+    const struct set_elem *e = NULL;
+    struct vertex *v = NULL;
+    const size_t size = set_size(&graph->adjacency_list) - 1;
+    for (size_t i = 0; i < size; ++i)
+    {
+        e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
+        if (e == set_end(&graph->adjacency_list))
+        {
+            quit("Looping through possible vertices yielded error.\n");
+        }
+        v = set_entry(e, struct vertex, elem);
+        if (!has_edge_with(src_vertex, v->name)
+            && vertex_degree(v) < max_degree)
+        {
+            return v;
+        }
+        ++key.name;
+        if (key.name >= last_title)
+        {
+            key.name = start_vertex_title;
+        }
+    }
+    return NULL;
 }
 
 static inline int
@@ -328,6 +527,135 @@ sort_vertices(char a, char b)
     return a < b ? a << 8 | b : b << 8 | a;
 }
 
+static char
+get_cell_vertex_title(const uint32_t cell)
+{
+    return (char)(cell >> vertex_cell_title_shift);
+}
+
+static bool
+has_edge_with(const struct vertex *const v, char vertex)
+{
+    for (size_t i = 0; i < max_degree; ++i)
+    {
+        if (v->edges[i].to == vertex)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool
+add_edge(struct vertex *const v, const struct edge *const e)
+{
+    for (size_t i = 0; i < max_degree; ++i)
+    {
+        if (!v->edges[i].to)
+        {
+            v->edges[i] = *e;
+            return true;
+        }
+    }
+    return false;
+}
+
+/*======================       Grid Helpers      ============================*/
+
+static void
+clear_and_flush_graph(const struct graph *const g)
+{
+    clear_screen();
+    for (int row = 0; row < g->rows; ++row)
+    {
+        for (int col = 0; col < g->cols; ++col)
+        {
+            flush_cursor_grid_coordinate(g, (struct point){.r = row, .c = col});
+        }
+        printf("\n");
+    }
+    (void)fflush(stdout);
+}
+
+static void
+flush_cursor_grid_coordinate(const struct graph *g, struct point p)
+{
+    set_cursor_position(p.r, p.c);
+    print_cell(g, p);
+    (void)fflush(stdout);
+}
+
+static void
+print_cell(const struct graph *const g, struct point p)
+{
+
+    const uint32_t cell = grid_at(g, p);
+    if (cell & vertex_bit)
+    {
+        printf("%c", (char)(cell >> vertex_cell_title_shift));
+    }
+    if (cell & path_bit)
+    {
+        printf("%s", paths[cell & path_mask]);
+    }
+    else if (!(cell & path_bit))
+    {
+        printf(" ");
+    }
+    else
+    {
+        (void)fprintf(stderr, "uncategorizable square.\n");
+    }
+}
+
+static void
+build_path_cell(struct graph *graph, struct point p)
+{
+    uint32_t path = 0;
+    if (p.r - 1 >= 0
+        && (grid_at(graph, (struct point){p.r - 1, p.c}) & path_bit))
+    {
+        path |= north_path;
+        *grid_at_mut(graph, (struct point){p.r - 1, p.c}) |= south_path;
+    }
+    if (p.r + 1 < graph->rows
+        && (grid_at(graph, (struct point){p.r + 1, p.c}) & path_bit))
+    {
+        path |= south_path;
+        *grid_at_mut(graph, (struct point){p.r + 1, p.c}) |= north_path;
+    }
+    if (p.c - 1 >= 0
+        && (grid_at(graph, (struct point){p.r, p.c - 1}) & path_bit))
+    {
+        path |= west_path;
+        *grid_at_mut(graph, (struct point){p.r, p.c - 1}) |= east_path;
+    }
+    if (p.c + 1 < graph->cols
+        && (grid_at(graph, (struct point){p.r, p.c + 1}) & path_bit))
+    {
+        path |= east_path;
+        *grid_at_mut(graph, (struct point){p.r, p.c + 1}) |= west_path;
+    }
+    *grid_at_mut(graph, p) = path | path_bit;
+}
+
+static void
+build_path_outline(struct graph *graph)
+{
+    for (int row = 0; row < graph->rows; row++)
+    {
+        for (int col = 0; col < graph->cols; col++)
+        {
+            if (col == 0 || col == graph->cols - 1 || row == 0
+                || row == graph->rows - 1)
+            {
+                struct point cur = {.r = row, .c = col};
+                build_path_cell(graph, cur);
+            }
+        }
+    }
+}
+
 /*====================    Data Structure Helpers    =========================*/
 
 static threeway_cmp
@@ -340,12 +668,57 @@ cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
     return (v_a->name > v_b->name) - (v_a->name < v_b->name);
 }
 
+static threeway_cmp
+cmp_lineage_points(const struct set_elem *key, const struct set_elem *n,
+                   void *aux)
+{
+    (void)aux;
+    const struct lineage *const a = set_entry(key, struct lineage, elem);
+    const struct lineage *const b = set_entry(n, struct lineage, elem);
+    if (a->key.r == b->key.r && a->key.c == b->key.c)
+    {
+        return EQL;
+    }
+    if (a->key.r == b->key.r)
+    {
+        return (a->key.c > b->key.c) - (a->key.c < b->key.c);
+    }
+    return (a->key.r > b->key.r) - (a->key.r < b->key.r);
+}
+
+/* By returning EQL every time while using a priority queue, it becomes
+   a standard queue. This is because the priority queue provided promises
+   round robin fairness. While a simple linked list or array could be used
+   to provide standard queue functionality, there is no need to make these
+   data structures when a working queue is possible with what is provided. */
+static threeway_cmp
+cmp_queue_points(const struct pq_elem *const a, const struct pq_elem *b,
+                 void *aux)
+{
+    (void)a;
+    (void)b;
+    (void)aux;
+    return EQL;
+}
+
 static void
 print_vertex(const struct set_elem *const x)
 {
     const struct vertex *v = set_entry(x, struct vertex, elem);
     printf("{%c,pos{%d,%d},edges{%c,%c,%c,%c}}", v->name, v->pos.r, v->pos.c,
            v->edges[0].to, v->edges[1].to, v->edges[2].to, v->edges[3].to);
+}
+
+static void
+set_vertex_destructor(struct set_elem *const e)
+{
+    free(set_entry(e, struct vertex, elem));
+}
+
+static void
+set_lineage_destructor(struct set_elem *const e)
+{
+    free(set_entry(e, struct lineage, elem));
 }
 
 /*===========================    Misc    ====================================*/
