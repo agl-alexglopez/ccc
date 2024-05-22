@@ -161,6 +161,8 @@ static void print_cell(uint32_t);
 static char get_cell_vertex_title(uint32_t);
 static bool has_edge_with(const struct vertex *, char);
 static bool add_edge(struct vertex *, const struct edge *);
+static bool is_edge_vertex(uint32_t, uint32_t);
+static bool is_valid_edge_cell(uint32_t, uint32_t);
 
 static struct int_conversion parse_digits(str_view);
 static void *valid_malloc(size_t);
