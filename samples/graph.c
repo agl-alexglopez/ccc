@@ -257,6 +257,7 @@ main(int argc, char **argv)
     set_print(&graph.adjacency_list, set_root(&graph.adjacency_list),
               print_vertex);
     printf("\n");
+    set_clear(&graph.adjacency_list, set_vertex_destructor);
 }
 
 /*========================   Graph Building    ==============================*/
