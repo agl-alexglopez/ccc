@@ -717,10 +717,16 @@ static void
 print_vertex(const struct set_elem *const x)
 {
     const struct vertex *v = set_entry(x, struct vertex, elem);
-    printf("{%c,pos{%d,%d},edges{{%c,%d},{%c,%d},{%c,%d},{%c,%d}}}", v->name,
-           v->pos.r, v->pos.c, v->edges[0].to, v->edges[0].cost, v->edges[1].to,
-           v->edges[1].cost, v->edges[2].to, v->edges[2].cost, v->edges[3].to,
-           v->edges[3].cost);
+    printf("{%c,pos{%d,%d},edges{", v->name, v->pos.r, v->pos.c);
+    for (int i = 0; i < max_degree && v->edges[i].to; ++i)
+    {
+        printf("{%c,%d}", v->edges[i].to, v->edges[i].cost);
+    }
+    printf("}");
+    if (!v->edges[0].to)
+    {
+        printf("}");
+    }
 }
 
 static void
