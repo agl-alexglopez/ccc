@@ -50,9 +50,8 @@ struct queue_point
    unique between two vertices. */
 struct edge
 {
-    char to;          /* This vertex shares an edge TO the specified vertex. */
-    unsigned cost;    /* Distance in cells to the other vertex. */
-    struct point dir; /* Path starts this way from the the vertex. */
+    char to;       /* This vertex shares an edge TO the specified vertex. */
+    unsigned cost; /* Distance in cells to the other vertex. */
 };
 
 /* Each vertex in the set/graph will hold it's key name and edges to other
@@ -112,7 +111,10 @@ const int speed_max = 7;
 const int max_vertices = 26;
 const int max_degree = 4;
 const char start_vertex_title = 'A';
-const size_t vertex_cell_title_shift = 24;
+const size_t vertex_cell_title_shift = 8;
+const size_t edge_id_shift = 16;
+const size_t vertex_title_mask = 0xFF00;
+const uint32_t edge_id_mask = 0xFFFF0000;
 /* This comes immediately after 'Z' on the ASCII table. */
 const char exclusive_end_vertex_title = '[';
 
@@ -137,22 +139,21 @@ const uint32_t vertex_bit = 0b1000000;
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
-static void create_edge_bfs(struct graph *, struct vertex *, struct vertex *);
+static bool create_edge_bfs(struct graph *, struct vertex *, struct vertex *);
 
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
 static int rand_range(int, int);
 static uint32_t *grid_at_mut(const struct graph *, struct point);
 static uint32_t grid_at(const struct graph *, struct point);
-static uint16_t sort_vertices(char a, char b);
+static uint16_t sort_vertices(char, char);
 static int vertex_degree(const struct vertex *);
-static struct vertex *choose_random_vertex_destination(struct graph *,
-                                                       const struct vertex *);
-static void build_path_outline(struct graph *graph);
-static void build_path_cell(struct graph *, struct point);
+static bool connect_random_edge(struct graph *, struct vertex *);
+static void build_path_outline(struct graph *);
+static void build_path_cell(struct graph *, struct point, uint32_t);
 static void flush_cursor_grid_coordinate(const struct graph *, struct point);
-static void clear_and_flush_graph(const struct graph *g);
-static void print_cell(const struct graph *, struct point);
+static void clear_and_flush_graph(const struct graph *);
+static void print_cell(uint32_t);
 static char get_cell_vertex_title(uint32_t);
 static bool has_edge_with(const struct vertex *, char);
 static bool add_edge(struct vertex *, const struct edge *);
@@ -278,7 +279,6 @@ build_graph(struct graph *const graph)
         {
             quit("Error building the graph. New vertex is already present.\n");
         }
-        flush_cursor_grid_coordinate(graph, rand_point);
     }
     struct vertex key = {0};
     for (int vertex = 0, vertex_title = start_vertex_title;
@@ -300,30 +300,55 @@ build_graph(struct graph *const graph)
         const int new_edges = rand_range(1, max_degree - degree);
         for (int i = 0; i < new_edges; ++i)
         {
-            struct vertex *dst = choose_random_vertex_destination(graph, src);
-            if (!dst)
+            if (!connect_random_edge(graph, src))
             {
                 break;
             }
-            create_edge_bfs(graph, src, dst);
         }
-        /* Select a random number of out degrees. */
-        /* For each out degree, choose a random vertex to try to find. */
-        /* If the vertex does not already have 4 in degrees */
-        /* Find the vertex with bfs or dfs. */
-        /* If another vertex is encountered along the way and
-           already shares an edge with the vertex we seek,
-           stop. If it does not share an edge with the desired
-           vertex already start the search from this vertex
-           we have encountered. */
     }
+    clear_and_flush_graph(graph);
 }
 
-static void
+static bool
+connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
+{
+    const char last_title
+        = (char)(start_vertex_title + set_size(&graph->adjacency_list));
+    struct vertex key = {
+        .name = (char)rand_range(start_vertex_title, last_title - 1),
+    };
+    const struct set_elem *e = NULL;
+    struct vertex *v = NULL;
+    const size_t size = set_size(&graph->adjacency_list) - 1;
+    for (size_t i = 0; i < size; ++i, ++key.name)
+    {
+        key.name = (char)(key.name + (key.name == src_vertex->name));
+        if (key.name >= last_title)
+        {
+            key.name = start_vertex_title;
+        }
+        e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
+        if (e == set_end(&graph->adjacency_list))
+        {
+            quit("Looping through possible vertices yielded error.\n");
+        }
+        v = set_entry(e, struct vertex, elem);
+        if (!has_edge_with(src_vertex, v->name) && vertex_degree(v) < max_degree
+            && create_edge_bfs(graph, src_vertex, v))
+        {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool
 create_edge_bfs(struct graph *const graph, struct vertex *const src,
                 struct vertex *const dst)
 {
-    const uint16_t edge_id = sort_vertices(src->name, dst->name);
+    const uint32_t edge_id = sort_vertices(src->name, dst->name)
+                             << edge_id_shift;
     struct set parent_map;
     set_init(&parent_map);
     struct pqueue bfs;
@@ -342,9 +367,8 @@ create_edge_bfs(struct graph *const graph, struct vertex *const src,
     while (!pq_empty(&bfs))
     {
         cur = pq_entry(pq_pop_max(&bfs), struct queue_point, elem)->p;
-        const uint32_t *square = grid_at_mut(graph, cur);
-        if ((*square & vertex_bit)
-            && get_cell_vertex_title(*square) == dst->name)
+        const uint32_t square = grid_at(graph, cur);
+        if ((square & vertex_bit) && get_cell_vertex_title(square) == dst->name)
         {
             success = true;
             break;
@@ -376,30 +400,34 @@ create_edge_bfs(struct graph *const graph, struct vertex *const src,
     if (success)
     {
         struct lineage c = {.key = cur};
-        struct lineage *cell = set_entry(
-            set_find(&parent_map, &c.elem, cmp_lineage_points, NULL),
-            struct lineage, elem);
+        const struct set_elem *e
+            = set_find(&parent_map, &c.elem, cmp_lineage_points, NULL);
+        if (e == set_end(&parent_map))
+        {
+            quit("Cannot find cell parent to rebuild path.\n");
+        }
+        struct lineage *cell = set_entry(e, struct lineage, elem);
         c.key = cell->parent;
-        cell = set_entry(
-            set_find(&parent_map, &c.elem, cmp_lineage_points, NULL),
-            struct lineage, elem);
-        struct edge e = {.to = dst->name, .cost = 1};
+        struct edge edge = {.to = dst->name, .cost = 1};
         while (cell->parent.r > 0)
         {
-            ++e.cost;
-            *grid_at_mut(graph, cell->key) = path_bit | (edge_id << 16);
-            build_path_cell(graph, cell->key);
-            flush_cursor_grid_coordinate(graph, cell->key);
+            e = set_find(&parent_map, &c.elem, cmp_lineage_points, NULL);
+            if (e == set_end(&parent_map))
+            {
+                quit("Cannot find cell parent to rebuild path.\n");
+            }
+            ++edge.cost;
+            cell = set_entry(e, struct lineage, elem);
+            *grid_at_mut(graph, cell->key) |= edge_id;
+            build_path_cell(graph, cell->key, edge_id);
             c.key = cell->parent;
-            cell = set_entry(
-                set_find(&parent_map, &c.elem, cmp_lineage_points, NULL),
-                struct lineage, elem);
         }
-        (void)add_edge(src, &e);
-        e.to = src->name;
-        (void)add_edge(dst, &e);
+        (void)add_edge(src, &edge);
+        edge.to = src->name;
+        (void)add_edge(dst, &edge);
     }
     set_clear(&parent_map, set_lineage_destructor);
+    return success;
 }
 
 static void
@@ -455,51 +483,9 @@ vertex_degree(const struct vertex *const v)
 {
     int n = 0;
     /* Vertexes are initialized with zeroed out edge array. Falsey. */
-    for (size_t i = 0; i < max_degree && v->edges[i].to; ++i, ++n)
+    for (int i = 0; i < max_degree && v->edges[i].to; ++i, ++n)
     {}
     return n;
-}
-
-static struct vertex *
-choose_random_vertex_destination(struct graph *const graph,
-                                 const struct vertex *const src_vertex)
-{
-    const char last_title
-        = (char)(start_vertex_title + set_size(&graph->adjacency_list));
-    struct vertex key = {
-        .name = (char)rand_range(start_vertex_title, last_title - 1),
-    };
-    if (key.name == src_vertex->name)
-    {
-        ++key.name;
-        if (key.name >= last_title)
-        {
-            key.name = start_vertex_title;
-        }
-    }
-    const struct set_elem *e = NULL;
-    struct vertex *v = NULL;
-    const size_t size = set_size(&graph->adjacency_list) - 1;
-    for (size_t i = 0; i < size; ++i)
-    {
-        e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
-        if (e == set_end(&graph->adjacency_list))
-        {
-            quit("Looping through possible vertices yielded error.\n");
-        }
-        v = set_entry(e, struct vertex, elem);
-        if (!has_edge_with(src_vertex, v->name)
-            && vertex_degree(v) < max_degree)
-        {
-            return v;
-        }
-        ++key.name;
-        if (key.name >= last_title)
-        {
-            key.name = start_vertex_title;
-        }
-    }
-    return NULL;
 }
 
 static inline int
@@ -530,13 +516,13 @@ sort_vertices(char a, char b)
 static char
 get_cell_vertex_title(const uint32_t cell)
 {
-    return (char)(cell >> vertex_cell_title_shift);
+    return (char)((cell & vertex_title_mask) >> vertex_cell_title_shift);
 }
 
 static bool
 has_edge_with(const struct vertex *const v, char vertex)
 {
-    for (size_t i = 0; i < max_degree; ++i)
+    for (int i = 0; i < max_degree; ++i)
     {
         if (v->edges[i].to == vertex)
         {
@@ -549,7 +535,7 @@ has_edge_with(const struct vertex *const v, char vertex)
 static bool
 add_edge(struct vertex *const v, const struct edge *const e)
 {
-    for (size_t i = 0; i < max_degree; ++i)
+    for (int i = 0; i < max_degree; ++i)
     {
         if (!v->edges[i].to)
         {
@@ -581,18 +567,18 @@ static void
 flush_cursor_grid_coordinate(const struct graph *g, struct point p)
 {
     set_cursor_position(p.r, p.c);
-    print_cell(g, p);
+    print_cell(grid_at(g, p));
     (void)fflush(stdout);
 }
 
 static void
-print_cell(const struct graph *const g, struct point p)
+print_cell(const uint32_t cell)
 {
 
-    const uint32_t cell = grid_at(g, p);
     if (cell & vertex_bit)
     {
-        printf("%c", (char)(cell >> vertex_cell_title_shift));
+        printf("\033[38;5;14m%c\033[0m",
+               (char)(cell >> vertex_cell_title_shift));
     }
     if (cell & path_bit)
     {
@@ -609,34 +595,46 @@ print_cell(const struct graph *const g, struct point p)
 }
 
 static void
-build_path_cell(struct graph *graph, struct point p)
+build_path_cell(struct graph *graph, struct point p, const uint32_t edge_id)
 {
-    uint32_t path = 0;
+    uint32_t path = path_bit;
     if (p.r - 1 >= 0
-        && (grid_at(graph, (struct point){p.r - 1, p.c}) & path_bit))
+        && ((((grid_at(graph, (struct point){p.r - 1, p.c}) & path_bit)
+              && (grid_at(graph, (struct point){p.r - 1, p.c}) & edge_id_mask)
+                     == edge_id))
+            || grid_at(graph, (struct point){p.r - 1, p.c}) & vertex_bit))
     {
         path |= north_path;
         *grid_at_mut(graph, (struct point){p.r - 1, p.c}) |= south_path;
     }
     if (p.r + 1 < graph->rows
-        && (grid_at(graph, (struct point){p.r + 1, p.c}) & path_bit))
+        && ((((grid_at(graph, (struct point){p.r + 1, p.c}) & path_bit)
+              && (grid_at(graph, (struct point){p.r + 1, p.c}) & edge_id_mask)
+                     == edge_id))
+            || grid_at(graph, (struct point){p.r + 1, p.c}) & vertex_bit))
     {
         path |= south_path;
         *grid_at_mut(graph, (struct point){p.r + 1, p.c}) |= north_path;
     }
     if (p.c - 1 >= 0
-        && (grid_at(graph, (struct point){p.r, p.c - 1}) & path_bit))
+        && ((((grid_at(graph, (struct point){p.r, p.c - 1}) & path_bit)
+              && (grid_at(graph, (struct point){p.r, p.c - 1}) & edge_id_mask)
+                     == edge_id))
+            || grid_at(graph, (struct point){p.r, p.c - 1}) & vertex_bit))
     {
         path |= west_path;
         *grid_at_mut(graph, (struct point){p.r, p.c - 1}) |= east_path;
     }
     if (p.c + 1 < graph->cols
-        && (grid_at(graph, (struct point){p.r, p.c + 1}) & path_bit))
+        && ((((grid_at(graph, (struct point){p.r, p.c + 1}) & path_bit)
+              && (grid_at(graph, (struct point){p.r, p.c + 1}) & edge_id_mask)
+                     == edge_id))
+            || grid_at(graph, (struct point){p.r, p.c + 1}) & vertex_bit))
     {
         path |= east_path;
         *grid_at_mut(graph, (struct point){p.r, p.c + 1}) |= west_path;
     }
-    *grid_at_mut(graph, p) = path | path_bit;
+    *grid_at_mut(graph, p) |= path;
 }
 
 static void
@@ -650,7 +648,7 @@ build_path_outline(struct graph *graph)
                 || row == graph->rows - 1)
             {
                 struct point cur = {.r = row, .c = col};
-                build_path_cell(graph, cur);
+                build_path_cell(graph, cur, 0);
             }
         }
     }
@@ -705,8 +703,10 @@ static void
 print_vertex(const struct set_elem *const x)
 {
     const struct vertex *v = set_entry(x, struct vertex, elem);
-    printf("{%c,pos{%d,%d},edges{%c,%c,%c,%c}}", v->name, v->pos.r, v->pos.c,
-           v->edges[0].to, v->edges[1].to, v->edges[2].to, v->edges[3].to);
+    printf("{%c,pos{%d,%d},edges{{%c,%d},{%c,%d},{%c,%d},{%c,%d}}}", v->name,
+           v->pos.r, v->pos.c, v->edges[0].to, v->edges[0].cost, v->edges[1].to,
+           v->edges[1].cost, v->edges[2].to, v->edges[2].cost, v->edges[3].to,
+           v->edges[3].cost);
 }
 
 static void
