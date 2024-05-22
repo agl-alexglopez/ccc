@@ -110,6 +110,7 @@ const int row_col_min = 7;
 const int speed_max = 7;
 const int max_vertices = 26;
 const int max_degree = 4;
+const int vertex_placement_padding = 3;
 const char start_vertex_title = 'A';
 const size_t vertex_cell_title_shift = 8;
 const size_t edge_id_shift = 16;
@@ -143,7 +144,7 @@ const uint32_t vertex_bit = 0b1000000;
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
-static bool create_edge_bfs(struct graph *, struct vertex *, struct vertex *);
+static bool find_vertex_bfs(struct graph *, struct vertex *, struct vertex *);
 
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
@@ -341,7 +342,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         }
         v = set_entry(e, struct vertex, elem);
         if (!has_edge_with(src_vertex, v->name) && vertex_degree(v) < max_degree
-            && create_edge_bfs(graph, src_vertex, v))
+            && find_vertex_bfs(graph, src_vertex, v))
         {
 
             return true;
@@ -351,7 +352,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 }
 
 static bool
-create_edge_bfs(struct graph *const graph, struct vertex *const src,
+find_vertex_bfs(struct graph *const graph, struct vertex *const src,
                 struct vertex *const dst)
 {
     const uint32_t edge_id = sort_vertices(src->name, dst->name)
@@ -449,22 +450,32 @@ random_vertex_placement(const struct graph *const graph)
     const int row_end = graph->rows - 2;
     const int col_end = graph->cols - 2;
     /* No vertices should be close to the edge of the map. */
-    const int row_start = rand_range(3, graph->rows - 3);
-    const int col_start = rand_range(3, graph->cols - 3);
+    const int row_start = rand_range(vertex_placement_padding,
+                                     graph->rows - vertex_placement_padding);
+    const int col_start = rand_range(vertex_placement_padding,
+                                     graph->cols - vertex_placement_padding);
     bool exhausted = false;
     for (int row = row_start; !exhausted && row < row_end;
          row = (row + 1) % row_end)
     {
+        if (!row)
+        {
+            row = vertex_placement_padding;
+        }
         for (int col = col_start; !exhausted && col < col_end;
              col = (col + 1) % col_end)
         {
+            if (!col)
+            {
+                col = vertex_placement_padding;
+            }
             const struct point cur = {.r = row, .c = col};
             if (is_valid_vertex_pos(graph, cur))
             {
                 return cur;
             }
-            exhausted = (row + 1) % graph->rows == row_start
-                        && (col + 1) % graph->cols == col_start;
+            exhausted = ((row + 1) % graph->rows) == row_start
+                        && ((col + 1) % graph->cols) == col_start;
         }
     }
     (void)fprintf(stderr, "cannot find a place for another vertex "
