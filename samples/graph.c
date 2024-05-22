@@ -115,6 +115,10 @@ const size_t vertex_cell_title_shift = 8;
 const size_t edge_id_shift = 16;
 const size_t vertex_title_mask = 0xFF00;
 const uint32_t edge_id_mask = 0xFFFF0000;
+const uint32_t l_edge_id_mask = 0xFF000000;
+const uint32_t l_edge_id_shift = 24;
+const uint32_t r_edge_id_mask = 0x00FF0000;
+const uint32_t r_edge_id_shift = 16;
 /* This comes immediately after 'Z' on the ASCII table. */
 const char exclusive_end_vertex_title = '[';
 
@@ -594,47 +598,57 @@ print_cell(const uint32_t cell)
     }
 }
 
+static bool
+is_edge_vertex(const uint32_t square, uint32_t edge_id)
+{
+    const char vertex_name = get_cell_vertex_title(square);
+    const char edge_vertex1
+        = (char)((edge_id & l_edge_id_mask) >> l_edge_id_shift);
+    const char edge_vertex2
+        = (char)((edge_id & r_edge_id_mask) >> r_edge_id_shift);
+    return vertex_name == edge_vertex1 || vertex_name == edge_vertex2;
+}
+
+static bool
+is_valid_edge_cell(const uint32_t square, const uint32_t edge_id)
+{
+    return ((square & vertex_bit) && is_edge_vertex(square, edge_id))
+           || ((square & path_bit) && (square & edge_id_mask) == edge_id);
+}
+
 static void
-build_path_cell(struct graph *graph, struct point p, const uint32_t edge_id)
+build_path_cell(struct graph *g, struct point p, const uint32_t edge_id)
 {
     uint32_t path = path_bit;
     if (p.r - 1 >= 0
-        && ((((grid_at(graph, (struct point){p.r - 1, p.c}) & path_bit)
-              && (grid_at(graph, (struct point){p.r - 1, p.c}) & edge_id_mask)
-                     == edge_id))
-            || grid_at(graph, (struct point){p.r - 1, p.c}) & vertex_bit))
+        && is_valid_edge_cell(
+            grid_at(g, (struct point){.r = p.r - 1, .c = p.c}), edge_id))
     {
         path |= north_path;
-        *grid_at_mut(graph, (struct point){p.r - 1, p.c}) |= south_path;
+        *grid_at_mut(g, (struct point){p.r - 1, p.c}) |= south_path;
     }
-    if (p.r + 1 < graph->rows
-        && ((((grid_at(graph, (struct point){p.r + 1, p.c}) & path_bit)
-              && (grid_at(graph, (struct point){p.r + 1, p.c}) & edge_id_mask)
-                     == edge_id))
-            || grid_at(graph, (struct point){p.r + 1, p.c}) & vertex_bit))
+    if (p.r + 1 < g->rows
+        && is_valid_edge_cell(
+            grid_at(g, (struct point){.r = p.r + 1, .c = p.c}), edge_id))
     {
         path |= south_path;
-        *grid_at_mut(graph, (struct point){p.r + 1, p.c}) |= north_path;
+        *grid_at_mut(g, (struct point){p.r + 1, p.c}) |= north_path;
     }
     if (p.c - 1 >= 0
-        && ((((grid_at(graph, (struct point){p.r, p.c - 1}) & path_bit)
-              && (grid_at(graph, (struct point){p.r, p.c - 1}) & edge_id_mask)
-                     == edge_id))
-            || grid_at(graph, (struct point){p.r, p.c - 1}) & vertex_bit))
+        && is_valid_edge_cell(
+            grid_at(g, (struct point){.r = p.r, .c = p.c - 1}), edge_id))
     {
         path |= west_path;
-        *grid_at_mut(graph, (struct point){p.r, p.c - 1}) |= east_path;
+        *grid_at_mut(g, (struct point){p.r, p.c - 1}) |= east_path;
     }
-    if (p.c + 1 < graph->cols
-        && ((((grid_at(graph, (struct point){p.r, p.c + 1}) & path_bit)
-              && (grid_at(graph, (struct point){p.r, p.c + 1}) & edge_id_mask)
-                     == edge_id))
-            || grid_at(graph, (struct point){p.r, p.c + 1}) & vertex_bit))
+    if (p.c + 1 < g->cols
+        && is_valid_edge_cell(
+            grid_at(g, (struct point){.r = p.r, .c = p.c + 1}), edge_id))
     {
         path |= east_path;
-        *grid_at_mut(graph, (struct point){p.r, p.c + 1}) |= west_path;
+        *grid_at_mut(g, (struct point){p.r, p.c + 1}) |= west_path;
     }
-    *grid_at_mut(graph, p) |= path;
+    *grid_at_mut(g, p) |= path;
 }
 
 static void
