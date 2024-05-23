@@ -36,7 +36,7 @@ struct parent_cell
 struct prev_vertex
 {
     struct vertex *v;
-    struct vertex *parent;
+    struct vertex *prev;
     struct set_elem elem;
 };
 
@@ -161,10 +161,12 @@ const uint32_t west_path = 0b1000;
 const uint32_t cached_bit = 0b10000;
 const uint32_t path_bit = 0b100000;
 const uint32_t vertex_bit = 0b1000000;
+const uint32_t paint_bit = 0b10000000;
 
 const str_view prompt_msg
     = SV("Enter two vertices to find the shortest path between them (i.e. "
-         "A-Z):");
+         "A-Z). Enter quit to quit:");
+const str_view quit_cmd = SV("quit");
 
 /*==========================   Prototypes  ================================= */
 
@@ -174,6 +176,8 @@ static bool find_grid_vertex_bfs(struct graph *, struct vertex *,
                                  struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct vertex *,
                                    struct vertex *);
+static void paint_edge(struct graph *, const struct vertex *,
+                       const struct vertex *);
 
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
@@ -193,6 +197,7 @@ static bool has_edge_with(const struct vertex *, char);
 static bool add_edge(struct vertex *, const struct edge *);
 static bool is_edge_vertex(uint32_t, uint32_t);
 static bool is_valid_edge_cell(uint32_t, uint32_t);
+static void clear_paint(struct graph *);
 
 static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
@@ -203,8 +208,8 @@ static threeway_cmp cmp_vertices(const struct set_elem *,
                                  const struct set_elem *, void *);
 static threeway_cmp cmp_queue_points(const struct pq_elem *,
                                      const struct pq_elem *, void *);
-static threeway_cmp cmp_lineage_points(const struct set_elem *,
-                                       const struct set_elem *, void *);
+static threeway_cmp cmp_parent_cells(const struct set_elem *,
+                                     const struct set_elem *, void *);
 static threeway_cmp cmp_pq_dist_points(const struct pq_elem *,
                                        const struct pq_elem *, void *);
 static threeway_cmp cmp_set_dist_points(const struct set_elem *,
@@ -225,7 +230,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+    srand(1);
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,
@@ -242,7 +247,7 @@ main(int argc, char **argv)
             const struct int_conversion row_arg = parse_digits(arg);
             if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
             {
-                quit("rows below required minimum or negative.\n");
+                quit("rows below required minimum or negative.\n", 1);
             }
             graph.rows = row_arg.conversion;
         }
@@ -251,7 +256,7 @@ main(int argc, char **argv)
             const struct int_conversion col_arg = parse_digits(arg);
             if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
             {
-                quit("cols below required minimum or negative.\n");
+                quit("cols below required minimum or negative.\n", 1);
             }
             graph.cols = col_arg.conversion;
         }
@@ -261,7 +266,7 @@ main(int argc, char **argv)
             if (speed_arg.status == CONV_ER || speed_arg.conversion > speed_max
                 || speed_arg.conversion < 0)
             {
-                quit("speed outside of valid range.\n");
+                quit("speed outside of valid range.\n", 1);
             }
             graph.speed = speed_arg.conversion;
         }
@@ -271,7 +276,7 @@ main(int argc, char **argv)
             if (vert_arg.status == CONV_ER || vert_arg.conversion > max_vertices
                 || vert_arg.conversion < 1)
             {
-                quit("vertices outside of valid range.\n");
+                quit("vertices outside of valid range.\n", 1);
             }
             graph.vertices = vert_arg.conversion;
         }
@@ -282,7 +287,8 @@ main(int argc, char **argv)
         else
         {
             quit("can only specify rows, columns, or speed "
-                 "for now (-r=N, -c=N, -s=N)\n");
+                 "for now (-r=N, -c=N, -s=N)\n",
+                 1);
         }
     }
     /* This type of maze generation requires odd rows and cols. */
@@ -323,7 +329,8 @@ build_graph(struct graph *const graph)
         if (!set_insert(&graph->adjacency_list, &new_vertex->elem, cmp_vertices,
                         NULL))
         {
-            quit("Error building the graph. New vertex is already present.\n");
+            quit("Error building the graph. New vertex is already present.\n",
+                 1);
         }
     }
     struct vertex key = {0};
@@ -335,7 +342,7 @@ build_graph(struct graph *const graph)
             = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
         if (e == set_end(&graph->adjacency_list))
         {
-            quit("Vertex that should be present in the set is absent.\n");
+            quit("Vertex that should be present in the set is absent.\n", 1);
         }
         struct vertex *const src = set_entry(e, struct vertex, elem);
         const int degree = vertex_degree(src);
@@ -344,13 +351,8 @@ build_graph(struct graph *const graph)
             continue;
         }
         const int new_edges = rand_range(1, max_degree - degree);
-        for (int i = 0; i < new_edges; ++i)
-        {
-            if (!connect_random_edge(graph, src))
-            {
-                break;
-            }
-        }
+        for (int i = 0; i < new_edges && connect_random_edge(graph, src); ++i)
+        {}
     }
     clear_and_flush_graph(graph);
 }
@@ -364,7 +366,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         .name = (char)rand_range(start_vertex_title, last_title - 1),
     };
     const struct set_elem *e = NULL;
-    struct vertex *v = NULL;
+    struct vertex *dst = NULL;
     const size_t size = set_size(&graph->adjacency_list) - 1;
     for (size_t i = 0; i < size; ++i, ++key.name)
     {
@@ -376,11 +378,12 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
         if (e == set_end(&graph->adjacency_list))
         {
-            quit("Looping through possible vertices yielded error.\n");
+            quit("Looping through possible vertices yielded error.\n", 1);
         }
-        v = set_entry(e, struct vertex, elem);
-        if (!has_edge_with(src_vertex, v->name) && vertex_degree(v) < max_degree
-            && find_grid_vertex_bfs(graph, src_vertex, v))
+        dst = set_entry(e, struct vertex, elem);
+        if (!has_edge_with(src_vertex, dst->name)
+            && vertex_degree(dst) < max_degree
+            && find_grid_vertex_bfs(graph, src_vertex, dst))
         {
 
             return true;
@@ -404,7 +407,7 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         .key = src->pos,
         .parent = (struct point){-1, -1},
     };
-    (void)set_insert(&parent_map, &start->elem, cmp_lineage_points, NULL);
+    (void)set_insert(&parent_map, &start->elem, cmp_parent_cells, NULL);
     struct bfs_point *start_point = valid_malloc(sizeof(struct bfs_point));
     *start_point = (struct bfs_point){.p = src->pos};
     (void)pq_insert(&bfs, &start_point->elem, cmp_queue_points, NULL);
@@ -415,14 +418,6 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         struct bfs_point *bp
             = pq_entry(pq_pop_max(&bfs), struct bfs_point, elem);
         cur = bp->p;
-        const uint32_t square = grid_at(graph, cur);
-        if ((square & vertex_bit) && get_cell_vertex_title(square) == dst->name)
-        {
-            free(bp);
-            success = true;
-            break;
-        }
-
         for (size_t i = 0; i < dirs_size; ++i)
         {
             struct point next = {
@@ -430,19 +425,40 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
                 .c = cur.c + dirs[i].c,
             };
             struct parent_cell push = {.key = next, .parent = cur};
-            if (!(grid_at(graph, next) & path_bit)
-                && !set_contains(&parent_map, &push.elem, cmp_lineage_points,
+            const uint32_t next_cell = grid_at(graph, next);
+            if ((next_cell & vertex_bit))
+            {
+                if (get_cell_vertex_title(next_cell) != dst->name)
+                {
+                    continue;
+                }
+                free(bp);
+                struct parent_cell *new_lineage
+                    = valid_malloc(sizeof(struct parent_cell));
+                *new_lineage = push;
+                (void)set_insert(&parent_map, &new_lineage->elem,
+                                 cmp_parent_cells, NULL);
+                cur = next;
+                success = true;
+                break;
+            }
+            if (!(next_cell & path_bit)
+                && !set_contains(&parent_map, &push.elem, cmp_parent_cells,
                                  NULL))
             {
                 struct parent_cell *new_lineage
                     = valid_malloc(sizeof(struct parent_cell));
                 *new_lineage = push;
                 (void)set_insert(&parent_map, &new_lineage->elem,
-                                 cmp_lineage_points, NULL);
+                                 cmp_parent_cells, NULL);
                 struct bfs_point *qp = valid_malloc(sizeof(struct bfs_point));
                 *qp = (struct bfs_point){.p = next};
                 (void)pq_insert(&bfs, &qp->elem, cmp_queue_points, NULL);
             }
+        }
+        if (success)
+        {
+            break;
         }
         free(bp);
     }
@@ -450,20 +466,20 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
     {
         struct parent_cell c = {.key = cur};
         const struct set_elem *e
-            = set_find(&parent_map, &c.elem, cmp_lineage_points, NULL);
+            = set_find(&parent_map, &c.elem, cmp_parent_cells, NULL);
         if (e == set_end(&parent_map))
         {
-            quit("Cannot find cell parent to rebuild path.\n");
+            quit("Cannot find cell parent to rebuild path.\n", 1);
         }
         struct parent_cell *cell = set_entry(e, struct parent_cell, elem);
         c.key = cell->parent;
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
         {
-            e = set_find(&parent_map, &c.elem, cmp_lineage_points, NULL);
+            e = set_find(&parent_map, &c.elem, cmp_parent_cells, NULL);
             if (e == set_end(&parent_map))
             {
-                quit("Cannot find cell parent to rebuild path.\n");
+                quit("Cannot find cell parent to rebuild path.\n", 1);
             }
             ++edge.cost;
             cell = set_entry(e, struct parent_cell, elem);
@@ -482,12 +498,13 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
 static void
 find_shortest_paths(struct graph *const graph)
 {
+    char *lineptr = NULL;
     for (;;)
     {
+        clear_paint(graph);
         set_cursor_position(graph->rows + 1, graph->cols);
         clear_line();
         sv_print(stdout, prompt_msg);
-        char *lineptr = NULL;
         size_t len = 0;
         ssize_t read = 0;
         while ((read = getline(&lineptr, &len, stdin)) != -1)
@@ -500,15 +517,17 @@ find_shortest_paths(struct graph *const graph)
             if (!pr.src)
             {
                 clear_line();
-                quit(
-                    "Please provide any source and destination vertex "
-                    "represented in the grid (ex. AB, A B, B-C, X->Y, DtoF). "
-                    "Most formats work but two capital vertices are needed.\n");
+                quit("Please provide any source and destination vertex "
+                     "represented in the grid\nExamples: AB, A B, B-C, X->Y, "
+                     "DtoF\nMost formats work but two capital vertices are "
+                     "needed.\n",
+                     1);
             }
             dijkstra_shortest_path(graph, pr.src, pr.dst);
+            break;
         }
-        free(lineptr);
     }
+    free(lineptr);
 }
 
 static bool
@@ -533,13 +552,10 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
         if (p->v == src)
         {
             p->dist = 0;
-        }
-        else
-        {
             struct prev_vertex *pv = valid_malloc(sizeof(struct parent_cell));
             *pv = (struct prev_vertex){
                 .v = p->v,
-                .parent = NULL,
+                .prev = NULL,
             };
             (void)set_insert(&parent_map, &pv->elem, cmp_set_prev_vertices,
                              NULL);
@@ -547,15 +563,14 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
         (void)pq_insert(&distances, &p->pq_elem, cmp_pq_dist_points, NULL);
         (void)set_insert(&vertices, &p->set_elem, cmp_set_dist_points, NULL);
     }
-    bool result = false;
+    bool success = false;
+    struct dist_point *cur = NULL;
     while (!pq_empty(&distances))
     {
-        struct dist_point *cur
-            = pq_entry(pq_pop_min(&distances), struct dist_point, pq_elem);
+        cur = pq_entry(pq_pop_min(&distances), struct dist_point, pq_elem);
         if (cur->v == dst)
         {
-            free(cur);
-            result = true;
+            success = true;
             break;
         }
         (void)set_erase(&vertices, &cur->set_elem, cmp_set_dist_points, NULL);
@@ -570,13 +585,13 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
             }
             struct dist_point *next = set_entry(e, struct dist_point, set_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
-            if (next->dist != INT_MAX && alt < next->dist)
+            if (alt < next->dist)
             {
                 struct prev_vertex *pv
                     = valid_malloc(sizeof(struct parent_cell));
                 *pv = (struct prev_vertex){
                     .v = next->v,
-                    .parent = cur->v,
+                    .prev = cur->v,
                 };
                 (void)set_insert(&parent_map, &pv->elem, cmp_set_prev_vertices,
                                  NULL);
@@ -584,11 +599,60 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
                           pq_update_dist, &alt);
             }
         }
-        free(cur);
+    }
+    if (success)
+    {
+        struct prev_vertex key = {.v = cur->v};
+        struct prev_vertex *prev = set_entry(
+            set_find(&parent_map, &key.elem, cmp_set_prev_vertices, NULL),
+            struct prev_vertex, elem);
+        while (prev->prev)
+        {
+            paint_edge(graph, key.v, prev->prev);
+            key.v = prev->prev;
+            prev = set_entry(
+                set_find(&parent_map, &key.elem, cmp_set_prev_vertices, NULL),
+                struct prev_vertex, elem);
+        }
     }
     pq_clear(&distances, pq_dist_point_destructor);
     set_clear(&parent_map, set_parent_destructor);
-    return result;
+    clear_and_flush_graph(graph);
+    return success;
+}
+
+static void
+paint_edge(struct graph *const g, const struct vertex *const src,
+           const struct vertex *const dst)
+{
+    struct point cur = src->pos;
+    const uint32_t edge_id = sort_vertices(src->name, dst->name)
+                             << edge_id_shift;
+    struct point prev = cur;
+    while (cur.r != dst->pos.r || cur.c != dst->pos.c)
+    {
+        *grid_at_mut(g, cur) |= paint_bit;
+        for (size_t i = 0; i < dirs_size; ++i)
+        {
+            struct point next = {
+                .r = cur.r + dirs[i].r,
+                .c = cur.c + dirs[i].c,
+            };
+            const uint32_t next_cell = grid_at(g, next);
+            if ((next_cell & vertex_bit)
+                && get_cell_vertex_title(next_cell) == dst->name)
+            {
+                return;
+            }
+            if ((grid_at(g, next) & edge_id_mask) == edge_id
+                && (prev.r != next.r || prev.c != next.c))
+            {
+                prev = cur;
+                cur = next;
+                break;
+            }
+        }
+    }
 }
 
 static struct point
@@ -687,7 +751,7 @@ get_cell_vertex_title(const uint32_t cell)
 static bool
 has_edge_with(const struct vertex *const v, char vertex)
 {
-    for (int i = 0; i < max_degree; ++i)
+    for (int i = 0; i < max_degree && v->edges[i].to; ++i)
     {
         if (v->edges[i].to->name == vertex)
         {
@@ -721,11 +785,24 @@ clear_and_flush_graph(const struct graph *const g)
     {
         for (int col = 0; col < g->cols; ++col)
         {
-            flush_cursor_grid_coordinate(g, (struct point){.r = row, .c = col});
+            set_cursor_position(row, col);
+            print_cell(grid_at(g, (struct point){.r = row, .c = col}));
         }
         printf("\n");
     }
     (void)fflush(stdout);
+}
+
+static void
+clear_paint(struct graph *const graph)
+{
+    for (int r = 0; r < graph->rows; ++r)
+    {
+        for (int c = 0; c < graph->cols; ++c)
+        {
+            *grid_at_mut(graph, (struct point){.r = r, .c = c}) &= ~paint_bit;
+        }
+    }
 }
 
 static void
@@ -745,13 +822,27 @@ print_cell(const uint32_t cell)
         printf("\033[38;5;14m%c\033[0m",
                (char)(cell >> vertex_cell_title_shift));
     }
-    if (cell & path_bit)
+    else if (cell & path_bit)
     {
-        printf("%s", paths[cell & path_mask]);
+        if (cell & paint_bit)
+        {
+            printf("\033[38;5;14m%s\033[0m", paths[cell & path_mask]);
+        }
+        else
+        {
+            printf("%s", paths[cell & path_mask]);
+        }
     }
     else if (!(cell & path_bit))
     {
-        printf(" ");
+        if (cell & paint_bit)
+        {
+            printf("\033[38;5;14m█\033[0m");
+        }
+        else
+        {
+            printf(" ");
+        }
     }
     else
     {
@@ -842,8 +933,7 @@ cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
 }
 
 static threeway_cmp
-cmp_lineage_points(const struct set_elem *x, const struct set_elem *y,
-                   void *aux)
+cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
 {
     (void)aux;
     const struct parent_cell *const a = set_entry(x, struct parent_cell, elem);
@@ -967,6 +1057,10 @@ pq_dist_point_destructor(struct pq_elem *const e)
 static struct path_request
 parse_path_request(struct graph *const g, str_view r)
 {
+    if (sv_contains(r, quit_cmd))
+    {
+        quit("Exiting now.\n", 0);
+    }
     struct path_request res = {0};
     for (const char *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {

@@ -23,10 +23,10 @@ set_cursor_position(const int row, const int col)
 }
 
 void
-quit(const char *const msg)
+quit(const char *const msg, int code)
 {
     (void)fprintf(stdout, "%s", msg);
-    exit(1);
+    exit(code);
 }
 
 struct int_conversion

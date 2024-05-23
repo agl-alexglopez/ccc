@@ -146,7 +146,7 @@ main(int argc, char **argv)
             const struct int_conversion row_arg = parse_digits(arg);
             if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
             {
-                quit("rows below required minimum or negative.\n");
+                quit("rows below required minimum or negative.\n", 1);
             }
             maze.rows = row_arg.conversion;
         }
@@ -155,7 +155,7 @@ main(int argc, char **argv)
             const struct int_conversion col_arg = parse_digits(arg);
             if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
             {
-                quit("cols below required minimum or negative.\n");
+                quit("cols below required minimum or negative.\n", 1);
             }
             maze.cols = col_arg.conversion;
         }
@@ -165,7 +165,7 @@ main(int argc, char **argv)
             if (speed_arg.status == CONV_ER || speed_arg.conversion > speed_max
                 || speed_arg.conversion < 0)
             {
-                quit("speed outside of valid range.\n");
+                quit("speed outside of valid range.\n", 1);
             }
             maze.speed = speed_arg.conversion;
         }
@@ -176,7 +176,8 @@ main(int argc, char **argv)
         else
         {
             quit("can only specify rows, columns, or speed "
-                 "for now (-r=N, -c=N, -s=N)\n");
+                 "for now (-r=N, -c=N, -s=N)\n",
+                 1);
         }
     }
     /* This type of maze generation requires odd rows and cols. */
