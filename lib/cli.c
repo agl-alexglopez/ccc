@@ -11,6 +11,12 @@ clear_screen(void)
 }
 
 void
+clear_line(void)
+{
+    printf("\033[2K\r");
+}
+
+void
 set_cursor_position(const int row, const int col)
 {
     printf("\033[%d;%df", row + 1, col + 1);

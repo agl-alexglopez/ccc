@@ -19,6 +19,7 @@ struct int_conversion convert_to_int(const char *);
 void quit(const char *);
 
 void clear_screen(void);
+void clear_line(void);
 void set_cursor_position(int row, int col);
 
 #endif
