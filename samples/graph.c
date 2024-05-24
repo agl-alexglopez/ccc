@@ -230,7 +230,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(1);
+    srand(time(NULL));
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,
@@ -502,7 +502,7 @@ find_shortest_paths(struct graph *const graph)
     for (;;)
     {
         clear_paint(graph);
-        set_cursor_position(graph->rows + 1, graph->cols);
+        set_cursor_position(graph->rows, 0);
         clear_line();
         sv_print(stdout, prompt_msg);
         size_t len = 0;
@@ -523,7 +523,13 @@ find_shortest_paths(struct graph *const graph)
                      "needed.\n",
                      1);
             }
-            dijkstra_shortest_path(graph, pr.src, pr.dst);
+            if (!dijkstra_shortest_path(graph, pr.src, pr.dst))
+            {
+                set_cursor_position(pr.src->pos.r, pr.src->pos.c);
+                printf("\033[38;5;9m%c\033[0m", pr.src->name);
+                set_cursor_position(pr.dst->pos.r, pr.dst->pos.c);
+                printf("\033[38;5;9m%c\033[0m", pr.dst->name);
+            }
             break;
         }
     }
@@ -568,9 +574,9 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
     while (!pq_empty(&distances))
     {
         cur = pq_entry(pq_pop_min(&distances), struct dist_point, pq_elem);
-        if (cur->v == dst)
+        if (cur->v == dst || cur->dist == INT_MAX)
         {
-            success = true;
+            success = cur->dist != INT_MAX;
             break;
         }
         (void)set_erase(&vertices, &cur->set_elem, cmp_set_dist_points, NULL);
@@ -595,8 +601,11 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
                 };
                 (void)set_insert(&parent_map, &pv->elem, cmp_set_prev_vertices,
                                  NULL);
-                pq_update(&distances, &next->pq_elem, cmp_pq_dist_points,
-                          pq_update_dist, &alt);
+                if (!pq_update(&distances, &next->pq_elem, cmp_pq_dist_points,
+                               pq_update_dist, &alt))
+                {
+                    quit("Updating vertex that is not in queue.\n", 1);
+                }
             }
         }
     }
@@ -826,7 +835,7 @@ print_cell(const uint32_t cell)
     {
         if (cell & paint_bit)
         {
-            printf("\033[38;5;14m%s\033[0m", paths[cell & path_mask]);
+            printf("\033[38;5;13m%s\033[0m", paths[cell & path_mask]);
         }
         else
         {
@@ -1062,11 +1071,11 @@ parse_path_request(struct graph *const g, str_view r)
         quit("Exiting now.\n", 0);
     }
     struct path_request res = {0};
+    const char end_title
+        = (char)(start_vertex_title + set_size(&g->adjacency_list) - 1);
     for (const char *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
-        if (*c >= start_vertex_title
-            && *c <= (char)(start_vertex_title + set_size(&g->adjacency_list)
-                            - 1))
+        if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex key = {.name = *c};
             struct vertex *v = set_entry(
