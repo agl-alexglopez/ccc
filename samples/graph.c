@@ -203,6 +203,7 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
 static void help(void);
 
+static bool insert_prev_vertex(struct set *, struct prev_vertex);
 static threeway_cmp cmp_vertices(const struct set_elem *,
                                  const struct set_elem *, void *);
 static threeway_cmp cmp_queue_points(const struct pq_elem *,
@@ -550,13 +551,10 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         if (p->v == pr.src)
         {
             p->dist = 0;
-            struct prev_vertex *pv = valid_malloc(sizeof(struct parent_cell));
-            *pv = (struct prev_vertex){
-                .v = p->v,
-                .prev = NULL,
-            };
-            (void)set_insert(&parent_map, &pv->elem, cmp_set_prev_vertices,
-                             NULL);
+            (void)insert_prev_vertex(&parent_map, (struct prev_vertex){
+                                                      .v = p->v,
+                                                      .prev = NULL,
+                                                  });
         }
         (void)pq_insert(&distances, &p->pq_elem, cmp_pq_dist_points, NULL);
         (void)set_insert(&vertices, &p->set_elem, cmp_set_dist_points, NULL);
@@ -585,14 +583,10 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < next->dist)
             {
-                struct prev_vertex *pv
-                    = valid_malloc(sizeof(struct parent_cell));
-                *pv = (struct prev_vertex){
-                    .v = next->v,
-                    .prev = cur->v,
-                };
-                (void)set_insert(&parent_map, &pv->elem, cmp_set_prev_vertices,
-                                 NULL);
+                (void)insert_prev_vertex(&parent_map, (struct prev_vertex){
+                                                          .v = next->v,
+                                                          .prev = cur->v,
+                                                      });
                 if (!pq_update(&distances, &next->pq_elem, cmp_pq_dist_points,
                                pq_update_dist, &alt))
                 {
@@ -922,6 +916,15 @@ build_path_outline(struct graph *graph)
 }
 
 /*====================    Data Structure Helpers    =========================*/
+
+static bool
+insert_prev_vertex(struct set *s, struct prev_vertex pv)
+{
+
+    struct prev_vertex *pv_heap = valid_malloc(sizeof(struct parent_cell));
+    *pv_heap = pv;
+    return set_insert(s, &pv_heap->elem, cmp_set_prev_vertices, NULL);
+}
 
 static threeway_cmp
 cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
