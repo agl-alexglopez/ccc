@@ -614,7 +614,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
-       prev map is the last allocation with access the priority queue
+       prev map is the last allocation with access to the priority queue
        elements that have been popped but not freed. It will free its
        own set and its references to priority queue elements. */
     set_clear(&prev_map, set_pq_prev_vertex_dist_point_destructor);
