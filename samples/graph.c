@@ -204,6 +204,8 @@ static void *valid_malloc(size_t);
 static void help(void);
 
 static bool insert_prev_vertex(struct set *, struct prev_vertex);
+static bool insert_parent_cell(struct set *, struct parent_cell);
+static void insert_bfs_point(struct pqueue *, struct bfs_point);
 static threeway_cmp cmp_vertices(const struct set_elem *,
                                  const struct set_elem *, void *);
 static threeway_cmp cmp_queue_points(const struct pq_elem *,
@@ -221,6 +223,7 @@ static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
 static void set_parent_destructor(struct set_elem *);
 static void pq_dist_point_destructor(struct pq_elem *);
+static void pq_bfs_point_destructor(struct pq_elem *);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -403,15 +406,11 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
     set_init(&parent_map);
     struct pqueue bfs;
     pq_init(&bfs);
-    struct parent_cell *const start = valid_malloc(sizeof(struct parent_cell));
-    *start = (struct parent_cell){
-        .key = src->pos,
-        .parent = (struct point){-1, -1},
-    };
-    (void)set_insert(&parent_map, &start->elem, cmp_parent_cells, NULL);
-    struct bfs_point *start_point = valid_malloc(sizeof(struct bfs_point));
-    *start_point = (struct bfs_point){.p = src->pos};
-    (void)pq_insert(&bfs, &start_point->elem, cmp_queue_points, NULL);
+    (void)insert_parent_cell(&parent_map, (struct parent_cell){
+                                              .key = src->pos,
+                                              .parent = (struct point){-1, -1},
+                                          });
+    insert_bfs_point(&bfs, (struct bfs_point){.p = src->pos});
     bool success = false;
     struct point cur = {0};
     while (!pq_empty(&bfs))
@@ -423,6 +422,7 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         if ((cur_cell & vertex_bit)
             && get_cell_vertex_title(cur_cell) == dst->name)
         {
+            free(bp);
             success = true;
             break;
         }
@@ -440,19 +440,9 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
                     && !set_contains(&parent_map, &push.elem, cmp_parent_cells,
                                      NULL)))
             {
-                struct parent_cell *new_lineage
-                    = valid_malloc(sizeof(struct parent_cell));
-                *new_lineage = push;
-                (void)set_insert(&parent_map, &new_lineage->elem,
-                                 cmp_parent_cells, NULL);
-                struct bfs_point *qp = valid_malloc(sizeof(struct bfs_point));
-                *qp = (struct bfs_point){.p = next};
-                (void)pq_insert(&bfs, &qp->elem, cmp_queue_points, NULL);
+                (void)insert_parent_cell(&parent_map, push);
+                insert_bfs_point(&bfs, (struct bfs_point){.p = next});
             }
-        }
-        if (success)
-        {
-            break;
         }
         free(bp);
     }
@@ -486,6 +476,7 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         (void)add_edge(dst, &edge);
     }
     set_clear(&parent_map, set_parent_destructor);
+    pq_clear(&bfs, pq_bfs_point_destructor);
     return success;
 }
 
@@ -926,6 +917,24 @@ insert_prev_vertex(struct set *s, struct prev_vertex pv)
     return set_insert(s, &pv_heap->elem, cmp_set_prev_vertices, NULL);
 }
 
+static bool
+insert_parent_cell(struct set *s, struct parent_cell pc)
+{
+    struct parent_cell *const pc_heap
+        = valid_malloc(sizeof(struct parent_cell));
+    *pc_heap = pc;
+    return set_insert(s, &pc_heap->elem, cmp_parent_cells, NULL);
+}
+
+static void
+insert_bfs_point(struct pqueue *pq, struct bfs_point bp)
+{
+    struct bfs_point *const bfs_point_heap
+        = valid_malloc(sizeof(struct parent_cell));
+    *bfs_point_heap = bp;
+    pq_insert(pq, &bfs_point_heap->elem, cmp_queue_points, NULL);
+}
+
 static threeway_cmp
 cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
              void *aux)
@@ -1054,6 +1063,12 @@ static void
 pq_dist_point_destructor(struct pq_elem *const e)
 {
     free(pq_entry(e, struct dist_point, pq_elem));
+}
+
+static void
+pq_bfs_point_destructor(struct pq_elem *const e)
+{
+    free(pq_entry(e, struct bfs_point, elem));
 }
 
 /*===========================    Misc    ====================================*/
