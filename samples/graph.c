@@ -2,6 +2,7 @@
 #include "pqueue.h"
 #include "set.h"
 #include "str_view.h"
+#include <assert.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -37,6 +38,8 @@ struct prev_vertex
 {
     struct vertex *v;
     struct vertex *prev;
+    /* A pointer to the corresponding pq_entry for this element. */
+    struct pq_elem *pq_elem;
     struct set_elem elem;
 };
 
@@ -56,7 +59,6 @@ struct dist_point
     struct vertex *v;
     int dist;
     struct pq_elem pq_elem;
-    struct set_elem set_elem;
 };
 
 struct path_request
@@ -214,14 +216,13 @@ static threeway_cmp cmp_parent_cells(const struct set_elem *,
                                      const struct set_elem *, void *);
 static threeway_cmp cmp_pq_dist_points(const struct pq_elem *,
                                        const struct pq_elem *, void *);
-static threeway_cmp cmp_set_dist_points(const struct set_elem *,
-                                        const struct set_elem *, void *);
 static threeway_cmp cmp_set_prev_vertices(const struct set_elem *,
                                           const struct set_elem *, void *);
 static void pq_update_dist(struct pq_elem *, void *);
 static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
-static void set_parent_destructor(struct set_elem *);
+static void set_pq_prev_vertex_dist_point_destructor(struct set_elem *);
+static void set_parent_point_destructor(struct set_elem *);
 static void pq_bfs_point_destructor(struct pq_elem *);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -474,7 +475,7 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         edge.to = src;
         (void)add_edge(dst, &edge);
     }
-    set_clear(&parent_map, set_parent_destructor);
+    set_clear(&parent_map, set_parent_point_destructor);
     pq_clear(&bfs, pq_bfs_point_destructor);
     return success;
 }
@@ -523,12 +524,10 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
-    struct pqueue distances;
-    pq_init(&distances);
-    struct set vertices;
-    set_init(&vertices);
-    struct set parent_map;
-    set_init(&parent_map);
+    struct pqueue dist_q;
+    pq_init(&dist_q);
+    struct set prev_map;
+    set_init(&prev_map);
     for (struct set_elem *e = set_begin(&graph->adjacency_list);
          e != set_end(&graph->adjacency_list);
          e = set_next(&graph->adjacency_list, e))
@@ -541,21 +540,25 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         if (p->v == pr.src)
         {
             p->dist = 0;
-            (void)insert_prev_vertex(&parent_map, (struct prev_vertex){
-                                                      .v = p->v,
-                                                      .prev = NULL,
-                                                  });
         }
-        (void)pq_insert(&distances, &p->pq_elem, cmp_pq_dist_points, NULL);
-        (void)set_insert(&vertices, &p->set_elem, cmp_set_dist_points, NULL);
+        /* All vertices will have undefined parents until we have
+           encountered the parent leading to them during the algorithm.
+           This doubles as a caching mechanism and helper to find the
+           vertex we need to update in the priority queue. */
+        (void)insert_prev_vertex(&prev_map, (struct prev_vertex){
+                                                .v = p->v,
+                                                .prev = NULL,
+                                                .pq_elem = &p->pq_elem,
+                                            });
+        (void)pq_insert(&dist_q, &p->pq_elem, cmp_pq_dist_points, NULL);
     }
     bool success = false;
     struct dist_point *cur = NULL;
-    while (!pq_empty(&distances))
+    while (!pq_empty(&dist_q))
     {
         /* PQ entries are popped but the set will free the memory at
            the end because the set and pq are allocated in same struct */
-        cur = pq_entry(pq_pop_min(&distances), struct dist_point, pq_elem);
+        cur = pq_entry(pq_pop_min(&dist_q), struct dist_point, pq_elem);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
@@ -563,22 +566,28 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         }
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
-            struct dist_point d = {.v = cur->v->edges[i].to};
+            struct prev_vertex pv = {.v = cur->v->edges[i].to};
             const struct set_elem *e
-                = set_find(&vertices, &d.set_elem, cmp_set_dist_points, NULL);
-            if (e == set_end(&vertices))
+                = set_find(&prev_map, &pv.elem, cmp_set_prev_vertices, NULL);
+            assert(e != set_end(&prev_map));
+            struct prev_vertex *next = set_entry(e, struct prev_vertex, elem);
+            /* We have encountered this element before because we know the
+               parent in the path to it. Skip it. */
+            if (next->prev)
             {
-                quit("Could not find vertex in set.\n", 1);
+                continue;
             }
-            struct dist_point *next = set_entry(e, struct dist_point, set_elem);
+            /* The seen set also holds a pointer to the corresponding
+               priority queue element so that this update is immediate. */
+            struct dist_point *next_dist
+                = pq_entry(next->pq_elem, struct dist_point, pq_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
-            if (alt < next->dist)
+            if (alt < next_dist->dist)
             {
-                (void)insert_prev_vertex(&parent_map, (struct prev_vertex){
-                                                          .v = next->v,
-                                                          .prev = cur->v,
-                                                      });
-                if (!pq_update(&distances, &next->pq_elem, cmp_pq_dist_points,
+                /* This vertex is now cache in the set and will be skipped
+                   if seen again. */
+                next->prev = cur->v;
+                if (!pq_update(&dist_q, &next_dist->pq_elem, cmp_pq_dist_points,
                                pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
@@ -590,18 +599,22 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
     {
         struct prev_vertex key = {.v = cur->v};
         struct prev_vertex *prev = set_entry(
-            set_find(&parent_map, &key.elem, cmp_set_prev_vertices, NULL),
+            set_find(&prev_map, &key.elem, cmp_set_prev_vertices, NULL),
             struct prev_vertex, elem);
         while (prev->prev)
         {
             paint_edge(graph, key.v, prev->prev);
             key.v = prev->prev;
             prev = set_entry(
-                set_find(&parent_map, &key.elem, cmp_set_prev_vertices, NULL),
+                set_find(&prev_map, &key.elem, cmp_set_prev_vertices, NULL),
                 struct prev_vertex, elem);
         }
     }
-    set_clear(&parent_map, set_parent_destructor);
+    /* Choosing when to free gets tricky during the algorithm. So, the
+       prev map is the last allocation with access the priority queue
+       elements that have been popped but not freed. It will free its
+       own set and its references to priority queue elements. */
+    set_clear(&prev_map, set_pq_prev_vertex_dist_point_destructor);
     clear_and_flush_graph(graph);
     return success;
 }
@@ -911,7 +924,7 @@ static bool
 insert_prev_vertex(struct set *s, struct prev_vertex pv)
 {
 
-    struct prev_vertex *pv_heap = valid_malloc(sizeof(struct parent_cell));
+    struct prev_vertex *pv_heap = valid_malloc(sizeof(struct prev_vertex));
     *pv_heap = pv;
     return set_insert(s, &pv_heap->elem, cmp_set_prev_vertices, NULL);
 }
@@ -929,7 +942,7 @@ static void
 insert_bfs_point(struct pqueue *pq, struct bfs_point bp)
 {
     struct bfs_point *const bfs_point_heap
-        = valid_malloc(sizeof(struct parent_cell));
+        = valid_malloc(sizeof(struct bfs_point));
     *bfs_point_heap = bp;
     pq_insert(pq, &bfs_point_heap->elem, cmp_queue_points, NULL);
 }
@@ -969,26 +982,6 @@ cmp_pq_dist_points(const struct pq_elem *const x, const struct pq_elem *const y,
     const struct dist_point *const a = pq_entry(x, struct dist_point, pq_elem);
     const struct dist_point *const b = pq_entry(y, struct dist_point, pq_elem);
     return (a->dist > b->dist) - (a->dist < b->dist);
-}
-
-static threeway_cmp
-cmp_set_dist_points(const struct set_elem *const x,
-                    const struct set_elem *const y, void *aux)
-{
-    (void)aux;
-    const struct dist_point *const a
-        = set_entry(x, struct dist_point, set_elem);
-    const struct dist_point *const b
-        = set_entry(y, struct dist_point, set_elem);
-    if (a->v > b->v)
-    {
-        return GRT;
-    }
-    if (a->v < b->v)
-    {
-        return LES;
-    }
-    return EQL;
 }
 
 static threeway_cmp
@@ -1053,7 +1046,15 @@ set_vertex_destructor(struct set_elem *const e)
 }
 
 static void
-set_parent_destructor(struct set_elem *const e)
+set_pq_prev_vertex_dist_point_destructor(struct set_elem *const e)
+{
+    struct prev_vertex *pv = set_entry(e, struct prev_vertex, elem);
+    free(pq_entry(pv->pq_elem, struct dist_point, pq_elem));
+    free(pv);
+}
+
+static void
+set_parent_point_destructor(struct set_elem *const e)
 {
     free(set_entry(e, struct parent_cell, elem));
 }
