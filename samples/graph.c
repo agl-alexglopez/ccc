@@ -318,7 +318,8 @@ build_graph(struct graph *const graph)
     {
         struct point rand_point = random_vertex_placement(graph);
         *grid_at_mut(graph, rand_point)
-            = vertex_bit | ((uint32_t)vertex_title << vertex_cell_title_shift);
+            = vertex_bit | path_bit
+              | ((uint32_t)vertex_title << vertex_cell_title_shift);
         struct vertex *new_vertex = valid_malloc(sizeof(struct vertex));
         *new_vertex = (struct vertex){
             .name = (char)vertex_title,
@@ -417,6 +418,13 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         struct bfs_point *bp
             = pq_entry(pq_pop_max(&bfs), struct bfs_point, elem);
         cur = bp->p;
+        const uint32_t cur_cell = grid_at(graph, cur);
+        if ((cur_cell & vertex_bit)
+            && get_cell_vertex_title(cur_cell) == dst->name)
+        {
+            success = true;
+            break;
+        }
         for (size_t i = 0; i < dirs_size; ++i)
         {
             struct point next = {
@@ -425,25 +433,11 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
             };
             struct parent_cell push = {.key = next, .parent = cur};
             const uint32_t next_cell = grid_at(graph, next);
-            if ((next_cell & vertex_bit))
-            {
-                if (get_cell_vertex_title(next_cell) != dst->name)
-                {
-                    continue;
-                }
-                free(bp);
-                struct parent_cell *new_lineage
-                    = valid_malloc(sizeof(struct parent_cell));
-                *new_lineage = push;
-                (void)set_insert(&parent_map, &new_lineage->elem,
-                                 cmp_parent_cells, NULL);
-                cur = next;
-                success = true;
-                break;
-            }
-            if (!(next_cell & path_bit)
-                && !set_contains(&parent_map, &push.elem, cmp_parent_cells,
-                                 NULL))
+            if (((next_cell & vertex_bit)
+                 && get_cell_vertex_title(next_cell) == dst->name)
+                || (!(next_cell & path_bit)
+                    && !set_contains(&parent_map, &push.elem, cmp_parent_cells,
+                                     NULL)))
             {
                 struct parent_cell *new_lineage
                     = valid_malloc(sizeof(struct parent_cell));
