@@ -587,6 +587,9 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
                 /* This vertex is now cache in the set and will be skipped
                    if seen again. */
                 next->prev = cur->v;
+                /* I would not prefer to do Dijkstra's with the update method
+                   but it is the perfect opportunity to test this functionality
+                   provided by the library for helpfullness and correctness. */
                 if (!pq_update(&dist_q, &next_dist->pq_elem, cmp_pq_dist_points,
                                pq_update_dist, &alt))
                 {
