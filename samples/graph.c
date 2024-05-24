@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+typedef uint32_t Cell;
+
 enum speed
 {
     INSTANT = 0,
@@ -38,9 +40,9 @@ struct prev_vertex
 {
     struct vertex *v;
     struct vertex *prev;
+    struct set_elem elem;
     /* A pointer to the corresponding pq_entry for this element. */
     struct pq_elem *pq_elem;
-    struct set_elem elem;
 };
 
 struct bfs_point
@@ -98,7 +100,7 @@ struct graph
     /* This is mostly needed for the visual representation of the graph on
        the screen. However, as we build the paths the result of that building
        will play a role in the cost of each edge between vertices. */
-    uint32_t *grid;
+    Cell *grid;
     /* Yes we could rep this differently, but we want to test the set here. */
     struct set adjacency_list;
 };
@@ -139,31 +141,31 @@ const char start_vertex_title = 'A';
 const size_t vertex_cell_title_shift = 8;
 const size_t edge_id_shift = 16;
 const size_t vertex_title_mask = 0xFF00;
-const uint32_t edge_id_mask = 0xFFFF0000;
-const uint32_t l_edge_id_mask = 0xFF000000;
-const uint32_t l_edge_id_shift = 24;
-const uint32_t r_edge_id_mask = 0x00FF0000;
-const uint32_t r_edge_id_shift = 16;
+const Cell edge_id_mask = 0xFFFF0000;
+const Cell l_edge_id_mask = 0xFF000000;
+const Cell l_edge_id_shift = 24;
+const Cell r_edge_id_mask = 0x00FF0000;
+const Cell r_edge_id_shift = 16;
 /* This comes immediately after 'Z' on the ASCII table. */
 const char exclusive_end_vertex_title = '[';
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
    vertex names. Vertex names are 8 bit characters, so two vertices can
-   fit into a uint16_t which we have room for in a uint32_t. The concatenation
+   fit into a uint16_t which we have room for in a Cell. The concatenation
    shall always be sorted alphabetically so an edge connecting vertex A and
    Z will be uint16_t=AZ. */
 
-const uint32_t path_mask = 0b1111;
-const uint32_t floating_path = 0b0000;
-const uint32_t north_path = 0b0001;
-const uint32_t east_path = 0b0010;
-const uint32_t south_path = 0b0100;
-const uint32_t west_path = 0b1000;
-const uint32_t cached_bit = 0b10000;
-const uint32_t path_bit = 0b100000;
-const uint32_t vertex_bit = 0b1000000;
-const uint32_t paint_bit = 0b10000000;
+const Cell path_mask = 0b1111;
+const Cell floating_path = 0b0000;
+const Cell north_path = 0b0001;
+const Cell east_path = 0b0010;
+const Cell south_path = 0b0100;
+const Cell west_path = 0b1000;
+const Cell cached_bit = 0b10000;
+const Cell path_bit = 0b100000;
+const Cell vertex_bit = 0b1000000;
+const Cell paint_bit = 0b10000000;
 
 const str_view prompt_msg
     = SV("Enter two vertices to find the shortest path between them (i.e. "
@@ -179,26 +181,29 @@ static bool find_grid_vertex_bfs(struct graph *, struct vertex *,
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void paint_edge(struct graph *, const struct vertex *,
                        const struct vertex *);
+static bool is_dst(Cell, char);
 
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
 static int rand_range(int, int);
-static uint32_t *grid_at_mut(const struct graph *, struct point);
-static uint32_t grid_at(const struct graph *, struct point);
+static Cell *grid_at_mut(const struct graph *, struct point);
+static Cell grid_at(const struct graph *, struct point);
 static uint16_t sort_vertices(char, char);
 static int vertex_degree(const struct vertex *);
 static bool connect_random_edge(struct graph *, struct vertex *);
 static void build_path_outline(struct graph *);
-static void build_path_cell(struct graph *, struct point, uint32_t);
+static void build_path_cell(struct graph *, struct point, Cell);
 static void flush_cursor_grid_coordinate(const struct graph *, struct point);
 static void clear_and_flush_graph(const struct graph *);
-static void print_cell(uint32_t);
-static char get_cell_vertex_title(uint32_t);
+static void print_cell(Cell);
+static char get_cell_vertex_title(Cell);
 static bool has_edge_with(const struct vertex *, char);
 static bool add_edge(struct vertex *, const struct edge *);
-static bool is_edge_vertex(uint32_t, uint32_t);
-static bool is_valid_edge_cell(uint32_t, uint32_t);
+static bool is_edge_vertex(Cell, Cell);
+static bool is_valid_edge_cell(Cell, Cell);
 static void clear_paint(struct graph *);
+static bool is_vertex(Cell);
+static bool is_path(Cell);
 
 static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
@@ -295,7 +300,7 @@ main(int argc, char **argv)
         }
     }
     /* This type of maze generation requires odd rows and cols. */
-    graph.grid = calloc((size_t)graph.rows * graph.cols, sizeof(uint32_t));
+    graph.grid = calloc((size_t)graph.rows * graph.cols, sizeof(Cell));
     if (!graph.grid)
     {
         (void)fprintf(stderr, "allocation failure for specified maze size.\n");
@@ -323,7 +328,7 @@ build_graph(struct graph *const graph)
         struct point rand_point = random_vertex_placement(graph);
         *grid_at_mut(graph, rand_point)
             = vertex_bit | path_bit
-              | ((uint32_t)vertex_title << vertex_cell_title_shift);
+              | ((Cell)vertex_title << vertex_cell_title_shift);
         struct vertex *new_vertex = valid_malloc(sizeof(struct vertex));
         *new_vertex = (struct vertex){
             .name = (char)vertex_title,
@@ -400,8 +405,7 @@ static bool
 find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
                      struct vertex *const dst)
 {
-    const uint32_t edge_id = sort_vertices(src->name, dst->name)
-                             << edge_id_shift;
+    const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct set parent_map;
     set_init(&parent_map);
     struct pqueue bfs;
@@ -418,9 +422,8 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
         struct bfs_point *bp
             = pq_entry(pq_pop_max(&bfs), struct bfs_point, elem);
         cur = bp->p;
-        const uint32_t cur_cell = grid_at(graph, cur);
-        if ((cur_cell & vertex_bit)
-            && get_cell_vertex_title(cur_cell) == dst->name)
+        const Cell cur_cell = grid_at(graph, cur);
+        if (is_dst(cur_cell, dst->name))
         {
             free(bp);
             success = true;
@@ -433,10 +436,9 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
                 .c = cur.c + dirs[i].c,
             };
             struct parent_cell push = {.key = next, .parent = cur};
-            const uint32_t next_cell = grid_at(graph, next);
-            if (((next_cell & vertex_bit)
-                 && get_cell_vertex_title(next_cell) == dst->name)
-                || (!(next_cell & path_bit)
+            const Cell next_cell = grid_at(graph, next);
+            if (is_dst(next_cell, dst->name)
+                || (!is_path(next_cell)
                     && !set_contains(&parent_map, &push.elem, cmp_parent_cells,
                                      NULL)))
             {
@@ -479,6 +481,53 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
     pq_clear(&bfs, pq_bfs_point_destructor);
     return success;
 }
+
+static struct point
+random_vertex_placement(const struct graph *const graph)
+{
+    const int row_end = graph->rows - 2;
+    const int col_end = graph->cols - 2;
+    /* No vertices should be close to the edge of the map. */
+    const int row_start = rand_range(vertex_placement_padding,
+                                     graph->rows - vertex_placement_padding);
+    const int col_start = rand_range(vertex_placement_padding,
+                                     graph->cols - vertex_placement_padding);
+    bool exhausted = false;
+    for (int row = row_start; !exhausted && row < row_end;
+         row = (row + 1) % row_end)
+    {
+        if (!row)
+        {
+            row = vertex_placement_padding;
+        }
+        for (int col = col_start; !exhausted && col < col_end;
+             col = (col + 1) % col_end)
+        {
+            if (!col)
+            {
+                col = vertex_placement_padding;
+            }
+            const struct point cur = {.r = row, .c = col};
+            if (is_valid_vertex_pos(graph, cur))
+            {
+                return cur;
+            }
+            exhausted = ((row + 1) % graph->rows) == row_start
+                        && ((col + 1) % graph->cols) == col_start;
+        }
+    }
+    (void)fprintf(stderr, "cannot find a place for another vertex "
+                          "on this grid, quitting now.\n");
+    exit(1);
+}
+
+static inline bool
+is_dst(const Cell c, const char dst)
+{
+    return is_vertex(c) && get_cell_vertex_title(c) == dst;
+}
+
+/*========================    Graph Solving    ==============================*/
 
 static void
 find_shortest_paths(struct graph *const graph)
@@ -557,7 +606,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
     while (!pq_empty(&dist_q))
     {
         /* PQ entries are popped but the set will free the memory at
-           the end because the set and pq are allocated in same struct */
+           the end because it always holds a reference to its pq_elem. */
         cur = pq_entry(pq_pop_min(&dist_q), struct dist_point, pq_elem);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
@@ -578,13 +627,13 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
                 continue;
             }
             /* The seen set also holds a pointer to the corresponding
-               priority queue element so that this update is immediate. */
+               priority queue element so that this update is easier. */
             struct dist_point *dist
                 = pq_entry(next->pq_elem, struct dist_point, pq_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < dist->dist)
             {
-                /* This vertex is now cache in the set and will be skipped
+                /* This vertex is now "seen" in the set and will be skipped
                    if seen again. */
                 next->prev = cur->v;
                 /* I would not prefer to do Dijkstra's with the update method
@@ -627,8 +676,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
            const struct vertex *const dst)
 {
     struct point cur = src->pos;
-    const uint32_t edge_id = sort_vertices(src->name, dst->name)
-                             << edge_id_shift;
+    const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct point prev = cur;
     while (cur.r != dst->pos.r || cur.c != dst->pos.c)
     {
@@ -639,7 +687,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
                 .r = cur.r + dirs[i].r,
                 .c = cur.c + dirs[i].c,
             };
-            const uint32_t next_cell = grid_at(g, next);
+            const Cell next_cell = grid_at(g, next);
             if ((next_cell & vertex_bit)
                 && get_cell_vertex_title(next_cell) == dst->name)
             {
@@ -656,44 +704,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
     }
 }
 
-static struct point
-random_vertex_placement(const struct graph *const graph)
-{
-    const int row_end = graph->rows - 2;
-    const int col_end = graph->cols - 2;
-    /* No vertices should be close to the edge of the map. */
-    const int row_start = rand_range(vertex_placement_padding,
-                                     graph->rows - vertex_placement_padding);
-    const int col_start = rand_range(vertex_placement_padding,
-                                     graph->cols - vertex_placement_padding);
-    bool exhausted = false;
-    for (int row = row_start; !exhausted && row < row_end;
-         row = (row + 1) % row_end)
-    {
-        if (!row)
-        {
-            row = vertex_placement_padding;
-        }
-        for (int col = col_start; !exhausted && col < col_end;
-             col = (col + 1) % col_end)
-        {
-            if (!col)
-            {
-                col = vertex_placement_padding;
-            }
-            const struct point cur = {.r = row, .c = col};
-            if (is_valid_vertex_pos(graph, cur))
-            {
-                return cur;
-            }
-            exhausted = ((row + 1) % graph->rows) == row_start
-                        && ((col + 1) % graph->cols) == col_start;
-        }
-    }
-    (void)fprintf(stderr, "cannot find a place for another vertex "
-                          "on this grid, quitting now.\n");
-    exit(1);
-}
+/*========================  Graph/Grid Helpers  =============================*/
 
 /* This function assumes that checking one cell in any direction is safe
    and within bounds. The vertices are only placed with padding around the
@@ -725,13 +736,13 @@ rand_range(const int min, const int max)
     return min + rand() / (RAND_MAX / (max - min + 1) + 1);
 }
 
-static inline uint32_t *
+static inline Cell *
 grid_at_mut(const struct graph *const graph, struct point p)
 {
     return &graph->grid[p.r * graph->cols + p.c];
 }
 
-static inline uint32_t
+static inline Cell
 grid_at(const struct graph *const graph, struct point p)
 {
     return graph->grid[p.r * graph->cols + p.c];
@@ -744,7 +755,7 @@ sort_vertices(char a, char b)
 }
 
 static char
-get_cell_vertex_title(const uint32_t cell)
+get_cell_vertex_title(const Cell cell)
 {
     return (char)((cell & vertex_title_mask) >> vertex_cell_title_shift);
 }
@@ -776,7 +787,17 @@ add_edge(struct vertex *const v, const struct edge *const e)
     return false;
 }
 
-/*======================       Grid Helpers      ============================*/
+static inline bool
+is_vertex(Cell c)
+{
+    return (c & vertex_bit) != 0;
+}
+
+static bool
+is_path(Cell c)
+{
+    return (c & path_bit) != 0;
+}
 
 static void
 clear_and_flush_graph(const struct graph *const g)
@@ -815,7 +836,7 @@ flush_cursor_grid_coordinate(const struct graph *g, struct point p)
 }
 
 static void
-print_cell(const uint32_t cell)
+print_cell(const Cell cell)
 {
 
     if (cell & vertex_bit)
@@ -852,7 +873,7 @@ print_cell(const uint32_t cell)
 }
 
 static bool
-is_edge_vertex(const uint32_t square, uint32_t edge_id)
+is_edge_vertex(const Cell square, Cell edge_id)
 {
     const char vertex_name = get_cell_vertex_title(square);
     const char edge_vertex1
@@ -863,16 +884,16 @@ is_edge_vertex(const uint32_t square, uint32_t edge_id)
 }
 
 static bool
-is_valid_edge_cell(const uint32_t square, const uint32_t edge_id)
+is_valid_edge_cell(const Cell square, const Cell edge_id)
 {
     return ((square & vertex_bit) && is_edge_vertex(square, edge_id))
            || ((square & path_bit) && (square & edge_id_mask) == edge_id);
 }
 
 static void
-build_path_cell(struct graph *g, struct point p, const uint32_t edge_id)
+build_path_cell(struct graph *g, struct point p, const Cell edge_id)
 {
-    uint32_t path = path_bit;
+    Cell path = path_bit;
     if (p.r - 1 >= 0
         && is_valid_edge_cell(
             grid_at(g, (struct point){.r = p.r - 1, .c = p.c}), edge_id))
