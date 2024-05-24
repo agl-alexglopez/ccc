@@ -174,8 +174,7 @@ static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
 static bool find_grid_vertex_bfs(struct graph *, struct vertex *,
                                  struct vertex *);
-static bool dijkstra_shortest_path(struct graph *, struct vertex *,
-                                   struct vertex *);
+static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void paint_edge(struct graph *, const struct vertex *,
                        const struct vertex *);
 
@@ -523,7 +522,7 @@ find_shortest_paths(struct graph *const graph)
                      "needed.\n",
                      1);
             }
-            if (!dijkstra_shortest_path(graph, pr.src, pr.dst))
+            if (!dijkstra_shortest_path(graph, pr))
             {
                 set_cursor_position(pr.src->pos.r, pr.src->pos.c);
                 printf("\033[38;5;9m%c\033[0m", pr.src->name);
@@ -537,8 +536,7 @@ find_shortest_paths(struct graph *const graph)
 }
 
 static bool
-dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
-                       struct vertex *const dst)
+dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
     struct pqueue distances;
     pq_init(&distances);
@@ -555,7 +553,7 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
             .v = set_entry(e, struct vertex, elem),
             .dist = INT_MAX,
         };
-        if (p->v == src)
+        if (p->v == pr.src)
         {
             p->dist = 0;
             struct prev_vertex *pv = valid_malloc(sizeof(struct parent_cell));
@@ -574,7 +572,7 @@ dijkstra_shortest_path(struct graph *const graph, struct vertex *const src,
     while (!pq_empty(&distances))
     {
         cur = pq_entry(pq_pop_min(&distances), struct dist_point, pq_elem);
-        if (cur->v == dst || cur->dist == INT_MAX)
+        if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
             break;
