@@ -222,7 +222,6 @@ static void pq_update_dist(struct pq_elem *, void *);
 static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
 static void set_parent_destructor(struct set_elem *);
-static void pq_dist_point_destructor(struct pq_elem *);
 static void pq_bfs_point_destructor(struct pq_elem *);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -554,13 +553,14 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
     struct dist_point *cur = NULL;
     while (!pq_empty(&distances))
     {
+        /* PQ entries are popped but the set will free the memory at
+           the end because the set and pq are allocated in same struct */
         cur = pq_entry(pq_pop_min(&distances), struct dist_point, pq_elem);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
             break;
         }
-        (void)set_erase(&vertices, &cur->set_elem, cmp_set_dist_points, NULL);
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct dist_point d = {.v = cur->v->edges[i].to};
@@ -568,7 +568,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
                 = set_find(&vertices, &d.set_elem, cmp_set_dist_points, NULL);
             if (e == set_end(&vertices))
             {
-                continue;
+                quit("Could not find vertex in set.\n", 1);
             }
             struct dist_point *next = set_entry(e, struct dist_point, set_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
@@ -601,7 +601,6 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
                 struct prev_vertex, elem);
         }
     }
-    pq_clear(&distances, pq_dist_point_destructor);
     set_clear(&parent_map, set_parent_destructor);
     clear_and_flush_graph(graph);
     return success;
@@ -1057,12 +1056,6 @@ static void
 set_parent_destructor(struct set_elem *const e)
 {
     free(set_entry(e, struct parent_cell, elem));
-}
-
-static void
-pq_dist_point_destructor(struct pq_elem *const e)
-{
-    free(pq_entry(e, struct dist_point, pq_elem));
 }
 
 static void
