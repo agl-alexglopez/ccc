@@ -518,11 +518,11 @@ struct set_elem *set_root(const struct set *);
    so it may not be a good fit in constrained environments. */
 void set_print(struct set *, struct set_elem *, set_print_fn *);
 
-/* (40){id:10,val:10}{id:10,val:10}(+1)
+/* (40){id:10,val:10}{id:10,val:10}
     ├──(29)R:{id:27,val:27}
-    │   ├──(12)R:{id:37,val:37}{id:37,val:37}(+1)
-    │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}(+1)
-    │   │   │   └──(1)R:{id:39,val:39}{id:39,val:39}(+1)
+    │   ├──(12)R:{id:37,val:37}{id:37,val:37}
+    │   │   ├──(2)R:{id:38,val:38}{id:38,val:38}
+    │   │   │   └──(1)R:{id:39,val:39}{id:39,val:39}
     │   │   └──(9)L:{id:35,val:35}
     │   │       ├──(1)R:{id:36,val:36}
     │   │       └──(7)L:{id:31,val:31}
@@ -532,11 +532,11 @@ void set_print(struct set *, struct set_elem *, set_print_fn *);
     │   │           └──(3)L:{id:29,val:29}
     │   │               ├──(1)R:{id:30,val:30}
     │   │               └──(1)L:{id:28,val:28}
-    │   └──(16)L:{id:11,val:11}{id:11,val:11}(+1)
-    │       └──(15)R:{id:24,val:24}{id:24,val:24}(+1)
-    │           ├──(2)R:{id:25,val:25}{id:25,val:25}(+1)
-    │           │   └──(1)R:{id:26,val:26}{id:26,val:26}(+1)
-    │           └──(12)L:{id:12,val:12}{id:12,val:12}(+1)
+    │   └──(16)L:{id:11,val:11}{id:11,val:11}
+    │       └──(15)R:{id:24,val:24}{id:24,val:24}
+    │           ├──(2)R:{id:25,val:25}{id:25,val:25}
+    │           │   └──(1)R:{id:26,val:26}{id:26,val:26}
+    │           └──(12)L:{id:12,val:12}{id:12,val:12}
     │               └──(11)R:{id:17,val:17}
     │                   ├──(6)R:{id:21,val:21}
     │                   │   ├──(2)R:{id:23,val:23}
@@ -546,7 +546,7 @@ void set_print(struct set *, struct set_elem *, set_print_fn *);
     │                   │       └──(1)L:{id:18,val:18}
     │                   └──(4)L:{id:15,val:15}
     │                       ├──(1)R:{id:16,val:16}
-    │                       └──(2)L:{id:13,val:13}{id:13,val:13}(+1)
+    │                       └──(2)L:{id:13,val:13}{id:13,val:13}
     │                           └──(1)R:{id:14,val:14}
     └──(10)L:{id:8,val:8}
         ├──(1)R:{id:9,val:9}

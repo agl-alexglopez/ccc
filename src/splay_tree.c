@@ -269,10 +269,8 @@ bool
 pq_update(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *cmp,
           pq_update_fn *fn, void *aux)
 {
-    if (NULL == elem->n.link[L] || NULL == elem->n.link[R]
-        || NULL == elem->n.parent_or_dups)
+    if (NULL == elem->n.link[L] || NULL == elem->n.link[R])
     {
-        (void)fprintf(stderr, "attempting to update removed node.\n");
         return false;
     }
     struct pq_elem *e = (struct pq_elem *)multiset_erase_node(
