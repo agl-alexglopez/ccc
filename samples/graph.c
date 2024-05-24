@@ -570,27 +570,27 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             const struct set_elem *e
                 = set_find(&prev_map, &pv.elem, cmp_set_prev_vertices, NULL);
             assert(e != set_end(&prev_map));
-            struct prev_vertex *cached = set_entry(e, struct prev_vertex, elem);
+            struct prev_vertex *next = set_entry(e, struct prev_vertex, elem);
             /* We have encountered this element before because we know the
                parent in the path to it. Skip it. */
-            if (cached->prev)
+            if (next->prev)
             {
                 continue;
             }
             /* The seen set also holds a pointer to the corresponding
                priority queue element so that this update is immediate. */
-            struct dist_point *next_dist
-                = pq_entry(cached->pq_elem, struct dist_point, pq_elem);
+            struct dist_point *dist
+                = pq_entry(next->pq_elem, struct dist_point, pq_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
-            if (alt < next_dist->dist)
+            if (alt < dist->dist)
             {
                 /* This vertex is now cache in the set and will be skipped
                    if seen again. */
-                cached->prev = cur->v;
+                next->prev = cur->v;
                 /* I would not prefer to do Dijkstra's with the update method
                    but it is the perfect opportunity to test this functionality
                    provided by the pq for helpfullness and correctness. */
-                if (!pq_update(&dist_q, &next_dist->pq_elem, cmp_pq_dist_points,
+                if (!pq_update(&dist_q, &dist->pq_elem, cmp_pq_dist_points,
                                pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
