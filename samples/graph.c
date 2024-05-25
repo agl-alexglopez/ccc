@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 typedef uint32_t Cell;
@@ -169,8 +170,8 @@ const Cell paint_bit = 0b10000000;
 
 const str_view prompt_msg
     = SV("Enter two vertices to find the shortest path between them (i.e. "
-         "A-Z). Enter quit to quit:");
-const str_view quit_cmd = SV("quit");
+         "A-Z). Enter q to quit:");
+const str_view quit_cmd = SV("q");
 
 /*==========================   Prototypes  ================================= */
 
@@ -284,7 +285,7 @@ main(int argc, char **argv)
             if (vert_arg.status == CONV_ER || vert_arg.conversion > max_vertices
                 || vert_arg.conversion < 1)
             {
-                quit("vertices outside of valid range.\n", 1);
+                quit("vertices outside of valid range (1-26).\n", 1);
             }
             graph.vertices = vert_arg.conversion;
         }
@@ -387,7 +388,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
         if (e == set_end(&graph->adjacency_list))
         {
-            quit("Looping through possible vertices yielded error.\n", 1);
+            quit("Broken or corrupted adjacency list.\n", 1);
         }
         dst = set_entry(e, struct vertex, elem);
         if (!has_edge_with(src_vertex, dst->name)
