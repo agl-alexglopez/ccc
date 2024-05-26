@@ -12,18 +12,6 @@
 
 typedef uint32_t Cell;
 
-enum speed
-{
-    INSTANT = 0,
-    SPEED_1,
-    SPEED_2,
-    SPEED_3,
-    SPEED_4,
-    SPEED_5,
-    SPEED_6,
-    SPEED_7,
-};
-
 struct point
 {
     int r;
@@ -97,7 +85,6 @@ struct graph
     int rows;
     int cols;
     int vertices;
-    enum speed speed;
     /* This is mostly needed for the visual representation of the graph on
        the screen. However, as we build the paths the result of that building
        will play a role in the cost of each edge between vertices. */
@@ -109,8 +96,10 @@ struct graph
 /*======================   Graph Constants   ================================*/
 
 const char *paths[] = {
-    "■", "╵", "╶", "└", "╷", "│", "┌", "├",
-    "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
+    // "■", "╵", "╶", "└", "╷", "│", "┌", "├",
+    // "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
+    "●", "╵", "╶", "╰", "╷", "│", "╭", "├", // rounded
+    "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼", // rounded
 };
 
 const int speeds[] = {
@@ -194,7 +183,6 @@ static int vertex_degree(const struct vertex *);
 static bool connect_random_edge(struct graph *, struct vertex *);
 static void build_path_outline(struct graph *);
 static void build_path_cell(struct graph *, struct point, Cell);
-static void flush_cursor_grid_coordinate(const struct graph *, struct point);
 static void clear_and_flush_graph(const struct graph *);
 static void print_cell(Cell);
 static char get_cell_vertex_title(Cell);
@@ -244,7 +232,6 @@ main(int argc, char **argv)
         .rows = default_rows,
         .cols = default_cols,
         .vertices = default_vertices,
-        .speed = default_speed,
         .grid = NULL,
     };
     set_init(&graph.adjacency_list);
@@ -268,16 +255,6 @@ main(int argc, char **argv)
                 quit("cols below required minimum or negative.\n", 1);
             }
             graph.cols = col_arg.conversion;
-        }
-        else if (sv_starts_with(arg, speed))
-        {
-            const struct int_conversion speed_arg = parse_digits(arg);
-            if (speed_arg.status == CONV_ER || speed_arg.conversion > speed_max
-                || speed_arg.conversion < 0)
-            {
-                quit("speed outside of valid range.\n", 1);
-            }
-            graph.speed = speed_arg.conversion;
         }
         else if (sv_starts_with(arg, vertices_flag))
         {
@@ -318,6 +295,12 @@ main(int argc, char **argv)
 
 /*========================   Graph Building    ==============================*/
 
+/* The undirected graphs produced are randomly generated graphs where each
+   vertex is placed on the grid of terminal cells. Each vertex then tries
+   to connect a random number of out edges to vertices that can accept an
+   in edge. The search for another vertex is a simple bfs search and thus
+   connects the edge via shortest path in the grid. The number of cells taken
+   to connect the edge to the other vertex is the cost/weight of that edge. */
 static void
 build_graph(struct graph *const graph)
 {
@@ -360,8 +343,8 @@ build_graph(struct graph *const graph)
         {
             continue;
         }
-        const int new_edges = rand_range(1, max_degree - degree);
-        for (int i = 0; i < new_edges && connect_random_edge(graph, src); ++i)
+        const int out_edges = rand_range(1, max_degree - degree);
+        for (int i = 0; i < out_edges && connect_random_edge(graph, src); ++i)
         {}
     }
     clear_and_flush_graph(graph);
@@ -829,14 +812,6 @@ clear_paint(struct graph *const graph)
 }
 
 static void
-flush_cursor_grid_coordinate(const struct graph *g, struct point p)
-{
-    set_cursor_position(p.r, p.c);
-    print_cell(grid_at(g, p));
-    (void)fflush(stdout);
-}
-
-static void
 print_cell(const Cell cell)
 {
 
@@ -847,25 +822,13 @@ print_cell(const Cell cell)
     }
     else if (cell & path_bit)
     {
-        if (cell & paint_bit)
-        {
-            printf("\033[38;5;13m%s\033[0m", paths[cell & path_mask]);
-        }
-        else
-        {
-            printf("%s", paths[cell & path_mask]);
-        }
+        (cell & paint_bit)
+            ? printf("\033[38;5;13m%s\033[0m", paths[cell & path_mask])
+            : printf("%s", paths[cell & path_mask]);
     }
     else if (!(cell & path_bit))
     {
-        if (cell & paint_bit)
-        {
-            printf("\033[38;5;14m█\033[0m");
-        }
-        else
-        {
-            printf(" ");
-        }
+        printf(" ");
     }
     else
     {
