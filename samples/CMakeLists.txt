@@ -12,5 +12,6 @@ target_link_libraries(graph PRIVATE
   str_view
   set
   pqueue
+  queue
 )
 

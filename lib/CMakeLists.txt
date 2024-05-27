@@ -3,3 +3,4 @@ add_library(cli cli.h cli.c)
 target_link_libraries(cli PUBLIC
   str_view
 )
+add_library(queue queue.h queue.c)

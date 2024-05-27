@@ -7,6 +7,8 @@ file (GLOB PROJ_C_FILES
   ${CMAKE_SOURCE_DIR}/tests/*.h
   ${CMAKE_SOURCE_DIR}/include/*.c
   ${CMAKE_SOURCE_DIR}/include/*.h
+  ${CMAKE_SOURCE_DIR}/lib/*.c
+  ${CMAKE_SOURCE_DIR}/lib/*.h
 )
 
 add_custom_target (format "clang-format" -i ${PROJ_C_FILES}  COMMENT "Formatting source code...")
