@@ -4,13 +4,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-struct queue {
-  void *mem;
-  size_t elem_sz;
-  size_t front;
-  size_t back;
-  size_t sz;
-  size_t capacity;
+struct queue
+{
+    void *mem;
+    size_t elem_sz;
+    size_t front;
+    size_t back;
+    size_t sz;
+    size_t capacity;
 };
 
 void q_init(size_t elem_sz, struct queue *, size_t capacity);
