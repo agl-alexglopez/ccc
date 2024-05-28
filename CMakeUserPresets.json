@@ -17,10 +17,10 @@
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_C_STANDARD": "11",
-                "CMAKE_C_COMPILER": "gcc-13",
+                "CMAKE_C_COMPILER": "gcc-12",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/deb",
-                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -fno-diagnostics-show-option -Wno-nonnull-compare -Wno-pointer-bool-conversion"
+                "CMAKE_C_FLAGS": "-g3 -Wall -Werror -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -fno-diagnostics-show-option -Wno-nonnull-compare -Wno-pointer-bool-conversion"
             }
         },
         {
@@ -34,10 +34,10 @@
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_C_STANDARD": "11",
-                "CMAKE_C_COMPILER": "gcc-13",
+                "CMAKE_C_COMPILER": "gcc-12",
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/rel",
-                "CMAKE_C_FLAGS": "-Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -fno-diagnostics-show-option -Wno-nonnull-compare -Wno-pointer-bool-conversion"
+                "CMAKE_C_FLAGS": "-Wall -Werror -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -fno-diagnostics-show-option -Wno-nonnull-compare -Wno-pointer-bool-conversion"
             }
         }
     ]

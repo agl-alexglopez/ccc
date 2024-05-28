@@ -5,7 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 static void q_grow(struct queue *);
+
+/* We don't need the deprecated warnings as implementer of the queue. The
+   warning is for users to stop them and force them to use provided
+   functions. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 void
 q_init(const size_t elem_sz, struct queue *const q, const size_t capacity)
@@ -64,7 +73,7 @@ q_pop(struct queue *const q)
 }
 
 void *
-q_front(struct queue *const q)
+q_front(const struct queue *const q)
 {
     if (!q->sz)
     {
@@ -74,9 +83,15 @@ q_front(struct queue *const q)
 }
 
 bool
-q_empty(struct queue *const q)
+q_empty(const struct queue *const q)
 {
     return !q || !q->sz;
+}
+
+size_t
+q_size(const struct queue *const q)
+{
+    return !q ? 0ULL : q->sz;
 }
 
 static void
@@ -88,11 +103,14 @@ q_grow(struct queue *const q)
         (void)fprintf(stderr, "reallocation failed.\n");
         return;
     }
-    for (size_t i = 0; i < q->sz; i++)
+    const size_t back_front_diff = q->capacity - q->front;
+    const size_t first_chunk = MIN(q->sz, back_front_diff);
+    memcpy(new, (uint8_t *)q->mem + (q->front * q->elem_sz),
+           q->elem_sz * first_chunk);
+    if (first_chunk < q->sz)
     {
-        memcpy((uint8_t *)new + (i * q->elem_sz),
-               (uint8_t *)q->mem + (q->front * q->elem_sz), q->elem_sz);
-        q->front = (q->front + 1) % q->capacity;
+        memcpy((uint8_t *)new + (first_chunk * q->elem_sz), q->mem,
+               q->elem_sz * (q->sz - first_chunk));
     }
     q->capacity *= 2;
     q->front = 0;
@@ -100,3 +118,5 @@ q_grow(struct queue *const q)
     free(q->mem);
     q->mem = new;
 }
+
+#pragma GCC diagnostic pop
