@@ -8,6 +8,8 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 static void q_grow(struct queue *);
+static void *q_at(const struct queue *, size_t);
+static size_t q_bytes(const struct queue *, size_t);
 
 /* We don't need the deprecated warnings as implementer of the queue. The
    warning is for users to stop them and force them to use provided
@@ -54,7 +56,7 @@ q_push(struct queue *const q, void *const elem)
     {
         q_grow(q);
     }
-    memcpy((uint8_t *)q->mem + (q->back * q->elem_sz), elem, q->elem_sz);
+    memcpy(q_at(q, q->back), elem, q->elem_sz);
     q->back = (q->back + 1) % q->capacity;
     q->sz++;
 }
@@ -78,7 +80,7 @@ q_front(const struct queue *const q)
     {
         return NULL;
     }
-    return (uint8_t *)q->mem + (q->front * q->elem_sz);
+    return q_at(q, q->front);
 }
 
 bool
@@ -102,20 +104,30 @@ q_grow(struct queue *const q)
         (void)fprintf(stderr, "reallocation failed.\n");
         return;
     }
-    const size_t back_front_diff = q->capacity - q->front;
-    const size_t first_chunk = MIN(q->sz, back_front_diff);
-    memcpy(new, (uint8_t *)q->mem + (q->front * q->elem_sz),
-           q->elem_sz * first_chunk);
+    const size_t first_chunk = MIN(q->sz, q->capacity - q->front);
+    memcpy(new, q_at(q, q->front), q_bytes(q, first_chunk));
     if (first_chunk < q->sz)
     {
-        memcpy((uint8_t *)new + (first_chunk * q->elem_sz), q->mem,
-               q->elem_sz * (q->sz - first_chunk));
+        memcpy((uint8_t *)new + q_bytes(q, first_chunk), q->mem,
+               q_bytes(q, q->sz - first_chunk));
     }
     q->capacity *= 2;
     q->front = 0;
     q->back = q->sz;
     free(q->mem);
     q->mem = new;
+}
+
+static inline void *
+q_at(const struct queue *const q, const size_t i)
+{
+    return (uint8_t *)q->mem + (q->elem_sz * i);
+}
+
+static inline size_t
+q_bytes(const struct queue *q, size_t n)
+{
+    return q->elem_sz * n;
 }
 
 #pragma GCC diagnostic pop
