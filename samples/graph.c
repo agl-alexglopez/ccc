@@ -561,12 +561,15 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
            encountered the parent leading to them during the algorithm.
            This doubles as a caching mechanism and helper to find the
            vertex we need to update in the priority queue. */
-        (void)insert_prev_vertex(&prev_map, (struct prev_vertex){
-                                                .v = p->v,
-                                                .prev = NULL,
-                                                .pq_elem = &p->pq_elem,
-                                            });
-        (void)pq_insert(&dist_q, &p->pq_elem, cmp_pq_dist_points, NULL);
+        if (!insert_prev_vertex(&prev_map, (struct prev_vertex){
+                                               .v = p->v,
+                                               .prev = NULL,
+                                               .pq_elem = &p->pq_elem,
+                                           }))
+        {
+            quit("inserting into set in in loading phase failed.\n", 1);
+        }
+        pq_insert(&dist_q, &p->pq_elem, cmp_pq_dist_points, NULL);
     }
     bool success = false;
     struct dist_point *cur = NULL;

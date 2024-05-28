@@ -551,7 +551,7 @@ init_node(struct tree *t, struct node *n)
 static bool
 empty(const struct tree *const t)
 {
-    return 0 == t->size;
+    return !t->size;
 }
 
 static struct node *
@@ -748,6 +748,12 @@ static bool
 insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
     init_node(t, elem);
+    if (empty(t))
+    {
+        t->root = elem;
+        t->size++;
+        return true;
+    }
     t->root = splay(t, t->root, elem, cmp, aux);
     const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
     if (EQL == root_cmp)
@@ -763,7 +769,7 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
     init_node(t, elem);
     t->size++;
-    if (t->root == &t->end)
+    if (empty(t))
     {
         t->root = elem;
         return;
@@ -821,6 +827,10 @@ add_duplicate(struct tree *t, struct node *tree_node, struct node *add,
 static struct node *
 erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
+    if (empty(t))
+    {
+        return &t->end;
+    }
     struct node *ret = splay(t, t->root, elem, cmp, aux);
     const threeway_cmp found = cmp(elem, ret, NULL);
     if (found != EQL)
