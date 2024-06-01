@@ -115,14 +115,14 @@ struct pqueue
    return the value of the cmp enum directly with conditionals switch
    statements or whatever other comparison logic you choose.
    The user is responsible for returning one of the three possible
-   comparison results for the threeway_cmp enum.
+   comparison results for the node_threeway_cmp enum.
 
       typedef enum
       {
           LES = -1,
           EQL = 0,
           GRT = 1
-      } threeway_cmp;
+      } node_threeway_cmp;
 
     This is modeled after the <=> operator in C++ but it is FAR less
     robust and fancy. In fact it's just a named wrapper around
@@ -136,7 +136,7 @@ struct pqueue
           pq_elem elem;
       };
 
-      static threeway_cmp
+      static node_threeway_cmp
       val_cmp(const pq_elem *a, const pq_elem *b, void *aux)
       {
           (void)aux;
@@ -156,7 +156,7 @@ struct pqueue
           LES = -1,
           EQL = 0,
           GRT = 1
-      } threeway_cmp;
+      } node_threeway_cmp;
 
    The compare function one must provide to perform queries
    and other operations on the priority queue. See above. */
@@ -322,7 +322,7 @@ void pq_insert(struct pqueue *, struct pq_elem *, pq_cmp_fn *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
-   pop we have O(lgN) runtime and then all subsequent
+   pop we have amortized O(lgN) runtime and then all subsequent
    pops will be O(1). However, if any other insertions or
    deletions other than the max occur before all duplicates
    have been popped then performance degrades back to O(lgN).
