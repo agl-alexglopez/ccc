@@ -935,19 +935,19 @@ pop_dup_node(struct tree *t, struct node *dup, tree_cmp_fn *cmp,
     {
         return pop_front_dup(t, splayed, cmp);
     }
-    /* This is the head of the list of duplicates so no dups left. */
+    /* This is the head of the list of duplicates and no dups left. */
     if (dup->link[N] == dup)
     {
         splayed->parent_or_dups = &t->end;
         return dup;
     }
-    /* There is an arbitrary number of dups after the head so replace head */
-    const struct node *head = dup;
-    /* Update the tail at the back of the list. Easy to forget hard to catch. */
-    head->link[P]->link[N] = head->link[N];
-    head->link[N]->link[P] = head->link[P];
-    head->link[N]->parent_or_dups = head->parent_or_dups;
-    splayed->parent_or_dups = head->link[N];
+    /* The dup is the head. There is an arbitrary number of dups after the
+       head so replace head. Update the tail at back of the list. Easy to
+       forget hard to catch because bugs are often delayed. */
+    dup->link[P]->link[N] = dup->link[N];
+    dup->link[N]->link[P] = dup->link[P];
+    dup->link[N]->parent_or_dups = dup->parent_or_dups;
+    splayed->parent_or_dups = dup->link[N];
     return dup;
 }
 
@@ -968,7 +968,6 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
 
     struct node *new_list_head = old->parent_or_dups->link[N];
     struct node *list_tail = old->parent_or_dups->link[P];
-    /* Circular linked lists are tricky to detect when empty */
     const bool circular_list_empty = new_list_head->link[N] == new_list_head;
 
     new_list_head->link[P] = list_tail;
