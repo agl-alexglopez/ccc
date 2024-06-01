@@ -214,8 +214,8 @@ struct set_elem
       }
 
    ============================================================= */
-typedef threeway_cmp set_cmp_fn(const struct set_elem *key,
-                                const struct set_elem *n, void *aux);
+typedef node_threeway_cmp set_cmp_fn(const struct set_elem *key,
+                                     const struct set_elem *n, void *aux);
 
 /* Performs user specified destructor actions on a single set_elem. This
    set_elem is assumed to be embedded in user defined structs and therefore
@@ -368,9 +368,9 @@ bool set_const_contains(struct set *, struct set_elem *, set_cmp_fn *, void *);
 /* Read only seek into the data structure backing the set.
    It is therefore safe for multiple threads to read with
    const find but any other concurrent operations are not
-   safe. Also, note that the Splay Implementing this set
+   safe. Also, note that the Splay Tree Implementing this set
    benefits from locality of reference and should be
-   allowed to repare itself with lookups with all other
+   allowed to repair itself with lookups with all other
    functions whenever possible. */
 const struct set_elem *set_const_find(struct set *, struct set_elem *,
                                       set_cmp_fn *, void *);

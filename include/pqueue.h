@@ -160,8 +160,8 @@ struct pqueue
 
    The compare function one must provide to perform queries
    and other operations on the priority queue. See above. */
-typedef threeway_cmp pq_cmp_fn(const struct pq_elem *key,
-                               const struct pq_elem *n, void *aux);
+typedef node_threeway_cmp pq_cmp_fn(const struct pq_elem *key,
+                                    const struct pq_elem *n, void *aux);
 
 /* Define a function to use printf for your custom struct type.
    For example:

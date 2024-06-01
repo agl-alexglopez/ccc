@@ -116,10 +116,10 @@ static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(const struct maze *);
 static int rand_range(int, int);
-static threeway_cmp cmp_priority_cells(const struct pq_elem *,
-                                       const struct pq_elem *, void *);
-static threeway_cmp cmp_points(const struct set_elem *, const struct set_elem *,
-                               void *);
+static node_threeway_cmp cmp_priority_cells(const struct pq_elem *,
+                                            const struct pq_elem *, void *);
+static node_threeway_cmp cmp_points(const struct set_elem *,
+                                    const struct set_elem *, void *);
 static void set_destructor(struct set_elem *);
 static struct int_conversion parse_digits(str_view);
 
@@ -482,7 +482,7 @@ can_build_new_square(const struct maze *const maze, const struct point next)
 
 /*===================   Data Structure Comparators   ========================*/
 
-static threeway_cmp
+static node_threeway_cmp
 cmp_priority_cells(const struct pq_elem *const key, const struct pq_elem *n,
                    void *const aux)
 {
@@ -494,7 +494,7 @@ cmp_priority_cells(const struct pq_elem *const key, const struct pq_elem *n,
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
-static threeway_cmp
+static node_threeway_cmp
 cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
 {
     (void)aux;
@@ -502,7 +502,7 @@ cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
     const struct point_cost *const b = set_entry(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
-        return EQL;
+        return NODE_EQL;
     }
     if (a->p.r == b->p.r)
     {

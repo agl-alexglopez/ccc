@@ -66,10 +66,10 @@ struct range
    Equality is important for duplicate tracking and speed. */
 typedef enum
 {
-    LES = -1,
-    EQL = 0,
-    GRT = 1
-} threeway_cmp;
+    NODE_LES = -1,
+    NODE_EQL = 0,
+    NODE_GRT = 1
+} node_threeway_cmp;
 
 typedef void node_print_fn(const struct node *);
 
@@ -81,8 +81,8 @@ typedef void node_print_fn(const struct node *);
    If such a comparison is not possible for your type you can simply
    return the value of the cmp enum directly with conditionals switch
    statements or whatever other comparison logic you choose. */
-typedef threeway_cmp tree_cmp_fn(const struct node *key, const struct node *n,
-                                 void *aux);
+typedef node_threeway_cmp tree_cmp_fn(const struct node *key,
+                                      const struct node *n, void *aux);
 
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of

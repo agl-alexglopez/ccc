@@ -20,8 +20,8 @@ static enum test_result pq_test_read_max_min(void);
 static enum test_result insert_shuffled(struct pqueue *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int[], size_t, struct pqueue *);
-static threeway_cmp val_cmp(const struct pq_elem *, const struct pq_elem *,
-                            void *);
+static node_threeway_cmp val_cmp(const struct pq_elem *, const struct pq_elem *,
+                                 void *);
 
 #define NUM_TESTS (size_t)6
 const test_fn all_tests[NUM_TESTS] = {
@@ -119,7 +119,7 @@ pq_test_insert_three_dups(void)
     return PASS;
 }
 
-static threeway_cmp
+static node_threeway_cmp
 val_cmp(const struct pq_elem *a, const struct pq_elem *b, void *aux)
 {
     (void)aux;

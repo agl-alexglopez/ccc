@@ -74,7 +74,7 @@ static struct node *pop_front_dup(struct tree *, struct node *, tree_cmp_fn *);
 static struct node *remove_from_tree(struct tree *, struct node *,
                                      tree_cmp_fn *);
 static struct node *connect_new_root(struct tree *, struct node *,
-                                     threeway_cmp);
+                                     node_threeway_cmp);
 static struct node *root(const struct tree *);
 static struct node *max(const struct tree *);
 static struct node *pop_max(struct tree *);
@@ -88,12 +88,12 @@ static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
 static struct range equal_range(struct tree *t, struct node *begin,
                                 struct node *end, tree_cmp_fn *cmp,
                                 enum tree_link traversal, void *aux);
-static threeway_cmp force_find_grt(const struct node *, const struct node *,
-                                   void *);
-static threeway_cmp force_find_les(const struct node *, const struct node *,
-                                   void *);
-static void give_parent_subtree(struct tree *, struct node *, enum tree_link,
-                                struct node *);
+static node_threeway_cmp force_find_grt(const struct node *,
+                                        const struct node *, void *);
+static node_threeway_cmp force_find_les(const struct node *,
+                                        const struct node *, void *);
+static void link_trees(struct tree *, struct node *, enum tree_link,
+                       struct node *);
 static inline bool has_dups(const struct node *, const struct node *);
 static struct node *get_parent(struct tree *, struct node *);
 static void add_duplicate(struct tree *, struct node *, struct node *,
@@ -207,8 +207,9 @@ struct pq_range
 pq_equal_range(struct pqueue *pq, struct pq_elem *begin, struct pq_elem *end,
                pq_cmp_fn *cmp, void *aux)
 {
-    struct range r = equal_range(&pq->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
-                                 reverse_inorder_traversal, aux);
+    const struct range r
+        = equal_range(&pq->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
+                      reverse_inorder_traversal, aux);
     return (struct pq_range){
         .begin = (struct pq_elem *)r.begin,
         .end = (struct pq_elem *)r.end,
@@ -219,8 +220,9 @@ struct pq_rrange
 pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend,
                 pq_cmp_fn *cmp, void *aux)
 {
-    struct range ret = equal_range(&pq->t, &rbegin->n, &rend->n,
-                                   (tree_cmp_fn *)cmp, inorder_traversal, aux);
+    const struct range ret
+        = equal_range(&pq->t, &rbegin->n, &rend->n, (tree_cmp_fn *)cmp,
+                      inorder_traversal, aux);
     return (struct pq_rrange){
         .rbegin = (struct pq_elem *)ret.begin,
         .end = (struct pq_elem *)ret.end,
@@ -585,12 +587,12 @@ const_seek(struct tree *const t, struct node *const n, tree_cmp_fn *cmp,
     struct node *seek = n;
     while (seek != &t->end)
     {
-        const threeway_cmp cur_cmp = cmp(n, seek, aux);
-        if (cur_cmp == EQL)
+        const node_threeway_cmp cur_cmp = cmp(n, seek, aux);
+        if (cur_cmp == NODE_EQL)
         {
             return seek;
         }
-        seek = seek->link[GRT == cur_cmp];
+        seek = seek->link[NODE_GRT == cur_cmp];
     }
     return seek;
 }
@@ -714,7 +716,7 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
-    const threeway_cmp grt_or_les[2] = {GRT, LES};
+    const node_threeway_cmp grt_or_les[2] = {NODE_GRT, NODE_LES};
     struct node *b = splay(t, t->root, begin, cmp, aux);
     if (cmp(begin, b, NULL) == grt_or_les[traversal])
     {
@@ -733,7 +735,7 @@ find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 {
     init_node(t, elem);
     t->root = splay(t, t->root, elem, cmp, aux);
-    return cmp(elem, t->root, NULL) == EQL ? t->root : &t->end;
+    return cmp(elem, t->root, NULL) == NODE_EQL ? t->root : &t->end;
 }
 
 static bool
@@ -741,7 +743,7 @@ contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
 {
     init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, cmp, aux);
-    return cmp(dummy_key, t->root, NULL) == EQL;
+    return cmp(dummy_key, t->root, NULL) == NODE_EQL;
 }
 
 static bool
@@ -755,8 +757,8 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
         return true;
     }
     t->root = splay(t, t->root, elem, cmp, aux);
-    const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
-    if (EQL == root_cmp)
+    const node_threeway_cmp root_cmp = cmp(elem, t->root, NULL);
+    if (NODE_EQL == root_cmp)
     {
         return false;
     }
@@ -776,8 +778,8 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
     }
     t->root = splay(t, t->root, elem, cmp, aux);
 
-    const threeway_cmp root_cmp = cmp(elem, t->root, NULL);
-    if (EQL == root_cmp)
+    const node_threeway_cmp root_cmp = cmp(elem, t->root, NULL);
+    if (NODE_EQL == root_cmp)
     {
         add_duplicate(t, t->root, elem, &t->end);
         return;
@@ -786,14 +788,15 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 }
 
 static struct node *
-connect_new_root(struct tree *t, struct node *new_root, threeway_cmp cmp_result)
+connect_new_root(struct tree *t, struct node *new_root,
+                 node_threeway_cmp cmp_result)
 {
-    const enum tree_link link = GRT == cmp_result;
-    give_parent_subtree(t, new_root, link, t->root->link[link]);
-    give_parent_subtree(t, new_root, !link, t->root);
+    const enum tree_link link = NODE_GRT == cmp_result;
+    link_trees(t, new_root, link, t->root->link[link]);
+    link_trees(t, new_root, !link, t->root);
     t->root->link[link] = &t->end;
     t->root = new_root;
-    give_parent_subtree(t, &t->end, 0, t->root);
+    link_trees(t, &t->end, 0, t->root);
     return new_root;
 }
 
@@ -832,8 +835,8 @@ erase(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
         return &t->end;
     }
     struct node *ret = splay(t, t->root, elem, cmp, aux);
-    const threeway_cmp found = cmp(elem, ret, NULL);
-    if (found != EQL)
+    const node_threeway_cmp found = cmp(elem, ret, NULL);
+    if (found != NODE_EQL)
     {
         return &t->end;
     }
@@ -907,7 +910,7 @@ multiset_erase_node(struct tree *t, struct node *node, tree_cmp_fn *cmp,
         return node;
     }
     struct node *ret = splay(t, t->root, node, cmp, aux);
-    if (cmp(node, ret, NULL) != EQL)
+    if (cmp(node, ret, NULL) != NODE_EQL)
     {
         return &t->end;
     }
@@ -960,7 +963,7 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
     else
     {
         /* Comparing sizes with the root's parent is undefined. */
-        parent->link[GRT == cmp(old, parent, NULL)] = tree_replacement;
+        parent->link[NODE_GRT == cmp(old, parent, NULL)] = tree_replacement;
     }
 
     struct node *new_list_head = old->parent_or_dups->link[N];
@@ -975,8 +978,8 @@ pop_front_dup(struct tree *t, struct node *old, tree_cmp_fn *cmp)
     tree_replacement->link[R] = old->link[R];
     tree_replacement->parent_or_dups = new_list_head;
 
-    give_parent_subtree(t, tree_replacement, L, tree_replacement->link[L]);
-    give_parent_subtree(t, tree_replacement, R, tree_replacement->link[R]);
+    link_trees(t, tree_replacement, L, tree_replacement->link[L]);
+    link_trees(t, tree_replacement, R, tree_replacement->link[R]);
     if (circular_list_empty)
     {
         tree_replacement->parent_or_dups = parent;
@@ -990,12 +993,12 @@ remove_from_tree(struct tree *t, struct node *ret, tree_cmp_fn *cmp)
     if (ret->link[L] == &t->end)
     {
         t->root = ret->link[R];
-        give_parent_subtree(t, &t->end, 0, t->root);
+        link_trees(t, &t->end, 0, t->root);
     }
     else
     {
         t->root = splay(t, ret->link[L], ret, cmp, NULL);
-        give_parent_subtree(t, t->root, R, ret->link[R]);
+        link_trees(t, t->root, R, ret->link[R]);
     }
     return ret;
 }
@@ -1011,45 +1014,50 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     struct node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        const threeway_cmp cur_cmp = cmp(elem, root, aux);
-        const enum tree_link next_link = GRT == cur_cmp;
-        if (EQL == cur_cmp || root->link[next_link] == &t->end)
+        const node_threeway_cmp root_cmp = cmp(elem, root, aux);
+        const enum tree_link dir = NODE_GRT == root_cmp;
+        if (NODE_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
-        const threeway_cmp child_cmp = cmp(elem, root->link[next_link], aux);
-        const enum tree_link next_link_from_child = GRT == child_cmp;
-        if (child_cmp != EQL && next_link == next_link_from_child)
+        const node_threeway_cmp child_cmp = cmp(elem, root->link[dir], aux);
+        const enum tree_link dir_from_child = NODE_GRT == child_cmp;
+        /* A straight line has formed from root->child->elem. An opportunity
+           to splay and heal the tree arises. */
+        if (NODE_EQL != child_cmp && dir == dir_from_child)
         {
-            struct node *pivot = root->link[next_link];
-            give_parent_subtree(t, root, next_link, pivot->link[!next_link]);
-            give_parent_subtree(t, pivot, !next_link, root);
+            struct node *const pivot = root->link[dir];
+            link_trees(t, root, dir, pivot->link[!dir]);
+            link_trees(t, pivot, !dir, root);
             root = pivot;
-            if (root->link[next_link] == &t->end)
+            if (root->link[dir] == &t->end)
             {
                 break;
             }
         }
-        give_parent_subtree(t, l_r_subtrees[!next_link], next_link, root);
-        l_r_subtrees[!next_link] = root;
-        root = root->link[next_link];
+        link_trees(t, l_r_subtrees[!dir], dir, root);
+        l_r_subtrees[!dir] = root;
+        root = root->link[dir];
     }
-    give_parent_subtree(t, l_r_subtrees[L], R, root->link[L]);
-    give_parent_subtree(t, l_r_subtrees[R], L, root->link[R]);
-    give_parent_subtree(t, root, L, t->end.link[R]);
-    give_parent_subtree(t, root, R, t->end.link[L]);
+    link_trees(t, l_r_subtrees[L], R, root->link[L]);
+    link_trees(t, l_r_subtrees[R], L, root->link[R]);
+    link_trees(t, root, L, t->end.link[R]);
+    link_trees(t, root, R, t->end.link[L]);
     t->root = root;
-    give_parent_subtree(t, &t->end, 0, t->root);
+    link_trees(t, &t->end, 0, t->root);
     return root;
 }
 
 /* This function has proven to be VERY important. The nil node often
    has garbage values associated with real nodes in our tree and if we access
    them by mistake it's bad! But the nil is also helpful for some invariant
-   coding patters and reducing if checks all over the place. */
+   coding patters and reducing if checks all over the place. Links a parent
+   to a subtree updating the parents child pointer in the direction specified
+   and updating the subtree parent field to point back to parent. This last
+   step is critical and easy to miss or mess up. */
 static inline void
-give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
-                    struct node *subtree)
+link_trees(struct tree *t, struct node *parent, enum tree_link dir,
+           struct node *subtree)
 {
     parent->link[dir] = subtree;
     if (has_dups(&t->end, subtree))
@@ -1060,7 +1068,7 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
     subtree->parent_or_dups = parent;
 }
 
-/* This is tricky but because how of we store our nodes we always have an
+/* This is tricky but because of how we store our nodes we always have an
    O(1) check available to us to tell whether a node in a tree is storing
    duplicates without any auxiliary data structures or struct fields.
 
@@ -1083,7 +1091,7 @@ give_parent_subtree(struct tree *t, struct node *parent, enum tree_link dir,
                        *    *  *   *
 
    Consider the above tree where one node is tracking duplicates. It
-   sacrifices its parent field to track a duplicate. The duplicate
+   sacrifices its parent field to track a duplicate. The head duplicate
    tracks the parent and uses its left/right fields to track previous/next
    in a circular list. So, we always know via pointers if we find a
    tree node that stores duplicates. By extension this means we can
@@ -1110,22 +1118,22 @@ get_parent(struct tree *t, struct node *n)
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters) */
-static threeway_cmp
+static node_threeway_cmp
 force_find_grt(const struct node *a, const struct node *b, void *aux)
 {
     (void)a;
     (void)b;
     (void)aux;
-    return GRT;
+    return NODE_GRT;
 }
 
-static threeway_cmp
+static node_threeway_cmp
 force_find_les(const struct node *a, const struct node *b, void *aux)
 {
     (void)a;
     (void)b;
     (void)aux;
-    return LES;
+    return NODE_LES;
 }
 
 /* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
@@ -1189,11 +1197,11 @@ are_subtrees_valid(const struct tree_range r, tree_cmp_fn *cmp,
     {
         return true;
     }
-    if (r.low != nil && cmp(r.root, r.low, NULL) != GRT)
+    if (r.low != nil && cmp(r.root, r.low, NULL) != NODE_GRT)
     {
         return false;
     }
-    if (r.high != nil && cmp(r.root, r.high, NULL) != LES)
+    if (r.high != nil && cmp(r.root, r.high, NULL) != NODE_LES)
     {
         return false;
     }
