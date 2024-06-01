@@ -238,8 +238,6 @@ pq_insert(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 struct pq_elem *
 pq_erase(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
-    (void)fn;
-    (void)aux;
     struct pq_elem *ret = pq_next(pq, elem);
     if (multiset_erase_node(&pq->t, &elem->n, (tree_cmp_fn *)fn, aux)
         == &pq->t.end)
@@ -254,8 +252,6 @@ pq_erase(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 struct pq_elem *
 pq_rerase(struct pqueue *pq, struct pq_elem *elem, pq_cmp_fn *fn, void *aux)
 {
-    (void)fn;
-    (void)aux;
     struct pq_elem *ret = pq_rnext(pq, elem);
     if (multiset_erase_node(&pq->t, &elem->n, (tree_cmp_fn *)fn, aux)
         == &pq->t.end)
