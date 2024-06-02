@@ -244,8 +244,7 @@ typedef void set_destructor_fn(struct set_elem *);
    loops may occur. */
 struct set_range
 {
-    struct set_elem *begin;
-    struct set_elem *end;
+    struct range r;
 };
 
 /* The reverse range container for queries performed with
@@ -261,8 +260,7 @@ struct set_range
    in this type of range.*/
 struct set_rrange
 {
-    struct set_elem *rbegin;
-    struct set_elem *end;
+    struct rrange r;
 };
 
 /* Define a function to use printf for your custom struct type.
@@ -468,8 +466,9 @@ struct set_elem *set_rnext(struct set *, struct set_elem *);
       struct val b = {.id = 0, .val = 35};
       struct val e = {.id = 0, .val = 64};
       const set_range range = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (struct set_elem *i = range.begin; i != range.end; i = set_next(&s,
-   i))
+      for (struct set_elem *i = set_begin_range(&range);
+           i != set_end_range(&range);
+           i = set_next(&s, i))
       {
           const int cur_val = set_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
@@ -481,6 +480,10 @@ struct set_elem *set_rnext(struct set *, struct set_elem *);
 struct set_range set_equal_range(struct set *, struct set_elem *begin,
                                  struct set_elem *end, set_cmp_fn *, void *aux);
 
+struct set_elem *set_begin_range(const struct set_range *);
+
+struct set_elem *set_end_range(const struct set_range *);
+
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
    provided end element. If either portion of the range cannot
@@ -491,7 +494,9 @@ struct set_range set_equal_range(struct set *, struct set_elem *begin,
       struct val b = {.id = 0, .val = 64};
       struct val e = {.id = 0, .val = 35};
       const set_range r = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (struct set_elem *i = r.rbegin; i != r.end; i = set_rnext(&s, i))
+      for (struct set_elem *i = set_begin_rrange(&range);
+           i != set_end_rrange(&range);
+           i = set_rnext(&s, i))
       {
           const int cur_val = set_entry(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
@@ -503,6 +508,10 @@ struct set_range set_equal_range(struct set *, struct set_elem *begin,
 struct set_rrange set_equal_rrange(struct set *, struct set_elem *rbegin,
                                    struct set_elem *end, set_cmp_fn *,
                                    void *aux);
+
+struct set_elem *set_begin_rrange(const struct set_rrange *);
+
+struct set_elem *set_end_rrange(const struct set_rrange *);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.

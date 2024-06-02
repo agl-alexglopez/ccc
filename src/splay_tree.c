@@ -101,6 +101,10 @@ static struct node *splay(struct tree *, struct node *, const struct node *,
                           tree_cmp_fn *, void *);
 static inline struct node *next_tree_node(struct tree *, struct node *,
                                           enum tree_link);
+static struct node *range_begin(const struct range *);
+static struct node *range_end(const struct range *);
+static struct node *rrange_begin(const struct rrange *);
+static struct node *rrange_end(const struct rrange *);
 
 /* ======================  Priority Queue Interface  ====================== */
 
@@ -208,13 +212,22 @@ struct pq_range
 pq_equal_range(struct pqueue *pq, struct pq_elem *begin, struct pq_elem *end,
                pq_cmp_fn *cmp, void *aux)
 {
-    const struct range r
-        = equal_range(&pq->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
-                      reverse_inorder_traversal, aux);
     return (struct pq_range){
-        .begin = (struct pq_elem *)r.begin,
-        .end = (struct pq_elem *)r.end,
+        equal_range(&pq->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
+                    reverse_inorder_traversal, aux),
     };
+}
+
+struct pq_elem *
+pq_begin_range(const struct pq_range *const r)
+{
+    return (struct pq_elem *)range_begin(&r->r);
+}
+
+struct pq_elem *
+pq_end_range(const struct pq_range *const r)
+{
+    return (struct pq_elem *)range_end(&r->r);
 }
 
 struct pq_rrange
@@ -225,9 +238,23 @@ pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend,
         = equal_range(&pq->t, &rbegin->n, &rend->n, (tree_cmp_fn *)cmp,
                       inorder_traversal, aux);
     return (struct pq_rrange){
-        .rbegin = (struct pq_elem *)ret.begin,
-        .end = (struct pq_elem *)ret.end,
+        .r = (struct rrange){
+            .rbegin =ret.begin,
+            .end = ret.end,
+        },
     };
+}
+
+struct pq_elem *
+pq_begin_rrange(const struct pq_rrange *const rr)
+{
+    return (struct pq_elem *)rrange_begin(&rr->r);
+}
+
+struct pq_elem *
+pq_end_rrange(const struct pq_rrange *const rr)
+{
+    return (struct pq_elem *)rrange_end(&rr->r);
 }
 
 void
@@ -400,24 +427,49 @@ struct set_range
 set_equal_range(struct set *s, struct set_elem *begin, struct set_elem *end,
                 set_cmp_fn *cmp, void *aux)
 {
-    struct range r = equal_range(&s->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
-                                 inorder_traversal, aux);
     return (struct set_range){
-        .begin = (struct set_elem *)r.begin,
-        .end = (struct set_elem *)r.end,
+        equal_range(&s->t, &begin->n, &end->n, (tree_cmp_fn *)cmp,
+                    inorder_traversal, aux),
     };
+}
+
+struct set_elem *
+set_begin_range(const struct set_range *const r)
+{
+    return (struct set_elem *)range_begin(&r->r);
+}
+
+struct set_elem *
+set_end_range(const struct set_range *const r)
+{
+    return (struct set_elem *)range_end(&r->r);
 }
 
 struct set_rrange
 set_equal_rrange(struct set *s, struct set_elem *rbegin, struct set_elem *end,
                  set_cmp_fn *cmp, void *aux)
 {
-    struct range r = equal_range(&s->t, &rbegin->n, &end->n, (tree_cmp_fn *)cmp,
-                                 reverse_inorder_traversal, aux);
+    const struct range r
+        = equal_range(&s->t, &rbegin->n, &end->n, (tree_cmp_fn *)cmp,
+                      reverse_inorder_traversal, aux);
     return (struct set_rrange){
-        .rbegin = (struct set_elem *)r.begin,
-        .end = (struct set_elem *)r.end,
+        .r = (struct rrange){
+            .rbegin = r.begin,
+            .end = r.end,
+        },
     };
+}
+
+struct set_elem *
+set_begin_rrange(const struct set_rrange *const rr)
+{
+    return (struct set_elem *)rrange_begin(&rr->r);
+}
+
+struct set_elem *
+set_end_rrange(const struct set_rrange *rr)
+{
+    return (struct set_elem *)rrange_end(&rr->r);
 }
 
 const struct set_elem *
@@ -738,6 +790,30 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
         e = next(t, e, traversal);
     }
     return (struct range){.begin = b, .end = e};
+}
+
+static struct node *
+range_begin(const struct range *const r)
+{
+    return r->begin;
+}
+
+static struct node *
+range_end(const struct range *const r)
+{
+    return r->end;
+}
+
+static struct node *
+rrange_begin(const struct rrange *const rr)
+{
+    return rr->rbegin;
+}
+
+static struct node *
+rrange_end(const struct rrange *const rr)
+{
+    return rr->end;
 }
 
 static struct node *

@@ -182,19 +182,19 @@ set_test_valid_range(void)
     const int range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     const struct set_range range
         = set_equal_range(&s, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(set_entry(range.begin, struct val, elem)->val, range_vals[0], int,
-          "%d");
-    CHECK(set_entry(range.end, struct val, elem)->val, range_vals[7], int,
-          "%d");
+    CHECK(set_entry(set_begin_range(&range), struct val, elem)->val,
+          range_vals[0], int, "%d");
+    CHECK(set_entry(set_end_range(&range), struct val, elem)->val,
+          range_vals[7], int, "%d");
     size_t index = 0;
-    struct set_elem *i1 = range.begin;
-    for (; i1 != range.end; i1 = set_next(&s, i1))
+    struct set_elem *i1 = set_begin_range(&range);
+    for (; i1 != set_end_range(&range); i1 = set_next(&s, i1))
     {
         const int cur_val = set_entry(i1, struct val, elem)->val;
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i1, range.end, struct set_elem *, "%p");
+    CHECK(i1, set_end_range(&range), struct set_elem *, "%p");
     CHECK(set_entry(i1, struct val, elem)->val, range_vals[7], int, "%d");
     b.val = 119;
     e.val = 84;
@@ -204,19 +204,19 @@ set_test_valid_range(void)
     const int rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     const struct set_rrange rev_range
         = set_equal_rrange(&s, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(set_entry(rev_range.rbegin, struct val, elem)->val, rev_range_vals[0],
-          int, "%d");
-    CHECK(set_entry(rev_range.end, struct val, elem)->val, rev_range_vals[7],
-          int, "%d");
+    CHECK(set_entry(set_begin_rrange(&rev_range), struct val, elem)->val,
+          rev_range_vals[0], int, "%d");
+    CHECK(set_entry(set_end_rrange(&rev_range), struct val, elem)->val,
+          rev_range_vals[7], int, "%d");
     index = 0;
-    struct set_elem *i2 = rev_range.rbegin;
-    for (; i2 != rev_range.end; i2 = set_rnext(&s, i2))
+    struct set_elem *i2 = set_begin_rrange(&rev_range);
+    for (; i2 != set_end_rrange(&rev_range); i2 = set_rnext(&s, i2))
     {
         const int cur_val = set_entry(i2, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i2, rev_range.end, struct set_elem *, "%p");
+    CHECK(i2, set_end_rrange(&rev_range), struct set_elem *, "%p");
     CHECK(set_entry(i2, struct val, elem)->val, rev_range_vals[7], int, "%d");
     return PASS;
 }
@@ -245,19 +245,19 @@ set_test_invalid_range(void)
     const int forward_range_vals[6] = {95, 100, 105, 110, 115, 120};
     const struct set_range rev_range
         = set_equal_range(&s, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(set_entry(rev_range.begin, struct val, elem)->val
+    CHECK(set_entry(set_begin_range(&rev_range), struct val, elem)->val
               == forward_range_vals[0],
           true, bool, "%b");
-    CHECK(rev_range.end, set_end(&s), struct set_elem *, "%p");
+    CHECK(set_end_range(&rev_range), set_end(&s), struct set_elem *, "%p");
     size_t index = 0;
-    struct set_elem *i1 = rev_range.begin;
-    for (; i1 != rev_range.end; i1 = set_next(&s, i1))
+    struct set_elem *i1 = set_begin_range(&rev_range);
+    for (; i1 != set_end_range(&rev_range); i1 = set_next(&s, i1))
     {
         const int cur_val = set_entry(i1, struct val, elem)->val;
         CHECK(forward_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i1, rev_range.end, struct set_elem *, "%p");
+    CHECK(i1, set_end_range(&rev_range), struct set_elem *, "%p");
     CHECK(i1, set_end(&s), struct set_elem *, "%p");
     b.val = 36;
     e.val = -999;
@@ -267,18 +267,18 @@ set_test_invalid_range(void)
     const int rev_range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     const struct set_rrange range
         = set_equal_rrange(&s, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(set_entry(range.rbegin, struct val, elem)->val, rev_range_vals[0],
-          int, "%d");
-    CHECK(range.end, set_end(&s), struct set_elem *, "%p");
+    CHECK(set_entry(set_begin_rrange(&range), struct val, elem)->val,
+          rev_range_vals[0], int, "%d");
+    CHECK(set_end_rrange(&range), set_end(&s), struct set_elem *, "%p");
     index = 0;
-    struct set_elem *i2 = range.rbegin;
-    for (; i2 != range.end; i2 = set_rnext(&s, i2))
+    struct set_elem *i2 = set_begin_rrange(&range);
+    for (; i2 != set_end_rrange(&range); i2 = set_rnext(&s, i2))
     {
         const int cur_val = set_entry(i2, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i2, range.end, struct set_elem *, "%p");
+    CHECK(i2, set_end_rrange(&range), struct set_elem *, "%p");
     CHECK(i2, set_end(&s), struct set_elem *, "%p");
     return PASS;
 }
@@ -306,17 +306,17 @@ set_test_empty_range(void)
     struct val e = {.id = 0, .val = -25};
     const struct set_range forward_range
         = set_equal_range(&s, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(set_entry(forward_range.begin, struct val, elem)->val, vals[0].val,
-          int, "%d");
-    CHECK(set_entry(forward_range.end, struct val, elem)->val, vals[0].val, int,
-          "%d");
+    CHECK(set_entry(set_begin_range(&forward_range), struct val, elem)->val,
+          vals[0].val, int, "%d");
+    CHECK(set_entry(set_end_range(&forward_range), struct val, elem)->val,
+          vals[0].val, int, "%d");
     b.val = 150;
     e.val = 999;
     const struct set_rrange rev_range
         = set_equal_rrange(&s, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(set_entry(rev_range.rbegin, struct val, elem)->val,
+    CHECK(set_entry(set_begin_rrange(&rev_range), struct val, elem)->val,
           vals[num_nodes - 1].val, int, "%d");
-    CHECK(set_entry(rev_range.end, struct val, elem)->val,
+    CHECK(set_entry(set_end_rrange(&rev_range), struct val, elem)->val,
           vals[num_nodes - 1].val, int, "%d");
     return PASS;
 }

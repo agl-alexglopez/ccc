@@ -251,8 +251,7 @@ typedef void pq_destructor_fn(struct pq_elem *);
    loops may occur. */
 struct pq_range
 {
-    struct pq_elem *begin;
-    struct pq_elem *end;
+    struct range r;
 };
 
 /* The reverse range container for queries performed with
@@ -268,8 +267,7 @@ struct pq_range
    in this type of range. */
 struct pq_rrange
 {
-    struct pq_elem *rbegin;
-    struct pq_elem *end;
+    struct rrange r;
 };
 
 /* How to obtain the struct that embeds the struct pq_elem. For example:
@@ -523,6 +521,10 @@ struct pq_elem *pq_rnext(struct pqueue *, struct pq_elem *);
 struct pq_range pq_equal_range(struct pqueue *, struct pq_elem *begin,
                                struct pq_elem *end, pq_cmp_fn *, void *aux);
 
+struct pq_elem *pq_begin_range(const struct pq_range *);
+
+struct pq_elem *pq_end_range(const struct pq_range *);
+
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
    provided end element. If either portion of the range cannot
@@ -545,6 +547,10 @@ struct pq_range pq_equal_range(struct pqueue *, struct pq_elem *begin,
    no values GREATER than end, end is returned as end element. */
 struct pq_rrange pq_equal_rrange(struct pqueue *, struct pq_elem *rbegin,
                                  struct pq_elem *end, pq_cmp_fn *, void *aux);
+
+struct pq_elem *pq_begin_rrange(const struct pq_rrange *);
+
+struct pq_elem *pq_end_rrange(const struct pq_rrange *);
 
 /* The end is not a valid position in the queue so it does not make
    sense to try to use any fields in the iterator once the end

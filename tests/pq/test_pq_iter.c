@@ -263,19 +263,20 @@ pq_test_priority_valid_range(void)
     const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     const struct pq_rrange rev_range
         = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(pq_entry(rev_range.rbegin, struct val, elem)->val == rev_range_vals[0]
-              && pq_entry(rev_range.end, struct val, elem)->val
+    CHECK(pq_entry(pq_begin_rrange(&rev_range), struct val, elem)->val
+                  == rev_range_vals[0]
+              && pq_entry(pq_end_rrange(&rev_range), struct val, elem)->val
                      == rev_range_vals[7],
           true, bool, "%b");
     size_t index = 0;
-    struct pq_elem *i1 = rev_range.rbegin;
-    for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
+    struct pq_elem *i1 = pq_begin_rrange(&rev_range);
+    for (; i1 != pq_end_rrange(&rev_range); i1 = pq_rnext(&pq, i1))
     {
         const int cur_val = pq_entry(i1, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i1 == rev_range.end
+    CHECK(i1 == pq_end_rrange(&rev_range)
               && pq_entry(i1, struct val, elem)->val == rev_range_vals[7],
           true, bool, "%b");
     b.val = 119;
@@ -286,18 +287,20 @@ pq_test_priority_valid_range(void)
     const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     const struct pq_range range
         = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(pq_entry(range.begin, struct val, elem)->val == range_vals[0]
-              && pq_entry(range.end, struct val, elem)->val == range_vals[7],
+    CHECK(pq_entry(pq_begin_range(&range), struct val, elem)->val
+                  == range_vals[0]
+              && pq_entry(pq_end_range(&range), struct val, elem)->val
+                     == range_vals[7],
           true, bool, "%b");
     index = 0;
-    struct pq_elem *i2 = range.begin;
-    for (; i2 != range.end; i2 = pq_next(&pq, i2))
+    struct pq_elem *i2 = pq_begin_range(&range);
+    for (; i2 != pq_end_range(&range); i2 = pq_next(&pq, i2))
     {
         const int cur_val = pq_entry(i2, struct val, elem)->val;
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i2 == range.end
+    CHECK(i2 == pq_end_range(&range)
               && pq_entry(i2, struct val, elem)->val == range_vals[7],
           true, bool, "%b");
     return PASS;
@@ -327,18 +330,20 @@ pq_test_priority_invalid_range(void)
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
     const struct pq_rrange rev_range
         = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(pq_entry(rev_range.rbegin, struct val, elem)->val == rev_range_vals[0]
-              && rev_range.end == pq_end(&pq),
+    CHECK(pq_entry(pq_begin_rrange(&rev_range), struct val, elem)->val
+                  == rev_range_vals[0]
+              && pq_end_rrange(&rev_range) == pq_end(&pq),
           true, bool, "%b");
     size_t index = 0;
-    struct pq_elem *i1 = rev_range.rbegin;
-    for (; i1 != rev_range.end; i1 = pq_rnext(&pq, i1))
+    struct pq_elem *i1 = pq_begin_rrange(&rev_range);
+    for (; i1 != pq_end_rrange(&rev_range); i1 = pq_rnext(&pq, i1))
     {
         const int cur_val = pq_entry(i1, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i1 == rev_range.end && i1 == pq_end(&pq), true, bool, "%b");
+    CHECK(i1 == pq_end_rrange(&rev_range) && i1 == pq_end(&pq), true, bool,
+          "%b");
     b.val = 36;
     e.val = -999;
     /* This should be the following range [36,-999). 36 should be
@@ -347,18 +352,19 @@ pq_test_priority_invalid_range(void)
     const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     const struct pq_range range
         = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(pq_entry(range.begin, struct val, elem)->val == range_vals[0]
-              && range.end == pq_end(&pq),
+    CHECK(pq_entry(pq_begin_range(&range), struct val, elem)->val
+                  == range_vals[0]
+              && pq_end_range(&range) == pq_end(&pq),
           true, bool, "%b");
     index = 0;
-    struct pq_elem *i2 = range.begin;
-    for (; i2 != range.end; i2 = pq_next(&pq, i2))
+    struct pq_elem *i2 = pq_begin_range(&range);
+    for (; i2 != pq_end_range(&range); i2 = pq_next(&pq, i2))
     {
         const int cur_val = pq_entry(i2, struct val, elem)->val;
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i2 == range.end && i2 == pq_end(&pq), true, bool, "%b");
+    CHECK(i2 == pq_end_range(&range) && i2 == pq_end(&pq), true, bool, "%b");
     return PASS;
 }
 
@@ -385,16 +391,18 @@ pq_test_priority_empty_range(void)
     struct val e = {.id = 0, .val = -25};
     const struct pq_rrange rev_range
         = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(pq_entry(rev_range.rbegin, struct val, elem)->val == vals[0].val
-              && pq_entry(rev_range.end, struct val, elem)->val == vals[0].val,
+    CHECK(pq_entry(pq_begin_rrange(&rev_range), struct val, elem)->val
+                  == vals[0].val
+              && pq_entry(pq_end_rrange(&rev_range), struct val, elem)->val
+                     == vals[0].val,
           true, bool, "%b");
     b.val = 150;
     e.val = 999;
     const struct pq_range range
         = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
-    CHECK(pq_entry(range.begin, struct val, elem)->val
+    CHECK(pq_entry(pq_begin_range(&range), struct val, elem)->val
                   == vals[num_nodes - 1].val
-              && pq_entry(range.end, struct val, elem)->val
+              && pq_entry(pq_end_range(&range), struct val, elem)->val
                      == vals[num_nodes - 1].val,
           true, bool, "%b");
     return PASS;
