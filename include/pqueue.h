@@ -561,7 +561,7 @@ struct pq_elem *pq_root(const struct pqueue *);
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void pq_print(struct pqueue *, struct pq_elem *, pq_print_fn *);
+void pq_print(const struct pqueue *, const struct pq_elem *, pq_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}(+1)
     ├──(29)R:{id:27,val:27}

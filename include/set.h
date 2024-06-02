@@ -516,7 +516,7 @@ struct set_elem *set_root(const struct set *);
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void set_print(struct set *, struct set_elem *, set_print_fn *);
+void set_print(const struct set *, const struct set_elem *, set_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}
     ├──(29)R:{id:27,val:27}

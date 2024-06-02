@@ -87,10 +87,11 @@ typedef node_threeway_cmp tree_cmp_fn(const struct node *key,
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of
    interface. */
-bool validate_tree(struct tree *t, tree_cmp_fn *cmp);
+bool validate_tree(const struct tree *t, tree_cmp_fn *cmp);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debugging use. */
-void print_tree(struct tree *t, const struct node *root, node_print_fn *fn);
+void print_tree(const struct tree *t, const struct node *root,
+                node_print_fn *fn);
 
 #endif
