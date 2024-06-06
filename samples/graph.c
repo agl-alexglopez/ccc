@@ -3,6 +3,7 @@
 #include "queue.h"
 #include "set.h"
 #include "str_view.h"
+#include <alloca.h>
 #include <assert.h>
 #include <limits.h>
 #include <stdint.h>
@@ -85,11 +86,10 @@ struct graph
 
 /*======================   Graph Constants   ================================*/
 
+/* Go to the box drawing unicode character wikipedia page to change styles. */
 const char *paths[] = {
-    // "■", "╵", "╶", "└", "╷", "│", "┌", "├",
-    // "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
-    "●", "╵", "╶", "╰", "╷", "│", "╭", "├", // rounded
-    "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼", // rounded
+    "●", "╵", "╶", "╰", "╷", "│", "╭", "├",
+    "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼",
 };
 
 const int speeds[] = {
@@ -97,8 +97,13 @@ const int speeds[] = {
 };
 
 /* North, East, South, West */
-const struct point dirs[] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-const size_t dirs_size = sizeof(dirs) / sizeof(dirs[0]);
+#define DIRS_SIZE ((size_t)4)
+const struct point dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+#define VERTEX_TITLES_SIZE ((size_t)26ULL)
+const char vertex_titles[VERTEX_TITLES_SIZE] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+};
 
 const str_view rows = SV("-r=");
 const str_view cols = SV("-c=");
@@ -115,7 +120,7 @@ const int default_speed = 4;
 const int row_col_min = 7;
 const int speed_max = 7;
 const int max_vertices = 26;
-const int max_degree = 4;
+const int max_degree = 4; /* Vertex has 4 edge limit on a terminal grid. */
 const int vertex_placement_padding = 3;
 const char start_vertex_title = 'A';
 const size_t vertex_cell_title_shift = 8;
@@ -126,8 +131,6 @@ const Cell l_edge_id_mask = 0xFF000000;
 const Cell l_edge_id_shift = 24;
 const Cell r_edge_id_mask = 0x00FF0000;
 const Cell r_edge_id_shift = 16;
-/* This comes immediately after 'Z' on the ASCII table. */
-const char exclusive_end_vertex_title = '[';
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
@@ -166,6 +169,7 @@ static bool is_dst(Cell, char);
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
 static int rand_range(int, int);
+static void rand_shuffle(size_t, void *, size_t);
 static Cell *grid_at_mut(const struct graph *, struct point);
 static Cell grid_at(const struct graph *, struct point);
 static uint16_t sort_vertices(char, char);
@@ -308,7 +312,7 @@ build_graph(struct graph *const graph)
         if (!set_insert(&graph->adjacency_list, &new_vertex->elem, cmp_vertices,
                         NULL))
         {
-            quit("Error building the graph. New vertex is already present.\n",
+            quit("Error building vertices. New vertex is already present.\n",
                  1);
         }
     }
@@ -339,20 +343,24 @@ build_graph(struct graph *const graph)
 static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
-    const char last_title
-        = (char)(start_vertex_title + set_size(&graph->adjacency_list));
-    struct vertex key = {
-        .name = (char)rand_range(start_vertex_title, last_title - 1),
-    };
+    const size_t graph_size = set_size(&graph->adjacency_list);
+    /* Bounded at size of the alphabet A-Z so alloca is fine here. */
+    size_t *vertex_title_indices = alloca(sizeof(size_t) * graph_size);
+    for (size_t i = 0; i < graph_size; ++i)
+    {
+        vertex_title_indices[i] = i;
+    }
+    /* Cycle through all vertices with which to join an edge randomly. */
+    rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size);
+    struct vertex key = {0};
     const struct set_elem *e = NULL;
     struct vertex *dst = NULL;
-    const size_t size = set_size(&graph->adjacency_list) - 1;
-    for (size_t i = 0; i < size; ++i, ++key.name)
+    for (size_t i = 0; i < graph_size; ++i)
     {
-        key.name = (char)(key.name + (key.name == src_vertex->name));
-        if (key.name >= last_title)
+        key.name = vertex_titles[vertex_title_indices[i]];
+        if (key.name == src_vertex->name)
         {
-            key.name = start_vertex_title;
+            continue;
         }
         e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
         if (e == set_end(&graph->adjacency_list))
@@ -397,7 +405,7 @@ find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
             success = true;
             break;
         }
-        for (size_t i = 0; i < dirs_size; ++i)
+        for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next = {
                 .r = cur.r + dirs[i].r,
@@ -603,12 +611,8 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < dist->dist)
             {
-                /* This vertex is now "seen" in the set and will be skipped
-                   if seen again. */
                 next->prev = cur->v;
-                /* I would not prefer to do Dijkstra's with the update method
-                   but it is the perfect opportunity to test this functionality
-                   provided by the pq for helpfullness and correctness. */
+                /* Dijkstra with update technique tests the pq abilities. */
                 if (!pq_update(&dist_q, &dist->pq_elem, cmp_pq_dist_points,
                                pq_update_dist, &alt))
                 {
@@ -651,7 +655,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
     while (cur.r != dst->pos.r || cur.c != dst->pos.c)
     {
         *grid_at_mut(g, cur) |= paint_bit;
-        for (size_t i = 0; i < dirs_size; ++i)
+        for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next = {
                 .r = cur.r + dirs[i].r,
@@ -704,6 +708,27 @@ rand_range(const int min, const int max)
 {
     /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
     return min + rand() / (RAND_MAX / (max - min + 1) + 1);
+}
+
+static inline void
+rand_shuffle(const size_t elem_size, void *const elems, const size_t n)
+{
+    if (n <= 1)
+    {
+        return;
+    }
+    uint8_t tmp[elem_size];
+    uint8_t *elem_view = elems;
+    const size_t step = elem_size * sizeof(uint8_t);
+    for (size_t i = 0; i < n - 1; ++i)
+    {
+        /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
+        const size_t rnd = (size_t)rand();
+        const size_t j = i + rnd / (RAND_MAX / (n - i) + 1);
+        memcpy(tmp, elem_view + (j * step), elem_size);
+        memcpy(elem_view + (j * step), elem_view + (i * step), elem_size);
+        memcpy(elem_view + (i * step), tmp, elem_size);
+    }
 }
 
 static inline Cell *
