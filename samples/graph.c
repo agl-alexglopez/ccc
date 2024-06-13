@@ -159,8 +159,7 @@ const str_view quit_cmd = SV("q");
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
-static bool find_grid_vertex_bfs(struct graph *, struct vertex *,
-                                 struct vertex *);
+static bool can_form_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void paint_edge(struct graph *, const struct vertex *,
                        const struct vertex *);
@@ -267,7 +266,6 @@ main(int argc, char **argv)
                  1);
         }
     }
-    /* This type of maze generation requires odd rows and cols. */
     graph.grid = calloc((size_t)graph.rows * graph.cols, sizeof(Cell));
     if (!graph.grid)
     {
@@ -370,7 +368,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         dst = set_entry(e, struct vertex, elem);
         if (!has_edge_with(src_vertex, dst->name)
             && vertex_degree(dst) < max_degree
-            && find_grid_vertex_bfs(graph, src_vertex, dst))
+            && can_form_edge(graph, src_vertex, dst))
         {
 
             return true;
@@ -379,9 +377,13 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
     return false;
 }
 
+/* This function assumes that the destination is valid. Valid means that
+   source is not already connected to destination and that destination
+   has less than the maximum allowable in degree. However, edge formation
+   still may fail if no path exists from source to destination. */
 static bool
-find_grid_vertex_bfs(struct graph *const graph, struct vertex *const src,
-                     struct vertex *const dst)
+can_form_edge(struct graph *const graph, struct vertex *const src,
+              struct vertex *const dst)
 {
     const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct set parent_map;
@@ -667,6 +669,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
             {
                 return;
             }
+            /* Always make forward progress, no backtracking. */
             if ((grid_at(g, next) & edge_id_mask) == edge_id
                 && (prev.r != next.r || prev.c != next.c))
             {
