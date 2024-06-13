@@ -1168,11 +1168,11 @@ link_trees(struct tree *t, struct node *parent, enum tree_link dir,
    careful not to access the end helper becuase it can store any pointers
    in its fields that should not be accessed for directions.
 
-                             *<<<<<<<<<
-                           //  \      ^>>>>v
-                          *      *----*----*
-                        // \\  // \\  ^<<<<v
-                       *    *  *   *
+                             *────┐
+                           ┌─┴─┐  ├──┐
+                           *   *──*──*
+                          ┌┴┐ ┌┴┐ └──┘
+                          * * * *
 
    Consider the above tree where one node is tracking duplicates. It
    sacrifices its parent field to track a duplicate. The head duplicate
