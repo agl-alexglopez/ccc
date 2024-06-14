@@ -134,8 +134,8 @@ const int max_degree = 4; /* Vertex has 4 edge limit on a terminal grid. */
 const int vertex_placement_padding = 3;
 const char start_vertex_title = 'A';
 const size_t vertex_cell_title_shift = 8;
+const Cell vertex_title_mask = 0xFF00;
 const size_t edge_id_shift = 16;
-const size_t vertex_title_mask = 0xFF00;
 const Cell edge_id_mask = 0xFFFF0000;
 const Cell l_edge_id_mask = 0xFF000000;
 const Cell l_edge_id_shift = 24;
@@ -147,7 +147,32 @@ const Cell r_edge_id_shift = 16;
    vertex names. Vertex names are 8 bit characters, so two vertices can
    fit into a uint16_t which we have room for in a Cell. The concatenation
    shall always be sorted alphabetically so an edge connecting vertex A and
-   Z will be uint16_t=AZ. */
+   Z will be uint16_t=AZ. Here is the breakdown of bits currently.
+
+   path shape bits───────────────────────────────────┬──┐
+   path_bit────────────────────────────────────────┐ │  │
+   vertex bit────────────────────────────────────┐ │ │  │
+   paint bit───────────────────────────────────┐ │ │ │  │
+   digit bit─────────────────────────────────┐ │ │ │ │  │
+   vertex title────────────────────┬───────┐ │ │ │ │ │  │
+   edge cost digit─────────────────┼────┬──┤ │ │ │ │ │  │
+   edge id───────┬──────┬─┬──────┐ │    │  │ │ │ │ │ │  │
+               0b00000000 00000000 0000 0000 0 0 0 0 0000
+   If various signal bits such as paint or digit are turned on we know
+   which bits to look at and how to interpret them.
+     - path shape bits determine how edges join as they run and turn.
+     - path bit marks a cell as a path
+     - vertex bit marks a cell as a vertex with a title in the highest eight
+       bits
+     - paint bit is a single bit to mark a path should be lit up.
+     - digit bit marks that one digit of an edge cost is stored in a edge cell.
+     - edge cost digit is stored in at most four bits. 9 is highest digit
+       in base 10.
+     - unused is not currently used but could be in the future.
+     - edge id is the concatenation of two vertex titles in an edge to signify
+       which vertices are connected. The edge id is sorted lexicographically
+       with the lower value in the leftmost bits.
+     - the vertex title is stored in 8 bits if the cell is a vertex. */
 
 const Cell path_mask = 0b1111;
 const Cell floating_path = 0b0000;
