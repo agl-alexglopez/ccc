@@ -84,6 +84,16 @@ struct graph
     struct set adjacency_list;
 };
 
+/* Helper type for labelling costs for edges between vertices in the graph. */
+enum label_orientation
+{
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST,
+    DIAGONAL,
+};
+
 /*======================   Graph Constants   ================================*/
 
 /* Go to the box drawing unicode character wikipedia page to change styles. */
@@ -145,10 +155,12 @@ const Cell north_path = 0b0001;
 const Cell east_path = 0b0010;
 const Cell south_path = 0b0100;
 const Cell west_path = 0b1000;
-const Cell cached_bit = 0b10000;
-const Cell path_bit = 0b100000;
-const Cell vertex_bit = 0b1000000;
-const Cell paint_bit = 0b10000000;
+const Cell path_bit = 0b10000;
+const Cell vertex_bit = 0b100000;
+const Cell paint_bit = 0b1000000;
+const Cell digit_bit = 0b10000000;
+const size_t digit_shift = 8;
+const Cell digit_mask = 0xF00;
 
 const str_view prompt_msg
     = SV("Enter two vertices to find the shortest path between them (i.e. "
@@ -159,10 +171,12 @@ const str_view quit_cmd = SV("q");
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
-static bool can_form_edge(struct graph *, struct vertex *, struct vertex *);
+static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void paint_edge(struct graph *, const struct vertex *,
                        const struct vertex *);
+static void add_edge_cost_label(struct graph *, struct vertex *,
+                                const struct edge *);
 static bool is_dst(Cell, char);
 
 static struct point random_vertex_placement(const struct graph *);
@@ -187,6 +201,9 @@ static void clear_paint(struct graph *);
 static bool is_vertex(Cell);
 static bool is_path(Cell);
 
+static void encode_digits(struct graph *, int, struct point,
+                          enum label_orientation);
+static enum label_orientation get_direction(struct point, struct point);
 static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
@@ -207,6 +224,7 @@ static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
 static void set_pq_prev_vertex_dist_point_destructor(struct set_elem *);
 static void set_parent_point_destructor(struct set_elem *);
+static unsigned count_digits(uintmax_t n);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -368,9 +386,8 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         dst = set_entry(e, struct vertex, elem);
         if (!has_edge_with(src_vertex, dst->name)
             && vertex_degree(dst) < max_degree
-            && can_form_edge(graph, src_vertex, dst))
+            && has_built_edge(graph, src_vertex, dst))
         {
-
             return true;
         }
     }
@@ -382,8 +399,8 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
    has less than the maximum allowable in degree. However, edge formation
    still may fail if no path exists from source to destination. */
 static bool
-can_form_edge(struct graph *const graph, struct vertex *const src,
-              struct vertex *const dst)
+has_built_edge(struct graph *const graph, struct vertex *const src,
+               struct vertex *const dst)
 {
     const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct set parent_map;
@@ -453,10 +470,147 @@ can_form_edge(struct graph *const graph, struct vertex *const src,
         (void)add_edge(src, &edge);
         edge.to = src;
         (void)add_edge(dst, &edge);
+        add_edge_cost_label(graph, dst, &edge);
     }
     set_clear(&parent_map, set_parent_point_destructor);
     q_free(&bfs);
     return success;
+}
+
+/* A edge cost lable will only be added if there is sufficient space. For
+   edges that are too small to fit a digit or two the line length can be
+   easily counted with the mouse or by eye. */
+static void
+add_edge_cost_label(struct graph *const g, struct vertex *const src,
+                    const struct edge *const e)
+{
+    struct point cur = src->pos;
+    const Cell edge_id = sort_vertices(src->name, e->to->name) << edge_id_shift;
+    struct point prev = cur;
+    /* Add a two space buffer to either side of the label so direction of lines
+       is not lost to writing of digits. Otherwise it would be unclear which
+       edge a cost is associated with if close to other costs. */
+    const size_t spaces_needed_for_cost = count_digits(e->cost) + 2;
+    size_t consecutive_spaces_found = 0;
+    enum label_orientation direction = NORTH;
+    while (cur.r != e->to->pos.r || cur.c != e->to->pos.c)
+    {
+        if (consecutive_spaces_found == spaces_needed_for_cost)
+        {
+            encode_digits(g, e->cost, cur, direction);
+            return;
+        }
+        for (size_t i = 0; i < DIRS_SIZE; ++i)
+        {
+            struct point next = {
+                .r = cur.r + dirs[i].r,
+                .c = cur.c + dirs[i].c,
+            };
+            const Cell next_cell = grid_at(g, next);
+            if ((next_cell & vertex_bit)
+                && get_cell_vertex_title(next_cell) == e->to->name)
+            {
+                return;
+            }
+            /* Always make forward progress, no backtracking. */
+            if ((grid_at(g, next) & edge_id_mask) == edge_id
+                && (prev.r != next.r || prev.c != next.c))
+            {
+                direction = get_direction(prev, next);
+                switch (direction)
+                {
+                case DIAGONAL:
+                    consecutive_spaces_found = 0;
+                    break;
+                default:
+                    ++consecutive_spaces_found;
+                    break;
+                }
+                prev = cur;
+                cur = next;
+                break;
+            }
+        }
+    }
+}
+
+/* Digits will be encoded so that they are readable by English language
+   standards. That means digits will either appear on a line to be
+   read left to right or top to bottom. This means that digits of the
+   numbers must either be handled left to right or right to left as they
+   are laid down such that they are read correctly. */
+static void
+encode_digits(struct graph *g, int cost, struct point start,
+              enum label_orientation orientation)
+{
+    uintmax_t digits = cost;
+    if (orientation == NORTH)
+    {
+        ++start.r;
+        for (; digits; digits /= 10, ++start.r)
+        {
+            uintmax_t lefmost_digit = digits;
+            for (uintmax_t remaining = digits; remaining;
+                 lefmost_digit = remaining, remaining /= 10)
+            {}
+            *grid_at_mut(g, start) |= digit_bit;
+            *grid_at_mut(g, start) |= lefmost_digit << digit_shift;
+        }
+    }
+    else if (orientation == SOUTH)
+    {
+        --start.r;
+        for (; digits; digits /= 10, --start.r)
+        {
+            *grid_at_mut(g, start) |= digit_bit;
+            *grid_at_mut(g, start) |= (digits % 10) << digit_shift;
+        }
+    }
+    else if (orientation == EAST)
+    {
+        --start.c;
+        for (; digits; digits /= 10, --start.c)
+        {
+            *grid_at_mut(g, start) |= digit_bit;
+            *grid_at_mut(g, start) |= (digits % 10) << digit_shift;
+        }
+    }
+    else /* WEST */
+    {
+        ++start.c;
+        for (; digits; digits /= 10, ++start.c)
+        {
+            uintmax_t lefmost_digit = digits;
+            for (uintmax_t remaining = digits; remaining;
+                 lefmost_digit = remaining, remaining /= 10)
+            {}
+            *grid_at_mut(g, start) |= digit_bit;
+            *grid_at_mut(g, start) |= lefmost_digit << digit_shift;
+        }
+    }
+}
+
+static enum label_orientation
+get_direction(struct point prev, struct point next)
+{
+    const struct point diff = {.r = next.r - prev.r, .c = next.c - prev.c};
+    if (diff.c && !diff.r && diff.c > 0)
+    {
+        return EAST;
+    }
+    if (diff.c && !diff.r && diff.c < 0)
+    {
+        return WEST;
+    }
+    if (diff.r && !diff.c && diff.r > 0)
+    {
+        return SOUTH;
+    }
+    if (diff.r && !diff.c && diff.r < 0)
+    {
+        return NORTH;
+    }
+    return DIAGONAL;
 }
 
 static struct point
@@ -834,6 +988,10 @@ print_cell(const Cell cell)
         printf("\033[38;5;14m%c\033[0m",
                (char)(cell >> vertex_cell_title_shift));
     }
+    else if (cell & digit_bit)
+    {
+        printf("%d", (cell & digit_mask) >> digit_shift);
+    }
     else if (cell & path_bit)
     {
         (cell & paint_bit)
@@ -1078,6 +1236,15 @@ parse_digits(str_view arg)
         return (struct int_conversion){.status = CONV_ER};
     }
     return convert_to_int(sv_begin(num));
+}
+
+static unsigned
+count_digits(uintmax_t n)
+{
+    unsigned res = 0;
+    for (; n; ++res, n /= 10)
+    {}
+    return res;
 }
 
 /* Promises valid memory or exits the program if the heap has an error. */

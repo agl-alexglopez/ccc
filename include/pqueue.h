@@ -22,39 +22,6 @@
 
 /* ====================  PRIORITY QUEUE ========================
 
-   Together the following form what you would normally expect for
-   an embedded data structure. In this case a priority queue.
-
-      pqueue
-      {
-         pq_elem *root
-         pq_elem nil;
-         size_t size;
-      };
-
-   Embed a pq_elem in your struct:
-
-      struct val
-      {
-         int val;
-         pq_elem elem;
-      };
-
-   If interested how these elems are implemented see tree.h
-   but each will occupy 24 bytes within your struct. The
-   queue itself is a one time 40 byte cost.
-
-   I have the additional space taken by the nil to afford some
-   nice conveniences in implementation. You could technically
-   get rid of it but that would make things harder and add
-   code bloat. It is a choice worth considering, however.
-
-   Becuase there are a few different helpful data structures
-   we can make from our underlying data structure we use typedef
-   to expose the expected interface to the user rather than force
-   them to remember how to use tree functionality to make a
-   priority queue in this case.
-
    A Priority Queue can be used to maintain a max or min. If
    you access the min or max for removal any future access
    to duplicates of that priority are guaranteed to be O(1).
