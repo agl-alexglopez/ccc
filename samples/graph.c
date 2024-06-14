@@ -133,14 +133,6 @@ const int max_vertices = 26;
 const int max_degree = 4; /* Vertex has 4 edge limit on a terminal grid. */
 const int vertex_placement_padding = 3;
 const char start_vertex_title = 'A';
-const size_t vertex_cell_title_shift = 8;
-const Cell vertex_title_mask = 0xFF00;
-const size_t edge_id_shift = 16;
-const Cell edge_id_mask = 0xFFFF0000;
-const Cell l_edge_id_mask = 0xFF000000;
-const Cell l_edge_id_shift = 24;
-const Cell r_edge_id_mask = 0x00FF0000;
-const Cell r_edge_id_shift = 16;
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
@@ -174,6 +166,14 @@ const Cell r_edge_id_shift = 16;
        with the lower value in the leftmost bits.
      - the vertex title is stored in 8 bits if the cell is a vertex. */
 
+const size_t vertex_cell_title_shift = 8;
+const Cell vertex_title_mask = 0xFF00;
+const size_t edge_id_shift = 16;
+const Cell edge_id_mask = 0xFFFF0000;
+const Cell l_edge_id_mask = 0xFF000000;
+const Cell l_edge_id_shift = 24;
+const Cell r_edge_id_mask = 0x00FF0000;
+const Cell r_edge_id_shift = 16;
 const Cell path_mask = 0b1111;
 const Cell floating_path = 0b0000;
 const Cell north_path = 0b0001;
