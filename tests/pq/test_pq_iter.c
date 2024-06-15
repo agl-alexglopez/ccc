@@ -53,7 +53,7 @@ static enum test_result
 pq_test_forward_iter_unique_vals(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct pq_elem *e = pq_begin(&pq); e != pq_end(&pq);
@@ -68,8 +68,8 @@ pq_test_forward_iter_unique_vals(void)
     {
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
@@ -89,7 +89,7 @@ static enum test_result
 pq_test_forward_iter_all_vals(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct pq_elem *i = pq_begin(&pq); i != pq_end(&pq);
@@ -100,7 +100,7 @@ pq_test_forward_iter_all_vals(void)
     struct val vals[num_nodes];
     vals[0].val = 0; // NOLINT
     vals[0].id = 0;
-    pq_insert(&pq, &vals[0].elem, val_cmp, NULL);
+    pq_insert(&pq, &vals[0].elem, NULL);
     /* This will test iterating through every possible length list. */
     for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
     {
@@ -109,9 +109,8 @@ pq_test_forward_iter_all_vals(void)
         {
             vals[index].val = val; // NOLINT
             vals[index].id = index;
-            pq_insert(&pq, &vals[index].elem, val_cmp, NULL);
-            CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool,
-                  "%b");
+            pq_insert(&pq, &vals[index].elem, NULL);
+            CHECK(validate_tree(&pq.t), true, bool, "%b");
         }
     }
     int val_keys_inorder[num_nodes];
@@ -130,7 +129,7 @@ static enum test_result
 pq_test_insert_iterate_pop(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -141,8 +140,8 @@ pq_test_insert_iterate_pop(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     size_t pop_count = 0;
@@ -150,7 +149,7 @@ pq_test_insert_iterate_pop(void)
     {
         pq_pop_max(&pq);
         ++pop_count;
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
         if (pop_count % 200)
         {
             CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
@@ -164,7 +163,7 @@ static enum test_result
 pq_test_priority_removal(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -175,8 +174,8 @@ pq_test_priority_removal(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     const int limit = 400;
@@ -185,9 +184,8 @@ pq_test_priority_removal(void)
         struct val *cur = pq_entry(i, struct val, elem);
         if (cur->val > limit)
         {
-            i = pq_erase(&pq, i, val_cmp, NULL);
-            CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool,
-                  "%b");
+            i = pq_erase(&pq, i, NULL);
+            CHECK(validate_tree(&pq.t), true, bool, "%b");
         }
         else
         {
@@ -201,7 +199,7 @@ static enum test_result
 pq_test_priority_update(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -212,8 +210,8 @@ pq_test_priority_update(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     const int limit = 400;
@@ -224,10 +222,8 @@ pq_test_priority_update(void)
         if (cur->val > limit)
         {
             struct pq_elem *next = pq_next(&pq, i);
-            CHECK(pq_update(&pq, i, val_cmp, val_update, &backoff), true, bool,
-                  "%b");
-            CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool,
-                  "%b");
+            CHECK(pq_update(&pq, i, val_update, &backoff), true, bool, "%b");
+            CHECK(validate_tree(&pq.t), true, bool, "%b");
             i = next;
         }
         else
@@ -243,7 +239,7 @@ static enum test_result
 pq_test_priority_valid_range(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -252,8 +248,8 @@ pq_test_priority_valid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -262,7 +258,7 @@ pq_test_priority_valid_range(void)
        value greater than 44, 45. */
     const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     const struct pq_rrange rev_range
-        = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
+        = pq_equal_rrange(&pq, &b.elem, &e.elem, NULL);
     CHECK(pq_entry(pq_begin_rrange(&rev_range), struct val, elem)->val
                   == rev_range_vals[0]
               && pq_entry(pq_end_rrange(&rev_range), struct val, elem)->val
@@ -285,8 +281,7 @@ pq_test_priority_valid_range(void)
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    const struct pq_range range
-        = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
+    const struct pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, NULL);
     CHECK(pq_entry(pq_begin_range(&range), struct val, elem)->val
                   == range_vals[0]
               && pq_entry(pq_end_range(&range), struct val, elem)->val
@@ -310,7 +305,7 @@ static enum test_result
 pq_test_priority_invalid_range(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -319,8 +314,8 @@ pq_test_priority_invalid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -329,7 +324,7 @@ pq_test_priority_invalid_range(void)
        value greater than 999, none or the end. */
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
     const struct pq_rrange rev_range
-        = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
+        = pq_equal_rrange(&pq, &b.elem, &e.elem, NULL);
     CHECK(pq_entry(pq_begin_rrange(&rev_range), struct val, elem)->val
                   == rev_range_vals[0]
               && pq_end_rrange(&rev_range) == pq_end(&pq),
@@ -350,8 +345,7 @@ pq_test_priority_invalid_range(void)
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
     const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
-    const struct pq_range range
-        = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
+    const struct pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, NULL);
     CHECK(pq_entry(pq_begin_range(&range), struct val, elem)->val
                   == range_vals[0]
               && pq_end_range(&range) == pq_end(&pq),
@@ -372,7 +366,7 @@ static enum test_result
 pq_test_priority_empty_range(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -381,8 +375,8 @@ pq_test_priority_empty_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, val_cmp, NULL);
-        CHECK(validate_tree(&pq.t, (tree_cmp_fn *)val_cmp), true, bool, "%b");
+        pq_insert(&pq, &vals[i].elem, NULL);
+        CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
@@ -390,7 +384,7 @@ pq_test_priority_empty_range(void)
     struct val b = {.id = 0, .val = -50};
     struct val e = {.id = 0, .val = -25};
     const struct pq_rrange rev_range
-        = pq_equal_rrange(&pq, &b.elem, &e.elem, val_cmp, NULL);
+        = pq_equal_rrange(&pq, &b.elem, &e.elem, NULL);
     CHECK(pq_entry(pq_begin_rrange(&rev_range), struct val, elem)->val
                   == vals[0].val
               && pq_entry(pq_end_rrange(&rev_range), struct val, elem)->val
@@ -398,8 +392,7 @@ pq_test_priority_empty_range(void)
           true, bool, "%b");
     b.val = 150;
     e.val = 999;
-    const struct pq_range range
-        = pq_equal_range(&pq, &b.elem, &e.elem, val_cmp, NULL);
+    const struct pq_range range = pq_equal_range(&pq, &b.elem, &e.elem, NULL);
     CHECK(pq_entry(pq_begin_range(&range), struct val, elem)->val
                   == vals[num_nodes - 1].val
               && pq_entry(pq_end_range(&range), struct val, elem)->val

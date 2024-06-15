@@ -127,8 +127,8 @@ struct pqueue
 
    The compare function one must provide to perform queries
    and other operations on the priority queue. See above. */
-typedef node_threeway_cmp pq_cmp_fn(const struct pq_elem *key,
-                                    const struct pq_elem *n, void *aux);
+typedef node_threeway_cmp pq_cmp_fn(const struct pq_elem *a,
+                                    const struct pq_elem *b, void *aux);
 
 /* Define a function to use printf for your custom struct type.
    For example:
@@ -259,8 +259,9 @@ struct pq_rrange
     ((STRUCT *)((uint8_t *)&(PQ_ELEM)->n.parent_or_dups                        \
                 - offsetof(STRUCT, MEMBER.n.parent_or_dups))) /* NOLINT */
 
-/* Initializes and empty queue with size 0. */
-void pq_init(struct pqueue *);
+/* Initializes and empty queue with size 0 and stores the comparison function
+   the user defines for the elements in the priority queue. */
+void pq_init(struct pqueue *, pq_cmp_fn *);
 
 /* Calls the destructor for each element while emptying the priority queue.
    Usually, this destructor function is expected to call free for each
@@ -283,7 +284,7 @@ size_t pq_size(struct pqueue *);
    behavior is undefined. Priority queue insertion
    shall not fail becuase priority queues support
    round robin duplicates. O(lgN) */
-void pq_insert(struct pqueue *, struct pq_elem *, pq_cmp_fn *, void *);
+void pq_insert(struct pqueue *, struct pq_elem *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
@@ -343,13 +344,11 @@ const struct pq_elem *pq_const_min(const struct pqueue *);
    the erased. O(lgN). However, in practice you can often
    benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
-struct pq_elem *pq_erase(struct pqueue *, struct pq_elem *, pq_cmp_fn *,
-                         void *);
+struct pq_elem *pq_erase(struct pqueue *, struct pq_elem *, void *);
 
 /* The same as erase but returns the next element in an
    ascending priority order. */
-struct pq_elem *pq_rerase(struct pqueue *, struct pq_elem *, pq_cmp_fn *,
-                          void *);
+struct pq_elem *pq_rerase(struct pqueue *, struct pq_elem *, void *);
 
 /* Updates the specified elem known to be in the queue with
    a new priority in O(lgN) time. Because an update does not
@@ -362,8 +361,7 @@ struct pq_elem *pq_rerase(struct pqueue *, struct pq_elem *, pq_cmp_fn *,
    an element could not be found to be in the queue. Insert
    does not fail in a priority queue. See the iteration section
    for a pattern that might work if updating while iterating. */
-bool pq_update(struct pqueue *, struct pq_elem *, pq_cmp_fn *, pq_update_fn *,
-               void *);
+bool pq_update(struct pqueue *, struct pq_elem *, pq_update_fn *, void *);
 
 /* Returns true if this priority value is in the queue.
    you need not search with any specific struct you have
@@ -395,7 +393,7 @@ bool pq_update(struct pqueue *, struct pq_elem *, pq_cmp_fn *, pq_update_fn *,
    This can be helpful if you need to know if such a priority
    is present regardless of how many round robin duplicates
    are present. Returns the result in O(lgN). */
-bool pq_contains(struct pqueue *, struct pq_elem *, pq_cmp_fn *, void *);
+bool pq_contains(struct pqueue *, struct pq_elem *, void *);
 
 /* ===================    Iteration   ==========================
 
@@ -486,7 +484,7 @@ struct pq_elem *pq_rnext(struct pqueue *, struct pq_elem *);
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, end is returned as end element. */
 struct pq_range pq_equal_range(struct pqueue *, struct pq_elem *begin,
-                               struct pq_elem *end, pq_cmp_fn *, void *aux);
+                               struct pq_elem *end, void *aux);
 
 struct pq_elem *pq_begin_range(const struct pq_range *);
 
@@ -513,7 +511,7 @@ struct pq_elem *pq_end_range(const struct pq_range *);
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, end is returned as end element. */
 struct pq_rrange pq_equal_rrange(struct pqueue *, struct pq_elem *rbegin,
-                                 struct pq_elem *end, pq_cmp_fn *, void *aux);
+                                 struct pq_elem *end, void *aux);
 
 struct pq_elem *pq_begin_rrange(const struct pq_rrange *);
 

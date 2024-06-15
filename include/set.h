@@ -214,8 +214,8 @@ struct set_elem
       }
 
    ============================================================= */
-typedef node_threeway_cmp set_cmp_fn(const struct set_elem *key,
-                                     const struct set_elem *n, void *aux);
+typedef node_threeway_cmp set_cmp_fn(const struct set_elem *a,
+                                     const struct set_elem *b, void *aux);
 
 /* Performs user specified destructor actions on a single set_elem. This
    set_elem is assumed to be embedded in user defined structs and therefore
@@ -288,7 +288,7 @@ typedef void set_print_fn(const struct set_elem *);
 
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
-void set_init(struct set *);
+void set_init(struct set *, set_cmp_fn *);
 
 /* Calls the destructor for each element while emptying the set.
    Usually, this destructor function is expected to call free for each
@@ -314,14 +314,14 @@ size_t set_size(struct set *);
    with the same key. Do not assume your element is the
    one that is found unless you know it is only one you
    have created. */
-bool set_contains(struct set *, struct set_elem *, set_cmp_fn *, void *);
+bool set_contains(struct set *, struct set_elem *, void *);
 
 /* Returns true if the element you have requested to be
    inserted is inserted false if it was present already.
    Becuase this is heap free data structure there is no need
    to return the actual element that is inserted. You already
    have it when you call this function.*/
-bool set_insert(struct set *, struct set_elem *, set_cmp_fn *, void *);
+bool set_insert(struct set *, struct set_elem *, void *);
 
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
@@ -335,8 +335,7 @@ bool set_insert(struct set *, struct set_elem *, set_cmp_fn *, void *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-const struct set_elem *set_find(struct set *, struct set_elem *, set_cmp_fn *,
-                                void *);
+const struct set_elem *set_find(struct set *, struct set_elem *, void *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -344,8 +343,7 @@ const struct set_elem *set_find(struct set *, struct set_elem *, set_cmp_fn *,
    end element and it does not have any attachment to any
    struct you are using so trying to get the set entry from
    it will return garbage or worse.*/
-struct set_elem *set_erase(struct set *, struct set_elem *, set_cmp_fn *,
-                           void *);
+struct set_elem *set_erase(struct set *, struct set_elem *, void *);
 
 /* Check if the current elem is the min. O(lgN) */
 bool set_is_min(struct set *, struct set_elem *);
@@ -361,7 +359,7 @@ bool set_is_max(struct set *, struct set_elem *);
    one that is found unless you know it is only one you
    have created. The const version does no fixups and should
    be used only rarely. */
-bool set_const_contains(struct set *, struct set_elem *, set_cmp_fn *, void *);
+bool set_const_contains(struct set *, struct set_elem *, void *);
 
 /* Read only seek into the data structure backing the set.
    It is therefore safe for multiple threads to read with
@@ -370,8 +368,7 @@ bool set_const_contains(struct set *, struct set_elem *, set_cmp_fn *, void *);
    benefits from locality of reference and should be
    allowed to repair itself with lookups with all other
    functions whenever possible. */
-const struct set_elem *set_const_find(struct set *, struct set_elem *,
-                                      set_cmp_fn *, void *);
+const struct set_elem *set_const_find(struct set *, struct set_elem *, void *);
 
 /* ===================    Iteration   ==========================
 
@@ -478,7 +475,7 @@ struct set_elem *set_rnext(struct set *, struct set_elem *);
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, end is returned as end element. */
 struct set_range set_equal_range(struct set *, struct set_elem *begin,
-                                 struct set_elem *end, set_cmp_fn *, void *aux);
+                                 struct set_elem *end, void *aux);
 
 struct set_elem *set_begin_range(const struct set_range *);
 
@@ -506,8 +503,7 @@ struct set_elem *set_end_range(const struct set_range *);
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, end is returned as end element. */
 struct set_rrange set_equal_rrange(struct set *, struct set_elem *rbegin,
-                                   struct set_elem *end, set_cmp_fn *,
-                                   void *aux);
+                                   struct set_elem *end, void *aux);
 
 struct set_elem *set_begin_rrange(const struct set_rrange *);
 

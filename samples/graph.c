@@ -266,7 +266,7 @@ main(int argc, char **argv)
         .vertices = default_vertices,
         .grid = NULL,
     };
-    set_init(&graph.adjacency_list);
+    set_init(&graph.adjacency_list, cmp_vertices);
     for (int i = 1; i < argc; ++i)
     {
         const str_view arg = sv(argv[i]);
@@ -350,8 +350,7 @@ build_graph(struct graph *const graph)
             .pos = rand_point,
             .edges = {{0}, {0}, {0}, {0}},
         };
-        if (!set_insert(&graph->adjacency_list, &new_vertex->elem, cmp_vertices,
-                        NULL))
+        if (!set_insert(&graph->adjacency_list, &new_vertex->elem, NULL))
         {
             quit("Error building vertices. New vertex is already present.\n",
                  1);
@@ -363,7 +362,7 @@ build_graph(struct graph *const graph)
     {
         key.name = (char)vertex_title;
         const struct set_elem *const e
-            = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
+            = set_find(&graph->adjacency_list, &key.elem, NULL);
         if (e == set_end(&graph->adjacency_list))
         {
             quit("Vertex that should be present in the set is absent.\n", 1);
@@ -403,7 +402,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        e = set_find(&graph->adjacency_list, &key.elem, cmp_vertices, NULL);
+        e = set_find(&graph->adjacency_list, &key.elem, NULL);
         if (e == set_end(&graph->adjacency_list))
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -429,7 +428,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
 {
     const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct set parent_map;
-    set_init(&parent_map);
+    set_init(&parent_map, cmp_parent_cells);
     struct queue bfs;
     q_init(sizeof(struct point), &bfs, 4);
     (void)insert_parent_cell(&parent_map, (struct parent_cell){
@@ -459,8 +458,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             const Cell next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name)
                 || (!is_path(next_cell)
-                    && !set_contains(&parent_map, &push.elem, cmp_parent_cells,
-                                     NULL)))
+                    && !set_contains(&parent_map, &push.elem, NULL)))
             {
                 (void)insert_parent_cell(&parent_map, push);
                 q_push(&bfs, &next);
@@ -470,8 +468,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     if (success)
     {
         struct parent_cell c = {.key = cur};
-        const struct set_elem *e
-            = set_find(&parent_map, &c.elem, cmp_parent_cells, NULL);
+        const struct set_elem *e = set_find(&parent_map, &c.elem, NULL);
         if (e == set_end(&parent_map))
         {
             quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -481,7 +478,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
         {
-            e = set_find(&parent_map, &c.elem, cmp_parent_cells, NULL);
+            e = set_find(&parent_map, &c.elem, NULL);
             if (e == set_end(&parent_map))
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -730,9 +727,9 @@ static bool
 dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
     struct pqueue dist_q;
-    pq_init(&dist_q);
+    pq_init(&dist_q, cmp_pq_dist_points);
     struct set prev_map;
-    set_init(&prev_map);
+    set_init(&prev_map, cmp_set_prev_vertices);
     for (struct set_elem *e = set_begin(&graph->adjacency_list);
          e != set_end(&graph->adjacency_list);
          e = set_next(&graph->adjacency_list, e))
@@ -758,7 +755,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         {
             quit("inserting into set in in loading phase failed.\n", 1);
         }
-        pq_insert(&dist_q, &p->pq_elem, cmp_pq_dist_points, NULL);
+        pq_insert(&dist_q, &p->pq_elem, NULL);
     }
     bool success = false;
     struct dist_point *cur = NULL;
@@ -775,8 +772,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct prev_vertex pv = {.v = cur->v->edges[i].to};
-            const struct set_elem *e
-                = set_find(&prev_map, &pv.elem, cmp_set_prev_vertices, NULL);
+            const struct set_elem *e = set_find(&prev_map, &pv.elem, NULL);
             assert(e != set_end(&prev_map));
             struct prev_vertex *next = set_entry(e, struct prev_vertex, elem);
             /* We have encountered this element before because we know the
@@ -794,8 +790,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             {
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!pq_update(&dist_q, &dist->pq_elem, cmp_pq_dist_points,
-                               pq_update_dist, &alt))
+                if (!pq_update(&dist_q, &dist->pq_elem, pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -806,15 +801,13 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
     {
         struct prev_vertex key = {.v = cur->v};
         struct prev_vertex *prev = set_entry(
-            set_find(&prev_map, &key.elem, cmp_set_prev_vertices, NULL),
-            struct prev_vertex, elem);
+            set_find(&prev_map, &key.elem, NULL), struct prev_vertex, elem);
         while (prev->prev)
         {
             paint_edge(graph, key.v, prev->prev);
             key.v = prev->prev;
-            prev = set_entry(
-                set_find(&prev_map, &key.elem, cmp_set_prev_vertices, NULL),
-                struct prev_vertex, elem);
+            prev = set_entry(set_find(&prev_map, &key.elem, NULL),
+                             struct prev_vertex, elem);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -1111,7 +1104,7 @@ insert_prev_vertex(struct set *s, struct prev_vertex pv)
 
     struct prev_vertex *pv_heap = valid_malloc(sizeof(struct prev_vertex));
     *pv_heap = pv;
-    return set_insert(s, &pv_heap->elem, cmp_set_prev_vertices, NULL);
+    return set_insert(s, &pv_heap->elem, NULL);
 }
 
 static bool
@@ -1120,7 +1113,7 @@ insert_parent_cell(struct set *s, struct parent_cell pc)
     struct parent_cell *const pc_heap
         = valid_malloc(sizeof(struct parent_cell));
     *pc_heap = pc;
-    return set_insert(s, &pc_heap->elem, cmp_parent_cells, NULL);
+    return set_insert(s, &pc_heap->elem, NULL);
 }
 
 static node_threeway_cmp
@@ -1237,9 +1230,9 @@ parse_path_request(struct graph *const g, str_view r)
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex key = {.name = *c};
-            struct vertex *v = set_entry(
-                set_find(&g->adjacency_list, &key.elem, cmp_vertices, NULL),
-                struct vertex, elem);
+            struct vertex *v
+                = set_entry(set_find(&g->adjacency_list, &key.elem, NULL),
+                            struct vertex, elem);
             res.src ? (res.dst = v) : (res.src = v);
         }
     }

@@ -10,6 +10,8 @@ struct val
 };
 
 static enum test_result pq_test_empty(void);
+static node_threeway_cmp val_cmp(const struct pq_elem *, const struct pq_elem *,
+                                 void *);
 
 #define NUM_TESTS (size_t)1
 const test_fn all_tests[NUM_TESTS] = {pq_test_empty};
@@ -33,7 +35,16 @@ static enum test_result
 pq_test_empty(void)
 {
     struct pqueue pq;
-    pq_init(&pq);
+    pq_init(&pq, val_cmp);
     CHECK(pq_empty(&pq), true, bool, "%b");
     return PASS;
+}
+
+static node_threeway_cmp
+val_cmp(const struct pq_elem *a, const struct pq_elem *b, void *aux)
+{
+    (void)aux;
+    struct val *lhs = pq_entry(a, struct val, elem);
+    struct val *rhs = pq_entry(b, struct val, elem);
+    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
