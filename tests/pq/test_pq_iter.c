@@ -68,7 +68,7 @@ pq_test_forward_iter_unique_vals(void)
     {
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -100,7 +100,7 @@ pq_test_forward_iter_all_vals(void)
     struct val vals[num_nodes];
     vals[0].val = 0; // NOLINT
     vals[0].id = 0;
-    pq_insert(&pq, &vals[0].elem, NULL);
+    pq_push(&pq, &vals[0].elem, NULL);
     /* This will test iterating through every possible length list. */
     for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
     {
@@ -109,7 +109,7 @@ pq_test_forward_iter_all_vals(void)
         {
             vals[index].val = val; // NOLINT
             vals[index].id = index;
-            pq_insert(&pq, &vals[index].elem, NULL);
+            pq_push(&pq, &vals[index].elem, NULL);
             CHECK(validate_tree(&pq.t), true, bool, "%b");
         }
     }
@@ -140,7 +140,7 @@ pq_test_insert_iterate_pop(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
@@ -174,7 +174,7 @@ pq_test_priority_removal(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
@@ -210,7 +210,7 @@ pq_test_priority_update(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
@@ -248,7 +248,7 @@ pq_test_priority_valid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     struct val b = {.id = 0, .val = 6};
@@ -314,7 +314,7 @@ pq_test_priority_invalid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     struct val b = {.id = 0, .val = 95};
@@ -375,7 +375,7 @@ pq_test_priority_empty_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     /* Nonexistant range returns end [begin, end) in both positions.

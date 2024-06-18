@@ -66,7 +66,7 @@ pq_test_insert_remove_four_dups(void)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        pq_insert(&pq, &three_vals[i].elem, NULL);
+        pq_push(&pq, &three_vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         const size_t size = i + 1;
         CHECK(pq_size(&pq), size, size_t, "%zu");
@@ -181,12 +181,12 @@ pq_test_max_round_robin(void)
     struct val vals[size];
     vals[0].id = 99;
     vals[0].val = 0;
-    pq_insert(&pq, &vals[0].elem, NULL);
+    pq_push(&pq, &vals[0].elem, NULL);
     for (int i = 1; i < size; ++i)
     {
         vals[i].val = 99;
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
@@ -209,12 +209,12 @@ pq_test_min_round_robin(void)
     struct val vals[size];
     vals[0].id = 99;
     vals[0].val = 99;
-    pq_insert(&pq, &vals[0].elem, NULL);
+    pq_push(&pq, &vals[0].elem, NULL);
     for (int i = 1; i < size; ++i)
     {
         vals[i].val = 1;
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
@@ -243,7 +243,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         const size_t s = i + 1;
         CHECK(pq_size(&pq), s, size_t, "%zu");
@@ -281,7 +281,7 @@ pq_test_prime_shuffle(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -314,7 +314,7 @@ pq_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     for (int i = 0; i < num_nodes; ++i)
@@ -339,7 +339,7 @@ insert_shuffled(struct pqueue *pq, struct val vals[], const size_t size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        pq_insert(pq, &vals[shuffled_index].elem, NULL);
+        pq_push(pq, &vals[shuffled_index].elem, NULL);
         CHECK(pq_size(pq), i + 1, size_t, "%zu");
         CHECK(validate_tree(&pq->t), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;

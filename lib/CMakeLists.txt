@@ -4,3 +4,4 @@ target_link_libraries(cli PUBLIC
   str_view
 )
 add_library(queue queue.h queue.c)
+add_library(heap_pqueue heap_pqueue.h heap_pqueue.c)

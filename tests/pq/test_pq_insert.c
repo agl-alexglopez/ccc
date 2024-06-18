@@ -51,7 +51,7 @@ pq_test_insert_one(void)
     pq_init(&pq, val_cmp);
     struct val single;
     single.val = 0;
-    pq_insert(&pq, &single.elem, NULL);
+    pq_push(&pq, &single.elem, NULL);
     CHECK(pq_empty(&pq), false, bool, "%b");
     CHECK(pq_entry(pq_root(&pq), struct val, elem)->val == single.val, true,
           bool, "%b");
@@ -67,7 +67,7 @@ pq_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        pq_insert(&pq, &three_vals[i].elem, NULL);
+        pq_push(&pq, &three_vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -88,8 +88,8 @@ pq_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
-        pq_insert(&pq_tester_clone, &tester_clone[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
+        pq_push(&pq_tester_clone, &tester_clone[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
@@ -111,7 +111,7 @@ pq_test_insert_three_dups(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        pq_insert(&pq, &three_vals[i].elem, NULL);
+        pq_push(&pq, &three_vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -161,7 +161,7 @@ pq_test_read_max_min(void)
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem, NULL);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -186,7 +186,7 @@ insert_shuffled(struct pqueue *pq, struct val vals[], const size_t size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        pq_insert(pq, &vals[shuffled_index].elem, NULL);
+        pq_push(pq, &vals[shuffled_index].elem, NULL);
         CHECK(pq_size(pq), i + 1, size_t, "%zu");
         CHECK(validate_tree(&pq->t), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;

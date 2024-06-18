@@ -1,5 +1,5 @@
 #include "cli.h"
-#include "pqueue.h"
+#include "heap_pqueue.h"
 #include "queue.h"
 #include "set.h"
 #include "str_view.h"
@@ -33,14 +33,14 @@ struct prev_vertex
     struct vertex *prev;
     struct set_elem elem;
     /* A pointer to the corresponding pq_entry for this element. */
-    struct pq_elem *pq_elem;
+    struct hpq_elem *hpq_elem;
 };
 
 struct dist_point
 {
     struct vertex *v;
     int dist;
-    struct pq_elem pq_elem;
+    struct hpq_elem hpq_elem;
 };
 
 struct path_request
@@ -97,42 +97,33 @@ enum label_orientation
 /*======================   Graph Constants   ================================*/
 
 /* Go to the box drawing unicode character wikipedia page to change styles. */
-const char *paths[] = {
+static const char *paths[] = {
     "●", "╵", "╶", "╰", "╷", "│", "╭", "├",
     "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼",
 };
 
-const int speeds[] = {
-    0, 5000000, 2500000, 1000000, 500000, 250000, 100000, 1000,
-};
-
 /* North, East, South, West */
 #define DIRS_SIZE ((size_t)4)
-const struct point dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+static const struct point dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 #define VERTEX_TITLES_SIZE ((size_t)26ULL)
-const char vertex_titles[VERTEX_TITLES_SIZE] = {
+static const char vertex_titles[VERTEX_TITLES_SIZE] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 };
 
-const str_view rows = SV("-r=");
-const str_view cols = SV("-c=");
-const str_view speed = SV("-s=");
-const str_view vertices_flag = SV("-v=");
-const str_view help_flag = SV("-h");
-const str_view escape = SV("\033[");
-const str_view semi_colon = SV(";");
-const str_view cursor_pos_specifier = SV("f");
-const int default_rows = 33;
-const int default_cols = 111;
-const int default_vertices = 4;
-const int default_speed = 4;
-const int row_col_min = 7;
-const int speed_max = 7;
-const int max_vertices = 26;
-const int max_degree = 4; /* Vertex has 4 edge limit on a terminal grid. */
-const int vertex_placement_padding = 3;
-const char start_vertex_title = 'A';
+static const str_view rows = SV("-r=");
+static const str_view cols = SV("-c=");
+static const str_view vertices_flag = SV("-v=");
+static const str_view help_flag = SV("-h");
+static const int default_rows = 33;
+static const int default_cols = 111;
+static const int default_vertices = 4;
+static const int row_col_min = 7;
+static const int max_vertices = 26;
+static const int max_degree
+    = 4; /* Vertex has 4 edge limit on a terminal grid. */
+static const int vertex_placement_padding = 3;
+static const char start_vertex_title = 'A';
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
@@ -166,31 +157,30 @@ const char start_vertex_title = 'A';
        with the lower value in the leftmost bits.
      - the vertex title is stored in 8 bits if the cell is a vertex. */
 
-const size_t vertex_cell_title_shift = 8;
-const Cell vertex_title_mask = 0xFF00;
-const size_t edge_id_shift = 16;
-const Cell edge_id_mask = 0xFFFF0000;
-const Cell l_edge_id_mask = 0xFF000000;
-const Cell l_edge_id_shift = 24;
-const Cell r_edge_id_mask = 0x00FF0000;
-const Cell r_edge_id_shift = 16;
-const Cell path_mask = 0b1111;
-const Cell floating_path = 0b0000;
-const Cell north_path = 0b0001;
-const Cell east_path = 0b0010;
-const Cell south_path = 0b0100;
-const Cell west_path = 0b1000;
-const Cell path_bit = 0b10000;
-const Cell vertex_bit = 0b100000;
-const Cell paint_bit = 0b1000000;
-const Cell digit_bit = 0b10000000;
-const size_t digit_shift = 8;
-const Cell digit_mask = 0xF00;
+static const size_t vertex_cell_title_shift = 8;
+static const Cell vertex_title_mask = 0xFF00;
+static const size_t edge_id_shift = 16;
+static const Cell edge_id_mask = 0xFFFF0000;
+static const Cell l_edge_id_mask = 0xFF000000;
+static const Cell l_edge_id_shift = 24;
+static const Cell r_edge_id_mask = 0x00FF0000;
+static const Cell r_edge_id_shift = 16;
+static const Cell path_mask = 0b1111;
+static const Cell north_path = 0b0001;
+static const Cell east_path = 0b0010;
+static const Cell south_path = 0b0100;
+static const Cell west_path = 0b1000;
+static const Cell path_bit = 0b10000;
+static const Cell vertex_bit = 0b100000;
+static const Cell paint_bit = 0b1000000;
+static const Cell digit_bit = 0b10000000;
+static const size_t digit_shift = 8;
+static const Cell digit_mask = 0xF00;
 
-const str_view prompt_msg
+static const str_view prompt_msg
     = SV("Enter two vertices to find the shortest path between them (i.e. "
          "A-Z). Enter q to quit:");
-const str_view quit_cmd = SV("q");
+static const str_view quit_cmd = SV("q");
 
 /*==========================   Prototypes  ================================= */
 
@@ -240,11 +230,11 @@ static node_threeway_cmp cmp_vertices(const struct set_elem *,
                                       const struct set_elem *, void *);
 static node_threeway_cmp cmp_parent_cells(const struct set_elem *,
                                           const struct set_elem *, void *);
-static node_threeway_cmp cmp_pq_dist_points(const struct pq_elem *,
-                                            const struct pq_elem *, void *);
+static enum heap_pq_threeway_cmp
+cmp_pq_dist_points(const struct hpq_elem *, const struct hpq_elem *, void *);
 static node_threeway_cmp cmp_set_prev_vertices(const struct set_elem *,
                                                const struct set_elem *, void *);
-static void pq_update_dist(struct pq_elem *, void *);
+static void pq_update_dist(struct hpq_elem *, void *);
 static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
 static void set_pq_prev_vertex_dist_point_destructor(struct set_elem *);
@@ -726,8 +716,8 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
-    struct pqueue dist_q;
-    pq_init(&dist_q, cmp_pq_dist_points);
+    struct heap_pqueue dist_q;
+    hpq_init(&dist_q, HPQ_LES, cmp_pq_dist_points, NULL);
     struct set prev_map;
     set_init(&prev_map, cmp_set_prev_vertices);
     for (struct set_elem *e = set_begin(&graph->adjacency_list);
@@ -750,20 +740,20 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         if (!insert_prev_vertex(&prev_map, (struct prev_vertex){
                                                .v = p->v,
                                                .prev = NULL,
-                                               .pq_elem = &p->pq_elem,
+                                               .hpq_elem = &p->hpq_elem,
                                            }))
         {
             quit("inserting into set in in loading phase failed.\n", 1);
         }
-        pq_insert(&dist_q, &p->pq_elem, NULL);
+        hpq_push(&dist_q, &p->hpq_elem);
     }
     bool success = false;
     struct dist_point *cur = NULL;
-    while (!pq_empty(&dist_q))
+    while (!hpq_empty(&dist_q))
     {
         /* PQ entries are popped but the set will free the memory at
-           the end because it always holds a reference to its pq_elem. */
-        cur = pq_entry(pq_pop_min(&dist_q), struct dist_point, pq_elem);
+           the end because it always holds a reference to its hpq_elem. */
+        cur = hpq_entry(hpq_pop(&dist_q), struct dist_point, hpq_elem);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
@@ -784,13 +774,13 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             /* The seen set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
             struct dist_point *dist
-                = pq_entry(next->pq_elem, struct dist_point, pq_elem);
+                = hpq_entry(next->hpq_elem, struct dist_point, hpq_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < dist->dist)
             {
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!pq_update(&dist_q, &dist->pq_elem, pq_update_dist, &alt))
+                if (!hpq_update(&dist_q, &dist->hpq_elem, pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -1143,13 +1133,15 @@ cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
     return (a->key.r > b->key.r) - (a->key.r < b->key.r);
 }
 
-static node_threeway_cmp
-cmp_pq_dist_points(const struct pq_elem *const x, const struct pq_elem *const y,
-                   void *aux)
+static enum heap_pq_threeway_cmp
+cmp_pq_dist_points(const struct hpq_elem *const x,
+                   const struct hpq_elem *const y, void *aux)
 {
     (void)aux;
-    const struct dist_point *const a = pq_entry(x, struct dist_point, pq_elem);
-    const struct dist_point *const b = pq_entry(y, struct dist_point, pq_elem);
+    const struct dist_point *const a
+        = hpq_entry(x, struct dist_point, hpq_elem);
+    const struct dist_point *const b
+        = hpq_entry(y, struct dist_point, hpq_elem);
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
@@ -1172,9 +1164,9 @@ cmp_set_prev_vertices(const struct set_elem *const x,
 }
 
 static void
-pq_update_dist(struct pq_elem *e, void *aux)
+pq_update_dist(struct hpq_elem *e, void *aux)
 {
-    pq_entry(e, struct dist_point, pq_elem)->dist = *((int *)aux);
+    hpq_entry(e, struct dist_point, hpq_elem)->dist = *((int *)aux);
 }
 
 static void
@@ -1203,7 +1195,7 @@ static void
 set_pq_prev_vertex_dist_point_destructor(struct set_elem *const e)
 {
     struct prev_vertex *pv = set_entry(e, struct prev_vertex, elem);
-    free(pq_entry(pv->pq_elem, struct dist_point, pq_elem));
+    free(hpq_entry(pv->hpq_elem, struct dist_point, hpq_elem));
     free(pv);
 }
 

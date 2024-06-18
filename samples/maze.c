@@ -218,7 +218,7 @@ animate_maze(struct maze *maze)
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)pq_insert(&cells, &start->elem, NULL);
+    (void)pq_push(&cells, &start->elem, NULL);
 
     const int animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
@@ -275,7 +275,7 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            pq_insert(&cells, &new_cell->elem, NULL);
+            pq_push(&cells, &new_cell->elem, NULL);
         }
         else
         {

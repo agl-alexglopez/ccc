@@ -284,7 +284,7 @@ size_t pq_size(struct pqueue *);
    behavior is undefined. Priority queue insertion
    shall not fail becuase priority queues support
    round robin duplicates. O(lgN) */
-void pq_insert(struct pqueue *, struct pq_elem *, void *);
+void pq_push(struct pqueue *, struct pq_elem *, void *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first

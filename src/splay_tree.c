@@ -253,7 +253,7 @@ pq_end_rrange(const struct pq_rrange *const rr)
 }
 
 void
-pq_insert(struct pqueue *pq, struct pq_elem *elem, void *aux)
+pq_push(struct pqueue *pq, struct pq_elem *elem, void *aux)
 {
     multiset_insert(&pq->t, &elem->n, pq->t.cmp, aux);
 }
