@@ -205,20 +205,20 @@ animate_maze(struct maze *maze)
        and priority queue data structures. Also a 2D vector wastes space. */
     struct pqueue cells;
     struct set cell_costs;
-    set_init(&cell_costs, cmp_points);
-    pq_init(&cells, cmp_priority_cells);
+    set_init(&cell_costs, cmp_points, NULL);
+    pq_init(&cells, cmp_priority_cells, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)set_insert(&cell_costs, &odd_point->elem, NULL);
+    (void)set_insert(&cell_costs, &odd_point->elem);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)pq_push(&cells, &start->elem, NULL);
+    (void)pq_push(&cells, &start->elem);
 
     const int animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
@@ -243,7 +243,7 @@ animate_maze(struct maze *maze)
             int cur_weight = 0;
             struct point_cost key = {.p = next};
             const struct set_elem *const found
-                = set_find(&cell_costs, &key.elem, NULL);
+                = set_find(&cell_costs, &key.elem);
             if (found == set_end(&cell_costs))
             {
                 struct point_cost *new_cost
@@ -253,7 +253,7 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                assert(set_insert(&cell_costs, &new_cost->elem, NULL));
+                assert(set_insert(&cell_costs, &new_cost->elem));
             }
             else
             {
@@ -275,7 +275,7 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            pq_push(&cells, &new_cell->elem, NULL);
+            pq_push(&cells, &new_cell->elem);
         }
         else
         {

@@ -48,10 +48,10 @@ static enum test_result
 set_test_insert_one(void)
 {
     struct set s;
-    set_init(&s, val_cmp);
+    set_init(&s, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(set_insert(&s, &single.elem, NULL), true, bool, "%b");
+    CHECK(set_insert(&s, &single.elem), true, bool, "%b");
     CHECK(set_empty(&s), false, bool, "%b");
     CHECK(set_entry(set_root(&s), struct val, elem)->val == single.val, true,
           bool, "%b");
@@ -62,12 +62,12 @@ static enum test_result
 set_test_insert_three(void)
 {
     struct set s;
-    set_init(&s, val_cmp);
+    set_init(&s, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        CHECK(set_insert(&s, &three_vals[i].elem, NULL), true, bool, "%b");
+        CHECK(set_insert(&s, &three_vals[i].elem), true, bool, "%b");
         CHECK(validate_tree(&s.t), true, bool, "%b");
     }
     CHECK(set_size(&s), 3ULL, size_t, "%zu");
@@ -78,18 +78,18 @@ static enum test_result
 set_test_struct_getter(void)
 {
     struct set s;
-    set_init(&s, val_cmp);
+    set_init(&s, val_cmp, NULL);
     struct set set_tester_clone;
-    set_init(&set_tester_clone, val_cmp);
+    set_init(&set_tester_clone, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        CHECK(set_insert(&s, &vals[i].elem, NULL), true, bool, "%b");
-        CHECK(set_insert(&set_tester_clone, &tester_clone[i].elem, NULL), true,
-              bool, "%b");
+        CHECK(set_insert(&s, &vals[i].elem), true, bool, "%b");
+        CHECK(set_insert(&set_tester_clone, &tester_clone[i].elem), true, bool,
+              "%b");
         CHECK(validate_tree(&s.t), true, bool, "%b");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
@@ -106,7 +106,7 @@ static enum test_result
 set_test_insert_shuffle(void)
 {
     struct set s;
-    set_init(&s, val_cmp);
+    set_init(&s, val_cmp, NULL);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;
@@ -134,7 +134,7 @@ insert_shuffled(struct set *s, struct val vals[], const size_t size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        set_insert(s, &vals[shuffled_index].elem, NULL);
+        set_insert(s, &vals[shuffled_index].elem);
         CHECK(set_size(s), i + 1, size_t, "%zu");
         CHECK(validate_tree(&s->t), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;

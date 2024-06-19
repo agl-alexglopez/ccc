@@ -61,12 +61,12 @@ static enum test_result
 pq_test_insert_remove_four_dups(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        pq_push(&pq, &three_vals[i].elem, NULL);
+        pq_push(&pq, &three_vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         const size_t size = i + 1;
         CHECK(pq_size(&pq), size, size_t, "%zu");
@@ -86,7 +86,7 @@ static enum test_result
 pq_test_insert_erase_shuffled(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -105,7 +105,7 @@ pq_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)pq_erase(&pq, &vals[i].elem, NULL);
+        (void)pq_erase(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(pq_size(&pq), 0ULL, size_t, "%zu");
@@ -116,7 +116,7 @@ static enum test_result
 pq_test_pop_max(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -146,7 +146,7 @@ static enum test_result
 pq_test_pop_min(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -176,17 +176,17 @@ static enum test_result
 pq_test_max_round_robin(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
     vals[0].val = 0;
-    pq_push(&pq, &vals[0].elem, NULL);
+    pq_push(&pq, &vals[0].elem);
     for (int i = 1; i < size; ++i)
     {
         vals[i].val = 99;
         vals[i].id = i;
-        pq_push(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
@@ -204,17 +204,17 @@ static enum test_result
 pq_test_min_round_robin(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
     vals[0].val = 99;
-    pq_push(&pq, &vals[0].elem, NULL);
+    pq_push(&pq, &vals[0].elem);
     for (int i = 1; i < size; ++i)
     {
         vals[i].val = 1;
         vals[i].id = i;
-        pq_push(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
@@ -232,7 +232,7 @@ static enum test_result
 pq_test_delete_prime_shuffle_duplicates(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const int size = 99;
     const int prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -243,7 +243,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        pq_push(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         const size_t s = i + 1;
         CHECK(pq_size(&pq), s, size_t, "%zu");
@@ -255,7 +255,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)pq_erase(&pq, &vals[shuffled_index].elem, NULL);
+        (void)pq_erase(&pq, &vals[shuffled_index].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         --cur_size;
         CHECK(pq_size(&pq), cur_size, size_t, "%zu");
@@ -269,7 +269,7 @@ static enum test_result
 pq_test_prime_shuffle(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     const int size = 50;
     const int prime = 53;
     const int less = 10;
@@ -281,7 +281,7 @@ pq_test_prime_shuffle(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        pq_push(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -292,7 +292,7 @@ pq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(pq_erase(&pq, &vals[i].elem, NULL) != NULL, true, bool, "%b");
+        CHECK(pq_erase(&pq, &vals[i].elem) != NULL, true, bool, "%b");
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         --cur_size;
         CHECK(pq_size(&pq), cur_size, size_t, "%zu");
@@ -304,7 +304,7 @@ static enum test_result
 pq_test_weak_srand(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -314,12 +314,12 @@ pq_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        pq_push(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(pq_erase(&pq, &vals[i].elem, NULL) != NULL, true, bool, "%b");
+        CHECK(pq_erase(&pq, &vals[i].elem) != NULL, true, bool, "%b");
         CHECK(validate_tree(&pq.t), true, bool, "%b");
     }
     CHECK(pq_empty(&pq), true, bool, "%b");
@@ -339,7 +339,7 @@ insert_shuffled(struct pqueue *pq, struct val vals[], const size_t size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        pq_push(pq, &vals[shuffled_index].elem, NULL);
+        pq_push(pq, &vals[shuffled_index].elem);
         CHECK(pq_size(pq), i + 1, size_t, "%zu");
         CHECK(validate_tree(&pq->t), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;

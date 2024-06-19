@@ -70,6 +70,7 @@ struct tree
     struct node *root;
     struct node end;
     tree_cmp_fn *cmp;
+    void *aux;
     size_t size;
 };
 
