@@ -7,11 +7,27 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
+/* Printing enum for printing tree structures if heap available. */
+enum print_link
+{
+    BRANCH = 0, /* ├── */
+    LEAF = 1    /* └── */
+};
+
 enum hpq_direction
 {
     L = 0,
     R,
 };
+
+#define COLOR_BLK "\033[34;1m"
+#define COLOR_BLU_BOLD "\033[38;5;12m"
+#define COLOR_RED_BOLD "\033[38;5;9m"
+#define COLOR_RED "\033[31;1m"
+#define COLOR_CYN "\033[36;1m"
+#define COLOR_GRN "\033[32;1m"
+#define COLOR_NIL "\033[0m"
+#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 
 static const size_t starting_capacity = 8;
 
@@ -19,6 +35,10 @@ static void grow(struct heap_pqueue *);
 static void swap(struct hpq_elem **, struct hpq_elem **);
 static void bubble_down(struct heap_pqueue *, size_t);
 static void bubble_up(struct heap_pqueue *, size_t);
+static void print_node(const struct heap_pqueue *, size_t, hpq_print_fn *);
+static void print_inner_heap(const struct heap_pqueue *, size_t, const char *,
+                             enum print_link, hpq_print_fn *);
+static void print_heap(const struct heap_pqueue *, size_t, hpq_print_fn *);
 
 void
 hpq_init(struct heap_pqueue *const hpq, enum heap_pq_threeway_cmp hpq_ordering,
@@ -99,9 +119,25 @@ hpq_update(struct heap_pqueue *hpq, struct hpq_elem *e, hpq_update_fn *fn,
     {
         return false;
     }
-    hpq_erase(hpq, e);
     fn(e, aux);
-    hpq_push(hpq, e);
+    if (!e->handle)
+    {
+        bubble_down(hpq, 0);
+        return true;
+    }
+    const enum heap_pq_threeway_cmp parent_cmp = hpq->cmp(
+        hpq->heap[e->handle], hpq->heap[(e->handle - 1) / 2], hpq->aux);
+    if (parent_cmp == hpq->order)
+    {
+        bubble_up(hpq, e->handle);
+        return true;
+    }
+    if (parent_cmp != HPQEQL)
+    {
+        bubble_down(hpq, e->handle);
+        return true;
+    }
+    /* If the comparison is equal do nothing. Element is in right spot. */
     return true;
 }
 
@@ -182,6 +218,12 @@ hpq_validate(const struct heap_pqueue *const hpq)
     return true;
 }
 
+void
+hpq_print(const struct heap_pqueue *hpq, const size_t i, hpq_print_fn *const fn)
+{
+    print_heap(hpq, i, fn);
+}
+
 /*===============================  Static Helpers  =========================*/
 
 static void
@@ -254,3 +296,87 @@ swap(struct hpq_elem **a, struct hpq_elem **b)
     *a = *b;
     *b = temp;
 }
+
+/* NOLINTBEGIN(*misc-no-recursion) */
+
+static void
+print_node(const struct heap_pqueue *const hpq, size_t i,
+           hpq_print_fn *const fn)
+{
+    printf(COLOR_CYN);
+    if (hpq->heap[i]->handle)
+    {
+        hpq->heap[hpq->heap[(i - 1) / 2]->handle * 2 + 1] == hpq->heap[i]
+            ? printf("L%zu:", i)
+            : printf("R%zu:", i);
+    }
+    printf(COLOR_NIL);
+    fn(hpq->heap[i]);
+    printf("\n");
+}
+
+static void
+print_inner_heap(const struct heap_pqueue *const hpq, size_t i,
+                 const char *prefix, const enum print_link node_type,
+                 hpq_print_fn *const fn)
+{
+    if (i >= hpq->sz)
+    {
+        return;
+    }
+    printf("%s", prefix);
+    printf("%s", node_type == LEAF ? " └──" : " ├──");
+    print_node(hpq, i, fn);
+
+    char *str = NULL;
+    int string_length
+        = snprintf(NULL, 0, "%s%s", prefix,
+                   node_type == LEAF ? "     " : " │   "); // NOLINT
+    if (string_length > 0)
+    {
+        str = malloc(string_length + 1);
+        (void)snprintf(str, string_length, "%s%s", prefix,
+                       node_type == LEAF ? "     " : " │   "); // NOLINT
+    }
+    if (str != NULL)
+    {
+        if ((i * 2) + 2 >= hpq->sz)
+        {
+            print_inner_heap(hpq, (i * 2) + 1, str, LEAF, fn);
+        }
+        else
+        {
+            print_inner_heap(hpq, (i * 2) + 2, str, BRANCH, fn);
+            print_inner_heap(hpq, (i * 2) + 1, str, LEAF, fn);
+        }
+    }
+    else
+    {
+        printf(COLOR_ERR "memory exceeded. Cannot display tree." COLOR_NIL);
+    }
+    free(str);
+}
+
+static void
+print_heap(const struct heap_pqueue *const hpq, size_t i,
+           hpq_print_fn *const fn)
+{
+    if (i >= hpq->sz)
+    {
+        return;
+    }
+    printf(" ");
+    print_node(hpq, i, fn);
+
+    if ((i * 2) + 2 >= hpq->sz)
+    {
+        print_inner_heap(hpq, (i * 2) + 1, "", LEAF, fn);
+    }
+    else
+    {
+        print_inner_heap(hpq, (i * 2) + 2, "", BRANCH, fn);
+        print_inner_heap(hpq, (i * 2) + 1, "", LEAF, fn);
+    }
+}
+
+/* NOLINTEND(*misc-no-recursion) */

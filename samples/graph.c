@@ -188,6 +188,8 @@ static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
+static void prepare_vertices(struct graph *, struct heap_pqueue *, struct set *,
+                             const struct path_request *);
 static void paint_edge(struct graph *, const struct vertex *,
                        const struct vertex *);
 static void add_edge_cost_label(struct graph *, struct vertex *,
@@ -249,7 +251,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(4);
+    srand(time(NULL));
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,
@@ -720,33 +722,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
     hpq_init(&dist_q, HPQLES, cmp_pq_dist_points, NULL);
     struct set prev_map;
     set_init(&prev_map, cmp_set_prev_vertices, NULL);
-    for (struct set_elem *e = set_begin(&graph->adjacency_list);
-         e != set_end(&graph->adjacency_list);
-         e = set_next(&graph->adjacency_list, e))
-    {
-        struct dist_point *p = valid_malloc(sizeof(struct dist_point));
-        *p = (struct dist_point){
-            .v = set_entry(e, struct vertex, elem),
-            .dist = INT_MAX,
-        };
-        if (p->v == pr.src)
-        {
-            p->dist = 0;
-        }
-        /* All vertices will have undefined parents until we have
-           encountered the parent leading to them during the algorithm.
-           This doubles as a caching mechanism and helper to find the
-           vertex we need to update in the priority queue. */
-        if (!insert_prev_vertex(&prev_map, (struct prev_vertex){
-                                               .v = p->v,
-                                               .prev = NULL,
-                                               .hpq_elem = &p->hpq_elem,
-                                           }))
-        {
-            quit("inserting into set in in loading phase failed.\n", 1);
-        }
-        hpq_push(&dist_q, &p->hpq_elem);
-    }
+    prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;
     while (!hpq_empty(&dist_q))
@@ -765,12 +741,6 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             const struct set_elem *e = set_find(&prev_map, &pv.elem);
             assert(e != set_end(&prev_map));
             struct prev_vertex *next = set_entry(e, struct prev_vertex, elem);
-            /* We have encountered this element before because we know the
-               parent in the path to it. Skip it. */
-            if (next->prev)
-            {
-                continue;
-            }
             /* The seen set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
             struct dist_point *dist
@@ -778,6 +748,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < dist->dist)
             {
+                /* Build the map with the appropriate best candidate parent. */
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
                 if (!hpq_update(&dist_q, &dist->hpq_elem, pq_update_dist, &alt))
@@ -807,6 +778,32 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
     set_clear(&prev_map, set_pq_prev_vertex_dist_point_destructor);
     clear_and_flush_graph(graph);
     return success;
+}
+
+static void
+prepare_vertices(struct graph *const graph, struct heap_pqueue *dist_q,
+                 struct set *prev_map, const struct path_request *pr)
+{
+    for (struct set_elem *e = set_begin(&graph->adjacency_list);
+         e != set_end(&graph->adjacency_list);
+         e = set_next(&graph->adjacency_list, e))
+    {
+        struct dist_point *p = valid_malloc(sizeof(struct dist_point));
+        struct vertex *const v = set_entry(e, struct vertex, elem);
+        *p = (struct dist_point){
+            .v = v,
+            .dist = v == pr->src ? 0 : INT_MAX,
+        };
+        if (!insert_prev_vertex(prev_map, (struct prev_vertex){
+                                              .v = p->v,
+                                              .prev = NULL,
+                                              .hpq_elem = &p->hpq_elem,
+                                          }))
+        {
+            quit("inserting into set in in loading phase failed.\n", 1);
+        }
+        hpq_push(dist_q, &p->hpq_elem);
+    }
 }
 
 static void

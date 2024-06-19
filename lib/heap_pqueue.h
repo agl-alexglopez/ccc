@@ -24,6 +24,8 @@ typedef void hpq_destructor_fn(struct hpq_elem *);
 
 typedef void hpq_update_fn(struct hpq_elem *, void *aux);
 
+typedef void hpq_print_fn(const struct hpq_elem *);
+
 struct heap_pqueue
 {
     struct hpq_elem **heap [[gnu::deprecated("private")]];
@@ -51,5 +53,7 @@ bool hpq_update(struct heap_pqueue *, struct hpq_elem *, hpq_update_fn *,
                 void *);
 bool hpq_validate(const struct heap_pqueue *);
 enum heap_pq_threeway_cmp hpq_order(const struct heap_pqueue *);
+
+void hpq_print(const struct heap_pqueue *, size_t i, hpq_print_fn *);
 
 #endif
