@@ -34,7 +34,7 @@ static enum test_result
 pq_test_empty(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     CHECK(hpq_empty(&pq), true, bool, "%b");
     return PASS;
 }

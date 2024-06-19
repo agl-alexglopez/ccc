@@ -59,7 +59,7 @@ static enum test_result
 hpq_test_insert_remove_four_dups(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -84,7 +84,7 @@ static enum test_result
 hpq_test_insert_erase_shuffled(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -112,7 +112,7 @@ static enum test_result
 hpq_test_pop_max(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -140,7 +140,7 @@ static enum test_result
 hpq_test_pop_min(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -168,7 +168,7 @@ static enum test_result
 hpq_test_max_round_robin(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
@@ -196,7 +196,7 @@ static enum test_result
 hpq_test_min_round_robin(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
@@ -224,7 +224,7 @@ static enum test_result
 hpq_test_delete_prime_shuffle_duplicates(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const int size = 99;
     const int prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -261,7 +261,7 @@ static enum test_result
 hpq_test_prime_shuffle(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     const int size = 50;
     const int prime = 53;
     const int less = 10;
@@ -294,7 +294,7 @@ static enum test_result
 hpq_test_weak_srand(void)
 {
     struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

@@ -7,9 +7,9 @@
 
 enum heap_pq_threeway_cmp
 {
-    HPQ_LES = -1,
-    HPQ_EQL,
-    HPQ_GRT,
+    HPQLES = -1,
+    HPQEQL,
+    HPQGRT,
 };
 
 struct hpq_elem
@@ -30,7 +30,7 @@ struct heap_pqueue
     size_t sz [[gnu::deprecated("private")]];
     size_t capacity [[gnu::deprecated("private")]];
     hpq_cmp_fn *cmp [[gnu::deprecated("private")]];
-    enum heap_pq_threeway_cmp ordering [[gnu::deprecated("private")]];
+    enum heap_pq_threeway_cmp order [[gnu::deprecated("private")]];
     void *aux [[gnu::deprecated("private")]];
 };
 

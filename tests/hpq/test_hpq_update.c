@@ -45,7 +45,7 @@ static enum test_result
 hpq_test_insert_iterate_pop(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -74,7 +74,7 @@ static enum test_result
 hpq_test_priority_removal(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -106,7 +106,7 @@ static enum test_result
 hpq_test_priority_update(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

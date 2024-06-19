@@ -249,7 +249,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+    srand(4);
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,
@@ -717,7 +717,7 @@ static bool
 dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
     struct heap_pqueue dist_q;
-    hpq_init(&dist_q, HPQ_LES, cmp_pq_dist_points, NULL);
+    hpq_init(&dist_q, HPQLES, cmp_pq_dist_points, NULL);
     struct set prev_map;
     set_init(&prev_map, cmp_set_prev_vertices);
     for (struct set_elem *e = set_begin(&graph->adjacency_list);

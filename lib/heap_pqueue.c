@@ -17,18 +17,18 @@ static const size_t starting_capacity = 8;
 
 static void grow(struct heap_pqueue *);
 static void swap(struct hpq_elem **, struct hpq_elem **);
-static void bubble_down(struct heap_pqueue *, struct hpq_elem *, size_t);
-static void bubble_up(struct heap_pqueue *, struct hpq_elem *, size_t);
+static void bubble_down(struct heap_pqueue *, size_t);
+static void bubble_up(struct heap_pqueue *, size_t);
 
 void
 hpq_init(struct heap_pqueue *const hpq, enum heap_pq_threeway_cmp hpq_ordering,
          hpq_cmp_fn *cmp, void *aux)
 {
-    if (hpq_ordering == HPQ_EQL)
+    if (hpq_ordering == HPQEQL)
     {
         (void)fprintf(stderr, "heap should be ordered hPQ_LES or hPQ_GRT.\n");
     }
-    hpq->ordering = hpq_ordering;
+    hpq->order = hpq_ordering;
     hpq->sz = 0;
     hpq->capacity = starting_capacity;
     hpq->heap = calloc(starting_capacity,
@@ -46,7 +46,7 @@ hpq_push(struct heap_pqueue *const hpq, struct hpq_elem *e)
     }
     hpq->heap[hpq->sz] = e;
     ++hpq->sz;
-    bubble_up(hpq, e, hpq->sz);
+    bubble_up(hpq, hpq->sz - 1);
 }
 
 struct hpq_elem *
@@ -59,7 +59,7 @@ hpq_pop(struct heap_pqueue *hpq)
     --hpq->sz;
     swap(&hpq->heap[0], &hpq->heap[hpq->sz]);
     struct hpq_elem *ret = hpq->heap[hpq->sz];
-    bubble_down(hpq, hpq->heap[0], 0);
+    bubble_down(hpq, 0);
     return ret;
 }
 
@@ -79,14 +79,14 @@ hpq_erase(struct heap_pqueue *const hpq, struct hpq_elem *e)
     swap(&hpq->heap[e->handle], &hpq->heap[hpq->sz]);
     struct hpq_elem *ret = hpq->heap[hpq->sz];
     const enum heap_pq_threeway_cmp swapped_cmp
-        = hpq->cmp(hpq->heap[e->handle], hpq->heap[hpq->sz], hpq->aux);
-    if (swapped_cmp == hpq->ordering)
+        = hpq->cmp(hpq->heap[e->handle], ret, hpq->aux);
+    if (swapped_cmp == hpq->order)
     {
-        bubble_up(hpq, hpq->heap[e->handle], e->handle);
+        bubble_up(hpq, e->handle);
     }
     else
     {
-        bubble_down(hpq, hpq->heap[e->handle], e->handle);
+        bubble_down(hpq, e->handle);
     }
     return ret;
 }
@@ -138,7 +138,7 @@ hpq_size(const struct heap_pqueue *const hpq)
 enum heap_pq_threeway_cmp
 hpq_order(const struct heap_pqueue *const hpq)
 {
-    return hpq->ordering;
+    return hpq->order;
 }
 
 void
@@ -162,12 +162,19 @@ hpq_validate(const struct heap_pqueue *const hpq)
     {
         const struct hpq_elem *const cur = hpq->heap[i];
         if (left < hpq->sz
-            && hpq->cmp(cur, hpq->heap[left], hpq->aux) == hpq->ordering)
+            && hpq->cmp(cur, hpq->heap[left], hpq->aux) == hpq->order)
         {
             return false;
         }
         if (right < hpq->sz
-            && hpq->cmp(cur, hpq->heap[right], hpq->aux) == hpq->ordering)
+            && hpq->cmp(cur, hpq->heap[right], hpq->aux) == hpq->order)
+        {
+            return false;
+        }
+    }
+    for (size_t i = 0; i < hpq->sz; ++i)
+    {
+        if (hpq->heap[i]->handle != i)
         {
             return false;
         }
@@ -178,24 +185,19 @@ hpq_validate(const struct heap_pqueue *const hpq)
 /*===============================  Static Helpers  =========================*/
 
 static void
-bubble_up(struct heap_pqueue *const hpq, struct hpq_elem *const e, size_t i)
+bubble_up(struct heap_pqueue *const hpq, size_t i)
 {
-    /* If the this is a min heap we stop when the element is less than OR EQUAL
-       to the parent. If it is a max heap we stop when the element is greater
-       than OR EQUAL to the parent. Therefore, we only run the loop while the
-       opposite of our desired ordering occurs, because equal is an acceptable
-       stop condition. */
     for (size_t j = (i - 1) / 2;
-         i && hpq->cmp(e, hpq->heap[j], hpq->aux) == hpq->ordering;
+         i && hpq->cmp(hpq->heap[i], hpq->heap[j], hpq->aux) == hpq->order;
          i = j, j = (j - 1) / 2)
     {
-        swap(&hpq->heap[j], &hpq->heap[i - 1]);
+        swap(&hpq->heap[j], &hpq->heap[i]);
     }
-    e->handle = i ? i - 1 : 0;
+    hpq->heap[i]->handle = i;
 }
 
 static void
-bubble_down(struct heap_pqueue *hpq, struct hpq_elem *e, size_t i)
+bubble_down(struct heap_pqueue *hpq, size_t i)
 {
     const size_t sz = hpq->sz;
     size_t dir[2];
@@ -203,16 +205,16 @@ bubble_down(struct heap_pqueue *hpq, struct hpq_elem *e, size_t i)
     {
         dir[HPQ_L] = (i * 2) + 1;
         dir[HPQ_R] = (i * 2) + 2;
-        next = dir[hpq->ordering
+        next = dir[hpq->order
                    == hpq->cmp(hpq->heap[dir[dir[HPQ_R] < sz]],
                                hpq->heap[dir[HPQ_L]], hpq->aux)];
-        if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->ordering)
+        if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->order)
         {
             break;
         }
         swap(&hpq->heap[next], &hpq->heap[i]);
     }
-    e->handle = i ? i - 1 : 0;
+    hpq->heap[i]->handle = i;
 }
 
 static void
@@ -231,8 +233,10 @@ grow(struct heap_pqueue *hpq)
 static inline void
 swap(struct hpq_elem **a, struct hpq_elem **b)
 {
+    const size_t temp_handle = (*a)->handle;
+    (*a)->handle = (*b)->handle;
+    (*b)->handle = temp_handle;
     struct hpq_elem *temp = *a;
-    temp = *a;
     *a = *b;
     *b = temp;
 }

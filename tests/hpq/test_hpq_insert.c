@@ -47,7 +47,7 @@ static enum test_result
 hpq_test_insert_one(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     struct val single;
     single.val = 0;
     hpq_push(&pq, &single.elem);
@@ -59,7 +59,7 @@ static enum test_result
 hpq_test_insert_three(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -76,9 +76,9 @@ static enum test_result
 hpq_test_struct_getter(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     struct heap_pqueue hpq_tester_clone;
-    hpq_init(&hpq_tester_clone, HPQ_LES, val_cmp, NULL);
+    hpq_init(&hpq_tester_clone, HPQLES, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -103,7 +103,7 @@ static enum test_result
 hpq_test_insert_three_dups(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -129,7 +129,7 @@ static enum test_result
 hpq_test_insert_shuffle(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;
@@ -151,7 +151,7 @@ static enum test_result
 hpq_test_read_max_min(void)
 {
     struct heap_pqueue pq;
-    hpq_init(&pq, HPQ_LES, val_cmp, NULL);
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
