@@ -7,10 +7,10 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-enum direction
+enum hpq_direction
 {
-    HPQ_L = 0,
-    HPQ_R,
+    L = 0,
+    R,
 };
 
 static const size_t starting_capacity = 8;
@@ -187,11 +187,11 @@ hpq_validate(const struct heap_pqueue *const hpq)
 static void
 bubble_up(struct heap_pqueue *const hpq, size_t i)
 {
-    for (size_t j = (i - 1) / 2;
-         i && hpq->cmp(hpq->heap[i], hpq->heap[j], hpq->aux) == hpq->order;
-         i = j, j = (j - 1) / 2)
+    for (size_t parent = (i - 1) / 2;
+         i && hpq->cmp(hpq->heap[i], hpq->heap[parent], hpq->aux) == hpq->order;
+         i = parent, parent = (parent - 1) / 2)
     {
-        swap(&hpq->heap[j], &hpq->heap[i]);
+        swap(&hpq->heap[parent], &hpq->heap[i]);
     }
     hpq->heap[i]->handle = i;
 }
@@ -200,17 +200,31 @@ static void
 bubble_down(struct heap_pqueue *hpq, size_t i)
 {
     const size_t sz = hpq->sz;
-    size_t dir[2];
-    for (size_t next = i; i * 2 + 1 < sz; i = next)
+    for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
+         i = next, left = i * 2 + 1, right = left + 1)
     {
-        dir[HPQ_L] = (i * 2) + 1;
-        dir[HPQ_R] = (i * 2) + 2;
-        next = dir[hpq->order
-                   == hpq->cmp(hpq->heap[dir[dir[HPQ_R] < sz]],
-                               hpq->heap[dir[HPQ_L]], hpq->aux)];
-        if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->order)
+        /* Without knowing the cost of the user provided comparison function,
+           it is important to call the cmp function minimal number of times.
+           Avoid one call if there is no right child. */
+        if (right >= sz)
         {
-            break;
+            next = left;
+            if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->order)
+            {
+                break;
+            }
+        }
+        else
+        {
+            next = hpq->order
+                           == hpq->cmp(hpq->heap[right], hpq->heap[left],
+                                       hpq->aux)
+                       ? right
+                       : left;
+            if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->order)
+            {
+                break;
+            }
         }
         swap(&hpq->heap[next], &hpq->heap[i]);
     }
