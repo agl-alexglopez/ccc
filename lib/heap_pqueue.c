@@ -115,6 +115,7 @@ hpq_erase(struct heap_pqueue *const hpq, struct hpq_elem *e)
     {
         bubble_down(hpq, swap_location);
     }
+    /* If the comparison is equal do nothing. Element is in right spot. */
     return erased;
 }
 
