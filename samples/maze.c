@@ -7,6 +7,7 @@
    are provided by the library offering a perfect sample program opportunity. */
 #include "cli.h"
 #include "pqueue.h"
+#include "random.h"
 #include "set.h"
 #include "str_view.h"
 
@@ -115,7 +116,6 @@ static bool can_build_new_square(const struct maze *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(const struct maze *);
-static int rand_range(int, int);
 static node_threeway_cmp cmp_priority_cells(const struct pq_elem *,
                                             const struct pq_elem *, void *);
 static node_threeway_cmp cmp_points(const struct set_elem *,
@@ -298,13 +298,6 @@ pick_rand_point(const struct maze *const maze)
         .r = 2 * rand_range(1, (maze->rows - 2) / 2) + 1,
         .c = 2 * rand_range(1, (maze->cols - 2) / 2) + 1,
     };
-}
-
-static int
-rand_range(const int min, const int max)
-{
-    /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
-    return min + rand() / (RAND_MAX / (max - min + 1) + 1);
 }
 
 /*=========================   Maze Support Code   ===========================*/

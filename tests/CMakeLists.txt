@@ -72,4 +72,12 @@ add_set_test(test_set_insert)
 add_set_test(test_set_erase)
 add_set_test(test_set_iter)
 
-
+################### Performance Testing #################
+add_executable(perf perf/perf.c)
+target_link_libraries(perf PRIVATE 
+  pqueue 
+  heap_pqueue
+  random
+  str_view
+  cli
+)

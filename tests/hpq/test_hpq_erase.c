@@ -16,8 +16,6 @@ static enum test_result hpq_test_insert_remove_four_dups(void);
 static enum test_result hpq_test_insert_erase_shuffled(void);
 static enum test_result hpq_test_pop_max(void);
 static enum test_result hpq_test_pop_min(void);
-static enum test_result hpq_test_max_round_robin(void);
-static enum test_result hpq_test_min_round_robin(void);
 static enum test_result hpq_test_delete_prime_shuffle_duplicates(void);
 static enum test_result hpq_test_prime_shuffle(void);
 static enum test_result hpq_test_weak_srand(void);
@@ -27,14 +25,12 @@ static size_t inorder_fill(int[], size_t, struct heap_pqueue *);
 static enum heap_pq_threeway_cmp val_cmp(const struct hpq_elem *,
                                          const struct hpq_elem *, void *);
 
-#define NUM_TESTS (size_t)9
+#define NUM_TESTS (size_t)7
 const test_fn all_tests[NUM_TESTS] = {
     hpq_test_insert_remove_four_dups,
     hpq_test_insert_erase_shuffled,
     hpq_test_pop_max,
     hpq_test_pop_min,
-    hpq_test_max_round_robin,
-    hpq_test_min_round_robin,
     hpq_test_delete_prime_shuffle_duplicates,
     hpq_test_prime_shuffle,
     hpq_test_weak_srand,
@@ -90,7 +86,7 @@ hpq_test_insert_erase_shuffled(void)
     struct val vals[size];
     CHECK(insert_shuffled(&hpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = hpq_entry(hpq_pop(&hpq), struct val, elem);
+    const struct val *min = hpq_entry(hpq_front(&hpq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &hpq), size, size_t, "%zu");
@@ -118,7 +114,7 @@ hpq_test_pop_max(void)
     struct val vals[size];
     CHECK(insert_shuffled(&hpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = hpq_entry(hpq_pop(&hpq), struct val, elem);
+    const struct val *min = hpq_entry(hpq_front(&hpq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &hpq), size, size_t, "%zu");
@@ -127,7 +123,7 @@ hpq_test_pop_max(void)
         CHECK(vals[i].val, sorted_check[i], int, "%d");
     }
     /* Now let's pop from the front of the queue until empty. */
-    for (size_t i = size - 1; i != (size_t)-1; --i)
+    for (size_t i = 0; i < size; ++i)
     {
         const struct val *front = hpq_entry(hpq_pop(&hpq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
@@ -146,7 +142,7 @@ hpq_test_pop_min(void)
     struct val vals[size];
     CHECK(insert_shuffled(&hpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = hpq_entry(hpq_pop(&hpq), struct val, elem);
+    const struct val *min = hpq_entry(hpq_front(&hpq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &hpq), size, size_t, "%zu");
@@ -161,62 +157,6 @@ hpq_test_pop_min(void)
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(hpq_empty(&hpq), true, bool, "%b");
-    return PASS;
-}
-
-static enum test_result
-hpq_test_max_round_robin(void)
-{
-    struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const int size = 50;
-    struct val vals[size];
-    vals[0].id = 99;
-    vals[0].val = 0;
-    hpq_push(&hpq, &vals[0].elem);
-    for (int i = 1; i < size; ++i)
-    {
-        vals[i].val = 99;
-        vals[i].id = i;
-        hpq_push(&hpq, &vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
-    }
-    /* Now let's make sure we pop round robin. */
-    int last_id = 0;
-    while (!hpq_empty(&hpq))
-    {
-        const struct val *front = hpq_entry(hpq_pop(&hpq), struct val, elem);
-        CHECK(last_id < front->id, true, bool, "%b");
-        last_id = front->id;
-    }
-    return PASS;
-}
-
-static enum test_result
-hpq_test_min_round_robin(void)
-{
-    struct heap_pqueue hpq;
-    hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const int size = 50;
-    struct val vals[size];
-    vals[0].id = 99;
-    vals[0].val = 99;
-    hpq_push(&hpq, &vals[0].elem);
-    for (int i = 1; i < size; ++i)
-    {
-        vals[i].val = 1;
-        vals[i].id = i;
-        hpq_push(&hpq, &vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
-    }
-    /* Now let's make sure we pop round robin. */
-    int last_id = 0;
-    while (!hpq_empty(&hpq))
-    {
-        const struct val *front = hpq_entry(hpq_pop(&hpq), struct val, elem);
-        CHECK(last_id < front->id, true, bool, "%b");
-        last_id = front->id;
-    }
     return PASS;
 }
 

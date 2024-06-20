@@ -136,7 +136,7 @@ hpq_test_insert_shuffle(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = hpq_entry(hpq_pop(&pq), struct val, elem);
+    const struct val *min = hpq_entry(hpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -161,7 +161,7 @@ hpq_test_read_max_min(void)
         CHECK(hpq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(hpq_size(&pq), 10ULL, size_t, "%zu");
-    const struct val *min = hpq_entry(hpq_pop(&pq), struct val, elem);
+    const struct val *min = hpq_entry(hpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -199,7 +199,7 @@ inorder_fill(int vals[], size_t size, struct heap_pqueue *hpq)
     size_t i = 0;
     struct heap_pqueue copy;
     hpq_init(&copy, hpq_order(hpq), val_cmp, NULL);
-    while (!hpq_empty(hpq))
+    while (!hpq_empty(hpq) && i < size)
     {
         struct hpq_elem *const front = hpq_pop(hpq);
         vals[i++] = hpq_entry(front, struct val, elem)->val;

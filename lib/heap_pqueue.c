@@ -65,6 +65,7 @@ hpq_push(struct heap_pqueue *const hpq, struct hpq_elem *e)
         grow(hpq);
     }
     hpq->heap[hpq->sz] = e;
+    e->handle = hpq->sz;
     ++hpq->sz;
     bubble_up(hpq, hpq->sz - 1);
 }
@@ -90,25 +91,29 @@ hpq_erase(struct heap_pqueue *const hpq, struct hpq_elem *e)
     {
         return NULL;
     }
-    if (hpq->sz == 1 || e->handle == hpq->sz)
+    --hpq->sz;
+    if (hpq->sz == 1)
     {
-        hpq->sz--;
         return hpq->heap[0];
     }
-    --hpq->sz;
-    swap(&hpq->heap[e->handle], &hpq->heap[hpq->sz]);
-    struct hpq_elem *ret = hpq->heap[hpq->sz];
-    const enum heap_pq_threeway_cmp swapped_cmp
-        = hpq->cmp(hpq->heap[e->handle], ret, hpq->aux);
-    if (swapped_cmp == hpq->order)
+    if (e->handle == hpq->sz)
     {
-        bubble_up(hpq, e->handle);
+        return hpq->heap[hpq->sz];
     }
-    else if (swapped_cmp != HPQEQL)
+    const size_t swap_location = e->handle;
+    swap(&hpq->heap[swap_location], &hpq->heap[hpq->sz]);
+    struct hpq_elem *erased = hpq->heap[hpq->sz];
+    const enum heap_pq_threeway_cmp erased_cmp
+        = hpq->cmp(hpq->heap[swap_location], erased, hpq->aux);
+    if (erased_cmp == hpq->order)
     {
-        bubble_down(hpq, e->handle);
+        bubble_up(hpq, swap_location);
     }
-    return ret;
+    else if (erased_cmp != HPQEQL)
+    {
+        bubble_down(hpq, swap_location);
+    }
+    return erased;
 }
 
 bool
@@ -193,19 +198,27 @@ hpq_clear(struct heap_pqueue *hpq, hpq_destructor_fn *fn)
 bool
 hpq_validate(const struct heap_pqueue *const hpq)
 {
-    for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2;
-         i <= (hpq->sz - 2) / 2; ++i, left = (i * 2) + 1, right = (i * 2) + 2)
+    if (hpq->sz > 1)
     {
-        const struct hpq_elem *const cur = hpq->heap[i];
-        if (left < hpq->sz
-            && hpq->cmp(cur, hpq->heap[left], hpq->aux) == hpq->order)
+        for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2;
+             i <= (hpq->sz - 2) / 2;
+             ++i, left = (i * 2) + 1, right = (i * 2) + 2)
         {
-            return false;
-        }
-        if (right < hpq->sz
-            && hpq->cmp(cur, hpq->heap[right], hpq->aux) == hpq->order)
-        {
-            return false;
+            const struct hpq_elem *const cur = hpq->heap[i];
+            /* Putting the child in the comparison function first evaluates
+               the childs three way comparison in relation to the parent. If
+               the child beats the parent in total ordering (min/max) something
+               has gone wrong. */
+            if (left < hpq->sz
+                && hpq->cmp(hpq->heap[left], cur, hpq->aux) == hpq->order)
+            {
+                return false;
+            }
+            if (right < hpq->sz
+                && hpq->cmp(hpq->heap[right], cur, hpq->aux) == hpq->order)
+            {
+                return false;
+            }
         }
     }
     for (size_t i = 0; i < hpq->sz; ++i)

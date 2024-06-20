@@ -1,8 +1,10 @@
 #include "cli.h"
 #include "heap_pqueue.h"
 #include "queue.h"
+#include "random.h"
 #include "set.h"
 #include "str_view.h"
+
 #include <alloca.h>
 #include <assert.h>
 #include <limits.h>
@@ -206,8 +208,6 @@ static bool is_dst(Cell, char);
 
 static struct point random_vertex_placement(const struct graph *);
 static bool is_valid_vertex_pos(const struct graph *, struct point);
-static int rand_range(int, int);
-static void rand_shuffle(size_t, void *, size_t);
 static Cell *grid_at_mut(const struct graph *, struct point);
 static Cell grid_at(const struct graph *, struct point);
 static uint16_t sort_vertices(char, char);
@@ -851,34 +851,6 @@ vertex_degree(const struct vertex *const v)
     for (int i = 0; i < max_degree && v->edges[i].to; ++i, ++n)
     {}
     return n;
-}
-
-static inline int
-rand_range(const int min, const int max)
-{
-    /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
-    return min + rand() / (RAND_MAX / (max - min + 1) + 1);
-}
-
-static inline void
-rand_shuffle(const size_t elem_size, void *const elems, const size_t n)
-{
-    if (n <= 1)
-    {
-        return;
-    }
-    uint8_t tmp[elem_size];
-    uint8_t *elem_view = elems;
-    const size_t step = elem_size * sizeof(uint8_t);
-    for (size_t i = 0; i < n - 1; ++i)
-    {
-        /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
-        const size_t rnd = (size_t)rand();
-        const size_t j = i + rnd / (RAND_MAX / (n - i) + 1);
-        memcpy(tmp, elem_view + (j * step), elem_size);
-        memcpy(elem_view + (j * step), elem_view + (i * step), elem_size);
-        memcpy(elem_view + (i * step), tmp, elem_size);
-    }
 }
 
 static inline Cell *
