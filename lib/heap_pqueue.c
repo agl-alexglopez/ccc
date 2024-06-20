@@ -100,6 +100,8 @@ hpq_erase(struct heap_pqueue *const hpq, struct hpq_elem *e)
     {
         return hpq->heap[hpq->sz];
     }
+    /* Important to remember this key now to avoid confusion later once the
+       elements are swapped and we lose access to original handle index. */
     const size_t swap_location = e->handle;
     swap(&hpq->heap[swap_location], &hpq->heap[hpq->sz]);
     struct hpq_elem *erased = hpq->heap[hpq->sz];
