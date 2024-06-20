@@ -104,7 +104,7 @@ hpq_erase(struct heap_pqueue *const hpq, struct hpq_elem *e)
     {
         bubble_up(hpq, e->handle);
     }
-    else
+    else if (swapped_cmp != HPQEQL)
     {
         bubble_down(hpq, e->handle);
     }

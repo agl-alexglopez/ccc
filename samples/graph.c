@@ -94,6 +94,14 @@ enum label_orientation
     DIAGONAL,
 };
 
+struct digit_encoding
+{
+    struct point start;
+    int cost;
+    size_t spaces_needed;
+    enum label_orientation orientation;
+};
+
 /*======================   Graph Constants   ================================*/
 
 /* Go to the box drawing unicode character wikipedia page to change styles. */
@@ -218,8 +226,7 @@ static void clear_paint(struct graph *);
 static bool is_vertex(Cell);
 static bool is_path(Cell);
 
-static void encode_digits(struct graph *, int, struct point,
-                          enum label_orientation);
+static void encode_digits(struct graph *, struct digit_encoding);
 static enum label_orientation get_direction(struct point, struct point);
 static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
@@ -251,7 +258,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+    srand(4);
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,
@@ -511,7 +518,12 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
     {
         if (consecutive_spaces_found == spaces_needed_for_cost)
         {
-            encode_digits(g, e->cost, cur, direction);
+            encode_digits(g, (struct digit_encoding){
+                                 .start = cur,
+                                 .cost = e->cost,
+                                 .spaces_needed = spaces_needed_for_cost,
+                                 .orientation = direction,
+                             });
             return;
         }
         for (size_t i = 0; i < DIRS_SIZE; ++i)
@@ -554,52 +566,28 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
    numbers must either be handled left to right or right to left as they
    are laid down such that they are read correctly. */
 static void
-encode_digits(struct graph *g, int cost, struct point start,
-              enum label_orientation orientation)
+encode_digits(struct graph *g, struct digit_encoding e)
 {
-    uintmax_t digits = cost;
-    if (orientation == NORTH)
+    uintmax_t digits = e.cost;
+    if (e.orientation == NORTH || e.orientation == SOUTH)
     {
-        ++start.r;
-        for (; digits; digits /= 10, ++start.r)
+        e.start.r = e.orientation == NORTH
+                        ? e.start.r + (int)e.spaces_needed - 2
+                        : e.start.r - 1;
+        for (; digits; digits /= 10, --e.start.r)
         {
-            uintmax_t lefmost_digit = digits;
-            for (uintmax_t remaining = digits; remaining;
-                 lefmost_digit = remaining, remaining /= 10)
-            {}
-            *grid_at_mut(g, start) |= digit_bit;
-            *grid_at_mut(g, start) |= lefmost_digit << digit_shift;
+            *grid_at_mut(g, e.start) |= digit_bit;
+            *grid_at_mut(g, e.start) |= ((digits % 10) << digit_shift);
         }
     }
-    else if (orientation == SOUTH)
+    else
     {
-        --start.r;
-        for (; digits; digits /= 10, --start.r)
+        e.start.c = e.orientation == WEST ? e.start.c + (int)e.spaces_needed - 2
+                                          : e.start.c - 1;
+        for (; digits; digits /= 10, --e.start.c)
         {
-            *grid_at_mut(g, start) |= digit_bit;
-            *grid_at_mut(g, start) |= (digits % 10) << digit_shift;
-        }
-    }
-    else if (orientation == EAST)
-    {
-        --start.c;
-        for (; digits; digits /= 10, --start.c)
-        {
-            *grid_at_mut(g, start) |= digit_bit;
-            *grid_at_mut(g, start) |= (digits % 10) << digit_shift;
-        }
-    }
-    else /* WEST */
-    {
-        ++start.c;
-        for (; digits; digits /= 10, ++start.c)
-        {
-            uintmax_t lefmost_digit = digits;
-            for (uintmax_t remaining = digits; remaining;
-                 lefmost_digit = remaining, remaining /= 10)
-            {}
-            *grid_at_mut(g, start) |= digit_bit;
-            *grid_at_mut(g, start) |= lefmost_digit << digit_shift;
+            *grid_at_mut(g, e.start) |= digit_bit;
+            *grid_at_mut(g, e.start) |= ((digits % 10) << digit_shift);
         }
     }
 }
