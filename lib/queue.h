@@ -1,17 +1,19 @@
 #ifndef QUEUE
 #define QUEUE
 
+#include "attrib.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 
 struct queue
 {
-    void *mem [[gnu::deprecated("private")]];
-    size_t elem_sz [[gnu::deprecated("private")]];
-    size_t front [[gnu::deprecated("private")]];
-    size_t back [[gnu::deprecated("private")]];
-    size_t sz [[gnu::deprecated("private")]];
-    size_t capacity [[gnu::deprecated("private")]];
+    void *mem ATTRIB_PRIVATE;
+    size_t elem_sz ATTRIB_PRIVATE;
+    size_t front ATTRIB_PRIVATE;
+    size_t back ATTRIB_PRIVATE;
+    size_t sz ATTRIB_PRIVATE;
+    size_t capacity ATTRIB_PRIVATE;
 };
 
 void q_init(size_t elem_sz, struct queue *, size_t capacity);
