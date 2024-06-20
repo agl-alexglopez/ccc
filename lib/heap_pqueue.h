@@ -1,8 +1,10 @@
 #ifndef HEAP_PQUEUE
 #define HEAP_PQUEUE
 
-#include "stddef.h"
+#include "attrib.h"
+
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 enum heap_pq_threeway_cmp
@@ -17,23 +19,23 @@ struct hpq_elem
     size_t handle;
 };
 
-typedef enum heap_pq_threeway_cmp
-hpq_cmp_fn(const struct hpq_elem *a, const struct hpq_elem *b, void *aux);
+typedef enum heap_pq_threeway_cmp hpq_cmp_fn(const struct hpq_elem *,
+                                             const struct hpq_elem *, void *);
 
 typedef void hpq_destructor_fn(struct hpq_elem *);
 
-typedef void hpq_update_fn(struct hpq_elem *, void *aux);
+typedef void hpq_update_fn(struct hpq_elem *, void *);
 
 typedef void hpq_print_fn(const struct hpq_elem *);
 
 struct heap_pqueue
 {
-    struct hpq_elem **heap [[gnu::deprecated("private")]];
-    size_t sz [[gnu::deprecated("private")]];
-    size_t capacity [[gnu::deprecated("private")]];
-    hpq_cmp_fn *cmp [[gnu::deprecated("private")]];
-    enum heap_pq_threeway_cmp order [[gnu::deprecated("private")]];
-    void *aux [[gnu::deprecated("private")]];
+    struct hpq_elem **heap ATTRIB_PRIVATE;
+    size_t sz ATTRIB_PRIVATE;
+    size_t capacity ATTRIB_PRIVATE;
+    hpq_cmp_fn *cmp ATTRIB_PRIVATE;
+    enum heap_pq_threeway_cmp order ATTRIB_PRIVATE;
+    void *aux ATTRIB_PRIVATE;
 };
 
 #define hpq_entry(HPQ_ELEM, STRUCT, MEMBER)                                    \
@@ -54,6 +56,6 @@ bool hpq_update(struct heap_pqueue *, struct hpq_elem *, hpq_update_fn *,
 bool hpq_validate(const struct heap_pqueue *);
 enum heap_pq_threeway_cmp hpq_order(const struct heap_pqueue *);
 
-void hpq_print(const struct heap_pqueue *, size_t i, hpq_print_fn *);
+void hpq_print(const struct heap_pqueue *, size_t, hpq_print_fn *);
 
 #endif

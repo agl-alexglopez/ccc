@@ -258,7 +258,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(4);
+    srand(time(NULL));
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,

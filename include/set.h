@@ -21,7 +21,10 @@
    modifications. This may combat such an anti-pattern. */
 #ifndef SET
 #define SET
+
+#include "attrib.h"
 #include "tree.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 /* NOLINTNEXTLINE */
@@ -244,7 +247,7 @@ typedef void set_destructor_fn(struct set_elem *);
    loops may occur. */
 struct set_range
 {
-    struct range r;
+    struct range r ATTRIB_PRIVATE;
 };
 
 /* The reverse range container for queries performed with
@@ -260,7 +263,7 @@ struct set_range
    in this type of range.*/
 struct set_rrange
 {
-    struct rrange r;
+    struct rrange r ATTRIB_PRIVATE;
 };
 
 /* Define a function to use printf for your custom struct type.

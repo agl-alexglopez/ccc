@@ -101,6 +101,9 @@ static struct node *range_end(const struct range *);
 static struct node *rrange_begin(const struct rrange *);
 static struct node *rrange_end(const struct rrange *);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 /* ======================  Priority Queue Interface  ====================== */
 
 void

@@ -9,6 +9,7 @@
    correct way for their data structure. */
 #ifndef TREE
 #define TREE
+
 #include <stdbool.h>
 #include <stddef.h>
 

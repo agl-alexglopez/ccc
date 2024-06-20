@@ -14,7 +14,9 @@
 #ifndef PQUEUE
 #define PQUEUE
 
+#include "attrib.h"
 #include "tree.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 /* NOLINTNEXTLINE */
@@ -218,7 +220,7 @@ typedef void pq_destructor_fn(struct pq_elem *);
    loops may occur. */
 struct pq_range
 {
-    struct range r;
+    struct range r ATTRIB_PRIVATE;
 };
 
 /* The reverse range container for queries performed with
@@ -234,7 +236,7 @@ struct pq_range
    in this type of range. */
 struct pq_rrange
 {
-    struct rrange r;
+    struct rrange r ATTRIB_PRIVATE;
 };
 
 /* How to obtain the struct that embeds the struct pq_elem. For example:
