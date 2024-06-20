@@ -48,10 +48,10 @@ static enum test_result
 pq_test_insert_one(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    pq_insert(&pq, &single.elem, NULL);
+    pq_push(&pq, &single.elem);
     CHECK(pq_empty(&pq), false, bool, "%b");
     CHECK(pq_entry(pq_root(&pq), struct val, elem)->val == single.val, true,
           bool, "%b");
@@ -62,12 +62,12 @@ static enum test_result
 pq_test_insert_three(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        pq_insert(&pq, &three_vals[i].elem, NULL);
+        pq_push(&pq, &three_vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -79,17 +79,17 @@ static enum test_result
 pq_test_struct_getter(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     struct pqueue pq_tester_clone;
-    pq_init(&pq_tester_clone, val_cmp);
+    pq_init(&pq_tester_clone, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
-        pq_insert(&pq_tester_clone, &tester_clone[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
+        pq_push(&pq_tester_clone, &tester_clone[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
@@ -106,12 +106,12 @@ static enum test_result
 pq_test_insert_three_dups(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        pq_insert(&pq, &three_vals[i].elem, NULL);
+        pq_push(&pq, &three_vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -132,7 +132,7 @@ static enum test_result
 pq_test_insert_shuffle(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;
@@ -156,12 +156,12 @@ static enum test_result
 pq_test_read_max_min(void)
 {
     struct pqueue pq;
-    pq_init(&pq, val_cmp);
+    pq_init(&pq, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
-        pq_insert(&pq, &vals[i].elem, NULL);
+        pq_push(&pq, &vals[i].elem);
         CHECK(validate_tree(&pq.t), true, bool, "%b");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -186,7 +186,7 @@ insert_shuffled(struct pqueue *pq, struct val vals[], const size_t size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        pq_insert(pq, &vals[shuffled_index].elem, NULL);
+        pq_push(pq, &vals[shuffled_index].elem);
         CHECK(pq_size(pq), i + 1, size_t, "%zu");
         CHECK(validate_tree(&pq->t), true, bool, "%b");
         shuffled_index = (shuffled_index + larger_prime) % size;

@@ -130,5 +130,3 @@ q_bytes(const struct queue *q, size_t n)
 {
     return q->elem_sz * n;
 }
-
-#pragma GCC diagnostic pop

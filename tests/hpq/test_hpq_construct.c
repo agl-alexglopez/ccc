@@ -1,17 +1,16 @@
-#include "pqueue.h"
+#include "heap_pqueue.h"
 #include "test.h"
-#include "tree.h"
 
 struct val
 {
     int id;
     int val;
-    struct pq_elem elem;
+    struct hpq_elem elem;
 };
 
 static enum test_result pq_test_empty(void);
-static node_threeway_cmp val_cmp(const struct pq_elem *, const struct pq_elem *,
-                                 void *);
+static enum heap_pq_threeway_cmp val_cmp(const struct hpq_elem *,
+                                         const struct hpq_elem *, void *);
 
 #define NUM_TESTS (size_t)1
 const test_fn all_tests[NUM_TESTS] = {pq_test_empty};
@@ -34,17 +33,17 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    struct pqueue pq;
-    pq_init(&pq, val_cmp, NULL);
-    CHECK(pq_empty(&pq), true, bool, "%b");
+    struct heap_pqueue pq;
+    hpq_init(&pq, HPQLES, val_cmp, NULL);
+    CHECK(hpq_empty(&pq), true, bool, "%b");
     return PASS;
 }
 
-static node_threeway_cmp
-val_cmp(const struct pq_elem *a, const struct pq_elem *b, void *aux)
+static enum heap_pq_threeway_cmp
+val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = pq_entry(a, struct val, elem);
-    struct val *rhs = pq_entry(b, struct val, elem);
+    struct val *lhs = hpq_entry(a, struct val, elem);
+    struct val *rhs = hpq_entry(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

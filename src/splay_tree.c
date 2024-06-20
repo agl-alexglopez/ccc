@@ -55,18 +55,17 @@ const enum tree_link reverse_inorder_traversal = R;
 
 /* =======================        Prototypes         ====================== */
 
-static void init_tree(struct tree *, tree_cmp_fn *);
+static void init_tree(struct tree *, tree_cmp_fn *, void *);
 static void init_node(struct tree *, struct node *);
 static bool empty(const struct tree *);
-static void multiset_insert(struct tree *, struct node *, tree_cmp_fn *,
-                            void *);
-static struct node *find(struct tree *, struct node *, tree_cmp_fn *, void *);
-static bool contains(struct tree *, struct node *, tree_cmp_fn *, void *);
-static struct node *erase(struct tree *, struct node *, void *);
-static bool insert(struct tree *, struct node *, tree_cmp_fn *, void *);
+static void multiset_insert(struct tree *, struct node *);
+static struct node *find(struct tree *, struct node *);
+static bool contains(struct tree *, struct node *);
+static struct node *erase(struct tree *, struct node *);
+static bool insert(struct tree *, struct node *);
 static struct node *multiset_erase_max_or_min(struct tree *, struct node *,
                                               tree_cmp_fn *);
-static struct node *multiset_erase_node(struct tree *, struct node *, void *);
+static struct node *multiset_erase_node(struct tree *, struct node *);
 static struct node *pop_dup_node(struct tree *, struct node *, struct node *);
 static struct node *pop_front_dup(struct tree *, struct node *);
 static struct node *remove_from_tree(struct tree *, struct node *);
@@ -77,13 +76,12 @@ static struct node *max(const struct tree *);
 static struct node *pop_max(struct tree *);
 static struct node *pop_min(struct tree *);
 static struct node *min(const struct tree *);
-static struct node *const_seek(struct tree *, struct node *, tree_cmp_fn *,
-                               void *);
+static struct node *const_seek(struct tree *, struct node *);
 static struct node *end(struct tree *);
 static struct node *next(struct tree *, struct node *, enum tree_link);
 static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
 static struct range equal_range(struct tree *, struct node *, struct node *,
-                                enum tree_link, void *);
+                                enum tree_link);
 static node_threeway_cmp force_find_grt(const struct node *,
                                         const struct node *, void *);
 static node_threeway_cmp force_find_les(const struct node *,
@@ -95,7 +93,7 @@ static struct node *get_parent(struct tree *, struct node *);
 static void add_duplicate(struct tree *, struct node *, struct node *,
                           struct node *);
 static struct node *splay(struct tree *, struct node *, const struct node *,
-                          tree_cmp_fn *, void *);
+                          tree_cmp_fn *);
 static inline struct node *next_tree_node(struct tree *, struct node *,
                                           enum tree_link);
 static struct node *range_begin(const struct range *);
@@ -103,12 +101,15 @@ static struct node *range_end(const struct range *);
 static struct node *rrange_begin(const struct rrange *);
 static struct node *rrange_end(const struct rrange *);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 /* ======================  Priority Queue Interface  ====================== */
 
 void
-pq_init(struct pqueue *pq, pq_cmp_fn *fn)
+pq_init(struct pqueue *pq, pq_cmp_fn *fn, void *aux)
 {
-    init_tree(&pq->t, (tree_cmp_fn *)fn);
+    init_tree(&pq->t, (tree_cmp_fn *)fn, aux);
 }
 
 void
@@ -140,7 +141,7 @@ struct pq_elem *
 pq_max(struct pqueue *const pq)
 {
     return (struct pq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
-                                   force_find_grt, NULL);
+                                   force_find_grt);
 }
 
 const struct pq_elem *
@@ -159,7 +160,7 @@ struct pq_elem *
 pq_min(struct pqueue *const pq)
 {
     return (struct pq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
-                                   force_find_les, NULL);
+                                   force_find_les);
 }
 
 const struct pq_elem *
@@ -206,11 +207,10 @@ pq_rnext(struct pqueue *pq, struct pq_elem *i)
 }
 
 struct pq_range
-pq_equal_range(struct pqueue *pq, struct pq_elem *begin, struct pq_elem *end,
-               void *aux)
+pq_equal_range(struct pqueue *pq, struct pq_elem *begin, struct pq_elem *end)
 {
     return (struct pq_range){
-        equal_range(&pq->t, &begin->n, &end->n, reverse_inorder_traversal, aux),
+        equal_range(&pq->t, &begin->n, &end->n, reverse_inorder_traversal),
     };
 }
 
@@ -227,11 +227,10 @@ pq_end_range(const struct pq_range *const r)
 }
 
 struct pq_rrange
-pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend,
-                void *aux)
+pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend)
 {
     const struct range ret
-        = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal, aux);
+        = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal);
     return (struct pq_rrange){
         .r = (struct rrange){
             .rbegin =ret.begin,
@@ -253,16 +252,16 @@ pq_end_rrange(const struct pq_rrange *const rr)
 }
 
 void
-pq_insert(struct pqueue *pq, struct pq_elem *elem, void *aux)
+pq_push(struct pqueue *pq, struct pq_elem *elem)
 {
-    multiset_insert(&pq->t, &elem->n, pq->t.cmp, aux);
+    multiset_insert(&pq->t, &elem->n);
 }
 
 struct pq_elem *
-pq_erase(struct pqueue *pq, struct pq_elem *elem, void *aux)
+pq_erase(struct pqueue *pq, struct pq_elem *elem)
 {
     struct pq_elem *ret = pq_next(pq, elem);
-    if (multiset_erase_node(&pq->t, &elem->n, aux) == &pq->t.end)
+    if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
     {
         (void)fprintf(stderr,
                       "element that does not exist cannot be erased.\n");
@@ -272,10 +271,10 @@ pq_erase(struct pqueue *pq, struct pq_elem *elem, void *aux)
 }
 
 struct pq_elem *
-pq_rerase(struct pqueue *pq, struct pq_elem *elem, void *aux)
+pq_rerase(struct pqueue *pq, struct pq_elem *elem)
 {
     struct pq_elem *ret = pq_rnext(pq, elem);
-    if (multiset_erase_node(&pq->t, &elem->n, aux) == &pq->t.end)
+    if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
     {
         (void)fprintf(stderr,
                       "element that does not exist cannot be erased.\n");
@@ -291,21 +290,20 @@ pq_update(struct pqueue *pq, struct pq_elem *elem, pq_update_fn *fn, void *aux)
     {
         return false;
     }
-    struct pq_elem *e
-        = (struct pq_elem *)multiset_erase_node(&pq->t, &elem->n, aux);
+    struct pq_elem *e = (struct pq_elem *)multiset_erase_node(&pq->t, &elem->n);
     if (e == (struct pq_elem *)&pq->t.end)
     {
         return false;
     }
     fn(e, aux);
-    multiset_insert(&pq->t, &e->n, pq->t.cmp, aux);
+    multiset_insert(&pq->t, &e->n);
     return true;
 }
 
 bool
-pq_contains(struct pqueue *pq, struct pq_elem *elem, void *aux)
+pq_contains(struct pqueue *pq, struct pq_elem *elem)
 {
-    return contains(&pq->t, &elem->n, pq->t.cmp, aux);
+    return contains(&pq->t, &elem->n);
 }
 
 struct pq_elem *
@@ -342,9 +340,9 @@ pq_print(const struct pqueue *const pq, const struct pq_elem *const start,
 /* ======================        Set Interface       ====================== */
 
 void
-set_init(struct set *s, set_cmp_fn *fn)
+set_init(struct set *const s, set_cmp_fn *const fn, void *const aux)
 {
-    init_tree(&s->t, (tree_cmp_fn *)fn);
+    init_tree(&s->t, (tree_cmp_fn *)fn, aux);
 }
 
 void
@@ -374,15 +372,15 @@ set_size(struct set *s)
 }
 
 bool
-set_contains(struct set *s, struct set_elem *se, void *aux)
+set_contains(struct set *s, struct set_elem *se)
 {
-    return contains(&s->t, &se->n, s->t.cmp, aux);
+    return contains(&s->t, &se->n);
 }
 
 bool
-set_insert(struct set *s, struct set_elem *se, void *aux)
+set_insert(struct set *s, struct set_elem *se)
 {
-    return insert(&s->t, &se->n, s->t.cmp, aux);
+    return insert(&s->t, &se->n);
 }
 
 struct set_elem *
@@ -416,11 +414,10 @@ set_rnext(struct set *s, struct set_elem *e)
 }
 
 struct set_range
-set_equal_range(struct set *s, struct set_elem *begin, struct set_elem *end,
-                void *aux)
+set_equal_range(struct set *s, struct set_elem *begin, struct set_elem *end)
 {
     return (struct set_range){
-        equal_range(&s->t, &begin->n, &end->n, inorder_traversal, aux),
+        equal_range(&s->t, &begin->n, &end->n, inorder_traversal),
     };
 }
 
@@ -437,11 +434,11 @@ set_end_range(const struct set_range *const r)
 }
 
 struct set_rrange
-set_equal_rrange(struct set *s, struct set_elem *rbegin, struct set_elem *end,
-                 void *aux)
+set_equal_rrange(struct set *s, struct set_elem *rbegin, struct set_elem *end)
+
 {
-    const struct range r = equal_range(&s->t, &rbegin->n, &end->n,
-                                       reverse_inorder_traversal, aux);
+    const struct range r
+        = equal_range(&s->t, &rbegin->n, &end->n, reverse_inorder_traversal);
     return (struct set_rrange){
         .r = (struct rrange){
             .rbegin = r.begin,
@@ -463,21 +460,21 @@ set_end_rrange(const struct set_rrange *rr)
 }
 
 const struct set_elem *
-set_find(struct set *s, struct set_elem *se, void *aux)
+set_find(struct set *s, struct set_elem *se)
 {
-    return (struct set_elem *)find(&s->t, &se->n, s->t.cmp, aux);
+    return (struct set_elem *)find(&s->t, &se->n);
 }
 
 struct set_elem *
-set_erase(struct set *s, struct set_elem *se, void *aux)
+set_erase(struct set *s, struct set_elem *se)
 {
-    return (struct set_elem *)erase(&s->t, &se->n, aux);
+    return (struct set_elem *)erase(&s->t, &se->n);
 }
 
 bool
-set_const_contains(struct set *s, struct set_elem *e, void *aux)
+set_const_contains(struct set *s, struct set_elem *e)
 {
-    return const_seek(&s->t, &e->n, s->t.cmp, aux) != &s->t.end;
+    return const_seek(&s->t, &e->n) != &s->t.end;
 }
 
 bool
@@ -493,9 +490,9 @@ set_is_max(struct set *s, struct set_elem *e)
 }
 
 const struct set_elem *
-set_const_find(struct set *s, struct set_elem *e, void *aux)
+set_const_find(struct set *s, struct set_elem *e)
 {
-    return (struct set_elem *)const_seek(&s->t, &e->n, s->t.cmp, aux);
+    return (struct set_elem *)const_seek(&s->t, &e->n);
 }
 
 struct set_elem *
@@ -573,7 +570,7 @@ set_print(const struct set *const s, const struct set_elem *const root,
 */
 
 static void
-init_tree(struct tree *t, tree_cmp_fn *fn)
+init_tree(struct tree *const t, tree_cmp_fn *const fn, void *const aux)
 {
     t->root = &t->end;
     t->root->parent_or_dups = &t->end;
@@ -581,6 +578,7 @@ init_tree(struct tree *t, tree_cmp_fn *fn)
     t->root->link[R] = &t->end;
     t->cmp = fn;
     t->size = 0;
+    t->aux = aux;
 }
 
 static void
@@ -622,13 +620,12 @@ min(const struct tree *t)
 }
 
 static struct node *
-const_seek(struct tree *const t, struct node *const n, tree_cmp_fn *cmp,
-           void *aux)
+const_seek(struct tree *const t, struct node *const n)
 {
     struct node *seek = n;
     while (seek != &t->end)
     {
-        const node_threeway_cmp cur_cmp = cmp(n, seek, aux);
+        const node_threeway_cmp cur_cmp = t->cmp(n, seek, t->aux);
         if (cur_cmp == NODE_EQL)
         {
             return seek;
@@ -761,7 +758,7 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
 
 static struct range
 equal_range(struct tree *t, struct node *begin, struct node *end,
-            const enum tree_link traversal, void *aux)
+            const enum tree_link traversal)
 {
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -769,12 +766,12 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
     const node_threeway_cmp grt_or_les[2] = {NODE_GRT, NODE_LES};
-    struct node *b = splay(t, t->root, begin, t->cmp, aux);
+    struct node *b = splay(t, t->root, begin, t->cmp);
     if (t->cmp(begin, b, NULL) == grt_or_les[traversal])
     {
         b = next(t, b, traversal);
     }
-    struct node *e = splay(t, t->root, end, t->cmp, aux);
+    struct node *e = splay(t, t->root, end, t->cmp);
     if (t->cmp(end, e, NULL) == grt_or_les[traversal])
     {
         e = next(t, e, traversal);
@@ -807,23 +804,23 @@ rrange_end(const struct rrange *const rr)
 }
 
 static struct node *
-find(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
+find(struct tree *t, struct node *elem)
 {
     init_node(t, elem);
-    t->root = splay(t, t->root, elem, cmp, aux);
-    return cmp(elem, t->root, NULL) == NODE_EQL ? t->root : &t->end;
+    t->root = splay(t, t->root, elem, t->cmp);
+    return t->cmp(elem, t->root, NULL) == NODE_EQL ? t->root : &t->end;
 }
 
 static bool
-contains(struct tree *t, struct node *dummy_key, tree_cmp_fn *cmp, void *aux)
+contains(struct tree *t, struct node *dummy_key)
 {
     init_node(t, dummy_key);
-    t->root = splay(t, t->root, dummy_key, cmp, aux);
-    return cmp(dummy_key, t->root, NULL) == NODE_EQL;
+    t->root = splay(t, t->root, dummy_key, t->cmp);
+    return t->cmp(dummy_key, t->root, NULL) == NODE_EQL;
 }
 
 static bool
-insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
+insert(struct tree *t, struct node *elem)
 {
     init_node(t, elem);
     if (empty(t))
@@ -832,8 +829,8 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
         t->size++;
         return true;
     }
-    t->root = splay(t, t->root, elem, cmp, aux);
-    const node_threeway_cmp root_cmp = cmp(elem, t->root, NULL);
+    t->root = splay(t, t->root, elem, t->cmp);
+    const node_threeway_cmp root_cmp = t->cmp(elem, t->root, NULL);
     if (NODE_EQL == root_cmp)
     {
         return false;
@@ -843,7 +840,7 @@ insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
 }
 
 static void
-multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
+multiset_insert(struct tree *t, struct node *elem)
 {
     init_node(t, elem);
     t->size++;
@@ -852,9 +849,9 @@ multiset_insert(struct tree *t, struct node *elem, tree_cmp_fn *cmp, void *aux)
         t->root = elem;
         return;
     }
-    t->root = splay(t, t->root, elem, cmp, aux);
+    t->root = splay(t, t->root, elem, t->cmp);
 
-    const node_threeway_cmp root_cmp = cmp(elem, t->root, NULL);
+    const node_threeway_cmp root_cmp = t->cmp(elem, t->root, NULL);
     if (NODE_EQL == root_cmp)
     {
         add_duplicate(t, t->root, elem, &t->end);
@@ -905,13 +902,13 @@ add_duplicate(struct tree *t, struct node *tree_node, struct node *add,
 }
 
 static struct node *
-erase(struct tree *t, struct node *elem, void *aux)
+erase(struct tree *t, struct node *elem)
 {
     if (empty(t))
     {
         return &t->end;
     }
-    struct node *ret = splay(t, t->root, elem, t->cmp, aux);
+    struct node *ret = splay(t, t->root, elem, t->cmp);
     const node_threeway_cmp found = t->cmp(elem, ret, NULL);
     if (found != NODE_EQL)
     {
@@ -943,7 +940,7 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
     }
     t->size--;
 
-    struct node *ret = splay(t, t->root, tnil, force_max_or_min, NULL);
+    struct node *ret = splay(t, t->root, tnil, force_max_or_min);
     if (has_dups(&t->end, ret))
     {
         ret = pop_front_dup(t, ret);
@@ -962,7 +959,7 @@ multiset_erase_max_or_min(struct tree *t, struct node *tnil,
    the same size is splayed to the root and we are a duplicate in the
    list. */
 static struct node *
-multiset_erase_node(struct tree *t, struct node *node, void *aux)
+multiset_erase_node(struct tree *t, struct node *node)
 {
     /* This is what we set removed nodes to so this is a mistaken query */
     if (NULL == node->link[R] || NULL == node->link[L])
@@ -983,7 +980,7 @@ multiset_erase_node(struct tree *t, struct node *node, void *aux)
         node->link[N]->link[P] = node->link[P];
         return node;
     }
-    struct node *ret = splay(t, t->root, node, t->cmp, aux);
+    struct node *ret = splay(t, t->root, node, t->cmp);
     if (t->cmp(node, ret, NULL) != NODE_EQL)
     {
         return &t->end;
@@ -1069,7 +1066,7 @@ remove_from_tree(struct tree *t, struct node *ret)
     }
     else
     {
-        t->root = splay(t, ret->link[L], ret, t->cmp, NULL);
+        t->root = splay(t, ret->link[L], ret, t->cmp);
         link_trees(t, t->root, R, ret->link[R]);
     }
     return ret;
@@ -1077,7 +1074,7 @@ remove_from_tree(struct tree *t, struct node *ret)
 
 static struct node *
 splay(struct tree *t, struct node *root, const struct node *elem,
-      tree_cmp_fn *cmp, void *aux)
+      tree_cmp_fn *cmp)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -1086,13 +1083,13 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     struct node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        const node_threeway_cmp root_cmp = cmp(elem, root, aux);
+        const node_threeway_cmp root_cmp = cmp(elem, root, t->aux);
         const enum tree_link dir = NODE_GRT == root_cmp;
         if (NODE_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
-        const node_threeway_cmp child_cmp = cmp(elem, root->link[dir], aux);
+        const node_threeway_cmp child_cmp = cmp(elem, root->link[dir], t->aux);
         const enum tree_link dir_from_child = NODE_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */

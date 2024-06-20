@@ -9,6 +9,7 @@
    correct way for their data structure. */
 #ifndef TREE
 #define TREE
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -70,6 +71,7 @@ struct tree
     struct node *root;
     struct node end;
     tree_cmp_fn *cmp;
+    void *aux;
     size_t size;
 };
 

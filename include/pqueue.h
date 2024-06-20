@@ -14,7 +14,9 @@
 #ifndef PQUEUE
 #define PQUEUE
 
+#include "attrib.h"
 #include "tree.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 /* NOLINTNEXTLINE */
@@ -218,7 +220,7 @@ typedef void pq_destructor_fn(struct pq_elem *);
    loops may occur. */
 struct pq_range
 {
-    struct range r;
+    struct range r ATTRIB_PRIVATE;
 };
 
 /* The reverse range container for queries performed with
@@ -234,7 +236,7 @@ struct pq_range
    in this type of range. */
 struct pq_rrange
 {
-    struct rrange r;
+    struct rrange r ATTRIB_PRIVATE;
 };
 
 /* How to obtain the struct that embeds the struct pq_elem. For example:
@@ -261,7 +263,7 @@ struct pq_rrange
 
 /* Initializes and empty queue with size 0 and stores the comparison function
    the user defines for the elements in the priority queue. */
-void pq_init(struct pqueue *, pq_cmp_fn *);
+void pq_init(struct pqueue *, pq_cmp_fn *, void *);
 
 /* Calls the destructor for each element while emptying the priority queue.
    Usually, this destructor function is expected to call free for each
@@ -284,7 +286,7 @@ size_t pq_size(struct pqueue *);
    behavior is undefined. Priority queue insertion
    shall not fail becuase priority queues support
    round robin duplicates. O(lgN) */
-void pq_insert(struct pqueue *, struct pq_elem *, void *);
+void pq_push(struct pqueue *, struct pq_elem *);
 
 /* Pops from the front of the queue. If multiple elements
    with the same priority are to be popped, then upon first
@@ -344,11 +346,11 @@ const struct pq_elem *pq_const_min(const struct pqueue *);
    the erased. O(lgN). However, in practice you can often
    benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
-struct pq_elem *pq_erase(struct pqueue *, struct pq_elem *, void *);
+struct pq_elem *pq_erase(struct pqueue *, struct pq_elem *);
 
 /* The same as erase but returns the next element in an
    ascending priority order. */
-struct pq_elem *pq_rerase(struct pqueue *, struct pq_elem *, void *);
+struct pq_elem *pq_rerase(struct pqueue *, struct pq_elem *);
 
 /* Updates the specified elem known to be in the queue with
    a new priority in O(lgN) time. Because an update does not
@@ -393,7 +395,7 @@ bool pq_update(struct pqueue *, struct pq_elem *, pq_update_fn *, void *);
    This can be helpful if you need to know if such a priority
    is present regardless of how many round robin duplicates
    are present. Returns the result in O(lgN). */
-bool pq_contains(struct pqueue *, struct pq_elem *, void *);
+bool pq_contains(struct pqueue *, struct pq_elem *);
 
 /* ===================    Iteration   ==========================
 
@@ -484,7 +486,7 @@ struct pq_elem *pq_rnext(struct pqueue *, struct pq_elem *);
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, end is returned as end element. */
 struct pq_range pq_equal_range(struct pqueue *, struct pq_elem *begin,
-                               struct pq_elem *end, void *aux);
+                               struct pq_elem *end);
 
 struct pq_elem *pq_begin_range(const struct pq_range *);
 
@@ -511,7 +513,7 @@ struct pq_elem *pq_end_range(const struct pq_range *);
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, end is returned as end element. */
 struct pq_rrange pq_equal_rrange(struct pqueue *, struct pq_elem *rbegin,
-                                 struct pq_elem *end, void *aux);
+                                 struct pq_elem *end);
 
 struct pq_elem *pq_begin_rrange(const struct pq_rrange *);
 
