@@ -265,7 +265,7 @@ bubble_down(struct heap_pqueue *hpq, size_t i)
     {
         /* Without knowing the cost of the user provided comparison function,
            it is important to call the cmp function minimal number of times.
-           Avoid one call if there is no right child. Costs an if branch. */
+           Avoid one call if there is no right child. */
         next = (right < sz
                 && (hpq->order
                     == hpq->cmp(hpq->heap[right], hpq->heap[left], hpq->aux)))
