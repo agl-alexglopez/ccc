@@ -258,6 +258,8 @@ static void
 bubble_down(struct heap_pqueue *hpq, size_t i)
 {
     const size_t sz = hpq->sz;
+    const enum heap_pq_threeway_cmp wrong_order
+        = hpq->order == HPQLES ? HPQGRT : HPQLES;
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
          i = next, left = i * 2 + 1, right = left + 1)
     {
@@ -267,7 +269,7 @@ bubble_down(struct heap_pqueue *hpq, size_t i)
         if (right >= sz)
         {
             next = left;
-            if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->order)
+            if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) != wrong_order)
             {
                 break;
             }
@@ -279,7 +281,7 @@ bubble_down(struct heap_pqueue *hpq, size_t i)
             next = left
                    + (hpq->order
                       == hpq->cmp(hpq->heap[right], hpq->heap[left], hpq->aux));
-            if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) == hpq->order)
+            if (hpq->cmp(hpq->heap[i], hpq->heap[next], NULL) != wrong_order)
             {
                 break;
             }
