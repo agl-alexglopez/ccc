@@ -257,16 +257,15 @@ bubble_up(struct heap_pqueue *const hpq, size_t i)
 static void
 bubble_down(struct heap_pqueue *hpq, size_t i)
 {
-    const size_t sz = hpq->sz;
     const enum heap_pq_threeway_cmp wrong_order
         = hpq->order == HPQLES ? HPQGRT : HPQLES;
-    for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
+    for (size_t next = i, left = i * 2 + 1, right = left + 1; left < hpq->sz;
          i = next, left = i * 2 + 1, right = left + 1)
     {
         /* Without knowing the cost of the user provided comparison function,
            it is important to call the cmp function minimal number of times.
            Avoid one call if there is no right child. */
-        next = (right < sz
+        next = (right < hpq->sz
                 && (hpq->order
                     == hpq->cmp(hpq->heap[right], hpq->heap[left], hpq->aux)))
                    ? right
