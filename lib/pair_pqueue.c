@@ -23,8 +23,8 @@ static void link_child(struct link);
 static void init_node(struct ppq_elem *);
 static size_t traversal_size(const struct ppq_elem *);
 static bool has_valid_links(const struct pair_pqueue *, struct lineage);
-static struct ppq_elem *accumulate_pair(struct pair_pqueue *,
-                                        struct ppq_elem **, struct ppq_elem *);
+static struct ppq_elem *next_pairing(struct pair_pqueue *, struct ppq_elem **,
+                                     struct ppq_elem *);
 static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
 static struct ppq_elem *delete_min(struct pair_pqueue *, struct ppq_elem *);
 static void clear_node(struct ppq_elem *);
@@ -182,6 +182,10 @@ ppq_decrease(struct pair_pqueue *const ppq, struct ppq_elem *const e,
 bool
 ppq_validate(const struct pair_pqueue *const ppq)
 {
+    if (ppq->root && ppq->root->parent)
+    {
+        return false;
+    }
     if (!has_valid_links(ppq, (struct lineage){
                                   .parent = NULL,
                                   .child = ppq->root,
@@ -260,8 +264,9 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     struct ppq_elem *accumulator = eldest;
     while (cur != eldest && cur->next_sibling != eldest)
     {
-        cur = accumulate_pair(ppq, &accumulator, cur);
+        cur = next_pairing(ppq, &accumulator, cur);
     }
+    /* This covers the odd or even case for number of pairings. */
     root = cur != eldest ? fair_merge(ppq, accumulator, cur) : accumulator;
     root->next_sibling = root->prev_sibling = root;
     root->parent = NULL;
@@ -273,8 +278,8 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
    My method required some modifications due to my use of circular
    doubly linked list and desire for round robin fairness. */
 static struct ppq_elem *
-accumulate_pair(struct pair_pqueue *const ppq,
-                struct ppq_elem **const accumulator, struct ppq_elem *old)
+next_pairing(struct pair_pqueue *const ppq, struct ppq_elem **const accumulator,
+             struct ppq_elem *old)
 {
     struct ppq_elem *new = old->next_sibling;
     struct ppq_elem *newest = new->next_sibling;
