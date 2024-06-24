@@ -15,8 +15,8 @@ struct lineage
     const struct ppq_elem *const child;
 };
 
-static struct ppq_elem *merge(struct pair_pqueue *, struct ppq_elem *,
-                              struct ppq_elem *);
+static struct ppq_elem *merge(struct pair_pqueue *, struct ppq_elem *old,
+                              struct ppq_elem *new);
 static void link_child(struct link);
 static void init_node(struct ppq_elem *);
 static size_t traversal_size(const struct ppq_elem *);
@@ -229,27 +229,26 @@ accumulate_pair(struct pair_pqueue *const ppq,
 }
 
 static struct ppq_elem *
-merge(struct pair_pqueue *const ppq, struct ppq_elem *const a,
-      struct ppq_elem *const b)
+merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
+      struct ppq_elem *const new)
 {
-    if (!a || !b || a == b)
+    if (!old || !new || old == new)
     {
-        return a ? a : b;
+        return old ? old : new;
     }
-    const enum ppq_threeway_cmp cmp = ppq->cmp(a, b, ppq->aux);
-    if (cmp == ppq->order || cmp == PPQEQL)
+    if (ppq->cmp(new, old, ppq->aux) == ppq->order)
     {
         link_child((struct link){
-            .parent = a,
-            .node = b,
+            .parent = new,
+            .node = old,
         });
-        return a;
+        return new;
     }
     link_child((struct link){
-        .parent = b,
-        .node = a,
+        .parent = old,
+        .node = new,
     });
-    return b;
+    return old;
 }
 
 static void
