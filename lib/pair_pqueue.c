@@ -15,6 +15,8 @@ struct lineage
     const struct ppq_elem *const child;
 };
 
+/*=========================  Function Prototypes   ==========================*/
+
 static struct ppq_elem *fair_merge(struct pair_pqueue *, struct ppq_elem *old,
                                    struct ppq_elem *new);
 static void link_child(struct link);
@@ -26,6 +28,9 @@ static struct ppq_elem *accumulate_pair(struct pair_pqueue *,
 static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
 static struct ppq_elem *delete_min(struct pair_pqueue *, struct ppq_elem *);
 static void clear_node(struct ppq_elem *);
+static void cut_child(struct ppq_elem *);
+
+/*=========================  Interface Functions   ==========================*/
 
 void
 ppq_init(struct pair_pqueue *const ppq, enum ppq_threeway_cmp ppq_ordering,
@@ -127,6 +132,54 @@ ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
 }
 
 bool
+ppq_increase(struct pair_pqueue *const ppq, struct ppq_elem *const e,
+             ppq_update_fn *fn, void *aux)
+{
+    if (!e->next_sibling || !e->prev_sibling)
+    {
+        return false;
+    }
+    if (ppq->order == PPQGRT)
+    {
+        fn(e, aux);
+        cut_child(e);
+        ppq->root = fair_merge(ppq, ppq->root, e);
+    }
+    else
+    {
+        ppq->root = delete (ppq, e);
+        fn(e, aux);
+        init_node(e);
+        ppq->root = fair_merge(ppq, ppq->root, e);
+    }
+    return true;
+}
+
+bool
+ppq_decrease(struct pair_pqueue *const ppq, struct ppq_elem *const e,
+             ppq_update_fn *fn, void *aux)
+{
+    if (!e->next_sibling || !e->prev_sibling)
+    {
+        return false;
+    }
+    if (ppq->order == PPQLES)
+    {
+        fn(e, aux);
+        cut_child(e);
+        ppq->root = fair_merge(ppq, ppq->root, e);
+    }
+    else
+    {
+        ppq->root = delete (ppq, e);
+        fn(e, aux);
+        init_node(e);
+        ppq->root = fair_merge(ppq, ppq->root, e);
+    }
+    return true;
+}
+
+bool
 ppq_validate(const struct pair_pqueue *const ppq)
 {
     if (!has_valid_links(ppq, (struct lineage){
@@ -166,15 +219,12 @@ clear_node(struct ppq_elem *e)
     e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
 }
 
-static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
+static void
+cut_child(struct ppq_elem *root)
 {
-    if (ppq->root == root)
-    {
-        return delete_min(ppq, root);
-    }
     root->next_sibling->prev_sibling = root->prev_sibling;
     root->prev_sibling->next_sibling = root->next_sibling;
-    if (root == root->parent->left_child)
+    if (root->parent && root == root->parent->left_child)
     {
         if (root->prev_sibling == root)
         {
@@ -186,6 +236,15 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
         }
     }
     root->parent = NULL;
+}
+
+static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
+{
+    if (ppq->root == root)
+    {
+        return delete_min(ppq, root);
+    }
+    cut_child(root);
     return fair_merge(ppq, ppq->root, delete_min(ppq, root));
 }
 

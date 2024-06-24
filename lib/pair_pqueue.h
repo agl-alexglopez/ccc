@@ -53,6 +53,10 @@ bool ppq_empty(const struct pair_pqueue *);
 size_t ppq_size(const struct pair_pqueue *);
 bool ppq_update(struct pair_pqueue *, struct ppq_elem *, ppq_update_fn *,
                 void *);
+bool ppq_increase(struct pair_pqueue *, struct ppq_elem *, ppq_update_fn *,
+                  void *);
+bool ppq_decrease(struct pair_pqueue *, struct ppq_elem *, ppq_update_fn *,
+                  void *);
 bool ppq_validate(const struct pair_pqueue *);
 enum ppq_threeway_cmp ppq_order(const struct pair_pqueue *);
 

@@ -739,7 +739,8 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!ppq_update(&dist_q, &dist->ppq_elem, pq_update_dist, &alt))
+                if (!ppq_decrease(&dist_q, &dist->ppq_elem, pq_update_dist,
+                                  &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }

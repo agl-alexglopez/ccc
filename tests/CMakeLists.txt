@@ -98,6 +98,7 @@ add_executable(perf perf/perf.c)
 target_link_libraries(perf PRIVATE 
   pqueue 
   heap_pqueue
+  pair_pqueue
   random
   str_view
   cli
