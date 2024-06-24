@@ -16,6 +16,8 @@ static enum test_result ppq_test_insert_remove_four_dups(void);
 static enum test_result ppq_test_insert_erase_shuffled(void);
 static enum test_result ppq_test_pop_max(void);
 static enum test_result ppq_test_pop_min(void);
+static enum test_result ppq_test_max_round_robin(void);
+static enum test_result ppq_test_min_round_robin(void);
 static enum test_result ppq_test_delete_prime_shuffle_duplicates(void);
 static enum test_result ppq_test_prime_shuffle(void);
 static enum test_result ppq_test_weak_srand(void);
@@ -25,12 +27,14 @@ static size_t inorder_fill(int[], size_t, struct pair_pqueue *);
 static enum ppq_threeway_cmp val_cmp(const struct ppq_elem *,
                                      const struct ppq_elem *, void *);
 
-#define NUM_TESTS (size_t)7
+#define NUM_TESTS (size_t)9
 const test_fn all_tests[NUM_TESTS] = {
     ppq_test_insert_remove_four_dups,
     ppq_test_insert_erase_shuffled,
     ppq_test_pop_max,
     ppq_test_pop_min,
+    ppq_test_max_round_robin,
+    ppq_test_min_round_robin,
     ppq_test_delete_prime_shuffle_duplicates,
     ppq_test_prime_shuffle,
     ppq_test_weak_srand,
@@ -157,6 +161,62 @@ ppq_test_pop_min(void)
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ppq_empty(&ppq), true, bool, "%b");
+    return PASS;
+}
+
+static enum test_result
+ppq_test_max_round_robin(void)
+{
+    struct pair_pqueue ppq;
+    ppq_init(&ppq, PPQGRT, val_cmp, NULL);
+    const int size = 50;
+    struct val vals[size];
+    vals[0].id = 99;
+    vals[0].val = 0;
+    ppq_push(&ppq, &vals[0].elem);
+    for (int i = 1; i < size; ++i)
+    {
+        vals[i].val = 99;
+        vals[i].id = i;
+        ppq_push(&ppq, &vals[i].elem);
+        CHECK(ppq_validate(&ppq), true, bool, "%b");
+    }
+    /* Now let's make sure we pop round robin. */
+    int last_id = 0;
+    while (!ppq_empty(&ppq))
+    {
+        const struct val *front = ppq_entry(ppq_pop(&ppq), struct val, elem);
+        CHECK(last_id < front->id, true, bool, "%b");
+        last_id = front->id;
+    }
+    return PASS;
+}
+
+static enum test_result
+ppq_test_min_round_robin(void)
+{
+    struct pair_pqueue ppq;
+    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    const int size = 50;
+    struct val vals[size];
+    vals[0].id = 99;
+    vals[0].val = 99;
+    ppq_push(&ppq, &vals[0].elem);
+    for (int i = 1; i < size; ++i)
+    {
+        vals[i].val = 1;
+        vals[i].id = i;
+        ppq_push(&ppq, &vals[i].elem);
+        CHECK(ppq_validate(&ppq), true, bool, "%b");
+    }
+    /* Now let's make sure we pop round robin. */
+    int last_id = 0;
+    while (!ppq_empty(&ppq))
+    {
+        const struct val *front = ppq_entry(ppq_pop(&ppq), struct val, elem);
+        CHECK(last_id < front->id, true, bool, "%b");
+        last_id = front->id;
+    }
     return PASS;
 }
 

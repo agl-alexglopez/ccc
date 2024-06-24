@@ -186,7 +186,7 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
         }
     }
     root->parent = NULL;
-    return merge(ppq, delete_min(ppq, root), ppq->root);
+    return merge(ppq, ppq->root, delete_min(ppq, root));
 }
 
 static struct ppq_elem *
@@ -204,7 +204,7 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
         cur = accumulate_pair(ppq, &accumulator, cur);
     }
     struct ppq_elem *const new_root
-        = cur != head ? merge(ppq, cur, accumulator) : accumulator;
+        = cur != head ? merge(ppq, accumulator, cur) : accumulator;
     new_root->next_sibling = new_root->prev_sibling = new_root;
     new_root->parent = NULL;
     return new_root;
@@ -236,7 +236,8 @@ merge(struct pair_pqueue *const ppq, struct ppq_elem *const a,
     {
         return a ? a : b;
     }
-    if (ppq->cmp(a, b, ppq->aux) == ppq->order)
+    const enum ppq_threeway_cmp cmp = ppq->cmp(a, b, ppq->aux);
+    if (cmp == ppq->order || cmp == PPQEQL)
     {
         link_child((struct link){
             .parent = a,
