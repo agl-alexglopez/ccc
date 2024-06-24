@@ -21,7 +21,11 @@ static struct ppq_elem *merge(struct pair_pqueue *, struct ppq_elem *,
 static void link_child(struct link);
 static void init_node(struct ppq_elem *);
 static size_t traversal_size(const struct ppq_elem *);
-static bool is_strictly_ordered(const struct pair_pqueue *, struct lineage);
+static bool has_valid_links(const struct pair_pqueue *, struct lineage);
+static struct ppq_elem *accumulate_pair(struct pair_pqueue *,
+                                        struct ppq_elem **, struct ppq_elem *);
+static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
+static struct ppq_elem *delete_min(struct pair_pqueue *, struct ppq_elem *);
 
 void
 ppq_init(struct pair_pqueue *const ppq, enum ppq_threeway_cmp ppq_ordering,
@@ -56,20 +60,6 @@ ppq_push(struct pair_pqueue *const ppq, struct ppq_elem *const e)
     ++ppq->sz;
 }
 
-static struct ppq_elem *
-accumulate_pair(struct pair_pqueue *const ppq,
-                struct ppq_elem **const accumulator, struct ppq_elem *a)
-{
-    struct ppq_elem *b = a->next_sibling;
-    struct ppq_elem *next = b->next_sibling;
-
-    b->next_sibling = NULL;
-    a->next_sibling = NULL;
-
-    *accumulator = merge(ppq, *accumulator, merge(ppq, a, b));
-    return next;
-}
-
 struct ppq_elem *
 ppq_pop(struct pair_pqueue *const ppq)
 {
@@ -84,25 +74,7 @@ ppq_pop(struct pair_pqueue *const ppq)
         ppq->sz = 0;
         return popped;
     }
-    struct ppq_elem *const head = ppq->root->left_child->next_sibling;
-    struct ppq_elem *cur = head->next_sibling;
-    struct ppq_elem *accumulator = head;
-    while (cur != head && cur->next_sibling != head)
-    {
-        cur = accumulate_pair(ppq, &accumulator, cur);
-    }
-    /* Covers the even or odd case for pairing. */
-    if (cur != head)
-    {
-        /* Cur is odd singleton. */
-        ppq->root = merge(ppq, cur, accumulator);
-    }
-    else
-    {
-        /* Everything was paired perfectly. */
-        ppq->root = accumulator;
-    }
-    ppq->root->next_sibling = ppq->root;
+    ppq->root = delete_min(ppq, ppq->root);
     ppq->sz--;
     return popped;
 }
@@ -110,9 +82,9 @@ ppq_pop(struct pair_pqueue *const ppq)
 struct ppq_elem *
 ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
 {
-    (void)ppq;
-    (void)e;
-    UNIMPLEMENTED();
+    ppq->root = delete (ppq, e);
+    ppq->sz--;
+    return e;
 }
 
 void
@@ -139,20 +111,20 @@ bool
 ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
            ppq_update_fn *const fn, void *const aux)
 {
-    (void)ppq;
-    (void)e;
-    (void)fn;
-    (void)aux;
-    UNIMPLEMENTED();
+    ppq->root = delete (ppq, e);
+    fn(e, aux);
+    init_node(e);
+    ppq->root = merge(ppq, ppq->root, e);
+    return true;
 }
 
 bool
 ppq_validate(const struct pair_pqueue *const ppq)
 {
-    if (!is_strictly_ordered(ppq, (struct lineage){
-                                      .parent = NULL,
-                                      .child = ppq->root,
-                                  }))
+    if (!has_valid_links(ppq, (struct lineage){
+                                  .parent = NULL,
+                                  .child = ppq->root,
+                              }))
     {
         return false;
     }
@@ -176,7 +148,55 @@ init_node(struct ppq_elem *e)
 {
     e->left_child = NULL;
     e->next_sibling = e;
+    e->prev_sibling = e;
     e->parent = NULL;
+}
+
+static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
+{
+    if (ppq->root == root)
+    {
+        ppq->root = delete_min(ppq, root);
+        return root;
+    }
+    root->next_sibling->prev_sibling = root->prev_sibling;
+    root->prev_sibling->next_sibling = root->next_sibling;
+    if (root == root->parent->left_child)
+    {
+        root->parent->left_child = root->prev_sibling;
+    }
+    root->parent = NULL;
+    return merge(ppq, delete_min(ppq, root), ppq->root);
+}
+
+static struct ppq_elem *
+delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
+{
+    struct ppq_elem *const head = root->left_child->next_sibling;
+    struct ppq_elem *cur = head->next_sibling;
+    struct ppq_elem *accumulator = head;
+    while (cur != head && cur->next_sibling != head)
+    {
+        cur = accumulate_pair(ppq, &accumulator, cur);
+    }
+    struct ppq_elem *const new_root
+        = cur != head ? merge(ppq, cur, accumulator) : accumulator;
+    new_root->next_sibling = new_root->prev_sibling = new_root;
+    return new_root;
+}
+
+static struct ppq_elem *
+accumulate_pair(struct pair_pqueue *const ppq,
+                struct ppq_elem **const accumulator, struct ppq_elem *a)
+{
+    struct ppq_elem *b = a->next_sibling;
+    struct ppq_elem *next = b->next_sibling;
+
+    b->next_sibling = b->prev_sibling = NULL;
+    a->next_sibling = a->prev_sibling = NULL;
+
+    *accumulator = merge(ppq, *accumulator, merge(ppq, a, b));
+    return next;
 }
 
 static struct ppq_elem *
@@ -208,13 +228,15 @@ link_child(struct link l)
     if (l.parent->left_child)
     {
         l.node->next_sibling = l.parent->left_child->next_sibling;
+        l.node->prev_sibling = l.parent->left_child;
+        l.parent->left_child->next_sibling->prev_sibling = l.node;
         l.parent->left_child->next_sibling = l.node;
         l.parent->left_child = l.node;
     }
     else
     {
         l.parent->left_child = l.node;
-        l.node->next_sibling = l.node;
+        l.node->next_sibling = l.node->prev_sibling = l.node;
     }
     l.node->parent = l.parent;
 }
@@ -243,7 +265,7 @@ traversal_size(const struct ppq_elem *const root)
 }
 
 static bool
-is_strictly_ordered(const struct pair_pqueue *const ppq, const struct lineage l)
+has_valid_links(const struct pair_pqueue *const ppq, const struct lineage l)
 {
     if (!l.child)
     {
@@ -263,14 +285,19 @@ is_strictly_ordered(const struct pair_pqueue *const ppq, const struct lineage l)
         {
             return false;
         }
+        if (l.child->next_sibling->prev_sibling != l.child
+            || l.child->prev_sibling->next_sibling != l.child)
+        {
+            return false;
+        }
         if (l.parent && (ppq->cmp(l.parent, cur, ppq->aux) == wrong_order))
         {
             return false;
         }
-        if (!is_strictly_ordered(ppq, (struct lineage){
-                                          .parent = cur,
-                                          .child = cur->left_child,
-                                      }))
+        if (!has_valid_links(ppq, (struct lineage){
+                                      .parent = cur,
+                                      .child = cur->left_child,
+                                  }))
         {
             return false;
         }

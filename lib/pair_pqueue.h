@@ -18,6 +18,7 @@ struct ppq_elem
 {
     struct ppq_elem *left_child;
     struct ppq_elem *next_sibling;
+    struct ppq_elem *prev_sibling;
     struct ppq_elem *parent;
 };
 
