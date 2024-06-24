@@ -120,8 +120,8 @@ ppq_size(const struct pair_pqueue *const ppq)
    or less than the previous we must always perform a delete and reinsert if
    the value has not broken total order with the parent. It is not sufficient
    to check if the value has exceeded the value of the first left child as
-   the sibling of that left child may be bigger than or smaller than that
-   child value. */
+   any sibling of that left child may be bigger than or smaller than that
+   newest child value. */
 bool
 ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
            ppq_update_fn *const fn, void *const aux)
