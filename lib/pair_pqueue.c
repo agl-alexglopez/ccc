@@ -61,9 +61,9 @@ accumulate_pair(struct pair_pqueue *const ppq,
                 struct ppq_elem **const accumulator, struct ppq_elem *a)
 {
     struct ppq_elem *b = a->next_sibling;
-    struct ppq_elem *next = a->next_sibling->next_sibling;
+    struct ppq_elem *next = b->next_sibling;
 
-    a->next_sibling->next_sibling = NULL;
+    b->next_sibling = NULL;
     a->next_sibling = NULL;
 
     *accumulator = merge(ppq, *accumulator, merge(ppq, a, b));
@@ -78,7 +78,7 @@ ppq_pop(struct pair_pqueue *const ppq)
         return NULL;
     }
     struct ppq_elem *const popped = ppq->root;
-    if (!popped->left_child)
+    if (ppq->sz == 1ULL)
     {
         ppq->root = NULL;
         ppq->sz = 0;
@@ -91,12 +91,15 @@ ppq_pop(struct pair_pqueue *const ppq)
     {
         cur = accumulate_pair(ppq, &accumulator, cur);
     }
+    /* Covers the even or odd case for pairing. */
     if (cur != head)
     {
+        /* Cur is odd singleton. */
         ppq->root = merge(ppq, cur, accumulator);
     }
     else
     {
+        /* Everything was paired perfectly. */
         ppq->root = accumulator;
     }
     ppq->root->next_sibling = ppq->root;
@@ -253,6 +256,10 @@ is_strictly_ordered(const struct pair_pqueue *const ppq, const struct lineage l)
     while (!sibling_ring_lapped)
     {
         if (!cur)
+        {
+            return false;
+        }
+        if (l.parent && l.child->parent != l.parent)
         {
             return false;
         }
