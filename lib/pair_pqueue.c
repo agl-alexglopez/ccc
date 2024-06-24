@@ -73,24 +73,32 @@ accumulate_pair(struct pair_pqueue *const ppq,
 struct ppq_elem *
 ppq_pop(struct pair_pqueue *const ppq)
 {
-    if (!ppq->root->left_child)
+    if (!ppq->root)
     {
         return NULL;
     }
     struct ppq_elem *const popped = ppq->root;
-    struct ppq_elem *const head = ppq->root->left_child->next_sibling;
-    struct ppq_elem *cur = head;
-    struct ppq_elem *accumulator = NULL;
-    if (cur->next_sibling != cur)
+    if (!popped->left_child)
     {
-        bool lapped = false;
-        while (!lapped)
-        {
-            cur = accumulate_pair(ppq, &accumulator, cur);
-            lapped = cur == head || cur->next_sibling == head;
-        }
+        ppq->root = NULL;
+        ppq->sz = 0;
+        return popped;
     }
-    ppq->root = merge(ppq, cur, accumulator);
+    struct ppq_elem *const head = ppq->root->left_child->next_sibling;
+    struct ppq_elem *cur = head->next_sibling;
+    struct ppq_elem *accumulator = head;
+    while (cur != head && cur->next_sibling != head)
+    {
+        cur = accumulate_pair(ppq, &accumulator, cur);
+    }
+    if (cur != head)
+    {
+        ppq->root = merge(ppq, cur, accumulator);
+    }
+    else
+    {
+        ppq->root = accumulator;
+    }
     ppq->root->next_sibling = ppq->root;
     ppq->sz--;
     return popped;
@@ -203,6 +211,7 @@ link_child(struct link l)
     else
     {
         l.parent->left_child = l.node;
+        l.node->next_sibling = l.node;
     }
     l.node->parent = l.parent;
 }
