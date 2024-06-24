@@ -68,12 +68,6 @@ ppq_pop(struct pair_pqueue *const ppq)
         return NULL;
     }
     struct ppq_elem *const popped = ppq->root;
-    if (ppq->sz == 1ULL)
-    {
-        ppq->root = NULL;
-        ppq->sz = 0;
-        return popped;
-    }
     ppq->root = delete_min(ppq, ppq->root);
     ppq->sz--;
     return popped;
@@ -85,12 +79,6 @@ ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
     if (!ppq->root)
     {
         return NULL;
-    }
-    if (ppq->sz == 1ULL)
-    {
-        ppq->root = NULL;
-        ppq->sz = 0;
-        return e;
     }
     ppq->root = delete (ppq, e);
     ppq->sz--;
