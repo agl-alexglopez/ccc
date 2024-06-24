@@ -82,6 +82,16 @@ ppq_pop(struct pair_pqueue *const ppq)
 struct ppq_elem *
 ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
 {
+    if (!ppq->root)
+    {
+        return NULL;
+    }
+    if (ppq->sz == 1ULL)
+    {
+        ppq->root = NULL;
+        ppq->sz = 0;
+        return e;
+    }
     ppq->root = delete (ppq, e);
     ppq->sz--;
     return e;
@@ -156,14 +166,20 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
 {
     if (ppq->root == root)
     {
-        ppq->root = delete_min(ppq, root);
-        return root;
+        return delete_min(ppq, root);
     }
     root->next_sibling->prev_sibling = root->prev_sibling;
     root->prev_sibling->next_sibling = root->next_sibling;
     if (root == root->parent->left_child)
     {
-        root->parent->left_child = root->prev_sibling;
+        if (root->prev_sibling == root)
+        {
+            root->parent->left_child = NULL;
+        }
+        else
+        {
+            root->parent->left_child = root->prev_sibling;
+        }
     }
     root->parent = NULL;
     return merge(ppq, delete_min(ppq, root), ppq->root);
@@ -172,6 +188,10 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
 static struct ppq_elem *
 delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
 {
+    if (!root->left_child)
+    {
+        return NULL;
+    }
     struct ppq_elem *const head = root->left_child->next_sibling;
     struct ppq_elem *cur = head->next_sibling;
     struct ppq_elem *accumulator = head;
@@ -182,6 +202,7 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     struct ppq_elem *const new_root
         = cur != head ? merge(ppq, cur, accumulator) : accumulator;
     new_root->next_sibling = new_root->prev_sibling = new_root;
+    new_root->parent = NULL;
     return new_root;
 }
 

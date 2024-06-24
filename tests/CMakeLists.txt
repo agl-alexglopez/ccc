@@ -70,7 +70,7 @@ endmacro()
 # Add tests below here by the name of the c file without the .c suffix
 #add_ppq_test(test_ppq_construct)
 add_ppq_test(test_ppq_insert)
-#add_ppq_test(test_ppq_erase)
+add_ppq_test(test_ppq_erase)
 #add_ppq_test(test_ppq_update)
 
 #############  Set  ##########################
