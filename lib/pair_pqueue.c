@@ -116,6 +116,12 @@ ppq_size(const struct pair_pqueue *const ppq)
     return ppq->sz;
 }
 
+/* This is a difficult function. Without knowing if this new value is greater
+   or less than the previous we must always perform a delete and reinsert if
+   the value has not broken total order with the parent. It is not sufficient
+   to check if the value has exceeded the value of the first left child as
+   the sibling of that left child may be bigger than or smaller than that
+   child value. */
 bool
 ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
            ppq_update_fn *const fn, void *const aux)
@@ -137,6 +143,8 @@ ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
     return true;
 }
 
+/* Preferable to use this function if it is known the value is increasing.
+   Much more efficient. */
 bool
 ppq_increase(struct pair_pqueue *const ppq, struct ppq_elem *const e,
              ppq_update_fn *fn, void *aux)
@@ -161,6 +169,8 @@ ppq_increase(struct pair_pqueue *const ppq, struct ppq_elem *const e,
     return true;
 }
 
+/* Preferable to use this function if it is known the value is decreasing.
+   Much more efficient. */
 bool
 ppq_decrease(struct pair_pqueue *const ppq, struct ppq_elem *const e,
              ppq_update_fn *fn, void *aux)
