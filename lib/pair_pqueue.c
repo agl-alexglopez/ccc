@@ -124,8 +124,14 @@ ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
     {
         return false;
     }
-    ppq->root = delete (ppq, e);
     fn(e, aux);
+    if (e->parent && ppq->cmp(e, e->parent, ppq->aux) == ppq->order)
+    {
+        cut_child(e);
+        ppq->root = fair_merge(ppq, ppq->root, e);
+        return true;
+    }
+    ppq->root = delete (ppq, e);
     init_node(e);
     ppq->root = fair_merge(ppq, ppq->root, e);
     return true;
