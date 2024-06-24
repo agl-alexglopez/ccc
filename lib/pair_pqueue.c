@@ -15,8 +15,8 @@ struct lineage
     const struct ppq_elem *const child;
 };
 
-static struct ppq_elem *merge(struct pair_pqueue *, struct ppq_elem *old,
-                              struct ppq_elem *new);
+static struct ppq_elem *fair_merge(struct pair_pqueue *, struct ppq_elem *old,
+                                   struct ppq_elem *new);
 static void link_child(struct link);
 static void init_node(struct ppq_elem *);
 static size_t traversal_size(const struct ppq_elem *);
@@ -56,7 +56,7 @@ ppq_push(struct pair_pqueue *const ppq, struct ppq_elem *const e)
         return;
     }
     init_node(e);
-    ppq->root = merge(ppq, ppq->root, e);
+    ppq->root = fair_merge(ppq, ppq->root, e);
     ++ppq->sz;
 }
 
@@ -122,7 +122,7 @@ ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
     ppq->root = delete (ppq, e);
     fn(e, aux);
     init_node(e);
-    ppq->root = merge(ppq, ppq->root, e);
+    ppq->root = fair_merge(ppq, ppq->root, e);
     return true;
 }
 
@@ -186,7 +186,7 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
         }
     }
     root->parent = NULL;
-    return merge(ppq, ppq->root, delete_min(ppq, root));
+    return fair_merge(ppq, ppq->root, delete_min(ppq, root));
 }
 
 static struct ppq_elem *
@@ -203,17 +203,16 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     {
         cur = accumulate_pair(ppq, &accumulator, cur);
     }
-    struct ppq_elem *const new_root
-        = cur != head ? merge(ppq, accumulator, cur) : accumulator;
-    new_root->next_sibling = new_root->prev_sibling = new_root;
-    new_root->parent = NULL;
-    return new_root;
+    root = cur != head ? fair_merge(ppq, accumulator, cur) : accumulator;
+    root->next_sibling = root->prev_sibling = root;
+    root->parent = NULL;
+    return root;
 }
 
 /* credit for this way of breaking down accumulation (keneoneth):
    https://github.com/keneoneth/priority-queue-benchmark
    My method required some modifications due to my use of circular
-   doubly linked list. */
+   doubly linked list and desire for round robin fairness. */
 static struct ppq_elem *
 accumulate_pair(struct pair_pqueue *const ppq,
                 struct ppq_elem **const accumulator, struct ppq_elem *a)
@@ -224,13 +223,18 @@ accumulate_pair(struct pair_pqueue *const ppq,
     b->next_sibling = b->prev_sibling = NULL;
     a->next_sibling = a->prev_sibling = NULL;
 
-    *accumulator = merge(ppq, *accumulator, merge(ppq, a, b));
+    *accumulator = fair_merge(ppq, *accumulator, fair_merge(ppq, a, b));
     return next;
 }
 
+/* Merges nodes ensuring round robin fairness among duplicates. Note the
+   parameter names closely. The sibling ring is ordered by newest as left
+   child of parent and oldest at back of doubly linked list. Nodes that
+   are equal are therefore guaranteed to be popped in round robin order
+   if these parameters are respected whenever merging occurs. */
 static struct ppq_elem *
-merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
-      struct ppq_elem *const new)
+fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
+           struct ppq_elem *const new)
 {
     if (!old || !new || old == new)
     {
