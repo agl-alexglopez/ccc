@@ -255,14 +255,14 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     {
         return NULL;
     }
-    struct ppq_elem *const head = root->left_child->next_sibling;
-    struct ppq_elem *cur = head->next_sibling;
-    struct ppq_elem *accumulator = head;
-    while (cur != head && cur->next_sibling != head)
+    struct ppq_elem *const eldest = root->left_child->next_sibling;
+    struct ppq_elem *cur = eldest->next_sibling;
+    struct ppq_elem *accumulator = eldest;
+    while (cur != eldest && cur->next_sibling != eldest)
     {
         cur = accumulate_pair(ppq, &accumulator, cur);
     }
-    root = cur != head ? fair_merge(ppq, accumulator, cur) : accumulator;
+    root = cur != eldest ? fair_merge(ppq, accumulator, cur) : accumulator;
     root->next_sibling = root->prev_sibling = root;
     root->parent = NULL;
     return root;
@@ -274,16 +274,16 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
    doubly linked list and desire for round robin fairness. */
 static struct ppq_elem *
 accumulate_pair(struct pair_pqueue *const ppq,
-                struct ppq_elem **const accumulator, struct ppq_elem *a)
+                struct ppq_elem **const accumulator, struct ppq_elem *old)
 {
-    struct ppq_elem *b = a->next_sibling;
-    struct ppq_elem *next = b->next_sibling;
+    struct ppq_elem *new = old->next_sibling;
+    struct ppq_elem *newest = new->next_sibling;
 
-    b->next_sibling = b->prev_sibling = NULL;
-    a->next_sibling = a->prev_sibling = NULL;
+    new->next_sibling = new->prev_sibling = NULL;
+    old->next_sibling = old->prev_sibling = NULL;
 
-    *accumulator = fair_merge(ppq, *accumulator, fair_merge(ppq, a, b));
-    return next;
+    *accumulator = fair_merge(ppq, *accumulator, fair_merge(ppq, old, new));
+    return newest;
 }
 
 /* Merges nodes ensuring round robin fairness among duplicates. Note the
