@@ -1,5 +1,4 @@
 #include "pair_pqueue.h"
-#include "attrib.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -26,6 +25,7 @@ static struct ppq_elem *accumulate_pair(struct pair_pqueue *,
                                         struct ppq_elem **, struct ppq_elem *);
 static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
 static struct ppq_elem *delete_min(struct pair_pqueue *, struct ppq_elem *);
+static void clear_node(struct ppq_elem *);
 
 void
 ppq_init(struct pair_pqueue *const ppq, enum ppq_threeway_cmp ppq_ordering,
@@ -70,6 +70,7 @@ ppq_pop(struct pair_pqueue *const ppq)
     struct ppq_elem *const popped = ppq->root;
     ppq->root = delete_min(ppq, ppq->root);
     ppq->sz--;
+    clear_node(popped);
     return popped;
 }
 
@@ -77,6 +78,10 @@ struct ppq_elem *
 ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
 {
     if (!ppq->root)
+    {
+        return NULL;
+    }
+    if (!e->next_sibling || !e->prev_sibling)
     {
         return NULL;
     }
@@ -88,9 +93,10 @@ ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
 void
 ppq_clear(struct pair_pqueue *const ppq, ppq_destructor_fn *fn)
 {
-    (void)ppq;
-    (void)fn;
-    UNIMPLEMENTED();
+    while (!ppq_empty(ppq))
+    {
+        fn(ppq_pop(ppq));
+    }
 }
 
 bool
@@ -109,6 +115,10 @@ bool
 ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
            ppq_update_fn *const fn, void *const aux)
 {
+    if (!e->next_sibling || !e->prev_sibling)
+    {
+        return false;
+    }
     ppq->root = delete (ppq, e);
     fn(e, aux);
     init_node(e);
@@ -148,6 +158,12 @@ init_node(struct ppq_elem *e)
     e->next_sibling = e;
     e->prev_sibling = e;
     e->parent = NULL;
+}
+
+static void
+clear_node(struct ppq_elem *e)
+{
+    e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
 }
 
 static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
@@ -194,6 +210,10 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     return new_root;
 }
 
+/* credit for this way of breaking down accumulation (keneoneth):
+   https://github.com/keneoneth/priority-queue-benchmark
+   My method required some modifications due to my use of circular
+   doubly linked list. */
 static struct ppq_elem *
 accumulate_pair(struct pair_pqueue *const ppq,
                 struct ppq_elem **const accumulator, struct ppq_elem *a)
