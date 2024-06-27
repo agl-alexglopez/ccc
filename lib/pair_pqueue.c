@@ -92,6 +92,7 @@ ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
     }
     ppq->root = delete (ppq, e);
     ppq->sz--;
+    clear_node(e);
     return e;
 }
 
@@ -227,10 +228,8 @@ ppq_order(const struct pair_pqueue *const ppq)
 static void
 init_node(struct ppq_elem *e)
 {
-    e->left_child = NULL;
-    e->next_sibling = e;
-    e->prev_sibling = e;
-    e->parent = NULL;
+    e->left_child = e->parent = NULL;
+    e->next_sibling = e->prev_sibling = e;
 }
 
 static void
@@ -275,7 +274,7 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     {
         return NULL;
     }
-    struct ppq_elem *const eldest = root->left_child->next_sibling;
+    struct ppq_elem *const eldest = root->left_child;
     struct ppq_elem *cur = eldest->next_sibling;
     struct ppq_elem *accumulator = eldest;
     while (cur != eldest && cur->next_sibling != eldest)
@@ -292,7 +291,9 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
 /* credit for this way of breaking down accumulation (keneoneth):
    https://github.com/keneoneth/priority-queue-benchmark
    My method required some modifications due to my use of circular
-   doubly linked list and desire for round robin fairness. */
+   doubly linked list and desire for round robin fairness. Merges next
+   pair into the accumulator and updates accumulator with new root if
+   new winning node is found. Returns the node after the next pair. */
 static struct ppq_elem *
 next_pairing(struct pair_pqueue *const ppq, struct ppq_elem **const accumulator,
              struct ppq_elem *old)
@@ -335,16 +336,35 @@ fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
     return old;
 }
 
+/* To ensure round robin fairiness and simplify memory access in the pairing
+   queue, the oldest sibling shall remain the left child of the parent. Newer
+   elements are tacked on to the end of the circular doubly linked list of
+   elements. Here is a simple series of adding three arbitrary elements
+   to the ring of siblings. Note that the reduced memory access of keeping
+   the oldest as left child is only possible due to the doubly linked list
+   we use to enable arbitrary erase in the heap. With singly linked list
+   you would have to follow the original paper guidelines and lose the
+   ability for fast erase and update:
+
+         a       a       a
+        ╱   ->  ╱   ->  ╱
+      ┌b┐     ┌b─c┐   ┌b─c─d┐
+      └─┘     └───┘   └─────┘
+
+    Then, when we iterate through the list in a delete min operation the
+    oldest child/sibling becomes the acumulator first ensuring round robin
+    fairness among duplicates. Thus, a one pass merge from left to right
+    is acheived that maintains the pairing heap runtime promises.
+   */
 static void
 link_child(struct link l)
 {
     if (l.parent->left_child)
     {
-        l.node->next_sibling = l.parent->left_child->next_sibling;
-        l.node->prev_sibling = l.parent->left_child;
-        l.parent->left_child->next_sibling->prev_sibling = l.node;
-        l.parent->left_child->next_sibling = l.node;
-        l.parent->left_child = l.node;
+        l.node->next_sibling = l.parent->left_child;
+        l.node->prev_sibling = l.parent->left_child->prev_sibling;
+        l.parent->left_child->prev_sibling->next_sibling = l.node;
+        l.parent->left_child->prev_sibling = l.node;
     }
     else
     {
