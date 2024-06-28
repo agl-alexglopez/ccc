@@ -239,22 +239,22 @@ clear_node(struct ppq_elem *e)
 }
 
 static void
-cut_child(struct ppq_elem *root)
+cut_child(struct ppq_elem *child)
 {
-    root->next_sibling->prev_sibling = root->prev_sibling;
-    root->prev_sibling->next_sibling = root->next_sibling;
-    if (root->parent && root == root->parent->left_child)
+    child->next_sibling->prev_sibling = child->prev_sibling;
+    child->prev_sibling->next_sibling = child->next_sibling;
+    if (child->parent && child == child->parent->left_child)
     {
-        if (root->next_sibling == root)
+        if (child->next_sibling == child)
         {
-            root->parent->left_child = NULL;
+            child->parent->left_child = NULL;
         }
         else
         {
-            root->parent->left_child = root->next_sibling;
+            child->parent->left_child = child->next_sibling;
         }
     }
-    root->parent = NULL;
+    child->parent = NULL;
 }
 
 static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
