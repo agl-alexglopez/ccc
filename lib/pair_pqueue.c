@@ -19,7 +19,7 @@ struct lineage
 
 static struct ppq_elem *fair_merge(struct pair_pqueue *, struct ppq_elem *old,
                                    struct ppq_elem *new);
-static void link_child(struct link);
+static void link_child(struct ppq_elem *parent, struct ppq_elem *child);
 static void init_node(struct ppq_elem *);
 static size_t traversal_size(const struct ppq_elem *);
 static bool has_valid_links(const struct pair_pqueue *, struct lineage);
@@ -324,16 +324,10 @@ fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
     }
     if (ppq->cmp(new, old, ppq->aux) == ppq->order)
     {
-        link_child((struct link){
-            .parent = new,
-            .node = old,
-        });
+        link_child(new, old);
         return new;
     }
-    link_child((struct link){
-        .parent = old,
-        .node = new,
-    });
+    link_child(old, new);
     return old;
 }
 
@@ -358,21 +352,21 @@ fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
     is acheived that maintains the pairing heap runtime promises.
    */
 static void
-link_child(struct link l)
+link_child(struct ppq_elem *const parent, struct ppq_elem *const child)
 {
-    if (l.parent->left_child)
+    if (parent->left_child)
     {
-        l.node->next_sibling = l.parent->left_child;
-        l.node->prev_sibling = l.parent->left_child->prev_sibling;
-        l.parent->left_child->prev_sibling->next_sibling = l.node;
-        l.parent->left_child->prev_sibling = l.node;
+        child->next_sibling = parent->left_child;
+        child->prev_sibling = parent->left_child->prev_sibling;
+        parent->left_child->prev_sibling->next_sibling = child;
+        parent->left_child->prev_sibling = child;
     }
     else
     {
-        l.parent->left_child = l.node;
-        l.node->next_sibling = l.node->prev_sibling = l.node;
+        parent->left_child = child;
+        child->next_sibling = child->prev_sibling = child;
     }
-    l.node->parent = l.parent;
+    child->parent = parent;
 }
 
 /*========================     Validation    ================================*/
