@@ -258,8 +258,8 @@ struct pq_rrange
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
 #define pq_entry(PQ_ELEM, STRUCT, MEMBER)                                      \
-    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->n.parent_or_dups                        \
-                - offsetof(STRUCT, MEMBER.n.parent_or_dups))) /* NOLINT */
+    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->n                                       \
+                - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
 /* Initializes and empty queue with size 0 and stores the comparison function
    the user defines for the elements in the priority queue. */

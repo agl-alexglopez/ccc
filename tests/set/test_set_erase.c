@@ -70,7 +70,7 @@ set_test_prime_shuffle(void)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    set_print(&s, (struct set_elem *)s.t.root, set_printer_fn);
+    set_print(&s, set_root(&s), set_printer_fn);
     CHECK(set_size(&s) < size, true, bool, "%b");
     for (size_t i = 0; i < size; ++i)
     {

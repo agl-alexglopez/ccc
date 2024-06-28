@@ -286,7 +286,7 @@ pq_test_prime_shuffle(void)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    pq_print(&pq, (struct pq_elem *)pq.t.root, pq_printer_fn);
+    pq_print(&pq, pq_root(&pq), pq_printer_fn);
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;

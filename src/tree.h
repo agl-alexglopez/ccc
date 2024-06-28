@@ -10,6 +10,8 @@
 #ifndef TREE
 #define TREE
 
+#include "attrib.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -39,8 +41,8 @@ enum list_link
    robust iterator for users. This is important for a priority queue. */
 struct node
 {
-    struct node *link[2];
-    struct node *parent_or_dups;
+    struct node *link[2] ATTRIB_PRIVATE;
+    struct node *parent_or_dups ATTRIB_PRIVATE;
 };
 
 /* All queries must be able to compare two types utilizing the tree.
@@ -68,11 +70,11 @@ typedef node_threeway_cmp tree_cmp_fn(const struct node *key,
    critical for this implementation, especially iterators. */
 struct tree
 {
-    struct node *root;
-    struct node end;
-    tree_cmp_fn *cmp;
-    void *aux;
-    size_t size;
+    struct node *root ATTRIB_PRIVATE;
+    struct node end ATTRIB_PRIVATE;
+    tree_cmp_fn *cmp ATTRIB_PRIVATE;
+    void *aux ATTRIB_PRIVATE;
+    size_t size ATTRIB_PRIVATE;
 };
 
 /* The underlying tree range can serve as both an inorder and reverse
@@ -81,14 +83,14 @@ struct tree
    the traversal orders. */
 struct range
 {
-    struct node *const begin;
-    struct node *const end;
+    struct node *const begin ATTRIB_PRIVATE;
+    struct node *const end ATTRIB_PRIVATE;
 };
 
 struct rrange
 {
-    struct node *const rbegin;
-    struct node *const end;
+    struct node *const rbegin ATTRIB_PRIVATE;
+    struct node *const end ATTRIB_PRIVATE;
 };
 
 typedef void node_print_fn(const struct node *);

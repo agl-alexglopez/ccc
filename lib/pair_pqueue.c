@@ -297,7 +297,7 @@ fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
    elements. Here is a simple series of adding three arbitrary elements
    to the ring of siblings. Note that the reduced memory access of keeping
    the oldest as left child is only possible due to the doubly linked list
-   we use to enable arbitrary erase in the heap. With singly linked list
+   we use to enable arbitrary erase in the heap. With a singly linked list
    you would have to follow the original paper guidelines and lose the
    ability for fast erase and update:
 

@@ -286,8 +286,8 @@ typedef void set_print_fn(const struct set_elem *);
 
 /* NOLINTNEXTLINE */
 #define set_entry(SET_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(SET_ELEM)->n.parent_or_dups                       \
-                - offsetof(STRUCT, MEMBER.n.parent_or_dups))) /* NOLINT */
+    ((STRUCT *)((uint8_t *)&(SET_ELEM)->n                                      \
+                - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
 /* Basic O(1) initialization and sanity checks for a set. Operations
    should only be used on a set once it has been intialized. */
