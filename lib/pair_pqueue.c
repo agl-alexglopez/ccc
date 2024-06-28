@@ -13,8 +13,6 @@ static size_t traversal_size(const struct ppq_elem *);
 static bool has_valid_links(const struct pair_pqueue *,
                             const struct ppq_elem *parent,
                             const struct ppq_elem *child);
-static struct ppq_elem *next_pairing(struct pair_pqueue *, struct ppq_elem **,
-                                     struct ppq_elem *);
 static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
 static struct ppq_elem *delete_min(struct pair_pqueue *, struct ppq_elem *);
 static void clear_node(struct ppq_elem *);
@@ -36,10 +34,6 @@ ppq_init(struct pair_pqueue *const ppq, enum ppq_threeway_cmp ppq_ordering,
 const struct ppq_elem *
 ppq_front(const struct pair_pqueue *const ppq)
 {
-    if (!ppq)
-    {
-        return NULL;
-    }
     return ppq->root;
 }
 
@@ -72,11 +66,7 @@ ppq_pop(struct pair_pqueue *const ppq)
 struct ppq_elem *
 ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
 {
-    if (!ppq->root)
-    {
-        return NULL;
-    }
-    if (!e->next_sibling || !e->prev_sibling)
+    if (!ppq->root || !e->next_sibling || !e->prev_sibling)
     {
         return NULL;
     }
@@ -148,15 +138,14 @@ ppq_increase(struct pair_pqueue *const ppq, struct ppq_elem *const e,
     {
         fn(e, aux);
         cut_child(e);
-        ppq->root = fair_merge(ppq, ppq->root, e);
     }
     else
     {
         ppq->root = delete (ppq, e);
         fn(e, aux);
         init_node(e);
-        ppq->root = fair_merge(ppq, ppq->root, e);
     }
+    ppq->root = fair_merge(ppq, ppq->root, e);
     return true;
 }
 
@@ -174,15 +163,14 @@ ppq_decrease(struct pair_pqueue *const ppq, struct ppq_elem *const e,
     {
         fn(e, aux);
         cut_child(e);
-        ppq->root = fair_merge(ppq, ppq->root, e);
     }
     else
     {
         ppq->root = delete (ppq, e);
         fn(e, aux);
         init_node(e);
-        ppq->root = fair_merge(ppq, ppq->root, e);
     }
+    ppq->root = fair_merge(ppq, ppq->root, e);
     return true;
 }
 
@@ -266,7 +254,12 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     struct ppq_elem *accumulator = eldest;
     while (cur != eldest && cur->next_sibling != eldest)
     {
-        cur = next_pairing(ppq, &accumulator, cur);
+        struct ppq_elem *new = cur->next_sibling;
+        struct ppq_elem *newest = new->next_sibling;
+        new->next_sibling = new->prev_sibling = NULL;
+        cur->next_sibling = cur->prev_sibling = NULL;
+        accumulator = fair_merge(ppq, accumulator, fair_merge(ppq, cur, new));
+        cur = newest;
     }
     /* This covers the odd or even case for number of pairings. */
     root = cur != eldest ? fair_merge(ppq, accumulator, cur) : accumulator;
@@ -274,26 +267,6 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     root->next_sibling = root->prev_sibling = root;
     root->parent = NULL;
     return root;
-}
-
-/* credit for this way of breaking down accumulation (keneoneth):
-   https://github.com/keneoneth/priority-queue-benchmark
-   My method required some modifications due to my use of circular
-   doubly linked list and desire for round robin fairness. Merges next
-   pair into the accumulator and updates accumulator with new root if
-   new winning node is found. Returns the node after the next pair. */
-static struct ppq_elem *
-next_pairing(struct pair_pqueue *const ppq, struct ppq_elem **const accumulator,
-             struct ppq_elem *old)
-{
-    struct ppq_elem *new = old->next_sibling;
-    struct ppq_elem *newest = new->next_sibling;
-
-    new->next_sibling = new->prev_sibling = NULL;
-    old->next_sibling = old->prev_sibling = NULL;
-
-    *accumulator = fair_merge(ppq, *accumulator, fair_merge(ppq, old, new));
-    return newest;
 }
 
 /* Merges nodes ensuring round robin fairness among duplicates. Note the
