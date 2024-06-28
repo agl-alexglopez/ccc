@@ -19,7 +19,7 @@
       for any binary tree code which I have been working on for a while and
       think is quite helpful!
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
-#include "pqueue.h"
+#include "depqueue.h"
 #include "set.h"
 #include "tree.h"
 

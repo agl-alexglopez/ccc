@@ -4,7 +4,7 @@ target_link_libraries(maze PRIVATE
   random
   str_view
   set
-  pqueue
+  depqueue
 )
 
 add_executable(graph graph.c)

@@ -11,8 +11,8 @@
    Recently Used) elements close to the root even if their
    runtime is amortized O(lgN). With the right use cases we
    can frequently benefit from O(1) operations. */
-#ifndef PQUEUE
-#define PQUEUE
+#ifndef DEPQUEUE
+#define DEPQUEUE
 
 #include "attrib.h"
 #include "tree.h"
@@ -580,4 +580,4 @@ void depq_print(const struct depqueue *, const struct depq_elem *,
                 └──(2)L:{id:1,val:1}
                     └──(1)L:{id:0,val:0} */
 
-#endif
+#endif /* DEPQUEUE */

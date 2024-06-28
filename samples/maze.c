@@ -6,7 +6,7 @@
    both a set and a priority queue to acheive its purpose. Such data structures
    are provided by the library offering a perfect sample program opportunity. */
 #include "cli.h"
-#include "pqueue.h"
+#include "depqueue.h"
 #include "random.h"
 #include "set.h"
 #include "str_view.h"

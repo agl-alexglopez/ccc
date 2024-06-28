@@ -1,7 +1,7 @@
 #include "cli.h"
+#include "depqueue.h"
 #include "heap_pqueue.h"
 #include "pair_pqueue.h"
-#include "pqueue.h"
 #include "random.h"
 #include "str_view.h"
 

@@ -1,4 +1,4 @@
-#include "pqueue.h"
+#include "depqueue.h"
 #include "test.h"
 #include "tree.h"
 
