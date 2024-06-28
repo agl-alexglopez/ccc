@@ -6,15 +6,15 @@ struct val
 {
     int id;
     int val;
-    struct pq_elem elem;
+    struct depq_elem elem;
 };
 
-static enum test_result pq_test_empty(void);
-static node_threeway_cmp val_cmp(const struct pq_elem *, const struct pq_elem *,
-                                 void *);
+static enum test_result depq_test_empty(void);
+static node_threeway_cmp val_cmp(const struct depq_elem *,
+                                 const struct depq_elem *, void *);
 
 #define NUM_TESTS (size_t)1
-const test_fn all_tests[NUM_TESTS] = {pq_test_empty};
+const test_fn all_tests[NUM_TESTS] = {depq_test_empty};
 
 int
 main()
@@ -32,19 +32,19 @@ main()
 }
 
 static enum test_result
-pq_test_empty(void)
+depq_test_empty(void)
 {
-    struct pqueue pq;
-    pq_init(&pq, val_cmp, NULL);
-    CHECK(pq_empty(&pq), true, bool, "%b");
+    struct depqueue pq;
+    depq_init(&pq, val_cmp, NULL);
+    CHECK(depq_empty(&pq), true, bool, "%b");
     return PASS;
 }
 
 static node_threeway_cmp
-val_cmp(const struct pq_elem *a, const struct pq_elem *b, void *aux)
+val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = pq_entry(a, struct val, elem);
-    struct val *rhs = pq_entry(b, struct val, elem);
+    struct val *lhs = depq_entry(a, struct val, elem);
+    struct val *rhs = depq_entry(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
