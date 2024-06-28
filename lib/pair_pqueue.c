@@ -3,18 +3,6 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-struct link
-{
-    struct ppq_elem *parent;
-    struct ppq_elem *node;
-};
-
-struct lineage
-{
-    const struct ppq_elem *const parent;
-    const struct ppq_elem *const child;
-};
-
 /*=========================  Function Prototypes   ==========================*/
 
 static struct ppq_elem *fair_merge(struct pair_pqueue *, struct ppq_elem *old,
@@ -22,7 +10,9 @@ static struct ppq_elem *fair_merge(struct pair_pqueue *, struct ppq_elem *old,
 static void link_child(struct ppq_elem *parent, struct ppq_elem *child);
 static void init_node(struct ppq_elem *);
 static size_t traversal_size(const struct ppq_elem *);
-static bool has_valid_links(const struct pair_pqueue *, struct lineage);
+static bool has_valid_links(const struct pair_pqueue *,
+                            const struct ppq_elem *parent,
+                            const struct ppq_elem *child);
 static struct ppq_elem *next_pairing(struct pair_pqueue *, struct ppq_elem **,
                                      struct ppq_elem *);
 static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
@@ -203,10 +193,7 @@ ppq_validate(const struct pair_pqueue *const ppq)
     {
         return false;
     }
-    if (!has_valid_links(ppq, (struct lineage){
-                                  .parent = NULL,
-                                  .child = ppq->root,
-                              }))
+    if (!has_valid_links(ppq, NULL, ppq->root))
     {
         return false;
     }
@@ -393,14 +380,16 @@ traversal_size(const struct ppq_elem *const root)
 }
 
 static bool
-has_valid_links(const struct pair_pqueue *const ppq, const struct lineage l)
+has_valid_links(const struct pair_pqueue *const ppq,
+                const struct ppq_elem *const parent,
+                const struct ppq_elem *const child)
 {
-    if (!l.child)
+    if (!child)
     {
         return true;
     }
     bool sibling_ring_lapped = false;
-    const struct ppq_elem *cur = l.child;
+    const struct ppq_elem *cur = child;
     const enum ppq_threeway_cmp wrong_order
         = ppq->order == PPQLES ? PPQGRT : PPQLES;
     while (!sibling_ring_lapped)
@@ -409,28 +398,25 @@ has_valid_links(const struct pair_pqueue *const ppq, const struct lineage l)
         {
             return false;
         }
-        if (l.parent && l.child->parent != l.parent)
+        if (parent && child->parent != parent)
         {
             return false;
         }
-        if (l.child->next_sibling->prev_sibling != l.child
-            || l.child->prev_sibling->next_sibling != l.child)
+        if (child->next_sibling->prev_sibling != child
+            || child->prev_sibling->next_sibling != child)
         {
             return false;
         }
-        if (l.parent && (ppq->cmp(l.parent, cur, ppq->aux) == wrong_order))
+        if (parent && (ppq->cmp(parent, cur, ppq->aux) == wrong_order))
         {
             return false;
         }
-        if (!has_valid_links(ppq, (struct lineage){
-                                      .parent = cur,
-                                      .child = cur->left_child,
-                                  }))
+        if (!has_valid_links(ppq, cur, cur->left_child))
         {
             return false;
         }
         cur = cur->next_sibling;
-        sibling_ring_lapped = cur == l.child;
+        sibling_ring_lapped = cur == child;
     }
     return true;
 }
