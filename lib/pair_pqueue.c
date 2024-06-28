@@ -254,12 +254,12 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     struct ppq_elem *accumulator = eldest;
     while (cur != eldest && cur->next_sibling != eldest)
     {
-        struct ppq_elem *new = cur->next_sibling;
-        struct ppq_elem *newest = new->next_sibling;
-        new->next_sibling = new->prev_sibling = NULL;
+        struct ppq_elem *next = cur->next_sibling;
+        struct ppq_elem *next_cur = cur->next_sibling->next_sibling;
+        next->next_sibling = next->prev_sibling = NULL;
         cur->next_sibling = cur->prev_sibling = NULL;
-        accumulator = fair_merge(ppq, accumulator, fair_merge(ppq, cur, new));
-        cur = newest;
+        accumulator = fair_merge(ppq, accumulator, fair_merge(ppq, cur, next));
+        cur = next_cur;
     }
     /* This covers the odd or even case for number of pairings. */
     root = cur != eldest ? fair_merge(ppq, accumulator, cur) : accumulator;
