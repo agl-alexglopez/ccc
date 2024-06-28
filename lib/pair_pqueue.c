@@ -309,8 +309,7 @@ fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
     Then, when we iterate through the list in a delete min operation the
     oldest child/sibling becomes the acumulator first ensuring round robin
     fairness among duplicates. Thus, a one pass merge from left to right
-    is acheived that maintains the pairing heap runtime promises.
-   */
+    is acheived that maintains the pairing heap runtime promises. */
 static void
 link_child(struct ppq_elem *const parent, struct ppq_elem *const child)
 {
