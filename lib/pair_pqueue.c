@@ -245,13 +245,13 @@ cut_child(struct ppq_elem *root)
     root->prev_sibling->next_sibling = root->next_sibling;
     if (root->parent && root == root->parent->left_child)
     {
-        if (root->prev_sibling == root)
+        if (root->next_sibling == root)
         {
             root->parent->left_child = NULL;
         }
         else
         {
-            root->parent->left_child = root->prev_sibling;
+            root->parent->left_child = root->next_sibling;
         }
     }
     root->parent = NULL;
@@ -283,6 +283,7 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
     }
     /* This covers the odd or even case for number of pairings. */
     root = cur != eldest ? fair_merge(ppq, accumulator, cur) : accumulator;
+    /* The root is always alone in its circular list at the end of merges. */
     root->next_sibling = root->prev_sibling = root;
     root->parent = NULL;
     return root;
@@ -309,8 +310,8 @@ next_pairing(struct pair_pqueue *const ppq, struct ppq_elem **const accumulator,
 }
 
 /* Merges nodes ensuring round robin fairness among duplicates. Note the
-   parameter names closely. The sibling ring is ordered by newest as left
-   child of parent and oldest at back of doubly linked list. Nodes that
+   parameter names closely. The sibling ring is ordered by oldest as left
+   child of parent and newest at back of doubly linked list. Nodes that
    are equal are therefore guaranteed to be popped in round robin order
    if these parameters are respected whenever merging occurs. */
 static struct ppq_elem *
