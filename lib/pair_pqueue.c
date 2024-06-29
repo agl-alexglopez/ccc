@@ -102,7 +102,7 @@ ppq_size(const struct pair_pqueue *const ppq)
    the value has not broken total order with the parent. It is not sufficient
    to check if the value has exceeded the value of the first left child as
    any sibling of that left child may be bigger than or smaller than that
-   newest child value. */
+   left child value. */
 bool
 ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
            ppq_update_fn *const fn, void *const aux)
@@ -242,6 +242,10 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
     return fair_merge(ppq, ppq->root, delete_min(ppq, root));
 }
 
+/* Performs a right to left one pass pairing merge in O(lgN) time. A variation
+   on the original paper's right to left one pass merge that aims at
+   ensuring round robin fairness among duplicate nodes at no extra runtime
+   cost. */
 static struct ppq_elem *
 delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
 {
