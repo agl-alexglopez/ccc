@@ -43,7 +43,7 @@ static enum heap_pq_threeway_cmp
 val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = hpq_entry(a, struct val, elem);
-    struct val *rhs = hpq_entry(b, struct val, elem);
+    struct val *lhs = HPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = HPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

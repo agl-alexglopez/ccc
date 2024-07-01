@@ -92,7 +92,7 @@ ppq_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         const struct val *get
-            = ppq_entry(&tester_clone[i].elem, struct val, elem);
+            = PPQ_ENTRY(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(ppq_size(&pq), 10ULL, size_t, "%zu");
@@ -120,8 +120,8 @@ static enum ppq_threeway_cmp
 val_cmp(const struct ppq_elem *a, const struct ppq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = ppq_entry(a, struct val, elem);
-    struct val *rhs = ppq_entry(b, struct val, elem);
+    struct val *lhs = PPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = PPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -136,7 +136,7 @@ ppq_test_insert_shuffle(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = ppq_entry(ppq_front(&pq), struct val, elem);
+    const struct val *min = PPQ_ENTRY(ppq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -161,7 +161,7 @@ ppq_test_read_max_min(void)
         CHECK(ppq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(ppq_size(&pq), 10ULL, size_t, "%zu");
-    const struct val *min = ppq_entry(ppq_front(&pq), struct val, elem);
+    const struct val *min = PPQ_ENTRY(ppq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -203,7 +203,7 @@ inorder_fill(int vals[], size_t size, struct pair_pqueue *ppq)
     {
         struct ppq_elem *const front = ppq_pop(ppq);
         CHECK(ppq_validate(ppq), true, bool, "%b");
-        vals[i++] = ppq_entry(front, struct val, elem)->val;
+        vals[i++] = PPQ_ENTRY(front, struct val, elem)->val;
         ppq_push(&copy, front);
     }
     while (!ppq_empty(&copy))

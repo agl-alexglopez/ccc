@@ -325,7 +325,7 @@ test_pop_intermittent_push(void)
         for (size_t i = 0; i < n; ++i)
         {
             struct val *v
-                = depq_entry(depq_pop_min(&pq), struct val, depq_elem);
+                = DEPQ_ENTRY(depq_pop_min(&pq), struct val, depq_elem);
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_range);
@@ -341,7 +341,7 @@ test_pop_intermittent_push(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *v = hpq_entry(hpq_pop(&hpq), struct val, hpq_elem);
+            struct val *v = HPQ_ENTRY(hpq_pop(&hpq), struct val, hpq_elem);
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_range);
@@ -357,7 +357,7 @@ test_pop_intermittent_push(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *v = ppq_entry(ppq_pop(&ppq), struct val, ppq_elem);
+            struct val *v = PPQ_ENTRY(ppq_pop(&ppq), struct val, ppq_elem);
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_range);
@@ -466,8 +466,8 @@ depq_val_cmp(const struct depq_elem *const a, const struct depq_elem *const b,
              void *const aux)
 {
     (void)aux;
-    const struct val *const x = depq_entry(a, struct val, depq_elem);
-    const struct val *const y = depq_entry(b, struct val, depq_elem);
+    const struct val *const x = DEPQ_ENTRY(a, struct val, depq_elem);
+    const struct val *const y = DEPQ_ENTRY(b, struct val, depq_elem);
     if (x->val < y->val)
     {
         return NODE_LES;
@@ -483,8 +483,8 @@ static enum heap_pq_threeway_cmp
 hpq_val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *const aux)
 {
     (void)aux;
-    const struct val *const x = hpq_entry(a, struct val, hpq_elem);
-    const struct val *const y = hpq_entry(b, struct val, hpq_elem);
+    const struct val *const x = HPQ_ENTRY(a, struct val, hpq_elem);
+    const struct val *const y = HPQ_ENTRY(b, struct val, hpq_elem);
     if (x->val < y->val)
     {
         return HPQLES;
@@ -499,21 +499,21 @@ hpq_val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *const aux)
 static void
 depq_update_val(struct depq_elem *e, void *aux)
 {
-    struct val *v = depq_entry(e, struct val, depq_elem);
+    struct val *v = DEPQ_ENTRY(e, struct val, depq_elem);
     v->val = *((int *)aux);
 }
 
 static void
 hpq_update_val(struct hpq_elem *e, void *aux)
 {
-    struct val *v = hpq_entry(e, struct val, hpq_elem);
+    struct val *v = HPQ_ENTRY(e, struct val, hpq_elem);
     v->val = *((int *)aux);
 }
 
 static void
 ppq_update_val(struct ppq_elem *e, void *aux)
 {
-    struct val *v = ppq_entry(e, struct val, ppq_elem);
+    struct val *v = PPQ_ENTRY(e, struct val, ppq_elem);
     v->val = *((int *)aux);
 }
 
@@ -534,8 +534,8 @@ ppq_val_cmp(const struct ppq_elem *a, const struct ppq_elem *const b,
             void *const aux)
 {
     (void)aux;
-    const struct val *const x = ppq_entry(a, struct val, ppq_elem);
-    const struct val *const y = ppq_entry(b, struct val, ppq_elem);
+    const struct val *const x = PPQ_ENTRY(a, struct val, ppq_elem);
+    const struct val *const y = PPQ_ENTRY(b, struct val, ppq_elem);
     if (x->val < y->val)
     {
         return PPQLES;

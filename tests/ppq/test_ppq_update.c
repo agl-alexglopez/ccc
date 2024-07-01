@@ -94,7 +94,7 @@ ppq_test_priority_removal(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct ppq_elem *i = &vals[val].elem;
-        struct val *cur = ppq_entry(i, struct val, elem);
+        struct val *cur = PPQ_ENTRY(i, struct val, elem);
         if (cur->val > limit)
         {
             i = ppq_erase(&pq, i);
@@ -126,7 +126,7 @@ ppq_test_priority_update(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct ppq_elem *i = &vals[val].elem;
-        struct val *cur = ppq_entry(i, struct val, elem);
+        struct val *cur = PPQ_ENTRY(i, struct val, elem);
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
@@ -160,7 +160,7 @@ ppq_test_priority_increase(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct ppq_elem *i = &vals[val].elem;
-        struct val *cur = ppq_entry(i, struct val, elem);
+        struct val *cur = PPQ_ENTRY(i, struct val, elem);
         int inc = limit * 2;
         int dec = cur->val / 2;
         if (cur->val > limit)
@@ -200,7 +200,7 @@ ppq_test_priority_decrease(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct ppq_elem *i = &vals[val].elem;
-        struct val *cur = ppq_entry(i, struct val, elem);
+        struct val *cur = PPQ_ENTRY(i, struct val, elem);
         int inc = limit * 2;
         int dec = cur->val / 2;
         if (cur->val < limit)
@@ -222,14 +222,14 @@ static enum ppq_threeway_cmp
 val_cmp(const struct ppq_elem *a, const struct ppq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = ppq_entry(a, struct val, elem);
-    struct val *rhs = ppq_entry(b, struct val, elem);
+    struct val *lhs = PPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = PPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 val_update(struct ppq_elem *a, void *aux)
 {
-    struct val *old = ppq_entry(a, struct val, elem);
+    struct val *old = PPQ_ENTRY(a, struct val, elem);
     old->val = *(int *)aux;
 }

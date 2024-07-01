@@ -226,7 +226,7 @@ animate_maze(struct maze *maze)
     while (!depq_empty(&cells))
     {
         const struct priority_cell *const cur
-            = depq_entry(depq_max(&cells), struct priority_cell, elem);
+            = DEPQ_ENTRY(depq_max(&cells), struct priority_cell, elem);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
@@ -257,7 +257,7 @@ animate_maze(struct maze *maze)
             }
             else
             {
-                cur_weight = set_entry(found, struct point_cost, elem)->cost;
+                cur_weight = SET_ENTRY(found, struct point_cost, elem)->cost;
             }
             if (cur_weight < min_weight)
             {
@@ -280,7 +280,7 @@ animate_maze(struct maze *maze)
         else
         {
             struct priority_cell *pc
-                = depq_entry(depq_pop_max(&cells), struct priority_cell, elem);
+                = DEPQ_ENTRY(depq_pop_max(&cells), struct priority_cell, elem);
             free(pc);
         }
     }
@@ -480,9 +480,9 @@ cmp_priority_cells(const struct depq_elem *const key, const struct depq_elem *n,
 {
     (void)aux;
     const struct priority_cell *const a
-        = depq_entry(key, struct priority_cell, elem);
+        = DEPQ_ENTRY(key, struct priority_cell, elem);
     const struct priority_cell *const b
-        = depq_entry(n, struct priority_cell, elem);
+        = DEPQ_ENTRY(n, struct priority_cell, elem);
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
@@ -490,8 +490,8 @@ static node_threeway_cmp
 cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
 {
     (void)aux;
-    const struct point_cost *const a = set_entry(key, struct point_cost, elem);
-    const struct point_cost *const b = set_entry(n, struct point_cost, elem);
+    const struct point_cost *const a = SET_ENTRY(key, struct point_cost, elem);
+    const struct point_cost *const b = SET_ENTRY(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
         return NODE_EQL;
@@ -506,7 +506,7 @@ cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
 static void
 set_destructor(struct set_elem *e)
 {
-    struct point_cost *pc = set_entry(e, struct point_cost, elem);
+    struct point_cost *pc = SET_ENTRY(e, struct point_cost, elem);
     free(pc);
 }
 

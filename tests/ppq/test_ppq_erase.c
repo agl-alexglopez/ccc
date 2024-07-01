@@ -90,7 +90,7 @@ ppq_test_insert_erase_shuffled(void)
     struct val vals[size];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = ppq_entry(ppq_front(&ppq), struct val, elem);
+    const struct val *min = PPQ_ENTRY(ppq_front(&ppq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &ppq), size, size_t, "%zu");
@@ -118,7 +118,7 @@ ppq_test_pop_max(void)
     struct val vals[size];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = ppq_entry(ppq_front(&ppq), struct val, elem);
+    const struct val *min = PPQ_ENTRY(ppq_front(&ppq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &ppq), size, size_t, "%zu");
@@ -129,7 +129,7 @@ ppq_test_pop_max(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        const struct val *front = ppq_entry(ppq_pop(&ppq), struct val, elem);
+        const struct val *front = PPQ_ENTRY(ppq_pop(&ppq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ppq_empty(&ppq), true, bool, "%b");
@@ -146,7 +146,7 @@ ppq_test_pop_min(void)
     struct val vals[size];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = ppq_entry(ppq_front(&ppq), struct val, elem);
+    const struct val *min = PPQ_ENTRY(ppq_front(&ppq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &ppq), size, size_t, "%zu");
@@ -157,7 +157,7 @@ ppq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        const struct val *front = ppq_entry(ppq_pop(&ppq), struct val, elem);
+        const struct val *front = PPQ_ENTRY(ppq_pop(&ppq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ppq_empty(&ppq), true, bool, "%b");
@@ -185,7 +185,7 @@ ppq_test_max_round_robin(void)
     int last_id = 0;
     while (!ppq_empty(&ppq))
     {
-        const struct val *front = ppq_entry(ppq_pop(&ppq), struct val, elem);
+        const struct val *front = PPQ_ENTRY(ppq_pop(&ppq), struct val, elem);
         CHECK(last_id < front->id, true, bool, "%b");
         last_id = front->id;
     }
@@ -213,7 +213,7 @@ ppq_test_min_round_robin(void)
     int last_id = 0;
     while (!ppq_empty(&ppq))
     {
-        const struct val *front = ppq_entry(ppq_pop(&ppq), struct val, elem);
+        const struct val *front = PPQ_ENTRY(ppq_pop(&ppq), struct val, elem);
         CHECK(last_id < front->id, true, bool, "%b");
         last_id = front->id;
     }
@@ -354,7 +354,7 @@ inorder_fill(int vals[], size_t size, struct pair_pqueue *ppq)
         struct ppq_elem *const front = ppq_pop(ppq);
         CHECK(ppq_validate(ppq), true, bool, "%b");
         CHECK(ppq_validate(&copy), true, bool, "%b");
-        vals[i++] = ppq_entry(front, struct val, elem)->val;
+        vals[i++] = PPQ_ENTRY(front, struct val, elem)->val;
         ppq_push(&copy, front);
     }
     while (!ppq_empty(&copy))
@@ -370,7 +370,7 @@ static enum ppq_threeway_cmp
 val_cmp(const struct ppq_elem *a, const struct ppq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = ppq_entry(a, struct val, elem);
-    struct val *rhs = ppq_entry(b, struct val, elem);
+    struct val *lhs = PPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = PPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

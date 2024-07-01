@@ -38,7 +38,7 @@ struct heap_pqueue
     void *aux ATTRIB_PRIVATE;
 };
 
-#define hpq_entry(HPQ_ELEM, STRUCT, MEMBER)                                    \
+#define HPQ_ENTRY(HPQ_ELEM, STRUCT, MEMBER)                                    \
     ((STRUCT *)((uint8_t *)&(HPQ_ELEM)->handle                                 \
                 - offsetof(STRUCT, MEMBER.handle))) /* NOLINT */
 

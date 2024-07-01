@@ -92,9 +92,9 @@ depq_test_insert_erase_shuffled(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *max = depq_entry(depq_const_max(&pq), struct val, elem);
+    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, size - 1, int, "%d");
-    const struct val *min = depq_entry(depq_const_min(&pq), struct val, elem);
+    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -122,9 +122,9 @@ depq_test_pop_max(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *max = depq_entry(depq_const_max(&pq), struct val, elem);
+    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, size - 1, int, "%d");
-    const struct val *min = depq_entry(depq_const_min(&pq), struct val, elem);
+    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -136,7 +136,7 @@ depq_test_pop_max(void)
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
         const struct val *front
-            = depq_entry(depq_pop_max(&pq), struct val, elem);
+            = DEPQ_ENTRY(depq_pop_max(&pq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(depq_empty(&pq), true, bool, "%b");
@@ -153,9 +153,9 @@ depq_test_pop_min(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *max = depq_entry(depq_const_max(&pq), struct val, elem);
+    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, size - 1, int, "%d");
-    const struct val *min = depq_entry(depq_const_min(&pq), struct val, elem);
+    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -167,7 +167,7 @@ depq_test_pop_min(void)
     for (size_t i = 0; i < size; ++i)
     {
         const struct val *front
-            = depq_entry(depq_pop_min(&pq), struct val, elem);
+            = DEPQ_ENTRY(depq_pop_min(&pq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(depq_empty(&pq), true, bool, "%b");
@@ -196,7 +196,7 @@ depq_test_max_round_robin(void)
     while (!depq_empty(&pq))
     {
         const struct val *front
-            = depq_entry(depq_pop_max(&pq), struct val, elem);
+            = DEPQ_ENTRY(depq_pop_max(&pq), struct val, elem);
         CHECK(last_id < front->id, true, bool, "%b");
         last_id = front->id;
     }
@@ -225,7 +225,7 @@ depq_test_min_round_robin(void)
     while (!depq_empty(&pq))
     {
         const struct val *front
-            = depq_entry(depq_pop_min(&pq), struct val, elem);
+            = DEPQ_ENTRY(depq_pop_min(&pq), struct val, elem);
         CHECK(last_id < front->id, true, bool, "%b");
         last_id = front->id;
     }
@@ -364,7 +364,7 @@ inorder_fill(int vals[], size_t size, struct depqueue *pq)
     for (struct depq_elem *e = depq_rbegin(pq); e != depq_end(pq);
          e = depq_rnext(pq, e))
     {
-        vals[i++] = depq_entry(e, struct val, elem)->val;
+        vals[i++] = DEPQ_ENTRY(e, struct val, elem)->val;
     }
     return i;
 }
@@ -372,7 +372,7 @@ inorder_fill(int vals[], size_t size, struct depqueue *pq)
 static void
 depq_printer_fn(const struct depq_elem *const e)
 {
-    const struct val *const v = depq_entry(e, struct val, elem);
+    const struct val *const v = DEPQ_ENTRY(e, struct val, elem);
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
@@ -380,7 +380,7 @@ static node_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = depq_entry(a, struct val, elem);
-    struct val *rhs = depq_entry(b, struct val, elem);
+    struct val *lhs = DEPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = DEPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

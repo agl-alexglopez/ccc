@@ -92,7 +92,7 @@ hpq_test_priority_removal(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct hpq_elem *i = &vals[val].elem;
-        struct val *cur = hpq_entry(i, struct val, elem);
+        struct val *cur = HPQ_ENTRY(i, struct val, elem);
         if (cur->val > limit)
         {
             i = hpq_erase(&pq, i);
@@ -124,7 +124,7 @@ hpq_test_priority_update(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct hpq_elem *i = &vals[val].elem;
-        struct val *cur = hpq_entry(i, struct val, elem);
+        struct val *cur = HPQ_ENTRY(i, struct val, elem);
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
@@ -140,14 +140,14 @@ static enum heap_pq_threeway_cmp
 val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = hpq_entry(a, struct val, elem);
-    struct val *rhs = hpq_entry(b, struct val, elem);
+    struct val *lhs = HPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = HPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 val_update(struct hpq_elem *a, void *aux)
 {
-    struct val *old = hpq_entry(a, struct val, elem);
+    struct val *old = HPQ_ENTRY(a, struct val, elem);
     old->val = *(int *)aux;
 }

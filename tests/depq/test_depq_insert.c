@@ -54,7 +54,7 @@ depq_test_insert_one(void)
     single.val = 0;
     depq_push(&pq, &single.elem);
     CHECK(depq_empty(&pq), false, bool, "%b");
-    CHECK(depq_entry(depq_root(&pq), struct val, elem)->val == single.val, true,
+    CHECK(DEPQ_ENTRY(depq_root(&pq), struct val, elem)->val == single.val, true,
           bool, "%b");
     return PASS;
 }
@@ -96,7 +96,7 @@ depq_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         const struct val *get
-            = depq_entry(&tester_clone[i].elem, struct val, elem);
+            = DEPQ_ENTRY(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(depq_size(&pq), 10ULL, size_t, "%zu");
@@ -124,8 +124,8 @@ static node_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = depq_entry(a, struct val, elem);
-    struct val *rhs = depq_entry(b, struct val, elem);
+    struct val *lhs = DEPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = DEPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -140,9 +140,9 @@ depq_test_insert_shuffle(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *max = depq_entry(depq_const_max(&pq), struct val, elem);
+    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, size - 1, int, "%d");
-    const struct val *min = depq_entry(depq_const_min(&pq), struct val, elem);
+    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -167,9 +167,9 @@ depq_test_read_max_min(void)
         CHECK(depq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(depq_size(&pq), 10ULL, size_t, "%zu");
-    const struct val *max = depq_entry(depq_const_max(&pq), struct val, elem);
+    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, 9, int, "%d");
-    const struct val *min = depq_entry(depq_const_min(&pq), struct val, elem);
+    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -208,7 +208,7 @@ inorder_fill(int vals[], size_t size, struct depqueue *pq)
     for (struct depq_elem *e = depq_rbegin(pq); e != depq_end(pq);
          e = depq_rnext(pq, e))
     {
-        vals[i++] = depq_entry(e, struct val, elem)->val;
+        vals[i++] = DEPQ_ENTRY(e, struct val, elem)->val;
     }
     return i;
 }

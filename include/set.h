@@ -91,8 +91,8 @@
       val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = set_entry(a, struct val, elem);
-          struct val *rhs = set_entry(b, struct val, elem);
+          struct val *lhs = SET_ENTRY(a, struct val, elem);
+          struct val *rhs = SET_ENTRY(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -126,8 +126,8 @@
       val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = set_entry(a, struct val, elem);
-          struct val *rhs = set_entry(b, struct val, elem);
+          struct val *lhs = SET_ENTRY(a, struct val, elem);
+          struct val *rhs = SET_ENTRY(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -211,8 +211,8 @@ struct set_elem
       val_cmp(const set_elem *a, const set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = set_entry (a, struct val, elem);
-          struct val *rhs = set_entry (b, struct val, elem);
+          struct val *lhs = SET_ENTRY (a, struct val, elem);
+          struct val *rhs = SET_ENTRY (b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -276,7 +276,7 @@ struct set_rrange
 
       void print_my_val(set_elem *elem)
       {
-         const struct val *v = set_entry(elem, struct val, elem);
+         const struct val *v = SET_ENTRY(elem, struct val, elem);
          printf("{%d}", v->val);
       }
 
@@ -285,7 +285,7 @@ struct set_rrange
 typedef void set_print_fn(const struct set_elem *);
 
 /* NOLINTNEXTLINE */
-#define set_entry(SET_ELEM, STRUCT, MEMBER)                                    \
+#define SET_ENTRY(SET_ELEM, STRUCT, MEMBER)                                    \
     ((STRUCT *)((uint8_t *)&(SET_ELEM)->n                                      \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
@@ -470,7 +470,7 @@ struct set_elem *set_rnext(struct set *, struct set_elem *);
            i != set_end_range(&range);
            i = set_next(&s, i))
       {
-          const int cur_val = set_entry(i, struct val, elem)->val;
+          const int cur_val = SET_ENTRY(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 
@@ -498,7 +498,7 @@ struct set_elem *set_end_range(const struct set_range *);
            i != set_end_rrange(&range);
            i = set_rnext(&s, i))
       {
-          const int cur_val = set_entry(i, struct val, elem)->val;
+          const int cur_val = SET_ENTRY(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 

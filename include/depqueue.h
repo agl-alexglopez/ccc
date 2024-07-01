@@ -257,7 +257,7 @@ struct depq_rrange
    The pq element should be passed by address not by value and the
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
-#define depq_entry(DEPQ_ELEM, STRUCT, MEMBER)                                  \
+#define DEPQ_ENTRY(DEPQ_ELEM, STRUCT, MEMBER)                                  \
     ((STRUCT *)((uint8_t *)&(DEPQ_ELEM)->n                                     \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 

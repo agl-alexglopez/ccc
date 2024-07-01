@@ -43,7 +43,7 @@ static enum ppq_threeway_cmp
 val_cmp(const struct ppq_elem *a, const struct ppq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = ppq_entry(a, struct val, elem);
-    struct val *rhs = ppq_entry(b, struct val, elem);
+    struct val *lhs = PPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = PPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

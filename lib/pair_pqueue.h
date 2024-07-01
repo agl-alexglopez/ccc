@@ -38,7 +38,7 @@ struct pair_pqueue
     void *aux ATTRIB_PRIVATE;
 };
 
-#define ppq_entry(PPQ_ELEM, STRUCT, MEMBER)                                    \
+#define PPQ_ENTRY(PPQ_ELEM, STRUCT, MEMBER)                                    \
     ((STRUCT *)((uint8_t *)&(PPQ_ELEM)->parent                                 \
                 - offsetof(STRUCT, MEMBER.parent))) /* NOLINT */
 

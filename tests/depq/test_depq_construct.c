@@ -44,7 +44,7 @@ static node_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = depq_entry(a, struct val, elem);
-    struct val *rhs = depq_entry(b, struct val, elem);
+    struct val *lhs = DEPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = DEPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
