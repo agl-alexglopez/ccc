@@ -34,8 +34,7 @@ main()
 static enum test_result
 depq_test_empty(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     CHECK(depq_empty(&pq), true, bool, "%b");
     return PASS;
 }

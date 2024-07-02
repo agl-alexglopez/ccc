@@ -47,8 +47,7 @@ main()
 static enum test_result
 set_test_insert_one(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     struct val single;
     single.val = 0;
     CHECK(set_insert(&s, &single.elem), true, bool, "%b");
@@ -61,8 +60,7 @@ set_test_insert_one(void)
 static enum test_result
 set_test_insert_three(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -77,10 +75,8 @@ set_test_insert_three(void)
 static enum test_result
 set_test_struct_getter(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
-    struct set set_tester_clone;
-    set_init(&set_tester_clone, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
+    struct set set_tester_clone = SET_INIT(set_tester_clone, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -105,8 +101,7 @@ set_test_struct_getter(void)
 static enum test_result
 set_test_insert_shuffle(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;

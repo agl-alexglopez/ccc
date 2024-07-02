@@ -48,8 +48,7 @@ main()
 static enum test_result
 depq_test_insert_one(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     struct val single;
     single.val = 0;
     depq_push(&pq, &single.elem);
@@ -62,8 +61,7 @@ depq_test_insert_one(void)
 static enum test_result
 depq_test_insert_three(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -79,10 +77,8 @@ depq_test_insert_three(void)
 static enum test_result
 depq_test_struct_getter(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
-    struct depqueue pq_tester_clone;
-    depq_init(&pq_tester_clone, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
+    struct depqueue pq_tester_clone = DEPQ_INIT(pq_tester_clone, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -106,8 +102,7 @@ depq_test_struct_getter(void)
 static enum test_result
 depq_test_insert_three_dups(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -132,8 +127,7 @@ val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 static enum test_result
 depq_test_insert_shuffle(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;
@@ -156,8 +150,7 @@ depq_test_insert_shuffle(void)
 static enum test_result
 depq_test_read_max_min(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {

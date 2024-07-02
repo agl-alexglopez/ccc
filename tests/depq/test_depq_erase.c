@@ -60,8 +60,7 @@ main()
 static enum test_result
 depq_test_insert_remove_four_dups(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -85,8 +84,7 @@ depq_test_insert_remove_four_dups(void)
 static enum test_result
 depq_test_insert_erase_shuffled(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -115,8 +113,7 @@ depq_test_insert_erase_shuffled(void)
 static enum test_result
 depq_test_pop_max(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -146,8 +143,7 @@ depq_test_pop_max(void)
 static enum test_result
 depq_test_pop_min(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -177,8 +173,7 @@ depq_test_pop_min(void)
 static enum test_result
 depq_test_max_round_robin(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
@@ -206,8 +201,7 @@ depq_test_max_round_robin(void)
 static enum test_result
 depq_test_min_round_robin(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
@@ -235,8 +229,7 @@ depq_test_min_round_robin(void)
 static enum test_result
 depq_test_delete_prime_shuffle_duplicates(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const int size = 99;
     const int prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -272,8 +265,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
 static enum test_result
 depq_test_prime_shuffle(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     const int size = 50;
     const int prime = 53;
     const int less = 10;
@@ -307,8 +299,7 @@ depq_test_prime_shuffle(void)
 static enum test_result
 depq_test_weak_srand(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

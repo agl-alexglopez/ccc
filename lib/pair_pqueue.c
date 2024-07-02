@@ -20,17 +20,6 @@ static void cut_child(struct ppq_elem *);
 
 /*=========================  Interface Functions   ==========================*/
 
-void
-ppq_init(struct pair_pqueue *const ppq, enum ppq_threeway_cmp ppq_ordering,
-         ppq_cmp_fn *const cmp, void *const aux)
-{
-    ppq->aux = aux;
-    ppq->cmp = cmp;
-    ppq->order = ppq_ordering;
-    ppq->root = NULL;
-    ppq->sz = 0;
-}
-
 const struct ppq_elem *
 ppq_front(const struct pair_pqueue *const ppq)
 {

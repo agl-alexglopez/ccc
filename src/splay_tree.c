@@ -55,7 +55,6 @@ const enum tree_link reverse_inorder_traversal = R;
 
 /* =======================        Prototypes         ====================== */
 
-static void init_tree(struct tree *, tree_cmp_fn *, void *);
 static void init_node(struct tree *, struct node *);
 static bool empty(const struct tree *);
 static void multiset_insert(struct tree *, struct node *);
@@ -105,12 +104,6 @@ static struct node *rrange_end(const struct rrange *);
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 /* ======================  Priority Queue Interface  ====================== */
-
-void
-depq_init(struct depqueue *pq, depq_cmp_fn *fn, void *aux)
-{
-    init_tree(&pq->t, (tree_cmp_fn *)fn, aux);
-}
 
 void
 depq_clear(struct depqueue *pq, depq_destructor_fn *destructor)
@@ -344,12 +337,6 @@ depq_print(const struct depqueue *const pq, const struct depq_elem *const start,
 /* ======================        Set Interface       ====================== */
 
 void
-set_init(struct set *const s, set_cmp_fn *const fn, void *const aux)
-{
-    init_tree(&s->t, (tree_cmp_fn *)fn, aux);
-}
-
-void
 set_clear(struct set *set, set_destructor_fn *destructor)
 {
 
@@ -572,18 +559,6 @@ set_print(const struct set *const s, const struct set_elem *const root,
 
    =========================================================================
 */
-
-static void
-init_tree(struct tree *const t, tree_cmp_fn *const fn, void *const aux)
-{
-    t->root = &t->end;
-    t->root->parent_or_dups = &t->end;
-    t->root->link[L] = &t->end;
-    t->root->link[R] = &t->end;
-    t->cmp = fn;
-    t->size = 0;
-    t->aux = aux;
-}
 
 static void
 init_node(struct tree *t, struct node *n)

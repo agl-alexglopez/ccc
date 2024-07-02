@@ -103,12 +103,10 @@ test_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        struct depqueue pq;
+        struct depqueue pq = DEPQ_INIT(pq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pair_pqueue ppq;
-        depq_init(&pq, depq_val_cmp, NULL);
+        struct pair_pqueue ppq = PPQ_INIT(PPQLES, ppq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        ppq_init(&ppq, PPQLES, ppq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -145,12 +143,10 @@ test_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        struct depqueue pq;
+        struct depqueue pq = DEPQ_INIT(pq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pair_pqueue ppq;
-        depq_init(&pq, depq_val_cmp, NULL);
+        struct pair_pqueue ppq = PPQ_INIT(PPQLES, ppq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        ppq_init(&ppq, PPQLES, ppq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             depq_push(&pq, &val_array[i].depq_elem);
@@ -201,12 +197,10 @@ test_push_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        struct depqueue pq;
+        struct depqueue pq = DEPQ_INIT(pq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pair_pqueue ppq;
-        depq_init(&pq, depq_val_cmp, NULL);
+        struct pair_pqueue ppq = PPQ_INIT(PPQLES, ppq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        ppq_init(&ppq, PPQLES, ppq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -256,12 +250,10 @@ test_push_intermittent_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        struct depqueue pq;
+        struct depqueue pq = DEPQ_INIT(pq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pair_pqueue ppq;
-        depq_init(&pq, depq_val_cmp, NULL);
+        struct pair_pqueue ppq = PPQ_INIT(PPQLES, ppq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        ppq_init(&ppq, PPQLES, ppq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -311,12 +303,10 @@ test_pop_intermittent_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        struct depqueue pq;
+        struct depqueue pq = DEPQ_INIT(pq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pair_pqueue ppq;
-        depq_init(&pq, depq_val_cmp, NULL);
+        struct pair_pqueue ppq = PPQ_INIT(PPQLES, ppq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        ppq_init(&ppq, PPQLES, ppq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             depq_push(&pq, &val_array[i].depq_elem);
@@ -382,12 +372,10 @@ test_update(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        struct depqueue pq;
+        struct depqueue pq = DEPQ_INIT(pq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pair_pqueue ppq;
-        depq_init(&pq, depq_val_cmp, NULL);
+        struct pair_pqueue ppq = PPQ_INIT(PPQLES, ppq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        ppq_init(&ppq, PPQLES, ppq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             depq_push(&pq, &val_array[i].depq_elem);

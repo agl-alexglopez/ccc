@@ -46,8 +46,7 @@ main()
 static enum test_result
 ppq_test_insert_one(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     struct val single;
     single.val = 0;
     ppq_push(&pq, &single.elem);
@@ -58,8 +57,7 @@ ppq_test_insert_one(void)
 static enum test_result
 ppq_test_insert_three(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -75,10 +73,8 @@ ppq_test_insert_three(void)
 static enum test_result
 ppq_test_struct_getter(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
-    struct pair_pqueue ppq_tester_clone;
-    ppq_init(&ppq_tester_clone, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq_tester_clone = PPQ_INIT(PPQLES, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -102,8 +98,7 @@ ppq_test_struct_getter(void)
 static enum test_result
 ppq_test_insert_three_dups(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -128,8 +123,7 @@ val_cmp(const struct ppq_elem *a, const struct ppq_elem *b, void *aux)
 static enum test_result
 ppq_test_insert_shuffle(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     /* Math magic ahead... */
     const size_t size = 50;
     const int prime = 53;
@@ -150,8 +144,7 @@ ppq_test_insert_shuffle(void)
 static enum test_result
 ppq_test_read_max_min(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
@@ -197,8 +190,7 @@ inorder_fill(int vals[], size_t size, struct pair_pqueue *ppq)
         return 0;
     }
     size_t i = 0;
-    struct pair_pqueue copy;
-    ppq_init(&copy, ppq_order(ppq), val_cmp, NULL);
+    struct pair_pqueue copy = PPQ_INIT(ppq_order(ppq), val_cmp, NULL);
     while (!ppq_empty(ppq) && i < size)
     {
         struct ppq_elem *const front = ppq_pop(ppq);

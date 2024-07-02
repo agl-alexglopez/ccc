@@ -48,8 +48,7 @@ main()
 static enum test_result
 set_test_forward_iter(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct set_elem *e = set_begin(&s); e != set_end(&s);
@@ -84,8 +83,7 @@ set_test_forward_iter(void)
 static enum test_result
 set_test_iterate_removal(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -118,8 +116,7 @@ set_test_iterate_removal(void)
 static enum test_result
 set_test_iterate_remove_reinsert(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -159,8 +156,7 @@ set_test_iterate_remove_reinsert(void)
 static enum test_result
 set_test_valid_range(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -220,8 +216,7 @@ set_test_valid_range(void)
 static enum test_result
 set_test_invalid_range(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -280,8 +275,7 @@ set_test_invalid_range(void)
 static enum test_result
 set_test_empty_range(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];

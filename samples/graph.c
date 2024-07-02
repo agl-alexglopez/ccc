@@ -264,8 +264,8 @@ main(int argc, char **argv)
         .cols = default_cols,
         .vertices = default_vertices,
         .grid = NULL,
+        .adjacency_list = SET_INIT(graph.adjacency_list, cmp_vertices, NULL),
     };
-    set_init(&graph.adjacency_list, cmp_vertices, NULL);
     for (int i = 1; i < argc; ++i)
     {
         const str_view arg = sv(argv[i]);
@@ -426,8 +426,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
     const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
-    struct set parent_map;
-    set_init(&parent_map, cmp_parent_cells, NULL);
+    struct set parent_map = SET_INIT(parent_map, cmp_parent_cells, NULL);
     struct queue bfs;
     q_init(sizeof(struct point), &bfs, 4);
     (void)insert_parent_cell(&parent_map, (struct parent_cell){
@@ -706,10 +705,8 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
-    struct pair_pqueue dist_q;
-    ppq_init(&dist_q, PPQLES, cmp_pq_dist_points, NULL);
-    struct set prev_map;
-    set_init(&prev_map, cmp_set_prev_vertices, NULL);
+    struct pair_pqueue dist_q = PPQ_INIT(PPQLES, cmp_pq_dist_points, NULL);
+    struct set prev_map = SET_INIT(prev_map, cmp_set_prev_vertices, NULL);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;

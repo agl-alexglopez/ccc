@@ -261,9 +261,10 @@ struct depq_rrange
     ((STRUCT *)((uint8_t *)&(DEPQ_ELEM)->n                                     \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
-/* Initializes and empty queue with size 0 and stores the comparison function
-   the user defines for the elements in the priority queue. */
-void depq_init(struct depqueue *, depq_cmp_fn *, void *);
+#define DEPQ_INIT(DEPQ_NAME, CMP, AUX)                                         \
+    {                                                                          \
+        .t = TREE_INIT(DEPQ_NAME, CMP, AUX)                                    \
+    }
 
 /* Calls the destructor for each element while emptying the priority queue.
    Usually, this destructor function is expected to call free for each

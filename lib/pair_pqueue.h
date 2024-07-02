@@ -31,19 +31,22 @@ typedef void ppq_update_fn(struct ppq_elem *, void *);
 
 struct pair_pqueue
 {
-    struct ppq_elem *root ATTRIB_PRIVATE;
-    size_t sz ATTRIB_PRIVATE;
-    ppq_cmp_fn *cmp ATTRIB_PRIVATE;
-    enum ppq_threeway_cmp order ATTRIB_PRIVATE;
-    void *aux ATTRIB_PRIVATE;
+    struct ppq_elem *root;
+    size_t sz;
+    ppq_cmp_fn *cmp;
+    enum ppq_threeway_cmp order;
+    void *aux;
 };
 
 #define PPQ_ENTRY(PPQ_ELEM, STRUCT, MEMBER)                                    \
     ((STRUCT *)((uint8_t *)&(PPQ_ELEM)->parent                                 \
                 - offsetof(STRUCT, MEMBER.parent))) /* NOLINT */
 
-void ppq_init(struct pair_pqueue *, enum ppq_threeway_cmp ppq_ordering,
-              ppq_cmp_fn *, void *);
+#define PPQ_INIT(ORDER, CMP_FN, AUX)                                           \
+    {                                                                          \
+        .root = NULL, .sz = 0, .cmp = (CMP_FN), .order = (ORDER), .aux = (AUX) \
+    }
+
 const struct ppq_elem *ppq_front(const struct pair_pqueue *);
 void ppq_push(struct pair_pqueue *, struct ppq_elem *);
 struct ppq_elem *ppq_pop(struct pair_pqueue *);

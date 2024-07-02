@@ -41,8 +41,8 @@ enum list_link
    robust iterator for users. This is important for a priority queue. */
 struct node
 {
-    struct node *link[2] ATTRIB_PRIVATE;
-    struct node *parent_or_dups ATTRIB_PRIVATE;
+    struct node *link[2];
+    struct node *parent_or_dups;
 };
 
 /* All queries must be able to compare two types utilizing the tree.
@@ -70,11 +70,11 @@ typedef node_threeway_cmp tree_cmp_fn(const struct node *key,
    critical for this implementation, especially iterators. */
 struct tree
 {
-    struct node *root ATTRIB_PRIVATE;
-    struct node end ATTRIB_PRIVATE;
-    tree_cmp_fn *cmp ATTRIB_PRIVATE;
-    void *aux ATTRIB_PRIVATE;
-    size_t size ATTRIB_PRIVATE;
+    struct node *root;
+    struct node end;
+    tree_cmp_fn *cmp;
+    void *aux;
+    size_t size;
 };
 
 /* The underlying tree range can serve as both an inorder and reverse
@@ -94,6 +94,14 @@ struct rrange
 };
 
 typedef void node_print_fn(const struct node *);
+
+#define TREE_INIT(TREE_NAME, CMP, AUX)                                         \
+    {                                                                          \
+        .root = &(TREE_NAME).t.end,                                            \
+        .end = {.link = {&(TREE_NAME).t.end, &(TREE_NAME).t.end},              \
+                .parent_or_dups = &(TREE_NAME).t.end},                         \
+        .cmp = (tree_cmp_fn *)(CMP), .aux = (AUX), .size = 0                   \
+    }
 
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of

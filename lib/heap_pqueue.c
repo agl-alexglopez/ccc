@@ -46,13 +46,17 @@ hpq_init(struct heap_pqueue *const hpq, enum heap_pq_threeway_cmp hpq_ordering,
 {
     if (hpq_ordering == HPQEQL)
     {
-        (void)fprintf(stderr, "heap should be ordered hPQ_LES or hPQ_GRT.\n");
+        (void)fprintf(stderr, "heap should be ordered HPQLES or HPQGRT.\n");
     }
     hpq->order = hpq_ordering;
     hpq->sz = 0;
     hpq->capacity = starting_capacity;
     hpq->heap = calloc(starting_capacity,
                        starting_capacity * sizeof(struct hpq_elem *));
+    if (!hpq->heap)
+    {
+        (void)fprintf(stderr, "heap backing store exhausted.\n");
+    }
     hpq->cmp = cmp;
     hpq->aux = aux;
 }

@@ -58,8 +58,7 @@ main()
 static enum test_result
 ppq_test_insert_remove_four_dups(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -83,8 +82,7 @@ ppq_test_insert_remove_four_dups(void)
 static enum test_result
 ppq_test_insert_erase_shuffled(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -111,8 +109,7 @@ ppq_test_insert_erase_shuffled(void)
 static enum test_result
 ppq_test_pop_max(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -139,8 +136,7 @@ ppq_test_pop_max(void)
 static enum test_result
 ppq_test_pop_min(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -167,8 +163,7 @@ ppq_test_pop_min(void)
 static enum test_result
 ppq_test_max_round_robin(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQGRT, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQGRT, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
@@ -195,8 +190,7 @@ ppq_test_max_round_robin(void)
 static enum test_result
 ppq_test_min_round_robin(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     const int size = 50;
     struct val vals[size];
     vals[0].id = 99;
@@ -223,8 +217,7 @@ ppq_test_min_round_robin(void)
 static enum test_result
 ppq_test_delete_prime_shuffle_duplicates(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     const int size = 99;
     const int prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -260,8 +253,7 @@ ppq_test_delete_prime_shuffle_duplicates(void)
 static enum test_result
 ppq_test_prime_shuffle(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     const int size = 50;
     const int prime = 53;
     const int less = 10;
@@ -293,8 +285,7 @@ ppq_test_prime_shuffle(void)
 static enum test_result
 ppq_test_weak_srand(void)
 {
-    struct pair_pqueue ppq;
-    ppq_init(&ppq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue ppq = PPQ_INIT(PPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -347,8 +338,7 @@ inorder_fill(int vals[], size_t size, struct pair_pqueue *ppq)
         return 0;
     }
     size_t i = 0;
-    struct pair_pqueue copy;
-    ppq_init(&copy, ppq_order(ppq), val_cmp, NULL);
+    struct pair_pqueue copy = PPQ_INIT(ppq_order(ppq), val_cmp, NULL);
     while (!ppq_empty(ppq))
     {
         struct ppq_elem *const front = ppq_pop(ppq);

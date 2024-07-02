@@ -46,8 +46,7 @@ main()
 static enum test_result
 ppq_test_insert_iterate_pop(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -75,8 +74,7 @@ ppq_test_insert_iterate_pop(void)
 static enum test_result
 ppq_test_priority_removal(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -107,8 +105,7 @@ ppq_test_priority_removal(void)
 static enum test_result
 ppq_test_priority_update(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -141,8 +138,7 @@ ppq_test_priority_update(void)
 static enum test_result
 ppq_test_priority_increase(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQLES, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -181,8 +177,7 @@ ppq_test_priority_increase(void)
 static enum test_result
 ppq_test_priority_decrease(void)
 {
-    struct pair_pqueue pq;
-    ppq_init(&pq, PPQGRT, val_cmp, NULL);
+    struct pair_pqueue pq = PPQ_INIT(PPQGRT, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

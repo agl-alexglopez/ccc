@@ -289,9 +289,10 @@ typedef void set_print_fn(const struct set_elem *);
     ((STRUCT *)((uint8_t *)&(SET_ELEM)->n                                      \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
-/* Basic O(1) initialization and sanity checks for a set. Operations
-   should only be used on a set once it has been intialized. */
-void set_init(struct set *, set_cmp_fn *, void *);
+#define SET_INIT(SET_NAME, CMP, AUX)                                           \
+    {                                                                          \
+        .t = TREE_INIT(SET_NAME, CMP, AUX)                                     \
+    }
 
 /* Calls the destructor for each element while emptying the set.
    Usually, this destructor function is expected to call free for each

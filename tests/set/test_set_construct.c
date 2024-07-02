@@ -36,8 +36,7 @@ main()
 static enum test_result
 set_test_empty(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     CHECK(set_empty(&s), true, bool, "%b");
     return PASS;
 }

@@ -52,8 +52,7 @@ main()
 static enum test_result
 depq_test_forward_iter_unique_vals(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct depq_elem *e = depq_begin(&pq); e != depq_end(&pq);
@@ -88,8 +87,7 @@ depq_test_forward_iter_unique_vals(void)
 static enum test_result
 depq_test_forward_iter_all_vals(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct depq_elem *i = depq_begin(&pq); i != depq_end(&pq);
@@ -128,8 +126,7 @@ depq_test_forward_iter_all_vals(void)
 static enum test_result
 depq_test_insert_iterate_pop(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -162,8 +159,7 @@ depq_test_insert_iterate_pop(void)
 static enum test_result
 depq_test_priority_removal(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -198,8 +194,7 @@ depq_test_priority_removal(void)
 static enum test_result
 depq_test_priority_update(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -238,8 +233,7 @@ depq_test_priority_update(void)
 static enum test_result
 depq_test_priority_valid_range(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -304,8 +298,7 @@ depq_test_priority_valid_range(void)
 static enum test_result
 depq_test_priority_invalid_range(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
@@ -366,8 +359,7 @@ depq_test_priority_invalid_range(void)
 static enum test_result
 depq_test_priority_empty_range(void)
 {
-    struct depqueue pq;
-    depq_init(&pq, val_cmp, NULL);
+    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
 
     const int num_nodes = 25;
     struct val vals[num_nodes];
