@@ -54,10 +54,10 @@ add_hpq_test(test_hpq_update)
 
 #############  Pair Priority Queue  ##########################
 
-macro(add_ppq_test TEST_NAME)
-  add_executable(${TEST_NAME} ppq/${TEST_NAME}.c)
+macro(add_pq_test TEST_NAME)
+  add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME} PRIVATE
-    pair_pqueue 
+    pqueue 
     test
   )
   set_target_properties(${TEST_NAME} 
@@ -68,10 +68,10 @@ macro(add_ppq_test TEST_NAME)
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
-add_ppq_test(test_ppq_construct)
-add_ppq_test(test_ppq_insert)
-add_ppq_test(test_ppq_erase)
-add_ppq_test(test_ppq_update)
+add_pq_test(test_pq_construct)
+add_pq_test(test_pq_insert)
+add_pq_test(test_pq_erase)
+add_pq_test(test_pq_update)
 
 #############  Set  ##########################
 
@@ -98,7 +98,7 @@ add_executable(perf perf/perf.c)
 target_link_libraries(perf PRIVATE 
   depqueue 
   heap_pqueue
-  pair_pqueue
+  pqueue
   random
   str_view
   cli

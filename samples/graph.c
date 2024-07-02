@@ -1,5 +1,5 @@
 #include "cli.h"
-#include "pair_pqueue.h"
+#include "pqueue.h"
 #include "queue.h"
 #include "random.h"
 #include "set.h"
@@ -35,14 +35,14 @@ struct prev_vertex
     struct vertex *prev;
     struct set_elem elem;
     /* A pointer to the corresponding pq_entry for this element. */
-    struct ppq_elem *ppq_elem;
+    struct pq_elem *pq_elem;
 };
 
 struct dist_point
 {
     struct vertex *v;
     int dist;
-    struct ppq_elem ppq_elem;
+    struct pq_elem pq_elem;
 };
 
 struct path_request
@@ -198,7 +198,7 @@ static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
-static void prepare_vertices(struct graph *, struct pair_pqueue *, struct set *,
+static void prepare_vertices(struct graph *, struct pqueue *, struct set *,
                              const struct path_request *);
 static void paint_edge(struct graph *, const struct vertex *,
                        const struct vertex *);
@@ -239,11 +239,11 @@ static node_threeway_cmp cmp_vertices(const struct set_elem *,
                                       const struct set_elem *, void *);
 static node_threeway_cmp cmp_parent_cells(const struct set_elem *,
                                           const struct set_elem *, void *);
-static enum ppq_threeway_cmp
-cmp_pq_dist_points(const struct ppq_elem *, const struct ppq_elem *, void *);
+static enum pq_threeway_cmp cmp_pq_dist_points(const struct pq_elem *,
+                                               const struct pq_elem *, void *);
 static node_threeway_cmp cmp_set_prev_vertices(const struct set_elem *,
                                                const struct set_elem *, void *);
-static void pq_update_dist(struct ppq_elem *, void *);
+static void pq_update_dist(struct pq_elem *, void *);
 static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
 static void set_pq_prev_vertex_dist_point_destructor(struct set_elem *);
@@ -705,16 +705,16 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 {
-    struct pair_pqueue dist_q = PPQ_INIT(PPQLES, cmp_pq_dist_points, NULL);
+    struct pqueue dist_q = PQ_INIT(PQLES, cmp_pq_dist_points, NULL);
     struct set prev_map = SET_INIT(prev_map, cmp_set_prev_vertices, NULL);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;
-    while (!ppq_empty(&dist_q))
+    while (!pq_empty(&dist_q))
     {
         /* PQ entries are popped but the set will free the memory at
-           the end because it always holds a reference to its ppq_elem. */
-        cur = PPQ_ENTRY(ppq_pop(&dist_q), struct dist_point, ppq_elem);
+           the end because it always holds a reference to its pq_elem. */
+        cur = PQ_ENTRY(pq_pop(&dist_q), struct dist_point, pq_elem);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
@@ -729,15 +729,14 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
             /* The seen set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
             struct dist_point *dist
-                = PPQ_ENTRY(next->ppq_elem, struct dist_point, ppq_elem);
+                = PQ_ENTRY(next->pq_elem, struct dist_point, pq_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < dist->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!ppq_decrease(&dist_q, &dist->ppq_elem, pq_update_dist,
-                                  &alt))
+                if (!pq_decrease(&dist_q, &dist->pq_elem, pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -767,7 +766,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 }
 
 static void
-prepare_vertices(struct graph *const graph, struct pair_pqueue *dist_q,
+prepare_vertices(struct graph *const graph, struct pqueue *dist_q,
                  struct set *prev_map, const struct path_request *pr)
 {
     for (struct set_elem *e = set_begin(&graph->adjacency_list);
@@ -783,12 +782,12 @@ prepare_vertices(struct graph *const graph, struct pair_pqueue *dist_q,
         if (!insert_prev_vertex(prev_map, (struct prev_vertex){
                                               .v = p->v,
                                               .prev = NULL,
-                                              .ppq_elem = &p->ppq_elem,
+                                              .pq_elem = &p->pq_elem,
                                           }))
         {
             quit("inserting into set in in loading phase failed.\n", 1);
         }
-        ppq_push(dist_q, &p->ppq_elem);
+        pq_push(dist_q, &p->pq_elem);
     }
 }
 
@@ -1088,15 +1087,13 @@ cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
     return (a->key.r > b->key.r) - (a->key.r < b->key.r);
 }
 
-static enum ppq_threeway_cmp
-cmp_pq_dist_points(const struct ppq_elem *const x,
-                   const struct ppq_elem *const y, void *aux)
+static enum pq_threeway_cmp
+cmp_pq_dist_points(const struct pq_elem *const x, const struct pq_elem *const y,
+                   void *aux)
 {
     (void)aux;
-    const struct dist_point *const a
-        = PPQ_ENTRY(x, struct dist_point, ppq_elem);
-    const struct dist_point *const b
-        = PPQ_ENTRY(y, struct dist_point, ppq_elem);
+    const struct dist_point *const a = PQ_ENTRY(x, struct dist_point, pq_elem);
+    const struct dist_point *const b = PQ_ENTRY(y, struct dist_point, pq_elem);
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
@@ -1119,9 +1116,9 @@ cmp_set_prev_vertices(const struct set_elem *const x,
 }
 
 static void
-pq_update_dist(struct ppq_elem *e, void *aux)
+pq_update_dist(struct pq_elem *e, void *aux)
 {
-    PPQ_ENTRY(e, struct dist_point, ppq_elem)->dist = *((int *)aux);
+    PQ_ENTRY(e, struct dist_point, pq_elem)->dist = *((int *)aux);
 }
 
 static void
@@ -1150,7 +1147,7 @@ static void
 set_pq_prev_vertex_dist_point_destructor(struct set_elem *const e)
 {
     struct prev_vertex *pv = SET_ENTRY(e, struct prev_vertex, elem);
-    free(PPQ_ENTRY(pv->ppq_elem, struct dist_point, ppq_elem));
+    free(PQ_ENTRY(pv->pq_elem, struct dist_point, pq_elem));
     free(pv);
 }
 

@@ -1,33 +1,29 @@
-#include "pair_pqueue.h"
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#include "pqueue.h"
 
 /*=========================  Function Prototypes   ==========================*/
 
-static struct ppq_elem *fair_merge(struct pair_pqueue *, struct ppq_elem *old,
-                                   struct ppq_elem *new);
-static void link_child(struct ppq_elem *parent, struct ppq_elem *child);
-static void init_node(struct ppq_elem *);
-static size_t traversal_size(const struct ppq_elem *);
-static bool has_valid_links(const struct pair_pqueue *,
-                            const struct ppq_elem *parent,
-                            const struct ppq_elem *child);
-static struct ppq_elem *delete(struct pair_pqueue *, struct ppq_elem *);
-static struct ppq_elem *delete_min(struct pair_pqueue *, struct ppq_elem *);
-static void clear_node(struct ppq_elem *);
-static void cut_child(struct ppq_elem *);
+static struct pq_elem *fair_merge(struct pqueue *, struct pq_elem *old,
+                                  struct pq_elem *new);
+static void link_child(struct pq_elem *parent, struct pq_elem *child);
+static void init_node(struct pq_elem *);
+static size_t traversal_size(const struct pq_elem *);
+static bool has_valid_links(const struct pqueue *, const struct pq_elem *parent,
+                            const struct pq_elem *child);
+static struct pq_elem *delete(struct pqueue *, struct pq_elem *);
+static struct pq_elem *delete_min(struct pqueue *, struct pq_elem *);
+static void clear_node(struct pq_elem *);
+static void cut_child(struct pq_elem *);
 
 /*=========================  Interface Functions   ==========================*/
 
-const struct ppq_elem *
-ppq_front(const struct pair_pqueue *const ppq)
+const struct pq_elem *
+pq_front(const struct pqueue *const ppq)
 {
     return ppq->root;
 }
 
 void
-ppq_push(struct pair_pqueue *const ppq, struct ppq_elem *const e)
+pq_push(struct pqueue *const ppq, struct pq_elem *const e)
 {
     if (!e || !ppq)
     {
@@ -38,22 +34,22 @@ ppq_push(struct pair_pqueue *const ppq, struct ppq_elem *const e)
     ++ppq->sz;
 }
 
-struct ppq_elem *
-ppq_pop(struct pair_pqueue *const ppq)
+struct pq_elem *
+pq_pop(struct pqueue *const ppq)
 {
     if (!ppq->root)
     {
         return NULL;
     }
-    struct ppq_elem *const popped = ppq->root;
+    struct pq_elem *const popped = ppq->root;
     ppq->root = delete_min(ppq, ppq->root);
     ppq->sz--;
     clear_node(popped);
     return popped;
 }
 
-struct ppq_elem *
-ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
+struct pq_elem *
+pq_erase(struct pqueue *const ppq, struct pq_elem *const e)
 {
     if (!ppq->root || !e->next_sibling || !e->prev_sibling)
     {
@@ -66,22 +62,22 @@ ppq_erase(struct pair_pqueue *const ppq, struct ppq_elem *const e)
 }
 
 void
-ppq_clear(struct pair_pqueue *const ppq, ppq_destructor_fn *fn)
+pq_clear(struct pqueue *const ppq, pq_destructor_fn *fn)
 {
-    while (!ppq_empty(ppq))
+    while (!pq_empty(ppq))
     {
-        fn(ppq_pop(ppq));
+        fn(pq_pop(ppq));
     }
 }
 
 bool
-ppq_empty(const struct pair_pqueue *const ppq)
+pq_empty(const struct pqueue *const ppq)
 {
     return !ppq->sz;
 }
 
 size_t
-ppq_size(const struct pair_pqueue *const ppq)
+pq_size(const struct pqueue *const ppq)
 {
     return ppq->sz;
 }
@@ -93,8 +89,8 @@ ppq_size(const struct pair_pqueue *const ppq)
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
 bool
-ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
-           ppq_update_fn *const fn, void *const aux)
+pq_update(struct pqueue *const ppq, struct pq_elem *const e,
+          pq_update_fn *const fn, void *const aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
     {
@@ -116,14 +112,14 @@ ppq_update(struct pair_pqueue *const ppq, struct ppq_elem *const e,
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
 bool
-ppq_increase(struct pair_pqueue *const ppq, struct ppq_elem *const e,
-             ppq_update_fn *fn, void *aux)
+pq_increase(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
+            void *aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
     {
         return false;
     }
-    if (ppq->order == PPQGRT)
+    if (ppq->order == PQGRT)
     {
         fn(e, aux);
         cut_child(e);
@@ -141,14 +137,14 @@ ppq_increase(struct pair_pqueue *const ppq, struct ppq_elem *const e,
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
 bool
-ppq_decrease(struct pair_pqueue *const ppq, struct ppq_elem *const e,
-             ppq_update_fn *fn, void *aux)
+pq_decrease(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
+            void *aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
     {
         return false;
     }
-    if (ppq->order == PPQLES)
+    if (ppq->order == PQLES)
     {
         fn(e, aux);
         cut_child(e);
@@ -164,7 +160,7 @@ ppq_decrease(struct pair_pqueue *const ppq, struct ppq_elem *const e,
 }
 
 bool
-ppq_validate(const struct pair_pqueue *const ppq)
+pq_validate(const struct pqueue *const ppq)
 {
     if (ppq->root && ppq->root->parent)
     {
@@ -181,8 +177,8 @@ ppq_validate(const struct pair_pqueue *const ppq)
     return true;
 }
 
-enum ppq_threeway_cmp
-ppq_order(const struct pair_pqueue *const ppq)
+enum pq_threeway_cmp
+pq_order(const struct pqueue *const ppq)
 {
     return ppq->order;
 }
@@ -190,20 +186,20 @@ ppq_order(const struct pair_pqueue *const ppq)
 /*========================   Static Helpers   ================================*/
 
 static void
-init_node(struct ppq_elem *e)
+init_node(struct pq_elem *e)
 {
     e->left_child = e->parent = NULL;
     e->next_sibling = e->prev_sibling = e;
 }
 
 static void
-clear_node(struct ppq_elem *e)
+clear_node(struct pq_elem *e)
 {
     e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
 }
 
 static void
-cut_child(struct ppq_elem *child)
+cut_child(struct pq_elem *child)
 {
     child->next_sibling->prev_sibling = child->prev_sibling;
     child->prev_sibling->next_sibling = child->next_sibling;
@@ -221,7 +217,7 @@ cut_child(struct ppq_elem *child)
     child->parent = NULL;
 }
 
-static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
+static struct pq_elem *delete(struct pqueue *ppq, struct pq_elem *root)
 {
     if (ppq->root == root)
     {
@@ -235,20 +231,20 @@ static struct ppq_elem *delete(struct pair_pqueue *ppq, struct ppq_elem *root)
    on the original paper's right to left one pass merge that aims at
    ensuring round robin fairness among duplicate nodes at no extra runtime
    cost. */
-static struct ppq_elem *
-delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
+static struct pq_elem *
+delete_min(struct pqueue *ppq, struct pq_elem *root)
 {
     if (!root->left_child)
     {
         return NULL;
     }
-    struct ppq_elem *const eldest = root->left_child;
-    struct ppq_elem *cur = eldest->next_sibling;
-    struct ppq_elem *accumulator = eldest;
+    struct pq_elem *const eldest = root->left_child;
+    struct pq_elem *cur = eldest->next_sibling;
+    struct pq_elem *accumulator = eldest;
     while (cur != eldest && cur->next_sibling != eldest)
     {
-        struct ppq_elem *next = cur->next_sibling;
-        struct ppq_elem *next_cur = cur->next_sibling->next_sibling;
+        struct pq_elem *next = cur->next_sibling;
+        struct pq_elem *next_cur = cur->next_sibling->next_sibling;
         next->next_sibling = next->prev_sibling = NULL;
         cur->next_sibling = cur->prev_sibling = NULL;
         accumulator = fair_merge(ppq, accumulator, fair_merge(ppq, cur, next));
@@ -267,9 +263,9 @@ delete_min(struct pair_pqueue *ppq, struct ppq_elem *root)
    child of parent and newest at back of doubly linked list. Nodes that
    are equal are therefore guaranteed to be popped in round robin order
    if these parameters are respected whenever merging occurs. */
-static struct ppq_elem *
-fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
-           struct ppq_elem *const new)
+static struct pq_elem *
+fair_merge(struct pqueue *const ppq, struct pq_elem *const old,
+           struct pq_elem *const new)
 {
     if (!old || !new || old == new)
     {
@@ -304,7 +300,7 @@ fair_merge(struct pair_pqueue *const ppq, struct ppq_elem *const old,
     fairness among duplicates. Thus, a one pass merge from left to right
     is acheived that maintains the pairing heap runtime promises. */
 static void
-link_child(struct ppq_elem *const parent, struct ppq_elem *const child)
+link_child(struct pq_elem *const parent, struct pq_elem *const child)
 {
     if (parent->left_child)
     {
@@ -326,7 +322,7 @@ link_child(struct ppq_elem *const parent, struct ppq_elem *const child)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static size_t
-traversal_size(const struct ppq_elem *const root)
+traversal_size(const struct pq_elem *const root)
 {
     if (!root)
     {
@@ -334,7 +330,7 @@ traversal_size(const struct ppq_elem *const root)
     }
     size_t sz = 0;
     bool sibling_ring_lapped = false;
-    const struct ppq_elem *cur = root;
+    const struct pq_elem *cur = root;
     while (!sibling_ring_lapped)
     {
         sz += 1 + traversal_size(cur->left_child);
@@ -345,18 +341,18 @@ traversal_size(const struct ppq_elem *const root)
 }
 
 static bool
-has_valid_links(const struct pair_pqueue *const ppq,
-                const struct ppq_elem *const parent,
-                const struct ppq_elem *const child)
+has_valid_links(const struct pqueue *const ppq,
+                const struct pq_elem *const parent,
+                const struct pq_elem *const child)
 {
     if (!child)
     {
         return true;
     }
     bool sibling_ring_lapped = false;
-    const struct ppq_elem *cur = child;
-    const enum ppq_threeway_cmp wrong_order
-        = ppq->order == PPQLES ? PPQGRT : PPQLES;
+    const struct pq_elem *cur = child;
+    const enum pq_threeway_cmp wrong_order
+        = ppq->order == PQLES ? PQGRT : PQLES;
     while (!sibling_ring_lapped)
     {
         if (!cur)

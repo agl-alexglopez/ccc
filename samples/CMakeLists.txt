@@ -13,7 +13,7 @@ target_link_libraries(graph PRIVATE
   random
   str_view
   set
-  pair_pqueue
+  pqueue
   queue
   heap_pqueue
 )
