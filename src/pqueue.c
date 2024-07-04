@@ -227,10 +227,6 @@ static struct pq_elem *delete(struct pqueue *ppq, struct pq_elem *root)
     return fair_merge(ppq, ppq->root, delete_min(ppq, root));
 }
 
-/* Performs a right to left one pass pairing merge in O(lgN) time. A variation
-   on the original paper's right to left one pass merge that aims at
-   ensuring round robin fairness among duplicate nodes at no extra runtime
-   cost. */
 static struct pq_elem *
 delete_min(struct pqueue *ppq, struct pq_elem *root)
 {
@@ -238,9 +234,9 @@ delete_min(struct pqueue *ppq, struct pq_elem *root)
     {
         return NULL;
     }
-    struct pq_elem *const eldest = root->left_child;
-    struct pq_elem *cur = eldest->next_sibling;
-    struct pq_elem *accumulator = eldest;
+    struct pq_elem *const eldest = root->left_child->next_sibling;
+    struct pq_elem *accumulator = root->left_child->next_sibling;
+    struct pq_elem *cur = root->left_child->next_sibling->next_sibling;
     while (cur != eldest && cur->next_sibling != eldest)
     {
         struct pq_elem *next = cur->next_sibling;
@@ -258,12 +254,7 @@ delete_min(struct pqueue *ppq, struct pq_elem *root)
     return root;
 }
 
-/* Merges nodes ensuring round robin fairness among duplicates. Note the
-   parameter names closely. The sibling ring is ordered by oldest as left
-   child of parent and newest at back of doubly linked list. Nodes that
-   are equal are therefore guaranteed to be popped in round robin order
-   if these parameters are respected whenever merging occurs. */
-static struct pq_elem *
+static inline struct pq_elem *
 fair_merge(struct pqueue *const ppq, struct pq_elem *const old,
            struct pq_elem *const new)
 {
@@ -280,40 +271,26 @@ fair_merge(struct pqueue *const ppq, struct pq_elem *const old,
     return old;
 }
 
-/* To ensure round robin fairiness and simplify memory access in the pairing
-   queue, the oldest sibling shall remain the left child of the parent. Newer
-   elements are tacked on to the end of the circular doubly linked list of
-   elements. Here is a simple series of adding three arbitrary elements
-   to the ring of siblings. Note that the reduced memory access of keeping
-   the oldest as left child is only possible due to the doubly linked list
-   we use to enable arbitrary erase in the heap. With a singly linked list
-   you would have to follow the original paper guidelines and lose the
-   ability for fast erase and update:
-
+/* Oldest nodes shuffle down, new drops in to replace.
          a       a       a
         ╱   ->  ╱   ->  ╱
-      ┌b┐     ┌b─c┐   ┌b─c─d┐
-      └─┘     └───┘   └─────┘
-
-    Then, when we iterate through the list in a delete min operation the
-    oldest child/sibling becomes the acumulator first ensuring round robin
-    fairness among duplicates. Thus, a one pass merge from left to right
-    is acheived that maintains the pairing heap runtime promises. */
-static void
+      ┌b┐     ┌c─b┐   ┌d─c─b┐
+      └─┘     └───┘   └─────┘ */
+static inline void
 link_child(struct pq_elem *const parent, struct pq_elem *const child)
 {
     if (parent->left_child)
     {
-        child->next_sibling = parent->left_child;
-        child->prev_sibling = parent->left_child->prev_sibling;
-        parent->left_child->prev_sibling->next_sibling = child;
-        parent->left_child->prev_sibling = child;
+        child->next_sibling = parent->left_child->next_sibling;
+        child->prev_sibling = parent->left_child;
+        parent->left_child->next_sibling->prev_sibling = child;
+        parent->left_child->next_sibling = child;
     }
     else
     {
-        parent->left_child = child;
         child->next_sibling = child->prev_sibling = child;
     }
+    parent->left_child = child;
     child->parent = parent;
 }
 
@@ -360,6 +337,10 @@ has_valid_links(const struct pqueue *const ppq,
             return false;
         }
         if (parent && child->parent != parent)
+        {
+            return false;
+        }
+        if (parent && parent->left_child != child->parent->left_child)
         {
             return false;
         }

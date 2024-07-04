@@ -191,25 +191,34 @@ static enum test_result
 pq_test_min_round_robin(void)
 {
     struct pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
-    const int size = 50;
+    const int size = 6;
     struct val vals[size];
-    vals[0].id = 99;
-    vals[0].val = 99;
-    pq_push(&ppq, &vals[0].elem);
-    for (int i = 1; i < size; ++i)
+    const struct val order[6] = {
+        {.id = 0, .val = 1},  {.id = 2, .val = 1},  {.id = 4, .val = 1},
+        {.id = 1, .val = 99}, {.id = 3, .val = 99}, {.id = 5, .val = 99},
+    };
+    for (int i = 0; i < size; ++i)
     {
-        vals[i].val = 1;
+        if (i % 2)
+        {
+            vals[i].val = 99;
+        }
+        else
+        {
+            vals[i].val = 1;
+        }
         vals[i].id = i;
         pq_push(&ppq, &vals[i].elem);
         CHECK(pq_validate(&ppq), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
-    int last_id = 0;
+    size_t i = 0;
     while (!pq_empty(&ppq))
     {
         const struct val *front = PQ_ENTRY(pq_pop(&ppq), struct val, elem);
-        CHECK(last_id < front->id, true, bool, "%b");
-        last_id = front->id;
+        CHECK(front->id, order[i].id, int, "%d");
+        CHECK(front->val, order[i].val, int, "%d");
+        ++i;
     }
     return PASS;
 }
