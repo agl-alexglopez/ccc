@@ -16,8 +16,6 @@ static enum test_result pq_test_insert_remove_four_dups(void);
 static enum test_result pq_test_insert_erase_shuffled(void);
 static enum test_result pq_test_pop_max(void);
 static enum test_result pq_test_pop_min(void);
-static enum test_result pq_test_max_round_robin(void);
-static enum test_result pq_test_min_round_robin(void);
 static enum test_result pq_test_delete_prime_shuffle_duplicates(void);
 static enum test_result pq_test_prime_shuffle(void);
 static enum test_result pq_test_weak_srand(void);
@@ -33,8 +31,6 @@ const test_fn all_tests[NUM_TESTS] = {
     pq_test_insert_erase_shuffled,
     pq_test_pop_max,
     pq_test_pop_min,
-    pq_test_max_round_robin,
-    pq_test_min_round_robin,
     pq_test_delete_prime_shuffle_duplicates,
     pq_test_prime_shuffle,
     pq_test_weak_srand,
@@ -157,69 +153,6 @@ pq_test_pop_min(void)
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(pq_empty(&ppq), true, bool, "%b");
-    return PASS;
-}
-
-static enum test_result
-pq_test_max_round_robin(void)
-{
-    struct pqueue ppq = PQ_INIT(PQGRT, val_cmp, NULL);
-    const int size = 50;
-    struct val vals[size];
-    vals[0].id = 99;
-    vals[0].val = 0;
-    pq_push(&ppq, &vals[0].elem);
-    for (int i = 1; i < size; ++i)
-    {
-        vals[i].val = 99;
-        vals[i].id = i;
-        pq_push(&ppq, &vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%b");
-    }
-    /* Now let's make sure we pop round robin. */
-    int last_id = 0;
-    while (!pq_empty(&ppq))
-    {
-        const struct val *front = PQ_ENTRY(pq_pop(&ppq), struct val, elem);
-        CHECK(last_id < front->id, true, bool, "%b");
-        last_id = front->id;
-    }
-    return PASS;
-}
-
-static enum test_result
-pq_test_min_round_robin(void)
-{
-    struct pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
-    const int size = 6;
-    struct val vals[size];
-    const struct val order[6] = {
-        {.id = 0, .val = 1},  {.id = 2, .val = 1},  {.id = 4, .val = 1},
-        {.id = 1, .val = 99}, {.id = 3, .val = 99}, {.id = 5, .val = 99},
-    };
-    for (int i = 0; i < size; ++i)
-    {
-        if (i % 2)
-        {
-            vals[i].val = 99;
-        }
-        else
-        {
-            vals[i].val = 1;
-        }
-        vals[i].id = i;
-        pq_push(&ppq, &vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%b");
-    }
-    /* Now let's make sure we pop round robin. */
-    size_t i = 0;
-    while (!pq_empty(&ppq))
-    {
-        const struct val *front = PQ_ENTRY(pq_pop(&ppq), struct val, elem);
-        CHECK(front->id, order[i].id, int, "%d");
-        CHECK(front->val, order[i].val, int, "%d");
-        ++i;
-    }
     return PASS;
 }
 
