@@ -253,11 +253,10 @@ depq_test_priority_valid_range(void)
     const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     const struct depq_rrange rev_range
         = depq_equal_rrange(&pq, &b.elem, &e.elem);
-    CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val
-                  == rev_range_vals[0]
-              && DEPQ_ENTRY(depq_end_rrange(&rev_range), struct val, elem)->val
-                     == rev_range_vals[7],
-          true, bool, "%b");
+    CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val,
+          rev_range_vals[0], int, "%d");
+    CHECK(DEPQ_ENTRY(depq_end_rrange(&rev_range), struct val, elem)->val,
+          rev_range_vals[7], int, "%d");
     size_t index = 0;
     struct depq_elem *i1 = depq_begin_rrange(&rev_range);
     for (; i1 != depq_end_rrange(&rev_range); i1 = depq_rnext(&pq, i1))
@@ -266,9 +265,8 @@ depq_test_priority_valid_range(void)
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i1 == depq_end_rrange(&rev_range)
-              && DEPQ_ENTRY(i1, struct val, elem)->val == rev_range_vals[7],
-          true, bool, "%b");
+    CHECK(i1 == depq_end_rrange(&rev_range), true, bool, "%b");
+    CHECK(DEPQ_ENTRY(i1, struct val, elem)->val, rev_range_vals[7], int, "%d");
     b.val = 119;
     e.val = 84;
     /* This should be the following range [119,84). 119 should be
@@ -276,11 +274,10 @@ depq_test_priority_valid_range(void)
        be dropped to first value less than 84. */
     const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     const struct depq_range range = depq_equal_range(&pq, &b.elem, &e.elem);
-    CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val
-                  == range_vals[0]
-              && DEPQ_ENTRY(depq_end_range(&range), struct val, elem)->val
-                     == range_vals[7],
-          true, bool, "%b");
+    CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val,
+          range_vals[0], int, "%d");
+    CHECK(DEPQ_ENTRY(depq_end_range(&range), struct val, elem)->val,
+          range_vals[7], int, "%d");
     index = 0;
     struct depq_elem *i2 = depq_begin_range(&range);
     for (; i2 != depq_end_range(&range); i2 = depq_next(&pq, i2))
@@ -289,9 +286,8 @@ depq_test_priority_valid_range(void)
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
-    CHECK(i2 == depq_end_range(&range)
-              && DEPQ_ENTRY(i2, struct val, elem)->val == range_vals[7],
-          true, bool, "%b");
+    CHECK(i2 == depq_end_range(&range), true, bool, "%b");
+    CHECK(DEPQ_ENTRY(i2, struct val, elem)->val, range_vals[7], int, "%d");
     return PASS;
 }
 
@@ -318,10 +314,9 @@ depq_test_priority_invalid_range(void)
     const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
     const struct depq_rrange rev_range
         = depq_equal_rrange(&pq, &b.elem, &e.elem);
-    CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val
-                  == rev_range_vals[0]
-              && depq_end_rrange(&rev_range) == depq_end(&pq),
-          true, bool, "%b");
+    CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val,
+          rev_range_vals[0], int, "%d");
+    CHECK(depq_end_rrange(&rev_range) == depq_end(&pq), true, bool, "%b");
     size_t index = 0;
     struct depq_elem *i1 = depq_begin_rrange(&rev_range);
     for (; i1 != depq_end_rrange(&rev_range); i1 = depq_rnext(&pq, i1))
@@ -339,10 +334,9 @@ depq_test_priority_invalid_range(void)
        be dropped to first value less than -999 which is end. */
     const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     const struct depq_range range = depq_equal_range(&pq, &b.elem, &e.elem);
-    CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val
-                  == range_vals[0]
-              && depq_end_range(&range) == depq_end(&pq),
-          true, bool, "%b");
+    CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val,
+          range_vals[0], int, "%d");
+    CHECK(depq_end_range(&range) == depq_end(&pq), true, bool, "%b");
     index = 0;
     struct depq_elem *i2 = depq_begin_range(&range);
     for (; i2 != depq_end_range(&range); i2 = depq_next(&pq, i2))
@@ -378,19 +372,17 @@ depq_test_priority_empty_range(void)
     struct val e = {.id = 0, .val = -25};
     const struct depq_rrange rev_range
         = depq_equal_rrange(&pq, &b.elem, &e.elem);
-    CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val
-                  == vals[0].val
-              && DEPQ_ENTRY(depq_end_rrange(&rev_range), struct val, elem)->val
-                     == vals[0].val,
-          true, bool, "%b");
+    CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val,
+          vals[0].val, int, "%d");
+    CHECK(DEPQ_ENTRY(depq_end_rrange(&rev_range), struct val, elem)->val,
+          vals[0].val, int, "%d");
     b.val = 150;
     e.val = 999;
     const struct depq_range range = depq_equal_range(&pq, &b.elem, &e.elem);
-    CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val
-                  == vals[num_nodes - 1].val
-              && DEPQ_ENTRY(depq_end_range(&range), struct val, elem)->val
-                     == vals[num_nodes - 1].val,
-          true, bool, "%b");
+    CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val,
+          vals[num_nodes - 1].val, int, "%d");
+    CHECK(DEPQ_ENTRY(depq_end_range(&range), struct val, elem)->val,
+          vals[num_nodes - 1].val, int, "%d");
     return PASS;
 }
 
