@@ -92,7 +92,7 @@ hpq_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         const struct val *get
-            = hpq_entry(&tester_clone[i].elem, struct val, elem);
+            = HPQ_ENTRY(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(hpq_size(&pq), 10ULL, size_t, "%zu");
@@ -120,8 +120,8 @@ static enum heap_pq_threeway_cmp
 val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = hpq_entry(a, struct val, elem);
-    struct val *rhs = hpq_entry(b, struct val, elem);
+    struct val *lhs = HPQ_ENTRY(a, struct val, elem);
+    struct val *rhs = HPQ_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -136,7 +136,7 @@ hpq_test_insert_shuffle(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = hpq_entry(hpq_front(&pq), struct val, elem);
+    const struct val *min = HPQ_ENTRY(hpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -161,7 +161,7 @@ hpq_test_read_max_min(void)
         CHECK(hpq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(hpq_size(&pq), 10ULL, size_t, "%zu");
-    const struct val *min = hpq_entry(hpq_front(&pq), struct val, elem);
+    const struct val *min = HPQ_ENTRY(hpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -202,7 +202,7 @@ inorder_fill(int vals[], size_t size, struct heap_pqueue *hpq)
     while (!hpq_empty(hpq) && i < size)
     {
         struct hpq_elem *const front = hpq_pop(hpq);
-        vals[i++] = hpq_entry(front, struct val, elem)->val;
+        vals[i++] = HPQ_ENTRY(front, struct val, elem)->val;
         hpq_push(&copy, front);
     }
     while (!hpq_empty(&copy))

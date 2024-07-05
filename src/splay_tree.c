@@ -19,7 +19,7 @@
       for any binary tree code which I have been working on for a while and
       think is quite helpful!
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
-#include "pqueue.h"
+#include "depqueue.h"
 #include "set.h"
 #include "tree.h"
 
@@ -55,7 +55,6 @@ const enum tree_link reverse_inorder_traversal = R;
 
 /* =======================        Prototypes         ====================== */
 
-static void init_tree(struct tree *, tree_cmp_fn *, void *);
 static void init_node(struct tree *, struct node *);
 static bool empty(const struct tree *);
 static void multiset_insert(struct tree *, struct node *);
@@ -107,17 +106,11 @@ static struct node *rrange_end(const struct rrange *);
 /* ======================  Priority Queue Interface  ====================== */
 
 void
-pq_init(struct pqueue *pq, pq_cmp_fn *fn, void *aux)
+depq_clear(struct depqueue *pq, depq_destructor_fn *destructor)
 {
-    init_tree(&pq->t, (tree_cmp_fn *)fn, aux);
-}
-
-void
-pq_clear(struct pqueue *pq, pq_destructor_fn *destructor)
-{
-    while (!pq_empty(pq))
+    while (!depq_empty(pq))
     {
-        struct pq_elem *e = pq_pop_max(pq);
+        struct depq_elem *e = depq_pop_max(pq);
         if (e)
         {
             destructor(e);
@@ -126,112 +119,114 @@ pq_clear(struct pqueue *pq, pq_destructor_fn *destructor)
 }
 
 bool
-pq_empty(const struct pqueue *const pq)
+depq_empty(const struct depqueue *const pq)
 {
     return empty(&pq->t);
 }
 
-struct pq_elem *
-pq_root(const struct pqueue *const pq)
+struct depq_elem *
+depq_root(const struct depqueue *const pq)
 {
-    return (struct pq_elem *)root(&pq->t);
+    return (struct depq_elem *)root(&pq->t);
 }
 
-struct pq_elem *
-pq_max(struct pqueue *const pq)
+struct depq_elem *
+depq_max(struct depqueue *const pq)
 {
-    return (struct pq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
-                                   force_find_grt);
+    return (struct depq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
+                                     force_find_grt);
 }
 
-const struct pq_elem *
-pq_const_max(const struct pqueue *const pq)
+const struct depq_elem *
+depq_const_max(const struct depqueue *const pq)
 {
-    return (struct pq_elem *)max(&pq->t);
-}
-
-bool
-pq_is_max(struct pqueue *const pq, struct pq_elem *const e)
-{
-    return pq_rnext(pq, e) == (struct pq_elem *)&pq->t.end;
-}
-
-struct pq_elem *
-pq_min(struct pqueue *const pq)
-{
-    return (struct pq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
-                                   force_find_les);
-}
-
-const struct pq_elem *
-pq_const_min(const struct pqueue *const pq)
-{
-    return (struct pq_elem *)min(&pq->t);
+    return (struct depq_elem *)max(&pq->t);
 }
 
 bool
-pq_is_min(struct pqueue *const pq, struct pq_elem *const e)
+depq_is_max(struct depqueue *const pq, struct depq_elem *const e)
 {
-    return pq_next(pq, e) == (struct pq_elem *)&pq->t.end;
+    return depq_rnext(pq, e) == (struct depq_elem *)&pq->t.end;
 }
 
-struct pq_elem *
-pq_begin(struct pqueue *pq)
+struct depq_elem *
+depq_min(struct depqueue *const pq)
 {
-    return (struct pq_elem *)max(&pq->t);
+    return (struct depq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
+                                     force_find_les);
 }
 
-struct pq_elem *
-pq_rbegin(struct pqueue *pq)
+const struct depq_elem *
+depq_const_min(const struct depqueue *const pq)
 {
-    return (struct pq_elem *)min(&pq->t);
+    return (struct depq_elem *)min(&pq->t);
 }
 
-struct pq_elem *
-pq_end(struct pqueue *pq)
+bool
+depq_is_min(struct depqueue *const pq, struct depq_elem *const e)
 {
-    return (struct pq_elem *)&pq->t.end;
+    return depq_next(pq, e) == (struct depq_elem *)&pq->t.end;
 }
 
-struct pq_elem *
-pq_next(struct pqueue *pq, struct pq_elem *i)
+struct depq_elem *
+depq_begin(struct depqueue *pq)
 {
-    return (struct pq_elem *)multiset_next(&pq->t, &i->n,
-                                           reverse_inorder_traversal);
+    return (struct depq_elem *)max(&pq->t);
 }
 
-struct pq_elem *
-pq_rnext(struct pqueue *pq, struct pq_elem *i)
+struct depq_elem *
+depq_rbegin(struct depqueue *pq)
 {
-    return (struct pq_elem *)multiset_next(&pq->t, &i->n, inorder_traversal);
+    return (struct depq_elem *)min(&pq->t);
 }
 
-struct pq_range
-pq_equal_range(struct pqueue *pq, struct pq_elem *begin, struct pq_elem *end)
+struct depq_elem *
+depq_end(struct depqueue *pq)
 {
-    return (struct pq_range){
+    return (struct depq_elem *)&pq->t.end;
+}
+
+struct depq_elem *
+depq_next(struct depqueue *pq, struct depq_elem *i)
+{
+    return (struct depq_elem *)multiset_next(&pq->t, &i->n,
+                                             reverse_inorder_traversal);
+}
+
+struct depq_elem *
+depq_rnext(struct depqueue *pq, struct depq_elem *i)
+{
+    return (struct depq_elem *)multiset_next(&pq->t, &i->n, inorder_traversal);
+}
+
+struct depq_range
+depq_equal_range(struct depqueue *pq, struct depq_elem *begin,
+                 struct depq_elem *end)
+{
+    return (struct depq_range){
         equal_range(&pq->t, &begin->n, &end->n, reverse_inorder_traversal),
     };
 }
 
-struct pq_elem *
-pq_begin_range(const struct pq_range *const r)
+struct depq_elem *
+depq_begin_range(const struct depq_range *const r)
 {
-    return (struct pq_elem *)range_begin(&r->r);
+    return (struct depq_elem *)range_begin(&r->r);
 }
 
-struct pq_elem *
-pq_end_range(const struct pq_range *const r)
+struct depq_elem *
+depq_end_range(const struct depq_range *const r)
 {
-    return (struct pq_elem *)range_end(&r->r);
+    return (struct depq_elem *)range_end(&r->r);
 }
 
-struct pq_rrange
-pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend)
+struct depq_rrange
+depq_equal_rrange(struct depqueue *pq, struct depq_elem *rbegin,
+                  struct depq_elem *rend)
 {
     const struct range ret
         = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal);
-    return (struct pq_rrange){
+    return (struct depq_rrange){
         .r = (struct rrange){
             .rbegin =ret.begin,
             .end = ret.end,
@@ -239,28 +234,28 @@ pq_equal_rrange(struct pqueue *pq, struct pq_elem *rbegin, struct pq_elem *rend)
     };
 }
 
-struct pq_elem *
-pq_begin_rrange(const struct pq_rrange *const rr)
+struct depq_elem *
+depq_begin_rrange(const struct depq_rrange *const rr)
 {
-    return (struct pq_elem *)rrange_begin(&rr->r);
+    return (struct depq_elem *)rrange_begin(&rr->r);
 }
 
-struct pq_elem *
-pq_end_rrange(const struct pq_rrange *const rr)
+struct depq_elem *
+depq_end_rrange(const struct depq_rrange *const rr)
 {
-    return (struct pq_elem *)rrange_end(&rr->r);
+    return (struct depq_elem *)rrange_end(&rr->r);
 }
 
 void
-pq_push(struct pqueue *pq, struct pq_elem *elem)
+depq_push(struct depqueue *pq, struct depq_elem *elem)
 {
     multiset_insert(&pq->t, &elem->n);
 }
 
-struct pq_elem *
-pq_erase(struct pqueue *pq, struct pq_elem *elem)
+struct depq_elem *
+depq_erase(struct depqueue *pq, struct depq_elem *elem)
 {
-    struct pq_elem *ret = pq_next(pq, elem);
+    struct depq_elem *ret = depq_next(pq, elem);
     if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
     {
         (void)fprintf(stderr,
@@ -270,10 +265,10 @@ pq_erase(struct pqueue *pq, struct pq_elem *elem)
     return ret;
 }
 
-struct pq_elem *
-pq_rerase(struct pqueue *pq, struct pq_elem *elem)
+struct depq_elem *
+depq_rerase(struct depqueue *pq, struct depq_elem *elem)
 {
-    struct pq_elem *ret = pq_rnext(pq, elem);
+    struct depq_elem *ret = depq_rnext(pq, elem);
     if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
     {
         (void)fprintf(stderr,
@@ -284,14 +279,16 @@ pq_rerase(struct pqueue *pq, struct pq_elem *elem)
 }
 
 bool
-pq_update(struct pqueue *pq, struct pq_elem *elem, pq_update_fn *fn, void *aux)
+depq_update(struct depqueue *pq, struct depq_elem *elem, depq_update_fn *fn,
+            void *aux)
 {
     if (NULL == elem->n.link[L] || NULL == elem->n.link[R])
     {
         return false;
     }
-    struct pq_elem *e = (struct pq_elem *)multiset_erase_node(&pq->t, &elem->n);
-    if (e == (struct pq_elem *)&pq->t.end)
+    struct depq_elem *e
+        = (struct depq_elem *)multiset_erase_node(&pq->t, &elem->n);
+    if (e == (struct depq_elem *)&pq->t.end)
     {
         return false;
     }
@@ -301,49 +298,43 @@ pq_update(struct pqueue *pq, struct pq_elem *elem, pq_update_fn *fn, void *aux)
 }
 
 bool
-pq_contains(struct pqueue *pq, struct pq_elem *elem)
+depq_contains(struct depqueue *pq, struct depq_elem *elem)
 {
     return contains(&pq->t, &elem->n);
 }
 
-struct pq_elem *
-pq_pop_max(struct pqueue *pq)
+struct depq_elem *
+depq_pop_max(struct depqueue *pq)
 {
-    return (struct pq_elem *)pop_max(&pq->t);
+    return (struct depq_elem *)pop_max(&pq->t);
 }
 
-struct pq_elem *
-pq_pop_min(struct pqueue *pq)
+struct depq_elem *
+depq_pop_min(struct depqueue *pq)
 {
-    return (struct pq_elem *)pop_min(&pq->t);
+    return (struct depq_elem *)pop_min(&pq->t);
 }
 
 size_t
-pq_size(struct pqueue *const pq)
+depq_size(struct depqueue *const pq)
 {
     return pq->t.size;
 }
 
 bool
-pq_has_dups(struct pqueue *const pq, struct pq_elem *e)
+pq_has_dups(struct depqueue *const pq, struct depq_elem *e)
 {
     return has_dups(&pq->t.end, &e->n);
 }
 
 void
-pq_print(const struct pqueue *const pq, const struct pq_elem *const start,
-         pq_print_fn *const fn)
+depq_print(const struct depqueue *const pq, const struct depq_elem *const start,
+           depq_print_fn *const fn)
 {
     print_tree(&pq->t, &start->n, (node_print_fn *)fn);
 }
 
 /* ======================        Set Interface       ====================== */
-
-void
-set_init(struct set *const s, set_cmp_fn *const fn, void *const aux)
-{
-    init_tree(&s->t, (tree_cmp_fn *)fn, aux);
-}
 
 void
 set_clear(struct set *set, set_destructor_fn *destructor)
@@ -570,18 +561,6 @@ set_print(const struct set *const s, const struct set_elem *const root,
 */
 
 static void
-init_tree(struct tree *const t, tree_cmp_fn *const fn, void *const aux)
-{
-    t->root = &t->end;
-    t->root->parent_or_dups = &t->end;
-    t->root->link[L] = &t->end;
-    t->root->link[R] = &t->end;
-    t->cmp = fn;
-    t->size = 0;
-    t->aux = aux;
-}
-
-static void
 init_node(struct tree *t, struct node *n)
 {
     n->link[L] = &t->end;
@@ -737,23 +716,17 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
     if (n->link[!traversal] != &t->end)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        n = n->link[!traversal];
-        while (n->link[traversal] != &t->end)
-        {
-            n = n->link[traversal];
-        }
+        for (n = n->link[!traversal]; n->link[traversal] != &t->end;
+             n = n->link[traversal])
+        {}
         return n;
     }
     /* A leaf. Work our way back up skpping nodes we already visited. */
     struct node *p = get_parent(t, n);
-    while (p->link[!traversal] == n)
-    {
-        n = p;
-        p = get_parent(t, p);
-    }
+    for (; p->link[!traversal] == n; n = p, p = get_parent(t, p))
+    {}
     /* This is where the end node is helpful. We get to it eventually. */
-    n = p;
-    return n;
+    return p;
 }
 
 static struct range

@@ -47,8 +47,7 @@ main()
 static enum test_result
 set_test_prime_shuffle(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     const size_t size = 50;
     const size_t prime = 53;
     const size_t less = 10;
@@ -70,7 +69,7 @@ set_test_prime_shuffle(void)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    set_print(&s, (struct set_elem *)s.t.root, set_printer_fn);
+    set_print(&s, set_root(&s), set_printer_fn);
     CHECK(set_size(&s) < size, true, bool, "%b");
     for (size_t i = 0; i < size; ++i)
     {
@@ -84,8 +83,7 @@ set_test_prime_shuffle(void)
 static enum test_result
 set_test_insert_erase_shuffled(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     const size_t size = 50;
     const int prime = 53;
     struct val vals[size];
@@ -109,8 +107,7 @@ set_test_insert_erase_shuffled(void)
 static enum test_result
 set_test_weak_srand(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -164,7 +161,7 @@ inorder_fill(int vals[], size_t size, struct set *s)
     size_t i = 0;
     for (struct set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
     {
-        vals[i++] = set_entry(e, struct val, elem)->val;
+        vals[i++] = SET_ENTRY(e, struct val, elem)->val;
     }
     return i;
 }
@@ -173,14 +170,14 @@ static node_threeway_cmp
 val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = set_entry(a, struct val, elem);
-    struct val *rhs = set_entry(b, struct val, elem);
+    struct val *lhs = SET_ENTRY(a, struct val, elem);
+    struct val *rhs = SET_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 set_printer_fn(const struct set_elem *const e) // NOLINT
 {
-    const struct val *const v = set_entry(e, struct val, elem);
+    const struct val *const v = SET_ENTRY(e, struct val, elem);
     printf("{id:%d,val:%d}", v->id, v->val);
 }

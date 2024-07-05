@@ -10,6 +10,8 @@
 #ifndef TREE
 #define TREE
 
+#include "attrib.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -81,17 +83,25 @@ struct tree
    the traversal orders. */
 struct range
 {
-    struct node *const begin;
-    struct node *const end;
+    struct node *const begin ATTRIB_PRIVATE;
+    struct node *const end ATTRIB_PRIVATE;
 };
 
 struct rrange
 {
-    struct node *const rbegin;
-    struct node *const end;
+    struct node *const rbegin ATTRIB_PRIVATE;
+    struct node *const end ATTRIB_PRIVATE;
 };
 
 typedef void node_print_fn(const struct node *);
+
+#define TREE_INIT(TREE_NAME, CMP, AUX)                                         \
+    {                                                                          \
+        .root = &(TREE_NAME).t.end,                                            \
+        .end = {.link = {&(TREE_NAME).t.end, &(TREE_NAME).t.end},              \
+                .parent_or_dups = &(TREE_NAME).t.end},                         \
+        .cmp = (tree_cmp_fn *)(CMP), .aux = (AUX), .size = 0                   \
+    }
 
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of

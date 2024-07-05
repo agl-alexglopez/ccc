@@ -36,8 +36,7 @@ main()
 static enum test_result
 set_test_empty(void)
 {
-    struct set s;
-    set_init(&s, val_cmp, NULL);
+    struct set s = SET_INIT(s, val_cmp, NULL);
     CHECK(set_empty(&s), true, bool, "%b");
     return PASS;
 }
@@ -46,7 +45,7 @@ static node_threeway_cmp
 val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = set_entry(a, struct val, elem);
-    struct val *rhs = set_entry(b, struct val, elem);
+    struct val *lhs = SET_ENTRY(a, struct val, elem);
+    struct val *rhs = SET_ENTRY(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
