@@ -19,7 +19,7 @@ struct val
 
 const size_t step = 100000;
 const size_t end_size = 1100000;
-const int max_range = 999999;
+const int max_rand_range = RAND_MAX;
 
 typedef void (*depq_perf_fn)(void);
 
@@ -105,8 +105,8 @@ test_push(void)
         struct val *val_array = create_rand_vals(n);
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
+        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -318,7 +318,7 @@ test_pop_intermittent_push(void)
                 = DEPQ_ENTRY(depq_pop_min(&depq), struct val, depq_elem);
             if (i % 10 == 0)
             {
-                v->val = rand_range(0, max_range);
+                v->val = rand_range(0, max_rand_range);
                 depq_push(&depq, &v->depq_elem);
             }
         }
@@ -334,7 +334,7 @@ test_pop_intermittent_push(void)
             struct val *v = HPQ_ENTRY(hpq_pop(&hpq), struct val, hpq_elem);
             if (i % 10 == 0)
             {
-                v->val = rand_range(0, max_range);
+                v->val = rand_range(0, max_rand_range);
                 hpq_push(&hpq, &v->hpq_elem);
             }
         }
@@ -350,7 +350,7 @@ test_pop_intermittent_push(void)
             struct val *v = PQ_ENTRY(pq_pop(&pq), struct val, pq_elem);
             if (i % 10 == 0)
             {
-                v->val = rand_range(0, max_range);
+                v->val = rand_range(0, max_rand_range);
                 pq_push(&pq, &v->pq_elem);
             }
         }
@@ -383,7 +383,7 @@ test_update(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            int new_val = rand_range(0, max_range);
+            int new_val = rand_range(0, max_rand_range);
             (void)depq_update(&depq, &val_array[i].depq_elem, depq_update_val,
                               &new_val);
         }
@@ -396,7 +396,7 @@ test_update(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            int new_val = rand_range(0, max_range);
+            int new_val = rand_range(0, max_rand_range);
             (void)hpq_update(&hpq, &val_array[i].hpq_elem, hpq_update_val,
                              &new_val);
         }
@@ -431,7 +431,7 @@ create_rand_vals(size_t n)
     struct val *vals = valid_malloc(n * sizeof(struct val));
     while (n--)
     {
-        vals[n].val = rand_range(0, max_range);
+        vals[n].val = rand_range(0, max_rand_range);
     }
     return vals;
 }
