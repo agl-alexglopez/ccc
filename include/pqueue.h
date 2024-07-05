@@ -30,11 +30,12 @@ struct pq_elem
     struct pq_elem *parent;
 };
 
-/* Functions that require comparisons between elements take a pointer to
-   a user defined callback function. This function should determine how
-   the structs the user creates are compared. */
-typedef enum pq_threeway_cmp ppq_cmp_fn(const struct pq_elem *,
-                                        const struct pq_elem *, void *);
+/* Signature for a user defined comparison function between two user defined
+   structs. Given two valid pointers to elements in the priority queue and any
+   auxilliary data necessary for comparison, return the resulting three way
+   comparison for the user struct values. */
+typedef enum pq_threeway_cmp pq_cmp_fn(const struct pq_elem *,
+                                       const struct pq_elem *, void *);
 
 /* A function type to aid in deallocation of the priority queue. The user may
    define a destructor function that will act on each element for clearing
@@ -60,7 +61,7 @@ struct pqueue
 {
     struct pq_elem *root;
     size_t sz;
-    ppq_cmp_fn *cmp;
+    pq_cmp_fn *cmp;
     enum pq_threeway_cmp order;
     void *aux;
 };
