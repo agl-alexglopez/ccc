@@ -173,27 +173,36 @@ depq_test_pop_min(void)
 static enum test_result
 depq_test_max_round_robin(void)
 {
-    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
-    const int size = 50;
+    struct depqueue depq = DEPQ_INIT(depq, val_cmp, NULL);
+    const int size = 6;
     struct val vals[size];
-    vals[0].id = 99;
-    vals[0].val = 0;
-    depq_push(&pq, &vals[0].elem);
-    for (int i = 1; i < size; ++i)
+    const struct val order[6] = {
+        {.id = 0, .val = 99}, {.id = 2, .val = 99}, {.id = 4, .val = 99},
+        {.id = 1, .val = 1},  {.id = 3, .val = 1},  {.id = 5, .val = 1},
+    };
+    for (int i = 0; i < size; ++i)
     {
-        vals[i].val = 99;
+        if (i % 2)
+        {
+            vals[i].val = 1;
+        }
+        else
+        {
+            vals[i].val = 99;
+        }
         vals[i].id = i;
-        depq_push(&pq, &vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%b");
+        depq_push(&depq, &vals[i].elem);
+        CHECK(validate_tree(&depq.t), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
-    int last_id = 0;
-    while (!depq_empty(&pq))
+    size_t i = 0;
+    while (!depq_empty(&depq))
     {
         const struct val *front
-            = DEPQ_ENTRY(depq_pop_max(&pq), struct val, elem);
-        CHECK(last_id < front->id, true, bool, "%b");
-        last_id = front->id;
+            = DEPQ_ENTRY(depq_pop_max(&depq), struct val, elem);
+        CHECK(front->id, order[i].id, int, "%d");
+        CHECK(front->val, order[i].val, int, "%d");
+        ++i;
     }
     return PASS;
 }
@@ -201,27 +210,36 @@ depq_test_max_round_robin(void)
 static enum test_result
 depq_test_min_round_robin(void)
 {
-    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
-    const int size = 50;
+    struct depqueue depq = DEPQ_INIT(depq, val_cmp, NULL);
+    const int size = 6;
     struct val vals[size];
-    vals[0].id = 99;
-    vals[0].val = 99;
-    depq_push(&pq, &vals[0].elem);
-    for (int i = 1; i < size; ++i)
+    const struct val order[6] = {
+        {.id = 0, .val = 1},  {.id = 2, .val = 1},  {.id = 4, .val = 1},
+        {.id = 1, .val = 99}, {.id = 3, .val = 99}, {.id = 5, .val = 99},
+    };
+    for (int i = 0; i < size; ++i)
     {
-        vals[i].val = 1;
+        if (i % 2)
+        {
+            vals[i].val = 99;
+        }
+        else
+        {
+            vals[i].val = 1;
+        }
         vals[i].id = i;
-        depq_push(&pq, &vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%b");
+        depq_push(&depq, &vals[i].elem);
+        CHECK(validate_tree(&depq.t), true, bool, "%b");
     }
     /* Now let's make sure we pop round robin. */
-    int last_id = 0;
-    while (!depq_empty(&pq))
+    size_t i = 0;
+    while (!depq_empty(&depq))
     {
         const struct val *front
-            = DEPQ_ENTRY(depq_pop_min(&pq), struct val, elem);
-        CHECK(last_id < front->id, true, bool, "%b");
-        last_id = front->id;
+            = DEPQ_ENTRY(depq_pop_min(&depq), struct val, elem);
+        CHECK(front->id, order[i].id, int, "%d");
+        CHECK(front->val, order[i].val, int, "%d");
+        ++i;
     }
     return PASS;
 }
