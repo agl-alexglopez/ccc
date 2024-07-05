@@ -716,23 +716,17 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
     if (n->link[!traversal] != &t->end)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        n = n->link[!traversal];
-        while (n->link[traversal] != &t->end)
-        {
-            n = n->link[traversal];
-        }
+        for (n = n->link[!traversal]; n->link[traversal] != &t->end;
+             n = n->link[traversal])
+        {}
         return n;
     }
     /* A leaf. Work our way back up skpping nodes we already visited. */
     struct node *p = get_parent(t, n);
-    while (p->link[!traversal] == n)
-    {
-        n = p;
-        p = get_parent(t, p);
-    }
+    for (; p->link[!traversal] == n; n = p, p = get_parent(t, p))
+    {}
     /* This is where the end node is helpful. We get to it eventually. */
-    n = p;
-    return n;
+    return p;
 }
 
 static struct range
