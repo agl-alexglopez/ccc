@@ -1,7 +1,7 @@
 add_library(test INTERFACE test.h)
 
 add_executable(run_tests run_tests.c)
-target_link_libraries(run_tests PRIVATE str_view test)
+target_link_libraries(run_tests PRIVATE str_view::str_view test)
 
 ###########   Add Test Files Below This Point   ###########
 
@@ -100,6 +100,6 @@ target_link_libraries(perf PRIVATE
   heap_pqueue
   pqueue
   random
-  str_view
+  str_view::str_view
   cli
 )

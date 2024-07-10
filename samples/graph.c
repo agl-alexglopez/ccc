@@ -3,7 +3,7 @@
 #include "queue.h"
 #include "random.h"
 #include "set.h"
-#include "str_view.h"
+#include "str_view/str_view.h"
 
 #include <alloca.h>
 #include <assert.h>

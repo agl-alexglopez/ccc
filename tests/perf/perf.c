@@ -3,7 +3,7 @@
 #include "heap_pqueue.h"
 #include "pqueue.h"
 #include "random.h"
-#include "str_view.h"
+#include "str_view/str_view.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -9,7 +9,7 @@
 #include "depqueue.h"
 #include "random.h"
 #include "set.h"
-#include "str_view.h"
+#include "str_view/str_view.h"
 
 #include <assert.h>
 #include <limits.h>

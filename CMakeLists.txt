@@ -3,6 +3,8 @@ project(splay-tree-lib VERSION 1.0 LANGUAGES C)
 
 include(etc/scanners.cmake)
 
+find_package(str_view)
+
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/lib")
