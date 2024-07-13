@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,10 +117,10 @@ static bool can_build_new_square(const struct maze *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(const struct maze *);
-static node_threeway_cmp cmp_priority_cells(const struct depq_elem *,
-                                            const struct depq_elem *, void *);
-static node_threeway_cmp cmp_points(const struct set_elem *,
-                                    const struct set_elem *, void *);
+static dpq_threeway_cmp cmp_priority_cells(const struct depq_elem *,
+                                           const struct depq_elem *, void *);
+static set_threeway_cmp cmp_points(const struct set_elem *,
+                                   const struct set_elem *, void *);
 static void set_destructor(struct set_elem *);
 static struct int_conversion parse_digits(str_view);
 
@@ -472,7 +473,7 @@ can_build_new_square(const struct maze *const maze, const struct point next)
 
 /*===================   Data Structure Comparators   ========================*/
 
-static node_threeway_cmp
+static dpq_threeway_cmp
 cmp_priority_cells(const struct depq_elem *const key, const struct depq_elem *n,
                    void *const aux)
 {
@@ -484,7 +485,7 @@ cmp_priority_cells(const struct depq_elem *const key, const struct depq_elem *n,
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
-static node_threeway_cmp
+static set_threeway_cmp
 cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
 {
     (void)aux;
@@ -492,7 +493,7 @@ cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
     const struct point_cost *const b = SET_ENTRY(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
-        return NODE_EQL;
+        return SETEQL;
     }
     if (a->p.r == b->p.r)
     {
@@ -518,13 +519,13 @@ parse_digits(str_view arg)
     {
         return (struct int_conversion){.status = CONV_ER};
     }
-    str_view row_count = sv_substr(arg, eql, ULLONG_MAX);
-    if (sv_empty(row_count))
+    arg = sv_substr(arg, eql, ULLONG_MAX);
+    if (sv_empty(arg))
     {
         (void)fprintf(stderr, "please specify element to convert.\n");
         return (struct int_conversion){.status = CONV_ER};
     }
-    row_count = sv_remove_prefix(row_count, 1);
+    arg = sv_remove_prefix(arg, 1);
     return convert_to_int(sv_begin(arg));
 }
 

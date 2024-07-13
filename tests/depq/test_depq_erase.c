@@ -25,8 +25,8 @@ static enum test_result depq_test_weak_srand(void);
 static enum test_result insert_shuffled(struct depqueue *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int[], size_t, struct depqueue *);
-static node_threeway_cmp val_cmp(const struct depq_elem *,
-                                 const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(const struct depq_elem *,
+                                const struct depq_elem *, void *);
 static void depq_printer_fn(const struct depq_elem *);
 
 #define NUM_TESTS (size_t)9
@@ -385,7 +385,7 @@ depq_printer_fn(const struct depq_elem *const e)
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-static node_threeway_cmp
+static dpq_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;

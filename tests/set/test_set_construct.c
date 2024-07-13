@@ -10,8 +10,8 @@ struct val
 };
 
 static enum test_result set_test_empty(void);
-static node_threeway_cmp val_cmp(const struct set_elem *,
-                                 const struct set_elem *, void *);
+static set_threeway_cmp val_cmp(const struct set_elem *,
+                                const struct set_elem *, void *);
 
 #define NUM_TESTS ((size_t)1)
 const test_fn all_tests[NUM_TESTS] = {
@@ -41,7 +41,7 @@ set_test_empty(void)
     return PASS;
 }
 
-static node_threeway_cmp
+static set_threeway_cmp
 val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
 {
     (void)aux;

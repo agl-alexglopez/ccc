@@ -10,8 +10,8 @@ struct val
 };
 
 static enum test_result depq_test_empty(void);
-static node_threeway_cmp val_cmp(const struct depq_elem *,
-                                 const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(const struct depq_elem *,
+                                const struct depq_elem *, void *);
 
 #define NUM_TESTS (size_t)1
 const test_fn all_tests[NUM_TESTS] = {depq_test_empty};
@@ -39,7 +39,7 @@ depq_test_empty(void)
     return PASS;
 }
 
-static node_threeway_cmp
+static dpq_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;

@@ -20,8 +20,8 @@ static enum test_result depq_test_read_max_min(void);
 static enum test_result insert_shuffled(struct depqueue *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int[], size_t, struct depqueue *);
-static node_threeway_cmp val_cmp(const struct depq_elem *,
-                                 const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(const struct depq_elem *,
+                                const struct depq_elem *, void *);
 
 #define NUM_TESTS (size_t)6
 const test_fn all_tests[NUM_TESTS] = {
@@ -115,7 +115,7 @@ depq_test_insert_three_dups(void)
     return PASS;
 }
 
-static node_threeway_cmp
+static dpq_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;

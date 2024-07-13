@@ -18,8 +18,8 @@ static enum test_result set_test_insert_shuffle(void);
 static enum test_result insert_shuffled(struct set *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int vals[], size_t, struct set *);
-static node_threeway_cmp val_cmp(const struct set_elem *,
-                                 const struct set_elem *, void *);
+static set_threeway_cmp val_cmp(const struct set_elem *,
+                                const struct set_elem *, void *);
 
 #define NUM_TESTS ((size_t)4)
 const test_fn all_tests[NUM_TESTS] = {
@@ -154,7 +154,7 @@ inorder_fill(int vals[], size_t size, struct set *s)
     return i;
 }
 
-static node_threeway_cmp
+static set_threeway_cmp
 val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
 {
     (void)aux;

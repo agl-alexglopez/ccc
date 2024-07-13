@@ -8,6 +8,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -235,14 +236,14 @@ static void help(void);
 
 static bool insert_prev_vertex(struct set *, struct prev_vertex);
 static bool insert_parent_cell(struct set *, struct parent_cell);
-static node_threeway_cmp cmp_vertices(const struct set_elem *,
-                                      const struct set_elem *, void *);
-static node_threeway_cmp cmp_parent_cells(const struct set_elem *,
-                                          const struct set_elem *, void *);
+static set_threeway_cmp cmp_vertices(const struct set_elem *,
+                                     const struct set_elem *, void *);
+static set_threeway_cmp cmp_parent_cells(const struct set_elem *,
+                                         const struct set_elem *, void *);
 static enum pq_threeway_cmp cmp_pq_dist_points(const struct pq_elem *,
                                                const struct pq_elem *, void *);
-static node_threeway_cmp cmp_set_prev_vertices(const struct set_elem *,
-                                               const struct set_elem *, void *);
+static set_threeway_cmp cmp_set_prev_vertices(const struct set_elem *,
+                                              const struct set_elem *, void *);
 static void pq_update_dist(struct pq_elem *, void *);
 static void print_vertex(const struct set_elem *);
 static void set_vertex_destructor(struct set_elem *);
@@ -688,6 +689,7 @@ find_shortest_paths(struct graph *const graph)
                      "DtoF\nMost formats work but two capital vertices are "
                      "needed.\n",
                      1);
+                return;
             }
             if (!dijkstra_shortest_path(graph, pr))
             {
@@ -1060,7 +1062,7 @@ insert_parent_cell(struct set *s, struct parent_cell pc)
     return set_insert(s, &pc_heap->elem);
 }
 
-static node_threeway_cmp
+static set_threeway_cmp
 cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
              void *aux)
 {
@@ -1070,7 +1072,7 @@ cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
     return (v_a->name > v_b->name) - (v_a->name < v_b->name);
 }
 
-static node_threeway_cmp
+static set_threeway_cmp
 cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
 {
     (void)aux;
@@ -1078,7 +1080,7 @@ cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
     const struct parent_cell *const b = SET_ENTRY(y, struct parent_cell, elem);
     if (a->key.r == b->key.r && a->key.c == b->key.c)
     {
-        return NODE_EQL;
+        return SETEQL;
     }
     if (a->key.r == b->key.r)
     {
@@ -1097,7 +1099,7 @@ cmp_pq_dist_points(const struct pq_elem *const x, const struct pq_elem *const y,
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
-static node_threeway_cmp
+static set_threeway_cmp
 cmp_set_prev_vertices(const struct set_elem *const x,
                       const struct set_elem *const y, void *aux)
 {
@@ -1106,13 +1108,13 @@ cmp_set_prev_vertices(const struct set_elem *const x,
     const struct prev_vertex *const b = SET_ENTRY(y, struct prev_vertex, elem);
     if (a->v > b->v)
     {
-        return NODE_GRT;
+        return SETGRT;
     }
     if (a->v < b->v)
     {
-        return NODE_LES;
+        return SETLES;
     }
-    return NODE_EQL;
+    return SETEQL;
 }
 
 static void
@@ -1190,13 +1192,14 @@ parse_digits(str_view arg)
     {
         return (struct int_conversion){.status = CONV_ER};
     }
-    str_view num = sv_substr(arg, eql + 1, ULLONG_MAX);
-    if (sv_empty(num))
+    arg = sv_substr(arg, eql + 1, ULLONG_MAX);
+    if (sv_empty(arg))
     {
         (void)fprintf(stderr, "please specify element to convert.\n");
         return (struct int_conversion){.status = CONV_ER};
     }
-    return convert_to_int(sv_begin(num));
+    arg = sv_remove_prefix(arg, 1);
+    return convert_to_int(sv_begin(arg));
 }
 
 static unsigned

@@ -38,6 +38,15 @@ struct depqueue
     struct tree t;
 };
 
+typedef node_threeway_cmp dpq_threeway_cmp;
+
+enum
+{
+    DPQLES = NODE_LES,
+    DPQEQL = NODE_EQL,
+    DPQGRT = NODE_GRT,
+};
+
 /* A comparison function that returns one of the threeway comparison
    values. To use this data structure you must be able to determine
    these three comparison values for two of your type. See example
@@ -51,8 +60,8 @@ struct depqueue
 
    The compare function one must provide to perform queries
    and other operations on the DEPQ. See above. */
-typedef node_threeway_cmp depq_cmp_fn(const struct depq_elem *a,
-                                      const struct depq_elem *b, void *aux);
+typedef dpq_threeway_cmp depq_cmp_fn(const struct depq_elem *a,
+                                     const struct depq_elem *b, void *aux);
 
 /* Define a function to use printf for your custom struct type.
    For example:

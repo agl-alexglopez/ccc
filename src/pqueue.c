@@ -1,5 +1,8 @@
 #include "pqueue.h"
 
+#include <stdbool.h>
+#include <stddef.h>
+
 /*=========================  Function Prototypes   ==========================*/
 
 static struct pq_elem *fair_merge(struct pqueue *, struct pq_elem *old,

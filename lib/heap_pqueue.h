@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+/* NOLINTNEXTLINE */
 #include <stdint.h>
 
 enum heap_pq_threeway_cmp

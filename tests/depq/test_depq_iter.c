@@ -24,8 +24,8 @@ static enum test_result depq_test_priority_empty_range(void);
 static size_t inorder_fill(int[], size_t, struct depqueue *);
 static enum test_result iterator_check(struct depqueue *);
 static void val_update(struct depq_elem *, void *);
-static node_threeway_cmp val_cmp(const struct depq_elem *,
-                                 const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(const struct depq_elem *,
+                                const struct depq_elem *, void *);
 
 #define NUM_TESTS (size_t)8
 const test_fn all_tests[NUM_TESTS] = {
@@ -427,7 +427,7 @@ iterator_check(struct depqueue *pq)
     return PASS;
 }
 
-static node_threeway_cmp
+static dpq_threeway_cmp
 val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
 {
     (void)aux;

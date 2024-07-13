@@ -175,6 +175,15 @@ struct set_elem
     struct node n;
 };
 
+typedef node_threeway_cmp set_threeway_cmp;
+
+enum
+{
+    SETLES = NODE_LES,
+    SETEQL = NODE_EQL,
+    SETGRT = NODE_GRT,
+};
+
 /* ===================   Comparisons  ==========================
 
    To implement three way comparison in C you can try something
@@ -217,8 +226,8 @@ struct set_elem
       }
 
    ============================================================= */
-typedef node_threeway_cmp set_cmp_fn(const struct set_elem *a,
-                                     const struct set_elem *b, void *aux);
+typedef set_threeway_cmp set_cmp_fn(const struct set_elem *a,
+                                    const struct set_elem *b, void *aux);
 
 /* Performs user specified destructor actions on a single set_elem. This
    set_elem is assumed to be embedded in user defined structs and therefore

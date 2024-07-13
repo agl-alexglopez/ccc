@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+/* NOLINTNEXTLINE */
 #include <stdint.h>
 
 /* Standard C-style three way comparison for priority queue elements. */
