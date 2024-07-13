@@ -61,7 +61,7 @@ hpq_test_insert_remove_four_dups(void)
     {
         three_vals[i].val = 0;
         hpq_push(&hpq, &three_vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
         const size_t size = i + 1;
         CHECK(hpq_size(&hpq), size, size_t, "%zu");
     }
@@ -70,7 +70,7 @@ hpq_test_insert_remove_four_dups(void)
     {
         three_vals[i].val = 0;
         hpq_pop(&hpq);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
     }
     CHECK(hpq_size(&hpq), 0ULL, size_t, "%zu");
     return PASS;
@@ -98,7 +98,7 @@ hpq_test_insert_erase_shuffled(void)
     for (size_t i = 0; i < size; ++i)
     {
         (void)hpq_erase(&hpq, &vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
     }
     CHECK(hpq_size(&hpq), 0ULL, size_t, "%zu");
     return PASS;
@@ -128,7 +128,7 @@ hpq_test_pop_max(void)
         const struct val *front = HPQ_ENTRY(hpq_pop(&hpq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
-    CHECK(hpq_empty(&hpq), true, bool, "%b");
+    CHECK(hpq_empty(&hpq), true, bool, "%d");
     return PASS;
 }
 
@@ -156,7 +156,7 @@ hpq_test_pop_min(void)
         const struct val *front = HPQ_ENTRY(hpq_pop(&hpq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
-    CHECK(hpq_empty(&hpq), true, bool, "%b");
+    CHECK(hpq_empty(&hpq), true, bool, "%d");
     return PASS;
 }
 
@@ -176,7 +176,7 @@ hpq_test_delete_prime_shuffle_duplicates(void)
         vals[i].val = shuffled_index;
         vals[i].id = i;
         hpq_push(&hpq, &vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
         const size_t s = i + 1;
         CHECK(hpq_size(&hpq), s, size_t, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
@@ -188,7 +188,7 @@ hpq_test_delete_prime_shuffle_duplicates(void)
     for (int i = 0; i < size; ++i)
     {
         (void)hpq_erase(&hpq, &vals[shuffled_index].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
         --cur_size;
         CHECK(hpq_size(&hpq), cur_size, size_t, "%zu");
         /* Shuffle normally here so we only remove each elem once. */
@@ -214,7 +214,7 @@ hpq_test_prime_shuffle(void)
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
         hpq_push(&hpq, &vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* Now we go through and free all the elements in order but
@@ -222,8 +222,8 @@ hpq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(hpq_erase(&hpq, &vals[i].elem) != NULL, true, bool, "%b");
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_erase(&hpq, &vals[i].elem) != NULL, true, bool, "%d");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
         --cur_size;
         CHECK(hpq_size(&hpq), cur_size, size_t, "%zu");
     }
@@ -245,14 +245,14 @@ hpq_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         hpq_push(&hpq, &vals[i].elem);
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
     }
     for (int i = 0; i < num_heap_elems; ++i)
     {
-        CHECK(hpq_erase(&hpq, &vals[i].elem) != NULL, true, bool, "%b");
-        CHECK(hpq_validate(&hpq), true, bool, "%b");
+        CHECK(hpq_erase(&hpq, &vals[i].elem) != NULL, true, bool, "%d");
+        CHECK(hpq_validate(&hpq), true, bool, "%d");
     }
-    CHECK(hpq_empty(&hpq), true, bool, "%b");
+    CHECK(hpq_empty(&hpq), true, bool, "%d");
     return PASS;
 }
 
@@ -271,7 +271,7 @@ insert_shuffled(struct heap_pqueue *hpq, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         hpq_push(hpq, &vals[shuffled_index].elem);
         CHECK(hpq_size(hpq), i + 1, size_t, "%zu");
-        CHECK(hpq_validate(hpq), true, bool, "%b");
+        CHECK(hpq_validate(hpq), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(hpq_size(hpq), size, size_t, "%zu");

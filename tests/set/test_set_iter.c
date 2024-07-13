@@ -64,7 +64,7 @@ set_test_forward_iter(void)
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
@@ -95,7 +95,7 @@ set_test_iterate_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
     const int limit = 400;
@@ -107,7 +107,7 @@ set_test_iterate_removal(void)
         if (cur->val > limit)
         {
             (void)set_erase(&s, i);
-            CHECK(validate_tree(&s.t), true, bool, "%b");
+            CHECK(validate_tree(&s.t), true, bool, "%d");
         }
     }
     return PASS;
@@ -128,7 +128,7 @@ set_test_iterate_remove_reinsert(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
     const size_t old_size = set_size(&s);
@@ -144,8 +144,8 @@ set_test_iterate_remove_reinsert(void)
             (void)set_erase(&s, i);
             struct val *v = SET_ENTRY(i, struct val, elem);
             v->val = new_unique_entry_val;
-            CHECK(set_insert(&s, i), true, bool, "%b");
-            CHECK(validate_tree(&s.t), true, bool, "%b");
+            CHECK(set_insert(&s, i), true, bool, "%d");
+            CHECK(validate_tree(&s.t), true, bool, "%d");
             ++new_unique_entry_val;
         }
     }
@@ -166,7 +166,7 @@ set_test_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -226,7 +226,7 @@ set_test_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -237,7 +237,7 @@ set_test_invalid_range(void)
     const struct set_range rev_range = set_equal_range(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_range(&rev_range), struct val, elem)->val
               == forward_range_vals[0],
-          true, bool, "%b");
+          true, bool, "%d");
     CHECK(set_end_range(&rev_range), set_end(&s), struct set_elem *, "%p");
     size_t index = 0;
     struct set_elem *i1 = set_begin_range(&rev_range);
@@ -285,7 +285,7 @@ set_test_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
@@ -332,8 +332,8 @@ iterator_check(struct set *s)
     for (struct set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
     {
         ++iter_count;
-        CHECK(iter_count != size || set_is_max(s, e), true, bool, "%b");
-        CHECK(iter_count == size || !set_is_max(s, e), true, bool, "%b");
+        CHECK(iter_count != size || set_is_max(s, e), true, bool, "%d");
+        CHECK(iter_count == size || !set_is_max(s, e), true, bool, "%d");
     }
     CHECK(iter_count, size, size_t, "%zu");
     iter_count = 0;
@@ -341,8 +341,8 @@ iterator_check(struct set *s)
          e = set_rnext(s, e))
     {
         ++iter_count;
-        CHECK(iter_count != size || set_is_min(s, e), true, bool, "%b");
-        CHECK(iter_count == size || !set_is_min(s, e), true, bool, "%b");
+        CHECK(iter_count != size || set_is_min(s, e), true, bool, "%d");
+        CHECK(iter_count == size || !set_is_min(s, e), true, bool, "%d");
     }
     CHECK(iter_count, size, size_t, "%zu");
     return PASS;

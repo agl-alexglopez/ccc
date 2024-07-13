@@ -35,7 +35,7 @@ pq_test_empty(void)
 {
     struct heap_pqueue pq;
     hpq_init(&pq, HPQLES, val_cmp, NULL);
-    CHECK(hpq_empty(&pq), true, bool, "%b");
+    CHECK(hpq_empty(&pq), true, bool, "%d");
     return PASS;
 }
 

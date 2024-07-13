@@ -58,14 +58,14 @@ pq_test_insert_iterate_pop(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
     }
     size_t pop_count = 0;
     while (!pq_empty(&pq))
     {
         pq_pop(&pq);
         ++pop_count;
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
     }
     CHECK(pop_count, num_nodes, size_t, "%zu");
     return PASS;
@@ -86,7 +86,7 @@ pq_test_priority_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
     }
     const int limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -96,7 +96,7 @@ pq_test_priority_removal(void)
         if (cur->val > limit)
         {
             i = pq_erase(&pq, i);
-            CHECK(pq_validate(&pq), true, bool, "%b");
+            CHECK(pq_validate(&pq), true, bool, "%d");
         }
     }
     return PASS;
@@ -117,7 +117,7 @@ pq_test_priority_update(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
     }
     const int limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -127,8 +127,8 @@ pq_test_priority_update(void)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(pq_update(&pq, i, val_update, &backoff), true, bool, "%b");
-            CHECK(pq_validate(&pq), true, bool, "%b");
+            CHECK(pq_update(&pq, i, val_update, &backoff), true, bool, "%d");
+            CHECK(pq_validate(&pq), true, bool, "%d");
         }
     }
     CHECK(pq_size(&pq), num_nodes, size_t, "%zu");
@@ -150,7 +150,7 @@ pq_test_priority_increase(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
     }
     const int limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -161,13 +161,13 @@ pq_test_priority_increase(void)
         int dec = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(pq_decrease(&pq, i, val_update, &dec), true, bool, "%b");
-            CHECK(pq_validate(&pq), true, bool, "%b");
+            CHECK(pq_decrease(&pq, i, val_update, &dec), true, bool, "%d");
+            CHECK(pq_validate(&pq), true, bool, "%d");
         }
         else
         {
-            CHECK(pq_increase(&pq, i, val_update, &inc), true, bool, "%b");
-            CHECK(pq_validate(&pq), true, bool, "%b");
+            CHECK(pq_increase(&pq, i, val_update, &inc), true, bool, "%d");
+            CHECK(pq_validate(&pq), true, bool, "%d");
         }
     }
     CHECK(pq_size(&pq), num_nodes, size_t, "%zu");
@@ -189,7 +189,7 @@ pq_test_priority_decrease(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
     }
     const int limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -200,13 +200,13 @@ pq_test_priority_decrease(void)
         int dec = cur->val / 2;
         if (cur->val < limit)
         {
-            CHECK(pq_increase(&pq, i, val_update, &inc), true, bool, "%b");
-            CHECK(pq_validate(&pq), true, bool, "%b");
+            CHECK(pq_increase(&pq, i, val_update, &inc), true, bool, "%d");
+            CHECK(pq_validate(&pq), true, bool, "%d");
         }
         else
         {
-            CHECK(pq_decrease(&pq, i, val_update, &dec), true, bool, "%b");
-            CHECK(pq_validate(&pq), true, bool, "%b");
+            CHECK(pq_decrease(&pq, i, val_update, &dec), true, bool, "%d");
+            CHECK(pq_validate(&pq), true, bool, "%d");
         }
     }
     CHECK(pq_size(&pq), num_nodes, size_t, "%zu");

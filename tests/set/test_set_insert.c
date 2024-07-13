@@ -50,10 +50,10 @@ set_test_insert_one(void)
     struct set s = SET_INIT(s, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(set_insert(&s, &single.elem), true, bool, "%b");
-    CHECK(set_empty(&s), false, bool, "%b");
+    CHECK(set_insert(&s, &single.elem), true, bool, "%d");
+    CHECK(set_empty(&s), false, bool, "%d");
     CHECK(SET_ENTRY(set_root(&s), struct val, elem)->val == single.val, true,
-          bool, "%b");
+          bool, "%d");
     return PASS;
 }
 
@@ -65,8 +65,8 @@ set_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        CHECK(set_insert(&s, &three_vals[i].elem), true, bool, "%b");
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(set_insert(&s, &three_vals[i].elem), true, bool, "%d");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     CHECK(set_size(&s), 3ULL, size_t, "%zu");
     return PASS;
@@ -83,10 +83,10 @@ set_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        CHECK(set_insert(&s, &vals[i].elem), true, bool, "%b");
+        CHECK(set_insert(&s, &vals[i].elem), true, bool, "%d");
         CHECK(set_insert(&set_tester_clone, &tester_clone[i].elem), true, bool,
-              "%b");
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+              "%d");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
@@ -131,7 +131,7 @@ insert_shuffled(struct set *s, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         set_insert(s, &vals[shuffled_index].elem);
         CHECK(set_size(s), i + 1, size_t, "%zu");
-        CHECK(validate_tree(&s->t), true, bool, "%b");
+        CHECK(validate_tree(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(set_size(s), size, size_t, "%zu");

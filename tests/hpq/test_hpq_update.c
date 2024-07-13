@@ -57,14 +57,14 @@ hpq_test_insert_iterate_pop(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         hpq_push(&pq, &vals[i].elem);
-        CHECK(hpq_validate(&pq), true, bool, "%b");
+        CHECK(hpq_validate(&pq), true, bool, "%d");
     }
     size_t pop_count = 0;
     while (!hpq_empty(&pq))
     {
         hpq_pop(&pq);
         ++pop_count;
-        CHECK(hpq_validate(&pq), true, bool, "%b");
+        CHECK(hpq_validate(&pq), true, bool, "%d");
     }
     CHECK(pop_count, num_nodes, size_t, "%zu");
     return PASS;
@@ -86,7 +86,7 @@ hpq_test_priority_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         hpq_push(&pq, &vals[i].elem);
-        CHECK(hpq_validate(&pq), true, bool, "%b");
+        CHECK(hpq_validate(&pq), true, bool, "%d");
     }
     const int limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -96,7 +96,7 @@ hpq_test_priority_removal(void)
         if (cur->val > limit)
         {
             i = hpq_erase(&pq, i);
-            CHECK(hpq_validate(&pq), true, bool, "%b");
+            CHECK(hpq_validate(&pq), true, bool, "%d");
         }
     }
     return PASS;
@@ -118,7 +118,7 @@ hpq_test_priority_update(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         hpq_push(&pq, &vals[i].elem);
-        CHECK(hpq_validate(&pq), true, bool, "%b");
+        CHECK(hpq_validate(&pq), true, bool, "%d");
     }
     const int limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -128,8 +128,8 @@ hpq_test_priority_update(void)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(hpq_update(&pq, i, val_update, &backoff), true, bool, "%b");
-            CHECK(hpq_validate(&pq), true, bool, "%b");
+            CHECK(hpq_update(&pq, i, val_update, &backoff), true, bool, "%d");
+            CHECK(hpq_validate(&pq), true, bool, "%d");
         }
     }
     CHECK(hpq_size(&pq), num_nodes, size_t, "%zu");

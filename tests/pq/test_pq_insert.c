@@ -50,7 +50,7 @@ pq_test_insert_one(void)
     struct val single;
     single.val = 0;
     pq_push(&pq, &single.elem);
-    CHECK(pq_empty(&pq), false, bool, "%b");
+    CHECK(pq_empty(&pq), false, bool, "%d");
     return PASS;
 }
 
@@ -63,7 +63,7 @@ pq_test_insert_three(void)
     {
         three_vals[i].val = i;
         pq_push(&pq, &three_vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(pq_size(&pq), 3, size_t, "%zu");
@@ -83,7 +83,7 @@ pq_test_struct_getter(void)
         tester_clone[i].val = i;
         pq_push(&pq, &vals[i].elem);
         pq_push(&pq_tester_clone, &tester_clone[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
@@ -104,7 +104,7 @@ pq_test_insert_three_dups(void)
     {
         three_vals[i].val = 0;
         pq_push(&pq, &three_vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(pq_size(&pq), 3ULL, size_t, "%zu");
@@ -150,7 +150,7 @@ pq_test_read_max_min(void)
     {
         vals[i].val = i;
         pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%b");
+        CHECK(pq_validate(&pq), true, bool, "%d");
         CHECK(pq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(pq_size(&pq), 10ULL, size_t, "%zu");
@@ -174,7 +174,7 @@ insert_shuffled(struct pqueue *pq, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         pq_push(pq, &vals[shuffled_index].elem);
         CHECK(pq_size(pq), i + 1, size_t, "%zu");
-        CHECK(pq_validate(pq), true, bool, "%b");
+        CHECK(pq_validate(pq), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(pq_size(pq), size, size_t, "%zu");
@@ -194,7 +194,7 @@ inorder_fill(int vals[], size_t size, struct pqueue *ppq)
     while (!pq_empty(ppq) && i < size)
     {
         struct pq_elem *const front = pq_pop(ppq);
-        CHECK(pq_validate(ppq), true, bool, "%b");
+        CHECK(pq_validate(ppq), true, bool, "%d");
         vals[i++] = PQ_ENTRY(front, struct val, elem)->val;
         pq_push(&copy, front);
     }

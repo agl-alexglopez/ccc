@@ -65,17 +65,17 @@ set_test_prime_shuffle(void)
         {
             repeats[i] = true;
         }
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
     set_print(&s, set_root(&s), set_printer_fn);
-    CHECK(set_size(&s) < size, true, bool, "%b");
+    CHECK(set_size(&s) < size, true, bool, "%d");
     for (size_t i = 0; i < size; ++i)
     {
         const struct set_elem *elem = set_erase(&s, &vals[i].elem);
-        CHECK(elem != set_end(&s) || !repeats[i], true, bool, "%b");
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(elem != set_end(&s) || !repeats[i], true, bool, "%d");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     return PASS;
 }
@@ -98,9 +98,9 @@ set_test_insert_erase_shuffled(void)
     for (size_t i = 0; i < size; ++i)
     {
         (void)set_erase(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
-    CHECK(set_empty(&s), true, bool, "%b");
+    CHECK(set_empty(&s), true, bool, "%d");
     return PASS;
 }
 
@@ -118,14 +118,14 @@ set_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         (void)set_erase(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%b");
+        CHECK(validate_tree(&s.t), true, bool, "%d");
     }
-    CHECK(set_empty(&s), true, bool, "%b");
+    CHECK(set_empty(&s), true, bool, "%d");
     return PASS;
 }
 
@@ -144,7 +144,7 @@ insert_shuffled(struct set *s, struct val vals[], const size_t size,
         vals[shuffled_index].val = (int)shuffled_index;
         set_insert(s, &vals[shuffled_index].elem);
         CHECK(set_size(s), i + 1, size_t, "%zu");
-        CHECK(validate_tree(&s->t), true, bool, "%b");
+        CHECK(validate_tree(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(set_size(s), size, size_t, "%zu");

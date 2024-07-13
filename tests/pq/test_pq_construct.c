@@ -34,7 +34,7 @@ static enum test_result
 pq_test_empty(void)
 {
     struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
-    CHECK(pq_empty(&pq), true, bool, "%b");
+    CHECK(pq_empty(&pq), true, bool, "%d");
     return PASS;
 }
 
