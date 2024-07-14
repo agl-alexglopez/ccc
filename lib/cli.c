@@ -17,23 +17,23 @@ clear_line(void)
 }
 
 void
-set_cursor_position(const int row, const int col)
+set_cursor_position(int const row, int const col)
 {
     printf("\033[%d;%df", row + 1, col + 1);
 }
 
 void
-quit(const char *const msg, int code)
+quit(char const *const msg, int code)
 {
     (void)fprintf(stdout, "%s", msg);
     exit(code);
 }
 
 struct int_conversion
-convert_to_int(const char *const arg)
+convert_to_int(char const *const arg)
 {
     char *end;
-    const long conv = strtol(arg, &end, 10);
+    long const conv = strtol(arg, &end, 10);
     if (errno == ERANGE)
     {
         (void)fprintf(stderr, "%s arg could not convert to int.\n", arg);

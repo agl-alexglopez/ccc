@@ -9,8 +9,8 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 static void q_grow(struct queue *);
-static void *q_at(const struct queue *, size_t);
-static size_t q_bytes(const struct queue *, size_t);
+static void *q_at(struct queue const *, size_t);
+static size_t q_bytes(struct queue const *, size_t);
 
 /* We don't need the deprecated warnings as implementer of the queue. The
    warning is for users to stop them and force them to use provided
@@ -19,7 +19,7 @@ static size_t q_bytes(const struct queue *, size_t);
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 void
-q_init(const size_t elem_sz, struct queue *const q, const size_t capacity)
+q_init(size_t const elem_sz, struct queue *const q, size_t const capacity)
 {
     if (!q)
     {
@@ -75,7 +75,7 @@ q_pop(struct queue *const q)
 }
 
 void *
-q_front(const struct queue *const q)
+q_front(struct queue const *const q)
 {
     if (!q->sz)
     {
@@ -85,13 +85,13 @@ q_front(const struct queue *const q)
 }
 
 bool
-q_empty(const struct queue *const q)
+q_empty(struct queue const *const q)
 {
     return !q || !q->sz;
 }
 
 size_t
-q_size(const struct queue *const q)
+q_size(struct queue const *const q)
 {
     return !q ? 0ULL : q->sz;
 }
@@ -105,7 +105,7 @@ q_grow(struct queue *const q)
         (void)fprintf(stderr, "reallocation failed.\n");
         return;
     }
-    const size_t first_chunk = MIN(q->sz, q->capacity - q->front);
+    size_t const first_chunk = MIN(q->sz, q->capacity - q->front);
     memcpy(new, q_at(q, q->front), q_bytes(q, first_chunk));
     if (first_chunk < q->sz)
     {
@@ -120,13 +120,13 @@ q_grow(struct queue *const q)
 }
 
 static inline void *
-q_at(const struct queue *const q, const size_t i)
+q_at(struct queue const *const q, size_t const i)
 {
     return (uint8_t *)q->mem + (q->elem_sz * i);
 }
 
 static inline size_t
-q_bytes(const struct queue *q, size_t n)
+q_bytes(struct queue const *q, size_t n)
 {
     return q->elem_sz * n;
 }

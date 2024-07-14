@@ -35,8 +35,8 @@ struct pq_elem
    structs. Given two valid pointers to elements in the priority queue and any
    auxilliary data necessary for comparison, return the resulting three way
    comparison for the user struct values. */
-typedef enum pq_threeway_cmp pq_cmp_fn(const struct pq_elem *,
-                                       const struct pq_elem *, void *);
+typedef enum pq_threeway_cmp pq_cmp_fn(struct pq_elem const *,
+                                       struct pq_elem const *, void *);
 
 /* A function type to aid in deallocation of the priority queue. The user may
    define a destructor function that will act on each element for clearing
@@ -89,7 +89,7 @@ struct pqueue
 
 /* Obtain a reference to the front of the priority queue. This will be a min
    or max depending on the initialization of the priority queue. O(1). */
-const struct pq_elem *pq_front(const struct pqueue *);
+struct pq_elem const *pq_front(struct pqueue const *);
 
 /* Adds an element to the priority queue in correct total order. O(1). */
 void pq_push(struct pqueue *, struct pq_elem *);
@@ -102,10 +102,10 @@ struct pq_elem *pq_pop(struct pqueue *);
 struct pq_elem *pq_erase(struct pqueue *, struct pq_elem *);
 
 /* Returns true if the priority queue is empty false if not. */
-bool pq_empty(const struct pqueue *);
+bool pq_empty(struct pqueue const *);
 
 /* Returns the size of the priority queue. */
-size_t pq_size(const struct pqueue *);
+size_t pq_size(struct pqueue const *);
 
 /* Update the value of a priority queue element if the new value is not
    known to be less than or greater than the old value. This operation
@@ -125,7 +125,7 @@ bool pq_increase(struct pqueue *, struct pq_elem *, pq_update_fn *, void *);
 bool pq_decrease(struct pqueue *, struct pq_elem *, pq_update_fn *, void *);
 
 /* Return the order used to initialize the heap. */
-enum pq_threeway_cmp pq_order(const struct pqueue *);
+enum pq_threeway_cmp pq_order(struct pqueue const *);
 
 /* Calls the user provided destructor on each element in the priority queue.
    It is safe to free the struct if it has been heap allocated as elements
@@ -134,6 +134,6 @@ void pq_clear(struct pqueue *, pq_destructor_fn *);
 
 /* Internal validation function for the state of the heap. This should be of
    little interest to the user. */
-bool pq_validate(const struct pqueue *);
+bool pq_validate(struct pqueue const *);
 
 #endif /* PQUEUE */

@@ -50,13 +50,13 @@ enum print_link
 #define PRINTER_INDENT (short)13
 #define LR 2
 
-const enum tree_link inorder_traversal = L;
-const enum tree_link reverse_inorder_traversal = R;
+enum tree_link const inorder_traversal = L;
+enum tree_link const reverse_inorder_traversal = R;
 
 /* =======================        Prototypes         ====================== */
 
 static void init_node(struct tree *, struct node *);
-static bool empty(const struct tree *);
+static bool empty(struct tree const *);
 static void multiset_insert(struct tree *, struct node *);
 static struct node *find(struct tree *, struct node *);
 static bool contains(struct tree *, struct node *);
@@ -70,35 +70,35 @@ static struct node *pop_front_dup(struct tree *, struct node *);
 static struct node *remove_from_tree(struct tree *, struct node *);
 static struct node *connect_new_root(struct tree *, struct node *,
                                      node_threeway_cmp);
-static struct node *root(const struct tree *);
-static struct node *max(const struct tree *);
+static struct node *root(struct tree const *);
+static struct node *max(struct tree const *);
 static struct node *pop_max(struct tree *);
 static struct node *pop_min(struct tree *);
-static struct node *min(const struct tree *);
+static struct node *min(struct tree const *);
 static struct node *const_seek(struct tree *, struct node *);
 static struct node *end(struct tree *);
 static struct node *next(struct tree *, struct node *, enum tree_link);
 static struct node *multiset_next(struct tree *, struct node *, enum tree_link);
 static struct range equal_range(struct tree *, struct node *, struct node *,
                                 enum tree_link);
-static node_threeway_cmp force_find_grt(const struct node *,
-                                        const struct node *, void *);
-static node_threeway_cmp force_find_les(const struct node *,
-                                        const struct node *, void *);
+static node_threeway_cmp force_find_grt(struct node const *,
+                                        struct node const *, void *);
+static node_threeway_cmp force_find_les(struct node const *,
+                                        struct node const *, void *);
 static void link_trees(struct tree *, struct node *, enum tree_link,
                        struct node *);
-static inline bool has_dups(const struct node *, const struct node *);
+static inline bool has_dups(struct node const *, struct node const *);
 static struct node *get_parent(struct tree *, struct node *);
 static void add_duplicate(struct tree *, struct node *, struct node *,
                           struct node *);
-static struct node *splay(struct tree *, struct node *, const struct node *,
+static struct node *splay(struct tree *, struct node *, struct node const *,
                           tree_cmp_fn *);
 static inline struct node *next_tree_node(struct tree *, struct node *,
                                           enum tree_link);
-static struct node *range_begin(const struct range *);
-static struct node *range_end(const struct range *);
-static struct node *rrange_begin(const struct rrange *);
-static struct node *rrange_end(const struct rrange *);
+static struct node *range_begin(struct range const *);
+static struct node *range_end(struct range const *);
+static struct node *rrange_begin(struct rrange const *);
+static struct node *rrange_end(struct rrange const *);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -119,13 +119,13 @@ depq_clear(struct depqueue *pq, depq_destructor_fn *destructor)
 }
 
 bool
-depq_empty(const struct depqueue *const pq)
+depq_empty(struct depqueue const *const pq)
 {
     return empty(&pq->t);
 }
 
 struct depq_elem *
-depq_root(const struct depqueue *const pq)
+depq_root(struct depqueue const *const pq)
 {
     return (struct depq_elem *)root(&pq->t);
 }
@@ -137,8 +137,8 @@ depq_max(struct depqueue *const pq)
                                      force_find_grt);
 }
 
-const struct depq_elem *
-depq_const_max(const struct depqueue *const pq)
+struct depq_elem const *
+depq_const_max(struct depqueue const *const pq)
 {
     return (struct depq_elem *)max(&pq->t);
 }
@@ -156,8 +156,8 @@ depq_min(struct depqueue *const pq)
                                      force_find_les);
 }
 
-const struct depq_elem *
-depq_const_min(const struct depqueue *const pq)
+struct depq_elem const *
+depq_const_min(struct depqueue const *const pq)
 {
     return (struct depq_elem *)min(&pq->t);
 }
@@ -209,13 +209,13 @@ depq_equal_range(struct depqueue *pq, struct depq_elem *begin,
 }
 
 struct depq_elem *
-depq_begin_range(const struct depq_range *const r)
+depq_begin_range(struct depq_range const *const r)
 {
     return (struct depq_elem *)range_begin(&r->r);
 }
 
 struct depq_elem *
-depq_end_range(const struct depq_range *const r)
+depq_end_range(struct depq_range const *const r)
 {
     return (struct depq_elem *)range_end(&r->r);
 }
@@ -224,7 +224,7 @@ struct depq_rrange
 depq_equal_rrange(struct depqueue *pq, struct depq_elem *rbegin,
                   struct depq_elem *rend)
 {
-    const struct range ret
+    struct range const ret
         = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal);
     return (struct depq_rrange){
         .r = (struct rrange){
@@ -235,13 +235,13 @@ depq_equal_rrange(struct depqueue *pq, struct depq_elem *rbegin,
 }
 
 struct depq_elem *
-depq_begin_rrange(const struct depq_rrange *const rr)
+depq_begin_rrange(struct depq_rrange const *const rr)
 {
     return (struct depq_elem *)rrange_begin(&rr->r);
 }
 
 struct depq_elem *
-depq_end_rrange(const struct depq_rrange *const rr)
+depq_end_rrange(struct depq_rrange const *const rr)
 {
     return (struct depq_elem *)rrange_end(&rr->r);
 }
@@ -328,7 +328,7 @@ pq_has_dups(struct depqueue *const pq, struct depq_elem *e)
 }
 
 void
-depq_print(const struct depqueue *const pq, const struct depq_elem *const start,
+depq_print(struct depqueue const *const pq, struct depq_elem const *const start,
            depq_print_fn *const fn)
 {
     print_tree(&pq->t, &start->n, (node_print_fn *)fn);
@@ -413,13 +413,13 @@ set_equal_range(struct set *s, struct set_elem *begin, struct set_elem *end)
 }
 
 struct set_elem *
-set_begin_range(const struct set_range *const r)
+set_begin_range(struct set_range const *const r)
 {
     return (struct set_elem *)range_begin(&r->r);
 }
 
 struct set_elem *
-set_end_range(const struct set_range *const r)
+set_end_range(struct set_range const *const r)
 {
     return (struct set_elem *)range_end(&r->r);
 }
@@ -428,7 +428,7 @@ struct set_rrange
 set_equal_rrange(struct set *s, struct set_elem *rbegin, struct set_elem *end)
 
 {
-    const struct range r
+    struct range const r
         = equal_range(&s->t, &rbegin->n, &end->n, reverse_inorder_traversal);
     return (struct set_rrange){
         .r = (struct rrange){
@@ -439,18 +439,18 @@ set_equal_rrange(struct set *s, struct set_elem *rbegin, struct set_elem *end)
 }
 
 struct set_elem *
-set_begin_rrange(const struct set_rrange *const rr)
+set_begin_rrange(struct set_rrange const *const rr)
 {
     return (struct set_elem *)rrange_begin(&rr->r);
 }
 
 struct set_elem *
-set_end_rrange(const struct set_rrange *rr)
+set_end_rrange(struct set_rrange const *rr)
 {
     return (struct set_elem *)rrange_end(&rr->r);
 }
 
-const struct set_elem *
+struct set_elem const *
 set_find(struct set *s, struct set_elem *se)
 {
     return (struct set_elem *)find(&s->t, &se->n);
@@ -480,20 +480,20 @@ set_is_max(struct set *s, struct set_elem *e)
     return set_next(s, e) == (struct set_elem *)&s->t.end;
 }
 
-const struct set_elem *
+struct set_elem const *
 set_const_find(struct set *s, struct set_elem *e)
 {
     return (struct set_elem *)const_seek(&s->t, &e->n);
 }
 
 struct set_elem *
-set_root(const struct set *const s)
+set_root(struct set const *const s)
 {
     return (struct set_elem *)root(&s->t);
 }
 
 void
-set_print(const struct set *const s, const struct set_elem *const root,
+set_print(struct set const *const s, struct set_elem const *const root,
           set_print_fn *const fn)
 {
     print_tree(&s->t, &root->n, (node_print_fn *)fn);
@@ -569,19 +569,19 @@ init_node(struct tree *t, struct node *n)
 }
 
 static bool
-empty(const struct tree *const t)
+empty(struct tree const *const t)
 {
     return !t->size;
 }
 
 static struct node *
-root(const struct tree *const t)
+root(struct tree const *const t)
 {
     return t->root;
 }
 
 static struct node *
-max(const struct tree *const t)
+max(struct tree const *const t)
 {
     struct node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
@@ -590,7 +590,7 @@ max(const struct tree *const t)
 }
 
 static struct node *
-min(const struct tree *t)
+min(struct tree const *t)
 {
     struct node *m = t->root;
     for (; m->link[L] != &t->end; m = m->link[L])
@@ -604,7 +604,7 @@ const_seek(struct tree *const t, struct node *const n)
     struct node *seek = n;
     while (seek != &t->end)
     {
-        const node_threeway_cmp cur_cmp = t->cmp(n, seek, t->aux);
+        node_threeway_cmp const cur_cmp = t->cmp(n, seek, t->aux);
         if (cur_cmp == NODE_EQL)
         {
             return seek;
@@ -645,7 +645,7 @@ is_dup_head(struct node *end, struct node *i)
 }
 
 static struct node *
-multiset_next(struct tree *t, struct node *i, const enum tree_link traversal)
+multiset_next(struct tree *t, struct node *i, enum tree_link const traversal)
 {
     /* An arbitrary node in a doubly linked list of duplicates. */
     if (NULL == i->parent_or_dups)
@@ -676,13 +676,13 @@ multiset_next(struct tree *t, struct node *i, const enum tree_link traversal)
 
 static inline struct node *
 next_tree_node(struct tree *t, struct node *head,
-               const enum tree_link traversal)
+               enum tree_link const traversal)
 {
     if (head->parent_or_dups == &t->end)
     {
         return next(t, t->root, traversal);
     }
-    const struct node *parent = head->parent_or_dups;
+    struct node const *parent = head->parent_or_dups;
     if (parent->link[L] != &t->end && parent->link[L]->parent_or_dups == head)
     {
         return next(t, parent->link[L], traversal);
@@ -696,7 +696,7 @@ next_tree_node(struct tree *t, struct node *head,
 }
 
 static struct node *
-next(struct tree *t, struct node *n, const enum tree_link traversal)
+next(struct tree *t, struct node *n, enum tree_link const traversal)
 {
     if (get_parent(t, t->root) != &t->end)
     {
@@ -731,14 +731,14 @@ next(struct tree *t, struct node *n, const enum tree_link traversal)
 
 static struct range
 equal_range(struct tree *t, struct node *begin, struct node *end,
-            const enum tree_link traversal)
+            enum tree_link const traversal)
 {
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
-    const node_threeway_cmp grt_or_les[2] = {NODE_GRT, NODE_LES};
+    node_threeway_cmp const grt_or_les[2] = {NODE_GRT, NODE_LES};
     struct node *b = splay(t, t->root, begin, t->cmp);
     if (t->cmp(begin, b, NULL) == grt_or_les[traversal])
     {
@@ -753,25 +753,25 @@ equal_range(struct tree *t, struct node *begin, struct node *end,
 }
 
 static struct node *
-range_begin(const struct range *const r)
+range_begin(struct range const *const r)
 {
     return r->begin;
 }
 
 static struct node *
-range_end(const struct range *const r)
+range_end(struct range const *const r)
 {
     return r->end;
 }
 
 static struct node *
-rrange_begin(const struct rrange *const rr)
+rrange_begin(struct rrange const *const rr)
 {
     return rr->rbegin;
 }
 
 static struct node *
-rrange_end(const struct rrange *const rr)
+rrange_end(struct rrange const *const rr)
 {
     return rr->end;
 }
@@ -803,7 +803,7 @@ insert(struct tree *t, struct node *elem)
         return true;
     }
     t->root = splay(t, t->root, elem, t->cmp);
-    const node_threeway_cmp root_cmp = t->cmp(elem, t->root, NULL);
+    node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
     if (NODE_EQL == root_cmp)
     {
         return false;
@@ -824,7 +824,7 @@ multiset_insert(struct tree *t, struct node *elem)
     }
     t->root = splay(t, t->root, elem, t->cmp);
 
-    const node_threeway_cmp root_cmp = t->cmp(elem, t->root, NULL);
+    node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
     if (NODE_EQL == root_cmp)
     {
         add_duplicate(t, t->root, elem, &t->end);
@@ -837,7 +837,7 @@ static struct node *
 connect_new_root(struct tree *t, struct node *new_root,
                  node_threeway_cmp cmp_result)
 {
-    const enum tree_link link = NODE_GRT == cmp_result;
+    enum tree_link const link = NODE_GRT == cmp_result;
     link_trees(t, new_root, link, t->root->link[link]);
     link_trees(t, new_root, !link, t->root);
     t->root->link[link] = &t->end;
@@ -882,7 +882,7 @@ erase(struct tree *t, struct node *elem)
         return &t->end;
     }
     struct node *ret = splay(t, t->root, elem, t->cmp);
-    const node_threeway_cmp found = t->cmp(elem, ret, NULL);
+    node_threeway_cmp const found = t->cmp(elem, ret, NULL);
     if (found != NODE_EQL)
     {
         return &t->end;
@@ -1011,7 +1011,7 @@ pop_front_dup(struct tree *t, struct node *old)
 
     struct node *new_list_head = old->parent_or_dups->link[N];
     struct node *list_tail = old->parent_or_dups->link[P];
-    const bool circular_list_empty = new_list_head->link[N] == new_list_head;
+    bool const circular_list_empty = new_list_head->link[N] == new_list_head;
 
     new_list_head->link[P] = list_tail;
     new_list_head->parent_or_dups = parent;
@@ -1046,7 +1046,7 @@ remove_from_tree(struct tree *t, struct node *ret)
 }
 
 static struct node *
-splay(struct tree *t, struct node *root, const struct node *elem,
+splay(struct tree *t, struct node *root, struct node const *elem,
       tree_cmp_fn *cmp)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
@@ -1056,14 +1056,14 @@ splay(struct tree *t, struct node *root, const struct node *elem,
     struct node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        const node_threeway_cmp root_cmp = cmp(elem, root, t->aux);
-        const enum tree_link dir = NODE_GRT == root_cmp;
+        node_threeway_cmp const root_cmp = cmp(elem, root, t->aux);
+        enum tree_link const dir = NODE_GRT == root_cmp;
         if (NODE_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
-        const node_threeway_cmp child_cmp = cmp(elem, root->link[dir], t->aux);
-        const enum tree_link dir_from_child = NODE_GRT == child_cmp;
+        node_threeway_cmp const child_cmp = cmp(elem, root->link[dir], t->aux);
+        enum tree_link const dir_from_child = NODE_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
         if (NODE_EQL != child_cmp && dir == dir_from_child)
@@ -1140,7 +1140,7 @@ link_trees(struct tree *t, struct node *parent, enum tree_link dir,
    also identify if we ARE a duplicate but that check is not part
    of this function. */
 static inline bool
-has_dups(const struct node *const end, const struct node *const n)
+has_dups(struct node const *const end, struct node const *const n)
 {
     return n != end && n->parent_or_dups != end
            && n->parent_or_dups->link[L] != end
@@ -1161,7 +1161,7 @@ get_parent(struct tree *t, struct node *n)
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters) */
 static node_threeway_cmp
-force_find_grt(const struct node *a, const struct node *b, void *aux)
+force_find_grt(struct node const *a, struct node const *b, void *aux)
 {
     (void)a;
     (void)b;
@@ -1170,7 +1170,7 @@ force_find_grt(const struct node *a, const struct node *b, void *aux)
 }
 
 static node_threeway_cmp
-force_find_les(const struct node *a, const struct node *b, void *aux)
+force_find_les(struct node const *a, struct node const *b, void *aux)
 {
     (void)a;
     (void)b;
@@ -1193,19 +1193,19 @@ force_find_les(const struct node *a, const struct node *b, void *aux)
    reliable check regardless of implementation changes throughout code base. */
 struct tree_range
 {
-    const struct node *low;
-    const struct node *root;
-    const struct node *high;
+    struct node const *low;
+    struct node const *root;
+    struct node const *high;
 };
 
 struct parent_status
 {
     bool correct;
-    const struct node *parent;
+    struct node const *parent;
 };
 
 static size_t
-count_dups(const struct tree *const t, const struct node *const n)
+count_dups(struct tree const *const t, struct node const *const n)
 {
     if (!has_dups(&t->end, n))
     {
@@ -1221,7 +1221,7 @@ count_dups(const struct tree *const t, const struct node *const n)
 }
 
 static size_t
-recursive_size(const struct tree *const t, const struct node *const r)
+recursive_size(struct tree const *const t, struct node const *const r)
 {
     if (r == &t->end)
     {
@@ -1232,8 +1232,8 @@ recursive_size(const struct tree *const t, const struct node *const r)
 }
 
 static bool
-are_subtrees_valid(const struct tree_range r, tree_cmp_fn *const cmp,
-                   const struct node *const nil)
+are_subtrees_valid(struct tree_range const r, tree_cmp_fn *const cmp,
+                   struct node const *const nil)
 {
     if (r.root == nil)
     {
@@ -1264,8 +1264,8 @@ are_subtrees_valid(const struct tree_range r, tree_cmp_fn *const cmp,
 }
 
 static struct parent_status
-child_tracks_parent(const struct tree *const t, const struct node *const parent,
-                    const struct node *const root)
+child_tracks_parent(struct tree const *const t, struct node const *const parent,
+                    struct node const *const root)
 {
     if (has_dups(&t->end, root))
     {
@@ -1284,9 +1284,9 @@ child_tracks_parent(const struct tree *const t, const struct node *const parent,
 }
 
 static bool
-is_duplicate_storing_parent(const struct tree *const t,
-                            const struct node *const parent,
-                            const struct node *const root)
+is_duplicate_storing_parent(struct tree const *const t,
+                            struct node const *const parent,
+                            struct node const *const root)
 {
     if (root == &t->end)
     {
@@ -1307,7 +1307,7 @@ is_duplicate_storing_parent(const struct tree *const t,
    truth of the provided pointers with its own stack as backtracking
    information. */
 bool
-validate_tree(const struct tree *const t)
+validate_tree(struct tree const *const t)
 {
     if (!are_subtrees_valid(
             (struct tree_range){
@@ -1331,7 +1331,7 @@ validate_tree(const struct tree *const t)
 }
 
 static size_t
-get_subtree_size(const struct node *const root, const void *const nil)
+get_subtree_size(struct node const *const root, void const *const nil)
 {
     if (root == nil)
     {
@@ -1341,9 +1341,9 @@ get_subtree_size(const struct node *const root, const void *const nil)
            + get_subtree_size(root->link[R], nil);
 }
 
-static const char *
-get_edge_color(const struct node *const root, const size_t parent_size,
-               const struct node *const nil)
+static char const *
+get_edge_color(struct node const *const root, size_t const parent_size,
+               struct node const *const nil)
 {
     if (root == nil)
     {
@@ -1354,8 +1354,8 @@ get_edge_color(const struct node *const root, const size_t parent_size,
 }
 
 static void
-print_node(const struct tree *const t, const struct node *const parent,
-           const struct node *const root, node_print_fn *const fn_print)
+print_node(struct tree const *const t, struct node const *const parent,
+           struct node const *const root, node_print_fn *const fn_print)
 {
     fn_print(root);
     struct parent_status stat = child_tracks_parent(t, parent, root);
@@ -1370,7 +1370,7 @@ print_node(const struct tree *const t, const struct node *const parent,
     if (has_dups(&t->end, root))
     {
         int duplicates = 1;
-        const struct node *head = root->parent_or_dups;
+        struct node const *head = root->parent_or_dups;
         if (head != &t->end)
         {
             fn_print(head);
@@ -1390,11 +1390,11 @@ print_node(const struct tree *const t, const struct node *const parent,
    than node color. Don't care about pretty code here, need thorough debug.
    I want to convert to iterative stack when I get the chance. */
 static void
-print_inner_tree(const struct node *const root, const size_t parent_size,
-                 const struct node *const parent, const char *const prefix,
-                 const char *const prefix_color,
-                 const enum print_link node_type, const enum tree_link dir,
-                 const struct tree *const t, node_print_fn *const fn_print)
+print_inner_tree(struct node const *const root, size_t const parent_size,
+                 struct node const *const parent, char const *const prefix,
+                 char const *const prefix_color,
+                 enum print_link const node_type, enum tree_link const dir,
+                 struct tree const *const t, node_print_fn *const fn_print)
 {
     if (root == &t->end)
     {
@@ -1412,7 +1412,7 @@ print_inner_tree(const struct node *const root, const size_t parent_size,
     print_node(t, parent, root, fn_print);
 
     char *str = NULL;
-    const int string_length
+    int const string_length
         = snprintf(NULL, 0, "%s%s%s", prefix, prefix_color, /* NOLINT */
                    node_type == LEAF ? "     " : " │   ");
     if (string_length > 0)
@@ -1429,7 +1429,7 @@ print_inner_tree(const struct node *const root, const size_t parent_size,
         return;
     }
 
-    const char *left_edge_color
+    char const *left_edge_color
         = get_edge_color(root->link[L], subtree_size, &t->end);
     if (root->link[R] == &t->end)
     {
@@ -1455,7 +1455,7 @@ print_inner_tree(const struct node *const root, const size_t parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 void
-print_tree(const struct tree *const t, const struct node *const root,
+print_tree(struct tree const *const t, struct node const *const root,
            node_print_fn *const fn_print)
 {
     if (root == &t->end)
@@ -1466,7 +1466,7 @@ print_tree(const struct tree *const t, const struct node *const root,
     printf("\n%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
     print_node(t, &t->end, root, fn_print);
 
-    const char *left_edge_color
+    char const *left_edge_color
         = get_edge_color(root->link[L], subtree_size, &t->end);
     if (root->link[R] == &t->end)
     {

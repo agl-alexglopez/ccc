@@ -66,61 +66,61 @@ struct point_cost
 
 /*======================   Maze Constants   =================================*/
 
-const char *walls[] = {
+char const *walls[] = {
     "■", "╵", "╶", "└", "╷", "│", "┌", "├",
     "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
 };
 
-const int speeds[] = {
+int const speeds[] = {
     0, 5000000, 2500000, 1000000, 500000, 250000, 100000, 1000,
 };
 
-const struct point build_dirs[] = {{-2, 0}, {0, 2}, {2, 0}, {0, -2}};
-const size_t build_dirs_size = sizeof(build_dirs) / sizeof(build_dirs[0]);
+struct point const build_dirs[] = {{-2, 0}, {0, 2}, {2, 0}, {0, -2}};
+size_t const build_dirs_size = sizeof(build_dirs) / sizeof(build_dirs[0]);
 
-const str_view rows = SV("-r=");
-const str_view cols = SV("-c=");
-const str_view speed = SV("-s=");
-const str_view help_flag = SV("-h");
-const str_view escape = SV("\033[");
-const str_view semi_colon = SV(";");
-const str_view cursor_pos_specifier = SV("f");
-const int default_rows = 33;
-const int default_cols = 111;
-const int default_speed = 4;
-const int row_col_min = 7;
-const int speed_max = 7;
+str_view const rows = SV("-r=");
+str_view const cols = SV("-c=");
+str_view const speed = SV("-s=");
+str_view const help_flag = SV("-h");
+str_view const escape = SV("\033[");
+str_view const semi_colon = SV(";");
+str_view const cursor_pos_specifier = SV("f");
+int const default_rows = 33;
+int const default_cols = 111;
+int const default_speed = 4;
+int const row_col_min = 7;
+int const speed_max = 7;
 
-const uint16_t path_bit = 0b0010000000000000;
-const uint16_t wall_mask = 0b1111;
-const uint16_t floating_wall = 0b0000;
-const uint16_t north_wall = 0b0001;
-const uint16_t east_wall = 0b0010;
-const uint16_t south_wall = 0b0100;
-const uint16_t west_wall = 0b1000;
-const uint16_t cached_bit = 0b0001000000000000;
+uint16_t const path_bit = 0b0010000000000000;
+uint16_t const wall_mask = 0b1111;
+uint16_t const floating_wall = 0b0000;
+uint16_t const north_wall = 0b0001;
+uint16_t const east_wall = 0b0010;
+uint16_t const south_wall = 0b0100;
+uint16_t const west_wall = 0b1000;
+uint16_t const cached_bit = 0b0001000000000000;
 
 /*==========================   Prototypes  ================================= */
 
 static void animate_maze(struct maze *);
 static void fill_maze_with_walls(struct maze *);
 static void build_wall(struct maze *, struct point);
-static void print_square(const struct maze *, struct point);
-static uint16_t *maze_at_mut(const struct maze *, struct point);
-static uint16_t maze_at(const struct maze *, struct point);
-static void clear_and_flush_maze(const struct maze *);
+static void print_square(struct maze const *, struct point);
+static uint16_t *maze_at_mut(struct maze const *, struct point);
+static uint16_t maze_at(struct maze const *, struct point);
+static void clear_and_flush_maze(struct maze const *);
 static void carve_path_walls_animated(struct maze *, struct point, int);
 static void join_squares_animated(struct maze *, struct point, struct point,
                                   int);
-static void flush_cursor_maze_coordinate(const struct maze *, struct point);
-static bool can_build_new_square(const struct maze *, struct point);
+static void flush_cursor_maze_coordinate(struct maze const *, struct point);
+static bool can_build_new_square(struct maze const *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
-static struct point pick_rand_point(const struct maze *);
-static dpq_threeway_cmp cmp_priority_cells(const struct depq_elem *,
-                                           const struct depq_elem *, void *);
-static set_threeway_cmp cmp_points(const struct set_elem *,
-                                   const struct set_elem *, void *);
+static struct point pick_rand_point(struct maze const *);
+static dpq_threeway_cmp cmp_priority_cells(struct depq_elem const *,
+                                           struct depq_elem const *, void *);
+static set_threeway_cmp cmp_points(struct set_elem const *,
+                                   struct set_elem const *, void *);
 static void set_destructor(struct set_elem *);
 static struct int_conversion parse_digits(str_view);
 
@@ -141,10 +141,10 @@ main(int argc, char **argv)
     };
     for (int i = 1; i < argc; ++i)
     {
-        const str_view arg = sv(argv[i]);
+        str_view const arg = sv(argv[i]);
         if (sv_starts_with(arg, rows))
         {
-            const struct int_conversion row_arg = parse_digits(arg);
+            struct int_conversion const row_arg = parse_digits(arg);
             if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
             {
                 quit("rows below required minimum or negative.\n", 1);
@@ -153,7 +153,7 @@ main(int argc, char **argv)
         }
         else if (sv_starts_with(arg, cols))
         {
-            const struct int_conversion col_arg = parse_digits(arg);
+            struct int_conversion const col_arg = parse_digits(arg);
             if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
             {
                 quit("cols below required minimum or negative.\n", 1);
@@ -162,7 +162,7 @@ main(int argc, char **argv)
         }
         else if (sv_starts_with(arg, speed))
         {
-            const struct int_conversion speed_arg = parse_digits(arg);
+            struct int_conversion const speed_arg = parse_digits(arg);
             if (speed_arg.status == CONV_ER || speed_arg.conversion > speed_max
                 || speed_arg.conversion < 0)
             {
@@ -219,19 +219,19 @@ animate_maze(struct maze *maze)
     };
     (void)depq_push(&cells, &start->elem);
 
-    const int animation_speed = speeds[maze->speed];
+    int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
     while (!depq_empty(&cells))
     {
-        const struct priority_cell *const cur
+        struct priority_cell const *const cur
             = DEPQ_ENTRY(depq_max(&cells), struct priority_cell, elem);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
         for (size_t i = 0; i < build_dirs_size; ++i)
         {
-            const struct point next = {
+            struct point const next = {
                 .r = cur->cell.r + build_dirs[i].r,
                 .c = cur->cell.c + build_dirs[i].c,
             };
@@ -241,7 +241,7 @@ animate_maze(struct maze *maze)
             }
             int cur_weight = 0;
             struct point_cost key = {.p = next};
-            const struct set_elem *const found
+            struct set_elem const *const found
                 = set_find(&cell_costs, &key.elem);
             if (found == set_end(&cell_costs))
             {
@@ -291,7 +291,7 @@ animate_maze(struct maze *maze)
 }
 
 static struct point
-pick_rand_point(const struct maze *const maze)
+pick_rand_point(struct maze const *const maze)
 {
     return (struct point){
         .r = 2 * rand_range(1, (maze->rows - 2) / 2) + 1,
@@ -314,7 +314,7 @@ fill_maze_with_walls(struct maze *maze)
 }
 
 static void
-clear_and_flush_maze(const struct maze *const maze)
+clear_and_flush_maze(struct maze const *const maze)
 {
     clear_screen();
     for (int row = 0; row < maze->rows; ++row)
@@ -329,8 +329,8 @@ clear_and_flush_maze(const struct maze *const maze)
 }
 
 static void
-join_squares_animated(struct maze *maze, const struct point cur,
-                      const struct point next, int s)
+join_squares_animated(struct maze *maze, struct point const cur,
+                      struct point const next, int s)
 {
     struct point wall = cur;
     if (next.r < cur.r)
@@ -359,7 +359,7 @@ join_squares_animated(struct maze *maze, const struct point cur,
 }
 
 static void
-carve_path_walls_animated(struct maze *maze, const struct point p, int s)
+carve_path_walls_animated(struct maze *maze, struct point const p, int s)
 {
     *maze_at_mut(maze, p) |= path_bit;
     flush_cursor_maze_coordinate(maze, p);
@@ -427,7 +427,7 @@ build_wall(struct maze *m, struct point p)
 }
 
 static void
-flush_cursor_maze_coordinate(const struct maze *maze, const struct point p)
+flush_cursor_maze_coordinate(struct maze const *maze, struct point const p)
 {
     set_cursor_position(p.r, p.c);
     print_square(maze, p);
@@ -435,9 +435,9 @@ flush_cursor_maze_coordinate(const struct maze *maze, const struct point p)
 }
 
 static void
-print_square(const struct maze *m, struct point p)
+print_square(struct maze const *m, struct point p)
 {
-    const uint16_t square = maze_at(m, p);
+    uint16_t const square = maze_at(m, p);
     if (!(square & path_bit))
     {
         printf("%s", walls[square & wall_mask]);
@@ -453,19 +453,19 @@ print_square(const struct maze *m, struct point p)
 }
 
 static uint16_t *
-maze_at_mut(const struct maze *const maze, struct point p)
+maze_at_mut(struct maze const *const maze, struct point p)
 {
     return &maze->maze[p.r * maze->cols + p.c];
 }
 
 static uint16_t
-maze_at(const struct maze *const maze, struct point p)
+maze_at(struct maze const *const maze, struct point p)
 {
     return maze->maze[p.r * maze->cols + p.c];
 }
 
 static bool
-can_build_new_square(const struct maze *const maze, const struct point next)
+can_build_new_square(struct maze const *const maze, struct point const next)
 {
     return next.r > 0 && next.r < maze->rows - 1 && next.c > 0
            && next.c < maze->cols - 1 && !(maze_at(maze, next) & cached_bit);
@@ -474,23 +474,23 @@ can_build_new_square(const struct maze *const maze, const struct point next)
 /*===================   Data Structure Comparators   ========================*/
 
 static dpq_threeway_cmp
-cmp_priority_cells(const struct depq_elem *const key, const struct depq_elem *n,
+cmp_priority_cells(struct depq_elem const *const key, struct depq_elem const *n,
                    void *const aux)
 {
     (void)aux;
-    const struct priority_cell *const a
+    struct priority_cell const *const a
         = DEPQ_ENTRY(key, struct priority_cell, elem);
-    const struct priority_cell *const b
+    struct priority_cell const *const b
         = DEPQ_ENTRY(n, struct priority_cell, elem);
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
 static set_threeway_cmp
-cmp_points(const struct set_elem *key, const struct set_elem *n, void *aux)
+cmp_points(struct set_elem const *key, struct set_elem const *n, void *aux)
 {
     (void)aux;
-    const struct point_cost *const a = SET_ENTRY(key, struct point_cost, elem);
-    const struct point_cost *const b = SET_ENTRY(n, struct point_cost, elem);
+    struct point_cost const *const a = SET_ENTRY(key, struct point_cost, elem);
+    struct point_cost const *const b = SET_ENTRY(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
         return SETEQL;
@@ -514,7 +514,7 @@ set_destructor(struct set_elem *e)
 static struct int_conversion
 parse_digits(str_view arg)
 {
-    const size_t eql = sv_rfind(arg, sv_npos(arg), SV("="));
+    size_t const eql = sv_rfind(arg, sv_npos(arg), SV("="));
     if (eql == sv_npos(arg))
     {
         return (struct int_conversion){.status = CONV_ER};

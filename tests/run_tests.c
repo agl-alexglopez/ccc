@@ -25,10 +25,10 @@ struct path_bin
     str_view bin;
 };
 
-static const str_view test_prefix = SV("test_");
-const char *const pass_msg = "⬤";
-const char *const fail_msg = "X";
-const char *const err_msg = "Test process failed abnormally:";
+static str_view const test_prefix = SV("test_");
+char const *const pass_msg = "⬤";
+char const *const fail_msg = "X";
+char const *const err_msg = "Test process failed abnormally:";
 
 static int run(str_view);
 enum test_result run_test_process(struct path_bin);
@@ -47,7 +47,7 @@ main(int argc, char **argv)
 }
 
 static int
-run(const str_view tests_dir)
+run(str_view const tests_dir)
 {
     DIR *dir_ptr = open_test_dir(tests_dir);
     if (!dir_ptr)
@@ -57,10 +57,10 @@ run(const str_view tests_dir)
     char absolute_path[FILESYS_MAX_PATH];
     size_t tests = 0;
     size_t passed = 0;
-    const struct dirent *d;
+    struct dirent const *d;
     while ((d = readdir(dir_ptr)))
     {
-        const str_view entry = sv(d->d_name);
+        str_view const entry = sv(d->d_name);
         if (!sv_starts_with(entry, test_prefix))
         {
             continue;
@@ -71,7 +71,7 @@ run(const str_view tests_dir)
         }
         printf("%s(%s%s\n", CYAN, sv_begin(entry), NONE);
         (void)fflush(stdout);
-        const enum test_result res
+        enum test_result const res
             = run_test_process((struct path_bin){sv(absolute_path), entry});
         switch (res)
         {
@@ -103,7 +103,7 @@ run_test_process(struct path_bin pb)
         (void)fprintf(stderr, "No test provided.\n");
         return ERROR;
     }
-    const pid_t test_proc = fork();
+    pid_t const test_proc = fork();
     if (test_proc == 0)
     {
         execl(sv_begin(pb.path), sv_begin(pb.bin), NULL);
@@ -145,7 +145,7 @@ open_test_dir(str_view tests_folder)
 static bool
 fill_path(char *path_buf, str_view tests_dir, str_view entry)
 {
-    const size_t dir_bytes = sv_fill(FILESYS_MAX_PATH, path_buf, tests_dir);
+    size_t const dir_bytes = sv_fill(FILESYS_MAX_PATH, path_buf, tests_dir);
     if (FILESYS_MAX_PATH - dir_bytes < sv_size(entry))
     {
         (void)fprintf(stderr, "Relative path exceeds FILESYS_MAX_PATH?\n%s",

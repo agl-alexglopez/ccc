@@ -226,8 +226,8 @@ enum
       }
 
    ============================================================= */
-typedef set_threeway_cmp set_cmp_fn(const struct set_elem *a,
-                                    const struct set_elem *b, void *aux);
+typedef set_threeway_cmp set_cmp_fn(struct set_elem const *a,
+                                    struct set_elem const *b, void *aux);
 
 /* Performs user specified destructor actions on a single set_elem. This
    set_elem is assumed to be embedded in user defined structs and therefore
@@ -285,13 +285,13 @@ struct set_rrange
 
       void print_my_val(set_elem *elem)
       {
-         const struct val *v = SET_ENTRY(elem, struct val, elem);
+         struct val const *v = SET_ENTRY(elem, struct val, elem);
          printf("{%d}", v->val);
       }
 
    Output should be one line with no newline character. Then,
    the printer function will take care of the rest. */
-typedef void set_print_fn(const struct set_elem *);
+typedef void set_print_fn(struct set_elem const *);
 
 /* NOLINTNEXTLINE */
 #define SET_ENTRY(SET_ELEM, STRUCT, MEMBER)                                    \
@@ -348,7 +348,7 @@ bool set_insert(struct set *, struct set_elem *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-const struct set_elem *set_find(struct set *, struct set_elem *);
+struct set_elem const *set_find(struct set *, struct set_elem *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -381,7 +381,7 @@ bool set_const_contains(struct set *, struct set_elem *);
    benefits from locality of reference and should be
    allowed to repair itself with lookups with all other
    functions whenever possible. */
-const struct set_elem *set_const_find(struct set *, struct set_elem *);
+struct set_elem const *set_const_find(struct set *, struct set_elem *);
 
 /* ===================    Iteration   ==========================
 
@@ -490,9 +490,9 @@ struct set_elem *set_rnext(struct set *, struct set_elem *);
 struct set_range set_equal_range(struct set *, struct set_elem *begin,
                                  struct set_elem *end);
 
-struct set_elem *set_begin_range(const struct set_range *);
+struct set_elem *set_begin_range(struct set_range const *);
 
-struct set_elem *set_end_range(const struct set_range *);
+struct set_elem *set_end_range(struct set_range const *);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -518,23 +518,23 @@ struct set_elem *set_end_range(const struct set_range *);
 struct set_rrange set_equal_rrange(struct set *, struct set_elem *rbegin,
                                    struct set_elem *end);
 
-struct set_elem *set_begin_rrange(const struct set_rrange *);
+struct set_elem *set_begin_rrange(struct set_rrange const *);
 
-struct set_elem *set_end_rrange(const struct set_rrange *);
+struct set_elem *set_end_rrange(struct set_rrange const *);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes.
    You will need to pass this to the print function as a
    starting node for debugging. */
-struct set_elem *set_root(const struct set *);
+struct set_elem *set_root(struct set const *);
 
 /* Prints a tree structure of the underlying set for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void set_print(const struct set *, const struct set_elem *, set_print_fn *);
+void set_print(struct set const *, struct set_elem const *, set_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}
     ├──(29)R:{id:27,val:27}

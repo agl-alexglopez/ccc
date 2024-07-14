@@ -9,9 +9,9 @@ static struct pq_elem *fair_merge(struct pqueue *, struct pq_elem *old,
                                   struct pq_elem *new);
 static void link_child(struct pq_elem *parent, struct pq_elem *child);
 static void init_node(struct pq_elem *);
-static size_t traversal_size(const struct pq_elem *);
-static bool has_valid_links(const struct pqueue *, const struct pq_elem *parent,
-                            const struct pq_elem *child);
+static size_t traversal_size(struct pq_elem const *);
+static bool has_valid_links(struct pqueue const *, struct pq_elem const *parent,
+                            struct pq_elem const *child);
 static struct pq_elem *delete(struct pqueue *, struct pq_elem *);
 static struct pq_elem *delete_min(struct pqueue *, struct pq_elem *);
 static void clear_node(struct pq_elem *);
@@ -19,8 +19,8 @@ static void cut_child(struct pq_elem *);
 
 /*=========================  Interface Functions   ==========================*/
 
-const struct pq_elem *
-pq_front(const struct pqueue *const ppq)
+struct pq_elem const *
+pq_front(struct pqueue const *const ppq)
 {
     return ppq->root;
 }
@@ -74,13 +74,13 @@ pq_clear(struct pqueue *const ppq, pq_destructor_fn *fn)
 }
 
 bool
-pq_empty(const struct pqueue *const ppq)
+pq_empty(struct pqueue const *const ppq)
 {
     return !ppq->sz;
 }
 
 size_t
-pq_size(const struct pqueue *const ppq)
+pq_size(struct pqueue const *const ppq)
 {
     return ppq->sz;
 }
@@ -163,7 +163,7 @@ pq_decrease(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
 }
 
 bool
-pq_validate(const struct pqueue *const ppq)
+pq_validate(struct pqueue const *const ppq)
 {
     if (ppq->root && ppq->root->parent)
     {
@@ -181,7 +181,7 @@ pq_validate(const struct pqueue *const ppq)
 }
 
 enum pq_threeway_cmp
-pq_order(const struct pqueue *const ppq)
+pq_order(struct pqueue const *const ppq)
 {
     return ppq->order;
 }
@@ -302,7 +302,7 @@ link_child(struct pq_elem *const parent, struct pq_elem *const child)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static size_t
-traversal_size(const struct pq_elem *const root)
+traversal_size(struct pq_elem const *const root)
 {
     if (!root)
     {
@@ -310,7 +310,7 @@ traversal_size(const struct pq_elem *const root)
     }
     size_t sz = 0;
     bool sibling_ring_lapped = false;
-    const struct pq_elem *cur = root;
+    struct pq_elem const *cur = root;
     while (!sibling_ring_lapped)
     {
         sz += 1 + traversal_size(cur->left_child);
@@ -321,17 +321,17 @@ traversal_size(const struct pq_elem *const root)
 }
 
 static bool
-has_valid_links(const struct pqueue *const ppq,
-                const struct pq_elem *const parent,
-                const struct pq_elem *const child)
+has_valid_links(struct pqueue const *const ppq,
+                struct pq_elem const *const parent,
+                struct pq_elem const *const child)
 {
     if (!child)
     {
         return true;
     }
     bool sibling_ring_lapped = false;
-    const struct pq_elem *cur = child;
-    const enum pq_threeway_cmp wrong_order
+    struct pq_elem const *cur = child;
+    enum pq_threeway_cmp const wrong_order
         = ppq->order == PQLES ? PQGRT : PQLES;
     while (!sibling_ring_lapped)
     {

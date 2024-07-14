@@ -62,8 +62,8 @@ typedef enum
    If such a comparison is not possible for your type you can simply
    return the value of the cmp enum directly with conditionals switch
    statements or whatever other comparison logic you choose. */
-typedef node_threeway_cmp tree_cmp_fn(const struct node *key,
-                                      const struct node *n, void *aux);
+typedef node_threeway_cmp tree_cmp_fn(struct node const *key,
+                                      struct node const *n, void *aux);
 
 /* The size field is not strictly necessary but seems to be standard
    practice for these types of containers for O(1) access. The end is
@@ -93,7 +93,7 @@ struct rrange
     struct node *const end ATTRIB_PRIVATE;
 };
 
-typedef void node_print_fn(const struct node *);
+typedef void node_print_fn(struct node const *);
 
 #define TREE_INIT(TREE_NAME, CMP, AUX)                                         \
     {                                                                          \
@@ -106,11 +106,11 @@ typedef void node_print_fn(const struct node *);
 /* Mostly intended for debugging. Validates the underlying tree
    data structure with invariants that must hold regardless of
    interface. */
-bool validate_tree(const struct tree *t);
+bool validate_tree(struct tree const *t);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debugging use. */
-void print_tree(const struct tree *t, const struct node *root,
+void print_tree(struct tree const *t, struct node const *root,
                 node_print_fn *fn);
 
 #endif

@@ -60,8 +60,8 @@ enum
 
    The compare function one must provide to perform queries
    and other operations on the DEPQ. See above. */
-typedef dpq_threeway_cmp depq_cmp_fn(const struct depq_elem *a,
-                                     const struct depq_elem *b, void *aux);
+typedef dpq_threeway_cmp depq_cmp_fn(struct depq_elem const *a,
+                                     struct depq_elem const *b, void *aux);
 
 /* Define a function to use printf for your custom struct type.
    For example:
@@ -73,13 +73,13 @@ typedef dpq_threeway_cmp depq_cmp_fn(const struct depq_elem *a,
 
       void print_my_val(struct depq_elem *elem)
       {
-         const struct val *v = depq_entry(elem, struct val, elem);
+         struct val const *v = depq_entry(elem, struct val, elem);
          printf("{%d}", v->val);
       }
 
    Output should be one line with no newline character. Then,
    the printer function will take care of the rest. */
-typedef void depq_print_fn(const struct depq_elem *);
+typedef void depq_print_fn(struct depq_elem const *);
 
 /* Provide a new auxilliary value corresponding to the value type used
    for depq comparisons. The old value will be changed to new and
@@ -162,7 +162,7 @@ void depq_clear(struct depqueue *, depq_destructor_fn *destructor);
 
 /* Checks if the DEPQ is empty. Undefined if
    depq_init has not been called first. */
-bool depq_empty(const struct depqueue *);
+bool depq_empty(struct depqueue const *);
 
 /* O(1) */
 size_t depq_size(struct depqueue *);
@@ -219,10 +219,10 @@ bool depq_is_min(struct depqueue *, struct depq_elem *);
    and it has duplicates those duplicates will remain at
    the root O(1) until another insertion, query, or pop
    occurs. */
-const struct depq_elem *depq_const_max(const struct depqueue *);
+struct depq_elem const *depq_const_max(struct depqueue const *);
 /* Read only peek at the min. Does not alter tree and thus
    is thread safe. */
-const struct depq_elem *depq_const_min(const struct depqueue *);
+struct depq_elem const *depq_const_min(struct depqueue const *);
 
 /* Erases a specified element known to be in the DEPQ.
    Returns the element that follows the previous value
@@ -301,11 +301,11 @@ struct depq_range depq_equal_range(struct depqueue *, struct depq_elem *begin,
 
 /* Access the beginning of a range. Prefer this function to attempting to
    access fields of ranges directly. */
-struct depq_elem *depq_begin_range(const struct depq_range *);
+struct depq_elem *depq_begin_range(struct depq_range const *);
 
 /* Access the ending of a range. Prefer this function to attempting to
    access fields of ranges directly. */
-struct depq_elem *depq_end_range(const struct depq_range *);
+struct depq_elem *depq_end_range(struct depq_range const *);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -321,16 +321,16 @@ struct depq_rrange depq_equal_rrange(struct depqueue *,
 
 /* Access the beginning of a rrange. Prefer this function to attempting to
    access fields of rranges directly. */
-struct depq_elem *depq_begin_rrange(const struct depq_rrange *);
+struct depq_elem *depq_begin_rrange(struct depq_rrange const *);
 
 /* Access the ending of a rrange. Prefer this function to attempting to
    access fields of rranges directly. */
-struct depq_elem *depq_end_rrange(const struct depq_rrange *);
+struct depq_elem *depq_end_rrange(struct depq_rrange const *);
 
 /* To view the underlying tree like structure of the DEPQ
    for debugging or other purposes, provide the root of the struct depqueue
    to the depq_print function as the starting struct depq_elem. */
-struct depq_elem *depq_root(const struct depqueue *);
+struct depq_elem *depq_root(struct depqueue const *);
 
 /* Prints a tree structure of the underlying DEPQ for readability
    of many values. Helpful for printing debugging or viewing
@@ -339,7 +339,7 @@ struct depq_elem *depq_root(const struct depqueue *);
    so it may not be a good fit in constrained environments. Duplicates
    are indicated with plus signs followed by the number of additional
    duplicates. */
-void depq_print(const struct depqueue *, const struct depq_elem *,
+void depq_print(struct depqueue const *, struct depq_elem const *,
                 depq_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}(+1)

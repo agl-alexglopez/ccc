@@ -13,6 +13,8 @@ AlignTrailingComments: Always
 BinPackArguments: true
 BinPackParameters: true
 BreakBeforeBraces: Custom
+QualifierAlignment: Custom
+QualifierOrder: [static, inline, type, volatile, const]
 BraceWrapping:
   AfterControlStatement: Always
   AfterCaseLabel: true

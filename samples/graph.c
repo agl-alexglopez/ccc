@@ -108,33 +108,33 @@ struct digit_encoding
 /*======================   Graph Constants   ================================*/
 
 /* Go to the box drawing unicode character wikipedia page to change styles. */
-static const char *paths[] = {
+static char const *paths[] = {
     "●", "╵", "╶", "╰", "╷", "│", "╭", "├",
     "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼",
 };
 
 /* North, East, South, West */
 #define DIRS_SIZE ((size_t)4)
-static const struct point dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+static struct point const dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 #define VERTEX_TITLES_SIZE ((size_t)26ULL)
-static const char vertex_titles[VERTEX_TITLES_SIZE] = {
+static char const vertex_titles[VERTEX_TITLES_SIZE] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 };
 
-static const str_view rows = SV("-r=");
-static const str_view cols = SV("-c=");
-static const str_view vertices_flag = SV("-v=");
-static const str_view help_flag = SV("-h");
-static const int default_rows = 33;
-static const int default_cols = 111;
-static const int default_vertices = 4;
-static const int row_col_min = 7;
-static const int max_vertices = 26;
-static const int max_degree
+static str_view const rows = SV("-r=");
+static str_view const cols = SV("-c=");
+static str_view const vertices_flag = SV("-v=");
+static str_view const help_flag = SV("-h");
+static int const default_rows = 33;
+static int const default_cols = 111;
+static int const default_vertices = 4;
+static int const row_col_min = 7;
+static int const max_vertices = 26;
+static int const max_degree
     = 4; /* Vertex has 4 edge limit on a terminal grid. */
-static const int vertex_placement_padding = 3;
-static const char start_vertex_title = 'A';
+static int const vertex_placement_padding = 3;
+static char const start_vertex_title = 'A';
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
@@ -168,30 +168,30 @@ static const char start_vertex_title = 'A';
        with the lower value in the leftmost bits.
      - the vertex title is stored in 8 bits if the cell is a vertex. */
 
-static const size_t vertex_cell_title_shift = 8;
-static const Cell vertex_title_mask = 0xFF00;
-static const size_t edge_id_shift = 16;
-static const Cell edge_id_mask = 0xFFFF0000;
-static const Cell l_edge_id_mask = 0xFF000000;
-static const Cell l_edge_id_shift = 24;
-static const Cell r_edge_id_mask = 0x00FF0000;
-static const Cell r_edge_id_shift = 16;
-static const Cell path_mask = 0b1111;
-static const Cell north_path = 0b0001;
-static const Cell east_path = 0b0010;
-static const Cell south_path = 0b0100;
-static const Cell west_path = 0b1000;
-static const Cell path_bit = 0b10000;
-static const Cell vertex_bit = 0b100000;
-static const Cell paint_bit = 0b1000000;
-static const Cell digit_bit = 0b10000000;
-static const size_t digit_shift = 8;
-static const Cell digit_mask = 0xF00;
+static size_t const vertex_cell_title_shift = 8;
+static Cell const vertex_title_mask = 0xFF00;
+static size_t const edge_id_shift = 16;
+static Cell const edge_id_mask = 0xFFFF0000;
+static Cell const l_edge_id_mask = 0xFF000000;
+static Cell const l_edge_id_shift = 24;
+static Cell const r_edge_id_mask = 0x00FF0000;
+static Cell const r_edge_id_shift = 16;
+static Cell const path_mask = 0b1111;
+static Cell const north_path = 0b0001;
+static Cell const east_path = 0b0010;
+static Cell const south_path = 0b0100;
+static Cell const west_path = 0b1000;
+static Cell const path_bit = 0b10000;
+static Cell const vertex_bit = 0b100000;
+static Cell const paint_bit = 0b1000000;
+static Cell const digit_bit = 0b10000000;
+static size_t const digit_shift = 8;
+static Cell const digit_mask = 0xF00;
 
-static const str_view prompt_msg
+static str_view const prompt_msg
     = SV("Enter two vertices to find the shortest path between them (i.e. "
          "A-Z). Enter q to quit:");
-static const str_view quit_cmd = SV("q");
+static str_view const quit_cmd = SV("q");
 
 /*==========================   Prototypes  ================================= */
 
@@ -200,27 +200,27 @@ static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void prepare_vertices(struct graph *, struct pqueue *, struct set *,
-                             const struct path_request *);
-static void paint_edge(struct graph *, const struct vertex *,
-                       const struct vertex *);
+                             struct path_request const *);
+static void paint_edge(struct graph *, struct vertex const *,
+                       struct vertex const *);
 static void add_edge_cost_label(struct graph *, struct vertex *,
-                                const struct edge *);
+                                struct edge const *);
 static bool is_dst(Cell, char);
 
-static struct point random_vertex_placement(const struct graph *);
-static bool is_valid_vertex_pos(const struct graph *, struct point);
-static Cell *grid_at_mut(const struct graph *, struct point);
-static Cell grid_at(const struct graph *, struct point);
+static struct point random_vertex_placement(struct graph const *);
+static bool is_valid_vertex_pos(struct graph const *, struct point);
+static Cell *grid_at_mut(struct graph const *, struct point);
+static Cell grid_at(struct graph const *, struct point);
 static uint16_t sort_vertices(char, char);
-static int vertex_degree(const struct vertex *);
+static int vertex_degree(struct vertex const *);
 static bool connect_random_edge(struct graph *, struct vertex *);
 static void build_path_outline(struct graph *);
 static void build_path_cell(struct graph *, struct point, Cell);
-static void clear_and_flush_graph(const struct graph *);
+static void clear_and_flush_graph(struct graph const *);
 static void print_cell(Cell);
 static char get_cell_vertex_title(Cell);
-static bool has_edge_with(const struct vertex *, char);
-static bool add_edge(struct vertex *, const struct edge *);
+static bool has_edge_with(struct vertex const *, char);
+static bool add_edge(struct vertex *, struct edge const *);
 static bool is_edge_vertex(Cell, Cell);
 static bool is_valid_edge_cell(Cell, Cell);
 static void clear_paint(struct graph *);
@@ -236,16 +236,16 @@ static void help(void);
 
 static bool insert_prev_vertex(struct set *, struct prev_vertex);
 static bool insert_parent_cell(struct set *, struct parent_cell);
-static set_threeway_cmp cmp_vertices(const struct set_elem *,
-                                     const struct set_elem *, void *);
-static set_threeway_cmp cmp_parent_cells(const struct set_elem *,
-                                         const struct set_elem *, void *);
-static enum pq_threeway_cmp cmp_pq_dist_points(const struct pq_elem *,
-                                               const struct pq_elem *, void *);
-static set_threeway_cmp cmp_set_prev_vertices(const struct set_elem *,
-                                              const struct set_elem *, void *);
+static set_threeway_cmp cmp_vertices(struct set_elem const *,
+                                     struct set_elem const *, void *);
+static set_threeway_cmp cmp_parent_cells(struct set_elem const *,
+                                         struct set_elem const *, void *);
+static enum pq_threeway_cmp cmp_pq_dist_points(struct pq_elem const *,
+                                               struct pq_elem const *, void *);
+static set_threeway_cmp cmp_set_prev_vertices(struct set_elem const *,
+                                              struct set_elem const *, void *);
 static void pq_update_dist(struct pq_elem *, void *);
-static void print_vertex(const struct set_elem *);
+static void print_vertex(struct set_elem const *);
 static void set_vertex_destructor(struct set_elem *);
 static void set_pq_prev_vertex_dist_point_destructor(struct set_elem *);
 static void set_parent_point_destructor(struct set_elem *);
@@ -269,10 +269,10 @@ main(int argc, char **argv)
     };
     for (int i = 1; i < argc; ++i)
     {
-        const str_view arg = sv(argv[i]);
+        str_view const arg = sv(argv[i]);
         if (sv_starts_with(arg, rows))
         {
-            const struct int_conversion row_arg = parse_digits(arg);
+            struct int_conversion const row_arg = parse_digits(arg);
             if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
             {
                 quit("rows below required minimum or negative.\n", 1);
@@ -281,7 +281,7 @@ main(int argc, char **argv)
         }
         else if (sv_starts_with(arg, cols))
         {
-            const struct int_conversion col_arg = parse_digits(arg);
+            struct int_conversion const col_arg = parse_digits(arg);
             if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
             {
                 quit("cols below required minimum or negative.\n", 1);
@@ -290,7 +290,7 @@ main(int argc, char **argv)
         }
         else if (sv_starts_with(arg, vertices_flag))
         {
-            const struct int_conversion vert_arg = parse_digits(arg);
+            struct int_conversion const vert_arg = parse_digits(arg);
             if (vert_arg.status == CONV_ER || vert_arg.conversion > max_vertices
                 || vert_arg.conversion < 1)
             {
@@ -361,19 +361,19 @@ build_graph(struct graph *const graph)
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         key.name = (char)vertex_title;
-        const struct set_elem *const e
+        struct set_elem const *const e
             = set_find(&graph->adjacency_list, &key.elem);
         if (e == set_end(&graph->adjacency_list))
         {
             quit("Vertex that should be present in the set is absent.\n", 1);
         }
         struct vertex *const src = SET_ENTRY(e, struct vertex, elem);
-        const int degree = vertex_degree(src);
+        int const degree = vertex_degree(src);
         if (degree == max_degree)
         {
             continue;
         }
-        const int out_edges = rand_range(1, max_degree - degree);
+        int const out_edges = rand_range(1, max_degree - degree);
         for (int i = 0; i < out_edges && connect_random_edge(graph, src); ++i)
         {}
     }
@@ -383,7 +383,7 @@ build_graph(struct graph *const graph)
 static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
-    const size_t graph_size = set_size(&graph->adjacency_list);
+    size_t const graph_size = set_size(&graph->adjacency_list);
     /* Bounded at size of the alphabet A-Z so alloca is fine here. */
     size_t *vertex_title_indices = alloca(sizeof(size_t) * graph_size);
     for (size_t i = 0; i < graph_size; ++i)
@@ -393,7 +393,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
     /* Cycle through all vertices with which to join an edge randomly. */
     rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size);
     struct vertex key = {0};
-    const struct set_elem *e = NULL;
+    struct set_elem const *e = NULL;
     struct vertex *dst = NULL;
     for (size_t i = 0; i < graph_size; ++i)
     {
@@ -426,7 +426,7 @@ static bool
 has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
-    const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
+    Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct set parent_map = SET_INIT(parent_map, cmp_parent_cells, NULL);
     struct queue bfs;
     q_init(sizeof(struct point), &bfs, 4);
@@ -441,7 +441,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     {
         cur = *((struct point *)q_front(&bfs));
         q_pop(&bfs);
-        const Cell cur_cell = grid_at(graph, cur);
+        Cell const cur_cell = grid_at(graph, cur);
         if (is_dst(cur_cell, dst->name))
         {
             success = true;
@@ -454,7 +454,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 .c = cur.c + dirs[i].c,
             };
             struct parent_cell push = {.key = next, .parent = cur};
-            const Cell next_cell = grid_at(graph, next);
+            Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name)
                 || (!is_path(next_cell)
                     && !set_contains(&parent_map, &push.elem)))
@@ -467,7 +467,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     if (success)
     {
         struct parent_cell c = {.key = cur};
-        const struct set_elem *e = set_find(&parent_map, &c.elem);
+        struct set_elem const *e = set_find(&parent_map, &c.elem);
         if (e == set_end(&parent_map))
         {
             quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -503,15 +503,15 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
    easily counted with the mouse or by eye. */
 static void
 add_edge_cost_label(struct graph *const g, struct vertex *const src,
-                    const struct edge *const e)
+                    struct edge const *const e)
 {
     struct point cur = src->pos;
-    const Cell edge_id = sort_vertices(src->name, e->to->name) << edge_id_shift;
+    Cell const edge_id = sort_vertices(src->name, e->to->name) << edge_id_shift;
     struct point prev = cur;
     /* Add a two space buffer to either side of the label so direction of lines
        is not lost to writing of digits. Otherwise it would be unclear which
        edge a cost is associated with if close to other costs. */
-    const size_t spaces_needed_for_cost = count_digits(e->cost) + 2;
+    size_t const spaces_needed_for_cost = count_digits(e->cost) + 2;
     size_t consecutive_spaces_found = 0;
     enum label_orientation direction = NORTH;
     while (cur.r != e->to->pos.r || cur.c != e->to->pos.c)
@@ -532,7 +532,7 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
                 .r = cur.r + dirs[i].r,
                 .c = cur.c + dirs[i].c,
             };
-            const Cell next_cell = grid_at(g, next);
+            Cell const next_cell = grid_at(g, next);
             if ((next_cell & vertex_bit)
                 && get_cell_vertex_title(next_cell) == e->to->name)
             {
@@ -595,7 +595,7 @@ encode_digits(struct graph *g, struct digit_encoding e)
 static enum label_orientation
 get_direction(struct point prev, struct point next)
 {
-    const struct point diff = {.r = next.r - prev.r, .c = next.c - prev.c};
+    struct point const diff = {.r = next.r - prev.r, .c = next.c - prev.c};
     if (diff.c && !diff.r && diff.c > 0)
     {
         return EAST;
@@ -616,14 +616,14 @@ get_direction(struct point prev, struct point next)
 }
 
 static struct point
-random_vertex_placement(const struct graph *const graph)
+random_vertex_placement(struct graph const *const graph)
 {
-    const int row_end = graph->rows - 2;
-    const int col_end = graph->cols - 2;
+    int const row_end = graph->rows - 2;
+    int const col_end = graph->cols - 2;
     /* No vertices should be close to the edge of the map. */
-    const int row_start = rand_range(vertex_placement_padding,
+    int const row_start = rand_range(vertex_placement_padding,
                                      graph->rows - vertex_placement_padding);
-    const int col_start = rand_range(vertex_placement_padding,
+    int const col_start = rand_range(vertex_placement_padding,
                                      graph->cols - vertex_placement_padding);
     bool exhausted = false;
     for (int row = row_start; !exhausted && row < row_end;
@@ -640,7 +640,7 @@ random_vertex_placement(const struct graph *const graph)
             {
                 col = vertex_placement_padding;
             }
-            const struct point cur = {.r = row, .c = col};
+            struct point const cur = {.r = row, .c = col};
             if (is_valid_vertex_pos(graph, cur))
             {
                 return cur;
@@ -655,7 +655,7 @@ random_vertex_placement(const struct graph *const graph)
 }
 
 static inline bool
-is_dst(const Cell c, const char dst)
+is_dst(Cell const c, char const dst)
 {
     return is_vertex(c) && get_cell_vertex_title(c) == dst;
 }
@@ -705,7 +705,7 @@ find_shortest_paths(struct graph *const graph)
 }
 
 static bool
-dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
+dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
     struct pqueue dist_q = PQ_INIT(PQLES, cmp_pq_dist_points, NULL);
     struct set prev_map = SET_INIT(prev_map, cmp_set_prev_vertices, NULL);
@@ -725,7 +725,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct prev_vertex pv = {.v = cur->v->edges[i].to};
-            const struct set_elem *e = set_find(&prev_map, &pv.elem);
+            struct set_elem const *e = set_find(&prev_map, &pv.elem);
             assert(e != set_end(&prev_map));
             struct prev_vertex *next = SET_ENTRY(e, struct prev_vertex, elem);
             /* The seen set also holds a pointer to the corresponding
@@ -769,7 +769,7 @@ dijkstra_shortest_path(struct graph *const graph, const struct path_request pr)
 
 static void
 prepare_vertices(struct graph *const graph, struct pqueue *dist_q,
-                 struct set *prev_map, const struct path_request *pr)
+                 struct set *prev_map, struct path_request const *pr)
 {
     for (struct set_elem *e = set_begin(&graph->adjacency_list);
          e != set_end(&graph->adjacency_list);
@@ -794,11 +794,11 @@ prepare_vertices(struct graph *const graph, struct pqueue *dist_q,
 }
 
 static void
-paint_edge(struct graph *const g, const struct vertex *const src,
-           const struct vertex *const dst)
+paint_edge(struct graph *const g, struct vertex const *const src,
+           struct vertex const *const dst)
 {
     struct point cur = src->pos;
-    const Cell edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
+    Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     struct point prev = cur;
     while (cur.r != dst->pos.r || cur.c != dst->pos.c)
     {
@@ -809,7 +809,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
                 .r = cur.r + dirs[i].r,
                 .c = cur.c + dirs[i].c,
             };
-            const Cell next_cell = grid_at(g, next);
+            Cell const next_cell = grid_at(g, next);
             if ((next_cell & vertex_bit)
                 && get_cell_vertex_title(next_cell) == dst->name)
             {
@@ -833,7 +833,7 @@ paint_edge(struct graph *const g, const struct vertex *const src,
    and within bounds. The vertices are only placed with padding around the
    full grid space so this assumption should be safe. */
 static inline bool
-is_valid_vertex_pos(const struct graph *graph, struct point p)
+is_valid_vertex_pos(struct graph const *graph, struct point p)
 {
     return !(grid_at(graph, (struct point){.r = p.r, .c = p.c}) & vertex_bit)
            && !(grid_at(graph, (struct point){(p.r + 1), p.c}) & vertex_bit)
@@ -843,7 +843,7 @@ is_valid_vertex_pos(const struct graph *graph, struct point p)
 }
 
 static int
-vertex_degree(const struct vertex *const v)
+vertex_degree(struct vertex const *const v)
 {
     int n = 0;
     /* Vertexes are initialized with zeroed out edge array. Falsey. */
@@ -853,13 +853,13 @@ vertex_degree(const struct vertex *const v)
 }
 
 static inline Cell *
-grid_at_mut(const struct graph *const graph, struct point p)
+grid_at_mut(struct graph const *const graph, struct point p)
 {
     return &graph->grid[p.r * graph->cols + p.c];
 }
 
 static inline Cell
-grid_at(const struct graph *const graph, struct point p)
+grid_at(struct graph const *const graph, struct point p)
 {
     return graph->grid[p.r * graph->cols + p.c];
 }
@@ -871,13 +871,13 @@ sort_vertices(char a, char b)
 }
 
 static char
-get_cell_vertex_title(const Cell cell)
+get_cell_vertex_title(Cell const cell)
 {
     return (char)((cell & vertex_title_mask) >> vertex_cell_title_shift);
 }
 
 static bool
-has_edge_with(const struct vertex *const v, char vertex)
+has_edge_with(struct vertex const *const v, char vertex)
 {
     for (int i = 0; i < max_degree && v->edges[i].to; ++i)
     {
@@ -890,7 +890,7 @@ has_edge_with(const struct vertex *const v, char vertex)
 }
 
 static bool
-add_edge(struct vertex *const v, const struct edge *const e)
+add_edge(struct vertex *const v, struct edge const *const e)
 {
     for (int i = 0; i < max_degree; ++i)
     {
@@ -916,7 +916,7 @@ is_path(Cell c)
 }
 
 static void
-clear_and_flush_graph(const struct graph *const g)
+clear_and_flush_graph(struct graph const *const g)
 {
     clear_screen();
     for (int row = 0; row < g->rows; ++row)
@@ -944,7 +944,7 @@ clear_paint(struct graph *const graph)
 }
 
 static void
-print_cell(const Cell cell)
+print_cell(Cell const cell)
 {
 
     if (cell & vertex_bit)
@@ -973,25 +973,25 @@ print_cell(const Cell cell)
 }
 
 static bool
-is_edge_vertex(const Cell square, Cell edge_id)
+is_edge_vertex(Cell const square, Cell edge_id)
 {
-    const char vertex_name = get_cell_vertex_title(square);
-    const char edge_vertex1
+    char const vertex_name = get_cell_vertex_title(square);
+    char const edge_vertex1
         = (char)((edge_id & l_edge_id_mask) >> l_edge_id_shift);
-    const char edge_vertex2
+    char const edge_vertex2
         = (char)((edge_id & r_edge_id_mask) >> r_edge_id_shift);
     return vertex_name == edge_vertex1 || vertex_name == edge_vertex2;
 }
 
 static bool
-is_valid_edge_cell(const Cell square, const Cell edge_id)
+is_valid_edge_cell(Cell const square, Cell const edge_id)
 {
     return ((square & vertex_bit) && is_edge_vertex(square, edge_id))
            || ((square & path_bit) && (square & edge_id_mask) == edge_id);
 }
 
 static void
-build_path_cell(struct graph *g, struct point p, const Cell edge_id)
+build_path_cell(struct graph *g, struct point p, Cell const edge_id)
 {
     Cell path = path_bit;
     if (p.r - 1 >= 0
@@ -1063,21 +1063,21 @@ insert_parent_cell(struct set *s, struct parent_cell pc)
 }
 
 static set_threeway_cmp
-cmp_vertices(const struct set_elem *const a, const struct set_elem *const b,
+cmp_vertices(struct set_elem const *const a, struct set_elem const *const b,
              void *aux)
 {
     (void)aux;
-    const struct vertex *const v_a = SET_ENTRY(a, struct vertex, elem);
-    const struct vertex *const v_b = SET_ENTRY(b, struct vertex, elem);
+    struct vertex const *const v_a = SET_ENTRY(a, struct vertex, elem);
+    struct vertex const *const v_b = SET_ENTRY(b, struct vertex, elem);
     return (v_a->name > v_b->name) - (v_a->name < v_b->name);
 }
 
 static set_threeway_cmp
-cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
+cmp_parent_cells(struct set_elem const *x, struct set_elem const *y, void *aux)
 {
     (void)aux;
-    const struct parent_cell *const a = SET_ENTRY(x, struct parent_cell, elem);
-    const struct parent_cell *const b = SET_ENTRY(y, struct parent_cell, elem);
+    struct parent_cell const *const a = SET_ENTRY(x, struct parent_cell, elem);
+    struct parent_cell const *const b = SET_ENTRY(y, struct parent_cell, elem);
     if (a->key.r == b->key.r && a->key.c == b->key.c)
     {
         return SETEQL;
@@ -1090,22 +1090,22 @@ cmp_parent_cells(const struct set_elem *x, const struct set_elem *y, void *aux)
 }
 
 static enum pq_threeway_cmp
-cmp_pq_dist_points(const struct pq_elem *const x, const struct pq_elem *const y,
+cmp_pq_dist_points(struct pq_elem const *const x, struct pq_elem const *const y,
                    void *aux)
 {
     (void)aux;
-    const struct dist_point *const a = PQ_ENTRY(x, struct dist_point, pq_elem);
-    const struct dist_point *const b = PQ_ENTRY(y, struct dist_point, pq_elem);
+    struct dist_point const *const a = PQ_ENTRY(x, struct dist_point, pq_elem);
+    struct dist_point const *const b = PQ_ENTRY(y, struct dist_point, pq_elem);
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static set_threeway_cmp
-cmp_set_prev_vertices(const struct set_elem *const x,
-                      const struct set_elem *const y, void *aux)
+cmp_set_prev_vertices(struct set_elem const *const x,
+                      struct set_elem const *const y, void *aux)
 {
     (void)aux;
-    const struct prev_vertex *const a = SET_ENTRY(x, struct prev_vertex, elem);
-    const struct prev_vertex *const b = SET_ENTRY(y, struct prev_vertex, elem);
+    struct prev_vertex const *const a = SET_ENTRY(x, struct prev_vertex, elem);
+    struct prev_vertex const *const b = SET_ENTRY(y, struct prev_vertex, elem);
     if (a->v > b->v)
     {
         return SETGRT;
@@ -1124,9 +1124,9 @@ pq_update_dist(struct pq_elem *e, void *aux)
 }
 
 static void
-print_vertex(const struct set_elem *const x)
+print_vertex(struct set_elem const *const x)
 {
-    const struct vertex *v = SET_ENTRY(x, struct vertex, elem);
+    struct vertex const *v = SET_ENTRY(x, struct vertex, elem);
     printf("{%c,pos{%d,%d},edges{", v->name, v->pos.r, v->pos.c);
     for (int i = 0; i < max_degree && v->edges[i].to; ++i)
     {
@@ -1169,9 +1169,9 @@ parse_path_request(struct graph *const g, str_view r)
         quit("Exiting now.\n", 0);
     }
     struct path_request res = {0};
-    const char end_title
+    char const end_title
         = (char)(start_vertex_title + set_size(&g->adjacency_list) - 1);
-    for (const char *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
+    for (char const *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
         if (*c >= start_vertex_title && *c <= end_title)
         {
@@ -1187,7 +1187,7 @@ parse_path_request(struct graph *const g, str_view r)
 static struct int_conversion
 parse_digits(str_view arg)
 {
-    const size_t eql = sv_rfind(arg, sv_npos(arg), SV("="));
+    size_t const eql = sv_rfind(arg, sv_npos(arg), SV("="));
     if (eql == sv_npos(arg))
     {
         return (struct int_conversion){.status = CONV_ER};

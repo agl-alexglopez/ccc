@@ -29,16 +29,16 @@ enum hpq_direction
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 
-static const size_t starting_capacity = 8;
+static size_t const starting_capacity = 8;
 
 static void grow(struct heap_pqueue *);
 static void swap(struct hpq_elem **, struct hpq_elem **);
 static void bubble_down(struct heap_pqueue *, size_t);
 static void bubble_up(struct heap_pqueue *, size_t);
-static void print_node(const struct heap_pqueue *, size_t, hpq_print_fn *);
-static void print_inner_heap(const struct heap_pqueue *, size_t, const char *,
+static void print_node(struct heap_pqueue const *, size_t, hpq_print_fn *);
+static void print_inner_heap(struct heap_pqueue const *, size_t, char const *,
                              enum print_link, hpq_print_fn *);
-static void print_heap(const struct heap_pqueue *, size_t, hpq_print_fn *);
+static void print_heap(struct heap_pqueue const *, size_t, hpq_print_fn *);
 
 void
 hpq_init(struct heap_pqueue *const hpq, enum heap_pq_threeway_cmp hpq_ordering,
@@ -106,10 +106,10 @@ hpq_erase(struct heap_pqueue *const hpq, struct hpq_elem *e)
     }
     /* Important to remember this key now to avoid confusion later once the
        elements are swapped and we lose access to original handle index. */
-    const size_t swap_location = e->handle;
+    size_t const swap_location = e->handle;
     swap(&hpq->heap[swap_location], &hpq->heap[hpq->sz]);
     struct hpq_elem *erased = hpq->heap[hpq->sz];
-    const enum heap_pq_threeway_cmp erased_cmp
+    enum heap_pq_threeway_cmp const erased_cmp
         = hpq->cmp(hpq->heap[swap_location], erased, hpq->aux);
     if (erased_cmp == hpq->order)
     {
@@ -137,7 +137,7 @@ hpq_update(struct heap_pqueue *hpq, struct hpq_elem *e, hpq_update_fn *fn,
         bubble_down(hpq, 0);
         return true;
     }
-    const enum heap_pq_threeway_cmp parent_cmp = hpq->cmp(
+    enum heap_pq_threeway_cmp const parent_cmp = hpq->cmp(
         hpq->heap[e->handle], hpq->heap[(e->handle - 1) / 2], hpq->aux);
     if (parent_cmp == hpq->order)
     {
@@ -153,8 +153,8 @@ hpq_update(struct heap_pqueue *hpq, struct hpq_elem *e, hpq_update_fn *fn,
     return true;
 }
 
-const struct hpq_elem *
-hpq_front(const struct heap_pqueue *const hpq)
+struct hpq_elem const *
+hpq_front(struct heap_pqueue const *const hpq)
 {
     if (!hpq->sz)
     {
@@ -164,7 +164,7 @@ hpq_front(const struct heap_pqueue *const hpq)
 }
 
 bool
-hpq_empty(const struct heap_pqueue *const hpq)
+hpq_empty(struct heap_pqueue const *const hpq)
 {
     if (!hpq)
     {
@@ -174,7 +174,7 @@ hpq_empty(const struct heap_pqueue *const hpq)
 }
 
 size_t
-hpq_size(const struct heap_pqueue *const hpq)
+hpq_size(struct heap_pqueue const *const hpq)
 {
     if (!hpq)
     {
@@ -184,7 +184,7 @@ hpq_size(const struct heap_pqueue *const hpq)
 }
 
 enum heap_pq_threeway_cmp
-hpq_order(const struct heap_pqueue *const hpq)
+hpq_order(struct heap_pqueue const *const hpq)
 {
     return hpq->order;
 }
@@ -203,7 +203,7 @@ hpq_clear(struct heap_pqueue *hpq, hpq_destructor_fn *fn)
 }
 
 bool
-hpq_validate(const struct heap_pqueue *const hpq)
+hpq_validate(struct heap_pqueue const *const hpq)
 {
     if (hpq->sz > 1)
     {
@@ -211,7 +211,7 @@ hpq_validate(const struct heap_pqueue *const hpq)
              i <= (hpq->sz - 2) / 2;
              ++i, left = (i * 2) + 1, right = (i * 2) + 2)
         {
-            const struct hpq_elem *const cur = hpq->heap[i];
+            struct hpq_elem const *const cur = hpq->heap[i];
             /* Putting the child in the comparison function first evaluates
                the childs three way comparison in relation to the parent. If
                the child beats the parent in total ordering (min/max) something
@@ -239,7 +239,7 @@ hpq_validate(const struct heap_pqueue *const hpq)
 }
 
 void
-hpq_print(const struct heap_pqueue *hpq, const size_t i, hpq_print_fn *const fn)
+hpq_print(struct heap_pqueue const *hpq, size_t const i, hpq_print_fn *const fn)
 {
     print_heap(hpq, i, fn);
 }
@@ -261,7 +261,7 @@ bubble_up(struct heap_pqueue *const hpq, size_t i)
 static void
 bubble_down(struct heap_pqueue *hpq, size_t i)
 {
-    const enum heap_pq_threeway_cmp wrong_order
+    enum heap_pq_threeway_cmp const wrong_order
         = hpq->order == HPQLES ? HPQGRT : HPQLES;
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < hpq->sz;
          i = next, left = i * 2 + 1, right = left + 1)
@@ -299,7 +299,7 @@ grow(struct heap_pqueue *hpq)
 static inline void
 swap(struct hpq_elem **a, struct hpq_elem **b)
 {
-    const size_t temp_handle = (*a)->handle;
+    size_t const temp_handle = (*a)->handle;
     (*a)->handle = (*b)->handle;
     (*b)->handle = temp_handle;
     struct hpq_elem *temp = *a;
@@ -310,7 +310,7 @@ swap(struct hpq_elem **a, struct hpq_elem **b)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static void
-print_node(const struct heap_pqueue *const hpq, size_t i,
+print_node(struct heap_pqueue const *const hpq, size_t i,
            hpq_print_fn *const fn)
 {
     printf(COLOR_CYN);
@@ -326,8 +326,8 @@ print_node(const struct heap_pqueue *const hpq, size_t i,
 }
 
 static void
-print_inner_heap(const struct heap_pqueue *const hpq, size_t i,
-                 const char *prefix, const enum print_link node_type,
+print_inner_heap(struct heap_pqueue const *const hpq, size_t i,
+                 char const *prefix, enum print_link const node_type,
                  hpq_print_fn *const fn)
 {
     if (i >= hpq->sz)
@@ -368,7 +368,7 @@ print_inner_heap(const struct heap_pqueue *const hpq, size_t i,
 }
 
 static void
-print_heap(const struct heap_pqueue *const hpq, size_t i,
+print_heap(struct heap_pqueue const *const hpq, size_t i,
            hpq_print_fn *const fn)
 {
     if (i >= hpq->sz)
