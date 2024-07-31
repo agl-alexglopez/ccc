@@ -175,14 +175,12 @@ struct set_elem
     struct node n;
 };
 
-typedef node_threeway_cmp set_threeway_cmp;
-
-enum
+typedef enum
 {
     SETLES = NODE_LES,
     SETEQL = NODE_EQL,
     SETGRT = NODE_GRT,
-};
+} set_threeway_cmp;
 
 /* ===================   Comparisons  ==========================
 

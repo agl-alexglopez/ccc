@@ -1,6 +1,8 @@
 #include "heap_pqueue.h"
 #include "test.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -22,11 +24,11 @@ static enum test_result hpq_test_weak_srand(void);
 static enum test_result insert_shuffled(struct heap_pqueue *, struct val[],
                                         size_t, int);
 static size_t inorder_fill(int[], size_t, struct heap_pqueue *);
-static enum heap_pq_threeway_cmp val_cmp(const struct hpq_elem *,
-                                         const struct hpq_elem *, void *);
+static enum heap_pq_threeway_cmp val_cmp(struct hpq_elem const *,
+                                         struct hpq_elem const *, void *);
 
 #define NUM_TESTS (size_t)7
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     hpq_test_insert_remove_four_dups,
     hpq_test_insert_erase_shuffled,
     hpq_test_pop_max,
@@ -42,7 +44,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -62,7 +64,7 @@ hpq_test_insert_remove_four_dups(void)
         three_vals[i].val = 0;
         hpq_push(&hpq, &three_vals[i].elem);
         CHECK(hpq_validate(&hpq), true, bool, "%d");
-        const size_t size = i + 1;
+        size_t const size = i + 1;
         CHECK(hpq_size(&hpq), size, size_t, "%zu");
     }
     CHECK(hpq_size(&hpq), 4, size_t, "%zu");
@@ -81,12 +83,12 @@ hpq_test_insert_erase_shuffled(void)
 {
     struct heap_pqueue hpq;
     hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&hpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = HPQ_ENTRY(hpq_front(&hpq), struct val, elem);
+    struct val const *min = HPQ_ENTRY(hpq_front(&hpq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &hpq), size, size_t, "%zu");
@@ -109,12 +111,12 @@ hpq_test_pop_max(void)
 {
     struct heap_pqueue hpq;
     hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&hpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = HPQ_ENTRY(hpq_front(&hpq), struct val, elem);
+    struct val const *min = HPQ_ENTRY(hpq_front(&hpq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &hpq), size, size_t, "%zu");
@@ -125,7 +127,7 @@ hpq_test_pop_max(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        const struct val *front = HPQ_ENTRY(hpq_pop(&hpq), struct val, elem);
+        struct val const *front = HPQ_ENTRY(hpq_pop(&hpq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(hpq_empty(&hpq), true, bool, "%d");
@@ -137,12 +139,12 @@ hpq_test_pop_min(void)
 {
     struct heap_pqueue hpq;
     hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&hpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = HPQ_ENTRY(hpq_front(&hpq), struct val, elem);
+    struct val const *min = HPQ_ENTRY(hpq_front(&hpq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &hpq), size, size_t, "%zu");
@@ -153,7 +155,7 @@ hpq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        const struct val *front = HPQ_ENTRY(hpq_pop(&hpq), struct val, elem);
+        struct val const *front = HPQ_ENTRY(hpq_pop(&hpq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(hpq_empty(&hpq), true, bool, "%d");
@@ -165,10 +167,10 @@ hpq_test_delete_prime_shuffle_duplicates(void)
 {
     struct heap_pqueue hpq;
     hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const int size = 99;
-    const int prime = 101;
+    int const size = 99;
+    int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
-    const int less = 77;
+    int const less = 77;
     struct val vals[size];
     int shuffled_index = prime % (size - less);
     for (int i = 0; i < size; ++i)
@@ -177,7 +179,7 @@ hpq_test_delete_prime_shuffle_duplicates(void)
         vals[i].id = i;
         hpq_push(&hpq, &vals[i].elem);
         CHECK(hpq_validate(&hpq), true, bool, "%d");
-        const size_t s = i + 1;
+        size_t const s = i + 1;
         CHECK(hpq_size(&hpq), s, size_t, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
@@ -202,9 +204,9 @@ hpq_test_prime_shuffle(void)
 {
     struct heap_pqueue hpq;
     hpq_init(&hpq, HPQLES, val_cmp, NULL);
-    const int size = 50;
-    const int prime = 53;
-    const int less = 10;
+    int const size = 50;
+    int const prime = 53;
+    int const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     int shuffled_index = prime % (size - less);
@@ -238,7 +240,7 @@ hpq_test_weak_srand(void)
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const int num_heap_elems = 1000;
+    int const num_heap_elems = 1000;
     struct val vals[num_heap_elems];
     for (int i = 0; i < num_heap_elems; ++i)
     {
@@ -257,8 +259,8 @@ hpq_test_weak_srand(void)
 }
 
 static enum test_result
-insert_shuffled(struct heap_pqueue *hpq, struct val vals[], const size_t size,
-                const int larger_prime)
+insert_shuffled(struct heap_pqueue *hpq, struct val vals[], size_t const size,
+                int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -303,7 +305,7 @@ inorder_fill(int vals[], size_t size, struct heap_pqueue *hpq)
 }
 
 static enum heap_pq_threeway_cmp
-val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
+val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);

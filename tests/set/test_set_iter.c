@@ -2,6 +2,8 @@
 #include "test.h"
 #include "tree.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -20,11 +22,11 @@ static enum test_result set_test_invalid_range(void);
 static enum test_result set_test_empty_range(void);
 static size_t inorder_fill(int[], size_t, struct set *);
 static enum test_result iterator_check(struct set *);
-static set_threeway_cmp val_cmp(const struct set_elem *,
-                                const struct set_elem *, void *);
+static set_threeway_cmp val_cmp(struct set_elem const *,
+                                struct set_elem const *, void *);
 
 #define NUM_TESTS ((size_t)6)
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     set_test_forward_iter, set_test_iterate_removal,
     set_test_valid_range,  set_test_invalid_range,
     set_test_empty_range,  set_test_iterate_remove_reinsert,
@@ -36,7 +38,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -55,8 +57,8 @@ set_test_forward_iter(void)
          e = set_next(&s, e), ++j)
     {}
     CHECK(j, 0, int, "%d");
-    const int num_nodes = 33;
-    const int prime = 37;
+    int const num_nodes = 33;
+    int const prime = 37;
     struct val vals[num_nodes];
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
@@ -74,7 +76,7 @@ set_test_forward_iter(void)
     for (struct set_elem *e = set_begin(&s); e != set_end(&s) && j < num_nodes;
          e = set_next(&s, e), ++j)
     {
-        const struct val *v = SET_ENTRY(e, struct val, elem);
+        struct val const *v = SET_ENTRY(e, struct val, elem);
         CHECK(v->val, val_keys_inorder[j], int, "%d");
     }
     return PASS;
@@ -87,7 +89,7 @@ set_test_iterate_removal(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -98,7 +100,7 @@ set_test_iterate_removal(void)
         CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
-    const int limit = 400;
+    int const limit = 400;
     for (struct set_elem *i = set_begin(&s), *next = NULL; i != set_end(&s);
          i = next)
     {
@@ -120,7 +122,7 @@ set_test_iterate_remove_reinsert(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -131,8 +133,8 @@ set_test_iterate_remove_reinsert(void)
         CHECK(validate_tree(&s.t), true, bool, "%d");
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
-    const size_t old_size = set_size(&s);
-    const int limit = 400;
+    size_t const old_size = set_size(&s);
+    int const limit = 400;
     int new_unique_entry_val = 1001;
     for (struct set_elem *i = set_begin(&s), *next = NULL; i != set_end(&s);
          i = next)
@@ -158,7 +160,7 @@ set_test_valid_range(void)
 {
     struct set s = SET_INIT(s, val_cmp, NULL);
 
-    const int num_nodes = 25;
+    int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
@@ -173,8 +175,8 @@ set_test_valid_range(void)
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    const int range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    const struct set_range range = set_equal_range(&s, &b.elem, &e.elem);
+    int const range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    struct set_range const range = set_equal_range(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_range(&range), struct val, elem)->val,
           range_vals[0], int, "%d");
     CHECK(SET_ENTRY(set_end_range(&range), struct val, elem)->val,
@@ -183,7 +185,7 @@ set_test_valid_range(void)
     struct set_elem *i1 = set_begin_range(&range);
     for (; i1 != set_end_range(&range); i1 = set_next(&s, i1))
     {
-        const int cur_val = SET_ENTRY(i1, struct val, elem)->val;
+        int const cur_val = SET_ENTRY(i1, struct val, elem)->val;
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -194,8 +196,8 @@ set_test_valid_range(void)
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    const int rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    const struct set_rrange rev_range = set_equal_rrange(&s, &b.elem, &e.elem);
+    int const rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    struct set_rrange const rev_range = set_equal_rrange(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_rrange(&rev_range), struct val, elem)->val,
           rev_range_vals[0], int, "%d");
     CHECK(SET_ENTRY(set_end_rrange(&rev_range), struct val, elem)->val,
@@ -204,7 +206,7 @@ set_test_valid_range(void)
     struct set_elem *i2 = set_begin_rrange(&rev_range);
     for (; i2 != set_end_rrange(&rev_range); i2 = set_rnext(&s, i2))
     {
-        const int cur_val = SET_ENTRY(i2, struct val, elem)->val;
+        int const cur_val = SET_ENTRY(i2, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -218,7 +220,7 @@ set_test_invalid_range(void)
 {
     struct set s = SET_INIT(s, val_cmp, NULL);
 
-    const int num_nodes = 25;
+    int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
@@ -233,8 +235,8 @@ set_test_invalid_range(void)
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    const int forward_range_vals[6] = {95, 100, 105, 110, 115, 120};
-    const struct set_range rev_range = set_equal_range(&s, &b.elem, &e.elem);
+    int const forward_range_vals[6] = {95, 100, 105, 110, 115, 120};
+    struct set_range const rev_range = set_equal_range(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_range(&rev_range), struct val, elem)->val
               == forward_range_vals[0],
           true, bool, "%d");
@@ -243,7 +245,7 @@ set_test_invalid_range(void)
     struct set_elem *i1 = set_begin_range(&rev_range);
     for (; i1 != set_end_range(&rev_range); i1 = set_next(&s, i1))
     {
-        const int cur_val = SET_ENTRY(i1, struct val, elem)->val;
+        int const cur_val = SET_ENTRY(i1, struct val, elem)->val;
         CHECK(forward_range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -254,8 +256,8 @@ set_test_invalid_range(void)
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    const int rev_range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
-    const struct set_rrange range = set_equal_rrange(&s, &b.elem, &e.elem);
+    int const rev_range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
+    struct set_rrange const range = set_equal_rrange(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_rrange(&range), struct val, elem)->val,
           rev_range_vals[0], int, "%d");
     CHECK(set_end_rrange(&range), set_end(&s), struct set_elem *, "%p");
@@ -263,7 +265,7 @@ set_test_invalid_range(void)
     struct set_elem *i2 = set_begin_rrange(&range);
     for (; i2 != set_end_rrange(&range); i2 = set_rnext(&s, i2))
     {
-        const int cur_val = SET_ENTRY(i2, struct val, elem)->val;
+        int const cur_val = SET_ENTRY(i2, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -277,7 +279,7 @@ set_test_empty_range(void)
 {
     struct set s = SET_INIT(s, val_cmp, NULL);
 
-    const int num_nodes = 25;
+    int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
@@ -292,7 +294,7 @@ set_test_empty_range(void)
        Normal iteration patterns would consider this empty. */
     struct val b = {.id = 0, .val = -50};
     struct val e = {.id = 0, .val = -25};
-    const struct set_range forward_range
+    struct set_range const forward_range
         = set_equal_range(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_range(&forward_range), struct val, elem)->val,
           vals[0].val, int, "%d");
@@ -300,7 +302,7 @@ set_test_empty_range(void)
           vals[0].val, int, "%d");
     b.val = 150;
     e.val = 999;
-    const struct set_rrange rev_range = set_equal_rrange(&s, &b.elem, &e.elem);
+    struct set_rrange const rev_range = set_equal_rrange(&s, &b.elem, &e.elem);
     CHECK(SET_ENTRY(set_begin_rrange(&rev_range), struct val, elem)->val,
           vals[num_nodes - 1].val, int, "%d");
     CHECK(SET_ENTRY(set_end_rrange(&rev_range), struct val, elem)->val,
@@ -327,7 +329,7 @@ inorder_fill(int vals[], size_t size, struct set *s)
 static enum test_result
 iterator_check(struct set *s)
 {
-    const size_t size = set_size(s);
+    size_t const size = set_size(s);
     size_t iter_count = 0;
     for (struct set_elem *e = set_begin(s); e != set_end(s); e = set_next(s, e))
     {
@@ -349,7 +351,7 @@ iterator_check(struct set *s)
 }
 
 static set_threeway_cmp
-val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
+val_cmp(struct set_elem const *a, struct set_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = SET_ENTRY(a, struct val, elem);

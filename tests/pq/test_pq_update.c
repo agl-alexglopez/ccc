@@ -1,6 +1,8 @@
 #include "pqueue.h"
 #include "test.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -18,11 +20,11 @@ static enum test_result pq_test_priority_increase(void);
 static enum test_result pq_test_priority_decrease(void);
 static enum test_result pq_test_priority_removal(void);
 static void val_update(struct pq_elem *, void *);
-static enum pq_threeway_cmp val_cmp(const struct pq_elem *,
-                                    const struct pq_elem *, void *);
+static enum pq_threeway_cmp val_cmp(struct pq_elem const *,
+                                    struct pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)5
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     pq_test_insert_iterate_pop, pq_test_priority_update,
     pq_test_priority_removal,   pq_test_priority_increase,
     pq_test_priority_decrease,
@@ -34,7 +36,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -50,7 +52,7 @@ pq_test_insert_iterate_pop(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -78,7 +80,7 @@ pq_test_priority_removal(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -88,14 +90,14 @@ pq_test_priority_removal(void)
         pq_push(&pq, &vals[i].elem);
         CHECK(pq_validate(&pq), true, bool, "%d");
     }
-    const int limit = 400;
+    int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct pq_elem *i = &vals[val].elem;
         struct val *cur = PQ_ENTRY(i, struct val, elem);
         if (cur->val > limit)
         {
-            i = pq_erase(&pq, i);
+            (void)pq_erase(&pq, i);
             CHECK(pq_validate(&pq), true, bool, "%d");
         }
     }
@@ -109,7 +111,7 @@ pq_test_priority_update(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -119,7 +121,7 @@ pq_test_priority_update(void)
         pq_push(&pq, &vals[i].elem);
         CHECK(pq_validate(&pq), true, bool, "%d");
     }
-    const int limit = 400;
+    int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct pq_elem *i = &vals[val].elem;
@@ -142,7 +144,7 @@ pq_test_priority_increase(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -152,7 +154,7 @@ pq_test_priority_increase(void)
         pq_push(&pq, &vals[i].elem);
         CHECK(pq_validate(&pq), true, bool, "%d");
     }
-    const int limit = 400;
+    int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct pq_elem *i = &vals[val].elem;
@@ -181,7 +183,7 @@ pq_test_priority_decrease(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -191,7 +193,7 @@ pq_test_priority_decrease(void)
         pq_push(&pq, &vals[i].elem);
         CHECK(pq_validate(&pq), true, bool, "%d");
     }
-    const int limit = 400;
+    int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct pq_elem *i = &vals[val].elem;
@@ -214,7 +216,7 @@ pq_test_priority_decrease(void)
 }
 
 static enum pq_threeway_cmp
-val_cmp(const struct pq_elem *a, const struct pq_elem *b, void *aux)
+val_cmp(struct pq_elem const *a, struct pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = PQ_ENTRY(a, struct val, elem);

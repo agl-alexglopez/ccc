@@ -1,6 +1,8 @@
 #include "set.h"
 #include "test.h"
-#include "tree.h"
+
+#include <stdbool.h>
+#include <stddef.h>
 
 struct val
 {
@@ -10,11 +12,11 @@ struct val
 };
 
 static enum test_result set_test_empty(void);
-static set_threeway_cmp val_cmp(const struct set_elem *,
-                                const struct set_elem *, void *);
+static set_threeway_cmp val_cmp(struct set_elem const *,
+                                struct set_elem const *, void *);
 
 #define NUM_TESTS ((size_t)1)
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     set_test_empty,
 };
 
@@ -24,7 +26,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -42,7 +44,7 @@ set_test_empty(void)
 }
 
 static set_threeway_cmp
-val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
+val_cmp(struct set_elem const *a, struct set_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = SET_ENTRY(a, struct val, elem);

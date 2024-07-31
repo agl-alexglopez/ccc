@@ -2,6 +2,8 @@
 #include "test.h"
 #include "tree.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 
 struct val
@@ -18,11 +20,11 @@ static enum test_result set_test_insert_shuffle(void);
 static enum test_result insert_shuffled(struct set *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int vals[], size_t, struct set *);
-static set_threeway_cmp val_cmp(const struct set_elem *,
-                                const struct set_elem *, void *);
+static set_threeway_cmp val_cmp(struct set_elem const *,
+                                struct set_elem const *, void *);
 
 #define NUM_TESTS ((size_t)4)
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     set_test_insert_one,
     set_test_insert_three,
     set_test_struct_getter,
@@ -35,7 +37,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -90,7 +92,7 @@ set_test_struct_getter(void)
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
-        const struct val *get
+        struct val const *get
             = SET_ENTRY(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
@@ -103,8 +105,8 @@ set_test_insert_shuffle(void)
 {
     struct set s = SET_INIT(s, val_cmp, NULL);
     /* Math magic ahead... */
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS, enum test_result, "%d");
     int sorted_check[size];
@@ -117,8 +119,8 @@ set_test_insert_shuffle(void)
 }
 
 static enum test_result
-insert_shuffled(struct set *s, struct val vals[], const size_t size,
-                const int larger_prime)
+insert_shuffled(struct set *s, struct val vals[], size_t const size,
+                int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -155,7 +157,7 @@ inorder_fill(int vals[], size_t size, struct set *s)
 }
 
 static set_threeway_cmp
-val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
+val_cmp(struct set_elem const *a, struct set_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = SET_ENTRY(a, struct val, elem);

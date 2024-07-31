@@ -2,6 +2,8 @@
 #include "test.h"
 #include "tree.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 
 struct val
@@ -20,11 +22,11 @@ static enum test_result depq_test_read_max_min(void);
 static enum test_result insert_shuffled(struct depqueue *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int[], size_t, struct depqueue *);
-static dpq_threeway_cmp val_cmp(const struct depq_elem *,
-                                const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(struct depq_elem const *,
+                                struct depq_elem const *, void *);
 
 #define NUM_TESTS (size_t)6
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     depq_test_insert_one,     depq_test_insert_three,
     depq_test_struct_getter,  depq_test_insert_three_dups,
     depq_test_insert_shuffle, depq_test_read_max_min,
@@ -36,7 +38,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -91,7 +93,7 @@ depq_test_struct_getter(void)
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
-        const struct val *get
+        struct val const *get
             = DEPQ_ENTRY(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
@@ -116,7 +118,7 @@ depq_test_insert_three_dups(void)
 }
 
 static dpq_threeway_cmp
-val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
+val_cmp(struct depq_elem const *a, struct depq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = DEPQ_ENTRY(a, struct val, elem);
@@ -129,14 +131,14 @@ depq_test_insert_shuffle(void)
 {
     struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
     /* Math magic ahead... */
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
+    struct val const *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, size - 1, int, "%d");
-    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
+    struct val const *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -160,16 +162,16 @@ depq_test_read_max_min(void)
         CHECK(depq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(depq_size(&pq), 10ULL, size_t, "%zu");
-    const struct val *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
+    struct val const *max = DEPQ_ENTRY(depq_const_max(&pq), struct val, elem);
     CHECK(max->val, 9, int, "%d");
-    const struct val *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
+    struct val const *min = DEPQ_ENTRY(depq_const_min(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
 
 static enum test_result
-insert_shuffled(struct depqueue *pq, struct val vals[], const size_t size,
-                const int larger_prime)
+insert_shuffled(struct depqueue *pq, struct val vals[], size_t const size,
+                int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily

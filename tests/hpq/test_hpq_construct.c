@@ -1,6 +1,9 @@
 #include "heap_pqueue.h"
 #include "test.h"
 
+#include <stdbool.h>
+#include <stddef.h>
+
 struct val
 {
     int id;
@@ -9,11 +12,11 @@ struct val
 };
 
 static enum test_result pq_test_empty(void);
-static enum heap_pq_threeway_cmp val_cmp(const struct hpq_elem *,
-                                         const struct hpq_elem *, void *);
+static enum heap_pq_threeway_cmp val_cmp(struct hpq_elem const *,
+                                         struct hpq_elem const *, void *);
 
 #define NUM_TESTS (size_t)1
-const test_fn all_tests[NUM_TESTS] = {pq_test_empty};
+test_fn const all_tests[NUM_TESTS] = {pq_test_empty};
 
 int
 main()
@@ -21,7 +24,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -40,7 +43,7 @@ pq_test_empty(void)
 }
 
 static enum heap_pq_threeway_cmp
-val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
+val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);

@@ -1,4 +1,4 @@
-.PHONY: default build rel deb clang test-rel test-deb clean
+.PHONY: default build rel deb crel cdeb test-rel test-deb clean
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
@@ -19,8 +19,12 @@ deb:
 	cmake --preset=deb
 	$(MAKE) build
 
-clang:
-	cmake --preset=clang
+crel:
+	cmake --preset=crel
+	$(MAKE) build
+
+cdeb:
+	cmake --preset=cdeb
 	$(MAKE) build
 
 format:

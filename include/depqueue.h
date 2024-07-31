@@ -38,14 +38,12 @@ struct depqueue
     struct tree t;
 };
 
-typedef node_threeway_cmp dpq_threeway_cmp;
-
-enum
+typedef enum
 {
     DPQLES = NODE_LES,
     DPQEQL = NODE_EQL,
     DPQGRT = NODE_GRT,
-};
+} dpq_threeway_cmp;
 
 /* A comparison function that returns one of the threeway comparison
    values. To use this data structure you must be able to determine

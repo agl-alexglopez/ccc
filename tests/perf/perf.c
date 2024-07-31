@@ -17,9 +17,9 @@ struct val
     struct pq_elem pq_elem;
 };
 
-const size_t step = 100000;
-const size_t end_size = 1100000;
-const int max_rand_range = RAND_MAX;
+size_t const step = 100000;
+size_t const end_size = 1100000;
+int const max_rand_range = RAND_MAX;
 
 typedef void (*depq_perf_fn)(void);
 
@@ -32,12 +32,12 @@ static void test_update(void);
 
 static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
-static node_threeway_cmp depq_val_cmp(const struct depq_elem *,
-                                      const struct depq_elem *, void *);
-static enum heap_pq_threeway_cmp hpq_val_cmp(const struct hpq_elem *,
-                                             const struct hpq_elem *, void *);
-static enum pq_threeway_cmp pq_val_cmp(const struct pq_elem *,
-                                       const struct pq_elem *, void *);
+static dpq_threeway_cmp depq_val_cmp(struct depq_elem const *,
+                                     struct depq_elem const *, void *);
+static enum heap_pq_threeway_cmp hpq_val_cmp(struct hpq_elem const *,
+                                             struct hpq_elem const *, void *);
+static enum pq_threeway_cmp pq_val_cmp(struct pq_elem const *,
+                                       struct pq_elem const *, void *);
 static void depq_update_val(struct depq_elem *, void *);
 static void hpq_update_val(struct hpq_elem *, void *);
 static void pq_update_val(struct pq_elem *, void *);
@@ -45,7 +45,7 @@ static void hpq_destroy_val(struct hpq_elem *);
 static void pq_destroy_val(struct pq_elem *);
 
 #define NUM_TESTS (size_t)6
-static const depq_perf_fn perf_tests[NUM_TESTS] = {test_push,
+static depq_perf_fn const perf_tests[NUM_TESTS] = {test_push,
                                                    test_pop,
                                                    test_push_pop,
                                                    test_push_intermittent_pop,
@@ -113,21 +113,21 @@ test_push(void)
             depq_push(&depq, &val_array[i].depq_elem);
         }
         clock_t end = clock();
-        const double depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
             hpq_push(&hpq, &val_array[i].hpq_elem);
         }
         end = clock();
-        const double hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
             pq_push(&pq, &val_array[i].pq_elem);
         }
         end = clock();
-        const double pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, HPQ=%f, PQ=%f\n", n, depq_time, hpq_time,
                pq_time);
         hpq_clear(&hpq, hpq_destroy_val);
@@ -157,7 +157,7 @@ test_pop(void)
             (void)depq_pop_min(&depq);
         }
         clock_t end = clock();
-        const double depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             hpq_push(&hpq, &val_array[i].hpq_elem);
@@ -168,7 +168,7 @@ test_pop(void)
             hpq_pop(&hpq);
         }
         end = clock();
-        const double hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             pq_push(&pq, &val_array[i].pq_elem);
@@ -179,7 +179,7 @@ test_pop(void)
             pq_pop(&pq);
         }
         end = clock();
-        const double pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, HPQ=%f, PQ=%f\n", n, depq_time, hpq_time,
                pq_time);
         hpq_clear(&hpq, hpq_destroy_val);
@@ -211,7 +211,7 @@ test_push_pop(void)
             (void)depq_pop_min(&depq);
         }
         clock_t end = clock();
-        const double depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -222,7 +222,7 @@ test_push_pop(void)
             hpq_pop(&hpq);
         }
         end = clock();
-        const double hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -233,7 +233,7 @@ test_push_pop(void)
             pq_pop(&pq);
         }
         end = clock();
-        const double pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, HPQ=%f, PQ=%f\n", n, depq_time, hpq_time,
                pq_time);
         hpq_clear(&hpq, hpq_destroy_val);
@@ -264,7 +264,7 @@ test_push_intermittent_pop(void)
             }
         }
         clock_t end = clock();
-        const double depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -275,7 +275,7 @@ test_push_intermittent_pop(void)
             }
         }
         end = clock();
-        const double hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -286,7 +286,7 @@ test_push_intermittent_pop(void)
             }
         }
         end = clock();
-        const double pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, HPQ=%f, PQ=%f\n", n, depq_time, hpq_time,
                pq_time);
         hpq_clear(&hpq, hpq_destroy_val);
@@ -323,7 +323,7 @@ test_pop_intermittent_push(void)
             }
         }
         clock_t end = clock();
-        const double depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             hpq_push(&hpq, &val_array[i].hpq_elem);
@@ -339,7 +339,7 @@ test_pop_intermittent_push(void)
             }
         }
         end = clock();
-        const double hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             pq_push(&pq, &val_array[i].pq_elem);
@@ -355,7 +355,7 @@ test_pop_intermittent_push(void)
             }
         }
         end = clock();
-        const double pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, HPQ=%f, PQ=%f\n", n, depq_time, hpq_time,
                pq_time);
         hpq_clear(&hpq, hpq_destroy_val);
@@ -388,7 +388,7 @@ test_update(void)
                               &new_val);
         }
         clock_t end = clock();
-        const double depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             hpq_push(&hpq, &val_array[i].hpq_elem);
@@ -401,7 +401,7 @@ test_update(void)
                              &new_val);
         }
         end = clock();
-        const double hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const hpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             pq_push(&pq, &val_array[i].pq_elem);
@@ -414,7 +414,7 @@ test_update(void)
             pq_decrease(&pq, &val_array[i].pq_elem, pq_update_val, &new_val);
         }
         end = clock();
-        const double pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, HPQ=%f, PQ=%f\n", n, depq_time, hpq_time,
                pq_time);
         hpq_clear(&hpq, hpq_destroy_val);
@@ -448,30 +448,30 @@ valid_malloc(size_t bytes)
     return mem;
 }
 
-static node_threeway_cmp
-depq_val_cmp(const struct depq_elem *const a, const struct depq_elem *const b,
+static dpq_threeway_cmp
+depq_val_cmp(struct depq_elem const *const a, struct depq_elem const *const b,
              void *const aux)
 {
     (void)aux;
-    const struct val *const x = DEPQ_ENTRY(a, struct val, depq_elem);
-    const struct val *const y = DEPQ_ENTRY(b, struct val, depq_elem);
+    struct val const *const x = DEPQ_ENTRY(a, struct val, depq_elem);
+    struct val const *const y = DEPQ_ENTRY(b, struct val, depq_elem);
     if (x->val < y->val)
     {
-        return NODE_LES;
+        return DPQLES;
     }
     if (x->val > y->val)
     {
-        return NODE_GRT;
+        return DPQGRT;
     }
-    return NODE_EQL;
+    return DPQEQL;
 }
 
 static enum heap_pq_threeway_cmp
-hpq_val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *const aux)
+hpq_val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *const aux)
 {
     (void)aux;
-    const struct val *const x = HPQ_ENTRY(a, struct val, hpq_elem);
-    const struct val *const y = HPQ_ENTRY(b, struct val, hpq_elem);
+    struct val const *const x = HPQ_ENTRY(a, struct val, hpq_elem);
+    struct val const *const y = HPQ_ENTRY(b, struct val, hpq_elem);
     if (x->val < y->val)
     {
         return HPQLES;
@@ -517,12 +517,12 @@ pq_destroy_val(struct pq_elem *e)
 }
 
 static enum pq_threeway_cmp
-pq_val_cmp(const struct pq_elem *a, const struct pq_elem *const b,
+pq_val_cmp(struct pq_elem const *a, struct pq_elem const *const b,
            void *const aux)
 {
     (void)aux;
-    const struct val *const x = PQ_ENTRY(a, struct val, pq_elem);
-    const struct val *const y = PQ_ENTRY(b, struct val, pq_elem);
+    struct val const *const x = PQ_ENTRY(a, struct val, pq_elem);
+    struct val const *const y = PQ_ENTRY(b, struct val, pq_elem);
     if (x->val < y->val)
     {
         return PQLES;

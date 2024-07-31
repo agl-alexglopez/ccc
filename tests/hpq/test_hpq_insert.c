@@ -1,6 +1,8 @@
 #include "heap_pqueue.h"
 #include "test.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 
 struct val
@@ -19,11 +21,11 @@ static enum test_result hpq_test_read_max_min(void);
 static enum test_result insert_shuffled(struct heap_pqueue *, struct val[],
                                         size_t, int);
 static size_t inorder_fill(int[], size_t, struct heap_pqueue *);
-static enum heap_pq_threeway_cmp val_cmp(const struct hpq_elem *,
-                                         const struct hpq_elem *, void *);
+static enum heap_pq_threeway_cmp val_cmp(struct hpq_elem const *,
+                                         struct hpq_elem const *, void *);
 
 #define NUM_TESTS (size_t)6
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     hpq_test_insert_one,        hpq_test_insert_three,   hpq_test_struct_getter,
     hpq_test_insert_three_dups, hpq_test_insert_shuffle, hpq_test_read_max_min,
 };
@@ -34,7 +36,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -91,7 +93,7 @@ hpq_test_struct_getter(void)
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
-        const struct val *get
+        struct val const *get
             = HPQ_ENTRY(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
@@ -117,7 +119,7 @@ hpq_test_insert_three_dups(void)
 }
 
 static enum heap_pq_threeway_cmp
-val_cmp(const struct hpq_elem *a, const struct hpq_elem *b, void *aux)
+val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);
@@ -131,12 +133,12 @@ hpq_test_insert_shuffle(void)
     struct heap_pqueue pq;
     hpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Math magic ahead... */
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    const struct val *min = HPQ_ENTRY(hpq_front(&pq), struct val, elem);
+    struct val const *min = HPQ_ENTRY(hpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -161,14 +163,14 @@ hpq_test_read_max_min(void)
         CHECK(hpq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(hpq_size(&pq), 10ULL, size_t, "%zu");
-    const struct val *min = HPQ_ENTRY(hpq_front(&pq), struct val, elem);
+    struct val const *min = HPQ_ENTRY(hpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
 
 static enum test_result
-insert_shuffled(struct heap_pqueue *pq, struct val vals[], const size_t size,
-                const int larger_prime)
+insert_shuffled(struct heap_pqueue *pq, struct val vals[], size_t const size,
+                int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily

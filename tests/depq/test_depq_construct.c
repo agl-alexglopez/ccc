@@ -1,6 +1,8 @@
 #include "depqueue.h"
 #include "test.h"
-#include "tree.h"
+
+#include <stdbool.h>
+#include <stddef.h>
 
 struct val
 {
@@ -10,11 +12,11 @@ struct val
 };
 
 static enum test_result depq_test_empty(void);
-static dpq_threeway_cmp val_cmp(const struct depq_elem *,
-                                const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(struct depq_elem const *,
+                                struct depq_elem const *, void *);
 
 #define NUM_TESTS (size_t)1
-const test_fn all_tests[NUM_TESTS] = {depq_test_empty};
+test_fn const all_tests[NUM_TESTS] = {depq_test_empty};
 
 int
 main()
@@ -22,7 +24,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -40,7 +42,7 @@ depq_test_empty(void)
 }
 
 static dpq_threeway_cmp
-val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
+val_cmp(struct depq_elem const *a, struct depq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = DEPQ_ENTRY(a, struct val, elem);

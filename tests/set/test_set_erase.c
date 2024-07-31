@@ -1,6 +1,10 @@
 #include "set.h"
 #include "test.h"
 #include "tree.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -18,12 +22,12 @@ static enum test_result set_test_weak_srand(void);
 static enum test_result insert_shuffled(struct set *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int[], size_t, struct set *);
-static set_threeway_cmp val_cmp(const struct set_elem *,
-                                const struct set_elem *, void *);
-static void set_printer_fn(const struct set_elem *);
+static set_threeway_cmp val_cmp(struct set_elem const *,
+                                struct set_elem const *, void *);
+static void set_printer_fn(struct set_elem const *);
 
 #define NUM_TESTS ((size_t)3)
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     set_test_insert_erase_shuffled,
     set_test_prime_shuffle,
     set_test_weak_srand,
@@ -35,7 +39,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -48,9 +52,9 @@ static enum test_result
 set_test_prime_shuffle(void)
 {
     struct set s = SET_INIT(s, val_cmp, NULL);
-    const size_t size = 50;
-    const size_t prime = 53;
-    const size_t less = 10;
+    size_t const size = 50;
+    size_t const prime = 53;
+    size_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
@@ -73,7 +77,7 @@ set_test_prime_shuffle(void)
     CHECK(set_size(&s) < size, true, bool, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        const struct set_elem *elem = set_erase(&s, &vals[i].elem);
+        struct set_elem const *elem = set_erase(&s, &vals[i].elem);
         CHECK(elem != set_end(&s) || !repeats[i], true, bool, "%d");
         CHECK(validate_tree(&s.t), true, bool, "%d");
     }
@@ -84,8 +88,8 @@ static enum test_result
 set_test_insert_erase_shuffled(void)
 {
     struct set s = SET_INIT(s, val_cmp, NULL);
-    const size_t size = 50;
-    const int prime = 53;
+    size_t const size = 50;
+    int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS, enum test_result, "%d");
     int sorted_check[size];
@@ -111,7 +115,7 @@ set_test_weak_srand(void)
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const int num_nodes = 1000;
+    int const num_nodes = 1000;
     struct val vals[num_nodes];
     for (int i = 0; i < num_nodes; ++i)
     {
@@ -130,8 +134,8 @@ set_test_weak_srand(void)
 }
 
 static enum test_result
-insert_shuffled(struct set *s, struct val vals[], const size_t size,
-                const int larger_prime)
+insert_shuffled(struct set *s, struct val vals[], size_t const size,
+                int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -167,7 +171,7 @@ inorder_fill(int vals[], size_t size, struct set *s)
 }
 
 static set_threeway_cmp
-val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
+val_cmp(struct set_elem const *a, struct set_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = SET_ENTRY(a, struct val, elem);
@@ -176,8 +180,8 @@ val_cmp(const struct set_elem *a, const struct set_elem *b, void *aux)
 }
 
 static void
-set_printer_fn(const struct set_elem *const e) // NOLINT
+set_printer_fn(struct set_elem const *const e) // NOLINT
 {
-    const struct val *const v = SET_ENTRY(e, struct val, elem);
+    struct val const *const v = SET_ENTRY(e, struct val, elem);
     printf("{id:%d,val:%d}", v->id, v->val);
 }

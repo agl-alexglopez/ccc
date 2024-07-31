@@ -2,6 +2,8 @@
 #include "test.h"
 #include "tree.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -24,11 +26,11 @@ static enum test_result depq_test_priority_empty_range(void);
 static size_t inorder_fill(int[], size_t, struct depqueue *);
 static enum test_result iterator_check(struct depqueue *);
 static void val_update(struct depq_elem *, void *);
-static dpq_threeway_cmp val_cmp(const struct depq_elem *,
-                                const struct depq_elem *, void *);
+static dpq_threeway_cmp val_cmp(struct depq_elem const *,
+                                struct depq_elem const *, void *);
 
 #define NUM_TESTS (size_t)8
-const test_fn all_tests[NUM_TESTS] = {
+test_fn const all_tests[NUM_TESTS] = {
     depq_test_forward_iter_unique_vals, depq_test_forward_iter_all_vals,
     depq_test_insert_iterate_pop,       depq_test_priority_update,
     depq_test_priority_removal,         depq_test_priority_valid_range,
@@ -41,7 +43,7 @@ main()
     enum test_result res = PASS;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
-        const bool fail = all_tests[i]() == FAIL;
+        bool const fail = all_tests[i]() == FAIL;
         if (fail)
         {
             res = FAIL;
@@ -59,8 +61,8 @@ depq_test_forward_iter_unique_vals(void)
          e = depq_next(&pq, e), ++j)
     {}
     CHECK(j, 0, int, "%d");
-    const int num_nodes = 33;
-    const int prime = 37;
+    int const num_nodes = 33;
+    int const prime = 37;
     struct val vals[num_nodes];
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
@@ -78,7 +80,7 @@ depq_test_forward_iter_unique_vals(void)
     for (struct depq_elem *e = depq_begin(&pq); e != depq_end(&pq) && j >= 0;
          e = depq_next(&pq, e), --j)
     {
-        const struct val *v = DEPQ_ENTRY(e, struct val, elem);
+        struct val const *v = DEPQ_ENTRY(e, struct val, elem);
         CHECK(v->val, val_keys_inorder[j], int, "%d");
     }
     return PASS;
@@ -94,7 +96,7 @@ depq_test_forward_iter_all_vals(void)
          i = depq_next(&pq, i), ++j)
     {}
     CHECK(j, 0, int, "%d");
-    const int num_nodes = 33;
+    int const num_nodes = 33;
     struct val vals[num_nodes];
     vals[0].val = 0; // NOLINT
     vals[0].id = 0;
@@ -117,7 +119,7 @@ depq_test_forward_iter_all_vals(void)
     for (struct depq_elem *i = depq_begin(&pq); i != depq_end(&pq) && j >= 0;
          i = depq_next(&pq, i), --j)
     {
-        const struct val *v = DEPQ_ENTRY(i, struct val, elem);
+        struct val const *v = DEPQ_ENTRY(i, struct val, elem);
         CHECK(v->val, val_keys_inorder[j], int, "%d");
     }
     return PASS;
@@ -130,7 +132,7 @@ depq_test_insert_iterate_pop(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -163,7 +165,7 @@ depq_test_priority_removal(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -174,7 +176,7 @@ depq_test_priority_removal(void)
         CHECK(validate_tree(&pq.t), true, bool, "%d");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
-    const int limit = 400;
+    int const limit = 400;
     for (struct depq_elem *i = depq_begin(&pq); i != depq_end(&pq);)
     {
         struct val *cur = DEPQ_ENTRY(i, struct val, elem);
@@ -198,7 +200,7 @@ depq_test_priority_update(void)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    const size_t num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[num_nodes];
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -209,7 +211,7 @@ depq_test_priority_update(void)
         CHECK(validate_tree(&pq.t), true, bool, "%d");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
-    const int limit = 400;
+    int const limit = 400;
     for (struct depq_elem *i = depq_begin(&pq); i != depq_end(&pq);)
     {
         struct val *cur = DEPQ_ENTRY(i, struct val, elem);
@@ -235,7 +237,7 @@ depq_test_priority_valid_range(void)
 {
     struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
 
-    const int num_nodes = 25;
+    int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
@@ -250,8 +252,8 @@ depq_test_priority_valid_range(void)
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    const int rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    const struct depq_rrange rev_range
+    int const rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    struct depq_rrange const rev_range
         = depq_equal_rrange(&pq, &b.elem, &e.elem);
     CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val,
           rev_range_vals[0], int, "%d");
@@ -261,7 +263,7 @@ depq_test_priority_valid_range(void)
     struct depq_elem *i1 = depq_begin_rrange(&rev_range);
     for (; i1 != depq_end_rrange(&rev_range); i1 = depq_rnext(&pq, i1))
     {
-        const int cur_val = DEPQ_ENTRY(i1, struct val, elem)->val;
+        int const cur_val = DEPQ_ENTRY(i1, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -272,8 +274,8 @@ depq_test_priority_valid_range(void)
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    const int range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    const struct depq_range range = depq_equal_range(&pq, &b.elem, &e.elem);
+    int const range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    struct depq_range const range = depq_equal_range(&pq, &b.elem, &e.elem);
     CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val,
           range_vals[0], int, "%d");
     CHECK(DEPQ_ENTRY(depq_end_range(&range), struct val, elem)->val,
@@ -282,7 +284,7 @@ depq_test_priority_valid_range(void)
     struct depq_elem *i2 = depq_begin_range(&range);
     for (; i2 != depq_end_range(&range); i2 = depq_next(&pq, i2))
     {
-        const int cur_val = DEPQ_ENTRY(i2, struct val, elem)->val;
+        int const cur_val = DEPQ_ENTRY(i2, struct val, elem)->val;
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -296,7 +298,7 @@ depq_test_priority_invalid_range(void)
 {
     struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
 
-    const int num_nodes = 25;
+    int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
@@ -311,8 +313,8 @@ depq_test_priority_invalid_range(void)
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    const int rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
-    const struct depq_rrange rev_range
+    int const rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
+    struct depq_rrange const rev_range
         = depq_equal_rrange(&pq, &b.elem, &e.elem);
     CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val,
           rev_range_vals[0], int, "%d");
@@ -321,7 +323,7 @@ depq_test_priority_invalid_range(void)
     struct depq_elem *i1 = depq_begin_rrange(&rev_range);
     for (; i1 != depq_end_rrange(&rev_range); i1 = depq_rnext(&pq, i1))
     {
-        const int cur_val = DEPQ_ENTRY(i1, struct val, elem)->val;
+        int const cur_val = DEPQ_ENTRY(i1, struct val, elem)->val;
         CHECK(rev_range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -332,8 +334,8 @@ depq_test_priority_invalid_range(void)
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    const int range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
-    const struct depq_range range = depq_equal_range(&pq, &b.elem, &e.elem);
+    int const range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
+    struct depq_range const range = depq_equal_range(&pq, &b.elem, &e.elem);
     CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val,
           range_vals[0], int, "%d");
     CHECK(depq_end_range(&range) == depq_end(&pq), true, bool, "%d");
@@ -341,7 +343,7 @@ depq_test_priority_invalid_range(void)
     struct depq_elem *i2 = depq_begin_range(&range);
     for (; i2 != depq_end_range(&range); i2 = depq_next(&pq, i2))
     {
-        const int cur_val = DEPQ_ENTRY(i2, struct val, elem)->val;
+        int const cur_val = DEPQ_ENTRY(i2, struct val, elem)->val;
         CHECK(range_vals[index], cur_val, int, "%d");
         ++index;
     }
@@ -355,7 +357,7 @@ depq_test_priority_empty_range(void)
 {
     struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
 
-    const int num_nodes = 25;
+    int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
@@ -370,7 +372,7 @@ depq_test_priority_empty_range(void)
        Normal iteration patterns would consider this empty. */
     struct val b = {.id = 0, .val = -50};
     struct val e = {.id = 0, .val = -25};
-    const struct depq_rrange rev_range
+    struct depq_rrange const rev_range
         = depq_equal_rrange(&pq, &b.elem, &e.elem);
     CHECK(DEPQ_ENTRY(depq_begin_rrange(&rev_range), struct val, elem)->val,
           vals[0].val, int, "%d");
@@ -378,7 +380,7 @@ depq_test_priority_empty_range(void)
           vals[0].val, int, "%d");
     b.val = 150;
     e.val = 999;
-    const struct depq_range range = depq_equal_range(&pq, &b.elem, &e.elem);
+    struct depq_range const range = depq_equal_range(&pq, &b.elem, &e.elem);
     CHECK(DEPQ_ENTRY(depq_begin_range(&range), struct val, elem)->val,
           vals[num_nodes - 1].val, int, "%d");
     CHECK(DEPQ_ENTRY(depq_end_range(&range), struct val, elem)->val,
@@ -405,7 +407,7 @@ inorder_fill(int vals[], size_t size, struct depqueue *pq)
 static enum test_result
 iterator_check(struct depqueue *pq)
 {
-    const size_t size = depq_size(pq);
+    size_t const size = depq_size(pq);
     size_t iter_count = 0;
     for (struct depq_elem *e = depq_begin(pq); e != depq_end(pq);
          e = depq_next(pq, e))
@@ -428,7 +430,7 @@ iterator_check(struct depqueue *pq)
 }
 
 static dpq_threeway_cmp
-val_cmp(const struct depq_elem *a, const struct depq_elem *b, void *aux)
+val_cmp(struct depq_elem const *a, struct depq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = DEPQ_ENTRY(a, struct val, elem);
