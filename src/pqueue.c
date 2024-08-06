@@ -5,28 +5,27 @@
 
 /*=========================  Function Prototypes   ==========================*/
 
-static struct pq_elem *fair_merge(struct pqueue *, struct pq_elem *old,
-                                  struct pq_elem *new);
-static void link_child(struct pq_elem *parent, struct pq_elem *child);
-static void init_node(struct pq_elem *);
-static size_t traversal_size(struct pq_elem const *);
-static bool has_valid_links(struct pqueue const *, struct pq_elem const *parent,
-                            struct pq_elem const *child);
-static struct pq_elem *delete(struct pqueue *, struct pq_elem *);
-static struct pq_elem *delete_min(struct pqueue *, struct pq_elem *);
-static void clear_node(struct pq_elem *);
-static void cut_child(struct pq_elem *);
+static pq_elem *fair_merge(pqueue *, pq_elem *old, pq_elem *new);
+static void link_child(pq_elem *parent, pq_elem *child);
+static void init_node(pq_elem *);
+static size_t traversal_size(pq_elem const *);
+static bool has_valid_links(pqueue const *, pq_elem const *parent,
+                            pq_elem const *child);
+static pq_elem *delete(pqueue *, pq_elem *);
+static pq_elem *delete_min(pqueue *, pq_elem *);
+static void clear_node(pq_elem *);
+static void cut_child(pq_elem *);
 
 /*=========================  Interface Functions   ==========================*/
 
-struct pq_elem const *
-pq_front(struct pqueue const *const ppq)
+pq_elem const *
+pq_front(pqueue const *const ppq)
 {
     return ppq->root;
 }
 
 void
-pq_push(struct pqueue *const ppq, struct pq_elem *const e)
+pq_push(pqueue *const ppq, pq_elem *const e)
 {
     if (!e || !ppq)
     {
@@ -37,22 +36,22 @@ pq_push(struct pqueue *const ppq, struct pq_elem *const e)
     ++ppq->sz;
 }
 
-struct pq_elem *
-pq_pop(struct pqueue *const ppq)
+pq_elem *
+pq_pop(pqueue *const ppq)
 {
     if (!ppq->root)
     {
         return NULL;
     }
-    struct pq_elem *const popped = ppq->root;
+    pq_elem *const popped = ppq->root;
     ppq->root = delete_min(ppq, ppq->root);
     ppq->sz--;
     clear_node(popped);
     return popped;
 }
 
-struct pq_elem *
-pq_erase(struct pqueue *const ppq, struct pq_elem *const e)
+pq_elem *
+pq_erase(pqueue *const ppq, pq_elem *const e)
 {
     if (!ppq->root || !e->next_sibling || !e->prev_sibling)
     {
@@ -65,7 +64,7 @@ pq_erase(struct pqueue *const ppq, struct pq_elem *const e)
 }
 
 void
-pq_clear(struct pqueue *const ppq, pq_destructor_fn *fn)
+pq_clear(pqueue *const ppq, pq_destructor_fn *fn)
 {
     while (!pq_empty(ppq))
     {
@@ -74,13 +73,13 @@ pq_clear(struct pqueue *const ppq, pq_destructor_fn *fn)
 }
 
 bool
-pq_empty(struct pqueue const *const ppq)
+pq_empty(pqueue const *const ppq)
 {
     return !ppq->sz;
 }
 
 size_t
-pq_size(struct pqueue const *const ppq)
+pq_size(pqueue const *const ppq)
 {
     return ppq->sz;
 }
@@ -92,8 +91,8 @@ pq_size(struct pqueue const *const ppq)
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
 bool
-pq_update(struct pqueue *const ppq, struct pq_elem *const e,
-          pq_update_fn *const fn, void *const aux)
+pq_update(pqueue *const ppq, pq_elem *const e, pq_update_fn *const fn,
+          void *const aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
     {
@@ -115,8 +114,7 @@ pq_update(struct pqueue *const ppq, struct pq_elem *const e,
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
 bool
-pq_increase(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
-            void *aux)
+pq_increase(pqueue *const ppq, pq_elem *const e, pq_update_fn *fn, void *aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
     {
@@ -140,8 +138,7 @@ pq_increase(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
 bool
-pq_decrease(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
-            void *aux)
+pq_decrease(pqueue *const ppq, pq_elem *const e, pq_update_fn *fn, void *aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
     {
@@ -163,7 +160,7 @@ pq_decrease(struct pqueue *const ppq, struct pq_elem *const e, pq_update_fn *fn,
 }
 
 bool
-pq_validate(struct pqueue const *const ppq)
+pq_validate(pqueue const *const ppq)
 {
     if (ppq->root && ppq->root->parent)
     {
@@ -180,8 +177,8 @@ pq_validate(struct pqueue const *const ppq)
     return true;
 }
 
-enum pq_threeway_cmp
-pq_order(struct pqueue const *const ppq)
+pq_threeway_cmp
+pq_order(pqueue const *const ppq)
 {
     return ppq->order;
 }
@@ -189,20 +186,20 @@ pq_order(struct pqueue const *const ppq)
 /*========================   Static Helpers   ================================*/
 
 static void
-init_node(struct pq_elem *e)
+init_node(pq_elem *e)
 {
     e->left_child = e->parent = NULL;
     e->next_sibling = e->prev_sibling = e;
 }
 
 static void
-clear_node(struct pq_elem *e)
+clear_node(pq_elem *e)
 {
     e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
 }
 
 static void
-cut_child(struct pq_elem *child)
+cut_child(pq_elem *child)
 {
     child->next_sibling->prev_sibling = child->prev_sibling;
     child->prev_sibling->next_sibling = child->next_sibling;
@@ -220,7 +217,7 @@ cut_child(struct pq_elem *child)
     child->parent = NULL;
 }
 
-static struct pq_elem *delete(struct pqueue *ppq, struct pq_elem *root)
+static pq_elem *delete(pqueue *ppq, pq_elem *root)
 {
     if (ppq->root == root)
     {
@@ -230,20 +227,20 @@ static struct pq_elem *delete(struct pqueue *ppq, struct pq_elem *root)
     return fair_merge(ppq, ppq->root, delete_min(ppq, root));
 }
 
-static struct pq_elem *
-delete_min(struct pqueue *ppq, struct pq_elem *root)
+static pq_elem *
+delete_min(pqueue *ppq, pq_elem *root)
 {
     if (!root->left_child)
     {
         return NULL;
     }
-    struct pq_elem *const eldest = root->left_child->next_sibling;
-    struct pq_elem *accumulator = root->left_child->next_sibling;
-    struct pq_elem *cur = root->left_child->next_sibling->next_sibling;
+    pq_elem *const eldest = root->left_child->next_sibling;
+    pq_elem *accumulator = root->left_child->next_sibling;
+    pq_elem *cur = root->left_child->next_sibling->next_sibling;
     while (cur != eldest && cur->next_sibling != eldest)
     {
-        struct pq_elem *next = cur->next_sibling;
-        struct pq_elem *next_cur = cur->next_sibling->next_sibling;
+        pq_elem *next = cur->next_sibling;
+        pq_elem *next_cur = cur->next_sibling->next_sibling;
         next->next_sibling = next->prev_sibling = NULL;
         cur->next_sibling = cur->prev_sibling = NULL;
         accumulator = fair_merge(ppq, accumulator, fair_merge(ppq, cur, next));
@@ -257,9 +254,8 @@ delete_min(struct pqueue *ppq, struct pq_elem *root)
     return root;
 }
 
-static inline struct pq_elem *
-fair_merge(struct pqueue *const ppq, struct pq_elem *const old,
-           struct pq_elem *const new)
+static inline pq_elem *
+fair_merge(pqueue *const ppq, pq_elem *const old, pq_elem *const new)
 {
     if (!old || !new || old == new)
     {
@@ -280,7 +276,7 @@ fair_merge(struct pqueue *const ppq, struct pq_elem *const old,
       ┌b┐     ┌c─b┐   ┌d─c─b┐
       └─┘     └───┘   └─────┘ */
 static inline void
-link_child(struct pq_elem *const parent, struct pq_elem *const child)
+link_child(pq_elem *const parent, pq_elem *const child)
 {
     if (parent->left_child)
     {
@@ -302,7 +298,7 @@ link_child(struct pq_elem *const parent, struct pq_elem *const child)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static size_t
-traversal_size(struct pq_elem const *const root)
+traversal_size(pq_elem const *const root)
 {
     if (!root)
     {
@@ -310,7 +306,7 @@ traversal_size(struct pq_elem const *const root)
     }
     size_t sz = 0;
     bool sibling_ring_lapped = false;
-    struct pq_elem const *cur = root;
+    pq_elem const *cur = root;
     while (!sibling_ring_lapped)
     {
         sz += 1 + traversal_size(cur->left_child);
@@ -321,18 +317,16 @@ traversal_size(struct pq_elem const *const root)
 }
 
 static bool
-has_valid_links(struct pqueue const *const ppq,
-                struct pq_elem const *const parent,
-                struct pq_elem const *const child)
+has_valid_links(pqueue const *const ppq, pq_elem const *const parent,
+                pq_elem const *const child)
 {
     if (!child)
     {
         return true;
     }
     bool sibling_ring_lapped = false;
-    struct pq_elem const *cur = child;
-    enum pq_threeway_cmp const wrong_order
-        = ppq->order == PQLES ? PQGRT : PQLES;
+    pq_elem const *cur = child;
+    pq_threeway_cmp const wrong_order = ppq->order == PQLES ? PQGRT : PQLES;
     while (!sibling_ring_lapped)
     {
         if (!cur)

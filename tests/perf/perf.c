@@ -14,7 +14,7 @@ struct val
     int val;
     struct depq_elem depq_elem;
     struct hpq_elem hpq_elem;
-    struct pq_elem pq_elem;
+    pq_elem pq_elem;
 };
 
 size_t const step = 100000;
@@ -36,13 +36,12 @@ static dpq_threeway_cmp depq_val_cmp(struct depq_elem const *,
                                      struct depq_elem const *, void *);
 static enum heap_pq_threeway_cmp hpq_val_cmp(struct hpq_elem const *,
                                              struct hpq_elem const *, void *);
-static enum pq_threeway_cmp pq_val_cmp(struct pq_elem const *,
-                                       struct pq_elem const *, void *);
+static pq_threeway_cmp pq_val_cmp(pq_elem const *, pq_elem const *, void *);
 static void depq_update_val(struct depq_elem *, void *);
 static void hpq_update_val(struct hpq_elem *, void *);
-static void pq_update_val(struct pq_elem *, void *);
+static void pq_update_val(pq_elem *, void *);
 static void hpq_destroy_val(struct hpq_elem *);
-static void pq_destroy_val(struct pq_elem *);
+static void pq_destroy_val(pq_elem *);
 
 #define NUM_TESTS (size_t)6
 static depq_perf_fn const perf_tests[NUM_TESTS] = {test_push,
@@ -106,7 +105,7 @@ test_push(void)
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
+        pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -145,7 +144,7 @@ test_pop(void)
         struct val *val_array = create_rand_vals(n);
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
+        pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
@@ -199,7 +198,7 @@ test_push_pop(void)
         struct val *val_array = create_rand_vals(n);
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
+        pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -253,7 +252,7 @@ test_push_intermittent_pop(void)
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
+        pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -305,7 +304,7 @@ test_pop_intermittent_push(void)
         struct val *val_array = create_rand_vals(n);
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
+        pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
@@ -374,7 +373,7 @@ test_update(void)
         struct val *val_array = create_rand_vals(n);
         struct depqueue depq = DEPQ_INIT(depq, depq_val_cmp, NULL);
         struct heap_pqueue hpq;
-        struct pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
+        pqueue pq = PQ_INIT(PQLES, pq_val_cmp, NULL);
         hpq_init(&hpq, HPQLES, hpq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
@@ -498,7 +497,7 @@ hpq_update_val(struct hpq_elem *e, void *aux)
 }
 
 static void
-pq_update_val(struct pq_elem *e, void *aux)
+pq_update_val(pq_elem *e, void *aux)
 {
     struct val *v = PQ_ENTRY(e, struct val, pq_elem);
     v->val = *((int *)aux);
@@ -511,14 +510,13 @@ hpq_destroy_val(struct hpq_elem *e)
 }
 
 static void
-pq_destroy_val(struct pq_elem *e)
+pq_destroy_val(pq_elem *e)
 {
     (void)e;
 }
 
-static enum pq_threeway_cmp
-pq_val_cmp(struct pq_elem const *a, struct pq_elem const *const b,
-           void *const aux)
+static pq_threeway_cmp
+pq_val_cmp(pq_elem const *a, pq_elem const *const b, void *const aux)
 {
     (void)aux;
     struct val const *const x = PQ_ENTRY(a, struct val, pq_elem);

@@ -8,12 +8,11 @@ struct val
 {
     int id;
     int val;
-    struct pq_elem elem;
+    pq_elem elem;
 };
 
 static enum test_result pq_test_empty(void);
-static enum pq_threeway_cmp val_cmp(struct pq_elem const *,
-                                    struct pq_elem const *, void *);
+static pq_threeway_cmp val_cmp(pq_elem const *, pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)1
 test_fn const all_tests[NUM_TESTS] = {pq_test_empty};
@@ -36,13 +35,13 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     CHECK(pq_empty(&pq), true, bool, "%d");
     return PASS;
 }
 
-static enum pq_threeway_cmp
-val_cmp(struct pq_elem const *a, struct pq_elem const *b, void *aux)
+static pq_threeway_cmp
+val_cmp(pq_elem const *a, pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = PQ_ENTRY(a, struct val, elem);

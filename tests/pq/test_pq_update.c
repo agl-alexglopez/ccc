@@ -11,7 +11,7 @@ struct val
 {
     int id;
     int val;
-    struct pq_elem elem;
+    pq_elem elem;
 };
 
 static enum test_result pq_test_insert_iterate_pop(void);
@@ -19,9 +19,8 @@ static enum test_result pq_test_priority_update(void);
 static enum test_result pq_test_priority_increase(void);
 static enum test_result pq_test_priority_decrease(void);
 static enum test_result pq_test_priority_removal(void);
-static void val_update(struct pq_elem *, void *);
-static enum pq_threeway_cmp val_cmp(struct pq_elem const *,
-                                    struct pq_elem const *, void *);
+static void val_update(pq_elem *, void *);
+static pq_threeway_cmp val_cmp(pq_elem const *, pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)5
 test_fn const all_tests[NUM_TESTS] = {
@@ -48,7 +47,7 @@ main()
 static enum test_result
 pq_test_insert_iterate_pop(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -76,7 +75,7 @@ pq_test_insert_iterate_pop(void)
 static enum test_result
 pq_test_priority_removal(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -93,7 +92,7 @@ pq_test_priority_removal(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct pq_elem *i = &vals[val].elem;
+        pq_elem *i = &vals[val].elem;
         struct val *cur = PQ_ENTRY(i, struct val, elem);
         if (cur->val > limit)
         {
@@ -107,7 +106,7 @@ pq_test_priority_removal(void)
 static enum test_result
 pq_test_priority_update(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -124,7 +123,7 @@ pq_test_priority_update(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct pq_elem *i = &vals[val].elem;
+        pq_elem *i = &vals[val].elem;
         struct val *cur = PQ_ENTRY(i, struct val, elem);
         int backoff = cur->val / 2;
         if (cur->val > limit)
@@ -140,7 +139,7 @@ pq_test_priority_update(void)
 static enum test_result
 pq_test_priority_increase(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -157,7 +156,7 @@ pq_test_priority_increase(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct pq_elem *i = &vals[val].elem;
+        pq_elem *i = &vals[val].elem;
         struct val *cur = PQ_ENTRY(i, struct val, elem);
         int inc = limit * 2;
         int dec = cur->val / 2;
@@ -179,7 +178,7 @@ pq_test_priority_increase(void)
 static enum test_result
 pq_test_priority_decrease(void)
 {
-    struct pqueue pq = PQ_INIT(PQGRT, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQGRT, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -196,7 +195,7 @@ pq_test_priority_decrease(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct pq_elem *i = &vals[val].elem;
+        pq_elem *i = &vals[val].elem;
         struct val *cur = PQ_ENTRY(i, struct val, elem);
         int inc = limit * 2;
         int dec = cur->val / 2;
@@ -215,8 +214,8 @@ pq_test_priority_decrease(void)
     return PASS;
 }
 
-static enum pq_threeway_cmp
-val_cmp(struct pq_elem const *a, struct pq_elem const *b, void *aux)
+static pq_threeway_cmp
+val_cmp(pq_elem const *a, pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = PQ_ENTRY(a, struct val, elem);
@@ -225,7 +224,7 @@ val_cmp(struct pq_elem const *a, struct pq_elem const *b, void *aux)
 }
 
 static void
-val_update(struct pq_elem *a, void *aux)
+val_update(pq_elem *a, void *aux)
 {
     struct val *old = PQ_ENTRY(a, struct val, elem);
     old->val = *(int *)aux;

@@ -37,17 +37,17 @@
 
       set
       {
-          set_elem *root;
-          set_elem nil;
+          ccc_set_elem *root;
+          ccc_set_elem nil;
           size_t size;
       };
 
-   Embed a set_elem in your struct:
+   Embed a ccc_set_elem in your struct:
 
       struct val
       {
           int val;
-          set_elem elem;
+          ccc_set_elem elem;
       };
 
    The nil is helpful in this case to make the Set data structure
@@ -64,7 +64,7 @@
       struct val
       {
           int val;
-          set_elem elem;
+          ccc_set_elem elem;
       }
 
       set s;
@@ -75,7 +75,7 @@
       assert(set_insert(&s, &my_val.elem, set_cmp_fn, NULL)))
       ...I am responsible for the set so I know this is unique...
 
-      struct set_elem *e = set_find(&s, &my_val.elem, set_cmp_fn, NULL);
+      ccc_set_elem *e = set_find(&s, &my_val.elem, set_cmp_fn, NULL);
       ...This must be mine, because I am the one who made it earlier...
 
    However, this approach is not very flexible and loses much of
@@ -88,11 +88,11 @@
       static set my_set;
 
       static threeway_cmp
-      val_cmp(const set_elem *a, const set_elem *b, void *aux)
+      val_cmp(const ccc_set_elem *a, const ccc_set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = SET_ENTRY(a, struct val, elem);
-          struct val *rhs = SET_ENTRY(b, struct val, elem);
+          struct val *lhs = CCC_SET_IN(a, struct val, elem);
+          struct val *rhs = CCC_SET_IN(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -123,15 +123,15 @@
       static set my_set;
 
       static threeway_cmp
-      val_cmp(const set_elem *a, const set_elem *b, void *aux)
+      val_cmp(const ccc_set_elem *a, const ccc_set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = SET_ENTRY(a, struct val, elem);
-          struct val *rhs = SET_ENTRY(b, struct val, elem);
+          struct val *lhs = CCC_SET_IN(a, struct val, elem);
+          struct val *rhs = CCC_SET_IN(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
-      struct node *
+      ccc_node *
       my_find(int key)
       {
           set_key.val = key;
@@ -145,7 +145,7 @@
           ... Program logic of generating all values  ...
           ... that will go in the set for later       ...
 
-          set_elem *my_query = my_find(5);
+          ccc_set_elem *my_query = my_find(5);
           if (my_query != set_end(&s))
              ... Proceed with some logic .....
       }
@@ -163,24 +163,24 @@
 /* An embedded set data structure for storage and retrieval
    of sorted unique elements for duplicate storage see
    priority queue or multiset */
-struct set
+typedef struct ccc_set
 {
-    struct tree t;
-};
+    ccc_tree t;
+} ccc_set;
 
 /* The element embedded withing a struct that is used to
    store, search, and retrieve data in the tree. */
-struct set_elem
+typedef struct ccc_set_elem
 {
-    struct node n;
-};
+    ccc_node n;
+} ccc_set_elem;
 
-typedef enum
+typedef enum ccc_set_threeway_cmp
 {
     SETLES = NODE_LES,
     SETEQL = NODE_EQL,
     SETGRT = NODE_GRT,
-} set_threeway_cmp;
+} ccc_set_threeway_cmp;
 
 /* ===================   Comparisons  ==========================
 
@@ -211,37 +211,37 @@ typedef enum
       struct val
       {
           int val;
-          set_elem elem;
+          ccc_set_elem elem;
       };
 
       static threeway_cmp
-      val_cmp(const set_elem *a, const set_elem *b, void *aux)
+      val_cmp(const ccc_set_elem *a, const ccc_set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = SET_ENTRY (a, struct val, elem);
-          struct val *rhs = SET_ENTRY (b, struct val, elem);
+          struct val *lhs = CCC_SET_IN (a, struct val, elem);
+          struct val *rhs = CCC_SET_IN (b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
    ============================================================= */
-typedef set_threeway_cmp set_cmp_fn(struct set_elem const *a,
-                                    struct set_elem const *b, void *aux);
+typedef ccc_set_threeway_cmp ccc_set_cmp_fn(ccc_set_elem const *a,
+                                            ccc_set_elem const *b, void *aux);
 
-/* Performs user specified destructor actions on a single set_elem. This
-   set_elem is assumed to be embedded in user defined structs and therefore
+/* Performs user specified destructor actions on a single ccc_set_elem. This
+   ccc_set_elem is assumed to be embedded in user defined structs and therefore
    allows the user to perform any updates to their program before deleting
    this element. The user will know if they have heap allocated their
    own structures and therefore shall call free on the containing structure.
    If the data structure is stack allocated, free is not necessary but other
    updates may be specified by this function. */
-typedef void set_destructor_fn(struct set_elem *);
+typedef void ccc_set_destructor_fn(ccc_set_elem *);
 
-/* A container for a simple begin and end pointer to a set_elem.
+/* A container for a simple begin and end pointer to a ccc_set_elem.
 
       set_range
       {
-         set_elem *begin;
-         set_elem *end;
+         ccc_set_elem *begin;
+         ccc_set_elem *end;
       };
 
    A user can use the equal_range or equal_rrange function to
@@ -252,26 +252,26 @@ typedef void set_destructor_fn(struct set_elem *);
    to use the appropriate next function. Use next for a
    set_range and rnext for a set_rrange. Otherwise, indefinite
    loops may occur. */
-struct set_range
+typedef struct ccc_set_range
 {
-    struct range r ATTRIB_PRIVATE;
-};
+    ccc_range r ATTRIB_PRIVATE;
+} ccc_set_range;
 
 /* The reverse range container for queries performed with
    requal_range.
 
       set_rrange
       {
-         set_elem *rbegin;
-         set_elem *end;
+         ccc_set_elem *rbegin;
+         ccc_set_elem *end;
       };
 
    Be sure to use the rnext function to progress the iterator
    in this type of range.*/
-struct set_rrange
+typedef struct ccc_set_rrange
 {
-    struct rrange r ATTRIB_PRIVATE;
-};
+    ccc_rrange r ATTRIB_PRIVATE;
+} ccc_set_rrange;
 
 /* Define a function to use printf for your custom struct type.
    For example:
@@ -281,39 +281,39 @@ struct set_rrange
          pq_elem elem;
       };
 
-      void print_my_val(set_elem *elem)
+      void print_my_val(ccc_set_elem *elem)
       {
-         struct val const *v = SET_ENTRY(elem, struct val, elem);
+         struct val const *v = CCC_SET_IN(elem, struct val, elem);
          printf("{%d}", v->val);
       }
 
    Output should be one line with no newline character. Then,
    the printer function will take care of the rest. */
-typedef void set_print_fn(struct set_elem const *);
+typedef void ccc_set_print_fn(ccc_set_elem const *);
 
 /* NOLINTNEXTLINE */
-#define SET_ENTRY(SET_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(SET_ELEM)->n                                      \
+#define CCC_SET_IN(CCC_SET_ELEM, STRUCT, MEMBER)                               \
+    ((STRUCT *)((uint8_t *)&(CCC_SET_ELEM)->n                                  \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
-#define SET_INIT(SET_NAME, CMP, AUX)                                           \
+#define CCC_SET_INIT(SET_NAME, CMP, AUX)                                       \
     {                                                                          \
         .t = TREE_INIT(SET_NAME, CMP, AUX)                                     \
     }
 
 /* Calls the destructor for each element while emptying the set.
    Usually, this destructor function is expected to call free for each
-   struct for which a struct set_elem is embedded if they are heap allocated.
+   struct for which a ccc_set_elem is embedded if they are heap allocated.
    However, for stack allocated structures this is not required.
    Other updates before destruction are possible to include in destructor
    if determined necessary by the user. A set has no hidden allocations and
    therefore the only heap memory is controlled by the user. */
-void set_clear(struct set *, set_destructor_fn *destructor);
+void ccc_set_clear(ccc_set *, ccc_set_destructor_fn *destructor);
 
 /* O(1) */
-bool set_empty(struct set *);
+bool ccc_set_empty(ccc_set *);
 /* O(1) */
-size_t set_size(struct set *);
+size_t ccc_set_size(ccc_set *);
 
 /* ===================     Set Methods   ======================= */
 
@@ -325,14 +325,14 @@ size_t set_size(struct set *);
    with the same key. Do not assume your element is the
    one that is found unless you know it is only one you
    have created. */
-bool set_contains(struct set *, struct set_elem *);
+bool ccc_set_contains(ccc_set *, ccc_set_elem *);
 
 /* Returns true if the element you have requested to be
    inserted is inserted false if it was present already.
    Becuase this is heap free data structure there is no need
    to return the actual element that is inserted. You already
    have it when you call this function.*/
-bool set_insert(struct set *, struct set_elem *);
+bool ccc_set_insert(ccc_set *, ccc_set_elem *);
 
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
@@ -346,7 +346,7 @@ bool set_insert(struct set *, struct set_elem *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-struct set_elem const *set_find(struct set *, struct set_elem *);
+ccc_set_elem const *ccc_set_find(ccc_set *, ccc_set_elem *);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or set end pointer if the
@@ -354,12 +354,12 @@ struct set_elem const *set_find(struct set *, struct set_elem *);
    end element and it does not have any attachment to any
    struct you are using so trying to get the set entry from
    it will return garbage or worse.*/
-struct set_elem *set_erase(struct set *, struct set_elem *);
+ccc_set_elem *ccc_set_erase(ccc_set *, ccc_set_elem *);
 
 /* Check if the current elem is the min. O(lgN) */
-bool set_is_min(struct set *, struct set_elem *);
+bool ccc_set_is_min(ccc_set *, ccc_set_elem *);
 /* Check if the current elem is the max. O(lgN) */
-bool set_is_max(struct set *, struct set_elem *);
+bool ccc_set_is_max(ccc_set *, ccc_set_elem *);
 
 /* Basic C++ style set operation. Contains does not return
    an element but will tell you if an element with the same
@@ -370,7 +370,7 @@ bool set_is_max(struct set *, struct set_elem *);
    one that is found unless you know it is only one you
    have created. The const version does no fixups and should
    be used only rarely. */
-bool set_const_contains(struct set *, struct set_elem *);
+bool ccc_set_const_contains(ccc_set *, ccc_set_elem *);
 
 /* Read only seek into the data structure backing the set.
    It is therefore safe for multiple threads to read with
@@ -379,7 +379,7 @@ bool set_const_contains(struct set *, struct set_elem *);
    benefits from locality of reference and should be
    allowed to repair itself with lookups with all other
    functions whenever possible. */
-struct set_elem const *set_const_find(struct set *, struct set_elem *);
+ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
 
 /* ===================    Iteration   ==========================
 
@@ -389,7 +389,7 @@ struct set_elem const *set_const_find(struct set *, struct set_elem *);
    struct val
    {
        int val;
-       set_elem elem;
+       ccc_set_elem elem;
    };
 
    static set s;
@@ -401,11 +401,11 @@ struct set_elem const *set_const_find(struct set *, struct set_elem *);
 
        ...Fill the container with program logic...
 
-       for (struct set_elem *i = set_begin(&s); i != set_end(&s, i); )
+       for (ccc_set_elem *i = set_begin(&s); i != set_end(&s, i); )
        {
           if (meets_criteria(i))
           {
-              struct set_elem *next = set_next(&s, i);
+              ccc_set_elem *next = set_next(&s, i);
               assert(set_erase(&s, i) != set_end(&s);
               i = next;
           }
@@ -428,7 +428,7 @@ struct set_elem const *set_const_find(struct set *, struct set_elem *);
 
       struct val {
          int val;
-         set_elem elem;
+         ccc_set_elem elem;
       }
 
       set s;
@@ -441,28 +441,28 @@ struct set_elem const *set_const_find(struct set *, struct set_elem *);
 
       ... Elsewhere ...
 
-      struct struct set_elem *e = set_find(&s, &a.elem, cmp, NULL);
+      ccc_set_elem *e = set_find(&s, &a.elem, cmp, NULL);
       if (e != set_end(&s))
          ...Proceed with some logic...
       else
          ...Do something else... */
-struct set_elem *set_end(struct set *);
+ccc_set_elem *ccc_set_end(ccc_set *);
 
 /* Provides the start for an inorder ascending order traversal
    of the set. Equivalent to end of the set is empty. */
-struct set_elem *set_begin(struct set *);
+ccc_set_elem *ccc_set_begin(ccc_set *);
 
 /* Provides the start for an inorder descending order traversal
    of the set. Equivalent to end of the set is empty. */
-struct set_elem *set_rbegin(struct set *);
+ccc_set_elem *ccc_set_rbegin(ccc_set *);
 
 /* Progresses the pointer to the next greatest element in
    the set or the end if done. */
-struct set_elem *set_next(struct set *, struct set_elem *);
+ccc_set_elem *ccc_set_next(ccc_set *, ccc_set_elem *);
 
 /* Progresses the pointer to the next lesser element in
    the set or the end if done. */
-struct set_elem *set_rnext(struct set *, struct set_elem *);
+ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -474,23 +474,23 @@ struct set_elem *set_rnext(struct set *, struct set_elem *);
       struct val b = {.id = 0, .val = 35};
       struct val e = {.id = 0, .val = 64};
       const set_range range = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (struct set_elem *i = set_begin_range(&range);
+      for (ccc_set_elem *i = set_begin_range(&range);
            i != set_end_range(&range);
            i = set_next(&s, i))
       {
-          const int cur_val = SET_ENTRY(i, struct val, elem)->val;
+          const int cur_val = CCC_SET_IN(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 
    Use the next iterator from begin to end. If there are no values NOT LESS
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, end is returned as end element. */
-struct set_range set_equal_range(struct set *, struct set_elem *begin,
-                                 struct set_elem *end);
+ccc_set_range ccc_set_equal_range(ccc_set *, ccc_set_elem *begin,
+                                  ccc_set_elem *end);
 
-struct set_elem *set_begin_range(struct set_range const *);
+ccc_set_elem *ccc_set_begin_range(ccc_set_range const *);
 
-struct set_elem *set_end_range(struct set_range const *);
+ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -502,37 +502,37 @@ struct set_elem *set_end_range(struct set_range const *);
       struct val b = {.id = 0, .val = 64};
       struct val e = {.id = 0, .val = 35};
       const set_range r = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (struct set_elem *i = set_begin_rrange(&range);
+      for (ccc_set_elem *i = set_begin_rrange(&range);
            i != set_end_rrange(&range);
            i = set_rnext(&s, i))
       {
-          const int cur_val = SET_ENTRY(i, struct val, elem)->val;
+          const int cur_val = CCC_SET_IN(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 
    Use the next iterator from begin to end. If there are no values NOT GREATER
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, end is returned as end element. */
-struct set_rrange set_equal_rrange(struct set *, struct set_elem *rbegin,
-                                   struct set_elem *end);
+ccc_set_rrange ccc_set_equal_rrange(ccc_set *, ccc_set_elem *rbegin,
+                                    ccc_set_elem *end);
 
-struct set_elem *set_begin_rrange(struct set_rrange const *);
+ccc_set_elem *ccc_set_begin_rrange(ccc_set_rrange const *);
 
-struct set_elem *set_end_rrange(struct set_rrange const *);
+ccc_set_elem *ccc_set_end_rrange(ccc_set_rrange const *);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes.
    You will need to pass this to the print function as a
    starting node for debugging. */
-struct set_elem *set_root(struct set const *);
+ccc_set_elem *ccc_set_root(ccc_set const *);
 
-/* Prints a tree structure of the underlying set for readability
+/* Prints a tree structure of the underlying ccc_set for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void set_print(struct set const *, struct set_elem const *, set_print_fn *);
+void ccc_set_print(ccc_set const *, ccc_set_elem const *, ccc_set_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}
     ├──(29)R:{id:27,val:27}

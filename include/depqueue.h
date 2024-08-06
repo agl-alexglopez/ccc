@@ -26,7 +26,7 @@
    fairness if a duplicate. */
 struct depq_elem
 {
-    struct node n;
+    ccc_node n;
 };
 
 /* A DEPQ that offers all of the expected operations
@@ -35,7 +35,7 @@ struct depq_elem
    values that are present in the DEPQ. */
 struct depqueue
 {
-    struct tree t;
+    ccc_tree t;
 };
 
 typedef enum
@@ -105,7 +105,7 @@ typedef void depq_destructor_fn(struct depq_elem *);
    loops may occur. */
 struct depq_range
 {
-    struct range r ATTRIB_PRIVATE;
+    ccc_range r ATTRIB_PRIVATE;
 };
 
 /* The reverse range container for queries performed with
@@ -114,7 +114,7 @@ struct depq_range
    in this type of range. */
 struct depq_rrange
 {
-    struct rrange r ATTRIB_PRIVATE;
+    ccc_rrange r ATTRIB_PRIVATE;
 };
 
 /* How to obtain the struct that embeds the struct depq_elem. For example:

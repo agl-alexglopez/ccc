@@ -3,8 +3,9 @@
    ============
    This file provides a simple maze builder that implements Prim's algorithm
    to randomly generate a maze. I chose this algorithm because it can use
-   both a set and a priority queue to acheive its purpose. Such data structures
-   are provided by the library offering a perfect sample program opportunity. */
+   both a ccc_set and a priority queue to acheive its purpose. Such data
+   structures are provided by the library offering a perfect sample program
+   opportunity. */
 #include "cli.h"
 #include "depqueue.h"
 #include "random.h"
@@ -61,7 +62,7 @@ struct point_cost
 {
     struct point p;
     int cost;
-    struct set_elem elem;
+    ccc_set_elem elem;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -119,9 +120,9 @@ static void help(void);
 static struct point pick_rand_point(struct maze const *);
 static dpq_threeway_cmp cmp_priority_cells(struct depq_elem const *,
                                            struct depq_elem const *, void *);
-static set_threeway_cmp cmp_points(struct set_elem const *,
-                                   struct set_elem const *, void *);
-static void set_destructor(struct set_elem *);
+static ccc_set_threeway_cmp cmp_points(ccc_set_elem const *,
+                                       ccc_set_elem const *, void *);
+static void set_destructor(ccc_set_elem *);
 static struct int_conversion parse_digits(str_view);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -201,17 +202,17 @@ static void
 animate_maze(struct maze *maze)
 {
     /* Setting up the data structures needed should look similar to C++.
-       A set could be replaced by a 2D vector copy of the maze with costs
+       A ccc_set could be replaced by a 2D vector copy of the maze with costs
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
     struct depqueue cells = DEPQ_INIT(cells, cmp_priority_cells, NULL);
-    struct set cell_costs = SET_INIT(cell_costs, cmp_points, NULL);
+    ccc_set cell_costs = CCC_SET_INIT(cell_costs, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)set_insert(&cell_costs, &odd_point->elem);
+    (void)ccc_set_insert(&cell_costs, &odd_point->elem);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
@@ -241,9 +242,9 @@ animate_maze(struct maze *maze)
             }
             int cur_weight = 0;
             struct point_cost key = {.p = next};
-            struct set_elem const *const found
-                = set_find(&cell_costs, &key.elem);
-            if (found == set_end(&cell_costs))
+            ccc_set_elem const *const found
+                = ccc_set_find(&cell_costs, &key.elem);
+            if (found == ccc_set_end(&cell_costs))
             {
                 struct point_cost *new_cost
                     = valid_malloc(sizeof(struct point_cost));
@@ -252,11 +253,11 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                assert(set_insert(&cell_costs, &new_cost->elem));
+                assert(ccc_set_insert(&cell_costs, &new_cost->elem));
             }
             else
             {
-                cur_weight = SET_ENTRY(found, struct point_cost, elem)->cost;
+                cur_weight = CCC_SET_IN(found, struct point_cost, elem)->cost;
             }
             if (cur_weight < min_weight)
             {
@@ -287,7 +288,7 @@ animate_maze(struct maze *maze)
        determined the course of the maze building. It has no hidden allocations
        either so no more work is needed if we know it's empty and the data
        structure metadata is on the stack. */
-    set_clear(&cell_costs, set_destructor);
+    ccc_set_clear(&cell_costs, set_destructor);
 }
 
 static struct point
@@ -485,12 +486,12 @@ cmp_priority_cells(struct depq_elem const *const key, struct depq_elem const *n,
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
-static set_threeway_cmp
-cmp_points(struct set_elem const *key, struct set_elem const *n, void *aux)
+static ccc_set_threeway_cmp
+cmp_points(ccc_set_elem const *key, ccc_set_elem const *n, void *aux)
 {
     (void)aux;
-    struct point_cost const *const a = SET_ENTRY(key, struct point_cost, elem);
-    struct point_cost const *const b = SET_ENTRY(n, struct point_cost, elem);
+    struct point_cost const *const a = CCC_SET_IN(key, struct point_cost, elem);
+    struct point_cost const *const b = CCC_SET_IN(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
         return SETEQL;
@@ -503,9 +504,9 @@ cmp_points(struct set_elem const *key, struct set_elem const *n, void *aux)
 }
 
 static void
-set_destructor(struct set_elem *e)
+set_destructor(ccc_set_elem *e)
 {
-    struct point_cost *pc = SET_ENTRY(e, struct point_cost, elem);
+    struct point_cost *pc = CCC_SET_IN(e, struct point_cost, elem);
     free(pc);
 }
 
@@ -545,12 +546,12 @@ valid_malloc(size_t n)
 static void
 help(void)
 {
-    (void)fprintf(stdout,
-                  "Maze Builder:\nBuilds a Perfect Maze with Prim's "
-                  "Algorithm to demonstrate usage of the priority "
-                  "queue and set provided by this library.\nUsage:\n-r=N The "
-                  "row flag lets you specify maze rows > 7.\n-c=N The col flag "
-                  "lets you specify maze cols > 7.\n-s=N The speed flag lets "
-                  "you specify the speed of the animation "
-                  "0-7.\nExample:\n./build/rel/maze -c=111 -r=33 -s=4\n");
+    (void)fprintf(
+        stdout, "Maze Builder:\nBuilds a Perfect Maze with Prim's "
+                "Algorithm to demonstrate usage of the priority "
+                "queue and ccc_set provided by this library.\nUsage:\n-r=N The "
+                "row flag lets you specify maze rows > 7.\n-c=N The col flag "
+                "lets you specify maze cols > 7.\n-s=N The speed flag lets "
+                "you specify the speed of the animation "
+                "0-7.\nExample:\n./build/rel/maze -c=111 -r=33 -s=4\n");
 }

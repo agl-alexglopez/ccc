@@ -18,7 +18,7 @@ enum test_result
 
 typedef enum test_result (*test_fn)(void);
 
-/* Set this breakpoint on any line where you wish
+/* ccc_set this breakpoint on any line where you wish
    execution to stop. Under normal program runs the program
    will simply exit. If triggered in GDB execution will stop
    while able to explore the surrounding context, varialbes,
