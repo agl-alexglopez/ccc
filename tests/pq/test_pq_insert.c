@@ -9,7 +9,7 @@ struct val
 {
     int id;
     int val;
-    struct pq_elem elem;
+    pq_elem elem;
 };
 
 static enum test_result pq_test_insert_one(void);
@@ -18,11 +18,9 @@ static enum test_result pq_test_insert_shuffle(void);
 static enum test_result pq_test_struct_getter(void);
 static enum test_result pq_test_insert_three_dups(void);
 static enum test_result pq_test_read_max_min(void);
-static enum test_result insert_shuffled(struct pqueue *, struct val[], size_t,
-                                        int);
-static size_t inorder_fill(int[], size_t, struct pqueue *);
-static enum pq_threeway_cmp val_cmp(struct pq_elem const *,
-                                    struct pq_elem const *, void *);
+static enum test_result insert_shuffled(pqueue *, struct val[], size_t, int);
+static size_t inorder_fill(int[], size_t, pqueue *);
+static pq_threeway_cmp val_cmp(pq_elem const *, pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -48,7 +46,7 @@ main()
 static enum test_result
 pq_test_insert_one(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     struct val single;
     single.val = 0;
     pq_push(&pq, &single.elem);
@@ -59,7 +57,7 @@ pq_test_insert_one(void)
 static enum test_result
 pq_test_insert_three(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -75,8 +73,8 @@ pq_test_insert_three(void)
 static enum test_result
 pq_test_struct_getter(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
-    struct pqueue pq_tester_clone = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq_tester_clone = PQ_INIT(PQLES, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -100,7 +98,7 @@ pq_test_struct_getter(void)
 static enum test_result
 pq_test_insert_three_dups(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -113,8 +111,8 @@ pq_test_insert_three_dups(void)
     return PASS;
 }
 
-static enum pq_threeway_cmp
-val_cmp(struct pq_elem const *a, struct pq_elem const *b, void *aux)
+static pq_threeway_cmp
+val_cmp(pq_elem const *a, pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = PQ_ENTRY(a, struct val, elem);
@@ -125,7 +123,7 @@ val_cmp(struct pq_elem const *a, struct pq_elem const *b, void *aux)
 static enum test_result
 pq_test_insert_shuffle(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -146,7 +144,7 @@ pq_test_insert_shuffle(void)
 static enum test_result
 pq_test_read_max_min(void)
 {
-    struct pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
@@ -162,7 +160,7 @@ pq_test_read_max_min(void)
 }
 
 static enum test_result
-insert_shuffled(struct pqueue *pq, struct val vals[], size_t const size,
+insert_shuffled(pqueue *pq, struct val vals[], size_t const size,
                 int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -185,17 +183,17 @@ insert_shuffled(struct pqueue *pq, struct val vals[], size_t const size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 static size_t
-inorder_fill(int vals[], size_t size, struct pqueue *ppq)
+inorder_fill(int vals[], size_t size, pqueue *ppq)
 {
     if (pq_size(ppq) != size)
     {
         return 0;
     }
     size_t i = 0;
-    struct pqueue copy = PQ_INIT(pq_order(ppq), val_cmp, NULL);
+    pqueue copy = PQ_INIT(pq_order(ppq), val_cmp, NULL);
     while (!pq_empty(ppq) && i < size)
     {
-        struct pq_elem *const front = pq_pop(ppq);
+        pq_elem *const front = pq_pop(ppq);
         CHECK(pq_validate(ppq), true, bool, "%d");
         vals[i++] = PQ_ENTRY(front, struct val, elem)->val;
         pq_push(&copy, front);
