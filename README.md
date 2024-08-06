@@ -1,4 +1,4 @@
-# C Container Library (CCL)
+# C Container Collection (CCC)
 
 This repository contains various data structures supported by a no heap C containers. This library is largely experimental as a byproduct of working with the `pintOS` operating system at Stanford University, but perhaps it can be interesting to others.
 
