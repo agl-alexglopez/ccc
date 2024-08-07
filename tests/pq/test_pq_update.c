@@ -48,7 +48,7 @@ main()
 static enum test_result
 pq_test_insert_iterate_pop(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -76,7 +76,7 @@ pq_test_insert_iterate_pop(void)
 static enum test_result
 pq_test_priority_removal(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -107,7 +107,7 @@ pq_test_priority_removal(void)
 static enum test_result
 pq_test_priority_update(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -141,7 +141,7 @@ pq_test_priority_update(void)
 static enum test_result
 pq_test_priority_increase(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -180,7 +180,7 @@ pq_test_priority_increase(void)
 static enum test_result
 pq_test_priority_decrease(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQGRT, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_GRT, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

@@ -48,7 +48,7 @@ main()
 static enum test_result
 pq_test_insert_one(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     struct val single;
     single.val = 0;
     ccc_pq_push(&pq, &single.elem);
@@ -59,7 +59,7 @@ pq_test_insert_one(void)
 static enum test_result
 pq_test_insert_three(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -75,8 +75,8 @@ pq_test_insert_three(void)
 static enum test_result
 pq_test_struct_getter(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
-    ccc_pqueue pq_tester_clone = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
+    ccc_pqueue pq_tester_clone = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -100,7 +100,7 @@ pq_test_struct_getter(void)
 static enum test_result
 pq_test_insert_three_dups(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -125,7 +125,7 @@ val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
 static enum test_result
 pq_test_insert_shuffle(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -146,7 +146,7 @@ pq_test_insert_shuffle(void)
 static enum test_result
 pq_test_read_max_min(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {

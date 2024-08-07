@@ -121,7 +121,7 @@ ccc_pq_increase(ccc_pqueue *const ppq, ccc_pq_elem *const e,
     {
         return false;
     }
-    if (ppq->order == PQGRT)
+    if (ppq->order == CCC_PQ_GRT)
     {
         fn(e, aux);
         cut_child(e);
@@ -146,7 +146,7 @@ ccc_pq_decrease(ccc_pqueue *const ppq, ccc_pq_elem *const e,
     {
         return false;
     }
-    if (ppq->order == PQLES)
+    if (ppq->order == CCC_PQ_LES)
     {
         fn(e, aux);
         cut_child(e);
@@ -328,7 +328,7 @@ has_valid_links(ccc_pqueue const *const ppq, ccc_pq_elem const *const parent,
     }
     bool sibling_ring_lapped = false;
     ccc_pq_elem const *cur = child;
-    ccc_pq_threeway_cmp const wrong_order = ppq->order == PQLES ? PQGRT : PQLES;
+    ccc_pq_threeway_cmp const wrong_order = ppq->order == CCC_PQ_LES ? CCC_PQ_GRT : CCC_PQ_LES;
     while (!sibling_ring_lapped)
     {
         if (!cur)

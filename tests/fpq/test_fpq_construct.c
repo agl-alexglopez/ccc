@@ -1,4 +1,4 @@
-#include "heap_pqueue.h"
+#include "flat_pqueue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -37,7 +37,7 @@ static enum test_result
 pq_test_empty(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     CHECK(ccc_fpq_empty(&pq), true, bool, "%d");
     return PASS;
 }
@@ -46,7 +46,7 @@ static ccc_fpq_threeway_cmp
 val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = HPQ_ENTRY(a, struct val, elem);
-    struct val *rhs = HPQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_FPQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_FPQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

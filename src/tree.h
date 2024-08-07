@@ -49,9 +49,9 @@ typedef struct ccc_node
    Equality is important for duplicate tracking and speed. */
 typedef enum ccc_node_threeway_cmp
 {
-    NODE_LES = -1,
-    NODE_EQL = 0,
-    NODE_GRT = 1
+    CCC_NODE_LES = -1,
+    CCC_NODE_EQL = 0,
+    CCC_NODE_GRT = 1
 } ccc_node_threeway_cmp;
 
 /* To implement three way comparison in C you can try something

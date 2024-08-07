@@ -1,4 +1,4 @@
-#include "heap_pqueue.h"
+#include "flat_pqueue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -49,7 +49,7 @@ static enum test_result
 fpq_test_insert_one(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     struct val single;
     single.val = 0;
     ccc_fpq_push(&pq, &single.elem);
@@ -61,7 +61,7 @@ static enum test_result
 fpq_test_insert_three(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -78,9 +78,9 @@ static enum test_result
 fpq_test_struct_getter(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     ccc_flat_pqueue fpq_tester_clone;
-    ccc_fpq_init(&fpq_tester_clone, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&fpq_tester_clone, CCC_FPQ_LES, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -94,7 +94,7 @@ fpq_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         struct val const *get
-            = HPQ_ENTRY(&tester_clone[i].elem, struct val, elem);
+            = CCC_FPQ_OF(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_fpq_size(&pq), 10ULL, size_t, "%zu");
@@ -105,7 +105,7 @@ static enum test_result
 fpq_test_insert_three_dups(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -122,8 +122,8 @@ static ccc_fpq_threeway_cmp
 val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = HPQ_ENTRY(a, struct val, elem);
-    struct val *rhs = HPQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_FPQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_FPQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -131,14 +131,14 @@ static enum test_result
 fpq_test_insert_shuffle(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = HPQ_ENTRY(ccc_fpq_front(&pq), struct val, elem);
+    struct val const *min = CCC_FPQ_OF(ccc_fpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -153,7 +153,7 @@ static enum test_result
 fpq_test_read_max_min(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
@@ -163,7 +163,7 @@ fpq_test_read_max_min(void)
         CHECK(ccc_fpq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(ccc_fpq_size(&pq), 10ULL, size_t, "%zu");
-    struct val const *min = HPQ_ENTRY(ccc_fpq_front(&pq), struct val, elem);
+    struct val const *min = CCC_FPQ_OF(ccc_fpq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -204,7 +204,7 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *hpq)
     while (!ccc_fpq_empty(hpq) && i < size)
     {
         ccc_fpq_elem *const front = ccc_fpq_pop(hpq);
-        vals[i++] = HPQ_ENTRY(front, struct val, elem)->val;
+        vals[i++] = CCC_FPQ_OF(front, struct val, elem)->val;
         ccc_fpq_push(&copy, front);
     }
     while (!ccc_fpq_empty(&copy))

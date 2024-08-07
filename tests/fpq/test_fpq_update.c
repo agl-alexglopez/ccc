@@ -1,4 +1,4 @@
-#include "heap_pqueue.h"
+#include "flat_pqueue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -47,7 +47,7 @@ static enum test_result
 fpq_test_insert_iterate_pop(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -76,7 +76,7 @@ static enum test_result
 fpq_test_priority_removal(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -94,7 +94,7 @@ fpq_test_priority_removal(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         ccc_fpq_elem *i = &vals[val].elem;
-        struct val *cur = HPQ_ENTRY(i, struct val, elem);
+        struct val *cur = CCC_FPQ_OF(i, struct val, elem);
         if (cur->val > limit)
         {
             (void)ccc_fpq_erase(&pq, i);
@@ -108,7 +108,7 @@ static enum test_result
 fpq_test_priority_update(void)
 {
     ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -126,7 +126,7 @@ fpq_test_priority_update(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         ccc_fpq_elem *i = &vals[val].elem;
-        struct val *cur = HPQ_ENTRY(i, struct val, elem);
+        struct val *cur = CCC_FPQ_OF(i, struct val, elem);
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
@@ -143,14 +143,14 @@ static ccc_fpq_threeway_cmp
 val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = HPQ_ENTRY(a, struct val, elem);
-    struct val *rhs = HPQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_FPQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_FPQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 val_update(ccc_fpq_elem *a, void *aux)
 {
-    struct val *old = HPQ_ENTRY(a, struct val, elem);
+    struct val *old = CCC_FPQ_OF(a, struct val, elem);
     old->val = *(int *)aux;
 }

@@ -9,9 +9,9 @@
 /* Standard C-style three way comparison for priority queue elements. */
 typedef enum ccc_pq_threeway_cmp
 {
-    PQLES = -1,
-    PQEQL,
-    PQGRT,
+    CCC_PQ_LES = -1,
+    CCC_PQ_EQL,
+    CCC_PQ_GRT,
 } ccc_pq_threeway_cmp;
 
 /* The embedded struct type for operation of the priority queue. The priority
@@ -79,7 +79,7 @@ typedef struct ccc_pqueue
    and any auxilliarry data needed for comparison, initialize an empty priority
    queue on the right hand side of it's declaration. This can be used at
    compile time or runtime. For example:
-     ccc_pqueue my_pq = CCC_PQ_INIT(PQLES, my_cmp_fn, NULL);
+     ccc_pqueue my_pq = CCC_PQ_INIT(CCC_PQ_LES, my_cmp_fn, NULL);
    Such initialization must always occur or use of the priority queue is
    undefined. */
 #define CCC_PQ_INIT(ORDER, CMP_FN, AUX)                                        \

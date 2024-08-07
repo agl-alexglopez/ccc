@@ -1,4 +1,4 @@
-#include "heap_pqueue.h"
+#include "flat_pqueue.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -44,9 +44,9 @@ void
 ccc_fpq_init(ccc_flat_pqueue *const hpq, ccc_fpq_threeway_cmp fpq_ordering,
              ccc_fpq_cmp_fn *cmp, void *aux)
 {
-    if (fpq_ordering == HPQEQL)
+    if (fpq_ordering == CCC_FPQ_EQL)
     {
-        (void)fprintf(stderr, "heap should be ordered HPQLES or HPQGRT.\n");
+        (void)fprintf(stderr, "heap should be ordered CCC_FPQ_LES or CCC_FPQ_GRT.\n");
     }
     hpq->order = fpq_ordering;
     hpq->sz = 0;
@@ -115,7 +115,7 @@ ccc_fpq_erase(ccc_flat_pqueue *const hpq, ccc_fpq_elem *e)
     {
         bubble_up(hpq, swap_location);
     }
-    else if (erased_cmp != HPQEQL)
+    else if (erased_cmp != CCC_FPQ_EQL)
     {
         bubble_down(hpq, swap_location);
     }
@@ -144,7 +144,7 @@ ccc_fpq_update(ccc_flat_pqueue *hpq, ccc_fpq_elem *e, fpq_update_fn *fn,
         bubble_up(hpq, e->handle);
         return true;
     }
-    if (parent_cmp != HPQEQL)
+    if (parent_cmp != CCC_FPQ_EQL)
     {
         bubble_down(hpq, e->handle);
         return true;
@@ -263,7 +263,7 @@ static void
 bubble_down(ccc_flat_pqueue *hpq, size_t i)
 {
     ccc_fpq_threeway_cmp const wrong_order
-        = hpq->order == HPQLES ? HPQGRT : HPQLES;
+        = hpq->order == CCC_FPQ_LES ? CCC_FPQ_GRT : CCC_FPQ_LES;
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < hpq->sz;
          i = next, left = i * 2 + 1, right = left + 1)
     {
