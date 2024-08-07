@@ -292,13 +292,13 @@ typedef struct ccc_set_rrange
 typedef void ccc_set_print_fn(ccc_set_elem const *);
 
 /* NOLINTNEXTLINE */
-#define CCC_SET_OF(SET_ELEM, STRUCT, MEMBER)                                   \
-    ((STRUCT *)((uint8_t *)&(SET_ELEM)->n                                      \
-                - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
+#define CCC_SET_OF(set_elem, struct, member)                                   \
+    ((struct *)((uint8_t *)&(set_elem)->n                                      \
+                - offsetof(struct, member.n))) /* NOLINT */
 
-#define CCC_SET_INIT(SET_NAME, CMP, AUX)                                       \
+#define CCC_SET_INIT(set_name, cmp, aux)                                       \
     {                                                                          \
-        .t = CCC_TREE_INIT(SET_NAME, CMP, AUX)                                 \
+        .t = CCC_TREE_INIT(set_name, cmp, aux)                                 \
     }
 
 /* Calls the destructor for each element while emptying the set.

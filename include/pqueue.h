@@ -71,9 +71,9 @@ typedef struct ccc_pqueue
    user defined struct in which the ccc_pq_elem is embedded and the name of the
    field in said struct where the  ccc_pq_elem is embedded, obtains the wrapping
    struct. */
-#define CCC_PQ_OF(PQ_ELEM, STRUCT, MEMBER)                                     \
-    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->parent                                  \
-                - offsetof(STRUCT, MEMBER.parent))) /* NOLINT */
+#define CCC_PQ_OF(pq_elem, struct, member)                                     \
+    ((struct *)((uint8_t *)&(pq_elem)->parent                                  \
+                - offsetof(struct, member.parent))) /* NOLINT */
 
 /* Given the desired total order of the priority queue, the comparison function,
    and any auxilliarry data needed for comparison, initialize an empty priority

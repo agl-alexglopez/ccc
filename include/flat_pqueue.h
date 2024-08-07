@@ -39,9 +39,9 @@ typedef struct ccc_flat_pqueue
     void *aux ATTRIB_PRIVATE;
 } ccc_flat_pqueue;
 
-#define CCC_FPQ_OF(FPQ_ELEM, STRUCT, MEMBER)                                    \
-    ((STRUCT *)((uint8_t *)&(FPQ_ELEM)->handle                                 \
-                - offsetof(STRUCT, MEMBER.handle))) /* NOLINT */
+#define CCC_FPQ_OF(fpq_elem, struct, member)                                   \
+    ((struct *)((uint8_t *)&(fpq_elem)->handle                                 \
+                - offsetof(struct, member.handle))) /* NOLINT */
 
 void ccc_fpq_init(ccc_flat_pqueue *, ccc_fpq_threeway_cmp fpq_ordering,
                   ccc_fpq_cmp_fn *, void *);

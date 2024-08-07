@@ -134,18 +134,18 @@ typedef struct ccc_depq_rrange
    The pq element should be passed by address not by value and the
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
-#define CCC_DEPQ_OF(PQ_ELEM, STRUCT, MEMBER)                             \
-    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->n                                 \
-                - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
+#define CCC_DEPQ_OF(pq_elem, struct, member)                                   \
+    ((struct *)((uint8_t *)&(pq_elem)->n                                       \
+                - offsetof(struct, member.n))) /* NOLINT */
 
 /* Initialize the depq on the left hand side with this right hand side
    initializer. Pass the left hand side depq by name to this macro along
    with the comparison function and any necessary auxilliary data. This may
    be used at compile time or runtime. It is undefined to use the depq if
    this has not been called. */
-#define CCC_DEPQ_INIT(DEPQ_NAME, CMP, AUX)                                     \
+#define CCC_DEPQ_INIT(depq_name, cmp, aux)                                     \
     {                                                                          \
-        .t = CCC_TREE_INIT(DEPQ_NAME, CMP, AUX)                                \
+        .t = CCC_TREE_INIT(depq_name, cmp, aux)                                \
     }
 
 /* Calls the destructor for each element while emptying the DEPQ.
