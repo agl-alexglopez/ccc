@@ -29,11 +29,11 @@
 #include <stdlib.h>
 
 /* Printing enum for printing tree structures if heap available. */
-enum print_link
+typedef enum ccc_print_link
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
-};
+} ccc_print_link;
 
 /* Text coloring macros (ANSI character escapes) for printing function
    colorful output. Consider changing to a more portable library like
@@ -50,8 +50,8 @@ enum print_link
 #define PRINTER_INDENT (short)13
 #define LR 2
 
-enum tree_link const inorder_traversal = L;
-enum tree_link const reverse_inorder_traversal = R;
+ccc_tree_link const inorder_traversal = L;
+ccc_tree_link const reverse_inorder_traversal = R;
 
 /* =======================        Prototypes         ====================== */
 
@@ -63,12 +63,13 @@ static bool contains(ccc_tree *, ccc_node *);
 static ccc_node *erase(ccc_tree *, ccc_node *);
 static bool insert(ccc_tree *, ccc_node *);
 static ccc_node *multiset_erase_max_or_min(ccc_tree *, ccc_node *,
-                                           tree_cmp_fn *);
+                                           ccc_tree_cmp_fn *);
 static ccc_node *multiset_erase_node(ccc_tree *, ccc_node *);
 static ccc_node *pop_dup_node(ccc_tree *, ccc_node *, ccc_node *);
 static ccc_node *pop_front_dup(ccc_tree *, ccc_node *);
 static ccc_node *remove_from_tree(ccc_tree *, ccc_node *);
-static ccc_node *connect_new_root(ccc_tree *, ccc_node *, node_threeway_cmp);
+static ccc_node *connect_new_root(ccc_tree *, ccc_node *,
+                                  ccc_node_threeway_cmp);
 static ccc_node *root(ccc_tree const *);
 static ccc_node *max(ccc_tree const *);
 static ccc_node *pop_max(ccc_tree *);
@@ -76,20 +77,20 @@ static ccc_node *pop_min(ccc_tree *);
 static ccc_node *min(ccc_tree const *);
 static ccc_node *const_seek(ccc_tree *, ccc_node *);
 static ccc_node *end(ccc_tree *);
-static ccc_node *next(ccc_tree *, ccc_node *, enum tree_link);
-static ccc_node *multiset_next(ccc_tree *, ccc_node *, enum tree_link);
-static ccc_range equal_range(ccc_tree *, ccc_node *, ccc_node *,
-                             enum tree_link);
-static node_threeway_cmp force_find_grt(ccc_node const *, ccc_node const *,
-                                        void *);
-static node_threeway_cmp force_find_les(ccc_node const *, ccc_node const *,
-                                        void *);
-static void link_trees(ccc_tree *, ccc_node *, enum tree_link, ccc_node *);
+static ccc_node *next(ccc_tree *, ccc_node *, ccc_tree_link);
+static ccc_node *multiset_next(ccc_tree *, ccc_node *, ccc_tree_link);
+static ccc_range equal_range(ccc_tree *, ccc_node *, ccc_node *, ccc_tree_link);
+static ccc_node_threeway_cmp force_find_grt(ccc_node const *, ccc_node const *,
+                                            void *);
+static ccc_node_threeway_cmp force_find_les(ccc_node const *, ccc_node const *,
+                                            void *);
+static void link_trees(ccc_tree *, ccc_node *, ccc_tree_link, ccc_node *);
 static inline bool has_dups(ccc_node const *, ccc_node const *);
 static ccc_node *get_parent(ccc_tree *, ccc_node *);
 static void add_duplicate(ccc_tree *, ccc_node *, ccc_node *, ccc_node *);
-static ccc_node *splay(ccc_tree *, ccc_node *, ccc_node const *, tree_cmp_fn *);
-static inline ccc_node *next_tree_node(ccc_tree *, ccc_node *, enum tree_link);
+static ccc_node *splay(ccc_tree *, ccc_node *, ccc_node const *,
+                       ccc_tree_cmp_fn *);
+static inline ccc_node *next_tree_node(ccc_tree *, ccc_node *, ccc_tree_link);
 static ccc_node *range_begin(ccc_range const *);
 static ccc_node *range_end(ccc_range const *);
 static ccc_node *rrange_begin(ccc_rrange const *);
@@ -326,7 +327,7 @@ void
 depq_print(struct depqueue const *const pq, struct depq_elem const *const start,
            depq_print_fn *const fn)
 {
-    print_tree(&pq->t, &start->n, (node_print_fn *)fn);
+    ccc_tree_print(&pq->t, &start->n, (ccc_node_print_fn *)fn);
 }
 
 /* ======================        ccc_set Interface       ======================
@@ -492,7 +493,7 @@ void
 ccc_set_print(ccc_set const *const s, ccc_set_elem const *const root,
               ccc_set_print_fn *const fn)
 {
-    print_tree(&s->t, &root->n, (node_print_fn *)fn);
+    ccc_tree_print(&s->t, &root->n, (ccc_node_print_fn *)fn);
 }
 
 /* ===========    Splay Tree Multiccc_set and Set Implementations    ===========
@@ -600,7 +601,7 @@ const_seek(ccc_tree *const t, ccc_node *const n)
     ccc_node *seek = n;
     while (seek != &t->end)
     {
-        node_threeway_cmp const cur_cmp = t->cmp(n, seek, t->aux);
+        ccc_node_threeway_cmp const cur_cmp = t->cmp(n, seek, t->aux);
         if (cur_cmp == NODE_EQL)
         {
             return seek;
@@ -641,7 +642,7 @@ is_dup_head(ccc_node *end, ccc_node *i)
 }
 
 static ccc_node *
-multiset_next(ccc_tree *t, ccc_node *i, enum tree_link const traversal)
+multiset_next(ccc_tree *t, ccc_node *i, ccc_tree_link const traversal)
 {
     /* An arbitrary node in a doubly linked list of duplicates. */
     if (NULL == i->parent_or_dups)
@@ -671,7 +672,7 @@ multiset_next(ccc_tree *t, ccc_node *i, enum tree_link const traversal)
 }
 
 static inline ccc_node *
-next_tree_node(ccc_tree *t, ccc_node *head, enum tree_link const traversal)
+next_tree_node(ccc_tree *t, ccc_node *head, ccc_tree_link const traversal)
 {
     if (head->parent_or_dups == &t->end)
     {
@@ -691,7 +692,7 @@ next_tree_node(ccc_tree *t, ccc_node *head, enum tree_link const traversal)
 }
 
 static ccc_node *
-next(ccc_tree *t, ccc_node *n, enum tree_link const traversal)
+next(ccc_tree *t, ccc_node *n, ccc_tree_link const traversal)
 {
     if (get_parent(t, t->root) != &t->end)
     {
@@ -726,14 +727,14 @@ next(ccc_tree *t, ccc_node *n, enum tree_link const traversal)
 
 static ccc_range
 equal_range(ccc_tree *t, ccc_node *begin, ccc_node *end,
-            enum tree_link const traversal)
+            ccc_tree_link const traversal)
 {
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
-    node_threeway_cmp const grt_or_les[2] = {NODE_GRT, NODE_LES};
+    ccc_node_threeway_cmp const grt_or_les[2] = {NODE_GRT, NODE_LES};
     ccc_node *b = splay(t, t->root, begin, t->cmp);
     if (t->cmp(begin, b, NULL) == grt_or_les[traversal])
     {
@@ -798,7 +799,7 @@ insert(ccc_tree *t, ccc_node *elem)
         return true;
     }
     t->root = splay(t, t->root, elem, t->cmp);
-    node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
+    ccc_node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
     if (NODE_EQL == root_cmp)
     {
         return false;
@@ -820,7 +821,7 @@ multiset_insert(ccc_tree *t, ccc_node *elem)
     t->size++;
     t->root = splay(t, t->root, elem, t->cmp);
 
-    node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
+    ccc_node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
     if (NODE_EQL == root_cmp)
     {
         add_duplicate(t, t->root, elem, &t->end);
@@ -830,9 +831,10 @@ multiset_insert(ccc_tree *t, ccc_node *elem)
 }
 
 static ccc_node *
-connect_new_root(ccc_tree *t, ccc_node *new_root, node_threeway_cmp cmp_result)
+connect_new_root(ccc_tree *t, ccc_node *new_root,
+                 ccc_node_threeway_cmp cmp_result)
 {
-    enum tree_link const link = NODE_GRT == cmp_result;
+    ccc_tree_link const link = NODE_GRT == cmp_result;
     link_trees(t, new_root, link, t->root->link[link]);
     link_trees(t, new_root, !link, t->root);
     t->root->link[link] = &t->end;
@@ -876,7 +878,7 @@ erase(ccc_tree *t, ccc_node *elem)
         return &t->end;
     }
     ccc_node *ret = splay(t, t->root, elem, t->cmp);
-    node_threeway_cmp const found = t->cmp(elem, ret, NULL);
+    ccc_node_threeway_cmp const found = t->cmp(elem, ret, NULL);
     if (found != NODE_EQL)
     {
         return &t->end;
@@ -895,7 +897,7 @@ erase(ccc_tree *t, ccc_node *elem)
    comparison function that forces either the max or min to be searched. */
 static ccc_node *
 multiset_erase_max_or_min(ccc_tree *t, ccc_node *tnil,
-                          tree_cmp_fn *force_max_or_min)
+                          ccc_tree_cmp_fn *force_max_or_min)
 {
     if (!t || !tnil || !force_max_or_min)
     {
@@ -1040,7 +1042,7 @@ remove_from_tree(ccc_tree *t, ccc_node *ret)
 }
 
 static ccc_node *
-splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, tree_cmp_fn *cmp)
+splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, ccc_tree_cmp_fn *cmp)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -1049,14 +1051,15 @@ splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, tree_cmp_fn *cmp)
     ccc_node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        node_threeway_cmp const root_cmp = cmp(elem, root, t->aux);
-        enum tree_link const dir = NODE_GRT == root_cmp;
+        ccc_node_threeway_cmp const root_cmp = cmp(elem, root, t->aux);
+        ccc_tree_link const dir = NODE_GRT == root_cmp;
         if (NODE_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
-        node_threeway_cmp const child_cmp = cmp(elem, root->link[dir], t->aux);
-        enum tree_link const dir_from_child = NODE_GRT == child_cmp;
+        ccc_node_threeway_cmp const child_cmp
+            = cmp(elem, root->link[dir], t->aux);
+        ccc_tree_link const dir_from_child = NODE_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
         if (NODE_EQL != child_cmp && dir == dir_from_child)
@@ -1091,7 +1094,7 @@ splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, tree_cmp_fn *cmp)
    and updating the subtree parent field to point back to parent. This last
    step is critical and easy to miss or mess up. */
 static inline void
-link_trees(ccc_tree *t, ccc_node *parent, enum tree_link dir, ccc_node *subtree)
+link_trees(ccc_tree *t, ccc_node *parent, ccc_tree_link dir, ccc_node *subtree)
 {
     parent->link[dir] = subtree;
     if (has_dups(&t->end, subtree))
@@ -1152,7 +1155,7 @@ get_parent(ccc_tree *t, ccc_node *n)
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters) */
-static node_threeway_cmp
+static ccc_node_threeway_cmp
 force_find_grt(ccc_node const *a, ccc_node const *b, void *aux)
 {
     (void)a;
@@ -1161,7 +1164,7 @@ force_find_grt(ccc_node const *a, ccc_node const *b, void *aux)
     return NODE_GRT;
 }
 
-static node_threeway_cmp
+static ccc_node_threeway_cmp
 force_find_les(ccc_node const *a, ccc_node const *b, void *aux)
 {
     (void)a;
@@ -1224,7 +1227,7 @@ recursive_size(ccc_tree const *const t, ccc_node const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_range const r, tree_cmp_fn *const cmp,
+are_subtrees_valid(struct ccc_tree_range const r, ccc_tree_cmp_fn *const cmp,
                    ccc_node const *const nil)
 {
     if (r.root == nil)
@@ -1299,7 +1302,7 @@ is_duplicate_storing_parent(ccc_tree const *const t,
    truth of the provided pointers with its own stack as backtracking
    information. */
 bool
-validate_tree(ccc_tree const *const t)
+ccc_tree_validate(ccc_tree const *const t)
 {
     if (!are_subtrees_valid(
             (struct ccc_tree_range){
@@ -1347,7 +1350,7 @@ get_edge_color(ccc_node const *const root, size_t const parent_size,
 
 static void
 print_node(ccc_tree const *const t, ccc_node const *const parent,
-           ccc_node const *const root, node_print_fn *const fn_print)
+           ccc_node const *const root, ccc_node_print_fn *const fn_print)
 {
     fn_print(root);
     struct parent_status stat = child_tracks_parent(t, parent, root);
@@ -1384,9 +1387,9 @@ print_node(ccc_tree const *const t, ccc_node const *const parent,
 static void
 print_inner_tree(ccc_node const *const root, size_t const parent_size,
                  ccc_node const *const parent, char const *const prefix,
-                 char const *const prefix_color,
-                 enum print_link const node_type, enum tree_link const dir,
-                 ccc_tree const *const t, node_print_fn *const fn_print)
+                 char const *const prefix_color, ccc_print_link const node_type,
+                 ccc_tree_link const dir, ccc_tree const *const t,
+                 ccc_node_print_fn *const fn_print)
 {
     if (root == &t->end)
     {
@@ -1447,8 +1450,8 @@ print_inner_tree(ccc_node const *const root, size_t const parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 void
-print_tree(ccc_tree const *const t, ccc_node const *const root,
-           node_print_fn *const fn_print)
+ccc_tree_print(ccc_tree const *const t, ccc_node const *const root,
+               ccc_node_print_fn *const fn_print)
 {
     if (root == &t->end)
     {

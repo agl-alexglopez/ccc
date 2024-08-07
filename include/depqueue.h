@@ -146,7 +146,7 @@ struct depq_rrange
    this has not been called. */
 #define DEPQ_INIT(DEPQ_NAME, CMP, AUX)                                         \
     {                                                                          \
-        .t = TREE_INIT(DEPQ_NAME, CMP, AUX)                                    \
+        .t = CCC_TREE_INIT(DEPQ_NAME, CMP, AUX)                                \
     }
 
 /* Calls the destructor for each element while emptying the DEPQ.

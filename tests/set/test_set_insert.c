@@ -53,7 +53,7 @@ set_test_insert_one(void)
     single.val = 0;
     CHECK(ccc_set_insert(&s, &single.elem), true, bool, "%d");
     CHECK(ccc_set_empty(&s), false, bool, "%d");
-    CHECK(CCC_SET_IN(ccc_set_root(&s), struct val, elem)->val == single.val,
+    CHECK(CCC_SET_OF(ccc_set_root(&s), struct val, elem)->val == single.val,
           true, bool, "%d");
     return PASS;
 }
@@ -67,7 +67,7 @@ set_test_insert_three(void)
     {
         three_vals[i].val = i;
         CHECK(ccc_set_insert(&s, &three_vals[i].elem), true, bool, "%d");
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_size(&s), 3ULL, size_t, "%zu");
     return PASS;
@@ -87,12 +87,12 @@ set_test_struct_getter(void)
         CHECK(ccc_set_insert(&s, &vals[i].elem), true, bool, "%d");
         CHECK(ccc_set_insert(&set_tester_clone, &tester_clone[i].elem), true,
               bool, "%d");
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
         struct val const *get
-            = CCC_SET_IN(&tester_clone[i].elem, struct val, elem);
+            = CCC_SET_OF(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_set_size(&s), 10ULL, size_t, "%zu");
@@ -132,7 +132,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_set_insert(s, &vals[shuffled_index].elem);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
-        CHECK(validate_tree(&s->t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_set_size(s), size, size_t, "%zu");
@@ -151,7 +151,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
     for (ccc_set_elem *e = ccc_set_begin(s); e != ccc_set_end(s);
          e = ccc_set_next(s, e))
     {
-        vals[i++] = CCC_SET_IN(e, struct val, elem)->val;
+        vals[i++] = CCC_SET_OF(e, struct val, elem)->val;
     }
     return i;
 }
@@ -160,7 +160,7 @@ static ccc_set_threeway_cmp
 val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_IN(a, struct val, elem);
-    struct val *rhs = CCC_SET_IN(b, struct val, elem);
+    struct val *lhs = CCC_SET_OF(a, struct val, elem);
+    struct val *rhs = CCC_SET_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

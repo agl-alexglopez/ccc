@@ -8,7 +8,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 /* Printing enum for printing tree structures if heap available. */
-enum print_link
+enum ccc_print_link
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
@@ -37,7 +37,7 @@ static void bubble_down(struct heap_pqueue *, size_t);
 static void bubble_up(struct heap_pqueue *, size_t);
 static void print_node(struct heap_pqueue const *, size_t, hpq_print_fn *);
 static void print_inner_heap(struct heap_pqueue const *, size_t, char const *,
-                             enum print_link, hpq_print_fn *);
+                             enum ccc_print_link, hpq_print_fn *);
 static void print_heap(struct heap_pqueue const *, size_t, hpq_print_fn *);
 
 void
@@ -327,7 +327,7 @@ print_node(struct heap_pqueue const *const hpq, size_t i,
 
 static void
 print_inner_heap(struct heap_pqueue const *const hpq, size_t i,
-                 char const *prefix, enum print_link const node_type,
+                 char const *prefix, enum ccc_print_link const node_type,
                  hpq_print_fn *const fn)
 {
     if (i >= hpq->sz)
