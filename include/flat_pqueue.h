@@ -1,5 +1,5 @@
-#ifndef HEAP_PQUEUE
-#define HEAP_PQUEUE
+#ifndef FLAT_PQUEUE
+#define FLAT_PQUEUE
 
 #include "attrib.h"
 
@@ -10,9 +10,9 @@
 
 typedef enum ccc_fpq_threeway_cmp
 {
-    HPQLES = -1,
-    HPQEQL,
-    HPQGRT,
+    CCC_FPQ_LES = -1,
+    CCC_FPQ_EQL,
+    CCC_FPQ_GRT,
 } ccc_fpq_threeway_cmp;
 
 typedef struct ccc_fpq_elem
@@ -39,7 +39,7 @@ typedef struct ccc_flat_pqueue
     void *aux ATTRIB_PRIVATE;
 } ccc_flat_pqueue;
 
-#define HPQ_ENTRY(FPQ_ELEM, STRUCT, MEMBER)                                    \
+#define CCC_FPQ_OF(FPQ_ELEM, STRUCT, MEMBER)                                    \
     ((STRUCT *)((uint8_t *)&(FPQ_ELEM)->handle                                 \
                 - offsetof(STRUCT, MEMBER.handle))) /* NOLINT */
 
@@ -58,4 +58,4 @@ ccc_fpq_threeway_cmp ccc_fpq_order(ccc_flat_pqueue const *);
 
 void ccc_fpq_print(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
 
-#endif
+#endif /* FLAT_PQUEUE */

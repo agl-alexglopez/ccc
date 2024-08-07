@@ -15,6 +15,6 @@ target_link_libraries(graph PRIVATE
   set
   pqueue
   queue
-  heap_pqueue
+  flat_pqueue
 )
 

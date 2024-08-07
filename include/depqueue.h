@@ -40,9 +40,9 @@ typedef struct ccc_depqueue
 
 typedef enum ccc_deccc_pq_threeway_cmp
 {
-    DPQLES = NODE_LES,
-    DPQEQL = NODE_EQL,
-    DPQGRT = NODE_GRT,
+    CCC_DPQ_LES = CCC_NODE_LES,
+    CCC_DPQ_EQL = CCC_NODE_EQL,
+    CCC_DPQ_GRT = CCC_NODE_GRT,
 } ccc_deccc_pq_threeway_cmp;
 
 /* A comparison function that returns one of the threeway comparison
@@ -51,9 +51,9 @@ typedef enum ccc_deccc_pq_threeway_cmp
    above.
       typedef enum
       {
-          NODE_LES = -1,
-          NODE_EQL = 0,
-          NODE_GRT = 1
+          CCC_NODE_LES = -1,
+          CCC_NODE_EQL = 0,
+          CCC_NODE_GRT = 1
       } node_threeway_cmp;
 
    The compare function one must provide to perform queries
@@ -134,8 +134,8 @@ typedef struct ccc_depq_rrange
    The pq element should be passed by address not by value and the
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
-#define CCC_DEPQ_OF(DEccc_pq_elem, STRUCT, MEMBER)                             \
-    ((STRUCT *)((uint8_t *)&(DEccc_pq_elem)->n                                 \
+#define CCC_DEPQ_OF(PQ_ELEM, STRUCT, MEMBER)                             \
+    ((STRUCT *)((uint8_t *)&(PQ_ELEM)->n                                 \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
 /* Initialize the depq on the left hand side with this right hand side

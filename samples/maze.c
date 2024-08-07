@@ -494,7 +494,7 @@ cmp_points(ccc_set_elem const *key, ccc_set_elem const *n, void *aux)
     struct point_cost const *const b = CCC_SET_OF(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
-        return SETEQL;
+        return CCC_SET_EQL;
     }
     if (a->p.r == b->p.r)
     {

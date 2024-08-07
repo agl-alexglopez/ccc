@@ -30,7 +30,7 @@
 /* NOLINTNEXTLINE */
 #include <stdint.h>
 
-/* ========================   SET   ============================
+/* ========================   CCC_SET_   ============================
 
    Together the following components make a set as an embedded
    data structure.
@@ -177,9 +177,9 @@ typedef struct ccc_set_elem
 
 typedef enum ccc_set_threeway_cmp
 {
-    SETLES = NODE_LES,
-    SETEQL = NODE_EQL,
-    SETGRT = NODE_GRT,
+    CCC_SET_LES = CCC_NODE_LES,
+    CCC_SET_EQL = CCC_NODE_EQL,
+    CCC_SET_GRT = CCC_NODE_GRT,
 } ccc_set_threeway_cmp;
 
 /* ===================   Comparisons  ==========================

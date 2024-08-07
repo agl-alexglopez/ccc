@@ -710,7 +710,7 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
-    ccc_pqueue dist_q = CCC_PQ_INIT(PQLES, cmp_pq_dist_points, NULL);
+    ccc_pqueue dist_q = CCC_PQ_INIT(CCC_PQ_LES, cmp_pq_dist_points, NULL);
     ccc_set prev_map = CCC_SET_INIT(prev_map, cmp_set_prev_vertices, NULL);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
@@ -1086,7 +1086,7 @@ cmp_parent_cells(ccc_set_elem const *x, ccc_set_elem const *y, void *aux)
     struct parent_cell const *const b = CCC_SET_OF(y, struct parent_cell, elem);
     if (a->key.r == b->key.r && a->key.c == b->key.c)
     {
-        return SETEQL;
+        return CCC_SET_EQL;
     }
     if (a->key.r == b->key.r)
     {
@@ -1116,13 +1116,13 @@ cmp_set_prev_vertices(ccc_set_elem const *const x, ccc_set_elem const *const y,
     struct prev_vertex const *const b = CCC_SET_OF(y, struct prev_vertex, elem);
     if (a->v > b->v)
     {
-        return SETGRT;
+        return CCC_SET_GRT;
     }
     if (a->v < b->v)
     {
-        return SETLES;
+        return CCC_SET_LES;
     }
-    return SETEQL;
+    return CCC_SET_EQL;
 }
 
 static void

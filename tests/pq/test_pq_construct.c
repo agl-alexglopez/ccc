@@ -36,7 +36,7 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(CCC_PQ_LES, val_cmp, NULL);
     CHECK(ccc_pq_empty(&pq), true, bool, "%d");
     return PASS;
 }

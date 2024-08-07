@@ -600,11 +600,11 @@ const_seek(ccc_tree *const t, ccc_node *const n)
     while (seek != &t->end)
     {
         ccc_node_threeway_cmp const cur_cmp = t->cmp(n, seek, t->aux);
-        if (cur_cmp == NODE_EQL)
+        if (cur_cmp == CCC_NODE_EQL)
         {
             return seek;
         }
-        seek = seek->link[NODE_GRT == cur_cmp];
+        seek = seek->link[CCC_NODE_GRT == cur_cmp];
     }
     return seek;
 }
@@ -732,7 +732,7 @@ equal_range(ccc_tree *t, ccc_node *begin, ccc_node *end,
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
-    ccc_node_threeway_cmp const grt_or_les[2] = {NODE_GRT, NODE_LES};
+    ccc_node_threeway_cmp const grt_or_les[2] = {CCC_NODE_GRT, CCC_NODE_LES};
     ccc_node *b = splay(t, t->root, begin, t->cmp);
     if (t->cmp(begin, b, NULL) == grt_or_les[traversal])
     {
@@ -775,7 +775,7 @@ find(ccc_tree *t, ccc_node *elem)
 {
     init_node(t, elem);
     t->root = splay(t, t->root, elem, t->cmp);
-    return t->cmp(elem, t->root, NULL) == NODE_EQL ? t->root : &t->end;
+    return t->cmp(elem, t->root, NULL) == CCC_NODE_EQL ? t->root : &t->end;
 }
 
 static bool
@@ -783,7 +783,7 @@ contains(ccc_tree *t, ccc_node *dummy_key)
 {
     init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, t->cmp);
-    return t->cmp(dummy_key, t->root, NULL) == NODE_EQL;
+    return t->cmp(dummy_key, t->root, NULL) == CCC_NODE_EQL;
 }
 
 static bool
@@ -798,7 +798,7 @@ insert(ccc_tree *t, ccc_node *elem)
     }
     t->root = splay(t, t->root, elem, t->cmp);
     ccc_node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
-    if (NODE_EQL == root_cmp)
+    if (CCC_NODE_EQL == root_cmp)
     {
         return false;
     }
@@ -820,7 +820,7 @@ multiset_insert(ccc_tree *t, ccc_node *elem)
     t->root = splay(t, t->root, elem, t->cmp);
 
     ccc_node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
-    if (NODE_EQL == root_cmp)
+    if (CCC_NODE_EQL == root_cmp)
     {
         add_duplicate(t, t->root, elem, &t->end);
         return;
@@ -832,7 +832,7 @@ static ccc_node *
 connect_new_root(ccc_tree *t, ccc_node *new_root,
                  ccc_node_threeway_cmp cmp_result)
 {
-    ccc_tree_link const link = NODE_GRT == cmp_result;
+    ccc_tree_link const link = CCC_NODE_GRT == cmp_result;
     link_trees(t, new_root, link, t->root->link[link]);
     link_trees(t, new_root, !link, t->root);
     t->root->link[link] = &t->end;
@@ -877,7 +877,7 @@ erase(ccc_tree *t, ccc_node *elem)
     }
     ccc_node *ret = splay(t, t->root, elem, t->cmp);
     ccc_node_threeway_cmp const found = t->cmp(elem, ret, NULL);
-    if (found != NODE_EQL)
+    if (found != CCC_NODE_EQL)
     {
         return &t->end;
     }
@@ -948,7 +948,7 @@ multiset_erase_node(ccc_tree *t, ccc_node *node)
         return node;
     }
     ccc_node *ret = splay(t, t->root, node, t->cmp);
-    if (t->cmp(node, ret, NULL) != NODE_EQL)
+    if (t->cmp(node, ret, NULL) != CCC_NODE_EQL)
     {
         return &t->end;
     }
@@ -1000,7 +1000,7 @@ pop_front_dup(ccc_tree *t, ccc_node *old)
     else
     {
         /* Comparing sizes with the root's parent is undefined. */
-        parent->link[NODE_GRT == t->cmp(old, parent, NULL)] = tree_replacement;
+        parent->link[CCC_NODE_GRT == t->cmp(old, parent, NULL)] = tree_replacement;
     }
 
     ccc_node *new_list_head = old->parent_or_dups->link[N];
@@ -1050,17 +1050,17 @@ splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, ccc_tree_cmp_fn *cmp)
     for (;;)
     {
         ccc_node_threeway_cmp const root_cmp = cmp(elem, root, t->aux);
-        ccc_tree_link const dir = NODE_GRT == root_cmp;
-        if (NODE_EQL == root_cmp || root->link[dir] == &t->end)
+        ccc_tree_link const dir = CCC_NODE_GRT == root_cmp;
+        if (CCC_NODE_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
         ccc_node_threeway_cmp const child_cmp
             = cmp(elem, root->link[dir], t->aux);
-        ccc_tree_link const dir_from_child = NODE_GRT == child_cmp;
+        ccc_tree_link const dir_from_child = CCC_NODE_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
-        if (NODE_EQL != child_cmp && dir == dir_from_child)
+        if (CCC_NODE_EQL != child_cmp && dir == dir_from_child)
         {
             ccc_node *const pivot = root->link[dir];
             link_trees(t, root, dir, pivot->link[!dir]);
@@ -1159,7 +1159,7 @@ force_find_grt(ccc_node const *a, ccc_node const *b, void *aux)
     (void)a;
     (void)b;
     (void)aux;
-    return NODE_GRT;
+    return CCC_NODE_GRT;
 }
 
 static ccc_node_threeway_cmp
@@ -1168,7 +1168,7 @@ force_find_les(ccc_node const *a, ccc_node const *b, void *aux)
     (void)a;
     (void)b;
     (void)aux;
-    return NODE_LES;
+    return CCC_NODE_LES;
 }
 
 /* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
@@ -1232,11 +1232,11 @@ are_subtrees_valid(struct ccc_tree_range const r, ccc_tree_cmp_fn *const cmp,
     {
         return true;
     }
-    if (r.low != nil && cmp(r.root, r.low, NULL) != NODE_GRT)
+    if (r.low != nil && cmp(r.root, r.low, NULL) != CCC_NODE_GRT)
     {
         return false;
     }
-    if (r.high != nil && cmp(r.root, r.high, NULL) != NODE_LES)
+    if (r.high != nil && cmp(r.root, r.high, NULL) != CCC_NODE_LES)
     {
         return false;
     }
