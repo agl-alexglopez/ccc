@@ -95,12 +95,12 @@ typedef struct ccc_rrange
 
 typedef void ccc_node_print_fn(ccc_node const *);
 
-#define CCC_TREE_INIT(TREE_NAME, CMP, AUX)                                     \
+#define CCC_TREE_INIT(tree_name, cmp_fn, aux_data)                             \
     {                                                                          \
-        .root = &(TREE_NAME).t.end,                                            \
-        .end = {.link = {&(TREE_NAME).t.end, &(TREE_NAME).t.end},              \
-                .parent_or_dups = &(TREE_NAME).t.end},                         \
-        .cmp = (ccc_tree_cmp_fn *)(CMP), .aux = (AUX), .size = 0               \
+        .root = &(tree_name).t.end,                                            \
+        .end = {.link = {&(tree_name).t.end, &(tree_name).t.end},              \
+                .parent_or_dups = &(tree_name).t.end},                         \
+        .cmp = (ccc_tree_cmp_fn *)(cmp_fn), .aux = (aux_data), .size = 0       \
     }
 
 /* Mostly intended for debugging. Validates the underlying tree
