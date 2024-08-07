@@ -8,12 +8,12 @@ struct val
 {
     int id;
     int val;
-    struct depq_elem elem;
+    ccc_depq_elem elem;
 };
 
 static enum test_result depq_test_empty(void);
-static dpq_threeway_cmp val_cmp(struct depq_elem const *,
-                                struct depq_elem const *, void *);
+static ccc_depq_threeway_cmp val_cmp(ccc_depq_elem const *,
+                                     ccc_depq_elem const *, void *);
 
 #define NUM_TESTS (size_t)1
 test_fn const all_tests[NUM_TESTS] = {depq_test_empty};
@@ -36,16 +36,16 @@ main()
 static enum test_result
 depq_test_empty(void)
 {
-    struct depqueue pq = DEPQ_INIT(pq, val_cmp, NULL);
-    CHECK(depq_empty(&pq), true, bool, "%d");
+    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    CHECK(ccc_depq_empty(&pq), true, bool, "%d");
     return PASS;
 }
 
-static dpq_threeway_cmp
-val_cmp(struct depq_elem const *a, struct depq_elem const *b, void *aux)
+static ccc_depq_threeway_cmp
+val_cmp(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = DEPQ_ENTRY(a, struct val, elem);
-    struct val *rhs = DEPQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_DEPQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_DEPQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

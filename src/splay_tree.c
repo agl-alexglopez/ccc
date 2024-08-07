@@ -99,14 +99,14 @@ static ccc_node *rrange_end(ccc_rrange const *);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-/* ======================  Priority Queue Interface  ====================== */
+/* =================  Double Ended Priority Queue Interface  ============== */
 
 void
-depq_clear(struct depqueue *pq, depq_destructor_fn *destructor)
+ccc_depq_clear(ccc_depqueue *pq, ccc_depq_destructor_fn *destructor)
 {
-    while (!depq_empty(pq))
+    while (!ccc_depq_empty(pq))
     {
-        struct depq_elem *e = depq_pop_max(pq);
+        ccc_depq_elem *e = ccc_depq_pop_max(pq);
         if (e)
         {
             destructor(e);
@@ -115,114 +115,113 @@ depq_clear(struct depqueue *pq, depq_destructor_fn *destructor)
 }
 
 bool
-depq_empty(struct depqueue const *const pq)
+ccc_depq_empty(ccc_depqueue const *const pq)
 {
     return empty(&pq->t);
 }
 
-struct depq_elem *
-depq_root(struct depqueue const *const pq)
+ccc_depq_elem *
+ccc_depq_root(ccc_depqueue const *const pq)
 {
-    return (struct depq_elem *)root(&pq->t);
+    return (ccc_depq_elem *)root(&pq->t);
 }
 
-struct depq_elem *
-depq_max(struct depqueue *const pq)
+ccc_depq_elem *
+ccc_depq_max(ccc_depqueue *const pq)
 {
-    return (struct depq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
-                                     force_find_grt);
+    return (ccc_depq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
+                                  force_find_grt);
 }
 
-struct depq_elem const *
-depq_const_max(struct depqueue const *const pq)
+ccc_depq_elem const *
+ccc_depq_const_max(ccc_depqueue const *const pq)
 {
-    return (struct depq_elem *)max(&pq->t);
-}
-
-bool
-depq_is_max(struct depqueue *const pq, struct depq_elem *const e)
-{
-    return depq_rnext(pq, e) == (struct depq_elem *)&pq->t.end;
-}
-
-struct depq_elem *
-depq_min(struct depqueue *const pq)
-{
-    return (struct depq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
-                                     force_find_les);
-}
-
-struct depq_elem const *
-depq_const_min(struct depqueue const *const pq)
-{
-    return (struct depq_elem *)min(&pq->t);
+    return (ccc_depq_elem *)max(&pq->t);
 }
 
 bool
-depq_is_min(struct depqueue *const pq, struct depq_elem *const e)
+ccc_depq_is_max(ccc_depqueue *const pq, ccc_depq_elem *const e)
 {
-    return depq_next(pq, e) == (struct depq_elem *)&pq->t.end;
+    return ccc_depq_rnext(pq, e) == (ccc_depq_elem *)&pq->t.end;
 }
 
-struct depq_elem *
-depq_begin(struct depqueue *pq)
+ccc_depq_elem *
+ccc_depq_min(ccc_depqueue *const pq)
 {
-    return (struct depq_elem *)max(&pq->t);
+    return (ccc_depq_elem *)splay(&pq->t, pq->t.root, &pq->t.end,
+                                  force_find_les);
 }
 
-struct depq_elem *
-depq_rbegin(struct depqueue *pq)
+ccc_depq_elem const *
+ccc_depq_const_min(ccc_depqueue const *const pq)
 {
-    return (struct depq_elem *)min(&pq->t);
+    return (ccc_depq_elem *)min(&pq->t);
 }
 
-struct depq_elem *
-depq_end(struct depqueue *pq)
+bool
+ccc_depq_is_min(ccc_depqueue *const pq, ccc_depq_elem *const e)
 {
-    return (struct depq_elem *)&pq->t.end;
+    return ccc_depq_next(pq, e) == (ccc_depq_elem *)&pq->t.end;
 }
 
-struct depq_elem *
-depq_next(struct depqueue *pq, struct depq_elem *i)
+ccc_depq_elem *
+ccc_depq_begin(ccc_depqueue *pq)
 {
-    return (struct depq_elem *)multiset_next(&pq->t, &i->n,
-                                             reverse_inorder_traversal);
+    return (ccc_depq_elem *)max(&pq->t);
 }
 
-struct depq_elem *
-depq_rnext(struct depqueue *pq, struct depq_elem *i)
+ccc_depq_elem *
+ccc_depq_rbegin(ccc_depqueue *pq)
 {
-    return (struct depq_elem *)multiset_next(&pq->t, &i->n, inorder_traversal);
+    return (ccc_depq_elem *)min(&pq->t);
 }
 
-struct depq_range
-depq_equal_range(struct depqueue *pq, struct depq_elem *begin,
-                 struct depq_elem *end)
+ccc_depq_elem *
+ccc_depq_end(ccc_depqueue *pq)
 {
-    return (struct depq_range){
+    return (ccc_depq_elem *)&pq->t.end;
+}
+
+ccc_depq_elem *
+ccc_depq_next(ccc_depqueue *pq, ccc_depq_elem *i)
+{
+    return (ccc_depq_elem *)multiset_next(&pq->t, &i->n,
+                                          reverse_inorder_traversal);
+}
+
+ccc_depq_elem *
+ccc_depq_rnext(ccc_depqueue *pq, ccc_depq_elem *i)
+{
+    return (ccc_depq_elem *)multiset_next(&pq->t, &i->n, inorder_traversal);
+}
+
+ccc_depq_range
+ccc_depq_equal_range(ccc_depqueue *pq, ccc_depq_elem *begin, ccc_depq_elem *end)
+{
+    return (ccc_depq_range){
         equal_range(&pq->t, &begin->n, &end->n, reverse_inorder_traversal),
     };
 }
 
-struct depq_elem *
-depq_begin_range(struct depq_range const *const r)
+ccc_depq_elem *
+ccc_depq_begin_range(ccc_depq_range const *const r)
 {
-    return (struct depq_elem *)range_begin(&r->r);
+    return (ccc_depq_elem *)range_begin(&r->r);
 }
 
-struct depq_elem *
-depq_end_range(struct depq_range const *const r)
+ccc_depq_elem *
+ccc_depq_end_range(ccc_depq_range const *const r)
 {
-    return (struct depq_elem *)range_end(&r->r);
+    return (ccc_depq_elem *)range_end(&r->r);
 }
 
-struct depq_rrange
-depq_equal_rrange(struct depqueue *pq, struct depq_elem *rbegin,
-                  struct depq_elem *rend)
+ccc_depq_rrange
+ccc_depq_equal_rrange(ccc_depqueue *pq, ccc_depq_elem *rbegin,
+                      ccc_depq_elem *rend)
 {
     ccc_range const ret
         = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal);
-    return (struct depq_rrange){
+    return (ccc_depq_rrange){
         .r = (ccc_rrange){
             .rbegin =ret.begin,
             .end = ret.end,
@@ -230,28 +229,28 @@ depq_equal_rrange(struct depqueue *pq, struct depq_elem *rbegin,
     };
 }
 
-struct depq_elem *
-depq_begin_rrange(struct depq_rrange const *const rr)
+ccc_depq_elem *
+ccc_depq_begin_rrange(ccc_depq_rrange const *const rr)
 {
-    return (struct depq_elem *)rrange_begin(&rr->r);
+    return (ccc_depq_elem *)rrange_begin(&rr->r);
 }
 
-struct depq_elem *
-depq_end_rrange(struct depq_rrange const *const rr)
+ccc_depq_elem *
+ccc_depq_end_rrange(ccc_depq_rrange const *const rr)
 {
-    return (struct depq_elem *)rrange_end(&rr->r);
+    return (ccc_depq_elem *)rrange_end(&rr->r);
 }
 
 void
-depq_push(struct depqueue *pq, struct depq_elem *elem)
+ccc_depq_push(ccc_depqueue *pq, ccc_depq_elem *elem)
 {
     multiset_insert(&pq->t, &elem->n);
 }
 
-struct depq_elem *
-depq_erase(struct depqueue *pq, struct depq_elem *elem)
+ccc_depq_elem *
+ccc_depq_erase(ccc_depqueue *pq, ccc_depq_elem *elem)
 {
-    struct depq_elem *ret = depq_next(pq, elem);
+    ccc_depq_elem *ret = ccc_depq_next(pq, elem);
     if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
     {
         (void)fprintf(stderr,
@@ -261,10 +260,10 @@ depq_erase(struct depqueue *pq, struct depq_elem *elem)
     return ret;
 }
 
-struct depq_elem *
-depq_rerase(struct depqueue *pq, struct depq_elem *elem)
+ccc_depq_elem *
+ccc_depq_rerase(ccc_depqueue *pq, ccc_depq_elem *elem)
 {
-    struct depq_elem *ret = depq_rnext(pq, elem);
+    ccc_depq_elem *ret = ccc_depq_rnext(pq, elem);
     if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
     {
         (void)fprintf(stderr,
@@ -275,16 +274,15 @@ depq_rerase(struct depqueue *pq, struct depq_elem *elem)
 }
 
 bool
-depq_update(struct depqueue *pq, struct depq_elem *elem, depq_update_fn *fn,
-            void *aux)
+ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *elem, ccc_depq_update_fn *fn,
+                void *aux)
 {
     if (NULL == elem->n.link[L] || NULL == elem->n.link[R])
     {
         return false;
     }
-    struct depq_elem *e
-        = (struct depq_elem *)multiset_erase_node(&pq->t, &elem->n);
-    if (e == (struct depq_elem *)&pq->t.end)
+    ccc_depq_elem *e = (ccc_depq_elem *)multiset_erase_node(&pq->t, &elem->n);
+    if (e == (ccc_depq_elem *)&pq->t.end)
     {
         return false;
     }
@@ -294,38 +292,38 @@ depq_update(struct depqueue *pq, struct depq_elem *elem, depq_update_fn *fn,
 }
 
 bool
-depq_contains(struct depqueue *pq, struct depq_elem *elem)
+ccc_depq_contains(ccc_depqueue *pq, ccc_depq_elem *elem)
 {
     return contains(&pq->t, &elem->n);
 }
 
-struct depq_elem *
-depq_pop_max(struct depqueue *pq)
+ccc_depq_elem *
+ccc_depq_pop_max(ccc_depqueue *pq)
 {
-    return (struct depq_elem *)pop_max(&pq->t);
+    return (ccc_depq_elem *)pop_max(&pq->t);
 }
 
-struct depq_elem *
-depq_pop_min(struct depqueue *pq)
+ccc_depq_elem *
+ccc_depq_pop_min(ccc_depqueue *pq)
 {
-    return (struct depq_elem *)pop_min(&pq->t);
+    return (ccc_depq_elem *)pop_min(&pq->t);
 }
 
 size_t
-depq_size(struct depqueue *const pq)
+ccc_depq_size(ccc_depqueue *const pq)
 {
     return pq->t.size;
 }
 
 bool
-pq_has_dups(struct depqueue *const pq, struct depq_elem *e)
+pq_has_dups(ccc_depqueue *const pq, ccc_depq_elem *e)
 {
     return has_dups(&pq->t.end, &e->n);
 }
 
 void
-depq_print(struct depqueue const *const pq, struct depq_elem const *const start,
-           depq_print_fn *const fn)
+ccc_depq_print(ccc_depqueue const *const pq, ccc_depq_elem const *const start,
+               ccc_depq_print_fn *const fn)
 {
     ccc_tree_print(&pq->t, &start->n, (ccc_node_print_fn *)fn);
 }
