@@ -55,7 +55,7 @@ struct priority_cell
 {
     struct point cell;
     int priority;
-    struct depq_elem elem;
+    ccc_depq_elem elem;
 };
 
 struct point_cost
@@ -118,8 +118,8 @@ static bool can_build_new_square(struct maze const *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(struct maze const *);
-static dpq_threeway_cmp cmp_priority_cells(struct depq_elem const *,
-                                           struct depq_elem const *, void *);
+static ccc_depq_threeway_cmp cmp_priority_cells(ccc_depq_elem const *,
+                                                ccc_depq_elem const *, void *);
 static ccc_set_threeway_cmp cmp_points(ccc_set_elem const *,
                                        ccc_set_elem const *, void *);
 static void set_destructor(ccc_set_elem *);
@@ -205,7 +205,7 @@ animate_maze(struct maze *maze)
        A ccc_set could be replaced by a 2D vector copy of the maze with costs
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
-    struct depqueue cells = DEPQ_INIT(cells, cmp_priority_cells, NULL);
+    ccc_depqueue cells = CCC_DEPQ_INIT(cells, cmp_priority_cells, NULL);
     ccc_set cell_costs = CCC_SET_INIT(cell_costs, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
@@ -218,15 +218,15 @@ animate_maze(struct maze *maze)
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)depq_push(&cells, &start->elem);
+    (void)ccc_depq_push(&cells, &start->elem);
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
-    while (!depq_empty(&cells))
+    while (!ccc_depq_empty(&cells))
     {
         struct priority_cell const *const cur
-            = DEPQ_ENTRY(depq_max(&cells), struct priority_cell, elem);
+            = CCC_DEPQ_OF(ccc_depq_max(&cells), struct priority_cell, elem);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
@@ -275,12 +275,12 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            depq_push(&cells, &new_cell->elem);
+            ccc_depq_push(&cells, &new_cell->elem);
         }
         else
         {
-            struct priority_cell *pc
-                = DEPQ_ENTRY(depq_pop_max(&cells), struct priority_cell, elem);
+            struct priority_cell *pc = CCC_DEPQ_OF(ccc_depq_pop_max(&cells),
+                                                   struct priority_cell, elem);
             free(pc);
         }
     }
@@ -474,15 +474,15 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 
 /*===================   Data Structure Comparators   ========================*/
 
-static dpq_threeway_cmp
-cmp_priority_cells(struct depq_elem const *const key, struct depq_elem const *n,
+static ccc_depq_threeway_cmp
+cmp_priority_cells(ccc_depq_elem const *const key, ccc_depq_elem const *n,
                    void *const aux)
 {
     (void)aux;
     struct priority_cell const *const a
-        = DEPQ_ENTRY(key, struct priority_cell, elem);
+        = CCC_DEPQ_OF(key, struct priority_cell, elem);
     struct priority_cell const *const b
-        = DEPQ_ENTRY(n, struct priority_cell, elem);
+        = CCC_DEPQ_OF(n, struct priority_cell, elem);
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
