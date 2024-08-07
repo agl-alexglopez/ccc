@@ -1,5 +1,10 @@
 add_library(pqueue pqueue.h ${CMAKE_SOURCE_DIR}/src/pqueue.c)
 
+add_library(heap_pqueue heap_pqueue.h ${CMAKE_SOURCE_DIR}/src/heap_pqueue.c)
+target_link_libraries(heap_pqueue PRIVATE
+  attrib
+)
+
 add_library(depqueue depqueue.h ${CMAKE_SOURCE_DIR}/src/splay_tree.c)
 target_link_libraries(depqueue PRIVATE
   tree

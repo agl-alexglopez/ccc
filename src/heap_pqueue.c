@@ -14,7 +14,7 @@ enum ccc_print_link
     LEAF = 1    /* └── */
 };
 
-enum hpq_direction
+enum fpq_direction
 {
     L = 0,
     R,
@@ -31,28 +31,28 @@ enum hpq_direction
 
 static size_t const starting_capacity = 8;
 
-static void grow(struct heap_pqueue *);
-static void swap(struct hccc_pq_elem **, struct hccc_pq_elem **);
-static void bubble_down(struct heap_pqueue *, size_t);
-static void bubble_up(struct heap_pqueue *, size_t);
-static void print_node(struct heap_pqueue const *, size_t, hpq_print_fn *);
-static void print_inner_heap(struct heap_pqueue const *, size_t, char const *,
-                             enum ccc_print_link, hpq_print_fn *);
-static void print_heap(struct heap_pqueue const *, size_t, hpq_print_fn *);
+static void grow(ccc_flat_pqueue *);
+static void swap(ccc_fpq_elem **, ccc_fpq_elem **);
+static void bubble_down(ccc_flat_pqueue *, size_t);
+static void bubble_up(ccc_flat_pqueue *, size_t);
+static void print_node(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
+static void print_inner_heap(ccc_flat_pqueue const *, size_t, char const *,
+                             enum ccc_print_link, fpq_print_fn *);
+static void print_heap(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
 
 void
-hpq_init(struct heap_pqueue *const hpq,
-         enum heap_ccc_pq_threeway_cmp hpq_ordering, hpq_cmp_fn *cmp, void *aux)
+ccc_fpq_init(ccc_flat_pqueue *const hpq, ccc_fpq_threeway_cmp fpq_ordering,
+             ccc_fpq_cmp_fn *cmp, void *aux)
 {
-    if (hpq_ordering == HPQEQL)
+    if (fpq_ordering == HPQEQL)
     {
         (void)fprintf(stderr, "heap should be ordered HPQLES or HPQGRT.\n");
     }
-    hpq->order = hpq_ordering;
+    hpq->order = fpq_ordering;
     hpq->sz = 0;
     hpq->capacity = starting_capacity;
-    hpq->heap = calloc(starting_capacity,
-                       starting_capacity * sizeof(struct hccc_pq_elem *));
+    hpq->heap
+        = calloc(starting_capacity, starting_capacity * sizeof(ccc_fpq_elem *));
     if (!hpq->heap)
     {
         (void)fprintf(stderr, "heap backing store exhausted.\n");
@@ -62,7 +62,7 @@ hpq_init(struct heap_pqueue *const hpq,
 }
 
 void
-hpq_push(struct heap_pqueue *const hpq, struct hccc_pq_elem *e)
+ccc_fpq_push(ccc_flat_pqueue *const hpq, ccc_fpq_elem *e)
 {
     if (hpq->sz == hpq->capacity)
     {
@@ -74,8 +74,8 @@ hpq_push(struct heap_pqueue *const hpq, struct hccc_pq_elem *e)
     bubble_up(hpq, hpq->sz - 1);
 }
 
-struct hccc_pq_elem *
-hpq_pop(struct heap_pqueue *hpq)
+ccc_fpq_elem *
+ccc_fpq_pop(ccc_flat_pqueue *hpq)
 {
     if (!hpq->sz)
     {
@@ -83,13 +83,13 @@ hpq_pop(struct heap_pqueue *hpq)
     }
     --hpq->sz;
     swap(&hpq->heap[0], &hpq->heap[hpq->sz]);
-    struct hccc_pq_elem *ret = hpq->heap[hpq->sz];
+    ccc_fpq_elem *ret = hpq->heap[hpq->sz];
     bubble_down(hpq, 0);
     return ret;
 }
 
-struct hccc_pq_elem *
-hpq_erase(struct heap_pqueue *const hpq, struct hccc_pq_elem *e)
+ccc_fpq_elem *
+ccc_fpq_erase(ccc_flat_pqueue *const hpq, ccc_fpq_elem *e)
 {
     if (!hpq->sz)
     {
@@ -108,8 +108,8 @@ hpq_erase(struct heap_pqueue *const hpq, struct hccc_pq_elem *e)
        elements are swapped and we lose access to original handle index. */
     size_t const swap_location = e->handle;
     swap(&hpq->heap[swap_location], &hpq->heap[hpq->sz]);
-    struct hccc_pq_elem *erased = hpq->heap[hpq->sz];
-    enum heap_ccc_pq_threeway_cmp const erased_cmp
+    ccc_fpq_elem *erased = hpq->heap[hpq->sz];
+    ccc_fpq_threeway_cmp const erased_cmp
         = hpq->cmp(hpq->heap[swap_location], erased, hpq->aux);
     if (erased_cmp == hpq->order)
     {
@@ -124,8 +124,8 @@ hpq_erase(struct heap_pqueue *const hpq, struct hccc_pq_elem *e)
 }
 
 bool
-hpq_update(struct heap_pqueue *hpq, struct hccc_pq_elem *e, hpq_update_fn *fn,
-           void *aux)
+ccc_fpq_update(ccc_flat_pqueue *hpq, ccc_fpq_elem *e, fpq_update_fn *fn,
+               void *aux)
 {
     if (!e || !hpq->sz)
     {
@@ -137,7 +137,7 @@ hpq_update(struct heap_pqueue *hpq, struct hccc_pq_elem *e, hpq_update_fn *fn,
         bubble_down(hpq, 0);
         return true;
     }
-    enum heap_ccc_pq_threeway_cmp const parent_cmp = hpq->cmp(
+    ccc_fpq_threeway_cmp const parent_cmp = hpq->cmp(
         hpq->heap[e->handle], hpq->heap[(e->handle - 1) / 2], hpq->aux);
     if (parent_cmp == hpq->order)
     {
@@ -153,8 +153,8 @@ hpq_update(struct heap_pqueue *hpq, struct hccc_pq_elem *e, hpq_update_fn *fn,
     return true;
 }
 
-struct hccc_pq_elem const *
-hpq_front(struct heap_pqueue const *const hpq)
+ccc_fpq_elem const *
+ccc_fpq_front(ccc_flat_pqueue const *const hpq)
 {
     if (!hpq->sz)
     {
@@ -164,7 +164,7 @@ hpq_front(struct heap_pqueue const *const hpq)
 }
 
 bool
-hpq_empty(struct heap_pqueue const *const hpq)
+ccc_fpq_empty(ccc_flat_pqueue const *const hpq)
 {
     if (!hpq)
     {
@@ -174,7 +174,7 @@ hpq_empty(struct heap_pqueue const *const hpq)
 }
 
 size_t
-hpq_size(struct heap_pqueue const *const hpq)
+ccc_fpq_size(ccc_flat_pqueue const *const hpq)
 {
     if (!hpq)
     {
@@ -183,14 +183,14 @@ hpq_size(struct heap_pqueue const *const hpq)
     return hpq->sz;
 }
 
-enum heap_ccc_pq_threeway_cmp
-hpq_order(struct heap_pqueue const *const hpq)
+ccc_fpq_threeway_cmp
+ccc_fpq_order(ccc_flat_pqueue const *const hpq)
 {
     return hpq->order;
 }
 
 void
-hpq_clear(struct heap_pqueue *hpq, hpq_destructor_fn *fn)
+ccc_fpq_clear(ccc_flat_pqueue *hpq, fpq_destructor_fn *fn)
 {
     for (size_t i = 0; i < hpq->sz; ++i)
     {
@@ -203,7 +203,7 @@ hpq_clear(struct heap_pqueue *hpq, hpq_destructor_fn *fn)
 }
 
 bool
-hpq_validate(struct heap_pqueue const *const hpq)
+ccc_fpq_validate(ccc_flat_pqueue const *const hpq)
 {
     if (hpq->sz > 1)
     {
@@ -211,7 +211,7 @@ hpq_validate(struct heap_pqueue const *const hpq)
              i <= (hpq->sz - 2) / 2;
              ++i, left = (i * 2) + 1, right = (i * 2) + 2)
         {
-            struct hccc_pq_elem const *const cur = hpq->heap[i];
+            ccc_fpq_elem const *const cur = hpq->heap[i];
             /* Putting the child in the comparison function first evaluates
                the childs three way comparison in relation to the parent. If
                the child beats the parent in total ordering (min/max) something
@@ -239,7 +239,8 @@ hpq_validate(struct heap_pqueue const *const hpq)
 }
 
 void
-hpq_print(struct heap_pqueue const *hpq, size_t const i, hpq_print_fn *const fn)
+ccc_fpq_print(ccc_flat_pqueue const *hpq, size_t const i,
+              fpq_print_fn *const fn)
 {
     print_heap(hpq, i, fn);
 }
@@ -247,7 +248,7 @@ hpq_print(struct heap_pqueue const *hpq, size_t const i, hpq_print_fn *const fn)
 /*===============================  Static Helpers  =========================*/
 
 static void
-bubble_up(struct heap_pqueue *const hpq, size_t i)
+bubble_up(ccc_flat_pqueue *const hpq, size_t i)
 {
     for (size_t parent = (i - 1) / 2;
          i && hpq->cmp(hpq->heap[i], hpq->heap[parent], hpq->aux) == hpq->order;
@@ -259,9 +260,9 @@ bubble_up(struct heap_pqueue *const hpq, size_t i)
 }
 
 static void
-bubble_down(struct heap_pqueue *hpq, size_t i)
+bubble_down(ccc_flat_pqueue *hpq, size_t i)
 {
-    enum heap_ccc_pq_threeway_cmp const wrong_order
+    ccc_fpq_threeway_cmp const wrong_order
         = hpq->order == HPQLES ? HPQGRT : HPQLES;
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < hpq->sz;
          i = next, left = i * 2 + 1, right = left + 1)
@@ -284,10 +285,10 @@ bubble_down(struct heap_pqueue *hpq, size_t i)
 }
 
 static void
-grow(struct heap_pqueue *hpq)
+grow(ccc_flat_pqueue *hpq)
 {
-    struct hccc_pq_elem **new
-        = realloc(hpq->heap, sizeof(struct hccc_pq_elem *) * hpq->capacity * 2);
+    ccc_fpq_elem **new
+        = realloc(hpq->heap, sizeof(ccc_fpq_elem *) * hpq->capacity * 2);
     if (!new)
     {
         (void)fprintf(stderr, "reallocation of flat priority queue failed.\n");
@@ -297,12 +298,12 @@ grow(struct heap_pqueue *hpq)
 }
 
 static inline void
-swap(struct hccc_pq_elem **a, struct hccc_pq_elem **b)
+swap(ccc_fpq_elem **a, ccc_fpq_elem **b)
 {
     size_t const temp_handle = (*a)->handle;
     (*a)->handle = (*b)->handle;
     (*b)->handle = temp_handle;
-    struct hccc_pq_elem *temp = *a;
+    ccc_fpq_elem *temp = *a;
     *a = *b;
     *b = temp;
 }
@@ -310,8 +311,7 @@ swap(struct hccc_pq_elem **a, struct hccc_pq_elem **b)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static void
-print_node(struct heap_pqueue const *const hpq, size_t i,
-           hpq_print_fn *const fn)
+print_node(ccc_flat_pqueue const *const hpq, size_t i, fpq_print_fn *const fn)
 {
     printf(COLOR_CYN);
     if (hpq->heap[i]->handle)
@@ -326,9 +326,8 @@ print_node(struct heap_pqueue const *const hpq, size_t i,
 }
 
 static void
-print_inner_heap(struct heap_pqueue const *const hpq, size_t i,
-                 char const *prefix, enum ccc_print_link const node_type,
-                 hpq_print_fn *const fn)
+print_inner_heap(ccc_flat_pqueue const *const hpq, size_t i, char const *prefix,
+                 enum ccc_print_link const node_type, fpq_print_fn *const fn)
 {
     if (i >= hpq->sz)
     {
@@ -368,8 +367,7 @@ print_inner_heap(struct heap_pqueue const *const hpq, size_t i,
 }
 
 static void
-print_heap(struct heap_pqueue const *const hpq, size_t i,
-           hpq_print_fn *const fn)
+print_heap(ccc_flat_pqueue const *const hpq, size_t i, fpq_print_fn *const fn)
 {
     if (i >= hpq->sz)
     {
