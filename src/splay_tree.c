@@ -811,12 +811,13 @@ static void
 multiset_insert(ccc_tree *t, ccc_node *elem)
 {
     init_node(t, elem);
-    t->size++;
     if (empty(t))
     {
         t->root = elem;
+        t->size = 1;
         return;
     }
+    t->size++;
     t->root = splay(t, t->root, elem, t->cmp);
 
     node_threeway_cmp const root_cmp = t->cmp(elem, t->root, NULL);
