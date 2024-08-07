@@ -11,21 +11,21 @@ struct val
 {
     int id;
     int val;
-    struct hccc_pq_elem elem;
+    ccc_fpq_elem elem;
 };
 
-static enum test_result hpq_test_insert_iterate_pop(void);
-static enum test_result hpq_test_priority_update(void);
-static enum test_result hpq_test_priority_removal(void);
-static void val_update(struct hccc_pq_elem *, void *);
-static enum heap_ccc_pq_threeway_cmp
-val_cmp(struct hccc_pq_elem const *, struct hccc_pq_elem const *, void *);
+static enum test_result fpq_test_insert_iterate_pop(void);
+static enum test_result fpq_test_priority_update(void);
+static enum test_result fpq_test_priority_removal(void);
+static void val_update(ccc_fpq_elem *, void *);
+static ccc_fpq_threeway_cmp val_cmp(ccc_fpq_elem const *, ccc_fpq_elem const *,
+                                    void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS] = {
-    hpq_test_insert_iterate_pop,
-    hpq_test_priority_update,
-    hpq_test_priority_removal,
+    fpq_test_insert_iterate_pop,
+    fpq_test_priority_update,
+    fpq_test_priority_removal,
 };
 
 int
@@ -44,10 +44,10 @@ main()
 }
 
 static enum test_result
-hpq_test_insert_iterate_pop(void)
+fpq_test_insert_iterate_pop(void)
 {
-    struct heap_pqueue pq;
-    hpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_flat_pqueue pq;
+    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -58,25 +58,25 @@ hpq_test_insert_iterate_pop(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        hpq_push(&pq, &vals[i].elem);
-        CHECK(hpq_validate(&pq), true, bool, "%d");
+        ccc_fpq_push(&pq, &vals[i].elem);
+        CHECK(ccc_fpq_validate(&pq), true, bool, "%d");
     }
     size_t pop_count = 0;
-    while (!hpq_empty(&pq))
+    while (!ccc_fpq_empty(&pq))
     {
-        hpq_pop(&pq);
+        ccc_fpq_pop(&pq);
         ++pop_count;
-        CHECK(hpq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_fpq_validate(&pq), true, bool, "%d");
     }
     CHECK(pop_count, num_nodes, size_t, "%zu");
     return PASS;
 }
 
 static enum test_result
-hpq_test_priority_removal(void)
+fpq_test_priority_removal(void)
 {
-    struct heap_pqueue pq;
-    hpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_flat_pqueue pq;
+    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -87,28 +87,28 @@ hpq_test_priority_removal(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        hpq_push(&pq, &vals[i].elem);
-        CHECK(hpq_validate(&pq), true, bool, "%d");
+        ccc_fpq_push(&pq, &vals[i].elem);
+        CHECK(ccc_fpq_validate(&pq), true, bool, "%d");
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct hccc_pq_elem *i = &vals[val].elem;
+        ccc_fpq_elem *i = &vals[val].elem;
         struct val *cur = HPQ_ENTRY(i, struct val, elem);
         if (cur->val > limit)
         {
-            (void)hpq_erase(&pq, i);
-            CHECK(hpq_validate(&pq), true, bool, "%d");
+            (void)ccc_fpq_erase(&pq, i);
+            CHECK(ccc_fpq_validate(&pq), true, bool, "%d");
         }
     }
     return PASS;
 }
 
 static enum test_result
-hpq_test_priority_update(void)
+fpq_test_priority_update(void)
 {
-    struct heap_pqueue pq;
-    hpq_init(&pq, HPQLES, val_cmp, NULL);
+    ccc_flat_pqueue pq;
+    ccc_fpq_init(&pq, HPQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -119,27 +119,28 @@ hpq_test_priority_update(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        hpq_push(&pq, &vals[i].elem);
-        CHECK(hpq_validate(&pq), true, bool, "%d");
+        ccc_fpq_push(&pq, &vals[i].elem);
+        CHECK(ccc_fpq_validate(&pq), true, bool, "%d");
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct hccc_pq_elem *i = &vals[val].elem;
+        ccc_fpq_elem *i = &vals[val].elem;
         struct val *cur = HPQ_ENTRY(i, struct val, elem);
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(hpq_update(&pq, i, val_update, &backoff), true, bool, "%d");
-            CHECK(hpq_validate(&pq), true, bool, "%d");
+            CHECK(ccc_fpq_update(&pq, i, val_update, &backoff), true, bool,
+                  "%d");
+            CHECK(ccc_fpq_validate(&pq), true, bool, "%d");
         }
     }
-    CHECK(hpq_size(&pq), num_nodes, size_t, "%zu");
+    CHECK(ccc_fpq_size(&pq), num_nodes, size_t, "%zu");
     return PASS;
 }
 
-static enum heap_ccc_pq_threeway_cmp
-val_cmp(struct hccc_pq_elem const *a, struct hccc_pq_elem const *b, void *aux)
+static ccc_fpq_threeway_cmp
+val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);
@@ -148,7 +149,7 @@ val_cmp(struct hccc_pq_elem const *a, struct hccc_pq_elem const *b, void *aux)
 }
 
 static void
-val_update(struct hccc_pq_elem *a, void *aux)
+val_update(ccc_fpq_elem *a, void *aux)
 {
     struct val *old = HPQ_ENTRY(a, struct val, elem);
     old->val = *(int *)aux;

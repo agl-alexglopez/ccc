@@ -6,5 +6,3 @@ target_link_libraries(cli PUBLIC
 )
 add_library(queue queue.h queue.c)
 target_link_libraries(queue attrib)
-add_library(heap_pqueue heap_pqueue.h heap_pqueue.c)
-target_link_libraries(heap_pqueue attrib)
