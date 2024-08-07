@@ -11,15 +11,15 @@ struct val
 {
     int id;
     int val;
-    struct hpq_elem elem;
+    struct hccc_pq_elem elem;
 };
 
 static enum test_result hpq_test_insert_iterate_pop(void);
 static enum test_result hpq_test_priority_update(void);
 static enum test_result hpq_test_priority_removal(void);
-static void val_update(struct hpq_elem *, void *);
-static enum heap_pq_threeway_cmp val_cmp(struct hpq_elem const *,
-                                         struct hpq_elem const *, void *);
+static void val_update(struct hccc_pq_elem *, void *);
+static enum heap_ccc_pq_threeway_cmp
+val_cmp(struct hccc_pq_elem const *, struct hccc_pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS] = {
@@ -93,7 +93,7 @@ hpq_test_priority_removal(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct hpq_elem *i = &vals[val].elem;
+        struct hccc_pq_elem *i = &vals[val].elem;
         struct val *cur = HPQ_ENTRY(i, struct val, elem);
         if (cur->val > limit)
         {
@@ -125,7 +125,7 @@ hpq_test_priority_update(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct hpq_elem *i = &vals[val].elem;
+        struct hccc_pq_elem *i = &vals[val].elem;
         struct val *cur = HPQ_ENTRY(i, struct val, elem);
         int backoff = cur->val / 2;
         if (cur->val > limit)
@@ -138,8 +138,8 @@ hpq_test_priority_update(void)
     return PASS;
 }
 
-static enum heap_pq_threeway_cmp
-val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
+static enum heap_ccc_pq_threeway_cmp
+val_cmp(struct hccc_pq_elem const *a, struct hccc_pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);
@@ -148,7 +148,7 @@ val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
 }
 
 static void
-val_update(struct hpq_elem *a, void *aux)
+val_update(struct hccc_pq_elem *a, void *aux)
 {
     struct val *old = HPQ_ENTRY(a, struct val, elem);
     old->val = *(int *)aux;

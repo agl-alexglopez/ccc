@@ -38,12 +38,12 @@ typedef struct ccc_depqueue
     ccc_tree t;
 } ccc_depqueue;
 
-typedef enum ccc_depq_threeway_cmp
+typedef enum ccc_deccc_pq_threeway_cmp
 {
     DPQLES = NODE_LES,
     DPQEQL = NODE_EQL,
     DPQGRT = NODE_GRT,
-} ccc_depq_threeway_cmp;
+} ccc_deccc_pq_threeway_cmp;
 
 /* A comparison function that returns one of the threeway comparison
    values. To use this data structure you must be able to determine
@@ -58,7 +58,7 @@ typedef enum ccc_depq_threeway_cmp
 
    The compare function one must provide to perform queries
    and other operations on the DEPQ. See above. */
-typedef ccc_depq_threeway_cmp
+typedef ccc_deccc_pq_threeway_cmp
 ccc_depq_cmp_fn(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux);
 
 /* Define a function to use printf for your custom struct type.
@@ -85,8 +85,8 @@ typedef void ccc_depq_print_fn(ccc_depq_elem const *);
    even if it is updated to the same value it previously stored O(lgN). */
 typedef void ccc_depq_update_fn(ccc_depq_elem *, void *aux);
 
-/* Performs user specified destructor actions on a single depq_elem. This
-   depq_elem is assumed to be embedded in user defined structs and therefore
+/* Performs user specified destructor actions on a single deccc_pq_elem. This
+   deccc_pq_elem is assumed to be embedded in user defined structs and therefore
    allows the user to perform any updates to their program before deleting
    this element. The user will know if they have heap allocated their
    own structures and therefore shall call free on the containing structure.
@@ -134,8 +134,8 @@ typedef struct ccc_depq_rrange
    The pq element should be passed by address not by value and the
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
-#define CCC_DEPQ_OF(DEPQ_ELEM, STRUCT, MEMBER)                                 \
-    ((STRUCT *)((uint8_t *)&(DEPQ_ELEM)->n                                     \
+#define CCC_DEPQ_OF(DEccc_pq_elem, STRUCT, MEMBER)                             \
+    ((STRUCT *)((uint8_t *)&(DEccc_pq_elem)->n                                 \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
 /* Initialize the depq on the left hand side with this right hand side

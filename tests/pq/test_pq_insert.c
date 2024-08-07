@@ -9,7 +9,7 @@ struct val
 {
     int id;
     int val;
-    pq_elem elem;
+    ccc_pq_elem elem;
 };
 
 static enum test_result pq_test_insert_one(void);
@@ -18,9 +18,11 @@ static enum test_result pq_test_insert_shuffle(void);
 static enum test_result pq_test_struct_getter(void);
 static enum test_result pq_test_insert_three_dups(void);
 static enum test_result pq_test_read_max_min(void);
-static enum test_result insert_shuffled(pqueue *, struct val[], size_t, int);
-static size_t inorder_fill(int[], size_t, pqueue *);
-static pq_threeway_cmp val_cmp(pq_elem const *, pq_elem const *, void *);
+static enum test_result insert_shuffled(ccc_pqueue *, struct val[], size_t,
+                                        int);
+static size_t inorder_fill(int[], size_t, ccc_pqueue *);
+static ccc_pq_threeway_cmp val_cmp(ccc_pq_elem const *, ccc_pq_elem const *,
+                                   void *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -46,91 +48,91 @@ main()
 static enum test_result
 pq_test_insert_one(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    pq_push(&pq, &single.elem);
-    CHECK(pq_empty(&pq), false, bool, "%d");
+    ccc_pq_push(&pq, &single.elem);
+    CHECK(ccc_pq_empty(&pq), false, bool, "%d");
     return PASS;
 }
 
 static enum test_result
 pq_test_insert_three(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        pq_push(&pq, &three_vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%d");
-        CHECK(pq_size(&pq), i + 1, size_t, "%zu");
+        ccc_pq_push(&pq, &three_vals[i].elem);
+        CHECK(ccc_pq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_pq_size(&pq), i + 1, size_t, "%zu");
     }
-    CHECK(pq_size(&pq), 3, size_t, "%zu");
+    CHECK(ccc_pq_size(&pq), 3, size_t, "%zu");
     return PASS;
 }
 
 static enum test_result
 pq_test_struct_getter(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
-    pqueue pq_tester_clone = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq_tester_clone = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        pq_push(&pq, &vals[i].elem);
-        pq_push(&pq_tester_clone, &tester_clone[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%d");
+        ccc_pq_push(&pq, &vals[i].elem);
+        ccc_pq_push(&pq_tester_clone, &tester_clone[i].elem);
+        CHECK(ccc_pq_validate(&pq), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         struct val const *get
-            = PQ_ENTRY(&tester_clone[i].elem, struct val, elem);
+            = CCC_PQ_OF(&tester_clone[i].elem, struct val, elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
-    CHECK(pq_size(&pq), 10ULL, size_t, "%zu");
+    CHECK(ccc_pq_size(&pq), 10ULL, size_t, "%zu");
     return PASS;
 }
 
 static enum test_result
 pq_test_insert_three_dups(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        pq_push(&pq, &three_vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%d");
-        CHECK(pq_size(&pq), i + 1, size_t, "%zu");
+        ccc_pq_push(&pq, &three_vals[i].elem);
+        CHECK(ccc_pq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_pq_size(&pq), i + 1, size_t, "%zu");
     }
-    CHECK(pq_size(&pq), 3ULL, size_t, "%zu");
+    CHECK(ccc_pq_size(&pq), 3ULL, size_t, "%zu");
     return PASS;
 }
 
-static pq_threeway_cmp
-val_cmp(pq_elem const *a, pq_elem const *b, void *aux)
+static ccc_pq_threeway_cmp
+val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = PQ_ENTRY(a, struct val, elem);
-    struct val *rhs = PQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_PQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_PQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static enum test_result
 pq_test_insert_shuffle(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = PQ_ENTRY(pq_front(&pq), struct val, elem);
+    struct val const *min = CCC_PQ_OF(ccc_pq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -144,23 +146,23 @@ pq_test_insert_shuffle(void)
 static enum test_result
 pq_test_read_max_min(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
-        pq_push(&pq, &vals[i].elem);
-        CHECK(pq_validate(&pq), true, bool, "%d");
-        CHECK(pq_size(&pq), i + 1, size_t, "%zu");
+        ccc_pq_push(&pq, &vals[i].elem);
+        CHECK(ccc_pq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_pq_size(&pq), i + 1, size_t, "%zu");
     }
-    CHECK(pq_size(&pq), 10ULL, size_t, "%zu");
-    struct val const *min = PQ_ENTRY(pq_front(&pq), struct val, elem);
+    CHECK(ccc_pq_size(&pq), 10ULL, size_t, "%zu");
+    struct val const *min = CCC_PQ_OF(ccc_pq_front(&pq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
 
 static enum test_result
-insert_shuffled(pqueue *pq, struct val vals[], size_t const size,
+insert_shuffled(ccc_pqueue *pq, struct val vals[], size_t const size,
                 int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -172,35 +174,35 @@ insert_shuffled(pqueue *pq, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        pq_push(pq, &vals[shuffled_index].elem);
-        CHECK(pq_size(pq), i + 1, size_t, "%zu");
-        CHECK(pq_validate(pq), true, bool, "%d");
+        ccc_pq_push(pq, &vals[shuffled_index].elem);
+        CHECK(ccc_pq_size(pq), i + 1, size_t, "%zu");
+        CHECK(ccc_pq_validate(pq), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(pq_size(pq), size, size_t, "%zu");
+    CHECK(ccc_pq_size(pq), size, size_t, "%zu");
     return PASS;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 static size_t
-inorder_fill(int vals[], size_t size, pqueue *ppq)
+inorder_fill(int vals[], size_t size, ccc_pqueue *ppq)
 {
-    if (pq_size(ppq) != size)
+    if (ccc_pq_size(ppq) != size)
     {
         return 0;
     }
     size_t i = 0;
-    pqueue copy = PQ_INIT(pq_order(ppq), val_cmp, NULL);
-    while (!pq_empty(ppq) && i < size)
+    ccc_pqueue copy = CCC_PQ_INIT(ccc_pq_order(ppq), val_cmp, NULL);
+    while (!ccc_pq_empty(ppq) && i < size)
     {
-        pq_elem *const front = pq_pop(ppq);
-        CHECK(pq_validate(ppq), true, bool, "%d");
-        vals[i++] = PQ_ENTRY(front, struct val, elem)->val;
-        pq_push(&copy, front);
+        ccc_pq_elem *const front = ccc_pq_pop(ppq);
+        CHECK(ccc_pq_validate(ppq), true, bool, "%d");
+        vals[i++] = CCC_PQ_OF(front, struct val, elem)->val;
+        ccc_pq_push(&copy, front);
     }
-    while (!pq_empty(&copy))
+    while (!ccc_pq_empty(&copy))
     {
-        pq_push(ppq, pq_pop(&copy));
+        ccc_pq_push(ppq, ccc_pq_pop(&copy));
     }
     return i;
 }

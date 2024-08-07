@@ -11,7 +11,7 @@ struct val
 {
     int id;
     int val;
-    pq_elem elem;
+    ccc_pq_elem elem;
 };
 
 static enum test_result pq_test_insert_remove_four_dups(void);
@@ -21,9 +21,11 @@ static enum test_result pq_test_pop_min(void);
 static enum test_result pq_test_delete_prime_shuffle_duplicates(void);
 static enum test_result pq_test_prime_shuffle(void);
 static enum test_result pq_test_weak_srand(void);
-static enum test_result insert_shuffled(pqueue *, struct val[], size_t, int);
-static size_t inorder_fill(int[], size_t, pqueue *);
-static pq_threeway_cmp val_cmp(pq_elem const *, pq_elem const *, void *);
+static enum test_result insert_shuffled(ccc_pqueue *, struct val[], size_t,
+                                        int);
+static size_t inorder_fill(int[], size_t, ccc_pqueue *);
+static ccc_pq_threeway_cmp val_cmp(ccc_pq_elem const *, ccc_pq_elem const *,
+                                   void *);
 
 #define NUM_TESTS (size_t)9
 test_fn const all_tests[NUM_TESTS] = {
@@ -54,37 +56,37 @@ main()
 static enum test_result
 pq_test_insert_remove_four_dups(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        pq_push(&ppq, &three_vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        ccc_pq_push(&ppq, &three_vals[i].elem);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         size_t const size = i + 1;
-        CHECK(pq_size(&ppq), size, size_t, "%zu");
+        CHECK(ccc_pq_size(&ppq), size, size_t, "%zu");
     }
-    CHECK(pq_size(&ppq), 4, size_t, "%zu");
+    CHECK(ccc_pq_size(&ppq), 4, size_t, "%zu");
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        pq_pop(&ppq);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        ccc_pq_pop(&ppq);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
-    CHECK(pq_size(&ppq), 0ULL, size_t, "%zu");
+    CHECK(ccc_pq_size(&ppq), 0ULL, size_t, "%zu");
     return PASS;
 }
 
 static enum test_result
 pq_test_insert_erase_shuffled(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = PQ_ENTRY(pq_front(&ppq), struct val, elem);
+    struct val const *min = CCC_PQ_OF(ccc_pq_front(&ppq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &ppq), size, size_t, "%zu");
@@ -95,23 +97,23 @@ pq_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)pq_erase(&ppq, &vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        (void)ccc_pq_erase(&ppq, &vals[i].elem);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
-    CHECK(pq_size(&ppq), 0ULL, size_t, "%zu");
+    CHECK(ccc_pq_size(&ppq), 0ULL, size_t, "%zu");
     return PASS;
 }
 
 static enum test_result
 pq_test_pop_max(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = PQ_ENTRY(pq_front(&ppq), struct val, elem);
+    struct val const *min = CCC_PQ_OF(ccc_pq_front(&ppq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &ppq), size, size_t, "%zu");
@@ -122,23 +124,23 @@ pq_test_pop_max(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *front = PQ_ENTRY(pq_pop(&ppq), struct val, elem);
+        struct val const *front = CCC_PQ_OF(ccc_pq_pop(&ppq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
-    CHECK(pq_empty(&ppq), true, bool, "%d");
+    CHECK(ccc_pq_empty(&ppq), true, bool, "%d");
     return PASS;
 }
 
 static enum test_result
 pq_test_pop_min(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = PQ_ENTRY(pq_front(&ppq), struct val, elem);
+    struct val const *min = CCC_PQ_OF(ccc_pq_front(&ppq), struct val, elem);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &ppq), size, size_t, "%zu");
@@ -149,17 +151,17 @@ pq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *front = PQ_ENTRY(pq_pop(&ppq), struct val, elem);
+        struct val const *front = CCC_PQ_OF(ccc_pq_pop(&ppq), struct val, elem);
         CHECK(front->val, vals[i].val, int, "%d");
     }
-    CHECK(pq_empty(&ppq), true, bool, "%d");
+    CHECK(ccc_pq_empty(&ppq), true, bool, "%d");
     return PASS;
 }
 
 static enum test_result
 pq_test_delete_prime_shuffle_duplicates(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -170,10 +172,10 @@ pq_test_delete_prime_shuffle_duplicates(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        pq_push(&ppq, &vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        ccc_pq_push(&ppq, &vals[i].elem);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         size_t const s = i + 1;
-        CHECK(pq_size(&ppq), s, size_t, "%zu");
+        CHECK(ccc_pq_size(&ppq), s, size_t, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -182,10 +184,10 @@ pq_test_delete_prime_shuffle_duplicates(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)pq_erase(&ppq, &vals[shuffled_index].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        (void)ccc_pq_erase(&ppq, &vals[shuffled_index].elem);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         --cur_size;
-        CHECK(pq_size(&ppq), cur_size, size_t, "%zu");
+        CHECK(ccc_pq_size(&ppq), cur_size, size_t, "%zu");
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
@@ -195,7 +197,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
 static enum test_result
 pq_test_prime_shuffle(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -207,8 +209,8 @@ pq_test_prime_shuffle(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        pq_push(&ppq, &vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        ccc_pq_push(&ppq, &vals[i].elem);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* Now we go through and free all the elements in order but
@@ -216,10 +218,10 @@ pq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(pq_erase(&ppq, &vals[i].elem) != NULL, true, bool, "%d");
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        CHECK(ccc_pq_erase(&ppq, &vals[i].elem) != NULL, true, bool, "%d");
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         --cur_size;
-        CHECK(pq_size(&ppq), cur_size, size_t, "%zu");
+        CHECK(ccc_pq_size(&ppq), cur_size, size_t, "%zu");
     }
     return PASS;
 }
@@ -227,7 +229,7 @@ pq_test_prime_shuffle(void)
 static enum test_result
 pq_test_weak_srand(void)
 {
-    pqueue ppq = PQ_INIT(PQLES, val_cmp, NULL);
+    ccc_pqueue ppq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -237,20 +239,20 @@ pq_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        pq_push(&ppq, &vals[i].elem);
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        ccc_pq_push(&ppq, &vals[i].elem);
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
     for (int i = 0; i < num_heap_elems; ++i)
     {
-        CHECK(pq_erase(&ppq, &vals[i].elem) != NULL, true, bool, "%d");
-        CHECK(pq_validate(&ppq), true, bool, "%d");
+        CHECK(ccc_pq_erase(&ppq, &vals[i].elem) != NULL, true, bool, "%d");
+        CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
-    CHECK(pq_empty(&ppq), true, bool, "%d");
+    CHECK(ccc_pq_empty(&ppq), true, bool, "%d");
     return PASS;
 }
 
 static enum test_result
-insert_shuffled(pqueue *ppq, struct val vals[], size_t const size,
+insert_shuffled(ccc_pqueue *ppq, struct val vals[], size_t const size,
                 int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -262,47 +264,47 @@ insert_shuffled(pqueue *ppq, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        pq_push(ppq, &vals[shuffled_index].elem);
-        CHECK(pq_size(ppq), i + 1, size_t, "%zu");
-        CHECK(pq_validate(ppq), true, bool, "%d");
+        ccc_pq_push(ppq, &vals[shuffled_index].elem);
+        CHECK(ccc_pq_size(ppq), i + 1, size_t, "%zu");
+        CHECK(ccc_pq_validate(ppq), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(pq_size(ppq), size, size_t, "%zu");
+    CHECK(ccc_pq_size(ppq), size, size_t, "%zu");
     return PASS;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 static size_t
-inorder_fill(int vals[], size_t size, pqueue *ppq)
+inorder_fill(int vals[], size_t size, ccc_pqueue *ppq)
 {
-    if (pq_size(ppq) != size)
+    if (ccc_pq_size(ppq) != size)
     {
         return 0;
     }
     size_t i = 0;
-    pqueue copy = PQ_INIT(pq_order(ppq), val_cmp, NULL);
-    while (!pq_empty(ppq))
+    ccc_pqueue copy = CCC_PQ_INIT(ccc_pq_order(ppq), val_cmp, NULL);
+    while (!ccc_pq_empty(ppq))
     {
-        pq_elem *const front = pq_pop(ppq);
-        CHECK(pq_validate(ppq), true, bool, "%d");
-        CHECK(pq_validate(&copy), true, bool, "%d");
-        vals[i++] = PQ_ENTRY(front, struct val, elem)->val;
-        pq_push(&copy, front);
+        ccc_pq_elem *const front = ccc_pq_pop(ppq);
+        CHECK(ccc_pq_validate(ppq), true, bool, "%d");
+        CHECK(ccc_pq_validate(&copy), true, bool, "%d");
+        vals[i++] = CCC_PQ_OF(front, struct val, elem)->val;
+        ccc_pq_push(&copy, front);
     }
-    while (!pq_empty(&copy))
+    while (!ccc_pq_empty(&copy))
     {
-        pq_push(ppq, pq_pop(&copy));
-        CHECK(pq_validate(ppq), true, bool, "%d");
-        CHECK(pq_validate(&copy), true, bool, "%d");
+        ccc_pq_push(ppq, ccc_pq_pop(&copy));
+        CHECK(ccc_pq_validate(ppq), true, bool, "%d");
+        CHECK(ccc_pq_validate(&copy), true, bool, "%d");
     }
     return i;
 }
 
-static pq_threeway_cmp
-val_cmp(pq_elem const *a, pq_elem const *b, void *aux)
+static ccc_pq_threeway_cmp
+val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = PQ_ENTRY(a, struct val, elem);
-    struct val *rhs = PQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_PQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_PQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
