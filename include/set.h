@@ -91,8 +91,8 @@
       val_cmp(const ccc_set_elem *a, const ccc_set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = CCC_SET_IN(a, struct val, elem);
-          struct val *rhs = CCC_SET_IN(b, struct val, elem);
+          struct val *lhs = CCC_SET_OF(a, struct val, elem);
+          struct val *rhs = CCC_SET_OF(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -126,8 +126,8 @@
       val_cmp(const ccc_set_elem *a, const ccc_set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = CCC_SET_IN(a, struct val, elem);
-          struct val *rhs = CCC_SET_IN(b, struct val, elem);
+          struct val *lhs = CCC_SET_OF(a, struct val, elem);
+          struct val *rhs = CCC_SET_OF(b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -218,8 +218,8 @@ typedef enum ccc_set_threeway_cmp
       val_cmp(const ccc_set_elem *a, const ccc_set_elem *b, void *aux)
       {
           (void)aux;
-          struct val *lhs = CCC_SET_IN (a, struct val, elem);
-          struct val *rhs = CCC_SET_IN (b, struct val, elem);
+          struct val *lhs = CCC_SET_OF (a, struct val, elem);
+          struct val *rhs = CCC_SET_OF (b, struct val, elem);
           return (lhs->val > rhs->val) - (lhs->val < rhs->val);
       }
 
@@ -283,7 +283,7 @@ typedef struct ccc_set_rrange
 
       void print_my_val(ccc_set_elem *elem)
       {
-         struct val const *v = CCC_SET_IN(elem, struct val, elem);
+         struct val const *v = CCC_SET_OF(elem, struct val, elem);
          printf("{%d}", v->val);
       }
 
@@ -292,13 +292,13 @@ typedef struct ccc_set_rrange
 typedef void ccc_set_print_fn(ccc_set_elem const *);
 
 /* NOLINTNEXTLINE */
-#define CCC_SET_IN(CCC_SET_ELEM, STRUCT, MEMBER)                               \
+#define CCC_SET_OF(CCC_SET_ELEM, STRUCT, MEMBER)                               \
     ((STRUCT *)((uint8_t *)&(CCC_SET_ELEM)->n                                  \
                 - offsetof(STRUCT, MEMBER.n))) /* NOLINT */
 
 #define CCC_SET_INIT(SET_NAME, CMP, AUX)                                       \
     {                                                                          \
-        .t = TREE_INIT(SET_NAME, CMP, AUX)                                     \
+        .t = CCC_TREE_INIT(SET_NAME, CMP, AUX)                                 \
     }
 
 /* Calls the destructor for each element while emptying the set.
@@ -478,7 +478,7 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
            i != set_end_range(&range);
            i = set_next(&s, i))
       {
-          const int cur_val = CCC_SET_IN(i, struct val, elem)->val;
+          const int cur_val = CCC_SET_OF(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 
@@ -506,7 +506,7 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
            i != set_end_rrange(&range);
            i = set_rnext(&s, i))
       {
-          const int cur_val = CCC_SET_IN(i, struct val, elem)->val;
+          const int cur_val = CCC_SET_OF(i, struct val, elem)->val;
           printf("%d\n", cur_val->val);
       }
 

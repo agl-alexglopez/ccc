@@ -68,7 +68,7 @@ depq_test_insert_remove_four_dups(void)
     {
         three_vals[i].val = 0;
         depq_push(&pq, &three_vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         size_t const size = i + 1;
         CHECK(depq_size(&pq), size, size_t, "%zu");
     }
@@ -77,7 +77,7 @@ depq_test_insert_remove_four_dups(void)
     {
         three_vals[i].val = 0;
         depq_pop_max(&pq);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     CHECK(depq_size(&pq), 0ULL, size_t, "%zu");
     return PASS;
@@ -106,7 +106,7 @@ depq_test_insert_erase_shuffled(void)
     for (size_t i = 0; i < size; ++i)
     {
         (void)depq_erase(&pq, &vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     CHECK(depq_size(&pq), 0ULL, size_t, "%zu");
     return PASS;
@@ -194,7 +194,7 @@ depq_test_max_round_robin(void)
         }
         vals[i].id = i;
         depq_push(&depq, &vals[i].elem);
-        CHECK(validate_tree(&depq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&depq.t), true, bool, "%d");
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
@@ -231,7 +231,7 @@ depq_test_min_round_robin(void)
         }
         vals[i].id = i;
         depq_push(&depq, &vals[i].elem);
-        CHECK(validate_tree(&depq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&depq.t), true, bool, "%d");
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
@@ -261,7 +261,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
         vals[i].val = shuffled_index;
         vals[i].id = i;
         depq_push(&pq, &vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         size_t const s = i + 1;
         CHECK(depq_size(&pq), s, size_t, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
@@ -273,7 +273,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
     for (int i = 0; i < size; ++i)
     {
         (void)depq_erase(&pq, &vals[shuffled_index].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         --cur_size;
         CHECK(depq_size(&pq), cur_size, size_t, "%zu");
         /* Shuffle normally here so we only remove each elem once. */
@@ -298,7 +298,7 @@ depq_test_prime_shuffle(void)
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
         depq_push(&pq, &vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
@@ -309,7 +309,7 @@ depq_test_prime_shuffle(void)
     for (int i = 0; i < size; ++i)
     {
         CHECK(depq_erase(&pq, &vals[i].elem) != NULL, true, bool, "%d");
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         --cur_size;
         CHECK(depq_size(&pq), cur_size, size_t, "%zu");
     }
@@ -330,12 +330,12 @@ depq_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         depq_push(&pq, &vals[i].elem);
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CHECK(depq_erase(&pq, &vals[i].elem) != NULL, true, bool, "%d");
-        CHECK(validate_tree(&pq.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     CHECK(depq_empty(&pq), true, bool, "%d");
     return PASS;
@@ -356,7 +356,7 @@ insert_shuffled(struct depqueue *pq, struct val vals[], size_t const size,
         vals[shuffled_index].val = (int)shuffled_index;
         depq_push(pq, &vals[shuffled_index].elem);
         CHECK(depq_size(pq), i + 1, size_t, "%zu");
-        CHECK(validate_tree(&pq->t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&pq->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(depq_size(pq), size, size_t, "%zu");

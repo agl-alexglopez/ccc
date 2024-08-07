@@ -68,7 +68,7 @@ set_test_prime_shuffle(void)
         {
             repeats[i] = true;
         }
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
@@ -78,7 +78,7 @@ set_test_prime_shuffle(void)
     {
         ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
         CHECK(elem != ccc_set_end(&s) || !repeats[i], true, bool, "%d");
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     return PASS;
 }
@@ -101,7 +101,7 @@ set_test_insert_erase_shuffled(void)
     for (size_t i = 0; i < size; ++i)
     {
         (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
     return PASS;
@@ -121,12 +121,12 @@ set_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(validate_tree(&s.t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
     return PASS;
@@ -147,7 +147,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_set_insert(s, &vals[shuffled_index].elem);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
-        CHECK(validate_tree(&s->t), true, bool, "%d");
+        CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_set_size(s), size, size_t, "%zu");
@@ -165,7 +165,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
     for (ccc_set_elem *e = ccc_set_begin(s); e != ccc_set_end(s);
          e = ccc_set_next(s, e))
     {
-        vals[i++] = CCC_SET_IN(e, struct val, elem)->val;
+        vals[i++] = CCC_SET_OF(e, struct val, elem)->val;
     }
     return i;
 }
@@ -174,14 +174,14 @@ static ccc_set_threeway_cmp
 val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_IN(a, struct val, elem);
-    struct val *rhs = CCC_SET_IN(b, struct val, elem);
+    struct val *lhs = CCC_SET_OF(a, struct val, elem);
+    struct val *rhs = CCC_SET_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 set_printer_fn(ccc_set_elem const *const e) // NOLINT
 {
-    struct val const *const v = CCC_SET_IN(e, struct val, elem);
+    struct val const *const v = CCC_SET_OF(e, struct val, elem);
     printf("{id:%d,val:%d}", v->id, v->val);
 }

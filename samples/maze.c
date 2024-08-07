@@ -257,7 +257,7 @@ animate_maze(struct maze *maze)
             }
             else
             {
-                cur_weight = CCC_SET_IN(found, struct point_cost, elem)->cost;
+                cur_weight = CCC_SET_OF(found, struct point_cost, elem)->cost;
             }
             if (cur_weight < min_weight)
             {
@@ -490,8 +490,8 @@ static ccc_set_threeway_cmp
 cmp_points(ccc_set_elem const *key, ccc_set_elem const *n, void *aux)
 {
     (void)aux;
-    struct point_cost const *const a = CCC_SET_IN(key, struct point_cost, elem);
-    struct point_cost const *const b = CCC_SET_IN(n, struct point_cost, elem);
+    struct point_cost const *const a = CCC_SET_OF(key, struct point_cost, elem);
+    struct point_cost const *const b = CCC_SET_OF(n, struct point_cost, elem);
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
         return SETEQL;
@@ -506,7 +506,7 @@ cmp_points(ccc_set_elem const *key, ccc_set_elem const *n, void *aux)
 static void
 set_destructor(ccc_set_elem *e)
 {
-    struct point_cost *pc = CCC_SET_IN(e, struct point_cost, elem);
+    struct point_cost *pc = CCC_SET_OF(e, struct point_cost, elem);
     free(pc);
 }
 
