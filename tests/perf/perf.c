@@ -314,8 +314,8 @@ test_pop_intermittent_push(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *v = CCC_DEPQ_OF(ccc_depq_pop_min(&depq), struct val,
-                                        deccc_pq_elem);
+            struct val *v = CCC_DEPQ_OF(struct val, deccc_pq_elem,
+                                        ccc_depq_pop_min(&depq));
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
@@ -332,7 +332,7 @@ test_pop_intermittent_push(void)
         for (size_t i = 0; i < n; ++i)
         {
             struct val *v
-                = CCC_FPQ_OF(ccc_fpq_pop(&hpq), struct val, hccc_pq_elem);
+                = CCC_FPQ_OF(struct val, hccc_pq_elem, ccc_fpq_pop(&hpq));
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
@@ -348,7 +348,7 @@ test_pop_intermittent_push(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *v = CCC_PQ_OF(ccc_pq_pop(&pq), struct val, ccc_pq_elem);
+            struct val *v = CCC_PQ_OF(struct val, ccc_pq_elem, ccc_pq_pop(&pq));
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
@@ -455,8 +455,8 @@ depq_val_cmp(ccc_depq_elem const *const a, ccc_depq_elem const *const b,
              void *const aux)
 {
     (void)aux;
-    struct val const *const x = CCC_DEPQ_OF(a, struct val, deccc_pq_elem);
-    struct val const *const y = CCC_DEPQ_OF(b, struct val, deccc_pq_elem);
+    struct val const *const x = CCC_DEPQ_OF(struct val, deccc_pq_elem, a);
+    struct val const *const y = CCC_DEPQ_OF(struct val, deccc_pq_elem, b);
     if (x->val < y->val)
     {
         return CCC_DPQ_LES;
@@ -472,8 +472,8 @@ static ccc_fpq_threeway_cmp
 fpq_val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *const aux)
 {
     (void)aux;
-    struct val const *const x = CCC_FPQ_OF(a, struct val, hccc_pq_elem);
-    struct val const *const y = CCC_FPQ_OF(b, struct val, hccc_pq_elem);
+    struct val const *const x = CCC_FPQ_OF(struct val, hccc_pq_elem, a);
+    struct val const *const y = CCC_FPQ_OF(struct val, hccc_pq_elem, b);
     if (x->val < y->val)
     {
         return CCC_FPQ_LES;
@@ -488,21 +488,21 @@ fpq_val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *const aux)
 static void
 depq_update_val(ccc_depq_elem *e, void *aux)
 {
-    struct val *v = CCC_DEPQ_OF(e, struct val, deccc_pq_elem);
+    struct val *v = CCC_DEPQ_OF(struct val, deccc_pq_elem, e);
     v->val = *((int *)aux);
 }
 
 static void
 fpq_update_val(ccc_fpq_elem *e, void *aux)
 {
-    struct val *v = CCC_FPQ_OF(e, struct val, hccc_pq_elem);
+    struct val *v = CCC_FPQ_OF(struct val, hccc_pq_elem, e);
     v->val = *((int *)aux);
 }
 
 static void
 pq_update_val(ccc_pq_elem *e, void *aux)
 {
-    struct val *v = CCC_PQ_OF(e, struct val, ccc_pq_elem);
+    struct val *v = CCC_PQ_OF(struct val, ccc_pq_elem, e);
     v->val = *((int *)aux);
 }
 
@@ -522,8 +522,8 @@ static ccc_pq_threeway_cmp
 pq_val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *const b, void *const aux)
 {
     (void)aux;
-    struct val const *const x = CCC_PQ_OF(a, struct val, ccc_pq_elem);
-    struct val const *const y = CCC_PQ_OF(b, struct val, ccc_pq_elem);
+    struct val const *const x = CCC_PQ_OF(struct val, ccc_pq_elem, a);
+    struct val const *const y = CCC_PQ_OF(struct val, ccc_pq_elem, b);
     if (x->val < y->val)
     {
         return CCC_PQ_LES;

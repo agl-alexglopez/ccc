@@ -55,7 +55,7 @@ depq_test_insert_one(void)
     single.val = 0;
     ccc_depq_push(&pq, &single.elem);
     CHECK(ccc_depq_empty(&pq), false, bool, "%d");
-    CHECK(CCC_DEPQ_OF(ccc_depq_root(&pq), struct val, elem)->val == single.val,
+    CHECK(CCC_DEPQ_OF(struct val, elem, ccc_depq_root(&pq))->val == single.val,
           true, bool, "%d");
     return PASS;
 }
@@ -95,7 +95,7 @@ depq_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         struct val const *get
-            = CCC_DEPQ_OF(&tester_clone[i].elem, struct val, elem);
+            = CCC_DEPQ_OF(struct val, elem, &tester_clone[i].elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_depq_size(&pq), 10ULL, size_t, "%zu");
@@ -122,8 +122,8 @@ static ccc_deccc_pq_threeway_cmp
 val_cmp(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_DEPQ_OF(a, struct val, elem);
-    struct val *rhs = CCC_DEPQ_OF(b, struct val, elem);
+    struct val *lhs = CCC_DEPQ_OF(struct val, elem, a);
+    struct val *rhs = CCC_DEPQ_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -138,10 +138,10 @@ depq_test_insert_shuffle(void)
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
     struct val const *max
-        = CCC_DEPQ_OF(ccc_depq_const_max(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
     CHECK(max->val, size - 1, int, "%d");
     struct val const *min
-        = CCC_DEPQ_OF(ccc_depq_const_min(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -166,10 +166,10 @@ depq_test_read_max_min(void)
     }
     CHECK(ccc_depq_size(&pq), 10ULL, size_t, "%zu");
     struct val const *max
-        = CCC_DEPQ_OF(ccc_depq_const_max(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
     CHECK(max->val, 9, int, "%d");
     struct val const *min
-        = CCC_DEPQ_OF(ccc_depq_const_min(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -208,7 +208,7 @@ inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
     for (ccc_depq_elem *e = ccc_depq_rbegin(pq); e != ccc_depq_end(pq);
          e = ccc_depq_rnext(pq, e))
     {
-        vals[i++] = CCC_DEPQ_OF(e, struct val, elem)->val;
+        vals[i++] = CCC_DEPQ_OF(struct val, elem, e)->val;
     }
     return i;
 }

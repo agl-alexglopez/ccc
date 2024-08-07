@@ -45,7 +45,7 @@ static ccc_pq_threeway_cmp
 val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_PQ_OF(a, struct val, elem);
-    struct val *rhs = CCC_PQ_OF(b, struct val, elem);
+    struct val *lhs = CCC_PQ_OF(struct val, elem, a);
+    struct val *rhs = CCC_PQ_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

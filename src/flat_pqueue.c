@@ -46,7 +46,8 @@ ccc_fpq_init(ccc_flat_pqueue *const hpq, ccc_fpq_threeway_cmp fpq_ordering,
 {
     if (fpq_ordering == CCC_FPQ_EQL)
     {
-        (void)fprintf(stderr, "heap should be ordered CCC_FPQ_LES or CCC_FPQ_GRT.\n");
+        (void)fprintf(stderr,
+                      "heap should be ordered CCC_FPQ_LES or CCC_FPQ_GRT.\n");
     }
     hpq->order = fpq_ordering;
     hpq->sz = 0;

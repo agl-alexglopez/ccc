@@ -94,7 +94,7 @@ fpq_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         struct val const *get
-            = CCC_FPQ_OF(&tester_clone[i].elem, struct val, elem);
+            = CCC_FPQ_OF(struct val, elem, &tester_clone[i].elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_fpq_size(&pq), 10ULL, size_t, "%zu");
@@ -122,8 +122,8 @@ static ccc_fpq_threeway_cmp
 val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_FPQ_OF(a, struct val, elem);
-    struct val *rhs = CCC_FPQ_OF(b, struct val, elem);
+    struct val *lhs = CCC_FPQ_OF(struct val, elem, a);
+    struct val *rhs = CCC_FPQ_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -138,7 +138,7 @@ fpq_test_insert_shuffle(void)
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = CCC_FPQ_OF(ccc_fpq_front(&pq), struct val, elem);
+    struct val const *min = CCC_FPQ_OF(struct val, elem, ccc_fpq_front(&pq));
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -163,7 +163,7 @@ fpq_test_read_max_min(void)
         CHECK(ccc_fpq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(ccc_fpq_size(&pq), 10ULL, size_t, "%zu");
-    struct val const *min = CCC_FPQ_OF(ccc_fpq_front(&pq), struct val, elem);
+    struct val const *min = CCC_FPQ_OF(struct val, elem, ccc_fpq_front(&pq));
     CHECK(min->val, 0, int, "%d");
     return PASS;
 }
@@ -204,7 +204,7 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *hpq)
     while (!ccc_fpq_empty(hpq) && i < size)
     {
         ccc_fpq_elem *const front = ccc_fpq_pop(hpq);
-        vals[i++] = CCC_FPQ_OF(front, struct val, elem)->val;
+        vals[i++] = CCC_FPQ_OF(struct val, elem, front)->val;
         ccc_fpq_push(&copy, front);
     }
     while (!ccc_fpq_empty(&copy))

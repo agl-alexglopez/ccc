@@ -134,7 +134,7 @@ typedef struct ccc_depq_rrange
    The pq element should be passed by address not by value and the
    struct and member macros represent the type used and the member
    in the struct of the pq element. NOLINTNEXTLINE */
-#define CCC_DEPQ_OF(pq_elem, struct, member)                                   \
+#define CCC_DEPQ_OF(struct, member, pq_elem)                                   \
     ((struct *)((uint8_t *)&(pq_elem)->n                                       \
                 - offsetof(struct, member.n))) /* NOLINT */
 

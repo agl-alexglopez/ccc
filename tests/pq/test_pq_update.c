@@ -94,7 +94,7 @@ pq_test_priority_removal(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         ccc_pq_elem *i = &vals[val].elem;
-        struct val *cur = CCC_PQ_OF(i, struct val, elem);
+        struct val *cur = CCC_PQ_OF(struct val, elem, i);
         if (cur->val > limit)
         {
             (void)ccc_pq_erase(&pq, i);
@@ -125,7 +125,7 @@ pq_test_priority_update(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         ccc_pq_elem *i = &vals[val].elem;
-        struct val *cur = CCC_PQ_OF(i, struct val, elem);
+        struct val *cur = CCC_PQ_OF(struct val, elem, i);
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
@@ -159,7 +159,7 @@ pq_test_priority_increase(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         ccc_pq_elem *i = &vals[val].elem;
-        struct val *cur = CCC_PQ_OF(i, struct val, elem);
+        struct val *cur = CCC_PQ_OF(struct val, elem, i);
         int inc = limit * 2;
         int dec = cur->val / 2;
         if (cur->val > limit)
@@ -198,7 +198,7 @@ pq_test_priority_decrease(void)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         ccc_pq_elem *i = &vals[val].elem;
-        struct val *cur = CCC_PQ_OF(i, struct val, elem);
+        struct val *cur = CCC_PQ_OF(struct val, elem, i);
         int inc = limit * 2;
         int dec = cur->val / 2;
         if (cur->val < limit)
@@ -220,14 +220,14 @@ static ccc_pq_threeway_cmp
 val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_PQ_OF(a, struct val, elem);
-    struct val *rhs = CCC_PQ_OF(b, struct val, elem);
+    struct val *lhs = CCC_PQ_OF(struct val, elem, a);
+    struct val *rhs = CCC_PQ_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 val_update(ccc_pq_elem *a, void *aux)
 {
-    struct val *old = CCC_PQ_OF(a, struct val, elem);
+    struct val *old = CCC_PQ_OF(struct val, elem, a);
     old->val = *(int *)aux;
 }

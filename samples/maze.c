@@ -226,7 +226,7 @@ animate_maze(struct maze *maze)
     while (!ccc_depq_empty(&cells))
     {
         struct priority_cell const *const cur
-            = CCC_DEPQ_OF(ccc_depq_max(&cells), struct priority_cell, elem);
+            = CCC_DEPQ_OF(struct priority_cell, elem, ccc_depq_max(&cells));
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
@@ -279,8 +279,8 @@ animate_maze(struct maze *maze)
         }
         else
         {
-            struct priority_cell *pc = CCC_DEPQ_OF(ccc_depq_pop_max(&cells),
-                                                   struct priority_cell, elem);
+            struct priority_cell *pc = CCC_DEPQ_OF(struct priority_cell, elem,
+                                                   ccc_depq_pop_max(&cells));
             free(pc);
         }
     }
@@ -480,9 +480,9 @@ cmp_priority_cells(ccc_depq_elem const *const key, ccc_depq_elem const *n,
 {
     (void)aux;
     struct priority_cell const *const a
-        = CCC_DEPQ_OF(key, struct priority_cell, elem);
+        = CCC_DEPQ_OF(struct priority_cell, elem, key);
     struct priority_cell const *const b
-        = CCC_DEPQ_OF(n, struct priority_cell, elem);
+        = CCC_DEPQ_OF(struct priority_cell, elem, n);
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
