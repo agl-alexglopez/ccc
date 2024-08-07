@@ -5,14 +5,14 @@ include(etc/scanners.cmake)
 
 find_package(str_view)
 
-include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/ccc")
+include_directories("${PROJECT_SOURCE_DIR}/ccc_src")
 include_directories("${PROJECT_SOURCE_DIR}/lib")
 include_directories("${PROJECT_SOURCE_DIR}/samples")
 include_directories("${PROJECT_SOURCE_DIR}/tests")
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/ccc")
+add_subdirectory("${PROJECT_SOURCE_DIR}/ccc_src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib")
 add_subdirectory("${PROJECT_SOURCE_DIR}/samples")
 add_subdirectory("${PROJECT_SOURCE_DIR}/tests")
