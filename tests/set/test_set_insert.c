@@ -53,7 +53,7 @@ set_test_insert_one(void)
     single.val = 0;
     CHECK(ccc_set_insert(&s, &single.elem), true, bool, "%d");
     CHECK(ccc_set_empty(&s), false, bool, "%d");
-    CHECK(CCC_SET_OF(ccc_set_root(&s), struct val, elem)->val == single.val,
+    CHECK(CCC_SET_OF(struct val, elem, ccc_set_root(&s))->val == single.val,
           true, bool, "%d");
     return PASS;
 }
@@ -92,7 +92,7 @@ set_test_struct_getter(void)
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
         struct val const *get
-            = CCC_SET_OF(&tester_clone[i].elem, struct val, elem);
+            = CCC_SET_OF(struct val, elem, &tester_clone[i].elem);
         CHECK(get->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_set_size(&s), 10ULL, size_t, "%zu");
@@ -151,7 +151,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
     for (ccc_set_elem *e = ccc_set_begin(s); e != ccc_set_end(s);
          e = ccc_set_next(s, e))
     {
-        vals[i++] = CCC_SET_OF(e, struct val, elem)->val;
+        vals[i++] = CCC_SET_OF(struct val, elem, e)->val;
     }
     return i;
 }
@@ -160,7 +160,7 @@ static ccc_set_threeway_cmp
 val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_OF(a, struct val, elem);
-    struct val *rhs = CCC_SET_OF(b, struct val, elem);
+    struct val *lhs = CCC_SET_OF(struct val, elem, a);
+    struct val *rhs = CCC_SET_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
