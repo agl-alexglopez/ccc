@@ -71,7 +71,7 @@ typedef struct ccc_pqueue
    user defined struct in which the ccc_pq_elem is embedded and the name of the
    field in said struct where the  ccc_pq_elem is embedded, obtains the wrapping
    struct. */
-#define CCC_PQ_OF(pq_elem, struct, member)                                     \
+#define CCC_PQ_OF(struct, member, pq_elem)                                     \
     ((struct *)((uint8_t *)&(pq_elem)->parent                                  \
                 - offsetof(struct, member.parent))) /* NOLINT */
 
@@ -82,9 +82,10 @@ typedef struct ccc_pqueue
      ccc_pqueue my_pq = CCC_PQ_INIT(CCC_PQ_LES, my_cmp_fn, NULL);
    Such initialization must always occur or use of the priority queue is
    undefined. */
-#define CCC_PQ_INIT(ORDER, CMP_FN, AUX)                                        \
+#define CCC_PQ_INIT(pq_order, cmp_fn, aux_data)                                \
     {                                                                          \
-        .root = NULL, .sz = 0, .cmp = (CMP_FN), .order = (ORDER), .aux = (AUX) \
+        .root = NULL, .sz = 0, .cmp = (cmp_fn), .order = (pq_order),           \
+        .aux = (aux_data)                                                      \
     }
 
 /* Obtain a reference to the front of the priority queue. This will be a min

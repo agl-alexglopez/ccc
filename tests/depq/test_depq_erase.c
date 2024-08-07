@@ -93,10 +93,10 @@ depq_test_insert_erase_shuffled(void)
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
     struct val const *max
-        = CCC_DEPQ_OF(ccc_depq_const_max(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
     CHECK(max->val, size - 1, int, "%d");
     struct val const *min
-        = CCC_DEPQ_OF(ccc_depq_const_min(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -124,10 +124,10 @@ depq_test_pop_max(void)
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
     struct val const *max
-        = CCC_DEPQ_OF(ccc_depq_const_max(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
     CHECK(max->val, size - 1, int, "%d");
     struct val const *min
-        = CCC_DEPQ_OF(ccc_depq_const_min(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -139,7 +139,7 @@ depq_test_pop_max(void)
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
         struct val const *front
-            = CCC_DEPQ_OF(ccc_depq_pop_max(&pq), struct val, elem);
+            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_max(&pq));
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_depq_empty(&pq), true, bool, "%d");
@@ -156,10 +156,10 @@ depq_test_pop_min(void)
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
     struct val const *max
-        = CCC_DEPQ_OF(ccc_depq_const_max(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
     CHECK(max->val, size - 1, int, "%d");
     struct val const *min
-        = CCC_DEPQ_OF(ccc_depq_const_min(&pq), struct val, elem);
+        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -171,7 +171,7 @@ depq_test_pop_min(void)
     for (size_t i = 0; i < size; ++i)
     {
         struct val const *front
-            = CCC_DEPQ_OF(ccc_depq_pop_min(&pq), struct val, elem);
+            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_min(&pq));
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_depq_empty(&pq), true, bool, "%d");
@@ -207,7 +207,7 @@ depq_test_max_round_robin(void)
     while (!ccc_depq_empty(&depq))
     {
         struct val const *front
-            = CCC_DEPQ_OF(ccc_depq_pop_max(&depq), struct val, elem);
+            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_max(&depq));
         CHECK(front->id, order[i].id, int, "%d");
         CHECK(front->val, order[i].val, int, "%d");
         ++i;
@@ -244,7 +244,7 @@ depq_test_min_round_robin(void)
     while (!ccc_depq_empty(&depq))
     {
         struct val const *front
-            = CCC_DEPQ_OF(ccc_depq_pop_min(&depq), struct val, elem);
+            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_min(&depq));
         CHECK(front->id, order[i].id, int, "%d");
         CHECK(front->val, order[i].val, int, "%d");
         ++i;
@@ -381,7 +381,7 @@ inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
     for (ccc_depq_elem *e = ccc_depq_rbegin(pq); e != ccc_depq_end(pq);
          e = ccc_depq_rnext(pq, e))
     {
-        vals[i++] = CCC_DEPQ_OF(e, struct val, elem)->val;
+        vals[i++] = CCC_DEPQ_OF(struct val, elem, e)->val;
     }
     return i;
 }
@@ -389,7 +389,7 @@ inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
 static void
 depq_printer_fn(ccc_depq_elem const *const e)
 {
-    struct val const *const v = CCC_DEPQ_OF(e, struct val, elem);
+    struct val const *const v = CCC_DEPQ_OF(struct val, elem, e);
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
@@ -397,7 +397,7 @@ static ccc_deccc_pq_threeway_cmp
 val_cmp(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_DEPQ_OF(a, struct val, elem);
-    struct val *rhs = CCC_DEPQ_OF(b, struct val, elem);
+    struct val *lhs = CCC_DEPQ_OF(struct val, elem, a);
+    struct val *rhs = CCC_DEPQ_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

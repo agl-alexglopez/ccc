@@ -719,7 +719,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     {
         /* PQ entries are popped but the ccc_set will free the memory at
            the end because it always holds a reference to its ccc_pq_elem. */
-        cur = CCC_PQ_OF(ccc_pq_pop(&dist_q), struct dist_point, ccc_pq_elem);
+        cur = CCC_PQ_OF(struct dist_point, ccc_pq_elem, ccc_pq_pop(&dist_q));
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
@@ -734,7 +734,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             /* The seen ccc_set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
             struct dist_point *dist
-                = CCC_PQ_OF(next->ccc_pq_elem, struct dist_point, ccc_pq_elem);
+                = CCC_PQ_OF(struct dist_point, ccc_pq_elem, next->ccc_pq_elem);
             int alt = cur->dist + cur->v->edges[i].cost;
             if (alt < dist->dist)
             {
@@ -752,12 +752,14 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct prev_vertex key = {.v = cur->v};
-        struct prev_vertex *prev = CCC_SET_OF(struct prev_vertex, elem,ccc_set_find(&prev_map, &key.elem));
+        struct prev_vertex *prev = CCC_SET_OF(
+            struct prev_vertex, elem, ccc_set_find(&prev_map, &key.elem));
         while (prev->prev)
         {
             paint_edge(graph, key.v, prev->prev);
             key.v = prev->prev;
-            prev = CCC_SET_OF(struct prev_vertex, elem,ccc_set_find(&prev_map, &key.elem));
+            prev = CCC_SET_OF(struct prev_vertex, elem,
+                              ccc_set_find(&prev_map, &key.elem));
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -1099,9 +1101,9 @@ cmp_pq_dist_points(ccc_pq_elem const *const x, ccc_pq_elem const *const y,
 {
     (void)aux;
     struct dist_point const *const a
-        = CCC_PQ_OF(x, struct dist_point, ccc_pq_elem);
+        = CCC_PQ_OF(struct dist_point, ccc_pq_elem, x);
     struct dist_point const *const b
-        = CCC_PQ_OF(y, struct dist_point, ccc_pq_elem);
+        = CCC_PQ_OF(struct dist_point, ccc_pq_elem, y);
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
@@ -1126,7 +1128,7 @@ cmp_set_prev_vertices(ccc_set_elem const *const x, ccc_set_elem const *const y,
 static void
 pq_update_dist(ccc_pq_elem *e, void *aux)
 {
-    CCC_PQ_OF(e, struct dist_point, ccc_pq_elem)->dist = *((int *)aux);
+    CCC_PQ_OF(struct dist_point, ccc_pq_elem, e)->dist = *((int *)aux);
 }
 
 static void
@@ -1155,7 +1157,7 @@ static void
 set_pq_prev_vertex_dist_point_destructor(ccc_set_elem *const e)
 {
     struct prev_vertex *pv = CCC_SET_OF(struct prev_vertex, elem, e);
-    free(CCC_PQ_OF(pv->ccc_pq_elem, struct dist_point, ccc_pq_elem));
+    free(CCC_PQ_OF(struct dist_point, ccc_pq_elem, pv->ccc_pq_elem));
     free(pv);
 }
 
@@ -1183,7 +1185,8 @@ parse_path_request(struct graph *const g, str_view r)
         {
             struct vertex key = {.name = *c};
             struct vertex *v
-                = CCC_SET_OF(struct vertex, elem, ccc_set_find(&g->adjacency_list, &key.elem) );
+                = CCC_SET_OF(struct vertex, elem,
+                             ccc_set_find(&g->adjacency_list, &key.elem));
             res.src ? (res.dst = v) : (res.src = v);
         }
     }

@@ -1000,7 +1000,8 @@ pop_front_dup(ccc_tree *t, ccc_node *old)
     else
     {
         /* Comparing sizes with the root's parent is undefined. */
-        parent->link[CCC_NODE_GRT == t->cmp(old, parent, NULL)] = tree_replacement;
+        parent->link[CCC_NODE_GRT == t->cmp(old, parent, NULL)]
+            = tree_replacement;
     }
 
     ccc_node *new_list_head = old->parent_or_dups->link[N];
