@@ -278,7 +278,7 @@ typedef struct ccc_set_rrange
       struct val
       {
          int val;
-         pq_elem elem;
+         ccc_pq_elem elem;
       };
 
       void print_my_val(ccc_set_elem *elem)

@@ -8,11 +8,12 @@ struct val
 {
     int id;
     int val;
-    pq_elem elem;
+    ccc_pq_elem elem;
 };
 
 static enum test_result pq_test_empty(void);
-static pq_threeway_cmp val_cmp(pq_elem const *, pq_elem const *, void *);
+static ccc_pq_threeway_cmp val_cmp(ccc_pq_elem const *, ccc_pq_elem const *,
+                                   void *);
 
 #define NUM_TESTS (size_t)1
 test_fn const all_tests[NUM_TESTS] = {pq_test_empty};
@@ -35,16 +36,16 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    pqueue pq = PQ_INIT(PQLES, val_cmp, NULL);
-    CHECK(pq_empty(&pq), true, bool, "%d");
+    ccc_pqueue pq = CCC_PQ_INIT(PQLES, val_cmp, NULL);
+    CHECK(ccc_pq_empty(&pq), true, bool, "%d");
     return PASS;
 }
 
-static pq_threeway_cmp
-val_cmp(pq_elem const *a, pq_elem const *b, void *aux)
+static ccc_pq_threeway_cmp
+val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = PQ_ENTRY(a, struct val, elem);
-    struct val *rhs = PQ_ENTRY(b, struct val, elem);
+    struct val *lhs = CCC_PQ_OF(a, struct val, elem);
+    struct val *rhs = CCC_PQ_OF(b, struct val, elem);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

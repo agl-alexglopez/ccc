@@ -8,12 +8,12 @@ struct val
 {
     int id;
     int val;
-    struct hpq_elem elem;
+    struct hccc_pq_elem elem;
 };
 
 static enum test_result pq_test_empty(void);
-static enum heap_pq_threeway_cmp val_cmp(struct hpq_elem const *,
-                                         struct hpq_elem const *, void *);
+static enum heap_ccc_pq_threeway_cmp
+val_cmp(struct hccc_pq_elem const *, struct hccc_pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)1
 test_fn const all_tests[NUM_TESTS] = {pq_test_empty};
@@ -42,8 +42,8 @@ pq_test_empty(void)
     return PASS;
 }
 
-static enum heap_pq_threeway_cmp
-val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
+static enum heap_ccc_pq_threeway_cmp
+val_cmp(struct hccc_pq_elem const *a, struct hccc_pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);

@@ -9,7 +9,7 @@ struct val
 {
     int id;
     int val;
-    struct hpq_elem elem;
+    struct hccc_pq_elem elem;
 };
 
 static enum test_result hpq_test_insert_one(void);
@@ -21,8 +21,8 @@ static enum test_result hpq_test_read_max_min(void);
 static enum test_result insert_shuffled(struct heap_pqueue *, struct val[],
                                         size_t, int);
 static size_t inorder_fill(int[], size_t, struct heap_pqueue *);
-static enum heap_pq_threeway_cmp val_cmp(struct hpq_elem const *,
-                                         struct hpq_elem const *, void *);
+static enum heap_ccc_pq_threeway_cmp
+val_cmp(struct hccc_pq_elem const *, struct hccc_pq_elem const *, void *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -118,8 +118,8 @@ hpq_test_insert_three_dups(void)
     return PASS;
 }
 
-static enum heap_pq_threeway_cmp
-val_cmp(struct hpq_elem const *a, struct hpq_elem const *b, void *aux)
+static enum heap_ccc_pq_threeway_cmp
+val_cmp(struct hccc_pq_elem const *a, struct hccc_pq_elem const *b, void *aux)
 {
     (void)aux;
     struct val *lhs = HPQ_ENTRY(a, struct val, elem);
@@ -203,7 +203,7 @@ inorder_fill(int vals[], size_t size, struct heap_pqueue *hpq)
     hpq_init(&copy, hpq_order(hpq), val_cmp, NULL);
     while (!hpq_empty(hpq) && i < size)
     {
-        struct hpq_elem *const front = hpq_pop(hpq);
+        struct hccc_pq_elem *const front = hpq_pop(hpq);
         vals[i++] = HPQ_ENTRY(front, struct val, elem)->val;
         hpq_push(&copy, front);
     }
