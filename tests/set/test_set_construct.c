@@ -47,7 +47,7 @@ static ccc_set_threeway_cmp
 val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_OF(a, struct val, elem);
-    struct val *rhs = CCC_SET_OF(b, struct val, elem);
+    struct val *lhs = CCC_SET_OF(struct val, elem, a);
+    struct val *rhs = CCC_SET_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

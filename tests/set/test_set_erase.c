@@ -165,7 +165,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
     for (ccc_set_elem *e = ccc_set_begin(s); e != ccc_set_end(s);
          e = ccc_set_next(s, e))
     {
-        vals[i++] = CCC_SET_OF(e, struct val, elem)->val;
+        vals[i++] = CCC_SET_OF(struct val, elem, e)->val;
     }
     return i;
 }
@@ -174,14 +174,14 @@ static ccc_set_threeway_cmp
 val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_OF(a, struct val, elem);
-    struct val *rhs = CCC_SET_OF(b, struct val, elem);
+    struct val *lhs = CCC_SET_OF(struct val, elem, a);
+    struct val *rhs = CCC_SET_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
 set_printer_fn(ccc_set_elem const *const e) // NOLINT
 {
-    struct val const *const v = CCC_SET_OF(e, struct val, elem);
+    struct val const *const v = CCC_SET_OF(struct val, elem, e);
     printf("{id:%d,val:%d}", v->id, v->val);
 }

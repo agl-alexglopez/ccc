@@ -370,7 +370,7 @@ build_graph(struct graph *const graph)
             quit("Vertex that should be present in the ccc_set is absent.\n",
                  1);
         }
-        struct vertex *const src = CCC_SET_OF(e, struct vertex, elem);
+        struct vertex *const src = CCC_SET_OF(struct vertex, elem, e);
         int const degree = vertex_degree(src);
         if (degree == max_degree)
         {
@@ -410,7 +410,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
         }
-        dst = CCC_SET_OF(e, struct vertex, elem);
+        dst = CCC_SET_OF(struct vertex, elem, e);
         if (!has_edge_with(src_vertex, dst->name)
             && vertex_degree(dst) < max_degree
             && edge_exists(graph, src_vertex, dst))
@@ -475,7 +475,7 @@ edge_exists(struct graph *const graph, struct vertex *const src,
         {
             quit("Cannot find cell parent to rebuild path.\n", 1);
         }
-        struct parent_cell *cell = CCC_SET_OF(e, struct parent_cell, elem);
+        struct parent_cell *cell = CCC_SET_OF(struct parent_cell, elem, e);
         c.key = cell->parent;
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
@@ -486,7 +486,7 @@ edge_exists(struct graph *const graph, struct vertex *const src,
                 quit("Cannot find cell parent to rebuild path.\n", 1);
             }
             ++edge.cost;
-            cell = CCC_SET_OF(e, struct parent_cell, elem);
+            cell = CCC_SET_OF(struct parent_cell, elem, e);
             *grid_at_mut(graph, cell->key) |= edge_id;
             build_path_cell(graph, cell->key, edge_id);
             c.key = cell->parent;
@@ -730,7 +730,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             struct prev_vertex pv = {.v = cur->v->edges[i].to};
             ccc_set_elem const *e = ccc_set_find(&prev_map, &pv.elem);
             assert(e != ccc_set_end(&prev_map));
-            struct prev_vertex *next = CCC_SET_OF(e, struct prev_vertex, elem);
+            struct prev_vertex *next = CCC_SET_OF(struct prev_vertex, elem, e);
             /* The seen ccc_set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
             struct dist_point *dist
@@ -752,14 +752,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct prev_vertex key = {.v = cur->v};
-        struct prev_vertex *prev = CCC_SET_OF(
-            ccc_set_find(&prev_map, &key.elem), struct prev_vertex, elem);
+        struct prev_vertex *prev = CCC_SET_OF(struct prev_vertex, elem,ccc_set_find(&prev_map, &key.elem));
         while (prev->prev)
         {
             paint_edge(graph, key.v, prev->prev);
             key.v = prev->prev;
-            prev = CCC_SET_OF(ccc_set_find(&prev_map, &key.elem),
-                              struct prev_vertex, elem);
+            prev = CCC_SET_OF(struct prev_vertex, elem,ccc_set_find(&prev_map, &key.elem));
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -780,7 +778,7 @@ prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
          e = ccc_set_next(&graph->adjacency_list, e))
     {
         struct dist_point *p = malloc_or_quit(sizeof(struct dist_point));
-        struct vertex *const v = CCC_SET_OF(e, struct vertex, elem);
+        struct vertex *const v = CCC_SET_OF(struct vertex, elem, e);
         *p = (struct dist_point){
             .v = v,
             .dist = v == pr->src ? 0 : INT_MAX,
@@ -1073,8 +1071,8 @@ cmp_vertices(ccc_set_elem const *const a, ccc_set_elem const *const b,
              void *aux)
 {
     (void)aux;
-    struct vertex const *const v_a = CCC_SET_OF(a, struct vertex, elem);
-    struct vertex const *const v_b = CCC_SET_OF(b, struct vertex, elem);
+    struct vertex const *const v_a = CCC_SET_OF(struct vertex, elem, a);
+    struct vertex const *const v_b = CCC_SET_OF(struct vertex, elem, b);
     return (v_a->name > v_b->name) - (v_a->name < v_b->name);
 }
 
@@ -1082,8 +1080,8 @@ static ccc_set_threeway_cmp
 cmp_parent_cells(ccc_set_elem const *x, ccc_set_elem const *y, void *aux)
 {
     (void)aux;
-    struct parent_cell const *const a = CCC_SET_OF(x, struct parent_cell, elem);
-    struct parent_cell const *const b = CCC_SET_OF(y, struct parent_cell, elem);
+    struct parent_cell const *const a = CCC_SET_OF(struct parent_cell, elem, x);
+    struct parent_cell const *const b = CCC_SET_OF(struct parent_cell, elem, y);
     if (a->key.r == b->key.r && a->key.c == b->key.c)
     {
         return CCC_SET_EQL;
@@ -1112,8 +1110,8 @@ cmp_set_prev_vertices(ccc_set_elem const *const x, ccc_set_elem const *const y,
                       void *aux)
 {
     (void)aux;
-    struct prev_vertex const *const a = CCC_SET_OF(x, struct prev_vertex, elem);
-    struct prev_vertex const *const b = CCC_SET_OF(y, struct prev_vertex, elem);
+    struct prev_vertex const *const a = CCC_SET_OF(struct prev_vertex, elem, x);
+    struct prev_vertex const *const b = CCC_SET_OF(struct prev_vertex, elem, y);
     if (a->v > b->v)
     {
         return CCC_SET_GRT;
@@ -1134,7 +1132,7 @@ pq_update_dist(ccc_pq_elem *e, void *aux)
 static void
 print_vertex(ccc_set_elem const *const x)
 {
-    struct vertex const *v = CCC_SET_OF(x, struct vertex, elem);
+    struct vertex const *v = CCC_SET_OF(struct vertex, elem, x);
     printf("{%c,pos{%d,%d},edges{", v->name, v->pos.r, v->pos.c);
     for (int i = 0; i < max_degree && v->edges[i].to; ++i)
     {
@@ -1150,13 +1148,13 @@ print_vertex(ccc_set_elem const *const x)
 static void
 set_vertex_destructor(ccc_set_elem *const e)
 {
-    free(CCC_SET_OF(e, struct vertex, elem));
+    free(CCC_SET_OF(struct vertex, elem, e));
 }
 
 static void
 set_pq_prev_vertex_dist_point_destructor(ccc_set_elem *const e)
 {
-    struct prev_vertex *pv = CCC_SET_OF(e, struct prev_vertex, elem);
+    struct prev_vertex *pv = CCC_SET_OF(struct prev_vertex, elem, e);
     free(CCC_PQ_OF(pv->ccc_pq_elem, struct dist_point, ccc_pq_elem));
     free(pv);
 }
@@ -1164,7 +1162,7 @@ set_pq_prev_vertex_dist_point_destructor(ccc_set_elem *const e)
 static void
 set_parent_point_destructor(ccc_set_elem *const e)
 {
-    free(CCC_SET_OF(e, struct parent_cell, elem));
+    free(CCC_SET_OF(struct parent_cell, elem, e));
 }
 
 /*===========================    Misc    ====================================*/
@@ -1185,8 +1183,7 @@ parse_path_request(struct graph *const g, str_view r)
         {
             struct vertex key = {.name = *c};
             struct vertex *v
-                = CCC_SET_OF(ccc_set_find(&g->adjacency_list, &key.elem),
-                             struct vertex, elem);
+                = CCC_SET_OF(struct vertex, elem, ccc_set_find(&g->adjacency_list, &key.elem) );
             res.src ? (res.dst = v) : (res.src = v);
         }
     }
