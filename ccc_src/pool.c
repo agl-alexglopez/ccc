@@ -12,35 +12,21 @@ static void *at(ccc_pool const[static 1], size_t) ATTRIB_NONNULL(1);
 
 ccc_pool_result
 ccc_pool_init(ccc_pool pool[static const 1], size_t const elem_sz,
-              size_t const capacity, ccc_pool_realloc_fn *const fn)
+              size_t const capacity, ccc_pool_malloc_fn *const fn)
 {
     pool->mem = NULL;
     pool->elem_sz = elem_sz;
     pool->capacity = capacity;
-    pool->fn = fn;
     pool->sz = 0;
     if (!capacity)
     {
         return CCC_POOL_OK;
     }
-    pool->mem = pool->fn(pool->mem, capacity * sizeof(elem_sz));
+    pool->mem = fn(capacity * sizeof(elem_sz));
     if (!pool->mem)
     {
         return CCC_POOL_ERR;
     }
-    return CCC_POOL_OK;
-}
-
-ccc_pool_result
-ccc_pool_realloc(ccc_pool pool[static const 1], size_t const new_capacity)
-{
-    void *const new_mem = pool->fn(pool->mem, new_capacity);
-    if (!new_mem)
-    {
-        return CCC_POOL_ERR;
-    }
-    pool->mem = new_mem;
-    pool->capacity = new_capacity;
     return CCC_POOL_OK;
 }
 
