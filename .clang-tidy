@@ -22,7 +22,8 @@ Checks: >
    -*-magic-numbers,
    -concurrency-*,
    -Wpointer-bool-conversion,
-   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+   -bugprone-easily-swappable-parameters
 
 CheckOptions:
    - { key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals, value: true }
