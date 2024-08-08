@@ -1,3 +1,8 @@
+add_library(pool pool.h ${CMAKE_SOURCE_DIR}/ccc_src/pool.c)
+target_link_libraries(pool PRIVATE
+  attrib
+)
+
 add_library(pqueue pqueue.h ${CMAKE_SOURCE_DIR}/ccc_src/pqueue.c)
 
 add_library(flat_pqueue flat_pqueue.h ${CMAKE_SOURCE_DIR}/ccc_src/flat_pqueue.c)

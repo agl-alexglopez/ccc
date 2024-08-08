@@ -11,8 +11,14 @@
 #        else
 #            define ATTRIB_PRIVATE /**/
 #        endif
+#        if __has_attribute(nonnull)
+#            define ATTRIB_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
+#        else
+#            define ATTRIB_NONNULL(...) /**/
+#        endif
 #    else
-#        define ATTRIB_PRIVATE /**/
+#        define ATTRIB_PRIVATE      /**/
+#        define ATTRIB_NONNULL(...) /**/
 #    endif
 #else
 #    define ATTRIB_PRIVATE /**/
