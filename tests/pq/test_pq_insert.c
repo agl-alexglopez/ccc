@@ -20,7 +20,7 @@ static enum test_result pq_test_insert_three_dups(void);
 static enum test_result pq_test_read_max_min(void);
 static enum test_result insert_shuffled(ccc_pqueue *, struct val[], size_t,
                                         int);
-static size_t inorder_fill(int[], size_t, ccc_pqueue *);
+static enum test_result inorder_fill(int[], size_t, ccc_pqueue *);
 static ccc_pq_threeway_cmp val_cmp(ccc_pq_elem const *, ccc_pq_elem const *,
                                    void *);
 
@@ -113,15 +113,6 @@ pq_test_insert_three_dups(void)
     return PASS;
 }
 
-static ccc_pq_threeway_cmp
-val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
-{
-    (void)aux;
-    struct val *lhs = CCC_PQ_OF(struct val, elem, a);
-    struct val *rhs = CCC_PQ_OF(struct val, elem, b);
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-}
-
 static enum test_result
 pq_test_insert_shuffle(void)
 {
@@ -135,11 +126,7 @@ pq_test_insert_shuffle(void)
     struct val const *min = CCC_PQ_OF(struct val, elem, ccc_pq_front(&pq));
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
-    for (size_t i = 0; i < size; ++i)
-    {
-        CHECK(vals[i].val, sorted_check[i], int, "%d");
-    }
+    CHECK(inorder_fill(sorted_check, size, &pq), PASS, enum test_result, "%d");
     return PASS;
 }
 
@@ -183,26 +170,40 @@ insert_shuffled(ccc_pqueue *pq, struct val vals[], size_t const size,
     return PASS;
 }
 
-/* Iterative inorder traversal to check the heap is sorted. */
-static size_t
+static enum test_result
 inorder_fill(int vals[], size_t size, ccc_pqueue *ppq)
 {
     if (ccc_pq_size(ppq) != size)
     {
-        return 0;
+        return FAIL;
     }
     size_t i = 0;
     ccc_pqueue copy = CCC_PQ_INIT(ccc_pq_order(ppq), val_cmp, NULL);
-    while (!ccc_pq_empty(ppq) && i < size)
+    while (!ccc_pq_empty(ppq))
     {
         ccc_pq_elem *const front = ccc_pq_pop(ppq);
         CHECK(ccc_pq_validate(ppq), true, bool, "%d");
+        CHECK(ccc_pq_validate(&copy), true, bool, "%d");
         vals[i++] = CCC_PQ_OF(struct val, elem, front)->val;
         ccc_pq_push(&copy, front);
     }
+    i = 0;
     while (!ccc_pq_empty(&copy))
     {
-        ccc_pq_push(ppq, ccc_pq_pop(&copy));
+        struct val *v = CCC_PQ_OF(struct val, elem, ccc_pq_pop(&copy));
+        CHECK(v->val, vals[i++], int, "%d");
+        ccc_pq_push(ppq, &v->elem);
+        CHECK(ccc_pq_validate(ppq), true, bool, "%d");
+        CHECK(ccc_pq_validate(&copy), true, bool, "%d");
     }
-    return i;
+    return PASS;
+}
+
+static ccc_pq_threeway_cmp
+val_cmp(ccc_pq_elem const *a, ccc_pq_elem const *b, void *aux)
+{
+    (void)aux;
+    struct val *lhs = CCC_PQ_OF(struct val, elem, a);
+    struct val *rhs = CCC_PQ_OF(struct val, elem, b);
+    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
