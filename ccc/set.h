@@ -146,7 +146,7 @@
           ... that will go in the set for later       ...
 
           ccc_set_elem *my_query = my_find(5);
-          if (my_query != set_end(&s))
+          if (my_query)
              ... Proceed with some logic .....
       }
 
@@ -396,7 +396,7 @@ ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
 
        ...Fill the container with program logic...
 
-       for (ccc_set_elem *i = set_begin(&s); i != set_end(&s, i); )
+       for (ccc_set_elem *i = set_begin(&s); i; )
        {
           if (meets_criteria(i))
           {
@@ -442,7 +442,8 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
       struct val b = {.id = 0, .val = 35};
       struct val e = {.id = 0, .val = 64};
       const set_range range = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (ccc_set_elem *i = set_begin_range(&range); i; i = set_next(&s, i))
+      for (ccc_set_elem *i = set_begin_range(&range);
+           i != set_end_range(&range); i = set_next(&s, i))
       {
           const int cur_val = CCC_SET_OF(struct val, elem, i)->val;
           printf("%d\n", cur_val->val);
@@ -454,8 +455,13 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
 ccc_set_range ccc_set_equal_range(ccc_set *, ccc_set_elem *begin,
                                   ccc_set_elem *end);
 
+/* The start of a range to iterate through. Use in combination with the
+   ccc_set_end_range function to determine loop termination. */
 ccc_set_elem *ccc_set_begin_range(ccc_set_range const *);
 
+/* It is best to check the iterator against this value for loop termination
+   as a range end may be NULL if there are no more values or a value that is
+   outside of the specified range if one exists. */
 ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
 
 /* Returns the range with pointers to the first element NOT GREATER
@@ -468,7 +474,8 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
       struct val b = {.id = 0, .val = 64};
       struct val e = {.id = 0, .val = 35};
       const set_range r = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (ccc_set_elem *i = set_begin_rrange(&range); i; i = set_rnext(&s, i))
+      for (ccc_set_elem *i = set_begin_rrange(&range);
+           i != set_end_rrange(&range); i = set_rnext(&s, i))
       {
           const int cur_val = CCC_SET_OF(struct val, elem, i)->val;
           printf("%d\n", cur_val->val);
@@ -480,8 +487,13 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
 ccc_set_rrange ccc_set_equal_rrange(ccc_set *, ccc_set_elem *rbegin,
                                     ccc_set_elem *end);
 
+/* The start of a range to iterate through. Use in combination with the
+   ccc_set_end_rrange function to determine loop termination. */
 ccc_set_elem *ccc_set_begin_rrange(ccc_set_rrange const *);
 
+/* It is best to check the iterator against this value for loop termination
+   as a range end may be NULL if there are no more values or a value that is
+   outside of the specified range if one exists. */
 ccc_set_elem *ccc_set_end_rrange(ccc_set_rrange const *);
 
 /* Internal testing. Mostly useless. User at your own risk
