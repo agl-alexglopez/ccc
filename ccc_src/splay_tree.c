@@ -76,7 +76,6 @@ static ccc_node *pop_max(ccc_tree *);
 static ccc_node *pop_min(ccc_tree *);
 static ccc_node *min(ccc_tree const *);
 static ccc_node *const_seek(ccc_tree *, ccc_node *);
-static ccc_node *end(ccc_tree *);
 static ccc_node *next(ccc_tree *, ccc_node *, ccc_tree_link);
 static ccc_node *multiset_next(ccc_tree *, ccc_node *, ccc_tree_link);
 static ccc_range equal_range(ccc_tree *, ccc_node *, ccc_node *, ccc_tree_link);
@@ -142,7 +141,7 @@ ccc_depq_const_max(ccc_depqueue const *const pq)
 bool
 ccc_depq_is_max(ccc_depqueue *const pq, ccc_depq_elem *const e)
 {
-    return ccc_depq_rnext(pq, e) == (ccc_depq_elem *)&pq->t.end;
+    return !ccc_depq_rnext(pq, e);
 }
 
 ccc_depq_elem *
@@ -161,7 +160,7 @@ ccc_depq_const_min(ccc_depqueue const *const pq)
 bool
 ccc_depq_is_min(ccc_depqueue *const pq, ccc_depq_elem *const e)
 {
-    return ccc_depq_next(pq, e) == (ccc_depq_elem *)&pq->t.end;
+    return !ccc_depq_next(pq, e);
 }
 
 ccc_depq_elem *
@@ -174,12 +173,6 @@ ccc_depq_elem *
 ccc_depq_rbegin(ccc_depqueue *pq)
 {
     return (ccc_depq_elem *)min(&pq->t);
-}
-
-ccc_depq_elem *
-ccc_depq_end(ccc_depqueue *pq)
-{
-    return (ccc_depq_elem *)&pq->t.end;
 }
 
 ccc_depq_elem *
@@ -250,27 +243,7 @@ ccc_depq_push(ccc_depqueue *pq, ccc_depq_elem *elem)
 ccc_depq_elem *
 ccc_depq_erase(ccc_depqueue *pq, ccc_depq_elem *elem)
 {
-    ccc_depq_elem *ret = ccc_depq_next(pq, elem);
-    if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
-    {
-        (void)fprintf(stderr,
-                      "element that does not exist cannot be erased.\n");
-        return elem;
-    }
-    return ret;
-}
-
-ccc_depq_elem *
-ccc_depq_rerase(ccc_depqueue *pq, ccc_depq_elem *elem)
-{
-    ccc_depq_elem *ret = ccc_depq_rnext(pq, elem);
-    if (multiset_erase_node(&pq->t, &elem->n) == &pq->t.end)
-    {
-        (void)fprintf(stderr,
-                      "element that does not exist cannot be erased.\n");
-        return elem;
-    }
-    return ret;
+    return (ccc_depq_elem *)multiset_erase_node(&pq->t, &elem->n);
 }
 
 bool
@@ -282,7 +255,7 @@ ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *elem, ccc_depq_update_fn *fn,
         return false;
     }
     ccc_depq_elem *e = (ccc_depq_elem *)multiset_erase_node(&pq->t, &elem->n);
-    if (e == (ccc_depq_elem *)&pq->t.end)
+    if (!e)
     {
         return false;
     }
@@ -382,12 +355,6 @@ ccc_set_rbegin(ccc_set *s)
 }
 
 ccc_set_elem *
-ccc_set_end(ccc_set *s)
-{
-    return (ccc_set_elem *)end(&s->t);
-}
-
-ccc_set_elem *
 ccc_set_next(ccc_set *s, ccc_set_elem *e)
 {
     return (ccc_set_elem *)next(&s->t, &e->n, inorder_traversal);
@@ -460,19 +427,19 @@ ccc_set_erase(ccc_set *s, ccc_set_elem *se)
 bool
 ccc_set_const_contains(ccc_set *s, ccc_set_elem *e)
 {
-    return const_seek(&s->t, &e->n) != &s->t.end;
+    return const_seek(&s->t, &e->n);
 }
 
 bool
 ccc_set_is_min(ccc_set *s, ccc_set_elem *e)
 {
-    return ccc_set_rnext(s, e) == (ccc_set_elem *)&s->t.end;
+    return !ccc_set_rnext(s, e);
 }
 
 bool
 ccc_set_is_max(ccc_set *s, ccc_set_elem *e)
 {
-    return ccc_set_next(s, e) == (ccc_set_elem *)&s->t.end;
+    return !ccc_set_next(s, e);
 }
 
 ccc_set_elem const *
@@ -581,7 +548,7 @@ max(ccc_tree const *const t)
     ccc_node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
     {}
-    return m;
+    return m == &t->end ? NULL : m;
 }
 
 static ccc_node *
@@ -590,7 +557,7 @@ min(ccc_tree const *t)
     ccc_node *m = t->root;
     for (; m->link[L] != &t->end; m = m->link[L])
     {}
-    return m;
+    return m == &t->end ? NULL : m;
 }
 
 static ccc_node *
@@ -606,7 +573,7 @@ const_seek(ccc_tree *const t, ccc_node *const n)
         }
         seek = seek->link[CCC_NODE_GRT == cur_cmp];
     }
-    return seek;
+    return NULL;
 }
 
 static ccc_node *
@@ -619,12 +586,6 @@ static ccc_node *
 pop_min(ccc_tree *t)
 {
     return multiset_erase_max_or_min(t, &t->end, force_find_les);
-}
-
-static ccc_node *
-end(ccc_tree *t)
-{
-    return &t->end;
 }
 
 static inline bool
@@ -685,23 +646,15 @@ next_tree_node(ccc_tree *t, ccc_node *head, ccc_tree_link const traversal)
     {
         return next(t, parent->link[R], traversal);
     }
-    printf("Error! Trapped in the duplicate list.\n");
-    return &t->end;
+    return NULL;
 }
 
 static ccc_node *
 next(ccc_tree *t, ccc_node *n, ccc_tree_link const traversal)
 {
-    if (get_parent(t, t->root) != &t->end)
+    if (!n || n == &t->end || get_parent(t, t->root) != &t->end)
     {
-        (void)fprintf(stderr,
-                      "traversal will be broken root parent is not end.\n");
-        return &t->end;
-    }
-
-    if (n == &t->end)
-    {
-        return n;
+        return NULL;
     }
     /* Using a helper node simplifies the code greatly. */
     t->end.link[traversal] = t->root;
@@ -720,7 +673,7 @@ next(ccc_tree *t, ccc_node *n, ccc_tree_link const traversal)
     for (; p->link[!traversal] == n; n = p, p = get_parent(t, p))
     {}
     /* This is where the end node is helpful. We get to it eventually. */
-    return p;
+    return p == &t->end ? NULL : p;
 }
 
 static ccc_range
@@ -775,7 +728,7 @@ find(ccc_tree *t, ccc_node *elem)
 {
     init_node(t, elem);
     t->root = splay(t, t->root, elem, t->cmp);
-    return t->cmp(elem, t->root, NULL) == CCC_NODE_EQL ? t->root : &t->end;
+    return t->cmp(elem, t->root, NULL) == CCC_NODE_EQL ? t->root : NULL;
 }
 
 static bool
@@ -873,13 +826,13 @@ erase(ccc_tree *t, ccc_node *elem)
 {
     if (empty(t))
     {
-        return &t->end;
+        return NULL;
     }
     ccc_node *ret = splay(t, t->root, elem, t->cmp);
     ccc_node_threeway_cmp const found = t->cmp(elem, ret, NULL);
     if (found != CCC_NODE_EQL)
     {
-        return &t->end;
+        return NULL;
     }
     ret = remove_from_tree(t, ret);
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
@@ -903,7 +856,7 @@ multiset_erase_max_or_min(ccc_tree *t, ccc_node *tnil,
     }
     if (empty(t))
     {
-        return &t->end;
+        return NULL;
     }
     t->size--;
 
@@ -935,7 +888,7 @@ multiset_erase_node(ccc_tree *t, ccc_node *node)
     }
     if (empty(t))
     {
-        return &t->end;
+        return NULL;
     }
     t->size--;
     /* Special case that this must be a duplicate that is in the
@@ -950,7 +903,7 @@ multiset_erase_node(ccc_tree *t, ccc_node *node)
     ccc_node *ret = splay(t, t->root, node, t->cmp);
     if (t->cmp(node, ret, NULL) != CCC_NODE_EQL)
     {
-        return &t->end;
+        return NULL;
     }
     if (has_dups(&t->end, ret))
     {

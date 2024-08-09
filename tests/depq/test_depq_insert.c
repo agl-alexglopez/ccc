@@ -205,8 +205,7 @@ inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
         return 0;
     }
     size_t i = 0;
-    for (ccc_depq_elem *e = ccc_depq_rbegin(pq); e != ccc_depq_end(pq);
-         e = ccc_depq_rnext(pq, e))
+    for (ccc_depq_elem *e = ccc_depq_rbegin(pq); e; e = ccc_depq_rnext(pq, e))
     {
         vals[i++] = CCC_DEPQ_OF(struct val, elem, e)->val;
     }

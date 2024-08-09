@@ -337,8 +337,7 @@ bool ccc_set_insert(ccc_set *, ccc_set_elem *);
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
    Returns the element sought after if found otherwise returns
-   the set end element that can be confirmed with set_end.
-   it is undefined to use the set end element and it does not
+   the NULL. It is undefined to use the set end element and it does not
    have any attachment to any struct you are using so trying
    to get the set entry from it is BAD. This function tries
    to enforce that you should not modify the element for
@@ -349,11 +348,7 @@ bool ccc_set_insert(ccc_set *, ccc_set_elem *);
 ccc_set_elem const *ccc_set_find(ccc_set *, ccc_set_elem *);
 
 /* Erases the element specified by key value and returns a
-   pointer to the set element or set end pointer if the
-   element cannot be found. It is undefined to use the set
-   end element and it does not have any attachment to any
-   struct you are using so trying to get the set entry from
-   it will return garbage or worse.*/
+   pointer to the set element or NULL if the element cannot be found. */
 ccc_set_elem *ccc_set_erase(ccc_set *, ccc_set_elem *);
 
 /* Check if the current elem is the min. O(lgN) */
@@ -378,7 +373,7 @@ bool ccc_set_const_contains(ccc_set *, ccc_set_elem *);
    safe. Also, note that the Splay Tree Implementing this set
    benefits from locality of reference and should be
    allowed to repair itself with lookups with all other
-   functions whenever possible. */
+   functions whenever possible. Returns NULL if not found. */
 ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
 
 /* ===================    Iteration   ==========================
@@ -421,33 +416,6 @@ ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
 
    ============================================================= */
 
-/* This is how you can tell if your set find and set erase
-   functions are successful. One should always check that
-   the set element does not equal the end element as you
-   would in C++. For example:
-
-      struct val {
-         int val;
-         ccc_set_elem elem;
-      }
-
-      set s;
-      set_init(&s);
-      struct val a;
-      a.val = 0;
-
-      if (!set_insert(&s, &a.elem, cmp, NULL))
-         ...Do some logic...
-
-      ... Elsewhere ...
-
-      ccc_set_elem *e = set_find(&s, &a.elem, cmp, NULL);
-      if (e != set_end(&s))
-         ...Proceed with some logic...
-      else
-         ...Do something else... */
-ccc_set_elem *ccc_set_end(ccc_set *);
-
 /* Provides the start for an inorder ascending order traversal
    of the set. Equivalent to end of the set is empty. */
 ccc_set_elem *ccc_set_begin(ccc_set *);
@@ -474,9 +442,7 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
       struct val b = {.id = 0, .val = 35};
       struct val e = {.id = 0, .val = 64};
       const set_range range = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (ccc_set_elem *i = set_begin_range(&range);
-           i != set_end_range(&range);
-           i = set_next(&s, i))
+      for (ccc_set_elem *i = set_begin_range(&range); i; i = set_next(&s, i))
       {
           const int cur_val = CCC_SET_OF(struct val, elem, i)->val;
           printf("%d\n", cur_val->val);
@@ -502,9 +468,7 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
       struct val b = {.id = 0, .val = 64};
       struct val e = {.id = 0, .val = 35};
       const set_range r = set_equal_range(&s, &b.elem, &e.elem, val_cmp);
-      for (ccc_set_elem *i = set_begin_rrange(&range);
-           i != set_end_rrange(&range);
-           i = set_rnext(&s, i))
+      for (ccc_set_elem *i = set_begin_rrange(&range); i; i = set_rnext(&s, i))
       {
           const int cur_val = CCC_SET_OF(struct val, elem, i)->val;
           printf("%d\n", cur_val->val);

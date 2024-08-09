@@ -148,8 +148,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
         return 0;
     }
     size_t i = 0;
-    for (ccc_set_elem *e = ccc_set_begin(s); e != ccc_set_end(s);
-         e = ccc_set_next(s, e))
+    for (ccc_set_elem *e = ccc_set_begin(s); e; e = ccc_set_next(s, e))
     {
         vals[i++] = CCC_SET_OF(struct val, elem, e)->val;
     }
