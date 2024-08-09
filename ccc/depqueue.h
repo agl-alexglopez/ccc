@@ -221,19 +221,11 @@ ccc_depq_elem const *ccc_depq_const_max(ccc_depqueue const *);
    is thread safe. */
 ccc_depq_elem const *ccc_depq_const_min(ccc_depqueue const *);
 
-/* Erases a specified element known to be in the DEPQ.
-   Returns the element that follows the previous value
-   of the element in round robin sorted order (lower priority).
-   This may be another element or it may be the end
-   element in which case no values are less than
-   the erased. O(lgN). However, in practice you can often
-   benefit from O(1) access if that element is a duplicate
+/* Erases a specified element known to be in the DEPQ and returns it.
+   If the element is not found NULL is returned. O(lgN). However, in practice
+   you can often benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
 ccc_depq_elem *ccc_depq_erase(ccc_depqueue *, ccc_depq_elem *);
-
-/* The same as erase but returns the next element in an
-   ascending priority order. */
-ccc_depq_elem *ccc_depq_rerase(ccc_depqueue *, ccc_depq_elem *);
 
 /* Updates the specified elem known to be in the DEPQ with
    a new priority in O(lgN) time. Because an update does not
@@ -280,19 +272,14 @@ ccc_depq_elem *ccc_depq_next(ccc_depqueue *, ccc_depq_elem *);
 /* Progresses through the DEPQ in ascending order */
 ccc_depq_elem *ccc_depq_rnext(ccc_depqueue *, ccc_depq_elem *);
 
-/* The end is not a valid position in the DEPQ so it does not make
-   sense to try to use any fields in the iterator once the end
-   is reached. The end is same for any iteration order. */
-ccc_depq_elem *ccc_depq_end(ccc_depqueue *);
-
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
    provided end element. If either portion of the range cannot
-   be found the end node is provided. It is the users responsibility
+   be found NULL is provided. It is the users responsibility
    to use the correct iterator as the range leaves it to the user to
    iterate. Use the next iterator from begin to end. If there are no values
    NOT GREATER than begin last is returned as the begin element. Similarly if
-   there are no values LESS than end, end is returned as end element. */
+   there are no values LESS than end, NULL is returned as end element. */
 ccc_depq_range ccc_depq_equal_range(ccc_depqueue *, ccc_depq_elem *begin,
                                     ccc_depq_elem *end);
 
@@ -307,11 +294,11 @@ ccc_depq_elem *ccc_depq_end_range(ccc_depq_range const *);
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
    provided end element. If either portion of the range cannot
-   be found the end node is provided. It is the users responsibility
+   be found NULL is provided. It is the users responsibility
    to use the correct iterator as the range leaves it to the user to
    iterate. Use the rnext iterator from rbegin to end. If there are no values
    NOT LESS than rbegin last is returned as the begin element. Similarly if
-   there are no values GREATER than end, end is returned as end element. */
+   there are no values GREATER than end, NULL is returned as end element. */
 ccc_depq_rrange ccc_depq_equal_rrange(ccc_depqueue *, ccc_depq_elem *rbegin,
                                       ccc_depq_elem *end);
 

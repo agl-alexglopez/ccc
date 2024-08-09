@@ -365,7 +365,7 @@ build_graph(struct graph *const graph)
         key.name = (char)vertex_title;
         ccc_set_elem const *const e
             = ccc_set_find(&graph->adjacency_list, &key.elem);
-        if (e == ccc_set_end(&graph->adjacency_list))
+        if (!e)
         {
             quit("Vertex that should be present in the ccc_set is absent.\n",
                  1);
@@ -406,7 +406,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
             continue;
         }
         e = ccc_set_find(&graph->adjacency_list, &key.elem);
-        if (e == ccc_set_end(&graph->adjacency_list))
+        if (!e)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
         }
@@ -471,7 +471,7 @@ edge_exists(struct graph *const graph, struct vertex *const src,
     {
         struct parent_cell c = {.key = cur};
         ccc_set_elem const *e = ccc_set_find(&parent_map, &c.elem);
-        if (e == ccc_set_end(&parent_map))
+        if (!e)
         {
             quit("Cannot find cell parent to rebuild path.\n", 1);
         }
@@ -481,7 +481,7 @@ edge_exists(struct graph *const graph, struct vertex *const src,
         while (cell->parent.r > 0)
         {
             e = ccc_set_find(&parent_map, &c.elem);
-            if (e == ccc_set_end(&parent_map))
+            if (!e)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
             }
@@ -729,7 +729,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         {
             struct prev_vertex pv = {.v = cur->v->edges[i].to};
             ccc_set_elem const *e = ccc_set_find(&prev_map, &pv.elem);
-            assert(e != ccc_set_end(&prev_map));
+            assert(e);
             struct prev_vertex *next = CCC_SET_OF(struct prev_vertex, elem, e);
             /* The seen ccc_set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -775,8 +775,7 @@ static void
 prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
                  ccc_set *prev_map, struct path_request const *pr)
 {
-    for (ccc_set_elem *e = ccc_set_begin(&graph->adjacency_list);
-         e != ccc_set_end(&graph->adjacency_list);
+    for (ccc_set_elem *e = ccc_set_begin(&graph->adjacency_list); e;
          e = ccc_set_next(&graph->adjacency_list, e))
     {
         struct dist_point *p = malloc_or_quit(sizeof(struct dist_point));

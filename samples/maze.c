@@ -244,7 +244,7 @@ animate_maze(struct maze *maze)
             struct point_cost key = {.p = next};
             ccc_set_elem const *const found
                 = ccc_set_find(&cell_costs, &key.elem);
-            if (found == ccc_set_end(&cell_costs))
+            if (!found)
             {
                 struct point_cost *new_cost
                     = valid_malloc(sizeof(struct point_cost));

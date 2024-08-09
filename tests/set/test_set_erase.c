@@ -77,7 +77,7 @@ set_test_prime_shuffle(void)
     for (size_t i = 0; i < size; ++i)
     {
         ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
-        CHECK(elem != ccc_set_end(&s) || !repeats[i], true, bool, "%d");
+        CHECK(elem || !repeats[i], true, bool, "%d");
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     return PASS;
@@ -162,8 +162,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
         return 0;
     }
     size_t i = 0;
-    for (ccc_set_elem *e = ccc_set_begin(s); e != ccc_set_end(s);
-         e = ccc_set_next(s, e))
+    for (ccc_set_elem *e = ccc_set_begin(s); e; e = ccc_set_next(s, e))
     {
         vals[i++] = CCC_SET_OF(struct val, elem, e)->val;
     }
