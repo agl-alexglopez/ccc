@@ -124,8 +124,7 @@ typedef struct ccc_depq_rrange
           ccc_depq_elem elem;
       };
 
-      for (ccc_depq_elem *e = depq_begin(pq);
-           e != depq_end(pq); e = depq_next(pq, e))
+      for (ccc_depq_elem *e = depq_begin(pq); e; e = depq_next(pq, e))
       {
           struct val *my_val = depq_entry(e, struct val, elem);
           printf("%d\n", my_val->val);
