@@ -1,3 +1,4 @@
+#include "buf.h"
 #include "flat_pqueue.h"
 #include "test.h"
 
@@ -36,8 +37,10 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    ccc_flat_pqueue pq;
-    ccc_fpq_init(&pq, CCC_FPQ_LES, val_cmp, NULL);
+    struct val vals[1];
+    ccc_buf buf = CCC_BUF_INIT(vals, sizeof(struct val), 1, NULL);
+    ccc_flat_pqueue pq = CCC_FPQ_INIT(&buf, offsetof(struct val, elem),
+                                      CCC_FPQ_LES, val_cmp, NULL);
     CHECK(ccc_fpq_empty(&pq), true, bool, "%d");
     return PASS;
 }

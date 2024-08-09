@@ -38,12 +38,12 @@ typedef struct ccc_depqueue
     ccc_tree t;
 } ccc_depqueue;
 
-typedef enum ccc_deccc_pq_threeway_cmp
+typedef enum ccc_depq_threeway_cmp
 {
-    CCC_DPQ_LES = CCC_NODE_LES,
-    CCC_DPQ_EQL = CCC_NODE_EQL,
-    CCC_DPQ_GRT = CCC_NODE_GRT,
-} ccc_deccc_pq_threeway_cmp;
+    CCC_DEPQ_LES = CCC_NODE_LES,
+    CCC_DEPQ_EQL = CCC_NODE_EQL,
+    CCC_DEPQ_GRT = CCC_NODE_GRT,
+} ccc_depq_threeway_cmp;
 
 /* A comparison function that returns one of the threeway comparison
    values. To use this data structure you must be able to determine
@@ -58,7 +58,7 @@ typedef enum ccc_deccc_pq_threeway_cmp
 
    The compare function one must provide to perform queries
    and other operations on the DEPQ. See above. */
-typedef ccc_deccc_pq_threeway_cmp
+typedef ccc_depq_threeway_cmp
 ccc_depq_cmp_fn(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux);
 
 /* Define a function to use printf for your custom struct type.

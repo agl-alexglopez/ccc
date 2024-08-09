@@ -118,8 +118,8 @@ static bool can_build_new_square(struct maze const *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(struct maze const *);
-static ccc_deccc_pq_threeway_cmp
-cmp_priority_cells(ccc_depq_elem const *, ccc_depq_elem const *, void *);
+static ccc_depq_threeway_cmp cmp_priority_cells(ccc_depq_elem const *,
+                                                ccc_depq_elem const *, void *);
 static ccc_set_threeway_cmp cmp_points(ccc_set_elem const *,
                                        ccc_set_elem const *, void *);
 static void set_destructor(ccc_set_elem *);
@@ -474,7 +474,7 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 
 /*===================   Data Structure Comparators   ========================*/
 
-static ccc_deccc_pq_threeway_cmp
+static ccc_depq_threeway_cmp
 cmp_priority_cells(ccc_depq_elem const *const key, ccc_depq_elem const *n,
                    void *const aux)
 {
