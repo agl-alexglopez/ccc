@@ -34,8 +34,10 @@ static ccc_fpq_elem *at(ccc_flat_pqueue const[static 1], size_t i)
     ATTRIB_NONNULL(1);
 static void swap(ccc_flat_pqueue[static 1], uint8_t[static 1], size_t, size_t)
     ATTRIB_NONNULL(1, 2);
-static void bubble_down(ccc_flat_pqueue[static 1], size_t) ATTRIB_NONNULL(1);
-static void bubble_up(ccc_flat_pqueue[static 1], size_t) ATTRIB_NONNULL(1);
+static void bubble_down(ccc_flat_pqueue[static 1], uint8_t tmp[static 1],
+                        size_t) ATTRIB_NONNULL(1, 2);
+static void bubble_up(ccc_flat_pqueue[static 1], uint8_t tmp[static 1], size_t)
+    ATTRIB_NONNULL(1, 2);
 static void print_node(ccc_flat_pqueue const[static 1], size_t, fpq_print_fn *)
     ATTRIB_NONNULL(1);
 static void print_inner_heap(ccc_flat_pqueue const[static 1], size_t,
@@ -52,8 +54,13 @@ ccc_fpq_push(ccc_flat_pqueue fpq[static const 1],
     {
         return CCC_BUF_ERR;
     }
-    e->handle = ccc_buf_size(fpq->buf) - 1;
-    bubble_up(fpq, e->handle);
+    size_t const buf_sz = ccc_buf_size(fpq->buf);
+    e->handle = buf_sz - 1;
+    if (buf_sz > 1)
+    {
+        uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
+        bubble_up(fpq, tmp, e->handle);
+    }
     return CCC_BUF_OK;
 }
 
@@ -70,20 +77,16 @@ ccc_fpq_pop(ccc_flat_pqueue fpq[static const 1])
     {
         return NULL;
     }
+    ccc_fpq_elem *ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
+    if (ccc_buf_size(fpq->buf) == 1)
+    {
+        ccc_buf_pop_back(fpq->buf);
+        return ret;
+    }
     uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
-    ccc_fpq_elem *ret = NULL;
-    if (ccc_buf_size(fpq->buf) > 1)
-    {
-        swap(fpq, tmp, 0, ccc_buf_size(fpq->buf) - 1);
-        ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
-        ccc_buf_pop_back(fpq->buf);
-        bubble_down(fpq, 0);
-    }
-    else
-    {
-        ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
-        ccc_buf_pop_back(fpq->buf);
-    }
+    swap(fpq, tmp, 0, ccc_buf_size(fpq->buf) - 1);
+    ccc_buf_pop_back(fpq->buf);
+    bubble_down(fpq, tmp, 0);
     return ret;
 }
 
@@ -118,11 +121,11 @@ ccc_fpq_erase(ccc_flat_pqueue fpq[static const 1],
         = fpq->cmp(at(fpq, swap_location), erased, fpq->aux);
     if (erased_cmp == fpq->order)
     {
-        bubble_up(fpq, swap_location);
+        bubble_up(fpq, tmp, swap_location);
     }
     else if (erased_cmp != CCC_FPQ_EQL)
     {
-        bubble_down(fpq, swap_location);
+        bubble_down(fpq, tmp, swap_location);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return erased;
@@ -137,21 +140,22 @@ ccc_fpq_update(ccc_flat_pqueue fpq[static const 1],
         return false;
     }
     fn(e, aux);
+    uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
     if (!e->handle)
     {
-        bubble_down(fpq, 0);
+        bubble_down(fpq, tmp, 0);
         return true;
     }
     ccc_fpq_threeway_cmp const parent_cmp
         = fpq->cmp(at(fpq, e->handle), at(fpq, (e->handle - 1) / 2), fpq->aux);
     if (parent_cmp == fpq->order)
     {
-        bubble_up(fpq, e->handle);
+        bubble_up(fpq, tmp, e->handle);
         return true;
     }
     if (parent_cmp != CCC_FPQ_EQL)
     {
-        bubble_down(fpq, e->handle);
+        bubble_down(fpq, tmp, e->handle);
         return true;
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
@@ -244,25 +248,23 @@ ccc_fpq_print(ccc_flat_pqueue const fpq[static const 1], size_t const i,
 /*===============================  Static Helpers  =========================*/
 
 static void
-bubble_up(ccc_flat_pqueue fpq[static const 1], size_t i)
+bubble_up(ccc_flat_pqueue fpq[static const 1], uint8_t tmp[static 1], size_t i)
 {
-    uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
     for (size_t parent = (i - 1) / 2;
          i && fpq->cmp(at(fpq, i), at(fpq, parent), fpq->aux) == fpq->order;
          i = parent, parent = (parent - 1) / 2)
     {
         swap(fpq, tmp, parent, i);
     }
-    at(fpq, i)->handle = i;
 }
 
 static void
-bubble_down(ccc_flat_pqueue fpq[static const 1], size_t i)
+bubble_down(ccc_flat_pqueue fpq[static const 1], uint8_t tmp[static 1],
+            size_t i)
 {
     ccc_fpq_threeway_cmp const wrong_order
         = fpq->order == CCC_FPQ_LES ? CCC_FPQ_GRT : CCC_FPQ_LES;
     size_t const sz = ccc_buf_size(fpq->buf);
-    uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
          i = next, left = i * 2 + 1, right = left + 1)
     {
@@ -280,7 +282,6 @@ bubble_down(ccc_flat_pqueue fpq[static const 1], size_t i)
         }
         swap(fpq, tmp, next, i);
     }
-    at(fpq, i)->handle = i;
 }
 
 static inline void
@@ -303,10 +304,6 @@ static inline ccc_fpq_elem *
 at(ccc_flat_pqueue const fpq[static 1], size_t const i)
 {
     void *loc = ccc_buf_at(fpq->buf, i);
-    if (!loc)
-    {
-        BREAKPOINT();
-    }
     assert(loc);
     return (ccc_fpq_elem *)((uint8_t *)loc + fpq->fpq_elem_offset);
 }
