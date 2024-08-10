@@ -417,7 +417,8 @@ ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
    ============================================================= */
 
 /* Provides the start for an inorder ascending order traversal
-   of the set. Equivalent to end of the set is empty. */
+   of the set. Equivalent to end of the set is empty. The iterator
+   will be NULL to signal loop termination. */
 ccc_set_elem *ccc_set_begin(ccc_set *);
 
 /* Provides the start for an inorder descending order traversal
@@ -435,9 +436,8 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
    provided end element. If either portion of the range cannot
-   be found the end node is provided. It is the users responsibility
-   to use the correct iterator as the range leaves it to the user to
-   iterate.
+   be found NULL is provided. Use the provided function to check
+   the terminating loop condition, as this covers both the NULL or value case.
 
       struct val b = {.id = 0, .val = 35};
       struct val e = {.id = 0, .val = 64};
@@ -451,7 +451,7 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
 
    Use the next iterator from begin to end. If there are no values NOT LESS
    than begin last is returned as the begin element. Similarly if there are
-   no values GREATER than end, end is returned as end element. */
+   no values GREATER than end, NULL is returned as end element. */
 ccc_set_range ccc_set_equal_range(ccc_set *, ccc_set_elem *begin,
                                   ccc_set_elem *end);
 
@@ -467,9 +467,8 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
    provided end element. If either portion of the range cannot
-   be found the end node is provided. It is the users responsibility
-   to use the correct iterator as the range leaves it to the user to
-   iterate. Use the next iterator from rbegin to end.
+   be found NULL is provided. Use the provided function to check
+   the terminating loop condition, as this covers both the NULL or value case.
 
       struct val b = {.id = 0, .val = 64};
       struct val e = {.id = 0, .val = 35};
@@ -483,7 +482,7 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
 
    Use the next iterator from begin to end. If there are no values NOT GREATER
    than begin last is returned as the begin element. Similarly if there are
-   no values LESS than end, end is returned as end element. */
+   no values LESS than end, NULL is returned as end element. */
 ccc_set_rrange ccc_set_equal_rrange(ccc_set *, ccc_set_elem *rbegin,
                                     ccc_set_elem *end);
 
