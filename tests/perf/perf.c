@@ -13,7 +13,6 @@
 struct val
 {
     int val;
-    char added_bytes[512];
     ccc_depq_elem depq_elem;
     ccc_fpq_elem fpq_elem;
     ccc_pq_elem pq_elem;
@@ -156,6 +155,7 @@ test_pop(void)
         }
         clock_t end = clock();
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             ccc_pq_push(&pq, &val_array[i].pq_elem);
@@ -181,7 +181,6 @@ test_pop(void)
             ccc_fpq_pop(&fpq);
         }
         end = clock();
-        double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
                pq_time);
         free(val_array);
