@@ -18,8 +18,7 @@ typedef enum ccc_fpq_threeway_cmp
 
 typedef struct ccc_fpq_elem
 {
-    size_t heap_index;
-    size_t buf_key;
+    size_t handle;
 } ccc_fpq_elem;
 
 typedef ccc_fpq_threeway_cmp ccc_fpq_cmp_fn(ccc_fpq_elem const *,
@@ -41,8 +40,8 @@ typedef struct ccc_flat_pqueue
 } ccc_flat_pqueue;
 
 #define CCC_FPQ_OF(struct, member, fpq_elem)                                   \
-    ((struct *)((uint8_t *)&(fpq_elem)->buf_key                                \
-                - offsetof(struct, member.buf_key))) /* NOLINT */
+    ((struct *)((uint8_t *)&(fpq_elem)->handle                                 \
+                - offsetof(struct, member.handle))) /* NOLINT */
 
 #define CCC_FPQ_INIT(mem_buf, elem_offset, cmp_order, cmp_fn, aux_data)        \
     {                                                                          \
