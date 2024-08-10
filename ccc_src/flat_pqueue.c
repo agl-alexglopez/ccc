@@ -289,10 +289,8 @@ swap(ccc_flat_pqueue fpq[static const 1], uint8_t tmp[static const 1],
      size_t const i, size_t const j)
 {
     ccc_buf_result const res = ccc_buf_swap(fpq->buf, tmp, i, j);
-    if (res != CCC_BUF_OK)
-    {
-        BREAKPOINT();
-    }
+    (void)res;
+    assert(res == CCC_BUF_OK);
     ccc_fpq_elem *const i_elem = at(fpq, i);
     size_t const tmp_handle = i_elem->handle;
     ccc_fpq_elem *const j_elem = at(fpq, j);
