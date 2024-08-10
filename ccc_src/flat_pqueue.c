@@ -1,6 +1,5 @@
 #include "flat_pqueue.h"
 #include "attrib.h"
-#include "test.h"
 
 #include <assert.h>
 #include <stdbool.h>
