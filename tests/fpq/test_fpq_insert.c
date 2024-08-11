@@ -23,7 +23,6 @@ static enum test_result insert_shuffled(ccc_flat_pqueue *, struct val[], size_t,
 static enum test_result inorder_fill(int[], size_t, ccc_flat_pqueue *);
 static ccc_fpq_threeway_cmp val_cmp(ccc_fpq_elem const *, ccc_fpq_elem const *,
                                     void *);
-static void fpq_printer_fn(ccc_fpq_elem const *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -155,7 +154,6 @@ fpq_test_insert_shuffle(void)
         CHECK(prev <= sorted_check[i], true, int, "%d");
         prev = sorted_check[i];
     }
-    ccc_fpq_print(&fpq, 0, fpq_printer_fn);
     return PASS;
 }
 
@@ -248,11 +246,4 @@ val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
     struct val *lhs = CCC_FPQ_OF(struct val, elem, a);
     struct val *rhs = CCC_FPQ_OF(struct val, elem, b);
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-}
-
-static void
-fpq_printer_fn(ccc_fpq_elem const *const e)
-{
-    struct val const *const v = CCC_FPQ_OF(struct val, elem, e);
-    printf("{val:%d}", v->val);
 }

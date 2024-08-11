@@ -1,8 +1,6 @@
 #ifndef PQUEUE
 #define PQUEUE
 
-#include "attrib.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 /* NOLINTNEXTLINE */
@@ -37,16 +35,15 @@ typedef struct ccc_pq_elem
    structs. Given two valid pointers to elements in the priority queue and any
    auxilliary data necessary for comparison, return the resulting three way
    comparison for the user struct values. */
-typedef ccc_pq_threeway_cmp ccc_pq_cmp_fn(ccc_pq_elem const[static 1],
-                                          ccc_pq_elem const[static 1], void *)
-    ATTRIB_NONNULL(1, 2);
+typedef ccc_pq_threeway_cmp ccc_pq_cmp_fn(ccc_pq_elem const *,
+                                          ccc_pq_elem const *, void *);
 
 /* A function type to aid in deallocation of the priority queue. The user may
    define a destructor function that will act on each element for clearing
    the priority queue. For example, freeing heap allocated structs with
    priority queue handles embedded within them is a common use for such
    a function. */
-typedef void ccc_pq_destructor_fn(ccc_pq_elem[static 1]) ATTRIB_NONNULL(1);
+typedef void ccc_pq_destructor_fn(ccc_pq_elem *);
 
 /* A function type to aid in the update, increase, and decrease operations
    in the priority queue. The new value should be placed in void * argument.
@@ -54,7 +51,7 @@ typedef void ccc_pq_destructor_fn(ccc_pq_elem[static 1]) ATTRIB_NONNULL(1);
    as they see fit. When the user defines a function to match this signature
    casting the void * should be well defined because the type corresponds to
    the type being used for comparisons in the priority queue. */
-typedef void ccc_pq_update_fn(ccc_pq_elem[static 1], void *) ATTRIB_NONNULL(1);
+typedef void ccc_pq_update_fn(ccc_pq_elem *, void *);
 
 /* The structure used to manage the data in a priority queue. Stack allocation
    is recommended for easy cleanup and speed. However, this structure may be
@@ -93,57 +90,51 @@ typedef struct ccc_pqueue
 
 /* Obtain a reference to the front of the priority queue. This will be a min
    or max depending on the initialization of the priority queue. O(1). */
-ccc_pq_elem const *ccc_pq_front(ccc_pqueue const[static 1]) ATTRIB_NONNULL(1);
+ccc_pq_elem const *ccc_pq_front(ccc_pqueue const *);
 
 /* Adds an element to the priority queue in correct total order. O(1). */
-void ccc_pq_push(ccc_pqueue[static 1], ccc_pq_elem[static 1])
-    ATTRIB_NONNULL(1, 2);
+void ccc_pq_push(ccc_pqueue *, ccc_pq_elem *);
 
 /* Pops the front element from the priority queue. O(lgN). */
-ccc_pq_elem *ccc_pq_pop(ccc_pqueue[static 1]) ATTRIB_NONNULL(1);
+ccc_pq_elem *ccc_pq_pop(ccc_pqueue *);
 
 /* Erase the specified element from the priority queue. This need not be
    the front element. O(lgN). */
-ccc_pq_elem *ccc_pq_erase(ccc_pqueue[static 1], ccc_pq_elem[static 1])
-    ATTRIB_NONNULL(1, 2);
+ccc_pq_elem *ccc_pq_erase(ccc_pqueue *, ccc_pq_elem *);
 
 /* Returns true if the priority queue is empty false if not. */
-bool ccc_pq_empty(ccc_pqueue const[static 1]) ATTRIB_NONNULL(1);
+bool ccc_pq_empty(ccc_pqueue const *);
 
 /* Returns the size of the priority queue. */
-size_t ccc_pq_size(ccc_pqueue const[static 1]) ATTRIB_NONNULL(1);
+size_t ccc_pq_size(ccc_pqueue const *);
 
 /* Update the value of a priority queue element if the new value is not
    known to be less than or greater than the old value. This operation
    may incur uneccessary overhead if the user can deduce if an increase
    or decrease is occuring. See the increase and decrease operations. O(1)
    best case, O(lgN) worst case. */
-bool ccc_pq_update(ccc_pqueue[static 1], ccc_pq_elem[static 1],
-                   ccc_pq_update_fn *, void *) ATTRIB_NONNULL(1, 2);
+bool ccc_pq_update(ccc_pqueue *, ccc_pq_elem *, ccc_pq_update_fn *, void *);
 
 /* Optimal update technique if the priority queue has been initialized as
    a max queue and the new value is known to be greater than the old value.
    If this is a max heap O(1), otherwise O(lgN). */
-bool ccc_pq_increase(ccc_pqueue[static 1], ccc_pq_elem[static 1],
-                     ccc_pq_update_fn *, void *) ATTRIB_NONNULL(1, 2);
+bool ccc_pq_increase(ccc_pqueue *, ccc_pq_elem *, ccc_pq_update_fn *, void *);
 
 /* Optimal update technique if the priority queue has been initialized as
    a min queue and the new value is known to be less than the old value.
    If this is a min heap O(1), otherwise O(lgN). */
-bool ccc_pq_decrease(ccc_pqueue[static 1], ccc_pq_elem[static 1],
-                     ccc_pq_update_fn *, void *) ATTRIB_NONNULL(1, 2);
+bool ccc_pq_decrease(ccc_pqueue *, ccc_pq_elem *, ccc_pq_update_fn *, void *);
 
 /* Return the order used to initialize the heap. */
-ccc_pq_threeway_cmp ccc_pq_order(ccc_pqueue const[static 1]) ATTRIB_NONNULL(1);
+ccc_pq_threeway_cmp ccc_pq_order(ccc_pqueue const *);
 
 /* Calls the user provided destructor on each element in the priority queue.
    It is safe to free the struct if it has been heap allocated as elements
    are popped from the priority queue before the function is called. O(NlgN). */
-void ccc_pq_clear(ccc_pqueue[static 1], ccc_pq_destructor_fn *)
-    ATTRIB_NONNULL(1);
+void ccc_pq_clear(ccc_pqueue *, ccc_pq_destructor_fn *);
 
 /* Internal validation function for the state of the heap. This should be of
    little interest to the user. */
-bool ccc_pq_validate(ccc_pqueue const[static 1]) ATTRIB_NONNULL(1);
+bool ccc_pq_validate(ccc_pqueue const *);
 
 #endif /* PQUEUE */

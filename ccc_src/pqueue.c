@@ -1,45 +1,43 @@
 #include "pqueue.h"
-#include "attrib.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
 /*=========================  Function Prototypes   ==========================*/
 
-static ccc_pq_elem *merge(ccc_pqueue[static 1], ccc_pq_elem *, ccc_pq_elem *)
-    ATTRIB_NONNULL(1);
-static void link_child(ccc_pq_elem parent[static 1],
-                       ccc_pq_elem child[static 1]) ATTRIB_NONNULL(1, 2);
-static void init_node(ccc_pq_elem[static 1]) ATTRIB_NONNULL(1);
-static size_t traversal_size(ccc_pq_elem const[static 1]) ATTRIB_NONNULL(1);
-static bool has_valid_links(ccc_pqueue const[static 1],
-                            ccc_pq_elem const *parent, ccc_pq_elem const *child)
-    ATTRIB_NONNULL(1);
-static ccc_pq_elem *delete(ccc_pqueue[static 1],
-                           ccc_pq_elem[static 1])ATTRIB_NONNULL(1, 2);
-static ccc_pq_elem *delete_min(ccc_pqueue[static 1], ccc_pq_elem[static 1])
-    ATTRIB_NONNULL(1, 2);
-static void clear_node(ccc_pq_elem[static 1]) ATTRIB_NONNULL(1);
-static void cut_child(ccc_pq_elem[static 1]) ATTRIB_NONNULL(1);
+static ccc_pq_elem *merge(ccc_pqueue *, ccc_pq_elem *old, ccc_pq_elem *new);
+static void link_child(ccc_pq_elem *parent, ccc_pq_elem *child);
+static void init_node(ccc_pq_elem *);
+static size_t traversal_size(ccc_pq_elem const *);
+static bool has_valid_links(ccc_pqueue const *, ccc_pq_elem const *parent,
+                            ccc_pq_elem const *child);
+static ccc_pq_elem *delete(ccc_pqueue *, ccc_pq_elem *);
+static ccc_pq_elem *delete_min(ccc_pqueue *, ccc_pq_elem *);
+static void clear_node(ccc_pq_elem *);
+static void cut_child(ccc_pq_elem *);
 
 /*=========================  Interface Functions   ==========================*/
 
 ccc_pq_elem const *
-ccc_pq_front(ccc_pqueue const ppq[static const 1])
+ccc_pq_front(ccc_pqueue const *const ppq)
 {
     return ppq->root;
 }
 
 void
-ccc_pq_push(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1])
+ccc_pq_push(ccc_pqueue *const ppq, ccc_pq_elem *const e)
 {
+    if (!e || !ppq)
+    {
+        return;
+    }
     init_node(e);
     ppq->root = merge(ppq, ppq->root, e);
     ++ppq->sz;
 }
 
 ccc_pq_elem *
-ccc_pq_pop(ccc_pqueue ppq[static const 1])
+ccc_pq_pop(ccc_pqueue *const ppq)
 {
     if (!ppq->root)
     {
@@ -53,7 +51,7 @@ ccc_pq_pop(ccc_pqueue ppq[static const 1])
 }
 
 ccc_pq_elem *
-ccc_pq_erase(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1])
+ccc_pq_erase(ccc_pqueue *const ppq, ccc_pq_elem *const e)
 {
     if (!ppq->root || !e->next_sibling || !e->prev_sibling)
     {
@@ -66,7 +64,7 @@ ccc_pq_erase(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1])
 }
 
 void
-ccc_pq_clear(ccc_pqueue ppq[static const 1], ccc_pq_destructor_fn *fn)
+ccc_pq_clear(ccc_pqueue *const ppq, ccc_pq_destructor_fn *fn)
 {
     while (!ccc_pq_empty(ppq))
     {
@@ -75,13 +73,13 @@ ccc_pq_clear(ccc_pqueue ppq[static const 1], ccc_pq_destructor_fn *fn)
 }
 
 bool
-ccc_pq_empty(ccc_pqueue const ppq[static const 1])
+ccc_pq_empty(ccc_pqueue const *const ppq)
 {
     return !ppq->sz;
 }
 
 size_t
-ccc_pq_size(ccc_pqueue const ppq[static const 1])
+ccc_pq_size(ccc_pqueue const *const ppq)
 {
     return ppq->sz;
 }
@@ -93,7 +91,7 @@ ccc_pq_size(ccc_pqueue const ppq[static const 1])
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
 bool
-ccc_pq_update(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1],
+ccc_pq_update(ccc_pqueue *const ppq, ccc_pq_elem *const e,
               ccc_pq_update_fn *const fn, void *const aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
@@ -116,7 +114,7 @@ ccc_pq_update(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1],
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
 bool
-ccc_pq_increase(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1],
+ccc_pq_increase(ccc_pqueue *const ppq, ccc_pq_elem *const e,
                 ccc_pq_update_fn *fn, void *aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
@@ -141,7 +139,7 @@ ccc_pq_increase(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1],
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
 bool
-ccc_pq_decrease(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1],
+ccc_pq_decrease(ccc_pqueue *const ppq, ccc_pq_elem *const e,
                 ccc_pq_update_fn *fn, void *aux)
 {
     if (!e->next_sibling || !e->prev_sibling)
@@ -164,7 +162,7 @@ ccc_pq_decrease(ccc_pqueue ppq[static const 1], ccc_pq_elem e[static const 1],
 }
 
 bool
-ccc_pq_validate(ccc_pqueue const ppq[static const 1])
+ccc_pq_validate(ccc_pqueue const *const ppq)
 {
     if (ppq->root && ppq->root->parent)
     {
@@ -182,7 +180,7 @@ ccc_pq_validate(ccc_pqueue const ppq[static const 1])
 }
 
 ccc_pq_threeway_cmp
-ccc_pq_order(ccc_pqueue const ppq[static const 1])
+ccc_pq_order(ccc_pqueue const *const ppq)
 {
     return ppq->order;
 }
@@ -190,20 +188,20 @@ ccc_pq_order(ccc_pqueue const ppq[static const 1])
 /*========================   Static Helpers   ================================*/
 
 static void
-init_node(ccc_pq_elem e[static const 1])
+init_node(ccc_pq_elem *e)
 {
     e->left_child = e->parent = NULL;
     e->next_sibling = e->prev_sibling = e;
 }
 
 static void
-clear_node(ccc_pq_elem e[static const 1])
+clear_node(ccc_pq_elem *e)
 {
     e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
 }
 
 static void
-cut_child(ccc_pq_elem child[static const 1])
+cut_child(ccc_pq_elem *child)
 {
     child->next_sibling->prev_sibling = child->prev_sibling;
     child->prev_sibling->next_sibling = child->next_sibling;
@@ -221,8 +219,7 @@ cut_child(ccc_pq_elem child[static const 1])
     child->parent = NULL;
 }
 
-static ccc_pq_elem *delete(ccc_pqueue ppq[static const 1],
-                           ccc_pq_elem root[static const 1])
+static ccc_pq_elem *delete(ccc_pqueue *ppq, ccc_pq_elem *root)
 {
     if (ppq->root == root)
     {
@@ -233,7 +230,7 @@ static ccc_pq_elem *delete(ccc_pqueue ppq[static const 1],
 }
 
 static ccc_pq_elem *
-delete_min(ccc_pqueue ppq[static const 1], ccc_pq_elem root[static 1])
+delete_min(ccc_pqueue *ppq, ccc_pq_elem *root)
 {
     if (!root->left_child)
     {
@@ -260,20 +257,19 @@ delete_min(ccc_pqueue ppq[static const 1], ccc_pq_elem root[static 1])
 }
 
 static inline ccc_pq_elem *
-merge(ccc_pqueue ppq[static const 1], ccc_pq_elem *const a,
-      ccc_pq_elem *const b)
+merge(ccc_pqueue *const ppq, ccc_pq_elem *const old, ccc_pq_elem *const new)
 {
-    if (!a || !b || a == b)
+    if (!old || !new || old == new)
     {
-        return a ? a : b;
+        return old ? old : new;
     }
-    if (ppq->cmp(b, a, ppq->aux) == ppq->order)
+    if (ppq->cmp(new, old, ppq->aux) == ppq->order)
     {
-        link_child(b, a);
-        return b;
+        link_child(new, old);
+        return new;
     }
-    link_child(a, b);
-    return a;
+    link_child(old, new);
+    return old;
 }
 
 /* Oldest nodes shuffle down, new drops in to replace.
@@ -282,8 +278,7 @@ merge(ccc_pqueue ppq[static const 1], ccc_pq_elem *const a,
       ┌b┐     ┌c─b┐   ┌d─c─b┐
       └─┘     └───┘   └─────┘ */
 static inline void
-link_child(ccc_pq_elem parent[static const 1],
-           ccc_pq_elem child[static const 1])
+link_child(ccc_pq_elem *const parent, ccc_pq_elem *const child)
 {
     if (parent->left_child)
     {
@@ -305,8 +300,12 @@ link_child(ccc_pq_elem parent[static const 1],
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static size_t
-traversal_size(ccc_pq_elem const root[static const 1])
+traversal_size(ccc_pq_elem const *const root)
 {
+    if (!root)
+    {
+        return 0;
+    }
     size_t sz = 0;
     bool sibling_ring_lapped = false;
     ccc_pq_elem const *cur = root;
@@ -320,8 +319,8 @@ traversal_size(ccc_pq_elem const root[static const 1])
 }
 
 static bool
-has_valid_links(ccc_pqueue const ppq[static const 1],
-                ccc_pq_elem const *const parent, ccc_pq_elem const *const child)
+has_valid_links(ccc_pqueue const *const ppq, ccc_pq_elem const *const parent,
+                ccc_pq_elem const *const child)
 {
     if (!child)
     {
