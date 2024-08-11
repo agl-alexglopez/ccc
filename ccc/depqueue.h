@@ -58,8 +58,9 @@ typedef enum ccc_depq_threeway_cmp
 
    The compare function one must provide to perform queries
    and other operations on the DEPQ. See above. */
-typedef ccc_depq_threeway_cmp
-ccc_depq_cmp_fn(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux);
+typedef ccc_depq_threeway_cmp ccc_depq_cmp_fn(ccc_depq_elem const a[static 1],
+                                              ccc_depq_elem const b[static 1],
+                                              void *aux) ATTRIB_NONNULL(1, 2);
 
 /* Define a function to use printf for your custom struct type.
    For example:
@@ -77,13 +78,14 @@ ccc_depq_cmp_fn(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux);
 
    Output should be one line with no newline character. Then,
    the printer function will take care of the rest. */
-typedef void ccc_depq_print_fn(ccc_depq_elem const *);
+typedef void ccc_depq_print_fn(ccc_depq_elem const[static 1]) ATTRIB_NONNULL(1);
 
 /* Provide a new auxilliary value corresponding to the value type used
    for depq comparisons. The old value will be changed to new and
    the element will be reinserted in round robin order to the DEPQ
    even if it is updated to the same value it previously stored O(lgN). */
-typedef void ccc_depq_update_fn(ccc_depq_elem *, void *aux);
+typedef void ccc_depq_update_fn(ccc_depq_elem[static 1], void *aux)
+    ATTRIB_NONNULL(1);
 
 /* Performs user specified destructor actions on a single deccc_pq_elem. This
    deccc_pq_elem is assumed to be embedded in user defined structs and therefore
@@ -92,7 +94,7 @@ typedef void ccc_depq_update_fn(ccc_depq_elem *, void *aux);
    own structures and therefore shall call free on the containing structure.
    If the data structure is stack allocated, free is not necessary but other
    actions may be specified by this function. */
-typedef void ccc_depq_destructor_fn(ccc_depq_elem *);
+typedef void ccc_depq_destructor_fn(ccc_depq_elem[static 1]) ATTRIB_NONNULL(1);
 
 /* A container for a simple begin and end pointer to a ccc_depq_elem.
    A user can use the equal_range or equal_rrange function to
@@ -154,21 +156,23 @@ typedef struct ccc_depq_rrange
    Other updates before destruction are possible to include in destructor
    if determined necessary by the user. A DEPQ has no hidden
    allocations and therefore the only heap memory is controlled by the user. */
-void ccc_depq_clear(ccc_depqueue *, ccc_depq_destructor_fn *destructor);
+void ccc_depq_clear(ccc_depqueue[static 1], ccc_depq_destructor_fn *destructor)
+    ATTRIB_NONNULL(1);
 
 /* Checks if the DEPQ is empty. Undefined if
    depq_init has not been called first. */
-bool ccc_depq_empty(ccc_depqueue const *);
+bool ccc_depq_empty(ccc_depqueue const[static 1]) ATTRIB_NONNULL(1);
 
 /* O(1) */
-size_t ccc_depq_size(ccc_depqueue *);
+size_t ccc_depq_size(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 
 /* Inserts the given ccc_depq_elem into an initialized ccc_depqueue
    any data in the ccc_depq_elem member will be overwritten
    The ccc_depq_elem must not already be in the DEPQ or the
    behavior is undefined. DEPQ insertion shall not fail becuase DEPQs
    support round robin duplicates. O(lgN) */
-void ccc_depq_push(ccc_depqueue *, ccc_depq_elem *);
+void ccc_depq_push(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1);
 
 /* Pops from the front of the DEPQ. If multiple elements
    with the same priority are to be popped, then upon first
@@ -182,9 +186,9 @@ void ccc_depq_push(ccc_depqueue *, ccc_depq_elem *);
    the tree it is considered new and returns to the back
    of the DEPQ of duplicates. Returns the end element if
    the DEPQ is empty. */
-ccc_depq_elem *ccc_depq_pop_max(ccc_depqueue *);
+ccc_depq_elem *ccc_depq_pop_max(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 /* Same promises as pop_max except for the minimum values. */
-ccc_depq_elem *ccc_depq_pop_min(ccc_depqueue *);
+ccc_depq_elem *ccc_depq_pop_min(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 
 /* Reports the maximum priority element in the DEPQ, drawing
    it to the root via splay operations. This, is a good
@@ -193,19 +197,21 @@ ccc_depq_elem *ccc_depq_pop_min(ccc_depqueue *);
    subsequent calls. This can be especially beneficial if
    multiple elements are tied for the max in round robin
    as all duplicates will be popped in O(1) time. */
-ccc_depq_elem *ccc_depq_max(ccc_depqueue *);
+ccc_depq_elem *ccc_depq_max(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 /* Same promises as the max except for the minimum ccc_depq_elem */
-ccc_depq_elem *ccc_depq_min(ccc_depqueue *);
+ccc_depq_elem *ccc_depq_min(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 
 /* If elem is already max this check is O(lgN) as the worst
    case. If not, O(1). However, if multiple  pops have occured
    the max will be close to the root. */
-bool ccc_depq_is_max(ccc_depqueue *, ccc_depq_elem *);
+bool ccc_depq_is_max(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* If the element is already min this check is O(lgN) as the worst
    case. If not, O(1). However, if multiple  pops have occured
    the max will be close to the root. */
-bool ccc_depq_is_min(ccc_depqueue *, ccc_depq_elem *);
+bool ccc_depq_is_min(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Read only peek at the max and min these operations do
    not modify the tree so multiple threads could call them
@@ -215,16 +221,19 @@ bool ccc_depq_is_min(ccc_depqueue *, ccc_depq_elem *);
    and it has duplicates those duplicates will remain at
    the root O(1) until another insertion, query, or pop
    occurs. */
-ccc_depq_elem const *ccc_depq_const_max(ccc_depqueue const *);
+ccc_depq_elem const *ccc_depq_const_max(ccc_depqueue const[static 1])
+    ATTRIB_NONNULL(1);
 /* Read only peek at the min. Does not alter tree and thus
    is thread safe. */
-ccc_depq_elem const *ccc_depq_const_min(ccc_depqueue const *);
+ccc_depq_elem const *ccc_depq_const_min(ccc_depqueue const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* Erases a specified element known to be in the DEPQ and returns it.
    If the element is not found NULL is returned. O(lgN). However, in practice
    you can often benefit from O(1) access if that element is a duplicate
    or you are repeatedly erasing duplicates while iterating. */
-ccc_depq_elem *ccc_depq_erase(ccc_depqueue *, ccc_depq_elem *);
+ccc_depq_elem *ccc_depq_erase(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Updates the specified elem known to be in the DEPQ with
    a new priority in O(lgN) time. Because an update does not
@@ -237,8 +246,8 @@ ccc_depq_elem *ccc_depq_erase(ccc_depqueue *, ccc_depq_elem *);
    an element could not be found to be in the DEPQ. Insert
    does not fail in a DEPQ. See the iteration section
    for a pattern that might work if updating while iterating. */
-bool ccc_depq_update(ccc_depqueue *, ccc_depq_elem *, ccc_depq_update_fn *,
-                     void *);
+bool ccc_depq_update(ccc_depqueue[static 1], ccc_depq_elem[static 1],
+                     ccc_depq_update_fn *, void *) ATTRIB_NONNULL(1, 2);
 
 /* Returns true if this priority value is in the DEPQ.
    you need not search with any specific struct you have
@@ -247,17 +256,18 @@ bool ccc_depq_update(ccc_depqueue *, ccc_depq_elem *, ccc_depq_update_fn *,
    This can be helpful if you need to know if such a priority
    is present regardless of how many round robin duplicates
    are present. Returns the result in O(lgN). */
-bool ccc_depq_contains(ccc_depqueue *, ccc_depq_elem *);
+bool ccc_depq_contains(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Returns the maximum priority element if present and end
    if the DEPQ is empty. By default iteration is in descending
    order by priority. Equal to end if empty. */
-ccc_depq_elem *ccc_depq_begin(ccc_depqueue *);
+ccc_depq_elem *ccc_depq_begin(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 
 /* Returns the minimum priority element if present and end
    if the DEPQ is empty. This is an ascending traversal
    starting point. Equal to end if empty. */
-ccc_depq_elem *ccc_depq_rbegin(ccc_depqueue *);
+ccc_depq_elem *ccc_depq_rbegin(ccc_depqueue[static 1]) ATTRIB_NONNULL(1);
 
 /* Progresses through the DEPQ in order of highest priority by
    default. Use the reverse order iterator if you prefer ascending
@@ -266,10 +276,12 @@ ccc_depq_elem *ccc_depq_rbegin(ccc_depqueue *);
    visit duplicates in round robin order meaning oldest first so
    that priorities can be organized round robin either ascending
    or descending and visitation is fair. */
-ccc_depq_elem *ccc_depq_next(ccc_depqueue *, ccc_depq_elem *);
+ccc_depq_elem *ccc_depq_next(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Progresses through the DEPQ in ascending order */
-ccc_depq_elem *ccc_depq_rnext(ccc_depqueue *, ccc_depq_elem *);
+ccc_depq_elem *ccc_depq_rnext(ccc_depqueue[static 1], ccc_depq_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -279,16 +291,20 @@ ccc_depq_elem *ccc_depq_rnext(ccc_depqueue *, ccc_depq_elem *);
    iterate. Use the next iterator from begin to end. If there are no values
    NOT GREATER than begin last is returned as the begin element. Similarly if
    there are no values LESS than end, NULL is returned as end element. */
-ccc_depq_range ccc_depq_equal_range(ccc_depqueue *, ccc_depq_elem *begin,
-                                    ccc_depq_elem *end);
+ccc_depq_range ccc_depq_equal_range(ccc_depqueue[static 1],
+                                    ccc_depq_elem begin[static 1],
+                                    ccc_depq_elem end[static 1])
+    ATTRIB_NONNULL(1, 2, 3);
 
 /* Access the beginning of a range. Prefer this function to attempting to
    access fields of ranges directly. */
-ccc_depq_elem *ccc_depq_begin_range(ccc_depq_range const *);
+ccc_depq_elem *ccc_depq_begin_range(ccc_depq_range const[static 1]);
+ATTRIB_NONNULL(1);
 
 /* Access the ending of a range. Prefer this function to attempting to
    access fields of ranges directly. */
-ccc_depq_elem *ccc_depq_end_range(ccc_depq_range const *);
+ccc_depq_elem *ccc_depq_end_range(ccc_depq_range const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -298,21 +314,25 @@ ccc_depq_elem *ccc_depq_end_range(ccc_depq_range const *);
    iterate. Use the rnext iterator from rbegin to end. If there are no values
    NOT LESS than rbegin last is returned as the begin element. Similarly if
    there are no values GREATER than end, NULL is returned as end element. */
-ccc_depq_rrange ccc_depq_equal_rrange(ccc_depqueue *, ccc_depq_elem *rbegin,
-                                      ccc_depq_elem *end);
+ccc_depq_rrange ccc_depq_equal_rrange(ccc_depqueue[static 1],
+                                      ccc_depq_elem rbegin[static 1],
+                                      ccc_depq_elem end[static 1])
+    ATTRIB_NONNULL(1, 2, 3);
 
 /* Access the beginning of a rrange. Prefer this function to attempting to
    access fields of rranges directly. */
-ccc_depq_elem *ccc_depq_begin_rrange(ccc_depq_rrange const *);
+ccc_depq_elem *ccc_depq_begin_rrange(ccc_depq_rrange const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* Access the ending of a rrange. Prefer this function to attempting to
    access fields of rranges directly. */
-ccc_depq_elem *ccc_depq_end_rrange(ccc_depq_rrange const *);
+ccc_depq_elem *ccc_depq_end_rrange(ccc_depq_rrange const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* To view the underlying tree like structure of the DEPQ
    for debugging or other purposes, provide the root of the ccc_depqueue
    to the depq_print function as the starting ccc_depq_elem. */
-ccc_depq_elem *ccc_depq_root(ccc_depqueue const *);
+ccc_depq_elem *ccc_depq_root(ccc_depqueue const[static 1]) ATTRIB_NONNULL(1);
 
 /* Prints a tree structure of the underlying DEPQ for readability
    of many values. Helpful for printing debugging or viewing
@@ -321,7 +341,7 @@ ccc_depq_elem *ccc_depq_root(ccc_depqueue const *);
    so it may not be a good fit in constrained environments. Duplicates
    are indicated with plus signs followed by the number of additional
    duplicates. */
-void ccc_depq_print(ccc_depqueue const *, ccc_depq_elem const *,
+void ccc_depq_print(ccc_depqueue const[static 1], ccc_depq_elem const[static 1],
                     ccc_depq_print_fn *);
 
 /* (40){id:10,val:10}{id:10,val:10}(+1)

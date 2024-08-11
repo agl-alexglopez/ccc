@@ -224,8 +224,9 @@ typedef enum ccc_set_threeway_cmp
       }
 
    ============================================================= */
-typedef ccc_set_threeway_cmp ccc_set_cmp_fn(ccc_set_elem const *a,
-                                            ccc_set_elem const *b, void *aux);
+typedef ccc_set_threeway_cmp ccc_set_cmp_fn(ccc_set_elem const a[static 1],
+                                            ccc_set_elem const b[static 1],
+                                            void *aux) ATTRIB_NONNULL(1, 2);
 
 /* Performs user specified destructor actions on a single ccc_set_elem. This
    ccc_set_elem is assumed to be embedded in user defined structs and therefore
@@ -234,7 +235,7 @@ typedef ccc_set_threeway_cmp ccc_set_cmp_fn(ccc_set_elem const *a,
    own structures and therefore shall call free on the containing structure.
    If the data structure is stack allocated, free is not necessary but other
    updates may be specified by this function. */
-typedef void ccc_set_destructor_fn(ccc_set_elem *);
+typedef void ccc_set_destructor_fn(ccc_set_elem[static 1]) ATTRIB_NONNULL(1);
 
 /* A container for a simple begin and end pointer to a ccc_set_elem.
 
@@ -289,7 +290,7 @@ typedef struct ccc_set_rrange
 
    Output should be one line with no newline character. Then,
    the printer function will take care of the rest. */
-typedef void ccc_set_print_fn(ccc_set_elem const *);
+typedef void ccc_set_print_fn(ccc_set_elem const[static 1]) ATTRIB_NONNULL(1);
 
 /* NOLINTNEXTLINE */
 #define CCC_SET_OF(struct, member, set_elem)                                   \
@@ -308,12 +309,13 @@ typedef void ccc_set_print_fn(ccc_set_elem const *);
    Other updates before destruction are possible to include in destructor
    if determined necessary by the user. A set has no hidden allocations and
    therefore the only heap memory is controlled by the user. */
-void ccc_set_clear(ccc_set *, ccc_set_destructor_fn *destructor);
+void ccc_set_clear(ccc_set[static 1], ccc_set_destructor_fn *destructor)
+    ATTRIB_NONNULL(1);
 
 /* O(1) */
-bool ccc_set_empty(ccc_set *);
+bool ccc_set_empty(ccc_set[static 1]) ATTRIB_NONNULL(1);
 /* O(1) */
-size_t ccc_set_size(ccc_set *);
+size_t ccc_set_size(ccc_set[static 1]) ATTRIB_NONNULL(1);
 
 /* ===================     Set Methods   ======================= */
 
@@ -325,14 +327,16 @@ size_t ccc_set_size(ccc_set *);
    with the same key. Do not assume your element is the
    one that is found unless you know it is only one you
    have created. */
-bool ccc_set_contains(ccc_set *, ccc_set_elem *);
+bool ccc_set_contains(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Returns true if the element you have requested to be
    inserted is inserted false if it was present already.
    Becuase this is heap free data structure there is no need
    to return the actual element that is inserted. You already
    have it when you call this function.*/
-bool ccc_set_insert(ccc_set *, ccc_set_elem *);
+bool ccc_set_insert(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* IT IS UNDEFINED BEHAVIOR TO MODIFY THE KEY OF A FOUND ELEM.
    THIS FUNCTION DOES NOT REMOVE THE ELEMENT YOU SEEK.
@@ -345,16 +349,20 @@ bool ccc_set_insert(ccc_set *, ccc_set_elem *);
    be using for your program, but please read the warning.
    There is little I can do to stop you from ruining
    everything if you choose to do so. */
-ccc_set_elem const *ccc_set_find(ccc_set *, ccc_set_elem *);
+ccc_set_elem const *ccc_set_find(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Erases the element specified by key value and returns a
    pointer to the set element or NULL if the element cannot be found. */
-ccc_set_elem *ccc_set_erase(ccc_set *, ccc_set_elem *);
+ccc_set_elem *ccc_set_erase(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Check if the current elem is the min. O(lgN) */
-bool ccc_set_is_min(ccc_set *, ccc_set_elem *);
+bool ccc_set_is_min(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 /* Check if the current elem is the max. O(lgN) */
-bool ccc_set_is_max(ccc_set *, ccc_set_elem *);
+bool ccc_set_is_max(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Basic C++ style set operation. Contains does not return
    an element but will tell you if an element with the same
@@ -365,7 +373,8 @@ bool ccc_set_is_max(ccc_set *, ccc_set_elem *);
    one that is found unless you know it is only one you
    have created. The const version does no fixups and should
    be used only rarely. */
-bool ccc_set_const_contains(ccc_set *, ccc_set_elem *);
+bool ccc_set_const_contains(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Read only seek into the data structure backing the set.
    It is therefore safe for multiple threads to read with
@@ -374,7 +383,9 @@ bool ccc_set_const_contains(ccc_set *, ccc_set_elem *);
    benefits from locality of reference and should be
    allowed to repair itself with lookups with all other
    functions whenever possible. Returns NULL if not found. */
-ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
+ccc_set_elem const *ccc_set_const_find(ccc_set[static 1],
+                                       ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* ===================    Iteration   ==========================
 
@@ -419,19 +430,21 @@ ccc_set_elem const *ccc_set_const_find(ccc_set *, ccc_set_elem *);
 /* Provides the start for an inorder ascending order traversal
    of the set. Equivalent to end of the set is empty. The iterator
    will be NULL to signal loop termination. */
-ccc_set_elem *ccc_set_begin(ccc_set *);
+ccc_set_elem *ccc_set_begin(ccc_set[static 1]) ATTRIB_NONNULL(1);
 
 /* Provides the start for an inorder descending order traversal
    of the set. Equivalent to end of the set is empty. */
-ccc_set_elem *ccc_set_rbegin(ccc_set *);
+ccc_set_elem *ccc_set_rbegin(ccc_set[static 1]) ATTRIB_NONNULL(1);
 
 /* Progresses the pointer to the next greatest element in
    the set or the end if done. */
-ccc_set_elem *ccc_set_next(ccc_set *, ccc_set_elem *);
+ccc_set_elem *ccc_set_next(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Progresses the pointer to the next lesser element in
    the set or the end if done. */
-ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
+ccc_set_elem *ccc_set_rnext(ccc_set[static 1], ccc_set_elem[static 1])
+    ATTRIB_NONNULL(1, 2);
 
 /* Returns the range with pointers to the first element NOT LESS
    than the requested begin and last element GREATER than the
@@ -452,17 +465,21 @@ ccc_set_elem *ccc_set_rnext(ccc_set *, ccc_set_elem *);
    Use the next iterator from begin to end. If there are no values NOT LESS
    than begin last is returned as the begin element. Similarly if there are
    no values GREATER than end, NULL is returned as end element. */
-ccc_set_range ccc_set_equal_range(ccc_set *, ccc_set_elem *begin,
-                                  ccc_set_elem *end);
+ccc_set_range ccc_set_equal_range(ccc_set[static 1],
+                                  ccc_set_elem begin[static 1],
+                                  ccc_set_elem end[static 1])
+    ATTRIB_NONNULL(1, 2, 3);
 
 /* The start of a range to iterate through. Use in combination with the
    ccc_set_end_range function to determine loop termination. */
-ccc_set_elem *ccc_set_begin_range(ccc_set_range const *);
+ccc_set_elem *ccc_set_begin_range(ccc_set_range const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* It is best to check the iterator against this value for loop termination
    as a range end may be NULL if there are no more values or a value that is
    outside of the specified range if one exists. */
-ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
+ccc_set_elem *ccc_set_end_range(ccc_set_range const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* Returns the range with pointers to the first element NOT GREATER
    than the requested begin and last element LESS than the
@@ -483,31 +500,36 @@ ccc_set_elem *ccc_set_end_range(ccc_set_range const *);
    Use the next iterator from begin to end. If there are no values NOT GREATER
    than begin last is returned as the begin element. Similarly if there are
    no values LESS than end, NULL is returned as end element. */
-ccc_set_rrange ccc_set_equal_rrange(ccc_set *, ccc_set_elem *rbegin,
-                                    ccc_set_elem *end);
+ccc_set_rrange ccc_set_equal_rrange(ccc_set[static 1],
+                                    ccc_set_elem rbegin[static 1],
+                                    ccc_set_elem end[static 1])
+    ATTRIB_NONNULL(1, 2, 3);
 
 /* The start of a range to iterate through. Use in combination with the
    ccc_set_end_rrange function to determine loop termination. */
-ccc_set_elem *ccc_set_begin_rrange(ccc_set_rrange const *);
+ccc_set_elem *ccc_set_begin_rrange(ccc_set_rrange const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* It is best to check the iterator against this value for loop termination
    as a range end may be NULL if there are no more values or a value that is
    outside of the specified range if one exists. */
-ccc_set_elem *ccc_set_end_rrange(ccc_set_rrange const *);
+ccc_set_elem *ccc_set_end_rrange(ccc_set_rrange const[static 1])
+    ATTRIB_NONNULL(1);
 
 /* Internal testing. Mostly useless. User at your own risk
    unless you wish to do some traversal of your own liking.
    However, you should of course not modify keys or nodes.
    You will need to pass this to the print function as a
    starting node for debugging. */
-ccc_set_elem *ccc_set_root(ccc_set const *);
+ccc_set_elem *ccc_set_root(ccc_set const[static 1]) ATTRIB_NONNULL(1);
 
 /* Prints a tree structure of the underlying ccc_set for readability
    of many values. Helpful for printing debugging or viewing
    storage charactersistics in gdb. See sample output below.
    This function currently uses heap allocation and recursion
    so it may not be a good fit in constrained environments. */
-void ccc_set_print(ccc_set const *, ccc_set_elem const *, ccc_set_print_fn *);
+void ccc_set_print(ccc_set const[static 1], ccc_set_elem const[static 1],
+                   ccc_set_print_fn *) ATTRIB_NONNULL(1, 2);
 
 /* (40){id:10,val:10}{id:10,val:10}
     ├──(29)R:{id:27,val:27}
