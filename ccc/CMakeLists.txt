@@ -4,9 +4,6 @@ target_link_libraries(buf PRIVATE
 )
 
 add_library(pqueue pqueue.h ${CMAKE_SOURCE_DIR}/ccc_src/pqueue.c)
-target_link_libraries(pqueue PRIVATE
-  attrib
-)
 
 add_library(flat_pqueue flat_pqueue.h ${CMAKE_SOURCE_DIR}/ccc_src/flat_pqueue.c)
 target_link_libraries(flat_pqueue PRIVATE

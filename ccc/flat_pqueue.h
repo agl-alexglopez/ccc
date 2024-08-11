@@ -18,18 +18,17 @@ typedef enum ccc_fpq_threeway_cmp
 
 typedef struct ccc_fpq_elem
 {
-    uint8_t handle;
+    size_t handle;
 } ccc_fpq_elem;
 
-typedef ccc_fpq_threeway_cmp ccc_fpq_cmp_fn(ccc_fpq_elem const[static 1],
-                                            ccc_fpq_elem const[static 1],
-                                            void *) ATTRIB_NONNULL(1, 2);
+typedef ccc_fpq_threeway_cmp ccc_fpq_cmp_fn(ccc_fpq_elem const *,
+                                            ccc_fpq_elem const *, void *);
 
-typedef void fpq_destructor_fn(ccc_fpq_elem[static 1]) ATTRIB_NONNULL(1);
+typedef void fpq_destructor_fn(ccc_fpq_elem *);
 
-typedef void fpq_update_fn(ccc_fpq_elem[static 1], void *) ATTRIB_NONNULL(1);
+typedef void fpq_update_fn(ccc_fpq_elem *, void *);
 
-typedef void fpq_print_fn(ccc_fpq_elem const[static 1]) ATTRIB_NONNULL(1);
+typedef void fpq_print_fn(ccc_fpq_elem const *);
 
 typedef struct ccc_flat_pqueue
 {
