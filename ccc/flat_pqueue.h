@@ -15,6 +15,13 @@ typedef enum ccc_fpq_threeway_cmp
     CCC_FPQ_GRT,
 } ccc_fpq_threeway_cmp;
 
+typedef enum ccc_fpq_result
+{
+    CCC_FPQ_OK = CCC_BUF_OK,
+    CCC_FPQ_FULL = CCC_BUF_FULL,
+    CCC_FPQ_ERR = CCC_BUF_ERR,
+} ccc_fpq_result;
+
 typedef struct ccc_fpq_elem
 {
     uint8_t handle;
@@ -83,41 +90,41 @@ typedef struct ccc_flat_pqueue
    If generating any values within the struct occurs via expensive function
    calls or calls with side effects, note that such functions do not execute
    if allocation fails due to a full buffer and no reallocation policy. */
-#define CCC_FPQ_EMPLACE(fpq, struct_name, struct_brace_initializer...)         \
+#define CCC_FPQ_EMPLACE(fpq, struct_name, struct_initializer...)               \
     ({                                                                         \
-        ccc_buf_result _macro_res_;                                            \
+        ccc_fpq_result _macro_res_;                                            \
         {                                                                      \
             if (sizeof(struct_name) != ccc_buf_elem_size((fpq)->buf))          \
             {                                                                  \
-                _macro_res_ = CCC_BUF_ERR;                                     \
+                _macro_res_ = CCC_FPQ_ERR;                                     \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 void *_macro_new_ = ccc_buf_alloc((fpq)->buf);                 \
                 if (!_macro_new_)                                              \
                 {                                                              \
-                    _macro_res_ = CCC_BUF_FULL;                                \
+                    _macro_res_ = CCC_FPQ_FULL;                                \
                 }                                                              \
                 else                                                           \
                 {                                                              \
                     *((struct_name *)_macro_new_)                              \
-                        = (struct_name)struct_brace_initializer;               \
+                        = (struct_name)struct_initializer;                     \
                     if (ccc_buf_size((fpq)->buf) > 1)                          \
                     {                                                          \
                         uint8_t _macro_tmp_[ccc_buf_elem_size((fpq)->buf)];    \
                         bubble_up((fpq), _macro_tmp_,                          \
                                   ccc_buf_size((fpq)->buf) - 1);               \
                     }                                                          \
-                    _macro_res_ = CCC_BUF_OK;                                  \
+                    _macro_res_ = CCC_FPQ_OK;                                  \
                 }                                                              \
             }                                                                  \
         };                                                                     \
         _macro_res_;                                                           \
     })
 
-ccc_buf_result ccc_fpq_realloc(ccc_flat_pqueue *, size_t new_capacity,
+ccc_fpq_result ccc_fpq_realloc(ccc_flat_pqueue *, size_t new_capacity,
                                ccc_buf_realloc_fn *);
-ccc_buf_result ccc_fpq_push(ccc_flat_pqueue *, void const *);
+ccc_fpq_result ccc_fpq_push(ccc_flat_pqueue *, void const *);
 ccc_fpq_elem const *ccc_fpq_front(ccc_flat_pqueue const *);
 ccc_buf *ccc_fpq_buf(ccc_flat_pqueue const *);
 ccc_fpq_elem *ccc_fpq_pop(ccc_flat_pqueue *);
