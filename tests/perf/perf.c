@@ -1,3 +1,4 @@
+#include "buf.h"
 #include "cli.h"
 #include "depqueue.h"
 #include "flat_pqueue.h"
@@ -118,14 +119,13 @@ test_push(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_buf buf = CCC_BUF_INIT(val_array, sizeof(struct val), n, NULL);
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, fpq_elem),
+        ccc_buf buf = CCC_BUF_INIT(val_array, struct val, n, NULL);
+        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, struct val, fpq_elem,
                                            CCC_FPQ_LES, fpq_val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *const v = ccc_buf_alloc(&buf);
-            ccc_fpq_push(&fpq, &v->fpq_elem);
+            ccc_fpq_push(&fpq, &val_array[i]);
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -166,13 +166,12 @@ test_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_buf buf = CCC_BUF_INIT(val_array, sizeof(struct val), n, NULL);
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, fpq_elem),
+        ccc_buf buf = CCC_BUF_INIT(val_array, struct val, n, NULL);
+        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, struct val, fpq_elem,
                                            CCC_FPQ_LES, fpq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *const v = ccc_buf_alloc(&buf);
-            ccc_fpq_push(&fpq, &v->fpq_elem);
+            ccc_fpq_push(&fpq, &val_array[i]);
         }
         begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -220,14 +219,13 @@ test_push_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_buf buf = CCC_BUF_INIT(val_array, sizeof(struct val), n, NULL);
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, fpq_elem),
+        ccc_buf buf = CCC_BUF_INIT(val_array, struct val, n, NULL);
+        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, struct val, fpq_elem,
                                            CCC_FPQ_LES, fpq_val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *const v = ccc_buf_alloc(&buf);
-            ccc_fpq_push(&fpq, &v->fpq_elem);
+            ccc_fpq_push(&fpq, &val_array[i]);
         }
         for (size_t i = 0; i < n; ++i)
         {
@@ -273,14 +271,13 @@ test_push_intermittent_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_buf buf = CCC_BUF_INIT(val_array, sizeof(struct val), n, NULL);
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, fpq_elem),
+        ccc_buf buf = CCC_BUF_INIT(val_array, struct val, n, NULL);
+        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, struct val, fpq_elem,
                                            CCC_FPQ_LES, fpq_val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *const v = ccc_buf_alloc(&buf);
-            ccc_fpq_push(&fpq, &v->fpq_elem);
+            ccc_fpq_push(&fpq, &val_array[i]);
             if (i % 10 == 0)
             {
                 ccc_fpq_pop(&fpq);
@@ -337,23 +334,21 @@ test_pop_intermittent_push(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_buf buf = CCC_BUF_INIT(val_array, sizeof(struct val), n, NULL);
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, fpq_elem),
+        ccc_buf buf = CCC_BUF_INIT(val_array, struct val, n, NULL);
+        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, struct val, fpq_elem,
                                            CCC_FPQ_LES, fpq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *const v = ccc_buf_alloc(&buf);
-            ccc_fpq_push(&fpq, &v->fpq_elem);
+            ccc_fpq_push(&fpq, &val_array[i]);
         }
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *v = CCC_FPQ_OF(struct val, fpq_elem, ccc_fpq_pop(&fpq));
+            (void)ccc_fpq_pop(&fpq);
             if (i % 10 == 0)
             {
-                v = ccc_buf_alloc(&buf);
-                v->val = rand_range(0, max_rand_range);
-                ccc_fpq_push(&fpq, &v->fpq_elem);
+                CCC_FPQ_PUSH(&fpq, struct val,
+                             {.val = rand_range(0, max_rand_range)});
             }
         }
         end = clock();
@@ -401,13 +396,12 @@ test_update(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_buf buf = CCC_BUF_INIT(val_array, sizeof(struct val), n, NULL);
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, fpq_elem),
+        ccc_buf buf = CCC_BUF_INIT(val_array, struct val, n, NULL);
+        ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, struct val, fpq_elem,
                                            CCC_FPQ_LES, fpq_val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *const v = ccc_buf_alloc(&buf);
-            ccc_fpq_push(&fpq, &v->fpq_elem);
+            ccc_fpq_push(&fpq, &val_array[i]);
         }
         begin = clock();
         for (size_t i = 0; i < n; ++i)

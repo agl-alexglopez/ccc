@@ -1,3 +1,4 @@
+#include "buf.h"
 #include "flat_pqueue.h"
 #include "test.h"
 
@@ -51,16 +52,15 @@ fpq_test_insert_iterate_pop(void)
     srand(1);
     size_t const num_nodes = 1000;
     struct val vals[num_nodes];
-    ccc_buf buf = CCC_BUF_INIT(vals, sizeof(struct val), num_nodes, NULL);
-    ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, elem),
-                                       CCC_FPQ_LES, val_cmp, NULL);
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
+    ccc_flat_pqueue fpq
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        struct val *const v = ccc_buf_alloc(&buf);
-        ccc_fpq_push(&fpq, &v->elem);
+        ccc_fpq_push(&fpq, &vals[i]);
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     size_t pop_count = 0;
@@ -82,16 +82,19 @@ fpq_test_priority_removal(void)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[num_nodes];
-    ccc_buf buf = CCC_BUF_INIT(vals, sizeof(struct val), num_nodes, NULL);
-    ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, elem),
-                                       CCC_FPQ_LES, val_cmp, NULL);
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
+    ccc_flat_pqueue fpq
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].val = rand() % (num_nodes + 1); // NOLINT
-        vals[i].id = (int)i;
-        struct val *const v = ccc_buf_alloc(&buf);
-        ccc_fpq_push(&fpq, &v->elem);
+        ccc_buf_result const res
+            = CCC_FPQ_PUSH(&fpq, struct val,
+                           {
+                               .val = rand() % (num_nodes + 1), /*NOLINT*/
+                               .id = (int)i,
+                           });
+        CHECK(res, CCC_BUF_OK, ccc_buf_result, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     int const limit = 400;
@@ -117,16 +120,19 @@ fpq_test_priority_update(void)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[num_nodes];
-    ccc_buf buf = CCC_BUF_INIT(vals, sizeof(struct val), num_nodes, NULL);
-    ccc_flat_pqueue fpq = CCC_FPQ_INIT(&buf, offsetof(struct val, elem),
-                                       CCC_FPQ_LES, val_cmp, NULL);
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
+    ccc_flat_pqueue fpq
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].val = rand() % (num_nodes + 1); // NOLINT
-        vals[i].id = (int)i;
-        struct val *const v = ccc_buf_alloc(&buf);
-        ccc_fpq_push(&fpq, &v->elem);
+        ccc_buf_result const res
+            = CCC_FPQ_PUSH(&fpq, struct val,
+                           {
+                               .val = rand() % (num_nodes + 1), /*NOLINT*/
+                               .id = (int)i,
+                           });
+        CHECK(res, CCC_BUF_OK, ccc_buf_result, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     int const limit = 400;

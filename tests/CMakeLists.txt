@@ -37,6 +37,7 @@ macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME} PRIVATE
     flat_pqueue 
+    buf
     test
   )
   set_target_properties(${TEST_NAME} 
@@ -96,6 +97,7 @@ add_set_test(test_set_iter)
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
 target_link_libraries(perf PRIVATE 
+  buf
   depqueue 
   flat_pqueue
   pqueue
