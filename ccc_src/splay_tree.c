@@ -310,11 +310,7 @@ ccc_set_clear(ccc_set *set, ccc_set_destructor_fn *destructor)
 
     while (!ccc_set_empty(set))
     {
-        ccc_set_elem *e = (ccc_set_elem *)pop_min(&set->t);
-        if (e)
-        {
-            destructor(e);
-        }
+        destructor((ccc_set_elem *)pop_min(&set->t));
     }
 }
 
