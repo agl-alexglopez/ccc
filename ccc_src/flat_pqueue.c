@@ -39,6 +39,13 @@ static void print_inner_heap(ccc_flat_pqueue const *, size_t, char const *,
 static void print_heap(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
 
 ccc_buf_result
+ccc_fpq_realloc(ccc_flat_pqueue *const fpq, size_t const new_capacity,
+                ccc_buf_realloc_fn *const fn)
+{
+    return ccc_buf_realloc(fpq->buf, new_capacity, fn);
+}
+
+ccc_buf_result
 ccc_fpq_push(ccc_flat_pqueue *const fpq, void const *const val)
 {
     void *const new = ccc_buf_alloc(fpq->buf);
