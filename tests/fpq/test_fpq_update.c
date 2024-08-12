@@ -88,13 +88,13 @@ fpq_test_priority_removal(void)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        ccc_buf_result const res
+        ccc_fpq_result const res
             = CCC_FPQ_EMPLACE(&fpq, struct val,
                               {
                                   .val = rand() % (num_nodes + 1), /*NOLINT*/
                                   .id = (int)i,
                               });
-        CHECK(res, CCC_BUF_OK, ccc_buf_result, "%d");
+        CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     int const limit = 400;
@@ -126,13 +126,13 @@ fpq_test_priority_update(void)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        ccc_buf_result const res
+        ccc_fpq_result const res
             = CCC_FPQ_EMPLACE(&fpq, struct val,
                               {
                                   .val = rand() % (num_nodes + 1), /*NOLINT*/
                                   .id = (int)i,
                               });
-        CHECK(res, CCC_BUF_OK, ccc_buf_result, "%d");
+        CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     int const limit = 400;

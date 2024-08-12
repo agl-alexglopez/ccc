@@ -38,20 +38,20 @@ static void print_inner_heap(ccc_flat_pqueue const *, size_t, char const *,
                              enum ccc_print_link, fpq_print_fn *);
 static void print_heap(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
 
-ccc_buf_result
+ccc_fpq_result
 ccc_fpq_realloc(ccc_flat_pqueue *const fpq, size_t const new_capacity,
                 ccc_buf_realloc_fn *const fn)
 {
-    return ccc_buf_realloc(fpq->buf, new_capacity, fn);
+    return (ccc_fpq_result)ccc_buf_realloc(fpq->buf, new_capacity, fn);
 }
 
-ccc_buf_result
+ccc_fpq_result
 ccc_fpq_push(ccc_flat_pqueue *const fpq, void const *const val)
 {
     void *const new = ccc_buf_alloc(fpq->buf);
     if (!new)
     {
-        return CCC_BUF_FULL;
+        return CCC_FPQ_FULL;
     }
     if (new != val)
     {
@@ -64,7 +64,7 @@ ccc_fpq_push(ccc_flat_pqueue *const fpq, void const *const val)
         uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
         bubble_up(fpq, tmp, i);
     }
-    return CCC_BUF_OK;
+    return CCC_FPQ_OK;
 }
 
 ccc_buf *
