@@ -3,7 +3,6 @@
 
 #include "buf.h"
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 /* NOLINTNEXTLINE */
@@ -52,7 +51,7 @@ typedef struct ccc_flat_pqueue
     }
 
 /* Given an initialized flat priority queue, a struct type, and its
-   initializer, attempts to push an r-value of one's struct type into the
+   initializer, attempts to write an r-value of one's struct type into the
    backing buffer directly, returning the ccc_buf_result according to the
    underlying buffer's allocation policy. If allocation fails because
    the underlying buffer does not define a reallocation policy and is full,
@@ -66,36 +65,25 @@ typedef struct ccc_flat_pqueue
        int id;
        ccc_fpq_elem e;
    };
-   static struct val memory[100];
-   static ccc_buf buf = CCC_BUF_INIT(&memory, struct val, 100, NULL);
-   static ccc_flat_pqueue fpq =
-       CCC_FPQ_INIT(&buf, offsetof(struct val, e), CCC_FPQ_LES, val_cmp, NULL);
-   int main()
-   {
-       ccc_buf_result const res = CCC_FPQ_PUSH(&fpq, struct val, {.v = 10});
-       return 0;
-   }
-
-   Most importantly, the struct name shall be provided followed by a brace
-   initializer with fields of the struct type specified. Here are further
-   examples of types of initialization possible.
 
    Various forms of designated initializers:
 
-   ccc_buf_result const res = CCC_FPQ_PUSH(&fpq, struct val, {.v = 10});
+   ccc_buf_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10});
    ccc_buf_result const res
-       = CCC_FPQ_PUSH(&fpq, struct val, {.v = 10, .id = 0});
+       = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = rand_value(), .id = 0});
    ccc_buf_result const res
-       = CCC_FPQ_PUSH(&fpq, struct val, {.v = 10, .id = 0, .e = {0}});
+       = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10, .id = 0, .e = {0}});
 
    Older C notation requires all fields be specified on some compilers:
 
-   ccc_buf_result const res = CCC_FPQ_PUSH(&fpq, struct val, {10, 0, {0}});
+   ccc_buf_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {10, 0, {0}});
 
-   This macro provides a more convenient succinct notation that avoids an
-   additional copy if the struct values are constructed by hand or
-   from input of other functions, requiring no intermediate storage. */
-#define CCC_FPQ_PUSH(fpq, struct_name, struct_brace_initializer...)            \
+   This macro avoids an additional copy if the struct values are constructed
+   by hand or from input of other functions, requiring no intermediate storage.
+   If generating any values within the struct occurs via expensive function
+   calls or calls with side effects, note that such functions do not execute
+   if allocation fails due to a full buffer and no reallocation policy. */
+#define CCC_FPQ_EMPLACE(fpq, struct_name, struct_brace_initializer...)         \
     ({                                                                         \
         ccc_buf_result _macro_res_;                                            \
         {                                                                      \
@@ -113,7 +101,7 @@ typedef struct ccc_flat_pqueue
                     if (ccc_buf_size((fpq)->buf) > 1)                          \
                     {                                                          \
                         uint8_t _macro_tmp_[ccc_buf_elem_size((fpq)->buf)];    \
-                        bubble_up((fpq), (_macro_tmp_),                        \
+                        bubble_up((fpq), _macro_tmp_,                          \
                                   ccc_buf_size((fpq)->buf) - 1);               \
                     }                                                          \
                     _macro_res_ = CCC_BUF_OK;                                  \
@@ -127,6 +115,8 @@ typedef struct ccc_flat_pqueue
         _macro_res_;                                                           \
     })
 
+ccc_buf_result ccc_fpq_realloc(ccc_flat_pqueue *, size_t new_capacity,
+                               ccc_buf_realloc_fn *);
 ccc_buf_result ccc_fpq_push(ccc_flat_pqueue *, void const *);
 ccc_fpq_elem const *ccc_fpq_front(ccc_flat_pqueue const *);
 ccc_buf *ccc_fpq_buf(ccc_flat_pqueue const *);

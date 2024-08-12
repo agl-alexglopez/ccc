@@ -347,8 +347,8 @@ test_pop_intermittent_push(void)
             (void)ccc_fpq_pop(&fpq);
             if (i % 10 == 0)
             {
-                CCC_FPQ_PUSH(&fpq, struct val,
-                             {.val = rand_range(0, max_rand_range)});
+                CCC_FPQ_EMPLACE(&fpq, struct val,
+                                {.val = rand_range(0, max_rand_range)});
             }
         }
         end = clock();

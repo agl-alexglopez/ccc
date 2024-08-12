@@ -56,11 +56,11 @@ pq_test_macro(void)
     ccc_flat_pqueue pq
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     ccc_buf_result res
-        = CCC_FPQ_PUSH(&pq, struct val, (struct val){.val = 0, .id = 0});
+        = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
     CHECK(res, CCC_BUF_OK, ccc_buf_result, "%d");
     CHECK(ccc_fpq_empty(&pq), false, bool, "%d");
     ccc_buf_result res2
-        = CCC_FPQ_PUSH(&pq, struct val, (struct val){.val = 0, .id = 0});
+        = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
     CHECK(res2, CCC_BUF_FULL, ccc_buf_result, "%d");
     return PASS;
 }
