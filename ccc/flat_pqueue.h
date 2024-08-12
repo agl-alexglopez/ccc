@@ -47,7 +47,7 @@ typedef struct ccc_flat_pqueue
     {                                                                          \
         .buf = (mem_buf),                                                      \
         .fpq_elem_offset = offsetof(struct_name, fpq_elem_field),              \
-        .cmp = (cmp_fn), .order = (cmp_order), .aux = (aux_data)               \
+        .cmp = (cmp_fn), .order = (cmp_order), .aux = (aux_data),              \
     }
 
 /* Given an initialized flat priority queue, a struct type, and its
@@ -94,7 +94,11 @@ typedef struct ccc_flat_pqueue
             else                                                               \
             {                                                                  \
                 void *_macro_new_ = ccc_buf_alloc((fpq)->buf);                 \
-                if (_macro_new_)                                               \
+                if (!_macro_new_)                                              \
+                {                                                              \
+                    _macro_res_ = CCC_BUF_FULL;                                \
+                }                                                              \
+                else                                                           \
                 {                                                              \
                     *((struct_name *)_macro_new_)                              \
                         = (struct_name)struct_brace_initializer;               \
@@ -105,10 +109,6 @@ typedef struct ccc_flat_pqueue
                                   ccc_buf_size((fpq)->buf) - 1);               \
                     }                                                          \
                     _macro_res_ = CCC_BUF_OK;                                  \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                    _macro_res_ = CCC_BUF_FULL;                                \
                 }                                                              \
             }                                                                  \
         };                                                                     \
