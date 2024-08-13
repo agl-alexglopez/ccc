@@ -15,7 +15,6 @@ struct val
 {
     int val;
     ccc_depq_elem depq_elem;
-    ccc_fpq_elem fpq_elem;
     ccc_pq_elem pq_elem;
 };
 
@@ -36,12 +35,11 @@ static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
 static ccc_depq_threeway_cmp depq_val_cmp(ccc_depq_elem const *,
                                           ccc_depq_elem const *, void *);
-static ccc_fpq_threeway_cmp fpq_val_cmp(ccc_fpq_elem const *,
-                                        ccc_fpq_elem const *, void *);
+static ccc_fpq_threeway_cmp fpq_val_cmp(void const *, void const *, void *);
 static ccc_pq_threeway_cmp pq_val_cmp(ccc_pq_elem const *, ccc_pq_elem const *,
                                       void *);
 static void depq_update_val(ccc_depq_elem *, void *);
-static void fpq_update_val(ccc_fpq_elem *, void *);
+static void fpq_update_val(void *, void *);
 static void pq_update_val(ccc_pq_elem *, void *);
 
 #define NUM_TESTS (size_t)6
@@ -407,8 +405,7 @@ test_update(void)
         for (size_t i = 0; i < n; ++i)
         {
             int new_val = rand_range(0, max_rand_range);
-            (void)ccc_fpq_update(&fpq, &val_array[i].fpq_elem, fpq_update_val,
-                                 &new_val);
+            (void)ccc_fpq_update(&fpq, &val_array[i], fpq_update_val, &new_val);
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -462,11 +459,11 @@ depq_val_cmp(ccc_depq_elem const *const a, ccc_depq_elem const *const b,
 }
 
 static ccc_fpq_threeway_cmp
-fpq_val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *const aux)
+fpq_val_cmp(void const *const a, void const *const b, void *const aux)
 {
     (void)aux;
-    struct val const *const x = CCC_FPQ_OF(struct val, fpq_elem, a);
-    struct val const *const y = CCC_FPQ_OF(struct val, fpq_elem, b);
+    struct val const *const x = a;
+    struct val const *const y = b;
     if (x->val < y->val)
     {
         return CCC_FPQ_LES;
@@ -486,9 +483,9 @@ depq_update_val(ccc_depq_elem *e, void *aux)
 }
 
 static void
-fpq_update_val(ccc_fpq_elem *e, void *aux)
+fpq_update_val(void *const e, void *aux)
 {
-    struct val *v = CCC_FPQ_OF(struct val, fpq_elem, e);
+    struct val *const v = e;
     v->val = *((int *)aux);
 }
 

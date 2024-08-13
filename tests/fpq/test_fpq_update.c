@@ -12,15 +12,13 @@ struct val
 {
     int id;
     int val;
-    ccc_fpq_elem elem;
 };
 
 static enum test_result fpq_test_insert_iterate_pop(void);
 static enum test_result fpq_test_priority_update(void);
 static enum test_result fpq_test_priority_removal(void);
-static void val_update(ccc_fpq_elem *, void *);
-static ccc_fpq_threeway_cmp val_cmp(ccc_fpq_elem const *, ccc_fpq_elem const *,
-                                    void *);
+static void val_update(void *, void *);
+static ccc_fpq_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS] = {
@@ -100,11 +98,10 @@ fpq_test_priority_removal(void)
     int const limit = 400;
     for (size_t seen = 0, remaining = num_nodes; seen < remaining; ++seen)
     {
-        ccc_fpq_elem *i = &vals[seen].elem;
-        struct val *cur = CCC_FPQ_OF(struct val, elem, i);
+        struct val *cur = &vals[seen];
         if (cur->val > limit)
         {
-            (void)ccc_fpq_erase(&fpq, i);
+            (void)ccc_fpq_erase(&fpq, cur);
             CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
             --remaining;
         }
@@ -138,12 +135,11 @@ fpq_test_priority_update(void)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        ccc_fpq_elem *i = &vals[val].elem;
-        struct val *cur = CCC_FPQ_OF(struct val, elem, i);
+        struct val *cur = &vals[val];
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(ccc_fpq_update(&fpq, i, val_update, &backoff), true, bool,
+            CHECK(ccc_fpq_update(&fpq, cur, val_update, &backoff), true, bool,
                   "%d");
             CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
         }
@@ -153,17 +149,17 @@ fpq_test_priority_update(void)
 }
 
 static ccc_fpq_threeway_cmp
-val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
+val_cmp(void const *const a, void const *const b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_FPQ_OF(struct val, elem, a);
-    struct val *rhs = CCC_FPQ_OF(struct val, elem, b);
+    struct val const *const lhs = a;
+    struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
-val_update(ccc_fpq_elem *a, void *aux)
+val_update(void *a, void *aux)
 {
-    struct val *old = CCC_FPQ_OF(struct val, elem, a);
+    struct val *const old = a;
     old->val = *(int *)aux;
 }
