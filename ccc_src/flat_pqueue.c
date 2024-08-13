@@ -29,8 +29,10 @@ enum fpq_direction
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 
-static ccc_fpq_elem *at(ccc_flat_pqueue const *, size_t i);
-static size_t index_of(ccc_flat_pqueue const *, ccc_fpq_elem const *);
+static void *at(ccc_flat_pqueue const *, size_t);
+static size_t index_of(ccc_flat_pqueue const *, void const *);
+static bool wins(ccc_flat_pqueue const *, void const *winner,
+                 void const *loser);
 static void swap(ccc_flat_pqueue *, uint8_t tmp[], size_t, size_t);
 static void bubble_down(ccc_flat_pqueue *, uint8_t tmp[], size_t);
 static void print_node(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
@@ -73,14 +75,14 @@ ccc_fpq_buf(ccc_flat_pqueue const *fpq)
     return fpq->buf;
 }
 
-ccc_fpq_elem *
+void *
 ccc_fpq_pop(ccc_flat_pqueue *const fpq)
 {
     if (ccc_buf_empty(fpq->buf))
     {
         return NULL;
     }
-    ccc_fpq_elem *ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
+    void *ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
     if (ccc_buf_size(fpq->buf) == 1)
     {
         ccc_buf_pop_back(fpq->buf);
@@ -93,8 +95,8 @@ ccc_fpq_pop(ccc_flat_pqueue *const fpq)
     return ret;
 }
 
-ccc_fpq_elem *
-ccc_fpq_erase(ccc_flat_pqueue *const fpq, ccc_fpq_elem *const e)
+void *
+ccc_fpq_erase(ccc_flat_pqueue *const fpq, void *const e)
 {
     if (ccc_buf_empty(fpq->buf))
     {
@@ -102,7 +104,7 @@ ccc_fpq_erase(ccc_flat_pqueue *const fpq, ccc_fpq_elem *const e)
     }
     if (ccc_buf_size(fpq->buf) == 1)
     {
-        ccc_fpq_elem *const ret = at(fpq, 0);
+        void *const ret = at(fpq, 0);
         ccc_buf_pop_back(fpq->buf);
         return ret;
     }
@@ -111,13 +113,13 @@ ccc_fpq_erase(ccc_flat_pqueue *const fpq, ccc_fpq_elem *const e)
     size_t const swap_location = index_of(fpq, e);
     if (swap_location == ccc_buf_size(fpq->buf) - 1)
     {
-        ccc_fpq_elem *const ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
+        void *const ret = at(fpq, ccc_buf_size(fpq->buf) - 1);
         ccc_buf_pop_back(fpq->buf);
         return ret;
     }
     uint8_t tmp[ccc_buf_elem_size(fpq->buf)];
     swap(fpq, tmp, swap_location, ccc_buf_size(fpq->buf) - 1);
-    ccc_fpq_elem *erased = at(fpq, ccc_buf_size(fpq->buf) - 1);
+    void *const erased = at(fpq, ccc_buf_size(fpq->buf) - 1);
     ccc_buf_pop_back(fpq->buf);
     ccc_fpq_threeway_cmp const erased_cmp
         = fpq->cmp(at(fpq, swap_location), erased, fpq->aux);
@@ -134,8 +136,8 @@ ccc_fpq_erase(ccc_flat_pqueue *const fpq, ccc_fpq_elem *const e)
 }
 
 bool
-ccc_fpq_update(ccc_flat_pqueue *const fpq, ccc_fpq_elem *const e,
-               fpq_update_fn *fn, void *aux)
+ccc_fpq_update(ccc_flat_pqueue *const fpq, void *const e, fpq_update_fn *fn,
+               void *aux)
 {
     if (ccc_buf_empty(fpq->buf))
     {
@@ -165,7 +167,7 @@ ccc_fpq_update(ccc_flat_pqueue *const fpq, ccc_fpq_elem *const e,
     return true;
 }
 
-ccc_fpq_elem const *
+void const *
 ccc_fpq_front(ccc_flat_pqueue const *const fpq)
 {
     if (ccc_buf_empty(fpq->buf))
@@ -215,16 +217,16 @@ ccc_fpq_validate(ccc_flat_pqueue const *const fpq)
     for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2;
          i <= (sz - 2) / 2; ++i, left = (i * 2) + 1, right = (i * 2) + 2)
     {
-        ccc_fpq_elem const *const cur = at(fpq, i);
+        void *const cur = at(fpq, i);
         /* Putting the child in the comparison function first evaluates
            the childs three way comparison in relation to the parent. If
            the child beats the parent in total ordering (min/max) something
            has gone wrong. */
-        if (left < sz && fpq->cmp(at(fpq, left), cur, fpq->aux) == fpq->order)
+        if (left < sz && wins(fpq, at(fpq, left), cur))
         {
             return false;
         }
-        if (right < sz && fpq->cmp(at(fpq, right), cur, fpq->aux) == fpq->order)
+        if (right < sz && wins(fpq, at(fpq, right), cur))
         {
             return false;
         }
@@ -243,7 +245,7 @@ void
 bubble_up(ccc_flat_pqueue *const fpq, uint8_t tmp[], size_t i)
 {
     for (size_t parent = (i - 1) / 2;
-         i && fpq->cmp(at(fpq, i), at(fpq, parent), fpq->aux) == fpq->order;
+         i && wins(fpq, at(fpq, i), at(fpq, parent));
          i = parent, parent = (parent - 1) / 2)
     {
         swap(fpq, tmp, parent, i);
@@ -255,21 +257,15 @@ bubble_up(ccc_flat_pqueue *const fpq, uint8_t tmp[], size_t i)
 static void
 bubble_down(ccc_flat_pqueue *const fpq, uint8_t tmp[], size_t i)
 {
-    ccc_fpq_threeway_cmp const wrong_order
-        = fpq->order == CCC_FPQ_LES ? CCC_FPQ_GRT : CCC_FPQ_LES;
     size_t const sz = ccc_buf_size(fpq->buf);
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
          i = next, left = i * 2 + 1, right = left + 1)
     {
-        /* Without knowing the cost of the user provided comparison function,
-           it is important to call the cmp function minimal number of times.
-           Avoid one call if there is no right child. */
-        next = (right < sz
-                && (fpq->order
-                    == fpq->cmp(at(fpq, right), at(fpq, left), fpq->aux)))
-                   ? right
-                   : left;
-        if (fpq->cmp(at(fpq, i), at(fpq, next), NULL) != wrong_order)
+        /* Avoid one comparison call if there is no right child. */
+        next = right < sz && wins(fpq, at(fpq, right), at(fpq, left)) ? right
+                                                                      : left;
+        /* If the child beats the parent we must swap. Equal is ok to break. */
+        if (!wins(fpq, at(fpq, next), at(fpq, i)))
         {
             break;
         }
@@ -285,20 +281,34 @@ swap(ccc_flat_pqueue *const fpq, uint8_t tmp[], size_t const i, size_t const j)
     assert(res == CCC_BUF_OK);
 }
 
-static inline ccc_fpq_elem *
-at(ccc_flat_pqueue const *fpq, size_t const i)
+/* Thin wrapper just for sanity checking in debug mode as index should always
+   be valid when this function is used. */
+static inline void *
+at(ccc_flat_pqueue const *const fpq, size_t const i)
 {
-    void *loc = ccc_buf_at(fpq->buf, i);
-    assert(loc);
-    return (ccc_fpq_elem *)((uint8_t *)loc + fpq->fpq_elem_offset);
+    void *const addr = ccc_buf_at(fpq->buf, i);
+    assert(addr);
+    return addr;
 }
 
-static size_t
-index_of(ccc_flat_pqueue const *const fpq, ccc_fpq_elem const *const e)
+/* Flat pqueue code that uses indices of the underlying buffer should always
+   be within the buffer range. It should never exceed the current size and
+   start at or after the buffer base. Only checked in debug. */
+static inline size_t
+index_of(ccc_flat_pqueue const *const fpq, void const *const slot)
 {
-    return (((uint8_t *)e - fpq->fpq_elem_offset)
-            - ((uint8_t *)ccc_buf_base(fpq->buf)))
-           / ccc_buf_elem_size(fpq->buf);
+    assert(slot >= ccc_buf_base(fpq->buf));
+    size_t const i = (((uint8_t *)slot) - ((uint8_t *)ccc_buf_base(fpq->buf)))
+                     / ccc_buf_elem_size(fpq->buf);
+    assert(i < ccc_buf_size(fpq->buf));
+    return i;
+}
+
+static inline bool
+wins(ccc_flat_pqueue const *const fpq, void const *const winner,
+     void const *const loser)
+{
+    return fpq->cmp(winner, loser, fpq->aux) == fpq->order;
 }
 
 /* NOLINTBEGIN(*misc-no-recursion) */

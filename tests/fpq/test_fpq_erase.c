@@ -12,7 +12,6 @@ struct val
 {
     int id;
     int val;
-    ccc_fpq_elem elem;
 };
 
 static enum test_result fpq_test_insert_remove_four_dups(void);
@@ -25,8 +24,7 @@ static enum test_result fpq_test_weak_srand(void);
 static enum test_result insert_shuffled(ccc_flat_pqueue *, struct val[], size_t,
                                         int);
 static enum test_result inorder_fill(int[], size_t, ccc_flat_pqueue *);
-static ccc_fpq_threeway_cmp val_cmp(ccc_fpq_elem const *, ccc_fpq_elem const *,
-                                    void *);
+static ccc_fpq_threeway_cmp val_cmp(void const *, void const *, void *);
 static size_t rand_range(size_t, size_t);
 
 #define NUM_TESTS (size_t)7
@@ -97,7 +95,7 @@ fpq_test_insert_erase_shuffled(void)
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = CCC_FPQ_OF(struct val, elem, ccc_fpq_front(&fpq));
+    struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS, enum test_result, "%d");
@@ -105,7 +103,7 @@ fpq_test_insert_erase_shuffled(void)
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        (void)ccc_fpq_erase(&fpq, &vals[rand_index].elem);
+        (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     CHECK(ccc_fpq_size(&fpq), 0ULL, size_t, "%zu");
@@ -123,16 +121,14 @@ fpq_test_pop_max(void)
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = CCC_FPQ_OF(struct val, elem, ccc_fpq_front(&fpq));
+    struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS, enum test_result, "%d");
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_fpq_elem const *const e = ccc_fpq_pop(&fpq);
-        CHECK(e, true, bool, "%b");
-        struct val const *const front = CCC_FPQ_OF(struct val, elem, e);
+        struct val const *const front = ccc_fpq_pop(&fpq);
         CHECK(front->val, sorted_check[i], int, "%d");
     }
     CHECK(ccc_fpq_empty(&fpq), true, bool, "%d");
@@ -150,16 +146,14 @@ fpq_test_pop_min(void)
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *min = CCC_FPQ_OF(struct val, elem, ccc_fpq_front(&fpq));
+    struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS, enum test_result, "%d");
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_fpq_elem const *const e = ccc_fpq_pop(&fpq);
-        CHECK(e, true, bool, "%b");
-        struct val const *const front = CCC_FPQ_OF(struct val, elem, e);
+        struct val const *const front = ccc_fpq_pop(&fpq);
         CHECK(front->val, sorted_check[i], int, "%d");
     }
     CHECK(ccc_fpq_empty(&fpq), true, bool, "%d");
@@ -196,7 +190,7 @@ fpq_test_delete_prime_shuffle_duplicates(void)
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        (void)ccc_fpq_erase(&fpq, &vals[rand_index].elem);
+        (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size, size_t, "%zu");
@@ -231,8 +225,7 @@ fpq_test_prime_shuffle(void)
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index].elem) != NULL, true, bool,
-              "%d");
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true, bool, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size, size_t, "%zu");
@@ -261,8 +254,7 @@ fpq_test_weak_srand(void)
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index].elem) != NULL, true, bool,
-              "%d");
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true, bool, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     CHECK(ccc_fpq_empty(&fpq), true, bool, "%d");
@@ -306,20 +298,18 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
     while (!ccc_fpq_empty(fpq) && i < size)
     {
-        ccc_fpq_elem *const front = ccc_fpq_pop(fpq);
-        vals[i++] = CCC_FPQ_OF(struct val, elem, front)->val;
-        struct val *const v = CCC_FPQ_OF(struct val, elem, front);
+        struct val *const front = ccc_fpq_pop(fpq);
+        vals[i++] = front->val;
         size_t const prev = ccc_fpq_size(&fpq_copy);
         ccc_fpq_result const res = CCC_FPQ_EMPLACE(
-            &fpq_copy, struct val, {.id = v->id, .val = v->val});
+            &fpq_copy, struct val, {.id = front->id, .val = front->val});
         CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
         CHECK(prev < ccc_fpq_size(&fpq_copy), true, bool, "%d");
     }
     i = 0;
     while (!ccc_fpq_empty(&fpq_copy) && i < size)
     {
-        struct val *const v
-            = CCC_FPQ_OF(struct val, elem, ccc_fpq_pop(&fpq_copy));
+        struct val *const v = ccc_fpq_pop(&fpq_copy);
         size_t const prev = ccc_fpq_size(fpq);
         ccc_fpq_result const res
             = CCC_FPQ_EMPLACE(fpq, struct val, {.id = v->id, .val = v->val});
@@ -331,11 +321,11 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
 }
 
 static ccc_fpq_threeway_cmp
-val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
+val_cmp(void const *a, void const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_FPQ_OF(struct val, elem, a);
-    struct val *rhs = CCC_FPQ_OF(struct val, elem, b);
+    struct val const *const lhs = a;
+    struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 

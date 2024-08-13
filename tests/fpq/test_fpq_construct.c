@@ -9,14 +9,12 @@ struct val
 {
     int id;
     int val;
-    ccc_fpq_elem elem;
 };
 
 static enum test_result pq_test_empty(void);
 static enum test_result pq_test_macro(void);
 static enum test_result pq_test_push(void);
-static ccc_fpq_threeway_cmp val_cmp(ccc_fpq_elem const *, ccc_fpq_elem const *,
-                                    void *);
+static ccc_fpq_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS]
@@ -79,10 +77,10 @@ pq_test_push(void)
 }
 
 static ccc_fpq_threeway_cmp
-val_cmp(ccc_fpq_elem const *a, ccc_fpq_elem const *b, void *aux)
+val_cmp(void const *a, void const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_FPQ_OF(struct val, elem, a);
-    struct val *rhs = CCC_FPQ_OF(struct val, elem, b);
+    struct val const *const lhs = a;
+    struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
