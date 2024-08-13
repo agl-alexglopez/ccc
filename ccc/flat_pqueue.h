@@ -59,12 +59,12 @@ typedef struct ccc_flat_pqueue
 
 /* Given an initialized flat priority queue, a struct type, and its
    initializer, attempts to write an r-value of one's struct type into the
-   backing buffer directly, returning the ccc_buf_result according to the
+   backing buffer directly, returning the ccc_fpq_result according to the
    underlying buffer's allocation policy. If allocation fails because
    the underlying buffer does not define a reallocation policy and is full,
-   CCC_BUF_FULL is returned, otherwise CCC_BUF_OK is returned. If the provided
+   CCC_FPQ_FULL is returned, otherwise CCC_FPQ_OK is returned. If the provided
    struct type does not match the size of the elements stored in the buffer
-   CCC_BUF_ERR is returned. Use as follows:
+   CCC_FPQ_ERR is returned. Use as follows:
 
    struct val
    {
@@ -75,15 +75,15 @@ typedef struct ccc_flat_pqueue
 
    Various forms of designated initializers:
 
-   ccc_buf_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10});
-   ccc_buf_result const res
+   ccc_fpq_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10});
+   ccc_fpq_result const res
        = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = rand_value(), .id = 0});
-   ccc_buf_result const res
+   ccc_fpq_result const res
        = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10, .id = 0, .e = {0}});
 
    Older C notation requires all fields be specified on some compilers:
 
-   ccc_buf_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {10, 0, {0}});
+   ccc_fpq_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {10, 0, {0}});
 
    This macro avoids an additional copy if the struct values are constructed
    by hand or from input of other functions, requiring no intermediate storage.
