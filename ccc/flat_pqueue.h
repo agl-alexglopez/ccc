@@ -36,7 +36,7 @@ typedef void fpq_print_fn(void const *);
    initialized. The CCC_FPQ_INIT macro allows for initialization at compile
    time for static/global data, or runtime for dynamic data so initialization
    via construction of const fields is always possible. There is no reason to
-   access the fields directly. */
+   access the fields directly or modify them. */
 typedef struct ccc_flat_pqueue
 {
     ccc_buf *const buf;
