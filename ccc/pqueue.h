@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 /* Standard C-style three way comparison for priority queue elements. */
-typedef enum ccc_pq_threeway_cmp
+typedef enum
 {
     CCC_PQ_LES = -1,
     CCC_PQ_EQL,
@@ -58,7 +58,7 @@ typedef void ccc_pq_update_fn(ccc_pq_elem *, void *);
    placed anywhere that is convenient for the user. Consider the fields
    private. This structure can be initialized upon declaration witht the
    provided initialization macro. */
-typedef struct ccc_pqueue
+typedef struct
 {
     ccc_pq_elem *root;
     size_t sz;

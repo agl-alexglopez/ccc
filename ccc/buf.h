@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef enum ccc_buf_result
+typedef enum
 {
     CCC_BUF_OK,
     CCC_BUF_FULL,
@@ -14,7 +14,7 @@ typedef enum ccc_buf_result
 
 typedef void *ccc_buf_realloc_fn(void *, size_t);
 
-typedef struct ccc_buf
+typedef struct
 {
     void *mem;
     size_t const elem_sz;
