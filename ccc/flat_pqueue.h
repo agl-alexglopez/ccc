@@ -8,14 +8,14 @@
 /* NOLINTNEXTLINE */
 #include <stdint.h>
 
-typedef enum ccc_fpq_threeway_cmp
+typedef enum
 {
     CCC_FPQ_LES = -1,
     CCC_FPQ_EQL,
     CCC_FPQ_GRT,
 } ccc_fpq_threeway_cmp;
 
-typedef enum ccc_fpq_result
+typedef enum
 {
     CCC_FPQ_OK = CCC_BUF_OK,
     CCC_FPQ_FULL = CCC_BUF_FULL,
@@ -25,11 +25,11 @@ typedef enum ccc_fpq_result
 typedef ccc_fpq_threeway_cmp ccc_fpq_cmp_fn(void const *, void const *,
                                             void *aux);
 
-typedef void fpq_destructor_fn(void *);
+typedef void ccc_fpq_destructor_fn(void *);
 
-typedef void fpq_update_fn(void *, void *);
+typedef void ccc_fpq_update_fn(void *, void *);
 
-typedef void fpq_print_fn(void const *);
+typedef void ccc_fpq_print_fn(void const *);
 
 /* It does not make sense for a flat pqueue to be associated with any other
    buffer, comparison function, ordering, or auxiliarry data once it has been
@@ -37,7 +37,7 @@ typedef void fpq_print_fn(void const *);
    time for static/global data, or runtime for dynamic data so initialization
    via construction of const fields is always possible. There is no reason to
    access the fields directly or modify them. */
-typedef struct ccc_flat_pqueue
+typedef struct
 {
     ccc_buf *const buf;
     ccc_fpq_cmp_fn *const cmp;
@@ -122,16 +122,16 @@ ccc_fpq_result ccc_fpq_push(ccc_flat_pqueue *, void const *);
 void const *ccc_fpq_front(ccc_flat_pqueue const *);
 void *ccc_fpq_pop(ccc_flat_pqueue *);
 void *ccc_fpq_erase(ccc_flat_pqueue *, void *);
-bool ccc_fpq_update(ccc_flat_pqueue *, void *, fpq_update_fn *, void *);
+bool ccc_fpq_update(ccc_flat_pqueue *, void *, ccc_fpq_update_fn *, void *);
 
 ccc_buf *ccc_fpq_buf(ccc_flat_pqueue const *);
-void ccc_fpq_clear(ccc_flat_pqueue *, fpq_destructor_fn *);
+void ccc_fpq_clear(ccc_flat_pqueue *, ccc_fpq_destructor_fn *);
 bool ccc_fpq_empty(ccc_flat_pqueue const *);
 size_t ccc_fpq_size(ccc_flat_pqueue const *);
 bool ccc_fpq_validate(ccc_flat_pqueue const *);
 ccc_fpq_threeway_cmp ccc_fpq_order(ccc_flat_pqueue const *);
 void bubble_up(ccc_flat_pqueue *, uint8_t[], size_t);
 
-void ccc_fpq_print(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
+void ccc_fpq_print(ccc_flat_pqueue const *, size_t, ccc_fpq_print_fn *);
 
 #endif /* FLAT_PQUEUE */

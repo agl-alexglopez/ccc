@@ -35,10 +35,10 @@ static bool wins(ccc_flat_pqueue const *, void const *winner,
                  void const *loser);
 static void swap(ccc_flat_pqueue *, uint8_t tmp[], size_t, size_t);
 static void bubble_down(ccc_flat_pqueue *, uint8_t tmp[], size_t);
-static void print_node(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
+static void print_node(ccc_flat_pqueue const *, size_t, ccc_fpq_print_fn *);
 static void print_inner_heap(ccc_flat_pqueue const *, size_t, char const *,
-                             enum ccc_print_link, fpq_print_fn *);
-static void print_heap(ccc_flat_pqueue const *, size_t, fpq_print_fn *);
+                             enum ccc_print_link, ccc_fpq_print_fn *);
+static void print_heap(ccc_flat_pqueue const *, size_t, ccc_fpq_print_fn *);
 
 ccc_fpq_result
 ccc_fpq_realloc(ccc_flat_pqueue *const fpq, size_t const new_capacity,
@@ -136,7 +136,7 @@ ccc_fpq_erase(ccc_flat_pqueue *const fpq, void *const e)
 }
 
 bool
-ccc_fpq_update(ccc_flat_pqueue *const fpq, void *const e, fpq_update_fn *fn,
+ccc_fpq_update(ccc_flat_pqueue *const fpq, void *const e, ccc_fpq_update_fn *fn,
                void *aux)
 {
     if (ccc_buf_empty(fpq->buf))
@@ -196,7 +196,7 @@ ccc_fpq_order(ccc_flat_pqueue const *const fpq)
 }
 
 void
-ccc_fpq_clear(ccc_flat_pqueue *const fpq, fpq_destructor_fn *fn)
+ccc_fpq_clear(ccc_flat_pqueue *const fpq, ccc_fpq_destructor_fn *fn)
 {
     size_t const sz = ccc_buf_size(fpq->buf);
     for (size_t i = 0; i < sz; ++i)
@@ -236,7 +236,7 @@ ccc_fpq_validate(ccc_flat_pqueue const *const fpq)
 
 void
 ccc_fpq_print(ccc_flat_pqueue const *const fpq, size_t const i,
-              fpq_print_fn *const fn)
+              ccc_fpq_print_fn *const fn)
 {
     print_heap(fpq, i, fn);
 }
@@ -314,7 +314,8 @@ wins(ccc_flat_pqueue const *const fpq, void const *const winner,
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static void
-print_node(ccc_flat_pqueue const *const fpq, size_t i, fpq_print_fn *const fn)
+print_node(ccc_flat_pqueue const *const fpq, size_t i,
+           ccc_fpq_print_fn *const fn)
 {
     printf(COLOR_CYN);
     if (i)
@@ -334,7 +335,8 @@ print_node(ccc_flat_pqueue const *const fpq, size_t i, fpq_print_fn *const fn)
 
 static void
 print_inner_heap(ccc_flat_pqueue const *const fpq, size_t i, char const *prefix,
-                 enum ccc_print_link const node_type, fpq_print_fn *const fn)
+                 enum ccc_print_link const node_type,
+                 ccc_fpq_print_fn *const fn)
 {
     size_t const sz = ccc_buf_size(fpq->buf);
     if (i >= sz)
@@ -375,7 +377,8 @@ print_inner_heap(ccc_flat_pqueue const *const fpq, size_t i, char const *prefix,
 }
 
 static void
-print_heap(ccc_flat_pqueue const *const fpq, size_t i, fpq_print_fn *const fn)
+print_heap(ccc_flat_pqueue const *const fpq, size_t i,
+           ccc_fpq_print_fn *const fn)
 {
     size_t const sz = ccc_buf_size(fpq->buf);
     if (i >= sz)

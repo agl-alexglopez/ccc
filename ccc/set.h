@@ -30,7 +30,7 @@
 /* NOLINTNEXTLINE */
 #include <stdint.h>
 
-/* ========================   CCC_SET_   ============================
+/* ========================   SET   ============================
 
    Together the following components make a set as an embedded
    data structure.
@@ -163,19 +163,19 @@
 /* An embedded set data structure for storage and retrieval
    of sorted unique elements for duplicate storage see
    priority queue or multiset */
-typedef struct ccc_set
+typedef struct
 {
     ccc_tree t;
 } ccc_set;
 
 /* The element embedded withing a struct that is used to
    store, search, and retrieve data in the tree. */
-typedef struct ccc_set_elem
+typedef struct
 {
     ccc_node n;
 } ccc_set_elem;
 
-typedef enum ccc_set_threeway_cmp
+typedef enum
 {
     CCC_SET_LES = CCC_NODE_LES,
     CCC_SET_EQL = CCC_NODE_EQL,
@@ -252,7 +252,7 @@ typedef void ccc_set_destructor_fn(ccc_set_elem *);
    to use the appropriate next function. Use next for a
    set_range and rnext for a set_rrange. Otherwise, indefinite
    loops may occur. */
-typedef struct ccc_set_range
+typedef struct
 {
     ccc_range r ATTRIB_PRIVATE;
 } ccc_set_range;
@@ -268,7 +268,7 @@ typedef struct ccc_set_range
 
    Be sure to use the rnext function to progress the iterator
    in this type of range.*/
-typedef struct ccc_set_rrange
+typedef struct
 {
     ccc_rrange r ATTRIB_PRIVATE;
 } ccc_set_rrange;

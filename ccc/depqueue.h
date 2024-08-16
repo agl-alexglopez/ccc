@@ -24,7 +24,7 @@
 
 /* An element stored in a DEPQ with Round Robin
    fairness if a duplicate. */
-typedef struct ccc_depq_elem
+typedef struct
 {
     ccc_node n;
 } ccc_depq_elem;
@@ -33,12 +33,12 @@ typedef struct ccc_depq_elem
    of a DEPQ with the additional benefits of an
    iterator and removal by node id if you remember your
    values that are present in the DEPQ. */
-typedef struct ccc_depqueue
+typedef struct
 {
     ccc_tree t;
 } ccc_depqueue;
 
-typedef enum ccc_depq_threeway_cmp
+typedef enum
 {
     CCC_DEPQ_LES = CCC_NODE_LES,
     CCC_DEPQ_EQL = CCC_NODE_EQL,
@@ -103,7 +103,7 @@ typedef void ccc_depq_destructor_fn(ccc_depq_elem *);
    to use the appropriate next function. Use next for a
    depq_range and rnext for a depq_rrange. Otherwise, indefinite
    loops may occur. */
-typedef struct ccc_depq_range
+typedef struct
 {
     ccc_range r ATTRIB_PRIVATE;
 } ccc_depq_range;
@@ -111,7 +111,7 @@ typedef struct ccc_depq_range
 /* The reverse range container for queries performed with requal_range.
    Be sure to use the rnext function to progress the iterator
    in this type of range. */
-typedef struct ccc_depq_rrange
+typedef struct
 {
     ccc_rrange r ATTRIB_PRIVATE;
 } ccc_depq_rrange;
