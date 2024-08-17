@@ -19,8 +19,8 @@
    provides robust iterators that can be used if read only
    access is required of all elements or only conditional
    modifications. This may combat such an anti-pattern. */
-#ifndef SET
-#define SET
+#ifndef CCC_SET_H
+#define CCC_SET_H
 
 #include "attrib.h"
 #include "tree.h"
@@ -550,4 +550,4 @@ void ccc_set_print(ccc_set const *, ccc_set_elem const *, ccc_set_print_fn *);
                 └──(2)L:{id:1,val:1}
                     └──(1)L:{id:0,val:0} */
 
-#endif
+#endif /* CCC_SET_H */

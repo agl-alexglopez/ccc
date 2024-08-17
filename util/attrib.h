@@ -1,5 +1,5 @@
-#ifndef ATTRIB_H
-#define ATTRIB_H
+#ifndef CCC_ATTRIB_H
+#define CCC_ATTRIB_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,4 +33,4 @@
         exit(EXIT_FAILURE);                                                    \
     } while (0)
 
-#endif
+#endif /* CCC_ATTRIB_H */

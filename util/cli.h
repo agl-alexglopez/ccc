@@ -1,5 +1,5 @@
-#ifndef CLI
-#define CLI
+#ifndef CCC_CLI_H
+#define CCC_CLI_H
 
 enum conversion_status
 {
@@ -22,4 +22,4 @@ void clear_screen(void);
 void clear_line(void);
 void set_cursor_position(int row, int col);
 
-#endif
+#endif /* CCC_CLI_H */

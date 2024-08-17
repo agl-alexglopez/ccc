@@ -1,5 +1,5 @@
-#ifndef FLAT_PQUEUE
-#define FLAT_PQUEUE
+#ifndef CCC_FLAT_PQUEUE_H
+#define CCC_FLAT_PQUEUE_H
 
 #include "buf.h"
 
@@ -134,4 +134,4 @@ void bubble_up(ccc_flat_pqueue *, uint8_t[], size_t);
 
 void ccc_fpq_print(ccc_flat_pqueue const *, size_t, ccc_fpq_print_fn *);
 
-#endif /* FLAT_PQUEUE */
+#endif /* CCC_FLAT_PQUEUE_H */

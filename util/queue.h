@@ -1,5 +1,5 @@
-#ifndef QUEUE
-#define QUEUE
+#ifndef CCC_QUEUE_H
+#define CCC_QUEUE_H
 
 #include "attrib.h"
 
@@ -24,4 +24,4 @@ bool q_empty(struct queue const *);
 size_t q_size(struct queue const *);
 void q_free(struct queue *);
 
-#endif
+#endif /* CCC_QUEUE_H */
