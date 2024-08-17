@@ -1,5 +1,5 @@
-#ifndef BUF_H
-#define BUF_H
+#ifndef CCC_BUF_H
+#define CCC_BUF_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -46,4 +46,4 @@ void *ccc_buf_copy(ccc_buf *, size_t dst, size_t src);
 ccc_buf_result ccc_buf_swap(ccc_buf *, uint8_t tmp[], size_t i, size_t j);
 ccc_buf_result ccc_buf_erase(ccc_buf *, size_t i);
 
-#endif /* BUF_H */
+#endif /* CCC_BUF_H */

@@ -11,8 +11,8 @@
    Recently Used) elements close to the root even if their
    runtime is amortized O(lgN). With the right use cases we
    can frequently benefit from O(1) operations. */
-#ifndef DEPQUEUE
-#define DEPQUEUE
+#ifndef CCC_DEPQUEUE_H
+#define CCC_DEPQUEUE_H
 
 #include "attrib.h"
 #include "tree.h"
@@ -365,4 +365,4 @@ void ccc_depq_print(ccc_depqueue const *, ccc_depq_elem const *,
                 └──(2)L:{id:1,val:1}
                     └──(1)L:{id:0,val:0} */
 
-#endif /* DEPQUEUE */
+#endif /* CCC_DEPQUEUE_H */

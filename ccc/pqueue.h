@@ -1,5 +1,5 @@
-#ifndef PQUEUE
-#define PQUEUE
+#ifndef CCC_PQUEUE_H
+#define CCC_PQUEUE_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -137,4 +137,4 @@ void ccc_pq_clear(ccc_pqueue *, ccc_pq_destructor_fn *);
    little interest to the user. */
 bool ccc_pq_validate(ccc_pqueue const *);
 
-#endif /* PQUEUE */
+#endif /* CCC_PQUEUE_H */

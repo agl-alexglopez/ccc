@@ -1,5 +1,5 @@
-#ifndef FLAT_HASH
-#define FLAT_HASH
+#ifndef CCC_FLAT_HASH_H
+#define CCC_FLAT_HASH_H
 
 #include "buf.h"
 
@@ -37,4 +37,4 @@ typedef struct
 
 bool ccc_hash_contains(ccc_hash *, void *);
 
-#endif /* FLAT_HASH */
+#endif /* CCC_FLAT_HASH_H */
