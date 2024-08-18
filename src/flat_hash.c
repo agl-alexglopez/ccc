@@ -22,7 +22,8 @@ static size_t next_prime(size_t);
 static ccc_hash_result maybe_resize(ccc_hash *);
 static void insert(ccc_hash *, void const *, size_t);
 static void swap(uint8_t tmp[], void *, void *, size_t);
-static ccc_hash_elem *hash_in_slot(ccc_hash const *, void const *slot);
+static ccc_hash_elem *hash_elem(ccc_hash const *, void const *slot);
+static size_t *hash_at(ccc_hash const *, size_t i);
 
 ccc_hash_result
 ccc_hash_init(ccc_hash *const h, ccc_buf *const buf,
@@ -105,19 +106,18 @@ ccc_hash_erase(ccc_hash *const h, void const *const e)
     {
         return CCC_HASH_NOP;
     }
-    size_t const elem_sz = ccc_buf_elem_size(h->buf);
-    hash_in_slot(h, ccc_buf_at(h->buf, q.stopped_at))->hash = empty;
+    *hash_at(h, q.stopped_at) = empty;
     size_t next = (hash + 1) % cap;
     uint8_t tmp[ccc_buf_elem_size(h->buf)];
     for (;; q.stopped_at = (q.stopped_at + 1) % cap, next = (next + 1) % cap)
     {
         void *next_slot = ccc_buf_at(h->buf, next);
-        ccc_hash_elem *next_elem = hash_in_slot(h, next_slot);
+        ccc_hash_elem *next_elem = hash_elem(h, next_slot);
         if (!distance(h, next_elem->hash, next))
         {
             break;
         }
-        swap(tmp, next_slot, ccc_buf_at(h->buf, q.stopped_at), elem_sz);
+        ccc_buf_swap(h->buf, tmp, q.stopped_at, next);
     }
     --h->buf->sz;
     return CCC_HASH_OK;
@@ -139,7 +139,7 @@ insert(ccc_hash *const h, void const *const e, size_t const hash)
     /* This function cannot modify e and e may be copied over to new insertion
        from old table. So should this function invariantly assign starting
        hash to this slot copy for insertion? I think yes so far. */
-    hash_in_slot(h, slot_copy)->hash = hash;
+    hash_elem(h, slot_copy)->hash = hash;
     size_t i = hash;
     size_t dist = 0;
     uint8_t tmp[elem_sz];
@@ -150,7 +150,7 @@ insert(ccc_hash *const h, void const *const e, size_t const hash)
             = (ccc_hash_elem *)((uint8_t *)slot + h->hash_elem_offset);
         if (home->hash == empty)
         {
-            memcpy(slot, e, elem_sz);
+            memcpy(slot, slot_copy, elem_sz);
             ++h->buf->sz;
             return;
         }
@@ -217,7 +217,7 @@ maybe_resize(ccc_hash *h)
          slot != ccc_buf_capacity_end(h->buf);
          slot = ccc_buf_next(h->buf, slot))
     {
-        ccc_hash_elem const *const e = hash_in_slot(h, slot);
+        ccc_hash_elem const *const e = hash_elem(h, slot);
         if (e->hash != empty)
         {
             size_t const hash = new_hash.hash_fn(slot);
@@ -243,9 +243,17 @@ distance(ccc_hash const *const h, size_t const a, size_t const b)
 }
 
 static inline ccc_hash_elem *
-hash_in_slot(ccc_hash const *const h, void const *const slot)
+hash_elem(ccc_hash const *const h, void const *const slot)
 {
     return (ccc_hash_elem *)((uint8_t *)slot + h->hash_elem_offset);
+}
+
+static size_t *
+hash_at(ccc_hash const *const h, size_t const i)
+{
+    return &((ccc_hash_elem *)((uint8_t *)ccc_buf_at(h->buf, i)
+                               + h->hash_elem_offset))
+                ->hash;
 }
 
 static inline size_t
