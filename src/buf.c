@@ -27,6 +27,10 @@ ccc_buf_realloc(ccc_buf *buf, size_t const new_capacity,
 void *
 ccc_buf_at(ccc_buf const *buf, size_t const i)
 {
+    if (i >= buf->capacity)
+    {
+        return NULL;
+    }
     return ((uint8_t *)buf->mem + (i * buf->elem_sz));
 }
 
@@ -107,6 +111,19 @@ ccc_buf_erase(ccc_buf *buf, size_t const i)
 }
 
 ccc_buf_result
+ccc_buf_free(ccc_buf *buf, ccc_buf_free_fn *fn)
+{
+    if (!buf->capacity)
+    {
+        return CCC_BUF_ERR;
+    }
+    buf->capacity = 0;
+    buf->sz = 0;
+    fn(buf->mem);
+    return CCC_BUF_OK;
+}
+
+ccc_buf_result
 ccc_buf_pop_back_n(ccc_buf *buf, size_t n)
 {
     if (n > buf->sz)
@@ -158,6 +175,32 @@ ccc_buf_base(ccc_buf *buf)
 {
     return buf->mem;
 }
+
+void *
+ccc_buf_begin(ccc_buf const *const buf)
+{
+    return buf->mem;
+}
+
+void *
+ccc_buf_next(ccc_buf const *const buf, void const *const pos)
+{
+    return (uint8_t *)pos + buf->elem_sz;
+}
+
+void *
+ccc_buf_size_end(ccc_buf const *const buf)
+{
+    return (uint8_t *)buf->mem + (buf->elem_sz * buf->sz);
+}
+
+void *
+ccc_buf_capcity_end(ccc_buf const *const buf)
+{
+    return (uint8_t *)buf->mem + (buf->elem_sz * buf->capacity);
+}
+
+/*======================  Static Helpers  ==================================*/
 
 static inline void *
 at(ccc_buf const *buf, size_t const i)
