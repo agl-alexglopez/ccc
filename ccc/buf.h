@@ -34,6 +34,33 @@ typedef struct
         (mem), sizeof(type), 0, (capacity), (realloc_fn)                       \
     }
 
+#define CCC_BUF_EMPLACE(ccc_buf_ptr, index, struct_name,                       \
+                        struct_initializer...)                                 \
+    ({                                                                         \
+        ccc_buf_result _macro_res_;                                            \
+        {                                                                      \
+            if (sizeof(struct_name) != ccc_buf_elem_size(ccc_buf_ptr))         \
+            {                                                                  \
+                _macro_res_ = CCC_BUF_ERR;                                     \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                void *_macro_pos_ = ccc_buf_at(ccc_buf_ptr, i);                \
+                if (!_macro_pos_)                                              \
+                {                                                              \
+                    _macro_res_ = CCC_BUF_ERR;                                 \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    *((struct_name *)_macro_pos_)                              \
+                        = (struct_name)struct_initializer;                     \
+                    _macro_res_ = CCC_BUF_OK;                                  \
+                }                                                              \
+            }                                                                  \
+        };                                                                     \
+        _macro_res_;                                                           \
+    })
+
 ccc_buf_result ccc_buf_realloc(ccc_buf *, size_t new_capacity,
                                ccc_buf_realloc_fn *);
 void *ccc_buf_base(ccc_buf *);
@@ -50,6 +77,8 @@ ccc_buf_result ccc_buf_pop_back(ccc_buf *);
 ccc_buf_result ccc_buf_pop_back_n(ccc_buf *, size_t n);
 void *ccc_buf_copy(ccc_buf *, size_t dst, size_t src);
 ccc_buf_result ccc_buf_swap(ccc_buf *, uint8_t tmp[], size_t i, size_t j);
+
+ccc_buf_result ccc_buf_write(ccc_buf *, size_t i, void const *data);
 ccc_buf_result ccc_buf_erase(ccc_buf *, size_t i);
 
 ccc_buf_result ccc_buf_free(ccc_buf *, ccc_buf_free_fn *);
