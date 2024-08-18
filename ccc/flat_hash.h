@@ -3,6 +3,8 @@
 
 #include "buf.h"
 
+#include <stdint.h>
+
 typedef enum
 {
     CCC_HASH_OK = CCC_BUF_OK,
@@ -13,7 +15,7 @@ typedef enum
 
 typedef struct
 {
-    size_t hash;
+    int64_t hash;
 } ccc_hash_elem;
 
 typedef bool ccc_hash_eq_fn(void const *, void const *, void *aux);
@@ -22,7 +24,7 @@ typedef void ccc_hash_destructor_fn(void *);
 
 typedef void ccc_hash_print_fn(void const *);
 
-typedef size_t ccc_hash_fn(void const *);
+typedef int64_t ccc_hash_fn(void const *);
 
 typedef struct
 {
@@ -47,5 +49,9 @@ bool ccc_hash_contains(ccc_hash const *, void const *);
 void const *ccc_hash_find(ccc_hash const *, void const *);
 ccc_hash_result ccc_hash_insert(ccc_hash *, void const *);
 ccc_hash_result ccc_hash_erase(ccc_hash *, void const *);
+
+void const *ccc_hash_begin(ccc_hash const *);
+void const *ccc_hash_next(ccc_hash const *, void const *iter);
+void const *ccc_hash_end(ccc_hash const *);
 
 #endif /* CCC_FLAT_HASH_H */

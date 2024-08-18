@@ -1,6 +1,7 @@
 #include "buf.h"
 
 #include <alloca.h>
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -85,6 +86,22 @@ ccc_buf_copy(ccc_buf *buf, size_t const dst, size_t const src)
         return at(buf, dst);
     }
     return memcpy(at(buf, dst), at(buf, src), buf->elem_sz);
+}
+
+ccc_buf_result
+ccc_buf_write(ccc_buf *const buf, size_t const i, void const *const data)
+{
+    void *pos = ccc_buf_at(buf, i);
+    if (!pos)
+    {
+        return CCC_BUF_ERR;
+    }
+    if (data == pos)
+    {
+        return CCC_BUF_ERR;
+    }
+    (void)memcpy(pos, data, ccc_buf_elem_size(buf));
+    return CCC_BUF_OK;
 }
 
 ccc_buf_result
@@ -185,6 +202,7 @@ ccc_buf_begin(ccc_buf const *const buf)
 void *
 ccc_buf_next(ccc_buf const *const buf, void const *const pos)
 {
+    assert(pos < ccc_buf_capacity_end(buf));
     return (uint8_t *)pos + buf->elem_sz;
 }
 
@@ -195,7 +213,7 @@ ccc_buf_size_end(ccc_buf const *const buf)
 }
 
 void *
-ccc_buf_capcity_end(ccc_buf const *const buf)
+ccc_buf_capacity_end(ccc_buf const *const buf)
 {
     return (uint8_t *)buf->mem + (buf->elem_sz * buf->capacity);
 }
