@@ -12,12 +12,18 @@ typedef enum
     CCC_BUF_ERR,
 } ccc_buf_result;
 
+/* This function must follow the API rules of the stdlib realloc function.
+   Notably, a call to realloc on NULL input is the same as malloc for the
+   specified size and is valid. */
 typedef void *ccc_buf_realloc_fn(void *, size_t);
+
+/* */
+typedef void ccc_buf_free_fn(void *);
 
 typedef struct
 {
     void *mem;
-    size_t const elem_sz;
+    size_t elem_sz;
     size_t sz;
     size_t capacity;
     ccc_buf_realloc_fn *realloc_fn;
@@ -45,5 +51,12 @@ ccc_buf_result ccc_buf_pop_back_n(ccc_buf *, size_t n);
 void *ccc_buf_copy(ccc_buf *, size_t dst, size_t src);
 ccc_buf_result ccc_buf_swap(ccc_buf *, uint8_t tmp[], size_t i, size_t j);
 ccc_buf_result ccc_buf_erase(ccc_buf *, size_t i);
+
+ccc_buf_result ccc_buf_free(ccc_buf *, ccc_buf_free_fn *);
+
+void *ccc_buf_begin(ccc_buf const *);
+void *ccc_buf_next(ccc_buf const *, void const *);
+void *ccc_buf_size_end(ccc_buf const *);
+void *ccc_buf_capacity_end(ccc_buf const *);
 
 #endif /* CCC_BUF_H */
