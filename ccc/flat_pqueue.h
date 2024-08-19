@@ -3,12 +3,9 @@
 
 /* Privately linked implementation. */
 #include "impl_flat_pqueue.h"
-/* Publicly linked so users need not include buf in own code. */
-#include "buf.h"
 
 #include <stdbool.h>
 #include <stddef.h>
-/* NOLINTNEXTLINE */
 
 typedef enum
 {

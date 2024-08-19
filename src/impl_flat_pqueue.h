@@ -22,10 +22,10 @@ typedef ccc_impl_fpq_threeway_cmp ccc_impl_fpq_cmp_fn(void const *,
 
 typedef struct
 {
-    ccc_buf *const buf;
-    ccc_impl_fpq_cmp_fn *const cmp;
-    ccc_impl_fpq_threeway_cmp const order;
-    void *const aux;
+    ccc_buf *buf;
+    ccc_impl_fpq_cmp_fn *cmp;
+    ccc_impl_fpq_threeway_cmp order;
+    void *aux;
 } ccc_impl_flat_pqueue;
 
 void ccc_impl_fpq_bubble_up(ccc_impl_flat_pqueue *, uint8_t[], size_t);
@@ -43,6 +43,9 @@ void ccc_impl_fpq_bubble_up(ccc_impl_flat_pqueue *, uint8_t[], size_t);
         },                                                                     \
     }
 
+/* This macro "returns" a value thanks to clang and gcc statement expressions.
+   See documentation in the flat pqueue header for usage. The ugly details
+   of the macro are hidden here in the impl header. */
 #define CCC_IMPL_FPQ_EMPLACE(fpq, struct_name, struct_initializer...)          \
     ({                                                                         \
         ccc_impl_fpq_result _impl_macro_result_;                               \
