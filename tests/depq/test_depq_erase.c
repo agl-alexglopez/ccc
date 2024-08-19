@@ -27,9 +27,8 @@ static enum test_result depq_test_weak_srand(void);
 static enum test_result insert_shuffled(ccc_depqueue *, struct val[], size_t,
                                         int);
 static size_t inorder_fill(int[], size_t, ccc_depqueue *);
-static ccc_depq_threeway_cmp val_cmp(ccc_depq_elem const *,
-                                     ccc_depq_elem const *, void *);
-static void depq_printer_fn(ccc_depq_elem const *);
+static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
+static void depq_printer_fn(void const *);
 
 #define NUM_TESTS (size_t)9
 test_fn const all_tests[NUM_TESTS] = {
@@ -62,12 +61,12 @@ main()
 static enum test_result
 depq_test_insert_remove_four_dups(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        ccc_depq_push(&pq, &three_vals[i].elem);
+        ccc_depq_push(&pq, &three_vals[i]);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         size_t const size = i + 1;
         CHECK(ccc_depq_size(&pq), size, size_t, "%zu");
@@ -86,17 +85,15 @@ depq_test_insert_remove_four_dups(void)
 static enum test_result
 depq_test_insert_erase_shuffled(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *max
-        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
+    struct val const *max = ccc_depq_const_max(&pq);
     CHECK(max->val, size - 1, int, "%d");
-    struct val const *min
-        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
+    struct val const *min = ccc_depq_const_min(&pq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -107,7 +104,7 @@ depq_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_depq_erase(&pq, &vals[i].elem);
+        (void)ccc_depq_erase(&pq, &vals[i]);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     CHECK(ccc_depq_size(&pq), 0ULL, size_t, "%zu");
@@ -117,17 +114,15 @@ depq_test_insert_erase_shuffled(void)
 static enum test_result
 depq_test_pop_max(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *max
-        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
+    struct val const *max = ccc_depq_const_max(&pq);
     CHECK(max->val, size - 1, int, "%d");
-    struct val const *min
-        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
+    struct val const *min = ccc_depq_const_min(&pq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -138,8 +133,7 @@ depq_test_pop_max(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
-        struct val const *front
-            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_max(&pq));
+        struct val const *front = ccc_depq_pop_max(&pq);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_depq_empty(&pq), true, bool, "%d");
@@ -149,17 +143,15 @@ depq_test_pop_max(void)
 static enum test_result
 depq_test_pop_min(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, enum test_result,
           "%d");
-    struct val const *max
-        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_max(&pq));
+    struct val const *max = ccc_depq_const_max(&pq);
     CHECK(max->val, size - 1, int, "%d");
-    struct val const *min
-        = CCC_DEPQ_OF(struct val, elem, ccc_depq_const_min(&pq));
+    struct val const *min = ccc_depq_const_min(&pq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, size_t, "%zu");
@@ -170,8 +162,7 @@ depq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *front
-            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_min(&pq));
+        struct val const *front = ccc_depq_pop_min(&pq);
         CHECK(front->val, vals[i].val, int, "%d");
     }
     CHECK(ccc_depq_empty(&pq), true, bool, "%d");
@@ -181,7 +172,7 @@ depq_test_pop_min(void)
 static enum test_result
 depq_test_max_round_robin(void)
 {
-    ccc_depqueue depq = CCC_DEPQ_INIT(depq, val_cmp, NULL);
+    ccc_depqueue depq = CCC_DEPQ_INIT(struct val, elem, depq, val_cmp, NULL);
     int const size = 6;
     struct val vals[size];
     struct val const order[6] = {
@@ -199,15 +190,14 @@ depq_test_max_round_robin(void)
             vals[i].val = 99;
         }
         vals[i].id = i;
-        ccc_depq_push(&depq, &vals[i].elem);
+        ccc_depq_push(&depq, &vals[i]);
         CHECK(ccc_tree_validate(&depq.t), true, bool, "%d");
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
     while (!ccc_depq_empty(&depq))
     {
-        struct val const *front
-            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_max(&depq));
+        struct val const *front = ccc_depq_pop_max(&depq);
         CHECK(front->id, order[i].id, int, "%d");
         CHECK(front->val, order[i].val, int, "%d");
         ++i;
@@ -218,7 +208,7 @@ depq_test_max_round_robin(void)
 static enum test_result
 depq_test_min_round_robin(void)
 {
-    ccc_depqueue depq = CCC_DEPQ_INIT(depq, val_cmp, NULL);
+    ccc_depqueue depq = CCC_DEPQ_INIT(struct val, elem, depq, val_cmp, NULL);
     int const size = 6;
     struct val vals[size];
     struct val const order[6] = {
@@ -236,15 +226,14 @@ depq_test_min_round_robin(void)
             vals[i].val = 1;
         }
         vals[i].id = i;
-        ccc_depq_push(&depq, &vals[i].elem);
+        ccc_depq_push(&depq, &vals[i]);
         CHECK(ccc_tree_validate(&depq.t), true, bool, "%d");
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
     while (!ccc_depq_empty(&depq))
     {
-        struct val const *front
-            = CCC_DEPQ_OF(struct val, elem, ccc_depq_pop_min(&depq));
+        struct val const *front = ccc_depq_pop_min(&depq);
         CHECK(front->id, order[i].id, int, "%d");
         CHECK(front->val, order[i].val, int, "%d");
         ++i;
@@ -255,7 +244,7 @@ depq_test_min_round_robin(void)
 static enum test_result
 depq_test_delete_prime_shuffle_duplicates(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -266,7 +255,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        ccc_depq_push(&pq, &vals[i]);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         size_t const s = i + 1;
         CHECK(ccc_depq_size(&pq), s, size_t, "%zu");
@@ -278,7 +267,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_depq_erase(&pq, &vals[shuffled_index].elem);
+        (void)ccc_depq_erase(&pq, &vals[shuffled_index]);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         --cur_size;
         CHECK(ccc_depq_size(&pq), cur_size, size_t, "%zu");
@@ -291,7 +280,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
 static enum test_result
 depq_test_prime_shuffle(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -303,7 +292,7 @@ depq_test_prime_shuffle(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        ccc_depq_push(&pq, &vals[i].elem);
+        ccc_depq_push(&pq, &vals[i]);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -314,7 +303,7 @@ depq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true, bool, "%d");
+        CHECK(ccc_depq_erase(&pq, &vals[i]) != NULL, true, bool, "%d");
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         --cur_size;
         CHECK(ccc_depq_size(&pq), cur_size, size_t, "%zu");
@@ -325,7 +314,7 @@ depq_test_prime_shuffle(void)
 static enum test_result
 depq_test_weak_srand(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(pq, val_cmp, NULL);
+    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -335,12 +324,12 @@ depq_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        ccc_depq_push(&pq, &vals[i]);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true, bool, "%d");
+        CHECK(ccc_depq_erase(&pq, &vals[i]) != NULL, true, bool, "%d");
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
     }
     CHECK(ccc_depq_empty(&pq), true, bool, "%d");
@@ -360,7 +349,7 @@ insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_depq_push(pq, &vals[shuffled_index].elem);
+        ccc_depq_push(pq, &vals[shuffled_index]);
         CHECK(ccc_depq_size(pq), i + 1, size_t, "%zu");
         CHECK(ccc_tree_validate(&pq->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -378,25 +367,25 @@ inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
         return 0;
     }
     size_t i = 0;
-    for (ccc_depq_elem *e = ccc_depq_rbegin(pq); e; e = ccc_depq_rnext(pq, e))
+    for (struct val *e = ccc_depq_rbegin(pq); e; e = ccc_depq_rnext(pq, e))
     {
-        vals[i++] = CCC_DEPQ_OF(struct val, elem, e)->val;
+        vals[i++] = e->val;
     }
     return i;
 }
 
 static void
-depq_printer_fn(ccc_depq_elem const *const e)
+depq_printer_fn(void const *const e)
 {
-    struct val const *const v = CCC_DEPQ_OF(struct val, elem, e);
+    struct val const *const v = e;
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-static ccc_depq_threeway_cmp
-val_cmp(ccc_depq_elem const *a, ccc_depq_elem const *b, void *aux)
+static ccc_threeway_cmp
+val_cmp(void const *a, void const *b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_DEPQ_OF(struct val, elem, a);
-    struct val *rhs = CCC_DEPQ_OF(struct val, elem, b);
+    struct val const *const lhs = a;
+    struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

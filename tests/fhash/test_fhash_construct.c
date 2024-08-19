@@ -4,7 +4,6 @@
 #include "test.h"
 
 #include <stddef.h>
-#include <stdint.h>
 
 static enum test_result fhash_test_empty(void);
 static enum test_result fhash_test_insert_one(void);
@@ -36,9 +35,9 @@ fhash_test_empty(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_flat_hash fh;
-    ccc_fhash_result const res = ccc_fhash_init(
-        &fh, &buf, offsetof(struct val, e), fhash_val_zero, fhash_val_eq, NULL);
-    CHECK(res, CCC_FHASH_OK, ccc_fhash_result, "%d");
+    ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
+                                          fhash_val_zero, fhash_val_eq, NULL);
+    CHECK(res, CCC_OK, ccc_result, "%d");
     CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
     return PASS;
 }
@@ -49,13 +48,13 @@ fhash_test_insert_one(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_flat_hash fh;
-    ccc_fhash_result const res = ccc_fhash_init(
-        &fh, &buf, offsetof(struct val, e), fhash_val_zero, fhash_val_eq, NULL);
-    CHECK(res, CCC_FHASH_OK, ccc_fhash_result, "%d");
+    ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
+                                          fhash_val_zero, fhash_val_eq, NULL);
+    CHECK(res, CCC_OK, ccc_result, "%d");
     CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
     struct val v = {.id = 99, .val = 137};
-    ccc_fhash_result const push_res = ccc_fhash_insert(&fh, &v);
-    CHECK(push_res, CCC_FHASH_OK, ccc_fhash_result, "%d");
+    ccc_result const push_res = ccc_fhash_insert(&fh, &v);
+    CHECK(push_res, CCC_OK, ccc_result, "%d");
     CHECK(ccc_fhash_size(&fh), 1, size_t, "%zu");
     return PASS;
 }

@@ -11,6 +11,7 @@
 #define TREE
 
 #include "attrib.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -45,62 +46,27 @@ typedef struct ccc_node
     struct ccc_node *parent_or_dups;
 } ccc_node;
 
-/* All queries must be able to compare two types utilizing the tree.
-   Equality is important for duplicate tracking and speed. */
-typedef enum ccc_node_threeway_cmp
-{
-    CCC_NODE_LES = -1,
-    CCC_NODE_EQL = 0,
-    CCC_NODE_GRT = 1
-} ccc_node_threeway_cmp;
-
-/* To implement three way comparison in C you can try something
-   like this:
-
-     return (a > b) - (a < b);
-
-   If such a comparison is not possible for your type you can simply
-   return the value of the cmp enum directly with conditionals switch
-   statements or whatever other comparison logic you choose. */
-typedef ccc_node_threeway_cmp ccc_tree_cmp_fn(ccc_node const *key,
-                                              ccc_node const *n, void *aux);
-
 /* The size field is not strictly necessary but seems to be standard
    practice for these types of containers for O(1) access. The end is
    critical for this implementation, especially iterators. */
-typedef struct ccc_tree
+typedef struct
 {
     ccc_node *root;
     ccc_node end;
-    ccc_tree_cmp_fn *cmp;
+    ccc_cmp_fn *cmp;
     void *aux;
     size_t size;
+    size_t node_elem_offset;
 } ccc_tree;
 
-/* The underlying tree range can serve as both an inorder and reverse
-   inorder traversal. The provided splaytree implementation shall be
-   generic enough to allow the calling API data structures to specify
-   the traversal orders. */
-typedef struct ccc_range
-{
-    ccc_node *const begin ATTRIB_PRIVATE;
-    ccc_node *const end ATTRIB_PRIVATE;
-} ccc_range;
-
-typedef struct ccc_rrange
-{
-    ccc_node *const rbegin ATTRIB_PRIVATE;
-    ccc_node *const end ATTRIB_PRIVATE;
-} ccc_rrange;
-
-typedef void ccc_node_print_fn(ccc_node const *);
-
-#define CCC_TREE_INIT(tree_name, cmp_fn, aux_data)                             \
+#define CCC_TREE_INIT(struct_name, set_elem_field, tree_name, cmp_fn,          \
+                      aux_data)                                                \
     {                                                                          \
         .root = &(tree_name).t.end,                                            \
         .end = {.link = {&(tree_name).t.end, &(tree_name).t.end},              \
                 .parent_or_dups = &(tree_name).t.end},                         \
-        .cmp = (ccc_tree_cmp_fn *)(cmp_fn), .aux = (aux_data), .size = 0       \
+        .cmp = (cmp_fn), .aux = (aux_data), .size = 0,                         \
+        .node_elem_offset = offsetof(struct_name, set_elem_field),             \
     }
 
 /* Mostly intended for debugging. Validates the underlying tree
@@ -110,7 +76,6 @@ bool ccc_tree_validate(ccc_tree const *t);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debugging use. */
-void ccc_tree_print(ccc_tree const *t, ccc_node const *root,
-                    ccc_node_print_fn *fn);
+void ccc_tree_print(ccc_tree const *t, ccc_node const *root, ccc_print_fn *fn);
 
 #endif

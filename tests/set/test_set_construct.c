@@ -12,8 +12,7 @@ struct val
 };
 
 static enum test_result set_test_empty(void);
-static ccc_set_threeway_cmp val_cmp(ccc_set_elem const *, ccc_set_elem const *,
-                                    void *);
+static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS ((size_t)1)
 test_fn const all_tests[NUM_TESTS] = {
@@ -38,16 +37,16 @@ main()
 static enum test_result
 set_test_empty(void)
 {
-    ccc_set s = CCC_SET_INIT(s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
     CHECK(ccc_set_empty(&s), true, bool, "%d");
     return PASS;
 }
 
-static ccc_set_threeway_cmp
-val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
+static ccc_threeway_cmp
+val_cmp(void const *const a, void const *const b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_OF(struct val, elem, a);
-    struct val *rhs = CCC_SET_OF(struct val, elem, b);
+    struct val const *const lhs = a;
+    struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

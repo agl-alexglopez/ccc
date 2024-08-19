@@ -21,9 +21,8 @@ static enum test_result set_test_prime_shuffle(void);
 static enum test_result set_test_weak_srand(void);
 static enum test_result insert_shuffled(ccc_set *, struct val[], size_t, int);
 static size_t inorder_fill(int[], size_t, ccc_set *);
-static ccc_set_threeway_cmp val_cmp(ccc_set_elem const *, ccc_set_elem const *,
-                                    void *);
-static void set_printer_fn(ccc_set_elem const *);
+static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
+static void set_printer_fn(void const *);
 
 #define NUM_TESTS ((size_t)3)
 test_fn const all_tests[NUM_TESTS] = {
@@ -50,7 +49,7 @@ main()
 static enum test_result
 set_test_prime_shuffle(void)
 {
-    ccc_set s = CCC_SET_INIT(s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -64,7 +63,7 @@ set_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_set_insert(&s, &vals[i].elem))
+        if (ccc_set_insert(&s, &vals[i]))
         {
             repeats[i] = true;
         }
@@ -76,7 +75,7 @@ set_test_prime_shuffle(void)
     CHECK(ccc_set_size(&s) < size, true, bool, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
+        ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i]);
         CHECK(elem || !repeats[i], true, bool, "%d");
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
@@ -86,7 +85,7 @@ set_test_prime_shuffle(void)
 static enum test_result
 set_test_insert_erase_shuffled(void)
 {
-    ccc_set s = CCC_SET_INIT(s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -100,7 +99,7 @@ set_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_set_erase(&s, &vals[i].elem);
+        (void)ccc_set_erase(&s, &vals[i]);
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
@@ -110,7 +109,7 @@ set_test_insert_erase_shuffled(void)
 static enum test_result
 set_test_weak_srand(void)
 {
-    ccc_set s = CCC_SET_INIT(s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -120,12 +119,12 @@ set_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_set_insert(&s, &vals[i].elem);
+        ccc_set_insert(&s, &vals[i]);
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        (void)ccc_set_erase(&s, &vals[i].elem);
+        (void)ccc_set_erase(&s, &vals[i]);
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
@@ -145,7 +144,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_set_insert(s, &vals[shuffled_index].elem);
+        ccc_set_insert(s, &vals[shuffled_index]);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
         CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -162,25 +161,25 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
         return 0;
     }
     size_t i = 0;
-    for (ccc_set_elem *e = ccc_set_begin(s); e; e = ccc_set_next(s, e))
+    for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, e))
     {
-        vals[i++] = CCC_SET_OF(struct val, elem, e)->val;
+        vals[i++] = e->val;
     }
     return i;
 }
 
-static ccc_set_threeway_cmp
-val_cmp(ccc_set_elem const *a, ccc_set_elem const *b, void *aux)
+static ccc_threeway_cmp
+val_cmp(void const *const a, void const *const b, void *aux)
 {
     (void)aux;
-    struct val *lhs = CCC_SET_OF(struct val, elem, a);
-    struct val *rhs = CCC_SET_OF(struct val, elem, b);
+    struct val const *const lhs = a;
+    struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 static void
-set_printer_fn(ccc_set_elem const *const e) // NOLINT
+set_printer_fn(void const *const e) // NOLINT
 {
-    struct val const *const v = CCC_SET_OF(struct val, elem, e);
+    struct val const *const v = e;
     printf("{id:%d,val:%d}", v->id, v->val);
 }
