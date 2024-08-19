@@ -6,8 +6,6 @@ add_library(flat_pqueue flat_pqueue.h ${CMAKE_SOURCE_DIR}/src/flat_pqueue.c)
 target_link_libraries(flat_pqueue 
   PRIVATE
     impl_flat_pqueue
-  PUBLIC 
-    buf
 )
 
 add_library(flat_hash flat_hash.h ${CMAKE_SOURCE_DIR}/src/flat_hash.c)
