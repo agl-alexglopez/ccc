@@ -17,7 +17,7 @@ static enum test_result fpq_test_insert_iterate_pop(void);
 static enum test_result fpq_test_priority_update(void);
 static enum test_result fpq_test_priority_removal(void);
 static void val_update(void *, void *);
-static ccc_fpq_threeway_cmp val_cmp(void const *, void const *, void *);
+static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS] = {
@@ -51,7 +51,7 @@ fpq_test_insert_iterate_pop(void)
     struct val vals[num_nodes];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -81,17 +81,17 @@ fpq_test_priority_removal(void)
     struct val vals[num_nodes];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        ccc_fpq_result const res
+        ccc_result const res
             = CCC_FPQ_EMPLACE(&fpq, struct val,
                               {
                                   .val = rand() % (num_nodes + 1), /*NOLINT*/
                                   .id = (int)i,
                               });
-        CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
+        CHECK(res, CCC_OK, ccc_result, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     int const limit = 400;
@@ -118,17 +118,17 @@ fpq_test_priority_update(void)
     struct val vals[num_nodes];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        ccc_fpq_result const res
+        ccc_result const res
             = CCC_FPQ_EMPLACE(&fpq, struct val,
                               {
                                   .val = rand() % (num_nodes + 1), /*NOLINT*/
                                   .id = (int)i,
                               });
-        CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
+        CHECK(res, CCC_OK, ccc_result, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
     }
     int const limit = 400;
@@ -147,7 +147,7 @@ fpq_test_priority_update(void)
     return PASS;
 }
 
-static ccc_fpq_threeway_cmp
+static ccc_threeway_cmp
 val_cmp(void const *const a, void const *const b, void *aux)
 {
     (void)aux;

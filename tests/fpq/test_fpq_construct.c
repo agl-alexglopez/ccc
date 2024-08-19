@@ -13,7 +13,7 @@ struct val
 static enum test_result pq_test_empty(void);
 static enum test_result pq_test_macro(void);
 static enum test_result pq_test_push(void);
-static ccc_fpq_threeway_cmp val_cmp(void const *, void const *, void *);
+static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS]
@@ -40,7 +40,7 @@ pq_test_empty(void)
     struct val vals[1] = {{0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 1, NULL);
     ccc_flat_pqueue pq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
     CHECK(ccc_fpq_empty(&pq), true, bool, "%d");
     return PASS;
 }
@@ -51,14 +51,14 @@ pq_test_macro(void)
     struct val vals[1] = {{0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 1, NULL);
     ccc_flat_pqueue pq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
-    ccc_fpq_result res
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+    ccc_result res
         = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
-    CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
+    CHECK(res, CCC_OK, ccc_result, "%d");
     CHECK(ccc_fpq_empty(&pq), false, bool, "%d");
-    ccc_fpq_result res2
+    ccc_result res2
         = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
-    CHECK(res2, CCC_FPQ_FULL, ccc_fpq_result, "%d");
+    CHECK(res2, CCC_FULL, ccc_result, "%d");
     return PASS;
 }
 
@@ -68,14 +68,14 @@ pq_test_push(void)
     struct val vals[1] = {{0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 1, NULL);
     ccc_flat_pqueue pq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_FPQ_LES, val_cmp, NULL);
-    ccc_fpq_result res = ccc_fpq_push(&pq, &vals[0]);
-    CHECK(res, CCC_FPQ_OK, ccc_fpq_result, "%d");
+        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+    ccc_result res = ccc_fpq_push(&pq, &vals[0]);
+    CHECK(res, CCC_OK, ccc_result, "%d");
     CHECK(ccc_fpq_empty(&pq), false, bool, "%d");
     return PASS;
 }
 
-static ccc_fpq_threeway_cmp
+static ccc_threeway_cmp
 val_cmp(void const *a, void const *b, void *aux)
 {
     (void)aux;

@@ -21,21 +21,21 @@ static struct query find(ccc_flat_hash const *, void const *, int64_t);
 static size_t distance(size_t capacity, size_t index, int64_t hash);
 static bool is_prime(size_t);
 static size_t next_prime(size_t);
-static ccc_fhash_result maybe_resize(ccc_flat_hash *);
+static ccc_result maybe_resize(ccc_flat_hash *);
 static void insert(ccc_flat_hash *, void const *, int64_t hash);
 static void swap(uint8_t tmp[], void *, void *, size_t);
 static ccc_fhash_elem *hash_in_slot(ccc_flat_hash const *, void const *slot);
 static int64_t *hash_at(ccc_flat_hash const *, size_t i);
 static int64_t hash_data(ccc_flat_hash const *, void const *);
 
-ccc_fhash_result
+ccc_result
 ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
-               size_t const hash_elem_offset, ccc_fhash_fn *const hash_fn,
-               ccc_fhash_eq_fn *const eq_fn, void *const aux)
+               size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
+               ccc_eq_fn *const eq_fn, void *const aux)
 {
     if (!h || !buf || !hash_fn || !eq_fn || !ccc_buf_capacity(buf))
     {
-        return CCC_FHASH_ERR;
+        return CCC_ERR;
     }
     h->buf = buf;
     h->hash_elem_offset = hash_elem_offset;
@@ -47,7 +47,7 @@ ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
     {
         hash_in_slot(h, i)->hash = empty;
     }
-    return CCC_FHASH_OK;
+    return CCC_OK;
 }
 
 bool
@@ -87,11 +87,11 @@ ccc_fhash_find(ccc_flat_hash const *const h, void const *const e)
     return ccc_buf_at(h->buf, q.stopped_at);
 }
 
-ccc_fhash_result
+ccc_result
 ccc_fhash_insert(ccc_flat_hash *const h, void const *const e)
 {
-    ccc_fhash_result const res = maybe_resize(h);
-    if (res != CCC_FHASH_OK)
+    ccc_result const res = maybe_resize(h);
+    if (res != CCC_OK)
     {
         return res;
     }
@@ -99,25 +99,25 @@ ccc_fhash_insert(ccc_flat_hash *const h, void const *const e)
     struct query const q = find(h, e, hash);
     if (q.found)
     {
-        return CCC_FHASH_NOP;
+        return CCC_NOP;
     }
     insert(h, e, hash);
-    return CCC_FHASH_OK;
+    return CCC_OK;
 }
 
-ccc_fhash_result
+ccc_result
 ccc_fhash_erase(ccc_flat_hash *const h, void const *const e)
 {
     if (ccc_buf_empty(h->buf))
     {
-        return CCC_FHASH_NOP;
+        return CCC_NOP;
     }
     size_t const cap = ccc_buf_capacity(h->buf);
     int64_t const hash = hash_data(h, e);
     struct query q = find(h, e, hash);
     if (!q.found)
     {
-        return CCC_FHASH_NOP;
+        return CCC_NOP;
     }
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     *hash_at(h, q.stopped_at) = empty;
@@ -134,7 +134,7 @@ ccc_fhash_erase(ccc_flat_hash *const h, void const *const e)
         swap(tmp, next_slot, ccc_buf_at(h->buf, q.stopped_at), elem_sz);
     }
     --h->buf->sz;
-    return CCC_FHASH_OK;
+    return CCC_OK;
 }
 
 void const *
@@ -232,24 +232,24 @@ find(ccc_flat_hash const *const h, void const *const elem, int64_t const hash)
     return (struct query){.found = false, .stopped_at = cur_i};
 }
 
-static ccc_fhash_result
+static ccc_result
 maybe_resize(ccc_flat_hash *h)
 {
     if ((double)ccc_buf_size(h->buf) / (double)ccc_buf_capacity(h->buf)
         <= load_factor)
     {
-        return CCC_FHASH_OK;
+        return CCC_OK;
     }
     if (!h->buf->realloc_fn)
     {
-        return CCC_FHASH_FULL;
+        return CCC_FULL;
     }
     ccc_buf new_buf = *h->buf;
     new_buf.capacity = next_prime(ccc_buf_size(h->buf) * 2);
     new_buf.mem = h->buf->realloc_fn(NULL, new_buf.capacity);
     if (!new_buf.mem)
     {
-        return CCC_FHASH_ERR;
+        return CCC_ERR;
     }
     ccc_flat_hash new_hash = *h;
     new_hash.buf = &new_buf;
@@ -269,7 +269,7 @@ maybe_resize(ccc_flat_hash *h)
         }
     }
     *h = new_hash;
-    return CCC_FHASH_OK;
+    return CCC_OK;
 }
 
 static inline void
