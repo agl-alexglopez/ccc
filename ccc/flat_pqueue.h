@@ -37,7 +37,7 @@ typedef void ccc_fpq_print_fn(void const *);
    access the fields directly or modify them. */
 typedef struct
 {
-    ccc_impl_flat_pqueue impl;
+    struct ccc_impl_flat_pqueue impl;
 } ccc_flat_pqueue;
 
 #define CCC_FPQ_INIT(mem_buf, struct_name, fpq_elem_field, cmp_order, cmp_fn,  \
