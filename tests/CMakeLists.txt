@@ -37,7 +37,6 @@ macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME} PRIVATE
     flat_pqueue 
-    buf
     test
   )
   set_target_properties(${TEST_NAME} 
@@ -93,6 +92,30 @@ add_set_test(test_set_construct)
 add_set_test(test_set_insert)
 add_set_test(test_set_erase)
 add_set_test(test_set_iter)
+
+#############  fhash  ##########################
+
+add_library(fhash_util fhash/fhash_util.h fhash/fhash_util.c)
+target_link_libraries(fhash_util
+  flat_hash
+)
+
+macro(add_fhash_test TEST_NAME)
+  add_executable(${TEST_NAME} fhash/${TEST_NAME}.c)
+  target_link_libraries(${TEST_NAME} PRIVATE
+    flat_hash
+    buf
+    test
+    fhash_util
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_fhash_test(test_fhash_construct)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
