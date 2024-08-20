@@ -16,7 +16,6 @@ static ccc_pq_elem *delete(ccc_pqueue *, ccc_pq_elem *);
 static ccc_pq_elem *delete_min(ccc_pqueue *, ccc_pq_elem *);
 static void clear_node(ccc_pq_elem *);
 static void cut_child(ccc_pq_elem *);
-static ccc_pq_elem *pq_elem(ccc_pqueue const *, void const *user_struct);
 static void *struct_base(ccc_pqueue const *, ccc_pq_elem const *e);
 static ccc_threeway_cmp cmp(ccc_pqueue const *, ccc_pq_elem const *a,
                             ccc_pq_elem const *b);
@@ -26,13 +25,12 @@ static ccc_threeway_cmp cmp(ccc_pqueue const *, ccc_pq_elem const *a,
 void const *
 ccc_pq_front(ccc_pqueue const *const ppq)
 {
-    return struct_base(ppq, ppq->root);
+    return ppq->root ? struct_base(ppq, ppq->root) : NULL;
 }
 
 void
-ccc_pq_push(ccc_pqueue *const ppq, void *const user_struct)
+ccc_pq_push(ccc_pqueue *const ppq, ccc_pq_elem *const e)
 {
-    ccc_pq_elem *const e = pq_elem(ppq, user_struct);
     if (!e || !ppq)
     {
         return;
@@ -57,9 +55,8 @@ ccc_pq_pop(ccc_pqueue *const ppq)
 }
 
 void *
-ccc_pq_erase(ccc_pqueue *const ppq, void *const user_struct)
+ccc_pq_erase(ccc_pqueue *const ppq, ccc_pq_elem *const e)
 {
-    ccc_pq_elem *const e = pq_elem(ppq, user_struct);
     if (!ppq->root || !e->next_sibling || !e->prev_sibling)
     {
         return NULL;
@@ -67,7 +64,7 @@ ccc_pq_erase(ccc_pqueue *const ppq, void *const user_struct)
     ppq->root = delete (ppq, e);
     ppq->sz--;
     clear_node(e);
-    return user_struct;
+    return struct_base(ppq, e);
 }
 
 void
@@ -98,15 +95,14 @@ ccc_pq_size(ccc_pqueue const *const ppq)
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
 bool
-ccc_pq_update(ccc_pqueue *const ppq, void *const user_struct,
+ccc_pq_update(ccc_pqueue *const ppq, ccc_pq_elem *const e,
               ccc_update_fn *const fn, void *const aux)
 {
-    ccc_pq_elem *const e = pq_elem(ppq, user_struct);
     if (!e->next_sibling || !e->prev_sibling)
     {
         return false;
     }
-    fn(user_struct, aux);
+    fn(struct_base(ppq, e), aux);
     if (e->parent && cmp(ppq, e, e->parent) == ppq->order)
     {
         cut_child(e);
@@ -122,23 +118,22 @@ ccc_pq_update(ccc_pqueue *const ppq, void *const user_struct,
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
 bool
-ccc_pq_increase(ccc_pqueue *const ppq, void *const user_struct,
-                ccc_update_fn *fn, void *aux)
+ccc_pq_increase(ccc_pqueue *const ppq, ccc_pq_elem *const e, ccc_update_fn *fn,
+                void *aux)
 {
-    ccc_pq_elem *const e = pq_elem(ppq, user_struct);
     if (!e->next_sibling || !e->prev_sibling)
     {
         return false;
     }
     if (ppq->order == CCC_GRT)
     {
-        fn(user_struct, aux);
+        fn(struct_base(ppq, e), aux);
         cut_child(e);
     }
     else
     {
         ppq->root = delete (ppq, e);
-        fn(user_struct, aux);
+        fn(struct_base(ppq, e), aux);
         init_node(e);
     }
     ppq->root = merge(ppq, ppq->root, e);
@@ -148,23 +143,22 @@ ccc_pq_increase(ccc_pqueue *const ppq, void *const user_struct,
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
 bool
-ccc_pq_decrease(ccc_pqueue *const ppq, void *const user_struct,
-                ccc_update_fn *fn, void *aux)
+ccc_pq_decrease(ccc_pqueue *const ppq, ccc_pq_elem *const e, ccc_update_fn *fn,
+                void *aux)
 {
-    ccc_pq_elem *const e = pq_elem(ppq, user_struct);
     if (!e->next_sibling || !e->prev_sibling)
     {
         return false;
     }
     if (ppq->order == CCC_LES)
     {
-        fn(user_struct, aux);
+        fn(struct_base(ppq, e), aux);
         cut_child(e);
     }
     else
     {
         ppq->root = delete (ppq, e);
-        fn(user_struct, aux);
+        fn(struct_base(ppq, e), aux);
         init_node(e);
     }
     ppq->root = merge(ppq, ppq->root, e);
@@ -204,16 +198,10 @@ cmp(ccc_pqueue const *const ppq, ccc_pq_elem const *const a,
     return ppq->cmp(struct_base(ppq, a), struct_base(ppq, b), ppq->aux);
 }
 
-static inline ccc_pq_elem *
-pq_elem(ccc_pqueue const *const pq, void const *user_struct)
-{
-    return (ccc_pq_elem *)((uint8_t *)user_struct + pq->pq_elem_offset);
-}
-
 static inline void *
 struct_base(ccc_pqueue const *const pq, ccc_pq_elem const *e)
 {
-    return ((uint8_t *)(&e->left_child)) - pq->pq_elem_offset;
+    return ((uint8_t *)&(e->left_child)) - pq->pq_elem_offset;
 }
 
 static inline void

@@ -52,7 +52,7 @@ depq_test_insert_one(void)
     ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    ccc_depq_push(&pq, &single);
+    ccc_depq_push(&pq, &single.elem);
     CHECK(ccc_depq_empty(&pq), false, bool, "%d");
     CHECK(((struct val *)ccc_depq_root(&pq))->val == single.val, true, bool,
           "%d");
@@ -67,7 +67,7 @@ depq_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        ccc_depq_push(&pq, &three_vals[i]);
+        ccc_depq_push(&pq, &three_vals[i].elem);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         CHECK(ccc_depq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -87,8 +87,8 @@ depq_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        ccc_depq_push(&pq, &vals[i]);
-        ccc_depq_push(&pq_tester_clone, &tester_clone[i]);
+        ccc_depq_push(&pq, &vals[i].elem);
+        ccc_depq_push(&pq_tester_clone, &tester_clone[i].elem);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
@@ -108,7 +108,7 @@ depq_test_insert_three_dups(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        ccc_depq_push(&pq, &three_vals[i]);
+        ccc_depq_push(&pq, &three_vals[i].elem);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         CHECK(ccc_depq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -147,7 +147,7 @@ depq_test_read_max_min(void)
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
-        ccc_depq_push(&pq, &vals[i]);
+        ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
         CHECK(ccc_depq_size(&pq), i + 1, size_t, "%zu");
     }
@@ -172,7 +172,7 @@ insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_depq_push(pq, &vals[shuffled_index]);
+        ccc_depq_push(pq, &vals[shuffled_index].elem);
         CHECK(ccc_depq_size(pq), i + 1, size_t, "%zu");
         CHECK(ccc_tree_validate(&pq->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -190,7 +190,8 @@ inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e; e = ccc_depq_rnext(pq, e))
+    for (struct val *e = ccc_depq_rbegin(pq); e;
+         e = ccc_depq_rnext(pq, &e->elem))
     {
         vals[i++] = e->val;
     }
