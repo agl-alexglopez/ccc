@@ -66,7 +66,7 @@ typedef struct
                 .parent_or_dups = &(tree_name).t.end},                         \
         .cmp = (cmp_fn), .aux = (aux_data), .size = 0,                         \
         .node_elem_offset                                                      \
-            = offsetof(struct_name, node_elem_field.n), /* NOLINT */           \
+            = offsetof(struct_name, node_elem_field.n.link), /* NOLINT */      \
     }
 
 /* Mostly intended for debugging. Validates the underlying tree

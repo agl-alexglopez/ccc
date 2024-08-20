@@ -300,13 +300,13 @@ ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *const elem, ccc_update_fn *fn,
     {
         return false;
     }
-    ccc_depq_elem *e = (ccc_depq_elem *)multiset_erase_node(&pq->t, &elem->n);
+    ccc_node *e = multiset_erase_node(&pq->t, &elem->n);
     if (!e)
     {
         return false;
     }
-    fn(struct_base(&pq->t, &elem->n), aux);
-    multiset_insert(&pq->t, &e->n);
+    fn(struct_base(&pq->t, e), aux);
+    multiset_insert(&pq->t, e);
     return true;
 }
 
@@ -360,8 +360,7 @@ ccc_set_clear(ccc_set *const set, ccc_destructor_fn *const destructor)
 
     while (!ccc_set_empty(set))
     {
-        ccc_node *n = pop_min(&set->t);
-        destructor(struct_base(&set->t, n));
+        destructor(struct_base(&set->t, pop_min(&set->t)));
     }
 }
 
@@ -1193,7 +1192,10 @@ get_parent(ccc_tree *t, ccc_node const *n)
 static inline void *
 struct_base(ccc_tree const *const t, ccc_node const *const n)
 {
-    return ((uint8_t *)&n->link) - t->node_elem_offset;
+    /* Link is the first field of the struct and is an array so no need to get
+       pointer address of [0] element of array. That's the same as just the
+       array field. */
+    return ((uint8_t *)n->link) - t->node_elem_offset;
 }
 
 static inline ccc_threeway_cmp
