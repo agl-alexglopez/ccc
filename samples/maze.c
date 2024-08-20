@@ -212,13 +212,13 @@ animate_maze(struct maze *maze)
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)ccc_set_insert(&cell_costs, odd_point);
+    (void)ccc_set_insert(&cell_costs, &odd_point->elem);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)ccc_depq_push(&cells, start);
+    (void)ccc_depq_push(&cells, &start->elem);
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
@@ -242,7 +242,7 @@ animate_maze(struct maze *maze)
             int cur_weight = 0;
             struct point_cost key = {.p = next};
             struct point_cost const *const found
-                = ccc_set_find(&cell_costs, &key);
+                = ccc_set_find(&cell_costs, &key.elem);
             if (!found)
             {
                 struct point_cost *new_cost
@@ -252,7 +252,9 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                assert(ccc_set_insert(&cell_costs, new_cost));
+                bool const inserted
+                    = ccc_set_insert(&cell_costs, &new_cost->elem);
+                assert(inserted);
             }
             else
             {
@@ -274,7 +276,7 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            ccc_depq_push(&cells, new_cell);
+            ccc_depq_push(&cells, &new_cell->elem);
         }
         else
         {

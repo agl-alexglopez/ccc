@@ -45,41 +45,43 @@ typedef struct
 
 void ccc_set_clear(ccc_set *, ccc_destructor_fn *destructor);
 
-bool ccc_set_empty(ccc_set *);
+bool ccc_set_empty(ccc_set const *);
 
-size_t ccc_set_size(ccc_set *);
+size_t ccc_set_size(ccc_set const *);
 
-bool ccc_set_contains(ccc_set *, void *);
+bool ccc_set_contains(ccc_set *, ccc_set_elem const *);
 
-bool ccc_set_insert(ccc_set *, void *);
+bool ccc_set_insert(ccc_set *, ccc_set_elem *);
 
-void *ccc_set_find(ccc_set *, void *);
+void *ccc_set_find(ccc_set *, ccc_set_elem const *);
 
-void *ccc_set_erase(ccc_set *, void *);
+void *ccc_set_erase(ccc_set *, ccc_set_elem *);
 
-bool ccc_set_is_min(ccc_set *, void *);
+bool ccc_set_is_min(ccc_set *, ccc_set_elem const *);
 
-bool ccc_set_is_max(ccc_set *, void *);
+bool ccc_set_is_max(ccc_set *, ccc_set_elem const *);
 
-bool ccc_set_const_contains(ccc_set *, void *);
+bool ccc_set_const_contains(ccc_set *, ccc_set_elem const *);
 
-void *ccc_set_const_find(ccc_set *, void *);
+void *ccc_set_const_find(ccc_set *, ccc_set_elem const *);
 
 void *ccc_set_begin(ccc_set *);
 
 void *ccc_set_rbegin(ccc_set *);
 
-void *ccc_set_next(ccc_set *, void *);
+void *ccc_set_next(ccc_set *, ccc_set_elem const *);
 
-void *ccc_set_rnext(ccc_set *, void *);
+void *ccc_set_rnext(ccc_set *, ccc_set_elem const *);
 
-ccc_range ccc_set_equal_range(ccc_set *, void *begin, void *end);
+ccc_range ccc_set_equal_range(ccc_set *, ccc_set_elem const *begin,
+                              ccc_set_elem const *end);
 
 void *ccc_set_begin_range(ccc_range const *);
 
 void *ccc_set_end_range(ccc_range const *);
 
-ccc_rrange ccc_set_equal_rrange(ccc_set *, void *rbegin, void *end);
+ccc_rrange ccc_set_equal_rrange(ccc_set *, ccc_set_elem const *rbegin,
+                                ccc_set_elem const *end);
 
 void *ccc_set_begin_rrange(ccc_rrange const *);
 
@@ -87,6 +89,6 @@ void *ccc_set_end_rrange(ccc_rrange const *);
 
 void *ccc_set_root(ccc_set const *);
 
-void ccc_set_print(ccc_set const *, void const *, ccc_print_fn *);
+void ccc_set_print(ccc_set const *, ccc_set_elem const *, ccc_print_fn *);
 
 #endif /* CCC_SET_H */

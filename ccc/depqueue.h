@@ -44,9 +44,9 @@ void ccc_depq_clear(ccc_depqueue *, ccc_destructor_fn *destructor);
 
 bool ccc_depq_empty(ccc_depqueue const *);
 
-size_t ccc_depq_size(ccc_depqueue *);
+size_t ccc_depq_size(ccc_depqueue const *);
 
-void ccc_depq_push(ccc_depqueue *, void *);
+void ccc_depq_push(ccc_depqueue *, ccc_depq_elem *);
 
 void *ccc_depq_pop_max(ccc_depqueue *);
 
@@ -56,35 +56,37 @@ void *ccc_depq_max(ccc_depqueue *);
 
 void *ccc_depq_min(ccc_depqueue *);
 
-bool ccc_depq_is_max(ccc_depqueue *, void *);
+bool ccc_depq_is_max(ccc_depqueue *, ccc_depq_elem const *);
 
-bool ccc_depq_is_min(ccc_depqueue *, void *);
+bool ccc_depq_is_min(ccc_depqueue *, ccc_depq_elem const *);
 
-void const *ccc_depq_const_max(ccc_depqueue const *);
+void *ccc_depq_const_max(ccc_depqueue const *);
 
-void const *ccc_depq_const_min(ccc_depqueue const *);
+void *ccc_depq_const_min(ccc_depqueue const *);
 
-void *ccc_depq_erase(ccc_depqueue *, void *);
+void *ccc_depq_erase(ccc_depqueue *, ccc_depq_elem *);
 
-bool ccc_depq_update(ccc_depqueue *, void *, ccc_update_fn *, void *);
+bool ccc_depq_update(ccc_depqueue *, ccc_depq_elem *, ccc_update_fn *, void *);
 
-bool ccc_depq_contains(ccc_depqueue *, void *);
+bool ccc_depq_contains(ccc_depqueue *, ccc_depq_elem const *);
 
 void *ccc_depq_begin(ccc_depqueue *);
 
 void *ccc_depq_rbegin(ccc_depqueue *);
 
-void *ccc_depq_next(ccc_depqueue *, void *);
+void *ccc_depq_next(ccc_depqueue *, ccc_depq_elem const *);
 
-void *ccc_depq_rnext(ccc_depqueue *, void *);
+void *ccc_depq_rnext(ccc_depqueue *, ccc_depq_elem const *);
 
-ccc_range ccc_depq_equal_range(ccc_depqueue *, void *begin, void *end);
+ccc_range ccc_depq_equal_range(ccc_depqueue *, ccc_depq_elem const *begin,
+                               ccc_depq_elem const *end);
 
 void *ccc_depq_begin_range(ccc_range const *);
 
 void *ccc_depq_end_range(ccc_range const *);
 
-ccc_rrange ccc_depq_equal_rrange(ccc_depqueue *, void *rbegin, void *end);
+ccc_rrange ccc_depq_equal_rrange(ccc_depqueue *, ccc_depq_elem const *rbegin,
+                                 ccc_depq_elem const *end);
 
 void *ccc_depq_begin_rrange(ccc_rrange const *);
 
@@ -92,6 +94,7 @@ void *ccc_depq_end_rrange(ccc_rrange const *);
 
 void *ccc_depq_root(ccc_depqueue const *);
 
-void ccc_depq_print(ccc_depqueue const *, void const *, ccc_print_fn *);
+void ccc_depq_print(ccc_depqueue const *, ccc_depq_elem const *,
+                    ccc_print_fn *);
 
 #endif /* CCC_DEPQUEUE_H */

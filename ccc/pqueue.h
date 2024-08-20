@@ -57,14 +57,14 @@ typedef struct
 void const *ccc_pq_front(ccc_pqueue const *);
 
 /* Adds an element to the priority queue in correct total order. O(1). */
-void ccc_pq_push(ccc_pqueue *, void *);
+void ccc_pq_push(ccc_pqueue *, ccc_pq_elem *);
 
 /* Pops the front element from the priority queue. O(lgN). */
 void *ccc_pq_pop(ccc_pqueue *);
 
 /* Erase the specified element from the priority queue. This need not be
    the front element. O(lgN). */
-void *ccc_pq_erase(ccc_pqueue *, void *);
+void *ccc_pq_erase(ccc_pqueue *, ccc_pq_elem *);
 
 /* Returns true if the priority queue is empty false if not. */
 bool ccc_pq_empty(ccc_pqueue const *);
@@ -77,17 +77,17 @@ size_t ccc_pq_size(ccc_pqueue const *);
    may incur uneccessary overhead if the user can deduce if an increase
    or decrease is occuring. See the increase and decrease operations. O(1)
    best case, O(lgN) worst case. */
-bool ccc_pq_update(ccc_pqueue *, void *, ccc_update_fn *, void *);
+bool ccc_pq_update(ccc_pqueue *, ccc_pq_elem *, ccc_update_fn *, void *);
 
 /* Optimal update technique if the priority queue has been initialized as
    a max queue and the new value is known to be greater than the old value.
    If this is a max heap O(1), otherwise O(lgN). */
-bool ccc_pq_increase(ccc_pqueue *, void *, ccc_update_fn *, void *);
+bool ccc_pq_increase(ccc_pqueue *, ccc_pq_elem *, ccc_update_fn *, void *);
 
 /* Optimal update technique if the priority queue has been initialized as
    a min queue and the new value is known to be less than the old value.
    If this is a min heap O(1), otherwise O(lgN). */
-bool ccc_pq_decrease(ccc_pqueue *, void *, ccc_update_fn *, void *);
+bool ccc_pq_decrease(ccc_pqueue *, ccc_pq_elem *, ccc_update_fn *, void *);
 
 /* Return the order used to initialize the heap. */
 ccc_threeway_cmp ccc_pq_order(ccc_pqueue const *);

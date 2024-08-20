@@ -63,7 +63,7 @@ set_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_set_insert(&s, &vals[i]))
+        if (ccc_set_insert(&s, &vals[i].elem))
         {
             repeats[i] = true;
         }
@@ -71,11 +71,11 @@ set_test_prime_shuffle(void)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_set_print(&s, ccc_set_root(&s), set_printer_fn);
+    ccc_set_print(&s, &((struct val *)ccc_set_root(&s))->elem, set_printer_fn);
     CHECK(ccc_set_size(&s) < size, true, bool, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i]);
+        ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
         CHECK(elem || !repeats[i], true, bool, "%d");
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
@@ -99,7 +99,7 @@ set_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_set_erase(&s, &vals[i]);
+        (void)ccc_set_erase(&s, &vals[i].elem);
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
@@ -119,12 +119,13 @@ set_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_set_insert(&s, &vals[i]);
+        ccc_set_insert(&s, &vals[i].elem);
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        (void)ccc_set_erase(&s, &vals[i]);
+        CHECK(ccc_set_contains(&s, &vals[i].elem), true, bool, "%d");
+        (void)ccc_set_erase(&s, &vals[i].elem);
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
@@ -144,7 +145,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_set_insert(s, &vals[shuffled_index]);
+        ccc_set_insert(s, &vals[shuffled_index].elem);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
         CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -161,7 +162,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, e))
+    for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, &e->elem))
     {
         vals[i++] = e->val;
     }

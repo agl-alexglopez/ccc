@@ -5,7 +5,6 @@
 #include "set.h"
 #include "str_view/str_view.h"
 
-#include <alloca.h>
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -258,7 +257,7 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+    srand(1);
     struct graph graph = {
         .rows = default_rows,
         .cols = default_cols,
@@ -348,7 +347,8 @@ build_graph(struct graph *const graph)
             .pos = rand_point,
             .edges = {{0}, {0}, {0}, {0}},
         };
-        if (!ccc_set_insert(&graph->adjacency_list, new_vertex))
+        if (!ccc_set_insert(&graph->adjacency_list,
+                            &new_vertex->vertex_set_elem))
         {
             quit("Error building vertices. New vertex is already present.\n",
                  1);
@@ -359,7 +359,8 @@ build_graph(struct graph *const graph)
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         key.name = (char)vertex_title;
-        struct vertex *const src = ccc_set_find(&graph->adjacency_list, &key);
+        struct vertex *const src
+            = ccc_set_find(&graph->adjacency_list, &key.vertex_set_elem);
         if (!src)
         {
             quit("Vertex that should be present in the ccc_set is absent.\n",
@@ -381,8 +382,7 @@ static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
     size_t const graph_size = ccc_set_size(&graph->adjacency_list);
-    /* Bounded at size of the alphabet A-Z so alloca is fine here. */
-    size_t *vertex_title_indices = alloca(sizeof(size_t) * graph_size);
+    size_t vertex_title_indices[sizeof(size_t) * graph_size];
     for (size_t i = 0; i < graph_size; ++i)
     {
         vertex_title_indices[i] = i;
@@ -398,7 +398,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        dst = ccc_set_find(&graph->adjacency_list, &key);
+        dst = ccc_set_find(&graph->adjacency_list, &key.vertex_set_elem);
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -453,7 +453,7 @@ edge_exists(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name)
                 || (!is_path(next_cell)
-                    && !ccc_set_contains(&parent_map, &push)))
+                    && !ccc_set_contains(&parent_map, &push.parent_set_elem)))
             {
                 (void)insert_parent_cell(&parent_map, push);
                 q_push(&bfs, &next);
@@ -463,7 +463,8 @@ edge_exists(struct graph *const graph, struct vertex *const src,
     if (success)
     {
         struct parent_cell c = {.key = cur};
-        struct parent_cell *cell = ccc_set_find(&parent_map, &c);
+        struct parent_cell *cell
+            = ccc_set_find(&parent_map, &c.parent_set_elem);
         if (!cell)
         {
             quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -472,7 +473,7 @@ edge_exists(struct graph *const graph, struct vertex *const src,
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
         {
-            cell = ccc_set_find(&parent_map, &c);
+            cell = ccc_set_find(&parent_map, &c.parent_set_elem);
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -721,7 +722,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct prev_vertex pv = {.v = cur->v->edges[i].to};
-            struct prev_vertex *next = ccc_set_find(&prev_map, &pv);
+            struct prev_vertex *next
+                = ccc_set_find(&prev_map, &pv.prev_vertex_elem);
             assert(next);
             /* The seen ccc_set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -732,7 +734,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!ccc_pq_decrease(&dist_q, dist, pq_update_dist, &alt))
+                if (!ccc_pq_decrease(&dist_q, &dist->ccc_pq_elem,
+                                     pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -742,12 +745,13 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct prev_vertex key = {.v = cur->v};
-        struct prev_vertex *prev = ccc_set_find(&prev_map, &key);
+        struct prev_vertex *prev
+            = ccc_set_find(&prev_map, &key.prev_vertex_elem);
         while (prev->prev)
         {
             paint_edge(graph, key.v, prev->prev);
             key.v = prev->prev;
-            prev = ccc_set_find(&prev_map, &key);
+            prev = ccc_set_find(&prev_map, &key.prev_vertex_elem);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -764,7 +768,7 @@ prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
                  ccc_set *prev_map, struct path_request const *pr)
 {
     for (struct vertex *v = ccc_set_begin(&graph->adjacency_list); v;
-         v = ccc_set_next(&graph->adjacency_list, v))
+         v = ccc_set_next(&graph->adjacency_list, &v->vertex_set_elem))
     {
         struct dist_point *p = malloc_or_quit(sizeof(struct dist_point));
         *p = (struct dist_point){
@@ -779,7 +783,7 @@ prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
         {
             quit("inserting into ccc_set in in loading phase failed.\n", 1);
         }
-        ccc_pq_push(dist_q, p);
+        ccc_pq_push(dist_q, &p->ccc_pq_elem);
     }
 }
 
@@ -1042,7 +1046,7 @@ insert_prev_vertex(ccc_set *s, struct prev_vertex pv)
 
     struct prev_vertex *pv_heap = malloc_or_quit(sizeof(struct prev_vertex));
     *pv_heap = pv;
-    return ccc_set_insert(s, pv_heap);
+    return ccc_set_insert(s, &pv_heap->prev_vertex_elem);
 }
 
 static bool
@@ -1051,7 +1055,7 @@ insert_parent_cell(ccc_set *s, struct parent_cell pc)
     struct parent_cell *const pc_heap
         = malloc_or_quit(sizeof(struct parent_cell));
     *pc_heap = pc;
-    return ccc_set_insert(s, pc_heap);
+    return ccc_set_insert(s, &pc_heap->parent_set_elem);
 }
 
 static ccc_threeway_cmp
@@ -1173,7 +1177,8 @@ parse_path_request(struct graph *const g, str_view r)
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex key = {.name = *c};
-            struct vertex *v = ccc_set_find(&g->adjacency_list, &key);
+            struct vertex *v
+                = ccc_set_find(&g->adjacency_list, &key.vertex_set_elem);
             res.src ? (res.dst = v) : (res.src = v);
         }
     }

@@ -59,8 +59,8 @@ ccc_tree_link const reverse_inorder_traversal = R;
 static void init_node(ccc_tree *, ccc_node *);
 static bool empty(ccc_tree const *);
 static void multiset_insert(ccc_tree *, ccc_node *);
-static ccc_node *find(ccc_tree *, ccc_node *);
-static bool contains(ccc_tree *, ccc_node *);
+static ccc_node *find(ccc_tree *, ccc_node const *);
+static bool contains(ccc_tree *, ccc_node const *);
 static ccc_node *erase(ccc_tree *, ccc_node *);
 static bool insert(ccc_tree *, ccc_node *);
 static ccc_node *multiset_erase_max_or_min(ccc_tree *, ccc_node *,
@@ -75,26 +75,28 @@ static ccc_node *max(ccc_tree const *);
 static ccc_node *pop_max(ccc_tree *);
 static ccc_node *pop_min(ccc_tree *);
 static ccc_node *min(ccc_tree const *);
-static ccc_node *const_seek(ccc_tree *, ccc_node *);
-static ccc_node *next(ccc_tree *, ccc_node *, ccc_tree_link);
-static ccc_node *multiset_next(ccc_tree *, ccc_node *, ccc_tree_link);
-static ccc_range equal_range(ccc_tree *, void *, void *, ccc_tree_link);
+static ccc_node const *const_seek(ccc_tree *, ccc_node const *);
+static ccc_node const *next(ccc_tree *, ccc_node const *, ccc_tree_link);
+static ccc_node const *multiset_next(ccc_tree *, ccc_node const *,
+                                     ccc_tree_link);
+static ccc_range equal_range(ccc_tree *, ccc_node const *, ccc_node const *,
+                             ccc_tree_link);
 static ccc_threeway_cmp force_find_grt(void const *, void const *, void *);
 static ccc_threeway_cmp force_find_les(void const *, void const *, void *);
 static void link_trees(ccc_tree *, ccc_node *, ccc_tree_link, ccc_node *);
 static inline bool has_dups(ccc_node const *, ccc_node const *);
-static ccc_node *get_parent(ccc_tree *, ccc_node *);
+static ccc_node *get_parent(ccc_tree *, ccc_node const *);
 static void add_duplicate(ccc_tree *, ccc_node *, ccc_node *, ccc_node *);
 static ccc_node *splay(ccc_tree *, ccc_node *, ccc_node const *, ccc_cmp_fn *);
-static inline ccc_node *next_tree_node(ccc_tree *, ccc_node *, ccc_tree_link);
+static inline ccc_node const *next_tree_node(ccc_tree *, ccc_node const *,
+                                             ccc_tree_link);
 static ccc_node *range_begin(ccc_range const *);
 static ccc_node *range_end(ccc_range const *);
 static ccc_node *rrange_begin(ccc_rrange const *);
 static ccc_node *rrange_end(ccc_rrange const *);
 static void *struct_base(ccc_tree const *, ccc_node const *);
-static ccc_node *node_elem(ccc_tree const *, void const *);
-static ccc_threeway_cmp cmp(ccc_tree const *, void const *, void const *,
-                            ccc_cmp_fn *);
+static ccc_threeway_cmp cmp(ccc_tree const *, ccc_node const *,
+                            ccc_node const *, ccc_cmp_fn *);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -106,11 +108,7 @@ ccc_depq_clear(ccc_depqueue *pq, ccc_destructor_fn *destructor)
 {
     while (!ccc_depq_empty(pq))
     {
-        ccc_depq_elem *e = ccc_depq_pop_max(pq);
-        if (e)
-        {
-            destructor(e);
-        }
+        destructor(ccc_depq_pop_max(pq));
     }
 }
 
@@ -123,7 +121,12 @@ ccc_depq_empty(ccc_depqueue const *const pq)
 void *
 ccc_depq_root(ccc_depqueue const *const pq)
 {
-    return struct_base(&pq->t, root(&pq->t));
+    ccc_node const *const n = root(&pq->t);
+    if (!n)
+    {
+        return NULL;
+    }
+    return struct_base(&pq->t, n);
 }
 
 void *
@@ -138,7 +141,7 @@ ccc_depq_max(ccc_depqueue *const pq)
     return struct_base(&pq->t, n);
 }
 
-void const *
+void *
 ccc_depq_const_max(ccc_depqueue const *const pq)
 {
     ccc_node const *const n = max(&pq->t);
@@ -150,9 +153,9 @@ ccc_depq_const_max(ccc_depqueue const *const pq)
 }
 
 bool
-ccc_depq_is_max(ccc_depqueue *const pq, void *const user_struct)
+ccc_depq_is_max(ccc_depqueue *const pq, ccc_depq_elem const *const e)
 {
-    return !ccc_depq_rnext(pq, user_struct);
+    return !ccc_depq_rnext(pq, e);
 }
 
 void *
@@ -167,7 +170,7 @@ ccc_depq_min(ccc_depqueue *const pq)
     return struct_base(&pq->t, n);
 }
 
-void const *
+void *
 ccc_depq_const_min(ccc_depqueue const *const pq)
 {
     ccc_node const *const n = min(&pq->t);
@@ -179,9 +182,9 @@ ccc_depq_const_min(ccc_depqueue const *const pq)
 }
 
 bool
-ccc_depq_is_min(ccc_depqueue *const pq, void *const user_struct)
+ccc_depq_is_min(ccc_depqueue *const pq, ccc_depq_elem const *const e)
 {
-    return !ccc_depq_next(pq, user_struct);
+    return !ccc_depq_next(pq, e);
 }
 
 void *
@@ -207,10 +210,10 @@ ccc_depq_rbegin(ccc_depqueue *pq)
 }
 
 void *
-ccc_depq_next(ccc_depqueue *pq, void *user_struct)
+ccc_depq_next(ccc_depqueue *pq, ccc_depq_elem const *e)
 {
-    ccc_node const *const n = multiset_next(
-        &pq->t, node_elem(&pq->t, user_struct), reverse_inorder_traversal);
+    ccc_node const *const n
+        = multiset_next(&pq->t, &e->n, reverse_inorder_traversal);
     if (!n)
     {
         return NULL;
@@ -219,10 +222,9 @@ ccc_depq_next(ccc_depqueue *pq, void *user_struct)
 }
 
 void *
-ccc_depq_rnext(ccc_depqueue *pq, void *user_struct)
+ccc_depq_rnext(ccc_depqueue *pq, ccc_depq_elem const *e)
 {
-    ccc_node const *const n = multiset_next(
-        &pq->t, node_elem(&pq->t, user_struct), inorder_traversal);
+    ccc_node const *const n = multiset_next(&pq->t, &e->n, inorder_traversal);
     if (!n)
     {
         return NULL;
@@ -231,9 +233,10 @@ ccc_depq_rnext(ccc_depqueue *pq, void *user_struct)
 }
 
 ccc_range
-ccc_depq_equal_range(ccc_depqueue *pq, void *begin, void *end)
+ccc_depq_equal_range(ccc_depqueue *pq, ccc_depq_elem const *const begin,
+                     ccc_depq_elem const *const end)
 {
-    return equal_range(&pq->t, begin, end, reverse_inorder_traversal);
+    return equal_range(&pq->t, &begin->n, &end->n, reverse_inorder_traversal);
 }
 
 void *
@@ -249,9 +252,11 @@ ccc_depq_end_range(ccc_range const *const r)
 }
 
 ccc_rrange
-ccc_depq_equal_rrange(ccc_depqueue *pq, void *const rbegin, void *const rend)
+ccc_depq_equal_rrange(ccc_depqueue *pq, ccc_depq_elem const *const rbegin,
+                      ccc_depq_elem const *const rend)
 {
-    ccc_range const ret = equal_range(&pq->t, rbegin, rend, inorder_traversal);
+    ccc_range const ret
+        = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal);
     return (ccc_rrange){
         .rbegin = ret.begin,
         .end = ret.end,
@@ -271,16 +276,15 @@ ccc_depq_end_rrange(ccc_rrange const *const rr)
 }
 
 void
-ccc_depq_push(ccc_depqueue *pq, void *const user_struct)
+ccc_depq_push(ccc_depqueue *pq, ccc_depq_elem *const e)
 {
-    multiset_insert(&pq->t, node_elem(&pq->t, user_struct));
+    multiset_insert(&pq->t, &e->n);
 }
 
 void *
-ccc_depq_erase(ccc_depqueue *pq, void *user_struct)
+ccc_depq_erase(ccc_depqueue *pq, ccc_depq_elem *const e)
 {
-    ccc_node const *const n
-        = multiset_erase_node(&pq->t, node_elem(&pq->t, user_struct));
+    ccc_node const *const n = multiset_erase_node(&pq->t, &e->n);
     if (!n)
     {
         return NULL;
@@ -289,28 +293,27 @@ ccc_depq_erase(ccc_depqueue *pq, void *user_struct)
 }
 
 bool
-ccc_depq_update(ccc_depqueue *pq, void *const user_struct, ccc_update_fn *fn,
+ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *const elem, ccc_update_fn *fn,
                 void *aux)
 {
-    ccc_node *const elem = node_elem(&pq->t, user_struct);
-    if (NULL == elem->link[L] || NULL == elem->link[R])
+    if (NULL == elem->n.link[L] || NULL == elem->n.link[R])
     {
         return false;
     }
-    ccc_depq_elem *e = (ccc_depq_elem *)multiset_erase_node(&pq->t, elem);
+    ccc_depq_elem *e = (ccc_depq_elem *)multiset_erase_node(&pq->t, &elem->n);
     if (!e)
     {
         return false;
     }
-    fn(user_struct, aux);
+    fn(struct_base(&pq->t, &elem->n), aux);
     multiset_insert(&pq->t, &e->n);
     return true;
 }
 
 bool
-ccc_depq_contains(ccc_depqueue *pq, void *const elem)
+ccc_depq_contains(ccc_depqueue *const pq, ccc_depq_elem const *const elem)
 {
-    return contains(&pq->t, node_elem(&pq->t, elem));
+    return contains(&pq->t, &elem->n);
 }
 
 void *
@@ -336,59 +339,54 @@ ccc_depq_pop_min(ccc_depqueue *pq)
 }
 
 size_t
-ccc_depq_size(ccc_depqueue *const pq)
+ccc_depq_size(ccc_depqueue const *const pq)
 {
     return pq->t.size;
 }
 
-bool
-pq_has_dups(ccc_depqueue *const pq, void *e)
-{
-    return has_dups(&pq->t.end, node_elem(&pq->t, e));
-}
-
 void
-ccc_depq_print(ccc_depqueue const *const pq, void const *const start,
+ccc_depq_print(ccc_depqueue const *const pq, ccc_depq_elem const *const start,
                ccc_print_fn *const fn)
 {
-    ccc_tree_print(&pq->t, start, fn);
+    ccc_tree_print(&pq->t, &start->n, fn);
 }
 
 /* ======================        ccc_set Interface       ======================
  */
 
 void
-ccc_set_clear(ccc_set *set, ccc_destructor_fn *destructor)
+ccc_set_clear(ccc_set *const set, ccc_destructor_fn *const destructor)
 {
 
     while (!ccc_set_empty(set))
     {
-        destructor(struct_base(&set->t, pop_min(&set->t)));
+        ccc_node *n = pop_min(&set->t);
+        destructor(struct_base(&set->t, n));
     }
 }
 
 bool
-ccc_set_empty(ccc_set *s)
+ccc_set_empty(ccc_set const *const s)
 {
     return empty(&s->t);
 }
 
 size_t
-ccc_set_size(ccc_set *s)
+ccc_set_size(ccc_set const *const s)
 {
     return s->t.size;
 }
 
 bool
-ccc_set_contains(ccc_set *s, void *se)
+ccc_set_contains(ccc_set *s, ccc_set_elem const *se)
 {
-    return contains(&s->t, node_elem(&s->t, se));
+    return contains(&s->t, &se->n);
 }
 
 bool
-ccc_set_insert(ccc_set *s, void *se)
+ccc_set_insert(ccc_set *s, ccc_set_elem *se)
 {
-    return insert(&s->t, node_elem(&s->t, se));
+    return insert(&s->t, &se->n);
 }
 
 void *
@@ -414,9 +412,9 @@ ccc_set_rbegin(ccc_set *s)
 }
 
 void *
-ccc_set_next(ccc_set *s, void *e)
+ccc_set_next(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node *n = next(&s->t, node_elem(&s->t, e), inorder_traversal);
+    ccc_node const *n = next(&s->t, &e->n, inorder_traversal);
     if (!n)
     {
         return NULL;
@@ -425,9 +423,9 @@ ccc_set_next(ccc_set *s, void *e)
 }
 
 void *
-ccc_set_rnext(ccc_set *s, void *e)
+ccc_set_rnext(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node *n = next(&s->t, node_elem(&s->t, e), reverse_inorder_traversal);
+    ccc_node const *n = next(&s->t, &e->n, reverse_inorder_traversal);
     if (!n)
     {
         return NULL;
@@ -436,9 +434,10 @@ ccc_set_rnext(ccc_set *s, void *e)
 }
 
 ccc_range
-ccc_set_equal_range(ccc_set *s, void *begin, void *end)
+ccc_set_equal_range(ccc_set *s, ccc_set_elem const *const begin,
+                    ccc_set_elem const *const end)
 {
-    return equal_range(&s->t, begin, end, inorder_traversal);
+    return equal_range(&s->t, &begin->n, &end->n, inorder_traversal);
 }
 
 void *
@@ -454,11 +453,12 @@ ccc_set_end_range(ccc_range const *const r)
 }
 
 ccc_rrange
-ccc_set_equal_rrange(ccc_set *s, void *rbegin, void *end)
+ccc_set_equal_rrange(ccc_set *s, ccc_set_elem const *const rbegin,
+                     ccc_set_elem const *const end)
 
 {
     ccc_range const r
-        = equal_range(&s->t, rbegin, end, reverse_inorder_traversal);
+        = equal_range(&s->t, &rbegin->n, &end->n, reverse_inorder_traversal);
     return (ccc_rrange){
         .rbegin = r.begin,
         .end = r.end,
@@ -478,9 +478,9 @@ ccc_set_end_rrange(ccc_rrange const *rr)
 }
 
 void *
-ccc_set_find(ccc_set *s, void *se)
+ccc_set_find(ccc_set *s, ccc_set_elem const *se)
 {
-    ccc_node *n = find(&s->t, node_elem(&s->t, se));
+    ccc_node *n = find(&s->t, &se->n);
     if (!n)
     {
         return NULL;
@@ -489,9 +489,9 @@ ccc_set_find(ccc_set *s, void *se)
 }
 
 void *
-ccc_set_erase(ccc_set *s, void *se)
+ccc_set_erase(ccc_set *s, ccc_set_elem *se)
 {
-    ccc_node *n = erase(&s->t, node_elem(&s->t, se));
+    ccc_node *n = erase(&s->t, &se->n);
     if (!n)
     {
         return NULL;
@@ -500,9 +500,9 @@ ccc_set_erase(ccc_set *s, void *se)
 }
 
 bool
-ccc_set_const_contains(ccc_set *s, void *e)
+ccc_set_const_contains(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node *n = const_seek(&s->t, node_elem(&s->t, e));
+    ccc_node const *n = const_seek(&s->t, &e->n);
     if (!n)
     {
         return NULL;
@@ -511,21 +511,21 @@ ccc_set_const_contains(ccc_set *s, void *e)
 }
 
 bool
-ccc_set_is_min(ccc_set *s, void *e)
+ccc_set_is_min(ccc_set *s, ccc_set_elem const *e)
 {
-    return !ccc_set_rnext(s, node_elem(&s->t, e));
+    return !ccc_set_rnext(s, e);
 }
 
 bool
-ccc_set_is_max(ccc_set *s, void *e)
+ccc_set_is_max(ccc_set *s, ccc_set_elem const *e)
 {
-    return !ccc_set_next(s, node_elem(&s->t, e));
+    return !ccc_set_next(s, e);
 }
 
 void *
-ccc_set_const_find(ccc_set *s, void *e)
+ccc_set_const_find(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node *n = const_seek(&s->t, node_elem(&s->t, e));
+    ccc_node const *n = const_seek(&s->t, &e->n);
     if (!n)
     {
         return NULL;
@@ -545,10 +545,10 @@ ccc_set_root(ccc_set const *const s)
 }
 
 void
-ccc_set_print(ccc_set const *const s, void const *const root,
+ccc_set_print(ccc_set const *const s, ccc_set_elem const *const root,
               ccc_print_fn *const fn)
 {
-    ccc_tree_print(&s->t, root, fn);
+    ccc_tree_print(&s->t, &root->n, fn);
 }
 
 /* ===========    Splay Tree Multiset and Set Implementations    ===========
@@ -650,10 +650,10 @@ min(ccc_tree const *t)
     return m == &t->end ? NULL : m;
 }
 
-static ccc_node *
-const_seek(ccc_tree *const t, ccc_node *const n)
+static ccc_node const *
+const_seek(ccc_tree *const t, ccc_node const *const n)
 {
-    ccc_node *seek = n;
+    ccc_node const *seek = n;
     while (seek != &t->end)
     {
         ccc_threeway_cmp const cur_cmp = cmp(t, n, seek, t->cmp);
@@ -679,19 +679,19 @@ pop_min(ccc_tree *t)
 }
 
 static inline bool
-is_dup_head_next(ccc_node *i)
+is_dup_head_next(ccc_node const *i)
 {
     return i->link[R]->parent_or_dups != NULL;
 }
 
 static inline bool
-is_dup_head(ccc_node *end, ccc_node *i)
+is_dup_head(ccc_node *end, ccc_node const *i)
 {
     return i != end && i->link[P] != end && i->link[P]->link[N] == i;
 }
 
-static ccc_node *
-multiset_next(ccc_tree *t, ccc_node *i, ccc_tree_link const traversal)
+static ccc_node const *
+multiset_next(ccc_tree *t, ccc_node const *i, ccc_tree_link const traversal)
 {
     /* An arbitrary node in a doubly linked list of duplicates. */
     if (NULL == i->parent_or_dups)
@@ -720,8 +720,8 @@ multiset_next(ccc_tree *t, ccc_node *i, ccc_tree_link const traversal)
     return next(t, i, traversal);
 }
 
-static inline ccc_node *
-next_tree_node(ccc_tree *t, ccc_node *head, ccc_tree_link const traversal)
+static inline ccc_node const *
+next_tree_node(ccc_tree *t, ccc_node const *head, ccc_tree_link const traversal)
 {
     if (head->parent_or_dups == &t->end)
     {
@@ -739,8 +739,8 @@ next_tree_node(ccc_tree *t, ccc_node *head, ccc_tree_link const traversal)
     return NULL;
 }
 
-static ccc_node *
-next(ccc_tree *t, ccc_node *n, ccc_tree_link const traversal)
+static ccc_node const *
+next(ccc_tree *t, ccc_node const *n, ccc_tree_link const traversal)
 {
     if (!n || n == &t->end || get_parent(t, t->root) != &t->end)
     {
@@ -767,23 +767,21 @@ next(ccc_tree *t, ccc_node *n, ccc_tree_link const traversal)
 }
 
 static ccc_range
-equal_range(ccc_tree *t, void *user_struct_begin, void *user_struct_end,
+equal_range(ccc_tree *t, ccc_node const *begin, ccc_node const *end,
             ccc_tree_link const traversal)
 {
-    ccc_node *begin = node_elem(t, user_struct_begin);
-    ccc_node *end = node_elem(t, user_struct_end);
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
     ccc_threeway_cmp const grt_or_les[2] = {CCC_GRT, CCC_LES};
-    ccc_node *b = splay(t, t->root, begin, t->cmp);
+    ccc_node const *b = splay(t, t->root, begin, t->cmp);
     if (cmp(t, begin, b, t->cmp) == grt_or_les[traversal])
     {
         b = next(t, b, traversal);
     }
-    ccc_node *e = splay(t, t->root, end, t->cmp);
+    ccc_node const *e = splay(t, t->root, end, t->cmp);
     if (cmp(t, end, e, t->cmp) == grt_or_les[traversal])
     {
         e = next(t, e, traversal);
@@ -819,17 +817,15 @@ rrange_end(ccc_rrange const *const rr)
 }
 
 static ccc_node *
-find(ccc_tree *t, ccc_node *elem)
+find(ccc_tree *t, ccc_node const *elem)
 {
-    init_node(t, elem);
     t->root = splay(t, t->root, elem, t->cmp);
     return cmp(t, elem, t->root, t->cmp) == CCC_EQL ? t->root : NULL;
 }
 
 static bool
-contains(ccc_tree *t, ccc_node *dummy_key)
+contains(ccc_tree *t, ccc_node const *dummy_key)
 {
-    init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, t->cmp);
     return cmp(t, dummy_key, t->root, t->cmp) == CCC_EQL;
 }
@@ -1188,7 +1184,7 @@ has_dups(ccc_node const *const end, ccc_node const *const n)
 }
 
 static inline ccc_node *
-get_parent(ccc_tree *t, ccc_node *n)
+get_parent(ccc_tree *t, ccc_node const *n)
 {
     return has_dups(&t->end, n) ? n->parent_or_dups->parent_or_dups
                                 : n->parent_or_dups;
@@ -1197,18 +1193,12 @@ get_parent(ccc_tree *t, ccc_node *n)
 static inline void *
 struct_base(ccc_tree const *const t, ccc_node const *const n)
 {
-    return ((uint8_t *)&(n->link[0])) - t->node_elem_offset;
-}
-
-static inline ccc_node *
-node_elem(ccc_tree const *const t, void const *const n)
-{
-    return (ccc_node *)((uint8_t *)n + t->node_elem_offset);
+    return ((uint8_t *)&n->link) - t->node_elem_offset;
 }
 
 static inline ccc_threeway_cmp
-cmp(ccc_tree const *const t, void const *const a, void const *const b,
-    ccc_cmp_fn *fn)
+cmp(ccc_tree const *const t, ccc_node const *const a, ccc_node const *const b,
+    ccc_cmp_fn *const fn)
 {
     return fn(struct_base(t, a), struct_base(t, b), t->aux);
 }
@@ -1294,6 +1284,10 @@ static bool
 are_subtrees_valid(ccc_tree const *t, struct ccc_tree_range const r,
                    ccc_node const *const nil)
 {
+    if (!r.root)
+    {
+        return false;
+    }
     if (r.root == nil)
     {
         return true;
@@ -1514,10 +1508,9 @@ print_inner_tree(ccc_node const *const root, size_t const parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 void
-ccc_tree_print(ccc_tree const *const t, void const *const root_struct,
+ccc_tree_print(ccc_tree const *const t, ccc_node const *const root,
                ccc_print_fn *const fn_print)
 {
-    ccc_node const *const root = node_elem(t, root_struct);
     if (root == &t->end)
     {
         return;

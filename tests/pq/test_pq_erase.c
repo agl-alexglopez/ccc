@@ -60,7 +60,7 @@ pq_test_insert_remove_four_dups(void)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        ccc_pq_push(&ppq, &three_vals[i]);
+        ccc_pq_push(&ppq, &three_vals[i].elem);
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         size_t const size = i + 1;
         CHECK(ccc_pq_size(&ppq), size, size_t, "%zu");
@@ -92,7 +92,7 @@ pq_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[i]);
+        (void)ccc_pq_erase(&ppq, &vals[i].elem);
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
     CHECK(ccc_pq_size(&ppq), 0ULL, size_t, "%zu");
@@ -159,7 +159,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        ccc_pq_push(&ppq, &vals[i]);
+        ccc_pq_push(&ppq, &vals[i].elem);
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         size_t const s = i + 1;
         CHECK(ccc_pq_size(&ppq), s, size_t, "%zu");
@@ -171,7 +171,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[shuffled_index]);
+        (void)ccc_pq_erase(&ppq, &vals[shuffled_index].elem);
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size, size_t, "%zu");
@@ -196,7 +196,7 @@ pq_test_prime_shuffle(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        ccc_pq_push(&ppq, &vals[i]);
+        ccc_pq_push(&ppq, &vals[i].elem);
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -205,7 +205,7 @@ pq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(ccc_pq_erase(&ppq, &vals[i]) != NULL, true, bool, "%d");
+        CHECK(ccc_pq_erase(&ppq, &vals[i].elem) != NULL, true, bool, "%d");
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size, size_t, "%zu");
@@ -226,12 +226,12 @@ pq_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_pq_push(&ppq, &vals[i]);
+        ccc_pq_push(&ppq, &vals[i].elem);
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
     for (int i = 0; i < num_heap_elems; ++i)
     {
-        CHECK(ccc_pq_erase(&ppq, &vals[i]) != NULL, true, bool, "%d");
+        CHECK(ccc_pq_erase(&ppq, &vals[i].elem) != NULL, true, bool, "%d");
         CHECK(ccc_pq_validate(&ppq), true, bool, "%d");
     }
     CHECK(ccc_pq_empty(&ppq), true, bool, "%d");
@@ -251,7 +251,7 @@ insert_shuffled(ccc_pqueue *ppq, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_pq_push(ppq, &vals[shuffled_index]);
+        ccc_pq_push(ppq, &vals[shuffled_index].elem);
         CHECK(ccc_pq_size(ppq), i + 1, size_t, "%zu");
         CHECK(ccc_pq_validate(ppq), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -277,14 +277,14 @@ inorder_fill(int vals[], size_t size, ccc_pqueue *ppq)
         CHECK(ccc_pq_validate(ppq), true, bool, "%d");
         CHECK(ccc_pq_validate(&copy), true, bool, "%d");
         vals[i++] = front->val;
-        ccc_pq_push(&copy, front);
+        ccc_pq_push(&copy, &front->elem);
     }
     i = 0;
     while (!ccc_pq_empty(&copy))
     {
         struct val *v = ccc_pq_pop(&copy);
         CHECK(v->val, vals[i++], int, "%d");
-        ccc_pq_push(ppq, v);
+        ccc_pq_push(ppq, &v->elem);
         CHECK(ccc_pq_validate(ppq), true, bool, "%d");
         CHECK(ccc_pq_validate(&copy), true, bool, "%d");
     }

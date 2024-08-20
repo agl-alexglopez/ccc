@@ -58,14 +58,15 @@ typedef struct
     size_t node_elem_offset;
 } ccc_tree;
 
-#define CCC_TREE_INIT(struct_name, set_elem_field, tree_name, cmp_fn,          \
+#define CCC_TREE_INIT(struct_name, node_elem_field, tree_name, cmp_fn,         \
                       aux_data)                                                \
     {                                                                          \
         .root = &(tree_name).t.end,                                            \
         .end = {.link = {&(tree_name).t.end, &(tree_name).t.end},              \
                 .parent_or_dups = &(tree_name).t.end},                         \
         .cmp = (cmp_fn), .aux = (aux_data), .size = 0,                         \
-        .node_elem_offset = offsetof(struct_name, set_elem_field),             \
+        .node_elem_offset                                                      \
+            = offsetof(struct_name, node_elem_field.n), /* NOLINT */           \
     }
 
 /* Mostly intended for debugging. Validates the underlying tree
@@ -75,6 +76,6 @@ bool ccc_tree_validate(ccc_tree const *t);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debugging use. */
-void ccc_tree_print(ccc_tree const *t, void const *root, ccc_print_fn *fn);
+void ccc_tree_print(ccc_tree const *t, ccc_node const *root, ccc_print_fn *fn);
 
 #endif

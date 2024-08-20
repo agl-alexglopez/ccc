@@ -50,7 +50,7 @@ set_test_insert_one(void)
     ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(ccc_set_insert(&s, &single), true, bool, "%d");
+    CHECK(ccc_set_insert(&s, &single.elem), true, bool, "%d");
     CHECK(ccc_set_empty(&s), false, bool, "%d");
     CHECK(((struct val *)ccc_set_root(&s))->val == single.val, true, bool,
           "%d");
@@ -65,7 +65,7 @@ set_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        CHECK(ccc_set_insert(&s, &three_vals[i]), true, bool, "%d");
+        CHECK(ccc_set_insert(&s, &three_vals[i].elem), true, bool, "%d");
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
     }
     CHECK(ccc_set_size(&s), 3ULL, size_t, "%zu");
@@ -84,9 +84,9 @@ set_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        CHECK(ccc_set_insert(&s, &vals[i]), true, bool, "%d");
-        CHECK(ccc_set_insert(&set_tester_clone, &tester_clone[i]), true, bool,
-              "%d");
+        CHECK(ccc_set_insert(&s, &vals[i].elem), true, bool, "%d");
+        CHECK(ccc_set_insert(&set_tester_clone, &tester_clone[i].elem), true,
+              bool, "%d");
         CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
@@ -129,7 +129,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_set_insert(s, &vals[shuffled_index]);
+        ccc_set_insert(s, &vals[shuffled_index].elem);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
         CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -147,7 +147,7 @@ inorder_fill(int vals[], size_t size, ccc_set *s)
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, e))
+    for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, &e->elem))
     {
         vals[i++] = e->val;
     }
