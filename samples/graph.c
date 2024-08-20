@@ -34,7 +34,7 @@ struct prev_vertex
     struct vertex *v;
     struct vertex *prev;
     ccc_set_elem prev_vertex_elem;
-    /* A pointer to the corresponding pq_entry for this element. */
+    /* A pointer to the correspondin dist_point in the priority queue. */
     struct dist_point *dist_point;
 };
 

@@ -254,6 +254,7 @@ animate_maze(struct maze *maze)
                 cur_weight = new_cost->cost;
                 bool const inserted
                     = ccc_set_insert(&cell_costs, &new_cost->elem);
+                (void)inserted;
                 assert(inserted);
             }
             else
