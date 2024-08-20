@@ -780,7 +780,7 @@ prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
         {
             quit("inserting into ccc_set in in loading phase failed.\n", 1);
         }
-        ccc_pq_push(dist_q, &p->ccc_pq_elem);
+        ccc_pq_push(dist_q, p);
     }
 }
 
@@ -1043,7 +1043,7 @@ insert_prev_vertex(ccc_set *s, struct prev_vertex pv)
 
     struct prev_vertex *pv_heap = malloc_or_quit(sizeof(struct prev_vertex));
     *pv_heap = pv;
-    return ccc_set_insert(s, &pv_heap->elem);
+    return ccc_set_insert(s, pv_heap);
 }
 
 static bool
@@ -1052,28 +1052,27 @@ insert_parent_cell(ccc_set *s, struct parent_cell pc)
     struct parent_cell *const pc_heap
         = malloc_or_quit(sizeof(struct parent_cell));
     *pc_heap = pc;
-    return ccc_set_insert(s, &pc_heap->elem);
+    return ccc_set_insert(s, pc_heap);
 }
 
 static ccc_threeway_cmp
-cmp_vertices(ccc_set_elem const *const a, ccc_set_elem const *const b,
-             void *aux)
+cmp_vertices(void const *const a, void const *const b, void *aux)
 {
     (void)aux;
-    struct vertex const *const v_a = CCC_SET_OF(struct vertex, elem, a);
-    struct vertex const *const v_b = CCC_SET_OF(struct vertex, elem, b);
+    struct vertex const *const v_a = a;
+    struct vertex const *const v_b = b;
     return (v_a->name > v_b->name) - (v_a->name < v_b->name);
 }
 
 static ccc_threeway_cmp
-cmp_parent_cells(ccc_set_elem const *x, ccc_set_elem const *y, void *aux)
+cmp_parent_cells(void const *x, void const *y, void *aux)
 {
     (void)aux;
-    struct parent_cell const *const a = CCC_SET_OF(struct parent_cell, elem, x);
-    struct parent_cell const *const b = CCC_SET_OF(struct parent_cell, elem, y);
+    struct parent_cell const *const a = x;
+    struct parent_cell const *const b = y;
     if (a->key.r == b->key.r && a->key.c == b->key.c)
     {
-        return CCC_SET_EQL;
+        return CCC_EQL;
     }
     if (a->key.r == b->key.r)
     {
@@ -1083,45 +1082,41 @@ cmp_parent_cells(ccc_set_elem const *x, ccc_set_elem const *y, void *aux)
 }
 
 static ccc_threeway_cmp
-cmp_pq_dist_points(ccc_pq_elem const *const x, ccc_pq_elem const *const y,
-                   void *aux)
+cmp_pq_dist_points(void const *const x, void const *const y, void *aux)
 {
     (void)aux;
-    struct dist_point const *const a
-        = CCC_PQ_OF(struct dist_point, ccc_pq_elem, x);
-    struct dist_point const *const b
-        = CCC_PQ_OF(struct dist_point, ccc_pq_elem, y);
+    struct dist_point const *const a = x;
+    struct dist_point const *const b = y;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static ccc_threeway_cmp
-cmp_set_prev_vertices(ccc_set_elem const *const x, ccc_set_elem const *const y,
-                      void *aux)
+cmp_set_prev_vertices(void const *const x, void const *const y, void *aux)
 {
     (void)aux;
-    struct prev_vertex const *const a = CCC_SET_OF(struct prev_vertex, elem, x);
-    struct prev_vertex const *const b = CCC_SET_OF(struct prev_vertex, elem, y);
+    struct prev_vertex const *const a = x;
+    struct prev_vertex const *const b = y;
     if (a->v > b->v)
     {
-        return CCC_SET_GRT;
+        return CCC_GRT;
     }
     if (a->v < b->v)
     {
-        return CCC_SET_LES;
+        return CCC_LES;
     }
-    return CCC_SET_EQL;
+    return CCC_EQL;
 }
 
 static void
-pq_update_dist(ccc_pq_elem *e, void *aux)
+pq_update_dist(void *e, void *aux)
 {
-    CCC_PQ_OF(struct dist_point, ccc_pq_elem, e)->dist = *((int *)aux);
+    ((struct dist_point *)e)->dist = *((int *)aux);
 }
 
 static void
-print_vertex(ccc_set_elem const *const x)
+print_vertex(void const *const x)
 {
-    struct vertex const *v = CCC_SET_OF(struct vertex, elem, x);
+    struct vertex const *v = x;
     printf("{%c,pos{%d,%d},edges{", v->name, v->pos.r, v->pos.c);
     for (int i = 0; i < max_degree && v->edges[i].to; ++i)
     {
@@ -1135,16 +1130,16 @@ print_vertex(ccc_set_elem const *const x)
 }
 
 static void
-set_vertex_destructor(ccc_set_elem *const e)
+set_vertex_destructor(void *const e)
 {
-    free(CCC_SET_OF(struct vertex, elem, e));
+    free(e);
 }
 
 static void
 set_pq_prev_vertex_dist_point_destructor(void *const e)
 {
     struct prev_vertex *pv = e;
-    free(CCC_PQ_OF(struct dist_point, ccc_pq_elem, pv->ccc_pq_elem));
+    free(pv->dist_point);
     free(pv);
 }
 
@@ -1171,9 +1166,7 @@ parse_path_request(struct graph *const g, str_view r)
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex key = {.name = *c};
-            struct vertex *v
-                = CCC_SET_OF(struct vertex, elem,
-                             ccc_set_find(&g->adjacency_list, &key.elem));
+            struct vertex *v = ccc_set_find(&g->adjacency_list, &key);
             res.src ? (res.dst = v) : (res.src = v);
         }
     }

@@ -118,11 +118,9 @@ static bool can_build_new_square(struct maze const *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(struct maze const *);
-static ccc_depq_threeway_cmp cmp_priority_cells(ccc_depq_elem const *,
-                                                ccc_depq_elem const *, void *);
-static ccc_set_threeway_cmp cmp_points(ccc_set_elem const *,
-                                       ccc_set_elem const *, void *);
-static void set_destructor(ccc_set_elem *);
+static ccc_threeway_cmp cmp_priority_cells(void const *, void const *, void *);
+static ccc_threeway_cmp cmp_points(void const *, void const *, void *);
+static void set_destructor(void *);
 static struct int_conversion parse_digits(str_view);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -205,28 +203,29 @@ animate_maze(struct maze *maze)
        A ccc_set could be replaced by a 2D vector copy of the maze with costs
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
-    ccc_depqueue cells = CCC_DEPQ_INIT(cells, cmp_priority_cells, NULL);
-    ccc_set cell_costs = CCC_SET_INIT(cell_costs, cmp_points, NULL);
+    ccc_depqueue cells = CCC_DEPQ_INIT(struct priority_cell, elem, cells,
+                                       cmp_priority_cells, NULL);
+    ccc_set cell_costs
+        = CCC_SET_INIT(struct point_cost, elem, cell_costs, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)ccc_set_insert(&cell_costs, &odd_point->elem);
+    (void)ccc_set_insert(&cell_costs, odd_point);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)ccc_depq_push(&cells, &start->elem);
+    (void)ccc_depq_push(&cells, start);
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
     while (!ccc_depq_empty(&cells))
     {
-        struct priority_cell const *const cur
-            = CCC_DEPQ_OF(struct priority_cell, elem, ccc_depq_max(&cells));
+        struct priority_cell const *const cur = ccc_depq_max(&cells);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
@@ -242,8 +241,8 @@ animate_maze(struct maze *maze)
             }
             int cur_weight = 0;
             struct point_cost key = {.p = next};
-            ccc_set_elem const *const found
-                = ccc_set_find(&cell_costs, &key.elem);
+            struct point_cost const *const found
+                = ccc_set_find(&cell_costs, &key);
             if (!found)
             {
                 struct point_cost *new_cost
@@ -253,11 +252,11 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                assert(ccc_set_insert(&cell_costs, &new_cost->elem));
+                assert(ccc_set_insert(&cell_costs, new_cost));
             }
             else
             {
-                cur_weight = CCC_SET_OF(struct point_cost, elem, found)->cost;
+                cur_weight = found->cost;
             }
             if (cur_weight < min_weight)
             {
@@ -275,13 +274,11 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            ccc_depq_push(&cells, &new_cell->elem);
+            ccc_depq_push(&cells, new_cell);
         }
         else
         {
-            struct priority_cell *pc = CCC_DEPQ_OF(struct priority_cell, elem,
-                                                   ccc_depq_pop_max(&cells));
-            free(pc);
+            free(ccc_depq_pop_max(&cells));
         }
     }
     /* The priority queue does not need to be cleared because it's emptiness
@@ -474,27 +471,24 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 
 /*===================   Data Structure Comparators   ========================*/
 
-static ccc_depq_threeway_cmp
-cmp_priority_cells(ccc_depq_elem const *const key, ccc_depq_elem const *n,
-                   void *const aux)
+static ccc_threeway_cmp
+cmp_priority_cells(void const *const key, void const *n, void *const aux)
 {
     (void)aux;
-    struct priority_cell const *const a
-        = CCC_DEPQ_OF(struct priority_cell, elem, key);
-    struct priority_cell const *const b
-        = CCC_DEPQ_OF(struct priority_cell, elem, n);
+    struct priority_cell const *const a = key;
+    struct priority_cell const *const b = n;
     return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
-static ccc_set_threeway_cmp
-cmp_points(ccc_set_elem const *key, ccc_set_elem const *n, void *aux)
+static ccc_threeway_cmp
+cmp_points(void const *key, void const *n, void *aux)
 {
     (void)aux;
-    struct point_cost const *const a = CCC_SET_OF(struct point_cost, elem, key);
-    struct point_cost const *const b = CCC_SET_OF(struct point_cost, elem, n);
+    struct point_cost const *const a = key;
+    struct point_cost const *const b = n;
     if (a->p.r == b->p.r && a->p.c == b->p.c)
     {
-        return CCC_SET_EQL;
+        return CCC_EQL;
     }
     if (a->p.r == b->p.r)
     {
@@ -504,10 +498,9 @@ cmp_points(ccc_set_elem const *key, ccc_set_elem const *n, void *aux)
 }
 
 static void
-set_destructor(ccc_set_elem *e)
+set_destructor(void *e)
 {
-    struct point_cost *pc = CCC_SET_OF(struct point_cost, elem, e);
-    free(pc);
+    free(e);
 }
 
 /*===========================    Misc    ====================================*/

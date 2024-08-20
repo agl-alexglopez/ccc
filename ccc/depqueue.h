@@ -56,9 +56,9 @@ void *ccc_depq_max(ccc_depqueue *);
 
 void *ccc_depq_min(ccc_depqueue *);
 
-bool ccc_depq_is_max(ccc_depqueue *, void const *);
+bool ccc_depq_is_max(ccc_depqueue *, void *);
 
-bool ccc_depq_is_min(ccc_depqueue *, void const *);
+bool ccc_depq_is_min(ccc_depqueue *, void *);
 
 void const *ccc_depq_const_max(ccc_depqueue const *);
 

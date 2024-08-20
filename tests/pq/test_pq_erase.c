@@ -284,7 +284,7 @@ inorder_fill(int vals[], size_t size, ccc_pqueue *ppq)
     {
         struct val *v = ccc_pq_pop(&copy);
         CHECK(v->val, vals[i++], int, "%d");
-        ccc_pq_push(ppq, &v->elem);
+        ccc_pq_push(ppq, v);
         CHECK(ccc_pq_validate(ppq), true, bool, "%d");
         CHECK(ccc_pq_validate(&copy), true, bool, "%d");
     }

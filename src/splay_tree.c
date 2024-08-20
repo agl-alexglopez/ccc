@@ -93,7 +93,8 @@ static ccc_node *rrange_begin(ccc_rrange const *);
 static ccc_node *rrange_end(ccc_rrange const *);
 static void *struct_base(ccc_tree const *, ccc_node const *);
 static ccc_node *node_elem(ccc_tree const *, void const *);
-static ccc_threeway_cmp cmp(ccc_tree const *, void const *, void const *);
+static ccc_threeway_cmp cmp(ccc_tree const *, void const *, void const *,
+                            ccc_cmp_fn *);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -149,10 +150,9 @@ ccc_depq_const_max(ccc_depqueue const *const pq)
 }
 
 bool
-ccc_depq_is_max(ccc_depqueue *const pq, void const *const user_struct)
+ccc_depq_is_max(ccc_depqueue *const pq, void *const user_struct)
 {
-    ccc_node *const e = node_elem(&pq->t, node_elem(&pq->t, user_struct));
-    return !ccc_depq_rnext(pq, e);
+    return !ccc_depq_rnext(pq, user_struct);
 }
 
 void *
@@ -179,10 +179,9 @@ ccc_depq_const_min(ccc_depqueue const *const pq)
 }
 
 bool
-ccc_depq_is_min(ccc_depqueue *const pq, void const *const user_struct)
+ccc_depq_is_min(ccc_depqueue *const pq, void *const user_struct)
 {
-    ccc_node *const e = node_elem(&pq->t, node_elem(&pq->t, user_struct));
-    return !ccc_depq_next(pq, e);
+    return !ccc_depq_next(pq, user_struct);
 }
 
 void *
@@ -478,7 +477,7 @@ ccc_set_end_rrange(ccc_rrange const *rr)
     return rrange_end(rr);
 }
 
-void const *
+void *
 ccc_set_find(ccc_set *s, void *se)
 {
     ccc_node *n = find(&s->t, node_elem(&s->t, se));
@@ -523,7 +522,7 @@ ccc_set_is_max(ccc_set *s, void *e)
     return !ccc_set_next(s, node_elem(&s->t, e));
 }
 
-void const *
+void *
 ccc_set_const_find(ccc_set *s, void *e)
 {
     ccc_node *n = const_seek(&s->t, node_elem(&s->t, e));
@@ -657,7 +656,7 @@ const_seek(ccc_tree *const t, ccc_node *const n)
     ccc_node *seek = n;
     while (seek != &t->end)
     {
-        ccc_threeway_cmp const cur_cmp = cmp(t, n, seek);
+        ccc_threeway_cmp const cur_cmp = cmp(t, n, seek, t->cmp);
         if (cur_cmp == CCC_EQL)
         {
             return seek;
@@ -780,12 +779,12 @@ equal_range(ccc_tree *t, void *user_struct_begin, void *user_struct_end,
        lesser element depending on the direction we are traversing. */
     ccc_threeway_cmp const grt_or_les[2] = {CCC_GRT, CCC_LES};
     ccc_node *b = splay(t, t->root, begin, t->cmp);
-    if (cmp(t, begin, b) == grt_or_les[traversal])
+    if (cmp(t, begin, b, t->cmp) == grt_or_les[traversal])
     {
         b = next(t, b, traversal);
     }
     ccc_node *e = splay(t, t->root, end, t->cmp);
-    if (cmp(t, end, e) == grt_or_les[traversal])
+    if (cmp(t, end, e, t->cmp) == grt_or_les[traversal])
     {
         e = next(t, e, traversal);
     }
@@ -824,7 +823,7 @@ find(ccc_tree *t, ccc_node *elem)
 {
     init_node(t, elem);
     t->root = splay(t, t->root, elem, t->cmp);
-    return cmp(t, elem, t->root) == CCC_EQL ? t->root : NULL;
+    return cmp(t, elem, t->root, t->cmp) == CCC_EQL ? t->root : NULL;
 }
 
 static bool
@@ -832,7 +831,7 @@ contains(ccc_tree *t, ccc_node *dummy_key)
 {
     init_node(t, dummy_key);
     t->root = splay(t, t->root, dummy_key, t->cmp);
-    return cmp(t, dummy_key, t->root) == CCC_EQL;
+    return cmp(t, dummy_key, t->root, t->cmp) == CCC_EQL;
 }
 
 static bool
@@ -846,7 +845,7 @@ insert(ccc_tree *t, ccc_node *elem)
         return true;
     }
     t->root = splay(t, t->root, elem, t->cmp);
-    ccc_threeway_cmp const root_cmp = cmp(t, elem, t->root);
+    ccc_threeway_cmp const root_cmp = cmp(t, elem, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
     {
         return false;
@@ -868,7 +867,7 @@ multiset_insert(ccc_tree *t, ccc_node *elem)
     t->size++;
     t->root = splay(t, t->root, elem, t->cmp);
 
-    ccc_threeway_cmp const root_cmp = cmp(t, elem, t->root);
+    ccc_threeway_cmp const root_cmp = cmp(t, elem, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
     {
         add_duplicate(t, t->root, elem, &t->end);
@@ -924,7 +923,7 @@ erase(ccc_tree *t, ccc_node *elem)
         return NULL;
     }
     ccc_node *ret = splay(t, t->root, elem, t->cmp);
-    ccc_threeway_cmp const found = cmp(t, elem, ret);
+    ccc_threeway_cmp const found = cmp(t, elem, ret, t->cmp);
     if (found != CCC_EQL)
     {
         return NULL;
@@ -996,7 +995,7 @@ multiset_erase_node(ccc_tree *t, ccc_node *node)
         return node;
     }
     ccc_node *ret = splay(t, t->root, node, t->cmp);
-    if (cmp(t, node, ret) != CCC_EQL)
+    if (cmp(t, node, ret, t->cmp) != CCC_EQL)
     {
         return NULL;
     }
@@ -1048,7 +1047,7 @@ pop_front_dup(ccc_tree *t, ccc_node *old)
     else
     {
         /* Comparing sizes with the root's parent is undefined. */
-        parent->link[CCC_GRT == cmp(t, old, parent)] = tree_replacement;
+        parent->link[CCC_GRT == cmp(t, old, parent, t->cmp)] = tree_replacement;
     }
 
     ccc_node *new_list_head = old->parent_or_dups->link[N];
@@ -1088,7 +1087,7 @@ remove_from_tree(ccc_tree *t, ccc_node *ret)
 }
 
 static ccc_node *
-splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, ccc_cmp_fn *cmp)
+splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, ccc_cmp_fn *cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -1097,13 +1096,14 @@ splay(ccc_tree *t, ccc_node *root, ccc_node const *elem, ccc_cmp_fn *cmp)
     ccc_node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        ccc_threeway_cmp const root_cmp = cmp(elem, root, t->aux);
+        ccc_threeway_cmp const root_cmp = cmp(t, elem, root, cmp_fn);
         ccc_tree_link const dir = CCC_GRT == root_cmp;
         if (CCC_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
-        ccc_threeway_cmp const child_cmp = cmp(elem, root->link[dir], t->aux);
+        ccc_threeway_cmp const child_cmp
+            = cmp(t, elem, root->link[dir], cmp_fn);
         ccc_tree_link const dir_from_child = CCC_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
@@ -1207,9 +1207,10 @@ node_elem(ccc_tree const *const t, void const *const n)
 }
 
 static inline ccc_threeway_cmp
-cmp(ccc_tree const *const t, void const *const a, void const *const b)
+cmp(ccc_tree const *const t, void const *const a, void const *const b,
+    ccc_cmp_fn *fn)
 {
-    return t->cmp(struct_base(t, a), struct_base(t, b), t->aux);
+    return fn(struct_base(t, a), struct_base(t, b), t->aux);
 }
 
 /* We can trick our splay tree into giving us the max via splaying
@@ -1290,35 +1291,35 @@ recursive_size(ccc_tree const *const t, ccc_node const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_range const r, ccc_cmp_fn *const cmp,
+are_subtrees_valid(ccc_tree const *t, struct ccc_tree_range const r,
                    ccc_node const *const nil)
 {
     if (r.root == nil)
     {
         return true;
     }
-    if (r.low != nil && cmp(r.root, r.low, NULL) != CCC_GRT)
+    if (r.low != nil && cmp(t, r.root, r.low, t->cmp) != CCC_GRT)
     {
         return false;
     }
-    if (r.high != nil && cmp(r.root, r.high, NULL) != CCC_LES)
+    if (r.high != nil && cmp(t, r.root, r.high, t->cmp) != CCC_LES)
     {
         return false;
     }
-    return are_subtrees_valid(
-               (struct ccc_tree_range){
-                   .low = r.low,
-                   .root = r.root->link[L],
-                   .high = r.root,
-               },
-               cmp, nil)
-           && are_subtrees_valid(
-               (struct ccc_tree_range){
-                   .low = r.root,
-                   .root = r.root->link[R],
-                   .high = r.high,
-               },
-               cmp, nil);
+    return are_subtrees_valid(t,
+                              (struct ccc_tree_range){
+                                  .low = r.low,
+                                  .root = r.root->link[L],
+                                  .high = r.root,
+                              },
+                              nil)
+           && are_subtrees_valid(t,
+                                 (struct ccc_tree_range){
+                                     .low = r.root,
+                                     .root = r.root->link[R],
+                                     .high = r.high,
+                                 },
+                                 nil);
 }
 
 static struct parent_status
@@ -1367,13 +1368,13 @@ is_duplicate_storing_parent(ccc_tree const *const t,
 bool
 ccc_tree_validate(ccc_tree const *const t)
 {
-    if (!are_subtrees_valid(
-            (struct ccc_tree_range){
-                .low = &t->end,
-                .root = t->root,
-                .high = &t->end,
-            },
-            t->cmp, &t->end))
+    if (!are_subtrees_valid(t,
+                            (struct ccc_tree_range){
+                                .low = &t->end,
+                                .root = t->root,
+                                .high = &t->end,
+                            },
+                            &t->end))
     {
         return false;
     }
