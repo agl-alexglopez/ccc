@@ -232,8 +232,8 @@ ccc_fpq_validate(ccc_flat_pqueue const *const fpq)
 }
 
 void
-ccc_print(ccc_flat_pqueue const *const fpq, size_t const i,
-          ccc_print_fn *const fn)
+ccc_fpq_print(ccc_flat_pqueue const *const fpq, size_t const i,
+              ccc_print_fn *const fn)
 {
     print_heap(&fpq->impl, i, fn);
 }

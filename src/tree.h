@@ -10,7 +10,6 @@
 #ifndef TREE
 #define TREE
 
-#include "attrib.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -76,6 +75,6 @@ bool ccc_tree_validate(ccc_tree const *t);
 
 /* Use this function in gdb or a terminal for some pretty colors.
    Intended for debugging use. */
-void ccc_tree_print(ccc_tree const *t, ccc_node const *root, ccc_print_fn *fn);
+void ccc_tree_print(ccc_tree const *t, void const *root, ccc_print_fn *fn);
 
 #endif

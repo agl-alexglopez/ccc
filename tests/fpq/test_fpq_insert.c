@@ -22,6 +22,7 @@ static enum test_result insert_shuffled(ccc_flat_pqueue *, struct val[], size_t,
                                         int);
 static enum test_result inorder_fill(int[], size_t, ccc_flat_pqueue *);
 static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
+static void val_print(void const *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -138,6 +139,10 @@ fpq_test_insert_shuffle(void)
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
           "%d");
+
+    /* Test the printing function at least once. */
+    ccc_fpq_print(&fpq, 0, val_print);
+
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, int, "%d");
     int sorted_check[size];
@@ -184,7 +189,7 @@ insert_shuffled(ccc_flat_pqueue *pq, struct val vals[], size_t const size,
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        vals[i].val = (int)shuffled_index;
+        vals[i].id = vals[i].val = (int)shuffled_index;
         ccc_fpq_push(pq, &vals[i]);
         CHECK(ccc_fpq_size(pq), i + 1, size_t, "%zu");
         CHECK(ccc_fpq_validate(pq), true, bool, "%d");
@@ -238,4 +243,11 @@ val_cmp(void const *const a, void const *const b, void *aux)
     struct val const *const lhs = a;
     struct val const *const rhs = b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+}
+
+static void
+val_print(void const *e)
+{
+    struct val const *const v = e;
+    printf("{%d,%d}", v->id, v->val);
 }
