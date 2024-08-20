@@ -351,7 +351,7 @@ void
 ccc_depq_print(ccc_depqueue const *const pq, void const *const start,
                ccc_print_fn *const fn)
 {
-    ccc_tree_print(&pq->t, node_elem(&pq->t, start), fn);
+    ccc_tree_print(&pq->t, start, fn);
 }
 
 /* ======================        ccc_set Interface       ======================
@@ -548,7 +548,7 @@ void
 ccc_set_print(ccc_set const *const s, void const *const root,
               ccc_print_fn *const fn)
 {
-    ccc_tree_print(&s->t, node_elem(&s->t, root), fn);
+    ccc_tree_print(&s->t, root, fn);
 }
 
 /* ===========    Splay Tree Multiccc_set and Set Implementations    ===========
@@ -1416,12 +1416,12 @@ static void
 print_node(ccc_tree const *const t, ccc_node const *const parent,
            ccc_node const *const root, ccc_print_fn *const fn_print)
 {
-    fn_print(root);
+    fn_print(struct_base(t, root));
     struct parent_status stat = child_tracks_parent(t, parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);
-        fn_print(stat.parent);
+        fn_print(struct_base(t, stat.parent));
         printf("%s", COLOR_NIL);
     }
     printf(COLOR_CYN);
@@ -1432,11 +1432,11 @@ print_node(ccc_tree const *const t, ccc_node const *const parent,
         ccc_node const *head = root->parent_or_dups;
         if (head != &t->end)
         {
-            fn_print(head);
+            fn_print(struct_base(t, head));
             for (ccc_node *i = head->link[N]; i != head;
                  i = i->link[N], ++duplicates)
             {
-                fn_print(i);
+                fn_print(struct_base(t, i));
             }
         }
         printf("(+%d)", duplicates);
@@ -1514,9 +1514,10 @@ print_inner_tree(ccc_node const *const root, size_t const parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 void
-ccc_tree_print(ccc_tree const *const t, ccc_node const *const root,
+ccc_tree_print(ccc_tree const *const t, void const *const root_struct,
                ccc_print_fn *const fn_print)
 {
+    ccc_node const *const root = node_elem(t, root_struct);
     if (root == &t->end)
     {
         return;

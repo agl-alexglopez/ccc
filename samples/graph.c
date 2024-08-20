@@ -317,9 +317,6 @@ main(int argc, char **argv)
     build_graph(&graph);
     find_shortest_paths(&graph);
     set_cursor_position(graph.rows + 1, graph.cols + 1);
-    ccc_set_print(&graph.adjacency_list, ccc_set_root(&graph.adjacency_list),
-                  print_vertex);
-    printf("\n");
     ccc_set_clear(&graph.adjacency_list, set_vertex_destructor);
 }
 
@@ -1114,7 +1111,7 @@ pq_update_dist(void *e, void *aux)
 }
 
 static void
-print_vertex(void const *const x)
+print_vertex(void const *const x) /* NOLINT */
 {
     struct vertex const *v = x;
     printf("{%c,pos{%d,%d},edges{", v->name, v->pos.r, v->pos.c);
