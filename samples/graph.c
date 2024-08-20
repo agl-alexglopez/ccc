@@ -27,14 +27,14 @@ struct parent_cell
 {
     struct point key;
     struct point parent;
-    ccc_set_elem elem;
+    ccc_set_elem parent_set_elem;
 };
 
 struct prev_vertex
 {
     struct vertex *v;
     struct vertex *prev;
-    ccc_set_elem elem;
+    ccc_set_elem prev_vertex_elem;
     /* A pointer to the corresponding pq_entry for this element. */
     struct dist_point *dist_point;
 };
@@ -71,7 +71,7 @@ struct vertex
     char name;            /* Names are bounded to 26 [A-Z] maximum nodes. */
     struct point pos;     /* Position of this vertex in the grid. */
     struct edge edges[4]; /* The other vertices to which a vertex connects. */
-    ccc_set_elem elem;    /* Vertices are in an adjacency map. */
+    ccc_set_elem vertex_set_elem; /* Vertices are in an adjacency map. */
 };
 
 struct graph
@@ -244,6 +244,7 @@ static ccc_threeway_cmp cmp_set_prev_vertices(void const *, void const *,
                                               void *);
 static void pq_update_dist(void *, void *);
 static void print_vertex(void const *);
+static void print_parent_cell(void const *);
 static void set_vertex_destructor(void *);
 static void set_pq_prev_vertex_dist_point_destructor(void *);
 static void set_parent_point_destructor(void *);
@@ -263,8 +264,9 @@ main(int argc, char **argv)
         .cols = default_cols,
         .vertices = default_vertices,
         .grid = NULL,
-        .adjacency_list = CCC_SET_INIT(
-            struct vertex, elem, graph.adjacency_list, cmp_vertices, NULL),
+        .adjacency_list
+        = CCC_SET_INIT(struct vertex, vertex_set_elem, graph.adjacency_list,
+                       cmp_vertices, NULL),
     };
     for (int i = 1; i < argc; ++i)
     {
@@ -420,8 +422,8 @@ edge_exists(struct graph *const graph, struct vertex *const src,
             struct vertex *const dst)
 {
     Cell const edge_id = get_edge_id(src->name, dst->name);
-    ccc_set parent_map = CCC_SET_INIT(struct parent_cell, elem, parent_map,
-                                      cmp_parent_cells, NULL);
+    ccc_set parent_map = CCC_SET_INIT(struct parent_cell, parent_set_elem,
+                                      parent_map, cmp_parent_cells, NULL);
     struct queue bfs;
     q_init(sizeof(struct point), &bfs, 4);
     (void)insert_parent_cell(&parent_map, (struct parent_cell){
@@ -701,8 +703,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
     ccc_pqueue dist_q = CCC_PQ_INIT(struct dist_point, ccc_pq_elem, CCC_LES,
                                     cmp_pq_dist_points, NULL);
-    ccc_set prev_map = CCC_SET_INIT(struct prev_vertex, elem, prev_map,
-                                    cmp_set_prev_vertices, NULL);
+    ccc_set prev_map = CCC_SET_INIT(struct prev_vertex, prev_vertex_elem,
+                                    prev_map, cmp_set_prev_vertices, NULL);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;
@@ -1124,6 +1126,14 @@ print_vertex(void const *const x) /* NOLINT */
     {
         printf("}");
     }
+}
+
+static void
+print_parent_cell(void const *const x) /* NOLINT */
+{
+    struct parent_cell const *const pc = x;
+    printf("{key{%d,%d}, parent{%d,%d}}", pc->key.r, pc->key.c, pc->parent.r,
+           pc->parent.c);
 }
 
 static void

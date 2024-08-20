@@ -551,7 +551,7 @@ ccc_set_print(ccc_set const *const s, void const *const root,
     ccc_tree_print(&s->t, root, fn);
 }
 
-/* ===========    Splay Tree Multiccc_set and Set Implementations    ===========
+/* ===========    Splay Tree Multiset and Set Implementations    ===========
 
       (40)0x7fffffffd5c8-0x7fffffffdac8(+1)
        ├──(29)R:0x7fffffffd968
