@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    struct ccc_impl_fhash_elem impl;
+    ccc_hash_value impl;
 } ccc_fhash_elem;
 
 typedef struct

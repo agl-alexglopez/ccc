@@ -4,11 +4,6 @@
 #include "buf.h"
 #include "types.h"
 
-struct ccc_impl_fhash_elem
-{
-    int64_t hash;
-};
-
 struct ccc_impl_flat_hash
 {
     ccc_buf *buf;
