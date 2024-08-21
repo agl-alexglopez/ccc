@@ -30,18 +30,16 @@
 
 typedef struct
 {
-    ccc_tree t;
+    ccc_tree impl;
 } ccc_set;
 
 typedef struct
 {
-    ccc_node n;
+    ccc_node impl;
 } ccc_set_elem;
 
 #define CCC_SET_INIT(struct_name, set_elem_field, set_name, cmp, aux)          \
-    {                                                                          \
-        .t = CCC_TREE_INIT(struct_name, set_elem_field, set_name, cmp, aux)    \
-    }
+    CCC_TREE_INIT(struct_name, set_elem_field, set_name, cmp, aux)
 
 void ccc_set_clear(ccc_set *, ccc_destructor_fn *destructor);
 
@@ -90,5 +88,7 @@ void *ccc_set_end_rrange(ccc_rrange const *);
 void *ccc_set_root(ccc_set const *);
 
 void ccc_set_print(ccc_set const *, ccc_set_elem const *, ccc_print_fn *);
+
+bool ccc_set_validate(ccc_set const *);
 
 #endif /* CCC_SET_H */

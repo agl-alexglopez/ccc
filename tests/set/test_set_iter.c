@@ -1,6 +1,5 @@
 #include "set.h"
 #include "test.h"
-#include "tree.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -65,7 +64,7 @@ set_test_forward_iter(void)
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
@@ -95,7 +94,7 @@ set_test_iterate_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
     int const limit = 400;
@@ -105,7 +104,7 @@ set_test_iterate_removal(void)
         if (i->val > limit)
         {
             (void)ccc_set_erase(&s, &i->elem);
-            CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+            CHECK(ccc_set_validate(&s), true, bool, "%d");
         }
     }
     return PASS;
@@ -126,7 +125,7 @@ set_test_iterate_remove_reinsert(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     CHECK(iterator_check(&s), PASS, enum test_result, "%d");
     size_t const old_size = ccc_set_size(&s);
@@ -140,7 +139,7 @@ set_test_iterate_remove_reinsert(void)
             (void)ccc_set_erase(&s, &i->elem);
             i->val = new_unique_entry_val;
             CHECK(ccc_set_insert(&s, &i->elem), true, bool, "%d");
-            CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+            CHECK(ccc_set_validate(&s), true, bool, "%d");
             ++new_unique_entry_val;
         }
     }
@@ -161,7 +160,7 @@ set_test_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -221,7 +220,7 @@ set_test_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -280,7 +279,7 @@ set_test_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,

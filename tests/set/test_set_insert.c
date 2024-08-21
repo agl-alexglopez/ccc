@@ -1,6 +1,5 @@
 #include "set.h"
 #include "test.h"
-#include "tree.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -66,7 +65,7 @@ set_test_insert_three(void)
     {
         three_vals[i].val = i;
         CHECK(ccc_set_insert(&s, &three_vals[i].elem), true, bool, "%d");
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     CHECK(ccc_set_size(&s), 3ULL, size_t, "%zu");
     return PASS;
@@ -87,7 +86,7 @@ set_test_struct_getter(void)
         CHECK(ccc_set_insert(&s, &vals[i].elem), true, bool, "%d");
         CHECK(ccc_set_insert(&set_tester_clone, &tester_clone[i].elem), true,
               bool, "%d");
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
@@ -131,7 +130,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_set_insert(s, &vals[shuffled_index].elem);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
-        CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
+        CHECK(ccc_set_validate(s), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_set_size(s), size, size_t, "%zu");

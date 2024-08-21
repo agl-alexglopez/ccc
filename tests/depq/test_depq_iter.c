@@ -1,6 +1,5 @@
 #include "depqueue.h"
 #include "test.h"
-#include "tree.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -69,7 +68,7 @@ depq_test_forward_iter_unique_vals(void)
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
@@ -108,7 +107,7 @@ depq_test_forward_iter_all_vals(void)
             vals[index].val = val; // NOLINT
             vals[index].id = index;
             ccc_depq_push(&pq, &vals[index].elem);
-            CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+            CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         }
     }
     int val_keys_inorder[num_nodes];
@@ -137,7 +136,7 @@ depq_test_insert_iterate_pop(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     size_t pop_count = 0;
@@ -145,7 +144,7 @@ depq_test_insert_iterate_pop(void)
     {
         ccc_depq_pop_max(&pq);
         ++pop_count;
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         if (pop_count % 200)
         {
             CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
@@ -170,7 +169,7 @@ depq_test_priority_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     int const limit = 400;
@@ -179,7 +178,7 @@ depq_test_priority_removal(void)
         if (i->val > limit)
         {
             i = ccc_depq_erase(&pq, &i->elem);
-            CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+            CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         }
         else
         {
@@ -204,7 +203,7 @@ depq_test_priority_update(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
     }
     CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
     int const limit = 400;
@@ -216,7 +215,7 @@ depq_test_priority_update(void)
             struct val *next = ccc_depq_next(&pq, &i->elem);
             CHECK(ccc_depq_update(&pq, &i->elem, val_update, &backoff), true,
                   bool, "%d");
-            CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+            CHECK(ccc_depq_validate(&pq), true, bool, "%d");
             i = next;
         }
         else
@@ -241,7 +240,7 @@ depq_test_priority_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -302,7 +301,7 @@ depq_test_priority_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -359,7 +358,7 @@ depq_test_priority_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,

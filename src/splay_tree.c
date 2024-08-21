@@ -115,41 +115,41 @@ ccc_depq_clear(ccc_depqueue *pq, ccc_destructor_fn *destructor)
 bool
 ccc_depq_empty(ccc_depqueue const *const pq)
 {
-    return empty(&pq->t);
+    return empty(&pq->impl);
 }
 
 void *
 ccc_depq_root(ccc_depqueue const *const pq)
 {
-    ccc_node const *const n = root(&pq->t);
+    ccc_node const *const n = root(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_max(ccc_depqueue *const pq)
 {
     ccc_node const *const n
-        = splay(&pq->t, pq->t.root, &pq->t.end, force_find_grt);
+        = splay(&pq->impl, pq->impl.root, &pq->impl.end, force_find_grt);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_const_max(ccc_depqueue const *const pq)
 {
-    ccc_node const *const n = max(&pq->t);
+    ccc_node const *const n = max(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 bool
@@ -162,23 +162,23 @@ void *
 ccc_depq_min(ccc_depqueue *const pq)
 {
     ccc_node const *const n
-        = splay(&pq->t, pq->t.root, &pq->t.end, force_find_les);
+        = splay(&pq->impl, pq->impl.root, &pq->impl.end, force_find_les);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_const_min(ccc_depqueue const *const pq)
 {
-    ccc_node const *const n = min(&pq->t);
+    ccc_node const *const n = min(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 bool
@@ -190,53 +190,55 @@ ccc_depq_is_min(ccc_depqueue *const pq, ccc_depq_elem const *const e)
 void *
 ccc_depq_begin(ccc_depqueue *pq)
 {
-    ccc_node const *const n = max(&pq->t);
+    ccc_node const *const n = max(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_rbegin(ccc_depqueue *pq)
 {
-    ccc_node const *const n = min(&pq->t);
+    ccc_node const *const n = min(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_next(ccc_depqueue *pq, ccc_depq_elem const *e)
 {
     ccc_node const *const n
-        = multiset_next(&pq->t, &e->n, reverse_inorder_traversal);
+        = multiset_next(&pq->impl, &e->impl, reverse_inorder_traversal);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_rnext(ccc_depqueue *pq, ccc_depq_elem const *e)
 {
-    ccc_node const *const n = multiset_next(&pq->t, &e->n, inorder_traversal);
+    ccc_node const *const n
+        = multiset_next(&pq->impl, &e->impl, inorder_traversal);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 ccc_range
 ccc_depq_equal_range(ccc_depqueue *pq, ccc_depq_elem const *const begin,
                      ccc_depq_elem const *const end)
 {
-    return equal_range(&pq->t, &begin->n, &end->n, reverse_inorder_traversal);
+    return equal_range(&pq->impl, &begin->impl, &end->impl,
+                       reverse_inorder_traversal);
 }
 
 void *
@@ -256,7 +258,7 @@ ccc_depq_equal_rrange(ccc_depqueue *pq, ccc_depq_elem const *const rbegin,
                       ccc_depq_elem const *const rend)
 {
     ccc_range const ret
-        = equal_range(&pq->t, &rbegin->n, &rend->n, inorder_traversal);
+        = equal_range(&pq->impl, &rbegin->impl, &rend->impl, inorder_traversal);
     return (ccc_rrange){
         .rbegin = ret.begin,
         .end = ret.end,
@@ -278,77 +280,83 @@ ccc_depq_end_rrange(ccc_rrange const *const rr)
 void
 ccc_depq_push(ccc_depqueue *pq, ccc_depq_elem *const e)
 {
-    multiset_insert(&pq->t, &e->n);
+    multiset_insert(&pq->impl, &e->impl);
 }
 
 void *
 ccc_depq_erase(ccc_depqueue *pq, ccc_depq_elem *const e)
 {
-    ccc_node const *const n = multiset_erase_node(&pq->t, &e->n);
+    ccc_node const *const n = multiset_erase_node(&pq->impl, &e->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 bool
 ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *const elem, ccc_update_fn *fn,
                 void *aux)
 {
-    if (NULL == elem->n.link[L] || NULL == elem->n.link[R])
+    if (NULL == elem->impl.link[L] || NULL == elem->impl.link[R])
     {
         return false;
     }
-    ccc_node *e = multiset_erase_node(&pq->t, &elem->n);
+    ccc_node *e = multiset_erase_node(&pq->impl, &elem->impl);
     if (!e)
     {
         return false;
     }
-    fn(struct_base(&pq->t, e), aux);
-    multiset_insert(&pq->t, e);
+    fn(struct_base(&pq->impl, e), aux);
+    multiset_insert(&pq->impl, e);
     return true;
 }
 
 bool
 ccc_depq_contains(ccc_depqueue *const pq, ccc_depq_elem const *const elem)
 {
-    return contains(&pq->t, &elem->n);
+    return contains(&pq->impl, &elem->impl);
 }
 
 void *
 ccc_depq_pop_max(ccc_depqueue *pq)
 {
-    ccc_node *n = pop_max(&pq->t);
+    ccc_node *n = pop_max(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 void *
 ccc_depq_pop_min(ccc_depqueue *pq)
 {
-    ccc_node *n = pop_min(&pq->t);
+    ccc_node *n = pop_min(&pq->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&pq->t, n);
+    return struct_base(&pq->impl, n);
 }
 
 size_t
 ccc_depq_size(ccc_depqueue const *const pq)
 {
-    return pq->t.size;
+    return pq->impl.size;
 }
 
 void
 ccc_depq_print(ccc_depqueue const *const pq, ccc_depq_elem const *const start,
                ccc_print_fn *const fn)
 {
-    ccc_tree_print(&pq->t, &start->n, fn);
+    ccc_tree_print(&pq->impl, &start->impl, fn);
+}
+
+bool
+ccc_depq_validate(ccc_depqueue const *pq)
+{
+    return ccc_tree_validate(&pq->impl);
 }
 
 /* ======================        ccc_set Interface       ======================
@@ -360,83 +368,83 @@ ccc_set_clear(ccc_set *const set, ccc_destructor_fn *const destructor)
 
     while (!ccc_set_empty(set))
     {
-        destructor(struct_base(&set->t, pop_min(&set->t)));
+        destructor(struct_base(&set->impl, pop_min(&set->impl)));
     }
 }
 
 bool
 ccc_set_empty(ccc_set const *const s)
 {
-    return empty(&s->t);
+    return empty(&s->impl);
 }
 
 size_t
 ccc_set_size(ccc_set const *const s)
 {
-    return s->t.size;
+    return s->impl.size;
 }
 
 bool
 ccc_set_contains(ccc_set *s, ccc_set_elem const *se)
 {
-    return contains(&s->t, &se->n);
+    return contains(&s->impl, &se->impl);
 }
 
 bool
 ccc_set_insert(ccc_set *s, ccc_set_elem *se)
 {
-    return insert(&s->t, &se->n);
+    return insert(&s->impl, &se->impl);
 }
 
 void *
 ccc_set_begin(ccc_set *s)
 {
-    ccc_node const *const n = min(&s->t);
+    ccc_node const *const n = min(&s->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 void *
 ccc_set_rbegin(ccc_set *s)
 {
-    ccc_node const *const n = max(&s->t);
+    ccc_node const *const n = max(&s->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 void *
 ccc_set_next(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node const *n = next(&s->t, &e->n, inorder_traversal);
+    ccc_node const *n = next(&s->impl, &e->impl, inorder_traversal);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 void *
 ccc_set_rnext(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node const *n = next(&s->t, &e->n, reverse_inorder_traversal);
+    ccc_node const *n = next(&s->impl, &e->impl, reverse_inorder_traversal);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 ccc_range
 ccc_set_equal_range(ccc_set *s, ccc_set_elem const *const begin,
                     ccc_set_elem const *const end)
 {
-    return equal_range(&s->t, &begin->n, &end->n, inorder_traversal);
+    return equal_range(&s->impl, &begin->impl, &end->impl, inorder_traversal);
 }
 
 void *
@@ -456,8 +464,8 @@ ccc_set_equal_rrange(ccc_set *s, ccc_set_elem const *const rbegin,
                      ccc_set_elem const *const end)
 
 {
-    ccc_range const r
-        = equal_range(&s->t, &rbegin->n, &end->n, reverse_inorder_traversal);
+    ccc_range const r = equal_range(&s->impl, &rbegin->impl, &end->impl,
+                                    reverse_inorder_traversal);
     return (ccc_rrange){
         .rbegin = r.begin,
         .end = r.end,
@@ -479,34 +487,34 @@ ccc_set_end_rrange(ccc_rrange const *rr)
 void *
 ccc_set_find(ccc_set *s, ccc_set_elem const *se)
 {
-    ccc_node *n = find(&s->t, &se->n);
+    ccc_node *n = find(&s->impl, &se->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 void *
 ccc_set_erase(ccc_set *s, ccc_set_elem *se)
 {
-    ccc_node *n = erase(&s->t, &se->n);
+    ccc_node *n = erase(&s->impl, &se->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 bool
 ccc_set_const_contains(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node const *n = const_seek(&s->t, &e->n);
+    ccc_node const *n = const_seek(&s->impl, &e->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 bool
@@ -524,30 +532,36 @@ ccc_set_is_max(ccc_set *s, ccc_set_elem const *e)
 void *
 ccc_set_const_find(ccc_set *s, ccc_set_elem const *e)
 {
-    ccc_node const *n = const_seek(&s->t, &e->n);
+    ccc_node const *n = const_seek(&s->impl, &e->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 void *
 ccc_set_root(ccc_set const *const s)
 {
-    ccc_node *n = root(&s->t);
+    ccc_node *n = root(&s->impl);
     if (!n)
     {
         return NULL;
     }
-    return struct_base(&s->t, n);
+    return struct_base(&s->impl, n);
 }
 
 void
 ccc_set_print(ccc_set const *const s, ccc_set_elem const *const root,
               ccc_print_fn *const fn)
 {
-    ccc_tree_print(&s->t, &root->n, fn);
+    ccc_tree_print(&s->impl, &root->impl, fn);
+}
+
+bool
+ccc_set_validate(ccc_set const *const s)
+{
+    return ccc_tree_validate(&s->impl);
 }
 
 /* ===========    Splay Tree Multiset and Set Implementations    ===========
@@ -933,7 +947,7 @@ erase(ccc_tree *t, ccc_node *elem)
    max or min, we have provided a dummy node and dummy compare function
    that will force us to return the max or min. So this operation
    simply grabs the first node available in the tree for round robin.
-   This function expects to be passed the t->nil as the node and a
+   This function expects to be passed the t->implil as the node and a
    comparison function that forces either the max or min to be searched. */
 static ccc_node *
 multiset_erase_max_or_min(ccc_tree *t, ccc_node *tnil,

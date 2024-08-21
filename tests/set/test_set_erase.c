@@ -1,6 +1,5 @@
 #include "set.h"
 #include "test.h"
-#include "tree.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -67,7 +66,7 @@ set_test_prime_shuffle(void)
         {
             repeats[i] = true;
         }
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
@@ -77,7 +76,7 @@ set_test_prime_shuffle(void)
     {
         ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
         CHECK(elem || !repeats[i], true, bool, "%d");
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     return PASS;
 }
@@ -100,7 +99,7 @@ set_test_insert_erase_shuffled(void)
     for (size_t i = 0; i < size; ++i)
     {
         (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
     return PASS;
@@ -120,13 +119,13 @@ set_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CHECK(ccc_set_contains(&s, &vals[i].elem), true, bool, "%d");
         (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(ccc_tree_validate(&s.t), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, bool, "%d");
     }
     CHECK(ccc_set_empty(&s), true, bool, "%d");
     return PASS;
@@ -147,7 +146,7 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_set_insert(s, &vals[shuffled_index].elem);
         CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
-        CHECK(ccc_tree_validate(&s->t), true, bool, "%d");
+        CHECK(ccc_set_validate(s), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_set_size(s), size, size_t, "%zu");
