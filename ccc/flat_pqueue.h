@@ -3,7 +3,6 @@
 
 /* Privately linked implementation. */
 #include "impl_flat_pqueue.h"
-#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -60,7 +59,7 @@ typedef struct
     CCC_IMPL_FPQ_EMPLACE((fpq), struct_name, struct_initializer)
 
 ccc_result ccc_fpq_realloc(ccc_flat_pqueue *, size_t new_capacity,
-                           ccc_buf_realloc_fn *);
+                           ccc_realloc_fn *);
 ccc_result ccc_fpq_push(ccc_flat_pqueue *, void const *);
 void const *ccc_fpq_front(ccc_flat_pqueue const *);
 void *ccc_fpq_pop(ccc_flat_pqueue *);

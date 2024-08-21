@@ -23,7 +23,6 @@
 #define CCC_SET_H
 
 #include "impl_tree.h"
-#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

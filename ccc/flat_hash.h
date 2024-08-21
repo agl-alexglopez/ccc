@@ -1,24 +1,16 @@
 #ifndef CCC_FLAT_HASH_H
 #define CCC_FLAT_HASH_H
 
-#include "buf.h"
-#include "types.h"
-
-#include <stdint.h>
+#include "impl_flat_hash.h"
 
 typedef struct
 {
-    int64_t hash;
+    struct ccc_impl_fhash_elem impl;
 } ccc_fhash_elem;
 
 typedef struct
 {
-    ccc_buf *buf;
-    ccc_buf_free_fn *free_fn;
-    ccc_hash_fn *hash_fn;
-    ccc_eq_fn *eq_fn;
-    void *aux;
-    size_t hash_elem_offset;
+    struct ccc_impl_flat_hash impl;
 } ccc_flat_hash;
 
 ccc_result ccc_fhash_init(ccc_flat_hash *, ccc_buf *, size_t hash_elem_offset,
