@@ -41,7 +41,7 @@ void ccc_impl_fpq_bubble_up(struct ccc_impl_flat_pqueue *, uint8_t[], size_t);
                 != ccc_buf_elem_size(                                          \
                     ((struct ccc_impl_flat_pqueue *)(fpq))->buf))              \
             {                                                                  \
-                _impl_macro_result_ = CCC_ERR;                                 \
+                _impl_macro_result_ = CCC_INPUT_ERR;                           \
             }                                                                  \
             else                                                               \
             {                                                                  \
@@ -49,7 +49,7 @@ void ccc_impl_fpq_bubble_up(struct ccc_impl_flat_pqueue *, uint8_t[], size_t);
                     ((struct ccc_impl_flat_pqueue *)(fpq))->buf);              \
                 if (!_macro_new_)                                              \
                 {                                                              \
-                    _impl_macro_result_ = CCC_FULL;                            \
+                    _impl_macro_result_ = CCC_NO_REALLOC;                      \
                 }                                                              \
                 else                                                           \
                 {                                                              \

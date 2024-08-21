@@ -58,7 +58,7 @@ pq_test_macro(void)
     CHECK(ccc_fpq_empty(&pq), false, bool, "%d");
     ccc_result res2
         = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
-    CHECK(res2, CCC_FULL, ccc_result, "%d");
+    CHECK(res2, CCC_NO_REALLOC, ccc_result, "%d");
     return PASS;
 }
 

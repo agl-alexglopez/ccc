@@ -15,12 +15,12 @@ ccc_buf_realloc(ccc_buf *buf, size_t const new_capacity,
 {
     if (!fn)
     {
-        return CCC_FULL;
+        return CCC_NO_REALLOC;
     }
     void *const new_mem = fn(buf->impl.mem, new_capacity);
     if (!new_mem)
     {
-        return CCC_ERR;
+        return CCC_MEM_ERR;
     }
     buf->impl.mem = new_mem;
     buf->impl.capacity = new_capacity;
@@ -70,7 +70,7 @@ ccc_buf_swap(ccc_buf *buf, uint8_t tmp[], size_t const i, size_t const j)
 {
     if (!buf->impl.sz || i >= buf->impl.sz || j >= buf->impl.sz || j == i)
     {
-        return CCC_ERR;
+        return CCC_MEM_ERR;
     }
     (void)memcpy(tmp, at(buf, i), buf->impl.elem_sz);
     (void)memcpy(at(buf, i), at(buf, j), buf->impl.elem_sz);
@@ -98,11 +98,11 @@ ccc_buf_write(ccc_buf *const buf, size_t const i, void const *const data)
     void *pos = ccc_buf_at(buf, i);
     if (!pos)
     {
-        return CCC_ERR;
+        return CCC_INPUT_ERR;
     }
     if (data == pos)
     {
-        return CCC_ERR;
+        return CCC_MEM_ERR;
     }
     (void)memcpy(pos, data, ccc_buf_elem_size(buf));
     return CCC_OK;
@@ -113,7 +113,7 @@ ccc_buf_erase(ccc_buf *buf, size_t const i)
 {
     if (!buf->impl.sz || i >= buf->impl.sz)
     {
-        return CCC_ERR;
+        return CCC_MEM_ERR;
     }
     if (1 == buf->impl.sz)
     {
@@ -136,7 +136,7 @@ ccc_buf_free(ccc_buf *buf, ccc_free_fn *fn)
 {
     if (!buf->impl.capacity)
     {
-        return CCC_ERR;
+        return CCC_MEM_ERR;
     }
     buf->impl.capacity = 0;
     buf->impl.sz = 0;
@@ -149,7 +149,7 @@ ccc_buf_pop_back_n(ccc_buf *buf, size_t n)
 {
     if (n > buf->impl.sz)
     {
-        return CCC_ERR;
+        return CCC_MEM_ERR;
     }
     buf->impl.sz -= n;
     return CCC_OK;
