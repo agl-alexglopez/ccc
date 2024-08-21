@@ -3,14 +3,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-int64_t
+uint64_t
 fhash_val_zero(void const *const n)
 {
     (void)n;
     return 0;
 }
 
-int64_t
+uint64_t
 fhash_val_last_digit(void const *n)
 {
     return ((struct val *)n)->val % 10;

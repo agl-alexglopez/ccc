@@ -14,22 +14,22 @@ struct query
     size_t stopped_at;
 };
 
-static int64_t const empty = -1;
-static int64_t const force_positive_mask = ~INT64_MIN;
+static uint64_t const empty = -1;
+static uint64_t const force_positive_mask = ~INT64_MIN;
 static double const load_factor = 0.8;
 
 static struct query find(struct ccc_impl_flat_hash const *, void const *,
-                         int64_t);
-static size_t distance(size_t capacity, size_t index, int64_t hash);
+                         uint64_t);
+static size_t distance(size_t capacity, size_t index, uint64_t hash);
 static bool is_prime(size_t);
 static size_t next_prime(size_t);
 static ccc_result maybe_resize(struct ccc_impl_flat_hash *);
-static void insert(struct ccc_impl_flat_hash *, void const *, int64_t hash);
+static void insert(struct ccc_impl_flat_hash *, void const *, uint64_t hash);
 static void swap(uint8_t tmp[], void *, void *, size_t);
 static ccc_fhash_elem *hash_in_slot(struct ccc_impl_flat_hash const *,
                                     void const *slot);
-static int64_t *hash_at(struct ccc_impl_flat_hash const *, size_t i);
-static int64_t hash_data(struct ccc_impl_flat_hash const *, void const *);
+static uint64_t *hash_at(struct ccc_impl_flat_hash const *, size_t i);
+static uint64_t hash_data(struct ccc_impl_flat_hash const *, void const *);
 
 ccc_result
 ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
@@ -49,7 +49,7 @@ ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
          i != ccc_buf_capacity_end(h->impl.buf);
          i = ccc_buf_next(h->impl.buf, i))
     {
-        hash_in_slot(&h->impl, i)->impl = empty;
+        hash_in_slot(&h->impl, i)->impl.hash = empty;
     }
     return CCC_OK;
 }
@@ -99,7 +99,7 @@ ccc_fhash_insert(ccc_flat_hash *const h, void const *const e)
     {
         return res;
     }
-    int64_t const hash = hash_data(&h->impl, e);
+    uint64_t const hash = hash_data(&h->impl, e);
     struct query const q = find(&h->impl, e, hash);
     if (q.found)
     {
@@ -117,7 +117,7 @@ ccc_fhash_erase(ccc_flat_hash *const h, void const *const e)
         return CCC_NOP;
     }
     size_t const cap = ccc_buf_capacity(h->impl.buf);
-    int64_t const hash = hash_data(&h->impl, e);
+    uint64_t const hash = hash_data(&h->impl, e);
     struct query q = find(&h->impl, e, hash);
     if (!q.found)
     {
@@ -131,7 +131,7 @@ ccc_fhash_erase(ccc_flat_hash *const h, void const *const e)
     {
         void *next_slot = ccc_buf_at(h->impl.buf, next);
         ccc_fhash_elem *next_elem = hash_in_slot(&h->impl, next_slot);
-        if (!distance(cap, next, next_elem->impl))
+        if (!distance(cap, next, next_elem->impl.hash))
         {
             break;
         }
@@ -150,7 +150,7 @@ ccc_fhash_begin(ccc_flat_hash const *const h)
     }
     void const *iter = ccc_buf_begin(h->impl.buf);
     for (; iter != ccc_buf_capacity_end(h->impl.buf)
-           && hash_in_slot(&h->impl, iter)->impl == empty;
+           && hash_in_slot(&h->impl, iter)->impl.hash == empty;
          iter = ccc_buf_next(h->impl.buf, iter))
     {}
     return iter;
@@ -161,7 +161,7 @@ ccc_fhash_next(ccc_flat_hash const *const h, void const *iter)
 {
     for (iter = ccc_buf_next(h->impl.buf, iter);
          iter != ccc_buf_capacity_end(h->impl.buf)
-         && hash_in_slot(&h->impl, iter)->impl == empty;
+         && hash_in_slot(&h->impl, iter)->impl.hash == empty;
          iter = ccc_buf_next(h->impl.buf, iter))
     {}
     return iter;
@@ -181,7 +181,7 @@ ccc_fhash_end(ccc_flat_hash const *const h)
    is full. */
 static void
 insert(struct ccc_impl_flat_hash *const h, void const *const e,
-       int64_t const hash)
+       uint64_t const hash)
 {
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     size_t const cap = ccc_buf_capacity(h->buf);
@@ -191,7 +191,7 @@ insert(struct ccc_impl_flat_hash *const h, void const *const e,
     /* This function cannot modify e and e may be copied over to new insertion
        from old table. So should this function invariantly assign starting
        hash to this slot copy for insertion? I think yes so far. */
-    hash_in_slot(h, slot_copy)->impl = hash;
+    hash_in_slot(h, slot_copy)->impl.hash = hash;
     size_t i = hash % cap;
     size_t dist = 0;
     uint8_t tmp[elem_sz];
@@ -199,13 +199,13 @@ insert(struct ccc_impl_flat_hash *const h, void const *const e,
     {
         void *const slot = ccc_buf_at(h->buf, i);
         ccc_fhash_elem const *slot_hash = hash_in_slot(h, slot);
-        if (slot_hash->impl == empty)
+        if (slot_hash->impl.hash == empty)
         {
             memcpy(slot, slot_copy, elem_sz);
             ++h->buf->impl.sz;
             return;
         }
-        if (dist > distance(cap, i, slot_hash->impl))
+        if (dist > distance(cap, i, slot_hash->impl.hash))
         {
             swap(tmp, slot_copy, slot, elem_sz);
         }
@@ -214,7 +214,7 @@ insert(struct ccc_impl_flat_hash *const h, void const *const e,
 
 static struct query
 find(struct ccc_impl_flat_hash const *const h, void const *const elem,
-     int64_t const hash)
+     uint64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(h->buf);
     size_t cur_i = hash % cap;
@@ -222,15 +222,15 @@ find(struct ccc_impl_flat_hash const *const h, void const *const elem,
     {
         void const *const slot = ccc_buf_at(h->buf, cur_i);
         ccc_fhash_elem const *const e = hash_in_slot(h, slot);
-        if (e->impl == empty)
+        if (e->impl.hash == empty)
         {
             return (struct query){.found = false, .stopped_at = cur_i};
         }
-        if (dist > distance(cap, cur_i, e->impl))
+        if (dist > distance(cap, cur_i, e->impl.hash))
         {
             return (struct query){.found = false, .stopped_at = cur_i};
         }
-        if (hash == e->impl && h->eq_fn(slot, elem, h->aux))
+        if (hash == e->impl.hash && h->eq_fn(slot, elem, h->aux))
         {
             return (struct query){.found = true, .stopped_at = cur_i};
         }
@@ -262,16 +262,16 @@ maybe_resize(struct ccc_impl_flat_hash *h)
     for (void *i = ccc_buf_begin(&new_buf); i != ccc_buf_capacity_end(&new_buf);
          i = ccc_buf_next(&new_buf, i))
     {
-        hash_in_slot(h, i)->impl = empty;
+        hash_in_slot(h, i)->impl.hash = empty;
     }
     for (void *slot = ccc_buf_begin(h->buf);
          slot != ccc_buf_capacity_end(h->buf);
          slot = ccc_buf_next(h->buf, slot))
     {
         ccc_fhash_elem const *const e = hash_in_slot(h, slot);
-        if (e->impl != empty)
+        if (e->impl.hash != empty)
         {
-            insert(&new_hash, slot, e->impl);
+            insert(&new_hash, slot, e->impl.hash);
         }
     }
     *h = new_hash;
@@ -288,7 +288,7 @@ swap(uint8_t tmp[], void *const a, void *const b, size_t ab_size)
 }
 
 static inline size_t
-distance(size_t const capacity, size_t const index, int64_t const hash)
+distance(size_t const capacity, size_t const index, uint64_t const hash)
 {
     size_t hash_i = hash;
     hash_i %= capacity;
@@ -301,15 +301,15 @@ hash_in_slot(struct ccc_impl_flat_hash const *const h, void const *const slot)
     return (ccc_fhash_elem *)((uint8_t *)slot + h->hash_elem_offset);
 }
 
-static inline ccc_hash_value *
+static inline uint64_t *
 hash_at(struct ccc_impl_flat_hash const *const h, size_t const i)
 {
-    return &((ccc_fhash_elem *)((uint8_t *)ccc_buf_at(h->buf, i)
-                                + h->hash_elem_offset))
-                ->impl;
+    return &((struct ccc_impl_fhash_elem *)((uint8_t *)ccc_buf_at(h->buf, i)
+                                            + h->hash_elem_offset))
+                ->hash;
 }
 
-static inline int64_t
+static inline uint64_t
 hash_data(struct ccc_impl_flat_hash const *const h, void const *const data)
 {
     return h->hash_fn(data) & force_positive_mask;
