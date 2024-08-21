@@ -2,6 +2,7 @@
 #define CCC_PQUEUE_H
 
 #include "impl_pqueue.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

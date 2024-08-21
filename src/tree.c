@@ -22,6 +22,7 @@
 #include "depqueue.h"
 #include "impl_tree.h"
 #include "set.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

@@ -7,7 +7,7 @@
 
 typedef enum
 {
-    CCC_OK,
+    CCC_OK = 0,
     CCC_FULL,
     CCC_ERR,
     CCC_NOP,
