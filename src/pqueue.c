@@ -1,5 +1,6 @@
 #include "pqueue.h"
 #include "impl_pqueue.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

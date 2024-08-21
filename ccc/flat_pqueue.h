@@ -3,6 +3,7 @@
 
 /* Privately linked implementation. */
 #include "impl_flat_pqueue.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

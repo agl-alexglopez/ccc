@@ -1,5 +1,6 @@
 #include "buf.h"
 #include "impl_buf.h"
+#include "types.h"
 
 #include <alloca.h>
 #include <assert.h>

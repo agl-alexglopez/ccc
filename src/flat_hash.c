@@ -1,6 +1,7 @@
 #include "flat_hash.h"
 #include "buf.h"
 #include "impl_flat_hash.h"
+#include "types.h"
 
 #include <assert.h>
 #include <stdbool.h>

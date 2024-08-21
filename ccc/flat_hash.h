@@ -2,6 +2,7 @@
 #define CCC_FLAT_HASH_H
 
 #include "impl_flat_hash.h"
+#include "types.h"
 
 typedef struct
 {

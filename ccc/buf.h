@@ -2,6 +2,7 @@
 #define CCC_BUF_H
 
 #include "impl_buf.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
