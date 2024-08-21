@@ -33,9 +33,13 @@ typedef struct
     void *const end;
 } ccc_rrange;
 
-typedef void *ccc_realloc_fn(void *, size_t);
+typedef struct
+{
+    bool found;
+    void *entry;
+} ccc_entry;
 
-typedef void ccc_free_fn(void *);
+typedef void *ccc_realloc_fn(void *, size_t);
 
 typedef ccc_threeway_cmp ccc_cmp_fn(void const *a, void const *b, void *aux);
 
