@@ -46,6 +46,8 @@ typedef void ccc_destructor_fn(void *);
 
 typedef bool ccc_eq_fn(void const *, void const *, void *aux);
 
-typedef int64_t ccc_hash_fn(void const *);
+typedef int64_t ccc_hash_value;
+
+typedef ccc_hash_value ccc_hash_fn(void const *);
 
 #endif /* CCC_TYPES_H */
