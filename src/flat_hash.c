@@ -1,5 +1,6 @@
 #include "flat_hash.h"
 #include "buf.h"
+#include "impl_flat_hash.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -17,16 +18,18 @@ static int64_t const empty = -1;
 static int64_t const force_positive_mask = ~INT64_MIN;
 static double const load_factor = 0.8;
 
-static struct query find(ccc_flat_hash const *, void const *, int64_t);
+static struct query find(struct ccc_impl_flat_hash const *, void const *,
+                         int64_t);
 static size_t distance(size_t capacity, size_t index, int64_t hash);
 static bool is_prime(size_t);
 static size_t next_prime(size_t);
-static ccc_result maybe_resize(ccc_flat_hash *);
-static void insert(ccc_flat_hash *, void const *, int64_t hash);
+static ccc_result maybe_resize(struct ccc_impl_flat_hash *);
+static void insert(struct ccc_impl_flat_hash *, void const *, int64_t hash);
 static void swap(uint8_t tmp[], void *, void *, size_t);
-static ccc_fhash_elem *hash_in_slot(ccc_flat_hash const *, void const *slot);
-static int64_t *hash_at(ccc_flat_hash const *, size_t i);
-static int64_t hash_data(ccc_flat_hash const *, void const *);
+static struct ccc_impl_fhash_elem *
+hash_in_slot(struct ccc_impl_flat_hash const *, void const *slot);
+static int64_t *hash_at(struct ccc_impl_flat_hash const *, size_t i);
+static int64_t hash_data(struct ccc_impl_flat_hash const *, void const *);
 
 ccc_result
 ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
@@ -37,15 +40,16 @@ ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
     {
         return CCC_ERR;
     }
-    h->buf = buf;
-    h->hash_elem_offset = hash_elem_offset;
-    h->hash_fn = hash_fn;
-    h->eq_fn = eq_fn;
-    h->aux = aux;
-    for (void *i = ccc_buf_begin(h->buf); i != ccc_buf_capacity_end(h->buf);
-         i = ccc_buf_next(h->buf, i))
+    h->impl.buf = buf;
+    h->impl.hash_elem_offset = hash_elem_offset;
+    h->impl.hash_fn = hash_fn;
+    h->impl.eq_fn = eq_fn;
+    h->impl.aux = aux;
+    for (void *i = ccc_buf_begin(h->impl.buf);
+         i != ccc_buf_capacity_end(h->impl.buf);
+         i = ccc_buf_next(h->impl.buf, i))
     {
-        hash_in_slot(h, i)->hash = empty;
+        hash_in_slot(&h->impl, i)->hash = empty;
     }
     return CCC_OK;
 }
@@ -53,101 +57,102 @@ ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
 bool
 ccc_fhash_empty(ccc_flat_hash const *const h)
 {
-    return !ccc_buf_size(h->buf);
+    return !ccc_buf_size(h->impl.buf);
 }
 
 bool
 ccc_fhash_contains(ccc_flat_hash const *const h, void const *const e)
 {
-    if (ccc_buf_empty(h->buf))
+    if (ccc_buf_empty(h->impl.buf))
     {
         return false;
     }
-    return find(h, e, hash_data(h, e)).found;
+    return find(&h->impl, e, hash_data(&h->impl, e)).found;
 }
 
 size_t
 ccc_fhash_size(ccc_flat_hash const *const h)
 {
-    return ccc_buf_size(h->buf);
+    return ccc_buf_size(h->impl.buf);
 }
 
 void const *
 ccc_fhash_find(ccc_flat_hash const *const h, void const *const e)
 {
-    if (ccc_buf_empty(h->buf))
+    if (ccc_buf_empty(h->impl.buf))
     {
         return NULL;
     }
-    struct query const q = find(h, e, hash_data(h, e));
+    struct query const q = find(&h->impl, e, hash_data(&h->impl, e));
     if (!q.found)
     {
         return NULL;
     }
-    return ccc_buf_at(h->buf, q.stopped_at);
+    return ccc_buf_at(h->impl.buf, q.stopped_at);
 }
 
 ccc_result
 ccc_fhash_insert(ccc_flat_hash *const h, void const *const e)
 {
-    ccc_result const res = maybe_resize(h);
+    ccc_result const res = maybe_resize(&h->impl);
     if (res != CCC_OK)
     {
         return res;
     }
-    int64_t const hash = hash_data(h, e);
-    struct query const q = find(h, e, hash);
+    int64_t const hash = hash_data(&h->impl, e);
+    struct query const q = find(&h->impl, e, hash);
     if (q.found)
     {
         return CCC_NOP;
     }
-    insert(h, e, hash);
+    insert(&h->impl, e, hash);
     return CCC_OK;
 }
 
 ccc_result
 ccc_fhash_erase(ccc_flat_hash *const h, void const *const e)
 {
-    if (ccc_buf_empty(h->buf))
+    if (ccc_buf_empty(h->impl.buf))
     {
         return CCC_NOP;
     }
-    size_t const cap = ccc_buf_capacity(h->buf);
-    int64_t const hash = hash_data(h, e);
-    struct query q = find(h, e, hash);
+    size_t const cap = ccc_buf_capacity(h->impl.buf);
+    int64_t const hash = hash_data(&h->impl, e);
+    struct query q = find(&h->impl, e, hash);
     if (!q.found)
     {
         return CCC_NOP;
     }
-    size_t const elem_sz = ccc_buf_elem_size(h->buf);
-    *hash_at(h, q.stopped_at) = empty;
+    size_t const elem_sz = ccc_buf_elem_size(h->impl.buf);
+    *hash_at(&h->impl, q.stopped_at) = empty;
     size_t next = (hash + 1) % cap;
-    uint8_t tmp[ccc_buf_elem_size(h->buf)];
+    uint8_t tmp[ccc_buf_elem_size(h->impl.buf)];
     for (;; q.stopped_at = (q.stopped_at + 1) % cap, next = (next + 1) % cap)
     {
-        void *next_slot = ccc_buf_at(h->buf, next);
-        ccc_fhash_elem *next_elem = hash_in_slot(h, next_slot);
+        void *next_slot = ccc_buf_at(h->impl.buf, next);
+        struct ccc_impl_fhash_elem *next_elem
+            = hash_in_slot(&h->impl, next_slot);
         if (!distance(cap, next, next_elem->hash))
         {
             break;
         }
-        swap(tmp, next_slot, ccc_buf_at(h->buf, q.stopped_at), elem_sz);
+        swap(tmp, next_slot, ccc_buf_at(h->impl.buf, q.stopped_at), elem_sz);
     }
-    --h->buf->sz;
+    --h->impl.buf->impl.sz;
     return CCC_OK;
 }
 
 void const *
 ccc_fhash_begin(ccc_flat_hash const *const h)
 {
-    if (ccc_buf_empty(h->buf))
+    if (ccc_buf_empty(h->impl.buf))
     {
         return NULL;
     }
-    void const *iter = ccc_buf_begin(h->buf);
-    for (; iter != ccc_buf_capacity_end(h->buf)
-           && hash_in_slot(h, iter)->hash == empty;
-         iter = ccc_buf_next(h->buf, iter))
+    void const *iter = ccc_buf_begin(h->impl.buf);
+    for (; iter != ccc_buf_capacity_end(h->impl.buf)
+           && hash_in_slot(&h->impl, iter)->hash == empty;
+         iter = ccc_buf_next(h->impl.buf, iter))
     {}
     return iter;
 }
@@ -155,10 +160,10 @@ ccc_fhash_begin(ccc_flat_hash const *const h)
 void const *
 ccc_fhash_next(ccc_flat_hash const *const h, void const *iter)
 {
-    for (iter = ccc_buf_next(h->buf, iter);
-         iter != ccc_buf_capacity_end(h->buf)
-         && hash_in_slot(h, iter)->hash == empty;
-         iter = ccc_buf_next(h->buf, iter))
+    for (iter = ccc_buf_next(h->impl.buf, iter);
+         iter != ccc_buf_capacity_end(h->impl.buf)
+         && hash_in_slot(&h->impl, iter)->hash == empty;
+         iter = ccc_buf_next(h->impl.buf, iter))
     {}
     return iter;
 }
@@ -166,7 +171,7 @@ ccc_fhash_next(ccc_flat_hash const *const h, void const *iter)
 void const *
 ccc_fhash_end(ccc_flat_hash const *const h)
 {
-    return ccc_buf_capacity_end(h->buf);
+    return ccc_buf_capacity_end(h->impl.buf);
 }
 
 /*=========================   Static Helpers    ============================*/
@@ -176,7 +181,8 @@ ccc_fhash_end(ccc_flat_hash const *const h)
    use this if the element has not been membership tested yet or the table
    is full. */
 static void
-insert(ccc_flat_hash *const h, void const *const e, int64_t const hash)
+insert(struct ccc_impl_flat_hash *const h, void const *const e,
+       int64_t const hash)
 {
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     size_t const cap = ccc_buf_capacity(h->buf);
@@ -193,11 +199,11 @@ insert(ccc_flat_hash *const h, void const *const e, int64_t const hash)
     for (;; i = (i + 1) % cap, ++dist)
     {
         void *const slot = ccc_buf_at(h->buf, i);
-        ccc_fhash_elem const *slot_hash = hash_in_slot(h, slot);
+        struct ccc_impl_fhash_elem const *slot_hash = hash_in_slot(h, slot);
         if (slot_hash->hash == empty)
         {
             memcpy(slot, slot_copy, elem_sz);
-            ++h->buf->sz;
+            ++h->buf->impl.sz;
             return;
         }
         if (dist > distance(cap, i, slot_hash->hash))
@@ -208,14 +214,15 @@ insert(ccc_flat_hash *const h, void const *const e, int64_t const hash)
 }
 
 static struct query
-find(ccc_flat_hash const *const h, void const *const elem, int64_t const hash)
+find(struct ccc_impl_flat_hash const *const h, void const *const elem,
+     int64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(h->buf);
     size_t cur_i = hash % cap;
     for (size_t dist = 0; dist < cap; ++dist, cur_i = (cur_i + 1) % cap)
     {
         void const *const slot = ccc_buf_at(h->buf, cur_i);
-        ccc_fhash_elem const *const e = hash_in_slot(h, slot);
+        struct ccc_impl_fhash_elem const *const e = hash_in_slot(h, slot);
         if (e->hash == empty)
         {
             return (struct query){.found = false, .stopped_at = cur_i};
@@ -233,25 +240,25 @@ find(ccc_flat_hash const *const h, void const *const elem, int64_t const hash)
 }
 
 static ccc_result
-maybe_resize(ccc_flat_hash *h)
+maybe_resize(struct ccc_impl_flat_hash *h)
 {
     if ((double)ccc_buf_size(h->buf) / (double)ccc_buf_capacity(h->buf)
         <= load_factor)
     {
         return CCC_OK;
     }
-    if (!h->buf->realloc_fn)
+    if (!h->buf->impl.realloc_fn)
     {
         return CCC_FULL;
     }
     ccc_buf new_buf = *h->buf;
-    new_buf.capacity = next_prime(ccc_buf_size(h->buf) * 2);
-    new_buf.mem = h->buf->realloc_fn(NULL, new_buf.capacity);
-    if (!new_buf.mem)
+    new_buf.impl.capacity = next_prime(ccc_buf_size(h->buf) * 2);
+    new_buf.impl.mem = h->buf->impl.realloc_fn(NULL, new_buf.impl.capacity);
+    if (!new_buf.impl.mem)
     {
         return CCC_ERR;
     }
-    ccc_flat_hash new_hash = *h;
+    struct ccc_impl_flat_hash new_hash = *h;
     new_hash.buf = &new_buf;
     for (void *i = ccc_buf_begin(&new_buf); i != ccc_buf_capacity_end(&new_buf);
          i = ccc_buf_next(&new_buf, i))
@@ -262,7 +269,7 @@ maybe_resize(ccc_flat_hash *h)
          slot != ccc_buf_capacity_end(h->buf);
          slot = ccc_buf_next(h->buf, slot))
     {
-        ccc_fhash_elem const *const e = hash_in_slot(h, slot);
+        struct ccc_impl_fhash_elem const *const e = hash_in_slot(h, slot);
         if (e->hash != empty)
         {
             insert(&new_hash, slot, e->hash);
@@ -289,22 +296,23 @@ distance(size_t const capacity, size_t const index, int64_t const hash)
     return index < hash_i ? (capacity - hash_i) + index : hash_i - index;
 }
 
-static inline ccc_fhash_elem *
-hash_in_slot(ccc_flat_hash const *const h, void const *const slot)
+static inline struct ccc_impl_fhash_elem *
+hash_in_slot(struct ccc_impl_flat_hash const *const h, void const *const slot)
 {
-    return (ccc_fhash_elem *)((uint8_t *)slot + h->hash_elem_offset);
+    return (struct ccc_impl_fhash_elem *)((uint8_t *)slot
+                                          + h->hash_elem_offset);
 }
 
 static inline int64_t *
-hash_at(ccc_flat_hash const *const h, size_t const i)
+hash_at(struct ccc_impl_flat_hash const *const h, size_t const i)
 {
-    return &((ccc_fhash_elem *)((uint8_t *)ccc_buf_at(h->buf, i)
-                                + h->hash_elem_offset))
+    return &((struct ccc_impl_fhash_elem *)((uint8_t *)ccc_buf_at(h->buf, i)
+                                            + h->hash_elem_offset))
                 ->hash;
 }
 
 static inline int64_t
-hash_data(ccc_flat_hash const *const h, void const *const data)
+hash_data(struct ccc_impl_flat_hash const *const h, void const *const data)
 {
     return h->hash_fn(data) & force_positive_mask;
 }

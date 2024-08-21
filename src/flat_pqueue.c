@@ -45,7 +45,7 @@ static void print_heap(struct ccc_impl_flat_pqueue const *, size_t,
 
 ccc_result
 ccc_fpq_realloc(ccc_flat_pqueue *const fpq, size_t const new_capacity,
-                ccc_buf_realloc_fn *const fn)
+                ccc_realloc_fn *const fn)
 {
     return (ccc_result)ccc_buf_realloc(fpq->impl.buf, new_capacity, fn);
 }
@@ -277,9 +277,9 @@ static inline void
 swap(struct ccc_impl_flat_pqueue *const fpq, uint8_t tmp[], size_t const i,
      size_t const j)
 {
-    ccc_buf_result const res = ccc_buf_swap(fpq->buf, tmp, i, j);
+    ccc_result const res = ccc_buf_swap(fpq->buf, tmp, i, j);
     (void)res;
-    assert(res == CCC_BUF_OK);
+    assert(res == CCC_OK);
 }
 
 /* Thin wrapper just for sanity checking in debug mode as index should always
