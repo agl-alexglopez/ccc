@@ -18,7 +18,7 @@ ccc_buf_realloc(ccc_buf *buf, size_t const new_capacity,
         return CCC_NO_REALLOC;
     }
     void *const new_mem = fn(buf->impl.mem, new_capacity);
-    if (!new_mem)
+    if (new_capacity && !new_mem)
     {
         return CCC_MEM_ERR;
     }
@@ -132,7 +132,7 @@ ccc_buf_erase(ccc_buf *buf, size_t const i)
 }
 
 ccc_result
-ccc_buf_free(ccc_buf *buf, ccc_free_fn *fn)
+ccc_buf_free(ccc_buf *buf, ccc_realloc_fn *fn)
 {
     if (!buf->impl.capacity)
     {
@@ -140,7 +140,7 @@ ccc_buf_free(ccc_buf *buf, ccc_free_fn *fn)
     }
     buf->impl.capacity = 0;
     buf->impl.sz = 0;
-    fn(buf->impl.mem);
+    fn(buf->impl.mem, 0);
     return CCC_OK;
 }
 
@@ -192,7 +192,7 @@ ccc_buf_empty(ccc_buf const *buf)
 }
 
 void *
-ccc_buf_base(ccc_buf *buf)
+ccc_buf_base(ccc_buf const *const buf)
 {
     return buf->impl.mem;
 }
@@ -220,6 +220,17 @@ void *
 ccc_buf_capacity_end(ccc_buf const *const buf)
 {
     return (uint8_t *)buf->impl.mem + (buf->impl.elem_sz * buf->impl.capacity);
+}
+
+size_t
+ccc_buf_index_of(ccc_buf const *const buf, void const *const slot)
+{
+    assert(slot >= ccc_buf_base(buf));
+    assert((uint8_t *)slot
+           < ((uint8_t *)ccc_buf_base(buf)
+              + (ccc_buf_capacity(buf) * ccc_buf_elem_size(buf))));
+    return ((uint8_t *)slot - ((uint8_t *)ccc_buf_base(buf)))
+           / ccc_buf_elem_size(buf);
 }
 
 /*======================  Static Helpers  ==================================*/

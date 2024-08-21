@@ -21,10 +21,11 @@ typedef struct
     CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, struct_name, struct_initializer)
 
 ccc_result ccc_buf_realloc(ccc_buf *, size_t new_capacity, ccc_realloc_fn *);
-void *ccc_buf_base(ccc_buf *);
+void *ccc_buf_base(ccc_buf const *);
 size_t ccc_buf_size(ccc_buf const *);
 size_t ccc_buf_capacity(ccc_buf const *);
 size_t ccc_buf_elem_size(ccc_buf const *);
+size_t ccc_buf_index_of(ccc_buf const *, void const *slot);
 bool ccc_buf_full(ccc_buf const *);
 bool ccc_buf_empty(ccc_buf const *);
 void *ccc_buf_at(ccc_buf const *, size_t);
@@ -39,7 +40,7 @@ ccc_result ccc_buf_swap(ccc_buf *, uint8_t tmp[], size_t i, size_t j);
 ccc_result ccc_buf_write(ccc_buf *, size_t i, void const *data);
 ccc_result ccc_buf_erase(ccc_buf *, size_t i);
 
-ccc_result ccc_buf_free(ccc_buf *, ccc_free_fn *);
+ccc_result ccc_buf_free(ccc_buf *, ccc_realloc_fn *);
 
 void *ccc_buf_begin(ccc_buf const *);
 void *ccc_buf_next(ccc_buf const *, void const *);
