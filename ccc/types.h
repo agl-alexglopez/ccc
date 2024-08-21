@@ -8,8 +8,9 @@
 typedef enum
 {
     CCC_OK = 0,
-    CCC_FULL,
-    CCC_ERR,
+    CCC_NO_REALLOC,
+    CCC_MEM_ERR,
+    CCC_INPUT_ERR,
     CCC_NOP,
 } ccc_result;
 

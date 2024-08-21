@@ -28,20 +28,20 @@ struct ccc_impl_buf
         {                                                                      \
             if (sizeof(struct_name) != ccc_buf_elem_size(ccc_buf_ptr))         \
             {                                                                  \
-                _macro_res_ = CCC_BUF_ERR;                                     \
+                _macro_res_ = CCC_INPUT_ERR;                                   \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                void *_macro_pos_ = ccc_buf_at(ccc_buf_ptr, i);                \
+                void *_macro_pos_ = ccc_buf_at(ccc_buf_ptr, index);            \
                 if (!_macro_pos_)                                              \
                 {                                                              \
-                    _macro_res_ = CCC_BUF_ERR;                                 \
+                    _macro_res_ = CCC_INPUT_ERR;                               \
                 }                                                              \
                 else                                                           \
                 {                                                              \
                     *((struct_name *)_macro_pos_)                              \
                         = (struct_name)struct_initializer;                     \
-                    _macro_res_ = CCC_BUF_OK;                                  \
+                    _macro_res_ = CCC_OK;                                      \
                 }                                                              \
             }                                                                  \
         };                                                                     \

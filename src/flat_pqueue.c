@@ -57,7 +57,7 @@ ccc_fpq_push(ccc_flat_pqueue *const fpq, void const *const val)
     void *const new = ccc_buf_alloc(fpq->impl.buf);
     if (!new)
     {
-        return CCC_FULL;
+        return CCC_NO_REALLOC;
     }
     if (new != val)
     {
