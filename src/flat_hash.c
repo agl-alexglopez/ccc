@@ -57,15 +57,9 @@ ccc_fhash_empty(ccc_flat_hash const *const h)
 }
 
 bool
-ccc_fhash_contains(ccc_flat_hash const *const h,
-                   ccc_fhash_elem const *const elem)
+ccc_fhash_contains(ccc_flat_hash *const h, ccc_fhash_elem *const elem)
 {
-    void const *const e = struct_base(&h->impl, elem);
-    if (ccc_buf_empty(h->impl.buf))
-    {
-        return false;
-    }
-    return ccc_impl_fhash_find(&h->impl, e, h->impl.hash_fn(e)).found;
+    return ccc_fhash_entry(h, elem).impl.entry.found;
 }
 
 size_t
@@ -111,57 +105,6 @@ ccc_fhash_and_erase(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
         return NULL;
     }
     return erase(h.impl.h, h.impl.entry.entry, elem->impl.hash);
-}
-
-void const *
-ccc_fhash_find(ccc_flat_hash const *const h, ccc_fhash_elem const *const elem)
-{
-    void const *const e = struct_base(&h->impl, elem);
-    if (ccc_buf_empty(h->impl.buf))
-    {
-        return NULL;
-    }
-    ccc_entry const q = ccc_impl_fhash_find(&h->impl, e, h->impl.hash_fn(e));
-    if (!q.found)
-    {
-        return NULL;
-    }
-    return q.entry;
-}
-
-ccc_result
-ccc_fhash_erase(ccc_flat_hash *const h, ccc_fhash_elem const *const elem)
-{
-    void const *const e = struct_base(&h->impl, elem);
-    if (ccc_buf_empty(h->impl.buf))
-    {
-        return CCC_NOP;
-    }
-    size_t const cap = ccc_buf_capacity(h->impl.buf);
-    uint64_t const hash = h->impl.hash_fn(e);
-    ccc_entry q = ccc_impl_fhash_find(&h->impl, e, hash);
-    if (!q.found)
-    {
-        return CCC_NOP;
-    }
-    size_t stopped_at = ccc_buf_index_of(h->impl.buf, q.entry);
-    size_t const elem_sz = ccc_buf_elem_size(h->impl.buf);
-    *hash_at(&h->impl, stopped_at) = EMPTY;
-    size_t next = (hash + 1) % cap;
-    uint8_t tmp[ccc_buf_elem_size(h->impl.buf)];
-    for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
-    {
-        void *next_slot = ccc_buf_at(h->impl.buf, next);
-        struct ccc_impl_fhash_elem *next_elem
-            = ccc_impl_fhash_in_slot(&h->impl, next_slot);
-        if (!ccc_impl_fhash_distance(cap, next, next_elem->hash))
-        {
-            break;
-        }
-        swap(tmp, next_slot, ccc_buf_at(h->impl.buf, stopped_at), elem_sz);
-    }
-    --h->impl.buf->impl.sz;
-    return CCC_OK;
 }
 
 void const *
