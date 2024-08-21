@@ -22,7 +22,7 @@
 #ifndef CCC_SET_H
 #define CCC_SET_H
 
-#include "tree.h"
+#include "impl_tree.h"
 #include "types.h"
 
 #include <stdbool.h>
