@@ -1,6 +1,7 @@
 #ifndef CCC_PQUEUE_H
 #define CCC_PQUEUE_H
 
+#include "impl_pqueue.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -17,10 +18,7 @@
    Do not access the fields of the struct directly. */
 typedef struct ccc_pq_elem
 {
-    struct ccc_pq_elem *left_child;
-    struct ccc_pq_elem *next_sibling;
-    struct ccc_pq_elem *prev_sibling;
-    struct ccc_pq_elem *parent;
+    struct ccc_impl_pq_elem impl;
 } ccc_pq_elem;
 
 /* The structure used to manage the data in a priority queue. Stack allocation
@@ -30,12 +28,7 @@ typedef struct ccc_pq_elem
    provided initialization macro. */
 typedef struct
 {
-    ccc_pq_elem *root;
-    size_t sz;
-    size_t pq_elem_offset;
-    ccc_cmp_fn *cmp;
-    ccc_threeway_cmp order;
-    void *aux;
+    struct ccc_impl_pqueue impl;
 } ccc_pqueue;
 
 /* Given the desired total order of the priority queue, the comparison function,
@@ -46,11 +39,7 @@ typedef struct
    Such initialization must always occur or use of the priority queue is
    undefined. */
 #define CCC_PQ_INIT(struct_name, pq_elem_field, pq_order, cmp_fn, aux_data)    \
-    {                                                                          \
-        .root = NULL, .sz = 0,                                                 \
-        .pq_elem_offset = offsetof(struct_name, pq_elem_field),                \
-        .cmp = (cmp_fn), .order = (pq_order), .aux = (aux_data)                \
-    }
+    CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, cmp_fn, aux_data)
 
 /* Obtain a reference to the front of the priority queue. This will be a min
    or max depending on the initialization of the priority queue. O(1). */

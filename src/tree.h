@@ -61,12 +61,15 @@ typedef struct
 #define CCC_TREE_INIT(struct_name, node_elem_field, tree_name, cmp_fn,         \
                       aux_data)                                                \
     {                                                                          \
-        .root = &(tree_name).t.end,                                            \
-        .end = {.link = {&(tree_name).t.end, &(tree_name).t.end},              \
-                .parent_or_dups = &(tree_name).t.end},                         \
-        .cmp = (cmp_fn), .aux = (aux_data), .size = 0,                         \
-        .node_elem_offset                                                      \
-            = offsetof(struct_name, node_elem_field.n.link), /* NOLINT */      \
+        .impl = {                                                              \
+            .root = &(tree_name).impl.end,                                     \
+            .end = {.link = {&(tree_name).impl.end, &(tree_name).impl.end},    \
+                    .parent_or_dups = &(tree_name).impl.end},                  \
+            .cmp = (cmp_fn),                                                   \
+            .aux = (aux_data),                                                 \
+            .size = 0,                                                         \
+            .node_elem_offset = offsetof(struct_name, node_elem_field),        \
+        },                                                                     \
     }
 
 /* Mostly intended for debugging. Validates the underlying tree

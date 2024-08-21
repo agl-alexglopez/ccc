@@ -22,12 +22,12 @@
 
 typedef struct
 {
-    ccc_node n;
+    ccc_node impl;
 } ccc_depq_elem;
 
 typedef struct
 {
-    ccc_tree t;
+    ccc_tree impl;
 } ccc_depqueue;
 
 /* Initialize the depq on the left hand side with this right hand side
@@ -36,9 +36,7 @@ typedef struct
    be used at compile time or runtime. It is undefined to use the depq if
    this has not been called. */
 #define CCC_DEPQ_INIT(struct_name, depq_elem_field, depq_name, cmp, aux)       \
-    {                                                                          \
-        .t = CCC_TREE_INIT(struct_name, depq_elem_field, depq_name, cmp, aux)  \
-    }
+    CCC_TREE_INIT(struct_name, depq_elem_field, depq_name, cmp, aux)
 
 void ccc_depq_clear(ccc_depqueue *, ccc_destructor_fn *destructor);
 
@@ -96,5 +94,7 @@ void *ccc_depq_root(ccc_depqueue const *);
 
 void ccc_depq_print(ccc_depqueue const *, ccc_depq_elem const *,
                     ccc_print_fn *);
+
+bool ccc_depq_validate(ccc_depqueue const *);
 
 #endif /* CCC_DEPQUEUE_H */

@@ -1,6 +1,5 @@
 #include "depqueue.h"
 #include "test.h"
-#include "tree.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -68,7 +67,7 @@ depq_test_insert_three(void)
     {
         three_vals[i].val = i;
         ccc_depq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         CHECK(ccc_depq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(ccc_depq_size(&pq), 3, size_t, "%zu");
@@ -89,7 +88,7 @@ depq_test_struct_getter(void)
         tester_clone[i].val = i;
         ccc_depq_push(&pq, &vals[i].elem);
         ccc_depq_push(&pq_tester_clone, &tester_clone[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
@@ -109,7 +108,7 @@ depq_test_insert_three_dups(void)
     {
         three_vals[i].val = 0;
         ccc_depq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         CHECK(ccc_depq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(ccc_depq_size(&pq), 3ULL, size_t, "%zu");
@@ -148,7 +147,7 @@ depq_test_read_max_min(void)
     {
         vals[i].val = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_tree_validate(&pq.t), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
         CHECK(ccc_depq_size(&pq), i + 1, size_t, "%zu");
     }
     CHECK(ccc_depq_size(&pq), 10ULL, size_t, "%zu");
@@ -174,7 +173,7 @@ insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_depq_push(pq, &vals[shuffled_index].elem);
         CHECK(ccc_depq_size(pq), i + 1, size_t, "%zu");
-        CHECK(ccc_tree_validate(&pq->t), true, bool, "%d");
+        CHECK(ccc_depq_validate(pq), true, bool, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_depq_size(pq), size, size_t, "%zu");
