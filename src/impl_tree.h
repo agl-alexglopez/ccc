@@ -7,8 +7,8 @@
    ccc_set abilities. Then we typdedef other interfaces and the user
    can include those instead of remembering how to use the tree the
    correct way for their data structure. */
-#ifndef TREE
-#define TREE
+#ifndef CCC_IMPL_TREE_H
+#define CCC_IMPL_TREE_H
 
 #include "types.h"
 
@@ -81,4 +81,4 @@ bool ccc_tree_validate(ccc_tree const *t);
    Intended for debugging use. */
 void ccc_tree_print(ccc_tree const *t, ccc_node const *root, ccc_print_fn *fn);
 
-#endif
+#endif /* CCC_IMPL_TREE_H */

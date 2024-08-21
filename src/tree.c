@@ -20,8 +20,8 @@
       think is quite helpful!
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
 #include "depqueue.h"
+#include "impl_tree.h"
 #include "set.h"
-#include "tree.h"
 
 #include <stdbool.h>
 #include <stddef.h>

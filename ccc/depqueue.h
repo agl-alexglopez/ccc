@@ -14,7 +14,7 @@
 #ifndef CCC_DEPQUEUE_H
 #define CCC_DEPQUEUE_H
 
-#include "tree.h"
+#include "impl_tree.h"
 #include "types.h"
 
 #include <stdbool.h>

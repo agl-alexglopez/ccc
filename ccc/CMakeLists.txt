@@ -21,16 +21,16 @@ target_link_libraries(flat_hash PRIVATE
     buf
 )
 
-add_library(depqueue depqueue.h ${CMAKE_SOURCE_DIR}/src/splay_tree.c)
+add_library(depqueue depqueue.h ${CMAKE_SOURCE_DIR}/src/tree.c)
 target_link_libraries(depqueue PRIVATE
   PRIVATE
     types
-    tree
+    impl_tree
 )
 
-add_library(set set.h ${CMAKE_SOURCE_DIR}/src/splay_tree.c)
+add_library(set set.h ${CMAKE_SOURCE_DIR}/src/tree.c)
 target_link_libraries(set PRIVATE
   PRIVATE
     types
-    tree
+    impl_tree
 )
