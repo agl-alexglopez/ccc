@@ -80,6 +80,27 @@ ccc_fhash_entry(ccc_flat_hash *h, void const *const key)
     };
 }
 
+ccc_flat_hash_entry
+ccc_fhash_and_modify(ccc_flat_hash_entry e, ccc_update_fn *const fn)
+{
+    if (e.impl.entry.occupied)
+    {
+        fn((void *)e.impl.entry.entry, NULL);
+    }
+    return e;
+}
+
+ccc_flat_hash_entry
+ccc_fhash_and_modify_with(ccc_flat_hash_entry e, ccc_update_fn *const fn,
+                          void *aux)
+{
+    if (e.impl.entry.occupied)
+    {
+        fn((void *)e.impl.entry.entry, aux);
+    }
+    return e;
+}
+
 void *
 ccc_fhash_or_insert(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
 {
