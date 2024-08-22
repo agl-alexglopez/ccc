@@ -25,6 +25,7 @@ struct ccc_impl_flat_hash
 struct ccc_impl_fhash_entry
 {
     struct ccc_impl_flat_hash *h;
+    struct ccc_impl_fhash_elem *query;
     ccc_entry entry;
 };
 
@@ -54,6 +55,7 @@ ccc_result ccc_impl_fhash_maybe_resize(struct ccc_impl_flat_hash *);
                         = (fhash_ptr)->impl.hash_fn(&_stack_struct_);          \
                     _ent_ = (struct ccc_impl_fhash_entry){                     \
                         .h = &(fhash_ptr)->impl,                               \
+                        .query = NULL,                                         \
                         .entry = ccc_impl_fhash_find(&(fhash_ptr)->impl,       \
                                                      &_stack_struct_, _hash_), \
                     };                                                         \
