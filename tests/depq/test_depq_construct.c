@@ -36,7 +36,7 @@ static enum test_result
 depq_test_empty(void)
 {
     ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
-    CHECK(ccc_depq_empty(&pq), true, bool, "%d");
+    CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;
 }
 

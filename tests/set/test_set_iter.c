@@ -54,7 +54,7 @@ set_test_forward_iter(void)
     for (struct val *e = ccc_set_begin(&s); e;
          e = ccc_set_next(&s, &e->elem), ++j)
     {}
-    CHECK(j, 0, int, "%d");
+    CHECK(j, 0, "%d");
     int const num_nodes = 33;
     int const prime = 37;
     struct val vals[num_nodes];
@@ -64,17 +64,17 @@ set_test_forward_iter(void)
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
     CHECK(inorder_fill(val_keys_inorder, num_nodes, &s), ccc_set_size(&s),
-          size_t, "%zu");
+          "%zu");
     j = 0;
     for (struct val *e = ccc_set_begin(&s); e && j < num_nodes;
          e = ccc_set_next(&s, &e->elem), ++j)
     {
-        CHECK(e->val, val_keys_inorder[j], int, "%d");
+        CHECK(e->val, val_keys_inorder[j], "%d");
     }
     return PASS;
 }
@@ -94,9 +94,9 @@ set_test_iterate_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
-    CHECK(iterator_check(&s), PASS, enum test_result, "%d");
+    CHECK(iterator_check(&s), PASS, "%d");
     int const limit = 400;
     for (struct val *i = ccc_set_begin(&s), *next = NULL; i; i = next)
     {
@@ -104,7 +104,7 @@ set_test_iterate_removal(void)
         if (i->val > limit)
         {
             (void)ccc_set_erase(&s, &i->elem);
-            CHECK(ccc_set_validate(&s), true, bool, "%d");
+            CHECK(ccc_set_validate(&s), true, "%d");
         }
     }
     return PASS;
@@ -125,9 +125,9 @@ set_test_iterate_remove_reinsert(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
-    CHECK(iterator_check(&s), PASS, enum test_result, "%d");
+    CHECK(iterator_check(&s), PASS, "%d");
     size_t const old_size = ccc_set_size(&s);
     int const limit = 400;
     int new_unique_entry_val = 1001;
@@ -138,12 +138,12 @@ set_test_iterate_remove_reinsert(void)
         {
             (void)ccc_set_erase(&s, &i->elem);
             i->val = new_unique_entry_val;
-            CHECK(ccc_set_insert(&s, &i->elem), true, bool, "%d");
-            CHECK(ccc_set_validate(&s), true, bool, "%d");
+            CHECK(ccc_set_insert(&s, &i->elem), true, "%d");
+            CHECK(ccc_set_validate(&s), true, "%d");
             ++new_unique_entry_val;
         }
     }
-    CHECK(ccc_set_size(&s), old_size, size_t, "%zu");
+    CHECK(ccc_set_size(&s), old_size, "%zu");
     return PASS;
 }
 
@@ -160,7 +160,7 @@ set_test_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -169,20 +169,19 @@ set_test_valid_range(void)
        value greater than 44, 45. */
     int const range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     ccc_range const range = ccc_set_equal_range(&s, &b.elem, &e.elem);
-    CHECK(((struct val *)ccc_set_begin_range(&range))->val, range_vals[0], int,
+    CHECK(((struct val *)ccc_set_begin_range(&range))->val, range_vals[0],
           "%d");
-    CHECK(((struct val *)ccc_set_end_range(&range))->val, range_vals[7], int,
-          "%d");
+    CHECK(((struct val *)ccc_set_end_range(&range))->val, range_vals[7], "%d");
     size_t index = 0;
     struct val *i1 = ccc_set_begin_range(&range);
     for (; i1 != ccc_set_end_range(&range); i1 = ccc_set_next(&s, &i1->elem))
     {
         int const cur_val = i1->val;
-        CHECK(range_vals[index], cur_val, int, "%d");
+        CHECK(range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1, ccc_set_end_range(&range), struct val *, "%p");
-    CHECK(((struct val *)i1)->val, range_vals[7], int, "%d");
+    CHECK(i1, ccc_set_end_range(&range), "%p");
+    CHECK(((struct val *)i1)->val, range_vals[7], "%d");
     b.val = 119;
     e.val = 84;
     /* This should be the following range [119,84). 119 should be
@@ -191,20 +190,20 @@ set_test_valid_range(void)
     int const rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     ccc_rrange const rev_range = ccc_set_equal_rrange(&s, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_set_begin_rrange(&rev_range))->val,
-          rev_range_vals[0], int, "%d");
+          rev_range_vals[0], "%d");
     CHECK(((struct val *)ccc_set_end_rrange(&rev_range))->val,
-          rev_range_vals[7], int, "%d");
+          rev_range_vals[7], "%d");
     index = 0;
     struct val *i2 = ccc_set_begin_rrange(&rev_range);
     for (; i2 != ccc_set_end_rrange(&rev_range);
          i2 = ccc_set_rnext(&s, &i2->elem))
     {
         int const cur_val = i2->val;
-        CHECK(rev_range_vals[index], cur_val, int, "%d");
+        CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2, ccc_set_end_rrange(&rev_range), struct val *, "%p");
-    CHECK(i2->val, rev_range_vals[7], int, "%d");
+    CHECK(i2, ccc_set_end_rrange(&rev_range), "%p");
+    CHECK(i2->val, rev_range_vals[7], "%d");
     return PASS;
 }
 
@@ -220,7 +219,7 @@ set_test_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -231,19 +230,19 @@ set_test_invalid_range(void)
     ccc_range const rev_range = ccc_set_equal_range(&s, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_set_begin_range(&rev_range))->val
               == forward_range_vals[0],
-          true, bool, "%d");
-    CHECK(ccc_set_end_range(&rev_range), NULL, ccc_set_elem *, "%p");
+          true, "%d");
+    CHECK(ccc_set_end_range(&rev_range), NULL, "%p");
     size_t index = 0;
     struct val *i1 = ccc_set_begin_range(&rev_range);
     for (; i1 != ccc_set_end_range(&rev_range);
          i1 = ccc_set_next(&s, &i1->elem))
     {
         int const cur_val = i1->val;
-        CHECK(forward_range_vals[index], cur_val, int, "%d");
+        CHECK(forward_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1, ccc_set_end_range(&rev_range), struct val *, "%p");
-    CHECK(i1, NULL, struct val *, "%p");
+    CHECK(i1, ccc_set_end_range(&rev_range), "%p");
+    CHECK(i1, NULL, "%p");
     b.val = 36;
     e.val = -999;
     /* This should be the following range [36,-999). 36 should be
@@ -252,18 +251,18 @@ set_test_invalid_range(void)
     int const rev_range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     ccc_rrange const range = ccc_set_equal_rrange(&s, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_set_begin_rrange(&range))->val, rev_range_vals[0],
-          int, "%d");
-    CHECK(ccc_set_end_rrange(&range), NULL, ccc_set_elem *, "%p");
+          "%d");
+    CHECK(ccc_set_end_rrange(&range), NULL, "%p");
     index = 0;
     struct val *i2 = ccc_set_begin_rrange(&range);
     for (; i2 != ccc_set_end_rrange(&range); i2 = ccc_set_rnext(&s, &i2->elem))
     {
         int const cur_val = i2->val;
-        CHECK(rev_range_vals[index], cur_val, int, "%d");
+        CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2, ccc_set_end_rrange(&range), struct val *, "%p");
-    CHECK(i2, NULL, struct val *, "%p");
+    CHECK(i2, ccc_set_end_rrange(&range), "%p");
+    CHECK(i2, NULL, "%p");
     return PASS;
 }
 
@@ -279,7 +278,7 @@ set_test_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
@@ -288,16 +287,16 @@ set_test_empty_range(void)
     struct val e = {.id = 0, .val = -25};
     ccc_range const forward_range = ccc_set_equal_range(&s, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_set_begin_range(&forward_range))->val, vals[0].val,
-          int, "%d");
+          "%d");
     CHECK(((struct val *)ccc_set_end_range(&forward_range))->val, vals[0].val,
-          int, "%d");
+          "%d");
     b.val = 150;
     e.val = 999;
     ccc_rrange const rev_range = ccc_set_equal_rrange(&s, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_set_begin_rrange(&rev_range))->val,
-          vals[num_nodes - 1].val, int, "%d");
+          vals[num_nodes - 1].val, "%d");
     CHECK(((struct val *)ccc_set_end_rrange(&rev_range))->val,
-          vals[num_nodes - 1].val, int, "%d");
+          vals[num_nodes - 1].val, "%d");
     return PASS;
 }
 
@@ -325,22 +324,18 @@ iterator_check(ccc_set *s)
     for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_set_is_max(s, &e->elem), true, bool,
-              "%d");
-        CHECK(iter_count == size || !ccc_set_is_max(s, &e->elem), true, bool,
-              "%d");
+        CHECK(iter_count != size || ccc_set_is_max(s, &e->elem), true, "%d");
+        CHECK(iter_count == size || !ccc_set_is_max(s, &e->elem), true, "%d");
     }
-    CHECK(iter_count, size, size_t, "%zu");
+    CHECK(iter_count, size, "%zu");
     iter_count = 0;
     for (struct val *e = ccc_set_rbegin(s); e; e = ccc_set_rnext(s, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_set_is_min(s, &e->elem), true, bool,
-              "%d");
-        CHECK(iter_count == size || !ccc_set_is_min(s, &e->elem), true, bool,
-              "%d");
+        CHECK(iter_count != size || ccc_set_is_min(s, &e->elem), true, "%d");
+        CHECK(iter_count == size || !ccc_set_is_min(s, &e->elem), true, "%d");
     }
-    CHECK(iter_count, size, size_t, "%zu");
+    CHECK(iter_count, size, "%zu");
     return PASS;
 }
 

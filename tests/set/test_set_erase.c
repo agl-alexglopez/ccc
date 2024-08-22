@@ -66,17 +66,17 @@ set_test_prime_shuffle(void)
         {
             repeats[i] = true;
         }
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
     ccc_set_print(&s, &((struct val *)ccc_set_root(&s))->elem, set_printer_fn);
-    CHECK(ccc_set_size(&s) < size, true, bool, "%d");
+    CHECK(ccc_set_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
         ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
-        CHECK(elem || !repeats[i], true, bool, "%d");
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(elem || !repeats[i], true, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
     return PASS;
 }
@@ -88,20 +88,20 @@ set_test_insert_erase_shuffled(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, enum test_result, "%d");
+    CHECK(insert_shuffled(&s, vals, size, prime), PASS, "%d");
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, size_t, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &s), size, "%zu");
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], int, "%d");
+        CHECK(vals[i].val, sorted_check[i], "%d");
     }
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
-    CHECK(ccc_set_empty(&s), true, bool, "%d");
+    CHECK(ccc_set_empty(&s), true, "%d");
     return PASS;
 }
 
@@ -119,15 +119,15 @@ set_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_set_contains(&s, &vals[i].elem), true, bool, "%d");
+        CHECK(ccc_set_contains(&s, &vals[i].elem), true, "%d");
         (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
-    CHECK(ccc_set_empty(&s), true, bool, "%d");
+    CHECK(ccc_set_empty(&s), true, "%d");
     return PASS;
 }
 
@@ -145,11 +145,11 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
     {
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_set_insert(s, &vals[shuffled_index].elem);
-        CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
-        CHECK(ccc_set_validate(s), true, bool, "%d");
+        CHECK(ccc_set_size(s), i + 1, "%zu");
+        CHECK(ccc_set_validate(s), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_set_size(s), size, size_t, "%zu");
+    CHECK(ccc_set_size(s), size, "%zu");
     return PASS;
 }
 
