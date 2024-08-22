@@ -41,23 +41,23 @@ typedef enum test_result (*test_fn)(void);
    the same for both RESULT and EXPECTED (e.g. int, "%d", size_t, "%zu",
    bool, "%b"). If RESULT or EXPECTED are function calls they will only
    be evaluated once, as expected. */
-#define CHECK(RESULT, EXPECTED, TYPE, TYPE_FORMAT_SPECIFIER)                   \
+#define CHECK(result, expected, type_format_specifier)                         \
     do                                                                         \
     {                                                                          \
-        const TYPE _result = RESULT;                                           \
-        const TYPE _expected = EXPECTED;                                       \
-        if (_result != _expected)                                              \
+        typeof(result) const _result_ = result;                                \
+        typeof(result) const _expected_ = expected;                            \
+        if (_result_ != _expected_)                                            \
         {                                                                      \
             (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,    \
                           __func__, __LINE__);                                 \
             (void)fprintf(stderr,                                              \
                           GREEN "CHECK: "                                      \
-                                "RESULT( %s ) == EXPECTED( %s )" NONE "\n",    \
-                          #RESULT, #EXPECTED);                                 \
-            (void)fprintf(stderr, RED "ERROR: RESULT( ");                      \
-            (void)fprintf(stderr, TYPE_FORMAT_SPECIFIER, _result);             \
-            (void)fprintf(stderr, " ) != EXPECTED( ");                         \
-            (void)fprintf(stderr, TYPE_FORMAT_SPECIFIER, _expected);           \
+                                "result( %s ) == expected( %s )" NONE "\n",    \
+                          #result, #expected);                                 \
+            (void)fprintf(stderr, RED "ERROR: result( ");                      \
+            (void)fprintf(stderr, type_format_specifier, _result_);            \
+            (void)fprintf(stderr, " ) != expected( ");                         \
+            (void)fprintf(stderr, type_format_specifier, _expected_);          \
             (void)fprintf(stderr, " )" CYAN "\n" NONE);                        \
             return FAIL;                                                       \
         }                                                                      \

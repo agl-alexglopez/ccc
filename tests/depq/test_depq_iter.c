@@ -58,7 +58,7 @@ depq_test_forward_iter_unique_vals(void)
     for (struct val *e = ccc_depq_begin(&pq); e;
          e = ccc_depq_next(&pq, &e->elem), ++j)
     {}
-    CHECK(j, 0, int, "%d");
+    CHECK(j, 0, "%d");
     int const num_nodes = 33;
     int const prime = 37;
     struct val vals[num_nodes];
@@ -68,17 +68,17 @@ depq_test_forward_iter_unique_vals(void)
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
     CHECK(inorder_fill(val_keys_inorder, num_nodes, &pq), ccc_depq_size(&pq),
-          size_t, "%zu");
+          "%zu");
     j = num_nodes - 1;
     for (struct val *e = ccc_depq_begin(&pq); e && j >= 0;
          e = ccc_depq_next(&pq, &e->elem), --j)
     {
-        CHECK(e->val, val_keys_inorder[j], int, "%d");
+        CHECK(e->val, val_keys_inorder[j], "%d");
     }
     return PASS;
 }
@@ -92,7 +92,7 @@ depq_test_forward_iter_all_vals(void)
     for (struct val *i = ccc_depq_begin(&pq); i;
          i = ccc_depq_next(&pq, &i->elem), ++j)
     {}
-    CHECK(j, 0, int, "%d");
+    CHECK(j, 0, "%d");
     int const num_nodes = 33;
     struct val vals[num_nodes];
     vals[0].val = 0; // NOLINT
@@ -107,7 +107,7 @@ depq_test_forward_iter_all_vals(void)
             vals[index].val = val; // NOLINT
             vals[index].id = index;
             ccc_depq_push(&pq, &vals[index].elem);
-            CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+            CHECK(ccc_depq_validate(&pq), true, "%d");
         }
     }
     int val_keys_inorder[num_nodes];
@@ -116,7 +116,7 @@ depq_test_forward_iter_all_vals(void)
     for (struct val *i = ccc_depq_begin(&pq); i && j >= 0;
          i = ccc_depq_next(&pq, &i->elem), --j)
     {
-        CHECK(i->val, val_keys_inorder[j], int, "%d");
+        CHECK(i->val, val_keys_inorder[j], "%d");
     }
     return PASS;
 }
@@ -136,21 +136,21 @@ depq_test_insert_iterate_pop(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
+    CHECK(iterator_check(&pq), PASS, "%d");
     size_t pop_count = 0;
     while (!ccc_depq_empty(&pq))
     {
         ccc_depq_pop_max(&pq);
         ++pop_count;
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
         if (pop_count % 200)
         {
-            CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
+            CHECK(iterator_check(&pq), PASS, "%d");
         }
     }
-    CHECK(pop_count, num_nodes, size_t, "%zu");
+    CHECK(pop_count, num_nodes, "%zu");
     return PASS;
 }
 
@@ -169,16 +169,16 @@ depq_test_priority_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
+    CHECK(iterator_check(&pq), PASS, "%d");
     int const limit = 400;
     for (struct val *i = ccc_depq_begin(&pq); i;)
     {
         if (i->val > limit)
         {
             i = ccc_depq_erase(&pq, &i->elem);
-            CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+            CHECK(ccc_depq_validate(&pq), true, "%d");
         }
         else
         {
@@ -203,9 +203,9 @@ depq_test_priority_update(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    CHECK(iterator_check(&pq), PASS, enum test_result, "%d");
+    CHECK(iterator_check(&pq), PASS, "%d");
     int const limit = 400;
     for (struct val *i = ccc_depq_begin(&pq); i;)
     {
@@ -214,8 +214,8 @@ depq_test_priority_update(void)
         {
             struct val *next = ccc_depq_next(&pq, &i->elem);
             CHECK(ccc_depq_update(&pq, &i->elem, val_update, &backoff), true,
-                  bool, "%d");
-            CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+                  "%d");
+            CHECK(ccc_depq_validate(&pq), true, "%d");
             i = next;
         }
         else
@@ -223,7 +223,7 @@ depq_test_priority_update(void)
             i = ccc_depq_next(&pq, &i->elem);
         }
     }
-    CHECK(ccc_depq_size(&pq), num_nodes, size_t, "%zu");
+    CHECK(ccc_depq_size(&pq), num_nodes, "%zu");
     return PASS;
 }
 
@@ -240,7 +240,7 @@ depq_test_priority_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
     }
     struct val b = {.id = 0, .val = 6};
     struct val e = {.id = 0, .val = 44};
@@ -250,20 +250,20 @@ depq_test_priority_valid_range(void)
     int const rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_depq_begin_rrange(&rev_range))->val,
-          rev_range_vals[0], int, "%d");
+          rev_range_vals[0], "%d");
     CHECK(((struct val *)ccc_depq_end_rrange(&rev_range))->val,
-          rev_range_vals[7], int, "%d");
+          rev_range_vals[7], "%d");
     size_t index = 0;
     struct val *i1 = ccc_depq_begin_rrange(&rev_range);
     for (; i1 != ccc_depq_end_rrange(&rev_range);
          i1 = ccc_depq_rnext(&pq, &i1->elem))
     {
         int const cur_val = i1->val;
-        CHECK(rev_range_vals[index], cur_val, int, "%d");
+        CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1 == ccc_depq_end_rrange(&rev_range), true, bool, "%d");
-    CHECK(i1->val, rev_range_vals[7], int, "%d");
+    CHECK(i1 == ccc_depq_end_rrange(&rev_range), true, "%d");
+    CHECK(i1->val, rev_range_vals[7], "%d");
     b.val = 119;
     e.val = 84;
     /* This should be the following range [119,84). 119 should be
@@ -271,20 +271,19 @@ depq_test_priority_valid_range(void)
        be dropped to first value less than 84. */
     int const range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     ccc_range const range = ccc_depq_equal_range(&pq, &b.elem, &e.elem);
-    CHECK(((struct val *)ccc_depq_begin_range(&range))->val, range_vals[0], int,
+    CHECK(((struct val *)ccc_depq_begin_range(&range))->val, range_vals[0],
           "%d");
-    CHECK(((struct val *)ccc_depq_end_range(&range))->val, range_vals[7], int,
-          "%d");
+    CHECK(((struct val *)ccc_depq_end_range(&range))->val, range_vals[7], "%d");
     index = 0;
     struct val *i2 = ccc_depq_begin_range(&range);
     for (; i2 != ccc_depq_end_range(&range); i2 = ccc_depq_next(&pq, &i2->elem))
     {
         int const cur_val = i2->val;
-        CHECK(range_vals[index], cur_val, int, "%d");
+        CHECK(range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2 == ccc_depq_end_range(&range), true, bool, "%d");
-    CHECK(i2->val, range_vals[7], int, "%d");
+    CHECK(i2 == ccc_depq_end_range(&range), true, "%d");
+    CHECK(i2->val, range_vals[7], "%d");
     return PASS;
 }
 
@@ -301,7 +300,7 @@ depq_test_priority_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
     }
     struct val b = {.id = 0, .val = 95};
     struct val e = {.id = 0, .val = 999};
@@ -311,18 +310,18 @@ depq_test_priority_invalid_range(void)
     int const rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
     ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_depq_begin_rrange(&rev_range))->val,
-          rev_range_vals[0], int, "%d");
-    CHECK(ccc_depq_end_rrange(&rev_range), NULL, ccc_depq_elem *, "%p");
+          rev_range_vals[0], "%d");
+    CHECK(ccc_depq_end_rrange(&rev_range), NULL, "%p");
     size_t index = 0;
     struct val *i1 = ccc_depq_begin_rrange(&rev_range);
     for (; i1 != ccc_depq_end_rrange(&rev_range);
          i1 = ccc_depq_rnext(&pq, &i1->elem))
     {
         int const cur_val = i1->val;
-        CHECK(rev_range_vals[index], cur_val, int, "%d");
+        CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1 == ccc_depq_end_rrange(&rev_range) && !i1, true, bool, "%d");
+    CHECK(i1 == ccc_depq_end_rrange(&rev_range) && !i1, true, "%d");
     b.val = 36;
     e.val = -999;
     /* This should be the following range [36,-999). 36 should be
@@ -330,18 +329,18 @@ depq_test_priority_invalid_range(void)
        be dropped to first value less than -999 which is end. */
     int const range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     ccc_range const range = ccc_depq_equal_range(&pq, &b.elem, &e.elem);
-    CHECK(((struct val *)ccc_depq_begin_range(&range))->val, range_vals[0], int,
+    CHECK(((struct val *)ccc_depq_begin_range(&range))->val, range_vals[0],
           "%d");
-    CHECK(ccc_depq_end_range(&range), NULL, ccc_depq_elem *, "%p");
+    CHECK(ccc_depq_end_range(&range), NULL, "%p");
     index = 0;
     struct val *i2 = ccc_depq_begin_range(&range);
     for (; i2 != ccc_depq_end_range(&range); i2 = ccc_depq_next(&pq, &i2->elem))
     {
         int const cur_val = i2->val;
-        CHECK(range_vals[index], cur_val, int, "%d");
+        CHECK(range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2 == ccc_depq_end_range(&range) && !i2, true, bool, "%d");
+    CHECK(i2 == ccc_depq_end_range(&range) && !i2, true, "%d");
     return PASS;
 }
 
@@ -358,7 +357,7 @@ depq_test_priority_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, bool, "%d");
+        CHECK(ccc_depq_validate(&pq), true, "%d");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
@@ -367,16 +366,16 @@ depq_test_priority_empty_range(void)
     struct val e = {.id = 0, .val = -25};
     ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_depq_begin_rrange(&rev_range))->val, vals[0].val,
-          int, "%d");
+          "%d");
     CHECK(((struct val *)ccc_depq_end_rrange(&rev_range))->val, vals[0].val,
-          int, "%d");
+          "%d");
     b.val = 150;
     e.val = 999;
     ccc_range const range = ccc_depq_equal_range(&pq, &b.elem, &e.elem);
     CHECK(((struct val *)ccc_depq_begin_range(&range))->val,
-          vals[num_nodes - 1].val, int, "%d");
+          vals[num_nodes - 1].val, "%d");
     CHECK(((struct val *)ccc_depq_end_range(&range))->val,
-          vals[num_nodes - 1].val, int, "%d");
+          vals[num_nodes - 1].val, "%d");
     return PASS;
 }
 
@@ -404,23 +403,19 @@ iterator_check(ccc_depqueue *pq)
     for (struct val *e = ccc_depq_begin(pq); e; e = ccc_depq_next(pq, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_depq_is_min(pq, &e->elem), true, bool,
-              "%d");
-        CHECK(iter_count == size || !ccc_depq_is_min(pq, &e->elem), true, bool,
-              "%d");
+        CHECK(iter_count != size || ccc_depq_is_min(pq, &e->elem), true, "%d");
+        CHECK(iter_count == size || !ccc_depq_is_min(pq, &e->elem), true, "%d");
     }
-    CHECK(iter_count, size, size_t, "%zu");
+    CHECK(iter_count, size, "%zu");
     iter_count = 0;
     for (struct val *e = ccc_depq_rbegin(pq); e;
          e = ccc_depq_rnext(pq, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_depq_is_max(pq, &e->elem), true, bool,
-              "%d");
-        CHECK(iter_count == size || !ccc_depq_is_max(pq, &e->elem), true, bool,
-              "%d");
+        CHECK(iter_count != size || ccc_depq_is_max(pq, &e->elem), true, "%d");
+        CHECK(iter_count == size || !ccc_depq_is_max(pq, &e->elem), true, "%d");
     }
-    CHECK(iter_count, size, size_t, "%zu");
+    CHECK(iter_count, size, "%zu");
     return PASS;
 }
 

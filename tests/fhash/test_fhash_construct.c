@@ -41,8 +41,8 @@ fhash_test_empty(void)
     ccc_flat_hash fh;
     ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
                                           fhash_int_zero, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_result, "%d");
-    CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
+    CHECK(res, CCC_OK, "%d");
+    CHECK(ccc_fhash_empty(&fh), true, "%d");
     return PASS;
 }
 
@@ -54,21 +54,20 @@ fhash_test_entry_functional(void)
     ccc_flat_hash fh;
     ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
                                           fhash_int_zero, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_result, "%d");
-    CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
+    CHECK(res, CCC_OK, "%d");
+    CHECK(ccc_fhash_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
-    CHECK(ccc_fhash_get(ccc_fhash_entry(&fh, &def.id)) == NULL, true, bool,
-          "%d");
+    CHECK(ccc_fhash_get(ccc_fhash_entry(&fh, &def.id)) == NULL, true, "%d");
     ((struct val *)ccc_fhash_or_insert(ccc_fhash_entry(&fh, &def.id), &def.e))
         ->val
         += 1;
     struct val const *inserted = ccc_fhash_get(ccc_fhash_entry(&fh, &def.id));
-    CHECK(inserted != NULL, true, bool, "%d");
-    CHECK(inserted->val, 1, int, "%d");
+    CHECK(inserted != NULL, true, "%d");
+    CHECK(inserted->val, 1, "%d");
     ((struct val *)ccc_fhash_or_insert(ccc_fhash_entry(&fh, &def.id), &def.e))
         ->val
         += 1;
-    CHECK(inserted->val, 2, int, "%d");
+    CHECK(inserted->val, 2, "%d");
     return PASS;
 }
 
@@ -80,9 +79,9 @@ fhash_test_entry_macros(void)
     ccc_flat_hash fh;
     ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
                                           fhash_int_zero, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_result, "%d");
-    CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
-    CHECK(ccc_fhash_get(CCC_FHASH_ENTRY(&fh, 137)) == NULL, true, bool, "%d");
+    CHECK(res, CCC_OK, "%d");
+    CHECK(ccc_fhash_empty(&fh), true, "%d");
+    CHECK(ccc_fhash_get(CCC_FHASH_ENTRY(&fh, 137)) == NULL, true, "%d");
     int to_affect = 99;
     /* The function with a side effect should execute. */
     struct val *inserted = CCC_FHASH_OR_INSERT_WITH(
@@ -91,10 +90,10 @@ fhash_test_entry_macros(void)
             .id = 137,
             .val = default_val_with_side_effect(&to_affect),
         });
-    CHECK(inserted != NULL, true, bool, "%d");
+    CHECK(inserted != NULL, true, "%d");
     inserted->val += 1;
-    CHECK(to_affect, 100, int, "%d");
-    CHECK(inserted->val, 1, int, "%d");
+    CHECK(to_affect, 100, "%d");
+    CHECK(inserted->val, 1, "%d");
     /* The function with a side effect should NOT execute. */
     ((struct val *)CCC_FHASH_OR_INSERT_WITH(
          CCC_FHASH_ENTRY(&fh, 137),
@@ -104,8 +103,8 @@ fhash_test_entry_macros(void)
          }))
         ->val
         += 1;
-    CHECK(to_affect, 100, int, "%d");
-    CHECK(inserted->val, 2, int, "%d");
+    CHECK(to_affect, 100, "%d");
+    CHECK(inserted->val, 2, "%d");
     return PASS;
 }
 

@@ -49,10 +49,9 @@ set_test_insert_one(void)
     ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(ccc_set_insert(&s, &single.elem), true, bool, "%d");
-    CHECK(ccc_set_empty(&s), false, bool, "%d");
-    CHECK(((struct val *)ccc_set_root(&s))->val == single.val, true, bool,
-          "%d");
+    CHECK(ccc_set_insert(&s, &single.elem), true, "%d");
+    CHECK(ccc_set_empty(&s), false, "%d");
+    CHECK(((struct val *)ccc_set_root(&s))->val == single.val, true, "%d");
     return PASS;
 }
 
@@ -64,10 +63,10 @@ set_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        CHECK(ccc_set_insert(&s, &three_vals[i].elem), true, bool, "%d");
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+        CHECK(ccc_set_insert(&s, &three_vals[i].elem), true, "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
     }
-    CHECK(ccc_set_size(&s), 3ULL, size_t, "%zu");
+    CHECK(ccc_set_size(&s), (size_t)3, "%zu");
     return PASS;
 }
 
@@ -83,17 +82,17 @@ set_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        CHECK(ccc_set_insert(&s, &vals[i].elem), true, bool, "%d");
+        CHECK(ccc_set_insert(&s, &vals[i].elem), true, "%d");
         CHECK(ccc_set_insert(&set_tester_clone, &tester_clone[i].elem), true,
-              bool, "%d");
-        CHECK(ccc_set_validate(&s), true, bool, "%d");
+              "%d");
+        CHECK(ccc_set_validate(&s), true, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
         struct val const *get = &tester_clone[i];
-        CHECK(get->val, vals[i].val, int, "%d");
+        CHECK(get->val, vals[i].val, "%d");
     }
-    CHECK(ccc_set_size(&s), 10ULL, size_t, "%zu");
+    CHECK(ccc_set_size(&s), (size_t)10, "%zu");
     return PASS;
 }
 
@@ -105,12 +104,12 @@ set_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, enum test_result, "%d");
+    CHECK(insert_shuffled(&s, vals, size, prime), PASS, "%d");
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, size_t, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &s), size, "%zu");
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], int, "%d");
+        CHECK(vals[i].val, sorted_check[i], "%d");
     }
     return PASS;
 }
@@ -129,11 +128,11 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
     {
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_set_insert(s, &vals[shuffled_index].elem);
-        CHECK(ccc_set_size(s), i + 1, size_t, "%zu");
-        CHECK(ccc_set_validate(s), true, bool, "%d");
+        CHECK(ccc_set_size(s), i + 1, "%zu");
+        CHECK(ccc_set_validate(s), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_set_size(s), size, size_t, "%zu");
+    CHECK(ccc_set_size(s), size, "%zu");
     return PASS;
 }
 

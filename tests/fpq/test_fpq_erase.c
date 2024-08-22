@@ -63,19 +63,19 @@ fpq_test_insert_remove_four_dups(void)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(ccc_fpq_push(&fpq, &three_vals[i]), CCC_OK, ccc_result, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_push(&fpq, &three_vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
         size_t const size_check = i + 1;
-        CHECK(ccc_fpq_size(&fpq), size_check, size_t, "%zu");
+        CHECK(ccc_fpq_size(&fpq), size_check, "%zu");
     }
-    CHECK(ccc_fpq_size(&fpq), 4, size_t, "%zu");
+    CHECK(ccc_fpq_size(&fpq), (size_t)4, "%zu");
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         ccc_fpq_pop(&fpq);
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
-    CHECK(ccc_fpq_size(&fpq), 0ULL, size_t, "%zu");
+    CHECK(ccc_fpq_size(&fpq), (size_t)0, "%zu");
     return PASS;
 }
 
@@ -91,20 +91,19 @@ fpq_test_insert_erase_shuffled(void)
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
-    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
-          "%d");
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
     struct val const *min = ccc_fpq_front(&fpq);
-    CHECK(min->val, 0, int, "%d");
+    CHECK(min->val, 0, "%d");
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &fpq), PASS, enum test_result, "%d");
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS, "%d");
     /* Now let's delete everything with no errors. */
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
         (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
-    CHECK(ccc_fpq_size(&fpq), 0ULL, size_t, "%zu");
+    CHECK(ccc_fpq_size(&fpq), (size_t)0, "%zu");
     return PASS;
 }
 
@@ -117,19 +116,18 @@ fpq_test_pop_max(void)
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
-    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
-          "%d");
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
     struct val const *min = ccc_fpq_front(&fpq);
-    CHECK(min->val, 0, int, "%d");
+    CHECK(min->val, 0, "%d");
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &fpq), PASS, enum test_result, "%d");
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS, "%d");
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
         struct val const *const front = ccc_fpq_pop(&fpq);
-        CHECK(front->val, sorted_check[i], int, "%d");
+        CHECK(front->val, sorted_check[i], "%d");
     }
-    CHECK(ccc_fpq_empty(&fpq), true, bool, "%d");
+    CHECK(ccc_fpq_empty(&fpq), true, "%d");
     return PASS;
 }
 
@@ -142,19 +140,18 @@ fpq_test_pop_min(void)
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
         = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
-    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, enum test_result,
-          "%d");
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
     struct val const *min = ccc_fpq_front(&fpq);
-    CHECK(min->val, 0, int, "%d");
+    CHECK(min->val, 0, "%d");
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &fpq), PASS, enum test_result, "%d");
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS, "%d");
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
         struct val const *const front = ccc_fpq_pop(&fpq);
-        CHECK(front->val, sorted_check[i], int, "%d");
+        CHECK(front->val, sorted_check[i], "%d");
     }
-    CHECK(ccc_fpq_empty(&fpq), true, bool, "%d");
+    CHECK(ccc_fpq_empty(&fpq), true, "%d");
     return PASS;
 }
 
@@ -177,10 +174,10 @@ fpq_test_delete_prime_shuffle_duplicates(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, ccc_result, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
         size_t const s = i + 1;
-        CHECK(ccc_fpq_size(&fpq), s, size_t, "%zu");
+        CHECK(ccc_fpq_size(&fpq), s, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -189,9 +186,9 @@ fpq_test_delete_prime_shuffle_duplicates(void)
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
         (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
         --cur_size;
-        CHECK(ccc_fpq_size(&fpq), cur_size, size_t, "%zu");
+        CHECK(ccc_fpq_size(&fpq), cur_size, "%zu");
     }
     return PASS;
 }
@@ -213,8 +210,8 @@ fpq_test_prime_shuffle(void)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, ccc_result, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* Now we go through and free all the elements in order but
@@ -223,10 +220,10 @@ fpq_test_prime_shuffle(void)
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true, bool, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
         --cur_size;
-        CHECK(ccc_fpq_size(&fpq), cur_size, size_t, "%zu");
+        CHECK(ccc_fpq_size(&fpq), cur_size, "%zu");
     }
     return PASS;
 }
@@ -246,16 +243,16 @@ fpq_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, ccc_result, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
     while (!ccc_fpq_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true, bool, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, bool, "%d");
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
-    CHECK(ccc_fpq_empty(&fpq), true, bool, "%d");
+    CHECK(ccc_fpq_empty(&fpq), true, "%d");
     return PASS;
 }
 
@@ -272,12 +269,12 @@ insert_shuffled(ccc_flat_pqueue *fpq, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)shuffled_index;
-        CHECK(ccc_fpq_push(fpq, &vals[i]), CCC_OK, ccc_result, "%d");
-        CHECK(ccc_fpq_size(fpq), i + 1, size_t, "%zu");
-        CHECK(ccc_fpq_validate(fpq), true, bool, "%d");
+        CHECK(ccc_fpq_push(fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_size(fpq), i + 1, "%zu");
+        CHECK(ccc_fpq_validate(fpq), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_fpq_size(fpq), size, size_t, "%zu");
+    CHECK(ccc_fpq_size(fpq), size, "%zu");
     return PASS;
 }
 
@@ -301,8 +298,8 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
         size_t const prev = ccc_fpq_size(&fpq_copy);
         ccc_result const res = CCC_FPQ_EMPLACE(
             &fpq_copy, struct val, {.id = front->id, .val = front->val});
-        CHECK(res, CCC_OK, ccc_result, "%d");
-        CHECK(prev < ccc_fpq_size(&fpq_copy), true, bool, "%d");
+        CHECK(res, CCC_OK, "%d");
+        CHECK(prev < ccc_fpq_size(&fpq_copy), true, "%d");
     }
     i = 0;
     while (!ccc_fpq_empty(&fpq_copy) && i < size)
@@ -311,9 +308,9 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
         size_t const prev = ccc_fpq_size(fpq);
         ccc_result const res
             = CCC_FPQ_EMPLACE(fpq, struct val, {.id = v->id, .val = v->val});
-        CHECK(res, CCC_OK, ccc_result, "%d");
-        CHECK(prev < ccc_fpq_size(fpq), true, bool, "%d");
-        CHECK(vals[i++], v->val, int, "%d");
+        CHECK(res, CCC_OK, "%d");
+        CHECK(prev < ccc_fpq_size(fpq), true, "%d");
+        CHECK(vals[i++], v->val, "%d");
     }
     return PASS;
 }
