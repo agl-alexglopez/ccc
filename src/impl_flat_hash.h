@@ -63,7 +63,7 @@ uint64_t ccc_impl_fhash_filter(struct ccc_impl_flat_hash const *,
             struct ccc_impl_fhash_entry _entry_ = entry_copy.impl;             \
             if (_entry_.entry.occupied)                                        \
             {                                                                  \
-                _res_ = _entry_.entry.entry;                                   \
+                _res_ = (void *)_entry_.entry.entry;                           \
             }                                                                  \
             else if (sizeof(typeof(struct_key_value_initializer))              \
                          != ccc_buf_elem_size(_entry_.h->buf)                  \
@@ -125,7 +125,7 @@ uint64_t ccc_impl_fhash_filter(struct ccc_impl_flat_hash const *,
                         }                                                      \
                     }                                                          \
                 }                                                              \
-                _res_ = _entry_.entry.entry;                                   \
+                _res_ = (void *)_entry_.entry.entry;                           \
             }                                                                  \
         };                                                                     \
         _res_;                                                                 \

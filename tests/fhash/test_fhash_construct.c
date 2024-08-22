@@ -64,7 +64,7 @@ fhash_test_entry_functional(void)
         += 1;
     struct val const *const inserted
         = ccc_fhash_get(ccc_fhash_entry(&fh, &def.id));
-    CHECK(inserted != NULL, true, "%d");
+    CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->val, 1, "%d");
     ((struct val *)ccc_fhash_or_insert(ccc_fhash_entry(&fh, &def.id), &def.e))
         ->val

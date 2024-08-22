@@ -85,7 +85,7 @@ ccc_fhash_or_insert(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
 {
     if (h.impl.entry.occupied)
     {
-        return h.impl.entry.entry;
+        return (void *)h.impl.entry.entry;
     }
     ccc_result const res = ccc_impl_fhash_maybe_resize(h.impl.h);
     if (res != CCC_OK)
@@ -95,7 +95,7 @@ ccc_fhash_or_insert(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
     void *e = struct_base(h.impl.h, &elem->impl);
     elem->impl.hash = h.impl.hash;
     insert(h.impl.h, e, elem->impl.hash);
-    return h.impl.entry.entry;
+    return (void *)h.impl.entry.entry;
 }
 
 void *
@@ -125,7 +125,7 @@ ccc_fhash_get_mut(ccc_flat_hash_entry const e)
     {
         return NULL;
     }
-    return e.impl.entry.entry;
+    return (void *)e.impl.entry.entry;
 }
 
 inline bool
