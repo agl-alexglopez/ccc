@@ -20,7 +20,7 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_entry_and_modify_macros,
 };
 
-static int def_and_side_effect(int *to_alter);
+static int def_and_side_effect(int *);
 static void modify(void *, void *);
 static void modify_w(void *, void *);
 
@@ -229,8 +229,8 @@ modify_w(void *struct_val, void *aux)
 }
 
 static int
-def_and_side_effect(int *to_alter)
+def_and_side_effect(int *to_affect)
 {
-    *to_alter += 1;
+    *to_affect += 1;
     return 0;
 }
