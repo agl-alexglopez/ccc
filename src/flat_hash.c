@@ -19,8 +19,6 @@ static double const load_factor = 0.8;
 static void insert(struct ccc_impl_flat_hash *, void const *, uint64_t hash);
 static void *erase(struct ccc_impl_flat_hash *, void const *, uint64_t hash);
 
-static uint64_t hash_filter(struct ccc_impl_flat_hash const *,
-                            void const *user_struct);
 static bool is_prime(size_t);
 static size_t next_prime(size_t);
 static void swap(uint8_t tmp[], void *, void *, size_t);
@@ -31,7 +29,7 @@ static void *struct_base(struct ccc_impl_flat_hash const *,
 ccc_result
 ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
                size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
-               ccc_eq_fn *const eq_fn, void *const aux)
+               ccc_key_cmp_fn *const eq_fn, void *const aux)
 {
     if (!h || !buf || !hash_fn || !eq_fn || !ccc_buf_capacity(buf))
     {
@@ -58,9 +56,9 @@ ccc_fhash_empty(ccc_flat_hash const *const h)
 }
 
 bool
-ccc_fhash_contains(ccc_flat_hash *const h, ccc_fhash_elem *const elem)
+ccc_fhash_contains(ccc_flat_hash *const h, void const *const key)
 {
-    return ccc_fhash_entry(h, elem).impl.entry.occupied;
+    return ccc_fhash_entry(h, key).impl.entry.occupied;
 }
 
 size_t
@@ -70,21 +68,20 @@ ccc_fhash_size(ccc_flat_hash const *const h)
 }
 
 ccc_flat_hash_entry
-ccc_fhash_entry(ccc_flat_hash *h, ccc_fhash_elem *const elem)
+ccc_fhash_entry(ccc_flat_hash *h, void const *const key)
 {
-    void *const e = struct_base(&h->impl, &elem->impl);
-    elem->impl.hash = hash_filter(&h->impl, e);
+    uint64_t const hash = ccc_impl_fhash_filter(&h->impl, key);
     return (ccc_flat_hash_entry){
         {
             .h = &h->impl,
-            .query = &elem->impl,
-            .entry = ccc_impl_fhash_find(&h->impl, e, elem->impl.hash),
+            .hash = hash,
+            .entry = ccc_impl_fhash_find(&h->impl, key, hash),
         },
     };
 }
 
 void *
-ccc_fhash_or_insert(ccc_flat_hash_entry h)
+ccc_fhash_or_insert(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
 {
     if (h.impl.entry.occupied)
     {
@@ -95,30 +92,46 @@ ccc_fhash_or_insert(ccc_flat_hash_entry h)
     {
         return NULL;
     }
-    void *e = struct_base(h.impl.h, h.impl.query);
-    h.impl.query->hash = hash_filter(h.impl.h, e);
-    insert(h.impl.h, e, h.impl.query->hash);
+    void *e = struct_base(h.impl.h, &elem->impl);
+    elem->impl.hash = h.impl.hash;
+    insert(h.impl.h, e, elem->impl.hash);
     return h.impl.entry.entry;
 }
 
 void *
-ccc_fhash_and_erase(ccc_flat_hash_entry h)
+ccc_fhash_and_erase(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
 {
     if (!h.impl.entry.occupied)
     {
         return NULL;
     }
-    return erase(h.impl.h, h.impl.entry.entry, h.impl.query->hash);
+    return erase(h.impl.h, h.impl.entry.entry, elem->impl.hash);
 }
 
-void *
-ccc_fhash_get(ccc_flat_hash_entry e)
+inline void const *
+ccc_fhash_get(ccc_flat_hash_entry const e)
 {
     if (!e.impl.entry.occupied)
     {
         return NULL;
     }
     return e.impl.entry.entry;
+}
+
+inline void *
+ccc_fhash_get_mut(ccc_flat_hash_entry const e)
+{
+    if (!e.impl.entry.occupied)
+    {
+        return NULL;
+    }
+    return e.impl.entry.entry;
+}
+
+inline bool
+ccc_fhash_occupied(ccc_flat_hash_entry const e)
+{
+    return e.impl.entry.occupied;
 }
 
 void const *
@@ -156,7 +169,7 @@ ccc_fhash_end(ccc_flat_hash const *const h)
 
 ccc_entry
 ccc_impl_fhash_find(struct ccc_impl_flat_hash const *const h,
-                    void const *const elem, uint64_t const hash)
+                    void const *const key, uint64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(h->buf);
     size_t cur_i = hash % cap;
@@ -173,11 +186,12 @@ ccc_impl_fhash_find(struct ccc_impl_flat_hash const *const h,
         {
             return (ccc_entry){.occupied = false, .entry = slot};
         }
-        if (hash == e->hash && h->eq_fn(slot, elem, h->aux))
+        if (hash == e->hash && h->eq_fn(slot, key, h->aux))
         {
             return (ccc_entry){.occupied = true, .entry = slot};
         }
     }
+    /* This should be impossible given we are managing load factor? */
     return (ccc_entry){.occupied = false, .entry = slot};
 }
 
@@ -331,11 +345,11 @@ hash_at(struct ccc_impl_flat_hash const *const h, size_t const i)
                 ->hash;
 }
 
-static inline uint64_t
-hash_filter(struct ccc_impl_flat_hash const *const h,
-            void const *const user_struct)
+inline uint64_t
+ccc_impl_fhash_filter(struct ccc_impl_flat_hash const *const h,
+                      void const *const key)
 {
-    uint64_t const hash = h->hash_fn(user_struct);
+    uint64_t const hash = h->hash_fn(key);
     return hash == EMPTY ? hash - 1 : hash;
 }
 

@@ -49,7 +49,8 @@ typedef void ccc_update_fn(void *, void *aux);
 
 typedef void ccc_destructor_fn(void *);
 
-typedef bool ccc_eq_fn(void const *, void const *, void *aux);
+typedef bool ccc_key_cmp_fn(void const *user_struct, void const *key,
+                            void *aux);
 
 typedef uint64_t ccc_hash_fn(void const *);
 
