@@ -24,9 +24,9 @@ struct ccc_impl_flat_hash
 
 struct ccc_impl_fhash_entry
 {
-    struct ccc_impl_flat_hash *h;
-    uint64_t hash;
-    ccc_entry entry;
+    struct ccc_impl_flat_hash *const h;
+    uint64_t const hash;
+    ccc_entry const entry;
 };
 
 ccc_entry ccc_impl_fhash_find(struct ccc_impl_flat_hash const *,
@@ -42,17 +42,14 @@ uint64_t ccc_impl_fhash_filter(struct ccc_impl_flat_hash const *,
 #define CCC_IMPL_FHASH_ENTRY(fhash_ptr, key)                                   \
     {                                                                          \
         .impl = ({                                                             \
-            struct ccc_impl_fhash_entry _ent_;                                 \
-            {                                                                  \
-                typeof(key) const _key_ = key;                                 \
-                uint64_t const _hash_                                          \
-                    = ccc_impl_fhash_filter(&(fhash_ptr)->impl, &_key_);       \
-                _ent_ = (struct ccc_impl_fhash_entry){                         \
-                    .h = &(fhash_ptr)->impl,                                   \
-                    .hash = _hash_,                                            \
-                    .entry                                                     \
-                    = ccc_impl_fhash_find(&(fhash_ptr)->impl, &_key_, _hash_), \
-                };                                                             \
+            typeof(key) const _key_ = key;                                     \
+            uint64_t const _hash_                                              \
+                = ccc_impl_fhash_filter(&(fhash_ptr)->impl, &_key_);           \
+            struct ccc_impl_fhash_entry _ent_ = {                              \
+                .h = &(fhash_ptr)->impl,                                       \
+                .hash = _hash_,                                                \
+                .entry                                                         \
+                = ccc_impl_fhash_find(&(fhash_ptr)->impl, &_key_, _hash_),     \
             };                                                                 \
             _ent_;                                                             \
         })                                                                     \

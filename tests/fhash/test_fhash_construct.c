@@ -57,7 +57,8 @@ fhash_test_entry_functional(void)
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fhash_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
-    CHECK(ccc_fhash_get(ccc_fhash_entry(&fh, &def.id)) == NULL, true, "%d");
+    ccc_flat_hash_entry ent = ccc_fhash_entry(&fh, &def.id);
+    CHECK(ccc_fhash_get(ent) == NULL, true, "%d");
     ((struct val *)ccc_fhash_or_insert(ccc_fhash_entry(&fh, &def.id), &def.e))
         ->val
         += 1;
