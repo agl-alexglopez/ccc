@@ -35,7 +35,7 @@ typedef struct
 
 typedef struct
 {
-    bool found;
+    bool occupied;
     void *entry;
 } ccc_entry;
 

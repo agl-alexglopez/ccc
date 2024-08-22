@@ -34,6 +34,7 @@ ccc_entry ccc_impl_fhash_find(struct ccc_impl_flat_hash const *, void const *,
 struct ccc_impl_fhash_elem *
 ccc_impl_fhash_in_slot(struct ccc_impl_flat_hash const *h, void const *slot);
 size_t ccc_impl_fhash_distance(size_t capacity, size_t index, uint64_t hash);
+ccc_result ccc_impl_fhash_maybe_resize(struct ccc_impl_flat_hash *);
 
 #define CCC_IMPL_FHASH_ENTRY(fhash_ptr, struct_name,                           \
                              struct_key_initializer...)                        \
@@ -62,20 +63,21 @@ size_t ccc_impl_fhash_distance(size_t capacity, size_t index, uint64_t hash);
         })                                                                     \
     }
 
-#define CCC_IMPL_FHASH_OR_INSERT(entry_copy, struct_name,                      \
-                                 struct_key_value_initializer...)              \
+#define CCC_IMPL_FHASH_OR_INSERT_WITH(entry_copy, struct_name,                 \
+                                      struct_key_value_initializer...)         \
     ({                                                                         \
-        ccc_result _res_;                                                      \
+        void *_res_;                                                           \
         {                                                                      \
             struct ccc_impl_fhash_entry _entry_ = entry_copy.impl;             \
-            if (sizeof(struct_name) != ccc_buf_elem_size(_entry_.h->buf)       \
-                || !_entry_.entry.entry)                                       \
+            if (_entry_.entry.occupied)                                        \
             {                                                                  \
-                _res_ = CCC_INPUT_ERR;                                         \
+                _res_ = _entry_.entry.entry;                                   \
             }                                                                  \
-            else if (_entry_.entry.found)                                      \
+            if (sizeof(struct_name) != ccc_buf_elem_size(_entry_.h->buf)       \
+                || !_entry_.entry.entry                                        \
+                || ccc_impl_fhash_maybe_resize(_entry_.h) != CCC_OK)           \
             {                                                                  \
-                _res_ = CCC_NOP;                                               \
+                _res_ = NULL;                                                  \
             }                                                                  \
             else                                                               \
             {                                                                  \
@@ -123,7 +125,7 @@ size_t ccc_impl_fhash_distance(size_t capacity, size_t index, uint64_t hash);
                         }                                                      \
                     }                                                          \
                 }                                                              \
-                _res_ = CCC_OK;                                                \
+                _res_ = _entry_.entry.entry;                                   \
             }                                                                  \
         };                                                                     \
         _res_;                                                                 \
