@@ -56,7 +56,7 @@ fhash_test_entry_functional(void)
     CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
     struct val v = {.id = 99, .val = 137};
     ccc_flat_hash_entry ent = ccc_fhash_entry(&fh, &v.e);
-    CHECK(ent.impl.entry.found, false, bool, "%d");
+    CHECK(ccc_fhash_get(ent) == NULL, true, bool, "%d");
     void *inserted = ccc_fhash_or_insert(ccc_fhash_entry(&fh, &v.e), &v.e);
     CHECK(inserted != NULL, true, bool, "%d");
     return PASS;
@@ -73,16 +73,13 @@ fhash_test_entry_macros(void)
     CHECK(res, CCC_OK, ccc_result, "%d");
     CHECK(ccc_fhash_empty(&fh), true, bool, "%d");
     ccc_flat_hash_entry ent = CCC_FHASH_ENTRY(&fh, struct val, {.val = 137});
-    CHECK(ent.impl.entry.found, false, bool, "%d");
-    ccc_result inserted = CCC_FHASH_OR_INSERT(CCC_FHASH_ENTRY(&fh, struct val,
-                                                              {
-                                                                  .val = 137,
-                                                              }),
-                                              struct val,
-                                              {
-                                                  .id = 99,
-                                                  .val = 137,
-                                              });
-    CHECK(inserted, CCC_OK, ccc_result, "%d");
+    CHECK(ccc_fhash_get(ent) == NULL, true, bool, "%d");
+    void *inserted = CCC_FHASH_OR_INSERT_WITH(
+        CCC_FHASH_ENTRY(&fh, struct val, {.val = 137}), struct val,
+        {
+            .id = 99,
+            .val = 137,
+        });
+    CHECK(inserted != NULL, true, bool, "%d");
     return PASS;
 }
