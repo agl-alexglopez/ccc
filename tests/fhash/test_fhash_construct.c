@@ -57,7 +57,7 @@ fhash_test_entry_functional(void)
     struct val v = {.id = 99, .val = 137};
     ccc_flat_hash_entry ent = ccc_fhash_entry(&fh, &v.e);
     CHECK(ccc_fhash_get(ent) == NULL, true, bool, "%d");
-    void *inserted = ccc_fhash_or_insert(ccc_fhash_entry(&fh, &v.e), &v.e);
+    void *inserted = ccc_fhash_or_insert(ccc_fhash_entry(&fh, &v.e));
     CHECK(inserted != NULL, true, bool, "%d");
     return PASS;
 }

@@ -26,7 +26,7 @@ static size_t next_prime(size_t);
 static void swap(uint8_t tmp[], void *, void *, size_t);
 static uint64_t *hash_at(struct ccc_impl_flat_hash const *, size_t i);
 static void *struct_base(struct ccc_impl_flat_hash const *,
-                         ccc_fhash_elem const *);
+                         struct ccc_impl_fhash_elem const *);
 
 ccc_result
 ccc_fhash_init(ccc_flat_hash *const h, ccc_buf *const buf,
@@ -72,18 +72,19 @@ ccc_fhash_size(ccc_flat_hash const *const h)
 ccc_flat_hash_entry
 ccc_fhash_entry(ccc_flat_hash *h, ccc_fhash_elem *const elem)
 {
-    void *const e = struct_base(&h->impl, elem);
+    void *const e = struct_base(&h->impl, &elem->impl);
     elem->impl.hash = hash_filter(&h->impl, e);
     return (ccc_flat_hash_entry){
         {
             .h = &h->impl,
+            .query = &elem->impl,
             .entry = ccc_impl_fhash_find(&h->impl, e, elem->impl.hash),
         },
     };
 }
 
 void *
-ccc_fhash_or_insert(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
+ccc_fhash_or_insert(ccc_flat_hash_entry h)
 {
     if (h.impl.entry.occupied)
     {
@@ -94,20 +95,20 @@ ccc_fhash_or_insert(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
     {
         return NULL;
     }
-    void *e = struct_base(h.impl.h, elem);
-    elem->impl.hash = hash_filter(h.impl.h, e);
-    insert(h.impl.h, e, elem->impl.hash);
+    void *e = struct_base(h.impl.h, h.impl.query);
+    h.impl.query->hash = hash_filter(h.impl.h, e);
+    insert(h.impl.h, e, h.impl.query->hash);
     return h.impl.entry.entry;
 }
 
 void *
-ccc_fhash_and_erase(ccc_flat_hash_entry h, ccc_fhash_elem *const elem)
+ccc_fhash_and_erase(ccc_flat_hash_entry h)
 {
     if (!h.impl.entry.occupied)
     {
         return NULL;
     }
-    return erase(h.impl.h, h.impl.entry.entry, elem->impl.hash);
+    return erase(h.impl.h, h.impl.entry.entry, h.impl.query->hash);
 }
 
 void *
@@ -138,7 +139,7 @@ ccc_fhash_begin(ccc_flat_hash const *const h)
 void const *
 ccc_fhash_next(ccc_flat_hash const *const h, ccc_fhash_elem const *iter)
 {
-    void const *i = struct_base(&h->impl, iter);
+    void const *i = struct_base(&h->impl, &iter->impl);
     for (i = ccc_buf_next(h->impl.buf, i);
          i != ccc_buf_capacity_end(h->impl.buf)
          && ccc_impl_fhash_in_slot(&h->impl, i)->hash == EMPTY;
@@ -305,9 +306,9 @@ erase(struct ccc_impl_flat_hash *const h, void const *const e,
 
 static void *
 struct_base(struct ccc_impl_flat_hash const *const h,
-            ccc_fhash_elem const *const e)
+            struct ccc_impl_fhash_elem const *const e)
 {
-    return ((uint8_t *)&e->impl) - h->hash_elem_offset;
+    return ((uint8_t *)&e->hash) - h->hash_elem_offset;
 }
 
 static inline void

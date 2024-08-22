@@ -35,8 +35,8 @@ size_t ccc_fhash_size(ccc_flat_hash const *);
 
 bool ccc_fhash_contains(ccc_flat_hash *, ccc_fhash_elem *);
 ccc_flat_hash_entry ccc_fhash_entry(ccc_flat_hash *, ccc_fhash_elem *);
-void *ccc_fhash_or_insert(ccc_flat_hash_entry, ccc_fhash_elem *);
-void *ccc_fhash_and_erase(ccc_flat_hash_entry, ccc_fhash_elem *);
+void *ccc_fhash_or_insert(ccc_flat_hash_entry);
+void *ccc_fhash_and_erase(ccc_flat_hash_entry);
 void *ccc_fhash_get(ccc_flat_hash_entry);
 
 void const *ccc_fhash_begin(ccc_flat_hash const *);
