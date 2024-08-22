@@ -35,8 +35,8 @@ typedef struct
 
 typedef struct
 {
-    void *entry;
-    bool occupied;
+    void const *const entry;
+    bool const occupied;
 } ccc_entry;
 
 typedef void *ccc_realloc_fn(void *, size_t);
