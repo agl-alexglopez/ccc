@@ -8,15 +8,21 @@
 static enum test_result fhash_test_empty(void);
 static enum test_result fhash_test_entry_macros(void);
 static enum test_result fhash_test_entry_functional(void);
+static enum test_result fhash_test_entry_and_modify_functional(void);
+static enum test_result fhash_test_entry_and_modify_macros(void);
 
-#define NUM_TESTS (size_t)3
+#define NUM_TESTS (size_t)5
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_empty,
     fhash_test_entry_macros,
     fhash_test_entry_functional,
+    fhash_test_entry_and_modify_functional,
+    fhash_test_entry_and_modify_macros,
 };
 
-static int default_val_with_side_effect(int *to_alter);
+static int def_and_side_effect(int *to_alter);
+static void modify(void *, void *);
+static void modify_w(void *, void *);
 
 int
 main()
@@ -87,11 +93,10 @@ fhash_test_entry_macros(void)
     int to_affect = 99;
     /* The function with a side effect should execute. */
     struct val *inserted = CCC_FHASH_OR_INSERT_WITH(
-        CCC_FHASH_ENTRY(&fh, 137),
-        (struct val){
-            .id = 137,
-            .val = default_val_with_side_effect(&to_affect),
-        });
+        CCC_FHASH_ENTRY(&fh, 137), (struct val){
+                                       .id = 137,
+                                       .val = def_and_side_effect(&to_affect),
+                                   });
     CHECK(inserted != NULL, true, "%d");
     inserted->val += 1;
     CHECK(to_affect, 100, "%d");
@@ -101,7 +106,7 @@ fhash_test_entry_macros(void)
          CCC_FHASH_ENTRY(&fh, 137),
          (struct val){
              .id = 137,
-             .val = default_val_with_side_effect(&to_affect),
+             .val = def_and_side_effect(&to_affect),
          }))
         ->val
         += 1;
@@ -110,8 +115,129 @@ fhash_test_entry_macros(void)
     return PASS;
 }
 
+static enum test_result
+fhash_test_entry_and_modify_functional(void)
+{
+    struct val vals[2] = {{0}, {0}};
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
+    ccc_flat_hash fh;
+    ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
+                                          fhash_int_zero, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    CHECK(ccc_fhash_empty(&fh), true, "%d");
+    struct val def = {.id = 137, .val = 0};
+
+    /* Returning a vacant entry is possible when modification is attemtped. */
+    ccc_flat_hash_entry ent
+        = ccc_fhash_and_modify(ccc_fhash_entry(&fh, &def.id), modify);
+    CHECK(ccc_fhash_occupied(ent), false, "%d");
+    CHECK((ccc_fhash_get(ent) == NULL), true, "%d");
+
+    /* Inserting default value before an in place modification is possible. */
+    ((struct val *)ccc_fhash_or_insert(ccc_fhash_entry(&fh, &def.id), &def.e))
+        ->val
+        += 1;
+    struct val const *const inserted
+        = ccc_fhash_get(ccc_fhash_entry(&fh, &def.id));
+    CHECK((inserted != NULL), true, "%d");
+    CHECK(inserted->id, 137, "%d");
+    CHECK(inserted->val, 1, "%d");
+
+    /* Modifying an existing value or inserting default is possible when no
+       auxilliary input is needed. */
+    struct val *v2 = ccc_fhash_or_insert(
+        ccc_fhash_and_modify(ccc_fhash_entry(&fh, &def.id), modify), &def.e);
+    CHECK((v2 != NULL), true, "%d");
+    CHECK(inserted->id, 137, "%d");
+    CHECK(v2->val, 6, "%d");
+
+    /* Modifying an existing value that requires external input is also
+       possible with slightly different signature. */
+    struct val *v3 = ccc_fhash_or_insert(
+        ccc_fhash_and_modify_with(ccc_fhash_entry(&fh, &def.id), modify_w,
+                                  &def.id),
+        &def.e);
+    CHECK((v3 != NULL), true, "%d");
+    CHECK(inserted->id, 137, "%d");
+    CHECK(v3->val, 137, "%d");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_entry_and_modify_macros(void)
+{
+    struct val vals[2] = {{0}, {0}};
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
+    ccc_flat_hash fh;
+    ccc_result const res = ccc_fhash_init(&fh, &buf, offsetof(struct val, e),
+                                          fhash_int_zero, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    CHECK(ccc_fhash_empty(&fh), true, "%d");
+
+    /* Returning a vacant entry is possible when modification is attemtped. */
+    ccc_flat_hash_entry ent
+        = CCC_FHASH_AND_MODIFY(CCC_FHASH_ENTRY(&fh, 137), modify);
+    CHECK(ccc_fhash_occupied(ent), false, "%d");
+    CHECK((ccc_fhash_get(ent) == NULL), true, "%d");
+
+    int to_affect = 99;
+
+    /* Inserting default value before an in place modification is possible. */
+    struct val *v = CCC_FHASH_OR_INSERT_WITH(
+        CCC_FHASH_ENTRY(&fh, 137), (struct val){
+                                       .id = 137,
+                                       .val = def_and_side_effect(&to_affect),
+                                   });
+    CHECK((v != NULL), true, "%d");
+    CHECK(v->id, 137, "%d");
+    CHECK(v->val, 0, "%d");
+    CHECK(to_affect, 100, "%d");
+
+    /* Modifying an existing value or inserting default is possible when no
+       auxilliary input is needed. */
+    struct val *v2 = CCC_FHASH_OR_INSERT_WITH(
+        CCC_FHASH_AND_MODIFY(CCC_FHASH_ENTRY(&fh, 137), modify),
+        (struct val){
+            .id = 137,
+            .val = def_and_side_effect(&to_affect),
+        });
+    CHECK((v2 != NULL), true, "%d");
+    CHECK(v2->id, 137, "%d");
+    CHECK(v2->val, 5, "%d");
+    CHECK(to_affect, 100, "%d");
+
+    /* Modifying an existing value that requires external input is also
+       possible with slightly different signature. */
+    struct val *v3 = CCC_FHASH_OR_INSERT_WITH(
+        CCC_FHASH_AND_MODIFY_WITH(CCC_FHASH_ENTRY(&fh, 137), modify_w, 137),
+        (struct val){
+            .id = 137,
+            .val = def_and_side_effect(&to_affect),
+        });
+    CHECK((v3 != NULL), true, "%d");
+    CHECK(v3->id, 137, "%d");
+    CHECK(v3->val, 137, "%d");
+    CHECK(to_affect, 100, "%d");
+    return PASS;
+}
+
+static void
+modify(void *struct_val, void *aux)
+{
+    (void)aux;
+    struct val *v = struct_val;
+    v->val += 5;
+}
+
+static void
+modify_w(void *struct_val, void *aux)
+{
+    struct val *v = struct_val;
+    v->val = *((int *)aux);
+}
+
 static int
-default_val_with_side_effect(int *to_alter)
+def_and_side_effect(int *to_alter)
 {
     *to_alter += 1;
     return 0;

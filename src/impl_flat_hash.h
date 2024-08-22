@@ -22,6 +22,12 @@ struct ccc_impl_flat_hash
     size_t hash_elem_offset;
 };
 
+/* The underlying memory for a hash table is mutable. This is what makes it
+   possible to add and remove elements. However, the user should not poke
+   around in a entry. They should only use the provided functions. The
+   functions can then cast away const when needed, which only occurs for
+   the memory pointed to by the entry. This is well-defined because the memory
+   to which an entry points is always modifiable. */
 struct ccc_impl_fhash_entry
 {
     struct ccc_impl_flat_hash *const h;
@@ -40,20 +46,38 @@ uint64_t ccc_impl_fhash_filter(struct ccc_impl_flat_hash const *,
                                void const *key);
 
 #define CCC_IMPL_FHASH_ENTRY(fhash_ptr, key)                                   \
-    {                                                                          \
-        .impl = ({                                                             \
-            typeof(key) const _key_ = key;                                     \
-            uint64_t const _hash_                                              \
-                = ccc_impl_fhash_filter(&(fhash_ptr)->impl, &_key_);           \
-            struct ccc_impl_fhash_entry _ent_ = {                              \
-                .h = &(fhash_ptr)->impl,                                       \
-                .hash = _hash_,                                                \
-                .entry                                                         \
-                = ccc_impl_fhash_find(&(fhash_ptr)->impl, &_key_, _hash_),     \
-            };                                                                 \
-            _ent_;                                                             \
-        })                                                                     \
-    }
+    ({                                                                         \
+        typeof(key) const _key_ = key;                                         \
+        uint64_t const _hash_                                                  \
+            = ccc_impl_fhash_filter(&(fhash_ptr)->impl, &_key_);               \
+        struct ccc_impl_fhash_entry _ent_ = {                                  \
+            .h = &(fhash_ptr)->impl,                                           \
+            .hash = _hash_,                                                    \
+            .entry = ccc_impl_fhash_find(&(fhash_ptr)->impl, &_key_, _hash_),  \
+        };                                                                     \
+        _ent_;                                                                 \
+    })
+
+#define CCC_IMPL_FHASH_AND_MODIFY(entry_copy, mod_fn)                          \
+    ({                                                                         \
+        struct ccc_impl_fhash_entry _mod_ent_ = (entry_copy).impl;             \
+        if (_mod_ent_.entry.occupied)                                          \
+        {                                                                      \
+            mod_fn((void *)_mod_ent_.entry.entry, NULL);                       \
+        }                                                                      \
+        _mod_ent_;                                                             \
+    })
+
+#define CCC_IMPL_FHASH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                \
+    ({                                                                         \
+        struct ccc_impl_fhash_entry _mod_with_ent_ = (entry_copy).impl;        \
+        typeof(aux) _aux_ = aux;                                               \
+        if (_mod_with_ent_.entry.occupied)                                     \
+        {                                                                      \
+            mod_fn((void *)_mod_with_ent_.entry.entry, &_aux_);                \
+        }                                                                      \
+        _mod_with_ent_;                                                        \
+    })
 
 #define CCC_IMPL_FHASH_OR_INSERT_WITH(entry_copy,                              \
                                       struct_key_value_initializer...)         \

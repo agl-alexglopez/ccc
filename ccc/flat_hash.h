@@ -20,7 +20,22 @@ typedef struct
 } ccc_flat_hash_entry;
 
 #define CCC_FHASH_ENTRY(fhash_ptr, key)                                        \
-    (ccc_flat_hash_entry) CCC_IMPL_FHASH_ENTRY((fhash_ptr), key)
+    (ccc_flat_hash_entry)                                                      \
+    {                                                                          \
+        CCC_IMPL_FHASH_ENTRY((fhash_ptr), key)                                 \
+    }
+
+#define CCC_FHASH_AND_MODIFY(entry_copy, mod_fn)                               \
+    (ccc_flat_hash_entry)                                                      \
+    {                                                                          \
+        CCC_IMPL_FHASH_AND_MODIFY(entry_copy, mod_fn)                          \
+    }
+
+#define CCC_FHASH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                     \
+    (ccc_flat_hash_entry)                                                      \
+    {                                                                          \
+        CCC_IMPL_FHASH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                \
+    }
 
 #define CCC_FHASH_OR_INSERT_WITH(entry_copy, struct_key_value_initializer...)  \
     CCC_IMPL_FHASH_OR_INSERT_WITH(entry_copy, struct_key_value_initializer)
@@ -32,6 +47,9 @@ size_t ccc_fhash_size(ccc_flat_hash const *);
 
 bool ccc_fhash_contains(ccc_flat_hash *, void const *key);
 ccc_flat_hash_entry ccc_fhash_entry(ccc_flat_hash *, void const *key);
+ccc_flat_hash_entry ccc_fhash_and_modify(ccc_flat_hash_entry, ccc_update_fn *);
+ccc_flat_hash_entry ccc_fhash_and_modify_with(ccc_flat_hash_entry,
+                                              ccc_update_fn *, void *aux);
 void *ccc_fhash_or_insert(ccc_flat_hash_entry, ccc_fhash_elem *);
 void *ccc_fhash_and_erase(ccc_flat_hash_entry, ccc_fhash_elem *);
 void const *ccc_fhash_get(ccc_flat_hash_entry);
