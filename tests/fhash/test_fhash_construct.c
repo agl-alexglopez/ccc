@@ -20,10 +20,10 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_entry_and_modify_macros,
 };
 
-static int def_and_side_effect(int *);
-static void modify(ccc_update);
-static void modify_w(ccc_update);
-static int generate_val_and_side_effect(int *);
+static int def(int *);
+static void mod(ccc_update);
+static void modw(ccc_update);
+static int gen(int *);
 
 int
 main()
@@ -89,20 +89,18 @@ fhash_test_entry_macros(void)
     CHECK(ccc_fh_empty(&fh), true, "%d");
     CHECK(ccc_fh_get(ENTRY(&fh, 137)) == NULL, true, "%d");
     int const key = 137;
-    int to_affect = 99;
+    int mut = 99;
     /* The function with a side effect should execute. */
     struct val *inserted = OR_INSERT_WITH(
-        ENTRY(&fh, key),
-        (struct val){.id = key, .val = def_and_side_effect(&to_affect)});
+        ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)});
     CHECK(inserted != NULL, true, "%d");
-    CHECK(to_affect, 100, "%d");
+    CHECK(mut, 100, "%d");
     CHECK(inserted->val, 0, "%d");
     /* The function with a side effect should NOT execute. */
-    ((struct val *)OR_INSERT_WITH(
-         ENTRY(&fh, key),
-         (struct val){.id = key, .val = def_and_side_effect(&to_affect)}))
+    ((struct val *)OR_INSERT_WITH(ENTRY(&fh, key),
+                                  (struct val){.id = key, .val = def(&mut)}))
         ->val++;
-    CHECK(to_affect, 100, "%d");
+    CHECK(mut, 100, "%d");
     CHECK(inserted->val, 1, "%d");
     return PASS;
 }
@@ -120,7 +118,7 @@ fhash_test_entry_and_modify_functional(void)
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fhash_entry ent = ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), modify);
+    ccc_fhash_entry ent = ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK((ccc_fh_get(ent) == NULL), true, "%d");
 
@@ -135,7 +133,7 @@ fhash_test_entry_and_modify_functional(void)
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
     struct val *v2 = ccc_fh_or_insert(
-        ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), modify), &def.e);
+        ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod), &def.e);
     CHECK((v2 != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
     CHECK(v2->val, 6, "%d");
@@ -143,7 +141,7 @@ fhash_test_entry_and_modify_functional(void)
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
     struct val *v3 = ccc_fh_or_insert(
-        ccc_fh_and_modify_with(ccc_fh_entry(&fh, &def.id), modify_w, &def.id),
+        ccc_fh_and_modify_with(ccc_fh_entry(&fh, &def.id), modw, &def.id),
         &def.e);
     CHECK((v3 != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
@@ -163,69 +161,66 @@ fhash_test_entry_and_modify_macros(void)
     CHECK(ccc_fh_empty(&fh), true, "%d");
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fhash_entry ent = AND_MODIFY(ENTRY(&fh, 137), modify);
+    ccc_fhash_entry ent = AND_MODIFY(ENTRY(&fh, 137), mod);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK((ccc_fh_get(ent) == NULL), true, "%d");
 
-    int to_affect = 99;
+    int mut = 99;
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v = OR_INSERT_WITH(
-        AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w,
-                        generate_val_and_side_effect(&to_affect)),
-        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
+    struct val *v
+        = OR_INSERT_WITH(AND_MODIFY_WITH(ENTRY(&fh, 137), modw, gen(&mut)),
+                         (struct val){.id = 137, .val = def(&mut)});
     CHECK((v != NULL), true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 0, "%d");
-    CHECK(to_affect, 100, "%d");
+    CHECK(mut, 100, "%d");
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2 = OR_INSERT_WITH(
-        AND_MODIFY(ENTRY(&fh, 137), modify),
-        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
+    struct val *v2 = OR_INSERT_WITH(AND_MODIFY(ENTRY(&fh, 137), mod),
+                                    (struct val){.id = 137, .val = def(&mut)});
     CHECK((v2 != NULL), true, "%d");
     CHECK(v2->id, 137, "%d");
     CHECK(v2->val, 5, "%d");
-    CHECK(to_affect, 100, "%d");
+    CHECK(mut, 100, "%d");
 
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. Generate val also has
        lazy evaluation. */
-    struct val *v3 = OR_INSERT_WITH(
-        AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w,
-                        generate_val_and_side_effect(&to_affect)),
-        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
+    struct val *v3
+        = OR_INSERT_WITH(AND_MODIFY_WITH(ENTRY(&fh, 137), modw, gen(&mut)),
+                         (struct val){.id = 137, .val = def(&mut)});
     CHECK((v3 != NULL), true, "%d");
     CHECK(v3->id, 137, "%d");
     CHECK(v3->val, 42, "%d");
-    CHECK(to_affect, 0, "%d");
+    CHECK(mut, 0, "%d");
     return PASS;
 }
 
 static void
-modify(ccc_update const u)
+mod(ccc_update const u)
 {
     struct val *v = u.container;
     v->val += 5;
 }
 
 static void
-modify_w(ccc_update const u)
+modw(ccc_update const u)
 {
     struct val *v = u.container;
     v->val = *((int *)u.aux);
 }
 
 static int
-def_and_side_effect(int *to_affect)
+def(int *to_affect)
 {
     *to_affect += 1;
     return 0;
 }
 
 static int
-generate_val_and_side_effect(int *to_affect)
+gen(int *to_affect)
 {
     *to_affect = 0;
     return 42;
