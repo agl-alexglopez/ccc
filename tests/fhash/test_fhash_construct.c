@@ -1,7 +1,7 @@
 #include "buf.h"
+#include "entry.h"
 #include "fhash_util.h"
 #include "flat_hash.h"
-#include "macros.h"
 #include "test.h"
 
 #include <stddef.h>
@@ -91,22 +91,17 @@ fhash_test_entry_macros(void)
     int to_affect = 99;
     /* The function with a side effect should execute. */
     struct val *inserted = OR_INSERT_WITH(
-        ENTRY(&fh, 137), (struct val){
-                             .id = 137,
-                             .val = def_and_side_effect(&to_affect),
-                         });
+        ENTRY(&fh, 137),
+        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
     CHECK(inserted != NULL, true, "%d");
     inserted->val += 1;
     CHECK(to_affect, 100, "%d");
     CHECK(inserted->val, 1, "%d");
     /* The function with a side effect should NOT execute. */
-    ((struct val *)OR_INSERT_WITH(ENTRY(&fh, 137),
-                                  (struct val){
-                                      .id = 137,
-                                      .val = def_and_side_effect(&to_affect),
-                                  }))
-        ->val
-        += 1;
+    ((struct val *)OR_INSERT_WITH(
+         ENTRY(&fh, 137),
+         (struct val){.id = 137, .val = def_and_side_effect(&to_affect)}))
+        ->val++;
     CHECK(to_affect, 100, "%d");
     CHECK(inserted->val, 2, "%d");
     return PASS;
@@ -175,11 +170,9 @@ fhash_test_entry_and_modify_macros(void)
     int to_affect = 99;
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v = OR_INSERT_WITH(ENTRY(&fh, 137),
-                                   (struct val){
-                                       .id = 137,
-                                       .val = def_and_side_effect(&to_affect),
-                                   });
+    struct val *v = OR_INSERT_WITH(
+        ENTRY(&fh, 137),
+        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
     CHECK((v != NULL), true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 0, "%d");
@@ -187,11 +180,9 @@ fhash_test_entry_and_modify_macros(void)
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2 = OR_INSERT_WITH(AND_MODIFY(ENTRY(&fh, 137), modify),
-                                    (struct val){
-                                        .id = 137,
-                                        .val = def_and_side_effect(&to_affect),
-                                    });
+    struct val *v2 = OR_INSERT_WITH(
+        AND_MODIFY(ENTRY(&fh, 137), modify),
+        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
     CHECK((v2 != NULL), true, "%d");
     CHECK(v2->id, 137, "%d");
     CHECK(v2->val, 5, "%d");
@@ -199,12 +190,9 @@ fhash_test_entry_and_modify_macros(void)
 
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
-    struct val *v3
-        = OR_INSERT_WITH(AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w, 137),
-                         (struct val){
-                             .id = 137,
-                             .val = def_and_side_effect(&to_affect),
-                         });
+    struct val *v3 = OR_INSERT_WITH(
+        AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w, 137),
+        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
     CHECK((v3 != NULL), true, "%d");
     CHECK(v3->id, 137, "%d");
     CHECK(v3->val, 137, "%d");
