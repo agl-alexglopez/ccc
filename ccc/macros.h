@@ -5,8 +5,8 @@
 
 #define DEFAULT_ERR                                                            \
     ({                                                                         \
-        ccc_result _or_insert_res_ = CCC_INPUT_ERR;                            \
-        _or_insert_res_;                                                       \
+        ccc_result _input_err_res_ = CCC_INPUT_ERR;                            \
+        _input_err_res_;                                                       \
     })
 
 #define ENTRY(container_ptr, key)                                              \
