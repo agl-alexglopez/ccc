@@ -82,8 +82,8 @@ static ccc_node const *multiset_next(ccc_tree *, ccc_node const *,
                                      ccc_tree_link);
 static ccc_range equal_range(ccc_tree *, ccc_node const *, ccc_node const *,
                              ccc_tree_link);
-static ccc_threeway_cmp force_find_grt(void const *, void const *, void *);
-static ccc_threeway_cmp force_find_les(void const *, void const *, void *);
+static ccc_threeway_cmp force_find_grt(ccc_cmp);
+static ccc_threeway_cmp force_find_les(ccc_cmp);
 static void link_trees(ccc_tree *, ccc_node *, ccc_tree_link, ccc_node *);
 static inline bool has_dups(ccc_node const *, ccc_node const *);
 static ccc_node *get_parent(ccc_tree *, ccc_node const *);
@@ -98,9 +98,6 @@ static ccc_node *rrange_end(ccc_rrange const *);
 static void *struct_base(ccc_tree const *, ccc_node const *);
 static ccc_threeway_cmp cmp(ccc_tree const *, ccc_node const *,
                             ccc_node const *, ccc_cmp_fn *);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 /* =================  Double Ended Priority Queue Interface  ============== */
 
@@ -308,7 +305,7 @@ ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *const elem, ccc_update_fn *fn,
     {
         return false;
     }
-    fn(struct_base(&pq->impl, e), aux);
+    fn((ccc_update){struct_base(&pq->impl, e), aux});
     multiset_insert(&pq->impl, e);
     return true;
 }
@@ -1217,7 +1214,7 @@ static inline ccc_threeway_cmp
 cmp(ccc_tree const *const t, ccc_node const *const a, ccc_node const *const b,
     ccc_cmp_fn *const fn)
 {
-    return fn(struct_base(t, a), struct_base(t, b), t->aux);
+    return fn((ccc_cmp){struct_base(t, a), struct_base(t, b), t->aux});
 }
 
 /* We can trick our splay tree into giving us the max via splaying
@@ -1227,20 +1224,16 @@ cmp(ccc_tree const *const t, ccc_node const *const a, ccc_node const *const b,
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters) */
 static ccc_threeway_cmp
-force_find_grt(void const *const a, void const *const b, void *const aux)
+force_find_grt(ccc_cmp const cmp)
 {
-    (void)a;
-    (void)b;
-    (void)aux;
+    (void)cmp;
     return CCC_GRT;
 }
 
 static ccc_threeway_cmp
-force_find_les(void const *const a, void const *const b, void *const aux)
+force_find_les(ccc_cmp const cmp)
 {
-    (void)a;
-    (void)b;
-    (void)aux;
+    (void)cmp;
     return CCC_LES;
 }
 

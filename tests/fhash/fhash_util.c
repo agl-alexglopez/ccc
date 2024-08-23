@@ -17,10 +17,8 @@ fhash_int_last_digit(void const *n)
 }
 
 bool
-fhash_id_eq(void const *const val_struct, void const *const key_id, void *aux)
+fhash_id_eq(ccc_key_cmp const cmp)
 {
-
-    (void)aux;
-    struct val const *const va = val_struct;
-    return va->id == *((int *)key_id);
+    struct val const *const va = cmp.container;
+    return va->id == *((int *)cmp.key);
 }

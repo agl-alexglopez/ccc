@@ -235,12 +235,11 @@ static void help(void);
 
 static bool insert_prev_vertex(ccc_set *, struct prev_vertex);
 static bool insert_parent_cell(ccc_set *, struct parent_cell);
-static ccc_threeway_cmp cmp_vertices(void const *, void const *, void *);
-static ccc_threeway_cmp cmp_parent_cells(void const *, void const *, void *);
-static ccc_threeway_cmp cmp_pq_dist_points(void const *, void const *, void *);
-static ccc_threeway_cmp cmp_set_prev_vertices(void const *, void const *,
-                                              void *);
-static void pq_update_dist(void *, void *);
+static ccc_threeway_cmp cmp_vertices(ccc_cmp);
+static ccc_threeway_cmp cmp_parent_cells(ccc_cmp);
+static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
+static ccc_threeway_cmp cmp_set_prev_vertices(ccc_cmp);
+static void pq_update_dist(ccc_update);
 static void print_vertex(void const *);
 static void set_vertex_destructor(void *);
 static void set_pq_prev_vertex_dist_point_destructor(void *);
@@ -1054,20 +1053,18 @@ insert_parent_cell(ccc_set *s, struct parent_cell pc)
 }
 
 static ccc_threeway_cmp
-cmp_vertices(void const *const a, void const *const b, void *aux)
+cmp_vertices(ccc_cmp const cmp)
 {
-    (void)aux;
-    struct vertex const *const v_a = a;
-    struct vertex const *const v_b = b;
+    struct vertex const *const v_a = cmp.container_a;
+    struct vertex const *const v_b = cmp.container_b;
     return (v_a->name > v_b->name) - (v_a->name < v_b->name);
 }
 
 static ccc_threeway_cmp
-cmp_parent_cells(void const *x, void const *y, void *aux)
+cmp_parent_cells(ccc_cmp const cmp)
 {
-    (void)aux;
-    struct parent_cell const *const a = x;
-    struct parent_cell const *const b = y;
+    struct parent_cell const *const a = cmp.container_a;
+    struct parent_cell const *const b = cmp.container_b;
     if (a->key.r == b->key.r && a->key.c == b->key.c)
     {
         return CCC_EQL;
@@ -1080,20 +1077,18 @@ cmp_parent_cells(void const *x, void const *y, void *aux)
 }
 
 static ccc_threeway_cmp
-cmp_pq_dist_points(void const *const x, void const *const y, void *aux)
+cmp_pq_dist_points(ccc_cmp const cmp)
 {
-    (void)aux;
-    struct dist_point const *const a = x;
-    struct dist_point const *const b = y;
+    struct dist_point const *const a = cmp.container_a;
+    struct dist_point const *const b = cmp.container_b;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static ccc_threeway_cmp
-cmp_set_prev_vertices(void const *const x, void const *const y, void *aux)
+cmp_set_prev_vertices(ccc_cmp const cmp)
 {
-    (void)aux;
-    struct prev_vertex const *const a = x;
-    struct prev_vertex const *const b = y;
+    struct prev_vertex const *const a = cmp.container_a;
+    struct prev_vertex const *const b = cmp.container_b;
     if (a->v > b->v)
     {
         return CCC_GRT;
@@ -1106,9 +1101,9 @@ cmp_set_prev_vertices(void const *const x, void const *const y, void *aux)
 }
 
 static void
-pq_update_dist(void *e, void *aux)
+pq_update_dist(ccc_update const u)
 {
-    ((struct dist_point *)e)->dist = *((int *)aux);
+    ((struct dist_point *)u.container)->dist = *((int *)u.aux);
 }
 
 static void

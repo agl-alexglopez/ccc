@@ -11,12 +11,20 @@ target_link_libraries(run_tests PRIVATE str_view::str_view test)
 # depending on the build type. The run_tests program then runs all binaries.
 
 #############  Priority Queue  ##########################
+add_library(depq_util depq/depq_util.h depq/depq_util.c)
+target_link_libraries(depq_util
+  PRIVATE
+    depqueue
+    test
+)
 
 macro(add_depq_test TEST_NAME)
   add_executable(${TEST_NAME} depq/${TEST_NAME}.c)
-  target_link_libraries(${TEST_NAME} PRIVATE
-    depqueue 
-    test
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      depqueue 
+      depq_util
+      test
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -32,12 +40,20 @@ add_depq_test(test_depq_erase)
 add_depq_test(test_depq_iter)
 
 #############  Heap Priority Queue  ##########################
+add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
+target_link_libraries(fpq_util
+  PRIVATE
+    flat_pqueue
+    test
+)
 
 macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
-  target_link_libraries(${TEST_NAME} PRIVATE
-    flat_pqueue 
-    test
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      fpq_util
+      flat_pqueue 
+      test
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -53,12 +69,20 @@ add_fpq_test(test_fpq_erase)
 add_fpq_test(test_fpq_update)
 
 #############  Pair Priority Queue  ##########################
+add_library(pq_util pq/pq_util.h pq/pq_util.c)
+target_link_libraries(pq_util
+  PRIVATE
+    pqueue
+    test
+)
 
 macro(add_pq_test TEST_NAME)
   add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
-  target_link_libraries(${TEST_NAME} PRIVATE
-    pqueue 
-    test
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      pq_util
+      pqueue 
+      test
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -74,12 +98,20 @@ add_pq_test(test_pq_erase)
 add_pq_test(test_pq_update)
 
 #############  Set  ##########################
+add_library(set_util set/set_util.h set/set_util.c)
+target_link_libraries(set_util
+  PRIVATE
+    set
+    test
+)
 
 macro(add_set_test TEST_NAME)
   add_executable(${TEST_NAME} set/${TEST_NAME}.c)
-  target_link_libraries(${TEST_NAME} 
-    set
-    test
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      set_util
+      set
+      test
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -102,11 +134,12 @@ target_link_libraries(fhash_util
 
 macro(add_fhash_test TEST_NAME)
   add_executable(${TEST_NAME} fhash/${TEST_NAME}.c)
-  target_link_libraries(${TEST_NAME} PRIVATE
-    flat_hash
-    buf
-    test
-    fhash_util
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      flat_hash
+      buf
+      test
+      fhash_util
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -119,12 +152,13 @@ add_fhash_test(test_fhash_construct)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
-target_link_libraries(perf PRIVATE 
-  buf
-  depqueue 
-  flat_pqueue
-  pqueue
-  random
-  str_view::str_view
-  cli
+target_link_libraries(perf 
+  PRIVATE 
+    buf
+    depqueue 
+    flat_pqueue
+    pqueue
+    random
+    str_view::str_view
+    cli
 )

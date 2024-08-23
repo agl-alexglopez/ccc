@@ -1,4 +1,5 @@
 #include "flat_pqueue.h"
+#include "fpq_util.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -7,17 +8,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-struct val
-{
-    int id;
-    int val;
-};
-
 static enum test_result fpq_test_insert_iterate_pop(void);
 static enum test_result fpq_test_priority_update(void);
 static enum test_result fpq_test_priority_removal(void);
-static void val_update(void *, void *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS] = {
@@ -144,20 +137,4 @@ fpq_test_priority_update(void)
     }
     CHECK(ccc_fpq_size(&fpq), num_nodes, "%zu");
     return PASS;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *const a, void const *const b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-}
-
-static void
-val_update(void *a, void *aux)
-{
-    struct val *const old = a;
-    old->val = *(int *)aux;
 }

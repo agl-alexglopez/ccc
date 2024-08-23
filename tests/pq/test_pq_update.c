@@ -1,3 +1,4 @@
+#include "pq_util.h"
 #include "pqueue.h"
 #include "test.h"
 
@@ -7,20 +8,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-struct val
-{
-    int id;
-    int val;
-    ccc_pq_elem elem;
-};
-
 static enum test_result pq_test_insert_iterate_pop(void);
 static enum test_result pq_test_priority_update(void);
 static enum test_result pq_test_priority_increase(void);
 static enum test_result pq_test_priority_decrease(void);
 static enum test_result pq_test_priority_removal(void);
-static void val_update(void *, void *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)5
 test_fn const all_tests[NUM_TESTS] = {
@@ -209,20 +201,4 @@ pq_test_priority_decrease(void)
     }
     CHECK(ccc_pq_size(&pq), num_nodes, "%zu");
     return PASS;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *const a, void const *const b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-}
-
-static void
-val_update(void *const a, void *aux)
-{
-    struct val *const old = a;
-    old->val = *(int *)aux;
 }

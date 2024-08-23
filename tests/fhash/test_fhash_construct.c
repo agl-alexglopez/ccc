@@ -21,8 +21,8 @@ test_fn const all_tests[NUM_TESTS] = {
 };
 
 static int def_and_side_effect(int *);
-static void modify(void *, void *);
-static void modify_w(void *, void *);
+static void modify(ccc_update);
+static void modify_w(ccc_update);
 static int generate_val_and_side_effect(int *);
 
 int
@@ -204,18 +204,17 @@ fhash_test_entry_and_modify_macros(void)
 }
 
 static void
-modify(void *struct_val, void *aux)
+modify(ccc_update const u)
 {
-    (void)aux;
-    struct val *v = struct_val;
+    struct val *v = u.container;
     v->val += 5;
 }
 
 static void
-modify_w(void *struct_val, void *aux)
+modify_w(ccc_update const u)
 {
-    struct val *v = struct_val;
-    v->val = *((int *)aux);
+    struct val *v = u.container;
+    v->val = *((int *)u.aux);
 }
 
 static int
