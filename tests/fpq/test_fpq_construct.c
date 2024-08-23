@@ -1,19 +1,13 @@
 #include "flat_pqueue.h"
+#include "fpq_util.h"
 #include "test.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
-struct val
-{
-    int id;
-    int val;
-};
-
 static enum test_result pq_test_empty(void);
 static enum test_result pq_test_macro(void);
 static enum test_result pq_test_push(void);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)3
 test_fn const all_tests[NUM_TESTS]
@@ -73,13 +67,4 @@ pq_test_push(void)
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fpq_empty(&pq), false, "%d");
     return PASS;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *a, void const *b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

@@ -14,6 +14,6 @@ struct val
 
 uint64_t fhash_int_zero(void const *);
 uint64_t fhash_int_last_digit(void const *);
-bool fhash_id_eq(void const *struct_val, void const *key_id, void *aux);
+bool fhash_id_eq(ccc_key_cmp);
 
 #endif /* FHASH_UTIL_H */

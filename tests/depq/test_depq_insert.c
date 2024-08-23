@@ -1,3 +1,4 @@
+#include "depq_util.h"
 #include "depqueue.h"
 #include "test.h"
 
@@ -5,23 +6,12 @@
 #include <stddef.h>
 #include <stdio.h>
 
-struct val
-{
-    int id;
-    int val;
-    ccc_depq_elem elem;
-};
-
 static enum test_result depq_test_insert_one(void);
 static enum test_result depq_test_insert_three(void);
 static enum test_result depq_test_insert_shuffle(void);
 static enum test_result depq_test_struct_getter(void);
 static enum test_result depq_test_insert_three_dups(void);
 static enum test_result depq_test_read_max_min(void);
-static enum test_result insert_shuffled(ccc_depqueue *, struct val[], size_t,
-                                        int);
-static size_t inorder_fill(int[], size_t, ccc_depqueue *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -154,52 +144,4 @@ depq_test_read_max_min(void)
     struct val const *min = ccc_depq_const_min(&pq);
     CHECK(min->val, 0, "%d");
     return PASS;
-}
-
-static enum test_result
-insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
-                int const larger_prime)
-{
-    /* Math magic ahead so that we iterate over every index
-       eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
-       easier to debug if something goes wrong. Think
-       of the prime number as a random seed, kind of. */
-    size_t shuffled_index = larger_prime % size;
-    for (size_t i = 0; i < size; ++i)
-    {
-        vals[shuffled_index].val = (int)shuffled_index;
-        ccc_depq_push(pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_size(pq), i + 1, "%zu");
-        CHECK(ccc_depq_validate(pq), true, "%d");
-        shuffled_index = (shuffled_index + larger_prime) % size;
-    }
-    CHECK(ccc_depq_size(pq), size, "%zu");
-    return PASS;
-}
-
-/* Iterative inorder traversal to check the heap is sorted. */
-static size_t
-inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
-{
-    if (ccc_depq_size(pq) != size)
-    {
-        return 0;
-    }
-    size_t i = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e;
-         e = ccc_depq_rnext(pq, &e->elem))
-    {
-        vals[i++] = e->val;
-    }
-    return i;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *a, void const *b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

@@ -1,4 +1,5 @@
 #include "set.h"
+#include "set_util.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -6,22 +7,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-struct val
-{
-    int id;
-    int val;
-    ccc_set_elem elem;
-};
-
 static enum test_result set_test_forward_iter(void);
 static enum test_result set_test_iterate_removal(void);
 static enum test_result set_test_iterate_remove_reinsert(void);
 static enum test_result set_test_valid_range(void);
 static enum test_result set_test_invalid_range(void);
 static enum test_result set_test_empty_range(void);
-static size_t inorder_fill(int[], size_t, ccc_set *);
 static enum test_result iterator_check(ccc_set *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS ((size_t)6)
 test_fn const all_tests[NUM_TESTS] = {
@@ -300,22 +292,6 @@ set_test_empty_range(void)
     return PASS;
 }
 
-/* Iterative inorder traversal to check the heap is sorted. */
-static size_t
-inorder_fill(int vals[], size_t size, ccc_set *s)
-{
-    if (ccc_set_size(s) != size)
-    {
-        return 0;
-    }
-    size_t i = 0;
-    for (struct val *e = ccc_set_begin(s); e; e = ccc_set_next(s, &e->elem))
-    {
-        vals[i++] = e->val;
-    }
-    return i;
-}
-
 static enum test_result
 iterator_check(ccc_set *s)
 {
@@ -337,13 +313,4 @@ iterator_check(ccc_set *s)
     }
     CHECK(iter_count, size, "%zu");
     return PASS;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *const a, void const *const b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

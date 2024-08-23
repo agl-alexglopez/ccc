@@ -1,3 +1,4 @@
+#include "depq_util.h"
 #include "depqueue.h"
 #include "test.h"
 
@@ -6,13 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-struct val
-{
-    int id;
-    int val;
-    ccc_depq_elem elem;
-};
 
 static enum test_result depq_test_insert_remove_four_dups(void);
 static enum test_result depq_test_insert_erase_shuffled(void);
@@ -23,11 +17,6 @@ static enum test_result depq_test_min_round_robin(void);
 static enum test_result depq_test_delete_prime_shuffle_duplicates(void);
 static enum test_result depq_test_prime_shuffle(void);
 static enum test_result depq_test_weak_srand(void);
-static enum test_result insert_shuffled(ccc_depqueue *, struct val[], size_t,
-                                        int);
-static size_t inorder_fill(int[], size_t, ccc_depqueue *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
-static void depq_printer_fn(void const *);
 
 #define NUM_TESTS (size_t)9
 test_fn const all_tests[NUM_TESTS] = {
@@ -331,59 +320,4 @@ depq_test_weak_srand(void)
     }
     CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;
-}
-
-static enum test_result
-insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
-                int const larger_prime)
-{
-    /* Math magic ahead so that we iterate over every index
-       eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
-       easier to debug if something goes wrong. Think
-       of the prime number as a random seed, kind of. */
-    size_t shuffled_index = larger_prime % size;
-    for (size_t i = 0; i < size; ++i)
-    {
-        vals[shuffled_index].val = (int)shuffled_index;
-        ccc_depq_push(pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_size(pq), i + 1, "%zu");
-        CHECK(ccc_depq_validate(pq), true, "%d");
-        shuffled_index = (shuffled_index + larger_prime) % size;
-    }
-    CHECK(ccc_depq_size(pq), size, "%zu");
-    return PASS;
-}
-
-/* Iterative inorder traversal to check the heap is sorted. */
-static size_t
-inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
-{
-    if (ccc_depq_size(pq) != size)
-    {
-        return 0;
-    }
-    size_t i = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e;
-         e = ccc_depq_rnext(pq, &e->elem))
-    {
-        vals[i++] = e->val;
-    }
-    return i;
-}
-
-static void
-depq_printer_fn(void const *const e)
-{
-    struct val const *const v = e;
-    printf("{id:%d,val:%d}", v->id, v->val);
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *a, void const *b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }

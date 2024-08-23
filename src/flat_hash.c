@@ -85,7 +85,7 @@ ccc_fh_and_modify(ccc_fhash_entry e, ccc_update_fn *const fn)
 {
     if (e.impl.entry.occupied)
     {
-        fn((void *)e.impl.entry.entry, NULL);
+        fn((ccc_update){(void *)e.impl.entry.entry, NULL});
     }
     return e;
 }
@@ -95,7 +95,7 @@ ccc_fh_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
 {
     if (e.impl.entry.occupied)
     {
-        fn((void *)e.impl.entry.entry, aux);
+        fn((ccc_update){(void *)e.impl.entry.entry, aux});
     }
     return e;
 }
@@ -250,7 +250,9 @@ ccc_impl_fh_find(struct ccc_impl_fhash const *const h, void const *const key,
         {
             return (ccc_entry){.occupied = false, .entry = slot};
         }
-        if (hash == e->hash && h->eq_fn(slot, key, h->aux))
+        if (hash == e->hash
+            && h->eq_fn(
+                (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux}))
         {
             return (ccc_entry){.occupied = true, .entry = slot};
         }

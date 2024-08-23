@@ -62,7 +62,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         struct ccc_impl_fh_entry _mod_ent_ = (entry_copy).impl;                \
         if (_mod_ent_.entry.occupied)                                          \
         {                                                                      \
-            mod_fn((void *)_mod_ent_.entry.entry, NULL);                       \
+            mod_fn((ccc_update){(void *)_mod_ent_.entry.entry, NULL});         \
         }                                                                      \
         _mod_ent_;                                                             \
     })
@@ -73,7 +73,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         if (_mod_with_ent_.entry.occupied)                                     \
         {                                                                      \
             typeof(aux) _aux_ = aux;                                           \
-            mod_fn((void *)_mod_with_ent_.entry.entry, &_aux_);                \
+            mod_fn((ccc_update){(void *)_mod_with_ent_.entry.entry, &_aux_});  \
         }                                                                      \
         _mod_with_ent_;                                                        \
     })

@@ -1,3 +1,4 @@
+#include "depq_util.h"
 #include "depqueue.h"
 #include "test.h"
 
@@ -7,13 +8,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-struct val
-{
-    int id;
-    int val;
-    ccc_depq_elem elem;
-};
-
 static enum test_result depq_test_forward_iter_unique_vals(void);
 static enum test_result depq_test_forward_iter_all_vals(void);
 static enum test_result depq_test_insert_iterate_pop(void);
@@ -22,10 +16,7 @@ static enum test_result depq_test_priority_removal(void);
 static enum test_result depq_test_priority_valid_range(void);
 static enum test_result depq_test_priority_invalid_range(void);
 static enum test_result depq_test_priority_empty_range(void);
-static size_t inorder_fill(int[], size_t, ccc_depqueue *);
 static enum test_result iterator_check(ccc_depqueue *);
-static void val_update(void *, void *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
 
 #define NUM_TESTS (size_t)8
 test_fn const all_tests[NUM_TESTS] = {
@@ -379,22 +370,6 @@ depq_test_priority_empty_range(void)
     return PASS;
 }
 
-static size_t
-inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
-{
-    if (ccc_depq_size(pq) != size)
-    {
-        return 0;
-    }
-    size_t i = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e;
-         e = ccc_depq_rnext(pq, &e->elem))
-    {
-        vals[i++] = e->val;
-    }
-    return i;
-}
-
 static enum test_result
 iterator_check(ccc_depqueue *pq)
 {
@@ -417,20 +392,4 @@ iterator_check(ccc_depqueue *pq)
     }
     CHECK(iter_count, size, "%zu");
     return PASS;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *a, void const *b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-}
-
-static void
-val_update(void *const a, void *aux)
-{
-    struct val *old = a;
-    old->val = *(int *)aux;
 }

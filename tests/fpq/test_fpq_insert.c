@@ -1,4 +1,5 @@
 #include "flat_pqueue.h"
+#include "fpq_util.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -6,23 +7,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct val
-{
-    int id;
-    int val;
-};
-
 static enum test_result fpq_test_insert_one(void);
 static enum test_result fpq_test_insert_three(void);
 static enum test_result fpq_test_insert_shuffle(void);
 static enum test_result fpq_test_struct_getter(void);
 static enum test_result fpq_test_insert_three_dups(void);
 static enum test_result fpq_test_read_max_min(void);
-static enum test_result insert_shuffled(ccc_flat_pqueue *, struct val[], size_t,
-                                        int);
-static enum test_result inorder_fill(int[], size_t, ccc_flat_pqueue *);
-static ccc_threeway_cmp val_cmp(void const *, void const *, void *);
-static void val_print(void const *);
 
 #define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
@@ -174,79 +164,4 @@ fpq_test_read_max_min(void)
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, "%d");
     return PASS;
-}
-
-static enum test_result
-insert_shuffled(ccc_flat_pqueue *pq, struct val vals[], size_t const size,
-                int const larger_prime)
-{
-    /* Math magic ahead so that we iterate over every index
-       eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
-       easier to debug if something goes wrong. Think
-       of the prime number as a random seed, kind of. */
-    size_t shuffled_index = larger_prime % size;
-    for (size_t i = 0; i < size; ++i)
-    {
-        vals[i].id = vals[i].val = (int)shuffled_index;
-        ccc_fpq_push(pq, &vals[i]);
-        CHECK(ccc_fpq_size(pq), i + 1, "%zu");
-        CHECK(ccc_fpq_validate(pq), true, "%d");
-        shuffled_index = (shuffled_index + larger_prime) % size;
-    }
-    CHECK(ccc_fpq_size(pq), size, "%zu");
-    return PASS;
-}
-
-/* Iterative inorder traversal to check the heap is sorted. */
-static enum test_result
-inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
-{
-    if (ccc_fpq_size(fpq) != size)
-    {
-        return FAIL;
-    }
-    size_t i = 0;
-    struct val copy_buf[sizeof(struct val) * ccc_fpq_size(fpq)];
-    ccc_buf buf = CCC_BUF_INIT(copy_buf, struct val, ccc_fpq_size(fpq), NULL);
-    ccc_flat_pqueue fpq_copy
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
-    while (i < size && !ccc_fpq_empty(fpq))
-    {
-        struct val const *const front = ccc_fpq_pop(fpq);
-        vals[i++] = front->val;
-        size_t const prev = ccc_fpq_size(&fpq_copy);
-        ccc_result const res = CCC_FPQ_EMPLACE(
-            &fpq_copy, struct val, {.id = front->id, .val = front->val});
-        CHECK(res, CCC_OK, "%d");
-        CHECK(prev < ccc_fpq_size(&fpq_copy), true, "%d");
-    }
-    i = 0;
-    while (i < size && !ccc_fpq_empty(&fpq_copy))
-    {
-        struct val *const v = ccc_fpq_pop(&fpq_copy);
-        size_t const prev = ccc_fpq_size(fpq);
-        ccc_result const res
-            = CCC_FPQ_EMPLACE(fpq, struct val, {.id = v->id, .val = v->val});
-        CHECK(res, CCC_OK, "%d");
-        CHECK(prev < ccc_fpq_size(fpq), true, "%d");
-        CHECK(vals[i++], v->val, "%d");
-    }
-    return PASS;
-}
-
-static ccc_threeway_cmp
-val_cmp(void const *const a, void const *const b, void *aux)
-{
-    (void)aux;
-    struct val const *const lhs = a;
-    struct val const *const rhs = b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
-}
-
-static void
-val_print(void const *e)
-{
-    struct val const *const v = e;
-    printf("{%d,%d}", v->id, v->val);
 }
