@@ -19,27 +19,6 @@ typedef struct
     struct ccc_impl_fh_entry impl;
 } ccc_fhash_entry;
 
-#define CCC_FH_ENTRY(fhash_ptr, key)                                           \
-    (ccc_fhash_entry)                                                          \
-    {                                                                          \
-        CCC_IMPL_FH_ENTRY((fhash_ptr), key)                                    \
-    }
-
-#define CCC_FH_AND_MODIFY(entry_copy, mod_fn)                                  \
-    (ccc_fhash_entry)                                                          \
-    {                                                                          \
-        CCC_IMPL_FH_AND_MODIFY(entry_copy, mod_fn)                             \
-    }
-
-#define CCC_FH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                        \
-    (ccc_fhash_entry)                                                          \
-    {                                                                          \
-        CCC_IMPL_FH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                   \
-    }
-
-#define CCC_FH_OR_INSERT_WITH(entry_copy, struct_key_value_initializer...)     \
-    CCC_IMPL_FH_OR_INSERT_WITH(entry_copy, struct_key_value_initializer)
-
 ccc_result ccc_fh_init(ccc_fhash *, ccc_buf *, size_t hash_elem_offset,
                        ccc_hash_fn *, ccc_key_cmp_fn *, void *aux);
 bool ccc_fh_empty(ccc_fhash const *);
