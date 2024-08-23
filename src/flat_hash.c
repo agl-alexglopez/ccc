@@ -100,6 +100,47 @@ ccc_fh_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
     return e;
 }
 
+ccc_fhash_entry
+ccc_fh_insert(ccc_fhash *h, void const *const key, ccc_fhash_elem *const elem)
+{
+    uint64_t const hash = ccc_impl_fh_filter(&h->impl, key);
+    ccc_entry const ent = ccc_impl_fh_find(&h->impl, key, hash);
+    void *user_return = struct_base(&h->impl, &elem->impl);
+    size_t const user_struct_size = ccc_buf_elem_size(h->impl.buf);
+    if (ent.occupied)
+    {
+        uint8_t tmp[user_struct_size];
+        memcpy(tmp, ent.entry, user_struct_size);
+        memcpy((void *)ent.entry, user_return, user_struct_size);
+        memcpy(user_return, tmp, user_struct_size);
+        return (ccc_fhash_entry){
+            {
+                .h = &h->impl,
+                .hash = hash,
+                .entry = {.entry = user_return, .occupied = true},
+            },
+        };
+    }
+    if (ccc_impl_fh_maybe_resize(&h->impl) != CCC_OK)
+    {
+        return (ccc_fhash_entry){
+            {
+                .h = &h->impl,
+                .hash = EMPTY,
+                .entry = {.entry = NULL, .occupied = false},
+            },
+        };
+    }
+    insert(&h->impl, user_return, hash);
+    return (ccc_fhash_entry){
+        {
+            .h = &h->impl,
+            .hash = EMPTY,
+            .entry = {.entry = ent.entry, .occupied = false},
+        },
+    };
+}
+
 void *
 ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
 {
@@ -152,6 +193,12 @@ inline bool
 ccc_fh_occupied(ccc_fhash_entry const e)
 {
     return e.impl.entry.occupied;
+}
+
+inline bool
+ccc_fh_insert_error(ccc_fhash_entry e)
+{
+    return e.impl.hash == EMPTY;
 }
 
 void const *
@@ -281,13 +328,13 @@ insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
 {
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     size_t const cap = ccc_buf_capacity(h->buf);
-    uint8_t slot_copy[elem_sz];
-    (void)memcpy(slot_copy, e, elem_sz);
+    uint8_t floater[elem_sz];
+    (void)memcpy(floater, e, elem_sz);
 
     /* This function cannot modify e and e may be copied over to new insertion
        from old table. So should this function invariantly assign starting
        hash to this slot copy for insertion? I think yes so far. */
-    ccc_impl_fh_in_slot(h, slot_copy)->hash = hash;
+    ccc_impl_fh_in_slot(h, floater)->hash = hash;
     size_t i = hash % cap;
     size_t dist = 0;
     uint8_t tmp[elem_sz];
@@ -297,13 +344,13 @@ insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
         struct ccc_impl_fh_elem const *slot_hash = ccc_impl_fh_in_slot(h, slot);
         if (slot_hash->hash == EMPTY)
         {
-            memcpy(slot, slot_copy, elem_sz);
+            memcpy(slot, floater, elem_sz);
             ++h->buf->impl.sz;
             return;
         }
         if (dist > ccc_impl_fh_distance(cap, i, slot_hash->hash))
         {
-            swap(tmp, slot_copy, slot, elem_sz);
+            swap(tmp, floater, slot, elem_sz);
         }
     }
 }
