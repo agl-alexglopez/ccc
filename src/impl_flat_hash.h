@@ -70,9 +70,9 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                   \
     ({                                                                         \
         struct ccc_impl_fh_entry _mod_with_ent_ = (entry_copy).impl;           \
-        typeof(aux) _aux_ = aux;                                               \
         if (_mod_with_ent_.entry.occupied)                                     \
         {                                                                      \
+            typeof(aux) _aux_ = aux;                                           \
             mod_fn((void *)_mod_with_ent_.entry.entry, &_aux_);                \
         }                                                                      \
         _mod_with_ent_;                                                        \
