@@ -110,9 +110,7 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
     if (ent.occupied)
     {
         uint8_t tmp[user_struct_size];
-        memcpy(tmp, ent.entry, user_struct_size);
-        memcpy((void *)ent.entry, user_return, user_struct_size);
-        memcpy(user_return, tmp, user_struct_size);
+        swap(tmp, (void *)ent.entry, user_return, user_struct_size);
         return (ccc_fhash_entry){
             {
                 .h = &h->impl,
@@ -135,7 +133,7 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
     return (ccc_fhash_entry){
         {
             .h = &h->impl,
-            .hash = EMPTY,
+            .hash = hash,
             .entry = {.entry = ent.entry, .occupied = false},
         },
     };
@@ -148,8 +146,7 @@ ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
     {
         return (void *)h.impl.entry.entry;
     }
-    ccc_result const res = ccc_impl_fh_maybe_resize(h.impl.h);
-    if (res != CCC_OK)
+    if (ccc_impl_fh_maybe_resize(h.impl.h) != CCC_OK)
     {
         return NULL;
     }

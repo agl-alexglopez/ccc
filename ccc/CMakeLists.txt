@@ -1,5 +1,11 @@
 add_library(types INTERFACE types.h)
 
+add_library(macros INTERFACE macros.h)
+target_link_libraries(macros
+  INTERFACE
+    impl_flat_hash
+)
+
 add_library(buf buf.h ${CMAKE_SOURCE_DIR}/src/buf.c)
 target_link_libraries(buf
   INTERFACE
