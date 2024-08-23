@@ -104,9 +104,9 @@ ccc_fhash_entry
 ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
 {
     uint64_t const hash = ccc_impl_fh_filter(&h->impl, key);
-    ccc_entry const ent = ccc_impl_fh_find(&h->impl, key, hash);
     void *user_return = struct_base(&h->impl, &val_handle->impl);
     size_t const user_struct_size = ccc_buf_elem_size(h->impl.buf);
+    ccc_entry const ent = ccc_impl_fh_find(&h->impl, key, hash);
     if (ent.occupied)
     {
         uint8_t tmp[user_struct_size];
