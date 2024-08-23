@@ -8,11 +8,6 @@
         ccc_fhash                                                              \
             *: (ccc_fhash_entry){CCC_IMPL_FH_ENTRY((container_ptr), (key))})
 
-#define OR_INSERT_WITH(entry_copy, struct_key_value_initializer...)            \
-    _Generic((entry_copy),                                                     \
-        ccc_fhash_entry: CCC_IMPL_FH_OR_INSERT_WITH(                           \
-                 (entry_copy), (struct_key_value_initializer)))
-
 #define AND_MODIFY(entry_copy, mod_fn)                                         \
     _Generic((entry_copy),                                                     \
         ccc_fhash_entry: (ccc_fhash_entry){                                    \
@@ -22,5 +17,10 @@
     _Generic((entry_copy),                                                     \
         ccc_fhash_entry: (ccc_fhash_entry){                                    \
             CCC_IMPL_FH_AND_MODIFY_WITH((entry_copy), (mod_fn), (aux))})
+
+#define OR_INSERT_WITH(entry_copy, struct_key_value_initializer...)            \
+    _Generic((entry_copy),                                                     \
+        ccc_fhash_entry: CCC_IMPL_FH_OR_INSERT_WITH(                           \
+                 (entry_copy), (struct_key_value_initializer)))
 
 #endif /* CCC_ENTRY_H */
