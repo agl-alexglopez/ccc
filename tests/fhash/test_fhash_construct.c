@@ -1,5 +1,4 @@
 #include "buf.h"
-#include "entry.h"
 #include "fhash_util.h"
 #include "flat_hash.h"
 #include "test.h"
@@ -24,6 +23,7 @@ test_fn const all_tests[NUM_TESTS] = {
 static int def_and_side_effect(int *);
 static void modify(void *, void *);
 static void modify_w(void *, void *);
+static int generate_val_and_side_effect(int *);
 
 int
 main()
@@ -88,22 +88,22 @@ fhash_test_entry_macros(void)
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
     CHECK(ccc_fh_get(ENTRY(&fh, 137)) == NULL, true, "%d");
+    int const key = 137;
     int to_affect = 99;
     /* The function with a side effect should execute. */
     struct val *inserted = OR_INSERT_WITH(
-        ENTRY(&fh, 137),
-        (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
+        ENTRY(&fh, key),
+        (struct val){.id = key, .val = def_and_side_effect(&to_affect)});
     CHECK(inserted != NULL, true, "%d");
-    inserted->val += 1;
     CHECK(to_affect, 100, "%d");
-    CHECK(inserted->val, 1, "%d");
+    CHECK(inserted->val, 0, "%d");
     /* The function with a side effect should NOT execute. */
     ((struct val *)OR_INSERT_WITH(
-         ENTRY(&fh, 137),
-         (struct val){.id = 137, .val = def_and_side_effect(&to_affect)}))
+         ENTRY(&fh, key),
+         (struct val){.id = key, .val = def_and_side_effect(&to_affect)}))
         ->val++;
     CHECK(to_affect, 100, "%d");
-    CHECK(inserted->val, 2, "%d");
+    CHECK(inserted->val, 1, "%d");
     return PASS;
 }
 
@@ -171,7 +171,8 @@ fhash_test_entry_and_modify_macros(void)
 
     /* Inserting default value before an in place modification is possible. */
     struct val *v = OR_INSERT_WITH(
-        ENTRY(&fh, 137),
+        AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w,
+                        generate_val_and_side_effect(&to_affect)),
         (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
     CHECK((v != NULL), true, "%d");
     CHECK(v->id, 137, "%d");
@@ -189,14 +190,16 @@ fhash_test_entry_and_modify_macros(void)
     CHECK(to_affect, 100, "%d");
 
     /* Modifying an existing value that requires external input is also
-       possible with slightly different signature. */
+       possible with slightly different signature. Generate val also has
+       lazy evaluation. */
     struct val *v3 = OR_INSERT_WITH(
-        AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w, 137),
+        AND_MODIFY_WITH(ENTRY(&fh, 137), modify_w,
+                        generate_val_and_side_effect(&to_affect)),
         (struct val){.id = 137, .val = def_and_side_effect(&to_affect)});
     CHECK((v3 != NULL), true, "%d");
     CHECK(v3->id, 137, "%d");
-    CHECK(v3->val, 137, "%d");
-    CHECK(to_affect, 100, "%d");
+    CHECK(v3->val, 42, "%d");
+    CHECK(to_affect, 0, "%d");
     return PASS;
 }
 
@@ -220,4 +223,11 @@ def_and_side_effect(int *to_affect)
 {
     *to_affect += 1;
     return 0;
+}
+
+static int
+generate_val_and_side_effect(int *to_affect)
+{
+    *to_affect = 0;
+    return 42;
 }

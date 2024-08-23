@@ -3,6 +3,8 @@
 
 #include "impl_flat_hash.h"
 #include "types.h"
+/* All containers transitively include the ENTRY API NOLINTNEXTLINE */
+#include "entry.h"
 
 typedef struct
 {
