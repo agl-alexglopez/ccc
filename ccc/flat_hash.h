@@ -47,8 +47,8 @@ size_t ccc_fh_size(ccc_fhash const *);
 
 bool ccc_fh_contains(ccc_fhash *, void const *key);
 
-ccc_fhash_entry ccc_fh_insert(ccc_fhash *, void const *key,
-                              ccc_fhash_elem *elem);
+ccc_fhash_entry ccc_fh_insert(ccc_fhash *, void *key,
+                              ccc_fhash_elem *val_handle);
 
 ccc_fhash_entry ccc_fh_entry(ccc_fhash *, void const *key);
 ccc_fhash_entry ccc_fh_and_modify(ccc_fhash_entry, ccc_update_fn *);
