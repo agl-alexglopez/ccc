@@ -68,7 +68,7 @@ fhash_test_insert_overwrite(void)
     ccc_fhash_entry old_ent = ccc_fh_insert(&fh, &q.id, &q.e);
     CHECK(ccc_fh_occupied(old_ent), true, "%d");
 
-    /* The old contents are now in q and the entry points to them. */
+    /* The old contents are now in q and the entry is in the table. */
     CHECK(((struct val *)ccc_fh_get(old_ent))->val, 100, "%d");
     CHECK(q.val, 99, "%d");
     CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 100, "%d");
@@ -102,6 +102,7 @@ fhash_test_insert_then_bad_ideas(void)
     CHECK(((struct val *)ccc_fh_get(new_ent))->val, 100, "%d");
     CHECK(q.val, 99, "%d");
     q.val += 5;
+
     /* Now the expected behavior of or insert shall occur and no insertion
        will happen because the value is already occupied in the table. */
     CHECK(((struct val *)ccc_fh_or_insert(ent, &q.e))->val, 100, "%d");
