@@ -3,8 +3,6 @@
 #include "flat_hash.h"
 #include "test.h"
 
-#include <stddef.h>
-
 static enum test_result fhash_test_empty(void);
 static enum test_result fhash_test_entry_macros(void);
 static enum test_result fhash_test_entry_functional(void);
