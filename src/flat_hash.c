@@ -115,7 +115,7 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
             {
                 .h = &h->impl,
                 .hash = hash,
-                .entry = {.entry = user_return, .occupied = true},
+                .entry = {.entry = ent.entry, .occupied = true},
             },
         };
     }
@@ -134,7 +134,7 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
         {
             .h = &h->impl,
             .hash = hash,
-            .entry = {.entry = ent.entry, .occupied = false},
+            .entry = {.entry = NULL, .occupied = false},
         },
     };
 }
@@ -142,7 +142,7 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
 void *
 ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
 {
-    if (h.impl.entry.occupied)
+    if (h.impl.entry.occupied || !h.impl.entry.entry)
     {
         return (void *)h.impl.entry.entry;
     }
@@ -159,7 +159,7 @@ ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
 void *
 ccc_fh_and_erase(ccc_fhash_entry h, ccc_fhash_elem *const elem)
 {
-    if (!h.impl.entry.occupied)
+    if (!h.impl.entry.occupied || !h.impl.entry.entry)
     {
         return NULL;
     }
