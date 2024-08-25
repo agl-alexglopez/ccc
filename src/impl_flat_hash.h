@@ -98,37 +98,41 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
             {                                                                  \
                 size_t _i_                                                     \
                     = ccc_buf_index_of(_entry_.h->buf, _entry_.entry.entry);   \
-                size_t const _cap_ = ccc_buf_capacity(_entry_.h->buf);         \
-                size_t _dist_                                                  \
-                    = ccc_impl_fh_distance(_cap_, _i_, _entry_.hash);          \
-                typeof(struct_key_value_initializer) _cur_;                    \
-                bool _initialized_ = false;                                    \
-                for (;; _i_ = (_i_ + 1) % _cap_, ++_dist_)                     \
+                void *_slot_ = ccc_buf_at(_entry_.h->buf, _i_);                \
+                struct ccc_impl_fh_elem *_slot_hash_                           \
+                    = ccc_impl_fh_in_slot(_entry_.h, _slot_);                  \
+                if (_slot_hash_->hash == EMPTY)                                \
                 {                                                              \
-                    void *const _slot_ = ccc_buf_at(_entry_.h->buf, _i_);      \
-                    struct ccc_impl_fh_elem *_slot_hash_                       \
-                        = ccc_impl_fh_in_slot(_entry_.h, _slot_);              \
-                    if (_slot_hash_->hash == EMPTY)                            \
+                    *((typeof(struct_key_value_initializer) *)_slot_)          \
+                        = (typeof(struct_key_value_initializer))               \
+                            struct_key_value_initializer;                      \
+                    _slot_hash_->hash = _entry_.hash;                          \
+                    ++_entry_.h->buf->impl.sz;                                 \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    size_t const _cap_ = ccc_buf_capacity(_entry_.h->buf);     \
+                    size_t _dist_                                              \
+                        = ccc_impl_fh_distance(_cap_, _i_, _entry_.hash);      \
+                    typeof(struct_key_value_initializer) _cur_                 \
+                        = *((typeof(struct_key_value_initializer) *)_slot_);   \
+                    *((typeof(struct_key_value_initializer) *)_slot_)          \
+                        = (typeof(struct_key_value_initializer))               \
+                            struct_key_value_initializer;                      \
+                    _slot_hash_->hash = _entry_.hash;                          \
+                    for (++_i_, ++_dist_;; _i_ = (_i_ + 1) % _cap_, ++_dist_)  \
                     {                                                          \
-                        if (_initialized_)                                     \
+                        _slot_ = ccc_buf_at(_entry_.h->buf, _i_);              \
+                        _slot_hash_ = ccc_impl_fh_in_slot(_entry_.h, _slot_);  \
+                        if (_slot_hash_->hash == EMPTY)                        \
                         {                                                      \
                             *((typeof(struct_key_value_initializer) *)_slot_)  \
                                 = _cur_;                                       \
+                            ++_entry_.h->buf->impl.sz;                         \
+                            break;                                             \
                         }                                                      \
-                        else                                                   \
-                        {                                                      \
-                            *((typeof(struct_key_value_initializer) *)_slot_)  \
-                                = (typeof(struct_key_value_initializer))       \
-                                    struct_key_value_initializer;              \
-                            _slot_hash_->hash = _entry_.hash;                  \
-                        }                                                      \
-                        ++_entry_.h->buf->impl.sz;                             \
-                        break;                                                 \
-                    }                                                          \
-                    if (_dist_                                                 \
-                        > ccc_impl_fh_distance(_cap_, _i_, _slot_hash_->hash)) \
-                    {                                                          \
-                        if (_initialized_)                                     \
+                        if (_dist_ > ccc_impl_fh_distance(_cap_, _i_,          \
+                                                          _slot_hash_->hash))  \
                         {                                                      \
                             typeof(struct_key_value_initializer) _tmp_         \
                                 = *((typeof(struct_key_value_initializer) *)   \
@@ -136,16 +140,6 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                             *((typeof(struct_key_value_initializer) *)_slot_)  \
                                 = _cur_;                                       \
                             _cur_ = _tmp_;                                     \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                            _cur_ = *((typeof(struct_key_value_initializer) *) \
-                                          _slot_);                             \
-                            *((typeof(struct_key_value_initializer) *)_slot_)  \
-                                = (typeof(struct_key_value_initializer))       \
-                                    struct_key_value_initializer;              \
-                            _slot_hash_->hash = _entry_.hash;                  \
-                            _initialized_ = true;                              \
                         }                                                      \
                     }                                                          \
                 }                                                              \
