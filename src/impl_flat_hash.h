@@ -81,7 +81,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_OR_INSERT_WITH(entry_copy,                                 \
                                    struct_key_value_initializer...)            \
     ({                                                                         \
-        void *_res_;                                                           \
+        typeof(struct_key_value_initializer) *_res_;                           \
         {                                                                      \
             struct ccc_impl_fh_entry _entry_ = entry_copy.impl;                \
             if (_entry_.entry.status != CCC_ENTRY_VACANT)                      \

@@ -95,8 +95,7 @@ fhash_test_entry_macros(void)
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 0, "%d");
     /* The function with a side effect should NOT execute. */
-    ((struct val *)OR_INSERT_WITH(ENTRY(&fh, key),
-                                  (struct val){.id = key, .val = def(&mut)}))
+    OR_INSERT_WITH(ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)})
         ->val++;
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 1, "%d");
