@@ -89,13 +89,13 @@ fhash_test_entry_macros(void)
     int const key = 137;
     int mut = 99;
     /* The function with a side effect should execute. */
-    struct val *inserted = OR_INSERT_WITH(
-        ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)});
+    struct val *inserted
+        = OR_INSERT(ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)});
     CHECK(inserted != NULL, true, "%d");
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 0, "%d");
     /* The function with a side effect should NOT execute. */
-    OR_INSERT_WITH(ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)})
+    OR_INSERT(ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)})
         ->val++;
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 1, "%d");
@@ -165,9 +165,8 @@ fhash_test_entry_and_modify_macros(void)
     int mut = 99;
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v
-        = OR_INSERT_WITH(AND_MODIFY_WITH(ENTRY(&fh, 137), modw, gen(&mut)),
-                         (struct val){.id = 137, .val = def(&mut)});
+    struct val *v = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, 137), modw, gen(&mut)),
+                              (struct val){.id = 137, .val = def(&mut)});
     CHECK((v != NULL), true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 0, "%d");
@@ -175,8 +174,8 @@ fhash_test_entry_and_modify_macros(void)
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2 = OR_INSERT_WITH(AND_MODIFY(ENTRY(&fh, 137), mod),
-                                    (struct val){.id = 137, .val = def(&mut)});
+    struct val *v2 = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), mod),
+                               (struct val){.id = 137, .val = def(&mut)});
     CHECK((v2 != NULL), true, "%d");
     CHECK(v2->id, 137, "%d");
     CHECK(v2->val, 5, "%d");
@@ -186,8 +185,8 @@ fhash_test_entry_and_modify_macros(void)
        possible with slightly different signature. Generate val also has
        lazy evaluation. */
     struct val *v3
-        = OR_INSERT_WITH(AND_MODIFY_WITH(ENTRY(&fh, 137), modw, gen(&mut)),
-                         (struct val){.id = 137, .val = def(&mut)});
+        = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, 137), modw, gen(&mut)),
+                    (struct val){.id = 137, .val = def(&mut)});
     CHECK((v3 != NULL), true, "%d");
     CHECK(v3->id, 137, "%d");
     CHECK(v3->val, 42, "%d");

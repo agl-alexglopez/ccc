@@ -251,7 +251,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
-            = INSERT_ENTRY_WITH(ENTRY(&fh, i), (struct val){i, i, {}});
+            = INSERT_ENTRY(ENTRY(&fh, i), (struct val){i, i, {}});
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -261,7 +261,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
-            = INSERT_ENTRY_WITH(ENTRY(&fh, i), (struct val){i, i + 1, {}});
+            = INSERT_ENTRY(ENTRY(&fh, i), (struct val){i, i + 1, {}});
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->val, i + 1, "%d");
@@ -296,8 +296,7 @@ fhash_test_entry_api_macros(void)
     {
         /* The macros support functions that will only execute if the or
            insert branch executes. */
-        struct val const *const d
-            = OR_INSERT_WITH(ENTRY(&fh, i), create_val(i, i));
+        struct val const *const d = OR_INSERT(ENTRY(&fh, i), create_val(i, i));
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -306,8 +305,8 @@ fhash_test_entry_api_macros(void)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val const *const d = OR_INSERT_WITH(
-            AND_MODIFY(ENTRY(&fh, i), mod), (struct val){.id = i, .val = i});
+        struct val const *const d = OR_INSERT(AND_MODIFY(ENTRY(&fh, i), mod),
+                                              (struct val){.id = i, .val = i});
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -326,10 +325,10 @@ fhash_test_entry_api_macros(void)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        OR_INSERT_WITH(ENTRY(&fh, i), (struct val){0})->val++;
+        OR_INSERT(ENTRY(&fh, i), (struct val){0})->val++;
         /* All values in the array should be odd now */
-        CHECK(OR_INSERT_WITH(ENTRY(&fh, i), (struct val){0})->val % 2 == 0,
-              true, "%d");
+        CHECK(OR_INSERT(ENTRY(&fh, i), (struct val){0})->val % 2 == 0, true,
+              "%d");
     }
     CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     return PASS;
