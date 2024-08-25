@@ -28,14 +28,16 @@ size_t ccc_fh_size(ccc_fhash const *);
 
 bool ccc_fh_contains(ccc_fhash *, void const *key);
 
-/** Inserts the specified key and value into the hash table invariantly.
+/** @brief Inserts the specified key and value into the hash table invariantly.
 @param[in] h the flat hash table being queried.
 @param [in] key the key being queried for insertion.
-@param [in] val_handle the handle to the struct being inserted. If a prior
-entry exists, It's content will be written to the container of val_handle.
-@return an empty entry indicates no prior value stored in the table. An
+@param [in] val_handle the handle to the struct being inserted with the value.
+If a prior entry exists, It's content will be written to this container.
+@return an empty entry indicates no prior value was stored in the table. An
 occupied entry now points to the new value in the table. The old value
 has been written to the val_handle containing struct.
+@warning this function's side effect is overwriting the provided struct with
+the previous hash table entry if one existed.
 
 The hash elem handle must point to the embedded handle within the same struct
 type the user is storing in the table or the behavior is undefined.

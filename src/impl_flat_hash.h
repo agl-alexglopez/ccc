@@ -60,7 +60,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_AND_MODIFY(entry_copy, mod_fn)                             \
     ({                                                                         \
         struct ccc_impl_fh_entry _mod_ent_ = (entry_copy).impl;                \
-        if (_mod_ent_.entry.occupied)                                          \
+        if (_mod_ent_.entry.status == CCC_ENTRY_OCCUPIED)                      \
         {                                                                      \
             mod_fn((ccc_update){(void *)_mod_ent_.entry.entry, NULL});         \
         }                                                                      \
@@ -70,7 +70,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                   \
     ({                                                                         \
         struct ccc_impl_fh_entry _mod_with_ent_ = (entry_copy).impl;           \
-        if (_mod_with_ent_.entry.occupied)                                     \
+        if (_mod_with_ent_.entry.status == CCC_ENTRY_OCCUPIED)                 \
         {                                                                      \
             typeof(aux) _aux_ = aux;                                           \
             mod_fn((ccc_update){(void *)_mod_with_ent_.entry.entry, &_aux_});  \
@@ -84,13 +84,12 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         void *_res_;                                                           \
         {                                                                      \
             struct ccc_impl_fh_entry _entry_ = entry_copy.impl;                \
-            if (_entry_.entry.occupied)                                        \
+            if (_entry_.entry.status != CCC_ENTRY_VACANT)                      \
             {                                                                  \
                 _res_ = (void *)_entry_.entry.entry;                           \
             }                                                                  \
             else if (sizeof(typeof(struct_key_value_initializer))              \
                          != ccc_buf_elem_size(_entry_.h->buf)                  \
-                     || !_entry_.entry.entry                                   \
                      || ccc_impl_fh_maybe_resize(_entry_.h) != CCC_OK)         \
             {                                                                  \
                 _res_ = NULL;                                                  \
@@ -99,10 +98,10 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
             {                                                                  \
                 size_t _i_                                                     \
                     = ccc_buf_index_of(_entry_.h->buf, _entry_.entry.entry);   \
-                size_t _dist_ = 0;                                             \
                 size_t const _cap_ = ccc_buf_capacity(_entry_.h->buf);         \
+                size_t _dist_                                                  \
+                    = ccc_impl_fh_distance(_cap_, _i_, _entry_.hash);          \
                 typeof(struct_key_value_initializer) _cur_;                    \
-                typeof(struct_key_value_initializer) _tmp_;                    \
                 bool _initialized_ = false;                                    \
                 for (;; _i_ = (_i_ + 1) % _cap_, ++_dist_)                     \
                 {                                                              \
@@ -131,8 +130,9 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                     {                                                          \
                         if (_initialized_)                                     \
                         {                                                      \
-                            _tmp_ = *((typeof(struct_key_value_initializer) *) \
-                                          _slot_);                             \
+                            typeof(struct_key_value_initializer) _tmp_         \
+                                = *((typeof(struct_key_value_initializer) *)   \
+                                        _slot_);                               \
                             *((typeof(struct_key_value_initializer) *)_slot_)  \
                                 = _cur_;                                       \
                             _cur_ = _tmp_;                                     \
@@ -144,6 +144,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                             *((typeof(struct_key_value_initializer) *)_slot_)  \
                                 = (typeof(struct_key_value_initializer))       \
                                     struct_key_value_initializer;              \
+                            _slot_hash_->hash = _entry_.hash;                  \
                             _initialized_ = true;                              \
                         }                                                      \
                     }                                                          \
