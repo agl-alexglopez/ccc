@@ -143,6 +143,7 @@ fhash_test_entry_api_functional(void)
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
     }
+    CHECK(ccc_fh_size(&fh), (size / 2) / 2, "%zu");
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -163,6 +164,7 @@ fhash_test_entry_api_functional(void)
         }
         CHECK(d->val % 2, true, "%d");
     }
+    CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (size_t i = 0; i < size / 2; ++i)
@@ -175,6 +177,7 @@ fhash_test_entry_api_functional(void)
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true, "%d");
     }
+    CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     return PASS;
 }
 
@@ -202,6 +205,7 @@ fhash_test_entry_api_macros(void)
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
     }
+    CHECK(ccc_fh_size(&fh), (size / 2) / 2, "%zu");
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
@@ -220,6 +224,7 @@ fhash_test_entry_api_macros(void)
         }
         CHECK(d->val % 2, true, "%d");
     }
+    CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
@@ -229,6 +234,7 @@ fhash_test_entry_api_macros(void)
         CHECK(((struct val *)ccc_fh_get(ENTRY(&fh, i)))->val % 2 == 0, true,
               "%d");
     }
+    CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     return PASS;
 }
 

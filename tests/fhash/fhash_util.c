@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 uint64_t
 fhash_int_zero(void const *const n)
@@ -21,4 +22,11 @@ fhash_id_eq(ccc_key_cmp const cmp)
 {
     struct val const *const va = cmp.container;
     return va->id == *((int *)cmp.key);
+}
+
+void
+fhash_print_val(void const *const val)
+{
+    struct val const *const v = val;
+    printf("{id:%d,val:%d},", v->id, v->val);
 }
