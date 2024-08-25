@@ -48,7 +48,7 @@ typedef struct
    provided. */
 typedef struct
 {
-    void const *const entry;
+    void const *entry;
     uint8_t const status;
 } ccc_entry;
 

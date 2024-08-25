@@ -21,8 +21,9 @@ typedef struct
     struct ccc_impl_fh_entry impl;
 } ccc_fhash_entry;
 
-ccc_result ccc_fh_init(ccc_fhash *, ccc_buf *, size_t hash_elem_offset,
-                       ccc_hash_fn *, ccc_key_cmp_fn *, void *aux);
+ccc_result ccc_fh_init(ccc_fhash *, ccc_buf *, size_t key_offset,
+                       size_t hash_elem_offset, ccc_hash_fn *, ccc_key_cmp_fn *,
+                       void *aux);
 bool ccc_fh_empty(ccc_fhash const *);
 size_t ccc_fh_size(ccc_fhash const *);
 
