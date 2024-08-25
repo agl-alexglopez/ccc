@@ -75,6 +75,29 @@ ccc_fh_entry(ccc_fhash *h, void const *const key)
     };
 }
 
+void *
+ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
+{
+    if (e.impl.entry.status & (CCC_ENTRY_NULL | CCC_ENTRY_SEARCH_ERROR))
+    {
+        return (void *)e.impl.entry.entry;
+    }
+    void *user_struct = struct_base(e.impl.h, &elem->impl);
+    if (e.impl.entry.status & CCC_ENTRY_OCCUPIED)
+    {
+        memcpy((void *)e.impl.entry.entry, user_struct,
+               ccc_buf_elem_size(e.impl.h->buf));
+        return (void *)e.impl.entry.entry;
+    }
+    if (ccc_impl_fh_maybe_resize(e.impl.h) != CCC_OK)
+    {
+        return NULL;
+    }
+    insert(e.impl.h, user_struct, e.impl.hash,
+           ccc_buf_index_of(e.impl.h->buf, e.impl.entry.entry));
+    return (void *)e.impl.entry.entry;
+}
+
 ccc_fhash_entry
 ccc_fh_and_modify(ccc_fhash_entry e, ccc_update_fn *const fn)
 {
