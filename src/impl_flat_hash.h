@@ -92,7 +92,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
          (i) = ((i) + 1) % _cap_, ++_dist_)                                     \
     {                                                                           \
         (slot_ptr) = ccc_buf_at((entry).h->buf, (i));                           \
-        (slot_hash_ptr) = ccc_impl_fh_in_slot((entry).h, slot_ptr);             \
+        (slot_hash_ptr) = ccc_impl_fh_in_slot((entry).h, (slot_ptr));           \
         if ((slot_hash_ptr)->hash == EMPTY)                                     \
         {                                                                       \
             *((typeof(struct_key_value_initializer) *)(slot_ptr)) = _cur_;      \
