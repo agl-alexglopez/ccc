@@ -8,24 +8,24 @@
         ccc_fhash                                                              \
             *: (ccc_fhash_entry){CCC_IMPL_FH_ENTRY((container_ptr), (key))})
 
-#define AND_MODIFY(entry_copy, mod_fn)                                         \
-    _Generic((entry_copy),                                                     \
+#define AND_MODIFY(entry, mod_fn)                                              \
+    _Generic((entry),                                                          \
         ccc_fhash_entry: (ccc_fhash_entry){                                    \
-            CCC_IMPL_FH_AND_MODIFY((entry_copy), (mod_fn))})
+            CCC_IMPL_FH_AND_MODIFY((entry), (mod_fn))})
 
-#define AND_MODIFY_WITH(entry_copy, mod_fn, aux)                               \
-    _Generic((entry_copy),                                                     \
+#define AND_MODIFY_WITH(entry, mod_fn, aux)                                    \
+    _Generic((entry),                                                          \
         ccc_fhash_entry: (ccc_fhash_entry){                                    \
-            CCC_IMPL_FH_AND_MODIFY_WITH((entry_copy), (mod_fn), (aux))})
+            CCC_IMPL_FH_AND_MODIFY_WITH((entry), (mod_fn), (aux))})
 
-#define INSERT_ENTRY_WITH(entry_copy, struct_key_value_initializer...)         \
-    _Generic((entry_copy),                                                     \
-        ccc_fhash_entry: CCC_IMPL_FH_INSERT_ENTRY_WITH(                        \
-                 (entry_copy), (struct_key_value_initializer)))
+#define INSERT_ENTRY(entry, struct_key_value_initializer...)                   \
+    _Generic((entry),                                                          \
+        ccc_fhash_entry: CCC_IMPL_FH_INSERT_ENTRY(                             \
+                 (entry), (struct_key_value_initializer)))
 
-#define OR_INSERT_WITH(entry_copy, struct_key_value_initializer...)            \
-    _Generic((entry_copy),                                                     \
-        ccc_fhash_entry: CCC_IMPL_FH_OR_INSERT_WITH(                           \
-                 (entry_copy), (struct_key_value_initializer)))
+#define OR_INSERT(entry, struct_key_value_initializer...)                      \
+    _Generic((entry),                                                          \
+        ccc_fhash_entry: CCC_IMPL_FH_OR_INSERT(                                \
+                 (entry), (struct_key_value_initializer)))
 
 #endif /* CCC_ENTRY_H */
