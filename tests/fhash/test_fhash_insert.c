@@ -5,13 +5,20 @@
 static enum test_result fhash_test_insert(void);
 static enum test_result fhash_test_insert_overwrite(void);
 static enum test_result fhash_test_insert_then_bad_ideas(void);
+static enum test_result fhash_test_entry_api_functional(void);
+static enum test_result fhash_test_entry_api_macros(void);
 
-#define NUM_TESTS (size_t)3
+#define NUM_TESTS (size_t)5
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
     fhash_test_insert_then_bad_ideas,
+    fhash_test_entry_api_functional,
+    fhash_test_entry_api_macros,
 };
+
+static void mod(ccc_update);
+static struct val create_val(int id, int val);
 
 int
 main()
@@ -101,12 +108,140 @@ fhash_test_insert_then_bad_ideas(void)
     CHECK(ccc_fh_occupied(new_ent), true, "%d");
     CHECK(((struct val *)ccc_fh_get(new_ent))->val, 100, "%d");
     CHECK(q.val, 99, "%d");
-    q.val += 5;
+    q.val -= 9;
 
     /* Now the expected behavior of or insert shall occur and no insertion
        will happen because the value is already occupied in the table. */
-    CHECK(((struct val *)ccc_fh_or_insert(ent, &q.e))->val, 100, "%d");
+    CHECK(((struct val *)ccc_fh_or_insert(new_ent, &q.e))->val, 100, "%d");
     CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 100, "%d");
-    CHECK(q.val, 105, "%d");
+    CHECK(q.val, 90, "%d");
     return PASS;
+}
+
+static enum test_result
+fhash_test_entry_api_functional(void)
+{
+    /* Over allocate size now because we don't want to worry about resizing. */
+    size_t const size = 200;
+    struct val vals[size];
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
+    ccc_fhash fh;
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+                                       fhash_int_last_digit, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    /* Test entry or insert with for all even values. Default should be
+       inserted. All entries are hashed to last digit so many spread out
+       collisions. */
+    struct val def = {0};
+    for (size_t i = 0; i < size / 2; i += 2)
+    {
+        def.id = (int)i;
+        def.val = (int)i;
+        struct val const *const d
+            = ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e);
+        CHECK((d != NULL), true, "%d");
+        CHECK(d->id, i, "%d");
+        CHECK(d->val, i, "%d");
+    }
+    /* The default insertion should not occur every other element. */
+    for (size_t i = 0; i < size / 2; ++i)
+    {
+        def.id = (int)i;
+        def.val = (int)i;
+        struct val const *const d = ccc_fh_or_insert(
+            ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod), &def.e);
+        /* All values in the array should be odd now */
+        CHECK((d != NULL), true, "%d");
+        CHECK(d->id, i, "%d");
+        if (i % 2)
+        {
+            CHECK(d->val, i, "%d");
+        }
+        else
+        {
+            CHECK(d->val, i + 1, "%d");
+        }
+        CHECK(d->val % 2, true, "%d");
+    }
+    /* More simply modifications don't require the and modify function. All
+       should be switched back to even now. */
+    for (size_t i = 0; i < size / 2; ++i)
+    {
+        def.id = (int)i;
+        def.val = (int)i;
+        struct val *const in
+            = ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e);
+        in->val++;
+        /* All values in the array should be odd now */
+        CHECK((in->val % 2 == 0), true, "%d");
+    }
+    return PASS;
+}
+
+static enum test_result
+fhash_test_entry_api_macros(void)
+{
+    /* Over allocate size now because we don't want to worry about resizing. */
+    int const size = 200;
+    struct val vals[size];
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
+    ccc_fhash fh;
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+                                       fhash_int_last_digit, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    /* Test entry or insert with for all even values. Default should be
+       inserted. All entries are hashed to last digit so many spread out
+       collisions. */
+    for (int i = 0; i < size / 2; i += 2)
+    {
+        /* The macros support functions that will only execute if the or
+           insert branch executes. */
+        struct val const *const d
+            = OR_INSERT_WITH(ENTRY(&fh, i), create_val(i, i));
+        CHECK((d != NULL), true, "%d");
+        CHECK(d->id, i, "%d");
+        CHECK(d->val, i, "%d");
+    }
+    /* The default insertion should not occur every other element. */
+    for (int i = 0; i < size / 2; ++i)
+    {
+        struct val const *const d = OR_INSERT_WITH(
+            AND_MODIFY(ENTRY(&fh, i), mod), (struct val){.id = i, .val = i});
+        /* All values in the array should be odd now */
+        CHECK((d != NULL), true, "%d");
+        CHECK(d->id, i, "%d");
+        if (i % 2)
+        {
+            CHECK(d->val, i, "%d");
+        }
+        else
+        {
+            CHECK(d->val, i + 1, "%d");
+        }
+        CHECK(d->val % 2, true, "%d");
+    }
+    /* More simply modifications don't require the and modify function. All
+       should be switched back to even now. */
+    for (int i = 0; i < size / 2; ++i)
+    {
+        struct val *const in
+            = OR_INSERT_WITH(ENTRY(&fh, i), (struct val){.id = i, .val = i});
+        in->val++;
+        /* All values in the array should be odd now */
+        CHECK(((struct val *)ccc_fh_get(ENTRY(&fh, i)))->val % 2 == 0, true,
+              "%d");
+    }
+    return PASS;
+}
+
+static void
+mod(ccc_update const mod)
+{
+    ((struct val *)mod.container)->val++;
+}
+
+static struct val
+create_val(int id, int val)
+{
+    return (struct val){.id = id, .val = val};
 }
