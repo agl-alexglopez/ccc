@@ -4,15 +4,17 @@
 
 static enum test_result fhash_test_insert(void);
 static enum test_result fhash_test_insert_overwrite(void);
+static enum test_result fhash_test_insert_via_entry(void);
 static enum test_result fhash_test_insert_then_bad_ideas(void);
 static enum test_result fhash_test_entry_api_functional(void);
 static enum test_result fhash_test_entry_api_macros(void);
 
-#define NUM_TESTS (size_t)5
+#define NUM_TESTS (size_t)6
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
     fhash_test_insert_then_bad_ideas,
+    fhash_test_insert_via_entry,
     fhash_test_entry_api_functional,
     fhash_test_entry_api_macros,
 };
@@ -176,6 +178,55 @@ fhash_test_entry_api_functional(void)
         in->val++;
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true, "%d");
+    }
+    CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_insert_via_entry(void)
+{
+    /* Over allocate size now because we don't want to worry about resizing. */
+    size_t const size = 200;
+    struct val vals[size];
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
+    ccc_fhash fh;
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+                                       fhash_int_last_digit, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    /* Test entry or insert with for all even values. Default should be
+       inserted. All entries are hashed to last digit so many spread out
+       collisions. */
+    struct val def = {0};
+    for (size_t i = 0; i < size / 2; i += 2)
+    {
+        def.id = (int)i;
+        def.val = (int)i;
+        struct val const *const d
+            = ccc_fh_insert_entry(ccc_fh_entry(&fh, &def.id), &def.e);
+        CHECK((d != NULL), true, "%d");
+        CHECK(d->id, i, "%d");
+        CHECK(d->val, i, "%d");
+    }
+    CHECK(ccc_fh_size(&fh), (size / 2) / 2, "%zu");
+    /* The default insertion should not occur every other element. */
+    for (size_t i = 0; i < size / 2; ++i)
+    {
+        def.id = (int)i;
+        def.val = (int)i + 1;
+        struct val const *const d
+            = ccc_fh_insert_entry(ccc_fh_entry(&fh, &def.id), &def.e);
+        /* All values in the array should be odd now */
+        CHECK((d != NULL), true, "%d");
+        CHECK(d->val, i + 1, "%d");
+        if (i % 2)
+        {
+            CHECK(d->val % 2 == 0, true, "%d");
+        }
+        else
+        {
+            CHECK(d->val % 2, true, "%d");
+        }
     }
     CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     return PASS;

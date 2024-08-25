@@ -59,6 +59,7 @@ ccc_fhash_entry ccc_fh_and_modify(ccc_fhash_entry, ccc_update_fn *);
 ccc_fhash_entry ccc_fh_and_modify_with(ccc_fhash_entry, ccc_update_fn *,
                                        void *aux);
 
+void *ccc_fh_insert_entry(ccc_fhash_entry, ccc_fhash_elem *elem);
 void *ccc_fh_or_insert(ccc_fhash_entry, ccc_fhash_elem *elem);
 void *ccc_fh_and_erase(ccc_fhash_entry, ccc_fhash_elem *elem);
 void const *ccc_fh_get(ccc_fhash_entry);
