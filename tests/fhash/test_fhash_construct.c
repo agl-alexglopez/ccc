@@ -44,8 +44,9 @@ fhash_test_empty(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
     return PASS;
@@ -57,8 +58,9 @@ fhash_test_entry_functional(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
@@ -81,8 +83,9 @@ fhash_test_entry_macros(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
     CHECK(ccc_fh_get(ENTRY(&fh, 137)) == NULL, true, "%d");
@@ -108,8 +111,9 @@ fhash_test_entry_and_modify_functional(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
@@ -152,8 +156,9 @@ fhash_test_entry_and_modify_macros(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
 

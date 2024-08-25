@@ -1,6 +1,7 @@
 #include "buf.h"
 #include "fhash_util.h"
 #include "test.h"
+#include <stddef.h>
 
 static enum test_result fhash_test_insert(void);
 static enum test_result fhash_test_insert_overwrite(void);
@@ -45,8 +46,9 @@ fhash_test_insert(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
@@ -62,8 +64,9 @@ fhash_test_insert_overwrite(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.id, &q.e);
@@ -92,8 +95,9 @@ fhash_test_insert_then_bad_ideas(void)
     struct val vals[2] = {{0}, {0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e), fhash_int_zero,
+                                       fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.id, &q.e);
@@ -130,7 +134,9 @@ fhash_test_entry_api_functional(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e),
+
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -193,7 +199,9 @@ fhash_test_insert_via_entry(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e),
+
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -242,7 +250,8 @@ fhash_test_insert_via_entry_macros(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e),
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -286,7 +295,9 @@ fhash_test_entry_api_macros(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, e),
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e),
+
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
