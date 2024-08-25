@@ -10,7 +10,8 @@
 
 static double const load_factor = 0.8;
 
-static void insert(struct ccc_impl_fhash *, void const *, uint64_t hash);
+static void insert(struct ccc_impl_fhash *, void const *, uint64_t hash,
+                   size_t i);
 static void *erase(struct ccc_impl_fhash *, void const *, uint64_t hash);
 
 static bool is_prime(size_t);
@@ -124,7 +125,8 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
             },
         };
     }
-    insert(&h->impl, user_return, hash);
+    insert(&h->impl, user_return, hash,
+           ccc_buf_index_of(h->impl.buf, ent.entry));
     return (ccc_fhash_entry){
         {
             .h = &h->impl,
@@ -148,7 +150,8 @@ ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
     }
     void *e = struct_base(h.impl.h, &elem->impl);
     elem->impl.hash = h.impl.hash;
-    insert(h.impl.h, e, elem->impl.hash);
+    insert(h.impl.h, e, elem->impl.hash,
+           ccc_buf_index_of(h.impl.h->buf, h.impl.entry.entry));
     return (void *)h.impl.entry.entry;
 }
 
@@ -304,7 +307,8 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h)
         struct ccc_impl_fh_elem const *const e = ccc_impl_fh_in_slot(h, slot);
         if (e->hash != EMPTY)
         {
-            insert(&new_hash, slot, e->hash);
+            insert(&new_hash, slot, e->hash,
+                   e->hash % ccc_buf_capacity(h->buf));
         }
     }
     (void)ccc_buf_realloc(h->buf, 0, h->buf->impl.realloc_fn);
@@ -333,7 +337,8 @@ ccc_fh_print(ccc_fhash const *h, ccc_print_fn *fn)
    use this if the element has not been membership tested yet or the table
    is full. */
 static void
-insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
+insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash,
+       size_t cur_i)
 {
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     size_t const cap = ccc_buf_capacity(h->buf);
@@ -344,11 +349,10 @@ insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
        from old table. So should this function invariantly assign starting
        hash to this slot copy for insertion? I think yes so far. */
     ccc_impl_fh_in_slot(h, floater)->hash = hash;
-    size_t i = hash % cap;
-    size_t dist = ccc_impl_fh_distance(cap, i, hash);
-    for (;; i = (i + 1) % cap, ++dist)
+    size_t dist = ccc_impl_fh_distance(cap, cur_i, hash);
+    for (;; cur_i = (cur_i + 1) % cap, ++dist)
     {
-        void *const slot = ccc_buf_at(h->buf, i);
+        void *const slot = ccc_buf_at(h->buf, cur_i);
         struct ccc_impl_fh_elem const *slot_hash = ccc_impl_fh_in_slot(h, slot);
         if (slot_hash->hash == EMPTY)
         {
@@ -356,7 +360,8 @@ insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
             ++h->buf->impl.sz;
             return;
         }
-        size_t const slot_dist = ccc_impl_fh_distance(cap, i, slot_hash->hash);
+        size_t const slot_dist
+            = ccc_impl_fh_distance(cap, cur_i, slot_hash->hash);
         if (dist > slot_dist)
         {
             uint8_t tmp[elem_sz];

@@ -231,8 +231,8 @@ fhash_test_entry_api_macros(void)
     {
         OR_INSERT_WITH(ENTRY(&fh, i), (struct val){0})->val++;
         /* All values in the array should be odd now */
-        CHECK(((struct val *)ccc_fh_get(ENTRY(&fh, i)))->val % 2 == 0, true,
-              "%d");
+        CHECK(OR_INSERT_WITH(ENTRY(&fh, i), (struct val){0})->val % 2 == 0,
+              true, "%d");
     }
     CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     return PASS;
