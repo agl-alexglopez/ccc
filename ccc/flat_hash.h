@@ -54,12 +54,22 @@ insertion error checking function will evaluate to true. */
 ccc_fhash_entry ccc_fh_insert(ccc_fhash *h, void *key,
                               ccc_fhash_elem *val_handle);
 
+/** @brief Inserts the provided entry invariantly.
+@param[in] e the entry returned from a call obtaining an entry.
+@param[in] elem a handle to the struct the user intends to insert.
+@return a pointer to the inserted element in the table or NULL upon error.
+
+This method can be used when the old value in the table does not need to
+be preserved. See the regular insert method if the old value is of interest.
+If an error occurs during the insertion process due to memory limitations
+or a search error NULL is returned. Otherwise insertion should not fail. */
+void *ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *elem);
+
 ccc_fhash_entry ccc_fh_entry(ccc_fhash *, void const *key);
 ccc_fhash_entry ccc_fh_and_modify(ccc_fhash_entry, ccc_update_fn *);
 ccc_fhash_entry ccc_fh_and_modify_with(ccc_fhash_entry, ccc_update_fn *,
                                        void *aux);
 
-void *ccc_fh_insert_entry(ccc_fhash_entry, ccc_fhash_elem *elem);
 void *ccc_fh_or_insert(ccc_fhash_entry, ccc_fhash_elem *elem);
 void *ccc_fh_and_erase(ccc_fhash_entry, ccc_fhash_elem *elem);
 void const *ccc_fh_get(ccc_fhash_entry);

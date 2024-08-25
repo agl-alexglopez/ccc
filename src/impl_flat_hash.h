@@ -78,12 +78,92 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         _mod_with_ent_;                                                        \
     })
 
+#define CCC_IMPL_FH_INSERT(entry, i, slot_ptr, slot_hash_ptr,                  \
+                           struct_key_value_initializer...)                    \
+    size_t const _cap_ = ccc_buf_capacity((entry).h->buf);                     \
+    size_t _dist_ = ccc_impl_fh_distance(_cap_, _i_, (entry).hash);            \
+    typeof(struct_key_value_initializer) _cur_                                 \
+        = *((typeof(struct_key_value_initializer) *)(slot_ptr));               \
+    *((typeof(struct_key_value_initializer) *)(slot_ptr))                      \
+        = (typeof(struct_key_value_initializer))struct_key_value_initializer;  \
+    (slot_hash_ptr)->hash = (entry).hash;                                      \
+    for (++_i_, ++_dist_;; _i_ = (_i_ + 1) % _cap_, ++_dist_)                  \
+    {                                                                          \
+        (slot_ptr) = ccc_buf_at((entry).h->buf, _i_);                          \
+        (slot_hash_ptr) = ccc_impl_fh_in_slot((entry).h, slot_ptr);            \
+        if ((slot_hash_ptr)->hash == EMPTY)                                    \
+        {                                                                      \
+            *((typeof(struct_key_value_initializer) *)(slot_ptr)) = _cur_;     \
+            ++(entry).h->buf->impl.sz;                                         \
+            break;                                                             \
+        }                                                                      \
+        size_t const _slot_ptr_dist_                                           \
+            = ccc_impl_fh_distance(_cap_, _i_, slot_hash_ptr->hash);           \
+        if (_dist_ > _slot_ptr_dist_)                                          \
+        {                                                                      \
+            typeof(struct_key_value_initializer) _tmp_                         \
+                = *((typeof(struct_key_value_initializer) *)(slot_ptr));       \
+            *((typeof(struct_key_value_initializer) *)(slot_ptr)) = _cur_;     \
+            _cur_ = _tmp_;                                                     \
+            _dist_ = _slot_ptr_dist_;                                          \
+        }                                                                      \
+    }
+
+#define CCC_IMPL_FH_INSERT_ENTRY_WITH(entry_copy,                              \
+                                      struct_key_value_initializer...)         \
+    ({                                                                         \
+        typeof(struct_key_value_initializer) *_res_;                           \
+        {                                                                      \
+            struct ccc_impl_fh_entry _ins_ent_ = (entry_copy).impl;            \
+            if (_ins_ent_.entry.status                                         \
+                & (CCC_ENTRY_NULL | CCC_ENTRY_SEARCH_ERROR))                   \
+            {                                                                  \
+                _res_ = (void *)_ins_ent_.entry.entry;                         \
+            }                                                                  \
+            else if (_ins_ent_.entry.status & CCC_ENTRY_OCCUPIED)              \
+            {                                                                  \
+                *((typeof(struct_key_value_initializer) *)                     \
+                      _ins_ent_.entry.entry)                                   \
+                    = (typeof(struct_key_value_initializer))                   \
+                        struct_key_value_initializer;                          \
+                _res_ = (void *)_ins_ent_.entry.entry;                         \
+            }                                                                  \
+            else if (ccc_impl_fh_maybe_resize(_ins_ent_.h) != CCC_OK)          \
+            {                                                                  \
+                _res_ = NULL;                                                  \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                size_t _i_ = ccc_buf_index_of(_ins_ent_.h->buf,                \
+                                              _ins_ent_.entry.entry);          \
+                void *_slot_ = ccc_buf_at(_ins_ent_.h->buf, _i_);              \
+                struct ccc_impl_fh_elem *_slot_hash_                           \
+                    = ccc_impl_fh_in_slot(_ins_ent_.h, _slot_);                \
+                if (_slot_hash_->hash == EMPTY)                                \
+                {                                                              \
+                    *((typeof(struct_key_value_initializer) *)_slot_)          \
+                        = (typeof(struct_key_value_initializer))               \
+                            struct_key_value_initializer;                      \
+                    _slot_hash_->hash = _ins_ent_.hash;                        \
+                    ++_ins_ent_.h->buf->impl.sz;                               \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    CCC_IMPL_FH_INSERT(_ins_ent_, _i_, _slot_, _slot_hash_,    \
+                                       struct_key_value_initializer);          \
+                }                                                              \
+                _res_ = (void *)_ins_ent_.entry.entry;                         \
+            }                                                                  \
+        }                                                                      \
+        _res_;                                                                 \
+    })
+
 #define CCC_IMPL_FH_OR_INSERT_WITH(entry_copy,                                 \
                                    struct_key_value_initializer...)            \
     ({                                                                         \
         typeof(struct_key_value_initializer) *_res_;                           \
         {                                                                      \
-            struct ccc_impl_fh_entry _entry_ = entry_copy.impl;                \
+            struct ccc_impl_fh_entry _entry_ = (entry_copy).impl;              \
             if (_entry_.entry.status != CCC_ENTRY_VACANT)                      \
             {                                                                  \
                 _res_ = (void *)_entry_.entry.entry;                           \
@@ -111,39 +191,8 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                    size_t const _cap_ = ccc_buf_capacity(_entry_.h->buf);     \
-                    size_t _dist_                                              \
-                        = ccc_impl_fh_distance(_cap_, _i_, _entry_.hash);      \
-                    typeof(struct_key_value_initializer) _cur_                 \
-                        = *((typeof(struct_key_value_initializer) *)_slot_);   \
-                    *((typeof(struct_key_value_initializer) *)_slot_)          \
-                        = (typeof(struct_key_value_initializer))               \
-                            struct_key_value_initializer;                      \
-                    _slot_hash_->hash = _entry_.hash;                          \
-                    for (++_i_, ++_dist_;; _i_ = (_i_ + 1) % _cap_, ++_dist_)  \
-                    {                                                          \
-                        _slot_ = ccc_buf_at(_entry_.h->buf, _i_);              \
-                        _slot_hash_ = ccc_impl_fh_in_slot(_entry_.h, _slot_);  \
-                        if (_slot_hash_->hash == EMPTY)                        \
-                        {                                                      \
-                            *((typeof(struct_key_value_initializer) *)_slot_)  \
-                                = _cur_;                                       \
-                            ++_entry_.h->buf->impl.sz;                         \
-                            break;                                             \
-                        }                                                      \
-                        size_t const _slot_dist_ = ccc_impl_fh_distance(       \
-                            _cap_, _i_, _slot_hash_->hash);                    \
-                        if (_dist_ > _slot_dist_)                              \
-                        {                                                      \
-                            typeof(struct_key_value_initializer) _tmp_         \
-                                = *((typeof(struct_key_value_initializer) *)   \
-                                        _slot_);                               \
-                            *((typeof(struct_key_value_initializer) *)_slot_)  \
-                                = _cur_;                                       \
-                            _cur_ = _tmp_;                                     \
-                            _dist_ = _slot_dist_;                              \
-                        }                                                      \
-                    }                                                          \
+                    CCC_IMPL_FH_INSERT(_entry_, _i_, _slot_, _slot_hash_,      \
+                                       struct_key_value_initializer);          \
                 }                                                              \
                 _res_ = (void *)_entry_.entry.entry;                           \
             }                                                                  \
