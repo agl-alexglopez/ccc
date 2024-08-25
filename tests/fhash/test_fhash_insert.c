@@ -224,9 +224,7 @@ fhash_test_entry_api_macros(void)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val *const in
-            = OR_INSERT_WITH(ENTRY(&fh, i), (struct val){.id = i, .val = i});
-        in->val++;
+        OR_INSERT_WITH(ENTRY(&fh, i), (struct val){0})->val++;
         /* All values in the array should be odd now */
         CHECK(((struct val *)ccc_fh_get(ENTRY(&fh, i)))->val % 2 == 0, true,
               "%d");
