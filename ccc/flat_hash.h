@@ -70,4 +70,6 @@ void const *ccc_fh_begin(ccc_fhash const *);
 void const *ccc_fh_next(ccc_fhash const *, ccc_fhash_elem const *iter);
 void const *ccc_fh_end(ccc_fhash const *);
 
+void ccc_fh_print(ccc_fhash const *, ccc_print_fn *);
+
 #endif /* CCC_FLAT_HASH_H */

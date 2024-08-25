@@ -312,6 +312,20 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h)
     return CCC_OK;
 }
 
+void
+ccc_fh_print(ccc_fhash const *h, ccc_print_fn *fn)
+{
+    for (void const *i = ccc_buf_begin(h->impl.buf);
+         i != ccc_buf_capacity_end(h->impl.buf);
+         i = ccc_buf_next(h->impl.buf, i))
+    {
+        if (ccc_impl_fh_in_slot(&h->impl, i)->hash != EMPTY)
+        {
+            fn(i);
+        }
+    }
+}
+
 /*=========================   Static Helpers    ============================*/
 
 /* Assumes that element to be inserted does not already exist in the table.
