@@ -131,8 +131,9 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                             ++_entry_.h->buf->impl.sz;                         \
                             break;                                             \
                         }                                                      \
-                        if (_dist_ > ccc_impl_fh_distance(_cap_, _i_,          \
-                                                          _slot_hash_->hash))  \
+                        size_t const _slot_dist_ = ccc_impl_fh_distance(       \
+                            _cap_, _i_, _slot_hash_->hash);                    \
+                        if (_dist_ > _slot_dist_)                              \
                         {                                                      \
                             typeof(struct_key_value_initializer) _tmp_         \
                                 = *((typeof(struct_key_value_initializer) *)   \
@@ -140,6 +141,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                             *((typeof(struct_key_value_initializer) *)_slot_)  \
                                 = _cur_;                                       \
                             _cur_ = _tmp_;                                     \
+                            _dist_ = _slot_dist_;                              \
                         }                                                      \
                     }                                                          \
                 }                                                              \

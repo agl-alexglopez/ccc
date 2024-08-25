@@ -342,10 +342,12 @@ insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
             ++h->buf->impl.sz;
             return;
         }
-        if (dist > ccc_impl_fh_distance(cap, i, slot_hash->hash))
+        size_t const slot_dist = ccc_impl_fh_distance(cap, i, slot_hash->hash);
+        if (dist > slot_dist)
         {
             uint8_t tmp[elem_sz];
             swap(tmp, floater, slot, elem_sz);
+            dist = slot_dist;
         }
     }
 }
