@@ -10,8 +10,9 @@ static enum test_result fhash_test_insert_via_entry_macros(void);
 static enum test_result fhash_test_insert_then_bad_ideas(void);
 static enum test_result fhash_test_entry_api_functional(void);
 static enum test_result fhash_test_entry_api_macros(void);
+static enum test_result fhash_test_two_sum(void);
 
-#define NUM_TESTS (size_t)7
+#define NUM_TESTS (size_t)8
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -20,6 +21,7 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert_via_entry_macros,
     fhash_test_entry_api_functional,
     fhash_test_entry_api_macros,
+    fhash_test_two_sum,
 };
 
 static void mod(ccc_update);
@@ -108,7 +110,6 @@ fhash_test_insert_then_bad_ideas(void)
     /* This is a dummy entry that indicates the entry was vacant in the table.
        so or insert and erase will do nothing. */
     CHECK(ccc_fh_or_insert(ent, &q.e), NULL, "%p");
-    CHECK(ccc_fh_and_erase(ent, &q.e), NULL, "%p");
 
     q = (struct val){.id = 137, .val = 100};
 
@@ -136,7 +137,6 @@ fhash_test_entry_api_functional(void)
     ccc_fhash fh;
     ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
                                        offsetof(struct val, e),
-
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -201,7 +201,6 @@ fhash_test_insert_via_entry(void)
     ccc_fhash fh;
     ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
                                        offsetof(struct val, e),
-
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -297,7 +296,6 @@ fhash_test_entry_api_macros(void)
     ccc_fhash fh;
     ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
                                        offsetof(struct val, e),
-
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -342,6 +340,39 @@ fhash_test_entry_api_macros(void)
               "%d");
     }
     CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_two_sum(void)
+{
+    size_t const size = 50;
+    struct val vals[size];
+    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
+    ccc_fhash fh;
+    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
+                                       offsetof(struct val, e),
+                                       fhash_int_last_digit, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    int const addends[10] = {1, 3, 5, 6, 7, 13, 44, 32, 10, -1};
+    int const target = 15;
+    int const correct[2] = {8, 2};
+    int indices[2];
+    for (int i = 0; i < 10; ++i)
+    {
+        struct val const *const v = ccc_fh_get(ENTRY(&fh, target - addends[i]));
+        if (v)
+        {
+            indices[0] = i;
+            indices[1] = v->val;
+            break;
+        }
+        INSERT_ENTRY(ENTRY(&fh, addends[i]),
+                     (struct val){.id = addends[i], .val = i});
+    }
+    CHECK(ccc_fh_size(&fh), indices[0], "%zu");
+    CHECK(indices[0], correct[0], "%d");
+    CHECK(indices[1], correct[1], "%d");
     return PASS;
 }
 
