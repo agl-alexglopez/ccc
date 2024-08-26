@@ -108,7 +108,10 @@ bool ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *);
         ccc_impl_fh_insert(                                                    \
             (swap_entry).h, &_cur_slot_,                                       \
             ccc_impl_fh_in_slot((swap_entry).h, &_cur_slot_)->hash, _i_);      \
-    }
+    }                                                                          \
+    (swap_entry).entry.entry = ccc_impl_fh_maybe_resize(                       \
+        (swap_entry).h, (void *)(swap_entry).entry.entry);                     \
+    _res_ = (void *)(swap_entry).entry.entry;
 
 #define CCC_IMPL_FH_INSERT_ENTRY(entry_copy, key_val_struct...)                \
     ({                                                                         \
@@ -132,9 +135,6 @@ bool ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *);
         else                                                                   \
         {                                                                      \
             CCC_IMPL_FH_SWAPS(_ins_ent_, (key_val_struct));                    \
-            _ins_ent_.entry.entry = ccc_impl_fh_maybe_resize(                  \
-                _ins_ent_.h, (void *)_ins_ent_.entry.entry);                   \
-            _res_ = (void *)_ins_ent_.entry.entry;                             \
         }                                                                      \
         _res_;                                                                 \
     })
@@ -156,9 +156,6 @@ bool ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *);
         else                                                                   \
         {                                                                      \
             CCC_IMPL_FH_SWAPS(_entry_, (key_val_struct));                      \
-            _entry_.entry.entry = ccc_impl_fh_maybe_resize(                    \
-                _entry_.h, (void *)_entry_.entry.entry);                       \
-            _res_ = (void *)_entry_.entry.entry;                               \
         }                                                                      \
         _res_;                                                                 \
     })
