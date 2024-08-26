@@ -18,14 +18,12 @@
         ccc_fhash_entry: (ccc_fhash_entry){                                    \
             CCC_IMPL_FH_AND_MODIFY_WITH((entry), (mod_fn), (aux))})
 
-#define INSERT_ENTRY(entry, struct_key_value_initializer...)                   \
+#define INSERT_ENTRY(entry, key_val_struct...)                                 \
     _Generic((entry),                                                          \
-        ccc_fhash_entry: CCC_IMPL_FH_INSERT_ENTRY(                             \
-                 (entry), (struct_key_value_initializer)))
+        ccc_fhash_entry: CCC_IMPL_FH_INSERT_ENTRY((entry), (key_val_struct)))
 
-#define OR_INSERT(entry, struct_key_value_initializer...)                      \
+#define OR_INSERT(entry, key_val_struct...)                                    \
     _Generic((entry),                                                          \
-        ccc_fhash_entry: CCC_IMPL_FH_OR_INSERT(                                \
-                 (entry), (struct_key_value_initializer)))
+        ccc_fhash_entry: CCC_IMPL_FH_OR_INSERT((entry), (key_val_struct)))
 
 #endif /* CCC_ENTRY_H */

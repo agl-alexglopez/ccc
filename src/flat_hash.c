@@ -10,8 +10,6 @@
 
 static double const load_factor = 0.8;
 
-static void insert(struct ccc_impl_fhash *, void const *, uint64_t hash,
-                   size_t i);
 static void *erase(struct ccc_impl_fhash *, void const *, uint64_t hash);
 
 static bool is_prime(size_t);
@@ -93,8 +91,8 @@ ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
                ccc_buf_elem_size(e.impl.h->buf));
         return (void *)e.impl.entry.entry;
     }
-    insert(e.impl.h, user_struct, e.impl.hash,
-           ccc_buf_index_of(e.impl.h->buf, e.impl.entry.entry));
+    ccc_impl_fh_insert(e.impl.h, user_struct, e.impl.hash,
+                       ccc_buf_index_of(e.impl.h->buf, e.impl.entry.entry));
     return ccc_impl_fh_maybe_resize(e.impl.h, (void *)e.impl.entry.entry);
 }
 
@@ -148,8 +146,8 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
             },
         };
     }
-    insert(&h->impl, user_return, hash,
-           ccc_buf_index_of(h->impl.buf, ent.entry));
+    ccc_impl_fh_insert(&h->impl, user_return, hash,
+                       ccc_buf_index_of(h->impl.buf, ent.entry));
     return (ccc_fhash_entry){
         {
             .h = &h->impl,
@@ -173,8 +171,8 @@ ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
     }
     void *e = struct_base(h.impl.h, &elem->impl);
     elem->impl.hash = h.impl.hash;
-    insert(h.impl.h, e, elem->impl.hash,
-           ccc_buf_index_of(h.impl.h->buf, h.impl.entry.entry));
+    ccc_impl_fh_insert(h.impl.h, e, elem->impl.hash,
+                       ccc_buf_index_of(h.impl.h->buf, h.impl.entry.entry));
     return ccc_impl_fh_maybe_resize(h.impl.h, (void *)h.impl.entry.entry);
 }
 
@@ -340,8 +338,8 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h,
         {
             ccc_entry ent = ccc_impl_fh_find(
                 &new_hash, ccc_impl_key_in_slot(h, slot), e->hash);
-            insert(&new_hash, ent.entry, e->hash,
-                   ccc_buf_index_of(new_hash.buf, ent.entry));
+            ccc_impl_fh_insert(&new_hash, ent.entry, e->hash,
+                               ccc_buf_index_of(new_hash.buf, ent.entry));
             if (track_after_resize && track_after_resize == slot)
             {
                 ret = (void *)ent.entry;
@@ -380,9 +378,9 @@ ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *const h)
    Assumes that the table has room for another insertion. It is undefined to
    use this if the element has not been membership tested yet or the table
    is full. */
-static void
-insert(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash,
-       size_t cur_i)
+void
+ccc_impl_fh_insert(struct ccc_impl_fhash *const h, void const *const e,
+                   uint64_t const hash, size_t cur_i)
 {
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     size_t const cap = ccc_buf_capacity(h->buf);
