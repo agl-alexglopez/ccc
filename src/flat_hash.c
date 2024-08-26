@@ -10,7 +10,7 @@
 
 static double const load_factor = 0.8;
 
-static void *erase(struct ccc_impl_fhash *, void const *, uint64_t hash);
+static void erase(struct ccc_impl_fhash *, void *, uint64_t hash);
 
 static bool is_prime(size_t);
 static size_t next_prime(size_t);
@@ -96,6 +96,17 @@ ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
     return ccc_impl_fh_maybe_resize(e.impl.h, (void *)e.impl.entry.entry);
 }
 
+bool
+ccc_fh_remove_entry(ccc_fhash_entry e)
+{
+    if (e.impl.entry.status != CCC_ENTRY_OCCUPIED)
+    {
+        return false;
+    }
+    erase(e.impl.h, (void *)e.impl.entry.entry, e.impl.hash);
+    return true;
+}
+
 ccc_fhash_entry
 ccc_fh_and_modify(ccc_fhash_entry e, ccc_update_fn *const fn)
 {
@@ -117,7 +128,7 @@ ccc_fh_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
 }
 
 ccc_fhash_entry
-ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
+ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const out_handle)
 {
     uint64_t const hash = ccc_impl_fh_filter(&h->impl, key);
     if (ccc_impl_load_factor_exceeded(&h->impl))
@@ -131,7 +142,7 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
             },
         };
     }
-    void *user_return = struct_base(&h->impl, &val_handle->impl);
+    void *user_return = struct_base(&h->impl, &out_handle->impl);
     size_t const user_struct_size = ccc_buf_elem_size(h->impl.buf);
     ccc_entry const ent = ccc_impl_fh_find(&h->impl, key, hash);
     if (ent.status & CCC_ENTRY_OCCUPIED)
@@ -159,6 +170,21 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const val_handle)
 }
 
 void *
+ccc_fh_remove(ccc_fhash *const h, void *const key,
+              ccc_fhash_elem *const out_handle)
+{
+    ccc_entry const ent
+        = ccc_impl_fh_find(&h->impl, key, ccc_impl_fh_filter(&h->impl, key));
+    if (ent.status == CCC_ENTRY_VACANT)
+    {
+        return NULL;
+    }
+    void *ret = struct_base(&h->impl, &out_handle->impl);
+    memcpy(ret, ent.entry, ccc_buf_elem_size(h->impl.buf));
+    return ret;
+}
+
+void *
 ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
 {
     if (ccc_impl_load_factor_exceeded(h.impl.h))
@@ -174,16 +200,6 @@ ccc_fh_or_insert(ccc_fhash_entry h, ccc_fhash_elem *const elem)
     ccc_impl_fh_insert(h.impl.h, e, elem->impl.hash,
                        ccc_buf_index_of(h.impl.h->buf, h.impl.entry.entry));
     return ccc_impl_fh_maybe_resize(h.impl.h, (void *)h.impl.entry.entry);
-}
-
-void *
-ccc_fh_and_erase(ccc_fhash_entry h, ccc_fhash_elem *const elem)
-{
-    if (!(h.impl.entry.status & CCC_ENTRY_OCCUPIED))
-    {
-        return NULL;
-    }
-    return erase(h.impl.h, h.impl.entry.entry, elem->impl.hash);
 }
 
 inline void const *
@@ -413,14 +429,14 @@ ccc_impl_fh_insert(struct ccc_impl_fhash *const h, void const *const e,
     }
 }
 
-static void *
-erase(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
+static void
+erase(struct ccc_impl_fhash *const h, void *const e, uint64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(h->buf);
     size_t stopped_at = ccc_buf_index_of(h->buf, e);
     size_t const elem_sz = ccc_buf_elem_size(h->buf);
     *ccc_impl_hash_at(h, stopped_at) = EMPTY;
-    size_t next = (hash + 1) % cap;
+    size_t next = (hash % cap) + 1;
     uint8_t tmp[ccc_buf_elem_size(h->buf)];
     for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
     {
@@ -433,7 +449,6 @@ erase(struct ccc_impl_fhash *const h, void const *const e, uint64_t const hash)
         swap(tmp, next_slot, ccc_buf_at(h->buf, stopped_at), elem_sz);
     }
     --h->buf->impl.sz;
-    return ccc_buf_at(h->buf, stopped_at);
 }
 
 static void *

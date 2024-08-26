@@ -31,12 +31,12 @@ bool ccc_fh_contains(ccc_fhash *, void const *key);
 
 /** @brief Inserts the specified key and value into the hash table invariantly.
 @param[in] h the flat hash table being queried.
-@param [in] key the key being queried for insertion.
-@param [in] val_handle the handle to the struct being inserted with the value.
+@param [in] key the key being queried for insertion matching stored key type.
+@param [in] out_handle the handle to the struct inserted with the value.
 If a prior entry exists, It's content will be written to this container.
 @return an empty entry indicates no prior value was stored in the table. An
 occupied entry now points to the new value in the table. The old value
-has been written to the val_handle containing struct.
+has been written to the out_handle containing struct.
 @warning this function's side effect is overwriting the provided struct with
 the previous hash table entry if one existed.
 
@@ -47,13 +47,25 @@ If the key did not exist in the table, an empty entry is returned and any
 get methods on it will yeild NULL/false. If a prior entry existed, the
 old entry from the table slot is swapped into the struct containing
 val_handle and the old table slot is overwritten with the new intended
-insertion. The new value in the table is returned as the entry.
+insertion. The new value in the table is returned as the entry. If such copy
+behavior is not needed consider using the entry api.
 
 If an insertion error occurs, due to a table resizing failure, a NULL and
 vacant entry is returned. Get methods will yeild false/NULL and the
 insertion error checking function will evaluate to true. */
 ccc_fhash_entry ccc_fh_insert(ccc_fhash *h, void *key,
-                              ccc_fhash_elem *val_handle);
+                              ccc_fhash_elem *out_handle);
+
+/** @brief Removes the entry stored at key, writing stored value to output.
+@param[in] h the hash table to query.
+@param[in] key the key used for the query matching stored key type.
+@param[in] the handle to the struct that will be returned from this function.
+@return a pointer to the struct wrapping out_handle if a value was present,
+NULL if no entry occupied the table at the provided key.
+
+This function should be used when one wishes to preserve the old value if
+one is present. If such behavior is not needed see the entry API. */
+void *ccc_fh_remove(ccc_fhash *h, void *key, ccc_fhash_elem *out_handle);
 
 /** @brief Inserts the provided entry invariantly.
 @param[in] e the entry returned from a call obtaining an entry.
@@ -66,13 +78,19 @@ If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
 void *ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *elem);
 
+/** @brief Removes the provided entry if it is Occupied.
+@param[in] e the entry to be removed.
+@return true if e was Occupied and now has been removed, false if vacant.
+
+This method does nothing to help preserve the old value if one was present. If
+preserving the old value is of interest see the remove method. */
+bool ccc_fh_remove_entry(ccc_fhash_entry e);
+
 ccc_fhash_entry ccc_fh_entry(ccc_fhash *, void const *key);
 ccc_fhash_entry ccc_fh_and_modify(ccc_fhash_entry, ccc_update_fn *);
 ccc_fhash_entry ccc_fh_and_modify_with(ccc_fhash_entry, ccc_update_fn *,
                                        void *aux);
-
 void *ccc_fh_or_insert(ccc_fhash_entry, ccc_fhash_elem *elem);
-void *ccc_fh_and_erase(ccc_fhash_entry, ccc_fhash_elem *elem);
 void const *ccc_fh_get(ccc_fhash_entry);
 void *ccc_fh_get_mut(ccc_fhash_entry);
 bool ccc_fh_occupied(ccc_fhash_entry);
