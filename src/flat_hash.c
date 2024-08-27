@@ -314,9 +314,6 @@ ccc_impl_fh_distance(size_t const capacity, size_t const index, uint64_t hash)
     return index < hash ? (capacity - hash) + index : hash - index;
 }
 
-/* TODO: There needs to be a return to signal a realloc failure here maybe
-   setting the output parameter instead. Either way, this needs to be
-   more communicative of errors. */
 void *
 ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h,
                          void *const track_after_resize)

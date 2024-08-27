@@ -78,7 +78,9 @@ void *ccc_fh_remove(ccc_fhash *h, void *key, ccc_fhash_elem *out_handle);
 /** @brief Inserts the provided entry invariantly.
 @param[in] e the entry returned from a call obtaining an entry.
 @param[in] elem a handle to the struct the user intends to insert.
-@return a pointer to the inserted element in the table or NULL upon error.
+@return a pointer to the inserted element or NULL upon a memory error in which
+the load factor would be exceeded when no reallocation policy is defined or
+resizing failed to find more memory.
 
 This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
