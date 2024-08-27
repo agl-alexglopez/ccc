@@ -3,7 +3,6 @@
 #include "test.h"
 #include "types.h"
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 static enum test_result fhash_test_insert(void);
@@ -16,8 +15,9 @@ static enum test_result fhash_test_entry_api_macros(void);
 static enum test_result fhash_test_two_sum(void);
 static enum test_result fhash_test_resize(void);
 static enum test_result fhash_test_resize_macros(void);
+static enum test_result fhash_test_resize_from_null(void);
 
-#define NUM_TESTS (size_t)10
+#define NUM_TESTS (size_t)11
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -29,6 +29,7 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_two_sum,
     fhash_test_resize,
     fhash_test_resize_macros,
+    fhash_test_resize_from_null,
 };
 
 static void mod(ccc_update);
@@ -381,36 +382,16 @@ fhash_test_resize(void)
     CHECK(res, CCC_OK, "%d");
     int const to_insert = 1000;
     int const larger_prime = (int)ccc_fh_next_prime(to_insert);
-    size_t resizes = 0;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        ccc_fhash_entry e = ccc_fh_entry(&fh, &elem.id);
-        /* WARNING: Perhaps this is poking a little too far into the inner
-           workings. However, as long as the entry object still exists the
-           user could technically do such a stupid thing and access old
-           buffer data after the resize. The provided functions should prevent
-           this however, because insertion that causes a resize will only
-           ever occur if a Vacant entry is found. In which case, get methods
-           would always return null. */
-        struct val const *possible_address_before_resize = e.impl.entry.entry;
-        struct val *v = ccc_fh_insert_entry(e, &elem.e);
-        if (possible_address_before_resize
-            && possible_address_before_resize != v)
-        {
-            CHECK((uint8_t *)v >= (uint8_t *)ccc_fh_buf_base(&fh), true, "%d");
-            CHECK(((uint8_t *)v - (uint8_t *)ccc_fh_buf_base(&fh))
-                          / sizeof(struct val)
-                      < ccc_fh_capacity(&fh),
-                  true, "%d");
-            ++resizes;
-        }
+        struct val *v
+            = ccc_fh_insert_entry(ccc_fh_entry(&fh, &elem.id), &elem.e);
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_size(&fh), to_insert, "%zu");
-    CHECK(resizes > 0, true, "%d");
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -438,28 +419,52 @@ fhash_test_resize_macros(void)
     CHECK(res, CCC_OK, "%d");
     int const to_insert = 1000;
     int const larger_prime = (int)ccc_fh_next_prime(to_insert);
-    size_t resizes = 0;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_fhash_entry e = ENTRY(&fh, shuffled_index);
-        struct val const *possible_address_before_resize = e.impl.entry.entry;
-        struct val *v = INSERT_ENTRY(e, create(shuffled_index, i));
-        if (possible_address_before_resize
-            && possible_address_before_resize != v)
-        {
-            CHECK((uint8_t *)v >= (uint8_t *)ccc_fh_buf_base(&fh), true, "%d");
-            CHECK(((uint8_t *)v - (uint8_t *)ccc_fh_buf_base(&fh))
-                          / sizeof(struct val)
-                      < ccc_fh_capacity(&fh),
-                  true, "%d");
-            ++resizes;
-        }
+        struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
+                                     create(shuffled_index, i));
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_size(&fh), to_insert, "%zu");
-    CHECK(resizes > 0, true, "%d");
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val const *const in_table
+            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index), swap_val,
+                                        shuffled_index),
+                        (struct val){0});
+        CHECK(in_table != NULL, true, "%d");
+        CHECK(in_table->val, shuffled_index, "%d");
+        OR_INSERT(ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
+        struct val *v = GET(ENTRY(&fh, shuffled_index));
+        CHECK(v->val, i, "%d");
+    }
+    CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_resize_from_null(void)
+{
+    size_t const prime_start = 0;
+    ccc_fhash fh;
+    ccc_result const res
+        = CCC_FH_INIT(&fh, NULL, prime_start, struct val, id, e, realloc,
+                      fhash_id_to_u64, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    int const to_insert = 1000;
+    int const larger_prime = (int)ccc_fh_next_prime(to_insert);
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
+                                     create(shuffled_index, i));
+        CHECK(v->id, shuffled_index, "%d");
+        CHECK(v->val, i, "%d");
+    }
+    CHECK(ccc_fh_size(&fh), to_insert, "%zu");
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
