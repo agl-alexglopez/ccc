@@ -9,6 +9,7 @@
 #include <string.h>
 
 static double const load_factor = 0.8;
+static size_t const default_prime = 11;
 
 static void erase(struct ccc_impl_fhash *, void *, uint64_t hash);
 
@@ -49,7 +50,8 @@ ccc_fh_empty(ccc_fhash const *const h)
 bool
 ccc_fh_contains(ccc_fhash *const h, void const *const key)
 {
-    return ccc_fh_entry(h, key).impl.entry.status & CCC_ENTRY_OCCUPIED;
+    return entry(&h->impl, key, ccc_impl_fh_filter(&h->impl, key)).status
+           & CCC_ENTRY_OCCUPIED;
 }
 
 size_t
@@ -356,7 +358,10 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h)
     }
     struct ccc_impl_fhash new_hash = *h;
     new_hash.buf.impl.sz = 0;
-    new_hash.buf.impl.capacity = ccc_fh_next_prime(ccc_buf_size(&h->buf) * 2);
+    new_hash.buf.impl.capacity
+        = new_hash.buf.impl.capacity
+              ? ccc_fh_next_prime(ccc_buf_size(&h->buf) * 2)
+              : default_prime;
     new_hash.buf.impl.mem = new_hash.buf.impl.realloc_fn(
         NULL, ccc_buf_elem_size(&h->buf) * new_hash.buf.impl.capacity);
     if (!new_hash.buf.impl.mem)
@@ -466,7 +471,7 @@ ccc_fh_capacity(ccc_fhash const *const h)
 
 /*=========================   Static Helpers    ============================*/
 
-static ccc_entry
+static inline ccc_entry
 entry(struct ccc_impl_fhash *const h, void const *key, uint64_t const hash)
 {
     if (ccc_impl_fh_maybe_resize(h) != CCC_OK)
