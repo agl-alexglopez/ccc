@@ -49,7 +49,7 @@ typedef struct
 typedef struct
 {
     void const *entry;
-    uint8_t const status;
+    uint8_t status;
 } ccc_entry;
 
 typedef struct

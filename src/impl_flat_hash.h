@@ -23,16 +23,10 @@ struct ccc_impl_fhash
     size_t hash_elem_offset;
 };
 
-/* The underlying memory for a hash table is mutable. This is what makes it
-   possible to add and remove elements. However, the user should not poke
-   around in a entry. They should only use the provided functions. The
-   functions can then cast away const when needed, which only occurs for
-   the memory pointed to by the entry. This is well-defined because the memory
-   to which an entry points is always modifiable. */
 struct ccc_impl_fh_entry
 {
-    struct ccc_impl_fhash *const h;
-    uint64_t const hash;
+    struct ccc_impl_fhash *h;
+    uint64_t hash;
     ccc_entry entry;
 };
 
@@ -63,8 +57,7 @@ void *ccc_impl_key_in_slot(struct ccc_impl_fhash const *h, void const *slot);
 uint64_t *ccc_impl_hash_at(struct ccc_impl_fhash const *h, size_t i);
 
 size_t ccc_impl_fh_distance(size_t capacity, size_t index, uint64_t hash);
-ccc_result ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *,
-                                    void **track_after_resize);
+ccc_result ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *);
 uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 
 #define CCC_IMPL_FH_ENTRY(fhash_ptr, key)                                      \
@@ -72,11 +65,26 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         __auto_type const _key_ = (key);                                       \
         uint64_t const _hash_                                                  \
             = ccc_impl_fh_filter(&(fhash_ptr)->impl, &_key_);                  \
-        struct ccc_impl_fh_entry _ent_ = {                                     \
-            .h = &(fhash_ptr)->impl,                                           \
-            .hash = _hash_,                                                    \
-            .entry = ccc_impl_fh_find(&(fhash_ptr)->impl, &_key_, _hash_),     \
-        };                                                                     \
+        struct ccc_impl_fh_entry _ent_;                                        \
+        if (ccc_impl_fh_maybe_resize(&(fhash_ptr)->impl) != CCC_OK)            \
+        {                                                                      \
+            ccc_entry _query_                                                  \
+                = ccc_impl_fh_find(&(fhash_ptr)->impl, &_key_, _hash_);        \
+            _ent_ = (struct ccc_impl_fh_entry){                                \
+                .h = &(fhash_ptr)->impl,                                       \
+                .hash = _hash_,                                                \
+                .entry = {.entry = _query_.entry,                              \
+                          .status = _query_.status | CCC_ENTRY_INSERT_ERROR},  \
+            };                                                                 \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            _ent_ = (struct ccc_impl_fh_entry){                                \
+                .h = &(fhash_ptr)->impl,                                       \
+                .hash = _hash_,                                                \
+                .entry = ccc_impl_fh_find(&(fhash_ptr)->impl, &_key_, _hash_), \
+            };                                                                 \
+        }                                                                      \
         _ent_;                                                                 \
     })
 
@@ -156,12 +164,6 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                 = (typeof(*_res_))key_val_struct;                              \
             _res_ = (void *)_ins_ent_.entry.entry;                             \
         }                                                                      \
-        else if (ccc_impl_fh_maybe_resize(_ins_ent_.h,                         \
-                                          (void **)&_ins_ent_.entry.entry)     \
-                 != CCC_OK)                                                    \
-        {                                                                      \
-            _res_ = NULL;                                                      \
-        }                                                                      \
         else                                                                   \
         {                                                                      \
             _res_ = CCC_IMPL_FH_SWAPS(_ins_ent_, (key_val_struct));            \
@@ -178,10 +180,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
             _res_ = (void *)_entry_.entry.entry;                               \
         }                                                                      \
         else if (sizeof(typeof(key_val_struct))                                \
-                     != ccc_buf_elem_size(&(_entry_.h->buf))                   \
-                 || ccc_impl_fh_maybe_resize(_entry_.h,                        \
-                                             (void **)&_entry_.entry.entry)    \
-                        != CCC_OK)                                             \
+                 != ccc_buf_elem_size(&(_entry_.h->buf)))                      \
         {                                                                      \
             _res_ = NULL;                                                      \
         }                                                                      \
