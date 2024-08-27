@@ -73,7 +73,7 @@ ccc_impl_fh_entry(struct ccc_impl_fhash *h, void const *key)
     return (struct ccc_impl_fh_entry){
         .h = h,
         .hash = hash,
-        entry(h, key, hash),
+        .entry = entry(h, key, hash),
     };
 }
 
