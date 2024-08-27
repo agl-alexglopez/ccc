@@ -1,7 +1,8 @@
-#include "buf.h"
 #include "fhash_util.h"
 #include "test.h"
 #include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 static enum test_result fhash_test_insert(void);
 static enum test_result fhash_test_insert_overwrite(void);
@@ -11,8 +12,9 @@ static enum test_result fhash_test_insert_then_bad_ideas(void);
 static enum test_result fhash_test_entry_api_functional(void);
 static enum test_result fhash_test_entry_api_macros(void);
 static enum test_result fhash_test_two_sum(void);
+static enum test_result fhash_test_resize(void);
 
-#define NUM_TESTS (size_t)8
+#define NUM_TESTS (size_t)9
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -22,6 +24,7 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_entry_api_functional,
     fhash_test_entry_api_macros,
     fhash_test_two_sum,
+    fhash_test_resize,
 };
 
 static void mod(ccc_update);
@@ -46,11 +49,9 @@ static enum test_result
 fhash_test_insert(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e), fhash_int_zero,
-                                       fhash_id_eq, NULL);
+    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                       fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
@@ -64,11 +65,9 @@ static enum test_result
 fhash_test_insert_overwrite(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e), fhash_int_zero,
-                                       fhash_id_eq, NULL);
+    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                       fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.id, &q.e);
@@ -95,11 +94,9 @@ static enum test_result
 fhash_test_insert_then_bad_ideas(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, 2, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e), fhash_int_zero,
-                                       fhash_id_eq, NULL);
+    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                       fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.id, &q.e);
@@ -133,10 +130,8 @@ fhash_test_entry_api_functional(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e),
+    ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -197,10 +192,8 @@ fhash_test_insert_via_entry(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e),
+    ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -247,10 +240,8 @@ fhash_test_insert_via_entry_macros(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e),
+    ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -292,10 +283,8 @@ fhash_test_entry_api_macros(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e),
+    ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     /* Test entry or insert with for all even values. Default should be
@@ -348,11 +337,9 @@ fhash_test_two_sum(void)
 {
     size_t const size = 50;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_fhash fh;
-    ccc_result const res = ccc_fh_init(&fh, &buf, offsetof(struct val, id),
-                                       offsetof(struct val, e),
-                                       fhash_int_last_digit, fhash_id_eq, NULL);
+    ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
+                                       fhash_id_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const addends[10] = {1, 3, 5, 6, 7, 13, 44, 32, 10, -1};
     int const target = 15;
@@ -360,7 +347,7 @@ fhash_test_two_sum(void)
     int indices[2];
     for (int i = 0; i < 10; ++i)
     {
-        struct val const *const v = ccc_fh_get(ENTRY(&fh, target - addends[i]));
+        struct val const *const v = GET(ENTRY(&fh, target - addends[i]));
         if (v)
         {
             indices[0] = i;
@@ -373,6 +360,59 @@ fhash_test_two_sum(void)
     CHECK(ccc_fh_size(&fh), indices[0], "%zu");
     CHECK(indices[0], correct[0], "%d");
     CHECK(indices[1], correct[1], "%d");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_resize(void)
+{
+    size_t const prime_start = 5;
+    struct val *vals = malloc(sizeof(struct val) * prime_start);
+    CHECK(vals != NULL, true, "%d");
+    ccc_fhash fh;
+    ccc_result const res
+        = CCC_FH_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
+                      fhash_id_to_u64, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    int const to_insert = 1000;
+    int const larger_prime = (int)ccc_fh_next_prime(to_insert);
+    size_t resizes = 0;
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val elem = {.id = shuffled_index, .val = i};
+        ccc_fhash_entry e = ccc_fh_entry(&fh, &elem.id);
+        /* WARNING: Perhaps this is poking a little too far into the inner
+           workings. However, as long as the entry object still exists the
+           user could technically do such a stupid thing and access old
+           buffer data after the resize. The provided functions should prevent
+           this however, because inserting that causes a resize will only
+           ever occur if a Vacant entry is found. In which case, get methods
+           would always return null. */
+        struct val const *possible_address_before_resize = e.impl.entry.entry;
+        struct val *v = ccc_fh_insert_entry(e, &elem.e);
+        if (possible_address_before_resize
+            && possible_address_before_resize != v)
+        {
+            CHECK((uint8_t *)v >= (uint8_t *)ccc_fh_buf_base(&fh), true, "%d");
+            CHECK(((uint8_t *)v - (uint8_t *)ccc_fh_buf_base(&fh))
+                          / sizeof(struct val)
+                      < ccc_fh_capacity(&fh),
+                  true, "%d");
+            ++resizes;
+        }
+        CHECK(v->id, shuffled_index, "%d");
+        CHECK(v->val, i, "%d");
+    }
+    CHECK(ccc_fh_size(&fh), to_insert, "%zu");
+    CHECK(resizes > 0, true, "%d");
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        CHECK(ccc_fh_get(ccc_fh_entry(&fh, &shuffled_index)) != NULL, true,
+              "%d");
+    }
+    CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
 }
 

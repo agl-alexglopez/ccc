@@ -29,8 +29,8 @@ typedef enum test_result (*test_fn)(void);
 #define CHECK(result, expected, type_format_specifier)                         \
     do                                                                         \
     {                                                                          \
-        typeof(result) const _result_ = result;                                \
-        typeof(result) const _expected_ = expected;                            \
+        __auto_type const _result_ = (result);                                 \
+        typeof(_result_) const _expected_ = (expected);                        \
         if (_result_ != _expected_)                                            \
         {                                                                      \
             (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,    \

@@ -21,9 +21,17 @@ typedef struct
     struct ccc_impl_fh_entry impl;
 } ccc_fhash_entry;
 
-ccc_result ccc_fh_init(ccc_fhash *, ccc_buf *, size_t key_offset,
-                       size_t hash_elem_offset, ccc_hash_fn *, ccc_key_cmp_fn *,
-                       void *aux);
+#define CCC_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,   \
+                    fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)    \
+    CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
+                     fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)
+
+size_t ccc_fh_next_prime(size_t);
+void *ccc_fh_buf_base(ccc_fhash const *);
+size_t ccc_fh_capacity(ccc_fhash const *);
+void ccc_fh_clear(ccc_fhash *, ccc_destructor_fn *);
+ccc_result ccc_fh_clear_and_free(ccc_fhash *, ccc_destructor_fn *);
+
 bool ccc_fh_empty(ccc_fhash const *);
 size_t ccc_fh_size(ccc_fhash const *);
 
