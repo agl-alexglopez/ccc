@@ -51,6 +51,11 @@ ccc_entry ccc_impl_fh_find(struct ccc_impl_fhash const *, void const *key,
 void ccc_impl_fh_insert(struct ccc_impl_fhash *h, void const *e, uint64_t hash,
                         size_t cur_i);
 
+struct ccc_impl_fh_entry ccc_impl_fh_entry(struct ccc_impl_fhash *h,
+                                           void const *key);
+struct ccc_impl_fh_entry ccc_impl_fh_and_modify(struct ccc_impl_fh_entry e,
+                                                ccc_update_fn *fn);
+
 struct ccc_impl_fh_elem *ccc_impl_fh_in_slot(struct ccc_impl_fhash const *h,
                                              void const *slot);
 void *ccc_impl_key_in_slot(struct ccc_impl_fhash const *h, void const *slot);
@@ -63,28 +68,8 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_ENTRY(fhash_ptr, key)                                      \
     ({                                                                         \
         __auto_type const _key_ = (key);                                       \
-        uint64_t const _hash_                                                  \
-            = ccc_impl_fh_filter(&(fhash_ptr)->impl, &_key_);                  \
-        struct ccc_impl_fh_entry _ent_;                                        \
-        if (ccc_impl_fh_maybe_resize(&(fhash_ptr)->impl) != CCC_OK)            \
-        {                                                                      \
-            ccc_entry _query_                                                  \
-                = ccc_impl_fh_find(&(fhash_ptr)->impl, &_key_, _hash_);        \
-            _ent_ = (struct ccc_impl_fh_entry){                                \
-                .h = &(fhash_ptr)->impl,                                       \
-                .hash = _hash_,                                                \
-                .entry = {.entry = _query_.entry,                              \
-                          .status = _query_.status | CCC_ENTRY_INSERT_ERROR},  \
-            };                                                                 \
-        }                                                                      \
-        else                                                                   \
-        {                                                                      \
-            _ent_ = (struct ccc_impl_fh_entry){                                \
-                .h = &(fhash_ptr)->impl,                                       \
-                .hash = _hash_,                                                \
-                .entry = ccc_impl_fh_find(&(fhash_ptr)->impl, &_key_, _hash_), \
-            };                                                                 \
-        }                                                                      \
+        struct ccc_impl_fh_entry _ent_                                         \
+            = ccc_impl_fh_entry(&(fhash_ptr)->impl, &_key_);                   \
         _ent_;                                                                 \
     })
 
@@ -101,11 +86,8 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 
 #define CCC_IMPL_FH_AND_MODIFY(entry_copy, mod_fn)                             \
     ({                                                                         \
-        struct ccc_impl_fh_entry _mod_ent_ = (entry_copy).impl;                \
-        if (_mod_ent_.entry.status == CCC_ENTRY_OCCUPIED)                      \
-        {                                                                      \
-            (mod_fn)((ccc_update){(void *)_mod_ent_.entry.entry, NULL});       \
-        }                                                                      \
+        struct ccc_impl_fh_entry _mod_ent_                                     \
+            = ccc_impl_fh_and_modify((entry_copy).impl, (mod_fn));             \
         _mod_ent_;                                                             \
     })
 
