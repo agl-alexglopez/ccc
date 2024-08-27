@@ -12,6 +12,7 @@ target_link_libraries(graph PRIVATE
   cli
   random
   str_view::str_view
+  flat_hash
   set
   pqueue
   queue
