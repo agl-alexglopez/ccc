@@ -1,5 +1,7 @@
 #include "fhash_util.h"
+#include "flat_hash.h"
 #include "test.h"
+#include "types.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -13,8 +15,9 @@ static enum test_result fhash_test_entry_api_functional(void);
 static enum test_result fhash_test_entry_api_macros(void);
 static enum test_result fhash_test_two_sum(void);
 static enum test_result fhash_test_resize(void);
+static enum test_result fhash_test_resize_macros(void);
 
-#define NUM_TESTS (size_t)9
+#define NUM_TESTS (size_t)10
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -25,10 +28,12 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_entry_api_macros,
     fhash_test_two_sum,
     fhash_test_resize,
+    fhash_test_resize_macros,
 };
 
 static void mod(ccc_update);
-static struct val create_val(int id, int val);
+static struct val create(int id, int val);
+static void swap_val(ccc_update u);
 
 int
 main()
@@ -294,7 +299,7 @@ fhash_test_entry_api_macros(void)
     {
         /* The macros support functions that will only execute if the or
            insert branch executes. */
-        struct val const *const d = OR_INSERT(ENTRY(&fh, i), create_val(i, i));
+        struct val const *const d = OR_INSERT(ENTRY(&fh, i), create(i, i));
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -303,8 +308,8 @@ fhash_test_entry_api_macros(void)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val const *const d = OR_INSERT(AND_MODIFY(ENTRY(&fh, i), mod),
-                                              (struct val){.id = i, .val = i});
+        struct val const *const d
+            = OR_INSERT(AND_MODIFY(ENTRY(&fh, i), mod), create(i, i));
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -386,7 +391,7 @@ fhash_test_resize(void)
            workings. However, as long as the entry object still exists the
            user could technically do such a stupid thing and access old
            buffer data after the resize. The provided functions should prevent
-           this however, because inserting that causes a resize will only
+           this however, because insertion that causes a resize will only
            ever occur if a Vacant entry is found. In which case, get methods
            would always return null. */
         struct val const *possible_address_before_resize = e.impl.entry.entry;
@@ -409,11 +414,74 @@ fhash_test_resize(void)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        CHECK(ccc_fh_get(ccc_fh_entry(&fh, &shuffled_index)) != NULL, true,
-              "%d");
+        struct val swap_slot = {shuffled_index, shuffled_index, {}};
+        struct val const *const in_table
+            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.id, &swap_slot.e));
+        CHECK(in_table != NULL, true, "%d");
+        CHECK(in_table->val, shuffled_index, "%d");
+        CHECK(swap_slot.val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
+}
+
+static enum test_result
+fhash_test_resize_macros(void)
+{
+    size_t const prime_start = 5;
+    struct val *vals = malloc(sizeof(struct val) * prime_start);
+    CHECK(vals != NULL, true, "%d");
+    ccc_fhash fh;
+    ccc_result const res
+        = CCC_FH_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
+                      fhash_id_to_u64, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    int const to_insert = 1000;
+    int const larger_prime = (int)ccc_fh_next_prime(to_insert);
+    size_t resizes = 0;
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        ccc_fhash_entry e = ENTRY(&fh, shuffled_index);
+        struct val const *possible_address_before_resize = e.impl.entry.entry;
+        struct val *v = INSERT_ENTRY(e, create(shuffled_index, i));
+        if (possible_address_before_resize
+            && possible_address_before_resize != v)
+        {
+            CHECK((uint8_t *)v >= (uint8_t *)ccc_fh_buf_base(&fh), true, "%d");
+            CHECK(((uint8_t *)v - (uint8_t *)ccc_fh_buf_base(&fh))
+                          / sizeof(struct val)
+                      < ccc_fh_capacity(&fh),
+                  true, "%d");
+            ++resizes;
+        }
+        CHECK(v->id, shuffled_index, "%d");
+        CHECK(v->val, i, "%d");
+    }
+    CHECK(ccc_fh_size(&fh), to_insert, "%zu");
+    CHECK(resizes > 0, true, "%d");
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val const *const in_table
+            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index), swap_val,
+                                        shuffled_index),
+                        (struct val){0});
+        CHECK(in_table != NULL, true, "%d");
+        CHECK(in_table->val, shuffled_index, "%d");
+        OR_INSERT(ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
+        struct val *v = GET(ENTRY(&fh, shuffled_index));
+        CHECK(v->val, i, "%d");
+    }
+    CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    return PASS;
+}
+
+static inline void
+swap_val(ccc_update u)
+{
+    struct val *v = u.container;
+    v->val = *((int *)u.aux);
 }
 
 static void
@@ -423,7 +491,7 @@ mod(ccc_update const mod)
 }
 
 static struct val
-create_val(int id, int val)
+create(int id, int val)
 {
     return (struct val){.id = id, .val = val};
 }
