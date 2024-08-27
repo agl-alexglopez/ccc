@@ -440,7 +440,7 @@ fhash_test_resize_macros(void)
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         OR_INSERT(ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val *v = GET(ENTRY(&fh, shuffled_index));
+        struct val const *v = GET(ENTRY(&fh, shuffled_index));
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
@@ -510,7 +510,7 @@ fhash_test_resize_from_null_macros(void)
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         OR_INSERT(ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val *v = GET(ENTRY(&fh, shuffled_index));
+        struct val *v = GET_MUT(ENTRY(&fh, shuffled_index));
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");

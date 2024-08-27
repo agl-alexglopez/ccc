@@ -55,6 +55,7 @@ struct ccc_impl_fh_entry ccc_impl_fh_entry(struct ccc_impl_fhash *h,
                                            void const *key);
 struct ccc_impl_fh_entry ccc_impl_fh_and_modify(struct ccc_impl_fh_entry e,
                                                 ccc_update_fn *fn);
+void const *ccc_impl_fh_get(struct ccc_impl_fh_entry *e);
 
 struct ccc_impl_fh_elem *ccc_impl_fh_in_slot(struct ccc_impl_fhash const *h,
                                              void const *slot);
@@ -76,11 +77,14 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_GET(entry_copy)                                            \
     ({                                                                         \
         struct ccc_impl_fh_entry _get_ent_ = (entry_copy).impl;                \
-        void *_ret_ = NULL;                                                    \
-        if (_get_ent_.entry.status == CCC_ENTRY_OCCUPIED)                      \
-        {                                                                      \
-            _ret_ = (void *)_get_ent_.entry.entry;                             \
-        }                                                                      \
+        void const *_ret_ = ccc_impl_fh_get(&_get_ent_);                       \
+        _ret_;                                                                 \
+    })
+
+#define CCC_IMPL_FH_GET_MUT(entry_copy)                                        \
+    ({                                                                         \
+        struct ccc_impl_fh_entry _get_ent_ = (entry_copy).impl;                \
+        void *_ret_ = (void *)ccc_impl_fh_get(&_get_ent_);                     \
         _ret_;                                                                 \
     })
 

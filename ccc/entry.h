@@ -10,6 +10,9 @@
 
 #define GET(entry) _Generic((entry), ccc_fhash_entry: CCC_IMPL_FH_GET((entry)))
 
+#define GET_MUT(entry)                                                         \
+    _Generic((entry), ccc_fhash_entry: CCC_IMPL_FH_GET_MUT((entry)))
+
 #define AND_MODIFY(entry, mod_fn)                                              \
     _Generic((entry),                                                          \
         ccc_fhash_entry: (ccc_fhash_entry){                                    \

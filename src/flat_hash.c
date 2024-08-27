@@ -201,23 +201,25 @@ ccc_fh_or_insert(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 }
 
 inline void const *
-ccc_fh_get(ccc_fhash_entry const e)
+ccc_fh_get(ccc_fhash_entry e)
 {
-    if (!(e.impl.entry.status & CCC_ENTRY_OCCUPIED))
-    {
-        return NULL;
-    }
-    return e.impl.entry.entry;
+    return ccc_impl_fh_get(&e.impl);
 }
 
 inline void *
-ccc_fh_get_mut(ccc_fhash_entry const e)
+ccc_fh_get_mut(ccc_fhash_entry e)
 {
-    if (!(e.impl.entry.status & CCC_ENTRY_OCCUPIED))
+    return (void *)ccc_impl_fh_get(&e.impl);
+}
+
+inline void const *
+ccc_impl_fh_get(struct ccc_impl_fh_entry *e)
+{
+    if (!(e->entry.status & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return (void *)e.impl.entry.entry;
+    return e->entry.entry;
 }
 
 inline bool
