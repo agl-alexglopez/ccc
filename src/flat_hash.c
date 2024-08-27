@@ -63,12 +63,18 @@ ccc_fh_size(ccc_fhash const *const h)
 ccc_fhash_entry
 ccc_fh_entry(ccc_fhash *h, void const *const key)
 {
-    uint64_t const hash = ccc_impl_fh_filter(&h->impl, key);
-    return (ccc_fhash_entry){{
-        .h = &h->impl,
+    return (ccc_fhash_entry){ccc_impl_fh_entry(&h->impl, key)};
+}
+
+struct ccc_impl_fh_entry
+ccc_impl_fh_entry(struct ccc_impl_fhash *h, void const *key)
+{
+    uint64_t const hash = ccc_impl_fh_filter(h, key);
+    return (struct ccc_impl_fh_entry){
+        .h = h,
         .hash = hash,
-        entry(&h->impl, key, hash),
-    }};
+        entry(h, key, hash),
+    };
 }
 
 void *
@@ -105,9 +111,15 @@ ccc_fh_remove_entry(ccc_fhash_entry e)
 ccc_fhash_entry
 ccc_fh_and_modify(ccc_fhash_entry e, ccc_update_fn *const fn)
 {
-    if (e.impl.entry.status == CCC_ENTRY_OCCUPIED)
+    return (ccc_fhash_entry){ccc_impl_fh_and_modify(e.impl, fn)};
+}
+
+struct ccc_impl_fh_entry
+ccc_impl_fh_and_modify(struct ccc_impl_fh_entry e, ccc_update_fn *const fn)
+{
+    if (e.entry.status == CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){(void *)e.impl.entry.entry, NULL});
+        fn((ccc_update){(void *)e.entry.entry, NULL});
     }
     return e;
 }

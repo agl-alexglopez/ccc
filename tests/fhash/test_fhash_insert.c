@@ -16,8 +16,9 @@ static enum test_result fhash_test_two_sum(void);
 static enum test_result fhash_test_resize(void);
 static enum test_result fhash_test_resize_macros(void);
 static enum test_result fhash_test_resize_from_null(void);
+static enum test_result fhash_test_resize_from_null_macros(void);
 
-#define NUM_TESTS (size_t)11
+#define NUM_TESTS (size_t)12
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -30,6 +31,7 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_resize,
     fhash_test_resize_macros,
     fhash_test_resize_from_null,
+    fhash_test_resize_from_null_macros,
 };
 
 static void mod(ccc_update);
@@ -447,6 +449,39 @@ fhash_test_resize_macros(void)
 
 static enum test_result
 fhash_test_resize_from_null(void)
+{
+    ccc_fhash fh;
+    ccc_result const res = CCC_FH_INIT(&fh, NULL, 0, struct val, id, e, realloc,
+                                       fhash_id_to_u64, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    int const to_insert = 1000;
+    int const larger_prime = (int)ccc_fh_next_prime(to_insert);
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val elem = {.id = shuffled_index, .val = i};
+        struct val *v
+            = ccc_fh_insert_entry(ccc_fh_entry(&fh, &elem.id), &elem.e);
+        CHECK(v->id, shuffled_index, "%d");
+        CHECK(v->val, i, "%d");
+    }
+    CHECK(ccc_fh_size(&fh), to_insert, "%zu");
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val swap_slot = {shuffled_index, shuffled_index, {}};
+        struct val const *const in_table
+            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.id, &swap_slot.e));
+        CHECK(in_table != NULL, true, "%d");
+        CHECK(in_table->val, shuffled_index, "%d");
+        CHECK(swap_slot.val, i, "%d");
+    }
+    CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_resize_from_null_macros(void)
 {
     size_t const prime_start = 0;
     ccc_fhash fh;
