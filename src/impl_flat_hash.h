@@ -15,7 +15,7 @@ struct ccc_impl_fh_elem
 
 struct ccc_impl_fhash
 {
-    ccc_buf *buf;
+    ccc_buf buf;
     ccc_hash_fn *hash_fn;
     ccc_key_cmp_fn *eq_fn;
     void *aux;
@@ -36,6 +36,22 @@ struct ccc_impl_fh_entry
     ccc_entry entry;
 };
 
+#define CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name,         \
+                         key_field, fhash_elem_field, realloc_fn, hash_fn,     \
+                         key_cmp_fn, aux)                                      \
+    ({                                                                         \
+        (fhash_ptr)->impl.buf = (ccc_buf)CCC_BUF_INIT(                         \
+            (memory_ptr), struct_name, (capacity), (realloc_fn));              \
+        ccc_result _res_ = ccc_impl_fh_init(                                   \
+            &(fhash_ptr)->impl, offsetof(struct_name, key_field),              \
+            offsetof(struct_name, fhash_elem_field), (hash_fn), (key_cmp_fn),  \
+            (aux));                                                            \
+        _res_;                                                                 \
+    })
+
+ccc_result ccc_impl_fh_init(struct ccc_impl_fhash *, size_t key_offset,
+                            size_t hash_elem_offset, ccc_hash_fn *,
+                            ccc_key_cmp_fn *, void *aux);
 ccc_entry ccc_impl_fh_find(struct ccc_impl_fhash const *, void const *key,
                            uint64_t hash);
 void ccc_impl_fh_insert(struct ccc_impl_fhash *h, void const *e, uint64_t hash,
@@ -65,6 +81,17 @@ bool ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *);
         _ent_;                                                                 \
     })
 
+#define CCC_IMPL_FH_GET(entry_copy)                                            \
+    ({                                                                         \
+        struct ccc_impl_fh_entry _get_ent_ = (entry_copy).impl;                \
+        void *_ret_ = NULL;                                                    \
+        if (_get_ent_.entry.status == CCC_ENTRY_OCCUPIED)                      \
+        {                                                                      \
+            _ret_ = (void *)_get_ent_.entry.entry;                             \
+        }                                                                      \
+        _ret_;                                                                 \
+    })
+
 #define CCC_IMPL_FH_AND_MODIFY(entry_copy, mod_fn)                             \
     ({                                                                         \
         struct ccc_impl_fh_entry _mod_ent_ = (entry_copy).impl;                \
@@ -89,22 +116,22 @@ bool ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *);
 
 #define CCC_IMPL_FH_SWAPS(swap_entry, key_val_struct...)                       \
     size_t _i_                                                                 \
-        = ccc_buf_index_of((swap_entry).h->buf, (swap_entry).entry.entry);     \
+        = ccc_buf_index_of(&((swap_entry).h->buf), (swap_entry).entry.entry);  \
     if (*ccc_impl_hash_at((swap_entry).h, _i_) == EMPTY)                       \
     {                                                                          \
-        *((typeof(key_val_struct) *)ccc_buf_at((swap_entry).h->buf, _i_))      \
+        *((typeof(key_val_struct) *)ccc_buf_at(&((swap_entry).h->buf), _i_))   \
             = (typeof(key_val_struct))key_val_struct;                          \
         *ccc_impl_hash_at((swap_entry).h, _i_) = (swap_entry).hash;            \
-        ++(swap_entry).h->buf->impl.sz;                                        \
+        ++(swap_entry).h->buf.impl.sz;                                         \
     }                                                                          \
     else                                                                       \
     {                                                                          \
-        typeof(key_val_struct) _cur_slot_                                      \
-            = *((typeof(_cur_slot_) *)ccc_buf_at((swap_entry).h->buf, _i_));   \
-        *((typeof(_cur_slot_) *)ccc_buf_at((swap_entry).h->buf, _i_))          \
+        typeof(key_val_struct) _cur_slot_ = *(                                 \
+            (typeof(_cur_slot_) *)ccc_buf_at(&((swap_entry).h->buf), _i_));    \
+        *((typeof(_cur_slot_) *)ccc_buf_at(&((swap_entry).h->buf), _i_))       \
             = (typeof(_cur_slot_))key_val_struct;                              \
         *ccc_impl_hash_at((swap_entry).h, _i_) = (swap_entry).hash;            \
-        _i_ = (_i_ + 1) % ccc_buf_capacity((swap_entry).h->buf);               \
+        _i_ = (_i_ + 1) % ccc_buf_capacity(&((swap_entry).h->buf));            \
         ccc_impl_fh_insert(                                                    \
             (swap_entry).h, &_cur_slot_,                                       \
             ccc_impl_fh_in_slot((swap_entry).h, &_cur_slot_)->hash, _i_);      \
@@ -148,7 +175,7 @@ bool ccc_impl_load_factor_exceeded(struct ccc_impl_fhash const *);
             _res_ = (void *)_entry_.entry.entry;                               \
         }                                                                      \
         else if (sizeof(typeof(key_val_struct))                                \
-                     != ccc_buf_elem_size(_entry_.h->buf)                      \
+                     != ccc_buf_elem_size(&(_entry_.h->buf))                   \
                  || ccc_impl_load_factor_exceeded(_entry_.h))                  \
         {                                                                      \
             _res_ = NULL;                                                      \

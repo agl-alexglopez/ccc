@@ -8,6 +8,8 @@
         ccc_fhash                                                              \
             *: (ccc_fhash_entry){CCC_IMPL_FH_ENTRY((container_ptr), (key))})
 
+#define GET(entry) _Generic((entry), ccc_fhash_entry: CCC_IMPL_FH_GET((entry)))
+
 #define AND_MODIFY(entry, mod_fn)                                              \
     _Generic((entry),                                                          \
         ccc_fhash_entry: (ccc_fhash_entry){                                    \
