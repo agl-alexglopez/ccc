@@ -560,9 +560,20 @@ fhash_test_insert_limit(void)
     CHECK(in_table->val, -2, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
+    in_table = INSERT_ENTRY(ENTRY(&fh, last_index),
+                            (struct val){.id = last_index, .val = -3});
+    CHECK(in_table != NULL, true, "%d");
+    CHECK(in_table->val, -3, "%d");
+    CHECK(ccc_fh_size(&fh), final_size, "%zu");
+
     /* The shuffled index key that failed insertion should fail again. */
-    v = (struct val){.id = shuffled_index, .val = -3};
+    v = (struct val){.id = shuffled_index, .val = -4};
     in_table = ccc_fh_insert_entry(ccc_fh_entry(&fh, &v.id), &v.e);
+    CHECK(in_table == NULL, true, "%d");
+    CHECK(ccc_fh_size(&fh), final_size, "%zu");
+
+    in_table = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
+                            (struct val){.id = shuffled_index, .val = -4});
     CHECK(in_table == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
