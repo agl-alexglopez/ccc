@@ -131,8 +131,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
                 (swap_entry).h, &_cur_slot_,                                   \
                 ccc_impl_fh_in_slot((swap_entry).h, &_cur_slot_)->hash, _i_);  \
         }                                                                      \
-        void *_return_slot_ = (void *)(swap_entry).entry.entry;                \
-        _return_slot_;                                                         \
+        (void *)(swap_entry).entry.entry;                                      \
     })
 
 #define CCC_IMPL_FH_INSERT_ENTRY(entry_copy, key_val_struct...)                \
