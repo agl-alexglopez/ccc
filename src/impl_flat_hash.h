@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#define EMPTY ((uint64_t)-1)
+#define EMPTY ((uint64_t)0)
 
 struct ccc_impl_fh_elem
 {
