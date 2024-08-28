@@ -17,8 +17,9 @@ static enum test_result fhash_test_resize(void);
 static enum test_result fhash_test_resize_macros(void);
 static enum test_result fhash_test_resize_from_null(void);
 static enum test_result fhash_test_resize_from_null_macros(void);
+static enum test_result fhash_test_insert_limit(void);
 
-#define NUM_TESTS (size_t)12
+#define NUM_TESTS (size_t)13
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -32,6 +33,7 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_resize_macros,
     fhash_test_resize_from_null,
     fhash_test_resize_from_null_macros,
+    fhash_test_insert_limit,
 };
 
 static void mod(ccc_update);
@@ -514,6 +516,60 @@ fhash_test_resize_from_null_macros(void)
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    return PASS;
+}
+
+static enum test_result
+fhash_test_insert_limit(void)
+{
+    int const size = 101;
+    struct val vals[size];
+    ccc_fhash fh;
+    ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
+                                       fhash_id_to_u64, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK, "%d");
+    int const larger_prime = (int)ccc_fh_next_prime(size);
+    int last_index = 0;
+    int shuffled_index = larger_prime % size;
+    for (int i = 0; i < size;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % size)
+    {
+        struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
+                                     create(shuffled_index, i));
+        if (!v)
+        {
+            break;
+        }
+        CHECK(v->id, shuffled_index, "%d");
+        CHECK(v->val, i, "%d");
+        last_index = shuffled_index;
+    }
+    size_t const final_size = ccc_fh_size(&fh);
+    /* The last successful entry is still in the table and is overwritten. */
+    struct val v = {.id = last_index, .val = -1};
+    ccc_fhash_entry ent = ccc_fh_insert(&fh, &v.id, &v.e);
+    CHECK(ccc_fh_get(ent) != NULL, true, "%d");
+    CHECK(ccc_fh_insert_error(ent), false, "%d");
+    CHECK(((struct val *)ccc_fh_get(ent))->val, -1, "%d");
+    CHECK(((struct val *)ccc_fh_get(ent))->val != v.val, true, "%d");
+    CHECK(ccc_fh_size(&fh), final_size, "%zu");
+
+    v = (struct val){.id = last_index, .val = -2};
+    struct val *in_table = ccc_fh_insert_entry(ccc_fh_entry(&fh, &v.id), &v.e);
+    CHECK(in_table != NULL, true, "%d");
+    CHECK(in_table->val, -2, "%d");
+    CHECK(ccc_fh_size(&fh), final_size, "%zu");
+
+    /* The shuffled index key that failed insertion should fail again. */
+    v = (struct val){.id = shuffled_index, .val = -3};
+    in_table = ccc_fh_insert_entry(ccc_fh_entry(&fh, &v.id), &v.e);
+    CHECK(in_table == NULL, true, "%d");
+    CHECK(ccc_fh_size(&fh), final_size, "%zu");
+
+    ent = ccc_fh_insert(&fh, &v.id, &v.e);
+    CHECK(ccc_fh_get(ent) == NULL, true, "%d");
+    CHECK(ccc_fh_insert_error(ent), true, "%d");
+    CHECK(ccc_fh_size(&fh), final_size, "%zu");
     return PASS;
 }
 
