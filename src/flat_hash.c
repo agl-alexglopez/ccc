@@ -137,38 +137,20 @@ ccc_fh_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
 ccc_fhash_entry
 ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const out_handle)
 {
-    uint64_t const hash = ccc_impl_fh_filter(&h->impl, key);
     void *user_return = struct_base(&h->impl, &out_handle->impl);
     size_t const user_struct_size = ccc_buf_elem_size(&h->impl.buf);
-    ccc_entry ent = entry(&h->impl, key, hash);
-    if (ent.status & CCC_ENTRY_INSERT_ERROR)
-    {
-        return (ccc_fhash_entry){{
-            .h = &h->impl,
-            .hash = hash,
-            .entry = ent,
-        }};
-    }
-    if (ent.status & CCC_ENTRY_OCCUPIED)
+    struct ccc_impl_fh_entry ent = ccc_impl_fh_entry(&h->impl, key);
+    if (ent.entry.status & CCC_ENTRY_OCCUPIED)
     {
         uint8_t tmp[user_struct_size];
-        swap(tmp, (void *)ent.entry, user_return, user_struct_size);
-        return (ccc_fhash_entry){{
-            .h = &h->impl,
-            .hash = hash,
-            .entry = ent,
-        }};
+        swap(tmp, (void *)ent.entry.entry, user_return, user_struct_size);
+        return (ccc_fhash_entry){ent};
     }
-    ccc_impl_fh_insert(&h->impl, user_return, hash,
-                       ccc_buf_index_of(&h->impl.buf, ent.entry));
-    return (ccc_fhash_entry){
-        {
-            .h = &h->impl,
-            .hash = hash,
-            .entry
-            = {.entry = NULL, .status = CCC_ENTRY_VACANT | CCC_ENTRY_NULL},
-        },
-    };
+    ccc_impl_fh_insert(&h->impl, user_return, ent.hash,
+                       ccc_buf_index_of(&h->impl.buf, ent.entry.entry));
+    ent.entry.entry = NULL;
+    ent.entry.status |= (CCC_ENTRY_VACANT | CCC_ENTRY_NULL);
+    return (ccc_fhash_entry){ent};
 }
 
 void *
