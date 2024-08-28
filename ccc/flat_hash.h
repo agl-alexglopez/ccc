@@ -26,19 +26,14 @@ typedef struct
     CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
                      fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)
 
-size_t ccc_fh_next_prime(size_t);
-void *ccc_fh_buf_base(ccc_fhash const *);
-size_t ccc_fh_capacity(ccc_fhash const *);
-void ccc_fh_clear(ccc_fhash *, ccc_destructor_fn *);
-ccc_result ccc_fh_clear_and_free(ccc_fhash *, ccc_destructor_fn *);
-
-bool ccc_fh_empty(ccc_fhash const *);
-size_t ccc_fh_size(ccc_fhash const *);
-
-bool ccc_fh_contains(ccc_fhash *, void const *key);
+/** @brief Searches the table for the presence of key.
+@param [in] h the flat hash table to be searched.
+@param [in] key pointer to the key matching the key type of the user struct.
+@return true if the struct containing key is stored, false if not. */
+bool ccc_fh_contains(ccc_fhash *h, void const *key);
 
 /** @brief Inserts the specified key and value into the hash table invariantly.
-@param[in] h the flat hash table being queried.
+@param [in] h the flat hash table being queried.
 @param [in] key the key being queried for insertion matching stored key type.
 @param [in] out_handle the handle to the struct inserted with the value.
 If a prior entry exists, It's content will be written to this container.
@@ -65,11 +60,13 @@ ccc_fhash_entry ccc_fh_insert(ccc_fhash *h, void *key,
                               ccc_fhash_elem *out_handle);
 
 /** @brief Removes the entry stored at key, writing stored value to output.
-@param[in] h the hash table to query.
-@param[in] key the key used for the query matching stored key type.
-@param[in] the handle to the struct that will be returned from this function.
+@param [in] h the hash table to query.
+@param [in] key the key used for the query matching stored key type.
+@param [in] the handle to the struct that will be returned from this function.
 @return a pointer to the struct wrapping out_handle if a value was present,
 NULL if no entry occupied the table at the provided key.
+@warning this function's side effect is overwriting the provided struct with
+the previous hash table entry if one existed.
 
 This function should be used when one wishes to preserve the old value if
 one is present. If such behavior is not needed see the entry API. */
@@ -106,10 +103,19 @@ void *ccc_fh_get_mut(ccc_fhash_entry);
 bool ccc_fh_occupied(ccc_fhash_entry);
 bool ccc_fh_insert_error(ccc_fhash_entry);
 
+bool ccc_fh_empty(ccc_fhash const *);
+size_t ccc_fh_size(ccc_fhash const *);
+
 void const *ccc_fh_begin(ccc_fhash const *);
 void const *ccc_fh_next(ccc_fhash const *, ccc_fhash_elem const *iter);
 void const *ccc_fh_end(ccc_fhash const *);
 
+void ccc_fh_clear(ccc_fhash *, ccc_destructor_fn *);
+ccc_result ccc_fh_clear_and_free(ccc_fhash *, ccc_destructor_fn *);
+
+size_t ccc_fh_next_prime(size_t);
+void *ccc_fh_buf_base(ccc_fhash const *);
+size_t ccc_fh_capacity(ccc_fhash const *);
 void ccc_fh_print(ccc_fhash const *, ccc_print_fn *);
 
 #endif /* CCC_FLAT_HASH_H */
