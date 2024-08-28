@@ -377,12 +377,10 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h)
     {
         return CCC_MEM_ERR;
     }
-    for (void *i = ccc_buf_begin(&new_hash.buf);
-         i != ccc_buf_capacity_end(&new_hash.buf);
-         i = ccc_buf_next(&new_hash.buf, i))
-    {
-        ccc_impl_fh_in_slot(&new_hash, i)->hash = EMPTY;
-    }
+    /* Empty is intentionally chosen as zero so every byte is just set to
+       0 in this new array. */
+    memset(ccc_buf_base(&new_hash.buf), EMPTY,
+           ccc_buf_capacity(&new_hash.buf) * ccc_buf_elem_size(&new_hash.buf));
     for (void *slot = ccc_buf_begin(&h->buf);
          slot != ccc_buf_capacity_end(&h->buf);
          slot = ccc_buf_next(&h->buf, slot))
@@ -500,7 +498,7 @@ erase(struct ccc_impl_fhash *const h, void *const e, uint64_t const hash)
     size_t stopped_at = ccc_buf_index_of(&h->buf, e);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf);
     *ccc_impl_hash_at(h, stopped_at) = EMPTY;
-    size_t next = (hash % cap) + 1;
+    size_t next = (hash + 1) % cap;
     uint8_t tmp[ccc_buf_elem_size(&h->buf)];
     for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
     {
@@ -546,7 +544,7 @@ inline uint64_t
 ccc_impl_fh_filter(struct ccc_impl_fhash const *const h, void const *const key)
 {
     uint64_t const hash = h->hash_fn(key);
-    return hash == EMPTY ? hash - 1 : hash;
+    return hash == EMPTY ? hash + 1 : hash;
 }
 
 static inline bool
