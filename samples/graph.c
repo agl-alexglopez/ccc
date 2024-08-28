@@ -226,9 +226,6 @@ static bool is_valid_edge_cell(Cell, Cell);
 static void clear_paint(struct graph *);
 static bool is_vertex(Cell);
 static bool is_path(Cell);
-static void build_edge(struct graph *graph, struct vertex *src,
-                       struct vertex *dst, Cell edge_id, ccc_fhash *parent_map,
-                       struct point cur);
 
 static void encode_digits(struct graph *, struct digit_encoding);
 static enum label_orientation get_direction(struct point, struct point);
@@ -238,18 +235,15 @@ static void *valid_malloc(size_t);
 static void help(void);
 
 static ccc_threeway_cmp cmp_vertices(ccc_cmp);
+static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 
 static bool eq_parent_cells(ccc_key_cmp);
 static uint64_t hash_parent_cells(void const *point_struct);
-
 static bool eq_prev_vertices(ccc_key_cmp);
 static uint64_t hash_vertex_addr(void const *pointer_to_vertex);
-
 static uint64_t hash_64_bits(uint64_t);
 
-static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 static void pq_update_dist(ccc_update);
-static void print_vertex(void const *);
 static void set_vertex_destructor(void *);
 static void set_pq_prev_vertex_dist_point_destructor(void *);
 static void set_parent_point_destructor(void *);
@@ -323,9 +317,6 @@ main(int argc, char **argv)
     build_graph(&graph);
     find_shortest_paths(&graph);
     set_cursor_position(graph.rows + 1, graph.cols + 1);
-    ccc_set_print(&graph.adjacency_list,
-                  &((struct vertex *)ccc_set_root(&graph.adjacency_list))->elem,
-                  print_vertex);
     printf("\n");
     ccc_set_clear(&graph.adjacency_list, set_vertex_destructor);
 }
@@ -463,7 +454,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 struct parent_cell *inserted = ccc_fh_insert_entry(
                     ccc_fh_entry(&parent_map, &next), &push.elem);
                 assert(inserted);
-                build_edge(graph, src, dst, edge_id, &parent_map, next);
+                cur = next;
                 success = true;
                 break;
             }
@@ -476,36 +467,31 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             }
         }
     }
+    if (success)
+    {
+        struct parent_cell const *cell
+            = ccc_fh_get(ccc_fh_entry(&parent_map, &cur));
+        assert(cell);
+        struct edge edge = {.to = dst, .cost = 1};
+        while (cell->parent.r > 0)
+        {
+            cell = ccc_fh_get(ccc_fh_entry(&parent_map, &cell->parent));
+            if (!cell)
+            {
+                quit("Cannot find cell parent to rebuild path.\n", 1);
+            }
+            ++edge.cost;
+            *grid_at_mut(graph, cell->key) |= edge_id;
+            build_path_cell(graph, cell->key, edge_id);
+        }
+        (void)add_edge(src, &edge);
+        edge.to = src;
+        (void)add_edge(dst, &edge);
+        add_edge_cost_label(graph, dst, &edge);
+    }
     ccc_fh_clear_and_free(&parent_map, set_parent_point_destructor);
     q_free(&bfs);
     return success;
-}
-
-static void
-build_edge(struct graph *graph, struct vertex *src, struct vertex *dst,
-           Cell edge_id, ccc_fhash *parent_map, struct point cur)
-{
-    struct parent_cell const *cell = ccc_fh_get(ccc_fh_entry(parent_map, &cur));
-    if (!cell)
-    {
-        quit("Cannot find cell parent to rebuild path.\n", 1);
-    }
-    struct edge edge = {.to = dst, .cost = 1};
-    while (cell->parent.r > 0)
-    {
-        cell = ccc_fh_get(ccc_fh_entry(parent_map, &cell->parent));
-        if (!cell)
-        {
-            quit("Cannot find cell parent to rebuild path.\n", 1);
-        }
-        ++edge.cost;
-        *grid_at_mut(graph, cell->key) |= edge_id;
-        build_path_cell(graph, cell->key, edge_id);
-    }
-    (void)add_edge(src, &edge);
-    edge.to = src;
-    (void)add_edge(dst, &edge);
-    add_edge_cost_label(graph, dst, &edge);
 }
 
 /* A edge cost lable will only be added if there is sufficient space. For
@@ -652,8 +638,8 @@ random_vertex_placement(struct graph const *const graph)
                         && ((col + 1) % graph->cols) == col_start;
         }
     }
-    (void)fprintf(stderr, "cannot find a place for another vertex "
-                          "on this grid, quitting now.\n");
+    quit("cannot find a place for another vertex on this grid, quitting now.\n",
+         1);
     exit(1);
 }
 
@@ -872,7 +858,7 @@ grid_at(struct graph const *const graph, struct point p)
 static inline uint16_t
 sort_vertices(char a, char b)
 {
-    return a < b ? a << 8 | b : b << 8 | a;
+    return a < b ? (a << 8) | b : (b << 8) | a;
 }
 
 static char
@@ -1107,22 +1093,6 @@ static void
 pq_update_dist(ccc_update const u)
 {
     ((struct dist_point *)u.container)->dist = *((int *)u.aux);
-}
-
-static void
-print_vertex(void const *const x)
-{
-    struct vertex const *v = x;
-    printf("{%c,pos{%d,%d},edges{", v->name, v->pos.r, v->pos.c);
-    for (int i = 0; i < max_degree && v->edges[i].to; ++i)
-    {
-        printf("{%c,%d}", v->edges[i].to->name, v->edges[i].cost);
-    }
-    printf("}");
-    if (!v->edges[0].to)
-    {
-        printf("}");
-    }
 }
 
 static void
