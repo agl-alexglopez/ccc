@@ -80,17 +80,23 @@ ccc_impl_fh_entry(struct ccc_impl_fhash *h, void const *key)
 void *
 ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 {
-    if (e.impl.entry.status
-        & (CCC_ENTRY_NULL | CCC_ENTRY_SEARCH_ERROR | CCC_ENTRY_INSERT_ERROR))
+    if (e.impl.entry.status & (CCC_ENTRY_NULL | CCC_ENTRY_SEARCH_ERROR))
     {
-        return (void *)e.impl.entry.entry;
+        return NULL;
     }
     void *user_struct = struct_base(e.impl.h, &elem->impl);
     if (e.impl.entry.status & CCC_ENTRY_OCCUPIED)
     {
+        /* It is ok if an insert error was indicated because we are do not
+           need more space if we are overwriting a previous value. */
+        e.impl.entry.status = CCC_ENTRY_OCCUPIED;
         memcpy((void *)e.impl.entry.entry, user_struct,
                ccc_buf_elem_size(&e.impl.h->buf));
         return (void *)e.impl.entry.entry;
+    }
+    if (e.impl.entry.status & CCC_ENTRY_INSERT_ERROR)
+    {
+        return NULL;
     }
     ccc_impl_fh_insert(e.impl.h, user_struct, e.impl.hash,
                        ccc_buf_index_of(&e.impl.h->buf, e.impl.entry.entry));
@@ -142,8 +148,17 @@ ccc_fh_insert(ccc_fhash *h, void *const key, ccc_fhash_elem *const out_handle)
     struct ccc_impl_fh_entry ent = ccc_impl_fh_entry(&h->impl, key);
     if (ent.entry.status & CCC_ENTRY_OCCUPIED)
     {
+        /* If an error occured when obtaining the entry and trying to resize,
+           that is ok. We will not need new space yet. Only allow the insert
+           error to persist if we actually need more space. */
+        ent.entry.status = CCC_ENTRY_OCCUPIED;
         uint8_t tmp[user_struct_size];
         swap(tmp, (void *)ent.entry.entry, user_return, user_struct_size);
+        return (ccc_fhash_entry){ent};
+    }
+    if (ent.entry.status & CCC_ENTRY_NULL)
+    {
+        ent.entry.status |= CCC_ENTRY_INSERT_ERROR;
         return (ccc_fhash_entry){ent};
     }
     ccc_impl_fh_insert(&h->impl, user_return, ent.hash,
@@ -275,10 +290,8 @@ ccc_impl_fh_find(struct ccc_impl_fhash const *const h, void const *const key,
             return (ccc_entry){.entry = slot, .status = CCC_ENTRY_OCCUPIED};
         }
     }
-    /* This should be impossible given we are managing load factor?
-       The resizing operates on every call to the entry api which is the
-       only way we searhc the table so the table should never be full. */
-    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
+    return (ccc_entry){.entry = NULL,
+                       .status = CCC_ENTRY_VACANT | CCC_ENTRY_NULL};
 }
 
 /* Assumes that element to be inserted does not already exist in the table.
