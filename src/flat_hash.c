@@ -388,8 +388,8 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *h)
         struct ccc_impl_fh_elem const *const e = ccc_impl_fh_in_slot(h, slot);
         if (e->hash != EMPTY)
         {
-            void *old_key = ccc_impl_key_in_slot(h, slot);
-            ccc_entry new_ent = ccc_impl_fh_find(&new_hash, old_key, e->hash);
+            ccc_entry new_ent = ccc_impl_fh_find(
+                &new_hash, ccc_impl_key_in_slot(h, slot), e->hash);
             ccc_impl_fh_insert(&new_hash, slot, e->hash,
                                ccc_buf_index_of(&new_hash.buf, new_ent.entry));
         }
