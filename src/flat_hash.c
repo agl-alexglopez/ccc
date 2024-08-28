@@ -488,13 +488,14 @@ ccc_fh_capacity(ccc_fhash const *const h)
 static inline ccc_entry
 entry(struct ccc_impl_fhash *const h, void const *key, uint64_t const hash)
 {
+    uint8_t upcoming_insertion_error = 0;
     if (ccc_impl_fh_maybe_resize(h) != CCC_OK)
     {
-        ccc_entry ent = ccc_impl_fh_find(h, key, hash);
-        ent.status |= CCC_ENTRY_INSERT_ERROR;
-        return ent;
+        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
     }
-    return ccc_impl_fh_find(h, key, hash);
+    ccc_entry res = ccc_impl_fh_find(h, key, hash);
+    res.status |= upcoming_insertion_error;
+    return res;
 }
 
 static void
