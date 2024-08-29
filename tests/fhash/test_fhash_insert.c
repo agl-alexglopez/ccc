@@ -354,7 +354,7 @@ fhash_test_two_sum(void)
     int const addends[10] = {1, 3, 5, 6, 7, 13, 44, 32, 10, -1};
     int const target = 15;
     int const correct[2] = {8, 2};
-    int indices[2];
+    int indices[2] = {-1, -1};
     for (int i = 0; i < 10; ++i)
     {
         struct val const *const v = GET(ENTRY(&fh, target - addends[i]));
@@ -608,7 +608,7 @@ fhash_test_insert_wrong_type(void)
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     CHECK(wrong == NULL, true, "%d");
     wrong = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
-                      (struct too_big){.a = {137, 137, {}}});
+                      (struct too_big){.a = {.id = 137, .val = 137}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     struct val *correct
@@ -619,15 +619,15 @@ fhash_test_insert_wrong_type(void)
     CHECK(ccc_fh_size(&fh), 1, "%zu");
 
     /* This must not work because the user would be looking at an array slot
-       as the wrong type. However the modification to the found entry is ok. */
+       as the wrong type. However the modification to the entry is ok. */
     wrong = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
                       (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 1, "%zu");
     CHECK(((struct val *)GET(ENTRY(&fh, 137)))->val, 138, "%d");
     /* This is somewhat nonsense as why would someone modify then overwrite
-       the previous value? However, it's possible. The modification will still
-       work before the overwrite insertion fails. */
+       the previous value? However, it's possible. The modification will
+       still work before the overwrite insertion fails. */
     wrong = INSERT_ENTRY(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
                          (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
