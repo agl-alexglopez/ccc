@@ -64,23 +64,19 @@ enum lru_call
 struct lru_request
 {
     enum lru_call call;
+    int key;
+    int val;
     union {
         struct
         {
-            int key;
-            int val;
             void (*fn)(struct lru_cache *, int, int);
         } put;
         struct
         {
-            int key;
-            int val;
             int (*fn)(struct lru_cache *, int);
         } get;
         struct
         {
-            int key;
-            int val;
             struct key_val *(*fn)(struct lru_cache *);
         } front;
     };
@@ -179,17 +175,18 @@ fhash_test_lru_cache(void)
     };
     CCC_FH_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
                 fhash_int_to_u64, lru_lookup_cmp, NULL);
-    struct lru_request requests[10] = {
-        {PUT, .put = {.key = 1, .val = 1, put}},
-        {PUT, .put = {.key = 2, .val = 2, put}},
-        {GET, .get = {.key = 1, .val = 1, get}},
-        {PUT, .put = {.key = 3, .val = 3, put}},
-        {FRONT, .front = {.key = 3, .val = 3, front}},
-        {PUT, .put = {.key = 4, .val = 4, put}},
-        {GET, .get = {.key = 2, .val = -1, get}},
-        {GET, .get = {.key = 4, .val = 4, get}},
-        {GET, .get = {.key = 2, .val = -1, get}},
-        {FRONT, .front = {.key = 4, .val = 4, front}},
+    struct lru_request requests[11] = {
+        {PUT, .key = 1, .val = 1, .put = {put}},
+        {PUT, .key = 2, .val = 2, .put = {put}},
+        {GET, .key = 1, .val = 1, .get = {get}},
+        {PUT, .key = 3, .val = 3, .put = {put}},
+        {FRONT, .key = 3, .val = 3, .front = {front}},
+        {PUT, .key = 4, .val = 4, .put = {put}},
+        {GET, .key = 2, .val = -1, .get = {get}},
+        {GET, .key = 3, .val = 3, .get = {get}},
+        {GET, .key = 4, .val = 4, .get = {get}},
+        {GET, .key = 2, .val = -1, .get = {get}},
+        {FRONT, .key = 4, .val = 4, .front = {front}},
     };
     for (size_t i = 0; i < 10; ++i)
     {
@@ -197,20 +194,20 @@ fhash_test_lru_cache(void)
         {
         case PUT:
         {
-            requests[i].put.fn(&lru, requests[i].put.key, requests[i].put.val);
+            requests[i].put.fn(&lru, requests[i].key, requests[i].val);
         }
         break;
         case GET:
         {
-            CHECK(requests[i].get.fn(&lru, requests[i].put.key),
-                  requests[i].get.val, "%d");
+            CHECK(requests[i].get.fn(&lru, requests[i].key), requests[i].val,
+                  "%d");
         }
         break;
         case FRONT:
         {
             struct key_val const *const kv = requests[i].front.fn(&lru);
-            CHECK(kv->key, requests[i].front.key, "%d");
-            CHECK(kv->val, requests[i].front.val, "%d");
+            CHECK(kv->key, requests[i].key, "%d");
+            CHECK(kv->val, requests[i].val, "%d");
         }
         break;
         }
