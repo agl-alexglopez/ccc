@@ -1,19 +1,9 @@
 add_library(types INTERFACE types.h)
 
-add_library(entry INTERFACE entry.h)
-
-add_library(emplace INTERFACE emplace.h)
-
-target_link_libraries(entry
-  INTERFACE
-    impl_flat_hash
-)
-
 add_library(buf buf.h ${CMAKE_SOURCE_DIR}/src/buf.c)
 target_link_libraries(buf
   INTERFACE
     types
-    emplace
   PRIVATE
     impl_buf
 )
@@ -22,7 +12,6 @@ add_library(list list.h ${CMAKE_SOURCE_DIR}/src/list.c)
 target_link_libraries(list
   INTERFACE
     types
-    emplace
   PRIVATE
     impl_list
 )
@@ -39,7 +28,6 @@ add_library(flat_pqueue flat_pqueue.h ${CMAKE_SOURCE_DIR}/src/flat_pqueue.c)
 target_link_libraries(flat_pqueue 
   INTERFACE
     types
-    emplace
   PRIVATE
     impl_flat_pqueue
 )
@@ -48,7 +36,6 @@ add_library(flat_hash flat_hash.h ${CMAKE_SOURCE_DIR}/src/flat_hash.c)
 target_link_libraries(flat_hash
   INTERFACE
     types
-    entry
   PRIVATE
     impl_flat_hash
 )

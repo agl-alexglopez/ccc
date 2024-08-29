@@ -2,7 +2,6 @@
 #define CCC_FLAT_PQUEUE_H
 
 /* Privately linked implementation. */
-#include "emplace.h" /* NOLINT */
 #include "impl_flat_pqueue.h"
 #include "types.h"
 
@@ -20,8 +19,10 @@ typedef struct
     struct ccc_impl_flat_pqueue impl;
 } ccc_flat_pqueue;
 
-#define CCC_FPQ_INIT(mem_buf, struct_name, cmp_order, cmp_fn, aux_data)        \
-    CCC_IMPL_FPQ_INIT(mem_buf, struct_name, cmp_order, cmp_fn, aux_data)
+#define CCC_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, realloc_fn,      \
+                     cmp_fn, aux_data)                                         \
+    CCC_IMPL_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, realloc_fn,     \
+                      cmp_fn, aux_data)
 
 /* Given an initialized flat priority queue, a struct type, and its
    initializer, attempts to write an r-value of one's struct type into the
@@ -51,12 +52,12 @@ typedef struct
    If generating any values within the struct occurs via expensive function
    calls or calls with side effects, note that such functions do not execute
    if allocation fails due to a full buffer and no reallocation policy. */
-#define CCC_FPQ_EMPLACE(fpq, struct_initializer...)                            \
+#define FPQ_EMPLACE(fpq, struct_initializer...)                                \
     CCC_IMPL_FPQ_EMPLACE(fpq, struct_initializer)
 
 ccc_result ccc_fpq_realloc(ccc_flat_pqueue *, size_t new_capacity,
                            ccc_realloc_fn *);
-ccc_result ccc_fpq_push(ccc_flat_pqueue *, void const *);
+void *ccc_fpq_push(ccc_flat_pqueue *, void const *);
 void const *ccc_fpq_front(ccc_flat_pqueue const *);
 void *ccc_fpq_pop(ccc_flat_pqueue *);
 void *ccc_fpq_erase(ccc_flat_pqueue *, void *);

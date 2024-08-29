@@ -21,9 +21,9 @@ struct ccc_impl_buf
         },                                                                     \
     }
 
-#define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, struct_initializer...)        \
+#define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, type_initializer...)          \
     ({                                                                         \
-        typeof(struct_initializer) *_res_;                                     \
+        typeof(type_initializer) *_res_;                                       \
         if (sizeof(typeof(*_res_)) != ccc_buf_elem_size(ccc_buf_ptr))          \
         {                                                                      \
             _res_ = NULL;                                                      \
@@ -33,15 +33,15 @@ struct ccc_impl_buf
             _res_ = ccc_buf_at(ccc_buf_ptr, index);                            \
             if (_res_)                                                         \
             {                                                                  \
-                *_res_ = (struct_name)struct_initializer;                      \
+                *_res_ = (struct_name)type_initializer;                        \
             }                                                                  \
         }                                                                      \
         _res_;                                                                 \
     })
 
-#define CCC_IMPL_BUF_EMPLACE_BACK(ccc_buf_ptr, struct_initializer...)          \
+#define CCC_IMPL_BUF_EMPLACE_BACK(ccc_buf_ptr, type_initializer...)            \
     ({                                                                         \
-        typeof(struct_initializer) *_res_;                                     \
+        typeof(type_initializer) *_res_;                                       \
         if (sizeof(typeof(*_res_)) != ccc_buf_elem_size(ccc_buf_ptr))          \
         {                                                                      \
             _res_ = NULL;                                                      \
@@ -51,7 +51,7 @@ struct ccc_impl_buf
             _res_ = ccc_buf_alloc((ccc_buf_ptr));                              \
             if (_res_)                                                         \
             {                                                                  \
-                *_res_ = (struct_name)struct_initializer;                      \
+                *_res_ = type_initializer;                                     \
             }                                                                  \
         }                                                                      \
         _res_;                                                                 \

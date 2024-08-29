@@ -21,13 +21,15 @@ struct ccc_impl_list
     void *aux;
 };
 
-void ccc_impl_l_push_back(struct ccc_impl_list *, struct ccc_impl_list_elem *);
-void ccc_impl_l_push_front(struct ccc_impl_list *, struct ccc_impl_list_elem *);
-struct ccc_impl_list_elem *ccc_impl_elem_in(struct ccc_impl_list const *,
-                                            void const *user_struct);
+void ccc_impl_list_push_back(struct ccc_impl_list *,
+                             struct ccc_impl_list_elem *);
+void ccc_impl_list_push_front(struct ccc_impl_list *,
+                              struct ccc_impl_list_elem *);
+struct ccc_impl_list_elem *ccc_impl_list_elem_in(struct ccc_impl_list const *,
+                                                 void const *user_struct);
 
-#define CCC_IMPL_L_INIT(list_ptr, list_name, struct_name, list_elem_field,     \
-                        realloc_fn, aux_data)                                  \
+#define CCC_IMPL_LIST_INIT(list_ptr, list_name, struct_name, list_elem_field,  \
+                           realloc_fn, aux_data)                               \
     {                                                                          \
         {                                                                      \
             .sentinel.n = &(list_name).impl.sentinel,                          \
@@ -38,7 +40,7 @@ struct ccc_impl_list_elem *ccc_impl_elem_in(struct ccc_impl_list const *,
         }                                                                      \
     }
 
-#define CCC_IMPL_L_EMPLACE_BACK(list_ptr, struct_initializer...)               \
+#define CCC_IMPL_LIST_EMPLACE_BACK(list_ptr, struct_initializer...)            \
     ({                                                                         \
         typeof(struct_initializer) *_res_;                                     \
         struct ccc_impl_list *_list_ = &(list_ptr)->impl;                      \
@@ -52,13 +54,14 @@ struct ccc_impl_list_elem *ccc_impl_elem_in(struct ccc_impl_list const *,
             if (_res_)                                                         \
             {                                                                  \
                 *_res_ = (typeof(*_res_))struct_initializer;                   \
-                ccc_impl_l_push_back(_list_, ccc_impl_elem_in(_list_, _res_)); \
+                ccc_impl_list_push_back(_list_,                                \
+                                        ccc_impl_list_elem_in(_list_, _res_)); \
             }                                                                  \
         }                                                                      \
         _res_;                                                                 \
     })
 
-#define CCC_IMPL_L_EMPLACE_FRONT(list_ptr, struct_initializer...)              \
+#define CCC_IMPL_LIST_EMPLACE_FRONT(list_ptr, struct_initializer...)           \
     ({                                                                         \
         typeof(struct_initializer) *_res_;                                     \
         struct ccc_impl_list *_list_ = &(list_ptr)->impl;                      \
@@ -72,8 +75,8 @@ struct ccc_impl_list_elem *ccc_impl_elem_in(struct ccc_impl_list const *,
             if (_res_)                                                         \
             {                                                                  \
                 *_res_ = struct_initializer;                                   \
-                ccc_impl_l_push_front(_list_,                                  \
-                                      ccc_impl_elem_in(_list_, _res_));        \
+                ccc_impl_list_push_front(                                      \
+                    _list_, ccc_impl_list_elem_in(_list_, _res_));             \
             }                                                                  \
         }                                                                      \
         _res_;                                                                 \

@@ -16,10 +16,6 @@ typedef struct
 #define CCC_BUF_INIT(mem, type, capacity, realloc_fn)                          \
     CCC_IMPL_BUF_INIT(mem, type, capacity, realloc_fn)
 
-#define CCC_BUF_EMPLACE(ccc_buf_ptr, index, struct_name,                       \
-                        struct_initializer...)                                 \
-    CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, struct_name, struct_initializer)
-
 ccc_result ccc_buf_realloc(ccc_buf *, size_t new_capacity, ccc_realloc_fn *);
 void *ccc_buf_base(ccc_buf const *);
 size_t ccc_buf_size(ccc_buf const *);
