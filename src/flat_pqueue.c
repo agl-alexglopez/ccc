@@ -68,7 +68,7 @@ ccc_fpq_push(ccc_flat_pqueue *const fpq, void const *const val)
     if (buf_sz > 1)
     {
         uint8_t tmp[ccc_buf_elem_size(fpq->impl.buf)];
-        ccc_impl_fpq_bubble_up(&fpq->impl, tmp, i);
+        (void)ccc_impl_fpq_bubble_up(&fpq->impl, tmp, i);
     }
     return CCC_OK;
 }
@@ -123,7 +123,7 @@ ccc_fpq_erase(ccc_flat_pqueue *const fpq, void *const e)
         (ccc_cmp){at(&fpq->impl, swap_location), erased, fpq->impl.aux});
     if (erased_cmp == fpq->impl.order)
     {
-        ccc_impl_fpq_bubble_up(&fpq->impl, tmp, swap_location);
+        (void)ccc_impl_fpq_bubble_up(&fpq->impl, tmp, swap_location);
     }
     else if (erased_cmp != CCC_EQL)
     {
@@ -153,7 +153,7 @@ ccc_fpq_update(ccc_flat_pqueue *const fpq, void *const e, ccc_update_fn *fn,
         at(&fpq->impl, i), at(&fpq->impl, (i - 1) / 2), fpq->impl.aux});
     if (parent_cmp == fpq->impl.order)
     {
-        ccc_impl_fpq_bubble_up(&fpq->impl, tmp, i);
+        (void)ccc_impl_fpq_bubble_up(&fpq->impl, tmp, i);
         return true;
     }
     if (parent_cmp != CCC_EQL)
@@ -241,16 +241,19 @@ ccc_fpq_print(ccc_flat_pqueue const *const fpq, size_t const i,
 
 /*===========================   Implementation   ========================== */
 
-void
+size_t
 ccc_impl_fpq_bubble_up(struct ccc_impl_flat_pqueue *const fpq, uint8_t tmp[],
                        size_t i)
 {
-    for (size_t parent = (i - 1) / 2;
-         i && wins(fpq, at(fpq, i), at(fpq, parent));
-         i = parent, parent = (parent - 1) / 2)
+    for (size_t parent = (i - 1) / 2; i; i = parent, parent = (parent - 1) / 2)
     {
+        if (!wins(fpq, at(fpq, i), at(fpq, parent)))
+        {
+            return i;
+        }
         swap(fpq, tmp, parent, i);
     }
+    return 0;
 }
 
 /*===============================  Static Helpers  =========================*/

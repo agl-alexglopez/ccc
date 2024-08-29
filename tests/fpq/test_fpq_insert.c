@@ -41,7 +41,7 @@ fpq_test_insert_one(void)
     struct val single[1];
     ccc_buf buf = CCC_BUF_INIT(single, struct val, 1, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     single[0].val = 0;
     ccc_fpq_push(&fpq, &single[0]);
     CHECK(ccc_fpq_empty(&fpq), false, "%d");
@@ -55,7 +55,7 @@ fpq_test_insert_three(void)
     struct val three_vals[size];
     ccc_buf buf = CCC_BUF_INIT(three_vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < size; ++i)
     {
         three_vals[i].val = (int)i;
@@ -74,19 +74,19 @@ fpq_test_struct_getter(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     struct val tester_clone[size];
     ccc_buf buf_clone = CCC_BUF_INIT(tester_clone, struct val, size, NULL);
     ccc_flat_pqueue fpq_clone
-        = CCC_FPQ_INIT(&buf_clone, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf_clone, struct val, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_result const res1
-            = CCC_FPQ_EMPLACE(&fpq, struct val, {.id = (int)i, .val = (int)i});
-        CHECK(res1, CCC_OK, "%d");
-        ccc_result const res2 = CCC_FPQ_EMPLACE(&fpq_clone, struct val,
-                                                {.id = (int)i, .val = (int)i});
-        CHECK(res2, CCC_OK, "%d");
+        struct val const *res1
+            = CCC_FPQ_EMPLACE(&fpq, (struct val){.id = (int)i, .val = (int)i});
+        CHECK(res1 != NULL, true, "%d");
+        struct val const *res2 = CCC_FPQ_EMPLACE(
+            &fpq_clone, (struct val){.id = (int)i, .val = (int)i});
+        CHECK(res2 != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
@@ -105,7 +105,7 @@ fpq_test_insert_three_dups(void)
     struct val three_vals[size];
     ccc_buf buf = CCC_BUF_INIT(three_vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
@@ -126,7 +126,7 @@ fpq_test_insert_shuffle(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
 
     /* Test the printing function at least once. */
@@ -152,7 +152,7 @@ fpq_test_read_max_min(void)
     struct val vals[size];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)i;

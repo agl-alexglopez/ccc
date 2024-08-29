@@ -2,6 +2,7 @@
 #define CCC_FLAT_PQUEUE_H
 
 /* Privately linked implementation. */
+#include "emplace.h" /* NOLINT */
 #include "impl_flat_pqueue.h"
 #include "types.h"
 
@@ -19,19 +20,13 @@ typedef struct
     struct ccc_impl_flat_pqueue impl;
 } ccc_flat_pqueue;
 
-#define CCC_FPQ_INIT(mem_buf, struct_name, fpq_elem_field, cmp_order, cmp_fn,  \
-                     aux_data)                                                 \
-    CCC_IMPL_FPQ_INIT(mem_buf, struct_name, fpq_elem_field, cmp_order, cmp_fn, \
-                      aux_data)
+#define CCC_FPQ_INIT(mem_buf, struct_name, cmp_order, cmp_fn, aux_data)        \
+    CCC_IMPL_FPQ_INIT(mem_buf, struct_name, cmp_order, cmp_fn, aux_data)
 
 /* Given an initialized flat priority queue, a struct type, and its
    initializer, attempts to write an r-value of one's struct type into the
-   backing buffer directly, returning the ccc_fpq_result according to the
-   underlying buffer's allocation policy. If allocation fails because
-   the underlying buffer does not define a reallocation policy and is full,
-   CCC_FPQ_FULL is returned, otherwise CCC_FPQ_OK is returned. If the provided
-   struct type does not match the size of the elements stored in the buffer
-   CCC_FPQ_ERR is returned. Use as follows:
+   backing buffer directly, returning a pointer to the element in storage.
+   If a memory permission error occurs NULL is returned. Use as follows:
 
    struct val
    {
@@ -41,23 +36,23 @@ typedef struct
 
    Various forms of designated initializers:
 
-   ccc_fpq_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10});
-   ccc_fpq_result const res
-       = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = rand_value(), .id = 0});
-   ccc_fpq_result const res
-       = CCC_FPQ_EMPLACE(&fpq, struct val, {.v = 10, .id = 0});
+   struct val const *res = CCC_FPQ_EMPLACE(&fpq, (struct val){.v = 10});
+   struct val const *res
+       = CCC_FPQ_EMPLACE(&fpq, (struct val){.v = rand_value(), .id = 0});
+   struct val const *res
+       = CCC_FPQ_EMPLACE(&fpq, (struct val){.v = 10, .id = 0});
 
    Older C notation requires all fields be specified on some compilers:
 
-   ccc_fpq_result const res = CCC_FPQ_EMPLACE(&fpq, struct val, {10, 0});
+   struct val const *res = CCC_FPQ_EMPLACE(&fpq, (struct val){10, 0});
 
    This macro avoids an additional copy if the struct values are constructed
    by hand or from input of other functions, requiring no intermediate storage.
    If generating any values within the struct occurs via expensive function
    calls or calls with side effects, note that such functions do not execute
    if allocation fails due to a full buffer and no reallocation policy. */
-#define CCC_FPQ_EMPLACE(fpq, struct_name, struct_initializer...)               \
-    CCC_IMPL_FPQ_EMPLACE((fpq), struct_name, struct_initializer)
+#define CCC_FPQ_EMPLACE(fpq, struct_initializer...)                            \
+    CCC_IMPL_FPQ_EMPLACE(fpq, struct_initializer)
 
 ccc_result ccc_fpq_realloc(ccc_flat_pqueue *, size_t new_capacity,
                            ccc_realloc_fn *);

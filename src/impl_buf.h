@@ -21,31 +21,40 @@ struct ccc_impl_buf
         },                                                                     \
     }
 
-#define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, struct_name,                  \
-                             struct_initializer...)                            \
+#define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, struct_initializer...)        \
     ({                                                                         \
-        ccc_result _macro_res_;                                                \
+        typeof(struct_initializer) *_res_;                                     \
+        if (sizeof(typeof(*_res_)) != ccc_buf_elem_size(ccc_buf_ptr))          \
         {                                                                      \
-            if (sizeof(struct_name) != ccc_buf_elem_size(ccc_buf_ptr))         \
+            _res_ = NULL;                                                      \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            _res_ = ccc_buf_at(ccc_buf_ptr, index);                            \
+            if (_res_)                                                         \
             {                                                                  \
-                _macro_res_ = CCC_INPUT_ERR;                                   \
+                *_res_ = (struct_name)struct_initializer;                      \
             }                                                                  \
-            else                                                               \
+        }                                                                      \
+        _res_;                                                                 \
+    })
+
+#define CCC_IMPL_BUF_EMPLACE_BACK(ccc_buf_ptr, struct_initializer...)          \
+    ({                                                                         \
+        typeof(struct_initializer) *_res_;                                     \
+        if (sizeof(typeof(*_res_)) != ccc_buf_elem_size(ccc_buf_ptr))          \
+        {                                                                      \
+            _res_ = NULL;                                                      \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            _res_ = ccc_buf_alloc((ccc_buf_ptr));                              \
+            if (_res_)                                                         \
             {                                                                  \
-                void *_macro_pos_ = ccc_buf_at(ccc_buf_ptr, index);            \
-                if (!_macro_pos_)                                              \
-                {                                                              \
-                    _macro_res_ = CCC_INPUT_ERR;                               \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                    *((struct_name *)_macro_pos_)                              \
-                        = (struct_name)struct_initializer;                     \
-                    _macro_res_ = CCC_OK;                                      \
-                }                                                              \
+                *_res_ = (struct_name)struct_initializer;                      \
             }                                                                  \
-        };                                                                     \
-        _macro_res_;                                                           \
+        }                                                                      \
+        _res_;                                                                 \
     })
 
 #endif /* CCC_IMPL_BUF_H */
