@@ -118,4 +118,6 @@ void *ccc_fh_buf_base(ccc_fhash const *);
 size_t ccc_fh_capacity(ccc_fhash const *);
 void ccc_fh_print(ccc_fhash const *, ccc_print_fn *);
 
+bool ccc_fh_validate(ccc_fhash const *);
+
 #endif /* CCC_FLAT_HASH_H */

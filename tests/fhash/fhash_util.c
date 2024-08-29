@@ -41,3 +41,22 @@ fhash_id_to_u64(void const *const id)
     x = x ^ (x >> 31);
     return x;
 }
+
+void
+fhash_modplus(ccc_update const mod)
+{
+    ((struct val *)mod.container)->val++;
+}
+
+struct val
+fhash_create(int const id, int const val)
+{
+    return (struct val){.id = id, .val = val};
+}
+
+void
+fhash_swap_val(ccc_update const u)
+{
+    struct val *v = u.container;
+    v->val = *((int *)u.aux);
+}

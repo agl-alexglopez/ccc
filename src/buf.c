@@ -96,13 +96,9 @@ ccc_result
 ccc_buf_write(ccc_buf *const buf, size_t const i, void const *const data)
 {
     void *pos = ccc_buf_at(buf, i);
-    if (!pos)
+    if (!pos || data == pos)
     {
         return CCC_INPUT_ERR;
-    }
-    if (data == pos)
-    {
-        return CCC_MEM_ERR;
     }
     (void)memcpy(pos, data, ccc_buf_elem_size(buf));
     return CCC_OK;
