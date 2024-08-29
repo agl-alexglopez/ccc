@@ -428,11 +428,11 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     assert(res == CCC_OK);
     struct queue bfs;
     q_init(sizeof(struct point), &bfs, 4);
-    struct parent_cell *pc = FH_INSERT_ENTRY(
-        FH_ENTRY(&parent_map, src->pos), (struct parent_cell){
-                                             .key = src->pos,
-                                             .parent = (struct point){-1, -1},
-                                         });
+    struct parent_cell *pc = FH_INS_ENT(FH_ENT(&parent_map, src->pos),
+                                        (struct parent_cell){
+                                            .key = src->pos,
+                                            .parent = (struct point){-1, -1},
+                                        });
     assert(pc);
     q_push(&bfs, &src->pos);
     bool success = false;
@@ -719,7 +719,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct prev_vertex *next
-                = FH_GET_MUT(FH_ENTRY(&prev_map, cur->v->edges[i].to));
+                = FH_GET_MUT(FH_ENT(&prev_map, cur->v->edges[i].to));
             assert(next);
             /* The seen set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -741,12 +741,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = FH_GET(FH_ENTRY(&prev_map, v));
+        struct prev_vertex const *prev = FH_GET(FH_ENT(&prev_map, v));
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = FH_GET(FH_ENTRY(&prev_map, prev->prev));
+            prev = FH_GET(FH_ENT(&prev_map, prev->prev));
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -771,11 +771,11 @@ prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
             .dist = v == pr->src ? 0 : INT_MAX,
         };
         struct prev_vertex const *const inserted
-            = FH_INSERT_ENTRY(FH_ENTRY(prev_map, p->v), (struct prev_vertex){
-                                                            .v = p->v,
-                                                            .prev = NULL,
-                                                            .dist_point = p,
-                                                        });
+            = FH_INS_ENT(FH_ENT(prev_map, p->v), (struct prev_vertex){
+                                                     .v = p->v,
+                                                     .prev = NULL,
+                                                     .dist_point = p,
+                                                 });
         if (!inserted)
         {
             quit("inserting into set in in loading phase failed.\n", 1);

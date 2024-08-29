@@ -81,17 +81,17 @@ fhash_test_entry_macros(void)
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
-    CHECK(ccc_fh_get(FH_ENTRY(&fh, 137)) == NULL, true, "%d");
+    CHECK(ccc_fh_get(FH_ENT(&fh, 137)) == NULL, true, "%d");
     int const key = 137;
     int mut = 99;
     /* The function with a side effect should execute. */
-    struct val *inserted = FH_OR_INSERT(
-        FH_ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)});
+    struct val *inserted = FH_OR_INS(FH_ENT(&fh, key),
+                                     (struct val){.id = key, .val = def(&mut)});
     CHECK(inserted != NULL, true, "%d");
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 0, "%d");
     /* The function with a side effect should NOT execute. */
-    FH_OR_INSERT(FH_ENTRY(&fh, key), (struct val){.id = key, .val = def(&mut)})
+    FH_OR_INS(FH_ENT(&fh, key), (struct val){.id = key, .val = def(&mut)})
         ->val++;
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 1, "%d");
@@ -152,7 +152,7 @@ fhash_test_entry_and_modify_macros(void)
     CHECK(ccc_fh_empty(&fh), true, "%d");
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fhash_entry ent = FH_AND_MODIFY(FH_ENTRY(&fh, 137), mod);
+    ccc_fhash_entry ent = FH_AND_MODIFY(FH_ENT(&fh, 137), mod);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK((ccc_fh_get(ent) == NULL), true, "%d");
 
@@ -160,8 +160,8 @@ fhash_test_entry_and_modify_macros(void)
 
     /* Inserting default value before an in place modification is possible. */
     struct val *v
-        = FH_OR_INSERT(FH_AND_MODIFY_WITH(FH_ENTRY(&fh, 137), modw, gen(&mut)),
-                       (struct val){.id = 137, .val = def(&mut)});
+        = FH_OR_INS(FH_AND_MODIFY_W(FH_ENT(&fh, 137), modw, gen(&mut)),
+                    (struct val){.id = 137, .val = def(&mut)});
     CHECK((v != NULL), true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 0, "%d");
@@ -169,8 +169,8 @@ fhash_test_entry_and_modify_macros(void)
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2 = FH_OR_INSERT(FH_AND_MODIFY(FH_ENTRY(&fh, 137), mod),
-                                  (struct val){.id = 137, .val = def(&mut)});
+    struct val *v2 = FH_OR_INS(FH_AND_MODIFY(FH_ENT(&fh, 137), mod),
+                               (struct val){.id = 137, .val = def(&mut)});
     CHECK((v2 != NULL), true, "%d");
     CHECK(v2->id, 137, "%d");
     CHECK(v2->val, 5, "%d");
@@ -180,8 +180,8 @@ fhash_test_entry_and_modify_macros(void)
        possible with slightly different signature. Generate val also has
        lazy evaluation. */
     struct val *v3
-        = FH_OR_INSERT(FH_AND_MODIFY_WITH(FH_ENTRY(&fh, 137), modw, gen(&mut)),
-                       (struct val){.id = 137, .val = def(&mut)});
+        = FH_OR_INS(FH_AND_MODIFY_W(FH_ENT(&fh, 137), modw, gen(&mut)),
+                    (struct val){.id = 137, .val = def(&mut)});
     CHECK((v3 != NULL), true, "%d");
     CHECK(v3->id, 137, "%d");
     CHECK(v3->val, 42, "%d");

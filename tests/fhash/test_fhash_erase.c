@@ -112,9 +112,9 @@ fhash_test_erase(void)
     v = ccc_fh_remove(&fh, &absent, &query.e);
     CHECK(v == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
-    FH_INSERT_ENTRY(FH_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
+    FH_INS_ENT(FH_ENT(&fh, 137), (struct val){.id = 137, .val = 99});
     CHECK(ccc_fh_size(&fh), 1, "%zu");
-    CHECK(ccc_fh_remove_entry(FH_ENTRY(&fh, 137)), true, "%d");
+    CHECK(ccc_fh_remove_entry(FH_ENT(&fh, 137)), true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     return PASS;
 }
@@ -154,7 +154,7 @@ fhash_test_shuffle_insert_erase(void)
         }
         else
         {
-            bool const removed = ccc_fh_remove_entry(FH_ENTRY(&fh, i));
+            bool const removed = ccc_fh_remove_entry(FH_ENT(&fh, i));
             CHECK(removed, true, "%d");
         }
         --cur_size;
@@ -222,7 +222,7 @@ fhash_test_lru_cache(void)
 static void
 put(struct lru_cache *const lru, int key, int val)
 {
-    ccc_fhash_entry const ent = FH_ENTRY(&lru->fh, key);
+    ccc_fhash_entry const ent = FH_ENT(&lru->fh, key);
     struct lru_lookup const *found = FH_GET(ent);
     if (found)
     {
@@ -233,20 +233,20 @@ put(struct lru_cache *const lru, int key, int val)
     }
     if (ccc_list_size(&lru->l) == lru->cap)
     {
-        ccc_fh_remove_entry(FH_ENTRY(
-            &lru->fh, ((struct key_val *)ccc_list_back(&lru->l))->key));
+        ccc_fh_remove_entry(
+            FH_ENT(&lru->fh, ((struct key_val *)ccc_list_back(&lru->l))->key));
         ccc_list_pop_back(&lru->l);
     }
 
     struct key_val *kv
         = LIST_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
-    FH_INSERT_ENTRY(ent, (struct lru_lookup){.key = key, .kv_in_list = kv});
+    FH_INS_ENT(ent, (struct lru_lookup){.key = key, .kv_in_list = kv});
 }
 
 static int
 get(struct lru_cache *const lru, int key)
 {
-    struct lru_lookup const *found = FH_GET(FH_ENTRY(&lru->fh, key));
+    struct lru_lookup const *found = FH_GET(FH_ENT(&lru->fh, key));
     if (!found)
     {
         return -1;
