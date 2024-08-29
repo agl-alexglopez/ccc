@@ -11,13 +11,15 @@
 static double const load_factor = 0.8;
 static size_t const default_prime = 11;
 
-static void erase(struct ccc_impl_fhash *, void *, uint64_t hash);
+static void erase(struct ccc_impl_fhash *, void *);
 
 static bool is_prime(size_t);
 static void swap(uint8_t tmp[], void *, void *, size_t);
 static void *struct_base(struct ccc_impl_fhash const *,
                          struct ccc_impl_fh_elem const *);
 static ccc_entry entry(struct ccc_impl_fhash *, void const *key, uint64_t hash);
+static bool valid_distance_from_home(struct ccc_impl_fhash const *,
+                                     void const *slot);
 
 ccc_result
 ccc_impl_fh_init(struct ccc_impl_fhash *const h, size_t key_offset,
@@ -80,10 +82,6 @@ ccc_impl_fh_entry(struct ccc_impl_fhash *h, void const *key)
 void *
 ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 {
-    if (e.impl.entry.status & (CCC_ENTRY_NULL | CCC_ENTRY_SEARCH_ERROR))
-    {
-        return NULL;
-    }
     void *user_struct = struct_base(e.impl.h, &elem->impl);
     if (e.impl.entry.status & CCC_ENTRY_OCCUPIED)
     {
@@ -94,7 +92,7 @@ ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
                ccc_buf_elem_size(&e.impl.h->buf));
         return (void *)e.impl.entry.entry;
     }
-    if (e.impl.entry.status & CCC_ENTRY_INSERT_ERROR)
+    if (e.impl.entry.status & ~CCC_ENTRY_OCCUPIED)
     {
         return NULL;
     }
@@ -110,7 +108,7 @@ ccc_fh_remove_entry(ccc_fhash_entry e)
     {
         return false;
     }
-    erase(e.impl.h, (void *)e.impl.entry.entry, e.impl.hash);
+    erase(e.impl.h, (void *)e.impl.entry.entry);
     return true;
 }
 
@@ -180,6 +178,7 @@ ccc_fh_remove(ccc_fhash *const h, void *const key,
     }
     void *ret = struct_base(&h->impl, &out_handle->impl);
     memcpy(ret, ent.entry, ccc_buf_elem_size(&h->impl.buf));
+    erase(&h->impl, (void *)ent.entry);
     return ret;
 }
 
@@ -270,10 +269,9 @@ ccc_impl_fh_find(struct ccc_impl_fhash const *const h, void const *const key,
 {
     size_t const cap = ccc_buf_capacity(&h->buf);
     size_t cur_i = hash % cap;
-    void *slot = ccc_buf_at(&h->buf, cur_i);
-    for (size_t dist = 0; dist < cap;
-         ++dist, cur_i = (cur_i + 1) % cap, slot = ccc_buf_at(&h->buf, cur_i))
+    for (size_t dist = 0; dist < cap; ++dist, cur_i = (cur_i + 1) % cap)
     {
+        void *slot = ccc_buf_at(&h->buf, cur_i);
         struct ccc_impl_fh_elem *const e = ccc_impl_fh_in_slot(h, slot);
         if (e->hash == EMPTY)
         {
@@ -331,26 +329,6 @@ ccc_impl_fh_insert(struct ccc_impl_fhash *const h, void const *const e,
             dist = slot_dist;
         }
     }
-}
-
-inline struct ccc_impl_fh_elem *
-ccc_impl_fh_in_slot(struct ccc_impl_fhash const *const h,
-                    void const *const slot)
-{
-    return (struct ccc_impl_fh_elem *)((uint8_t *)slot + h->hash_elem_offset);
-}
-
-void *
-ccc_impl_key_in_slot(struct ccc_impl_fhash const *h, void const *slot)
-{
-    return (struct ccc_impl_fh_elem *)((uint8_t *)slot + h->key_offset);
-}
-
-inline size_t
-ccc_impl_fh_distance(size_t const capacity, size_t const index, uint64_t hash)
-{
-    hash %= capacity;
-    return index < hash ? (capacity - hash) + index : hash - index;
 }
 
 ccc_result
@@ -476,6 +454,42 @@ ccc_fh_capacity(ccc_fhash const *const h)
     return ccc_buf_capacity(&h->impl.buf);
 }
 
+inline struct ccc_impl_fh_elem *
+ccc_impl_fh_in_slot(struct ccc_impl_fhash const *const h,
+                    void const *const slot)
+{
+    return (struct ccc_impl_fh_elem *)((uint8_t *)slot + h->hash_elem_offset);
+}
+
+void *
+ccc_impl_key_in_slot(struct ccc_impl_fhash const *h, void const *slot)
+{
+    return (struct ccc_impl_fh_elem *)((uint8_t *)slot + h->key_offset);
+}
+
+inline size_t
+ccc_impl_fh_distance(size_t const capacity, size_t const index, uint64_t hash)
+{
+    hash %= capacity;
+    return index < hash ? (capacity - hash) + index : index - hash;
+}
+
+bool
+ccc_fh_validate(ccc_fhash const *const h)
+{
+    for (void const *i = ccc_buf_begin(&h->impl.buf);
+         i != ccc_buf_capacity_end(&h->impl.buf);
+         i = ccc_buf_next(&h->impl.buf, i))
+    {
+        if (ccc_impl_fh_in_slot(&h->impl, i)->hash != EMPTY
+            && !valid_distance_from_home(&h->impl, i))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 /*=========================   Static Helpers    ============================*/
 
 static inline ccc_entry
@@ -492,19 +506,20 @@ entry(struct ccc_impl_fhash *const h, void const *key, uint64_t const hash)
 }
 
 static void
-erase(struct ccc_impl_fhash *const h, void *const e, uint64_t const hash)
+erase(struct ccc_impl_fhash *const h, void *const e)
 {
     size_t const cap = ccc_buf_capacity(&h->buf);
-    size_t stopped_at = ccc_buf_index_of(&h->buf, e);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf);
+    size_t stopped_at = ccc_buf_index_of(&h->buf, e);
     *ccc_impl_hash_at(h, stopped_at) = EMPTY;
-    size_t next = (hash + 1) % cap;
+    size_t next = (stopped_at + 1) % cap;
     uint8_t tmp[ccc_buf_elem_size(&h->buf)];
     for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
     {
         void *next_slot = ccc_buf_at(&h->buf, next);
         struct ccc_impl_fh_elem *next_elem = ccc_impl_fh_in_slot(h, next_slot);
-        if (!ccc_impl_fh_distance(cap, next, next_elem->hash))
+        if (next_elem->hash == EMPTY
+            || !ccc_impl_fh_distance(cap, next, next_elem->hash))
         {
             break;
         }
@@ -565,6 +580,37 @@ is_prime(size_t const n)
     for (size_t i = 5; i * i <= n; i += 6)
     {
         if (n % i == 0 || n % (i + 2) == 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool
+valid_distance_from_home(struct ccc_impl_fhash const *h, void const *slot)
+{
+    size_t const cap = ccc_buf_capacity(&h->buf);
+    uint64_t const hash = ccc_impl_fh_in_slot(h, slot)->hash;
+    size_t const home = hash % cap;
+    size_t const end = home ? home - 1 : cap - 1;
+    for (size_t i = ccc_buf_index_of(&h->buf, slot),
+                distance_to_home = ccc_impl_fh_distance(cap, i, hash);
+         i != end; --distance_to_home, (i = i ? i - 1 : cap - 1))
+    {
+        uint64_t const cur_hash = *ccc_impl_hash_at(h, i);
+        /* The only reason an element is not home is because it has been moved
+           away to help another element be closer to its home. This would
+           break the purpose of doing that. Upon erase everyone needs to
+           shuffle closer to home. */
+        if (cur_hash == EMPTY)
+        {
+            return false;
+        }
+        /* This shouldn't happen either. The whole point of Robin Hood is
+           taking from the close and giving to the far. If this happens
+           we have made our algorithm greedy not altruistic. */
+        if (distance_to_home > ccc_impl_fh_distance(cap, i, cur_hash))
         {
             return false;
         }

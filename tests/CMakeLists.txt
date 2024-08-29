@@ -150,6 +150,7 @@ endmacro()
 
 add_fhash_test(test_fhash_construct)
 add_fhash_test(test_fhash_insert)
+add_fhash_test(test_fhash_erase)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)

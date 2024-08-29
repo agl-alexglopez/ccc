@@ -18,8 +18,9 @@ static enum test_result fhash_test_resize_macros(void);
 static enum test_result fhash_test_resize_from_null(void);
 static enum test_result fhash_test_resize_from_null_macros(void);
 static enum test_result fhash_test_insert_limit(void);
+static enum test_result fhash_test_insert_wrong_type(void);
 
-#define NUM_TESTS (size_t)13
+#define NUM_TESTS (size_t)14
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -34,11 +35,8 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_resize_from_null,
     fhash_test_resize_from_null_macros,
     fhash_test_insert_limit,
+    fhash_test_insert_wrong_type,
 };
-
-static void mod(ccc_update);
-static struct val create(int id, int val);
-static void swap_val(ccc_update u);
 
 int
 main()
@@ -165,7 +163,8 @@ fhash_test_entry_api_functional(void)
         def.id = (int)i;
         def.val = (int)i;
         struct val const *const d = ccc_fh_or_insert(
-            ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod), &def.e);
+            ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), fhash_modplus),
+            &def.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -304,7 +303,8 @@ fhash_test_entry_api_macros(void)
     {
         /* The macros support functions that will only execute if the or
            insert branch executes. */
-        struct val const *const d = OR_INSERT(ENTRY(&fh, i), create(i, i));
+        struct val const *const d
+            = OR_INSERT(ENTRY(&fh, i), fhash_create(i, i));
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -313,8 +313,8 @@ fhash_test_entry_api_macros(void)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val const *const d
-            = OR_INSERT(AND_MODIFY(ENTRY(&fh, i), mod), create(i, i));
+        struct val const *const d = OR_INSERT(
+            AND_MODIFY(ENTRY(&fh, i), fhash_modplus), fhash_create(i, i));
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -394,6 +394,7 @@ fhash_test_resize(void)
             = ccc_fh_insert_entry(ccc_fh_entry(&fh, &elem.id), &elem.e);
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
+        CHECK(ccc_fh_validate(&fh), true, "%d");
     }
     CHECK(ccc_fh_size(&fh), to_insert, "%zu");
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -427,7 +428,7 @@ fhash_test_resize_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                                     create(shuffled_index, i));
+                                     fhash_create(shuffled_index, i));
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
     }
@@ -436,8 +437,8 @@ fhash_test_resize_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index), swap_val,
-                                        shuffled_index),
+            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index),
+                                        fhash_swap_val, shuffled_index),
                         (struct val){0});
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
@@ -497,7 +498,7 @@ fhash_test_resize_from_null_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                                     create(shuffled_index, i));
+                                     fhash_create(shuffled_index, i));
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
     }
@@ -506,8 +507,8 @@ fhash_test_resize_from_null_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index), swap_val,
-                                        shuffled_index),
+            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index),
+                                        fhash_swap_val, shuffled_index),
                         (struct val){0});
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
@@ -535,7 +536,7 @@ fhash_test_insert_limit(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % size)
     {
         struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                                     create(shuffled_index, i));
+                                     fhash_create(shuffled_index, i));
         if (!v)
         {
             break;
@@ -584,21 +585,53 @@ fhash_test_insert_limit(void)
     return PASS;
 }
 
-static inline void
-swap_val(ccc_update u)
+/* The macros, not the functions, provide some type checking to prevent the
+   user from looking at hash table entries as the wrong type or inserting
+   types that are too large. This makes a strong case for their inclusion to
+   the API. */
+static enum test_result
+fhash_test_insert_wrong_type(void)
 {
-    struct val *v = u.container;
-    v->val = *((int *)u.aux);
-}
+    struct val vals[2] = {{0}, {0}};
+    ccc_fhash fh;
+    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                       fhash_int_zero, fhash_id_eq, NULL);
+    struct too_big
+    {
+        struct val a;
+        bool extra_byte;
+    };
+    CHECK(res, CCC_OK, "%d");
+    /* Nothing was there before so nothing is in the entry. */
+    struct too_big const *wrong
+        = INSERT_ENTRY(ENTRY(&fh, 137), (struct too_big){.a = {137, 137, {}}});
+    CHECK(ccc_fh_size(&fh), 0, "%zu");
+    CHECK(wrong == NULL, true, "%d");
+    wrong = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
+                      (struct too_big){.a = {137, 137, {}}});
+    CHECK(wrong == NULL, true, "%d");
+    CHECK(ccc_fh_size(&fh), 0, "%zu");
+    struct val *correct
+        = INSERT_ENTRY(ENTRY(&fh, 137), (struct val){137, 137, {}});
+    CHECK(correct != NULL, true, "%d");
+    CHECK(correct->id, 137, "%d");
+    CHECK(correct->val, 137, "%d");
+    CHECK(ccc_fh_size(&fh), 1, "%zu");
 
-static void
-mod(ccc_update const mod)
-{
-    ((struct val *)mod.container)->val++;
-}
-
-static struct val
-create(int id, int val)
-{
-    return (struct val){.id = id, .val = val};
+    /* This must not work because the user would be looking at an array slot
+       as the wrong type. However the modification to the found entry is ok. */
+    wrong = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
+                      (struct too_big){.a = {0, 0, {}}});
+    CHECK(wrong == NULL, true, "%d");
+    CHECK(ccc_fh_size(&fh), 1, "%zu");
+    CHECK(((struct val *)GET(ENTRY(&fh, 137)))->val, 138, "%d");
+    /* This is somewhat nonsense as why would someone modify then overwrite
+       the previous value? However, it's possible. The modification will still
+       work before the overwrite insertion fails. */
+    wrong = INSERT_ENTRY(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
+                         (struct too_big){.a = {0, 0, {}}});
+    CHECK(wrong == NULL, true, "%d");
+    CHECK(ccc_fh_size(&fh), 1, "%zu");
+    CHECK(((struct val *)GET(ENTRY(&fh, 137)))->val, 139, "%d");
+    return PASS;
 }

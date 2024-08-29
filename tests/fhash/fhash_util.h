@@ -18,4 +18,8 @@ uint64_t fhash_id_to_u64(void const *);
 bool fhash_id_eq(ccc_key_cmp);
 void fhash_print_val(void const *val);
 
+void fhash_modplus(ccc_update);
+struct val fhash_create(int id, int val);
+void fhash_swap_val(ccc_update u);
+
 #endif /* CCC_FHASH_UTIL_H */
