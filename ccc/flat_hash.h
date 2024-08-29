@@ -94,7 +94,7 @@ void *ccc_fh_remove(ccc_fhash *h, void *key, ccc_fhash_elem *out_handle);
 
 /*========================    Entry API    ==================================*/
 
-/** @brief Obtains a entry for the provided key in the table for future use.
+/** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
 @param [in] key the key used to search the table matching the stored key type.
 @return a specialized hash entry for use with other functions in the Entry API.
@@ -142,8 +142,8 @@ to resize because no reallocation function is provided. */
 void *ccc_fh_or_insert(ccc_fhash_entry e, ccc_fhash_elem *elem);
 
 /** @brief Inserts the provided entry invariantly.
-@param[in] e the entry returned from a call obtaining an entry.
-@param[in] elem a handle to the struct the user intends to insert.
+@param [in] e the entry returned from a call obtaining an entry.
+@param [in] elem a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon a memory error in which
 the load factor would be exceeded when no reallocation policy is defined or
 resizing failed to find more memory.
@@ -155,7 +155,7 @@ or a search error NULL is returned. Otherwise insertion should not fail. */
 void *ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *elem);
 
 /** @brief Removes the provided entry if it is Occupied.
-@param[in] e the entry to be removed.
+@param [in] e the entry to be removed.
 @return true if e was Occupied and now has been removed, false if vacant.
 
 This method does nothing to help preserve the old value if one was present. If
