@@ -163,13 +163,14 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
     ({                                                                         \
         typeof(key_val_struct) *_res_;                                         \
         struct ccc_impl_fh_entry _entry_ = (entry_copy).impl;                  \
-        if (sizeof(*_res_) != ccc_buf_elem_size(&(_entry_.h->buf)))            \
-        {                                                                      \
-            _res_ = NULL;                                                      \
-        }                                                                      \
-        else if (_entry_.entry.status != CCC_ENTRY_VACANT)                     \
+        if (_entry_.entry.status & CCC_ENTRY_OCCUPIED)                         \
         {                                                                      \
             _res_ = (void *)_entry_.entry.entry;                               \
+        }                                                                      \
+        else if (sizeof(*_res_) != ccc_buf_elem_size(&(_entry_.h->buf))        \
+                 || (_entry_.entry.status & ~CCC_ENTRY_VACANT))                \
+        {                                                                      \
+            _res_ = NULL;                                                      \
         }                                                                      \
         else                                                                   \
         {                                                                      \

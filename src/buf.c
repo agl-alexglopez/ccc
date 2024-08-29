@@ -130,7 +130,7 @@ ccc_buf_erase(ccc_buf *buf, size_t const i)
 ccc_result
 ccc_buf_free(ccc_buf *buf, ccc_realloc_fn *fn)
 {
-    if (!buf->impl.capacity)
+    if (!buf->impl.capacity || !fn)
     {
         return CCC_MEM_ERR;
     }
