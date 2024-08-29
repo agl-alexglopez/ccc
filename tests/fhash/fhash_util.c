@@ -32,7 +32,7 @@ fhash_print_val(void const *const val)
 }
 
 uint64_t
-fhash_id_to_u64(void const *const id)
+fhash_int_to_u64(void const *const id)
 {
     int const id_int = *((int *)id);
     uint64_t x = id_int;

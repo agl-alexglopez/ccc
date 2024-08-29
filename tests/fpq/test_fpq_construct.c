@@ -33,8 +33,7 @@ pq_test_empty(void)
 {
     struct val vals[1] = {{0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 1, NULL);
-    ccc_flat_pqueue pq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+    ccc_flat_pqueue pq = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     CHECK(ccc_fpq_empty(&pq), true, "%d");
     return PASS;
 }
@@ -44,15 +43,12 @@ pq_test_macro(void)
 {
     struct val vals[1] = {{0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 1, NULL);
-    ccc_flat_pqueue pq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
-    ccc_result res
-        = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
-    CHECK(res, CCC_OK, "%d");
+    ccc_flat_pqueue pq = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+    struct val *res = CCC_FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
+    CHECK(res != NULL, true, "%d");
     CHECK(ccc_fpq_empty(&pq), false, "%d");
-    ccc_result res2
-        = CCC_FPQ_EMPLACE(&pq, struct val, (struct val){.val = 0, .id = 0});
-    CHECK(res2, CCC_NO_REALLOC, "%d");
+    struct val *res2 = CCC_FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
+    CHECK(res2 == NULL, true, "%d");
     return PASS;
 }
 
@@ -61,8 +57,7 @@ pq_test_push(void)
 {
     struct val vals[1] = {{0}};
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, 1, NULL);
-    ccc_flat_pqueue pq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+    ccc_flat_pqueue pq = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     ccc_result res = ccc_fpq_push(&pq, &vals[0]);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fpq_empty(&pq), false, "%d");

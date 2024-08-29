@@ -1,6 +1,9 @@
 add_library(impl_buf INTERFACE impl_buf.h)
 target_link_libraries(impl_buf INTERFACE types)
 
+add_library(impl_list INTERFACE impl_list.h)
+target_link_libraries(impl_list INTERFACE types)
+
 add_library(impl_tree INTERFACE impl_tree.h)
 target_link_libraries(impl_tree INTERFACE types)
 

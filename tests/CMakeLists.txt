@@ -136,6 +136,7 @@ macro(add_fhash_test TEST_NAME)
   add_executable(${TEST_NAME} fhash/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
+      list
       flat_hash
       buf
       test

@@ -349,7 +349,7 @@ fhash_test_two_sum(void)
     struct val vals[size];
     ccc_fhash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
-                                       fhash_id_to_u64, fhash_id_eq, NULL);
+                                       fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const addends[10] = {1, 3, 5, 6, 7, 13, 44, 32, 10, -1};
     int const target = 15;
@@ -382,7 +382,7 @@ fhash_test_resize(void)
     ccc_fhash fh;
     ccc_result const res
         = CCC_FH_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
-                      fhash_id_to_u64, fhash_id_eq, NULL);
+                      fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const to_insert = 1000;
     int const larger_prime = (int)ccc_fh_next_prime(to_insert);
@@ -420,7 +420,7 @@ fhash_test_resize_macros(void)
     ccc_fhash fh;
     ccc_result const res
         = CCC_FH_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
-                      fhash_id_to_u64, fhash_id_eq, NULL);
+                      fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const to_insert = 1000;
     int const larger_prime = (int)ccc_fh_next_prime(to_insert);
@@ -455,7 +455,7 @@ fhash_test_resize_from_null(void)
 {
     ccc_fhash fh;
     ccc_result const res = CCC_FH_INIT(&fh, NULL, 0, struct val, id, e, realloc,
-                                       fhash_id_to_u64, fhash_id_eq, NULL);
+                                       fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const to_insert = 1000;
     int const larger_prime = (int)ccc_fh_next_prime(to_insert);
@@ -490,7 +490,7 @@ fhash_test_resize_from_null_macros(void)
     ccc_fhash fh;
     ccc_result const res
         = CCC_FH_INIT(&fh, NULL, prime_start, struct val, id, e, realloc,
-                      fhash_id_to_u64, fhash_id_eq, NULL);
+                      fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const to_insert = 1000;
     int const larger_prime = (int)ccc_fh_next_prime(to_insert);
@@ -527,7 +527,7 @@ fhash_test_insert_limit(void)
     struct val vals[size];
     ccc_fhash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
-                                       fhash_id_to_u64, fhash_id_eq, NULL);
+                                       fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     int const larger_prime = (int)ccc_fh_next_prime(size);
     int last_index = 0;

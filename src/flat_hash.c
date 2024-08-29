@@ -82,7 +82,7 @@ ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
     void *user_struct = struct_base(e.impl.h, &elem->impl);
     if (e.impl.entry.status & CCC_ENTRY_OCCUPIED)
     {
-        /* It is ok if an insert error was indicated because we are do not
+        /* It is ok if an insert error was indicated because we do not
            need more space if we are overwriting a previous value. */
         e.impl.entry.status = CCC_ENTRY_OCCUPIED;
         memcpy((void *)e.impl.entry.entry, user_struct,

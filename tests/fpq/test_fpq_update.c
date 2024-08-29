@@ -44,7 +44,7 @@ fpq_test_insert_iterate_pop(void)
     struct val vals[num_nodes];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -74,17 +74,16 @@ fpq_test_priority_removal(void)
     struct val vals[num_nodes];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        ccc_result const res
-            = CCC_FPQ_EMPLACE(&fpq, struct val,
-                              {
-                                  .val = rand() % (num_nodes + 1), /*NOLINT*/
-                                  .id = (int)i,
-                              });
-        CHECK(res, CCC_OK, "%d");
+        struct val const *res = CCC_FPQ_EMPLACE(
+            &fpq, (struct val){
+                      .val = rand() % (num_nodes + 1), /*NOLINT*/
+                      .id = (int)i,
+                  });
+        CHECK(res != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
     int const limit = 400;
@@ -111,17 +110,16 @@ fpq_test_priority_update(void)
     struct val vals[num_nodes];
     ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_nodes, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, elem, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        ccc_result const res
-            = CCC_FPQ_EMPLACE(&fpq, struct val,
-                              {
-                                  .val = rand() % (num_nodes + 1), /*NOLINT*/
-                                  .id = (int)i,
-                              });
-        CHECK(res, CCC_OK, "%d");
+        struct val const *res = CCC_FPQ_EMPLACE(
+            &fpq, (struct val){
+                      .val = rand() % (num_nodes + 1), /*NOLINT*/
+                      .id = (int)i,
+                  });
+        CHECK(res != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
     int const limit = 400;

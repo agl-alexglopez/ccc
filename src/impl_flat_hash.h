@@ -115,7 +115,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         {                                                                      \
             *((typeof(key_val_struct) *)ccc_buf_at(&((swap_entry).h->buf),     \
                                                    _i_))                       \
-                = (typeof(key_val_struct))key_val_struct;                      \
+                = key_val_struct;                                              \
             *ccc_impl_hash_at((swap_entry).h, _i_) = (swap_entry).hash;        \
             ++(swap_entry).h->buf.impl.sz;                                     \
         }                                                                      \
@@ -124,7 +124,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
             typeof(key_val_struct) _cur_slot_ = *((                            \
                 typeof(_cur_slot_) *)ccc_buf_at(&((swap_entry).h->buf), _i_)); \
             *((typeof(_cur_slot_) *)ccc_buf_at(&((swap_entry).h->buf), _i_))   \
-                = (typeof(_cur_slot_))key_val_struct;                          \
+                = key_val_struct;                                              \
             *ccc_impl_hash_at((swap_entry).h, _i_) = (swap_entry).hash;        \
             _i_ = (_i_ + 1) % ccc_buf_capacity(&((swap_entry).h->buf));        \
             ccc_impl_fh_insert(                                                \
@@ -143,8 +143,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         if (_slot_fits_ && (_ins_ent_.entry.status & CCC_ENTRY_OCCUPIED))      \
         {                                                                      \
             _ins_ent_.entry.status = CCC_ENTRY_OCCUPIED;                       \
-            *((typeof(_res_))_ins_ent_.entry.entry)                            \
-                = (typeof(*_res_))key_val_struct;                              \
+            *((typeof(_res_))_ins_ent_.entry.entry) = key_val_struct;          \
             _res_ = (void *)_ins_ent_.entry.entry;                             \
         }                                                                      \
         else if (!_slot_fits_                                                  \
