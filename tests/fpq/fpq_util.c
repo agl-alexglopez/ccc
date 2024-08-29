@@ -62,15 +62,14 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
     }
     size_t i = 0;
     struct val copy_buf[sizeof(struct val) * ccc_fpq_size(fpq)];
-    ccc_buf buf = CCC_BUF_INIT(copy_buf, struct val, ccc_fpq_size(fpq), NULL);
-    ccc_flat_pqueue fpq_copy
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+    ccc_flat_pqueue fpq_copy = CCC_FPQ_INIT(
+        &copy_buf, ccc_fpq_size(fpq), struct val, CCC_LES, NULL, val_cmp, NULL);
     while (!ccc_fpq_empty(fpq) && i < size)
     {
         struct val *const front = ccc_fpq_pop(fpq);
         vals[i++] = front->val;
         size_t const prev = ccc_fpq_size(&fpq_copy);
-        struct val *v = CCC_FPQ_EMPLACE(
+        struct val *v = FPQ_EMPLACE(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
         CHECK(v != NULL, true, "%d");
         CHECK(prev < ccc_fpq_size(&fpq_copy), true, "%d");
@@ -81,7 +80,7 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
         struct val *const v = ccc_fpq_pop(&fpq_copy);
         size_t const prev = ccc_fpq_size(fpq);
         struct val *e
-            = CCC_FPQ_EMPLACE(fpq, (struct val){.id = v->id, .val = v->val});
+            = FPQ_EMPLACE(fpq, (struct val){.id = v->id, .val = v->val});
         CHECK(e != NULL, true, "%d");
         CHECK(prev < ccc_fpq_size(fpq), true, "%d");
         CHECK(vals[i++], v->val, "%d");

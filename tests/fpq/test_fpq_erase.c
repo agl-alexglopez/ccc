@@ -47,13 +47,12 @@ fpq_test_insert_remove_four_dups(void)
 {
     size_t const size = 4;
     struct val three_vals[size];
-    ccc_buf buf = CCC_BUF_INIT(three_vals, struct val, size, NULL);
-    ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+    ccc_flat_pqueue fpq = CCC_FPQ_INIT(three_vals, size, struct val, CCC_LES,
+                                       NULL, val_cmp, NULL);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(ccc_fpq_push(&fpq, &three_vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_push(&fpq, &three_vals[i]) != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
         size_t const size_check = i + 1;
         CHECK(ccc_fpq_size(&fpq), size_check, "%zu");
@@ -78,9 +77,8 @@ fpq_test_insert_erase_shuffled(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(vals, size, struct val, CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, "%d");
@@ -103,9 +101,8 @@ fpq_test_pop_max(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(vals, size, struct val, CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, "%d");
@@ -127,9 +124,8 @@ fpq_test_pop_min(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(vals, size, struct val, CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS, "%d");
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0, "%d");
@@ -156,15 +152,14 @@ fpq_test_delete_prime_shuffle_duplicates(void)
     /* Make the prime shuffle shorter than size for many duplicates. */
     int const less = 77;
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(vals, size, struct val, CCC_LES, NULL, val_cmp, NULL);
     int shuffled_index = prime % (size - less);
     for (int i = 0; i < size; ++i)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]) != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
         size_t const s = i + 1;
         CHECK(ccc_fpq_size(&fpq), s, "%zu");
@@ -193,14 +188,13 @@ fpq_test_prime_shuffle(void)
        reduce the shuffle range so it will repeat some values. */
     int shuffled_index = prime % (size - less);
     struct val vals[size];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, size, NULL);
     ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+        = CCC_FPQ_INIT(vals, size, struct val, CCC_LES, NULL, val_cmp, NULL);
     for (int i = 0; i < size; ++i)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]) != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -226,14 +220,13 @@ fpq_test_weak_srand(void)
     srand(time(NULL));
     int const num_stack_elems = 1000;
     struct val vals[num_stack_elems];
-    ccc_buf buf = CCC_BUF_INIT(vals, struct val, num_stack_elems, NULL);
-    ccc_flat_pqueue fpq
-        = CCC_FPQ_INIT(&buf, struct val, CCC_LES, val_cmp, NULL);
+    ccc_flat_pqueue fpq = CCC_FPQ_INIT(vals, num_stack_elems, struct val,
+                                       CCC_LES, NULL, val_cmp, NULL);
     for (int i = 0; i < num_stack_elems; ++i)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]), CCC_OK, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]) != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
     while (!ccc_fpq_empty(&fpq))

@@ -3,8 +3,6 @@
 
 #include "impl_flat_hash.h"
 #include "types.h"
-/* All containers transitively include the ENTRY API */
-#include "entry.h" /* NOLINT */
 
 typedef struct
 {
@@ -45,6 +43,34 @@ initialization is successful or a failure. */
                     fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)    \
     CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
                      fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)
+
+#define FH_ENTRY(fhash_ptr, key)                                               \
+    (ccc_fhash_entry)                                                          \
+    {                                                                          \
+        CCC_IMPL_FH_ENTRY(fhash_ptr, key)                                      \
+    }
+
+#define FH_GET(entry_copy) CCC_IMPL_FH_GET(entry_copy)
+
+#define FH_GET_MUT(entry_copy) CCC_IMPL_FH_GET_MUT(entry_copy)
+
+#define FH_AND_MODIFY(entry_copy, mod_fn)                                      \
+    (ccc_fhash_entry)                                                          \
+    {                                                                          \
+        CCC_IMPL_FH_AND_MODIFY(entry_copy, mod_fn)                             \
+    }
+
+#define FH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                            \
+    (ccc_fhash_entry)                                                          \
+    {                                                                          \
+        CCC_IMPL_FH_AND_MODIFY_WITH(entry_copy, mod_fn, aux)                   \
+    }
+
+#define FH_INSERT_ENTRY(entry_copy, key_val_struct...)                         \
+    CCC_IMPL_FH_INSERT_ENTRY(entry_copy, key_val_struct)
+
+#define FH_OR_INSERT(entry_copy, key_val_struct...)                            \
+    CCC_IMPL_FH_OR_INSERT(entry_copy, key_val_struct)
 
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.

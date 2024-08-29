@@ -2,6 +2,7 @@
 #include "flat_hash.h"
 #include "test.h"
 #include "types.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -259,7 +260,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
-            = INSERT_ENTRY(ENTRY(&fh, i), (struct val){i, i, {}});
+            = FH_INSERT_ENTRY(FH_ENTRY(&fh, i), (struct val){i, i, {}});
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -269,7 +270,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
-            = INSERT_ENTRY(ENTRY(&fh, i), (struct val){i, i + 1, {}});
+            = FH_INSERT_ENTRY(FH_ENTRY(&fh, i), (struct val){i, i + 1, {}});
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->val, i + 1, "%d");
@@ -304,7 +305,7 @@ fhash_test_entry_api_macros(void)
         /* The macros support functions that will only execute if the or
            insert branch executes. */
         struct val const *const d
-            = OR_INSERT(ENTRY(&fh, i), fhash_create(i, i));
+            = FH_OR_INSERT(FH_ENTRY(&fh, i), fhash_create(i, i));
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -313,8 +314,8 @@ fhash_test_entry_api_macros(void)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val const *const d = OR_INSERT(
-            AND_MODIFY(ENTRY(&fh, i), fhash_modplus), fhash_create(i, i));
+        struct val const *const d = FH_OR_INSERT(
+            FH_AND_MODIFY(FH_ENTRY(&fh, i), fhash_modplus), fhash_create(i, i));
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -333,10 +334,10 @@ fhash_test_entry_api_macros(void)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        OR_INSERT(ENTRY(&fh, i), (struct val){0})->val++;
+        FH_OR_INSERT(FH_ENTRY(&fh, i), (struct val){0})->val++;
         /* All values in the array should be odd now */
-        CHECK(OR_INSERT(ENTRY(&fh, i), (struct val){0})->val % 2 == 0, true,
-              "%d");
+        CHECK(FH_OR_INSERT(FH_ENTRY(&fh, i), (struct val){0})->val % 2 == 0,
+              true, "%d");
     }
     CHECK(ccc_fh_size(&fh), (size / 2), "%zu");
     return PASS;
@@ -357,15 +358,15 @@ fhash_test_two_sum(void)
     int indices[2] = {-1, -1};
     for (int i = 0; i < 10; ++i)
     {
-        struct val const *const v = GET(ENTRY(&fh, target - addends[i]));
+        struct val const *const v = FH_GET(FH_ENTRY(&fh, target - addends[i]));
         if (v)
         {
             indices[0] = i;
             indices[1] = v->val;
             break;
         }
-        INSERT_ENTRY(ENTRY(&fh, addends[i]),
-                     (struct val){.id = addends[i], .val = i});
+        FH_INSERT_ENTRY(FH_ENTRY(&fh, addends[i]),
+                        (struct val){.id = addends[i], .val = i});
     }
     CHECK(ccc_fh_size(&fh), indices[0], "%zu");
     CHECK(indices[0], correct[0], "%d");
@@ -427,8 +428,8 @@ fhash_test_resize_macros(void)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                                     fhash_create(shuffled_index, i));
+        struct val *v = FH_INSERT_ENTRY(FH_ENTRY(&fh, shuffled_index),
+                                        fhash_create(shuffled_index, i));
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
     }
@@ -437,13 +438,13 @@ fhash_test_resize_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index),
-                                        fhash_swap_val, shuffled_index),
-                        (struct val){0});
+            = FH_OR_INSERT(FH_AND_MODIFY_WITH(FH_ENTRY(&fh, shuffled_index),
+                                              fhash_swap_val, shuffled_index),
+                           (struct val){0});
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
-        OR_INSERT(ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val const *v = GET(ENTRY(&fh, shuffled_index));
+        FH_OR_INSERT(FH_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
+        struct val const *v = FH_GET(FH_ENTRY(&fh, shuffled_index));
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
@@ -497,8 +498,8 @@ fhash_test_resize_from_null_macros(void)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                                     fhash_create(shuffled_index, i));
+        struct val *v = FH_INSERT_ENTRY(FH_ENTRY(&fh, shuffled_index),
+                                        fhash_create(shuffled_index, i));
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
     }
@@ -507,13 +508,13 @@ fhash_test_resize_from_null_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = OR_INSERT(AND_MODIFY_WITH(ENTRY(&fh, shuffled_index),
-                                        fhash_swap_val, shuffled_index),
-                        (struct val){0});
+            = FH_OR_INSERT(FH_AND_MODIFY_WITH(FH_ENTRY(&fh, shuffled_index),
+                                              fhash_swap_val, shuffled_index),
+                           (struct val){0});
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
-        OR_INSERT(ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val *v = GET_MUT(ENTRY(&fh, shuffled_index));
+        FH_OR_INSERT(FH_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
+        struct val *v = FH_GET_MUT(FH_ENTRY(&fh, shuffled_index));
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
@@ -535,8 +536,8 @@ fhash_test_insert_limit(void)
     for (int i = 0; i < size;
          ++i, shuffled_index = (shuffled_index + larger_prime) % size)
     {
-        struct val *v = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                                     fhash_create(shuffled_index, i));
+        struct val *v = FH_INSERT_ENTRY(FH_ENTRY(&fh, shuffled_index),
+                                        fhash_create(shuffled_index, i));
         if (!v)
         {
             break;
@@ -561,8 +562,8 @@ fhash_test_insert_limit(void)
     CHECK(in_table->val, -2, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
-    in_table = INSERT_ENTRY(ENTRY(&fh, last_index),
-                            (struct val){.id = last_index, .val = -3});
+    in_table = FH_INSERT_ENTRY(FH_ENTRY(&fh, last_index),
+                               (struct val){.id = last_index, .val = -3});
     CHECK(in_table != NULL, true, "%d");
     CHECK(in_table->val, -3, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
@@ -573,8 +574,8 @@ fhash_test_insert_limit(void)
     CHECK(in_table == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
-    in_table = INSERT_ENTRY(ENTRY(&fh, shuffled_index),
-                            (struct val){.id = shuffled_index, .val = -4});
+    in_table = FH_INSERT_ENTRY(FH_ENTRY(&fh, shuffled_index),
+                               (struct val){.id = shuffled_index, .val = -4});
     CHECK(in_table == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
@@ -603,16 +604,16 @@ fhash_test_insert_wrong_type(void)
     };
     CHECK(res, CCC_OK, "%d");
     /* Nothing was there before so nothing is in the entry. */
-    struct too_big const *wrong
-        = INSERT_ENTRY(ENTRY(&fh, 137), (struct too_big){.a = {137, 137, {}}});
+    struct too_big const *wrong = FH_INSERT_ENTRY(
+        FH_ENTRY(&fh, 137), (struct too_big){.a = {137, 137, {}}});
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     CHECK(wrong == NULL, true, "%d");
-    wrong = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
-                      (struct too_big){.a = {.id = 137, .val = 137}});
+    wrong = FH_OR_INSERT(FH_AND_MODIFY(FH_ENTRY(&fh, 137), fhash_modplus),
+                         (struct too_big){.a = {.id = 137, .val = 137}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     struct val *correct
-        = INSERT_ENTRY(ENTRY(&fh, 137), (struct val){137, 137, {}});
+        = FH_INSERT_ENTRY(FH_ENTRY(&fh, 137), (struct val){137, 137, {}});
     CHECK(correct != NULL, true, "%d");
     CHECK(correct->id, 137, "%d");
     CHECK(correct->val, 137, "%d");
@@ -620,18 +621,18 @@ fhash_test_insert_wrong_type(void)
 
     /* This must not work because the user would be looking at an array slot
        as the wrong type. However the modification to the entry is ok. */
-    wrong = OR_INSERT(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
-                      (struct too_big){.a = {0, 0, {}}});
-    CHECK(wrong == NULL, true, "%d");
-    CHECK(ccc_fh_size(&fh), 1, "%zu");
-    CHECK(((struct val *)GET(ENTRY(&fh, 137)))->val, 138, "%d");
-    /* This is somewhat nonsense as why would someone modify then overwrite
-       the previous value? However, it's possible. The modification will
-       still work before the overwrite insertion fails. */
-    wrong = INSERT_ENTRY(AND_MODIFY(ENTRY(&fh, 137), fhash_modplus),
+    wrong = FH_OR_INSERT(FH_AND_MODIFY(FH_ENTRY(&fh, 137), fhash_modplus),
                          (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 1, "%zu");
-    CHECK(((struct val *)GET(ENTRY(&fh, 137)))->val, 139, "%d");
+    CHECK(((struct val *)FH_GET(FH_ENTRY(&fh, 137)))->val, 138, "%d");
+    /* This is somewhat nonsense as why would someone modify then overwrite
+       the previous value? However, it's possible. The modification will
+       still work before the overwrite insertion fails. */
+    wrong = FH_INSERT_ENTRY(FH_AND_MODIFY(FH_ENTRY(&fh, 137), fhash_modplus),
+                            (struct too_big){.a = {0, 0, {}}});
+    CHECK(wrong == NULL, true, "%d");
+    CHECK(ccc_fh_size(&fh), 1, "%zu");
+    CHECK(((struct val *)FH_GET(FH_ENTRY(&fh, 137)))->val, 139, "%d");
     return PASS;
 }

@@ -33,6 +33,8 @@ main()
     return res;
 }
 
+#define REQS 11
+
 struct key_val
 {
     int key;
@@ -110,9 +112,9 @@ fhash_test_erase(void)
     v = ccc_fh_remove(&fh, &absent, &query.e);
     CHECK(v == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
-    INSERT_ENTRY(ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
+    FH_INSERT_ENTRY(FH_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
     CHECK(ccc_fh_size(&fh), 1, "%zu");
-    CHECK(ccc_fh_remove_entry(ENTRY(&fh, 137)), true, "%d");
+    CHECK(ccc_fh_remove_entry(FH_ENTRY(&fh, 137)), true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     return PASS;
 }
@@ -152,7 +154,7 @@ fhash_test_shuffle_insert_erase(void)
         }
         else
         {
-            bool const removed = ccc_fh_remove_entry(ENTRY(&fh, i));
+            bool const removed = ccc_fh_remove_entry(FH_ENTRY(&fh, i));
             CHECK(removed, true, "%d");
         }
         --cur_size;
@@ -170,12 +172,12 @@ fhash_test_lru_cache(void)
 {
     struct lru_cache lru = {
         .cap = 3,
-        .l
-        = CCC_L_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc, NULL),
+        .l = CCC_LIST_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc,
+                           NULL),
     };
     CCC_FH_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
                 fhash_int_to_u64, lru_lookup_cmp, NULL);
-    struct lru_request requests[11] = {
+    struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .put = {put}},
         {PUT, .key = 2, .val = 2, .put = {put}},
         {GET, .key = 1, .val = 1, .get = {get}},
@@ -188,7 +190,7 @@ fhash_test_lru_cache(void)
         {GET, .key = 2, .val = -1, .get = {get}},
         {FRONT, .key = 4, .val = 4, .front = {front}},
     };
-    for (size_t i = 0; i < 10; ++i)
+    for (size_t i = 0; i < REQS; ++i)
     {
         switch (requests[i].call)
         {
@@ -212,51 +214,52 @@ fhash_test_lru_cache(void)
         break;
         }
     }
+    ccc_fh_clear_and_free(&lru.fh, NULL);
+    ccc_list_clear(&lru.l, NULL);
     return PASS;
 }
 
 static void
 put(struct lru_cache *const lru, int key, int val)
 {
-    ccc_fhash_entry const ent = ENTRY(&lru->fh, key);
-    struct lru_lookup const *found = GET(ent);
+    ccc_fhash_entry const ent = FH_ENTRY(&lru->fh, key);
+    struct lru_lookup const *found = FH_GET(ent);
     if (found)
     {
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        ccc_l_splice(&((struct key_val *)ccc_l_begin(&lru->l))->list_elem,
-                     &found->kv_in_list->list_elem);
+        ccc_list_splice(ccc_list_head(&lru->l), &found->kv_in_list->list_elem);
         return;
     }
-    if (ccc_l_size(&lru->l) == lru->cap)
+    if (ccc_list_size(&lru->l) == lru->cap)
     {
-        ccc_fh_remove_entry(
-            ENTRY(&lru->fh, ((struct key_val *)ccc_l_back(&lru->l))->key));
-        ccc_l_pop_back(&lru->l);
+        ccc_fh_remove_entry(FH_ENTRY(
+            &lru->fh, ((struct key_val *)ccc_list_back(&lru->l))->key));
+        ccc_list_pop_back(&lru->l);
     }
 
     struct key_val *kv
-        = EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
-    INSERT_ENTRY(ent, (struct lru_lookup){.key = key, .kv_in_list = kv});
+        = LIST_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
+    FH_INSERT_ENTRY(ent, (struct lru_lookup){.key = key, .kv_in_list = kv});
 }
 
 static int
 get(struct lru_cache *const lru, int key)
 {
-    struct lru_lookup const *found = GET(ENTRY(&lru->fh, key));
+    struct lru_lookup const *found = FH_GET(FH_ENTRY(&lru->fh, key));
     if (!found)
     {
         return -1;
     }
-    ccc_l_splice(&((struct key_val *)ccc_l_begin(&lru->l))->list_elem,
-                 &found->kv_in_list->list_elem);
+    ccc_list_splice(&((struct key_val *)ccc_list_begin(&lru->l))->list_elem,
+                    &found->kv_in_list->list_elem);
     return found->kv_in_list->val;
 }
 
 static struct key_val *
 front(struct lru_cache *const lru)
 {
-    return ccc_l_front(&lru->l);
+    return ccc_list_front(&lru->l);
 }
 
 static bool
