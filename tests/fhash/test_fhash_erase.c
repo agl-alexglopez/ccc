@@ -203,6 +203,8 @@ fhash_test_lru_cache(void)
             CHECK(kv->val, requests[i].val, "%d");
         }
         break;
+        default:
+            break;
         }
     }
     ccc_fh_clear_and_free(&lru.fh, NULL);
