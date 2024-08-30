@@ -44,10 +44,10 @@ initialization is successful or a failure. */
     CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
                      fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)
 
-#define FH_ENT(fhash_ptr, key)                                                 \
+#define FH_ENTRY(fhash_ptr, key)                                               \
     (ccc_fhash_entry)                                                          \
     {                                                                          \
-        CCC_IMPL_FH_ENT(fhash_ptr, key)                                        \
+        CCC_IMPL_FH_ENTRY(fhash_ptr, key)                                      \
     }
 
 #define FH_GET(entry_copy) CCC_IMPL_FH_GET(entry_copy)
@@ -66,11 +66,11 @@ initialization is successful or a failure. */
         CCC_IMPL_FH_AND_MODIFY_W(entry_copy, mod_fn, aux)                      \
     }
 
-#define FH_INS_ENT(entry_copy, key_val_struct...)                              \
-    CCC_IMPL_FH_INS_ENT(entry_copy, key_val_struct)
+#define FH_INSERT_ENTRY(entry_copy, key_val_struct...)                         \
+    CCC_IMPL_FH_INSERT_ENTRY(entry_copy, key_val_struct)
 
-#define FH_OR_INS(entry_copy, key_val_struct...)                               \
-    CCC_IMPL_FH_OR_INS(entry_copy, key_val_struct)
+#define FH_OR_INSERT(entry_copy, key_val_struct...)                            \
+    CCC_IMPL_FH_OR_INSERT(entry_copy, key_val_struct)
 
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
@@ -210,7 +210,7 @@ bool ccc_fh_occupied(ccc_fhash_entry e);
 Table resizing occurs upon calls to entry functions/macros or when trying
 to insert a new element directly. This is to provide stable entries from the
 time they are obtained to the time they are used in functions they are passed
-to (i.e. the idiomatic OR_INS(ENT(...)...)).
+to (i.e. the idiomatic OR_INSERT(ENTRY(...)...)).
 
 However, if a Vacant entry is returned and then a subsequent insertion function
 is used, it will not work if resizing has failed and the return of those

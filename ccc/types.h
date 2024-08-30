@@ -33,12 +33,6 @@ typedef struct
     void *const end;
 } ccc_rrange;
 
-#define CCC_ENT_VACANT ((uint8_t)0x0)
-#define CCC_ENT_OCCUPIED ((uint8_t)0x1)
-#define CCC_ENT_INS_ERROR ((uint8_t)0x2)
-#define CCC_ENT_SEARCH_ERROR ((uint8_t)0x4)
-#define CCC_ENT_NULL ((uint8_t)0x8)
-
 /* An entry is a snapshot of a query from the user for a container. All
    memory for all containers is writable (that's what allows us to use the
    containers). So, the const here discourages modification by the user.
@@ -51,6 +45,12 @@ typedef struct
     void const *entry;
     uint8_t status;
 } ccc_entry;
+
+#define CCC_ENTRY_VACANT ((uint8_t)0x0)
+#define CCC_ENTRY_OCCUPIED ((uint8_t)0x1)
+#define CCC_ENTRY_INSERT_ERROR ((uint8_t)0x2)
+#define CCC_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
+#define CCC_ENTRY_NULL ((uint8_t)0x8)
 
 typedef struct
 {
