@@ -186,23 +186,16 @@ fhash_test_lru_cache(void)
         switch (requests[i].call)
         {
         case PUT:
-        {
             requests[i].put(&lru, requests[i].key, requests[i].val);
-        }
-        break;
+            break;
         case GET:
-        {
             CHECK(requests[i].get(&lru, requests[i].key), requests[i].val,
                   "%d");
-        }
-        break;
+            break;
         case FRONT:
-        {
-            struct key_val const *const kv = requests[i].front(&lru);
-            CHECK(kv->key, requests[i].key, "%d");
-            CHECK(kv->val, requests[i].val, "%d");
-        }
-        break;
+            CHECK(requests[i].front(&lru)->key, requests[i].key, "%d");
+            CHECK(requests[i].front(&lru)->val, requests[i].val, "%d");
+            break;
         default:
             break;
         }
