@@ -204,7 +204,7 @@ ccc_list_validate(ccc_list const *const l)
 {
     size_t size = 0;
     for (struct ccc_impl_list_elem *e = l->impl.sentinel.n;
-         e != &l->impl.sentinel; e = e->n)
+         e != &l->impl.sentinel; e = e->n, ++size)
     {
         if (!e || !e->n || !e->p)
         {

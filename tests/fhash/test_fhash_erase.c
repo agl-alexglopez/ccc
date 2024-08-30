@@ -187,10 +187,13 @@ fhash_test_lru_cache(void)
         {
         case PUT:
             requests[i].put(&lru, requests[i].key, requests[i].val);
+            CHECK(ccc_fh_validate(&lru.fh), true, "%d");
+            CHECK(ccc_list_validate(&lru.l), true, "%d");
             break;
         case GET:
             CHECK(requests[i].get(&lru, requests[i].key), requests[i].val,
                   "%d");
+            CHECK(ccc_list_validate(&lru.l), true, "%d");
             break;
         case FRONT:
             CHECK(requests[i].front(&lru)->key, requests[i].key, "%d");
