@@ -1,5 +1,5 @@
 #include "depq_util.h"
-#include "depqueue.h"
+#include "double_ended_priority_queue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -38,7 +38,8 @@ main()
 static enum test_result
 depq_test_insert_one(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     struct val single;
     single.val = 0;
     ccc_depq_push(&pq, &single.elem);
@@ -50,7 +51,8 @@ depq_test_insert_one(void)
 static enum test_result
 depq_test_insert_three(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -66,8 +68,9 @@ depq_test_insert_three(void)
 static enum test_result
 depq_test_struct_getter(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
-    ccc_depqueue pq_tester_clone
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq_tester_clone
         = CCC_DEPQ_INIT(struct val, elem, pq_tester_clone, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
@@ -91,7 +94,8 @@ depq_test_struct_getter(void)
 static enum test_result
 depq_test_insert_three_dups(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -107,7 +111,8 @@ depq_test_insert_three_dups(void)
 static enum test_result
 depq_test_insert_shuffle(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -129,7 +134,8 @@ depq_test_insert_shuffle(void)
 static enum test_result
 depq_test_read_max_min(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {

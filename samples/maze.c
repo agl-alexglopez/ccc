@@ -7,7 +7,7 @@
    structures are provided by the library offering a perfect sample program
    opportunity. */
 #include "cli.h"
-#include "depqueue.h"
+#include "double_ended_priority_queue.h"
 #include "random.h"
 #include "set.h"
 #include "str_view/str_view.h"
@@ -203,8 +203,8 @@ animate_maze(struct maze *maze)
        A ccc_set could be replaced by a 2D vector copy of the maze with costs
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
-    ccc_depqueue cells = CCC_DEPQ_INIT(struct priority_cell, elem, cells,
-                                       cmp_priority_cells, NULL);
+    ccc_double_ended_priority_queue cells = CCC_DEPQ_INIT(
+        struct priority_cell, elem, cells, cmp_priority_cells, NULL);
     ccc_set cell_costs
         = CCC_SET_INIT(struct point_cost, elem, cell_costs, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));

@@ -1,5 +1,5 @@
-#ifndef CCC_IMPL_PQUEUE_H
-#define CCC_IMPL_PQUEUE_H
+#ifndef CCC_IMPL_PRIORITY_QUEUE_H
+#define CCC_IMPL_PRIORITY_QUEUE_H
 
 #include "types.h"
 
@@ -17,7 +17,7 @@ struct ccc_impl_pq_elem
     struct ccc_impl_pq_elem *parent;
 };
 
-struct ccc_impl_pqueue
+struct ccc_impl_priority_queue
 {
     struct ccc_impl_pq_elem *root;
     size_t sz;
@@ -40,4 +40,4 @@ struct ccc_impl_pqueue
         },                                                                     \
     }
 
-#endif /* CCC_IMPL_PQUEUE_H */
+#endif /* CCC_IMPL_PRIORITY_QUEUE_H */

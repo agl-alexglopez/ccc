@@ -1,17 +1,20 @@
-add_library(impl_buf INTERFACE impl_buf.h)
-target_link_libraries(impl_buf INTERFACE types)
+add_library(impl_buffer INTERFACE impl_buffer.h)
+target_link_libraries(impl_buffer INTERFACE types)
 
-add_library(impl_list INTERFACE impl_list.h)
-target_link_libraries(impl_list INTERFACE types)
+add_library(impl_doubly_linked_list INTERFACE impl_doubly_linked_list.h)
+target_link_libraries(impl_doubly_linked_list INTERFACE types)
+
+add_library(impl_singly_linked_list INTERFACE impl_singly_linked_list.h)
+target_link_libraries(impl_singly_linked_list INTERFACE types)
 
 add_library(impl_tree INTERFACE impl_tree.h)
 target_link_libraries(impl_tree INTERFACE types)
 
-add_library(impl_flat_pqueue INTERFACE impl_flat_pqueue.h)
-target_link_libraries(impl_flat_pqueue INTERFACE buf types)
+add_library(impl_flat_priority_queue INTERFACE impl_flat_priority_queue.h)
+target_link_libraries(impl_flat_priority_queue INTERFACE buffer types)
 
-add_library(impl_pqueue INTERFACE impl_pqueue.h)
-target_link_libraries(impl_pqueue INTERFACE types)
+add_library(impl_priority_queue INTERFACE impl_priority_queue.h)
+target_link_libraries(impl_priority_queue INTERFACE types)
 
 add_library(impl_flat_hash INTERFACE impl_flat_hash.h)
-target_link_libraries(impl_flat_hash INTERFACE types buf)
+target_link_libraries(impl_flat_hash INTERFACE types buffer)

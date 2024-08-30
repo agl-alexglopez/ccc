@@ -1,5 +1,5 @@
 #include "pq_util.h"
-#include "pqueue.h"
+#include "priority_queue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -28,7 +28,8 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    ccc_pqueue pq = CCC_PQ_INIT(struct val, elem, CCC_LES, val_cmp, NULL);
+    ccc_priority_queue pq
+        = CCC_PQ_INIT(struct val, elem, CCC_LES, val_cmp, NULL);
     CHECK(ccc_pq_empty(&pq), true, "%d");
     return PASS;
 }

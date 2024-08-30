@@ -58,7 +58,7 @@ static enum test_result
 fhash_test_insert(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -74,7 +74,7 @@ static enum test_result
 fhash_test_insert_overwrite(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -103,7 +103,7 @@ static enum test_result
 fhash_test_insert_then_bad_ideas(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -139,7 +139,7 @@ fhash_test_entry_api_functional(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[size];
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -202,7 +202,7 @@ fhash_test_insert_via_entry(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[size];
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -250,7 +250,7 @@ fhash_test_insert_via_entry_macros(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[size];
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -293,7 +293,7 @@ fhash_test_entry_api_macros(void)
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     struct val vals[size];
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -348,7 +348,7 @@ fhash_test_two_sum(void)
 {
     size_t const size = 50;
     struct val vals[size];
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -380,7 +380,7 @@ fhash_test_resize(void)
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals != NULL, true, "%d");
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res
         = CCC_FH_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
                       fhash_int_to_u64, fhash_id_eq, NULL);
@@ -418,7 +418,7 @@ fhash_test_resize_macros(void)
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals != NULL, true, "%d");
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res
         = CCC_FH_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
                       fhash_int_to_u64, fhash_id_eq, NULL);
@@ -454,7 +454,7 @@ fhash_test_resize_macros(void)
 static enum test_result
 fhash_test_resize_from_null(void)
 {
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, NULL, 0, struct val, id, e, realloc,
                                        fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -488,7 +488,7 @@ static enum test_result
 fhash_test_resize_from_null_macros(void)
 {
     size_t const prime_start = 0;
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res
         = CCC_FH_INIT(&fh, NULL, prime_start, struct val, id, e, realloc,
                       fhash_int_to_u64, fhash_id_eq, NULL);
@@ -526,7 +526,7 @@ fhash_test_insert_limit(void)
 {
     int const size = 101;
     struct val vals[size];
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, size, struct val, id, e, NULL,
                                        fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -594,7 +594,7 @@ static enum test_result
 fhash_test_insert_wrong_type(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_fhash fh;
+    ccc_flat_hash fh;
     ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                        fhash_int_zero, fhash_id_eq, NULL);
     struct too_big

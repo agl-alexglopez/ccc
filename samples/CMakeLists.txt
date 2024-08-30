@@ -4,7 +4,7 @@ target_link_libraries(maze PRIVATE
   random
   str_view::str_view
   set
-  depqueue
+  double_ended_priority_queue
 )
 
 add_executable(graph graph.c)
@@ -14,8 +14,8 @@ target_link_libraries(graph PRIVATE
   str_view::str_view
   flat_hash
   set
-  pqueue
+  priority_queue
   queue
-  flat_pqueue
+  flat_priority_queue
 )
 

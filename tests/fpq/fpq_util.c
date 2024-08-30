@@ -31,8 +31,8 @@ rand_range(size_t const min, size_t const max)
 }
 
 enum test_result
-insert_shuffled(ccc_flat_pqueue *pq, struct val vals[], size_t const size,
-                int const larger_prime)
+insert_shuffled(ccc_flat_priority_queue *pq, struct val vals[],
+                size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -54,7 +54,7 @@ insert_shuffled(ccc_flat_pqueue *pq, struct val vals[], size_t const size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 enum test_result
-inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
+inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
 {
     if (ccc_fpq_size(fpq) != size)
     {
@@ -62,7 +62,7 @@ inorder_fill(int vals[], size_t size, ccc_flat_pqueue *fpq)
     }
     size_t i = 0;
     struct val copy_buf[sizeof(struct val) * ccc_fpq_size(fpq)];
-    ccc_flat_pqueue fpq_copy = CCC_FPQ_INIT(
+    ccc_flat_priority_queue fpq_copy = CCC_FPQ_INIT(
         &copy_buf, ccc_fpq_size(fpq), struct val, CCC_LES, NULL, val_cmp, NULL);
     while (!ccc_fpq_empty(fpq) && i < size)
     {

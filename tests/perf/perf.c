@@ -1,7 +1,7 @@
 #include "cli.h"
-#include "depqueue.h"
-#include "flat_pqueue.h"
-#include "pqueue.h"
+#include "double_ended_priority_queue.h"
+#include "flat_priority_queue.h"
+#include "priority_queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
 
@@ -94,9 +94,9 @@ test_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_depqueue depq
+        ccc_double_ended_priority_queue depq
             = CCC_DEPQ_INIT(struct val, depq_elem, depq, val_cmp, NULL);
-        ccc_pqueue pq
+        ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -112,8 +112,8 @@ test_push(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(val_array, n, struct val, CCC_LES,
-                                           NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
+            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -134,9 +134,9 @@ test_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_depqueue depq
+        ccc_double_ended_priority_queue depq
             = CCC_DEPQ_INIT(struct val, depq_elem, depq, val_cmp, NULL);
-        ccc_pqueue pq
+        ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
@@ -160,8 +160,8 @@ test_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(val_array, n, struct val, CCC_LES,
-                                           NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
+            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)ccc_fpq_push(&fpq, &val_array[i]);
@@ -188,9 +188,9 @@ test_push_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_depqueue depq
+        ccc_double_ended_priority_queue depq
             = CCC_DEPQ_INIT(struct val, depq_elem, depq, val_cmp, NULL);
-        ccc_pqueue pq
+        ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -214,8 +214,8 @@ test_push_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(val_array, n, struct val, CCC_LES,
-                                           NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
+            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -241,9 +241,9 @@ test_push_intermittent_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_depqueue depq
+        ccc_double_ended_priority_queue depq
             = CCC_DEPQ_INIT(struct val, depq_elem, depq, val_cmp, NULL);
-        ccc_pqueue pq
+        ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -267,8 +267,8 @@ test_push_intermittent_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(val_array, n, struct val, CCC_LES,
-                                           NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
+            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -294,9 +294,9 @@ test_pop_intermittent_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_depqueue depq
+        ccc_double_ended_priority_queue depq
             = CCC_DEPQ_INIT(struct val, depq_elem, depq, val_cmp, NULL);
-        ccc_pqueue pq
+        ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
@@ -330,8 +330,8 @@ test_pop_intermittent_push(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(val_array, n, struct val, CCC_LES,
-                                           NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
+            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)ccc_fpq_push(&fpq, &val_array[i]);
@@ -362,9 +362,9 @@ test_update(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_depqueue depq
+        ccc_double_ended_priority_queue depq
             = CCC_DEPQ_INIT(struct val, depq_elem, depq, val_cmp, NULL);
-        ccc_pqueue pq
+        ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
@@ -392,8 +392,8 @@ test_update(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_pqueue fpq = CCC_FPQ_INIT(val_array, n, struct val, CCC_LES,
-                                           NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
+            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)ccc_fpq_push(&fpq, &val_array[i]);

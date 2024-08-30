@@ -1,4 +1,4 @@
-#include "flat_pqueue.h"
+#include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "test.h"
 
@@ -39,7 +39,7 @@ static enum test_result
 pq_test_empty(void)
 {
     struct val vals[1] = {{0}};
-    ccc_flat_pqueue pq
+    ccc_flat_priority_queue pq
         = CCC_FPQ_INIT(vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
     CHECK(ccc_fpq_empty(&pq), true, "%d");
     return PASS;
@@ -49,7 +49,7 @@ static enum test_result
 pq_test_macro(void)
 {
     struct val vals[1] = {{0}};
-    ccc_flat_pqueue pq
+    ccc_flat_priority_queue pq
         = CCC_FPQ_INIT(&vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
     struct val *res = FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res != NULL, true, "%d");
@@ -63,7 +63,7 @@ static enum test_result
 pq_test_push(void)
 {
     struct val vals[1] = {{0}};
-    ccc_flat_pqueue pq
+    ccc_flat_priority_queue pq
         = CCC_FPQ_INIT(&vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
     struct val *res = ccc_fpq_push(&pq, &vals[0]);
     CHECK(res != NULL, true, "%d");
@@ -75,7 +75,7 @@ static enum test_result
 pq_test_raw_type(void)
 {
     int vals[3] = {0};
-    ccc_flat_pqueue pq
+    ccc_flat_priority_queue pq
         = CCC_FPQ_INIT(&vals, 3, int, CCC_LES, NULL, int_cmp, NULL);
     int val = 1;
     int *res = ccc_fpq_push(&pq, &val);

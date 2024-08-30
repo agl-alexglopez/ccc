@@ -1,6 +1,6 @@
 #include "cli.h"
 #include "flat_hash.h"
-#include "pqueue.h"
+#include "priority_queue.h"
 #include "queue.h"
 #include "random.h"
 #include "set.h"
@@ -199,8 +199,8 @@ static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
-static void prepare_vertices(struct graph *, ccc_pqueue *, ccc_fhash *,
-                             struct path_request const *);
+static void prepare_vertices(struct graph *, ccc_priority_queue *,
+                             ccc_flat_hash *, struct path_request const *);
 static void paint_edge(struct graph *, struct vertex const *,
                        struct vertex const *);
 static void add_edge_cost_label(struct graph *, struct vertex *,
@@ -421,7 +421,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
     Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
-    ccc_fhash parent_map;
+    ccc_flat_hash parent_map;
     ccc_result res
         = CCC_FH_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem,
                       realloc, hash_parent_cells, eq_parent_cells, NULL);
@@ -696,9 +696,9 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
-    ccc_pqueue dist_q = CCC_PQ_INIT(struct dist_point, pq_elem, CCC_LES,
-                                    cmp_pq_dist_points, NULL);
-    ccc_fhash prev_map;
+    ccc_priority_queue dist_q = CCC_PQ_INIT(struct dist_point, pq_elem, CCC_LES,
+                                            cmp_pq_dist_points, NULL);
+    ccc_flat_hash prev_map;
     ccc_result res
         = CCC_FH_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
                       hash_vertex_addr, eq_prev_vertices, NULL);
@@ -759,8 +759,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 }
 
 static void
-prepare_vertices(struct graph *const graph, ccc_pqueue *dist_q,
-                 ccc_fhash *prev_map, struct path_request const *pr)
+prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
+                 ccc_flat_hash *prev_map, struct path_request const *pr)
 {
     for (struct vertex *v = ccc_set_begin(&graph->adjacency_list); v;
          v = ccc_set_next(&graph->adjacency_list, &v->elem))

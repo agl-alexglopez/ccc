@@ -19,7 +19,7 @@
       for any binary tree code which I have been working on for a while and
       think is quite helpful!
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
-#include "depqueue.h"
+#include "double_ended_priority_queue.h"
 #include "impl_tree.h"
 #include "set.h"
 #include "types.h"
@@ -31,7 +31,7 @@
 #include <stdlib.h>
 
 /* Printing enum for printing tree structures if heap available. */
-typedef enum ccc_print_link
+typedef enum
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
@@ -102,7 +102,8 @@ static ccc_threeway_cmp cmp(ccc_tree const *, ccc_node const *,
 /* =================  Double Ended Priority Queue Interface  ============== */
 
 void
-ccc_depq_clear(ccc_depqueue *pq, ccc_destructor_fn *destructor)
+ccc_depq_clear(ccc_double_ended_priority_queue *pq,
+               ccc_destructor_fn *destructor)
 {
     while (!ccc_depq_empty(pq))
     {
@@ -111,13 +112,13 @@ ccc_depq_clear(ccc_depqueue *pq, ccc_destructor_fn *destructor)
 }
 
 bool
-ccc_depq_empty(ccc_depqueue const *const pq)
+ccc_depq_empty(ccc_double_ended_priority_queue const *const pq)
 {
     return empty(&pq->impl);
 }
 
 void *
-ccc_depq_root(ccc_depqueue const *const pq)
+ccc_depq_root(ccc_double_ended_priority_queue const *const pq)
 {
     ccc_node const *const n = root(&pq->impl);
     if (!n)
@@ -128,7 +129,7 @@ ccc_depq_root(ccc_depqueue const *const pq)
 }
 
 void *
-ccc_depq_max(ccc_depqueue *const pq)
+ccc_depq_max(ccc_double_ended_priority_queue *const pq)
 {
     ccc_node const *const n
         = splay(&pq->impl, pq->impl.root, &pq->impl.end, force_find_grt);
@@ -140,7 +141,7 @@ ccc_depq_max(ccc_depqueue *const pq)
 }
 
 void *
-ccc_depq_const_max(ccc_depqueue const *const pq)
+ccc_depq_const_max(ccc_double_ended_priority_queue const *const pq)
 {
     ccc_node const *const n = max(&pq->impl);
     if (!n)
@@ -151,13 +152,14 @@ ccc_depq_const_max(ccc_depqueue const *const pq)
 }
 
 bool
-ccc_depq_is_max(ccc_depqueue *const pq, ccc_depq_elem const *const e)
+ccc_depq_is_max(ccc_double_ended_priority_queue *const pq,
+                ccc_depq_elem const *const e)
 {
     return !ccc_depq_rnext(pq, e);
 }
 
 void *
-ccc_depq_min(ccc_depqueue *const pq)
+ccc_depq_min(ccc_double_ended_priority_queue *const pq)
 {
     ccc_node const *const n
         = splay(&pq->impl, pq->impl.root, &pq->impl.end, force_find_les);
@@ -169,7 +171,7 @@ ccc_depq_min(ccc_depqueue *const pq)
 }
 
 void *
-ccc_depq_const_min(ccc_depqueue const *const pq)
+ccc_depq_const_min(ccc_double_ended_priority_queue const *const pq)
 {
     ccc_node const *const n = min(&pq->impl);
     if (!n)
@@ -180,13 +182,14 @@ ccc_depq_const_min(ccc_depqueue const *const pq)
 }
 
 bool
-ccc_depq_is_min(ccc_depqueue *const pq, ccc_depq_elem const *const e)
+ccc_depq_is_min(ccc_double_ended_priority_queue *const pq,
+                ccc_depq_elem const *const e)
 {
     return !ccc_depq_next(pq, e);
 }
 
 void *
-ccc_depq_begin(ccc_depqueue *pq)
+ccc_depq_begin(ccc_double_ended_priority_queue *pq)
 {
     ccc_node const *const n = max(&pq->impl);
     if (!n)
@@ -197,7 +200,7 @@ ccc_depq_begin(ccc_depqueue *pq)
 }
 
 void *
-ccc_depq_rbegin(ccc_depqueue *pq)
+ccc_depq_rbegin(ccc_double_ended_priority_queue *pq)
 {
     ccc_node const *const n = min(&pq->impl);
     if (!n)
@@ -208,7 +211,7 @@ ccc_depq_rbegin(ccc_depqueue *pq)
 }
 
 void *
-ccc_depq_next(ccc_depqueue *pq, ccc_depq_elem const *e)
+ccc_depq_next(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
 {
     ccc_node const *const n
         = multiset_next(&pq->impl, &e->impl, reverse_inorder_traversal);
@@ -220,7 +223,7 @@ ccc_depq_next(ccc_depqueue *pq, ccc_depq_elem const *e)
 }
 
 void *
-ccc_depq_rnext(ccc_depqueue *pq, ccc_depq_elem const *e)
+ccc_depq_rnext(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
 {
     ccc_node const *const n
         = multiset_next(&pq->impl, &e->impl, inorder_traversal);
@@ -232,7 +235,8 @@ ccc_depq_rnext(ccc_depqueue *pq, ccc_depq_elem const *e)
 }
 
 ccc_range
-ccc_depq_equal_range(ccc_depqueue *pq, ccc_depq_elem const *const begin,
+ccc_depq_equal_range(ccc_double_ended_priority_queue *pq,
+                     ccc_depq_elem const *const begin,
                      ccc_depq_elem const *const end)
 {
     return equal_range(&pq->impl, &begin->impl, &end->impl,
@@ -252,7 +256,8 @@ ccc_depq_end_range(ccc_range const *const r)
 }
 
 ccc_rrange
-ccc_depq_equal_rrange(ccc_depqueue *pq, ccc_depq_elem const *const rbegin,
+ccc_depq_equal_rrange(ccc_double_ended_priority_queue *pq,
+                      ccc_depq_elem const *const rbegin,
                       ccc_depq_elem const *const rend)
 {
     ccc_range const ret
@@ -276,13 +281,13 @@ ccc_depq_end_rrange(ccc_rrange const *const rr)
 }
 
 void
-ccc_depq_push(ccc_depqueue *pq, ccc_depq_elem *const e)
+ccc_depq_push(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
 {
     multiset_insert(&pq->impl, &e->impl);
 }
 
 void *
-ccc_depq_erase(ccc_depqueue *pq, ccc_depq_elem *const e)
+ccc_depq_erase(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
 {
     ccc_node const *const n = multiset_erase_node(&pq->impl, &e->impl);
     if (!n)
@@ -293,8 +298,8 @@ ccc_depq_erase(ccc_depqueue *pq, ccc_depq_elem *const e)
 }
 
 bool
-ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *const elem, ccc_update_fn *fn,
-                void *aux)
+ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
+                ccc_update_fn *fn, void *aux)
 {
     if (NULL == elem->impl.link[L] || NULL == elem->impl.link[R])
     {
@@ -311,13 +316,14 @@ ccc_depq_update(ccc_depqueue *pq, ccc_depq_elem *const elem, ccc_update_fn *fn,
 }
 
 bool
-ccc_depq_contains(ccc_depqueue *const pq, ccc_depq_elem const *const elem)
+ccc_depq_contains(ccc_double_ended_priority_queue *const pq,
+                  ccc_depq_elem const *const elem)
 {
     return contains(&pq->impl, &elem->impl);
 }
 
 void *
-ccc_depq_pop_max(ccc_depqueue *pq)
+ccc_depq_pop_max(ccc_double_ended_priority_queue *pq)
 {
     ccc_node *n = pop_max(&pq->impl);
     if (!n)
@@ -328,7 +334,7 @@ ccc_depq_pop_max(ccc_depqueue *pq)
 }
 
 void *
-ccc_depq_pop_min(ccc_depqueue *pq)
+ccc_depq_pop_min(ccc_double_ended_priority_queue *pq)
 {
     ccc_node *n = pop_min(&pq->impl);
     if (!n)
@@ -339,20 +345,20 @@ ccc_depq_pop_min(ccc_depqueue *pq)
 }
 
 size_t
-ccc_depq_size(ccc_depqueue const *const pq)
+ccc_depq_size(ccc_double_ended_priority_queue const *const pq)
 {
     return pq->impl.size;
 }
 
 void
-ccc_depq_print(ccc_depqueue const *const pq, ccc_depq_elem const *const start,
-               ccc_print_fn *const fn)
+ccc_depq_print(ccc_double_ended_priority_queue const *const pq,
+               ccc_depq_elem const *const start, ccc_print_fn *const fn)
 {
     ccc_tree_print(&pq->impl, &start->impl, fn);
 }
 
 bool
-ccc_depq_validate(ccc_depqueue const *pq)
+ccc_depq_validate(ccc_double_ended_priority_queue const *pq)
 {
     return ccc_tree_validate(&pq->impl);
 }

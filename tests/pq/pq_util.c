@@ -16,7 +16,7 @@ val_update(ccc_update const u)
 }
 
 enum test_result
-insert_shuffled(ccc_pqueue *ppq, struct val vals[], size_t const size,
+insert_shuffled(ccc_priority_queue *ppq, struct val vals[], size_t const size,
                 int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -39,14 +39,14 @@ insert_shuffled(ccc_pqueue *ppq, struct val vals[], size_t const size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 enum test_result
-inorder_fill(int vals[], size_t size, ccc_pqueue *ppq)
+inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
 {
     if (ccc_pq_size(ppq) != size)
     {
         return FAIL;
     }
     size_t i = 0;
-    ccc_pqueue copy
+    ccc_priority_queue copy
         = CCC_PQ_INIT(struct val, elem, ccc_pq_order(ppq), val_cmp, NULL);
     while (!ccc_pq_empty(ppq))
     {

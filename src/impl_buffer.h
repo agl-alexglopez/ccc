@@ -1,5 +1,5 @@
-#ifndef CCC_IMPL_BUF_H
-#define CCC_IMPL_BUF_H
+#ifndef CCC_IMPL_BUFFER_H
+#define CCC_IMPL_BUFFER_H
 
 #include "types.h"
 

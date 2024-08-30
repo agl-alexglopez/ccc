@@ -1,5 +1,5 @@
-#include "pqueue.h"
-#include "impl_pqueue.h"
+#include "priority_queue.h"
+#include "impl_priority_queue.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -8,38 +8,38 @@
 
 /*=========================  Function Prototypes   ==========================*/
 
-static struct ccc_impl_pq_elem *merge(struct ccc_impl_pqueue *,
+static struct ccc_impl_pq_elem *merge(struct ccc_impl_priority_queue *,
                                       struct ccc_impl_pq_elem *old,
                                       struct ccc_impl_pq_elem *new);
 static void link_child(struct ccc_impl_pq_elem *parent,
                        struct ccc_impl_pq_elem *child);
 static void init_node(struct ccc_impl_pq_elem *);
 static size_t traversal_size(struct ccc_impl_pq_elem const *);
-static bool has_valid_links(struct ccc_impl_pqueue const *,
+static bool has_valid_links(struct ccc_impl_priority_queue const *,
                             struct ccc_impl_pq_elem const *parent,
                             struct ccc_impl_pq_elem const *child);
-static struct ccc_impl_pq_elem *delete(struct ccc_impl_pqueue *,
+static struct ccc_impl_pq_elem *delete(struct ccc_impl_priority_queue *,
                                        struct ccc_impl_pq_elem *);
-static struct ccc_impl_pq_elem *delete_min(struct ccc_impl_pqueue *,
+static struct ccc_impl_pq_elem *delete_min(struct ccc_impl_priority_queue *,
                                            struct ccc_impl_pq_elem *);
 static void clear_node(struct ccc_impl_pq_elem *);
 static void cut_child(struct ccc_impl_pq_elem *);
-static void *struct_base(struct ccc_impl_pqueue const *,
+static void *struct_base(struct ccc_impl_priority_queue const *,
                          struct ccc_impl_pq_elem const *e);
-static ccc_threeway_cmp cmp(struct ccc_impl_pqueue const *,
+static ccc_threeway_cmp cmp(struct ccc_impl_priority_queue const *,
                             struct ccc_impl_pq_elem const *a,
                             struct ccc_impl_pq_elem const *b);
 
 /*=========================  Interface Functions   ==========================*/
 
 void const *
-ccc_pq_front(ccc_pqueue const *const ppq)
+ccc_pq_front(ccc_priority_queue const *const ppq)
 {
     return ppq->impl.root ? struct_base(&ppq->impl, ppq->impl.root) : NULL;
 }
 
 void
-ccc_pq_push(ccc_pqueue *const ppq, ccc_pq_elem *const e)
+ccc_pq_push(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
     if (!e || !ppq)
     {
@@ -51,7 +51,7 @@ ccc_pq_push(ccc_pqueue *const ppq, ccc_pq_elem *const e)
 }
 
 void *
-ccc_pq_pop(ccc_pqueue *const ppq)
+ccc_pq_pop(ccc_priority_queue *const ppq)
 {
     if (!ppq->impl.root)
     {
@@ -65,7 +65,7 @@ ccc_pq_pop(ccc_pqueue *const ppq)
 }
 
 void *
-ccc_pq_erase(ccc_pqueue *const ppq, ccc_pq_elem *const e)
+ccc_pq_erase(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
     if (!ppq->impl.root || !e->impl.next_sibling || !e->impl.prev_sibling)
     {
@@ -78,7 +78,7 @@ ccc_pq_erase(ccc_pqueue *const ppq, ccc_pq_elem *const e)
 }
 
 void
-ccc_pq_clear(ccc_pqueue *const ppq, ccc_destructor_fn *fn)
+ccc_pq_clear(ccc_priority_queue *const ppq, ccc_destructor_fn *fn)
 {
     while (!ccc_pq_empty(ppq))
     {
@@ -87,13 +87,13 @@ ccc_pq_clear(ccc_pqueue *const ppq, ccc_destructor_fn *fn)
 }
 
 bool
-ccc_pq_empty(ccc_pqueue const *const ppq)
+ccc_pq_empty(ccc_priority_queue const *const ppq)
 {
     return !ppq->impl.sz;
 }
 
 size_t
-ccc_pq_size(ccc_pqueue const *const ppq)
+ccc_pq_size(ccc_priority_queue const *const ppq)
 {
     return ppq->impl.sz;
 }
@@ -105,7 +105,7 @@ ccc_pq_size(ccc_pqueue const *const ppq)
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
 bool
-ccc_pq_update(ccc_pqueue *const ppq, ccc_pq_elem *const e,
+ccc_pq_update(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
               ccc_update_fn *const fn, void *const aux)
 {
     if (!e->impl.next_sibling || !e->impl.prev_sibling)
@@ -129,8 +129,8 @@ ccc_pq_update(ccc_pqueue *const ppq, ccc_pq_elem *const e,
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
 bool
-ccc_pq_increase(ccc_pqueue *const ppq, ccc_pq_elem *const e, ccc_update_fn *fn,
-                void *aux)
+ccc_pq_increase(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
+                ccc_update_fn *fn, void *aux)
 {
     if (!e->impl.next_sibling || !e->impl.prev_sibling)
     {
@@ -154,8 +154,8 @@ ccc_pq_increase(ccc_pqueue *const ppq, ccc_pq_elem *const e, ccc_update_fn *fn,
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
 bool
-ccc_pq_decrease(ccc_pqueue *const ppq, ccc_pq_elem *const e, ccc_update_fn *fn,
-                void *aux)
+ccc_pq_decrease(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
+                ccc_update_fn *fn, void *aux)
 {
     if (!e->impl.next_sibling || !e->impl.prev_sibling)
     {
@@ -177,7 +177,7 @@ ccc_pq_decrease(ccc_pqueue *const ppq, ccc_pq_elem *const e, ccc_update_fn *fn,
 }
 
 bool
-ccc_pq_validate(ccc_pqueue const *const ppq)
+ccc_pq_validate(ccc_priority_queue const *const ppq)
 {
     if (ppq->impl.root && ppq->impl.root->parent)
     {
@@ -195,7 +195,7 @@ ccc_pq_validate(ccc_pqueue const *const ppq)
 }
 
 ccc_threeway_cmp
-ccc_pq_order(ccc_pqueue const *const ppq)
+ccc_pq_order(ccc_priority_queue const *const ppq)
 {
     return ppq->impl.order;
 }
@@ -203,7 +203,7 @@ ccc_pq_order(ccc_pqueue const *const ppq)
 /*========================   Static Helpers   ================================*/
 
 static inline ccc_threeway_cmp
-cmp(struct ccc_impl_pqueue const *const ppq,
+cmp(struct ccc_impl_priority_queue const *const ppq,
     struct ccc_impl_pq_elem const *const a,
     struct ccc_impl_pq_elem const *const b)
 {
@@ -212,7 +212,7 @@ cmp(struct ccc_impl_pqueue const *const ppq,
 }
 
 static inline void *
-struct_base(struct ccc_impl_pqueue const *const pq,
+struct_base(struct ccc_impl_priority_queue const *const pq,
             struct ccc_impl_pq_elem const *e)
 {
     return ((uint8_t *)&(e->left_child)) - pq->pq_elem_offset;
@@ -250,8 +250,8 @@ cut_child(struct ccc_impl_pq_elem *child)
     child->parent = NULL;
 }
 
-static inline struct ccc_impl_pq_elem *delete(struct ccc_impl_pqueue *ppq,
-                                              struct ccc_impl_pq_elem *root)
+static inline struct ccc_impl_pq_elem *delete(
+    struct ccc_impl_priority_queue *ppq, struct ccc_impl_pq_elem *root)
 {
     if (ppq->root == root)
     {
@@ -262,7 +262,7 @@ static inline struct ccc_impl_pq_elem *delete(struct ccc_impl_pqueue *ppq,
 }
 
 static inline struct ccc_impl_pq_elem *
-delete_min(struct ccc_impl_pqueue *ppq, struct ccc_impl_pq_elem *root)
+delete_min(struct ccc_impl_priority_queue *ppq, struct ccc_impl_pq_elem *root)
 {
     if (!root->left_child)
     {
@@ -289,8 +289,8 @@ delete_min(struct ccc_impl_pqueue *ppq, struct ccc_impl_pq_elem *root)
 }
 
 static inline struct ccc_impl_pq_elem *
-merge(struct ccc_impl_pqueue *const ppq, struct ccc_impl_pq_elem *const old,
-      struct ccc_impl_pq_elem *const new)
+merge(struct ccc_impl_priority_queue *const ppq,
+      struct ccc_impl_pq_elem *const old, struct ccc_impl_pq_elem *const new)
 {
     if (!old || !new || old == new)
     {
@@ -353,7 +353,7 @@ traversal_size(struct ccc_impl_pq_elem const *const root)
 }
 
 static bool
-has_valid_links(struct ccc_impl_pqueue const *const ppq,
+has_valid_links(struct ccc_impl_priority_queue const *const ppq,
                 struct ccc_impl_pq_elem const *const parent,
                 struct ccc_impl_pq_elem const *const child)
 {

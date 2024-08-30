@@ -1,13 +1,13 @@
 /* Author: Alexander Lopez
    File: impl_flat_pqueue.h
    ------------------------ */
-#ifndef CCC_IMPL_FLAT_PQUEUE_H
-#define CCC_IMPL_FLAT_PQUEUE_H
+#ifndef CCC_IMPL_FLAT_PRIORITY_QUEUE_H
+#define CCC_IMPL_FLAT_PRIORITY_QUEUE_H
 
-#include "buf.h"
+#include "buffer.h"
 #include "types.h"
 
-struct ccc_impl_flat_pqueue
+struct ccc_impl_flat_priority_queue
 {
     ccc_buf buf;
     ccc_cmp_fn *cmp;
@@ -15,7 +15,8 @@ struct ccc_impl_flat_pqueue
     void *aux;
 };
 
-size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_pqueue *, uint8_t[], size_t);
+size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *, uint8_t[],
+                              size_t);
 
 /*=======================    Convenience Macros    ======================== */
 
@@ -37,7 +38,7 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_pqueue *, uint8_t[], size_t);
 #define CCC_IMPL_FPQ_EMPLACE(fpq, type_initializer...)                         \
     ({                                                                         \
         typeof(type_initializer) *_res_;                                       \
-        struct ccc_impl_flat_pqueue *_fpq_ = &(fpq)->impl;                     \
+        struct ccc_impl_flat_priority_queue *_fpq_ = &(fpq)->impl;             \
         {                                                                      \
             if (sizeof(*_res_) != ccc_buf_elem_size(&_fpq_->buf))              \
             {                                                                  \
@@ -71,4 +72,4 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_pqueue *, uint8_t[], size_t);
         _res_;                                                                 \
     })
 
-#endif /* CCC_IMPL_FLAT_PQUEUE_H */
+#endif /* CCC_IMPL_FLAT_PRIORITY_QUEUE_H */
