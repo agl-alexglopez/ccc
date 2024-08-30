@@ -1,4 +1,3 @@
-#include "doubly_linked_list.h"
 #include "fhash_util.h"
 #include "flat_hash.h"
 #include "test.h"
@@ -9,13 +8,11 @@
 
 static enum test_result fhash_test_erase(void);
 static enum test_result fhash_test_shuffle_insert_erase(void);
-static enum test_result fhash_test_lru_cache(void);
 
-#define NUM_TESTS (size_t)3
+#define NUM_TESTS (size_t)2
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_erase,
     fhash_test_shuffle_insert_erase,
-    fhash_test_lru_cache,
 };
 
 int
@@ -32,53 +29,6 @@ main()
     }
     return res;
 }
-
-#define REQS 11
-
-struct key_val
-{
-    int key;
-    int val;
-    ccc_dll_elem list_elem;
-};
-
-struct lru_cache
-{
-    ccc_flat_hash fh;
-    ccc_doubly_linked_list l;
-    size_t cap;
-};
-
-struct lru_lookup
-{
-    int key;
-    struct key_val *kv_in_list;
-    ccc_fhash_elem hash_elem;
-};
-
-enum lru_call
-{
-    PUT,
-    GET,
-    FRONT,
-};
-
-struct lru_request
-{
-    enum lru_call call;
-    int key;
-    int val;
-    union {
-        void (*put)(struct lru_cache *, int, int);
-        int (*get)(struct lru_cache *, int);
-        struct key_val *(*front)(struct lru_cache *);
-    };
-};
-
-static void put(struct lru_cache *, int key, int val);
-static int get(struct lru_cache *, int key);
-static struct key_val *front(struct lru_cache *);
-static bool lru_lookup_cmp(ccc_key_cmp);
 
 static enum test_result
 fhash_test_erase(void)
@@ -156,102 +106,4 @@ fhash_test_shuffle_insert_erase(void)
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
-}
-
-static enum test_result
-fhash_test_lru_cache(void)
-{
-    struct lru_cache lru = {
-        .cap = 3,
-        .l
-        = CCC_DLL_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc, NULL),
-    };
-    CCC_FH_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
-                fhash_int_to_u64, lru_lookup_cmp, NULL);
-    struct lru_request requests[REQS] = {
-        {PUT, .key = 1, .val = 1, .put = put},
-        {PUT, .key = 2, .val = 2, .put = put},
-        {GET, .key = 1, .val = 1, .get = get},
-        {PUT, .key = 3, .val = 3, .put = put},
-        {FRONT, .key = 3, .val = 3, .front = front},
-        {PUT, .key = 4, .val = 4, .put = put},
-        {GET, .key = 2, .val = -1, .get = get},
-        {GET, .key = 3, .val = 3, .get = get},
-        {GET, .key = 4, .val = 4, .get = get},
-        {GET, .key = 2, .val = -1, .get = get},
-        {FRONT, .key = 4, .val = 4, .front = front},
-    };
-    for (size_t i = 0; i < REQS; ++i)
-    {
-        switch (requests[i].call)
-        {
-        case PUT:
-            requests[i].put(&lru, requests[i].key, requests[i].val);
-            CHECK(ccc_fh_validate(&lru.fh), true, "%d");
-            CHECK(ccc_dll_validate(&lru.l), true, "%d");
-            break;
-        case GET:
-            CHECK(requests[i].get(&lru, requests[i].key), requests[i].val,
-                  "%d");
-            CHECK(ccc_dll_validate(&lru.l), true, "%d");
-            break;
-        case FRONT:
-            CHECK(requests[i].front(&lru)->key, requests[i].key, "%d");
-            CHECK(requests[i].front(&lru)->val, requests[i].val, "%d");
-            break;
-        default:
-            break;
-        }
-    }
-    ccc_fh_clear_and_free(&lru.fh, NULL);
-    ccc_dll_clear(&lru.l, NULL);
-    return PASS;
-}
-
-static void
-put(struct lru_cache *const lru, int key, int val)
-{
-    ccc_fhash_entry const ent = FH_ENTRY(&lru->fh, key);
-    struct lru_lookup const *found = FH_GET(ent);
-    if (found)
-    {
-        found->kv_in_list->key = key;
-        found->kv_in_list->val = val;
-        ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
-        return;
-    }
-    if (ccc_dll_size(&lru->l) == lru->cap)
-    {
-        struct key_val const *const to_drop = ccc_dll_back(&lru->l);
-        ccc_fh_remove_entry(FH_ENTRY(&lru->fh, to_drop->key));
-        ccc_dll_pop_back(&lru->l);
-    }
-    struct key_val *kv
-        = DLL_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
-    FH_INSERT_ENTRY(ent, (struct lru_lookup){.key = key, .kv_in_list = kv});
-}
-
-static int
-get(struct lru_cache *const lru, int key)
-{
-    struct lru_lookup const *found = FH_GET(FH_ENTRY(&lru->fh, key));
-    if (!found)
-    {
-        return -1;
-    }
-    ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
-    return found->kv_in_list->val;
-}
-
-static struct key_val *
-front(struct lru_cache *const lru)
-{
-    return ccc_dll_front(&lru->l);
-}
-
-static bool
-lru_lookup_cmp(ccc_key_cmp const cmp)
-{
-    struct lru_lookup const *const lookup = cmp.container;
-    return lookup->key == *((int *)cmp.key);
 }

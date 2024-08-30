@@ -19,3 +19,9 @@ target_link_libraries(graph PRIVATE
   flat_priority_queue
 )
 
+add_executable(lru lru.c)
+target_link_libraries(lru PRIVATE
+  flat_hash
+  doubly_linked_list
+  fhash_util
+)

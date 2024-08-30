@@ -119,20 +119,12 @@ ccc_impl_dll_push_front(struct ccc_impl_doubly_linked_list *const l,
 ccc_dll_elem *
 ccc_dll_head(ccc_doubly_linked_list const *const l)
 {
-    if (!l || !l->impl.sz)
-    {
-        return NULL;
-    }
     return (ccc_dll_elem *)l->impl.sentinel.n;
 }
 
 ccc_dll_elem *
 ccc_dll_tail(ccc_doubly_linked_list const *const l)
 {
-    if (!l || !l->impl.sz)
-    {
-        return NULL;
-    }
     return (ccc_dll_elem *)l->impl.sentinel.p;
 }
 

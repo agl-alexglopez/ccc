@@ -39,22 +39,22 @@ ccc_impl_sll_elem_in(struct ccc_impl_singly_linked_list const *,
 
 #define CCC_IMPL_LIST_EMPLACE_FRONT(list_ptr, struct_initializer...)           \
     ({                                                                         \
-        typeof(struct_initializer) *_res_;                                     \
+        typeof(struct_initializer) *_sll_res_;                                 \
         struct ccc_impl_singly_linked_list *_sll_ = &(list_ptr)->impl;         \
-        if (!_sll_->fn || sizeof(*_res_) != _sll_->elem_sz)                    \
+        if (!_sll_->fn || sizeof(*_sll_res_) != _sll_->elem_sz)                \
         {                                                                      \
-            _res_ = NULL;                                                      \
+            _sll_res_ = NULL;                                                  \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            _res_ = _sll_->fn(NULL, _sll_->elem_sz);                           \
-            if (_res_)                                                         \
+            _sll_res_ = _sll_->fn(NULL, _sll_->elem_sz);                       \
+            if (_sll_res_)                                                     \
             {                                                                  \
-                *_res_ = struct_initializer;                                   \
-                ccc_impl_sll_push_front(_sll_,                                 \
-                                        ccc_impl_sll_elem_in(_sll_, _res_));   \
+                *_sll_res_ = struct_initializer;                               \
+                ccc_impl_sll_push_front(                                       \
+                    _sll_, ccc_impl_sll_elem_in(_sll_, _sll_res_));            \
             }                                                                  \
         }                                                                      \
-        _res_;                                                                 \
+        _sll_res_;                                                             \
     })
 #endif /* CCC_IMPL_SINGLY_LINKED_LIST_H */

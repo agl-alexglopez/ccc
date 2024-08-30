@@ -9,7 +9,7 @@
 
 struct ccc_impl_flat_priority_queue
 {
-    ccc_buf buf;
+    ccc_buffer buf;
     ccc_cmp_fn *cmp;
     ccc_threeway_cmp order;
     void *aux;
@@ -24,8 +24,8 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *, uint8_t[],
                           cmp_fn, aux_data)                                    \
     {                                                                          \
         .impl = {                                                              \
-            .buf                                                               \
-            = (ccc_buf)CCC_BUF_INIT(mem_ptr, type_name, capacity, realloc_fn), \
+            .buf = (ccc_buffer)CCC_BUF_INIT(mem_ptr, type_name, capacity,      \
+                                            realloc_fn),                       \
             .cmp = (cmp_fn),                                                   \
             .order = (cmp_order),                                              \
             .aux = (aux_data),                                                 \
@@ -37,39 +37,35 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *, uint8_t[],
    of the macro are hidden here in the impl header. */
 #define CCC_IMPL_FPQ_EMPLACE(fpq, type_initializer...)                         \
     ({                                                                         \
-        typeof(type_initializer) *_res_;                                       \
+        typeof(type_initializer) *_fpq_res_;                                   \
         struct ccc_impl_flat_priority_queue *_fpq_ = &(fpq)->impl;             \
         {                                                                      \
-            if (sizeof(*_res_) != ccc_buf_elem_size(&_fpq_->buf))              \
+            if (sizeof(*_fpq_res_) != ccc_buf_elem_size(&_fpq_->buf))          \
             {                                                                  \
-                _res_ = NULL;                                                  \
+                _fpq_res_ = NULL;                                              \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                void *_macro_new_ = ccc_buf_alloc(&_fpq_->buf);                \
-                if (!_macro_new_)                                              \
+                _fpq_res_ = ccc_buf_alloc(&_fpq_->buf);                        \
+                if (_fpq_res_)                                                 \
                 {                                                              \
-                    _res_ = NULL;                                              \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                    *((typeof(_res_))_macro_new_) = type_initializer;          \
+                    *_fpq_res_ = type_initializer;                             \
                     if (ccc_buf_size(&_fpq_->buf) > 1)                         \
                     {                                                          \
-                        uint8_t _macro_tmp_[ccc_buf_elem_size(&_fpq_->buf)];   \
-                        _res_ = ccc_buf_at(                                    \
+                        uint8_t _fpq_tmp_[ccc_buf_elem_size(&_fpq_->buf)];     \
+                        _fpq_res_ = ccc_buf_at(                                \
                             &_fpq_->buf, ccc_impl_fpq_bubble_up(               \
-                                             _fpq_, _macro_tmp_,               \
+                                             _fpq_, _fpq_tmp_,                 \
                                              ccc_buf_size(&_fpq_->buf) - 1));  \
                     }                                                          \
                     else                                                       \
                     {                                                          \
-                        _res_ = ccc_buf_at(&_fpq_->buf, 0);                    \
+                        _fpq_res_ = ccc_buf_at(&_fpq_->buf, 0);                \
                     }                                                          \
                 }                                                              \
             }                                                                  \
         };                                                                     \
-        _res_;                                                                 \
+        _fpq_res_;                                                             \
     })
 
 #endif /* CCC_IMPL_FLAT_PRIORITY_QUEUE_H */

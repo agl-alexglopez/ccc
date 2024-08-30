@@ -7,10 +7,10 @@
 #include <stdint.h>
 #include <string.h>
 
-static void *at(ccc_buf const *, size_t);
+static void *at(ccc_buffer const *, size_t);
 
 ccc_result
-ccc_buf_realloc(ccc_buf *buf, size_t const new_capacity,
+ccc_buf_realloc(ccc_buffer *buf, size_t const new_capacity,
                 ccc_realloc_fn *const fn)
 {
     if (!fn)
@@ -28,7 +28,7 @@ ccc_buf_realloc(ccc_buf *buf, size_t const new_capacity,
 }
 
 void *
-ccc_buf_at(ccc_buf const *buf, size_t const i)
+ccc_buf_at(ccc_buffer const *buf, size_t const i)
 {
     if (i >= buf->impl.capacity)
     {
@@ -38,19 +38,19 @@ ccc_buf_at(ccc_buf const *buf, size_t const i)
 }
 
 void *
-ccc_buf_back(ccc_buf const *buf)
+ccc_buf_back(ccc_buffer const *buf)
 {
-    return ccc_buf_at(buf, buf->impl.sz - 1ULL);
+    return ccc_buf_at(buf, buf->impl.sz - (size_t)1);
 }
 
 void *
-ccc_buf_front(ccc_buf const *buf)
+ccc_buf_front(ccc_buffer const *buf)
 {
     return ccc_buf_at(buf, 0);
 }
 
 void *
-ccc_buf_alloc(ccc_buf *buf)
+ccc_buf_alloc(ccc_buffer *buf)
 {
     if (buf->impl.sz != buf->impl.capacity)
     {
@@ -66,7 +66,7 @@ ccc_buf_alloc(ccc_buf *buf)
 }
 
 ccc_result
-ccc_buf_swap(ccc_buf *buf, uint8_t tmp[], size_t const i, size_t const j)
+ccc_buf_swap(ccc_buffer *buf, uint8_t tmp[], size_t const i, size_t const j)
 {
     if (!buf->impl.sz || i >= buf->impl.sz || j >= buf->impl.sz || j == i)
     {
@@ -79,7 +79,7 @@ ccc_buf_swap(ccc_buf *buf, uint8_t tmp[], size_t const i, size_t const j)
 }
 
 void *
-ccc_buf_copy(ccc_buf *buf, size_t const dst, size_t const src)
+ccc_buf_copy(ccc_buffer *buf, size_t const dst, size_t const src)
 {
     if (!buf->impl.sz || dst >= buf->impl.sz || src >= buf->impl.sz)
     {
@@ -93,7 +93,7 @@ ccc_buf_copy(ccc_buf *buf, size_t const dst, size_t const src)
 }
 
 ccc_result
-ccc_buf_write(ccc_buf *const buf, size_t const i, void const *const data)
+ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
 {
     void *pos = ccc_buf_at(buf, i);
     if (!pos || data == pos)
@@ -105,7 +105,7 @@ ccc_buf_write(ccc_buf *const buf, size_t const i, void const *const data)
 }
 
 ccc_result
-ccc_buf_erase(ccc_buf *buf, size_t const i)
+ccc_buf_erase(ccc_buffer *buf, size_t const i)
 {
     if (!buf->impl.sz || i >= buf->impl.sz)
     {
@@ -128,7 +128,7 @@ ccc_buf_erase(ccc_buf *buf, size_t const i)
 }
 
 ccc_result
-ccc_buf_free(ccc_buf *buf, ccc_realloc_fn *fn)
+ccc_buf_free(ccc_buffer *buf, ccc_realloc_fn *fn)
 {
     if (!buf->impl.capacity || !fn)
     {
@@ -141,7 +141,7 @@ ccc_buf_free(ccc_buf *buf, ccc_realloc_fn *fn)
 }
 
 ccc_result
-ccc_buf_pop_back_n(ccc_buf *buf, size_t n)
+ccc_buf_pop_back_n(ccc_buffer *buf, size_t n)
 {
     if (n > buf->impl.sz)
     {
@@ -152,74 +152,74 @@ ccc_buf_pop_back_n(ccc_buf *buf, size_t n)
 }
 
 ccc_result
-ccc_buf_pop_back(ccc_buf *buf)
+ccc_buf_pop_back(ccc_buffer *buf)
 {
     return ccc_buf_pop_back_n(buf, 1);
 }
 
 size_t
-ccc_buf_size(ccc_buf const *buf)
+ccc_buf_size(ccc_buffer const *buf)
 {
     return buf->impl.sz;
 }
 
 size_t
-ccc_buf_capacity(ccc_buf const *buf)
+ccc_buf_capacity(ccc_buffer const *buf)
 {
     return buf->impl.capacity;
 }
 
 size_t
-ccc_buf_elem_size(ccc_buf const *buf)
+ccc_buf_elem_size(ccc_buffer const *buf)
 {
     return buf->impl.elem_sz;
 }
 
 bool
-ccc_buf_full(ccc_buf const *buf)
+ccc_buf_full(ccc_buffer const *buf)
 {
     return buf->impl.sz == buf->impl.capacity;
 }
 
 bool
-ccc_buf_empty(ccc_buf const *buf)
+ccc_buf_empty(ccc_buffer const *buf)
 {
     return !buf->impl.sz;
 }
 
 void *
-ccc_buf_base(ccc_buf const *const buf)
+ccc_buf_base(ccc_buffer const *const buf)
 {
     return buf->impl.mem;
 }
 
 void *
-ccc_buf_begin(ccc_buf const *const buf)
+ccc_buf_begin(ccc_buffer const *const buf)
 {
     return buf->impl.mem;
 }
 
 void *
-ccc_buf_next(ccc_buf const *const buf, void const *const pos)
+ccc_buf_next(ccc_buffer const *const buf, void const *const pos)
 {
     assert(pos < ccc_buf_capacity_end(buf));
     return (uint8_t *)pos + buf->impl.elem_sz;
 }
 
 void *
-ccc_buf_size_end(ccc_buf const *const buf)
+ccc_buf_size_end(ccc_buffer const *const buf)
 {
     return (uint8_t *)buf->impl.mem + (buf->impl.elem_sz * buf->impl.sz);
 }
 
 void *
-ccc_buf_capacity_end(ccc_buf const *const buf)
+ccc_buf_capacity_end(ccc_buffer const *const buf)
 {
     return (uint8_t *)buf->impl.mem + (buf->impl.elem_sz * buf->impl.capacity);
 }
 
 size_t
-ccc_buf_index_of(ccc_buf const *const buf, void const *const slot)
+ccc_buf_index_of(ccc_buffer const *const buf, void const *const slot)
 {
     assert(slot >= ccc_buf_base(buf));
     assert((uint8_t *)slot
@@ -232,7 +232,7 @@ ccc_buf_index_of(ccc_buf const *const buf, void const *const slot)
 /*======================  Static Helpers  ==================================*/
 
 static inline void *
-at(ccc_buf const *buf, size_t const i)
+at(ccc_buffer const *buf, size_t const i)
 {
     return ((uint8_t *)buf->impl.mem + (i * buf->impl.elem_sz));
 }

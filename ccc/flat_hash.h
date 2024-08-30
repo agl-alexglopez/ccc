@@ -11,7 +11,7 @@ typedef struct
 
 typedef struct
 {
-    struct ccc_impl_fhash impl;
+    struct ccc_impl_flat_hash impl;
 } ccc_flat_hash;
 
 typedef struct
