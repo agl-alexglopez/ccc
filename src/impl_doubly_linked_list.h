@@ -43,44 +43,44 @@ ccc_impl_dll_elem_in(struct ccc_impl_doubly_linked_list const *,
 
 #define CCC_IMPL_DLL_EMPLACE_BACK(dll_ptr, struct_initializer...)              \
     ({                                                                         \
-        typeof(struct_initializer) *_res_;                                     \
+        typeof(struct_initializer) *_dll_res_;                                 \
         struct ccc_impl_doubly_linked_list *_dll_ = &(dll_ptr)->impl;          \
-        if (!_dll_->fn || sizeof(*_res_) != _dll_->elem_sz)                    \
+        if (!_dll_->fn || sizeof(*_dll_res_) != _dll_->elem_sz)                \
         {                                                                      \
-            _res_ = NULL;                                                      \
+            _dll_res_ = NULL;                                                  \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            _res_ = _dll_->fn(NULL, _dll_->elem_sz);                           \
-            if (_res_)                                                         \
+            _dll_res_ = _dll_->fn(NULL, _dll_->elem_sz);                       \
+            if (_dll_res_)                                                     \
             {                                                                  \
-                *_res_ = (typeof(*_res_))struct_initializer;                   \
-                ccc_impl_dll_push_back(_dll_,                                  \
-                                       ccc_impl_dll_elem_in(_dll_, _res_));    \
+                *_dll_res_ = (typeof(*_dll_res_))struct_initializer;           \
+                ccc_impl_dll_push_back(                                        \
+                    _dll_, ccc_impl_dll_elem_in(_dll_, _dll_res_));            \
             }                                                                  \
         }                                                                      \
-        _res_;                                                                 \
+        _dll_res_;                                                             \
     })
 
 #define CCC_IMPL_DLL_EMPLACE_FRONT(dll_ptr, struct_initializer...)             \
     ({                                                                         \
-        typeof(struct_initializer) *_res_;                                     \
+        typeof(struct_initializer) *_dll_res_;                                 \
         struct ccc_impl_doubly_linked_list *_dll_ = &(dll_ptr)->impl;          \
-        if (!_dll_->fn || sizeof(*_res_) != _dll_->elem_sz)                    \
+        if (!_dll_->fn || sizeof(*_dll_res_) != _dll_->elem_sz)                \
         {                                                                      \
-            _res_ = NULL;                                                      \
+            _dll_res_ = NULL;                                                  \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            _res_ = _dll_->fn(NULL, _dll_->elem_sz);                           \
-            if (_res_)                                                         \
+            _dll_res_ = _dll_->fn(NULL, _dll_->elem_sz);                       \
+            if (_dll_res_)                                                     \
             {                                                                  \
-                *_res_ = struct_initializer;                                   \
-                ccc_impl_dll_push_front(_dll_,                                 \
-                                        ccc_impl_dll_elem_in(_dll_, _res_));   \
+                *_dll_res_ = struct_initializer;                               \
+                ccc_impl_dll_push_front(                                       \
+                    _dll_, ccc_impl_dll_elem_in(_dll_, _dll_res_));            \
             }                                                                  \
         }                                                                      \
-        _res_;                                                                 \
+        _dll_res_;                                                             \
     })
 
 #endif /* CCC_IMPL_DOUBLY_LINKED_LIST_H */
