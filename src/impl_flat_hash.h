@@ -66,7 +66,7 @@ size_t ccc_impl_fh_distance(size_t capacity, size_t index, uint64_t hash);
 ccc_result ccc_impl_fh_maybe_resize(struct ccc_impl_fhash *);
 uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 
-#define CCC_IMPL_FH_ENT(fhash_ptr, key)                                        \
+#define CCC_IMPL_FH_ENTRY(fhash_ptr, key)                                      \
     ({                                                                         \
         __auto_type const _key_ = (key);                                       \
         struct ccc_impl_fh_entry _ent_                                         \
@@ -98,7 +98,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
 #define CCC_IMPL_FH_AND_MODIFY_W(entry_copy, mod_fn, aux)                      \
     ({                                                                         \
         struct ccc_impl_fh_entry _mod_with_ent_ = (entry_copy).impl;           \
-        if (_mod_with_ent_.entry.status == CCC_ENT_OCCUPIED)                   \
+        if (_mod_with_ent_.entry.status == CCC_ENTRY_OCCUPIED)                 \
         {                                                                      \
             typeof(aux) _aux_ = aux;                                           \
             (mod_fn)(                                                          \
@@ -134,19 +134,20 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         (void *)(swap_entry).entry.entry;                                      \
     })
 
-#define CCC_IMPL_FH_INS_ENT(entry_copy, key_val_struct...)                     \
+#define CCC_IMPL_FH_INSERT_ENTRY(entry_copy, key_val_struct...)                \
     ({                                                                         \
         typeof(key_val_struct) *_res_;                                         \
         struct ccc_impl_fh_entry _ins_ent_ = (entry_copy).impl;                \
         bool _slot_fits_                                                       \
             = sizeof(*_res_) == ccc_buf_elem_size(&(_ins_ent_.h->buf));        \
-        if (_slot_fits_ && (_ins_ent_.entry.status & CCC_ENT_OCCUPIED))        \
+        if (_slot_fits_ && (_ins_ent_.entry.status & CCC_ENTRY_OCCUPIED))      \
         {                                                                      \
-            _ins_ent_.entry.status = CCC_ENT_OCCUPIED;                         \
+            _ins_ent_.entry.status = CCC_ENTRY_OCCUPIED;                       \
             *((typeof(_res_))_ins_ent_.entry.entry) = key_val_struct;          \
             _res_ = (void *)_ins_ent_.entry.entry;                             \
         }                                                                      \
-        else if (!_slot_fits_ || (_ins_ent_.entry.status & ~CCC_ENT_OCCUPIED)) \
+        else if (!_slot_fits_                                                  \
+                 || (_ins_ent_.entry.status & ~CCC_ENTRY_OCCUPIED))            \
         {                                                                      \
             _res_ = NULL;                                                      \
         }                                                                      \
@@ -157,16 +158,16 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_fhash const *, void const *key);
         _res_;                                                                 \
     })
 
-#define CCC_IMPL_FH_OR_INS(entry_copy, key_val_struct...)                      \
+#define CCC_IMPL_FH_OR_INSERT(entry_copy, key_val_struct...)                   \
     ({                                                                         \
         typeof(key_val_struct) *_res_;                                         \
         struct ccc_impl_fh_entry _entry_ = (entry_copy).impl;                  \
-        if (_entry_.entry.status & CCC_ENT_OCCUPIED)                           \
+        if (_entry_.entry.status & CCC_ENTRY_OCCUPIED)                         \
         {                                                                      \
             _res_ = (void *)_entry_.entry.entry;                               \
         }                                                                      \
         else if (sizeof(*_res_) != ccc_buf_elem_size(&(_entry_.h->buf))        \
-                 || (_entry_.entry.status & ~CCC_ENT_VACANT))                  \
+                 || (_entry_.entry.status & ~CCC_ENTRY_VACANT))                \
         {                                                                      \
             _res_ = NULL;                                                      \
         }                                                                      \
