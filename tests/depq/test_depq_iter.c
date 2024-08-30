@@ -1,5 +1,5 @@
 #include "depq_util.h"
-#include "depqueue.h"
+#include "double_ended_priority_queue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -16,7 +16,7 @@ static enum test_result depq_test_priority_removal(void);
 static enum test_result depq_test_priority_valid_range(void);
 static enum test_result depq_test_priority_invalid_range(void);
 static enum test_result depq_test_priority_empty_range(void);
-static enum test_result iterator_check(ccc_depqueue *);
+static enum test_result iterator_check(ccc_double_ended_priority_queue *);
 
 #define NUM_TESTS (size_t)8
 test_fn const all_tests[NUM_TESTS] = {
@@ -43,7 +43,8 @@ main()
 static enum test_result
 depq_test_forward_iter_unique_vals(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = ccc_depq_begin(&pq); e;
@@ -77,7 +78,8 @@ depq_test_forward_iter_unique_vals(void)
 static enum test_result
 depq_test_forward_iter_all_vals(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *i = ccc_depq_begin(&pq); i;
@@ -115,7 +117,8 @@ depq_test_forward_iter_all_vals(void)
 static enum test_result
 depq_test_insert_iterate_pop(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -148,7 +151,8 @@ depq_test_insert_iterate_pop(void)
 static enum test_result
 depq_test_priority_removal(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -182,7 +186,8 @@ depq_test_priority_removal(void)
 static enum test_result
 depq_test_priority_update(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -221,7 +226,8 @@ depq_test_priority_update(void)
 static enum test_result
 depq_test_priority_valid_range(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -281,7 +287,8 @@ depq_test_priority_valid_range(void)
 static enum test_result
 depq_test_priority_invalid_range(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -338,7 +345,8 @@ depq_test_priority_invalid_range(void)
 static enum test_result
 depq_test_priority_empty_range(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -371,7 +379,7 @@ depq_test_priority_empty_range(void)
 }
 
 static enum test_result
-iterator_check(ccc_depqueue *pq)
+iterator_check(ccc_double_ended_priority_queue *pq)
 {
     size_t const size = ccc_depq_size(pq);
     size_t iter_count = 0;

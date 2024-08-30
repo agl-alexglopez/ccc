@@ -1,4 +1,4 @@
-#include "flat_pqueue.h"
+#include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "test.h"
 
@@ -42,8 +42,8 @@ fpq_test_insert_iterate_pop(void)
     srand(1);
     size_t const num_nodes = 1000;
     struct val vals[num_nodes];
-    ccc_flat_pqueue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val, CCC_LES,
-                                       NULL, val_cmp, NULL);
+    ccc_flat_priority_queue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val,
+                                               CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -71,8 +71,8 @@ fpq_test_priority_removal(void)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[num_nodes];
-    ccc_flat_pqueue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val, CCC_LES,
-                                       NULL, val_cmp, NULL);
+    ccc_flat_priority_queue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val,
+                                               CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -106,8 +106,8 @@ fpq_test_priority_update(void)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[num_nodes];
-    ccc_flat_pqueue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val, CCC_LES,
-                                       NULL, val_cmp, NULL);
+    ccc_flat_priority_queue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val,
+                                               CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */

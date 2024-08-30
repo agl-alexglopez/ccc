@@ -18,7 +18,7 @@
 /* Instead of thinking about left and right consider only links
    in the abstract sense. Put them in an array and then flip
    this enum and left and right code paths can be united into one */
-typedef enum ccc_tree_link
+typedef enum
 {
     L = 0,
     R = 1
@@ -26,7 +26,7 @@ typedef enum ccc_tree_link
 
 /* Trees are just a different interpretation of the same links used
    for doubly linked lists. We take advantage of this for duplicates. */
-typedef enum ccc_list_link
+typedef enum
 {
     P = 0,
     N = 1

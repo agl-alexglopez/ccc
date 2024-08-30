@@ -26,8 +26,8 @@ depq_printer_fn(void const *const e)
 }
 
 enum test_result
-insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
-                int const larger_prime)
+insert_shuffled(ccc_double_ended_priority_queue *pq, struct val vals[],
+                size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -49,7 +49,7 @@ insert_shuffled(ccc_depqueue *pq, struct val vals[], size_t const size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_depqueue *pq)
+inorder_fill(int vals[], size_t size, ccc_double_ended_priority_queue *pq)
 {
     if (ccc_depq_size(pq) != size)
     {

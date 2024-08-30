@@ -1,7 +1,7 @@
-#ifndef CCC_BUF_H
-#define CCC_BUF_H
+#ifndef CCC_BUFFER_H
+#define CCC_BUFFER_H
 
-#include "impl_buf.h"
+#include "impl_buffer.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -43,4 +43,4 @@ void *ccc_buf_next(ccc_buf const *, void const *);
 void *ccc_buf_size_end(ccc_buf const *);
 void *ccc_buf_capacity_end(ccc_buf const *);
 
-#endif /* CCC_BUF_H */
+#endif /* CCC_BUFFER_H */

@@ -14,7 +14,7 @@ target_link_libraries(run_tests PRIVATE str_view::str_view test)
 add_library(depq_util depq/depq_util.h depq/depq_util.c)
 target_link_libraries(depq_util
   PRIVATE
-    depqueue
+    double_ended_priority_queue
     test
 )
 
@@ -22,7 +22,7 @@ macro(add_depq_test TEST_NAME)
   add_executable(${TEST_NAME} depq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      depqueue 
+      double_ended_priority_queue 
       depq_util
       test
   )
@@ -43,7 +43,7 @@ add_depq_test(test_depq_iter)
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
 target_link_libraries(fpq_util
   PRIVATE
-    flat_pqueue
+    flat_priority_queue
     test
 )
 
@@ -52,7 +52,7 @@ macro(add_fpq_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       fpq_util
-      flat_pqueue 
+      flat_priority_queue 
       test
   )
   set_target_properties(${TEST_NAME} 
@@ -72,7 +72,7 @@ add_fpq_test(test_fpq_update)
 add_library(pq_util pq/pq_util.h pq/pq_util.c)
 target_link_libraries(pq_util
   PRIVATE
-    pqueue
+    priority_queue
     test
 )
 
@@ -81,7 +81,7 @@ macro(add_pq_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       pq_util
-      pqueue 
+      priority_queue 
       test
   )
   set_target_properties(${TEST_NAME} 
@@ -136,9 +136,9 @@ macro(add_fhash_test TEST_NAME)
   add_executable(${TEST_NAME} fhash/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      list
+      doubly_linked_list
       flat_hash
-      buf
+      buffer
       test
       fhash_util
   )
@@ -157,10 +157,10 @@ add_fhash_test(test_fhash_erase)
 add_executable(perf perf/perf.c)
 target_link_libraries(perf 
   PRIVATE 
-    buf
-    depqueue 
-    flat_pqueue
-    pqueue
+    buffer
+    double_ended_priority_queue 
+    flat_priority_queue
+    priority_queue
     random
     str_view::str_view
     cli

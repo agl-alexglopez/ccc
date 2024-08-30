@@ -1,5 +1,5 @@
 #include "depq_util.h"
-#include "depqueue.h"
+#include "double_ended_priority_queue.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -28,7 +28,8 @@ main()
 static enum test_result
 depq_test_empty(void)
 {
-    ccc_depqueue pq = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
     CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;
 }

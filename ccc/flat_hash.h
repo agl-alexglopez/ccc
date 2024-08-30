@@ -6,17 +6,17 @@
 
 typedef struct
 {
-    struct ccc_impl_fh_elem impl;
+    struct ccc_impl_fhash_elem impl;
 } ccc_fhash_elem;
 
 typedef struct
 {
     struct ccc_impl_fhash impl;
-} ccc_fhash;
+} ccc_flat_hash;
 
 typedef struct
 {
-    struct ccc_impl_fh_entry impl;
+    struct ccc_impl_fhash_entry impl;
 } ccc_fhash_entry;
 
 /** @brief the initialization helper macro for a hash table. Must be called
@@ -76,7 +76,7 @@ initialization is successful or a failure. */
 @param [in] h the flat hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-bool ccc_fh_contains(ccc_fhash *h, void const *key);
+bool ccc_fh_contains(ccc_flat_hash *h, void const *key);
 
 /** @brief Inserts the specified key and value into the hash table invariantly.
 @param [in] h the flat hash table being queried.
@@ -102,7 +102,7 @@ behavior is not needed consider using the entry api.
 If an insertion error occurs, due to a table resizing failure, a NULL and
 vacant entry is returned. Get methods will yeild false/NULL and the
 insertion error checking function will evaluate to true. */
-ccc_fhash_entry ccc_fh_insert(ccc_fhash *h, void *key,
+ccc_fhash_entry ccc_fh_insert(ccc_flat_hash *h, void *key,
                               ccc_fhash_elem *out_handle);
 
 /** @brief Removes the entry stored at key, writing stored value to output.
@@ -116,7 +116,7 @@ the previous hash table entry if one existed.
 
 This function should be used when one wishes to preserve the old value if
 one is present. If such behavior is not needed see the entry API. */
-void *ccc_fh_remove(ccc_fhash *h, void *key, ccc_fhash_elem *out_handle);
+void *ccc_fh_remove(ccc_flat_hash *h, void *key, ccc_fhash_elem *out_handle);
 
 /*========================    Entry API    ==================================*/
 
@@ -134,7 +134,7 @@ where in the table such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry API.*/
-ccc_fhash_entry ccc_fh_entry(ccc_fhash *h, void const *key);
+ccc_fhash_entry ccc_fh_entry(ccc_flat_hash *h, void const *key);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -228,7 +228,7 @@ resizing occurs which would lead to undefined behavior. O(capacity).
 
 Iteration starts from index 0 by capacity of the table so iteration order is
 not obvious to the user, nor should any specific order be relied on. */
-void *ccc_fh_begin(ccc_fhash const *h);
+void *ccc_fh_begin(ccc_flat_hash const *h);
 
 /** @brief Advances the iterator to the next occupied table slot.
 @param [in] h the table being iterated upon.
@@ -236,23 +236,23 @@ void *ccc_fh_begin(ccc_fhash const *h);
 @return a pointer that can be cast directly to the user type that is stored.
 @warning erasing or inserting during iteration may invalidate iterators if
 resizing occurs which would lead to undefined behavior. O(capacity). */
-void *ccc_fh_next(ccc_fhash const *h, ccc_fhash_elem const *iter);
+void *ccc_fh_next(ccc_flat_hash const *h, ccc_fhash_elem const *iter);
 
 /** @brief Check the current iterator against the end for loop termination.
 @param [in] h the table being iterated upon.
 @return the end address of the hash table.
 @warning It is undefined behavior to access or modify the end address. */
-void *ccc_fh_end(ccc_fhash const *h);
+void *ccc_fh_end(ccc_flat_hash const *h);
 
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. */
-bool ccc_fh_empty(ccc_fhash const *h);
+bool ccc_fh_empty(ccc_flat_hash const *h);
 
 /** @brief Returns the size of the table.
 @param [in] h the hash table.
 @return the size_t size. */
-size_t ccc_fh_size(ccc_fhash const *h);
+size_t ccc_fh_size(ccc_flat_hash const *h);
 
 /** @brief Frees all slots in the table for use without affecting capacity.
 @param [in] h the table to be cleared.
@@ -261,7 +261,7 @@ maintenance is required on the elements in the table before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(capacity). */
-void ccc_fh_clear(ccc_fhash *h, ccc_destructor_fn *fn);
+void ccc_fh_clear(ccc_flat_hash *h, ccc_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer.
 @param [in] h the table to be cleared.
@@ -271,7 +271,7 @@ forfeit.
 @return the result of free operation. If no realloc function is provided it is
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
-ccc_result ccc_fh_clear_and_free(ccc_fhash *, ccc_destructor_fn *);
+ccc_result ccc_fh_clear_and_free(ccc_flat_hash *, ccc_destructor_fn *);
 
 /** @brief Helper to find a prime number if needed.
 @param [in] n the input that may or may not be prime.
@@ -286,18 +286,18 @@ size_t ccc_fh_next_prime(size_t n);
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
 @return the capacity. */
-size_t ccc_fh_capacity(ccc_fhash const *h);
+size_t ccc_fh_capacity(ccc_flat_hash const *h);
 
 /** @brief Print all elements in the table as defined by the provided printer.
 @param [in] h the hash table
 @param [in] the printer function for the type stored by the user.
 
 This function will only print the occupied slots in the table. O(capacity) */
-void ccc_fh_print(ccc_fhash const *h, ccc_print_fn *fn);
+void ccc_fh_print(ccc_flat_hash const *h, ccc_print_fn *fn);
 
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
-bool ccc_fh_validate(ccc_fhash const *h);
+bool ccc_fh_validate(ccc_flat_hash const *h);
 
 #endif /* CCC_FLAT_HASH_H */

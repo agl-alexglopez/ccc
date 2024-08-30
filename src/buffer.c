@@ -1,5 +1,5 @@
-#include "buf.h"
-#include "impl_buf.h"
+#include "buffer.h"
+#include "impl_buffer.h"
 #include "types.h"
 
 #include <alloca.h>
