@@ -12,7 +12,7 @@ struct val
     ccc_depq_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_cmp);
+ccc_threeway_cmp val_cmp(ccc_key_cmp);
 void val_update(ccc_update);
 void depq_printer_fn(void const *);
 

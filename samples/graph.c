@@ -234,7 +234,7 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
 static void help(void);
 
-static ccc_threeway_cmp cmp_vertices(ccc_cmp);
+static ccc_threeway_cmp cmp_vertices(ccc_key_cmp);
 static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 
 static bool eq_parent_cells(ccc_key_cmp);
@@ -263,8 +263,9 @@ main(int argc, char **argv)
         .cols = default_cols,
         .vertices = default_vertices,
         .grid = NULL,
-        .adjacency_list = CCC_SET_INIT(
-            struct vertex, elem, graph.adjacency_list, cmp_vertices, NULL),
+        .adjacency_list
+        = CCC_SET_INIT(struct vertex, elem, name, graph.adjacency_list, NULL,
+                       cmp_vertices, NULL),
     };
     for (int i = 1; i < argc; ++i)
     {
@@ -347,19 +348,17 @@ build_graph(struct graph *const graph)
             .pos = rand_point,
             .edges = {{0}, {0}, {0}, {0}},
         };
-        if (!ccc_s_insert(&graph->adjacency_list, &new_vertex->elem))
+        if (ccc_s_get(ccc_s_insert(&graph->adjacency_list, &new_vertex->elem)))
         {
-            quit("Error building vertices. New vertex is already present.\n",
-                 1);
+            quit("Error building vertices. Vertex already present.\n", 1);
         }
     }
-    struct vertex key = {0};
     for (int vertex = 0, vertex_title = start_vertex_title;
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
-        key.name = (char)vertex_title;
+        char key = (char)vertex_title;
         struct vertex *const src
-            = ccc_s_find(&graph->adjacency_list, &key.elem);
+            = ccc_s_get_mut(ccc_s_entry(&graph->adjacency_list, &key));
         if (!src)
         {
             quit("Vertex that should be present in the set is absent.\n", 1);
@@ -388,16 +387,15 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
     }
     /* Cycle through all vertices with which to join an edge randomly. */
     rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size);
-    struct vertex key = {0};
     struct vertex *dst = NULL;
     for (size_t i = 0; i < graph_size; ++i)
     {
-        key.name = vertex_titles[vertex_title_indices[i]];
-        if (key.name == src_vertex->name)
+        char key = vertex_titles[vertex_title_indices[i]];
+        if (key == src_vertex->name)
         {
             continue;
         }
-        dst = ccc_s_find(&graph->adjacency_list, &key.elem);
+        dst = ccc_s_get_mut(ccc_s_entry(&graph->adjacency_list, &key));
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -1051,11 +1049,11 @@ hash_parent_cells(void const *const point_struct)
 }
 
 static ccc_threeway_cmp
-cmp_vertices(ccc_cmp const cmp)
+cmp_vertices(ccc_key_cmp const cmp)
 {
-    struct vertex const *const v_a = cmp.container_a;
-    struct vertex const *const v_b = cmp.container_b;
-    return (v_a->name > v_b->name) - (v_a->name < v_b->name);
+    struct vertex const *const c = cmp.container;
+    char const key = *((char *)cmp.key);
+    return (key > c->name) - (key < c->name);
 }
 
 static ccc_threeway_cmp
@@ -1130,8 +1128,8 @@ parse_path_request(struct graph *const g, str_view r)
     {
         if (*c >= start_vertex_title && *c <= end_title)
         {
-            struct vertex key = {.name = *c};
-            struct vertex *v = ccc_s_find(&g->adjacency_list, &key.elem);
+            struct vertex *v
+                = ccc_s_get_mut(ccc_s_entry(&g->adjacency_list, c));
             res.src ? (res.dst = v) : (res.src = v);
         }
     }
