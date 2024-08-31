@@ -151,8 +151,8 @@ depq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val, "%d");
-        ccc_depq_pop_max(&pq);
+        CHECK(((struct val *)ccc_depq_min(&pq))->val, vals[i].val, "%d");
+        ccc_depq_pop_min(&pq);
     }
     CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;

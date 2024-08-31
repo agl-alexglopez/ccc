@@ -239,13 +239,13 @@ depq_test_priority_valid_range(void)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    struct val b = {.id = 0, .val = 6};
-    struct val e = {.id = 0, .val = 44};
+    int b = 6;
+    int e = 44;
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int const rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b.elem, &e.elem);
+    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
     CHECK(((struct val *)ccc_depq_begin_rrange(&rev_range))->val,
           rev_range_vals[0], "%d");
     CHECK(((struct val *)ccc_depq_end_rrange(&rev_range))->val,
@@ -261,13 +261,13 @@ depq_test_priority_valid_range(void)
     }
     CHECK(i1 == ccc_depq_end_rrange(&rev_range), true, "%d");
     CHECK(i1->val, rev_range_vals[7], "%d");
-    b.val = 119;
-    e.val = 84;
+    b = 119;
+    e = 84;
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int const range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    ccc_range const range = ccc_depq_equal_range(&pq, &b.elem, &e.elem);
+    ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
     CHECK(((struct val *)ccc_depq_begin_range(&range))->val, range_vals[0],
           "%d");
     CHECK(((struct val *)ccc_depq_end_range(&range))->val, range_vals[7], "%d");
@@ -300,13 +300,13 @@ depq_test_priority_invalid_range(void)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    struct val b = {.id = 0, .val = 95};
-    struct val e = {.id = 0, .val = 999};
+    int b = 95;
+    int e = 999;
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
     int const rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
-    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b.elem, &e.elem);
+    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
     CHECK(((struct val *)ccc_depq_begin_rrange(&rev_range))->val,
           rev_range_vals[0], "%d");
     CHECK(ccc_depq_end_rrange(&rev_range), NULL, "%p");
@@ -320,13 +320,13 @@ depq_test_priority_invalid_range(void)
         ++index;
     }
     CHECK(i1 == ccc_depq_end_rrange(&rev_range) && !i1, true, "%d");
-    b.val = 36;
-    e.val = -999;
+    b = 36;
+    e = -999;
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
     int const range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
-    ccc_range const range = ccc_depq_equal_range(&pq, &b.elem, &e.elem);
+    ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
     CHECK(((struct val *)ccc_depq_begin_range(&range))->val, range_vals[0],
           "%d");
     CHECK(ccc_depq_end_range(&range), NULL, "%p");
@@ -361,16 +361,16 @@ depq_test_priority_empty_range(void)
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    struct val b = {.id = 0, .val = -50};
-    struct val e = {.id = 0, .val = -25};
-    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b.elem, &e.elem);
+    int b = -50;
+    int e = -25;
+    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
     CHECK(((struct val *)ccc_depq_begin_rrange(&rev_range))->val, vals[0].val,
           "%d");
     CHECK(((struct val *)ccc_depq_end_rrange(&rev_range))->val, vals[0].val,
           "%d");
-    b.val = 150;
-    e.val = 999;
-    ccc_range const range = ccc_depq_equal_range(&pq, &b.elem, &e.elem);
+    b = 150;
+    e = 999;
+    ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
     CHECK(((struct val *)ccc_depq_begin_range(&range))->val,
           vals[num_nodes - 1].val, "%d");
     CHECK(((struct val *)ccc_depq_end_range(&range))->val,
