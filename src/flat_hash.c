@@ -25,7 +25,7 @@ static bool valid_distance_from_home(struct ccc_impl_flat_hash const *,
 ccc_result
 ccc_impl_fh_init(struct ccc_impl_flat_hash *const h, size_t key_offset,
                  size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
-                 ccc_key_cmp_fn *const eq_fn, void *const aux)
+                 ccc_key_eq_fn *const eq_fn, void *const aux)
 {
     if (!h || !hash_fn || !eq_fn)
     {
@@ -36,7 +36,7 @@ ccc_impl_fh_init(struct ccc_impl_flat_hash *const h, size_t key_offset,
     h->hash_fn = hash_fn;
     h->eq_fn = eq_fn;
     h->aux = aux;
-    memset(ccc_buf_begin(&h->buf), EMPTY,
+    memset(ccc_buf_begin(&h->buf), CCC_FH_EMPTY,
            ccc_buf_capacity(&h->buf) * ccc_buf_elem_size(&h->buf));
     return CCC_OK;
 }
@@ -51,7 +51,7 @@ bool
 ccc_fh_contains(ccc_flat_hash *const h, void const *const key)
 {
     return entry(&h->impl, key, ccc_impl_fh_filter(&h->impl, key)).status
-           & CCC_ENTRY_OCCUPIED;
+           & CCC_FH_ENTRY_OCCUPIED;
 }
 
 size_t
@@ -81,16 +81,16 @@ void *
 ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 {
     void *user_struct = struct_base(e.impl.h, &elem->impl);
-    if (e.impl.entry.status & CCC_ENTRY_OCCUPIED)
+    if (e.impl.entry.status & CCC_FH_ENTRY_OCCUPIED)
     {
         /* It is ok if an insert error was indicated because we do not
            need more space if we are overwriting a previous value. */
-        e.impl.entry.status = CCC_ENTRY_OCCUPIED;
+        e.impl.entry.status = CCC_FH_ENTRY_OCCUPIED;
         memcpy((void *)e.impl.entry.entry, user_struct,
                ccc_buf_elem_size(&e.impl.h->buf));
         return (void *)e.impl.entry.entry;
     }
-    if (e.impl.entry.status & ~CCC_ENTRY_OCCUPIED)
+    if (e.impl.entry.status & ~CCC_FH_ENTRY_OCCUPIED)
     {
         return NULL;
     }
@@ -102,7 +102,7 @@ ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 bool
 ccc_fh_remove_entry(ccc_fhash_entry e)
 {
-    if (e.impl.entry.status != CCC_ENTRY_OCCUPIED)
+    if (e.impl.entry.status != CCC_FH_ENTRY_OCCUPIED)
     {
         return false;
     }
@@ -119,7 +119,7 @@ ccc_fh_and_modify(ccc_fhash_entry e, ccc_update_fn *const fn)
 struct ccc_impl_fhash_entry
 ccc_impl_fh_and_modify(struct ccc_impl_fhash_entry e, ccc_update_fn *const fn)
 {
-    if (e.entry.status == CCC_ENTRY_OCCUPIED)
+    if (e.entry.status == CCC_FH_ENTRY_OCCUPIED)
     {
         fn((ccc_update){(void *)e.entry.entry, NULL});
     }
@@ -129,7 +129,7 @@ ccc_impl_fh_and_modify(struct ccc_impl_fhash_entry e, ccc_update_fn *const fn)
 ccc_fhash_entry
 ccc_fh_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
 {
-    if (e.impl.entry.status == CCC_ENTRY_OCCUPIED)
+    if (e.impl.entry.status == CCC_FH_ENTRY_OCCUPIED)
     {
         fn((ccc_update){(void *)e.impl.entry.entry, aux});
     }
@@ -137,45 +137,45 @@ ccc_fh_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
 }
 
 ccc_fhash_entry
-ccc_fh_insert(ccc_flat_hash *h, void *const key,
-              ccc_fhash_elem *const out_handle)
+ccc_fh_insert(ccc_flat_hash *h, ccc_fhash_elem *const out_handle)
 {
     void *user_return = struct_base(&h->impl, &out_handle->impl);
+    void *key = ccc_impl_h_key_in_slot(&h->impl, user_return);
     size_t const user_struct_size = ccc_buf_elem_size(&h->impl.buf);
     struct ccc_impl_fhash_entry ent = ccc_impl_fhash_entry(&h->impl, key);
-    if (ent.entry.status & CCC_ENTRY_OCCUPIED)
+    if (ent.entry.status & CCC_FH_ENTRY_OCCUPIED)
     {
         /* If an error occured when obtaining the entry and trying to resize,
            that is ok. We will not need new space yet. Only allow the insert
            error to persist if we actually need more space. */
-        ent.entry.status = CCC_ENTRY_OCCUPIED;
+        ent.entry.status = CCC_FH_ENTRY_OCCUPIED;
         uint8_t tmp[user_struct_size];
         swap(tmp, (void *)ent.entry.entry, user_return, user_struct_size);
         return (ccc_fhash_entry){ent};
     }
-    if (ent.entry.status & CCC_ENTRY_NULL)
+    if (ent.entry.status & CCC_FH_ENTRY_NULL)
     {
-        ent.entry.status |= CCC_ENTRY_INSERT_ERROR;
+        ent.entry.status |= CCC_FH_ENTRY_INSERT_ERROR;
         return (ccc_fhash_entry){ent};
     }
     ccc_impl_fh_insert(&h->impl, user_return, ent.hash,
                        ccc_buf_index_of(&h->impl.buf, ent.entry.entry));
     ent.entry.entry = NULL;
-    ent.entry.status |= (CCC_ENTRY_VACANT | CCC_ENTRY_NULL);
+    ent.entry.status |= (CCC_FH_ENTRY_VACANT | CCC_FH_ENTRY_NULL);
     return (ccc_fhash_entry){ent};
 }
 
 void *
-ccc_fh_remove(ccc_flat_hash *const h, void *const key,
-              ccc_fhash_elem *const out_handle)
+ccc_fh_remove(ccc_flat_hash *const h, ccc_fhash_elem *const out_handle)
 {
+    void *ret = struct_base(&h->impl, &out_handle->impl);
+    void *key = ccc_impl_h_key_in_slot(&h->impl, ret);
     ccc_entry const ent
         = ccc_impl_fh_find(&h->impl, key, ccc_impl_fh_filter(&h->impl, key));
-    if (ent.status == CCC_ENTRY_VACANT)
+    if (ent.status == CCC_FH_ENTRY_VACANT)
     {
         return NULL;
     }
-    void *ret = struct_base(&h->impl, &out_handle->impl);
     memcpy(ret, ent.entry, ccc_buf_elem_size(&h->impl.buf));
     erase(&h->impl, (void *)ent.entry);
     return ret;
@@ -184,11 +184,11 @@ ccc_fh_remove(ccc_flat_hash *const h, void *const key,
 void *
 ccc_fh_or_insert(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 {
-    if (e.impl.entry.status & CCC_ENTRY_OCCUPIED)
+    if (e.impl.entry.status & CCC_FH_ENTRY_OCCUPIED)
     {
         return (void *)e.impl.entry.entry;
     }
-    if (e.impl.entry.status & ~CCC_ENTRY_VACANT)
+    if (e.impl.entry.status & ~CCC_FH_ENTRY_VACANT)
     {
         return NULL;
     }
@@ -214,7 +214,7 @@ ccc_fh_get_mut(ccc_fhash_entry e)
 inline void const *
 ccc_impl_fh_get(struct ccc_impl_fhash_entry *e)
 {
-    if (!(e->entry.status & CCC_ENTRY_OCCUPIED))
+    if (!(e->entry.status & CCC_FH_ENTRY_OCCUPIED))
     {
         return NULL;
     }
@@ -224,13 +224,13 @@ ccc_impl_fh_get(struct ccc_impl_fhash_entry *e)
 inline bool
 ccc_fh_occupied(ccc_fhash_entry const e)
 {
-    return e.impl.entry.status & CCC_ENTRY_OCCUPIED;
+    return e.impl.entry.status & CCC_FH_ENTRY_OCCUPIED;
 }
 
 inline bool
 ccc_fh_insert_error(ccc_fhash_entry e)
 {
-    return e.impl.entry.status & CCC_ENTRY_INSERT_ERROR;
+    return e.impl.entry.status & CCC_FH_ENTRY_INSERT_ERROR;
 }
 
 void *
@@ -242,7 +242,7 @@ ccc_fh_begin(ccc_flat_hash const *const h)
     }
     void *iter = ccc_buf_begin(&h->impl.buf);
     for (; iter != ccc_buf_capacity_end(&h->impl.buf)
-           && ccc_impl_fh_in_slot(&h->impl, iter)->hash == EMPTY;
+           && ccc_impl_fh_in_slot(&h->impl, iter)->hash == CCC_FH_EMPTY;
          iter = ccc_buf_next(&h->impl.buf, iter))
     {}
     return iter;
@@ -254,7 +254,7 @@ ccc_fh_next(ccc_flat_hash const *const h, ccc_fhash_elem const *iter)
     void *i = struct_base(&h->impl, &iter->impl);
     for (i = ccc_buf_next(&h->impl.buf, i);
          i != ccc_buf_capacity_end(&h->impl.buf)
-         && ccc_impl_fh_in_slot(&h->impl, i)->hash == EMPTY;
+         && ccc_impl_fh_in_slot(&h->impl, i)->hash == CCC_FH_EMPTY;
          i = ccc_buf_next(&h->impl.buf, i))
     {}
     return i;
@@ -272,7 +272,7 @@ entry(struct ccc_impl_flat_hash *const h, void const *key, uint64_t const hash)
     uint8_t upcoming_insertion_error = 0;
     if (ccc_impl_fh_maybe_resize(h) != CCC_OK)
     {
-        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
+        upcoming_insertion_error = CCC_FH_ENTRY_INSERT_ERROR;
     }
     ccc_entry res = ccc_impl_fh_find(h, key, hash);
     res.status |= upcoming_insertion_error;
@@ -289,23 +289,23 @@ ccc_impl_fh_find(struct ccc_impl_flat_hash const *const h,
     {
         void *slot = ccc_buf_at(&h->buf, cur_i);
         struct ccc_impl_fhash_elem *const e = ccc_impl_fh_in_slot(h, slot);
-        if (e->hash == EMPTY)
+        if (e->hash == CCC_FH_EMPTY)
         {
-            return (ccc_entry){.entry = slot, .status = CCC_ENTRY_VACANT};
+            return (ccc_entry){.entry = slot, .status = CCC_FH_ENTRY_VACANT};
         }
         if (dist > ccc_impl_fh_distance(cap, cur_i, e->hash))
         {
-            return (ccc_entry){.entry = slot, .status = CCC_ENTRY_VACANT};
+            return (ccc_entry){.entry = slot, .status = CCC_FH_ENTRY_VACANT};
         }
         if (hash == e->hash
             && h->eq_fn(
                 (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux}))
         {
-            return (ccc_entry){.entry = slot, .status = CCC_ENTRY_OCCUPIED};
+            return (ccc_entry){.entry = slot, .status = CCC_FH_ENTRY_OCCUPIED};
         }
     }
     return (ccc_entry){.entry = NULL,
-                       .status = CCC_ENTRY_VACANT | CCC_ENTRY_NULL};
+                       .status = CCC_FH_ENTRY_VACANT | CCC_FH_ENTRY_NULL};
 }
 
 /* Assumes that element to be inserted does not already exist in the table.
@@ -331,7 +331,7 @@ ccc_impl_fh_insert(struct ccc_impl_flat_hash *const h, void const *const e,
         void *const slot = ccc_buf_at(&h->buf, cur_i);
         struct ccc_impl_fhash_elem const *slot_hash
             = ccc_impl_fh_in_slot(h, slot);
-        if (slot_hash->hash == EMPTY)
+        if (slot_hash->hash == CCC_FH_EMPTY)
         {
             memcpy(slot, floater, elem_sz);
             ++h->buf.impl.sz;
@@ -354,7 +354,7 @@ erase(struct ccc_impl_flat_hash *const h, void *const e)
     size_t const cap = ccc_buf_capacity(&h->buf);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf);
     size_t stopped_at = ccc_buf_index_of(&h->buf, e);
-    *ccc_impl_hash_at(h, stopped_at) = EMPTY;
+    *ccc_impl_hash_at(h, stopped_at) = CCC_FH_EMPTY;
     size_t next = (stopped_at + 1) % cap;
     uint8_t tmp[ccc_buf_elem_size(&h->buf)];
     for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
@@ -362,7 +362,7 @@ erase(struct ccc_impl_flat_hash *const h, void *const e)
         void *next_slot = ccc_buf_at(&h->buf, next);
         struct ccc_impl_fhash_elem *next_elem
             = ccc_impl_fh_in_slot(h, next_slot);
-        if (next_elem->hash == EMPTY
+        if (next_elem->hash == CCC_FH_EMPTY
             || !ccc_impl_fh_distance(cap, next, next_elem->hash))
         {
             break;
@@ -398,7 +398,7 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_flat_hash *h)
     }
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
-    memset(ccc_buf_base(&new_hash.buf), EMPTY,
+    memset(ccc_buf_base(&new_hash.buf), CCC_FH_EMPTY,
            ccc_buf_capacity(&new_hash.buf) * ccc_buf_elem_size(&new_hash.buf));
     for (void *slot = ccc_buf_begin(&h->buf);
          slot != ccc_buf_capacity_end(&h->buf);
@@ -406,10 +406,10 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_flat_hash *h)
     {
         struct ccc_impl_fhash_elem const *const e
             = ccc_impl_fh_in_slot(h, slot);
-        if (e->hash != EMPTY)
+        if (e->hash != CCC_FH_EMPTY)
         {
             ccc_entry new_ent = ccc_impl_fh_find(
-                &new_hash, ccc_impl_key_in_slot(h, slot), e->hash);
+                &new_hash, ccc_impl_h_key_in_slot(h, slot), e->hash);
             ccc_impl_fh_insert(&new_hash, slot, e->hash,
                                ccc_buf_index_of(&new_hash.buf, new_ent.entry));
         }
@@ -426,7 +426,7 @@ ccc_fh_print(ccc_flat_hash const *h, ccc_print_fn *fn)
          i != ccc_buf_capacity_end(&h->impl.buf);
          i = ccc_buf_next(&h->impl.buf, i))
     {
-        if (ccc_impl_fh_in_slot(&h->impl, i)->hash != EMPTY)
+        if (ccc_impl_fh_in_slot(&h->impl, i)->hash != CCC_FH_EMPTY)
         {
             fn(i);
         }
@@ -457,7 +457,7 @@ ccc_fh_clear(ccc_flat_hash *const h, ccc_destructor_fn *const fn)
          slot != ccc_buf_capacity_end(&h->impl.buf);
          slot = ccc_buf_next(&h->impl.buf, slot))
     {
-        if (ccc_impl_fh_in_slot(&h->impl, slot)->hash != EMPTY)
+        if (ccc_impl_fh_in_slot(&h->impl, slot)->hash != CCC_FH_EMPTY)
         {
             fn(slot);
         }
@@ -476,7 +476,7 @@ ccc_fh_clear_and_free(ccc_flat_hash *const h, ccc_destructor_fn *const fn)
          slot != ccc_buf_capacity_end(&h->impl.buf);
          slot = ccc_buf_next(&h->impl.buf, slot))
     {
-        if (ccc_impl_fh_in_slot(&h->impl, slot)->hash != EMPTY)
+        if (ccc_impl_fh_in_slot(&h->impl, slot)->hash != CCC_FH_EMPTY)
         {
             fn(slot);
         }
@@ -499,9 +499,9 @@ ccc_impl_fh_in_slot(struct ccc_impl_flat_hash const *const h,
 }
 
 void *
-ccc_impl_key_in_slot(struct ccc_impl_flat_hash const *h, void const *slot)
+ccc_impl_h_key_in_slot(struct ccc_impl_flat_hash const *h, void const *slot)
 {
-    return (struct ccc_impl_fhash_elem *)((uint8_t *)slot + h->key_offset);
+    return (uint8_t *)slot + h->key_offset;
 }
 
 inline size_t
@@ -518,7 +518,7 @@ ccc_fh_validate(ccc_flat_hash const *const h)
          i != ccc_buf_capacity_end(&h->impl.buf);
          i = ccc_buf_next(&h->impl.buf, i))
     {
-        if (ccc_impl_fh_in_slot(&h->impl, i)->hash != EMPTY
+        if (ccc_impl_fh_in_slot(&h->impl, i)->hash != CCC_FH_EMPTY
             && !valid_distance_from_home(&h->impl, i))
         {
             return false;
@@ -561,7 +561,7 @@ ccc_impl_fh_filter(struct ccc_impl_flat_hash const *const h,
                    void const *const key)
 {
     uint64_t const hash = h->hash_fn(key);
-    return hash == EMPTY ? hash + 1 : hash;
+    return hash == CCC_FH_EMPTY ? hash + 1 : hash;
 }
 
 static inline bool
@@ -605,7 +605,7 @@ valid_distance_from_home(struct ccc_impl_flat_hash const *h, void const *slot)
            away to help another element be closer to its home. This would
            break the purpose of doing that. Upon erase everyone needs to
            shuffle closer to home. */
-        if (cur_hash == EMPTY)
+        if (cur_hash == CCC_FH_EMPTY)
         {
             return false;
         }

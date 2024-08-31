@@ -38,57 +38,73 @@ typedef struct
     ccc_node impl;
 } ccc_set_elem;
 
-#define CCC_SET_INIT(struct_name, set_elem_field, set_name, cmp, aux)          \
-    CCC_TREE_INIT(struct_name, set_elem_field, set_name, cmp, aux)
+typedef struct
+{
+    struct ccc_tree_entry impl;
+} ccc_set_entry;
 
-void ccc_set_clear(ccc_set *, ccc_destructor_fn *destructor);
+#define CCC_SET_INIT(struct_name, set_elem_field, key_elem_field, set_name,    \
+                     realloc_fn, key_cmp, aux)                                 \
+    CCC_TREE_INIT(struct_name, set_elem_field, key_elem_field, set_name,       \
+                  realloc_fn, key_cmp, aux)
 
-bool ccc_set_empty(ccc_set const *);
+ccc_set_entry ccc_s_entry(ccc_set *s, void const *key);
 
-size_t ccc_set_size(ccc_set const *);
+void *ccc_s_or_insert(ccc_set_entry e, ccc_set_elem *elem);
 
-bool ccc_set_contains(ccc_set *, ccc_set_elem const *);
+ccc_set_entry ccc_s_and_modify(ccc_set_entry e, ccc_update_fn *fn);
 
-bool ccc_set_insert(ccc_set *, ccc_set_elem *);
+ccc_set_entry ccc_s_and_modify_with(ccc_set_entry e, ccc_update_fn *fn,
+                                    void *aux);
 
-void *ccc_set_find(ccc_set *, ccc_set_elem const *);
+void const *ccc_s_get(ccc_set_entry e);
 
-void *ccc_set_erase(ccc_set *, ccc_set_elem *);
+void *ccc_s_get_mut(ccc_set_entry e);
 
-bool ccc_set_is_min(ccc_set *, ccc_set_elem const *);
+void *ccc_s_insert_entry(ccc_set_entry e, ccc_set_elem *elem);
 
-bool ccc_set_is_max(ccc_set *, ccc_set_elem const *);
+ccc_set_entry ccc_s_remove_entry(ccc_set_entry e);
 
-bool ccc_set_const_contains(ccc_set *, ccc_set_elem const *);
+bool ccc_s_contains(ccc_set *, void const *key);
 
-void *ccc_set_const_find(ccc_set *, ccc_set_elem const *);
+ccc_set_entry ccc_s_insert(ccc_set *, ccc_set_elem *out_handle);
 
-void *ccc_set_begin(ccc_set *);
+void *ccc_s_remove(ccc_set *, ccc_set_elem *out_handle);
 
-void *ccc_set_rbegin(ccc_set *);
+bool ccc_s_const_contains(ccc_set *, ccc_set_elem const *);
 
-void *ccc_set_next(ccc_set *, ccc_set_elem const *);
+void *ccc_s_begin(ccc_set *);
 
-void *ccc_set_rnext(ccc_set *, ccc_set_elem const *);
+void *ccc_s_rbegin(ccc_set *);
 
-ccc_range ccc_set_equal_range(ccc_set *, ccc_set_elem const *begin,
-                              ccc_set_elem const *end);
+void *ccc_s_next(ccc_set *, ccc_set_elem const *);
 
-void *ccc_set_begin_range(ccc_range const *);
+void *ccc_s_rnext(ccc_set *, ccc_set_elem const *);
 
-void *ccc_set_end_range(ccc_range const *);
+ccc_range ccc_s_equal_range(ccc_set *, void const *begin_key,
+                            void const *end_key);
 
-ccc_rrange ccc_set_equal_rrange(ccc_set *, ccc_set_elem const *rbegin,
-                                ccc_set_elem const *end);
+void *ccc_s_begin_range(ccc_range const *);
 
-void *ccc_set_begin_rrange(ccc_rrange const *);
+void *ccc_s_end_range(ccc_range const *);
 
-void *ccc_set_end_rrange(ccc_rrange const *);
+ccc_rrange ccc_s_equal_rrange(ccc_set *, void const *rbegin_key,
+                              void const *end_key);
 
-void *ccc_set_root(ccc_set const *);
+void *ccc_s_begin_rrange(ccc_rrange const *);
 
-void ccc_set_print(ccc_set const *, ccc_set_elem const *, ccc_print_fn *);
+void *ccc_s_end_rrange(ccc_rrange const *);
 
-bool ccc_set_validate(ccc_set const *);
+void *ccc_s_root(ccc_set const *);
+
+void ccc_s_clear(ccc_set *, ccc_destructor_fn *destructor);
+
+bool ccc_s_empty(ccc_set const *);
+
+size_t ccc_s_size(ccc_set const *);
+
+void ccc_s_print(ccc_set const *, ccc_set_elem const *, ccc_print_fn *);
+
+bool ccc_s_validate(ccc_set const *);
 
 #endif /* CCC_SET_H */

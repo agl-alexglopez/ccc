@@ -46,12 +46,6 @@ typedef struct
     uint8_t status;
 } ccc_entry;
 
-#define CCC_ENTRY_VACANT ((uint8_t)0x0)
-#define CCC_ENTRY_OCCUPIED ((uint8_t)0x1)
-#define CCC_ENTRY_INSERT_ERROR ((uint8_t)0x2)
-#define CCC_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
-#define CCC_ENTRY_NULL ((uint8_t)0x8)
-
 typedef struct
 {
     void const *const container_a;
@@ -82,7 +76,9 @@ typedef void ccc_update_fn(ccc_update);
 
 typedef void ccc_destructor_fn(void *container);
 
-typedef bool ccc_key_cmp_fn(ccc_key_cmp);
+typedef bool ccc_key_eq_fn(ccc_key_cmp);
+
+typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
 typedef uint64_t ccc_hash_fn(void const *to_hash);
 

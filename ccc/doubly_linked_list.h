@@ -14,9 +14,9 @@ typedef struct
 } ccc_doubly_linked_list;
 
 #define CCC_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,        \
-                     realloc_fn, aux_data)                                     \
+                     realloc_fn, cmp_fn, aux_data)                             \
     CCC_IMPL_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,       \
-                      realloc_fn, aux_data)
+                      realloc_fn, cmp_fn, aux_data)
 
 #define DLL_EMPLACE_BACK(list_ptr, struct_initializer...)                      \
     CCC_IMPL_DLL_EMPLACE_BACK(list_ptr, struct_initializer)
@@ -36,6 +36,9 @@ void ccc_dll_pop_back(ccc_doubly_linked_list *l);
 @param [in] pos the position before which to_cut will be moved.
 @param [in] to_cut the element to cut out of its current position. */
 void ccc_dll_splice(ccc_dll_elem *pos, ccc_dll_elem *to_cut);
+
+void ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin,
+                          ccc_dll_elem *end);
 
 void *ccc_dll_begin(ccc_doubly_linked_list const *);
 void *ccc_dll_next(ccc_doubly_linked_list const *, ccc_dll_elem const *);

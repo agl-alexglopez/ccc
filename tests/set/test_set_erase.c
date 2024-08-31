@@ -38,7 +38,7 @@ main()
 static enum test_result
 set_test_prime_shuffle(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -52,21 +52,21 @@ set_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_set_insert(&s, &vals[i].elem))
+        if (ccc_s_get(ccc_s_insert(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }
-        CHECK(ccc_set_validate(&s), true, "%d");
+        CHECK(ccc_s_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_set_print(&s, &((struct val *)ccc_set_root(&s))->elem, set_printer_fn);
-    CHECK(ccc_set_size(&s) < size, true, "%d");
+    ccc_s_print(&s, &((struct val *)ccc_s_root(&s))->elem, set_printer_fn);
+    CHECK(ccc_s_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_set_elem const *elem = ccc_set_erase(&s, &vals[i].elem);
+        void *const elem = ccc_s_remove(&s, &vals[i].elem);
         CHECK(elem || !repeats[i], true, "%d");
-        CHECK(ccc_set_validate(&s), true, "%d");
+        CHECK(ccc_s_validate(&s), true, "%d");
     }
     return PASS;
 }
@@ -74,7 +74,7 @@ set_test_prime_shuffle(void)
 static enum test_result
 set_test_insert_erase_shuffled(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -88,17 +88,17 @@ set_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, "%d");
+        (void)ccc_s_remove(&s, &vals[i].elem);
+        CHECK(ccc_s_validate(&s), true, "%d");
     }
-    CHECK(ccc_set_empty(&s), true, "%d");
+    CHECK(ccc_s_empty(&s), true, "%d");
     return PASS;
 }
 
 static enum test_result
 set_test_weak_srand(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
+    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -108,15 +108,15 @@ set_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_set_insert(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, "%d");
+        ccc_s_insert(&s, &vals[i].elem);
+        CHECK(ccc_s_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_set_contains(&s, &vals[i].elem), true, "%d");
-        (void)ccc_set_erase(&s, &vals[i].elem);
-        CHECK(ccc_set_validate(&s), true, "%d");
+        CHECK(ccc_s_contains(&s, &vals[i].elem), true, "%d");
+        (void)ccc_s_remove(&s, &vals[i].elem);
+        CHECK(ccc_s_validate(&s), true, "%d");
     }
-    CHECK(ccc_set_empty(&s), true, "%d");
+    CHECK(ccc_s_empty(&s), true, "%d");
     return PASS;
 }

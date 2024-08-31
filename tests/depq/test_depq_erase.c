@@ -50,7 +50,7 @@ static enum test_result
 depq_test_insert_remove_four_dups(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -75,7 +75,7 @@ static enum test_result
 depq_test_insert_erase_shuffled(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -104,7 +104,7 @@ static enum test_result
 depq_test_pop_max(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -122,8 +122,8 @@ depq_test_pop_max(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
-        struct val const *front = ccc_depq_pop_max(&pq);
-        CHECK(front->val, vals[i].val, "%d");
+        CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val, "%d");
+        ccc_depq_pop_max(&pq);
     }
     CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;
@@ -133,7 +133,7 @@ static enum test_result
 depq_test_pop_min(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -151,8 +151,8 @@ depq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *front = ccc_depq_pop_min(&pq);
-        CHECK(front->val, vals[i].val, "%d");
+        CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val, "%d");
+        ccc_depq_pop_max(&pq);
     }
     CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;
@@ -162,7 +162,7 @@ static enum test_result
 depq_test_max_round_robin(void)
 {
     ccc_double_ended_priority_queue depq
-        = CCC_DEPQ_INIT(struct val, elem, depq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, depq, NULL, val_cmp, NULL);
     int const size = 6;
     struct val vals[size];
     struct val const order[6] = {
@@ -187,9 +187,10 @@ depq_test_max_round_robin(void)
     size_t i = 0;
     while (!ccc_depq_empty(&depq))
     {
-        struct val const *front = ccc_depq_pop_max(&depq);
+        struct val const *front = ccc_depq_max(&depq);
         CHECK(front->id, order[i].id, "%d");
         CHECK(front->val, order[i].val, "%d");
+        ccc_depq_pop_max(&depq);
         ++i;
     }
     return PASS;
@@ -199,7 +200,7 @@ static enum test_result
 depq_test_min_round_robin(void)
 {
     ccc_double_ended_priority_queue depq
-        = CCC_DEPQ_INIT(struct val, elem, depq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, depq, NULL, val_cmp, NULL);
     int const size = 6;
     struct val vals[size];
     struct val const order[6] = {
@@ -224,9 +225,10 @@ depq_test_min_round_robin(void)
     size_t i = 0;
     while (!ccc_depq_empty(&depq))
     {
-        struct val const *front = ccc_depq_pop_min(&depq);
+        struct val const *front = ccc_depq_min(&depq);
         CHECK(front->id, order[i].id, "%d");
         CHECK(front->val, order[i].val, "%d");
+        ccc_depq_pop_min(&depq);
         ++i;
     }
     return PASS;
@@ -236,7 +238,7 @@ static enum test_result
 depq_test_delete_prime_shuffle_duplicates(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -273,7 +275,7 @@ static enum test_result
 depq_test_prime_shuffle(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -309,7 +311,7 @@ static enum test_result
 depq_test_weak_srand(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

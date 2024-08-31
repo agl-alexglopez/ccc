@@ -9,9 +9,9 @@ static void *struct_base(struct ccc_impl_doubly_linked_list const *,
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
 {
-    if (l->impl.fn)
+    if (l->impl.alloc)
     {
-        void *node = l->impl.fn(NULL, l->impl.elem_sz);
+        void *node = l->impl.alloc(NULL, l->impl.elem_sz);
         if (!node)
         {
             return NULL;
@@ -26,9 +26,9 @@ ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
 void *
 ccc_dll_push_back(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
 {
-    if (l->impl.fn)
+    if (l->impl.alloc)
     {
-        void *node = l->impl.fn(NULL, l->impl.elem_sz);
+        void *node = l->impl.alloc(NULL, l->impl.elem_sz);
         if (!node)
         {
             return NULL;
@@ -70,9 +70,9 @@ ccc_dll_pop_front(ccc_doubly_linked_list *l)
     struct ccc_impl_dll_elem *remove = l->impl.sentinel.n;
     remove->n->p = &l->impl.sentinel;
     l->impl.sentinel.n = remove->n;
-    if (l->impl.fn)
+    if (l->impl.alloc)
     {
-        l->impl.fn(struct_base(&l->impl, remove), 0);
+        l->impl.alloc(struct_base(&l->impl, remove), 0);
     }
     --l->impl.sz;
 }
@@ -87,9 +87,9 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
     struct ccc_impl_dll_elem *remove = l->impl.sentinel.p;
     remove->p->n = &l->impl.sentinel;
     l->impl.sentinel.p = remove->p;
-    if (l->impl.fn)
+    if (l->impl.alloc)
     {
-        l->impl.fn(struct_base(&l->impl, remove), 0);
+        l->impl.alloc(struct_base(&l->impl, remove), 0);
     }
     --l->impl.sz;
 }
@@ -143,6 +143,25 @@ ccc_dll_splice(ccc_dll_elem *pos, ccc_dll_elem *const to_cut)
     to_cut->impl.n = &pos->impl;
     pos->impl.p->n = &to_cut->impl;
     pos->impl.p = &to_cut->impl;
+}
+
+void
+ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin, ccc_dll_elem *end)
+{
+    if (!begin || !end || !pos || &pos->impl == &begin->impl
+        || begin->impl.n == &pos->impl || begin == end)
+    {
+        return;
+    }
+    end = (ccc_dll_elem *)end->impl.p;
+
+    end->impl.n->p = begin->impl.p;
+    begin->impl.p->n = end->impl.n;
+
+    begin->impl.p = pos->impl.p;
+    end->impl.n = &pos->impl;
+    pos->impl.p->n = &begin->impl;
+    pos->impl.p = &end->impl;
 }
 
 void *

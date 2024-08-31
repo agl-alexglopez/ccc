@@ -40,17 +40,17 @@ fhash_test_erase(void)
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_fhash_entry ent = ccc_fh_insert(&fh, &query.id, &query.e);
+    ccc_fhash_entry ent = ccc_fh_insert(&fh, &query.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK(ccc_fh_get(ent), NULL, "%p");
     CHECK(ccc_fh_size(&fh), 1, "%zu");
-    struct val *v = ccc_fh_remove(&fh, &query.id, &query.e);
+    struct val *v = ccc_fh_remove(&fh, &query.e);
     CHECK(v != NULL, true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 99, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
-    int absent = 101;
-    v = ccc_fh_remove(&fh, &absent, &query.e);
+    query.id = 101;
+    v = ccc_fh_remove(&fh, &query.e);
     CHECK(v == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 0, "%zu");
     FH_INSERT_ENTRY(FH_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
@@ -88,8 +88,7 @@ fhash_test_shuffle_insert_erase(void)
         if (i % 2)
         {
             struct val swap_slot = {.id = i};
-            struct val const *const old_val
-                = ccc_fh_remove(&fh, &swap_slot.id, &swap_slot.e);
+            struct val const *const old_val = ccc_fh_remove(&fh, &swap_slot.e);
             CHECK(old_val != NULL, true, "%d");
             CHECK(old_val->id, i, "%d");
         }
