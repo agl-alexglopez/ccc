@@ -60,10 +60,11 @@ fhash_test_entry_functional(void)
     CHECK(ccc_fh_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
     ccc_fhash_entry ent = ccc_fh_entry(&fh, &def.id);
-    CHECK(ccc_fh_get(ent) == NULL, true, "%d");
+    CHECK(ccc_fh_unwrap(ent) == NULL, true, "%d");
     ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
         += 1;
-    struct val const *const inserted = ccc_fh_get(ccc_fh_entry(&fh, &def.id));
+    struct val const *const inserted
+        = ccc_fh_unwrap(ccc_fh_entry(&fh, &def.id));
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->val, 1, "%d");
     ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
@@ -81,7 +82,7 @@ fhash_test_entry_macros(void)
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
-    CHECK(ccc_fh_get(FH_ENTRY(&fh, 137)) == NULL, true, "%d");
+    CHECK(ccc_fh_unwrap(FH_ENTRY(&fh, 137)) == NULL, true, "%d");
     int const key = 137;
     int mut = 99;
     /* The function with a side effect should execute. */
@@ -112,12 +113,13 @@ fhash_test_entry_and_modify_functional(void)
     /* Returning a vacant entry is possible when modification is attemtped. */
     ccc_fhash_entry ent = ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod);
     CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK((ccc_fh_get(ent) == NULL), true, "%d");
+    CHECK((ccc_fh_unwrap(ent) == NULL), true, "%d");
 
     /* Inserting default value before an in place modification is possible. */
     ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
         += 1;
-    struct val const *const inserted = ccc_fh_get(ccc_fh_entry(&fh, &def.id));
+    struct val const *const inserted
+        = ccc_fh_unwrap(ccc_fh_entry(&fh, &def.id));
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
     CHECK(inserted->val, 1, "%d");
@@ -154,7 +156,7 @@ fhash_test_entry_and_modify_macros(void)
     /* Returning a vacant entry is possible when modification is attemtped. */
     ccc_fhash_entry ent = FH_AND_MODIFY(FH_ENTRY(&fh, 137), mod);
     CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK((ccc_fh_get(ent) == NULL), true, "%d");
+    CHECK((ccc_fh_unwrap(ent) == NULL), true, "%d");
 
     int mut = 99;
 

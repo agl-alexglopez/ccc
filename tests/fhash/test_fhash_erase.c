@@ -42,7 +42,7 @@ fhash_test_erase(void)
     /* Nothing was there before so nothing is in the entry. */
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &query.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK(ccc_fh_get(ent), NULL, "%p");
+    CHECK(ccc_fh_unwrap(ent), NULL, "%p");
     CHECK(ccc_fh_size(&fh), 1, "%zu");
     struct val *v = ccc_fh_remove(&fh, &query.e);
     CHECK(v != NULL, true, "%d");

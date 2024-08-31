@@ -468,12 +468,12 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     if (success)
     {
         struct parent_cell const *cell
-            = ccc_fh_get(ccc_fh_entry(&parent_map, &cur));
+            = ccc_fh_unwrap(ccc_fh_entry(&parent_map, &cur));
         assert(cell);
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
         {
-            cell = ccc_fh_get(ccc_fh_entry(&parent_map, &cell->parent));
+            cell = ccc_fh_unwrap(ccc_fh_entry(&parent_map, &cell->parent));
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);

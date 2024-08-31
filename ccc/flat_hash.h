@@ -117,6 +117,10 @@ This function should be used when one wishes to preserve the old value if
 one is present. If such behavior is not needed see the entry API. */
 void *ccc_fh_remove(ccc_flat_hash *h, ccc_fhash_elem *out_handle);
 
+void const *ccc_fh_get(ccc_flat_hash *h, void const *key);
+
+void *ccc_fh_get_mut(ccc_flat_hash *h, void const *key);
+
 /*========================    Entry API    ==================================*/
 
 /** @brief Obtains an entry for the provided key in the table for future use.
@@ -190,12 +194,12 @@ bool ccc_fh_remove_entry(ccc_fhash_entry e);
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return an immutable view into the table entry if one is present, or NULL. */
-void const *ccc_fh_get(ccc_fhash_entry e);
+void const *ccc_fh_unwrap(ccc_fhash_entry e);
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return a mutable view into the table entry if one is present, or NULL. */
-void *ccc_fh_get_mut(ccc_fhash_entry e);
+void *ccc_fh_unwrap_mut(ccc_fhash_entry e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
