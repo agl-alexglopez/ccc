@@ -99,6 +99,24 @@ ccc_fh_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
     return (void *)e.impl.entry.entry;
 }
 
+inline void *
+ccc_fh_get_mut(ccc_flat_hash *const h, void const *const key)
+{
+    return (void *)ccc_fh_get(h, key);
+}
+
+void const *
+ccc_fh_get(ccc_flat_hash *const h, void const *const key)
+{
+    ccc_entry e
+        = ccc_impl_fh_find(&h->impl, key, ccc_impl_fh_filter(&h->impl, key));
+    if (e.status & CCC_FH_ENTRY_OCCUPIED)
+    {
+        return e.entry;
+    }
+    return NULL;
+}
+
 bool
 ccc_fh_remove_entry(ccc_fhash_entry e)
 {
@@ -200,13 +218,13 @@ ccc_fh_or_insert(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 }
 
 inline void const *
-ccc_fh_get(ccc_fhash_entry e)
+ccc_fh_unwrap(ccc_fhash_entry e)
 {
     return ccc_impl_fh_get(&e.impl);
 }
 
 inline void *
-ccc_fh_get_mut(ccc_fhash_entry e)
+ccc_fh_unwrap_mut(ccc_fhash_entry e)
 {
     return (void *)ccc_impl_fh_get(&e.impl);
 }

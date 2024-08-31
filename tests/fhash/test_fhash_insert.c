@@ -66,7 +66,7 @@ fhash_test_insert(void)
     /* Nothing was there before so nothing is in the entry. */
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &query.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK(ccc_fh_get(ent), NULL, "%p");
+    CHECK(ccc_fh_unwrap(ent), NULL, "%p");
     return PASS;
 }
 
@@ -81,8 +81,9 @@ fhash_test_insert_overwrite(void)
     struct val q = {.id = 137, .val = 99};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK(ccc_fh_get(ent), NULL, "%p");
-    CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 99, "%d");
+    CHECK(ccc_fh_unwrap(ent), NULL, "%p");
+    CHECK(((struct val *)ccc_fh_unwrap(ccc_fh_entry(&fh, &q.id)))->val, 99,
+          "%d");
 
     /* Now the second insertion will take place and the old occupying value
        will be written into our struct we used to make the query. */
@@ -93,9 +94,10 @@ fhash_test_insert_overwrite(void)
     CHECK(ccc_fh_occupied(old_ent), true, "%d");
 
     /* The old contents are now in q and the entry is in the table. */
-    CHECK(((struct val *)ccc_fh_get(old_ent))->val, 100, "%d");
+    CHECK(((struct val *)ccc_fh_unwrap(old_ent))->val, 100, "%d");
     CHECK(q.val, 99, "%d");
-    CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 100, "%d");
+    CHECK(((struct val *)ccc_fh_unwrap(ccc_fh_entry(&fh, &q.id)))->val, 100,
+          "%d");
     return PASS;
 }
 
@@ -110,8 +112,9 @@ fhash_test_insert_then_bad_ideas(void)
     struct val q = {.id = 137, .val = 99};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK(ccc_fh_get(ent), NULL, "%p");
-    CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 99, "%d");
+    CHECK(ccc_fh_unwrap(ent), NULL, "%p");
+    CHECK(((struct val *)ccc_fh_unwrap(ccc_fh_entry(&fh, &q.id)))->val, 99,
+          "%d");
 
     /* This is a dummy entry that indicates the entry was vacant in the table.
        so or insert and erase will do nothing. */
@@ -121,14 +124,15 @@ fhash_test_insert_then_bad_ideas(void)
 
     ccc_fhash_entry new_ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(new_ent), true, "%d");
-    CHECK(((struct val *)ccc_fh_get(new_ent))->val, 100, "%d");
+    CHECK(((struct val *)ccc_fh_unwrap(new_ent))->val, 100, "%d");
     CHECK(q.val, 99, "%d");
     q.val -= 9;
 
     /* Now the expected behavior of or insert shall occur and no insertion
        will happen because the value is already occupied in the table. */
     CHECK(((struct val *)ccc_fh_or_insert(new_ent, &q.e))->val, 100, "%d");
-    CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 100, "%d");
+    CHECK(((struct val *)ccc_fh_unwrap(ccc_fh_entry(&fh, &q.id)))->val, 100,
+          "%d");
     CHECK(q.val, 90, "%d");
     return PASS;
 }
@@ -403,7 +407,7 @@ fhash_test_resize(void)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.e));
+            = ccc_fh_unwrap(ccc_fh_insert(&fh, &swap_slot.e));
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         CHECK(swap_slot.val, i, "%d");
@@ -475,7 +479,7 @@ fhash_test_resize_from_null(void)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.e));
+            = ccc_fh_unwrap(ccc_fh_insert(&fh, &swap_slot.e));
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         CHECK(swap_slot.val, i, "%d");
@@ -550,10 +554,10 @@ fhash_test_insert_limit(void)
     /* The last successful entry is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
     ccc_fhash_entry ent = ccc_fh_insert(&fh, &v.e);
-    CHECK(ccc_fh_get(ent) != NULL, true, "%d");
+    CHECK(ccc_fh_unwrap(ent) != NULL, true, "%d");
     CHECK(ccc_fh_insert_error(ent), false, "%d");
-    CHECK(((struct val *)ccc_fh_get(ent))->val, -1, "%d");
-    CHECK(((struct val *)ccc_fh_get(ent))->val != v.val, true, "%d");
+    CHECK(((struct val *)ccc_fh_unwrap(ent))->val, -1, "%d");
+    CHECK(((struct val *)ccc_fh_unwrap(ent))->val != v.val, true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
     v = (struct val){.id = last_index, .val = -2};
@@ -580,7 +584,7 @@ fhash_test_insert_limit(void)
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
     ent = ccc_fh_insert(&fh, &v.e);
-    CHECK(ccc_fh_get(ent) == NULL, true, "%d");
+    CHECK(ccc_fh_unwrap(ent) == NULL, true, "%d");
     CHECK(ccc_fh_insert_error(ent), true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
     return PASS;
