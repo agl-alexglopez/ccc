@@ -118,8 +118,8 @@ static bool can_build_new_square(struct maze const *, struct point);
 static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(struct maze const *);
-static ccc_threeway_cmp cmp_priority_cells(ccc_cmp);
-static ccc_threeway_cmp cmp_points(ccc_cmp);
+static ccc_threeway_cmp cmp_priority_cells(ccc_key_cmp);
+static ccc_threeway_cmp cmp_points(ccc_key_cmp);
 static void set_destructor(void *);
 static struct int_conversion parse_digits(str_view);
 
@@ -203,10 +203,11 @@ animate_maze(struct maze *maze)
        A ccc_set could be replaced by a 2D vector copy of the maze with costs
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
-    ccc_double_ended_priority_queue cells = CCC_DEPQ_INIT(
-        struct priority_cell, elem, cells, NULL, cmp_priority_cells, NULL);
-    ccc_set cell_costs = CCC_SET_INIT(struct point_cost, elem, cell_costs, NULL,
-                                      cmp_points, NULL);
+    ccc_double_ended_priority_queue cells
+        = CCC_DEPQ_INIT(struct priority_cell, elem, priority, cells, NULL,
+                        cmp_priority_cells, NULL);
+    ccc_set cell_costs = CCC_SET_INIT(struct point_cost, elem, p, cell_costs,
+                                      NULL, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
@@ -240,9 +241,8 @@ animate_maze(struct maze *maze)
                 continue;
             }
             int cur_weight = 0;
-            struct point_cost key = {.p = next};
             struct point_cost const *const found
-                = ccc_s_find(&cell_costs, &key.elem);
+                = ccc_s_get(ccc_s_entry(&cell_costs, &next));
             if (!found)
             {
                 struct point_cost *new_cost
@@ -252,8 +252,8 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                bool const inserted
-                    = ccc_s_insert(&cell_costs, &new_cost->elem);
+                bool const inserted = ccc_s_insert_entry(
+                    ccc_s_entry(&cell_costs, &new_cost->p), &new_cost->elem);
                 (void)inserted;
                 assert(inserted);
             }
@@ -477,27 +477,27 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 /*===================   Data Structure Comparators   ========================*/
 
 static ccc_threeway_cmp
-cmp_priority_cells(ccc_cmp const cmp)
+cmp_priority_cells(ccc_key_cmp const cmp)
 {
-    struct priority_cell const *const a = cmp.container_a;
-    struct priority_cell const *const b = cmp.container_b;
-    return (a->priority > b->priority) - (a->priority < b->priority);
+    struct priority_cell const *const a = cmp.container;
+    int const key = *((int *)cmp.key);
+    return (key > a->priority) - (key < a->priority);
 }
 
 static ccc_threeway_cmp
-cmp_points(ccc_cmp const cmp)
+cmp_points(ccc_key_cmp const cmp)
 {
-    struct point_cost const *const a = cmp.container_a;
-    struct point_cost const *const b = cmp.container_b;
-    if (a->p.r == b->p.r && a->p.c == b->p.c)
+    struct point_cost const *const a = cmp.container;
+    struct point const *const key = cmp.key;
+    if (a->p.r == key->r && a->p.c == key->c)
     {
         return CCC_EQL;
     }
-    if (a->p.r == b->p.r)
+    if (a->p.r == key->r)
     {
-        return (a->p.c > b->p.c) - (a->p.c < b->p.c);
+        return (key->c > a->p.c) - (key->c < a->p.c);
     }
-    return (a->p.r > b->p.r) - (a->p.r < b->p.r);
+    return (key->r > a->p.r) - (key->r < a->p.r);
 }
 
 static void

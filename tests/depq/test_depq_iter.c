@@ -44,7 +44,7 @@ static enum test_result
 depq_test_forward_iter_unique_vals(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = ccc_depq_begin(&pq); e;
@@ -79,7 +79,7 @@ static enum test_result
 depq_test_forward_iter_all_vals(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *i = ccc_depq_begin(&pq); i;
@@ -118,7 +118,7 @@ static enum test_result
 depq_test_insert_iterate_pop(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -152,7 +152,7 @@ static enum test_result
 depq_test_priority_removal(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -187,7 +187,7 @@ static enum test_result
 depq_test_priority_update(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -227,7 +227,7 @@ static enum test_result
 depq_test_priority_valid_range(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -288,7 +288,7 @@ static enum test_result
 depq_test_priority_invalid_range(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -346,7 +346,7 @@ static enum test_result
 depq_test_priority_empty_range(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];

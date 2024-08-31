@@ -4,11 +4,11 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_cmp const cmp)
+val_cmp(ccc_key_cmp const cmp)
 {
-    struct val const *const lhs = cmp.container_a;
-    struct val const *const rhs = cmp.container_b;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+    struct val const *const c = cmp.container;
+    int key = *((int *)cmp.key);
+    return (key > c->val) - (key < c->val);
 }
 
 void

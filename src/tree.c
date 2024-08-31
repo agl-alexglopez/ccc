@@ -64,7 +64,7 @@ static bool empty(ccc_tree const *);
 static void multiset_insert(ccc_tree *, ccc_node *);
 static ccc_node *find(ccc_tree *, void const *);
 static bool contains(ccc_tree *, void const *);
-static void *erase(ccc_tree *, ccc_node *);
+static void *erase(ccc_tree *, void const *key);
 static void *insert(ccc_tree *, ccc_node *);
 static ccc_node *multiset_erase_max_or_min(ccc_tree *, ccc_key_cmp_fn *);
 static ccc_node *multiset_erase_node(ccc_tree *, ccc_node *);
@@ -98,7 +98,7 @@ static ccc_node *range_end(ccc_range const *);
 static ccc_node *rrange_begin(ccc_rrange const *);
 static ccc_node *rrange_end(ccc_rrange const *);
 static void *struct_base(ccc_tree const *, ccc_node const *);
-static ccc_threeway_cmp cmp(ccc_tree const *, ccc_node const *, void const *,
+static ccc_threeway_cmp cmp(ccc_tree const *, void const *, ccc_node const *,
                             ccc_key_cmp_fn *);
 static void swap(uint8_t tmp[], void *, void *, size_t);
 
@@ -139,7 +139,7 @@ void *
 ccc_depq_max(ccc_double_ended_priority_queue *const pq)
 {
     ccc_node const *const n
-        = splay(&pq->impl, pq->impl.root, &pq->impl.end, force_find_grt);
+        = splay(&pq->impl, pq->impl.root, NULL, force_find_grt);
     if (!n)
     {
         return NULL;
@@ -169,7 +169,7 @@ void *
 ccc_depq_min(ccc_double_ended_priority_queue *const pq)
 {
     ccc_node const *const n
-        = splay(&pq->impl, pq->impl.root, &pq->impl.end, force_find_les);
+        = splay(&pq->impl, pq->impl.root, NULL, force_find_les);
     if (!n)
     {
         return NULL;
@@ -438,6 +438,19 @@ ccc_s_entry(ccc_set *const s, void const *const key)
 }
 
 void *
+ccc_s_insert_entry(ccc_set_entry const e, ccc_set_elem *const elem)
+{
+    if (e.impl.entry.status == CCC_S_ENTRY_OCCUPIED)
+    {
+        elem->impl = *ccc_impl_tree_elem_in_slot(e.impl.t, e.impl.entry.entry);
+        memcpy((void *)e.impl.entry.entry, struct_base(e.impl.t, &elem->impl),
+               e.impl.t->elem_sz);
+        return (void *)e.impl.entry.entry;
+    }
+    return insert(e.impl.t, &elem->impl);
+}
+
+void *
 ccc_s_or_insert(ccc_set_entry const e, ccc_set_elem *const elem)
 {
     if (e.impl.entry.status & CCC_S_ENTRY_OCCUPIED)
@@ -501,13 +514,32 @@ ccc_s_insert(ccc_set *const s, ccc_set_elem *const out_handle)
     }};
 }
 
+void *
+ccc_s_remove(ccc_set *s, ccc_set_elem *out_handle)
+{
+    void *n
+        = erase(&s->impl, ccc_impl_key_from_node(&s->impl, &out_handle->impl));
+    if (!n)
+    {
+        return NULL;
+    }
+    if (s->impl.alloc)
+    {
+        void *user_struct = struct_base(&s->impl, &out_handle->impl);
+        memcpy(user_struct, struct_base(&s->impl, n), s->impl.elem_sz);
+        s->impl.alloc(n, 0);
+        return user_struct;
+    }
+    return n;
+}
+
 ccc_set_entry
 ccc_s_remove_entry(ccc_set_entry e)
 {
     if (e.impl.entry.status == CCC_S_ENTRY_OCCUPIED)
     {
         void *erased = erase(
-            e.impl.t, ccc_impl_tree_elem_in_slot(e.impl.t, e.impl.entry.entry));
+            e.impl.t, ccc_impl_tree_key_in_slot(e.impl.t, e.impl.entry.entry));
         assert(erased);
         if (e.impl.t->alloc)
         {
@@ -622,25 +654,6 @@ void *
 ccc_s_end_rrange(ccc_rrange const *rr)
 {
     return rrange_end(rr);
-}
-
-void *
-ccc_s_remove(ccc_set *s, ccc_set_elem *out_handle)
-{
-    void *n
-        = erase(&s->impl, ccc_impl_key_from_node(&s->impl, &out_handle->impl));
-    if (!n)
-    {
-        return NULL;
-    }
-    if (s->impl.alloc)
-    {
-        void *user_struct = struct_base(&s->impl, &out_handle->impl);
-        memcpy(user_struct, struct_base(&s->impl, n), s->impl.elem_sz);
-        s->impl.alloc(n, 0);
-        return user_struct;
-    }
-    return n;
 }
 
 bool
@@ -782,7 +795,7 @@ const_seek(ccc_tree *const t, void const *const key)
     ccc_node const *seek = t->root;
     while (seek != &t->end)
     {
-        ccc_threeway_cmp const cur_cmp = cmp(t, seek, key, t->cmp);
+        ccc_threeway_cmp const cur_cmp = cmp(t, key, seek, t->cmp);
         if (cur_cmp == CCC_EQL)
         {
             return seek;
@@ -903,12 +916,12 @@ equal_range(ccc_tree *t, void const *begin_key, void const *end_key,
        lesser element depending on the direction we are traversing. */
     ccc_threeway_cmp const grt_or_les[2] = {CCC_GRT, CCC_LES};
     ccc_node const *b = splay(t, t->root, begin_key, t->cmp);
-    if (cmp(t, b, begin_key, t->cmp) == grt_or_les[traversal])
+    if (cmp(t, begin_key, b, t->cmp) == grt_or_les[traversal])
     {
         b = next(t, b, traversal);
     }
     ccc_node const *e = splay(t, t->root, end_key, t->cmp);
-    if (cmp(t, e, end_key, t->cmp) == grt_or_les[traversal])
+    if (cmp(t, end_key, e, t->cmp) == grt_or_les[traversal])
     {
         e = next(t, e, traversal);
     }
@@ -946,14 +959,14 @@ static ccc_node *
 find(ccc_tree *t, void const *const key)
 {
     t->root = splay(t, t->root, key, t->cmp);
-    return cmp(t, t->root, key, t->cmp) == CCC_EQL ? t->root : NULL;
+    return cmp(t, key, t->root, t->cmp) == CCC_EQL ? t->root : NULL;
 }
 
 static bool
 contains(ccc_tree *t, void const *key)
 {
     t->root = splay(t, t->root, key, t->cmp);
-    return cmp(t, t->root, key, t->cmp) == CCC_EQL;
+    return cmp(t, key, t->root, t->cmp) == CCC_EQL;
 }
 
 static void *
@@ -962,13 +975,23 @@ insert(ccc_tree *t, ccc_node *out_handle)
     init_node(t, out_handle);
     if (empty(t))
     {
+        if (t->alloc)
+        {
+            void *node = t->alloc(NULL, t->elem_sz);
+            if (!node)
+            {
+                return NULL;
+            }
+            memcpy(node, struct_base(t, out_handle), t->elem_sz);
+            out_handle = ccc_impl_tree_elem_in_slot(t, node);
+        }
         t->root = out_handle;
         t->size++;
         return t->root;
     }
     void const *const key = ccc_impl_key_from_node(t, out_handle);
     t->root = splay(t, t->root, key, t->cmp);
-    ccc_threeway_cmp const root_cmp = cmp(t, t->root, key, t->cmp);
+    ccc_threeway_cmp const root_cmp = cmp(t, key, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
     {
         return NULL;
@@ -1001,7 +1024,7 @@ multiset_insert(ccc_tree *t, ccc_node *out_handle)
     void const *const key = ccc_impl_key_from_node(t, out_handle);
     t->root = splay(t, t->root, key, t->cmp);
 
-    ccc_threeway_cmp const root_cmp = cmp(t, t->root, key, t->cmp);
+    ccc_threeway_cmp const root_cmp = cmp(t, key, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
     {
         add_duplicate(t, t->root, out_handle, &t->end);
@@ -1050,15 +1073,14 @@ add_duplicate(ccc_tree *t, ccc_node *tree_node, ccc_node *add, ccc_node *parent)
 }
 
 static void *
-erase(ccc_tree *t, ccc_node *elem)
+erase(ccc_tree *t, void const *const key)
 {
     if (empty(t))
     {
         return NULL;
     }
-    void const *const key = ccc_impl_key_from_node(t, elem);
     ccc_node *ret = splay(t, t->root, key, t->cmp);
-    ccc_threeway_cmp const found = cmp(t, ret, key, t->cmp);
+    ccc_threeway_cmp const found = cmp(t, key, ret, t->cmp);
     if (found != CCC_EQL)
     {
         return NULL;
@@ -1087,8 +1109,7 @@ multiset_erase_max_or_min(ccc_tree *t, ccc_key_cmp_fn *force_max_or_min)
         return NULL;
     }
     t->size--;
-    void *dummy_key;
-    ccc_node *ret = splay(t, t->root, dummy_key, force_max_or_min);
+    ccc_node *ret = splay(t, t->root, NULL, force_max_or_min);
     if (has_dups(&t->end, ret))
     {
         ret = pop_front_dup(t, ret, ccc_impl_key_from_node(t, ret));
@@ -1130,7 +1151,7 @@ multiset_erase_node(ccc_tree *t, ccc_node *node)
     }
     void const *const key = ccc_impl_key_from_node(t, node);
     ccc_node *ret = splay(t, t->root, key, t->cmp);
-    if (cmp(t, node, ret, t->cmp) != CCC_EQL)
+    if (cmp(t, key, ret, t->cmp) != CCC_EQL)
     {
         return NULL;
     }
@@ -1182,7 +1203,7 @@ pop_front_dup(ccc_tree *t, ccc_node *old, void const *const old_key)
     else
     {
         /* Comparing sizes with the root's parent is undefined. */
-        parent->link[CCC_GRT == cmp(t, parent, old_key, t->cmp)]
+        parent->link[CCC_GRT == cmp(t, old_key, parent, t->cmp)]
             = tree_replacement;
     }
 
@@ -1216,7 +1237,8 @@ remove_from_tree(ccc_tree *t, ccc_node *ret)
     }
     else
     {
-        t->root = splay(t, ret->link[L], ret, t->cmp);
+        t->root
+            = splay(t, ret->link[L], ccc_impl_key_from_node(t, ret), t->cmp);
         link_trees(t, t->root, R, ret->link[R]);
     }
     return ret;
@@ -1233,13 +1255,13 @@ splay(ccc_tree *t, ccc_node *root, void const *const key,
     ccc_node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
-        ccc_threeway_cmp const root_cmp = cmp(t, root, key, cmp_fn);
+        ccc_threeway_cmp const root_cmp = cmp(t, key, root, cmp_fn);
         ccc_tree_link const dir = CCC_GRT == root_cmp;
         if (CCC_EQL == root_cmp || root->link[dir] == &t->end)
         {
             break;
         }
-        ccc_threeway_cmp const child_cmp = cmp(t, root->link[dir], key, cmp_fn);
+        ccc_threeway_cmp const child_cmp = cmp(t, key, root->link[dir], cmp_fn);
         ccc_tree_link const dir_from_child = CCC_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
@@ -1340,13 +1362,13 @@ struct_base(ccc_tree const *const t, ccc_node const *const n)
 }
 
 static inline ccc_threeway_cmp
-cmp(ccc_tree const *const t, ccc_node const *const node, void const *const key,
+cmp(ccc_tree const *const t, void const *const key, ccc_node const *const node,
     ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){
-        .container = ccc_impl_tree_key_in_slot(t, struct_base(t, node)),
+        .container = struct_base(t, node),
         .key = key,
-        t->aux,
+        .aux = t->aux,
     });
 }
 
@@ -1467,12 +1489,12 @@ are_subtrees_valid(ccc_tree const *t, struct ccc_tree_range const r,
         return true;
     }
     if (r.low != nil
-        && cmp(t, r.root, ccc_impl_key_from_node(t, r.low), t->cmp) != CCC_GRT)
+        && cmp(t, ccc_impl_key_from_node(t, r.low), r.root, t->cmp) != CCC_LES)
     {
         return false;
     }
     if (r.high != nil
-        && cmp(t, r.root, ccc_impl_key_from_node(t, r.high), t->cmp) != CCC_LES)
+        && cmp(t, ccc_impl_key_from_node(t, r.high), r.root, t->cmp) != CCC_GRT)
     {
         return false;
     }

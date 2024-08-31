@@ -65,7 +65,7 @@ set_test_prime_shuffle(void)
     for (size_t i = 0; i < size; ++i)
     {
         void *const elem = ccc_s_remove(&s, &vals[i].elem);
-        CHECK(elem || !repeats[i], true, "%d");
+        CHECK(elem || repeats[i], true, "%d");
         CHECK(ccc_s_validate(&s), true, "%d");
     }
     return PASS;
@@ -108,12 +108,12 @@ set_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_s_insert(&s, &vals[i].elem);
+        (void)ccc_s_insert(&s, &vals[i].elem);
         CHECK(ccc_s_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_s_contains(&s, &vals[i].elem), true, "%d");
+        CHECK(ccc_s_contains(&s, &vals[i].val), true, "%d");
         (void)ccc_s_remove(&s, &vals[i].elem);
         CHECK(ccc_s_validate(&s), true, "%d");
     }

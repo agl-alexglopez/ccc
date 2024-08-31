@@ -32,6 +32,7 @@ static void test_update(void);
 
 static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
+static ccc_threeway_cmp val_key_cmp(ccc_key_cmp);
 static ccc_threeway_cmp val_cmp(ccc_cmp);
 static void val_update(ccc_update);
 
@@ -94,8 +95,8 @@ test_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_double_ended_priority_queue depq
-            = CCC_DEPQ_INIT(struct val, depq_elem, depq, NULL, val_cmp, NULL);
+        ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
+            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         clock_t begin = clock();
@@ -134,8 +135,8 @@ test_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_double_ended_priority_queue depq
-            = CCC_DEPQ_INIT(struct val, depq_elem, depq, NULL, val_cmp, NULL);
+        ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
+            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
@@ -188,8 +189,8 @@ test_push_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_double_ended_priority_queue depq
-            = CCC_DEPQ_INIT(struct val, depq_elem, depq, NULL, val_cmp, NULL);
+        ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
+            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         clock_t begin = clock();
@@ -241,8 +242,8 @@ test_push_intermittent_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_double_ended_priority_queue depq
-            = CCC_DEPQ_INIT(struct val, depq_elem, depq, NULL, val_cmp, NULL);
+        ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
+            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         clock_t begin = clock();
@@ -294,8 +295,8 @@ test_pop_intermittent_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_double_ended_priority_queue depq
-            = CCC_DEPQ_INIT(struct val, depq_elem, depq, NULL, val_cmp, NULL);
+        ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
+            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
@@ -363,8 +364,8 @@ test_update(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n);
-        ccc_double_ended_priority_queue depq
-            = CCC_DEPQ_INIT(struct val, depq_elem, depq, NULL, val_cmp, NULL);
+        ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
+            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = CCC_PQ_INIT(struct val, pq_elem, CCC_LES, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
@@ -439,19 +440,19 @@ valid_malloc(size_t bytes)
 }
 
 static ccc_threeway_cmp
+val_key_cmp(ccc_key_cmp const cmp)
+{
+    struct val const *const x = cmp.container;
+    int const key = *((int *)cmp.key);
+    return (key > x->val) - (key < x->val);
+}
+
+static ccc_threeway_cmp
 val_cmp(ccc_cmp const cmp)
 {
-    struct val const *const x = cmp.container_a;
-    struct val const *const y = cmp.container_b;
-    if (x->val < y->val)
-    {
-        return CCC_LES;
-    }
-    if (x->val > y->val)
-    {
-        return CCC_GRT;
-    }
-    return CCC_EQL;
+    struct val const *const a = cmp.container_a;
+    struct val const *const b = cmp.container_b;
+    return (a->val > b->val) - (a->val < b->val);
 }
 
 static void

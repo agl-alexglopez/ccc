@@ -29,7 +29,7 @@ static enum test_result
 depq_test_empty(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, pq, NULL, val_cmp, NULL);
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     CHECK(ccc_depq_empty(&pq), true, "%d");
     return PASS;
 }
