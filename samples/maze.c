@@ -204,15 +204,15 @@ animate_maze(struct maze *maze)
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
     ccc_double_ended_priority_queue cells = CCC_DEPQ_INIT(
-        struct priority_cell, elem, cells, cmp_priority_cells, NULL);
-    ccc_set cell_costs
-        = CCC_SET_INIT(struct point_cost, elem, cell_costs, cmp_points, NULL);
+        struct priority_cell, elem, cells, NULL, cmp_priority_cells, NULL);
+    ccc_set cell_costs = CCC_SET_INIT(struct point_cost, elem, cell_costs, NULL,
+                                      cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)ccc_set_insert(&cell_costs, &odd_point->elem);
+    (void)ccc_s_insert(&cell_costs, &odd_point->elem);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
@@ -242,7 +242,7 @@ animate_maze(struct maze *maze)
             int cur_weight = 0;
             struct point_cost key = {.p = next};
             struct point_cost const *const found
-                = ccc_set_find(&cell_costs, &key.elem);
+                = ccc_s_find(&cell_costs, &key.elem);
             if (!found)
             {
                 struct point_cost *new_cost
@@ -253,7 +253,7 @@ animate_maze(struct maze *maze)
                 };
                 cur_weight = new_cost->cost;
                 bool const inserted
-                    = ccc_set_insert(&cell_costs, &new_cost->elem);
+                    = ccc_s_insert(&cell_costs, &new_cost->elem);
                 (void)inserted;
                 assert(inserted);
             }
@@ -281,14 +281,16 @@ animate_maze(struct maze *maze)
         }
         else
         {
-            free(ccc_depq_pop_max(&cells));
+            struct priority_cell *pc = ccc_depq_max(&cells);
+            ccc_depq_pop_max(&cells);
+            free(pc);
         }
     }
     /* The priority queue does not need to be cleared because it's emptiness
        determined the course of the maze building. It has no hidden allocations
        either so no more work is needed if we know it's empty and the data
        structure metadata is on the stack. */
-    ccc_set_clear(&cell_costs, set_destructor);
+    ccc_s_clear(&cell_costs, set_destructor);
 }
 
 static struct point

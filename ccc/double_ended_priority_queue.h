@@ -35,8 +35,9 @@ typedef struct
    with the comparison function and any necessary auxilliary data. This may
    be used at compile time or runtime. It is undefined to use the depq if
    this has not been called. */
-#define CCC_DEPQ_INIT(struct_name, depq_elem_field, depq_name, cmp, aux)       \
-    CCC_TREE_INIT(struct_name, depq_elem_field, depq_name, cmp, aux)
+#define CCC_DEPQ_INIT(struct_name, depq_elem_field, depq_name, realloc_fn,     \
+                      cmp, aux)                                                \
+    CCC_TREE_INIT(struct_name, depq_elem_field, depq_name, realloc_fn, cmp, aux)
 
 void ccc_depq_clear(ccc_double_ended_priority_queue *,
                     ccc_destructor_fn *destructor);
@@ -45,11 +46,11 @@ bool ccc_depq_empty(ccc_double_ended_priority_queue const *);
 
 size_t ccc_depq_size(ccc_double_ended_priority_queue const *);
 
-void ccc_depq_push(ccc_double_ended_priority_queue *, ccc_depq_elem *);
+ccc_result ccc_depq_push(ccc_double_ended_priority_queue *, ccc_depq_elem *);
 
-void *ccc_depq_pop_max(ccc_double_ended_priority_queue *);
+void ccc_depq_pop_max(ccc_double_ended_priority_queue *);
 
-void *ccc_depq_pop_min(ccc_double_ended_priority_queue *);
+void ccc_depq_pop_min(ccc_double_ended_priority_queue *);
 
 void *ccc_depq_max(ccc_double_ended_priority_queue *);
 
@@ -80,16 +81,14 @@ void *ccc_depq_next(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 void *ccc_depq_rnext(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 
 ccc_range ccc_depq_equal_range(ccc_double_ended_priority_queue *,
-                               ccc_depq_elem const *begin,
-                               ccc_depq_elem const *end);
+                               void const *begin_key, void const *end_key);
 
 void *ccc_depq_begin_range(ccc_range const *);
 
 void *ccc_depq_end_range(ccc_range const *);
 
 ccc_rrange ccc_depq_equal_rrange(ccc_double_ended_priority_queue *,
-                                 ccc_depq_elem const *rbegin,
-                                 ccc_depq_elem const *end);
+                                 void const *rbegin_key, void const *end_key);
 
 void *ccc_depq_begin_rrange(ccc_rrange const *);
 

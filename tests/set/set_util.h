@@ -13,7 +13,7 @@ struct val
     ccc_set_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_cmp);
+ccc_threeway_cmp val_cmp(ccc_key_cmp);
 void set_printer_fn(void const *);
 
 enum test_result insert_shuffled(ccc_set *s, struct val vals[], size_t size,

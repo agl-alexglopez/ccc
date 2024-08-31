@@ -15,6 +15,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define CCC_S_EMPTY ((uint64_t)0)
+#define CCC_S_ENTRY_VACANT ((uint8_t)0x0)
+#define CCC_S_ENTRY_OCCUPIED ((uint8_t)0x1)
+#define CCC_S_ENTRY_INSERT_ERROR ((uint8_t)0x2)
+#define CCC_S_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
+#define CCC_S_ENTRY_NULL ((uint8_t)0x8)
+#define CCC_S_ENTRY_DELETE_ERROR ((uint8_t)0x10)
+
 /* Instead of thinking about left and right consider only links
    in the abstract sense. Put them in an array and then flip
    this enum and left and right code paths can be united into one */
@@ -52,33 +60,42 @@ typedef struct
 {
     ccc_node *root;
     ccc_node end;
-    ccc_cmp_fn *cmp;
+    ccc_realloc_fn *alloc;
+    ccc_key_cmp_fn *cmp;
     void *aux;
     size_t size;
+    size_t elem_sz;
     size_t node_elem_offset;
+    size_t key_offset;
 } ccc_tree;
 
-#define CCC_TREE_INIT(struct_name, node_elem_field, tree_name, cmp_fn,         \
-                      aux_data)                                                \
+struct ccc_tree_entry
+{
+    ccc_tree *t;
+    ccc_entry entry;
+};
+
+#define CCC_TREE_INIT(struct_name, node_elem_field, key_elem_field, tree_name, \
+                      realloc_fn, key_cmp_fn, aux_data)                        \
     {                                                                          \
         .impl = {                                                              \
             .root = &(tree_name).impl.end,                                     \
             .end = {.link = {&(tree_name).impl.end, &(tree_name).impl.end},    \
                     .parent_or_dups = &(tree_name).impl.end},                  \
-            .cmp = (cmp_fn),                                                   \
+            .alloc = (realloc_fn),                                             \
+            .cmp = (key_cmp_fn),                                               \
             .aux = (aux_data),                                                 \
             .size = 0,                                                         \
+            .elem_sz = sizeof(struct_name),                                    \
             .node_elem_offset = offsetof(struct_name, node_elem_field),        \
+            .key_offset = offsetof(struct_name, key_elem_field),               \
         },                                                                     \
     }
 
-/* Mostly intended for debugging. Validates the underlying tree
-   data structure with invariants that must hold regardless of
-   interface. */
 bool ccc_tree_validate(ccc_tree const *t);
-
-/* Use this function in gdb or a terminal for some pretty colors.
-   Intended for debugging use. */
 void ccc_tree_print(ccc_tree const *t, ccc_node const *root, ccc_print_fn *fn);
+void *ccc_impl_tree_key_in_slot(ccc_tree const *t, void const *slot);
+ccc_node *ccc_impl_tree_elem_in_slot(ccc_tree const *t, void const *slot);
+void *ccc_impl_key_from_node(ccc_tree const *t, ccc_node const *n);
 
 #endif /* CCC_IMPL_TREE_H */

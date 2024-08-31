@@ -35,14 +35,14 @@ handle.
 @param [in] realloc_fn the reallocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
-@param [in] key_cmp_fn the ccc_key_cmp_fn the user intends to use.
+@param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux auxilliary data that is needed for key comparison.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
 #define CCC_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,   \
-                    fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)    \
+                    fhash_elem_field, realloc_fn, hash_fn, key_eq_fn, aux)     \
     CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
-                     fhash_elem_field, realloc_fn, hash_fn, key_cmp_fn, aux)
+                     fhash_elem_field, realloc_fn, hash_fn, key_eq_fn, aux)
 
 #define FH_ENTRY(fhash_ptr, key)                                               \
     (ccc_fhash_entry)                                                          \
@@ -102,8 +102,7 @@ behavior is not needed consider using the entry api.
 If an insertion error occurs, due to a table resizing failure, a NULL and
 vacant entry is returned. Get methods will yeild false/NULL and the
 insertion error checking function will evaluate to true. */
-ccc_fhash_entry ccc_fh_insert(ccc_flat_hash *h, void *key,
-                              ccc_fhash_elem *out_handle);
+ccc_fhash_entry ccc_fh_insert(ccc_flat_hash *h, ccc_fhash_elem *out_handle);
 
 /** @brief Removes the entry stored at key, writing stored value to output.
 @param [in] h the hash table to query.
@@ -116,7 +115,7 @@ the previous hash table entry if one existed.
 
 This function should be used when one wishes to preserve the old value if
 one is present. If such behavior is not needed see the entry API. */
-void *ccc_fh_remove(ccc_flat_hash *h, void *key, ccc_fhash_elem *out_handle);
+void *ccc_fh_remove(ccc_flat_hash *h, ccc_fhash_elem *out_handle);
 
 /*========================    Entry API    ==================================*/
 

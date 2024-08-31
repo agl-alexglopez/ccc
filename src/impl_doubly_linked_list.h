@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+#include <assert.h>
 #include <stddef.h>
 
 typedef struct ccc_impl_dll_elem
@@ -17,7 +18,8 @@ struct ccc_impl_doubly_linked_list
     size_t elem_sz;
     size_t dll_elem_offset;
     size_t sz;
-    ccc_realloc_fn *fn;
+    ccc_realloc_fn *alloc;
+    ccc_cmp_fn *cmp;
     void *aux;
 };
 
@@ -30,14 +32,14 @@ ccc_impl_dll_elem_in(struct ccc_impl_doubly_linked_list const *,
                      void const *user_struct);
 
 #define CCC_IMPL_DLL_INIT(dll_ptr, dll_name, struct_name, dll_elem_field,      \
-                          realloc_fn, aux_data)                                \
+                          realloc_fn, cmp_fn, aux_data)                        \
     {                                                                          \
         {                                                                      \
             .sentinel.n = &(dll_name).impl.sentinel,                           \
             .sentinel.p = &(dll_name).impl.sentinel,                           \
             .elem_sz = sizeof(struct_name),                                    \
             .dll_elem_offset = offsetof(struct_name, dll_elem_field), .sz = 0, \
-            .fn = (realloc_fn), .aux = (aux_data)                              \
+            .alloc = (realloc_fn), .cmp = (cmp_fn), .aux = (aux_data),         \
         }                                                                      \
     }
 
@@ -45,13 +47,14 @@ ccc_impl_dll_elem_in(struct ccc_impl_doubly_linked_list const *,
     ({                                                                         \
         typeof(struct_initializer) *_dll_res_;                                 \
         struct ccc_impl_doubly_linked_list *_dll_ = &(dll_ptr)->impl;          \
-        if (!_dll_->fn || sizeof(*_dll_res_) != _dll_->elem_sz)                \
+        assert(sizeof(*_dll_res_) == _dll_->elem_sz);                          \
+        if (!_dll_->alloc)                                                     \
         {                                                                      \
             _dll_res_ = NULL;                                                  \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            _dll_res_ = _dll_->fn(NULL, _dll_->elem_sz);                       \
+            _dll_res_ = _dll_->alloc(NULL, _dll_->elem_sz);                    \
             if (_dll_res_)                                                     \
             {                                                                  \
                 *_dll_res_ = (typeof(*_dll_res_))struct_initializer;           \
@@ -66,13 +69,14 @@ ccc_impl_dll_elem_in(struct ccc_impl_doubly_linked_list const *,
     ({                                                                         \
         typeof(struct_initializer) *_dll_res_;                                 \
         struct ccc_impl_doubly_linked_list *_dll_ = &(dll_ptr)->impl;          \
-        if (!_dll_->fn || sizeof(*_dll_res_) != _dll_->elem_sz)                \
+        assert(sizeof(*_dll_res_) == _dll_->elem_sz);                          \
+        if (!_dll_->alloc)                                                     \
         {                                                                      \
             _dll_res_ = NULL;                                                  \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            _dll_res_ = _dll_->fn(NULL, _dll_->elem_sz);                       \
+            _dll_res_ = _dll_->alloc(NULL, _dll_->elem_sz);                    \
             if (_dll_res_)                                                     \
             {                                                                  \
                 *_dll_res_ = struct_initializer;                               \

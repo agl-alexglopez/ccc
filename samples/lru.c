@@ -1,7 +1,5 @@
 /** File: lru.c
----------------
-The leetcode Least Recently Used Cache problem in C. This combines the
-use of two containers, the doubly linked list and the hash table. */
+The leetcode lru problem in C. */
 #include "doubly_linked_list.h"
 #include "fhash/fhash_util.h"
 #include "flat_hash.h"
@@ -57,6 +55,8 @@ static int get(struct lru_cache *, int key);
 static struct key_val *hed(struct lru_cache *);
 static bool lru_lookup_cmp(ccc_key_cmp);
 
+static ccc_threeway_cmp cmp_by_key(ccc_cmp cmp);
+
 int
 main()
 {
@@ -68,8 +68,8 @@ run_lru_cache(void)
 {
     struct lru_cache lru = {
         .cap = 3,
-        .l
-        = CCC_DLL_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc, NULL),
+        .l = CCC_DLL_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc,
+                          cmp_by_key, NULL),
     };
     printf("LRU CAPACITY -> %zu\n", lru.cap);
     CCC_FH_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
@@ -93,23 +93,23 @@ run_lru_cache(void)
         {
         case PUT:
             requests[i].put(&lru, requests[i].key, requests[i].val);
-            CHECK(ccc_fh_validate(&lru.fh), true, "%d");
-            CHECK(ccc_dll_validate(&lru.l), true, "%d");
             printf("PUT -> {key: %d, val: %d}\n", requests[i].key,
                    requests[i].val);
+            CHECK(ccc_fh_validate(&lru.fh), true, "%d");
+            CHECK(ccc_dll_validate(&lru.l), true, "%d");
             break;
         case GET:
+            printf("GET -> {key: %d, val: %d}\n", requests[i].key,
+                   requests[i].val);
             CHECK(requests[i].get(&lru, requests[i].key), requests[i].val,
                   "%d");
             CHECK(ccc_dll_validate(&lru.l), true, "%d");
-            printf("GET -> {key: %d, val: %d}\n", requests[i].key,
-                   requests[i].val);
             break;
         case HED:
-            CHECK(requests[i].hed(&lru)->key, requests[i].key, "%d");
-            CHECK(requests[i].hed(&lru)->val, requests[i].val, "%d");
             printf("HED -> {key: %d, val: %d}\n", requests[i].key,
                    requests[i].val);
+            CHECK(requests[i].hed(&lru)->key, requests[i].key, "%d");
+            CHECK(requests[i].hed(&lru)->val, requests[i].val, "%d");
             break;
         default:
             break;
@@ -132,15 +132,12 @@ put(struct lru_cache *const lru, int key, int val)
         ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
         return;
     }
-    /* Having the entry hang around as a variable is dangerous. If we were to
-       remove the back entry before inserting this one the entry could be
-       invalidated due to internal changes in the table. Important to consider
-       when using such a pattern. */
-    FH_INSERT_ENTRY(ent, (struct lru_lookup){
-                             .key = key,
-                             .kv_in_list = DLL_EMPLACE_FRONT(
-                                 &lru->l, (struct key_val){key, val, {}}),
-                         });
+    FH_INSERT_ENTRY(ent,
+                    (struct lru_lookup){
+                        .key = key,
+                        .kv_in_list = DLL_EMPLACE_FRONT(
+                            &lru->l, (struct key_val){.key = key, .val = val}),
+                    });
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
@@ -172,4 +169,12 @@ lru_lookup_cmp(ccc_key_cmp const cmp)
 {
     struct lru_lookup const *const lookup = cmp.container;
     return lookup->key == *((int *)cmp.key);
+}
+
+static ccc_threeway_cmp
+cmp_by_key(ccc_cmp const cmp)
+{
+    struct key_val const *const kv_a = cmp.container_a;
+    struct key_val const *const kv_b = cmp.container_b;
+    return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }

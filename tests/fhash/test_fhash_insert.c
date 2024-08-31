@@ -64,7 +64,7 @@ fhash_test_insert(void)
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_fhash_entry ent = ccc_fh_insert(&fh, &query.id, &query.e);
+    ccc_fhash_entry ent = ccc_fh_insert(&fh, &query.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK(ccc_fh_get(ent), NULL, "%p");
     return PASS;
@@ -79,7 +79,7 @@ fhash_test_insert_overwrite(void)
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
-    ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.id, &q.e);
+    ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK(ccc_fh_get(ent), NULL, "%p");
     CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 99, "%d");
@@ -89,7 +89,7 @@ fhash_test_insert_overwrite(void)
     q = (struct val){.id = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_fhash_entry old_ent = ccc_fh_insert(&fh, &q.id, &q.e);
+    ccc_fhash_entry old_ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(old_ent), true, "%d");
 
     /* The old contents are now in q and the entry is in the table. */
@@ -108,7 +108,7 @@ fhash_test_insert_then_bad_ideas(void)
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
-    ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.id, &q.e);
+    ccc_fhash_entry ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(ent), false, "%d");
     CHECK(ccc_fh_get(ent), NULL, "%p");
     CHECK(((struct val *)ccc_fh_get(ccc_fh_entry(&fh, &q.id)))->val, 99, "%d");
@@ -119,7 +119,7 @@ fhash_test_insert_then_bad_ideas(void)
 
     q = (struct val){.id = 137, .val = 100};
 
-    ccc_fhash_entry new_ent = ccc_fh_insert(&fh, &q.id, &q.e);
+    ccc_fhash_entry new_ent = ccc_fh_insert(&fh, &q.e);
     CHECK(ccc_fh_occupied(new_ent), true, "%d");
     CHECK(((struct val *)ccc_fh_get(new_ent))->val, 100, "%d");
     CHECK(q.val, 99, "%d");
@@ -403,7 +403,7 @@ fhash_test_resize(void)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.id, &swap_slot.e));
+            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.e));
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         CHECK(swap_slot.val, i, "%d");
@@ -475,7 +475,7 @@ fhash_test_resize_from_null(void)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.id, &swap_slot.e));
+            = ccc_fh_get(ccc_fh_insert(&fh, &swap_slot.e));
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         CHECK(swap_slot.val, i, "%d");
@@ -549,7 +549,7 @@ fhash_test_insert_limit(void)
     size_t const final_size = ccc_fh_size(&fh);
     /* The last successful entry is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
-    ccc_fhash_entry ent = ccc_fh_insert(&fh, &v.id, &v.e);
+    ccc_fhash_entry ent = ccc_fh_insert(&fh, &v.e);
     CHECK(ccc_fh_get(ent) != NULL, true, "%d");
     CHECK(ccc_fh_insert_error(ent), false, "%d");
     CHECK(((struct val *)ccc_fh_get(ent))->val, -1, "%d");
@@ -579,7 +579,7 @@ fhash_test_insert_limit(void)
     CHECK(in_table == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");
 
-    ent = ccc_fh_insert(&fh, &v.id, &v.e);
+    ent = ccc_fh_insert(&fh, &v.e);
     CHECK(ccc_fh_get(ent) == NULL, true, "%d");
     CHECK(ccc_fh_insert_error(ent), true, "%d");
     CHECK(ccc_fh_size(&fh), final_size, "%zu");

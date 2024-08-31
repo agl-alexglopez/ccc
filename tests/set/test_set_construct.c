@@ -30,7 +30,7 @@ main()
 static enum test_result
 set_test_empty(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, s, val_cmp, NULL);
-    CHECK(ccc_set_empty(&s), true, "%d");
+    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    CHECK(ccc_s_empty(&s), true, "%d");
     return PASS;
 }

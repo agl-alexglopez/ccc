@@ -318,7 +318,7 @@ main(int argc, char **argv)
     find_shortest_paths(&graph);
     set_cursor_position(graph.rows + 1, graph.cols + 1);
     printf("\n");
-    ccc_set_clear(&graph.adjacency_list, set_vertex_destructor);
+    ccc_s_clear(&graph.adjacency_list, set_vertex_destructor);
 }
 
 /*========================   Graph Building    ==============================*/
@@ -347,7 +347,7 @@ build_graph(struct graph *const graph)
             .pos = rand_point,
             .edges = {{0}, {0}, {0}, {0}},
         };
-        if (!ccc_set_insert(&graph->adjacency_list, &new_vertex->elem))
+        if (!ccc_s_insert(&graph->adjacency_list, &new_vertex->elem))
         {
             quit("Error building vertices. New vertex is already present.\n",
                  1);
@@ -359,7 +359,7 @@ build_graph(struct graph *const graph)
     {
         key.name = (char)vertex_title;
         struct vertex *const src
-            = ccc_set_find(&graph->adjacency_list, &key.elem);
+            = ccc_s_find(&graph->adjacency_list, &key.elem);
         if (!src)
         {
             quit("Vertex that should be present in the set is absent.\n", 1);
@@ -379,7 +379,7 @@ build_graph(struct graph *const graph)
 static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
-    size_t const graph_size = ccc_set_size(&graph->adjacency_list);
+    size_t const graph_size = ccc_s_size(&graph->adjacency_list);
     /* Bounded at size of the alphabet A-Z so alloca is fine here. */
     size_t vertex_title_indices[sizeof(size_t) * graph_size];
     for (size_t i = 0; i < graph_size; ++i)
@@ -397,7 +397,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        dst = ccc_set_find(&graph->adjacency_list, &key.elem);
+        dst = ccc_s_find(&graph->adjacency_list, &key.elem);
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -762,8 +762,8 @@ static void
 prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
                  ccc_flat_hash *prev_map, struct path_request const *pr)
 {
-    for (struct vertex *v = ccc_set_begin(&graph->adjacency_list); v;
-         v = ccc_set_next(&graph->adjacency_list, &v->elem))
+    for (struct vertex *v = ccc_s_begin(&graph->adjacency_list); v;
+         v = ccc_s_next(&graph->adjacency_list, &v->elem))
     {
         struct dist_point *p = valid_malloc(sizeof(struct dist_point));
         *p = (struct dist_point){
@@ -1125,13 +1125,13 @@ parse_path_request(struct graph *const g, str_view r)
     }
     struct path_request res = {0};
     char const end_title
-        = (char)(start_vertex_title + ccc_set_size(&g->adjacency_list) - 1);
+        = (char)(start_vertex_title + ccc_s_size(&g->adjacency_list) - 1);
     for (char const *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex key = {.name = *c};
-            struct vertex *v = ccc_set_find(&g->adjacency_list, &key.elem);
+            struct vertex *v = ccc_s_find(&g->adjacency_list, &key.elem);
             res.src ? (res.dst = v) : (res.src = v);
         }
     }
