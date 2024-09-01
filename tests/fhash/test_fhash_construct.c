@@ -63,8 +63,7 @@ fhash_test_entry_functional(void)
     CHECK(ccc_fh_unwrap(ent) == NULL, true, "%d");
     ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
         += 1;
-    struct val const *const inserted
-        = ccc_fh_unwrap(ccc_fh_entry(&fh, &def.id));
+    struct val const *const inserted = ccc_fh_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->val, 1, "%d");
     ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
@@ -82,7 +81,7 @@ fhash_test_entry_macros(void)
                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fh_empty(&fh), true, "%d");
-    CHECK(ccc_fh_unwrap(FH_ENTRY(&fh, 137)) == NULL, true, "%d");
+    CHECK(FH_GET(&fh, 137) == NULL, true, "%d");
     int const key = 137;
     int mut = 99;
     /* The function with a side effect should execute. */
@@ -118,8 +117,7 @@ fhash_test_entry_and_modify_functional(void)
     /* Inserting default value before an in place modification is possible. */
     ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
         += 1;
-    struct val const *const inserted
-        = ccc_fh_unwrap(ccc_fh_entry(&fh, &def.id));
+    struct val const *const inserted = ccc_fh_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
     CHECK(inserted->val, 1, "%d");

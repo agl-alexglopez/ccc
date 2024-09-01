@@ -61,7 +61,7 @@ struct ccc_impl_fhash_entry ccc_impl_fhash_entry(struct ccc_impl_flat_hash *h,
                                                  void const *key);
 struct ccc_impl_fhash_entry
 ccc_impl_fh_and_modify(struct ccc_impl_fhash_entry e, ccc_update_fn *fn);
-void const *ccc_impl_fh_get(struct ccc_impl_fhash_entry *e);
+void const *ccc_impl_fh_unwrap(struct ccc_impl_fhash_entry *e);
 
 struct ccc_impl_fhash_elem *
 ccc_impl_fh_in_slot(struct ccc_impl_flat_hash const *h, void const *slot);
@@ -80,17 +80,36 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
         _fh_ent_;                                                              \
     })
 
+#define CCC_IMPL_FH_GET(fhash_ptr, key)                                        \
+    ({                                                                         \
+        __auto_type const _fh_key_ = (key);                                    \
+        struct ccc_impl_fhash_entry _fh_get_ent_                               \
+            = ccc_impl_fhash_entry(&(fhash_ptr)->impl, &_fh_key_);             \
+        void const *_fh_get_res_ = NULL;                                       \
+        if (_fh_get_ent_.entry.status & CCC_FH_ENTRY_OCCUPIED)                 \
+        {                                                                      \
+            _fh_get_res_ = _fh_get_ent_.entry.entry;                           \
+        }                                                                      \
+        _fh_get_res_;                                                          \
+    })
+
+#define CCC_IMPL_FH_GET_MUT(fhash_ptr, key)                                    \
+    ({                                                                         \
+        void *_fh_get_mut_res_ = (void *)CCC_IMPL_FH_GET(fhash_ptr, key);      \
+        _fh_get_mut_res_;                                                      \
+    })
+
 #define CCC_IMPL_FH_UNWRAP(entry_copy)                                         \
     ({                                                                         \
         struct ccc_impl_fhash_entry _fh_get_ent_ = (entry_copy).impl;          \
-        void const *_ret_ = ccc_impl_fh_get(&_fh_get_ent_);                    \
+        void const *_ret_ = ccc_impl_fh_unwrap(&_fh_get_ent_);                 \
         _ret_;                                                                 \
     })
 
 #define CCC_IMPL_FH_UNWRAP_MUT(entry_copy)                                     \
     ({                                                                         \
         struct ccc_impl_fhash_entry _fh_get_ent_ = (entry_copy).impl;          \
-        void *_fh_ret_ = (void *)ccc_impl_fh_get(&_fh_get_ent_);               \
+        void *_fh_ret_ = (void *)ccc_impl_fh_unwrap(&_fh_get_ent_);            \
         _fh_ret_;                                                              \
     })
 

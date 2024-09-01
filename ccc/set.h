@@ -54,6 +54,10 @@ void *ccc_s_or_insert(ccc_set_entry e, ccc_set_elem *elem);
 
 ccc_set_entry ccc_s_and_modify(ccc_set_entry e, ccc_update_fn *fn);
 
+void const *ccc_s_get(ccc_set *s, void const *key);
+
+void *ccc_s_get_mut(ccc_set *s, void const *key);
+
 ccc_set_entry ccc_s_and_modify_with(ccc_set_entry e, ccc_update_fn *fn,
                                     void *aux);
 

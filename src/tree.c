@@ -552,6 +552,18 @@ ccc_s_remove_entry(ccc_set_entry e)
     return e;
 }
 
+void *
+ccc_s_get_mut(ccc_set *s, void const *const key)
+{
+    return (void *)find(&s->impl, key);
+}
+
+void const *
+ccc_s_get(ccc_set *s, void const *const key)
+{
+    return find(&s->impl, key);
+}
+
 inline void *
 ccc_s_unwrap_mut(ccc_set_entry e)
 {
