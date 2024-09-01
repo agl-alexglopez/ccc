@@ -56,8 +56,8 @@ target_link_libraries(double_ended_priority_queue
     impl_tree
 )
 
-add_library(set set.h ${CMAKE_SOURCE_DIR}/src/tree.c)
-target_link_libraries(set
+add_library(map map.h ${CMAKE_SOURCE_DIR}/src/tree.c)
+target_link_libraries(map
   INTERFACE
     types
   PRIVATE

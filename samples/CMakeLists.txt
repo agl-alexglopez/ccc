@@ -3,7 +3,7 @@ target_link_libraries(maze PRIVATE
   cli
   random
   str_view::str_view
-  set
+  map
   double_ended_priority_queue
 )
 
@@ -13,7 +13,7 @@ target_link_libraries(graph PRIVATE
   random
   str_view::str_view
   flat_hash
-  set
+  map
   priority_queue
   queue
   flat_priority_queue
