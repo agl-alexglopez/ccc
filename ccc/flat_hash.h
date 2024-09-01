@@ -44,6 +44,10 @@ initialization is successful or a failure. */
     CCC_IMPL_FH_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
                      fhash_elem_field, realloc_fn, hash_fn, key_eq_fn, aux)
 
+#define FH_GET(fhash_ptr, key) CCC_IMPL_FH_GET(fhash_ptr, key)
+
+#define FH_GET_MUT(fhash_ptr, key) CCC_IMPL_FH_GET_MUT(fhash_ptr, key)
+
 #define FH_ENTRY(fhash_ptr, key)                                               \
     (ccc_fhash_entry)                                                          \
     {                                                                          \

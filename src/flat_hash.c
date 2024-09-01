@@ -220,17 +220,17 @@ ccc_fh_or_insert(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 inline void const *
 ccc_fh_unwrap(ccc_fhash_entry e)
 {
-    return ccc_impl_fh_get(&e.impl);
+    return ccc_impl_fh_unwrap(&e.impl);
 }
 
 inline void *
 ccc_fh_unwrap_mut(ccc_fhash_entry e)
 {
-    return (void *)ccc_impl_fh_get(&e.impl);
+    return (void *)ccc_impl_fh_unwrap(&e.impl);
 }
 
 inline void const *
-ccc_impl_fh_get(struct ccc_impl_fhash_entry *e)
+ccc_impl_fh_unwrap(struct ccc_impl_fhash_entry *e)
 {
     if (!(e->entry.status & CCC_FH_ENTRY_OCCUPIED))
     {

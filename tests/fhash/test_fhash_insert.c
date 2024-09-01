@@ -131,8 +131,7 @@ fhash_test_insert_then_bad_ideas(void)
     /* Now the expected behavior of or insert shall occur and no insertion
        will happen because the value is already occupied in the table. */
     CHECK(((struct val *)ccc_fh_or_insert(new_ent, &q.e))->val, 100, "%d");
-    CHECK(((struct val *)ccc_fh_unwrap(ccc_fh_entry(&fh, &q.id)))->val, 100,
-          "%d");
+    CHECK(((struct val *)ccc_fh_get(&fh, &q.id))->val, 100, "%d");
     CHECK(q.val, 90, "%d");
     return PASS;
 }
@@ -362,8 +361,7 @@ fhash_test_two_sum(void)
     int indices[2] = {-1, -1};
     for (int i = 0; i < 10; ++i)
     {
-        struct val const *const v
-            = FH_UNWRAP(FH_ENTRY(&fh, target - addends[i]));
+        struct val const *const v = FH_GET(&fh, target - addends[i]);
         if (v)
         {
             indices[0] = i;
@@ -449,7 +447,7 @@ fhash_test_resize_macros(void)
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         FH_OR_INSERT(FH_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val const *v = FH_UNWRAP(FH_ENTRY(&fh, shuffled_index));
+        struct val const *v = FH_GET(&fh, shuffled_index);
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
@@ -519,7 +517,7 @@ fhash_test_resize_from_null_macros(void)
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         FH_OR_INSERT(FH_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val *v = FH_UNWRAP_MUT(FH_ENTRY(&fh, shuffled_index));
+        struct val *v = FH_GET_MUT(&fh, shuffled_index);
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
