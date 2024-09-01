@@ -97,20 +97,20 @@ add_pq_test(test_pq_insert)
 add_pq_test(test_pq_erase)
 add_pq_test(test_pq_update)
 
-#############  Set  ##########################
-add_library(set_util set/set_util.h set/set_util.c)
-target_link_libraries(set_util
+#############  Map  ##########################
+add_library(map_util map/map_util.h map/map_util.c)
+target_link_libraries(map_util
   PRIVATE
-    set
+    map
     test
 )
 
-macro(add_set_test TEST_NAME)
-  add_executable(${TEST_NAME} set/${TEST_NAME}.c)
+macro(add_map_test TEST_NAME)
+  add_executable(${TEST_NAME} map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      set_util
-      set
+      map_util
+      map
       test
   )
   set_target_properties(${TEST_NAME} 
@@ -120,10 +120,10 @@ macro(add_set_test TEST_NAME)
   )
 endmacro()
 
-add_set_test(test_set_construct)
-add_set_test(test_set_insert)
-add_set_test(test_set_erase)
-add_set_test(test_set_iter)
+add_map_test(test_map_construct)
+add_map_test(test_map_insert)
+add_map_test(test_map_erase)
+add_map_test(test_map_iter)
 
 #############  fhash  ##########################
 

@@ -3,13 +3,13 @@
    ============
    This file provides a simple maze builder that implements Prim's algorithm
    to randomly generate a maze. I chose this algorithm because it can use
-   both a ccc_set and a priority queue to acheive its purpose. Such data
+   both a ccc_map and a priority queue to acheive its purpose. Such data
    structures are provided by the library offering a perfect sample program
    opportunity. */
 #include "cli.h"
 #include "double_ended_priority_queue.h"
+#include "map.h"
 #include "random.h"
-#include "set.h"
 #include "str_view/str_view.h"
 
 #include <assert.h>
@@ -62,7 +62,7 @@ struct point_cost
 {
     struct point p;
     int cost;
-    ccc_set_elem elem;
+    ccc_mp_elem elem;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -200,20 +200,20 @@ static void
 animate_maze(struct maze *maze)
 {
     /* Setting up the data structures needed should look similar to C++.
-       A ccc_set could be replaced by a 2D vector copy of the maze with costs
+       A ccc_map could be replaced by a 2D vector copy of the maze with costs
        mapped but the purpose of this program is to test both the set
        and priority queue data structures. Also a 2D vector wastes space. */
     ccc_double_ended_priority_queue cells
         = CCC_DEPQ_INIT(struct priority_cell, elem, priority, cells, NULL,
                         cmp_priority_cells, NULL);
-    ccc_set cell_costs = CCC_SET_INIT(struct point_cost, elem, p, cell_costs,
-                                      NULL, cmp_points, NULL);
+    ccc_map cell_costs = CCC_M_INIT(struct point_cost, elem, p, cell_costs,
+                                    NULL, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)ccc_s_insert(&cell_costs, &odd_point->elem);
+    (void)ccc_m_insert(&cell_costs, &odd_point->elem);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
@@ -242,7 +242,7 @@ animate_maze(struct maze *maze)
             }
             int cur_weight = 0;
             struct point_cost const *const found
-                = ccc_s_unwrap(ccc_s_entry(&cell_costs, &next));
+                = ccc_m_unwrap(ccc_m_entry(&cell_costs, &next));
             if (!found)
             {
                 struct point_cost *new_cost
@@ -252,8 +252,8 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                bool const inserted = ccc_s_insert_entry(
-                    ccc_s_entry(&cell_costs, &new_cost->p), &new_cost->elem);
+                bool const inserted = ccc_m_insert_entry(
+                    ccc_m_entry(&cell_costs, &new_cost->p), &new_cost->elem);
                 (void)inserted;
                 assert(inserted);
             }
@@ -290,7 +290,7 @@ animate_maze(struct maze *maze)
        determined the course of the maze building. It has no hidden allocations
        either so no more work is needed if we know it's empty and the data
        structure metadata is on the stack. */
-    ccc_s_clear(&cell_costs, set_destructor);
+    ccc_m_clear(&cell_costs, set_destructor);
 }
 
 static struct point
@@ -545,7 +545,7 @@ help(void)
     (void)fprintf(
         stdout, "Maze Builder:\nBuilds a Perfect Maze with Prim's "
                 "Algorithm to demonstrate usage of the priority "
-                "queue and ccc_set provided by this library.\nUsage:\n-r=N The "
+                "queue and ccc_map provided by this library.\nUsage:\n-r=N The "
                 "row flag lets you specify maze rows > 7.\n-c=N The col flag "
                 "lets you specify maze cols > 7.\n-s=N The speed flag lets "
                 "you specify the speed of the animation "

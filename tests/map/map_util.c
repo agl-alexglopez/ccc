@@ -1,4 +1,4 @@
-#include "set_util.h"
+#include "map_util.h"
 #include "test.h"
 
 #include <stdio.h>
@@ -12,14 +12,14 @@ val_cmp(ccc_key_cmp const cmp)
 }
 
 void
-set_printer_fn(void const *const container)
+map_printer_fn(void const *const container)
 {
     struct val const *const v = container;
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
 enum test_result
-insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
+insert_shuffled(ccc_map *m, struct val vals[], size_t const size,
                 int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -31,25 +31,25 @@ insert_shuffled(ccc_set *s, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_s_insert(s, &vals[shuffled_index].elem);
-        CHECK(ccc_s_size(s), i + 1, "%zu");
-        CHECK(ccc_s_validate(s), true, "%d");
+        ccc_m_insert(m, &vals[shuffled_index].elem);
+        CHECK(ccc_m_size(m), i + 1, "%zu");
+        CHECK(ccc_m_validate(m), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_s_size(s), size, "%zu");
+    CHECK(ccc_m_size(m), size, "%zu");
     return PASS;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_set *s)
+inorder_fill(int vals[], size_t size, ccc_map *m)
 {
-    if (ccc_s_size(s) != size)
+    if (ccc_m_size(m) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_s_begin(s); e; e = ccc_s_next(s, &e->elem))
+    for (struct val *e = ccc_m_begin(m); e; e = ccc_m_next(m, &e->elem))
     {
         vals[i++] = e->val;
     }

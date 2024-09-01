@@ -1,15 +1,15 @@
-#include "set.h"
-#include "set_util.h"
+#include "map.h"
+#include "map_util.h"
 #include "test.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
-static enum test_result set_test_empty(void);
+static enum test_result map_test_empty(void);
 
 #define NUM_TESTS ((size_t)1)
 test_fn const all_tests[NUM_TESTS] = {
-    set_test_empty,
+    map_test_empty,
 };
 
 int
@@ -28,9 +28,9 @@ main()
 }
 
 static enum test_result
-set_test_empty(void)
+map_test_empty(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(ccc_s_empty(&s), true, "%d");
+    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    CHECK(ccc_m_empty(&s), true, "%d");
     return PASS;
 }

@@ -1,5 +1,5 @@
-#include "set.h"
-#include "set_util.h"
+#include "map.h"
+#include "map_util.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -9,15 +9,15 @@
 #include <string.h>
 #include <time.h>
 
-static enum test_result set_test_insert_erase_shuffled(void);
-static enum test_result set_test_prime_shuffle(void);
-static enum test_result set_test_weak_srand(void);
+static enum test_result map_test_insert_erase_shuffled(void);
+static enum test_result map_test_prime_shuffle(void);
+static enum test_result map_test_weak_srand(void);
 
 #define NUM_TESTS ((size_t)3)
 test_fn const all_tests[NUM_TESTS] = {
-    set_test_insert_erase_shuffled,
-    set_test_prime_shuffle,
-    set_test_weak_srand,
+    map_test_insert_erase_shuffled,
+    map_test_prime_shuffle,
+    map_test_weak_srand,
 };
 
 int
@@ -36,9 +36,9 @@ main()
 }
 
 static enum test_result
-set_test_prime_shuffle(void)
+map_test_prime_shuffle(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -52,29 +52,29 @@ set_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_s_unwrap(ccc_s_insert(&s, &vals[i].elem)))
+        if (ccc_m_unwrap(ccc_m_insert(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }
-        CHECK(ccc_s_validate(&s), true, "%d");
+        CHECK(ccc_m_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_s_print(&s, &((struct val *)ccc_s_root(&s))->elem, set_printer_fn);
-    CHECK(ccc_s_size(&s) < size, true, "%d");
+    ccc_m_print(&s, &((struct val *)ccc_m_root(&s))->elem, map_printer_fn);
+    CHECK(ccc_m_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        void *const elem = ccc_s_remove(&s, &vals[i].elem);
+        void *const elem = ccc_m_remove(&s, &vals[i].elem);
         CHECK(elem || repeats[i], true, "%d");
-        CHECK(ccc_s_validate(&s), true, "%d");
+        CHECK(ccc_m_validate(&s), true, "%d");
     }
     return PASS;
 }
 
 static enum test_result
-set_test_insert_erase_shuffled(void)
+map_test_insert_erase_shuffled(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -88,17 +88,17 @@ set_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_s_remove(&s, &vals[i].elem);
-        CHECK(ccc_s_validate(&s), true, "%d");
+        (void)ccc_m_remove(&s, &vals[i].elem);
+        CHECK(ccc_m_validate(&s), true, "%d");
     }
-    CHECK(ccc_s_empty(&s), true, "%d");
+    CHECK(ccc_m_empty(&s), true, "%d");
     return PASS;
 }
 
 static enum test_result
-set_test_weak_srand(void)
+map_test_weak_srand(void)
 {
-    ccc_set s = CCC_SET_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -108,15 +108,15 @@ set_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)ccc_s_insert(&s, &vals[i].elem);
-        CHECK(ccc_s_validate(&s), true, "%d");
+        (void)ccc_m_insert(&s, &vals[i].elem);
+        CHECK(ccc_m_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_s_contains(&s, &vals[i].val), true, "%d");
-        (void)ccc_s_remove(&s, &vals[i].elem);
-        CHECK(ccc_s_validate(&s), true, "%d");
+        CHECK(ccc_m_contains(&s, &vals[i].val), true, "%d");
+        (void)ccc_m_remove(&s, &vals[i].elem);
+        CHECK(ccc_m_validate(&s), true, "%d");
     }
-    CHECK(ccc_s_empty(&s), true, "%d");
+    CHECK(ccc_m_empty(&s), true, "%d");
     return PASS;
 }
