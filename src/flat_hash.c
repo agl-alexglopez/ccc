@@ -63,11 +63,11 @@ ccc_fh_size(ccc_flat_hash const *const h)
 ccc_fhash_entry
 ccc_fh_entry(ccc_flat_hash *h, void const *const key)
 {
-    return (ccc_fhash_entry){ccc_impl_fhash_entry(&h->impl, key)};
+    return (ccc_fhash_entry){ccc_impl_fh_entry(&h->impl, key)};
 }
 
 struct ccc_impl_fhash_entry
-ccc_impl_fhash_entry(struct ccc_impl_flat_hash *h, void const *key)
+ccc_impl_fh_entry(struct ccc_impl_flat_hash *h, void const *key)
 {
     uint64_t const hash = ccc_impl_fh_filter(h, key);
     return (struct ccc_impl_fhash_entry){
@@ -158,9 +158,9 @@ ccc_fhash_entry
 ccc_fh_insert(ccc_flat_hash *h, ccc_fhash_elem *const out_handle)
 {
     void *user_return = struct_base(&h->impl, &out_handle->impl);
-    void *key = ccc_impl_h_key_in_slot(&h->impl, user_return);
+    void *key = ccc_impl_fh_key_in_slot(&h->impl, user_return);
     size_t const user_struct_size = ccc_buf_elem_size(&h->impl.buf);
-    struct ccc_impl_fhash_entry ent = ccc_impl_fhash_entry(&h->impl, key);
+    struct ccc_impl_fhash_entry ent = ccc_impl_fh_entry(&h->impl, key);
     if (ent.entry.status & CCC_FH_ENTRY_OCCUPIED)
     {
         /* If an error occured when obtaining the entry and trying to resize,
@@ -187,7 +187,7 @@ void *
 ccc_fh_remove(ccc_flat_hash *const h, ccc_fhash_elem *const out_handle)
 {
     void *ret = struct_base(&h->impl, &out_handle->impl);
-    void *key = ccc_impl_h_key_in_slot(&h->impl, ret);
+    void *key = ccc_impl_fh_key_in_slot(&h->impl, ret);
     ccc_entry const ent
         = ccc_impl_fh_find(&h->impl, key, ccc_impl_fh_filter(&h->impl, key));
     if (ent.status == CCC_FH_ENTRY_VACANT)
@@ -372,7 +372,7 @@ erase(struct ccc_impl_flat_hash *const h, void *const e)
     size_t const cap = ccc_buf_capacity(&h->buf);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf);
     size_t stopped_at = ccc_buf_index_of(&h->buf, e);
-    *ccc_impl_hash_at(h, stopped_at) = CCC_FH_EMPTY;
+    *ccc_impl_fh_hash_at(h, stopped_at) = CCC_FH_EMPTY;
     size_t next = (stopped_at + 1) % cap;
     uint8_t tmp[ccc_buf_elem_size(&h->buf)];
     for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
@@ -427,7 +427,7 @@ ccc_impl_fh_maybe_resize(struct ccc_impl_flat_hash *h)
         if (e->hash != CCC_FH_EMPTY)
         {
             ccc_entry new_ent = ccc_impl_fh_find(
-                &new_hash, ccc_impl_h_key_in_slot(h, slot), e->hash);
+                &new_hash, ccc_impl_fh_key_in_slot(h, slot), e->hash);
             ccc_impl_fh_insert(&new_hash, slot, e->hash,
                                ccc_buf_index_of(&new_hash.buf, new_ent.entry));
         }
@@ -517,7 +517,7 @@ ccc_impl_fh_in_slot(struct ccc_impl_flat_hash const *const h,
 }
 
 void *
-ccc_impl_h_key_in_slot(struct ccc_impl_flat_hash const *h, void const *slot)
+ccc_impl_fh_key_in_slot(struct ccc_impl_flat_hash const *h, void const *slot)
 {
     return (uint8_t *)slot + h->key_offset;
 }
@@ -567,7 +567,7 @@ swap(uint8_t tmp[], void *const a, void *const b, size_t ab_size)
 }
 
 inline uint64_t *
-ccc_impl_hash_at(struct ccc_impl_flat_hash const *const h, size_t const i)
+ccc_impl_fh_hash_at(struct ccc_impl_flat_hash const *const h, size_t const i)
 {
     return &((struct ccc_impl_fhash_elem *)((uint8_t *)ccc_buf_at(&h->buf, i)
                                             + h->hash_elem_offset))
@@ -618,7 +618,7 @@ valid_distance_from_home(struct ccc_impl_flat_hash const *h, void const *slot)
                 distance_to_home = ccc_impl_fh_distance(cap, i, hash);
          i != end; --distance_to_home, (i = i ? i - 1 : cap - 1))
     {
-        uint64_t const cur_hash = *ccc_impl_hash_at(h, i);
+        uint64_t const cur_hash = *ccc_impl_fh_hash_at(h, i);
         /* The only reason an element is not home is because it has been moved
            away to help another element be closer to its home. This would
            break the purpose of doing that. Upon erase everyone needs to

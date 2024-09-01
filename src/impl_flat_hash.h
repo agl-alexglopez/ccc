@@ -57,17 +57,17 @@ ccc_entry ccc_impl_fh_find(struct ccc_impl_flat_hash const *, void const *key,
 void ccc_impl_fh_insert(struct ccc_impl_flat_hash *h, void const *e,
                         uint64_t hash, size_t cur_i);
 
-struct ccc_impl_fhash_entry ccc_impl_fhash_entry(struct ccc_impl_flat_hash *h,
-                                                 void const *key);
+struct ccc_impl_fhash_entry ccc_impl_fh_entry(struct ccc_impl_flat_hash *h,
+                                              void const *key);
 struct ccc_impl_fhash_entry
 ccc_impl_fh_and_modify(struct ccc_impl_fhash_entry e, ccc_update_fn *fn);
 void const *ccc_impl_fh_unwrap(struct ccc_impl_fhash_entry *e);
 
 struct ccc_impl_fhash_elem *
 ccc_impl_fh_in_slot(struct ccc_impl_flat_hash const *h, void const *slot);
-void *ccc_impl_h_key_in_slot(struct ccc_impl_flat_hash const *h,
-                             void const *slot);
-uint64_t *ccc_impl_hash_at(struct ccc_impl_flat_hash const *h, size_t i);
+void *ccc_impl_fh_key_in_slot(struct ccc_impl_flat_hash const *h,
+                              void const *slot);
+uint64_t *ccc_impl_fh_hash_at(struct ccc_impl_flat_hash const *h, size_t i);
 size_t ccc_impl_fh_distance(size_t capacity, size_t index, uint64_t hash);
 ccc_result ccc_impl_fh_maybe_resize(struct ccc_impl_flat_hash *);
 uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
@@ -76,7 +76,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
     ({                                                                         \
         __auto_type const _fh_key_ = (key);                                    \
         struct ccc_impl_fhash_entry _fh_ent_                                   \
-            = ccc_impl_fhash_entry(&(fhash_ptr)->impl, &_fh_key_);             \
+            = ccc_impl_fh_entry(&(fhash_ptr)->impl, &_fh_key_);                \
         _fh_ent_;                                                              \
     })
 
@@ -84,7 +84,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
     ({                                                                         \
         __auto_type const _fh_key_ = (key);                                    \
         struct ccc_impl_fhash_entry _fh_get_ent_                               \
-            = ccc_impl_fhash_entry(&(fhash_ptr)->impl, &_fh_key_);             \
+            = ccc_impl_fh_entry(&(fhash_ptr)->impl, &_fh_key_);                \
         void const *_fh_get_res_ = NULL;                                       \
         if (_fh_get_ent_.entry.status & CCC_FH_ENTRY_OCCUPIED)                 \
         {                                                                      \
@@ -136,12 +136,12 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
     ({                                                                         \
         size_t _fh_i_ = ccc_buf_index_of(&((swap_entry).h->buf),               \
                                          (swap_entry).entry.entry);            \
-        if (*ccc_impl_hash_at((swap_entry).h, _fh_i_) == CCC_FH_EMPTY)         \
+        if (*ccc_impl_fh_hash_at((swap_entry).h, _fh_i_) == CCC_FH_EMPTY)      \
         {                                                                      \
             *((typeof(key_val_struct) *)ccc_buf_at(&((swap_entry).h->buf),     \
                                                    _fh_i_))                    \
                 = key_val_struct;                                              \
-            *ccc_impl_hash_at((swap_entry).h, _fh_i_) = (swap_entry).hash;     \
+            *ccc_impl_fh_hash_at((swap_entry).h, _fh_i_) = (swap_entry).hash;  \
             ++(swap_entry).h->buf.impl.sz;                                     \
         }                                                                      \
         else                                                                   \
@@ -152,7 +152,7 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
             *((typeof(_fh_cur_slot_) *)ccc_buf_at(&((swap_entry).h->buf),      \
                                                   _fh_i_))                     \
                 = key_val_struct;                                              \
-            *ccc_impl_hash_at((swap_entry).h, _fh_i_) = (swap_entry).hash;     \
+            *ccc_impl_fh_hash_at((swap_entry).h, _fh_i_) = (swap_entry).hash;  \
             _fh_i_ = (_fh_i_ + 1) % ccc_buf_capacity(&((swap_entry).h->buf));  \
             ccc_impl_fh_insert(                                                \
                 (swap_entry).h, &_fh_cur_slot_,                                \
