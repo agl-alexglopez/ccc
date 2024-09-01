@@ -57,9 +57,9 @@ ccc_set_entry ccc_s_and_modify(ccc_set_entry e, ccc_update_fn *fn);
 ccc_set_entry ccc_s_and_modify_with(ccc_set_entry e, ccc_update_fn *fn,
                                     void *aux);
 
-void const *ccc_s_get(ccc_set_entry e);
+void const *ccc_s_unwrap(ccc_set_entry e);
 
-void *ccc_s_get_mut(ccc_set_entry e);
+void *ccc_s_unwrap_mut(ccc_set_entry e);
 
 void *ccc_s_insert_entry(ccc_set_entry e, ccc_set_elem *elem);
 

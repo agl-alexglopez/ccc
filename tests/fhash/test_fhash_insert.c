@@ -362,7 +362,8 @@ fhash_test_two_sum(void)
     int indices[2] = {-1, -1};
     for (int i = 0; i < 10; ++i)
     {
-        struct val const *const v = FH_GET(FH_ENTRY(&fh, target - addends[i]));
+        struct val const *const v
+            = FH_UNWRAP(FH_ENTRY(&fh, target - addends[i]));
         if (v)
         {
             indices[0] = i;
@@ -448,7 +449,7 @@ fhash_test_resize_macros(void)
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         FH_OR_INSERT(FH_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val const *v = FH_GET(FH_ENTRY(&fh, shuffled_index));
+        struct val const *v = FH_UNWRAP(FH_ENTRY(&fh, shuffled_index));
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
@@ -518,7 +519,7 @@ fhash_test_resize_from_null_macros(void)
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
         FH_OR_INSERT(FH_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val *v = FH_GET_MUT(FH_ENTRY(&fh, shuffled_index));
+        struct val *v = FH_UNWRAP_MUT(FH_ENTRY(&fh, shuffled_index));
         CHECK(v->val, i, "%d");
     }
     CHECK(ccc_fh_clear_and_free(&fh, NULL), CCC_OK, "%d");
@@ -629,7 +630,7 @@ fhash_test_insert_wrong_type(void)
                          (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 1, "%zu");
-    CHECK(((struct val *)FH_GET(FH_ENTRY(&fh, 137)))->val, 138, "%d");
+    CHECK(((struct val *)FH_UNWRAP(FH_ENTRY(&fh, 137)))->val, 138, "%d");
     /* This is somewhat nonsense as why would someone modify then overwrite
        the previous value? However, it's possible. The modification will
        still work before the overwrite insertion fails. */
@@ -637,6 +638,6 @@ fhash_test_insert_wrong_type(void)
                             (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fh_size(&fh), 1, "%zu");
-    CHECK(((struct val *)FH_GET(FH_ENTRY(&fh, 137)))->val, 139, "%d");
+    CHECK(((struct val *)FH_UNWRAP(FH_ENTRY(&fh, 137)))->val, 139, "%d");
     return PASS;
 }

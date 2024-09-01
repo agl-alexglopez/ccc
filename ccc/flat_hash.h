@@ -50,9 +50,9 @@ initialization is successful or a failure. */
         CCC_IMPL_FH_ENTRY(fhash_ptr, key)                                      \
     }
 
-#define FH_GET(entry_copy) CCC_IMPL_FH_GET(entry_copy)
+#define FH_UNWRAP(entry_copy) CCC_IMPL_FH_UNWRAP(entry_copy)
 
-#define FH_GET_MUT(entry_copy) CCC_IMPL_FH_GET_MUT(entry_copy)
+#define FH_UNWRAP_MUT(entry_copy) CCC_IMPL_FH_UNWRAP_MUT(entry_copy)
 
 #define FH_AND_MODIFY(entry_copy, mod_fn)                                      \
     (ccc_fhash_entry)                                                          \

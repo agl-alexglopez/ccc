@@ -56,7 +56,7 @@ set_test_insert_three(void)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        CHECK(ccc_s_get(ccc_s_insert(&s, &three_vals[i].elem)) == NULL, true,
+        CHECK(ccc_s_unwrap(ccc_s_insert(&s, &three_vals[i].elem)) == NULL, true,
               "%d");
         CHECK(ccc_s_validate(&s), true, "%d");
     }

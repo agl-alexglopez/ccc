@@ -80,14 +80,14 @@ uint64_t ccc_impl_fh_filter(struct ccc_impl_flat_hash const *, void const *key);
         _fh_ent_;                                                              \
     })
 
-#define CCC_IMPL_FH_GET(entry_copy)                                            \
+#define CCC_IMPL_FH_UNWRAP(entry_copy)                                         \
     ({                                                                         \
         struct ccc_impl_fhash_entry _fh_get_ent_ = (entry_copy).impl;          \
         void const *_ret_ = ccc_impl_fh_get(&_fh_get_ent_);                    \
         _ret_;                                                                 \
     })
 
-#define CCC_IMPL_FH_GET_MUT(entry_copy)                                        \
+#define CCC_IMPL_FH_UNWRAP_MUT(entry_copy)                                     \
     ({                                                                         \
         struct ccc_impl_fhash_entry _fh_get_ent_ = (entry_copy).impl;          \
         void *_fh_ret_ = (void *)ccc_impl_fh_get(&_fh_get_ent_);               \
