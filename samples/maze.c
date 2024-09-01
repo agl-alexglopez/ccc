@@ -242,7 +242,7 @@ animate_maze(struct maze *maze)
             }
             int cur_weight = 0;
             struct point_cost const *const found
-                = ccc_s_get(ccc_s_entry(&cell_costs, &next));
+                = ccc_s_unwrap(ccc_s_entry(&cell_costs, &next));
             if (!found)
             {
                 struct point_cost *new_cost

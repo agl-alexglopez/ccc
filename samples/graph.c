@@ -348,9 +348,11 @@ build_graph(struct graph *const graph)
             .pos = rand_point,
             .edges = {{0}, {0}, {0}, {0}},
         };
-        if (ccc_s_get(ccc_s_insert(&graph->adjacency_list, &new_vertex->elem)))
+        if (!ccc_s_insert_entry(
+                ccc_s_entry(&graph->adjacency_list, &new_vertex->name),
+                &new_vertex->elem))
         {
-            quit("Error building vertices. Vertex already present.\n", 1);
+            quit("Error building vertices. Could not insert vertex.\n", 1);
         }
     }
     for (int vertex = 0, vertex_title = start_vertex_title;
@@ -358,7 +360,7 @@ build_graph(struct graph *const graph)
     {
         char key = (char)vertex_title;
         struct vertex *const src
-            = ccc_s_get_mut(ccc_s_entry(&graph->adjacency_list, &key));
+            = ccc_s_unwrap_mut(ccc_s_entry(&graph->adjacency_list, &key));
         if (!src)
         {
             quit("Vertex that should be present in the set is absent.\n", 1);
@@ -395,7 +397,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        dst = ccc_s_get_mut(ccc_s_entry(&graph->adjacency_list, &key));
+        dst = ccc_s_unwrap_mut(ccc_s_entry(&graph->adjacency_list, &key));
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -717,7 +719,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct prev_vertex *next
-                = FH_GET_MUT(FH_ENTRY(&prev_map, cur->v->edges[i].to));
+                = FH_UNWRAP_MUT(FH_ENTRY(&prev_map, cur->v->edges[i].to));
             assert(next);
             /* The seen set also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -739,12 +741,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = FH_GET(FH_ENTRY(&prev_map, v));
+        struct prev_vertex const *prev = FH_UNWRAP(FH_ENTRY(&prev_map, v));
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = FH_GET(FH_ENTRY(&prev_map, prev->prev));
+            prev = FH_UNWRAP(FH_ENTRY(&prev_map, prev->prev));
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -1129,7 +1131,8 @@ parse_path_request(struct graph *const g, str_view r)
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex *v
-                = ccc_s_get_mut(ccc_s_entry(&g->adjacency_list, c));
+                = ccc_s_unwrap_mut(ccc_s_entry(&g->adjacency_list, c));
+            assert(v);
             res.src ? (res.dst = v) : (res.src = v);
         }
     }

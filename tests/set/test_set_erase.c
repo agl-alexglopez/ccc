@@ -52,7 +52,7 @@ set_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_s_get(ccc_s_insert(&s, &vals[i].elem)))
+        if (ccc_s_unwrap(ccc_s_insert(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }

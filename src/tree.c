@@ -62,7 +62,7 @@ ccc_tree_link const reverse_inorder_traversal = R;
 static void init_node(ccc_tree *, ccc_node *);
 static bool empty(ccc_tree const *);
 static void multiset_insert(ccc_tree *, ccc_node *);
-static ccc_node *find(ccc_tree *, void const *);
+static void *find(ccc_tree *, void const *);
 static bool contains(ccc_tree *, void const *);
 static void *erase(ccc_tree *, void const *key);
 static void *insert(ccc_tree *, ccc_node *);
@@ -553,13 +553,13 @@ ccc_s_remove_entry(ccc_set_entry e)
 }
 
 inline void *
-ccc_s_get_mut(ccc_set_entry e)
+ccc_s_unwrap_mut(ccc_set_entry e)
 {
-    return (void *)ccc_s_get(e);
+    return (void *)ccc_s_unwrap(e);
 }
 
 inline void const *
-ccc_s_get(ccc_set_entry e)
+ccc_s_unwrap(ccc_set_entry e)
 {
     if (e.impl.entry.status == CCC_S_ENTRY_OCCUPIED)
     {
@@ -955,11 +955,12 @@ rrange_end(ccc_rrange const *const rr)
     return rr->end;
 }
 
-static ccc_node *
+static void *
 find(ccc_tree *t, void const *const key)
 {
     t->root = splay(t, t->root, key, t->cmp);
-    return cmp(t, key, t->root, t->cmp) == CCC_EQL ? t->root : NULL;
+    return cmp(t, key, t->root, t->cmp) == CCC_EQL ? struct_base(t, t->root)
+                                                   : NULL;
 }
 
 static bool
