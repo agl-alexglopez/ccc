@@ -398,7 +398,7 @@ ccc_impl_fhm_maybe_resize(struct ccc_impl_flat_hash *h)
     {
         return CCC_OK;
     }
-    if (!h->buf.impl.realloc_fn)
+    if (!h->buf.impl.alloc)
     {
         return CCC_NO_REALLOC;
     }
@@ -408,7 +408,7 @@ ccc_impl_fhm_maybe_resize(struct ccc_impl_flat_hash *h)
         = new_hash.buf.impl.capacity
               ? ccc_fhm_next_prime(ccc_buf_size(&h->buf) * 2)
               : default_prime;
-    new_hash.buf.impl.mem = new_hash.buf.impl.realloc_fn(
+    new_hash.buf.impl.mem = new_hash.buf.impl.alloc(
         NULL, ccc_buf_elem_size(&h->buf) * new_hash.buf.impl.capacity);
     if (!new_hash.buf.impl.mem)
     {
@@ -432,7 +432,7 @@ ccc_impl_fhm_maybe_resize(struct ccc_impl_flat_hash *h)
                                 ccc_buf_index_of(&new_hash.buf, new_ent.entry));
         }
     }
-    (void)ccc_buf_realloc(&h->buf, 0, h->buf.impl.realloc_fn);
+    (void)ccc_buf_realloc(&h->buf, 0, h->buf.impl.alloc);
     *h = new_hash;
     return CCC_OK;
 }
@@ -488,7 +488,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     if (!fn)
     {
         h->impl.buf.impl.sz = 0;
-        return ccc_buf_free(&h->impl.buf, h->impl.buf.impl.realloc_fn);
+        return ccc_buf_free(&h->impl.buf, h->impl.buf.impl.alloc);
     }
     for (void *slot = ccc_buf_begin(&h->impl.buf);
          slot != ccc_buf_capacity_end(&h->impl.buf);
@@ -499,7 +499,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn(slot);
         }
     }
-    return ccc_buf_free(&h->impl.buf, h->impl.buf.impl.realloc_fn);
+    return ccc_buf_free(&h->impl.buf, h->impl.buf.impl.alloc);
 }
 
 size_t

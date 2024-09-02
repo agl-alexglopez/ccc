@@ -60,7 +60,7 @@ typedef struct
 {
     ccc_node *root;
     ccc_node end;
-    ccc_realloc_fn *alloc;
+    ccc_alloc_fn *alloc;
     ccc_key_cmp_fn *cmp;
     void *aux;
     size_t size;
@@ -76,13 +76,13 @@ struct ccc_tree_entry
 };
 
 #define CCC_TREE_INIT(struct_name, node_elem_field, key_elem_field, tree_name, \
-                      realloc_fn, key_cmp_fn, aux_data)                        \
+                      alloc_fn, key_cmp_fn, aux_data)                          \
     {                                                                          \
         .impl = {                                                              \
             .root = &(tree_name).impl.end,                                     \
             .end = {.link = {&(tree_name).impl.end, &(tree_name).impl.end},    \
                     .parent_or_dups = &(tree_name).impl.end},                  \
-            .alloc = (realloc_fn),                                             \
+            .alloc = (alloc_fn),                                               \
             .cmp = (key_cmp_fn),                                               \
             .aux = (aux_data),                                                 \
             .size = 0,                                                         \

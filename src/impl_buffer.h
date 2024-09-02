@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+#include <assert.h>
 #include <stddef.h>
 
 struct ccc_impl_buf
@@ -11,30 +12,24 @@ struct ccc_impl_buf
     size_t elem_sz;
     size_t sz;
     size_t capacity;
-    ccc_realloc_fn *realloc_fn;
+    ccc_alloc_fn *alloc;
 };
 
-#define CCC_IMPL_BUF_INIT(mem, type, capacity, realloc_fn)                     \
+#define CCC_IMPL_BUF_INIT(mem, type, capacity, alloc_fn)                       \
     {                                                                          \
         .impl = {                                                              \
-            (mem), sizeof(type), 0, (capacity), (realloc_fn),                  \
+            (mem), sizeof(type), 0, (capacity), (alloc_fn),                    \
         },                                                                     \
     }
 
 #define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, type_initializer...)          \
     ({                                                                         \
         typeof(type_initializer) *_buf_res_;                                   \
-        if (sizeof(typeof(*_buf_res_)) != ccc_buf_elem_size(ccc_buf_ptr))      \
+        assert(sizeof(typeof(*_buf_res_)) == ccc_buf_elem_size(ccc_buf_ptr));  \
+        _buf_res_ = ccc_buf_at(ccc_buf_ptr, index);                            \
+        if (_buf_res_)                                                         \
         {                                                                      \
-            _buf_res_ = NULL;                                                  \
-        }                                                                      \
-        else                                                                   \
-        {                                                                      \
-            _buf_res_ = ccc_buf_at(ccc_buf_ptr, index);                        \
-            if (_buf_res_)                                                     \
-            {                                                                  \
-                *_buf_res_ = (struct_name)type_initializer;                    \
-            }                                                                  \
+            *_buf_res_ = type_initializer;                                     \
         }                                                                      \
         _buf_res_;                                                             \
     })
@@ -42,17 +37,11 @@ struct ccc_impl_buf
 #define CCC_IMPL_BUF_EMPLACE_BACK(ccc_buf_ptr, type_initializer...)            \
     ({                                                                         \
         typeof(type_initializer) *_buf_res_;                                   \
-        if (sizeof(typeof(*_buf_res_)) != ccc_buf_elem_size(ccc_buf_ptr))      \
+        assert(sizeof(typeof(*_buf_res_)) == ccc_buf_elem_size(ccc_buf_ptr));  \
+        _buf_res_ = ccc_buf_alloc((ccc_buf_ptr));                              \
+        if (_buf_res_)                                                         \
         {                                                                      \
-            _buf_res_ = NULL;                                                  \
-        }                                                                      \
-        else                                                                   \
-        {                                                                      \
-            _buf_res_ = ccc_buf_alloc((ccc_buf_ptr));                          \
-            if (_buf_res_)                                                     \
-            {                                                                  \
-                *_buf_res_ = type_initializer;                                 \
-            }                                                                  \
+            *_buf_res_ = type_initializer;                                     \
         }                                                                      \
         _buf_res_;                                                             \
     })

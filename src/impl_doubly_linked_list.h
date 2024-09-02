@@ -18,7 +18,7 @@ struct ccc_impl_doubly_linked_list
     size_t elem_sz;
     size_t dll_elem_offset;
     size_t sz;
-    ccc_realloc_fn *alloc;
+    ccc_alloc_fn *alloc;
     ccc_cmp_fn *cmp;
     void *aux;
 };
@@ -32,14 +32,14 @@ ccc_impl_dll_elem_in(struct ccc_impl_doubly_linked_list const *,
                      void const *user_struct);
 
 #define CCC_IMPL_DLL_INIT(dll_ptr, dll_name, struct_name, dll_elem_field,      \
-                          realloc_fn, cmp_fn, aux_data)                        \
+                          alloc_fn, cmp_fn, aux_data)                          \
     {                                                                          \
         {                                                                      \
             .sentinel.n = &(dll_name).impl.sentinel,                           \
             .sentinel.p = &(dll_name).impl.sentinel,                           \
             .elem_sz = sizeof(struct_name),                                    \
             .dll_elem_offset = offsetof(struct_name, dll_elem_field), .sz = 0, \
-            .alloc = (realloc_fn), .cmp = (cmp_fn), .aux = (aux_data),         \
+            .alloc = (alloc_fn), .cmp = (cmp_fn), .aux = (aux_data),           \
         }                                                                      \
     }
 

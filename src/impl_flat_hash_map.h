@@ -37,11 +37,11 @@ struct ccc_impl_fhash_entry
 };
 
 #define CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name,        \
-                          key_field, fhash_elem_field, realloc_fn, hash_fn,    \
+                          key_field, fhash_elem_field, alloc_fn, hash_fn,      \
                           key_eq_fn, aux)                                      \
     ({                                                                         \
         (fhash_ptr)->impl.buf = (ccc_buffer)CCC_BUF_INIT(                      \
-            (memory_ptr), struct_name, (capacity), (realloc_fn));              \
+            (memory_ptr), struct_name, (capacity), (alloc_fn));                \
         ccc_result _res_ = ccc_impl_fhm_init(                                  \
             &(fhash_ptr)->impl, offsetof(struct_name, key_field),              \
             offsetof(struct_name, fhash_elem_field), (hash_fn), (key_eq_fn),   \

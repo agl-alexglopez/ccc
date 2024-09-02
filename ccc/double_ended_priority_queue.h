@@ -36,9 +36,9 @@ typedef struct
    be used at compile time or runtime. It is undefined to use the depq if
    this has not been called. */
 #define CCC_DEPQ_INIT(struct_name, depq_elem_field, key_field, depq_name,      \
-                      realloc_fn, key_cmp_fn, aux)                             \
+                      alloc_fn, key_cmp_fn, aux)                               \
     CCC_TREE_INIT(struct_name, depq_elem_field, key_field, depq_name,          \
-                  realloc_fn, key_cmp_fn, aux)
+                  alloc_fn, key_cmp_fn, aux)
 
 void ccc_depq_clear(ccc_double_ended_priority_queue *,
                     ccc_destructor_fn *destructor);

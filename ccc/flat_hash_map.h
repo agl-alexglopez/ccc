@@ -32,7 +32,7 @@ hash table.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] fhash_elem_field the name of the field holding the fhash_elem
 handle.
-@param [in] realloc_fn the reallocation function for resizing or NULL if no
+@param [in] alloc_fn the reallocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
@@ -40,9 +40,9 @@ resizing is allowed.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
 #define CCC_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
-                     fhash_elem_field, realloc_fn, hash_fn, key_eq_fn, aux)    \
+                     fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)      \
     CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
-                      fhash_elem_field, realloc_fn, hash_fn, key_eq_fn, aux)
+                      fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
 #define FHM_GET(fhash_ptr, key) CCC_IMPL_FHM_GET(fhash_ptr, key)
 
