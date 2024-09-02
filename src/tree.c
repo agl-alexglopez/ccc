@@ -59,48 +59,63 @@ ccc_tree_link const reverse_inorder_traversal = R;
 
 /* =======================        Prototypes         ====================== */
 
+/* No return value. */
+
 static void init_node(ccc_tree *, ccc_node *);
-static bool empty(ccc_tree const *);
+static void swap(uint8_t tmp[], void *, void *, size_t);
 static void multimap_insert(ccc_tree *, ccc_node *);
-static void *find(ccc_tree *, void const *);
+static void link_trees(ccc_tree *, ccc_node *, ccc_tree_link, ccc_node *);
+static void add_duplicate(ccc_tree *, ccc_node *, ccc_node *, ccc_node *);
+
+/* Boolean returns */
+
+static bool empty(ccc_tree const *);
 static bool contains(ccc_tree *, void const *);
+static bool has_dups(ccc_node const *, ccc_node const *);
+
+/* Returning the user type that is stored in data structure. */
+
+static void *struct_base(ccc_tree const *, ccc_node const *);
+static void *find(ccc_tree *, void const *);
 static void *erase(ccc_tree *, void const *key);
 static void *insert(ccc_tree *, ccc_node *);
-static ccc_node *multimap_erase_max_or_min(ccc_tree *, ccc_key_cmp_fn *);
-static ccc_node *multimap_erase_node(ccc_tree *, ccc_node *);
+static void *multimap_erase_max_or_min(ccc_tree *, ccc_key_cmp_fn *);
+static void *multimap_erase_node(ccc_tree *, ccc_node *);
+static void *connect_new_root(ccc_tree *, ccc_node *, ccc_threeway_cmp);
+static void *max(ccc_tree const *);
+static void *pop_max(ccc_tree *);
+static void *pop_min(ccc_tree *);
+static void *min(ccc_tree const *);
+static void *range_begin(ccc_range const *);
+static void *range_end(ccc_range const *);
+static void *rrange_begin(ccc_rrange const *);
+static void *rrange_end(ccc_rrange const *);
+static ccc_range equal_range(ccc_tree *, void const *, void const *,
+                             ccc_tree_link);
+
+/* Internal operations that take and return nodes for the tree. */
+
+static ccc_node *root(ccc_tree const *);
 static ccc_node *pop_dup_node(ccc_tree *, ccc_node *, ccc_node *);
 static ccc_node *pop_front_dup(ccc_tree *, ccc_node *, void const *old_key);
 static ccc_node *remove_from_tree(ccc_tree *, ccc_node *);
-static void *connect_new_root(ccc_tree *, ccc_node *, ccc_threeway_cmp);
-static ccc_node *root(ccc_tree const *);
-static ccc_node *max(ccc_tree const *);
-static ccc_node *pop_max(ccc_tree *);
-static ccc_node *pop_min(ccc_tree *);
-static ccc_node *min(ccc_tree const *);
 static ccc_node const *const_seek(ccc_tree *, void const *);
 static ccc_node const *next(ccc_tree *, ccc_node const *, ccc_tree_link);
 static ccc_node const *multimap_next(ccc_tree *, ccc_node const *,
                                      ccc_tree_link);
-static ccc_range equal_range(ccc_tree *, void const *, void const *,
-                             ccc_tree_link);
-static ccc_threeway_cmp force_find_grt(ccc_key_cmp);
-static ccc_threeway_cmp force_find_les(ccc_key_cmp);
-static void link_trees(ccc_tree *, ccc_node *, ccc_tree_link, ccc_node *);
-static inline bool has_dups(ccc_node const *, ccc_node const *);
-static ccc_node *get_parent(ccc_tree *, ccc_node const *);
-static void add_duplicate(ccc_tree *, ccc_node *, ccc_node *, ccc_node *);
 static ccc_node *splay(ccc_tree *, ccc_node *, void const *key,
                        ccc_key_cmp_fn *);
-static inline ccc_node const *next_tree_node(ccc_tree *, ccc_node const *,
-                                             ccc_tree_link);
-static ccc_node *range_begin(ccc_range const *);
-static ccc_node *range_end(ccc_range const *);
-static ccc_node *rrange_begin(ccc_rrange const *);
-static ccc_node *rrange_end(ccc_rrange const *);
-static void *struct_base(ccc_tree const *, ccc_node const *);
-static ccc_threeway_cmp cmp(ccc_tree const *, void const *, ccc_node const *,
+static ccc_node const *next_tree_node(ccc_tree *, ccc_node const *,
+                                      ccc_tree_link);
+static ccc_node *get_parent(ccc_tree *, ccc_node const *);
+
+/* Comparison function returns */
+
+static ccc_threeway_cmp force_find_grt(ccc_key_cmp);
+static ccc_threeway_cmp force_find_les(ccc_key_cmp);
+/* The key comes first. It is the "left hand side" of the comparison. */
+static ccc_threeway_cmp cmp(ccc_tree const *, void const *key, ccc_node const *,
                             ccc_key_cmp_fn *);
-static void swap(uint8_t tmp[], void *, void *, size_t);
 
 /* =================  Double Ended Priority Queue Interface  ============== */
 
@@ -110,7 +125,7 @@ ccc_depq_clear(ccc_double_ended_priority_queue *pq,
 {
     while (!ccc_depq_empty(pq))
     {
-        void *popped = struct_base(&pq->impl, pop_min(&pq->impl));
+        void *popped = pop_min(&pq->impl);
         if (destructor)
         {
             destructor(popped);
@@ -154,12 +169,7 @@ ccc_depq_max(ccc_double_ended_priority_queue *const pq)
 void *
 ccc_depq_const_max(ccc_double_ended_priority_queue const *const pq)
 {
-    ccc_node const *const n = max(&pq->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return max(&pq->impl);
 }
 
 bool
@@ -184,12 +194,7 @@ ccc_depq_min(ccc_double_ended_priority_queue *const pq)
 void *
 ccc_depq_const_min(ccc_double_ended_priority_queue const *const pq)
 {
-    ccc_node const *const n = min(&pq->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return min(&pq->impl);
 }
 
 bool
@@ -202,23 +207,13 @@ ccc_depq_is_min(ccc_double_ended_priority_queue *const pq,
 void *
 ccc_depq_begin(ccc_double_ended_priority_queue *pq)
 {
-    ccc_node const *const n = max(&pq->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return max(&pq->impl);
 }
 
 void *
 ccc_depq_rbegin(ccc_double_ended_priority_queue *pq)
 {
-    ccc_node const *const n = min(&pq->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return min(&pq->impl);
 }
 
 void *
@@ -308,12 +303,7 @@ ccc_depq_push(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
 void *
 ccc_depq_erase(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
 {
-    ccc_node const *const n = multimap_erase_node(&pq->impl, &e->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return multimap_erase_node(&pq->impl, &e->impl);
 }
 
 bool
@@ -324,13 +314,13 @@ ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
     {
         return false;
     }
-    ccc_node *e = multimap_erase_node(&pq->impl, &elem->impl);
+    void *e = multimap_erase_node(&pq->impl, &elem->impl);
     if (!e)
     {
         return false;
     }
-    fn((ccc_update){struct_base(&pq->impl, e), aux});
-    multimap_insert(&pq->impl, e);
+    fn((ccc_update){e, aux});
+    multimap_insert(&pq->impl, &elem->impl);
     return true;
 }
 
@@ -344,14 +334,14 @@ ccc_depq_contains(ccc_double_ended_priority_queue *const pq,
 void
 ccc_depq_pop_max(ccc_double_ended_priority_queue *pq)
 {
-    ccc_node *n = pop_max(&pq->impl);
+    void *n = pop_max(&pq->impl);
     if (!n)
     {
         return;
     }
     if (pq->impl.alloc)
     {
-        pq->impl.alloc(struct_base(&pq->impl, n), 0);
+        pq->impl.alloc(n, 0);
     }
 }
 
@@ -396,7 +386,7 @@ ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
 
     while (!ccc_om_empty(set))
     {
-        void *popped = struct_base(&set->impl, pop_min(&set->impl));
+        void *popped = pop_min(&set->impl);
         if (destructor)
         {
             destructor(popped);
@@ -502,17 +492,16 @@ ccc_o_map_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
     void *inserted = insert(&s->impl, &out_handle->impl);
-    void *root_struct = struct_base(&s->impl, s->impl.root);
     if (!inserted)
     {
         *out_handle = *(ccc_o_map_elem *)s->impl.root;
         uint8_t tmp[s->impl.elem_sz];
         void *user_struct = struct_base(&s->impl, &out_handle->impl);
-        swap(tmp, user_struct, root_struct, s->impl.elem_sz);
+        swap(tmp, user_struct, inserted, s->impl.elem_sz);
         return (ccc_o_map_entry){{
             .t = &s->impl,
             .entry = {
-                .entry = root_struct, 
+                .entry = inserted, 
                 .status = CCC_OM_ENTRY_OCCUPIED,
             },
         }};
@@ -595,23 +584,13 @@ ccc_om_unwrap(ccc_o_map_entry e)
 void *
 ccc_om_begin(ccc_ordered_map *s)
 {
-    ccc_node const *const n = min(&s->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&s->impl, n);
+    return min(&s->impl);
 }
 
 void *
 ccc_om_rbegin(ccc_ordered_map *s)
 {
-    ccc_node const *const n = max(&s->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&s->impl, n);
+    return max(&s->impl);
 }
 
 void *
@@ -795,22 +774,22 @@ root(ccc_tree const *const t)
     return t->root;
 }
 
-static ccc_node *
+static void *
 max(ccc_tree const *const t)
 {
     ccc_node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
     {}
-    return m == &t->end ? NULL : m;
+    return m == &t->end ? NULL : struct_base(t, m);
 }
 
-static ccc_node *
+static void *
 min(ccc_tree const *t)
 {
     ccc_node *m = t->root;
     for (; m->link[L] != &t->end; m = m->link[L])
     {}
-    return m == &t->end ? NULL : m;
+    return m == &t->end ? NULL : struct_base(t, m);
 }
 
 static ccc_node const *
@@ -829,13 +808,13 @@ const_seek(ccc_tree *const t, void const *const key)
     return NULL;
 }
 
-static ccc_node *
+static void *
 pop_max(ccc_tree *t)
 {
     return multimap_erase_max_or_min(t, force_find_grt);
 }
 
-static ccc_node *
+static void *
 pop_min(ccc_tree *t)
 {
     return multimap_erase_max_or_min(t, force_find_les);
@@ -955,25 +934,25 @@ equal_range(ccc_tree *t, void const *begin_key, void const *end_key,
     };
 }
 
-static ccc_node *
+static void *
 range_begin(ccc_range const *const r)
 {
     return r->begin;
 }
 
-static ccc_node *
+static void *
 range_end(ccc_range const *const r)
 {
     return r->end;
 }
 
-static ccc_node *
+static void *
 rrange_begin(ccc_rrange const *const rr)
 {
     return rr->rbegin;
 }
 
-static ccc_node *
+static void *
 rrange_end(ccc_rrange const *const rr)
 {
     return rr->end;
@@ -1012,7 +991,7 @@ insert(ccc_tree *t, ccc_node *out_handle)
         }
         t->root = out_handle;
         t->size++;
-        return t->root;
+        return struct_base(t, out_handle);
     }
     void const *const key = ccc_impl_key_from_node(t, out_handle);
     t->root = splay(t, t->root, key, t->cmp);
@@ -1122,7 +1101,7 @@ erase(ccc_tree *t, void const *const key)
    simply grabs the first node available in the tree for round robin.
    This function expects to be passed the t->implil as the node and a
    comparison function that forces either the max or min to be searched. */
-static ccc_node *
+static void *
 multimap_erase_max_or_min(ccc_tree *t, ccc_key_cmp_fn *force_max_or_min)
 {
     if (!t || !force_max_or_min)
@@ -1144,7 +1123,7 @@ multimap_erase_max_or_min(ccc_tree *t, ccc_key_cmp_fn *force_max_or_min)
         ret = remove_from_tree(t, ret);
     }
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
-    return ret;
+    return struct_base(t, ret);
 }
 
 /* We need to mindful of what the user is asking for. This is a request
@@ -1152,7 +1131,7 @@ multimap_erase_max_or_min(ccc_tree *t, ccc_key_cmp_fn *force_max_or_min)
    taken to only delete that node, especially if a different node with
    the same size is splayed to the root and we are a duplicate in the
    list. */
-static ccc_node *
+static void *
 multimap_erase_node(ccc_tree *t, ccc_node *node)
 {
     /* This is what we set removed nodes to so this is a mistaken query */
@@ -1172,7 +1151,7 @@ multimap_erase_node(ccc_tree *t, ccc_node *node)
     {
         node->link[P]->link[N] = node->link[N];
         node->link[N]->link[P] = node->link[P];
-        return node;
+        return struct_base(t, node);
     }
     void const *const key = ccc_impl_key_from_node(t, node);
     ccc_node *ret = splay(t, t->root, key, t->cmp);
@@ -1189,7 +1168,7 @@ multimap_erase_node(ccc_tree *t, ccc_node *node)
         ret = remove_from_tree(t, ret);
     }
     ret->link[L] = ret->link[R] = ret->parent_or_dups = NULL;
-    return ret;
+    return struct_base(t, ret);
 }
 
 /* This function assumes that splayed is the new root of the tree */
