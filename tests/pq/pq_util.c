@@ -47,10 +47,11 @@ inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
     }
     size_t i = 0;
     ccc_priority_queue copy
-        = CCC_PQ_INIT(struct val, elem, ccc_pq_order(ppq), val_cmp, NULL);
+        = CCC_PQ_INIT(struct val, elem, ccc_pq_order(ppq), NULL, val_cmp, NULL);
     while (!ccc_pq_empty(ppq))
     {
-        struct val *const front = ccc_pq_pop(ppq);
+        struct val *const front = ccc_pq_front(ppq);
+        ccc_pq_pop(ppq);
         CHECK(ccc_pq_validate(ppq), true, "%d");
         CHECK(ccc_pq_validate(&copy), true, "%d");
         vals[i++] = front->val;
@@ -59,8 +60,9 @@ inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
     i = 0;
     while (!ccc_pq_empty(&copy))
     {
-        struct val *v = ccc_pq_pop(&copy);
+        struct val *v = ccc_pq_front(&copy);
         CHECK(v->val, vals[i++], "%d");
+        ccc_pq_pop(&copy);
         ccc_pq_push(ppq, &v->elem);
         CHECK(ccc_pq_validate(ppq), true, "%d");
         CHECK(ccc_pq_validate(&copy), true, "%d");

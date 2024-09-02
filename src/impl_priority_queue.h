@@ -22,18 +22,22 @@ struct ccc_impl_priority_queue
     struct ccc_impl_pq_elem *root;
     size_t sz;
     size_t pq_elem_offset;
+    size_t elem_sz;
+    ccc_realloc_fn *alloc;
     ccc_cmp_fn *cmp;
     ccc_threeway_cmp order;
     void *aux;
 };
 
-#define CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, cmp_fn,         \
-                         aux_data)                                             \
+#define CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn,       \
+                         cmp_fn, aux_data)                                     \
     {                                                                          \
         .impl = {                                                              \
             .root = NULL,                                                      \
             .sz = 0,                                                           \
             .pq_elem_offset = offsetof(struct_name, pq_elem_field),            \
+            .elem_sz = sizeof(struct_name),                                    \
+            .alloc = (alloc_fn),                                               \
             .cmp = (cmp_fn),                                                   \
             .order = (pq_order),                                               \
             .aux = (aux_data),                                                 \

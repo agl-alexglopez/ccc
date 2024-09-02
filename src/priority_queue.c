@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 /*=========================  Function Prototypes   ==========================*/
 
@@ -32,7 +33,7 @@ static ccc_threeway_cmp cmp(struct ccc_impl_priority_queue const *,
 
 /*=========================  Interface Functions   ==========================*/
 
-void const *
+void *
 ccc_pq_front(ccc_priority_queue const *const ppq)
 {
     return ppq->impl.root ? struct_base(&ppq->impl, ppq->impl.root) : NULL;
@@ -46,35 +47,50 @@ ccc_pq_push(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
         return;
     }
     init_node(&e->impl);
+    if (ppq->impl.alloc)
+    {
+        void *node = ppq->impl.alloc(NULL, ppq->impl.elem_sz);
+        if (!node)
+        {
+            return;
+        }
+        memcpy(node, struct_base(&ppq->impl, &e->impl), ppq->impl.elem_sz);
+    }
     ppq->impl.root = merge(&ppq->impl, ppq->impl.root, &e->impl);
     ++ppq->impl.sz;
 }
 
-void *
+void
 ccc_pq_pop(ccc_priority_queue *const ppq)
 {
     if (!ppq->impl.root)
     {
-        return NULL;
+        return;
     }
     struct ccc_impl_pq_elem *const popped = ppq->impl.root;
     ppq->impl.root = delete_min(&ppq->impl, ppq->impl.root);
     ppq->impl.sz--;
     clear_node(popped);
-    return struct_base(&ppq->impl, popped);
+    if (ppq->impl.alloc)
+    {
+        ppq->impl.alloc(struct_base(&ppq->impl, popped), 0);
+    }
 }
 
-void *
+void
 ccc_pq_erase(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
     if (!ppq->impl.root || !e->impl.next_sibling || !e->impl.prev_sibling)
     {
-        return NULL;
+        return;
     }
     ppq->impl.root = delete (&ppq->impl, &e->impl);
     ppq->impl.sz--;
     clear_node(&e->impl);
-    return struct_base(&ppq->impl, &e->impl);
+    if (ppq->impl.alloc)
+    {
+        ppq->impl.alloc(struct_base(&ppq->impl, &e->impl), 0);
+    }
 }
 
 void
@@ -82,7 +98,8 @@ ccc_pq_clear(ccc_priority_queue *const ppq, ccc_destructor_fn *fn)
 {
     while (!ccc_pq_empty(ppq))
     {
-        fn(ccc_pq_pop(ppq));
+        fn(ccc_pq_front(ppq));
+        ccc_pq_pop(ppq);
     }
 }
 
