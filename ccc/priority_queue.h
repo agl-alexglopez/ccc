@@ -38,22 +38,24 @@ typedef struct
      ccc_priority_queue my_pq = CCC_PQ_INIT(CCC_PQ_LES, my_cmp_fn, NULL);
    Such initialization must always occur or use of the priority queue is
    undefined. */
-#define CCC_PQ_INIT(struct_name, pq_elem_field, pq_order, cmp_fn, aux_data)    \
-    CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, cmp_fn, aux_data)
+#define CCC_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,    \
+                    aux_data)                                                  \
+    CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
+                     aux_data)
 
 /* Obtain a reference to the front of the priority queue. This will be a min
    or max depending on the initialization of the priority queue. O(1). */
-void const *ccc_pq_front(ccc_priority_queue const *);
+void *ccc_pq_front(ccc_priority_queue const *);
 
 /* Adds an element to the priority queue in correct total order. O(1). */
 void ccc_pq_push(ccc_priority_queue *, ccc_pq_elem *);
 
 /* Pops the front element from the priority queue. O(lgN). */
-void *ccc_pq_pop(ccc_priority_queue *);
+void ccc_pq_pop(ccc_priority_queue *);
 
 /* Erase the specified element from the priority queue. This need not be
    the front element. O(lgN). */
-void *ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *);
+void ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *);
 
 /* Returns true if the priority queue is empty false if not. */
 bool ccc_pq_empty(ccc_priority_queue const *);

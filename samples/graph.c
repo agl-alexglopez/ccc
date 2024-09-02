@@ -697,7 +697,7 @@ static bool
 dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
     ccc_priority_queue dist_q = CCC_PQ_INIT(struct dist_point, pq_elem, CCC_LES,
-                                            cmp_pq_dist_points, NULL);
+                                            NULL, cmp_pq_dist_points, NULL);
     ccc_flat_hash_map prev_map;
     ccc_result res
         = CCC_FHM_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
@@ -710,7 +710,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     {
         /* PQ entries are popped but the map will free the memory at
            the end because it always holds a reference to its pq_elem. */
-        cur = ccc_pq_pop(&dist_q);
+        cur = ccc_pq_front(&dist_q);
+        ccc_pq_pop(&dist_q);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
