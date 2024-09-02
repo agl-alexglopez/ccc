@@ -129,14 +129,14 @@ add_map_test(test_map_iter)
 
 add_library(fhash_util fhash/fhash_util.h fhash/fhash_util.c)
 target_link_libraries(fhash_util
-  flat_hash
+  flat_hash_map
 )
 
 macro(add_fhash_test TEST_NAME)
   add_executable(${TEST_NAME} fhash/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      flat_hash
+      flat_hash_map
       test
       fhash_util
   )

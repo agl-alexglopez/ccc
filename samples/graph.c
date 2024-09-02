@@ -1,5 +1,5 @@
 #include "cli.h"
-#include "flat_hash.h"
+#include "flat_hash_map.h"
 #include "map.h"
 #include "priority_queue.h"
 #include "queue.h"
@@ -200,7 +200,7 @@ static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void prepare_vertices(struct graph *, ccc_priority_queue *,
-                             ccc_flat_hash *, struct path_request const *);
+                             ccc_flat_hash_map *, struct path_request const *);
 static void paint_edge(struct graph *, struct vertex const *,
                        struct vertex const *);
 static void add_edge_cost_label(struct graph *, struct vertex *,
@@ -421,10 +421,10 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
     Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
-    ccc_flat_hash parent_map;
+    ccc_flat_hash_map parent_map;
     ccc_result res
-        = CCC_FH_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem,
-                      realloc, hash_parent_cells, eq_parent_cells, NULL);
+        = CCC_FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem,
+                       realloc, hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     struct queue bfs;
     q_init(sizeof(struct point), &bfs, 4);
@@ -451,17 +451,17 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                struct parent_cell *inserted = ccc_fh_insert_entry(
-                    ccc_fh_entry(&parent_map, &next), &push.elem);
+                struct parent_cell *inserted = ccc_fhm_insert_entry(
+                    ccc_fhm_entry(&parent_map, &next), &push.elem);
                 assert(inserted);
                 cur = next;
                 success = true;
                 break;
             }
-            if (!is_path(next_cell) && !ccc_fh_contains(&parent_map, &next))
+            if (!is_path(next_cell) && !ccc_fhm_contains(&parent_map, &next))
             {
-                struct parent_cell *inserted = ccc_fh_insert_entry(
-                    ccc_fh_entry(&parent_map, &next), &push.elem);
+                struct parent_cell *inserted = ccc_fhm_insert_entry(
+                    ccc_fhm_entry(&parent_map, &next), &push.elem);
                 assert(inserted != NULL);
                 q_push(&bfs, &next);
             }
@@ -470,12 +470,12 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     if (success)
     {
         struct parent_cell const *cell
-            = ccc_fh_unwrap(ccc_fh_entry(&parent_map, &cur));
+            = ccc_fhm_unwrap(ccc_fhm_entry(&parent_map, &cur));
         assert(cell);
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
         {
-            cell = ccc_fh_unwrap(ccc_fh_entry(&parent_map, &cell->parent));
+            cell = ccc_fhm_unwrap(ccc_fhm_entry(&parent_map, &cell->parent));
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -489,7 +489,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         (void)add_edge(dst, &edge);
         add_edge_cost_label(graph, dst, &edge);
     }
-    ccc_fh_clear_and_free(&parent_map, map_parent_point_destructor);
+    ccc_fhm_clear_and_free(&parent_map, map_parent_point_destructor);
     q_free(&bfs);
     return success;
 }
@@ -698,10 +698,10 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
     ccc_priority_queue dist_q = CCC_PQ_INIT(struct dist_point, pq_elem, CCC_LES,
                                             cmp_pq_dist_points, NULL);
-    ccc_flat_hash prev_map;
+    ccc_flat_hash_map prev_map;
     ccc_result res
-        = CCC_FH_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
-                      hash_vertex_addr, eq_prev_vertices, NULL);
+        = CCC_FHM_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
+                       hash_vertex_addr, eq_prev_vertices, NULL);
     assert(res == CCC_OK);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
@@ -753,14 +753,14 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
        prev map is the last allocation with access to the priority queue
        elements that have been popped but not freed. It will free its
        own map and its references to priority queue elements. */
-    ccc_fh_clear_and_free(&prev_map, map_pq_prev_vertex_dist_point_destructor);
+    ccc_fhm_clear_and_free(&prev_map, map_pq_prev_vertex_dist_point_destructor);
     clear_and_flush_graph(graph);
     return success;
 }
 
 static void
 prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
-                 ccc_flat_hash *prev_map, struct path_request const *pr)
+                 ccc_flat_hash_map *prev_map, struct path_request const *pr)
 {
     for (struct vertex *v = ccc_m_begin(&graph->adjacency_list); v;
          v = ccc_m_next(&graph->adjacency_list, &v->elem))

@@ -12,7 +12,7 @@ target_link_libraries(graph PRIVATE
   cli
   random
   str_view::str_view
-  flat_hash
+  flat_hash_map
   map
   priority_queue
   queue
@@ -21,7 +21,7 @@ target_link_libraries(graph PRIVATE
 
 add_executable(lru lru.c)
 target_link_libraries(lru PRIVATE
-  flat_hash
+  flat_hash_map
   doubly_linked_list
   fhash_util
 )
