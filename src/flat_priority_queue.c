@@ -50,7 +50,7 @@ static void print_heap(struct ccc_impl_flat_priority_queue const *, size_t,
 
 ccc_result
 ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
-                ccc_realloc_fn *const fn)
+                ccc_alloc_fn *const fn)
 {
     return (ccc_result)ccc_buf_realloc(&fpq->impl.buf, new_capacity, fn);
 }

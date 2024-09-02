@@ -9,9 +9,9 @@ void *
 ccc_sll_push_front(ccc_singly_linked_list *const sll,
                    ccc_sll_elem *const struct_handle)
 {
-    if (sll->impl.fn)
+    if (sll->impl.alloc)
     {
-        void *node = sll->impl.fn(NULL, sll->impl.elem_sz);
+        void *node = sll->impl.alloc(NULL, sll->impl.elem_sz);
         if (!node)
         {
             return NULL;
@@ -48,9 +48,9 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
     }
     struct ccc_impl_sll_elem *remove = sll->impl.sentinel.n;
     sll->impl.sentinel.n = remove->n;
-    if (sll->impl.fn)
+    if (sll->impl.alloc)
     {
-        sll->impl.fn(struct_base(&sll->impl, remove), 0);
+        sll->impl.alloc(struct_base(&sll->impl, remove), 0);
     }
     --sll->impl.sz;
 }

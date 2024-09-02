@@ -13,10 +13,10 @@ typedef struct
     struct ccc_impl_buf impl;
 } ccc_buffer;
 
-#define CCC_BUF_INIT(mem, type, capacity, realloc_fn)                          \
-    CCC_IMPL_BUF_INIT(mem, type, capacity, realloc_fn)
+#define CCC_BUF_INIT(mem, type, capacity, alloc_fn)                            \
+    CCC_IMPL_BUF_INIT(mem, type, capacity, alloc_fn)
 
-ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_realloc_fn *);
+ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);
 size_t ccc_buf_size(ccc_buffer const *);
 size_t ccc_buf_capacity(ccc_buffer const *);
@@ -36,7 +36,7 @@ ccc_result ccc_buf_swap(ccc_buffer *, uint8_t tmp[], size_t i, size_t j);
 ccc_result ccc_buf_write(ccc_buffer *, size_t i, void const *data);
 ccc_result ccc_buf_erase(ccc_buffer *, size_t i);
 
-ccc_result ccc_buf_free(ccc_buffer *, ccc_realloc_fn *);
+ccc_result ccc_buf_free(ccc_buffer *, ccc_alloc_fn *);
 
 void *ccc_buf_begin(ccc_buffer const *);
 void *ccc_buf_next(ccc_buffer const *, void const *);

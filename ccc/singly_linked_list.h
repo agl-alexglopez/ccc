@@ -14,9 +14,9 @@ typedef struct
 } ccc_singly_linked_list;
 
 #define CCC_SLL_INIT(list_ptr, list_name, struct_name, list_elem_field,        \
-                     realloc_fn, aux_data)                                     \
+                     alloc_fn, aux_data)                                       \
     CCC_IMPL_SLL_INIT(list_ptr, list_name, struct_name, list_elem_field,       \
-                      realloc_fn, aux_data)
+                      alloc_fn, aux_data)
 
 #define SLL_EMPLACE_FRONT(list_ptr, struct_initializer...)                     \
     CCC_IMPL_SLL_EMPLACE_FRONT(list_ptr, struct_initializer)

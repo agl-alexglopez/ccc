@@ -44,9 +44,9 @@ typedef struct
 } ccc_o_map_entry;
 
 #define CCC_OM_INIT(struct_name, set_elem_field, key_elem_field, set_name,     \
-                    realloc_fn, key_cmp, aux)                                  \
+                    alloc_fn, key_cmp, aux)                                    \
     CCC_TREE_INIT(struct_name, set_elem_field, key_elem_field, set_name,       \
-                  realloc_fn, key_cmp, aux)
+                  alloc_fn, key_cmp, aux)
 
 ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
 

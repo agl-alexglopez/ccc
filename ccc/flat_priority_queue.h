@@ -19,9 +19,9 @@ typedef struct
     struct ccc_impl_flat_priority_queue impl;
 } ccc_flat_priority_queue;
 
-#define CCC_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, realloc_fn,      \
+#define CCC_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, alloc_fn,        \
                      cmp_fn, aux_data)                                         \
-    CCC_IMPL_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, realloc_fn,     \
+    CCC_IMPL_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, alloc_fn,       \
                       cmp_fn, aux_data)
 
 /* Given an initialized flat priority queue, a struct type, and its
@@ -56,7 +56,7 @@ typedef struct
     CCC_IMPL_FPQ_EMPLACE(fpq, struct_initializer)
 
 ccc_result ccc_fpq_realloc(ccc_flat_priority_queue *, size_t new_capacity,
-                           ccc_realloc_fn *);
+                           ccc_alloc_fn *);
 void *ccc_fpq_push(ccc_flat_priority_queue *, void const *);
 void const *ccc_fpq_front(ccc_flat_priority_queue const *);
 void *ccc_fpq_pop(ccc_flat_priority_queue *);

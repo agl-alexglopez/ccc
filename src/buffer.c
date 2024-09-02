@@ -11,7 +11,7 @@ static void *at(ccc_buffer const *, size_t);
 
 ccc_result
 ccc_buf_realloc(ccc_buffer *buf, size_t const new_capacity,
-                ccc_realloc_fn *const fn)
+                ccc_alloc_fn *const fn)
 {
     if (!fn)
     {
@@ -57,8 +57,7 @@ ccc_buf_alloc(ccc_buffer *buf)
         return ((uint8_t *)buf->impl.mem
                 + (buf->impl.elem_sz * buf->impl.sz++));
     }
-    if (ccc_buf_realloc(buf, buf->impl.capacity * 2, buf->impl.realloc_fn)
-        == CCC_OK)
+    if (ccc_buf_realloc(buf, buf->impl.capacity * 2, buf->impl.alloc) == CCC_OK)
     {
         return ccc_buf_back(buf);
     }
@@ -128,7 +127,7 @@ ccc_buf_erase(ccc_buffer *buf, size_t const i)
 }
 
 ccc_result
-ccc_buf_free(ccc_buffer *buf, ccc_realloc_fn *fn)
+ccc_buf_free(ccc_buffer *buf, ccc_alloc_fn *fn)
 {
     if (!buf->impl.capacity || !fn)
     {

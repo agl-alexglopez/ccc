@@ -23,7 +23,7 @@ struct ccc_impl_priority_queue
     size_t sz;
     size_t pq_elem_offset;
     size_t elem_sz;
-    ccc_realloc_fn *alloc;
+    ccc_alloc_fn *alloc;
     ccc_cmp_fn *cmp;
     ccc_threeway_cmp order;
     void *aux;

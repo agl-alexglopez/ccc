@@ -14,9 +14,9 @@ typedef struct
 } ccc_doubly_linked_list;
 
 #define CCC_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,        \
-                     realloc_fn, cmp_fn, aux_data)                             \
+                     alloc_fn, cmp_fn, aux_data)                               \
     CCC_IMPL_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,       \
-                      realloc_fn, cmp_fn, aux_data)
+                      alloc_fn, cmp_fn, aux_data)
 
 #define DLL_EMPLACE_BACK(list_ptr, struct_initializer...)                      \
     CCC_IMPL_DLL_EMPLACE_BACK(list_ptr, struct_initializer)

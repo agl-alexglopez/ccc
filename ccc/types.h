@@ -66,7 +66,7 @@ typedef struct
     void *aux;
 } ccc_update;
 
-typedef void *ccc_realloc_fn(void *, size_t);
+typedef void *ccc_alloc_fn(void *, size_t);
 
 typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
 
