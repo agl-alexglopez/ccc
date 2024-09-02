@@ -70,8 +70,7 @@ void *ccc_depq_erase(ccc_double_ended_priority_queue *, ccc_depq_elem *);
 bool ccc_depq_update(ccc_double_ended_priority_queue *, ccc_depq_elem *,
                      ccc_update_fn *, void *);
 
-bool ccc_depq_contains(ccc_double_ended_priority_queue *,
-                       ccc_depq_elem const *);
+bool ccc_depq_contains(ccc_double_ended_priority_queue *, void const *key);
 
 void *ccc_depq_begin(ccc_double_ended_priority_queue *);
 
