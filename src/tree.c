@@ -110,11 +110,15 @@ ccc_depq_clear(ccc_double_ended_priority_queue *pq,
 {
     while (!ccc_depq_empty(pq))
     {
+        void *popped = struct_base(&pq->impl, pop_min(&pq->impl));
         if (destructor)
         {
-            destructor(ccc_depq_max(pq));
+            destructor(popped);
         }
-        ccc_depq_pop_max(pq);
+        if (pq->impl.alloc)
+        {
+            pq->impl.alloc(popped, 0);
+        }
     }
 }
 
@@ -332,9 +336,9 @@ ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
 
 bool
 ccc_depq_contains(ccc_double_ended_priority_queue *const pq,
-                  ccc_depq_elem const *const elem)
+                  void const *const key)
 {
-    return contains(&pq->impl, &elem->impl);
+    return contains(&pq->impl, key);
 }
 
 void
@@ -392,7 +396,15 @@ ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
 
     while (!ccc_om_empty(set))
     {
-        destructor(struct_base(&set->impl, pop_min(&set->impl)));
+        void *popped = struct_base(&set->impl, pop_min(&set->impl));
+        if (destructor)
+        {
+            destructor(popped);
+        }
+        if (set->impl.alloc)
+        {
+            set->impl.alloc(popped, 0);
+        }
     }
 }
 
