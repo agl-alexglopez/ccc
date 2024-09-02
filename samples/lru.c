@@ -27,7 +27,7 @@ struct lru_lookup
 {
     int key;
     struct key_val *kv_in_list;
-    ccc_fhash_elem hash_elem;
+    ccc_fh_map_elem hash_elem;
 };
 
 enum lru_call
@@ -123,7 +123,7 @@ run_lru_cache(void)
 static void
 put(struct lru_cache *const lru, int key, int val)
 {
-    ccc_fhash_entry const ent = FHM_ENTRY(&lru->fh, key);
+    ccc_fh_map_entry const ent = FHM_ENTRY(&lru->fh, key);
     struct lru_lookup const *found = FHM_UNWRAP(ent);
     if (found)
     {

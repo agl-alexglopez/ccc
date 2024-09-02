@@ -3,8 +3,8 @@
    These are the base types that all interfaces typedef to implement
    specialized data structures. Because everything is based on a tree
    of some sort, we provide those types here and implement the core
-   functionality as if we were crafting a tree with ccc_map and multi
-   ccc_map abilities. Then we typdedef other interfaces and the user
+   functionality as if we were crafting a tree with ccc_ordered_map and multi
+   ccc_ordered_map abilities. Then we typdedef other interfaces and the user
    can include those instead of remembering how to use the tree the
    correct way for their data structure. */
 #ifndef CCC_IMPL_TREE_H
@@ -15,13 +15,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define CCC_M_EMPTY ((uint64_t)0)
-#define CCC_M_ENTRY_VACANT ((uint8_t)0x0)
-#define CCC_M_ENTRY_OCCUPIED ((uint8_t)0x1)
-#define CCC_M_ENTRY_INSERT_ERROR ((uint8_t)0x2)
-#define CCC_M_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
-#define CCC_M_ENTRY_NULL ((uint8_t)0x8)
-#define CCC_M_ENTRY_DELETE_ERROR ((uint8_t)0x10)
+#define CCC_OM_EMPTY ((uint64_t)0)
+#define CCC_OM_ENTRY_VACANT ((uint8_t)0x0)
+#define CCC_OM_ENTRY_OCCUPIED ((uint8_t)0x1)
+#define CCC_OM_ENTRY_INSERT_ERROR ((uint8_t)0x2)
+#define CCC_OM_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
+#define CCC_OM_ENTRY_NULL ((uint8_t)0x8)
+#define CCC_OM_ENTRY_DELETE_ERROR ((uint8_t)0x10)
 
 /* Instead of thinking about left and right consider only links
    in the abstract sense. Put them in an array and then flip

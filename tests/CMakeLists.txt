@@ -101,7 +101,7 @@ add_pq_test(test_pq_update)
 add_library(map_util map/map_util.h map/map_util.c)
 target_link_libraries(map_util
   PRIVATE
-    map
+    ordered_map
     test
 )
 
@@ -110,7 +110,7 @@ macro(add_map_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       map_util
-      map
+      ordered_map
       test
   )
   set_target_properties(${TEST_NAME} 

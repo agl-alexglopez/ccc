@@ -9,7 +9,7 @@ struct val
 {
     int id;
     int val;
-    ccc_fhash_elem e;
+    ccc_fh_map_elem e;
 };
 
 uint64_t fhash_int_zero(void const *);

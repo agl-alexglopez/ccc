@@ -1,5 +1,5 @@
-#include "map.h"
 #include "map_util.h"
+#include "ordered_map.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -38,7 +38,8 @@ main()
 static enum test_result
 map_test_prime_shuffle(void)
 {
-    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_ordered_map s
+        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -52,21 +53,21 @@ map_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_m_unwrap(ccc_m_insert(&s, &vals[i].elem)))
+        if (ccc_om_unwrap(ccc_om_insert(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }
-        CHECK(ccc_m_validate(&s), true, "%d");
+        CHECK(ccc_om_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_m_print(&s, &((struct val *)ccc_m_root(&s))->elem, map_printer_fn);
-    CHECK(ccc_m_size(&s) < size, true, "%d");
+    ccc_om_print(&s, &((struct val *)ccc_om_root(&s))->elem, map_printer_fn);
+    CHECK(ccc_om_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        void *const elem = ccc_m_remove(&s, &vals[i].elem);
+        void *const elem = ccc_om_remove(&s, &vals[i].elem);
         CHECK(elem || repeats[i], true, "%d");
-        CHECK(ccc_m_validate(&s), true, "%d");
+        CHECK(ccc_om_validate(&s), true, "%d");
     }
     return PASS;
 }
@@ -74,7 +75,8 @@ map_test_prime_shuffle(void)
 static enum test_result
 map_test_insert_erase_shuffled(void)
 {
-    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_ordered_map s
+        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -88,17 +90,18 @@ map_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_m_remove(&s, &vals[i].elem);
-        CHECK(ccc_m_validate(&s), true, "%d");
+        (void)ccc_om_remove(&s, &vals[i].elem);
+        CHECK(ccc_om_validate(&s), true, "%d");
     }
-    CHECK(ccc_m_empty(&s), true, "%d");
+    CHECK(ccc_om_empty(&s), true, "%d");
     return PASS;
 }
 
 static enum test_result
 map_test_weak_srand(void)
 {
-    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_ordered_map s
+        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -108,15 +111,15 @@ map_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)ccc_m_insert(&s, &vals[i].elem);
-        CHECK(ccc_m_validate(&s), true, "%d");
+        (void)ccc_om_insert(&s, &vals[i].elem);
+        CHECK(ccc_om_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_m_contains(&s, &vals[i].val), true, "%d");
-        (void)ccc_m_remove(&s, &vals[i].elem);
-        CHECK(ccc_m_validate(&s), true, "%d");
+        CHECK(ccc_om_contains(&s, &vals[i].val), true, "%d");
+        (void)ccc_om_remove(&s, &vals[i].elem);
+        CHECK(ccc_om_validate(&s), true, "%d");
     }
-    CHECK(ccc_m_empty(&s), true, "%d");
+    CHECK(ccc_om_empty(&s), true, "%d");
     return PASS;
 }

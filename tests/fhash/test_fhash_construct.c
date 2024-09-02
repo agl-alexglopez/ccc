@@ -59,7 +59,7 @@ fhash_test_entry_functional(void)
     CHECK(res, CCC_OK, "%d");
     CHECK(ccc_fhm_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
-    ccc_fhash_entry ent = ccc_fhm_entry(&fh, &def.id);
+    ccc_fh_map_entry ent = ccc_fhm_entry(&fh, &def.id);
     CHECK(ccc_fhm_unwrap(ent) == NULL, true, "%d");
     ((struct val *)ccc_fhm_or_insert(ccc_fhm_entry(&fh, &def.id), &def.e))->val
         += 1;
@@ -111,7 +111,7 @@ fhash_test_entry_and_modify_functional(void)
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fhash_entry ent = ccc_fhm_and_modify(ccc_fhm_entry(&fh, &def.id), mod);
+    ccc_fh_map_entry ent = ccc_fhm_and_modify(ccc_fhm_entry(&fh, &def.id), mod);
     CHECK(ccc_fhm_occupied(ent), false, "%d");
     CHECK((ccc_fhm_unwrap(ent) == NULL), true, "%d");
 
@@ -153,7 +153,7 @@ fhash_test_entry_and_modify_macros(void)
     CHECK(ccc_fhm_empty(&fh), true, "%d");
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fhash_entry ent = FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), mod);
+    ccc_fh_map_entry ent = FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), mod);
     CHECK(ccc_fhm_occupied(ent), false, "%d");
     CHECK((ccc_fhm_unwrap(ent) == NULL), true, "%d");
 

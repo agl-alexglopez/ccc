@@ -40,7 +40,7 @@ fhash_test_erase(void)
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_fhash_entry ent = ccc_fhm_insert(&fh, &query.e);
+    ccc_fh_map_entry ent = ccc_fhm_insert(&fh, &query.e);
     CHECK(ccc_fhm_occupied(ent), false, "%d");
     CHECK(ccc_fhm_unwrap(ent), NULL, "%p");
     CHECK(ccc_fhm_size(&fh), 1, "%zu");

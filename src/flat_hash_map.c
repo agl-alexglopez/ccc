@@ -60,10 +60,10 @@ ccc_fhm_size(ccc_flat_hash_map const *const h)
     return ccc_buf_size(&h->impl.buf);
 }
 
-ccc_fhash_entry
+ccc_fh_map_entry
 ccc_fhm_entry(ccc_flat_hash_map *h, void const *const key)
 {
-    return (ccc_fhash_entry){ccc_impl_fhm_entry(&h->impl, key)};
+    return (ccc_fh_map_entry){ccc_impl_fhm_entry(&h->impl, key)};
 }
 
 struct ccc_impl_fhash_entry
@@ -78,7 +78,7 @@ ccc_impl_fhm_entry(struct ccc_impl_flat_hash *h, void const *key)
 }
 
 void *
-ccc_fhm_insert_entry(ccc_fhash_entry e, ccc_fhash_elem *const elem)
+ccc_fhm_insert_entry(ccc_fh_map_entry e, ccc_fh_map_elem *const elem)
 {
     void *user_struct = struct_base(e.impl.h, &elem->impl);
     if (e.impl.entry.status & CCC_FHM_ENTRY_OCCUPIED)
@@ -118,7 +118,7 @@ ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
 }
 
 bool
-ccc_fhm_remove_entry(ccc_fhash_entry e)
+ccc_fhm_remove_entry(ccc_fh_map_entry e)
 {
     if (e.impl.entry.status != CCC_FHM_ENTRY_OCCUPIED)
     {
@@ -128,10 +128,10 @@ ccc_fhm_remove_entry(ccc_fhash_entry e)
     return true;
 }
 
-ccc_fhash_entry
-ccc_fhm_and_modify(ccc_fhash_entry e, ccc_update_fn *const fn)
+ccc_fh_map_entry
+ccc_fhm_and_modify(ccc_fh_map_entry e, ccc_update_fn *const fn)
 {
-    return (ccc_fhash_entry){ccc_impl_fhm_and_modify(e.impl, fn)};
+    return (ccc_fh_map_entry){ccc_impl_fhm_and_modify(e.impl, fn)};
 }
 
 struct ccc_impl_fhash_entry
@@ -144,8 +144,8 @@ ccc_impl_fhm_and_modify(struct ccc_impl_fhash_entry e, ccc_update_fn *const fn)
     return e;
 }
 
-ccc_fhash_entry
-ccc_fhm_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
+ccc_fh_map_entry
+ccc_fhm_and_modify_with(ccc_fh_map_entry e, ccc_update_fn *const fn, void *aux)
 {
     if (e.impl.entry.status == CCC_FHM_ENTRY_OCCUPIED)
     {
@@ -154,8 +154,8 @@ ccc_fhm_and_modify_with(ccc_fhash_entry e, ccc_update_fn *const fn, void *aux)
     return e;
 }
 
-ccc_fhash_entry
-ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fhash_elem *const out_handle)
+ccc_fh_map_entry
+ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
 {
     void *user_return = struct_base(&h->impl, &out_handle->impl);
     void *key = ccc_impl_fhm_key_in_slot(&h->impl, user_return);
@@ -169,22 +169,22 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fhash_elem *const out_handle)
         ent.entry.status = CCC_FHM_ENTRY_OCCUPIED;
         uint8_t tmp[user_struct_size];
         swap(tmp, (void *)ent.entry.entry, user_return, user_struct_size);
-        return (ccc_fhash_entry){ent};
+        return (ccc_fh_map_entry){ent};
     }
     if (ent.entry.status & CCC_FHM_ENTRY_NULL)
     {
         ent.entry.status |= CCC_FHM_ENTRY_INSERT_ERROR;
-        return (ccc_fhash_entry){ent};
+        return (ccc_fh_map_entry){ent};
     }
     ccc_impl_fhm_insert(&h->impl, user_return, ent.hash,
                         ccc_buf_index_of(&h->impl.buf, ent.entry.entry));
     ent.entry.entry = NULL;
     ent.entry.status |= (CCC_FHM_ENTRY_VACANT | CCC_FHM_ENTRY_NULL);
-    return (ccc_fhash_entry){ent};
+    return (ccc_fh_map_entry){ent};
 }
 
 void *
-ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fhash_elem *const out_handle)
+ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
 {
     void *ret = struct_base(&h->impl, &out_handle->impl);
     void *key = ccc_impl_fhm_key_in_slot(&h->impl, ret);
@@ -200,7 +200,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fhash_elem *const out_handle)
 }
 
 void *
-ccc_fhm_or_insert(ccc_fhash_entry e, ccc_fhash_elem *const elem)
+ccc_fhm_or_insert(ccc_fh_map_entry e, ccc_fh_map_elem *const elem)
 {
     if (e.impl.entry.status & CCC_FHM_ENTRY_OCCUPIED)
     {
@@ -218,13 +218,13 @@ ccc_fhm_or_insert(ccc_fhash_entry e, ccc_fhash_elem *const elem)
 }
 
 inline void const *
-ccc_fhm_unwrap(ccc_fhash_entry e)
+ccc_fhm_unwrap(ccc_fh_map_entry e)
 {
     return ccc_impl_fhm_unwrap(&e.impl);
 }
 
 inline void *
-ccc_fhm_unwrap_mut(ccc_fhash_entry e)
+ccc_fhm_unwrap_mut(ccc_fh_map_entry e)
 {
     return (void *)ccc_impl_fhm_unwrap(&e.impl);
 }
@@ -240,13 +240,13 @@ ccc_impl_fhm_unwrap(struct ccc_impl_fhash_entry *e)
 }
 
 inline bool
-ccc_fhm_occupied(ccc_fhash_entry const e)
+ccc_fhm_occupied(ccc_fh_map_entry const e)
 {
     return e.impl.entry.status & CCC_FHM_ENTRY_OCCUPIED;
 }
 
 inline bool
-ccc_fhm_insert_error(ccc_fhash_entry e)
+ccc_fhm_insert_error(ccc_fh_map_entry e)
 {
     return e.impl.entry.status & CCC_FHM_ENTRY_INSERT_ERROR;
 }
@@ -267,7 +267,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
 }
 
 void *
-ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fhash_elem const *iter)
+ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
 {
     void *i = struct_base(&h->impl, &iter->impl);
     for (i = ccc_buf_next(&h->impl.buf, i);

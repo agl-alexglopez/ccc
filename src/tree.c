@@ -21,7 +21,7 @@
       https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c */
 #include "double_ended_priority_queue.h"
 #include "impl_tree.h"
-#include "map.h"
+#include "ordered_map.h"
 #include "types.h"
 
 #include <assert.h>
@@ -387,60 +387,60 @@ ccc_depq_validate(ccc_double_ended_priority_queue const *pq)
 /* ======================        Map Interface      ====================== */
 
 void
-ccc_m_clear(ccc_map *const set, ccc_destructor_fn *const destructor)
+ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
 {
 
-    while (!ccc_m_empty(set))
+    while (!ccc_om_empty(set))
     {
         destructor(struct_base(&set->impl, pop_min(&set->impl)));
     }
 }
 
 bool
-ccc_m_empty(ccc_map const *const s)
+ccc_om_empty(ccc_ordered_map const *const s)
 {
     return empty(&s->impl);
 }
 
 size_t
-ccc_m_size(ccc_map const *const s)
+ccc_om_size(ccc_ordered_map const *const s)
 {
     return s->impl.size;
 }
 
 bool
-ccc_m_contains(ccc_map *s, void const *const key)
+ccc_om_contains(ccc_ordered_map *s, void const *const key)
 {
     return contains(&s->impl, key);
 }
 
-ccc_mp_entry
-ccc_m_entry(ccc_map *const s, void const *const key)
+ccc_o_map_entry
+ccc_om_entry(ccc_ordered_map *const s, void const *const key)
 {
     void *found = find(&s->impl, key);
     if (found)
     {
-        return (ccc_mp_entry){{
+        return (ccc_o_map_entry){{
             .t = &s->impl,
             .entry = {
                 .entry = found, 
-                .status = CCC_M_ENTRY_OCCUPIED,
+                .status = CCC_OM_ENTRY_OCCUPIED,
             },
         }};
     }
-    return (ccc_mp_entry){{
+    return (ccc_o_map_entry){{
         .t = &s->impl,
         .entry = {
             .entry = found, 
-            .status = CCC_M_ENTRY_VACANT,
+            .status = CCC_OM_ENTRY_VACANT,
         },
     }};
 }
 
 void *
-ccc_m_insert_entry(ccc_mp_entry const e, ccc_mp_elem *const elem)
+ccc_om_insert_entry(ccc_o_map_entry const e, ccc_o_map_elem *const elem)
 {
-    if (e.impl.entry.status == CCC_M_ENTRY_OCCUPIED)
+    if (e.impl.entry.status == CCC_OM_ENTRY_OCCUPIED)
     {
         elem->impl = *ccc_impl_tree_elem_in_slot(e.impl.t, e.impl.entry.entry);
         memcpy((void *)e.impl.entry.entry, struct_base(e.impl.t, &elem->impl),
@@ -451,19 +451,19 @@ ccc_m_insert_entry(ccc_mp_entry const e, ccc_mp_elem *const elem)
 }
 
 void *
-ccc_m_or_insert(ccc_mp_entry const e, ccc_mp_elem *const elem)
+ccc_om_or_insert(ccc_o_map_entry const e, ccc_o_map_elem *const elem)
 {
-    if (e.impl.entry.status & CCC_M_ENTRY_OCCUPIED)
+    if (e.impl.entry.status & CCC_OM_ENTRY_OCCUPIED)
     {
         return NULL;
     }
     return insert(e.impl.t, &elem->impl);
 }
 
-ccc_mp_entry
-ccc_m_and_modify(ccc_mp_entry e, ccc_update_fn *const fn)
+ccc_o_map_entry
+ccc_om_and_modify(ccc_o_map_entry e, ccc_update_fn *const fn)
 {
-    if (e.impl.entry.status & CCC_M_ENTRY_OCCUPIED)
+    if (e.impl.entry.status & CCC_OM_ENTRY_OCCUPIED)
     {
         fn((ccc_update){
             .container = (void *const)e.impl.entry.entry,
@@ -473,10 +473,10 @@ ccc_m_and_modify(ccc_mp_entry e, ccc_update_fn *const fn)
     return e;
 }
 
-ccc_mp_entry
-ccc_m_and_modify_with(ccc_mp_entry e, ccc_update_fn *fn, void *aux)
+ccc_o_map_entry
+ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn, void *aux)
 {
-    if (e.impl.entry.status & CCC_M_ENTRY_OCCUPIED)
+    if (e.impl.entry.status & CCC_OM_ENTRY_OCCUPIED)
     {
         fn((ccc_update){
             .container = (void *const)e.impl.entry.entry,
@@ -486,36 +486,36 @@ ccc_m_and_modify_with(ccc_mp_entry e, ccc_update_fn *fn, void *aux)
     return e;
 }
 
-ccc_mp_entry
-ccc_m_insert(ccc_map *const s, ccc_mp_elem *const out_handle)
+ccc_o_map_entry
+ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
     void *inserted = insert(&s->impl, &out_handle->impl);
     void *root_struct = struct_base(&s->impl, s->impl.root);
     if (!inserted)
     {
-        *out_handle = *(ccc_mp_elem *)s->impl.root;
+        *out_handle = *(ccc_o_map_elem *)s->impl.root;
         uint8_t tmp[s->impl.elem_sz];
         void *user_struct = struct_base(&s->impl, &out_handle->impl);
         swap(tmp, user_struct, root_struct, s->impl.elem_sz);
-        return (ccc_mp_entry){{
+        return (ccc_o_map_entry){{
             .t = &s->impl,
             .entry = {
                 .entry = root_struct, 
-                .status = CCC_M_ENTRY_OCCUPIED,
+                .status = CCC_OM_ENTRY_OCCUPIED,
             },
         }};
     }
-    return (ccc_mp_entry){{
+    return (ccc_o_map_entry){{
         .t = &s->impl,
         .entry = {
             .entry = NULL, 
-            .status = CCC_M_ENTRY_VACANT | CCC_M_ENTRY_NULL,
+            .status = CCC_OM_ENTRY_VACANT | CCC_OM_ENTRY_NULL,
         },
     }};
 }
 
 void *
-ccc_m_remove(ccc_map *s, ccc_mp_elem *out_handle)
+ccc_om_remove(ccc_ordered_map *s, ccc_o_map_elem *out_handle)
 {
     void *n
         = erase(&s->impl, ccc_impl_key_from_node(&s->impl, &out_handle->impl));
@@ -533,10 +533,10 @@ ccc_m_remove(ccc_map *s, ccc_mp_elem *out_handle)
     return n;
 }
 
-ccc_mp_entry
-ccc_m_remove_entry(ccc_mp_entry e)
+ccc_o_map_entry
+ccc_om_remove_entry(ccc_o_map_entry e)
 {
-    if (e.impl.entry.status == CCC_M_ENTRY_OCCUPIED)
+    if (e.impl.entry.status == CCC_OM_ENTRY_OCCUPIED)
     {
         void *erased = erase(
             e.impl.t, ccc_impl_tree_key_in_slot(e.impl.t, e.impl.entry.entry));
@@ -545,35 +545,35 @@ ccc_m_remove_entry(ccc_mp_entry e)
         {
             e.impl.t->alloc(erased, 0);
             e.impl.entry.entry = NULL;
-            e.impl.entry.status |= CCC_M_ENTRY_NULL;
+            e.impl.entry.status |= CCC_OM_ENTRY_NULL;
         }
-        e.impl.entry.status |= CCC_M_ENTRY_DELETE_ERROR;
+        e.impl.entry.status |= CCC_OM_ENTRY_DELETE_ERROR;
     }
     return e;
 }
 
 void *
-ccc_m_get_mut(ccc_map *s, void const *const key)
+ccc_om_get_mut(ccc_ordered_map *s, void const *const key)
 {
     return (void *)find(&s->impl, key);
 }
 
 void const *
-ccc_m_get(ccc_map *s, void const *const key)
+ccc_om_get(ccc_ordered_map *s, void const *const key)
 {
     return find(&s->impl, key);
 }
 
 inline void *
-ccc_m_unwrap_mut(ccc_mp_entry e)
+ccc_om_unwrap_mut(ccc_o_map_entry e)
 {
-    return (void *)ccc_m_unwrap(e);
+    return (void *)ccc_om_unwrap(e);
 }
 
 inline void const *
-ccc_m_unwrap(ccc_mp_entry e)
+ccc_om_unwrap(ccc_o_map_entry e)
 {
-    if (e.impl.entry.status == CCC_M_ENTRY_OCCUPIED)
+    if (e.impl.entry.status == CCC_OM_ENTRY_OCCUPIED)
     {
         return e.impl.entry.entry;
     }
@@ -581,7 +581,7 @@ ccc_m_unwrap(ccc_mp_entry e)
 }
 
 void *
-ccc_m_begin(ccc_map *s)
+ccc_om_begin(ccc_ordered_map *s)
 {
     ccc_node const *const n = min(&s->impl);
     if (!n)
@@ -592,7 +592,7 @@ ccc_m_begin(ccc_map *s)
 }
 
 void *
-ccc_m_rbegin(ccc_map *s)
+ccc_om_rbegin(ccc_ordered_map *s)
 {
     ccc_node const *const n = max(&s->impl);
     if (!n)
@@ -603,7 +603,7 @@ ccc_m_rbegin(ccc_map *s)
 }
 
 void *
-ccc_m_next(ccc_map *s, ccc_mp_elem const *e)
+ccc_om_next(ccc_ordered_map *s, ccc_o_map_elem const *e)
 {
     ccc_node const *n = next(&s->impl, &e->impl, inorder_traversal);
     if (!n)
@@ -614,7 +614,7 @@ ccc_m_next(ccc_map *s, ccc_mp_elem const *e)
 }
 
 void *
-ccc_m_rnext(ccc_map *s, ccc_mp_elem const *e)
+ccc_om_rnext(ccc_ordered_map *s, ccc_o_map_elem const *e)
 {
     ccc_node const *n = next(&s->impl, &e->impl, reverse_inorder_traversal);
     if (!n)
@@ -625,27 +625,27 @@ ccc_m_rnext(ccc_map *s, ccc_mp_elem const *e)
 }
 
 ccc_range
-ccc_m_equal_range(ccc_map *s, void const *const begin_key,
-                  void const *const end_key)
+ccc_om_equal_range(ccc_ordered_map *s, void const *const begin_key,
+                   void const *const end_key)
 {
     return equal_range(&s->impl, begin_key, end_key, inorder_traversal);
 }
 
 void *
-ccc_m_begin_range(ccc_range const *const r)
+ccc_om_begin_range(ccc_range const *const r)
 {
     return range_begin(r);
 }
 
 void *
-ccc_m_end_range(ccc_range const *const r)
+ccc_om_end_range(ccc_range const *const r)
 {
     return range_end(r);
 }
 
 ccc_rrange
-ccc_m_equal_rrange(ccc_map *s, void const *const rbegin_key,
-                   void const *const end_key)
+ccc_om_equal_rrange(ccc_ordered_map *s, void const *const rbegin_key,
+                    void const *const end_key)
 
 {
     ccc_range const r
@@ -657,19 +657,19 @@ ccc_m_equal_rrange(ccc_map *s, void const *const rbegin_key,
 }
 
 void *
-ccc_m_begin_rrange(ccc_rrange const *const rr)
+ccc_om_begin_rrange(ccc_rrange const *const rr)
 {
     return rrange_begin(rr);
 }
 
 void *
-ccc_m_end_rrange(ccc_rrange const *rr)
+ccc_om_end_rrange(ccc_rrange const *rr)
 {
     return rrange_end(rr);
 }
 
 bool
-ccc_m_const_contains(ccc_map *s, ccc_mp_elem const *e)
+ccc_om_const_contains(ccc_ordered_map *s, ccc_o_map_elem const *e)
 {
     ccc_node const *n = const_seek(&s->impl, &e->impl);
     if (!n)
@@ -680,7 +680,7 @@ ccc_m_const_contains(ccc_map *s, ccc_mp_elem const *e)
 }
 
 void *
-ccc_m_root(ccc_map const *const s)
+ccc_om_root(ccc_ordered_map const *const s)
 {
     ccc_node *n = root(&s->impl);
     if (!n)
@@ -691,14 +691,14 @@ ccc_m_root(ccc_map const *const s)
 }
 
 void
-ccc_m_print(ccc_map const *const s, ccc_mp_elem const *const root,
-            ccc_print_fn *const fn)
+ccc_om_print(ccc_ordered_map const *const s, ccc_o_map_elem const *const root,
+             ccc_print_fn *const fn)
 {
     ccc_tree_print(&s->impl, &root->impl, fn);
 }
 
 bool
-ccc_m_validate(ccc_map const *const s)
+ccc_om_validate(ccc_ordered_map const *const s)
 {
     return ccc_tree_validate(&s->impl);
 }
