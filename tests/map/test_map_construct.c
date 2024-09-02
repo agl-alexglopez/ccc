@@ -1,5 +1,5 @@
-#include "map.h"
 #include "map_util.h"
+#include "ordered_map.h"
 #include "test.h"
 
 #include <stdbool.h>
@@ -30,7 +30,8 @@ main()
 static enum test_result
 map_test_empty(void)
 {
-    ccc_map s = CCC_M_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(ccc_m_empty(&s), true, "%d");
+    ccc_ordered_map s
+        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    CHECK(ccc_om_empty(&s), true, "%d");
     return PASS;
 }

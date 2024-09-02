@@ -1,6 +1,6 @@
 #include "cli.h"
 #include "flat_hash_map.h"
-#include "map.h"
+#include "ordered_map.h"
 #include "priority_queue.h"
 #include "queue.h"
 #include "random.h"
@@ -27,14 +27,14 @@ struct parent_cell
 {
     struct point key;
     struct point parent;
-    ccc_fhash_elem elem;
+    ccc_fh_map_elem elem;
 };
 
 struct prev_vertex
 {
     struct vertex *v;
     struct vertex *prev;
-    ccc_fhash_elem elem;
+    ccc_fh_map_elem elem;
     /* A pointer to the corresponding pq_entry for this element. */
     struct dist_point *dist_point;
 };
@@ -71,7 +71,7 @@ struct vertex
     char name;            /* Names are bounded to 26 [A-Z] maximum nodes. */
     struct point pos;     /* Position of this vertex in the grid. */
     struct edge edges[4]; /* The other vertices to which a vertex connects. */
-    ccc_mp_elem elem;     /* Vertices are in an adjacency map. */
+    ccc_o_map_elem elem;  /* Vertices are in an adjacency map. */
 };
 
 struct graph
@@ -84,7 +84,7 @@ struct graph
        will play a role in the cost of each edge between vertices. */
     Cell *grid;
     /* Yes we could rep this differently, but we want to test the map here. */
-    ccc_map adjacency_list;
+    ccc_ordered_map adjacency_list;
 };
 
 /* Helper type for labelling costs for edges between vertices in the graph. */
@@ -264,8 +264,8 @@ main(int argc, char **argv)
         .vertices = default_vertices,
         .grid = NULL,
         .adjacency_list
-        = CCC_M_INIT(struct vertex, elem, name, graph.adjacency_list, NULL,
-                     cmp_vertices, NULL),
+        = CCC_OM_INIT(struct vertex, elem, name, graph.adjacency_list, NULL,
+                      cmp_vertices, NULL),
     };
     for (int i = 1; i < argc; ++i)
     {
@@ -319,7 +319,7 @@ main(int argc, char **argv)
     find_shortest_paths(&graph);
     set_cursor_position(graph.rows + 1, graph.cols + 1);
     printf("\n");
-    ccc_m_clear(&graph.adjacency_list, map_vertex_destructor);
+    ccc_om_clear(&graph.adjacency_list, map_vertex_destructor);
 }
 
 /*========================   Graph Building    ==============================*/
@@ -348,8 +348,8 @@ build_graph(struct graph *const graph)
             .pos = rand_point,
             .edges = {{0}, {0}, {0}, {0}},
         };
-        if (!ccc_m_insert_entry(
-                ccc_m_entry(&graph->adjacency_list, &new_vertex->name),
+        if (!ccc_om_insert_entry(
+                ccc_om_entry(&graph->adjacency_list, &new_vertex->name),
                 &new_vertex->elem))
         {
             quit("Error building vertices. Could not insert vertex.\n", 1);
@@ -360,7 +360,7 @@ build_graph(struct graph *const graph)
     {
         char key = (char)vertex_title;
         struct vertex *const src
-            = ccc_m_unwrap_mut(ccc_m_entry(&graph->adjacency_list, &key));
+            = ccc_om_unwrap_mut(ccc_om_entry(&graph->adjacency_list, &key));
         if (!src)
         {
             quit("Vertex that should be present in the map is absent.\n", 1);
@@ -380,7 +380,7 @@ build_graph(struct graph *const graph)
 static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
-    size_t const graph_size = ccc_m_size(&graph->adjacency_list);
+    size_t const graph_size = ccc_om_size(&graph->adjacency_list);
     /* Bounded at size of the alphabet A-Z so alloca is fine here. */
     size_t vertex_title_indices[sizeof(size_t) * graph_size];
     for (size_t i = 0; i < graph_size; ++i)
@@ -397,7 +397,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        dst = ccc_m_unwrap_mut(ccc_m_entry(&graph->adjacency_list, &key));
+        dst = ccc_om_unwrap_mut(ccc_om_entry(&graph->adjacency_list, &key));
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -762,8 +762,8 @@ static void
 prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
                  ccc_flat_hash_map *prev_map, struct path_request const *pr)
 {
-    for (struct vertex *v = ccc_m_begin(&graph->adjacency_list); v;
-         v = ccc_m_next(&graph->adjacency_list, &v->elem))
+    for (struct vertex *v = ccc_om_begin(&graph->adjacency_list); v;
+         v = ccc_om_next(&graph->adjacency_list, &v->elem))
     {
         struct dist_point *p = valid_malloc(sizeof(struct dist_point));
         *p = (struct dist_point){
@@ -1125,13 +1125,13 @@ parse_path_request(struct graph *const g, str_view r)
     }
     struct path_request res = {0};
     char const end_title
-        = (char)(start_vertex_title + ccc_m_size(&g->adjacency_list) - 1);
+        = (char)(start_vertex_title + ccc_om_size(&g->adjacency_list) - 1);
     for (char const *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex *v
-                = ccc_m_unwrap_mut(ccc_m_entry(&g->adjacency_list, c));
+                = ccc_om_unwrap_mut(ccc_om_entry(&g->adjacency_list, c));
             assert(v);
             res.src ? (res.dst = v) : (res.src = v);
         }

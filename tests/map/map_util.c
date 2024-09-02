@@ -19,7 +19,7 @@ map_printer_fn(void const *const container)
 }
 
 enum test_result
-insert_shuffled(ccc_map *m, struct val vals[], size_t const size,
+insert_shuffled(ccc_ordered_map *m, struct val vals[], size_t const size,
                 int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -31,25 +31,25 @@ insert_shuffled(ccc_map *m, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_m_insert(m, &vals[shuffled_index].elem);
-        CHECK(ccc_m_size(m), i + 1, "%zu");
-        CHECK(ccc_m_validate(m), true, "%d");
+        ccc_om_insert(m, &vals[shuffled_index].elem);
+        CHECK(ccc_om_size(m), i + 1, "%zu");
+        CHECK(ccc_om_validate(m), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_m_size(m), size, "%zu");
+    CHECK(ccc_om_size(m), size, "%zu");
     return PASS;
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_map *m)
+inorder_fill(int vals[], size_t size, ccc_ordered_map *m)
 {
-    if (ccc_m_size(m) != size)
+    if (ccc_om_size(m) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_m_begin(m); e; e = ccc_m_next(m, &e->elem))
+    for (struct val *e = ccc_om_begin(m); e; e = ccc_om_next(m, &e->elem))
     {
         vals[i++] = e->val;
     }
