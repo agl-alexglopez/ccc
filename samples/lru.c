@@ -123,8 +123,8 @@ run_lru_cache(void)
 static void
 put(struct lru_cache *const lru, int key, int val)
 {
-    ccc_fhash_entry const ent = FH_ENTRY(&lru->fh, key);
-    struct lru_lookup const *found = FH_UNWRAP(ent);
+    ccc_fhash_entry const ent = FHM_ENTRY(&lru->fh, key);
+    struct lru_lookup const *found = FHM_UNWRAP(ent);
     if (found)
     {
         found->kv_in_list->key = key;
@@ -132,16 +132,16 @@ put(struct lru_cache *const lru, int key, int val)
         ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
         return;
     }
-    FH_INSERT_ENTRY(ent,
-                    (struct lru_lookup){
-                        .key = key,
-                        .kv_in_list = DLL_EMPLACE_FRONT(
-                            &lru->l, (struct key_val){.key = key, .val = val}),
-                    });
+    FHM_INSERT_ENTRY(ent,
+                     (struct lru_lookup){
+                         .key = key,
+                         .kv_in_list = DLL_EMPLACE_FRONT(
+                             &lru->l, (struct key_val){.key = key, .val = val}),
+                     });
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
-        ccc_fhm_remove_entry(FH_ENTRY(&lru->fh, to_drop->key));
+        ccc_fhm_remove_entry(FHM_ENTRY(&lru->fh, to_drop->key));
         ccc_dll_pop_back(&lru->l);
     }
 }
@@ -149,7 +149,7 @@ put(struct lru_cache *const lru, int key, int val)
 static int
 get(struct lru_cache *const lru, int key)
 {
-    struct lru_lookup const *found = FH_UNWRAP(FH_ENTRY(&lru->fh, key));
+    struct lru_lookup const *found = FHM_UNWRAP(FHM_ENTRY(&lru->fh, key));
     if (!found)
     {
         return -1;

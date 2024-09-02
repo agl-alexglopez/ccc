@@ -53,9 +53,9 @@ fhash_test_erase(void)
     v = ccc_fhm_remove(&fh, &query.e);
     CHECK(v == NULL, true, "%d");
     CHECK(ccc_fhm_size(&fh), 0, "%zu");
-    FH_INSERT_ENTRY(FH_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
+    FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
     CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    CHECK(ccc_fhm_remove_entry(FH_ENTRY(&fh, 137)), true, "%d");
+    CHECK(ccc_fhm_remove_entry(FHM_ENTRY(&fh, 137)), true, "%d");
     CHECK(ccc_fhm_size(&fh), 0, "%zu");
     return PASS;
 }
@@ -95,7 +95,7 @@ fhash_test_shuffle_insert_erase(void)
         }
         else
         {
-            bool const removed = ccc_fhm_remove_entry(FH_ENTRY(&fh, i));
+            bool const removed = ccc_fhm_remove_entry(FHM_ENTRY(&fh, i));
             CHECK(removed, true, "%d");
         }
         --cur_size;

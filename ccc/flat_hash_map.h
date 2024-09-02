@@ -44,36 +44,36 @@ initialization is successful or a failure. */
     CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
                       fhash_elem_field, realloc_fn, hash_fn, key_eq_fn, aux)
 
-#define FH_GET(fhash_ptr, key) CCC_IMPL_FHM_GET(fhash_ptr, key)
+#define FHM_GET(fhash_ptr, key) CCC_IMPL_FHM_GET(fhash_ptr, key)
 
-#define FH_GET_MUT(fhash_ptr, key) CCC_IMPL_FHM_GET_MUT(fhash_ptr, key)
+#define FHM_GET_MUT(fhash_ptr, key) CCC_IMPL_FHM_GET_MUT(fhash_ptr, key)
 
-#define FH_ENTRY(fhash_ptr, key)                                               \
+#define FHM_ENTRY(fhash_ptr, key)                                              \
     (ccc_fhash_entry)                                                          \
     {                                                                          \
         CCC_IMPL_FHM_ENTRY(fhash_ptr, key)                                     \
     }
 
-#define FH_UNWRAP(entry_copy) CCC_IMPL_FHM_UNWRAP(entry_copy)
+#define FHM_UNWRAP(entry_copy) CCC_IMPL_FHM_UNWRAP(entry_copy)
 
-#define FH_UNWRAP_MUT(entry_copy) CCC_IMPL_FHM_UNWRAP_MUT(entry_copy)
+#define FHM_UNWRAP_MUT(entry_copy) CCC_IMPL_FHM_UNWRAP_MUT(entry_copy)
 
-#define FH_AND_MODIFY(entry_copy, mod_fn)                                      \
+#define FHM_AND_MODIFY(entry_copy, mod_fn)                                     \
     (ccc_fhash_entry)                                                          \
     {                                                                          \
         CCC_IMPL_FHM_AND_MODIFY(entry_copy, mod_fn)                            \
     }
 
-#define FH_AND_MODIFY_W(entry_copy, mod_fn, aux)                               \
+#define FHM_AND_MODIFY_W(entry_copy, mod_fn, aux)                              \
     (ccc_fhash_entry)                                                          \
     {                                                                          \
         CCC_IMPL_FHM_AND_MODIFY_W(entry_copy, mod_fn, aux)                     \
     }
 
-#define FH_INSERT_ENTRY(entry_copy, key_val_struct...)                         \
+#define FHM_INSERT_ENTRY(entry_copy, key_val_struct...)                        \
     CCC_IMPL_FHM_INSERT_ENTRY(entry_copy, key_val_struct)
 
-#define FH_OR_INSERT(entry_copy, key_val_struct...)                            \
+#define FHM_OR_INSERT(entry_copy, key_val_struct...)                           \
     CCC_IMPL_FHM_OR_INSERT(entry_copy, key_val_struct)
 
 /** @brief Searches the table for the presence of key.
