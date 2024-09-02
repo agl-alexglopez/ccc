@@ -16,5 +16,5 @@ target_link_libraries(impl_flat_priority_queue INTERFACE buffer types)
 add_library(impl_priority_queue INTERFACE impl_priority_queue.h)
 target_link_libraries(impl_priority_queue INTERFACE types)
 
-add_library(impl_flat_hash INTERFACE impl_flat_hash.h)
-target_link_libraries(impl_flat_hash INTERFACE types buffer)
+add_library(impl_flat_hash_map INTERFACE impl_flat_hash_map.h)
+target_link_libraries(impl_flat_hash_map INTERFACE types buffer)

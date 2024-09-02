@@ -40,12 +40,12 @@ target_link_libraries(flat_priority_queue
     impl_flat_priority_queue
 )
 
-add_library(flat_hash flat_hash.h ${CMAKE_SOURCE_DIR}/src/flat_hash.c)
-target_link_libraries(flat_hash
+add_library(flat_hash_map flat_hash_map.h ${CMAKE_SOURCE_DIR}/src/flat_hash_map.c)
+target_link_libraries(flat_hash_map
   INTERFACE
     types
   PRIVATE
-    impl_flat_hash
+    impl_flat_hash_map
 )
 
 add_library(double_ended_priority_queue double_ended_priority_queue.h ${CMAKE_SOURCE_DIR}/src/tree.c)

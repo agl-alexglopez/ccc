@@ -2,7 +2,7 @@
 The leetcode lru problem in C. */
 #include "doubly_linked_list.h"
 #include "fhash/fhash_util.h"
-#include "flat_hash.h"
+#include "flat_hash_map.h"
 #include "test.h"
 
 #include <stdlib.h>
@@ -18,7 +18,7 @@ struct key_val
 
 struct lru_cache
 {
-    ccc_flat_hash fh;
+    ccc_flat_hash_map fh;
     ccc_doubly_linked_list l;
     size_t cap;
 };
@@ -72,8 +72,8 @@ run_lru_cache(void)
                           cmp_by_key, NULL),
     };
     printf("LRU CAPACITY -> %zu\n", lru.cap);
-    CCC_FH_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
-                fhash_int_to_u64, lru_lookup_cmp, NULL);
+    CCC_FHM_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
+                 fhash_int_to_u64, lru_lookup_cmp, NULL);
     struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .put = put},
         {PUT, .key = 2, .val = 2, .put = put},
@@ -95,7 +95,7 @@ run_lru_cache(void)
             requests[i].put(&lru, requests[i].key, requests[i].val);
             printf("PUT -> {key: %d, val: %d}\n", requests[i].key,
                    requests[i].val);
-            CHECK(ccc_fh_validate(&lru.fh), true, "%d");
+            CHECK(ccc_fhm_validate(&lru.fh), true, "%d");
             CHECK(ccc_dll_validate(&lru.l), true, "%d");
             break;
         case GET:
@@ -115,7 +115,7 @@ run_lru_cache(void)
             break;
         }
     }
-    ccc_fh_clear_and_free(&lru.fh, NULL);
+    ccc_fhm_clear_and_free(&lru.fh, NULL);
     ccc_dll_clear(&lru.l, NULL);
     return PASS;
 }
@@ -141,7 +141,7 @@ put(struct lru_cache *const lru, int key, int val)
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
-        ccc_fh_remove_entry(FH_ENTRY(&lru->fh, to_drop->key));
+        ccc_fhm_remove_entry(FH_ENTRY(&lru->fh, to_drop->key));
         ccc_dll_pop_back(&lru->l);
     }
 }

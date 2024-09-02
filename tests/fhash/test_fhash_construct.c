@@ -1,5 +1,5 @@
 #include "fhash_util.h"
-#include "flat_hash.h"
+#include "flat_hash_map.h"
 #include "test.h"
 
 static enum test_result fhash_test_empty(void);
@@ -41,11 +41,11 @@ static enum test_result
 fhash_test_empty(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_flat_hash fh;
-    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_flat_hash_map fh;
+    ccc_result const res = CCC_FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
-    CHECK(ccc_fh_empty(&fh), true, "%d");
+    CHECK(ccc_fhm_empty(&fh), true, "%d");
     return PASS;
 }
 
@@ -53,20 +53,20 @@ static enum test_result
 fhash_test_entry_functional(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_flat_hash fh;
-    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_flat_hash_map fh;
+    ccc_result const res = CCC_FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
-    CHECK(ccc_fh_empty(&fh), true, "%d");
+    CHECK(ccc_fhm_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
-    ccc_fhash_entry ent = ccc_fh_entry(&fh, &def.id);
-    CHECK(ccc_fh_unwrap(ent) == NULL, true, "%d");
-    ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
+    ccc_fhash_entry ent = ccc_fhm_entry(&fh, &def.id);
+    CHECK(ccc_fhm_unwrap(ent) == NULL, true, "%d");
+    ((struct val *)ccc_fhm_or_insert(ccc_fhm_entry(&fh, &def.id), &def.e))->val
         += 1;
-    struct val const *const inserted = ccc_fh_get(&fh, &def.id);
+    struct val const *const inserted = ccc_fhm_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->val, 1, "%d");
-    ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
+    ((struct val *)ccc_fhm_or_insert(ccc_fhm_entry(&fh, &def.id), &def.e))->val
         += 1;
     CHECK(inserted->val, 2, "%d");
     return PASS;
@@ -76,11 +76,11 @@ static enum test_result
 fhash_test_entry_macros(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_flat_hash fh;
-    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_flat_hash_map fh;
+    ccc_result const res = CCC_FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
-    CHECK(ccc_fh_empty(&fh), true, "%d");
+    CHECK(ccc_fhm_empty(&fh), true, "%d");
     CHECK(FH_GET(&fh, 137) == NULL, true, "%d");
     int const key = 137;
     int mut = 99;
@@ -102,38 +102,38 @@ static enum test_result
 fhash_test_entry_and_modify_functional(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_flat_hash fh;
-    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_flat_hash_map fh;
+    ccc_result const res = CCC_FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
-    CHECK(ccc_fh_empty(&fh), true, "%d");
+    CHECK(ccc_fhm_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fhash_entry ent = ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod);
-    CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK((ccc_fh_unwrap(ent) == NULL), true, "%d");
+    ccc_fhash_entry ent = ccc_fhm_and_modify(ccc_fhm_entry(&fh, &def.id), mod);
+    CHECK(ccc_fhm_occupied(ent), false, "%d");
+    CHECK((ccc_fhm_unwrap(ent) == NULL), true, "%d");
 
     /* Inserting default value before an in place modification is possible. */
-    ((struct val *)ccc_fh_or_insert(ccc_fh_entry(&fh, &def.id), &def.e))->val
+    ((struct val *)ccc_fhm_or_insert(ccc_fhm_entry(&fh, &def.id), &def.e))->val
         += 1;
-    struct val const *const inserted = ccc_fh_get(&fh, &def.id);
+    struct val const *const inserted = ccc_fhm_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
     CHECK(inserted->val, 1, "%d");
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2 = ccc_fh_or_insert(
-        ccc_fh_and_modify(ccc_fh_entry(&fh, &def.id), mod), &def.e);
+    struct val *v2 = ccc_fhm_or_insert(
+        ccc_fhm_and_modify(ccc_fhm_entry(&fh, &def.id), mod), &def.e);
     CHECK((v2 != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
     CHECK(v2->val, 6, "%d");
 
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
-    struct val *v3 = ccc_fh_or_insert(
-        ccc_fh_and_modify_with(ccc_fh_entry(&fh, &def.id), modw, &def.id),
+    struct val *v3 = ccc_fhm_or_insert(
+        ccc_fhm_and_modify_with(ccc_fhm_entry(&fh, &def.id), modw, &def.id),
         &def.e);
     CHECK((v3 != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
@@ -145,16 +145,16 @@ static enum test_result
 fhash_test_entry_and_modify_macros(void)
 {
     struct val vals[2] = {{0}, {0}};
-    ccc_flat_hash fh;
-    ccc_result const res = CCC_FH_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                       fhash_int_zero, fhash_id_eq, NULL);
+    ccc_flat_hash_map fh;
+    ccc_result const res = CCC_FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
+                                        fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
-    CHECK(ccc_fh_empty(&fh), true, "%d");
+    CHECK(ccc_fhm_empty(&fh), true, "%d");
 
     /* Returning a vacant entry is possible when modification is attemtped. */
     ccc_fhash_entry ent = FH_AND_MODIFY(FH_ENTRY(&fh, 137), mod);
-    CHECK(ccc_fh_occupied(ent), false, "%d");
-    CHECK((ccc_fh_unwrap(ent) == NULL), true, "%d");
+    CHECK(ccc_fhm_occupied(ent), false, "%d");
+    CHECK((ccc_fhm_unwrap(ent) == NULL), true, "%d");
 
     int mut = 99;
 

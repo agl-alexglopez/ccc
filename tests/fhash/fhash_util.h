@@ -1,7 +1,7 @@
 #ifndef CCC_FHASH_UTIL_H
 #define CCC_FHASH_UTIL_H
 
-#include "flat_hash.h"
+#include "flat_hash_map.h"
 
 #include <stdint.h>
 
