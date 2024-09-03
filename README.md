@@ -4,5 +4,9 @@ This repository contains various data structures written to support C programmer
 
 ## Build Instructions
 
-Work in progress. Full library installation instructions via CMake are coming as soon.
+Currently, this library supports a manual installation via CMake. See the [INSTALL.md](/INSTALL.md) file for more details.
+
+## About
+
+Currently all Containers provided by this library can be viewed in the [`ccc/`](/ccc/) folder. More details on usage and design of the library is coming soon.
 
