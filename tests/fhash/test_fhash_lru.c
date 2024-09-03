@@ -57,6 +57,18 @@ static bool lru_lookup_cmp(ccc_key_cmp);
 
 static ccc_threeway_cmp cmp_by_key(ccc_cmp cmp);
 
+/* Disable me if tests start failing! */
+static bool const quiet = true;
+
+#define QUIET_PRINT(format_string...)                                          \
+    do                                                                         \
+    {                                                                          \
+        if (!quiet)                                                            \
+        {                                                                      \
+            printf(format_string);                                             \
+        }                                                                      \
+    } while (0)
+
 int
 main()
 {
@@ -71,7 +83,7 @@ run_lru_cache(void)
         .l = CCC_DLL_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc,
                           cmp_by_key, NULL),
     };
-    printf("LRU CAPACITY -> %zu\n", lru.cap);
+    QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
     CCC_FHM_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
                  fhash_int_to_u64, lru_lookup_cmp, NULL);
     struct lru_request requests[REQS] = {
@@ -93,21 +105,21 @@ run_lru_cache(void)
         {
         case PUT:
             requests[i].put(&lru, requests[i].key, requests[i].val);
-            printf("PUT -> {key: %d, val: %d}\n", requests[i].key,
-                   requests[i].val);
+            QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
+                        requests[i].val);
             CHECK(ccc_fhm_validate(&lru.fh), true, "%d");
             CHECK(ccc_dll_validate(&lru.l), true, "%d");
             break;
         case GET:
-            printf("GET -> {key: %d, val: %d}\n", requests[i].key,
-                   requests[i].val);
+            QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
+                        requests[i].val);
             CHECK(requests[i].get(&lru, requests[i].key), requests[i].val,
                   "%d");
             CHECK(ccc_dll_validate(&lru.l), true, "%d");
             break;
         case HED:
-            printf("HED -> {key: %d, val: %d}\n", requests[i].key,
-                   requests[i].val);
+            QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
+                        requests[i].val);
             CHECK(requests[i].hed(&lru)->key, requests[i].key, "%d");
             CHECK(requests[i].hed(&lru)->val, requests[i].val, "%d");
             break;

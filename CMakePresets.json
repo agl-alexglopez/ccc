@@ -31,6 +31,34 @@
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin",
                 "CMAKE_C_FLAGS": "-Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -fno-diagnostics-show-option"
             }
+        },
+        {
+            "name": "gcc-deb",
+            "inherits": "default-deb",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc-12"
+            }
+        },
+        {
+            "name": "gcc-rel",
+            "inherits": "default-rel",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc-12"
+            }
+        },
+        {
+            "name": "clang-deb",
+            "inherits": "default-deb",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang"
+            }
+        },
+        {
+            "name": "clang-rel",
+            "inherits": "default-rel",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang"
+            }
         }
     ]
 }

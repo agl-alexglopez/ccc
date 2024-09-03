@@ -66,7 +66,7 @@ map_test_prime_shuffle(void)
     for (size_t i = 0; i < size; ++i)
     {
         void *const elem = ccc_om_remove(&s, &vals[i].elem);
-        CHECK(elem || repeats[i], true, "%d");
+        CHECK(elem || !repeats[i], true, "%d");
         CHECK(ccc_om_validate(&s), true, "%d");
     }
     return PASS;
