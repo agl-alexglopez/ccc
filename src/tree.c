@@ -497,8 +497,9 @@ ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn, void *aux)
 ccc_o_map_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
-    void *inserted = alloc_insert(&s->impl, &out_handle->impl);
-    if (!inserted)
+    void *found = find(
+        &s->impl, ccc_impl_tree_key_from_node(&s->impl, &out_handle->impl));
+    if (found)
     {
         assert(s->impl.root != &s->impl.end);
         *out_handle = *(ccc_o_map_elem *)s->impl.root;
@@ -513,6 +514,17 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
                 .status = CCC_OM_ENTRY_OCCUPIED,
             },
         }};
+    }
+    void *inserted = alloc_insert(&s->impl, &out_handle->impl);
+    if (!inserted)
+    {
+        return (ccc_o_map_entry){{
+        .t = &s->impl,
+        .entry = {
+            .entry = NULL, 
+            .status = CCC_OM_ENTRY_NULL | CCC_OM_ENTRY_INSERT_ERROR,
+        },
+    }};
     }
     return (ccc_o_map_entry){{
         .t = &s->impl,
@@ -542,7 +554,7 @@ ccc_om_remove(ccc_ordered_map *s, ccc_o_map_elem *out_handle)
     return n;
 }
 
-ccc_o_map_entry
+bool
 ccc_om_remove_entry(ccc_o_map_entry e)
 {
     if (e.impl.entry.status == CCC_OM_ENTRY_OCCUPIED)
@@ -556,9 +568,9 @@ ccc_om_remove_entry(ccc_o_map_entry e)
             e.impl.entry.entry = NULL;
             e.impl.entry.status |= CCC_OM_ENTRY_NULL;
         }
-        e.impl.entry.status |= CCC_OM_ENTRY_DELETE_ERROR;
+        return true;
     }
-    return e;
+    return false;
 }
 
 void *
@@ -694,6 +706,12 @@ ccc_om_print(ccc_ordered_map const *const s, ccc_o_map_elem const *const root,
              ccc_print_fn *const fn)
 {
     ccc_tree_print(&s->impl, &root->impl, fn);
+}
+
+bool
+ccc_om_insert_error(ccc_o_map_entry e)
+{
+    return e.impl.entry.status & CCC_OM_ENTRY_INSERT_ERROR;
 }
 
 bool

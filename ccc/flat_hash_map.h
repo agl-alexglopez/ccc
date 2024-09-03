@@ -78,33 +78,6 @@ initialization is successful or a failure. */
 @return true if the struct containing key is stored, false if not. */
 bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
 
-/** @brief Inserts the specified key and value into the hash table invariantly.
-@param [in] h the flat hash table being queried.
-@param [in] key the key being queried for insertion matching stored key type.
-@param [in] out_handle the handle to the struct inserted with the value.
-If a prior entry exists, It's content will be written to this container.
-@return an empty entry indicates no prior value was stored in the table. An
-occupied entry now points to the new value in the table. The old value
-has been written to the out_handle containing struct.
-@warning this function's side effect is overwriting the provided struct with
-the previous hash table entry if one existed.
-
-The hash elem handle must point to the embedded handle within the same struct
-type the user is storing in the table or the behavior is undefined.
-
-If the key did not exist in the table, an empty entry is returned and any
-get methods on it will yeild NULL/false. If a prior entry existed, the
-old entry from the table slot is swapped into the struct containing
-val_handle and the old table slot is overwritten with the new intended
-insertion. The new value in the table is returned as the entry. If such copy
-behavior is not needed consider using the entry api.
-
-If an insertion error occurs, due to a table resizing failure, a NULL and
-vacant entry is returned. Get methods will yeild false/NULL and the
-insertion error checking function will evaluate to true. */
-ccc_fh_map_entry ccc_fhm_insert(ccc_flat_hash_map *h,
-                                ccc_fh_map_elem *out_handle);
-
 /** @brief Removes the entry stored at key, writing stored value to output.
 @param [in] h the hash table to query.
 @param [in] key the key used for the query matching stored key type.
@@ -131,6 +104,33 @@ void const *ccc_fhm_get(ccc_flat_hash_map *h, void const *key);
 void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 
 /*========================    Entry API    ==================================*/
+
+/** @brief Inserts the specified key and value into the hash table invariantly.
+@param [in] h the flat hash table being queried.
+@param [in] key the key being queried for insertion matching stored key type.
+@param [in] out_handle the handle to the struct inserted with the value.
+If a prior entry exists, It's content will be written to this container.
+@return an empty entry indicates no prior value was stored in the table. An
+occupied entry now points to the new value in the table. The old value
+has been written to the out_handle containing struct.
+@warning this function's side effect is overwriting the provided struct with
+the previous hash table entry if one existed.
+
+The hash elem handle must point to the embedded handle within the same struct
+type the user is storing in the table or the behavior is undefined.
+
+If the key did not exist in the table, an empty entry is returned and any
+get methods on it will yeild NULL/false. If a prior entry existed, the
+old entry from the table slot is swapped into the struct containing
+val_handle and the old table slot is overwritten with the new intended
+insertion. The new value in the table is returned as the entry. If such copy
+behavior is not needed consider using the entry api.
+
+If an insertion error occurs, due to a table resizing failure, a NULL and
+vacant entry is returned. Get methods will yeild false/NULL and the
+insertion error checking function will evaluate to true. */
+ccc_fh_map_entry ccc_fhm_insert(ccc_flat_hash_map *h,
+                                ccc_fh_map_elem *out_handle);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
@@ -227,7 +227,9 @@ to (i.e. the idiomatic OR_INSERT(ENTRY(...)...)).
 However, if a Vacant entry is returned and then a subsequent insertion function
 is used, it will not work if resizing has failed and the return of those
 functions will indicate such a failure. One can also confirm an insertion error
-will occur from an entry with this function. */
+will occur from an entry with this function. For example, leaving this function
+in an assert for debug builds can be a helpful sanity check if the heap should
+correctly resize by default and errors are not usually expected. */
 bool ccc_fhm_insert_error(ccc_fh_map_entry e);
 
 /*==============================   Iteration    =============================*/

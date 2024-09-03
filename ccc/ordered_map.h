@@ -76,15 +76,23 @@ typedef struct
 #define OM_OR_INSERT(map_entry, key_value...)                                  \
     CCC_IMPL_TREE_OR_INSERT(map_entry, key_value)
 
-ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
+bool ccc_om_contains(ccc_ordered_map *, void const *key);
 
-void *ccc_om_or_insert(ccc_o_map_entry e, ccc_o_map_elem *elem);
-
-ccc_o_map_entry ccc_om_and_modify(ccc_o_map_entry e, ccc_update_fn *fn);
+void *ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
 void const *ccc_om_get(ccc_ordered_map *s, void const *key);
 
 void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
+
+/*===========================   Entry API   =================================*/
+
+ccc_o_map_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+
+bool ccc_om_remove_entry(ccc_o_map_entry e);
+
+ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
+
+ccc_o_map_entry ccc_om_and_modify(ccc_o_map_entry e, ccc_update_fn *fn);
 
 ccc_o_map_entry ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn,
                                        void *aux);
@@ -93,15 +101,11 @@ void const *ccc_om_unwrap(ccc_o_map_entry e);
 
 void *ccc_om_unwrap_mut(ccc_o_map_entry e);
 
+void *ccc_om_or_insert(ccc_o_map_entry e, ccc_o_map_elem *elem);
+
 void *ccc_om_insert_entry(ccc_o_map_entry e, ccc_o_map_elem *elem);
 
-ccc_o_map_entry ccc_om_remove_entry(ccc_o_map_entry e);
-
-bool ccc_om_contains(ccc_ordered_map *, void const *key);
-
-ccc_o_map_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
-
-void *ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+bool ccc_om_insert_error(ccc_o_map_entry e);
 
 bool ccc_om_const_contains(ccc_ordered_map *, ccc_o_map_elem const *);
 

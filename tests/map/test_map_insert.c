@@ -55,13 +55,21 @@ map_test_insert_three(void)
 {
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
-    struct val first_val = {.val = 1};
-    CHECK(ccc_om_unwrap(ccc_om_insert(&s, &first_val.elem)) == NULL, true,
+    struct val swap_slot = {.val = 1, .id = 99};
+    CHECK(ccc_om_unwrap(ccc_om_insert(&s, &swap_slot.elem)) == NULL, true,
           "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)1, "%zu");
-    struct val *ins
-        = OM_OR_INSERT(OM_ENTRY(&s, 2), (struct val){.val = 2, .id = 0});
+    swap_slot = (struct val){.val = 1, .id = 137};
+    struct val const *ins = ccc_om_unwrap(ccc_om_insert(&s, &swap_slot.elem));
+    CHECK(ccc_om_validate(&s), true, "%d");
+    CHECK(ccc_om_size(&s), (size_t)1, "%zu");
+    CHECK(ins != NULL, true, "%d");
+    CHECK(ins->val, 1, "%d");
+    CHECK(ins->id, 137, "%d");
+    CHECK(swap_slot.val, 1, "%d");
+    CHECK(swap_slot.id, 99, "%d");
+    ins = OM_OR_INSERT(OM_ENTRY(&s, 2), (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true, "%d");
     CHECK(ins->id, 0, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
