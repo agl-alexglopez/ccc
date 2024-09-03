@@ -72,3 +72,4 @@ build/
 .gdbinit
 save
 CMakeUserPresets.json
+install/
