@@ -6,7 +6,6 @@ project("ccc"
 )
 
 set(namespace "ccc")
-find_package(str_view)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src")

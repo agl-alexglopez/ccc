@@ -5,6 +5,8 @@ project("ccc util"
     DESCRIPTION "Utilities for testing and samples."
 )
 
+find_package(str_view)
+
 add_library(attrib INTERFACE attrib.h)
 add_library(random random.h random.c)
 add_library(cli cli.h cli.c)

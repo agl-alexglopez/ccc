@@ -5,6 +5,8 @@ project("ccc tests"
     DESCRIPTION "Testing the C Container Collection (ccc)."
 )
 
+find_package(str_view)
+
 add_library(test INTERFACE test.h)
 include_directories("../ccc")
 include_directories("../util")

@@ -33,13 +33,6 @@ typedef struct
     void *const end;
 } ccc_rrange;
 
-/* An entry is a snapshot of a query from the user for a container. All
-   memory for all containers is writable (that's what allows us to use the
-   containers). So, the const here discourages modification by the user.
-   To access the memory of an entry they must use the provided functions
-   for the given container. Those functions can then freely decide when
-   casting away const is appropriate (and well-defined) given the API
-   provided. */
 typedef struct
 {
     void const *entry;

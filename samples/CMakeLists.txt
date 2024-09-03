@@ -5,6 +5,7 @@ project("ccc samples"
     DESCRIPTION "Testing the C Container Collection with sample programs."
 )
 
+find_package(str_view)
 include_directories("../ccc")
 include_directories("../util")
 

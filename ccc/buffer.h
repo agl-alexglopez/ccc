@@ -1,7 +1,7 @@
 #ifndef CCC_BUFFER_H
 #define CCC_BUFFER_H
 
-#include "../src/impl_buffer.h"
+#include "impl_buffer.h"
 #include "types.h"
 
 #include <stdbool.h>
