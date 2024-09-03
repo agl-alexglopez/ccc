@@ -89,6 +89,7 @@ target_sources(${PROJECT_NAME}
             TYPE HEADERS
             BASE_DIRS ${PROJECT_SOURCE_DIR}
             FILES 
+              types.h
               buffer.h
               flat_hash_map.h
               flat_priority_queue.h
@@ -99,7 +100,7 @@ target_sources(${PROJECT_NAME}
               doubly_linked_list.h
 )
 
-target_compile_features(${PROJECT_NAME} PUBLIC c_std_11)
+target_compile_features(${PROJECT_NAME} PUBLIC c_std_17)
 
 # set properties for the target. VERSION set the library version to the project
 # version * SOVERSION set the compatibility  version for the library to the

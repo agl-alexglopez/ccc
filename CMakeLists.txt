@@ -10,8 +10,8 @@ find_package(str_view)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src")
-include_directories("${PROJECT_SOURCE_DIR}/ccc")
-add_subdirectory("${PROJECT_SOURCE_DIR}/ccc")
+include_directories("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
+add_subdirectory("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 
 # For the sake of vcpkg we will make sure cloning and building from
 # main will only build the minimal files in the all target. I can't
@@ -24,10 +24,12 @@ if (EXISTS "${PROJECT_SOURCE_DIR}/tests")
     include_directories("${PROJECT_SOURCE_DIR}/tests")
     add_subdirectory("${PROJECT_SOURCE_DIR}/tests" EXCLUDE_FROM_ALL)
 endif()
-if (EXISTS "${PROJECT_SOURCE_DIR}/tests" AND EXISTS "${PROJECT_SOURCE_DIR}/samples")
-    include(etc/scanners.cmake)
+if (EXISTS "${PROJECT_SOURCE_DIR}/util")
     include_directories("${PROJECT_SOURCE_DIR}/util")
     add_subdirectory("${PROJECT_SOURCE_DIR}/util" EXCLUDE_FROM_ALL)
+endif()
+if (EXISTS "${PROJECT_SOURCE_DIR}/tests" AND EXISTS "${PROJECT_SOURCE_DIR}/samples" AND EXISTS "${PROJECT_SOURCE_DIR}/util")
+    include(etc/scanners.cmake)
 endif()
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
