@@ -359,8 +359,7 @@ build_graph(struct graph *const graph)
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         char key = (char)vertex_title;
-        struct vertex *const src
-            = ccc_om_unwrap_mut(ccc_om_entry(&graph->adjacency_list, &key));
+        struct vertex *const src = ccc_om_get_mut(&graph->adjacency_list, &key);
         if (!src)
         {
             quit("Vertex that should be present in the map is absent.\n", 1);
@@ -397,7 +396,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        dst = ccc_om_unwrap_mut(ccc_om_entry(&graph->adjacency_list, &key));
+        dst = ccc_om_get_mut(&graph->adjacency_list, &key);
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
@@ -469,13 +468,12 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     }
     if (success)
     {
-        struct parent_cell const *cell
-            = ccc_fhm_unwrap(ccc_fhm_entry(&parent_map, &cur));
+        struct parent_cell const *cell = ccc_fhm_get(&parent_map, &cur);
         assert(cell);
         struct edge edge = {.to = dst, .cost = 1};
         while (cell->parent.r > 0)
         {
-            cell = ccc_fhm_unwrap(ccc_fhm_entry(&parent_map, &cell->parent));
+            cell = ccc_fhm_get(&parent_map, &cell->parent);
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -720,7 +718,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
         {
             struct prev_vertex *next
-                = FHM_UNWRAP_MUT(FHM_ENTRY(&prev_map, cur->v->edges[i].to));
+                = FHM_GET_MUT(&prev_map, cur->v->edges[i].to);
             assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -742,12 +740,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = FHM_UNWRAP(FHM_ENTRY(&prev_map, v));
+        struct prev_vertex const *prev = FHM_GET(&prev_map, v);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = FHM_UNWRAP(FHM_ENTRY(&prev_map, prev->prev));
+            prev = FHM_GET(&prev_map, prev->prev);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -1131,8 +1129,7 @@ parse_path_request(struct graph *const g, str_view r)
     {
         if (*c >= start_vertex_title && *c <= end_title)
         {
-            struct vertex *v
-                = ccc_om_unwrap_mut(ccc_om_entry(&g->adjacency_list, c));
+            struct vertex *v = ccc_om_get_mut(&g->adjacency_list, c);
             assert(v);
             res.src ? (res.dst = v) : (res.src = v);
         }
