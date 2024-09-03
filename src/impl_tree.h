@@ -96,6 +96,114 @@ bool ccc_tree_validate(ccc_tree const *t);
 void ccc_tree_print(ccc_tree const *t, ccc_node const *root, ccc_print_fn *fn);
 void *ccc_impl_tree_key_in_slot(ccc_tree const *t, void const *slot);
 ccc_node *ccc_impl_tree_elem_in_slot(ccc_tree const *t, void const *slot);
-void *ccc_impl_key_from_node(ccc_tree const *t, ccc_node const *n);
+void *ccc_impl_tree_key_from_node(ccc_tree const *t, ccc_node const *n);
+
+struct ccc_tree_entry ccc_impl_tree_entry(ccc_tree *t, void const *key);
+void *ccc_impl_tree_insert(ccc_tree *t, ccc_node *n);
+
+#define CCC_IMPL_TREE_ENTRY(tree_ptr, key...)                                  \
+    ({                                                                         \
+        __auto_type _tree_key_ = key;                                          \
+        struct ccc_tree_entry _tree_entry_                                     \
+            = ccc_impl_tree_entry(&(tree_ptr)->impl, &_tree_key_);             \
+        _tree_entry_;                                                          \
+    })
+
+#define CCC_IMPL_TREE_GET(tree_ptr, key...)                                    \
+    ({                                                                         \
+        __auto_type const _tree_key_ = key;                                    \
+        struct ccc_impl_fhash_entry _tree_get_ent_                             \
+            = ccc_impl_tree_entry(&(tree_ptr)->impl, &_tree_key_);             \
+        void const *_tree_get_res_ = NULL;                                     \
+        if (_tree_get_ent_.entry.status & CCC_OM_ENTRY_OCCUPIED)               \
+        {                                                                      \
+            _tree_get_res_ = _tree_get_ent_.entry.entry;                       \
+        }                                                                      \
+        _tree_get_res_;                                                        \
+    })
+
+#define CCC_IMPL_TREE_GET_MUT(tree_ptr, key...)                                \
+    ({                                                                         \
+        void *_tree_get_mut_res_ = (void *)CCC_IMPL_TREE_GET(fhash_ptr, key);  \
+        _tree_get_mut_res_;                                                    \
+    })
+
+#define CCC_IMPL_TREE_AND_MODIFY(tree_entry, mod_fn)                           \
+    ({                                                                         \
+        struct ccc_tree_entry _tree_mod_ent_ = (tree_entry).impl;              \
+        if (_tree_mod_ent_.entry.status & CCC_OM_ENTRY_OCCUPIED)               \
+        {                                                                      \
+            (mod_fn)(                                                          \
+                (ccc_update){.container = (void *const)e.entry, .aux = NULL}); \
+        }                                                                      \
+        _tree_mod_ent_;                                                        \
+    })
+
+#define CCC_IMPL_TREE_AND_MODIFY_W(tree_entry, mod_fn, aux_data)               \
+    ({                                                                         \
+        struct ccc_tree_entry _tree_mod_ent_ = (tree_entry).impl;              \
+        if (_tree_mod_ent_.entry.status & CCC_OM_ENTRY_OCCUPIED)               \
+        {                                                                      \
+            __auto_type _tree_aux_data_ = (aux_data);                          \
+            (mod_fn)((ccc_update){.container = (void *const)e.entry,           \
+                                  .aux = &_tree_aux_data_});                   \
+        }                                                                      \
+        _tree_mod_ent_;                                                        \
+    })
+
+#define CCC_IMPL_TREE_NEW_INSERT(entry, key_value...)                          \
+    ({                                                                         \
+        void *_tree_ins_alloc_ret_ = NULL;                                     \
+        if ((entry).t->alloc)                                                  \
+        {                                                                      \
+            _tree_ins_alloc_ret_ = (entry).t->alloc(NULL, (entry).t->elem_sz); \
+            if (_tree_ins_alloc_ret_)                                          \
+            {                                                                  \
+                *((typeof(key_value) *)_tree_ins_alloc_ret_) = key_value;      \
+                _tree_ins_alloc_ret_ = ccc_impl_tree_insert(                   \
+                    (entry).t, ccc_impl_tree_elem_in_slot(                     \
+                                   (entry).t, _tree_ins_alloc_ret_));          \
+            }                                                                  \
+        }                                                                      \
+        _tree_ins_alloc_ret_;                                                  \
+    })
+
+#define CCC_IMPL_TREE_INSERT_ENTRY(tree_entry, key_value...)                   \
+    ({                                                                         \
+        struct ccc_tree_entry _tree_ins_ent_ = (tree_entry).impl;              \
+        void *_tree_ins_ent_ret_ = NULL;                                       \
+        if (!(_tree_ins_ent_.entry.status & CCC_OM_ENTRY_OCCUPIED))            \
+        {                                                                      \
+            _tree_ins_ent_ret_                                                 \
+                = CCC_IMPL_TREE_NEW_INSERT(_tree_ins_ent_, key_value);         \
+        }                                                                      \
+        else if (_tree_ins_ent_.entry.status == CCC_OM_ENTRY_OCCUPIED)         \
+        {                                                                      \
+            struct ccc_node _ins_ent_saved_ = *ccc_impl_tree_elem_in_slot(     \
+                _tree_ins_ent_.t, _tree_ins_ent_.entry.entry);                 \
+            *((typeof(key_value) *)_tree_ins_ent_.entry.entry) = key_value;    \
+            *ccc_impl_tree_elem_in_slot(_tree_ins_ent_.t,                      \
+                                        _tree_ins_ent_.entry.entry)            \
+                = _ins_ent_saved_;                                             \
+            _tree_ins_ent_ret_ = (void *)_tree_ins_ent_.entry.entry;           \
+        }                                                                      \
+        _tree_ins_ent_ret_;                                                    \
+    })
+
+#define CCC_IMPL_TREE_OR_INSERT(tree_entry, key_value...)                      \
+    ({                                                                         \
+        struct ccc_tree_entry _tree_or_ins_ent_ = (tree_entry).impl;           \
+        void *_or_ins_ret_ = NULL;                                             \
+        if (_tree_or_ins_ent_.entry.status == CCC_OM_ENTRY_OCCUPIED)           \
+        {                                                                      \
+            _or_ins_ret_ = (void *)_tree_or_ins_ent_.entry.entry;              \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            _or_ins_ret_                                                       \
+                = CCC_IMPL_TREE_NEW_INSERT(_tree_or_ins_ent_, key_value);      \
+        }                                                                      \
+        _or_ins_ret_;                                                          \
+    })
 
 #endif /* CCC_IMPL_TREE_H */

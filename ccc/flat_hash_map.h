@@ -44,19 +44,15 @@ initialization is successful or a failure. */
     CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
-#define FHM_GET(fhash_ptr, key) CCC_IMPL_FHM_GET(fhash_ptr, key)
+#define FHM_GET(fhash_ptr, key...) CCC_IMPL_FHM_GET(fhash_ptr, key)
 
-#define FHM_GET_MUT(fhash_ptr, key) CCC_IMPL_FHM_GET_MUT(fhash_ptr, key)
+#define FHM_GET_MUT(fhash_ptr, key...) CCC_IMPL_FHM_GET_MUT(fhash_ptr, key)
 
-#define FHM_ENTRY(fhash_ptr, key)                                              \
+#define FHM_ENTRY(fhash_ptr, key...)                                           \
     (ccc_fh_map_entry)                                                         \
     {                                                                          \
         CCC_IMPL_FHM_ENTRY(fhash_ptr, key)                                     \
     }
-
-#define FHM_UNWRAP(entry_copy) CCC_IMPL_FHM_UNWRAP(entry_copy)
-
-#define FHM_UNWRAP_MUT(entry_copy) CCC_IMPL_FHM_UNWRAP_MUT(entry_copy)
 
 #define FHM_AND_MODIFY(entry_copy, mod_fn)                                     \
     (ccc_fh_map_entry)                                                         \

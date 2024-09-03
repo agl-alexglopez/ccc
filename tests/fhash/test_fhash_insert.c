@@ -637,7 +637,7 @@ fhash_test_insert_wrong_type(void)
                           (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    CHECK(((struct val *)FHM_UNWRAP(FHM_ENTRY(&fh, 137)))->val, 138, "%d");
+    CHECK(((struct val *)ccc_fhm_unwrap(FHM_ENTRY(&fh, 137)))->val, 138, "%d");
     /* This is somewhat nonsense as why would someone modify then overwrite
        the previous value? However, it's possible. The modification will
        still work before the overwrite insertion fails. */
@@ -645,6 +645,6 @@ fhash_test_insert_wrong_type(void)
                              (struct too_big){.a = {0, 0, {}}});
     CHECK(wrong == NULL, true, "%d");
     CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    CHECK(((struct val *)FHM_UNWRAP(FHM_ENTRY(&fh, 137)))->val, 139, "%d");
+    CHECK(((struct val *)ccc_fhm_unwrap(FHM_ENTRY(&fh, 137)))->val, 139, "%d");
     return PASS;
 }

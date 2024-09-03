@@ -136,7 +136,7 @@ static void
 put(struct lru_cache *const lru, int key, int val)
 {
     ccc_fh_map_entry const ent = FHM_ENTRY(&lru->fh, key);
-    struct lru_lookup const *found = FHM_UNWRAP(ent);
+    struct lru_lookup const *found = ccc_fhm_unwrap(ent);
     if (found)
     {
         found->kv_in_list->key = key;
@@ -161,7 +161,7 @@ put(struct lru_cache *const lru, int key, int val)
 static int
 get(struct lru_cache *const lru, int key)
 {
-    struct lru_lookup const *found = FHM_UNWRAP(FHM_ENTRY(&lru->fh, key));
+    struct lru_lookup const *found = ccc_fhm_unwrap(FHM_ENTRY(&lru->fh, key));
     if (!found)
     {
         return -1;

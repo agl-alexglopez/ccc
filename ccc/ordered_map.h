@@ -1,24 +1,24 @@
 /* Author: Alexander G. Lopez
-   --------------------------
-   This is the Map interface for the Splay Tree
-   Map. In this case we modify a Splay Tree to allow for
-   a true set (naturally sorted unique elements). See the
-   priority queue for another use case of this data
-   structure. A set can be an interesting option for a
-   LRU cache. Any application such that there is biased
-   distribution of access via lookup, insertion, and
-   removal brings those elements closer to the root of
-   the tree, approaching constant time operations. See
-   also the multiset for great benefits of duplicates
-   being taken from a data structure. The runtime is
-   amortized O(lgN) but with the right use cases we
-   may benefit from the O(1) capabilities of the working
-   set. The anti-pattern is to seek and splay all elements
-   to the tree in sequential order. However, any random
-   variants will help maintain tree health and this interface
-   provides robust iterators that can be used if read only
-   access is required of all elements or only conditional
-   modifications. This may combat such an anti-pattern. */
+--------------------------
+This is the Map interface for the Splay Tree
+Map. In this case we modify a Splay Tree to allow for
+a true set (naturally sorted unique elements). See the
+priority queue for another use case of this data
+structure. A set can be an interesting option for a
+LRU cache. Any application such that there is biased
+distribution of access via lookup, insertion, and
+removal brings those elements closer to the root of
+the tree, approaching constant time operations. See
+also the multiset for great benefits of duplicates
+being taken from a data structure. The runtime is
+amortized O(lgN) but with the right use cases we
+may benefit from the O(1) capabilities of the working
+set. The anti-pattern is to seek and splay all elements
+to the tree in sequential order. However, any random
+variants will help maintain tree health and this interface
+provides robust iterators that can be used if read only
+access is required of all elements or only conditional
+modifications. This may combat such an anti-pattern. */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 
@@ -47,6 +47,34 @@ typedef struct
                     alloc_fn, key_cmp, aux)                                    \
     CCC_TREE_INIT(struct_name, set_elem_field, key_elem_field, set_name,       \
                   alloc_fn, key_cmp, aux)
+
+#define OM_ENTRY(map_ptr, key...)                                              \
+    (ccc_o_map_entry)                                                          \
+    {                                                                          \
+        CCC_IMPL_TREE_ENTRY(map_ptr, key)                                      \
+    }
+
+#define OM_GET(map_ptr, key...) CCC_IMPL_TREE_GET(map_ptr, key)
+
+#define OM_GET_MUT(map_ptr, key...) CCC_IMPL_TREE_GET_MUT(map_ptr, key)
+
+#define OM_AND_MODIFY(map_entry, mod_fn)                                       \
+    (ccc_o_map_entry)                                                          \
+    {                                                                          \
+        CCC_IMPL_TREE_AND_MODIFY(map_entry, mod_fn)                            \
+    }
+
+#define OM_AND_MODIFY_W(map_entry, mod_fn, aux_data)                           \
+    (ccc_o_map_entry)                                                          \
+    {                                                                          \
+        CCC_IMPL_TREE_AND_MODIFY_WITH(map_entry, mod_fn, aux_data)             \
+    }
+
+#define OM_INSERT_ENTRY(map_entry, key_value...)                               \
+    CCC_IMPL_TREE_INSERT_ENTRY(map_entry, key_value)
+
+#define OM_OR_INSERT(map_entry, key_value...)                                  \
+    CCC_IMPL_TREE_OR_INSERT(map_entry, key_value)
 
 ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
 

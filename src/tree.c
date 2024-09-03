@@ -78,7 +78,7 @@ static bool has_dups(ccc_node const *, ccc_node const *);
 static void *struct_base(ccc_tree const *, ccc_node const *);
 static void *find(ccc_tree *, void const *);
 static void *erase(ccc_tree *, void const *key);
-static void *insert(ccc_tree *, ccc_node *);
+static void *alloc_insert(ccc_tree *, ccc_node *);
 static void *multimap_erase_max_or_min(ccc_tree *, ccc_key_cmp_fn *);
 static void *multimap_erase_node(ccc_tree *, ccc_node *);
 static void *connect_new_root(ccc_tree *, ccc_node *, ccc_threeway_cmp);
@@ -416,27 +416,33 @@ ccc_om_contains(ccc_ordered_map *s, void const *const key)
     return contains(&s->impl, key);
 }
 
-ccc_o_map_entry
-ccc_om_entry(ccc_ordered_map *const s, void const *const key)
+struct ccc_tree_entry
+ccc_impl_tree_entry(ccc_tree *t, void const *key)
 {
-    void *found = find(&s->impl, key);
+    void *found = find(t, key);
     if (found)
     {
-        return (ccc_o_map_entry){{
-            .t = &s->impl,
+        return (struct ccc_tree_entry){
+            .t = t,
             .entry = {
                 .entry = found, 
                 .status = CCC_OM_ENTRY_OCCUPIED,
             },
-        }};
+        };
     }
-    return (ccc_o_map_entry){{
-        .t = &s->impl,
+    return (struct ccc_tree_entry){
+        .t = t,
         .entry = {
             .entry = found, 
             .status = CCC_OM_ENTRY_VACANT,
         },
-    }};
+    };
+}
+
+ccc_o_map_entry
+ccc_om_entry(ccc_ordered_map *const s, void const *const key)
+{
+    return (ccc_o_map_entry){ccc_impl_tree_entry(&s->impl, key)};
 }
 
 void *
@@ -449,7 +455,7 @@ ccc_om_insert_entry(ccc_o_map_entry const e, ccc_o_map_elem *const elem)
                e.impl.t->elem_sz);
         return (void *)e.impl.entry.entry;
     }
-    return insert(e.impl.t, &elem->impl);
+    return alloc_insert(e.impl.t, &elem->impl);
 }
 
 void *
@@ -459,7 +465,7 @@ ccc_om_or_insert(ccc_o_map_entry const e, ccc_o_map_elem *const elem)
     {
         return NULL;
     }
-    return insert(e.impl.t, &elem->impl);
+    return alloc_insert(e.impl.t, &elem->impl);
 }
 
 ccc_o_map_entry
@@ -491,7 +497,7 @@ ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn, void *aux)
 ccc_o_map_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
-    void *inserted = insert(&s->impl, &out_handle->impl);
+    void *inserted = alloc_insert(&s->impl, &out_handle->impl);
     if (!inserted)
     {
         assert(s->impl.root != &s->impl.end);
@@ -520,8 +526,8 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 void *
 ccc_om_remove(ccc_ordered_map *s, ccc_o_map_elem *out_handle)
 {
-    void *n
-        = erase(&s->impl, ccc_impl_key_from_node(&s->impl, &out_handle->impl));
+    void *n = erase(&s->impl,
+                    ccc_impl_tree_key_from_node(&s->impl, &out_handle->impl));
     if (!n)
     {
         return NULL;
@@ -976,7 +982,7 @@ contains(ccc_tree *t, void const *key)
 }
 
 static void *
-insert(ccc_tree *t, ccc_node *out_handle)
+alloc_insert(ccc_tree *t, ccc_node *out_handle)
 {
     init_node(t, out_handle);
     if (empty(t))
@@ -995,7 +1001,7 @@ insert(ccc_tree *t, ccc_node *out_handle)
         t->size++;
         return struct_base(t, out_handle);
     }
-    void const *const key = ccc_impl_key_from_node(t, out_handle);
+    void const *const key = ccc_impl_tree_key_from_node(t, out_handle);
     t->root = splay(t, t->root, key, t->cmp);
     ccc_threeway_cmp const root_cmp = cmp(t, key, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
@@ -1016,6 +1022,27 @@ insert(ccc_tree *t, ccc_node *out_handle)
     return connect_new_root(t, out_handle, root_cmp);
 }
 
+void *
+ccc_impl_tree_insert(ccc_tree *t, ccc_node *n)
+{
+    init_node(t, n);
+    if (empty(t))
+    {
+        t->root = n;
+        t->size++;
+        return struct_base(t, n);
+    }
+    void const *const key = ccc_impl_tree_key_from_node(t, n);
+    t->root = splay(t, t->root, key, t->cmp);
+    ccc_threeway_cmp const root_cmp = cmp(t, key, t->root, t->cmp);
+    if (CCC_EQL == root_cmp)
+    {
+        return NULL;
+    }
+    t->size++;
+    return connect_new_root(t, n, root_cmp);
+}
+
 static void
 multimap_insert(ccc_tree *t, ccc_node *out_handle)
 {
@@ -1027,7 +1054,7 @@ multimap_insert(ccc_tree *t, ccc_node *out_handle)
         return;
     }
     t->size++;
-    void const *const key = ccc_impl_key_from_node(t, out_handle);
+    void const *const key = ccc_impl_tree_key_from_node(t, out_handle);
     t->root = splay(t, t->root, key, t->cmp);
 
     ccc_threeway_cmp const root_cmp = cmp(t, key, t->root, t->cmp);
@@ -1118,7 +1145,7 @@ multimap_erase_max_or_min(ccc_tree *t, ccc_key_cmp_fn *force_max_or_min)
     ccc_node *ret = splay(t, t->root, NULL, force_max_or_min);
     if (has_dups(&t->end, ret))
     {
-        ret = pop_front_dup(t, ret, ccc_impl_key_from_node(t, ret));
+        ret = pop_front_dup(t, ret, ccc_impl_tree_key_from_node(t, ret));
     }
     else
     {
@@ -1155,7 +1182,7 @@ multimap_erase_node(ccc_tree *t, ccc_node *node)
         node->link[N]->link[P] = node->link[P];
         return struct_base(t, node);
     }
-    void const *const key = ccc_impl_key_from_node(t, node);
+    void const *const key = ccc_impl_tree_key_from_node(t, node);
     ccc_node *ret = splay(t, t->root, key, t->cmp);
     if (cmp(t, key, ret, t->cmp) != CCC_EQL)
     {
@@ -1179,7 +1206,8 @@ pop_dup_node(ccc_tree *t, ccc_node *dup, ccc_node *splayed)
 {
     if (dup == splayed)
     {
-        return pop_front_dup(t, splayed, ccc_impl_key_from_node(t, splayed));
+        return pop_front_dup(t, splayed,
+                             ccc_impl_tree_key_from_node(t, splayed));
     }
     /* This is the head of the list of duplicates and no dups left. */
     if (dup->link[N] == dup)
@@ -1243,8 +1271,8 @@ remove_from_tree(ccc_tree *t, ccc_node *ret)
     }
     else
     {
-        t->root
-            = splay(t, ret->link[L], ccc_impl_key_from_node(t, ret), t->cmp);
+        t->root = splay(t, ret->link[L], ccc_impl_tree_key_from_node(t, ret),
+                        t->cmp);
         link_trees(t, t->root, R, ret->link[R]);
     }
     return ret;
@@ -1385,7 +1413,7 @@ ccc_impl_tree_key_in_slot(ccc_tree const *const t, void const *const slot)
 }
 
 inline void *
-ccc_impl_key_from_node(ccc_tree const *const t, ccc_node const *const n)
+ccc_impl_tree_key_from_node(ccc_tree const *const t, ccc_node const *const n)
 {
     return (uint8_t *)struct_base(t, n) + t->key_offset;
 }
@@ -1495,12 +1523,14 @@ are_subtrees_valid(ccc_tree const *t, struct ccc_tree_range const r,
         return true;
     }
     if (r.low != nil
-        && cmp(t, ccc_impl_key_from_node(t, r.low), r.root, t->cmp) != CCC_LES)
+        && cmp(t, ccc_impl_tree_key_from_node(t, r.low), r.root, t->cmp)
+               != CCC_LES)
     {
         return false;
     }
     if (r.high != nil
-        && cmp(t, ccc_impl_key_from_node(t, r.high), r.root, t->cmp) != CCC_GRT)
+        && cmp(t, ccc_impl_tree_key_from_node(t, r.high), r.root, t->cmp)
+               != CCC_GRT)
     {
         return false;
     }

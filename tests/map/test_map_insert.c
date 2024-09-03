@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static enum test_result map_test_insert_one(void);
 static enum test_result map_test_insert_three(void);
@@ -53,16 +54,27 @@ static enum test_result
 map_test_insert_three(void)
 {
     ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    struct val three_vals[3];
-    for (int i = 0; i < 3; ++i)
-    {
-        three_vals[i].val = i;
-        CHECK(ccc_om_unwrap(ccc_om_insert(&s, &three_vals[i].elem)) == NULL,
-              true, "%d");
-        CHECK(ccc_om_validate(&s), true, "%d");
-    }
+        = CCC_OM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
+    struct val first_val = {.val = 1};
+    CHECK(ccc_om_unwrap(ccc_om_insert(&s, &first_val.elem)) == NULL, true,
+          "%d");
+    CHECK(ccc_om_validate(&s), true, "%d");
+    CHECK(ccc_om_size(&s), (size_t)1, "%zu");
+    struct val *ins
+        = OM_OR_INSERT(OM_ENTRY(&s, 2), (struct val){.val = 2, .id = 0});
+    CHECK(ins != NULL, true, "%d");
+    CHECK(ins->id, 0, "%d");
+    CHECK(ccc_om_validate(&s), true, "%d");
+    CHECK(ccc_om_size(&s), (size_t)2, "%zu");
+    ins = OM_INSERT_ENTRY(OM_ENTRY(&s, 2), (struct val){.val = 2, .id = 1});
+    CHECK(ins != NULL, true, "%d");
+    CHECK(ins->id, 1, "%d");
+    CHECK(ccc_om_validate(&s), true, "%d");
+    CHECK(ccc_om_size(&s), (size_t)2, "%zu");
+    ins = OM_INSERT_ENTRY(OM_ENTRY(&s, 3), (struct val){.val = 3});
+    CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)3, "%zu");
+    ccc_om_clear(&s, NULL);
     return PASS;
 }
 
