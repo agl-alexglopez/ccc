@@ -81,24 +81,22 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
     return ccc_buf_at(&fpq->impl.buf, i);
 }
 
-void *
+void
 ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 {
     if (ccc_buf_empty(&fpq->impl.buf))
     {
-        return NULL;
+        return;
     }
-    void *ret = at(&fpq->impl, ccc_buf_size(&fpq->impl.buf) - 1);
     if (ccc_buf_size(&fpq->impl.buf) == 1)
     {
         ccc_buf_pop_back(&fpq->impl.buf);
-        return ret;
+        return;
     }
     uint8_t tmp[ccc_buf_elem_size(&fpq->impl.buf)];
     swap(&fpq->impl, tmp, 0, ccc_buf_size(&fpq->impl.buf) - 1);
     ccc_buf_pop_back(&fpq->impl.buf);
     bubble_down(&fpq->impl, tmp, 0);
-    return ret;
 }
 
 void *
@@ -173,7 +171,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
     return true;
 }
 
-void const *
+void *
 ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {
     if (ccc_buf_empty(&fpq->impl.buf))

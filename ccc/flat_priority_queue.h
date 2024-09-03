@@ -58,8 +58,8 @@ typedef struct
 ccc_result ccc_fpq_realloc(ccc_flat_priority_queue *, size_t new_capacity,
                            ccc_alloc_fn *);
 void *ccc_fpq_push(ccc_flat_priority_queue *, void const *);
-void const *ccc_fpq_front(ccc_flat_priority_queue const *);
-void *ccc_fpq_pop(ccc_flat_priority_queue *);
+void *ccc_fpq_front(ccc_flat_priority_queue const *);
+void ccc_fpq_pop(ccc_flat_priority_queue *);
 void *ccc_fpq_erase(ccc_flat_priority_queue *, void *);
 bool ccc_fpq_update(ccc_flat_priority_queue *, void *, ccc_update_fn *, void *);
 

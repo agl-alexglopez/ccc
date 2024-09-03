@@ -10,6 +10,9 @@ target_link_libraries(impl_singly_linked_list INTERFACE types)
 add_library(impl_tree INTERFACE impl_tree.h)
 target_link_libraries(impl_tree INTERFACE types)
 
+add_library(impl_flat_queue INTERFACE impl_flat_queue.h)
+target_link_libraries(impl_flat_queue INTERFACE buffer types)
+
 add_library(impl_flat_priority_queue INTERFACE impl_flat_priority_queue.h)
 target_link_libraries(impl_flat_priority_queue INTERFACE buffer types)
 

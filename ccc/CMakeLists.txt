@@ -64,6 +64,14 @@ target_link_libraries(ordered_map
     impl_tree
 )
 
+add_library(flat_queue flat_queue.h ${CMAKE_SOURCE_DIR}/src/flat_queue.c)
+target_link_libraries(flat_queue
+  INTERFACE
+    types
+  PRIVATE
+    impl_flat_queue
+)
+
 add_library(${PROJECT_NAME})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
@@ -74,6 +82,8 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/buffer.c
         ${PROJECT_SOURCE_DIR}/src/impl_flat_hash_map.h
         ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
+        ${PROJECT_SOURCE_DIR}/src/impl_flat_queue.h
+        ${PROJECT_SOURCE_DIR}/src/flat_queue.c
         ${PROJECT_SOURCE_DIR}/src/impl_flat_priority_queue.h
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/impl_tree.h
@@ -92,6 +102,7 @@ target_sources(${PROJECT_NAME}
               types.h
               buffer.h
               flat_hash_map.h
+              flat_queue.h
               flat_priority_queue.h
               ordered_map.h
               double_ended_priority_queue.h

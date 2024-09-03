@@ -720,65 +720,19 @@ ccc_om_validate(ccc_ordered_map const *const s)
     return ccc_tree_validate(&s->impl);
 }
 
-/* ===========    Splay Tree multimap and Map Implementations    ===========
-
-      (40)0x7fffffffd5c8-0x7fffffffdac8(+1)
-       ├──(29)R:0x7fffffffd968
-       │   ├──(12)R:0x7fffffffd5a8-0x7fffffffdaa8(+1)
-       │   │   ├──(2)R:0x7fffffffd548-0x7fffffffda48(+1)
-       │   │   │   └──(1)R:0x7fffffffd4e8-0x7fffffffd9e8(+1)
-       │   │   └──(9)L:0x7fffffffd668
-       │   │       ├──(1)R:0x7fffffffd608
-       │   │       └──(7)L:0x7fffffffd7e8
-       │   │           ├──(3)R:0x7fffffffd728
-       │   │           │   ├──(1)R:0x7fffffffd6c8
-       │   │           │   └──(1)L:0x7fffffffd788
-       │   │           └──(3)L:0x7fffffffd8a8
-       │   │               ├──(1)R:0x7fffffffd848
-       │   │               └──(1)L:0x7fffffffd908
-       │   └──(16)L:0x7fffffffd568-0x7fffffffda68(+1)
-       │       └──(15)R:0x7fffffffd588-0x7fffffffda88(+1)
-       │           ├──(2)R:0x7fffffffd528-0x7fffffffda28(+1)
-       │           │   └──(1)R:0x7fffffffd4c8-0x7fffffffd9c8(+1)
-       │           └──(12)L:0x7fffffffd508-0x7fffffffda08(+1)
-       │               └──(11)R:0x7fffffffd828
-       │                   ├──(6)R:0x7fffffffd6a8
-       │                   │   ├──(2)R:0x7fffffffd5e8
-       │                   │   │   └──(1)L:0x7fffffffd648
-       │                   │   └──(3)L:0x7fffffffd768
-       │                   │       ├──(1)R:0x7fffffffd708
-       │                   │       └──(1)L:0x7fffffffd7c8
-       │                   └──(4)L:0x7fffffffd8e8
-       │                       ├──(1)R:0x7fffffffd888
-       │                       └──(2)L:0x7fffffffd4a8-0x7fffffffd9a8(+1)
-       │                           └──(1)R:0x7fffffffd948
-       └──(10)L:0x7fffffffd688
-           ├──(1)R:0x7fffffffd628
-           └──(8)L:0x7fffffffd808
-               ├──(3)R:0x7fffffffd748
-               │   ├──(1)R:0x7fffffffd6e8
-               │   └──(1)L:0x7fffffffd7a8
-               └──(4)L:0x7fffffffd8c8
-                   ├──(1)R:0x7fffffffd868
-                   └──(2)L:0x7fffffffd928
-                       └──(1)L:0x7fffffffd988
-
-   Pictured above is the heavy/light decomposition of a splay tree.
+/* Splay Tree Multimap and Map Implementations
+   -------------------------------------------
    The goal of a splay tree is to take advantage of "good" edges
    that drop half the weight of the tree, weight being the number of
-   nodes rooted at X. Blue edges are "good" edges so if we
+   nodes rooted at a node. Blue edges are "good" edges so if we
    have a mathematical bound on the cost of those edges, a splay tree
    then amortizes the cost of the red edges, leaving a solid O(lgN) runtime.
-   You can't see the color here but check out the printing function.
 
    All types that use a splay tree are simply wrapper interfaces around
    the core splay tree operations. Splay trees can be used as priority
-   queues, sets, and probably much more but we can implement all the
+   queues, maps, and probably much more but we can implement all the
    needed functionality here rather than multiple times for each
-   data structure. Through the use of typedefs we only have to write the
-   actual code once and then just hand out interfaces as needed.
-
-   ======================================================================*/
+   data structure.*/
 
 static void
 init_node(ccc_tree *t, ccc_node *n)

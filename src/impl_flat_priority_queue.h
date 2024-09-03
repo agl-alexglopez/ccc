@@ -26,8 +26,7 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *, uint8_t[],
                           cmp_fn, aux_data)                                    \
     {                                                                          \
         .impl = {                                                              \
-            .buf = (ccc_buffer)CCC_BUF_INIT(mem_ptr, type_name, capacity,      \
-                                            alloc_fn),                         \
+            .buf = CCC_BUF_INIT(mem_ptr, type_name, capacity, alloc_fn),       \
             .cmp = (cmp_fn),                                                   \
             .order = (cmp_order),                                              \
             .aux = (aux_data),                                                 \

@@ -84,7 +84,7 @@ pq_test_raw_type(void)
     res = FPQ_EMPLACE(&pq, -1);
     CHECK(res != NULL, true, "%d");
     CHECK(ccc_fpq_size(&pq), 2, "%zu");
-    int *popped = ccc_fpq_pop(&pq);
+    int *popped = ccc_fpq_front(&pq);
     CHECK(*popped, -1, "%d");
     return PASS;
 }

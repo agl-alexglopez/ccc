@@ -111,8 +111,9 @@ fpq_test_pop_max(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *const front = ccc_fpq_pop(&fpq);
+        struct val const *const front = ccc_fpq_front(&fpq);
         CHECK(front->val, sorted_check[i], "%d");
+        ccc_fpq_pop(&fpq);
     }
     CHECK(ccc_fpq_empty(&fpq), true, "%d");
     return PASS;
@@ -134,8 +135,9 @@ fpq_test_pop_min(void)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *const front = ccc_fpq_pop(&fpq);
+        struct val const *const front = ccc_fpq_front(&fpq);
         CHECK(front->val, sorted_check[i], "%d");
+        ccc_fpq_pop(&fpq);
     }
     CHECK(ccc_fpq_empty(&fpq), true, "%d");
     return PASS;

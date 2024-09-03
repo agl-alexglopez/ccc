@@ -1,8 +1,8 @@
 #include "cli.h"
 #include "flat_hash_map.h"
+#include "flat_queue.h"
 #include "ordered_map.h"
 #include "priority_queue.h"
-#include "queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
 
@@ -425,21 +425,20 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         = CCC_FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem,
                        realloc, hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
-    struct queue bfs;
-    q_init(sizeof(struct point), &bfs, 4);
+    ccc_flat_queue bfs = CCC_FQ_INIT(NULL, 0, struct point, realloc);
     struct parent_cell *pc = FHM_INSERT_ENTRY(
         FHM_ENTRY(&parent_map, src->pos), (struct parent_cell){
                                               .key = src->pos,
                                               .parent = (struct point){-1, -1},
                                           });
     assert(pc);
-    q_push(&bfs, &src->pos);
+    ccc_fq_push(&bfs, &src->pos);
     bool success = false;
     struct point cur = {0};
-    while (!q_empty(&bfs) && !success)
+    while (!ccc_fq_empty(&bfs) && !success)
     {
-        cur = *((struct point *)q_front(&bfs));
-        q_pop(&bfs);
+        cur = *((struct point *)ccc_fq_front(&bfs));
+        ccc_fq_pop(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next = {
@@ -462,7 +461,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 struct parent_cell *inserted = ccc_fhm_insert_entry(
                     ccc_fhm_entry(&parent_map, &next), &push.elem);
                 assert(inserted != NULL);
-                q_push(&bfs, &next);
+                (void)ccc_fq_push(&bfs, &next);
             }
         }
     }
@@ -488,7 +487,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         add_edge_cost_label(graph, dst, &edge);
     }
     ccc_fhm_clear_and_free(&parent_map, map_parent_point_destructor);
-    q_free(&bfs);
+    ccc_fq_clear_and_free(&bfs, NULL);
     return success;
 }
 
