@@ -494,10 +494,12 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
     void *inserted = insert(&s->impl, &out_handle->impl);
     if (!inserted)
     {
+        assert(s->impl.root != &s->impl.end);
         *out_handle = *(ccc_o_map_elem *)s->impl.root;
         uint8_t tmp[s->impl.elem_sz];
         void *user_struct = struct_base(&s->impl, &out_handle->impl);
-        swap(tmp, user_struct, inserted, s->impl.elem_sz);
+        swap(tmp, user_struct, struct_base(&s->impl, s->impl.root),
+             s->impl.elem_sz);
         return (ccc_o_map_entry){{
             .t = &s->impl,
             .entry = {

@@ -1,4 +1,13 @@
+cmake_minimum_required(VERSION 3.23)
+project("ccc tests"
+    VERSION 0.1.0
+    LANGUAGES C
+    DESCRIPTION "Testing the C Container Collection (ccc)."
+)
+
 add_library(test INTERFACE test.h)
+include_directories("../ccc")
+include_directories("../util")
 
 add_executable(run_tests run_tests.c)
 target_link_libraries(run_tests PRIVATE str_view::str_view test)
@@ -137,6 +146,7 @@ macro(add_fhash_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       flat_hash_map
+      doubly_linked_list
       test
       fhash_util
   )
@@ -150,6 +160,7 @@ endmacro()
 add_fhash_test(test_fhash_construct)
 add_fhash_test(test_fhash_insert)
 add_fhash_test(test_fhash_erase)
+add_fhash_test(test_fhash_lru)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
@@ -163,3 +174,11 @@ target_link_libraries(perf
     str_view::str_view
     cli
 )
+
+# Create a custom target that will depend on all targets in the subdirectory
+add_custom_target(tests)
+# Function to add dependencies on all targets from the subdirectory
+get_property(test_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+foreach(target IN LISTS test_targets)
+    add_dependencies(tests ${target})
+endforeach()
