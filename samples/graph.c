@@ -1,7 +1,6 @@
 #include "cli.h"
 #include "flat_hash_map.h"
 #include "flat_queue.h"
-#include "ordered_map.h"
 #include "priority_queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
@@ -9,6 +8,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,41 +52,6 @@ struct path_request
     struct vertex *dst;
 };
 
-/* A vertex is connected via an edge to another vertex. Each vertex
-   shall store a bounded list of edges representing the other vertices
-   to which it is connected. The cost of this connection is the distance
-   in cells on the screen to reach that vertex. Edges are undirected and
-   unique between two vertices. */
-struct edge
-{
-    struct vertex *to; /* This vertex shares an edge TO the specified vertex. */
-    int cost;          /* Distance in cells to the other vertex. */
-};
-
-/* Each vertex in the map/graph will hold it's key name and edges to other
-   vertices that it is connected to. This is displayed in a CLI so there
-   is a maximum out degree of 4. Terminals only display cells in a grid. */
-struct vertex
-{
-    char name;            /* Names are bounded to 26 [A-Z] maximum nodes. */
-    struct point pos;     /* Position of this vertex in the grid. */
-    struct edge edges[4]; /* The other vertices to which a vertex connects. */
-    ccc_o_map_elem elem;  /* Vertices are in an adjacency map. */
-};
-
-struct graph
-{
-    int rows;
-    int cols;
-    int vertices;
-    /* This is mostly needed for the visual representation of the graph on
-       the screen. However, as we build the paths the result of that building
-       will play a role in the cost of each edge between vertices. */
-    Cell *grid;
-    /* Yes we could rep this differently, but we want to test the map here. */
-    ccc_ordered_map adjacency_list;
-};
-
 /* Helper type for labelling costs for edges between vertices in the graph. */
 enum label_orientation
 {
@@ -105,7 +70,48 @@ struct digit_encoding
     enum label_orientation orientation;
 };
 
+struct node
+{
+    char name;
+    int cost;
+};
+
+/* Each vertex in the map/graph will hold it's key name and edges to other
+   vertices that it is connected to. This is displayed in a CLI so there
+   is a maximum out degree of 4. Terminals only display cells in a grid.
+   Vertex has 4 edge limit on a terminal grid. */
+#define MAX_DEGREE 4
+struct vertex
+{
+    char name;
+    struct point pos;
+    struct node edges[MAX_DEGREE];
+};
+
+struct graph
+{
+    int rows;
+    int cols;
+    int vertices;
+    Cell *grid;
+    struct vertex *graph;
+};
+
+struct edge
+{
+    struct node n;
+    struct point pos;
+};
+
 /*======================   Graph Constants   ================================*/
+
+#define MAX_VERTICES 26
+
+/* Because the maximum out degree that is easy to display on a terminal is 4,
+   it is easy to pack all the vertices and fixed length edge arrays into one
+   static buffer. This gives nice default initializations and provides easy
+   access to vertices. */
+static struct vertex network[MAX_VERTICES];
 
 /* Go to the box drawing unicode character wikipedia page to change styles. */
 static char const *paths[] = {
@@ -130,9 +136,6 @@ static int const default_rows = 33;
 static int const default_cols = 111;
 static int const default_vertices = 4;
 static int const row_col_min = 7;
-static int const max_vertices = 26;
-static int const max_degree
-    = 4; /* Vertex has 4 edge limit on a terminal grid. */
 static int const vertex_placement_padding = 3;
 static char const start_vertex_title = 'A';
 
@@ -226,6 +229,7 @@ static bool is_valid_edge_cell(Cell, Cell);
 static void clear_paint(struct graph *);
 static bool is_vertex(Cell);
 static bool is_path(Cell);
+static struct vertex *vertex_at(struct graph const *g, char name);
 
 static void encode_digits(struct graph *, struct digit_encoding);
 static enum label_orientation get_direction(struct point, struct point);
@@ -234,7 +238,6 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
 static void help(void);
 
-static ccc_threeway_cmp cmp_vertices(ccc_key_cmp);
 static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 
 static bool eq_parent_cells(ccc_key_cmp);
@@ -244,7 +247,6 @@ static uint64_t hash_vertex_addr(void const *pointer_to_vertex);
 static uint64_t hash_64_bits(uint64_t);
 
 static void pq_update_dist(ccc_update);
-static void map_vertex_destructor(void *);
 static void map_pq_prev_vertex_dist_point_destructor(void *);
 static void map_parent_point_destructor(void *);
 static unsigned count_digits(uintmax_t n);
@@ -263,9 +265,7 @@ main(int argc, char **argv)
         .cols = default_cols,
         .vertices = default_vertices,
         .grid = NULL,
-        .adjacency_list
-        = CCC_OM_INIT(struct vertex, elem, name, graph.adjacency_list, NULL,
-                      cmp_vertices, NULL),
+        .graph = network,
     };
     for (int i = 1; i < argc; ++i)
     {
@@ -291,7 +291,7 @@ main(int argc, char **argv)
         else if (sv_starts_with(arg, vertices_flag))
         {
             struct int_conversion const vert_arg = parse_digits(arg);
-            if (vert_arg.status == CONV_ER || vert_arg.conversion > max_vertices
+            if (vert_arg.status == CONV_ER || vert_arg.conversion > MAX_VERTICES
                 || vert_arg.conversion < 1)
             {
                 quit("vertices outside of valid range (1-26).\n", 1);
@@ -319,7 +319,6 @@ main(int argc, char **argv)
     find_shortest_paths(&graph);
     set_cursor_position(graph.rows + 1, graph.cols + 1);
     printf("\n");
-    ccc_om_clear(&graph.adjacency_list, map_vertex_destructor);
 }
 
 /*========================   Graph Building    ==============================*/
@@ -342,34 +341,26 @@ build_graph(struct graph *const graph)
         *grid_at_mut(graph, rand_point)
             = vertex_bit | path_bit
               | ((Cell)vertex_title << vertex_cell_title_shift);
-        struct vertex *new_vertex = valid_malloc(sizeof(struct vertex));
-        *new_vertex = (struct vertex){
+        *vertex_at(graph, (char)vertex_title) = (struct vertex){
             .name = (char)vertex_title,
             .pos = rand_point,
-            .edges = {{0}, {0}, {0}, {0}},
         };
-        if (!ccc_om_insert_entry(
-                ccc_om_entry(&graph->adjacency_list, &new_vertex->name),
-                &new_vertex->elem))
-        {
-            quit("Error building vertices. Could not insert vertex.\n", 1);
-        }
     }
     for (int vertex = 0, vertex_title = start_vertex_title;
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         char key = (char)vertex_title;
-        struct vertex *const src = ccc_om_get_mut(&graph->adjacency_list, &key);
+        struct vertex *const src = vertex_at(graph, key);
         if (!src)
         {
             quit("Vertex that should be present in the map is absent.\n", 1);
         }
         int const degree = vertex_degree(src);
-        if (degree == max_degree)
+        if (degree == MAX_DEGREE)
         {
             continue;
         }
-        int const out_edges = rand_range(1, max_degree - degree);
+        int const out_edges = rand_range(1, MAX_DEGREE - degree);
         for (int i = 0; i < out_edges && connect_random_edge(graph, src); ++i)
         {}
     }
@@ -379,7 +370,7 @@ build_graph(struct graph *const graph)
 static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
-    size_t const graph_size = ccc_om_size(&graph->adjacency_list);
+    size_t const graph_size = graph->vertices;
     /* Bounded at size of the alphabet A-Z so alloca is fine here. */
     size_t vertex_title_indices[sizeof(size_t) * graph_size];
     for (size_t i = 0; i < graph_size; ++i)
@@ -396,13 +387,13 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             continue;
         }
-        dst = ccc_om_get_mut(&graph->adjacency_list, &key);
+        dst = vertex_at(graph, key);
         if (!dst)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
         }
         if (!has_edge_with(src_vertex, dst->name)
-            && vertex_degree(dst) < max_degree
+            && vertex_degree(dst) < MAX_DEGREE
             && has_built_edge(graph, src_vertex, dst))
         {
             return true;
@@ -469,7 +460,10 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     {
         struct parent_cell const *cell = ccc_fhm_get(&parent_map, &cur);
         assert(cell);
-        struct edge edge = {.to = dst, .cost = 1};
+        struct edge edge = {
+            .n = {.name = dst->name, .cost = 0},
+            .pos = dst->pos,
+        };
         while (cell->parent.r > 0)
         {
             cell = ccc_fhm_get(&parent_map, &cell->parent);
@@ -477,12 +471,13 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
             }
-            ++edge.cost;
+            ++edge.n.cost;
             *grid_at_mut(graph, cell->key) |= edge_id;
             build_path_cell(graph, cell->key, edge_id);
         }
         (void)add_edge(src, &edge);
-        edge.to = src;
+        edge.n.name = src->name;
+        edge.pos = src->pos;
         (void)add_edge(dst, &edge);
         add_edge_cost_label(graph, dst, &edge);
     }
@@ -499,21 +494,21 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
                     struct edge const *const e)
 {
     struct point cur = src->pos;
-    Cell const edge_id = sort_vertices(src->name, e->to->name) << edge_id_shift;
+    Cell const edge_id = sort_vertices(src->name, e->n.name) << edge_id_shift;
     struct point prev = cur;
     /* Add a two space buffer to either side of the label so direction of lines
        is not lost to writing of digits. Otherwise it would be unclear which
        edge a cost is associated with if close to other costs. */
-    size_t const spaces_needed_for_cost = count_digits(e->cost) + 2;
+    size_t const spaces_needed_for_cost = count_digits(e->n.cost) + 2;
     size_t consecutive_spaces_found = 0;
     enum label_orientation direction = NORTH;
-    while (cur.r != e->to->pos.r || cur.c != e->to->pos.c)
+    while (cur.r != e->pos.r || cur.c != e->pos.c)
     {
         if (consecutive_spaces_found == spaces_needed_for_cost)
         {
             encode_digits(g, (struct digit_encoding){
                                  .start = cur,
-                                 .cost = e->cost,
+                                 .cost = e->n.cost,
                                  .spaces_needed = spaces_needed_for_cost,
                                  .orientation = direction,
                              });
@@ -527,7 +522,7 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
             };
             Cell const next_cell = grid_at(g, next);
             if ((next_cell & vertex_bit)
-                && get_cell_vertex_title(next_cell) == e->to->name)
+                && get_cell_vertex_title(next_cell) == e->n.name)
             {
                 return;
             }
@@ -714,10 +709,10 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             success = cur->dist != INT_MAX;
             break;
         }
-        for (int i = 0; i < max_degree && cur->v->edges[i].to; ++i)
+        for (int i = 0; i < MAX_DEGREE && cur->v->edges[i].name; ++i)
         {
-            struct prev_vertex *next
-                = FHM_GET_MUT(&prev_map, cur->v->edges[i].to);
+            struct prev_vertex *next = FHM_GET_MUT(
+                &prev_map, vertex_at(graph, cur->v->edges[i].name));
             assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -760,9 +755,10 @@ static void
 prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
                  ccc_flat_hash_map *prev_map, struct path_request const *pr)
 {
-    for (struct vertex *v = ccc_om_begin(&graph->adjacency_list); v;
-         v = ccc_om_next(&graph->adjacency_list, &v->elem))
+    for (int count = 0, name = start_vertex_title; count < graph->vertices;
+         ++count, ++name)
     {
+        struct vertex *v = vertex_at(graph, (char)name);
         struct dist_point *p = valid_malloc(sizeof(struct dist_point));
         *p = (struct dist_point){
             .v = v,
@@ -818,6 +814,12 @@ paint_edge(struct graph *const g, struct vertex const *const src,
 
 /*========================  Graph/Grid Helpers  =============================*/
 
+static struct vertex *
+vertex_at(struct graph const *const g, char const name)
+{
+    return &((struct vertex *)g->graph)[((size_t)name - start_vertex_title)];
+}
+
 /* This function assumes that checking one cell in any direction is safe
    and within bounds. The vertices are only placed with padding around the
    full grid space so this assumption should be safe. */
@@ -836,7 +838,7 @@ vertex_degree(struct vertex const *const v)
 {
     int n = 0;
     /* Vertexes are initialized with zeroed out edge array. Falsey. */
-    for (int i = 0; i < max_degree && v->edges[i].to; ++i, ++n)
+    for (int i = 0; i < MAX_DEGREE && v->edges[i].name; ++i, ++n)
     {}
     return n;
 }
@@ -868,9 +870,9 @@ get_cell_vertex_title(Cell const cell)
 static bool
 has_edge_with(struct vertex const *const v, char vertex)
 {
-    for (int i = 0; i < max_degree && v->edges[i].to; ++i)
+    for (int i = 0; i < MAX_DEGREE && v->edges[i].name; ++i)
     {
-        if (v->edges[i].to->name == vertex)
+        if (v->edges[i].name == vertex)
         {
             return true;
         }
@@ -881,11 +883,14 @@ has_edge_with(struct vertex const *const v, char vertex)
 static bool
 add_edge(struct vertex *const v, struct edge const *const e)
 {
-    for (int i = 0; i < max_degree; ++i)
+    for (int i = 0; i < MAX_DEGREE; ++i)
     {
-        if (!v->edges[i].to)
+        if (!v->edges[i].name)
         {
-            v->edges[i] = *e;
+            v->edges[i] = (struct node){
+                .name = e->n.name,
+                .cost = e->n.cost,
+            };
             return true;
         }
     }
@@ -1049,14 +1054,6 @@ hash_parent_cells(void const *const point_struct)
 }
 
 static ccc_threeway_cmp
-cmp_vertices(ccc_key_cmp const cmp)
-{
-    struct vertex const *const c = cmp.container;
-    char const key = *((char *)cmp.key);
-    return (key > c->name) - (key < c->name);
-}
-
-static ccc_threeway_cmp
 cmp_pq_dist_points(ccc_cmp const cmp)
 {
     struct dist_point const *const a = cmp.container_a;
@@ -1094,12 +1091,6 @@ pq_update_dist(ccc_update const u)
 }
 
 static void
-map_vertex_destructor(void *const e)
-{
-    free(e);
-}
-
-static void
 map_pq_prev_vertex_dist_point_destructor(void *const e)
 {
     struct prev_vertex *pv = e;
@@ -1122,13 +1113,12 @@ parse_path_request(struct graph *const g, str_view r)
         quit("Exiting now.\n", 0);
     }
     struct path_request res = {0};
-    char const end_title
-        = (char)(start_vertex_title + ccc_om_size(&g->adjacency_list) - 1);
+    char const end_title = (char)(start_vertex_title + g->vertices - 1);
     for (char const *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
         if (*c >= start_vertex_title && *c <= end_title)
         {
-            struct vertex *v = ccc_om_get_mut(&g->adjacency_list, c);
+            struct vertex *v = vertex_at(g, *c);
             assert(v);
             res.src ? (res.dst = v) : (res.src = v);
         }
