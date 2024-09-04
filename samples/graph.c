@@ -15,6 +15,13 @@
 #include <string.h>
 #include <time.h>
 
+enum
+{
+    DIRS_SIZE = 4,
+    MAX_VERTICES = 26,
+    MAX_DEGREE = 4,
+};
+
 typedef uint32_t Cell;
 
 struct point
@@ -80,7 +87,6 @@ struct node
    vertices that it is connected to. This is displayed in a CLI so there
    is a maximum out degree of 4. Terminals only display cells in a grid.
    Vertex has 4 edge limit on a terminal grid. */
-#define MAX_DEGREE 4
 struct vertex
 {
     char name;
@@ -105,8 +111,6 @@ struct edge
 
 /*======================   Graph Constants   ================================*/
 
-#define MAX_VERTICES 26
-
 /* Because the maximum out degree that is easy to display on a terminal is 4,
    it is easy to pack all the vertices and fixed length edge arrays into one
    static buffer. This gives nice default initializations and provides easy
@@ -120,10 +124,8 @@ static char const *paths[] = {
 };
 
 /* North, East, South, West */
-#define DIRS_SIZE ((size_t)4)
 static struct point const dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-#define VERTEX_TITLES_SIZE ((size_t)26ULL)
-static char const vertex_titles[VERTEX_TITLES_SIZE] = {
+static char const vertex_titles[MAX_VERTICES] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 };
