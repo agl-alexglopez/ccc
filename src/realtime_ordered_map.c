@@ -58,8 +58,8 @@ static struct query find(struct ccc_impl_realtime_ordered_map *,
 static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
 static void *maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *,
                                 struct query *, struct ccc_impl_r_om_elem *);
-static void *remove_from_tree(struct ccc_impl_realtime_ordered_map *,
-                              struct ccc_impl_r_om_elem *);
+static void *remove_fixup(struct ccc_impl_realtime_ordered_map *,
+                          struct ccc_impl_r_om_elem *);
 static void insert_fixup(struct ccc_impl_realtime_ordered_map *,
                          struct ccc_impl_r_om_elem *parent,
                          struct ccc_impl_r_om_elem *x);
@@ -72,6 +72,8 @@ static void fix_3_child_rank_rule(struct ccc_impl_realtime_ordered_map *rom,
                                   struct ccc_impl_r_om_elem *y);
 static void fixup_x_22_leaf(struct ccc_impl_realtime_ordered_map *rom,
                             struct ccc_impl_r_om_elem *x);
+static bool is_leaf(struct ccc_impl_realtime_ordered_map *rom,
+                    struct ccc_impl_r_om_elem *x);
 static bool is_2_child(struct ccc_impl_r_om_elem const *parent,
                        struct ccc_impl_r_om_elem const *x);
 static bool is_parent_01(struct ccc_impl_r_om_elem *x,
@@ -157,7 +159,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     {
         return NULL;
     }
-    void *const removed = remove_from_tree(&rom->impl, q.found);
+    void *const removed = remove_fixup(&rom->impl, q.found);
     if (rom->impl.alloc)
     {
         void *const user_struct = struct_base(&rom->impl, &out_handle->impl);
@@ -447,8 +449,8 @@ insert_fixup(struct ccc_impl_realtime_ordered_map *const rom,
 }
 
 static void *
-remove_from_tree(struct ccc_impl_realtime_ordered_map *const rom,
-                 struct ccc_impl_r_om_elem *const remove)
+remove_fixup(struct ccc_impl_realtime_ordered_map *const rom,
+             struct ccc_impl_r_om_elem *const remove)
 {
     struct ccc_impl_r_om_elem *y = NULL;
     if (remove->link[L] == &rom->end || remove->link[R] == &rom->end)
@@ -494,8 +496,7 @@ remove_from_tree(struct ccc_impl_realtime_ordered_map *const rom,
     {
         fixup_x_22_leaf(rom, parent);
     }
-    assert(parent->link[L] != &rom->end || parent->link[R] != &rom->end
-           || !parent->parity);
+    assert(!is_leaf(rom, parent) || !parent->parity);
     remove->link[L] = remove->link[R] = remove->parent = NULL;
     remove->parity = 0;
     --rom->sz;
@@ -559,7 +560,7 @@ fix_3_child_rank_rule(struct ccc_impl_realtime_ordered_map *const rom,
         rotate(rom, parent, y, w, !rotation);
         promote(rom, y);
         demote(rom, parent);
-        if (parent->link[L] == &rom->end && parent->link[R] == &rom->end)
+        if (is_leaf(rom, parent))
         {
             demote(rom, parent);
         }
@@ -643,8 +644,13 @@ demote(struct ccc_impl_realtime_ordered_map const *const rom,
     promote(rom, x);
 }
 
-/*===========================   Validation   ===============================*/
+static inline bool
+is_leaf(struct ccc_impl_realtime_ordered_map *rom, struct ccc_impl_r_om_elem *x)
+{
+    return x->link[L] == &rom->end && x->link[R] == &rom->end;
+}
 
+/*===========================   Validation   ===============================*/
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 struct ccc_tree_range
