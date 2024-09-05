@@ -20,10 +20,10 @@ typedef struct
     struct ccc_impl_r_om_entry impl;
 } ccc_r_om_entry;
 
-#define CCC_ROM_INIT(struct_name, key_elem_field, node_elem_field, map_name,   \
+#define CCC_ROM_INIT(struct_name, node_elem_field, key_elem_field, map_name,   \
                      alloc_fn, key_cmp_fn, aux_data)                           \
     (ccc_realtime_ordered_map)                                                 \
-        CCC_IMPL_ROM_INIT(struct_name, key_elem_field, node_elem_field,        \
+        CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)
 
 ccc_r_om_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
@@ -37,7 +37,9 @@ void *ccc_rom_next(ccc_realtime_ordered_map *rom, ccc_r_om_elem const *);
 
 size_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
 bool ccc_rom_empty(ccc_realtime_ordered_map const *rom);
+
 bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
+void ccc_rom_print(ccc_realtime_ordered_map const *rom, ccc_print_fn *fn);
 
 void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
 

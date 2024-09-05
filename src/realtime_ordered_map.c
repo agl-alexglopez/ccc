@@ -2,13 +2,33 @@
 #include "types.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#define COLOR_BLK "\033[34;1m"
+#define COLOR_BLU_BOLD "\033[38;5;12m"
+#define COLOR_RED_BOLD "\033[38;5;9m"
+#define COLOR_RED "\033[31;1m"
+#define COLOR_CYN "\033[36;1m"
+#define COLOR_GRN "\033[32;1m"
+#define COLOR_NIL "\033[0m"
+#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
+#define PRINTER_INDENT (short)13
+#define LR 2
 
 enum tree_link
 {
     L = 0,
     R,
+};
+
+enum print_link
+{
+    BRANCH = 0, /* ├── */
+    LEAF = 1    /* └── */
 };
 
 struct query
@@ -19,6 +39,9 @@ struct query
         struct ccc_impl_r_om_elem *parent;
     };
 };
+
+enum tree_link const inorder_traversal = L;
+enum tree_link const reverse_inorder_traversal = R;
 
 static void init_node(struct ccc_impl_realtime_ordered_map *,
                       struct ccc_impl_r_om_elem *);
@@ -36,10 +59,10 @@ static void *maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *,
 static void insert_fixup(struct ccc_impl_realtime_ordered_map *,
                          struct ccc_impl_r_om_elem *parent,
                          struct ccc_impl_r_om_elem *x);
-static bool is_0_1(uint8_t x_parity, uint8_t parent_parity,
-                   uint8_t sibling_parity);
-static bool is_0_2(uint8_t x_parity, uint8_t parent_parity,
-                   uint8_t sibling_parity);
+static bool parent_01(uint8_t x_parity, uint8_t parent_parity,
+                      uint8_t sibling_parity);
+static bool parent_02(uint8_t x_parity, uint8_t parent_parity,
+                      uint8_t sibling_parity);
 static struct ccc_impl_r_om_elem *
 sibling(struct ccc_impl_r_om_elem const *parent,
         struct ccc_impl_r_om_elem const *x);
@@ -53,6 +76,14 @@ static void rotate(struct ccc_impl_realtime_ordered_map *rom,
                    struct ccc_impl_r_om_elem *x, struct ccc_impl_r_om_elem *y,
                    enum tree_link dir);
 static bool validate(struct ccc_impl_realtime_ordered_map const *rom);
+static void ccc_tree_print(struct ccc_impl_realtime_ordered_map const *rom,
+                           struct ccc_impl_r_om_elem const *root,
+                           ccc_print_fn *fn_print);
+
+static struct ccc_impl_r_om_elem const *
+next(struct ccc_impl_realtime_ordered_map *, struct ccc_impl_r_om_elem const *,
+     enum tree_link);
+void *min(struct ccc_impl_realtime_ordered_map const *);
 
 ccc_r_om_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
@@ -132,12 +163,35 @@ ccc_rom_unwrap_mut(ccc_r_om_entry e)
 }
 
 void *
-ccc_rom_begin(ccc_realtime_ordered_map const *rom)
-{}
+min(struct ccc_impl_realtime_ordered_map const *const rom)
+{
+    if (!rom->sz)
+    {
+        return NULL;
+    }
+    struct ccc_impl_r_om_elem *n = rom->root;
+    for (; n->link[L] != &rom->end; n = n->link[L])
+    {}
+    return struct_base(rom, n);
+}
 
 void *
-ccc_rom_next(ccc_realtime_ordered_map *rom, ccc_r_om_elem const *)
-{}
+ccc_rom_begin(ccc_realtime_ordered_map const *rom)
+{
+    return min(&rom->impl);
+}
+
+void *
+ccc_rom_next(ccc_realtime_ordered_map *const rom, ccc_r_om_elem const *const e)
+{
+    struct ccc_impl_r_om_elem const *n
+        = next(&rom->impl, &e->impl, inorder_traversal);
+    if (!n)
+    {
+        return NULL;
+    }
+    return struct_base(&rom->impl, n);
+}
 
 size_t
 ccc_rom_size(ccc_realtime_ordered_map const *const rom)
@@ -165,6 +219,12 @@ bool
 ccc_rom_validate(ccc_realtime_ordered_map const *rom)
 {
     return validate(&rom->impl);
+}
+
+void
+ccc_rom_print(ccc_realtime_ordered_map const *const rom, ccc_print_fn *const fn)
+{
+    ccc_tree_print(&rom->impl, rom->impl.root, fn);
 }
 
 /*=========================   Static Helpers   ============================*/
@@ -200,9 +260,11 @@ maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *const rom,
         memcpy(new, struct_base(rom, out_handle), rom->elem_sz);
         out_handle = ccc_impl_rom_elem_in_slot(rom, new);
     }
+    bool const rank_rule_break
+        = q->parent->link[L] == &rom->end && q->parent->link[R] == &rom->end;
     q->parent->link[CCC_GRT == q->dir] = out_handle;
     out_handle->parent = q->parent;
-    if (q->parent->link[L] == &rom->end && q->parent->link[R] == &rom->end)
+    if (rank_rule_break)
     {
         insert_fixup(rom, q->parent, out_handle);
     }
@@ -214,13 +276,18 @@ static void
 insert_fixup(struct ccc_impl_realtime_ordered_map *const rom,
              struct ccc_impl_r_om_elem *parent, struct ccc_impl_r_om_elem *x)
 {
-    for (; parent != &rom->end
-           && is_0_1(x->parity, parent->parity, sibling(parent, x)->parity);
-         x = parent, parent = parent->parent)
+    do
     {
         promote(rom, parent);
-    }
-    if (!is_0_2(x->parity, parent->parity, sibling(parent, x)->parity))
+        x = parent;
+        parent = parent->parent;
+        if (parent == &rom->end)
+        {
+            return;
+        }
+    } while (parent_01(x->parity, parent->parity, sibling(parent, x)->parity));
+
+    if (!parent_02(x->parity, parent->parity, sibling(parent, x)->parity))
     {
         return;
     }
@@ -279,15 +346,44 @@ rotate(struct ccc_impl_realtime_ordered_map *const rom,
     y->parent = parent;
 }
 
+struct ccc_impl_r_om_elem const *
+next(struct ccc_impl_realtime_ordered_map *const t,
+     struct ccc_impl_r_om_elem const *n, enum tree_link traversal)
+{
+    if (!n || n == &t->end)
+    {
+        return NULL;
+    }
+    assert(t->root->parent == &t->end);
+    /* Using a helper node simplifies the code greatly. */
+    t->end.link[traversal] = t->root;
+    t->end.link[!traversal] = &t->end;
+    /* The node is a parent, backtracked to, or the end. */
+    if (n->link[!traversal] != &t->end)
+    {
+        /* The goal is to get far left/right ASAP in any traversal. */
+        for (n = n->link[!traversal]; n->link[traversal] != &t->end;
+             n = n->link[traversal])
+        {}
+        return n;
+    }
+    /* A leaf. Work our way back up skpping nodes we already visited. */
+    struct ccc_impl_r_om_elem *p = n->parent;
+    for (; p->link[!traversal] == n; n = p, p = p->parent)
+    {}
+    /* This is where the end node is helpful. We get to it eventually. */
+    return p == &t->end ? NULL : p;
+}
+
 static inline bool
-is_0_1(uint8_t x_parity, uint8_t parent_parity, uint8_t sibling_parity)
+parent_01(uint8_t x_parity, uint8_t parent_parity, uint8_t sibling_parity)
 {
     return (!x_parity && !parent_parity && sibling_parity)
            || (x_parity && parent_parity && !sibling_parity);
 }
 
-static bool
-is_0_2(uint8_t x_parity, uint8_t parent_parity, uint8_t sibling_parity)
+static inline bool
+parent_02(uint8_t x_parity, uint8_t parent_parity, uint8_t sibling_parity)
 {
     return (x_parity && parent_parity && sibling_parity)
            || (!x_parity && !parent_parity && !sibling_parity);
@@ -297,7 +393,7 @@ static inline struct ccc_impl_r_om_elem *
 sibling(struct ccc_impl_r_om_elem const *parent,
         struct ccc_impl_r_om_elem const *x)
 {
-    /* Gives the opposite result, aka the sibling. */
+    /* We want the sibling so we need the truthy value to be opposite of x. */
     return parent->link[parent->link[L] == x];
 }
 
@@ -324,7 +420,9 @@ init_node(struct ccc_impl_realtime_ordered_map *const rom,
 {
     assert(e != NULL);
     assert(rom != NULL);
-    e->link[L] = e->link[R] = e->parent = &rom->end;
+    e->link[L] = &rom->end;
+    e->link[R] = &rom->end;
+    e->parent = &rom->end;
     e->parity = 0;
 }
 
@@ -443,6 +541,7 @@ is_storing_parent(struct ccc_impl_realtime_ordered_map const *const t,
     return is_storing_parent(t, root, root->link[L])
            && is_storing_parent(t, root, root->link[R]);
 }
+
 static bool
 validate(struct ccc_impl_realtime_ordered_map const *const rom)
 {
@@ -465,6 +564,93 @@ validate(struct ccc_impl_realtime_ordered_map const *const rom)
         return false;
     }
     return true;
+}
+
+static void
+print_node(struct ccc_impl_realtime_ordered_map const *const rom,
+           struct ccc_impl_r_om_elem const *const root,
+           ccc_print_fn *const fn_print)
+{
+    printf("%s%u%s:", COLOR_CYN, root->parity, COLOR_NIL);
+    fn_print(struct_base(rom, root));
+    printf("\n");
+}
+
+static void
+print_inner_tree(struct ccc_impl_r_om_elem const *const root,
+                 char const *const prefix, enum print_link const node_type,
+                 enum tree_link const dir,
+                 struct ccc_impl_realtime_ordered_map const *const rom,
+                 ccc_print_fn *const fn_print)
+{
+    if (root == &rom->end)
+    {
+        return;
+    }
+    printf("%s", prefix);
+    printf("%s%s", node_type == LEAF ? " └──" : " ├──", COLOR_NIL);
+    printf(COLOR_CYN);
+    dir == L ? printf("L" COLOR_NIL) : printf("R" COLOR_NIL);
+    print_node(rom, root, fn_print);
+
+    char *str = NULL;
+    /* NOLINTNEXTLINE */
+    int const string_length = snprintf(NULL, 0, "%s%s", prefix,
+                                       node_type == LEAF ? "     " : " │   ");
+    if (string_length > 0)
+    {
+        /* NOLINTNEXTLINE */
+        str = malloc(string_length + 1);
+        /* NOLINTNEXTLINE */
+        (void)snprintf(str, string_length, "%s%s", prefix,
+                       node_type == LEAF ? "     " : " │   ");
+    }
+    if (str == NULL)
+    {
+        printf(COLOR_ERR "memory exceeded. Cannot display tree." COLOR_NIL);
+        return;
+    }
+
+    if (root->link[R] == &rom->end)
+    {
+        print_inner_tree(root->link[L], str, LEAF, L, rom, fn_print);
+    }
+    else if (root->link[L] == &rom->end)
+    {
+        print_inner_tree(root->link[R], str, LEAF, R, rom, fn_print);
+    }
+    else
+    {
+        print_inner_tree(root->link[R], str, BRANCH, R, rom, fn_print);
+        print_inner_tree(root->link[L], str, LEAF, L, rom, fn_print);
+    }
+    free(str);
+}
+
+static void
+ccc_tree_print(struct ccc_impl_realtime_ordered_map const *const rom,
+               struct ccc_impl_r_om_elem const *const root,
+               ccc_print_fn *const fn_print)
+{
+    if (root == &rom->end)
+    {
+        return;
+    }
+    print_node(rom, root, fn_print);
+
+    if (root->link[R] == &rom->end)
+    {
+        print_inner_tree(root->link[L], "", LEAF, L, rom, fn_print);
+    }
+    else if (root->link[L] == &rom->end)
+    {
+        print_inner_tree(root->link[R], "", LEAF, R, rom, fn_print);
+    }
+    else
+    {
+        print_inner_tree(root->link[R], "", BRANCH, R, rom, fn_print);
+        print_inner_tree(root->link[L], "", LEAF, L, rom, fn_print);
+    }
 }
 
 /* NOLINTEND(*misc-no-recursion) */

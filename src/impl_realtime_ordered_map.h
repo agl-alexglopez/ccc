@@ -40,7 +40,7 @@ struct ccc_impl_r_om_entry
     ccc_entry entry;
 };
 
-#define CCC_IMPL_ROM_INIT(struct_name, key_elem_field, node_elem_field,        \
+#define CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)            \
     {                                                                          \
         {                                                                      \

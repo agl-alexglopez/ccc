@@ -54,6 +54,10 @@ rtomap_test_insert_shuffle(void)
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS, "%d");
+
+    ccc_rom_print(&s, map_printer_fn);
+    printf("\n");
+
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &s), size, "%zu");
     for (size_t i = 0; i < size; ++i)

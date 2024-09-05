@@ -39,10 +39,6 @@ typedef enum
     LEAF = 1    /* └── */
 } ccc_print_link;
 
-/* Text coloring macros (ANSI character escapes) for printing function
-   colorful output. Consider changing to a more portable library like
-   ncurses.h. However, I don't want others to install ncurses just to explore
-   the project. They already must install gnuplot. Hope this works. */
 #define COLOR_BLK "\033[34;1m"
 #define COLOR_BLU_BOLD "\033[38;5;12m"
 #define COLOR_RED_BOLD "\033[38;5;9m"
@@ -757,19 +753,27 @@ root(ccc_tree const *const t)
 static void *
 max(ccc_tree const *const t)
 {
+    if (!t->size)
+    {
+        return NULL;
+    }
     ccc_node *m = t->root;
     for (; m->link[R] != &t->end; m = m->link[R])
     {}
-    return m == &t->end ? NULL : struct_base(t, m);
+    return struct_base(t, m);
 }
 
 static void *
 min(ccc_tree const *t)
 {
+    if (!t->size)
+    {
+        return NULL;
+    }
     ccc_node *m = t->root;
     for (; m->link[L] != &t->end; m = m->link[L])
     {}
-    return m == &t->end ? NULL : struct_base(t, m);
+    return struct_base(t, m);
 }
 
 static ccc_node const *
