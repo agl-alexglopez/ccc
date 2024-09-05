@@ -64,6 +64,14 @@ target_link_libraries(ordered_map
     impl_tree
 )
 
+add_library(realtime_ordered_map realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/realtime_ordered_map.c)
+target_link_libraries(realtime_ordered_map
+  INTERFACE
+    types
+  PRIVATE
+    impl_realtime_ordered_map
+)
+
 add_library(flat_queue flat_queue.h ${CMAKE_SOURCE_DIR}/src/flat_queue.c)
 target_link_libraries(flat_queue
   INTERFACE
@@ -94,6 +102,8 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
         ${PROJECT_SOURCE_DIR}/src/impl_doubly_linked_list.h
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
+        ${PROJECT_SOURCE_DIR}/src/impl_realtime_ordered_map.h
+        ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS
@@ -105,6 +115,7 @@ target_sources(${PROJECT_NAME}
               flat_queue.h
               flat_priority_queue.h
               ordered_map.h
+              realtime_ordered_map.h
               double_ended_priority_queue.h
               priority_queue.h
               singly_linked_list.h

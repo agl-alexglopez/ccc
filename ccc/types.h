@@ -19,6 +19,7 @@ typedef enum
     CCC_LES = -1,
     CCC_EQL,
     CCC_GRT,
+    CCC_CMP_ERR,
 } ccc_threeway_cmp;
 
 typedef struct

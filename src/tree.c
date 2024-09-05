@@ -519,12 +519,12 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
     if (!inserted)
     {
         return (ccc_o_map_entry){{
-        .t = &s->impl,
-        .entry = {
-            .entry = NULL, 
-            .status = CCC_OM_ENTRY_NULL | CCC_OM_ENTRY_INSERT_ERROR,
-        },
-    }};
+            .t = &s->impl,
+            .entry = {
+                .entry = NULL, 
+                .status = CCC_OM_ENTRY_NULL | CCC_OM_ENTRY_INSERT_ERROR,
+            },
+        }};
     }
     return (ccc_o_map_entry){{
         .t = &s->impl,
@@ -1397,7 +1397,7 @@ ccc_impl_tree_elem_in_slot(ccc_tree const *t, void const *slot)
     return (ccc_node *)((uint8_t *)slot + t->node_elem_offset);
 }
 
-static void
+static inline void
 swap(uint8_t tmp[], void *const a, void *const b, size_t elem_sz)
 {
     if (a == b)

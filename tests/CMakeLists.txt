@@ -136,7 +136,33 @@ add_map_test(test_map_insert)
 add_map_test(test_map_erase)
 add_map_test(test_map_iter)
 
-#############  fhash  ##########################
+#############  Realtime Map  ##########################
+add_library(rtomap_util rtomap/rtomap_util.h rtomap/rtomap_util.c)
+target_link_libraries(rtomap_util
+  PRIVATE
+    realtime_ordered_map
+    test
+)
+
+macro(add_rtomap_test TEST_NAME)
+  add_executable(${TEST_NAME} rtomap/${TEST_NAME}.c)
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      rtomap_util
+      ordered_map
+      test
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_rtomap_test(test_rtomap_construct)
+add_rtomap_test(test_rtomap_insert)
+
+#############  Flat Hash Map ##########################
 
 add_library(fhash_util fhash/fhash_util.h fhash/fhash_util.c)
 target_link_libraries(fhash_util
