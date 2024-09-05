@@ -716,7 +716,10 @@ rotate(struct ccc_impl_realtime_ordered_map *const rom,
     {
         rom->root = x;
     }
-    grandparent->link[grandparent->link[R] == parent] = x;
+    else
+    {
+        grandparent->link[grandparent->link[R] == parent] = x;
+    }
     x->link[dir] = parent;
     parent->parent = x;
     parent->link[!dir] = y;
@@ -942,11 +945,8 @@ print_inner_tree(struct ccc_impl_r_om_elem const *const root,
         (void)snprintf(str, string_length, "%s%s", prefix,
                        node_type == LEAF ? "     " : " │   ");
     }
-    if (str == NULL)
-    {
-        printf(COLOR_ERR "memory exceeded. Cannot display tree." COLOR_NIL);
-        return;
-    }
+
+    assert(str);
 
     if (root->link[R] == &rom->end)
     {
