@@ -121,8 +121,6 @@ rtomap_test_weak_srand(void)
         CHECK(ccc_rom_contains(&s, &vals[i].val), true, "%d");
         (void)ccc_rom_remove(&s, &vals[i].elem);
         CHECK(ccc_rom_validate(&s), true, "%d");
-        ccc_rom_print(&s, map_printer_fn);
-        printf("\n");
     }
     CHECK(ccc_rom_empty(&s), true, "%d");
     return PASS;
