@@ -532,7 +532,7 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 }
 
 void *
-ccc_om_remove(ccc_ordered_map *s, ccc_o_map_elem *out_handle)
+ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
     void *n = erase(&s->impl,
                     ccc_impl_tree_key_from_node(&s->impl, &out_handle->impl));
@@ -543,7 +543,7 @@ ccc_om_remove(ccc_ordered_map *s, ccc_o_map_elem *out_handle)
     if (s->impl.alloc)
     {
         void *user_struct = struct_base(&s->impl, &out_handle->impl);
-        memcpy(user_struct, struct_base(&s->impl, n), s->impl.elem_sz);
+        memcpy(user_struct, n, s->impl.elem_sz);
         s->impl.alloc(n, 0);
         return user_struct;
     }

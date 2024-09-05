@@ -3,8 +3,6 @@
 
 #include "impl_realtime_ordered_map.h"
 
-#
-
 typedef struct
 {
     struct ccc_impl_r_om_elem impl;

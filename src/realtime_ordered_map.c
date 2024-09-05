@@ -43,6 +43,8 @@ struct query
 enum tree_link const inorder_traversal = L;
 enum tree_link const reverse_inorder_traversal = R;
 
+/*==============================  Prototypes   ==============================*/
+
 static void init_node(struct ccc_impl_realtime_ordered_map *,
                       struct ccc_impl_r_om_elem *);
 static ccc_threeway_cmp cmp(struct ccc_impl_realtime_ordered_map const *,
@@ -56,13 +58,28 @@ static struct query find(struct ccc_impl_realtime_ordered_map *,
 static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
 static void *maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *,
                                 struct query *, struct ccc_impl_r_om_elem *);
+static void *remove_from_tree(struct ccc_impl_realtime_ordered_map *,
+                              struct ccc_impl_r_om_elem *);
 static void insert_fixup(struct ccc_impl_realtime_ordered_map *,
                          struct ccc_impl_r_om_elem *parent,
                          struct ccc_impl_r_om_elem *x);
-static bool parent_01(uint8_t x_parity, uint8_t parent_parity,
-                      uint8_t sibling_parity);
-static bool parent_02(uint8_t x_parity, uint8_t parent_parity,
-                      uint8_t sibling_parity);
+static void fixup_x_3_child(struct ccc_impl_realtime_ordered_map *rom,
+                            struct ccc_impl_r_om_elem *parent,
+                            struct ccc_impl_r_om_elem *x);
+static void fix_3_child_rank_rule(struct ccc_impl_realtime_ordered_map *rom,
+                                  struct ccc_impl_r_om_elem *parent,
+                                  struct ccc_impl_r_om_elem *x,
+                                  struct ccc_impl_r_om_elem *y);
+static void fixup_x_22_leaf(struct ccc_impl_realtime_ordered_map *rom,
+                            struct ccc_impl_r_om_elem *x);
+static bool is_2_child(struct ccc_impl_r_om_elem const *parent,
+                       struct ccc_impl_r_om_elem const *x);
+static bool is_parent_01(struct ccc_impl_r_om_elem *x,
+                         struct ccc_impl_r_om_elem *parent,
+                         struct ccc_impl_r_om_elem *sibling);
+static bool is_parent_02(struct ccc_impl_r_om_elem *x,
+                         struct ccc_impl_r_om_elem *parent,
+                         struct ccc_impl_r_om_elem *sibling);
 static struct ccc_impl_r_om_elem *
 sibling(struct ccc_impl_r_om_elem const *parent,
         struct ccc_impl_r_om_elem const *x);
@@ -83,7 +100,11 @@ static void ccc_tree_print(struct ccc_impl_realtime_ordered_map const *rom,
 static struct ccc_impl_r_om_elem const *
 next(struct ccc_impl_realtime_ordered_map *, struct ccc_impl_r_om_elem const *,
      enum tree_link);
-void *min(struct ccc_impl_realtime_ordered_map const *);
+static struct ccc_impl_r_om_elem *
+min_from(struct ccc_impl_realtime_ordered_map const *,
+         struct ccc_impl_r_om_elem *start);
+
+/*==============================  Interface    ==============================*/
 
 ccc_r_om_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
@@ -127,19 +148,24 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
 }
 
 void *
-ccc_impl_rom_key_from_node(
-    struct ccc_impl_realtime_ordered_map const *const rom,
-    struct ccc_impl_r_om_elem const *const elem)
+ccc_rom_remove(ccc_realtime_ordered_map *const rom,
+               ccc_r_om_elem *const out_handle)
 {
-    return (uint8_t *)struct_base(rom, elem) + rom->key_offset;
-}
-
-struct ccc_impl_r_om_elem *
-ccc_impl_rom_elem_in_slot(struct ccc_impl_realtime_ordered_map const *const rom,
-                          void const *const slot)
-{
-    return (struct ccc_impl_r_om_elem *)((uint8_t *)slot
-                                         + rom->node_elem_offset);
+    struct query q = find(
+        &rom->impl, ccc_impl_rom_key_from_node(&rom->impl, &out_handle->impl));
+    if (q.dir != CCC_EQL)
+    {
+        return NULL;
+    }
+    void *const removed = remove_from_tree(&rom->impl, q.found);
+    if (rom->impl.alloc)
+    {
+        void *const user_struct = struct_base(&rom->impl, &out_handle->impl);
+        memcpy(user_struct, removed, rom->impl.elem_sz);
+        rom->impl.alloc(removed, 0);
+        return user_struct;
+    }
+    return removed;
 }
 
 void const *
@@ -162,23 +188,24 @@ ccc_rom_unwrap_mut(ccc_r_om_entry e)
     return NULL;
 }
 
-void *
-min(struct ccc_impl_realtime_ordered_map const *const rom)
+static struct ccc_impl_r_om_elem *
+min_from(struct ccc_impl_realtime_ordered_map const *const rom,
+         struct ccc_impl_r_om_elem *start)
 {
-    if (!rom->sz)
+    if (start == &rom->end)
     {
-        return NULL;
+        return start;
     }
-    struct ccc_impl_r_om_elem *n = rom->root;
-    for (; n->link[L] != &rom->end; n = n->link[L])
+    for (; start->link[L] != &rom->end; start = start->link[L])
     {}
-    return struct_base(rom, n);
+    return start;
 }
 
 void *
 ccc_rom_begin(ccc_realtime_ordered_map const *rom)
 {
-    return min(&rom->impl);
+    struct ccc_impl_r_om_elem *m = min_from(&rom->impl, rom->impl.root);
+    return m == &rom->impl.end ? NULL : struct_base(&rom->impl, m);
 }
 
 void *
@@ -227,7 +254,25 @@ ccc_rom_print(ccc_realtime_ordered_map const *const rom, ccc_print_fn *const fn)
     ccc_tree_print(&rom->impl, rom->impl.root, fn);
 }
 
-/*=========================   Static Helpers   ============================*/
+/*=========================   Private Interface  ============================*/
+
+void *
+ccc_impl_rom_key_from_node(
+    struct ccc_impl_realtime_ordered_map const *const rom,
+    struct ccc_impl_r_om_elem const *const elem)
+{
+    return (uint8_t *)struct_base(rom, elem) + rom->key_offset;
+}
+
+struct ccc_impl_r_om_elem *
+ccc_impl_rom_elem_in_slot(struct ccc_impl_realtime_ordered_map const *const rom,
+                          void const *const slot)
+{
+    return (struct ccc_impl_r_om_elem *)((uint8_t *)slot
+                                         + rom->node_elem_offset);
+}
+
+/*=========================    Static Helpers    ============================*/
 
 static void *
 maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *const rom,
@@ -272,42 +317,6 @@ maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *const rom,
     return struct_base(rom, out_handle);
 }
 
-static void
-insert_fixup(struct ccc_impl_realtime_ordered_map *const rom,
-             struct ccc_impl_r_om_elem *parent, struct ccc_impl_r_om_elem *x)
-{
-    do
-    {
-        promote(rom, parent);
-        x = parent;
-        parent = parent->parent;
-        if (parent == &rom->end)
-        {
-            return;
-        }
-    } while (parent_01(x->parity, parent->parity, sibling(parent, x)->parity));
-
-    if (!parent_02(x->parity, parent->parity, sibling(parent, x)->parity))
-    {
-        return;
-    }
-    enum tree_link const parent_to_x = parent->link[R] == x;
-    struct ccc_impl_r_om_elem *y = x->link[!parent_to_x];
-    if (y->parity == x->parity)
-    {
-        rotate(rom, parent, x, y, !parent_to_x);
-        demote(rom, parent);
-    }
-    else
-    {
-        rotate(rom, x, y, y->link[!parent_to_x], parent_to_x);
-        rotate(rom, y->parent, y, y->link[parent_to_x], !parent_to_x);
-        promote(rom, y);
-        demote(rom, x);
-        demote(rom, parent);
-    }
-}
-
 static struct query
 find(struct ccc_impl_realtime_ordered_map *const rom, void const *const key)
 {
@@ -327,26 +336,7 @@ find(struct ccc_impl_realtime_ordered_map *const rom, void const *const key)
     return (struct query){dir, .parent = parent};
 }
 
-static inline void
-rotate(struct ccc_impl_realtime_ordered_map *const rom,
-       struct ccc_impl_r_om_elem *const parent,
-       struct ccc_impl_r_om_elem *const x, struct ccc_impl_r_om_elem *const y,
-       enum tree_link dir)
-{
-    struct ccc_impl_r_om_elem *const grandparent = parent->parent;
-    x->parent = grandparent;
-    if (grandparent == &rom->end)
-    {
-        rom->root = x;
-    }
-    grandparent->link[grandparent->link[R] == parent] = x;
-    x->link[dir] = parent;
-    parent->parent = x;
-    parent->link[!dir] = y;
-    y->parent = parent;
-}
-
-struct ccc_impl_r_om_elem const *
+static struct ccc_impl_r_om_elem const *
 next(struct ccc_impl_realtime_ordered_map *const t,
      struct ccc_impl_r_om_elem const *n, enum tree_link traversal)
 {
@@ -373,45 +363,6 @@ next(struct ccc_impl_realtime_ordered_map *const t,
     {}
     /* This is where the end node is helpful. We get to it eventually. */
     return p == &t->end ? NULL : p;
-}
-
-static inline bool
-parent_01(uint8_t x_parity, uint8_t parent_parity, uint8_t sibling_parity)
-{
-    return (!x_parity && !parent_parity && sibling_parity)
-           || (x_parity && parent_parity && !sibling_parity);
-}
-
-static inline bool
-parent_02(uint8_t x_parity, uint8_t parent_parity, uint8_t sibling_parity)
-{
-    return (x_parity && parent_parity && sibling_parity)
-           || (!x_parity && !parent_parity && !sibling_parity);
-}
-
-static inline struct ccc_impl_r_om_elem *
-sibling(struct ccc_impl_r_om_elem const *parent,
-        struct ccc_impl_r_om_elem const *x)
-{
-    /* We want the sibling so we need the truthy value to be opposite of x. */
-    return parent->link[parent->link[L] == x];
-}
-
-static inline void
-promote(struct ccc_impl_realtime_ordered_map const *const rom,
-        struct ccc_impl_r_om_elem *x)
-{
-    if (x != &rom->end)
-    {
-        x->parity = !x->parity;
-    }
-}
-
-static inline void
-demote(struct ccc_impl_realtime_ordered_map const *const rom,
-       struct ccc_impl_r_om_elem *x)
-{
-    promote(rom, x);
 }
 
 static inline void
@@ -456,6 +407,243 @@ struct_base(struct ccc_impl_realtime_ordered_map const *const rom,
 {
     return ((uint8_t *)e->link) - rom->node_elem_offset;
 }
+
+/*=======================   WAVL Tree Maintenance   =========================*/
+
+static void
+insert_fixup(struct ccc_impl_realtime_ordered_map *const rom,
+             struct ccc_impl_r_om_elem *parent, struct ccc_impl_r_om_elem *x)
+{
+    do
+    {
+        promote(rom, parent);
+        x = parent;
+        parent = parent->parent;
+        if (parent == &rom->end)
+        {
+            return;
+        }
+    } while (is_parent_01(x, parent, sibling(parent, x)));
+
+    if (!is_parent_02(x, parent, sibling(parent, x)))
+    {
+        return;
+    }
+    enum tree_link const rotation = parent->link[R] == x;
+    struct ccc_impl_r_om_elem *y = x->link[!rotation];
+    if (y->parity == x->parity)
+    {
+        rotate(rom, parent, x, y, !rotation);
+        demote(rom, parent);
+    }
+    else
+    {
+        rotate(rom, x, y, y->link[rotation], rotation);
+        rotate(rom, y->parent, y, y->link[!rotation], !rotation);
+        promote(rom, y);
+        demote(rom, x);
+        demote(rom, parent);
+    }
+}
+
+static void *
+remove_from_tree(struct ccc_impl_realtime_ordered_map *const rom,
+                 struct ccc_impl_r_om_elem *const remove)
+{
+    struct ccc_impl_r_om_elem *y = NULL;
+    if (remove->link[L] == &rom->end || remove->link[R] == &rom->end)
+    {
+        y = remove;
+    }
+    else
+    {
+        y = min_from(rom, remove->link[R]);
+    }
+    struct ccc_impl_r_om_elem *x = y->link[y->link[L] == &rom->end];
+    x->parent = y->parent;
+    bool two_child = false;
+    if (remove == rom->root)
+    {
+        rom->root = y;
+    }
+    else
+    {
+        two_child = is_2_child(y->parent, y);
+        y->parent->link[y->parent->link[R] == y] = x;
+    }
+    if (remove != y)
+    {
+        y->parent = remove->parent;
+        y->link[L] = remove->link[L];
+        y->link[R] = remove->link[R];
+        remove->link[L]->parent = y;
+        remove->link[R]->parent = y;
+        y->parity = remove->parity;
+    }
+    remove->parent->link[remove->parent->link[R] == remove] = y;
+    struct ccc_impl_r_om_elem *parent = y->parent;
+    if (parent == &rom->end)
+    {
+        return remove;
+    }
+    if (two_child)
+    {
+        fixup_x_3_child(rom, x, parent);
+    }
+    else if (x == &rom->end && parent->link[L] == parent->link[R])
+    {
+        fixup_x_22_leaf(rom, parent);
+    }
+    assert(parent->link[L] != &rom->end || parent->link[R] != &rom->end
+           || !parent->parity);
+    remove->link[L] = remove->link[R] = remove->parent = NULL;
+    remove->parity = 0;
+    --rom->sz;
+    return struct_base(rom, remove);
+}
+
+static inline void
+fixup_x_22_leaf(struct ccc_impl_realtime_ordered_map *const rom,
+                struct ccc_impl_r_om_elem *const x)
+{
+    if (x->parent->parity == x->parity)
+    {
+        demote(rom, x);
+        fixup_x_3_child(rom, x->parent, x);
+    }
+    else
+    {
+        demote(rom, x);
+    }
+}
+
+static inline void
+fixup_x_3_child(struct ccc_impl_realtime_ordered_map *const rom,
+                struct ccc_impl_r_om_elem *parent, struct ccc_impl_r_om_elem *x)
+{
+    bool x_is_3_child = false;
+    struct ccc_impl_r_om_elem *y = NULL;
+    do
+    {
+        struct ccc_impl_r_om_elem *const grandparent = parent->parent;
+        y = sibling(parent, x);
+        x_is_3_child = grandparent != &rom->end
+                       && (parent->parity == grandparent->parity);
+        if (is_2_child(parent, parent))
+        {
+            demote(rom, parent);
+        }
+        else if (y->parity != y->link[L]->parity
+                 || y->parity != y->link[R]->parity)
+        {
+            fix_3_child_rank_rule(rom, parent, x, y);
+            return;
+        }
+        demote(rom, parent);
+        demote(rom, y);
+        x = parent;
+        parent = parent->parent;
+    } while (parent != &rom->end && x_is_3_child);
+}
+
+static inline void
+fix_3_child_rank_rule(struct ccc_impl_realtime_ordered_map *const rom,
+                      struct ccc_impl_r_om_elem *parent,
+                      struct ccc_impl_r_om_elem *x,
+                      struct ccc_impl_r_om_elem *y)
+{
+    enum tree_link const rotation = parent->link[R] == x;
+    struct ccc_impl_r_om_elem *const w = y->link[!rotation];
+    if (w->parity != y->parity)
+    {
+        rotate(rom, parent, y, w, !rotation);
+        promote(rom, y);
+        demote(rom, parent);
+        if (parent->link[L] == &rom->end && parent->link[R] == &rom->end)
+        {
+            demote(rom, parent);
+        }
+    }
+    else
+    {
+        struct ccc_impl_r_om_elem *const v = y->link[rotation];
+        assert(y->parity != v->parity);
+        rotate(rom, y, v, v->link[rotation], rotation);
+        rotate(rom, v->parent, v, v->link[!rotation], !rotation);
+        /* Double promote v but this does nothing so skip it. */
+        demote(rom, y);
+        /* Double demote parent but this does nothing so skip it. */
+    }
+}
+
+static inline void
+rotate(struct ccc_impl_realtime_ordered_map *const rom,
+       struct ccc_impl_r_om_elem *const parent,
+       struct ccc_impl_r_om_elem *const x, struct ccc_impl_r_om_elem *const y,
+       enum tree_link dir)
+{
+    struct ccc_impl_r_om_elem *const grandparent = parent->parent;
+    x->parent = grandparent;
+    if (grandparent == &rom->end)
+    {
+        rom->root = x;
+    }
+    grandparent->link[grandparent->link[R] == parent] = x;
+    x->link[dir] = parent;
+    parent->parent = x;
+    parent->link[!dir] = y;
+    y->parent = parent;
+}
+
+static inline bool
+is_2_child(struct ccc_impl_r_om_elem const *const parent,
+           struct ccc_impl_r_om_elem const *const x)
+{
+    return parent->parity == x->parity;
+}
+
+static inline bool
+is_parent_01(struct ccc_impl_r_om_elem *x, struct ccc_impl_r_om_elem *parent,
+             struct ccc_impl_r_om_elem *sibling)
+{
+    return (!x->parity && !parent->parity && sibling->parity)
+           || (x->parity && parent->parity && !sibling->parity);
+}
+
+static inline bool
+is_parent_02(struct ccc_impl_r_om_elem *x, struct ccc_impl_r_om_elem *parent,
+             struct ccc_impl_r_om_elem *sibling)
+{
+    return (x->parity && parent->parity && sibling->parity)
+           || (!x->parity && !parent->parity && !sibling->parity);
+}
+
+static inline struct ccc_impl_r_om_elem *
+sibling(struct ccc_impl_r_om_elem const *parent,
+        struct ccc_impl_r_om_elem const *x)
+{
+    /* We want the sibling so we need the truthy value to be opposite of x. */
+    return parent->link[parent->link[L] == x];
+}
+
+static inline void
+promote(struct ccc_impl_realtime_ordered_map const *const rom,
+        struct ccc_impl_r_om_elem *x)
+{
+    if (x != &rom->end)
+    {
+        x->parity = !x->parity;
+    }
+}
+
+static inline void
+demote(struct ccc_impl_realtime_ordered_map const *const rom,
+       struct ccc_impl_r_om_elem *x)
+{
+    promote(rom, x);
+}
+
+/*===========================   Validation   ===============================*/
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
