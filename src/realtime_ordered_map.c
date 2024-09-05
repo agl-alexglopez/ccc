@@ -319,12 +319,12 @@ find(struct ccc_impl_realtime_ordered_map *const rom, void const *const key)
         dir = cmp(rom, key, seek, rom->cmp);
         if (CCC_EQL == dir)
         {
-            return (struct query){CCC_EQL, {seek}};
+            return (struct query){CCC_EQL, .found = seek};
         }
         parent = seek;
         seek = seek->link[CCC_GRT == dir];
     }
-    return (struct query){dir, {parent}};
+    return (struct query){dir, .parent = parent};
 }
 
 static inline void
