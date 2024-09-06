@@ -416,22 +416,22 @@ find(struct ccc_impl_realtime_ordered_map const *const rom,
 {
     struct ccc_impl_r_om_elem const *parent = &rom->end;
     struct ccc_impl_r_om_elem const *seek = rom->root;
-    ccc_threeway_cmp dir = CCC_CMP_ERR;
+    ccc_threeway_cmp link = CCC_CMP_ERR;
     while (seek != &rom->end)
     {
-        dir = cmp(rom, key, seek, rom->cmp);
-        if (CCC_EQL == dir)
+        link = cmp(rom, key, seek, rom->cmp);
+        if (CCC_EQL == link)
         {
             return (struct query){
-                CCC_EQL,
+                .last_cmp = CCC_EQL,
                 .found = (struct ccc_impl_r_om_elem *)seek,
             };
         }
         parent = seek;
-        seek = seek->link[CCC_GRT == dir];
+        seek = seek->link[CCC_GRT == link];
     }
     return (struct query){
-        dir,
+        .last_cmp = link,
         .parent = (struct ccc_impl_r_om_elem *)parent,
     };
 }
@@ -564,8 +564,11 @@ remove_fixup(struct ccc_impl_realtime_ordered_map *const rom,
         {
             rom->root = x;
         }
-        two_child = is_2_child(p_of_x, y);
-        p_of_x->link[p_of_x->link[R] == y] = x;
+        else
+        {
+            two_child = is_2_child(p_of_x, y);
+            p_of_x->link[p_of_x->link[R] == y] = x;
+        }
     }
     else
     {
