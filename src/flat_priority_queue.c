@@ -31,22 +31,16 @@ enum fpq_direction
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
 
-static void *at(struct ccc_impl_flat_priority_queue const *, size_t);
-static size_t index_of(struct ccc_impl_flat_priority_queue const *,
-                       void const *);
-static bool wins(struct ccc_impl_flat_priority_queue const *,
-                 void const *winner, void const *loser);
-static void swap(struct ccc_impl_flat_priority_queue *, uint8_t tmp[], size_t,
-                 size_t);
-static void bubble_down(struct ccc_impl_flat_priority_queue *, uint8_t tmp[],
-                        size_t);
-static void print_node(struct ccc_impl_flat_priority_queue const *, size_t,
-                       ccc_print_fn *);
-static void print_inner_heap(struct ccc_impl_flat_priority_queue const *,
-                             size_t, char const *, enum ccc_print_link,
-                             ccc_print_fn *);
-static void print_heap(struct ccc_impl_flat_priority_queue const *, size_t,
-                       ccc_print_fn *);
+static void *at(struct ccc_fpq_ const *, size_t);
+static size_t index_of(struct ccc_fpq_ const *, void const *);
+static bool wins(struct ccc_fpq_ const *, void const *winner,
+                 void const *loser);
+static void swap(struct ccc_fpq_ *, uint8_t tmp[], size_t, size_t);
+static void bubble_down(struct ccc_fpq_ *, uint8_t tmp[], size_t);
+static void print_node(struct ccc_fpq_ const *, size_t, ccc_print_fn *);
+static void print_inner_heap(struct ccc_fpq_ const *, size_t, char const *,
+                             enum ccc_print_link, ccc_print_fn *);
+static void print_heap(struct ccc_fpq_ const *, size_t, ccc_print_fn *);
 
 ccc_result
 ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
@@ -248,8 +242,7 @@ ccc_fpq_print(ccc_flat_priority_queue const *const fpq, size_t const i,
 /*===========================   Implementation   ========================== */
 
 size_t
-ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *const fpq,
-                       uint8_t tmp[], size_t i)
+ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t i)
 {
     for (size_t parent = (i - 1) / 2; i; i = parent, parent = (parent - 1) / 2)
     {
@@ -265,8 +258,7 @@ ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *const fpq,
 /*===============================  Static Helpers  =========================*/
 
 static void
-bubble_down(struct ccc_impl_flat_priority_queue *const fpq, uint8_t tmp[],
-            size_t i)
+bubble_down(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t i)
 {
     size_t const sz = ccc_buf_size(&fpq->buf);
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
@@ -285,8 +277,7 @@ bubble_down(struct ccc_impl_flat_priority_queue *const fpq, uint8_t tmp[],
 }
 
 static inline void
-swap(struct ccc_impl_flat_priority_queue *const fpq, uint8_t tmp[],
-     size_t const i, size_t const j)
+swap(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t const i, size_t const j)
 {
     ccc_result const res = ccc_buf_swap(&fpq->buf, tmp, i, j);
     (void)res;
@@ -296,7 +287,7 @@ swap(struct ccc_impl_flat_priority_queue *const fpq, uint8_t tmp[],
 /* Thin wrapper just for sanity checking in debug mode as index should always
    be valid when this function is used. */
 static inline void *
-at(struct ccc_impl_flat_priority_queue const *const fpq, size_t const i)
+at(struct ccc_fpq_ const *const fpq, size_t const i)
 {
     void *const addr = ccc_buf_at(&fpq->buf, i);
     assert(addr);
@@ -307,8 +298,7 @@ at(struct ccc_impl_flat_priority_queue const *const fpq, size_t const i)
    be within the buffer range. It should never exceed the current size and
    start at or after the buffer base. Only checked in debug. */
 static inline size_t
-index_of(struct ccc_impl_flat_priority_queue const *const fpq,
-         void const *const slot)
+index_of(struct ccc_fpq_ const *const fpq, void const *const slot)
 {
     assert(slot >= ccc_buf_base(&fpq->buf));
     size_t const i = (((uint8_t *)slot) - ((uint8_t *)ccc_buf_base(&fpq->buf)))
@@ -318,8 +308,8 @@ index_of(struct ccc_impl_flat_priority_queue const *const fpq,
 }
 
 static inline bool
-wins(struct ccc_impl_flat_priority_queue const *const fpq,
-     void const *const winner, void const *const loser)
+wins(struct ccc_fpq_ const *const fpq, void const *const winner,
+     void const *const loser)
 {
     return fpq->cmp((ccc_cmp){winner, loser, fpq->aux}) == fpq->order;
 }
@@ -327,8 +317,7 @@ wins(struct ccc_impl_flat_priority_queue const *const fpq,
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static void
-print_node(struct ccc_impl_flat_priority_queue const *const fpq, size_t i,
-           ccc_print_fn *const fn)
+print_node(struct ccc_fpq_ const *const fpq, size_t i, ccc_print_fn *const fn)
 {
     printf(COLOR_CYN);
     if (i)
@@ -347,9 +336,8 @@ print_node(struct ccc_impl_flat_priority_queue const *const fpq, size_t i,
 }
 
 static void
-print_inner_heap(struct ccc_impl_flat_priority_queue const *const fpq, size_t i,
-                 char const *prefix, enum ccc_print_link const node_type,
-                 ccc_print_fn *const fn)
+print_inner_heap(struct ccc_fpq_ const *const fpq, size_t i, char const *prefix,
+                 enum ccc_print_link const node_type, ccc_print_fn *const fn)
 {
     size_t const sz = ccc_buf_size(&fpq->buf);
     if (i >= sz)
@@ -390,8 +378,7 @@ print_inner_heap(struct ccc_impl_flat_priority_queue const *const fpq, size_t i,
 }
 
 static void
-print_heap(struct ccc_impl_flat_priority_queue const *const fpq, size_t i,
-           ccc_print_fn *const fn)
+print_heap(struct ccc_fpq_ const *const fpq, size_t i, ccc_print_fn *const fn)
 {
     size_t const sz = ccc_buf_size(&fpq->buf);
     if (i >= sz)

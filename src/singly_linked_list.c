@@ -2,8 +2,7 @@
 
 #include <string.h>
 
-static void *struct_base(struct ccc_impl_singly_linked_list const *,
-                         struct ccc_impl_sll_elem const *);
+static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);
 
 void *
 ccc_sll_push_front(ccc_singly_linked_list *const sll,
@@ -46,7 +45,7 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
     {
         return;
     }
-    struct ccc_impl_sll_elem *remove = sll->impl.sentinel.n;
+    struct ccc_sll_elem_ *remove = sll->impl.sentinel.n;
     sll->impl.sentinel.n = remove->n;
     if (sll->impl.alloc)
     {
@@ -56,8 +55,8 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
 }
 
 void
-ccc_impl_sll_push_front(struct ccc_impl_singly_linked_list *const sll,
-                        struct ccc_impl_sll_elem *const e)
+ccc_impl_sll_push_front(struct ccc_sll_ *const sll,
+                        struct ccc_sll_elem_ *const e)
 {
     e->n = sll->sentinel.n;
     sll->sentinel.n = e;
@@ -68,7 +67,7 @@ bool
 ccc_sll_validate(ccc_singly_linked_list const *const sll)
 {
     size_t size = 0;
-    for (struct ccc_impl_sll_elem *e = sll->impl.sentinel.n;
+    for (struct ccc_sll_elem_ *e = sll->impl.sentinel.n;
          e != &sll->impl.sentinel; e = e->n, ++size)
     {
         if (!e || !e->n)
@@ -83,17 +82,16 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     return size == sll->impl.sz;
 }
 
-struct ccc_impl_sll_elem *
-ccc_impl_sll_elem_in(struct ccc_impl_singly_linked_list const *const sll,
-                     void const *const user_struct)
+struct ccc_sll_elem_ *
+ccc_sll_elem__in(struct ccc_sll_ const *const sll,
+                 void const *const user_struct)
 {
-    return (struct ccc_impl_sll_elem *)((uint8_t *)user_struct
-                                        + sll->sll_elem_offset);
+    return (struct ccc_sll_elem_ *)((uint8_t *)user_struct
+                                    + sll->sll_elem_offset);
 }
 
 static inline void *
-struct_base(struct ccc_impl_singly_linked_list const *const l,
-            struct ccc_impl_sll_elem const *const e)
+struct_base(struct ccc_sll_ const *const l, struct ccc_sll_elem_ const *const e)
 {
     return ((uint8_t *)&e->n) - l->sll_elem_offset;
 }

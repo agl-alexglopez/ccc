@@ -3,8 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-static void *struct_base(struct ccc_impl_doubly_linked_list const *,
-                         struct ccc_impl_dll_elem const *);
+static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
 
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
@@ -67,7 +66,7 @@ ccc_dll_pop_front(ccc_doubly_linked_list *l)
     {
         return;
     }
-    struct ccc_impl_dll_elem *remove = l->impl.sentinel.n;
+    struct ccc_dll_elem_ *remove = l->impl.sentinel.n;
     remove->n->p = &l->impl.sentinel;
     l->impl.sentinel.n = remove->n;
     if (l->impl.alloc)
@@ -84,7 +83,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
     {
         return;
     }
-    struct ccc_impl_dll_elem *remove = l->impl.sentinel.p;
+    struct ccc_dll_elem_ *remove = l->impl.sentinel.p;
     remove->p->n = &l->impl.sentinel;
     l->impl.sentinel.p = remove->p;
     if (l->impl.alloc)
@@ -95,8 +94,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
 }
 
 void
-ccc_impl_dll_push_back(struct ccc_impl_doubly_linked_list *const l,
-                       struct ccc_impl_dll_elem *const e)
+ccc_impl_dll_push_back(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
 {
     e->n = &l->sentinel;
     e->p = l->sentinel.p;
@@ -106,8 +104,7 @@ ccc_impl_dll_push_back(struct ccc_impl_doubly_linked_list *const l,
 }
 
 void
-ccc_impl_dll_push_front(struct ccc_impl_doubly_linked_list *const l,
-                        struct ccc_impl_dll_elem *const e)
+ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
 {
     e->p = &l->sentinel;
     e->n = l->sentinel.n;
@@ -214,8 +211,8 @@ bool
 ccc_dll_validate(ccc_doubly_linked_list const *const l)
 {
     size_t size = 0;
-    for (struct ccc_impl_dll_elem *e = l->impl.sentinel.n;
-         e != &l->impl.sentinel; e = e->n, ++size)
+    for (struct ccc_dll_elem_ *e = l->impl.sentinel.n; e != &l->impl.sentinel;
+         e = e->n, ++size)
     {
         if (!e || !e->n || !e->p)
         {
@@ -229,17 +226,15 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     return size == l->impl.sz;
 }
 
-struct ccc_impl_dll_elem *
-ccc_impl_dll_elem_in(struct ccc_impl_doubly_linked_list const *const l,
-                     void const *const user_struct)
+struct ccc_dll_elem_ *
+ccc_dll_elem__in(struct ccc_dll_ const *const l, void const *const user_struct)
 {
-    return (struct ccc_impl_dll_elem *)((uint8_t *)user_struct
-                                        + l->dll_elem_offset);
+    return (struct ccc_dll_elem_ *)((uint8_t *)user_struct
+                                    + l->dll_elem_offset);
 }
 
 static inline void *
-struct_base(struct ccc_impl_doubly_linked_list const *const l,
-            struct ccc_impl_dll_elem const *const e)
+struct_base(struct ccc_dll_ const *const l, struct ccc_dll_elem_ const *const e)
 {
     return ((uint8_t *)&e->n) - l->dll_elem_offset;
 }

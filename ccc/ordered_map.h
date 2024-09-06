@@ -30,17 +30,17 @@ modifications. This may combat such an anti-pattern. */
 
 typedef struct
 {
-    ccc_tree impl;
+    struct ccc_om_ impl;
 } ccc_ordered_map;
 
 typedef struct
 {
-    ccc_node impl;
+    ccc_om_node_ impl;
 } ccc_o_map_elem;
 
 typedef struct
 {
-    struct ccc_tree_entry impl;
+    struct ccc_om_entry_ impl;
 } ccc_o_map_entry;
 
 #define CCC_OM_INIT(struct_name, set_elem_field, key_elem_field, set_name,     \

@@ -22,12 +22,12 @@
 
 typedef struct
 {
-    ccc_node impl;
+    ccc_om_node_ impl;
 } ccc_depq_elem;
 
 typedef struct
 {
-    ccc_tree impl;
+    struct ccc_om_ impl;
 } ccc_double_ended_priority_queue;
 
 /* Initialize the depq on the left hand side with this right hand side

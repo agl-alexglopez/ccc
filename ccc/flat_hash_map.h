@@ -6,17 +6,17 @@
 
 typedef struct
 {
-    struct ccc_impl_fhash_elem impl;
+    struct ccc_fhm_elem_ impl;
 } ccc_fh_map_elem;
 
 typedef struct
 {
-    struct ccc_impl_flat_hash impl;
+    struct ccc_fhm_ impl;
 } ccc_flat_hash_map;
 
 typedef struct
 {
-    struct ccc_impl_fhash_entry impl;
+    struct ccc_fhm_entry_ impl;
 } ccc_fh_map_entry;
 
 /** @brief the initialization helper macro for a hash table. Must be called

@@ -29,9 +29,9 @@ typedef enum test_result (*test_fn)(void);
 #define CHECK(result, expected, type_format_specifier)                         \
     do                                                                         \
     {                                                                          \
-        __auto_type const _result_ = (result);                                 \
-        typeof(_result_) const _expected_ = (expected);                        \
-        if (_result_ != _expected_)                                            \
+        __auto_type const result_ = (result);                                  \
+        typeof(result_) const expected_ = (expected);                          \
+        if (result_ != expected_)                                              \
         {                                                                      \
             (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,    \
                           __func__, __LINE__);                                 \
@@ -40,9 +40,9 @@ typedef enum test_result (*test_fn)(void);
                                 "result( %s ) == expected( %s )" NONE "\n",    \
                           #result, #expected);                                 \
             (void)fprintf(stderr, RED "ERROR: result( ");                      \
-            (void)fprintf(stderr, type_format_specifier, _result_);            \
+            (void)fprintf(stderr, type_format_specifier, result_);             \
             (void)fprintf(stderr, " ) != expected( ");                         \
-            (void)fprintf(stderr, type_format_specifier, _expected_);          \
+            (void)fprintf(stderr, type_format_specifier, expected_);           \
             (void)fprintf(stderr, " )" CYAN "\n" NONE);                        \
             return FAIL;                                                       \
         }                                                                      \

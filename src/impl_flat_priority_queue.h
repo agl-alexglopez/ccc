@@ -9,7 +9,7 @@
 
 #include <assert.h>
 
-struct ccc_impl_flat_priority_queue
+struct ccc_fpq_
 {
     ccc_buffer buf;
     ccc_cmp_fn *cmp;
@@ -17,8 +17,7 @@ struct ccc_impl_flat_priority_queue
     void *aux;
 };
 
-size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *, uint8_t[],
-                              size_t);
+size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, uint8_t[], size_t);
 
 /*=======================    Convenience Macros    ======================== */
 
@@ -38,27 +37,27 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_impl_flat_priority_queue *, uint8_t[],
    of the macro are hidden here in the impl header. */
 #define CCC_IMPL_FPQ_EMPLACE(fpq, type_initializer...)                         \
     ({                                                                         \
-        typeof(type_initializer) *_fpq_res_;                                   \
-        struct ccc_impl_flat_priority_queue *_fpq_ = &(fpq)->impl;             \
-        assert(sizeof(*_fpq_res_) == ccc_buf_elem_size(&_fpq_->buf));          \
-        _fpq_res_ = ccc_buf_alloc(&_fpq_->buf);                                \
-        if (_fpq_res_)                                                         \
+        typeof(type_initializer) *fpq_res_;                                    \
+        struct ccc_fpq_ *fpq_ = &(fpq)->impl;                                  \
+        assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf));            \
+        fpq_res_ = ccc_buf_alloc(&fpq_->buf);                                  \
+        if (fpq_res_)                                                          \
         {                                                                      \
-            *_fpq_res_ = type_initializer;                                     \
-            if (ccc_buf_size(&_fpq_->buf) > 1)                                 \
+            *fpq_res_ = type_initializer;                                      \
+            if (ccc_buf_size(&fpq_->buf) > 1)                                  \
             {                                                                  \
-                uint8_t _fpq_tmp_[ccc_buf_elem_size(&_fpq_->buf)];             \
-                _fpq_res_ = ccc_buf_at(                                        \
-                    &_fpq_->buf,                                               \
-                    ccc_impl_fpq_bubble_up(_fpq_, _fpq_tmp_,                   \
-                                           ccc_buf_size(&_fpq_->buf) - 1));    \
+                uint8_t fpq_tmp_[ccc_buf_elem_size(&fpq_->buf)];               \
+                fpq_res_ = ccc_buf_at(                                         \
+                    &fpq_->buf,                                                \
+                    ccc_impl_fpq_bubble_up(fpq_, fpq_tmp_,                     \
+                                           ccc_buf_size(&fpq_->buf) - 1));     \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                _fpq_res_ = ccc_buf_at(&_fpq_->buf, 0);                        \
+                fpq_res_ = ccc_buf_at(&fpq_->buf, 0);                          \
             }                                                                  \
         }                                                                      \
-        _fpq_res_;                                                             \
+        fpq_res_;                                                              \
     })
 
 #endif /* CCC_IMPL_FLAT_PRIORITY_QUEUE_H */

@@ -6,13 +6,13 @@
 
 #include <stddef.h>
 
-struct ccc_impl_flat_queue
+struct ccc_fq_
 {
     ccc_buffer buf;
     size_t front;
 };
 
-void *ccc_impl_fq_alloc(struct ccc_impl_flat_queue *);
+void *ccc_impl_fq_alloc(struct ccc_fq_ *);
 
 #define CCC_IMPL_FQ_INIT(mem_ptr, capacity, type_name, alloc_fn)               \
     {                                                                          \
@@ -24,12 +24,12 @@ void *ccc_impl_fq_alloc(struct ccc_impl_flat_queue *);
 
 #define CCC_IMPL_FQ_EMPLACE(fq_ptr, value...)                                  \
     ({                                                                         \
-        void *_fq_emplace_ret_ = ccc_impl_fq_alloc(&(fq_ptr)->impl);           \
-        if (_fq_emplace_ret_)                                                  \
+        void *fq_emplace_ret_ = ccc_impl_fq_alloc(&(fq_ptr)->impl);            \
+        if (fq_emplace_ret_)                                                   \
         {                                                                      \
-            *((typeof(value) *)_fq_emplace_ret_) = value;                      \
+            *((typeof(value) *)fq_emplace_ret_) = value;                       \
         }                                                                      \
-        _fq_emplace_ret_;                                                      \
+        fq_emplace_ret_;                                                       \
     })
 
 #endif /* CCC_IMPL_FLAT_QUEUE_H */

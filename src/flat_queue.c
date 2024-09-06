@@ -7,13 +7,13 @@ static size_t const start_capacity = 8;
 
 #define MIN(a, b)                                                              \
     ({                                                                         \
-        __auto_type _a_ = (a);                                                 \
-        __auto_type _b_ = (b);                                                 \
-        _a_ < _b_ ? _a_ : _b_;                                                 \
+        __auto_type a_ = (a);                                                  \
+        __auto_type b_ = (b);                                                  \
+        a_ < b_ ? a_ : b_;                                                     \
     })
 
-static ccc_result maybe_resize(struct ccc_impl_flat_queue *);
-static size_t bytes(struct ccc_impl_flat_queue const *, size_t);
+static ccc_result maybe_resize(struct ccc_fq_ *);
+static size_t bytes(struct ccc_fq_ const *, size_t);
 
 void
 ccc_fq_clear(ccc_flat_queue *const fq, ccc_destructor_fn *destructor)
@@ -105,7 +105,7 @@ ccc_fq_size(ccc_flat_queue const *const fq)
 }
 
 void *
-ccc_impl_fq_alloc(struct ccc_impl_flat_queue *fq)
+ccc_impl_fq_alloc(struct ccc_fq_ *fq)
 {
     if (!fq || maybe_resize(fq) != CCC_OK)
     {
@@ -118,7 +118,7 @@ ccc_impl_fq_alloc(struct ccc_impl_flat_queue *fq)
 }
 
 static ccc_result
-maybe_resize(struct ccc_impl_flat_queue *const q)
+maybe_resize(struct ccc_fq_ *const q)
 {
     if (ccc_buf_size(&q->buf) < ccc_buf_capacity(&q->buf))
     {
@@ -154,7 +154,7 @@ maybe_resize(struct ccc_impl_flat_queue *const q)
 }
 
 static inline size_t
-bytes(struct ccc_impl_flat_queue const *q, size_t n)
+bytes(struct ccc_fq_ const *q, size_t n)
 {
     return ccc_buf_elem_size(&q->buf) * n;
 }

@@ -5,12 +5,12 @@
 
 typedef struct
 {
-    struct ccc_impl_sll_elem impl;
+    struct ccc_sll_elem_ impl;
 } ccc_sll_elem;
 
 typedef struct
 {
-    struct ccc_impl_singly_linked_list impl;
+    struct ccc_sll_ impl;
 } ccc_singly_linked_list;
 
 #define CCC_SLL_INIT(list_ptr, list_name, struct_name, list_elem_field,        \

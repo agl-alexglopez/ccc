@@ -10,7 +10,7 @@ struct val
 {
     int id;
     int val;
-    ccc_r_om_elem elem;
+    ccc_rtom_elem elem;
 };
 
 ccc_threeway_cmp val_cmp(ccc_key_cmp);

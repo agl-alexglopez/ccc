@@ -6,7 +6,7 @@
 
 typedef struct
 {
-    struct ccc_impl_flat_queue impl;
+    struct ccc_fq_ impl;
 } ccc_flat_queue;
 
 #define CCC_FQ_INIT(mem_ptr, capacity, type_name, alloc_fn)                    \

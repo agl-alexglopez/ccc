@@ -9,27 +9,22 @@
 
 /*=========================  Function Prototypes   ==========================*/
 
-static struct ccc_impl_pq_elem *merge(struct ccc_impl_priority_queue *,
-                                      struct ccc_impl_pq_elem *old,
-                                      struct ccc_impl_pq_elem *new);
-static void link_child(struct ccc_impl_pq_elem *parent,
-                       struct ccc_impl_pq_elem *child);
-static void init_node(struct ccc_impl_pq_elem *);
-static size_t traversal_size(struct ccc_impl_pq_elem const *);
-static bool has_valid_links(struct ccc_impl_priority_queue const *,
-                            struct ccc_impl_pq_elem const *parent,
-                            struct ccc_impl_pq_elem const *child);
-static struct ccc_impl_pq_elem *delete(struct ccc_impl_priority_queue *,
-                                       struct ccc_impl_pq_elem *);
-static struct ccc_impl_pq_elem *delete_min(struct ccc_impl_priority_queue *,
-                                           struct ccc_impl_pq_elem *);
-static void clear_node(struct ccc_impl_pq_elem *);
-static void cut_child(struct ccc_impl_pq_elem *);
-static void *struct_base(struct ccc_impl_priority_queue const *,
-                         struct ccc_impl_pq_elem const *e);
-static ccc_threeway_cmp cmp(struct ccc_impl_priority_queue const *,
-                            struct ccc_impl_pq_elem const *a,
-                            struct ccc_impl_pq_elem const *b);
+static struct ccc_pq_elem_ *merge(struct ccc_pq_ *, struct ccc_pq_elem_ *old,
+                                  struct ccc_pq_elem_ *new);
+static void link_child(struct ccc_pq_elem_ *parent, struct ccc_pq_elem_ *child);
+static void init_node(struct ccc_pq_elem_ *);
+static size_t traversal_size(struct ccc_pq_elem_ const *);
+static bool has_valid_links(struct ccc_pq_ const *,
+                            struct ccc_pq_elem_ const *parent,
+                            struct ccc_pq_elem_ const *child);
+static struct ccc_pq_elem_ *delete(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+static struct ccc_pq_elem_ *delete_min(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+static void clear_node(struct ccc_pq_elem_ *);
+static void cut_child(struct ccc_pq_elem_ *);
+static void *struct_base(struct ccc_pq_ const *, struct ccc_pq_elem_ const *e);
+static ccc_threeway_cmp cmp(struct ccc_pq_ const *,
+                            struct ccc_pq_elem_ const *a,
+                            struct ccc_pq_elem_ const *b);
 
 /*=========================  Interface Functions   ==========================*/
 
@@ -67,7 +62,7 @@ ccc_pq_pop(ccc_priority_queue *const ppq)
     {
         return;
     }
-    struct ccc_impl_pq_elem *const popped = ppq->impl.root;
+    struct ccc_pq_elem_ *const popped = ppq->impl.root;
     ppq->impl.root = delete_min(&ppq->impl, ppq->impl.root);
     ppq->impl.sz--;
     clear_node(popped);
@@ -220,36 +215,34 @@ ccc_pq_order(ccc_priority_queue const *const ppq)
 /*========================   Static Helpers   ================================*/
 
 static inline ccc_threeway_cmp
-cmp(struct ccc_impl_priority_queue const *const ppq,
-    struct ccc_impl_pq_elem const *const a,
-    struct ccc_impl_pq_elem const *const b)
+cmp(struct ccc_pq_ const *const ppq, struct ccc_pq_elem_ const *const a,
+    struct ccc_pq_elem_ const *const b)
 {
     return ppq->cmp(
         (ccc_cmp){struct_base(ppq, a), struct_base(ppq, b), ppq->aux});
 }
 
 static inline void *
-struct_base(struct ccc_impl_priority_queue const *const pq,
-            struct ccc_impl_pq_elem const *e)
+struct_base(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *e)
 {
     return ((uint8_t *)&(e->left_child)) - pq->pq_elem_offset;
 }
 
 static inline void
-init_node(struct ccc_impl_pq_elem *e)
+init_node(struct ccc_pq_elem_ *e)
 {
     e->left_child = e->parent = NULL;
     e->next_sibling = e->prev_sibling = e;
 }
 
 static inline void
-clear_node(struct ccc_impl_pq_elem *e)
+clear_node(struct ccc_pq_elem_ *e)
 {
     e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
 }
 
 static inline void
-cut_child(struct ccc_impl_pq_elem *child)
+cut_child(struct ccc_pq_elem_ *child)
 {
     child->next_sibling->prev_sibling = child->prev_sibling;
     child->prev_sibling->next_sibling = child->next_sibling;
@@ -267,8 +260,8 @@ cut_child(struct ccc_impl_pq_elem *child)
     child->parent = NULL;
 }
 
-static inline struct ccc_impl_pq_elem *delete(
-    struct ccc_impl_priority_queue *ppq, struct ccc_impl_pq_elem *root)
+static inline struct ccc_pq_elem_ *delete(struct ccc_pq_ *ppq,
+                                          struct ccc_pq_elem_ *root)
 {
     if (ppq->root == root)
     {
@@ -278,20 +271,20 @@ static inline struct ccc_impl_pq_elem *delete(
     return merge(ppq, ppq->root, delete_min(ppq, root));
 }
 
-static inline struct ccc_impl_pq_elem *
-delete_min(struct ccc_impl_priority_queue *ppq, struct ccc_impl_pq_elem *root)
+static inline struct ccc_pq_elem_ *
+delete_min(struct ccc_pq_ *ppq, struct ccc_pq_elem_ *root)
 {
     if (!root->left_child)
     {
         return NULL;
     }
-    struct ccc_impl_pq_elem *const eldest = root->left_child->next_sibling;
-    struct ccc_impl_pq_elem *accumulator = root->left_child->next_sibling;
-    struct ccc_impl_pq_elem *cur = root->left_child->next_sibling->next_sibling;
+    struct ccc_pq_elem_ *const eldest = root->left_child->next_sibling;
+    struct ccc_pq_elem_ *accumulator = root->left_child->next_sibling;
+    struct ccc_pq_elem_ *cur = root->left_child->next_sibling->next_sibling;
     while (cur != eldest && cur->next_sibling != eldest)
     {
-        struct ccc_impl_pq_elem *next = cur->next_sibling;
-        struct ccc_impl_pq_elem *next_cur = cur->next_sibling->next_sibling;
+        struct ccc_pq_elem_ *next = cur->next_sibling;
+        struct ccc_pq_elem_ *next_cur = cur->next_sibling->next_sibling;
         next->next_sibling = next->prev_sibling = NULL;
         cur->next_sibling = cur->prev_sibling = NULL;
         accumulator = merge(ppq, accumulator, merge(ppq, cur, next));
@@ -305,9 +298,9 @@ delete_min(struct ccc_impl_priority_queue *ppq, struct ccc_impl_pq_elem *root)
     return root;
 }
 
-static inline struct ccc_impl_pq_elem *
-merge(struct ccc_impl_priority_queue *const ppq,
-      struct ccc_impl_pq_elem *const old, struct ccc_impl_pq_elem *const new)
+static inline struct ccc_pq_elem_ *
+merge(struct ccc_pq_ *const ppq, struct ccc_pq_elem_ *const old,
+      struct ccc_pq_elem_ *const new)
 {
     if (!old || !new || old == new)
     {
@@ -328,8 +321,7 @@ merge(struct ccc_impl_priority_queue *const ppq,
       ┌b┐     ┌c─b┐   ┌d─c─b┐
       └─┘     └───┘   └─────┘ */
 static inline void
-link_child(struct ccc_impl_pq_elem *const parent,
-           struct ccc_impl_pq_elem *const child)
+link_child(struct ccc_pq_elem_ *const parent, struct ccc_pq_elem_ *const child)
 {
     if (parent->left_child)
     {
@@ -351,7 +343,7 @@ link_child(struct ccc_impl_pq_elem *const parent,
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static size_t
-traversal_size(struct ccc_impl_pq_elem const *const root)
+traversal_size(struct ccc_pq_elem_ const *const root)
 {
     if (!root)
     {
@@ -359,7 +351,7 @@ traversal_size(struct ccc_impl_pq_elem const *const root)
     }
     size_t sz = 0;
     bool sibling_ring_lapped = false;
-    struct ccc_impl_pq_elem const *cur = root;
+    struct ccc_pq_elem_ const *cur = root;
     while (!sibling_ring_lapped)
     {
         sz += 1 + traversal_size(cur->left_child);
@@ -370,16 +362,16 @@ traversal_size(struct ccc_impl_pq_elem const *const root)
 }
 
 static bool
-has_valid_links(struct ccc_impl_priority_queue const *const ppq,
-                struct ccc_impl_pq_elem const *const parent,
-                struct ccc_impl_pq_elem const *const child)
+has_valid_links(struct ccc_pq_ const *const ppq,
+                struct ccc_pq_elem_ const *const parent,
+                struct ccc_pq_elem_ const *const child)
 {
     if (!child)
     {
         return true;
     }
     bool sibling_ring_lapped = false;
-    struct ccc_impl_pq_elem const *cur = child;
+    struct ccc_pq_elem_ const *cur = child;
     ccc_threeway_cmp const wrong_order
         = ppq->order == CCC_LES ? CCC_GRT : CCC_LES;
     while (!sibling_ring_lapped)

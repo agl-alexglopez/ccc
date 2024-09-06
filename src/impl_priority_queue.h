@@ -5,21 +5,21 @@
 
 #include <stddef.h>
 
-struct ccc_impl_pq_elem
+struct ccc_pq_elem_
 {
     /* If any of the below fields are changed make sure to adjust how
        the offset of this struct is determined when returning the
        user struct base to them. See implementation code
        (struct_base function). */
-    struct ccc_impl_pq_elem *left_child;
-    struct ccc_impl_pq_elem *next_sibling;
-    struct ccc_impl_pq_elem *prev_sibling;
-    struct ccc_impl_pq_elem *parent;
+    struct ccc_pq_elem_ *left_child;
+    struct ccc_pq_elem_ *next_sibling;
+    struct ccc_pq_elem_ *prev_sibling;
+    struct ccc_pq_elem_ *parent;
 };
 
-struct ccc_impl_priority_queue
+struct ccc_pq_
 {
-    struct ccc_impl_pq_elem *root;
+    struct ccc_pq_elem_ *root;
     size_t sz;
     size_t pq_elem_offset;
     size_t elem_sz;

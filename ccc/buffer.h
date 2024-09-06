@@ -10,7 +10,7 @@
 
 typedef struct
 {
-    struct ccc_impl_buf impl;
+    struct ccc_buf_ impl;
 } ccc_buffer;
 
 #define CCC_BUF_INIT(mem, type, capacity, alloc_fn)                            \

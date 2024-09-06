@@ -14,17 +14,17 @@
 #define CCC_ROM_ENTRY_NULL ((uint8_t)0x8)
 #define CCC_ROM_ENTRY_DELETE_ERROR ((uint8_t)0x10)
 
-typedef struct ccc_impl_r_om_elem
+typedef struct ccc_rtom_elem_
 {
-    struct ccc_impl_r_om_elem *link[2];
-    struct ccc_impl_r_om_elem *parent;
+    struct ccc_rtom_elem_ *link[2];
+    struct ccc_rtom_elem_ *parent;
     uint8_t parity;
-} ccc_impl_r_om_elem;
+} ccc_rtom_elem_;
 
-struct ccc_impl_realtime_ordered_map
+struct ccc_rtom_
 {
-    struct ccc_impl_r_om_elem *root;
-    struct ccc_impl_r_om_elem end;
+    struct ccc_rtom_elem_ *root;
+    struct ccc_rtom_elem_ end;
     size_t sz;
     size_t key_offset;
     size_t node_elem_offset;
@@ -34,9 +34,9 @@ struct ccc_impl_realtime_ordered_map
     void *aux;
 };
 
-struct ccc_impl_r_om_entry
+struct ccc_rtom_entry_
 {
-    struct ccc_impl_realtime_ordered_map *rom;
+    struct ccc_rtom_ *rom;
     ccc_threeway_cmp last_cmp;
     ccc_entry entry;
 };
@@ -56,11 +56,9 @@ struct ccc_impl_r_om_entry
         }                                                                      \
     }
 
-void *
-ccc_impl_rom_key_from_node(struct ccc_impl_realtime_ordered_map const *rom,
-                           struct ccc_impl_r_om_elem const *elem);
-struct ccc_impl_r_om_elem *
-ccc_impl_rom_elem_in_slot(struct ccc_impl_realtime_ordered_map const *rom,
-                          void const *slot);
+void *ccc_impl_rom_key_from_node(struct ccc_rtom_ const *rom,
+                                 struct ccc_rtom_elem_ const *elem);
+struct ccc_rtom_elem_ *ccc_impl_rom_elem_in_slot(struct ccc_rtom_ const *rom,
+                                                 void const *slot);
 
 #endif /* CCC_IMPL_REALTIME_ORDERED_MAP_H */
