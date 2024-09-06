@@ -564,11 +564,8 @@ remove_fixup(struct ccc_impl_realtime_ordered_map *const rom,
         {
             rom->root = x;
         }
-        else
-        {
-            two_child = is_2_child(p_of_x, y);
-            p_of_x->link[p_of_x->link[R] == y] = x;
-        }
+        two_child = is_2_child(p_of_x, y);
+        p_of_x->link[p_of_x->link[R] == y] = x;
     }
     else
     {
