@@ -23,22 +23,22 @@
    demoting does nothing and a macro won't produce any instructions if empty.
    However it is still good to insert these where the original research
    paper specifies they should occur in a WAVL tree for clarity. */
-#define DOUBLE_PROMOTE(x) ((void)0)
+#define DOUBLE_PROMOTE(x) ((void)(x))
 #define DOUBLE_DEMOTE(x) DOUBLE_PROMOTE(x)
 
-enum tree_link
+enum rtom_link
 {
     L = 0,
     R,
 };
 
-enum print_link
+enum rtom_print_link
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
 };
 
-struct query
+struct rtom_query
 {
     ccc_threeway_cmp last_cmp;
     union {
@@ -47,8 +47,8 @@ struct query
     };
 };
 
-enum tree_link const inorder_traversal = L;
-enum tree_link const reverse_inorder_traversal = R;
+enum rtom_link const inorder_traversal = L;
+enum rtom_link const reverse_inorder_traversal = R;
 
 /*==============================  Prototypes   ==============================*/
 
@@ -56,9 +56,9 @@ static void init_node(struct ccc_rtom_ *, ccc_rtom_elem_ *);
 static ccc_threeway_cmp cmp(struct ccc_rtom_ const *, void const *key,
                             ccc_rtom_elem_ const *node, ccc_key_cmp_fn *);
 static void *struct_base(struct ccc_rtom_ const *, ccc_rtom_elem_ const *);
-static struct query find(struct ccc_rtom_ const *, void const *key);
+static struct rtom_query find(struct ccc_rtom_ const *, void const *key);
 static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
-static void *maybe_alloc_insert(struct ccc_rtom_ *, struct query,
+static void *maybe_alloc_insert(struct ccc_rtom_ *, struct rtom_query,
                                 ccc_rtom_elem_ *);
 static void *remove_fixup(struct ccc_rtom_ *, ccc_rtom_elem_ *);
 static void insert_fixup(struct ccc_rtom_ *, ccc_rtom_elem_ *p_of_x,
@@ -83,13 +83,13 @@ static void demote(struct ccc_rtom_ const *rom, ccc_rtom_elem_ *x);
 
 static void rotate(struct ccc_rtom_ *rom, ccc_rtom_elem_ *p_of_x,
                    ccc_rtom_elem_ *x_p_of_y, ccc_rtom_elem_ *y,
-                   enum tree_link dir);
+                   enum rtom_link dir);
 static bool validate(struct ccc_rtom_ const *rom);
 static void ccc_tree_print(struct ccc_rtom_ const *rom,
                            ccc_rtom_elem_ const *root, ccc_print_fn *fn_print);
 
 static ccc_rtom_elem_ const *next(struct ccc_rtom_ *, ccc_rtom_elem_ const *,
-                                  enum tree_link);
+                                  enum rtom_link);
 static ccc_rtom_elem_ *min_from(struct ccc_rtom_ const *,
                                 ccc_rtom_elem_ *start);
 
@@ -105,7 +105,7 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
 void const *
 ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key)
 {
-    struct query q = find(&rom->impl, key);
+    struct rtom_query q = find(&rom->impl, key);
     if (CCC_EQL == q.last_cmp)
     {
         return struct_base(&rom->impl, q.found);
@@ -123,7 +123,7 @@ ccc_rtom_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct query q = find(
+    struct rtom_query q = find(
         &rom->impl, ccc_impl_rom_key_from_node(&rom->impl, &out_handle->impl));
     if (CCC_EQL == q.last_cmp)
     {
@@ -167,7 +167,7 @@ ccc_rtom_entry
 ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
 {
 
-    struct query q = find(&rom->impl, key);
+    struct rtom_query q = find(&rom->impl, key);
     if (CCC_EQL == q.last_cmp)
     {
         return (ccc_rtom_entry){{
@@ -200,7 +200,7 @@ ccc_rom_insert_entry(ccc_rtom_entry e, ccc_rtom_elem *const elem)
         return (void *)e.impl.entry.entry;
     }
     return maybe_alloc_insert(e.impl.rom,
-                              (struct query){
+                              (struct rtom_query){
                                   .last_cmp = e.impl.last_cmp,
                                   .parent = ccc_impl_rom_elem_in_slot(
                                       e.impl.rom, (void *)e.impl.entry.entry),
@@ -230,7 +230,7 @@ void *
 ccc_rom_remove(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct query q = find(
+    struct rtom_query q = find(
         &rom->impl, ccc_impl_rom_key_from_node(&rom->impl, &out_handle->impl));
     if (q.last_cmp != CCC_EQL)
     {
@@ -289,8 +289,9 @@ ccc_rom_begin(ccc_realtime_ordered_map const *rom)
 void *
 ccc_rom_next(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
 {
-    ccc_rtom_elem_ const *n = next(&rom->impl, &e->impl, inorder_traversal);
-    if (!n)
+    ccc_rtom_elem_ const *const n
+        = next(&rom->impl, &e->impl, inorder_traversal);
+    if (n == &rom->impl.end)
     {
         return NULL;
     }
@@ -350,7 +351,7 @@ ccc_impl_rom_elem_in_slot(struct ccc_rtom_ const *const rom,
 /*=========================    Static Helpers    ============================*/
 
 static void *
-maybe_alloc_insert(struct ccc_rtom_ *const rom, struct query const q,
+maybe_alloc_insert(struct ccc_rtom_ *const rom, struct rtom_query const q,
                    ccc_rtom_elem_ *out_handle)
 {
     init_node(rom, out_handle);
@@ -383,7 +384,7 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom, struct query const q,
     return struct_base(rom, out_handle);
 }
 
-static struct query
+static struct rtom_query
 find(struct ccc_rtom_ const *const rom, void const *const key)
 {
     ccc_rtom_elem_ const *parent = &rom->end;
@@ -394,7 +395,7 @@ find(struct ccc_rtom_ const *const rom, void const *const key)
         link = cmp(rom, key, seek, rom->cmp);
         if (CCC_EQL == link)
         {
-            return (struct query){
+            return (struct rtom_query){
                 .last_cmp = CCC_EQL,
                 .found = (ccc_rtom_elem_ *)seek,
             };
@@ -402,7 +403,7 @@ find(struct ccc_rtom_ const *const rom, void const *const key)
         parent = seek;
         seek = seek->link[CCC_GRT == link];
     }
-    return (struct query){
+    return (struct rtom_query){
         .last_cmp = link,
         .parent = (ccc_rtom_elem_ *)parent,
     };
@@ -410,17 +411,19 @@ find(struct ccc_rtom_ const *const rom, void const *const key)
 
 static ccc_rtom_elem_ const *
 next(struct ccc_rtom_ *const t, ccc_rtom_elem_ const *n,
-     enum tree_link traversal)
+     enum rtom_link traversal)
 {
     if (!n || n == &t->end)
     {
-        return NULL;
+        return &t->end;
     }
     assert(t->root->parent == &t->end);
-    /* Using a helper node simplifies the code greatly. */
+    /* This setup helps when once all nodes are visited. When ascending up to
+       the root, traversal stops because the sentinel has root as child in the
+       traversal direction. Iterator steps up to sentinel and terminates. */
     t->end.link[traversal] = t->root;
     t->end.link[!traversal] = &t->end;
-    /* The node is a parent, backtracked to, or the end. */
+    /* The node is an internal one that has a subtree to explore first. */
     if (n->link[!traversal] != &t->end)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
@@ -429,12 +432,12 @@ next(struct ccc_rtom_ *const t, ccc_rtom_elem_ const *n,
         {}
         return n;
     }
-    /* A leaf. Work our way back up skpping nodes we already visited. */
+    /* A leaf. Now it is time to visit the closest parent not yet visited. */
     ccc_rtom_elem_ *p = n->parent;
     for (; p->link[!traversal] == n; n = p, p = p->parent)
     {}
-    /* This is where the end node is helpful. We get to it eventually. */
-    return p == &t->end ? NULL : p;
+    /* This is an internal node, for example the root, or the end sentinel. */
+    return p;
 }
 
 static inline void
@@ -498,7 +501,7 @@ insert_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_x,
     {
         return;
     }
-    enum tree_link const p_to_x = p_of_x->link[R] == x;
+    enum rtom_link const p_to_x = p_of_x->link[R] == x;
     ccc_rtom_elem_ *y = x->link[!p_to_x];
     if (y->parity == x->parity)
     {
@@ -538,9 +541,9 @@ remove_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const remove)
     else
     {
         y = min_from(rom, remove->link[R]);
+        p_of_x = y->parent;
         x = y->link[y->link[L] == &rom->end];
         x->parent = y->parent;
-        p_of_x = y->parent;
 
         /* Save if check and improve readability by assuming this is true. */
         assert(p_of_x != &rom->end);
@@ -625,7 +628,7 @@ static inline void
 fix_3_child_rank_rule(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_xy,
                       ccc_rtom_elem_ *x, ccc_rtom_elem_ *y)
 {
-    enum tree_link const p_to_x_dir = p_of_xy->link[R] == x;
+    enum rtom_link const p_to_x_dir = p_of_xy->link[R] == x;
     ccc_rtom_elem_ *const w = y->link[!p_to_x_dir];
     if (w->parity != y->parity)
     {
@@ -645,7 +648,7 @@ fix_3_child_rank_rule(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_xy,
         rotate(rom, v->parent, v, v->link[p_to_x_dir], p_to_x_dir);
         DOUBLE_PROMOTE(v);
         demote(rom, y);
-        DOUBLE_DEMOTE(pxy);
+        DOUBLE_DEMOTE(p_of_xy);
     }
 }
 
@@ -673,7 +676,7 @@ transplant(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const remove,
 static inline void
 rotate(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const p_of_x,
        ccc_rtom_elem_ *const x_p_of_y, ccc_rtom_elem_ *const y,
-       enum tree_link dir)
+       enum rtom_link dir)
 {
     ccc_rtom_elem_ *const p_of_p_of_x = p_of_x->parent;
     x_p_of_y->parent = p_of_p_of_x;
@@ -867,7 +870,7 @@ print_node(struct ccc_rtom_ const *const rom, ccc_rtom_elem_ const *const root,
 
 static void
 print_inner_tree(ccc_rtom_elem_ const *const root, char const *const prefix,
-                 enum print_link const node_type, enum tree_link const dir,
+                 enum rtom_print_link const node_type, enum rtom_link const dir,
                  struct ccc_rtom_ const *const rom,
                  ccc_print_fn *const fn_print)
 {
@@ -889,12 +892,11 @@ print_inner_tree(ccc_rtom_elem_ const *const root, char const *const prefix,
     {
         /* NOLINTNEXTLINE */
         str = malloc(string_length + 1);
+        assert(str);
         /* NOLINTNEXTLINE */
         (void)snprintf(str, string_length, "%s%s", prefix,
                        node_type == LEAF ? "     " : " │   ");
     }
-
-    assert(str);
 
     if (root->link[R] == &rom->end)
     {
