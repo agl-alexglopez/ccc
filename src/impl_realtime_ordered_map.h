@@ -37,7 +37,7 @@ struct ccc_impl_realtime_ordered_map
 struct ccc_impl_r_om_entry
 {
     struct ccc_impl_realtime_ordered_map *rom;
-    ccc_threeway_cmp last_dir;
+    ccc_threeway_cmp last_cmp;
     ccc_entry entry;
 };
 

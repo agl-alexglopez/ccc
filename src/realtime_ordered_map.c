@@ -40,7 +40,7 @@ enum print_link
 
 struct query
 {
-    ccc_threeway_cmp last_dir;
+    ccc_threeway_cmp last_cmp;
     union {
         struct ccc_impl_r_om_elem *found;
         struct ccc_impl_r_om_elem *parent;
@@ -122,14 +122,14 @@ bool
 ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
                  void const *const key)
 {
-    return CCC_EQL == find(&rom->impl, key).last_dir;
+    return CCC_EQL == find(&rom->impl, key).last_cmp;
 }
 
 void const *
 ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key)
 {
     struct query q = find(&rom->impl, key);
-    if (CCC_EQL == q.last_dir)
+    if (CCC_EQL == q.last_cmp)
     {
         return struct_base(&rom->impl, q.found);
     }
@@ -148,7 +148,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
 {
     struct query q = find(
         &rom->impl, ccc_impl_rom_key_from_node(&rom->impl, &out_handle->impl));
-    if (CCC_EQL == q.last_dir)
+    if (CCC_EQL == q.last_cmp)
     {
         *out_handle = *(ccc_r_om_elem *)q.found;
         uint8_t tmp[rom->impl.elem_sz];
@@ -157,7 +157,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
         swap(tmp, user_struct, ret, rom->impl.elem_sz);
         return (ccc_r_om_entry) {{
             .rom = &rom->impl,
-            .last_dir = q.last_dir,
+            .last_cmp = q.last_cmp,
             .entry = {
                 .entry = ret,
                 .status = CCC_ROM_ENTRY_OCCUPIED,
@@ -169,7 +169,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
     {
         return (ccc_r_om_entry){{
             .rom = &rom->impl,
-            .last_dir = CCC_CMP_ERR,
+            .last_cmp = CCC_CMP_ERR,
             .entry = {
                 .entry = NULL, 
                 .status = CCC_ROM_ENTRY_NULL | CCC_ROM_ENTRY_INSERT_ERROR,
@@ -178,7 +178,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
     }
     return (ccc_r_om_entry){{
         .rom = &rom->impl,
-        .last_dir = q.last_dir,
+        .last_cmp = q.last_cmp,
         .entry = {
             .entry = NULL, 
             .status = CCC_ROM_ENTRY_VACANT | CCC_ROM_ENTRY_NULL,
@@ -191,11 +191,11 @@ ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
 {
 
     struct query q = find(&rom->impl, key);
-    if (CCC_EQL == q.last_dir)
+    if (CCC_EQL == q.last_cmp)
     {
         return (ccc_r_om_entry){{
             .rom = (struct ccc_impl_realtime_ordered_map *)&rom->impl,
-            .last_dir = q.last_dir,
+            .last_cmp = q.last_cmp,
             .entry = {
                 .entry = struct_base(&rom->impl, q.found), 
                 .status = CCC_ROM_ENTRY_OCCUPIED,
@@ -204,7 +204,7 @@ ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
     }
     return (ccc_r_om_entry){{
         .rom = (struct ccc_impl_realtime_ordered_map *)&rom->impl,
-        .last_dir = q.last_dir,
+        .last_cmp = q.last_cmp,
         .entry = {
             .entry = struct_base(&rom->impl,q.parent), 
             .status = CCC_ROM_ENTRY_VACANT,
@@ -224,7 +224,7 @@ ccc_rom_insert_entry(ccc_r_om_entry e, ccc_r_om_elem *const elem)
     }
     return maybe_alloc_insert(e.impl.rom,
                               (struct query){
-                                  .last_dir = e.impl.last_dir,
+                                  .last_cmp = e.impl.last_cmp,
                                   .parent = ccc_impl_rom_elem_in_slot(
                                       e.impl.rom, (void *)e.impl.entry.entry),
                               },
@@ -255,7 +255,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
 {
     struct query q = find(
         &rom->impl, ccc_impl_rom_key_from_node(&rom->impl, &out_handle->impl));
-    if (q.last_dir != CCC_EQL)
+    if (q.last_cmp != CCC_EQL)
     {
         return NULL;
     }
@@ -381,22 +381,6 @@ maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *const rom,
                    struct query const q, struct ccc_impl_r_om_elem *out_handle)
 {
     init_node(rom, out_handle);
-    if (!rom->sz)
-    {
-        if (rom->alloc)
-        {
-            void *new = rom->alloc(NULL, rom->elem_sz);
-            if (!new)
-            {
-                return NULL;
-            }
-            memcpy(new, struct_base(rom, out_handle), rom->elem_sz);
-            out_handle = ccc_impl_rom_elem_in_slot(rom, new);
-        }
-        rom->root = out_handle;
-        ++rom->sz;
-        return struct_base(rom, out_handle);
-    }
     if (rom->alloc)
     {
         void *new = rom->alloc(NULL, rom->elem_sz);
@@ -407,9 +391,16 @@ maybe_alloc_insert(struct ccc_impl_realtime_ordered_map *const rom,
         memcpy(new, struct_base(rom, out_handle), rom->elem_sz);
         out_handle = ccc_impl_rom_elem_in_slot(rom, new);
     }
+    if (!rom->sz)
+    {
+        rom->root = out_handle;
+        ++rom->sz;
+        return struct_base(rom, out_handle);
+    }
+    assert(q.last_cmp == CCC_GRT || q.last_cmp == CCC_LES);
     bool const rank_rule_break
         = q.parent->link[L] == &rom->end && q.parent->link[R] == &rom->end;
-    q.parent->link[CCC_GRT == q.last_dir] = out_handle;
+    q.parent->link[CCC_GRT == q.last_cmp] = out_handle;
     out_handle->parent = q.parent;
     if (rank_rule_break)
     {

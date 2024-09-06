@@ -961,28 +961,16 @@ static void *
 alloc_insert(ccc_tree *t, ccc_node *out_handle)
 {
     init_node(t, out_handle);
-    if (empty(t))
+    ccc_threeway_cmp root_cmp = CCC_CMP_ERR;
+    if (!empty(t))
     {
-        if (t->alloc)
+        void const *const key = ccc_impl_tree_key_from_node(t, out_handle);
+        t->root = splay(t, t->root, key, t->cmp);
+        root_cmp = cmp(t, key, t->root, t->cmp);
+        if (CCC_EQL == root_cmp)
         {
-            void *node = t->alloc(NULL, t->elem_sz);
-            if (!node)
-            {
-                return NULL;
-            }
-            memcpy(node, struct_base(t, out_handle), t->elem_sz);
-            out_handle = ccc_impl_tree_elem_in_slot(t, node);
+            return NULL;
         }
-        t->root = out_handle;
-        t->size++;
-        return struct_base(t, out_handle);
-    }
-    void const *const key = ccc_impl_tree_key_from_node(t, out_handle);
-    t->root = splay(t, t->root, key, t->cmp);
-    ccc_threeway_cmp const root_cmp = cmp(t, key, t->root, t->cmp);
-    if (CCC_EQL == root_cmp)
-    {
-        return NULL;
     }
     if (t->alloc)
     {
@@ -994,6 +982,13 @@ alloc_insert(ccc_tree *t, ccc_node *out_handle)
         memcpy(node, struct_base(t, out_handle), t->elem_sz);
         out_handle = ccc_impl_tree_elem_in_slot(t, node);
     }
+    if (empty(t))
+    {
+        t->root = out_handle;
+        t->size++;
+        return struct_base(t, out_handle);
+    }
+    assert(root_cmp != CCC_CMP_ERR);
     t->size++;
     return connect_new_root(t, out_handle, root_cmp);
 }
