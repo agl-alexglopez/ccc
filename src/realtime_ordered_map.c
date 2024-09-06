@@ -65,16 +65,22 @@ static void insert_fixup(struct ccc_rtom_ *, ccc_rtom_elem_ *p_of_x,
                          ccc_rtom_elem_ *x);
 static void transplant(struct ccc_rtom_ *, ccc_rtom_elem_ *remove,
                        ccc_rtom_elem_ *replacement);
-static void fixup_3_child(struct ccc_rtom_ *rom, ccc_rtom_elem_ *p_of_x,
-                          ccc_rtom_elem_ *x);
-static void fix_3_child_rank_rule(struct ccc_rtom_ *rom, ccc_rtom_elem_ *p_of_x,
-                                  ccc_rtom_elem_ *x, ccc_rtom_elem_ *y);
+static void rebalance_3_child(struct ccc_rtom_ *rom, ccc_rtom_elem_ *p_of_x,
+                              ccc_rtom_elem_ *x);
+static void rebalance_via_rotation(struct ccc_rtom_ *rom,
+                                   ccc_rtom_elem_ *z_p_of_xy, ccc_rtom_elem_ *x,
+                                   ccc_rtom_elem_ *y);
 static void fixup_22_leaf(struct ccc_rtom_ *rom, ccc_rtom_elem_ *x);
+static bool is_0_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x);
+static bool is_1_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x);
 static bool is_2_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x);
-static bool is_parent_01(ccc_rtom_elem_ *x, ccc_rtom_elem_ *p_of_xy,
-                         ccc_rtom_elem_ *y);
-static bool is_parent_02(ccc_rtom_elem_ *x, ccc_rtom_elem_ *p_of_xy,
-                         ccc_rtom_elem_ *y);
+static bool is_3_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x);
+static bool is_01_parent(ccc_rtom_elem_ const *x, ccc_rtom_elem_ const *p_of_xy,
+                         ccc_rtom_elem_ const *y);
+static bool is_02_parent(ccc_rtom_elem_ const *x, ccc_rtom_elem_ const *p_of_xy,
+                         ccc_rtom_elem_ const *y);
+static bool is_22_parent(ccc_rtom_elem_ const *x, ccc_rtom_elem_ const *p_of_xy,
+                         ccc_rtom_elem_ const *y);
 static bool is_leaf(struct ccc_rtom_ const *rom, ccc_rtom_elem_ const *x);
 static ccc_rtom_elem_ *sibling_of(struct ccc_rtom_ const *rom,
                                   ccc_rtom_elem_ const *x);
@@ -483,38 +489,41 @@ struct_base(struct ccc_rtom_ const *const rom, ccc_rtom_elem_ const *const e)
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_x,
+insert_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_xy,
              ccc_rtom_elem_ *x)
 {
     do
     {
-        promote(rom, p_of_x);
-        x = p_of_x;
-        p_of_x = p_of_x->parent;
-        if (p_of_x == &rom->end)
+        promote(rom, p_of_xy);
+        x = p_of_xy;
+        p_of_xy = p_of_xy->parent;
+        if (p_of_xy == &rom->end)
         {
             return;
         }
-    } while (is_parent_01(x, p_of_x, sibling_of(rom, x)));
+    } while (is_01_parent(x, p_of_xy, sibling_of(rom, x)));
 
-    if (!is_parent_02(x, p_of_x, sibling_of(rom, x)))
+    if (!is_02_parent(x, p_of_xy, sibling_of(rom, x)))
     {
         return;
     }
-    enum rtom_link const p_to_x = p_of_x->link[R] == x;
+    assert(x != &rom->end);
+    assert(is_0_child(p_of_xy, x));
+    enum rtom_link const p_to_x = p_of_xy->link[R] == x;
     ccc_rtom_elem_ *y = x->link[!p_to_x];
-    if (y->parity == x->parity)
+    if (y == &rom->end || is_2_child(p_of_xy, y))
     {
-        rotate(rom, p_of_x, x, y, !p_to_x);
-        demote(rom, p_of_x);
+        rotate(rom, p_of_xy, x, y, !p_to_x);
+        demote(rom, p_of_xy);
     }
     else
     {
+        assert(is_1_child(p_of_xy, y));
         rotate(rom, x, y, y->link[p_to_x], p_to_x);
         rotate(rom, y->parent, y, y->link[!p_to_x], !p_to_x);
         promote(rom, y);
         demote(rom, x);
-        demote(rom, p_of_x);
+        demote(rom, p_of_xy);
     }
 }
 
@@ -561,7 +570,7 @@ remove_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const remove)
     {
         if (two_child)
         {
-            fixup_3_child(rom, p_of_x, x);
+            rebalance_3_child(rom, p_of_x, x);
         }
         else if (x == &rom->end && p_of_x->link[L] == p_of_x->link[R])
         {
@@ -581,7 +590,7 @@ fixup_22_leaf(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const x)
     if (x->parent->parity == x->parity)
     {
         demote(rom, x);
-        fixup_3_child(rom, x->parent, x);
+        rebalance_3_child(rom, x->parent, x);
     }
     else
     {
@@ -590,8 +599,8 @@ fixup_22_leaf(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const x)
 }
 
 static inline void
-fixup_3_child(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_x,
-              ccc_rtom_elem_ *x)
+rebalance_3_child(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_x,
+                  ccc_rtom_elem_ *x)
 {
     bool x_is_3_child = false;
     do
@@ -608,15 +617,15 @@ fixup_3_child(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_x,
         {
             demote(rom, p_of_x);
         }
-        else if (y->parity == y->link[L]->parity
-                 && y->parity == y->link[R]->parity)
+        else if (is_22_parent(y->link[L], y, y->link[R]))
         {
             demote(rom, p_of_x);
             demote(rom, y);
         }
-        else
+        else /* p(x) is 1,3 and y is not a 2,2 parent and x is 3-child.*/
         {
-            fix_3_child_rank_rule(rom, p_of_x, x, y);
+            assert(is_3_child(p_of_x, x));
+            rebalance_via_rotation(rom, p_of_x, x, y);
             return;
         }
         x = p_of_x;
@@ -625,30 +634,39 @@ fixup_3_child(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_x,
 }
 
 static inline void
-fix_3_child_rank_rule(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_xy,
-                      ccc_rtom_elem_ *x, ccc_rtom_elem_ *y)
+rebalance_via_rotation(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const z,
+                       ccc_rtom_elem_ *const x, ccc_rtom_elem_ *const y)
 {
-    enum rtom_link const p_to_x_dir = p_of_xy->link[R] == x;
-    ccc_rtom_elem_ *const w = y->link[!p_to_x_dir];
-    if (w->parity != y->parity)
+    enum rtom_link const z_to_x_dir = z->link[R] == x;
+    ccc_rtom_elem_ *const w = y->link[!z_to_x_dir];
+    if (is_1_child(y, w))
     {
-        rotate(rom, p_of_xy, y, y->link[p_to_x_dir], p_to_x_dir);
+        rotate(rom, z, y, y->link[z_to_x_dir], z_to_x_dir);
         promote(rom, y);
-        demote(rom, p_of_xy);
-        if (is_leaf(rom, p_of_xy))
+        demote(rom, z);
+        if (is_leaf(rom, z))
         {
-            demote(rom, p_of_xy);
+            demote(rom, z);
         }
     }
-    else
+    else /* w is a 2-child and v will be a 1-child. */
     {
-        ccc_rtom_elem_ *const v = y->link[p_to_x_dir];
-        assert(y->parity != v->parity);
-        rotate(rom, y, v, v->link[!p_to_x_dir], !p_to_x_dir);
-        rotate(rom, v->parent, v, v->link[p_to_x_dir], p_to_x_dir);
+        ccc_rtom_elem_ *const v = y->link[z_to_x_dir];
+        assert(is_2_child(y, w));
+        assert(is_1_child(y, v));
+        rotate(rom, y, v, v->link[!z_to_x_dir], !z_to_x_dir);
+        rotate(rom, v->parent, v, v->link[z_to_x_dir], z_to_x_dir);
         DOUBLE_PROMOTE(v);
         demote(rom, y);
-        DOUBLE_DEMOTE(p_of_xy);
+        DOUBLE_DEMOTE(z);
+        /* At this point, the original paper mentions "Rebalancing with
+           Promotion," and defines it as follows:
+               if node z is a non-leaf 1,1 node, we promote it; otherwise, if y
+               is a non-leaf 1,1 node, we promote it. (See Figure 4.)
+           This reduces constants in some of theorems mentioned in the paper
+           but I am not sure if it is worth including as it does not ultimately
+           improve the worst case rotations to less than 2. This should be
+           revisited after more performance testing code is in place. */
     }
 }
 
@@ -657,6 +675,7 @@ transplant(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const remove,
            ccc_rtom_elem_ *const replacement)
 {
     assert(remove != &rom->end);
+    assert(replacement != &rom->end);
     replacement->parent = remove->parent;
     if (remove->parent == &rom->end)
     {
@@ -666,10 +685,10 @@ transplant(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const remove,
     {
         remove->parent->link[remove->parent->link[R] == remove] = replacement;
     }
-    replacement->link[R] = remove->link[R];
     remove->link[R]->parent = replacement;
-    replacement->link[L] = remove->link[L];
     remove->link[L]->parent = replacement;
+    replacement->link[R] = remove->link[R];
+    replacement->link[L] = remove->link[L];
     replacement->parity = remove->parity;
 }
 
@@ -695,23 +714,80 @@ rotate(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const p_of_x,
 }
 
 static inline bool
-is_2_child(ccc_rtom_elem_ const *const p_of_x, ccc_rtom_elem_ const *const x)
+is_0_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x)
 {
     return p_of_x->parity == x->parity;
 }
 
 static inline bool
-is_parent_01(ccc_rtom_elem_ *x, ccc_rtom_elem_ *p_of_xy, ccc_rtom_elem_ *y)
+is_1_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x)
+{
+    return p_of_x->parity != x->parity;
+}
+
+/* Returns true for rank difference 2 between the parent and node.
+         p
+       2/
+       x
+   This function only checks parities, not full numeric rank. */
+static inline bool
+is_2_child(ccc_rtom_elem_ const *const p_of_x, ccc_rtom_elem_ const *const x)
+{
+    return p_of_x->parity == x->parity;
+}
+
+/* Returns true for rank difference 3 between the parent and node.
+         p
+       3/
+       x
+   This function only checks parities, not full numeric rank. */
+static inline bool
+is_3_child(ccc_rtom_elem_ const *p_of_x, ccc_rtom_elem_ const *x)
+{
+    return p_of_x->parity != x->parity;
+}
+
+/* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
+   child may be the sentinel node which has a parity of 1 and rank -1.
+         p
+       1/ \0
+       x   y
+   This function only checks parities, not full numeric rank. */
+static inline bool
+is_01_parent(ccc_rtom_elem_ const *const x, ccc_rtom_elem_ const *const p_of_xy,
+             ccc_rtom_elem_ const *const y)
 {
     return (!x->parity && !p_of_xy->parity && y->parity)
            || (x->parity && p_of_xy->parity && !y->parity);
 }
 
+/* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
+   child may be the sentinel node which has a parity of 1 and rank -1.
+         p
+       2/ \0
+       x   y
+   This function only checks parities, not full numeric rank. */
 static inline bool
-is_parent_02(ccc_rtom_elem_ *x, ccc_rtom_elem_ *p_of_xy, ccc_rtom_elem_ *y)
+is_02_parent(ccc_rtom_elem_ const *const x, ccc_rtom_elem_ const *const p_of_xy,
+             ccc_rtom_elem_ const *const y)
 {
-    return (x->parity && p_of_xy->parity && y->parity)
-           || (!x->parity && !p_of_xy->parity && !y->parity);
+    return (x->parity == p_of_xy->parity) && (p_of_xy->parity == y->parity);
+}
+
+/* Returns true if a parent is a 2,2 or 2,2 node, which is allowed. 2,2 nodes
+   are allowed in a WAVL tree but the absence of any 2,2 nodes is the exact
+   equivalent of a normal AVL tree which can occur if only insertions occur
+   for a WAVL tree. Either child may be the sentinel node which has a parity of
+   1 and rank -1.
+         p
+       2/ \2
+       x   y
+   This function only checks parities, not full numeric rank. */
+static inline bool
+is_22_parent(ccc_rtom_elem_ const *const x, ccc_rtom_elem_ const *const p_of_xy,
+             ccc_rtom_elem_ const *const y)
+{
+    return (x->parity == p_of_xy->parity) && (p_of_xy->parity == y->parity);
 }
 
 static inline ccc_rtom_elem_ *
