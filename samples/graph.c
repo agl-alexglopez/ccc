@@ -414,12 +414,12 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
 {
     Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     ccc_flat_hash_map parent_map;
-    ccc_result res
+    [[maybe_unused]] ccc_result res
         = CCC_FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem,
                        realloc, hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_queue bfs = CCC_FQ_INIT(NULL, 0, struct point, realloc);
-    struct parent_cell *pc = FHM_INSERT_ENTRY(
+    [[maybe_unused]] struct parent_cell *pc = FHM_INSERT_ENTRY(
         FHM_ENTRY(&parent_map, src->pos), (struct parent_cell){
                                               .key = src->pos,
                                               .parent = (struct point){-1, -1},
@@ -442,8 +442,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                struct parent_cell *inserted = ccc_fhm_insert_entry(
-                    ccc_fhm_entry(&parent_map, &next), &push.elem);
+                [[maybe_unused]] struct parent_cell *inserted
+                    = ccc_fhm_insert_entry(ccc_fhm_entry(&parent_map, &next),
+                                           &push.elem);
                 assert(inserted);
                 cur = next;
                 success = true;
@@ -451,8 +452,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             }
             if (!is_path(next_cell) && !ccc_fhm_contains(&parent_map, &next))
             {
-                struct parent_cell *inserted = ccc_fhm_insert_entry(
-                    ccc_fhm_entry(&parent_map, &next), &push.elem);
+                [[maybe_unused]] struct parent_cell *inserted
+                    = ccc_fhm_insert_entry(ccc_fhm_entry(&parent_map, &next),
+                                           &push.elem);
                 assert(inserted != NULL);
                 (void)ccc_fq_push(&bfs, &next);
             }
@@ -693,7 +695,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     ccc_priority_queue dist_q = CCC_PQ_INIT(struct dist_point, pq_elem, CCC_LES,
                                             NULL, cmp_pq_dist_points, NULL);
     ccc_flat_hash_map prev_map;
-    ccc_result res
+    [[maybe_unused]] ccc_result res
         = CCC_FHM_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
                        hash_vertex_addr, eq_prev_vertices, NULL);
     assert(res == CCC_OK);

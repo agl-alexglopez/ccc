@@ -122,7 +122,7 @@ target_sources(${PROJECT_NAME}
               doubly_linked_list.h
 )
 
-target_compile_features(${PROJECT_NAME} PUBLIC c_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC c_std_23)
 
 # set properties for the target. VERSION set the library version to the project
 # version * SOVERSION set the compatibility  version for the library to the

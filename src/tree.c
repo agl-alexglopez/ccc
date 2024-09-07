@@ -993,6 +993,10 @@ rrange_end(ccc_rrange const *const rr)
 static void *
 find(struct ccc_om_ *t, void const *const key)
 {
+    if (t->root == &t->end)
+    {
+        return NULL;
+    }
     t->root = splay(t, t->root, key, t->cmp);
     return cmp(t, key, t->root, t->cmp) == CCC_EQL ? struct_base(t, t->root)
                                                    : NULL;
