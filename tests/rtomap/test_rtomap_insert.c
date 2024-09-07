@@ -6,14 +6,17 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 static enum test_result rtomap_test_insert_one(void);
 static enum test_result rtomap_test_insert_shuffle(void);
+static enum test_result rtomap_test_insert_weak_srand(void);
 
-#define NUM_TESTS ((size_t)2)
+#define NUM_TESTS ((size_t)3)
 test_fn const all_tests[NUM_TESTS] = {
     rtomap_test_insert_one,
     rtomap_test_insert_shuffle,
+    rtomap_test_insert_weak_srand,
 };
 
 int
@@ -38,7 +41,8 @@ rtomap_test_insert_one(void)
         = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(ccc_rom_unwrap(ccc_rom_insert(&s, &single.elem)) == NULL, true, "%d");
+    CHECK(ccc_entry_unwrap(ccc_rom_insert(&s, &single.elem)) != NULL, true,
+          "%d");
     CHECK(ccc_rom_empty(&s), false, "%d");
     CHECK(((struct val *)ccc_rom_root(&s))->val == single.val, true, "%d");
     return PASS;
@@ -64,5 +68,26 @@ rtomap_test_insert_shuffle(void)
     {
         CHECK(vals[i].val, sorted_check[i], "%d");
     }
+    return PASS;
+}
+
+static enum test_result
+rtomap_test_insert_weak_srand(void)
+{
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    /* Seed the test with any integer for reproducible randome test sequence
+       currently this will change every test. NOLINTNEXTLINE */
+    srand(time(NULL));
+    int const num_nodes = 1000;
+    struct val vals[num_nodes];
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        vals[i].val = rand(); // NOLINT
+        vals[i].id = i;
+        (void)ccc_rom_insert(&s, &vals[i].elem);
+        CHECK(ccc_rom_validate(&s), true, "%d");
+    }
+    CHECK(ccc_rom_size(&s), (size_t)num_nodes, "%zu");
     return PASS;
 }

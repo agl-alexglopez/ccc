@@ -24,8 +24,8 @@
    improvements suggested by the authors of the original paper are implemented.
 
    Overall a WAVL tree is quite impressive for it's simplicity and purported
-   improvements over AVL and Red-Black trees. The rank framework is more
-   intuitive than most other balanced trees I have implemented. */
+   improvements over AVL and Red-Black trees. The rank framework is intuitive
+   and flexible in how it can be implemented. */
 #include "realtime_ordered_map.h"
 #include "impl_realtime_ordered_map.h"
 #include "types.h"
@@ -83,7 +83,7 @@ static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
 static void *maybe_alloc_insert(struct ccc_rtom_ *, struct rtom_query,
                                 ccc_rtom_elem_ *);
 static void *remove_fixup(struct ccc_rtom_ *, ccc_rtom_elem_ *);
-static void insert_fixup(struct ccc_rtom_ *, ccc_rtom_elem_ *p_of_x,
+static void insert_fixup(struct ccc_rtom_ *, ccc_rtom_elem_ *z_p_of_x,
                          ccc_rtom_elem_ *x);
 static void maintain_rank_rules(struct ccc_rtom_ *rom, bool two_child,
                                 ccc_rtom_elem_ *p_of_xy, ccc_rtom_elem_ *x);
@@ -160,7 +160,7 @@ ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key)
     return (void *)ccc_rom_get(rom, key);
 }
 
-ccc_rtom_entry
+ccc_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
@@ -173,35 +173,23 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
         void *user_struct = struct_base(&rom->impl, &out_handle->impl);
         void *ret = struct_base(&rom->impl, q.found);
         swap(tmp, user_struct, ret, rom->impl.elem_sz);
-        return (ccc_rtom_entry) {{
-            .rom = &rom->impl,
-            .last_cmp = q.last_cmp,
-            .entry = {
-                .entry = ret,
-                .status = CCC_ROM_ENTRY_OCCUPIED,
-            },
-        }};
+        return (ccc_entry){
+            .entry = ret,
+            .status = CCC_ENTRY_OCCUPIED,
+        };
     }
     void *inserted = maybe_alloc_insert(&rom->impl, q, &out_handle->impl);
     if (!inserted)
     {
-        return (ccc_rtom_entry){{
-            .rom = &rom->impl,
-            .last_cmp = CCC_CMP_ERR,
-            .entry = {
-                .entry = NULL, 
-                .status = CCC_ROM_ENTRY_NULL | CCC_ROM_ENTRY_INSERT_ERROR,
-            },
-        }};
+        return (ccc_entry){
+            .entry = NULL,
+            .status = CCC_ENTRY_ERROR,
+        };
     }
-    return (ccc_rtom_entry){{
-        .rom = &rom->impl,
-        .last_cmp = q.last_cmp,
-        .entry = {
-            .entry = NULL, 
-            .status = CCC_ROM_ENTRY_VACANT | CCC_ROM_ENTRY_NULL,
-        },
-    }};
+    return (ccc_entry){
+        .entry = inserted,
+        .status = CCC_ENTRY_VACANT,
+    };
 }
 
 ccc_rtom_entry
@@ -267,7 +255,7 @@ ccc_rom_remove_entry(ccc_rtom_entry e)
     return false;
 }
 
-void *
+ccc_entry
 ccc_rom_remove(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
@@ -275,7 +263,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
         &rom->impl, ccc_impl_rom_key_from_node(&rom->impl, &out_handle->impl));
     if (q.last_cmp != CCC_EQL)
     {
-        return NULL;
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
     }
     void *const removed = remove_fixup(&rom->impl, q.found);
     if (rom->impl.alloc)
@@ -283,9 +271,9 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
         void *const user_struct = struct_base(&rom->impl, &out_handle->impl);
         memcpy(user_struct, removed, rom->impl.elem_sz);
         rom->impl.alloc(removed, 0);
-        return user_struct;
+        return (ccc_entry){.entry = user_struct, .status = CCC_ENTRY_OCCUPIED};
     }
-    return removed;
+    return (ccc_entry){.entry = removed, .status = CCC_ENTRY_OCCUPIED};
 }
 
 void const *
@@ -522,41 +510,45 @@ struct_base(struct ccc_rtom_ const *const rom, ccc_rtom_elem_ const *const e)
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_xy,
+insert_fixup(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *z_p_of_xy,
              ccc_rtom_elem_ *x)
 {
     do
     {
-        promote(rom, p_of_xy);
-        x = p_of_xy;
-        p_of_xy = p_of_xy->parent;
-        if (p_of_xy == &rom->end)
+        promote(rom, z_p_of_xy);
+        x = z_p_of_xy;
+        z_p_of_xy = z_p_of_xy->parent;
+        if (z_p_of_xy == &rom->end)
         {
             return;
         }
-    } while (is_01_parent(rom, x, p_of_xy, sibling_of(rom, x)));
+    } while (is_01_parent(rom, x, z_p_of_xy, sibling_of(rom, x)));
 
-    if (!is_02_parent(rom, x, p_of_xy, sibling_of(rom, x)))
+    if (!is_02_parent(rom, x, z_p_of_xy, sibling_of(rom, x)))
     {
         return;
     }
     assert(x != &rom->end);
-    assert(is_0_child(rom, p_of_xy, x));
-    enum rtom_link const p_to_x_dir = p_of_xy->link[R] == x;
+    assert(is_0_child(rom, z_p_of_xy, x));
+    enum rtom_link const p_to_x_dir = z_p_of_xy->link[R] == x;
     ccc_rtom_elem_ *y = x->link[!p_to_x_dir];
-    if (y == &rom->end || is_2_child(rom, p_of_xy, y))
+    if (y == &rom->end || is_2_child(rom, z_p_of_xy, y))
     {
-        rotate(rom, p_of_xy, x, y, !p_to_x_dir);
-        demote(rom, p_of_xy);
+        rotate(rom, z_p_of_xy, x, y, !p_to_x_dir);
+        assert(x->link[!p_to_x_dir] == z_p_of_xy);
+        assert(z_p_of_xy->link[p_to_x_dir] == y);
+        demote(rom, z_p_of_xy);
     }
     else
     {
-        assert(is_1_child(rom, p_of_xy, y));
+        assert(is_1_child(rom, z_p_of_xy, y));
         rotate(rom, x, y, y->link[p_to_x_dir], p_to_x_dir);
         rotate(rom, y->parent, y, y->link[!p_to_x_dir], !p_to_x_dir);
+        assert(y->link[p_to_x_dir] == x);
+        assert(y->link[!p_to_x_dir] == z_p_of_xy);
         promote(rom, y);
         demote(rom, x);
-        demote(rom, p_of_xy);
+        demote(rom, z_p_of_xy);
     }
 }
 
@@ -644,10 +636,6 @@ rebalance_3_child(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *p_of_xy,
         ccc_rtom_elem_ *const p_of_p_of_x = p_of_xy->parent;
         ccc_rtom_elem_ *y = p_of_xy->link[p_of_xy->link[L] == x];
         made_3_child = is_2_child(rom, p_of_p_of_x, p_of_xy);
-        /* Sanity check for the second case. It would be undefined behavior
-           to access a node stored in the end node as those are often written
-           to invariantly to cut down on lines of code. */
-        assert(is_2_child(rom, p_of_xy, y) || y != &rom->end);
         if (is_2_child(rom, p_of_xy, y))
         {
             demote(rom, p_of_xy);
@@ -677,6 +665,8 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const z,
     if (is_1_child(rom, y, w))
     {
         rotate(rom, z, y, y->link[z_to_x_dir], z_to_x_dir);
+        assert(y->link[z_to_x_dir] == z);
+        assert(y->link[!z_to_x_dir] == w);
         promote(rom, y);
         demote(rom, z);
         if (is_leaf(rom, z))
@@ -691,6 +681,8 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom, ccc_rtom_elem_ *const z,
         assert(is_1_child(rom, y, v));
         rotate(rom, y, v, v->link[!z_to_x_dir], !z_to_x_dir);
         rotate(rom, v->parent, v, v->link[z_to_x_dir], z_to_x_dir);
+        assert(v->link[z_to_x_dir] == z);
+        assert(v->link[!z_to_x_dir] == y);
         double_promote(rom, v);
         demote(rom, y);
         double_demote(rom, z);

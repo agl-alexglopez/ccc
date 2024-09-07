@@ -1,8 +1,8 @@
-add_library(types INTERFACE types.h)
+add_library(types types.h ${CMAKE_SOURCE_DIR}/src/types.c)
 
 add_library(buffer buffer.h ${CMAKE_SOURCE_DIR}/src/buffer.c)
 target_link_libraries(buffer
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_buffer
@@ -10,7 +10,7 @@ target_link_libraries(buffer
 
 add_library(doubly_linked_list doubly_linked_list.h ${CMAKE_SOURCE_DIR}/src/doubly_linked_list.c)
 target_link_libraries(doubly_linked_list
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_doubly_linked_list
@@ -18,7 +18,7 @@ target_link_libraries(doubly_linked_list
 
 add_library(singly_linked_list singly_linked_list.h ${CMAKE_SOURCE_DIR}/src/singly_linked_list.c)
 target_link_libraries(singly_linked_list
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_singly_linked_list
@@ -26,7 +26,7 @@ target_link_libraries(singly_linked_list
 
 add_library(priority_queue priority_queue.h ${CMAKE_SOURCE_DIR}/src/priority_queue.c)
 target_link_libraries(priority_queue 
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_priority_queue
@@ -34,7 +34,7 @@ target_link_libraries(priority_queue
 
 add_library(flat_priority_queue flat_priority_queue.h ${CMAKE_SOURCE_DIR}/src/flat_priority_queue.c)
 target_link_libraries(flat_priority_queue 
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_flat_priority_queue
@@ -42,7 +42,7 @@ target_link_libraries(flat_priority_queue
 
 add_library(flat_hash_map flat_hash_map.h ${CMAKE_SOURCE_DIR}/src/flat_hash_map.c)
 target_link_libraries(flat_hash_map
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_flat_hash_map
@@ -50,7 +50,7 @@ target_link_libraries(flat_hash_map
 
 add_library(double_ended_priority_queue double_ended_priority_queue.h ${CMAKE_SOURCE_DIR}/src/tree.c)
 target_link_libraries(double_ended_priority_queue
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_tree
@@ -58,7 +58,7 @@ target_link_libraries(double_ended_priority_queue
 
 add_library(ordered_map ordered_map.h ${CMAKE_SOURCE_DIR}/src/tree.c)
 target_link_libraries(ordered_map
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_tree
@@ -66,7 +66,7 @@ target_link_libraries(ordered_map
 
 add_library(realtime_ordered_map realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/realtime_ordered_map.c)
 target_link_libraries(realtime_ordered_map
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_realtime_ordered_map
@@ -74,7 +74,7 @@ target_link_libraries(realtime_ordered_map
 
 add_library(flat_queue flat_queue.h ${CMAKE_SOURCE_DIR}/src/flat_queue.c)
 target_link_libraries(flat_queue
-  INTERFACE
+  PUBLIC
     types
   PRIVATE
     impl_flat_queue
@@ -86,6 +86,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # add sources to the library target
 target_sources(${PROJECT_NAME}
     PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/types.c
         ${PROJECT_SOURCE_DIR}/src/impl_buffer.h
         ${PROJECT_SOURCE_DIR}/src/buffer.c
         ${PROJECT_SOURCE_DIR}/src/impl_flat_hash_map.h

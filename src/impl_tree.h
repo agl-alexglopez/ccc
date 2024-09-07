@@ -15,13 +15,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define CCC_OM_EMPTY ((uint64_t)0)
-#define CCC_OM_ENTRY_VACANT ((uint8_t)0x0)
-#define CCC_OM_ENTRY_OCCUPIED ((uint8_t)0x1)
-#define CCC_OM_ENTRY_INSERT_ERROR ((uint8_t)0x2)
-#define CCC_OM_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
-#define CCC_OM_ENTRY_NULL ((uint8_t)0x8)
-#define CCC_OM_ENTRY_DELETE_ERROR ((uint8_t)0x10)
+#define CCC_OM_EMPTY 0
+#define CCC_OM_ENTRY_VACANT 0x0
+#define CCC_OM_ENTRY_OCCUPIED 0x1
+#define CCC_OM_ENTRY_INSERT_ERROR 0x2
+#define CCC_OM_ENTRY_SEARCH_ERROR 0x4
+#define CCC_OM_ENTRY_NULL 0x8
+#define CCC_OM_ENTRY_DELETE_ERROR 0x10
 
 /* The core node of the underlying tree implementation. Using an array
    for the nodes allows symmetric left/right cases to always be united

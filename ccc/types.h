@@ -24,24 +24,6 @@ typedef enum
 
 typedef struct
 {
-    void *const begin;
-    void *const end;
-} ccc_range;
-
-typedef struct
-{
-    void *const rbegin;
-    void *const end;
-} ccc_rrange;
-
-typedef struct
-{
-    void const *entry;
-    uint8_t status;
-} ccc_entry;
-
-typedef struct
-{
     void const *const container_a;
     void const *const container_b;
     void *aux;
@@ -56,9 +38,31 @@ typedef struct
 
 typedef struct
 {
-    void *const container;
+    void *container;
     void *aux;
 } ccc_update;
+
+typedef struct
+{
+    void *begin;
+    void *end;
+} ccc_range;
+
+typedef struct
+{
+    void *rbegin;
+    void *end;
+} ccc_rrange;
+
+#define CCC_ENTRY_OCCUPIED 1
+#define CCC_ENTRY_VACANT 0
+#define CCC_ENTRY_ERROR (-1)
+
+typedef struct
+{
+    void *entry;
+    int8_t status;
+} ccc_entry;
 
 typedef void *ccc_alloc_fn(void *, size_t);
 
@@ -75,5 +79,9 @@ typedef bool ccc_key_eq_fn(ccc_key_cmp);
 typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
 typedef uint64_t ccc_hash_fn(void const *to_hash);
+
+bool ccc_entry_occupied(ccc_entry);
+bool ccc_entry_error(ccc_entry);
+void *ccc_entry_unwrap(ccc_entry);
 
 #endif /* CCC_TYPES_H */

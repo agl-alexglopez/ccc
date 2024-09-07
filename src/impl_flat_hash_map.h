@@ -7,12 +7,12 @@
 #include <assert.h>
 #include <stdint.h>
 
-#define CCC_FHM_EMPTY ((uint64_t)0)
-#define CCC_FHM_ENTRY_VACANT ((uint8_t)0x0)
-#define CCC_FHM_ENTRY_OCCUPIED ((uint8_t)0x1)
-#define CCC_FHM_ENTRY_INSERT_ERROR ((uint8_t)0x2)
-#define CCC_FHM_ENTRY_SEARCH_ERROR ((uint8_t)0x4)
-#define CCC_FHM_ENTRY_NULL ((uint8_t)0x8)
+#define CCC_FHM_EMPTY 0
+#define CCC_FHM_ENTRY_VACANT 0x0
+#define CCC_FHM_ENTRY_OCCUPIED 0x1
+#define CCC_FHM_ENTRY_INSERT_ERROR 0x2
+#define CCC_FHM_ENTRY_SEARCH_ERROR 0x4
+#define CCC_FHM_ENTRY_NULL 0x8
 
 struct ccc_fhm_elem_
 {

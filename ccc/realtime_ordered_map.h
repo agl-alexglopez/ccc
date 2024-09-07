@@ -28,9 +28,10 @@ bool ccc_rom_contains(ccc_realtime_ordered_map const *rom, void const *key);
 void const *ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key);
 void *ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key);
 
-ccc_rtom_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
-                              ccc_rtom_elem *out_handle);
-void *ccc_rom_remove(ccc_realtime_ordered_map *rom, ccc_rtom_elem *out_handle);
+ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
+                         ccc_rtom_elem *out_handle);
+ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
+                         ccc_rtom_elem *out_handle);
 
 ccc_rtom_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
                              void const *key);
