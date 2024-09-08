@@ -30,19 +30,19 @@
    in some interpretations of a multiset. However, the parent field
    gives this implementation flexibility for duplicates, speed, and a
    robust iterator for users. This is important for a priority queue. */
-typedef struct ccc_om_node_
+typedef struct ccc_om_elem_
 {
-    struct ccc_om_node_ *link[2];
-    struct ccc_om_node_ *parent_or_dups;
-} ccc_om_node_;
+    struct ccc_om_elem_ *link[2];
+    struct ccc_om_elem_ *parent_or_dups;
+} ccc_om_elem_;
 
 /* The size field is not strictly necessary but seems to be standard
    practice for these types of containers for O(1) access. The end is
    critical for this implementation, especially iterators. */
 struct ccc_om_
 {
-    ccc_om_node_ *root;
-    ccc_om_node_ end;
+    struct ccc_om_elem_ *root;
+    struct ccc_om_elem_ end;
     ccc_alloc_fn *alloc;
     ccc_key_cmp_fn *cmp;
     void *aux;
@@ -76,16 +76,16 @@ struct ccc_om_entry_
     }
 
 bool ccc_tree_validate(struct ccc_om_ const *t);
-void ccc_tree_print(struct ccc_om_ const *t, ccc_om_node_ const *root,
+void ccc_tree_print(struct ccc_om_ const *t, ccc_om_elem_ const *root,
                     ccc_print_fn *fn);
 void *ccc_impl_tree_key_in_slot(struct ccc_om_ const *t, void const *slot);
-ccc_om_node_ *ccc_impl_tree_elem_in_slot(struct ccc_om_ const *t,
+ccc_om_elem_ *ccc_impl_tree_elem_in_slot(struct ccc_om_ const *t,
                                          void const *slot);
 void *ccc_impl_tree_key_from_node(struct ccc_om_ const *t,
-                                  ccc_om_node_ const *n);
+                                  ccc_om_elem_ const *n);
 
 struct ccc_om_entry_ ccc_impl_tree_entry(struct ccc_om_ *t, void const *key);
-void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_node_ *n);
+void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
 
 #define CCC_IMPL_TREE_ENTRY(tree_ptr, key...)                                  \
     ({                                                                         \
@@ -165,7 +165,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_node_ *n);
         }                                                                      \
         else if (tree_ins_ent_.entry.status == CCC_OM_ENTRY_OCCUPIED)          \
         {                                                                      \
-            struct ccc_om_node_ ins_ent_saved_ = *ccc_impl_tree_elem_in_slot(  \
+            struct ccc_om_elem_ ins_ent_saved_ = *ccc_impl_tree_elem_in_slot(  \
                 tree_ins_ent_.t, tree_ins_ent_.entry.entry);                   \
             *((typeof(key_value) *)tree_ins_ent_.entry.entry) = key_value;     \
             *ccc_impl_tree_elem_in_slot(tree_ins_ent_.t,                       \

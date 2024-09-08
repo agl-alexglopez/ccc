@@ -22,7 +22,7 @@
 
 typedef struct
 {
-    ccc_om_node_ impl;
+    ccc_om_elem_ impl;
 } ccc_depq_elem;
 
 typedef struct

@@ -35,7 +35,7 @@ typedef struct
 
 typedef struct
 {
-    ccc_om_node_ impl;
+    ccc_om_elem_ impl;
 } ccc_o_map_elem;
 
 typedef struct
