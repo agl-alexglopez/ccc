@@ -78,7 +78,7 @@ typedef struct
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);
 
-void *ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
 void const *ccc_om_get(ccc_ordered_map *s, void const *key);
 
@@ -86,7 +86,7 @@ void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
 
 /*===========================   Entry API   =================================*/
 
-ccc_o_map_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
 bool ccc_om_remove_entry(ccc_o_map_entry e);
 

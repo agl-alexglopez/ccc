@@ -173,23 +173,14 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
         void *user_struct = struct_base(&rom->impl, &out_handle->impl);
         void *ret = struct_base(&rom->impl, q.found);
         swap(tmp, user_struct, ret, rom->impl.elem_sz);
-        return (ccc_entry){
-            .entry = ret,
-            .status = CCC_ENTRY_OCCUPIED,
-        };
+        return (ccc_entry){.entry = ret, .status = CCC_ENTRY_OCCUPIED};
     }
     void *inserted = maybe_alloc_insert(&rom->impl, q, &out_handle->impl);
     if (!inserted)
     {
-        return (ccc_entry){
-            .entry = NULL,
-            .status = CCC_ENTRY_ERROR,
-        };
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_ERROR};
     }
-    return (ccc_entry){
-        .entry = inserted,
-        .status = CCC_ENTRY_VACANT,
-    };
+    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
 }
 
 ccc_rtom_entry
@@ -237,7 +228,7 @@ ccc_rom_insert_entry(ccc_rtom_entry e, ccc_rtom_elem *const elem)
                               &elem->impl);
 }
 
-bool
+ccc_entry
 ccc_rom_remove_entry(ccc_rtom_entry e)
 {
     if (e.impl.entry.status == CCC_ROM_ENTRY_OCCUPIED)
@@ -249,10 +240,11 @@ ccc_rom_remove_entry(ccc_rtom_entry e)
         if (e.impl.rom->alloc)
         {
             e.impl.rom->alloc(erased, 0);
+            return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_OCCUPIED};
         }
-        return true;
+        return (ccc_entry){.entry = erased, .status = CCC_ENTRY_OCCUPIED};
     }
-    return false;
+    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
 }
 
 ccc_entry

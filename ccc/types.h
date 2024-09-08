@@ -54,14 +54,14 @@ typedef struct
     void *end;
 } ccc_rrange;
 
-#define CCC_ENTRY_OCCUPIED 1
+#define CCC_ENTRY_OCCUPIED 0x1
 #define CCC_ENTRY_VACANT 0
-#define CCC_ENTRY_ERROR (-1)
+#define CCC_ENTRY_ERROR 0x2
 
 typedef struct
 {
     void *entry;
-    int8_t status;
+    uint8_t status;
 } ccc_entry;
 
 typedef void *ccc_alloc_fn(void *, size_t);

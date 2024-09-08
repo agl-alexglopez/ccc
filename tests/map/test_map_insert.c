@@ -56,12 +56,12 @@ map_test_insert_three(void)
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val swap_slot = {.val = 1, .id = 99};
-    CHECK(ccc_om_unwrap(ccc_om_insert(&s, &swap_slot.elem)) == NULL, true,
-          "%d");
+    CHECK(ccc_entry_occupied(ccc_om_insert(&s, &swap_slot.elem)), false, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)1, "%zu");
     swap_slot = (struct val){.val = 1, .id = 137};
-    struct val const *ins = ccc_om_unwrap(ccc_om_insert(&s, &swap_slot.elem));
+    struct val const *ins
+        = ccc_entry_unwrap(ccc_om_insert(&s, &swap_slot.elem));
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)1, "%zu");
     CHECK(ins != NULL, true, "%d");

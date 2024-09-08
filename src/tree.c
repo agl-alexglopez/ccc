@@ -513,7 +513,7 @@ ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn, void *aux)
     return e;
 }
 
-ccc_o_map_entry
+ccc_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
     void *found = find(
@@ -526,51 +526,33 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
         void *user_struct = struct_base(&s->impl, &out_handle->impl);
         void *ret = struct_base(&s->impl, s->impl.root);
         swap(tmp, user_struct, ret, s->impl.elem_sz);
-        return (ccc_o_map_entry){{
-            .t = &s->impl,
-            .entry = {
-                .entry = ret, 
-                .status = CCC_OM_ENTRY_OCCUPIED,
-            },
-        }};
+        return (ccc_entry){.entry = ret, .status = CCC_ENTRY_OCCUPIED};
     }
     void *inserted = alloc_insert(&s->impl, &out_handle->impl);
     if (!inserted)
     {
-        return (ccc_o_map_entry){{
-            .t = &s->impl,
-            .entry = {
-                .entry = NULL, 
-                .status = CCC_OM_ENTRY_NULL | CCC_OM_ENTRY_INSERT_ERROR,
-            },
-        }};
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_ERROR};
     }
-    return (ccc_o_map_entry){{
-        .t = &s->impl,
-        .entry = {
-            .entry = NULL, 
-            .status = CCC_OM_ENTRY_VACANT | CCC_OM_ENTRY_NULL,
-        },
-    }};
+    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
 }
 
-void *
+ccc_entry
 ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
     void *n = erase(&s->impl,
                     ccc_impl_tree_key_from_node(&s->impl, &out_handle->impl));
     if (!n)
     {
-        return NULL;
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
     }
     if (s->impl.alloc)
     {
         void *user_struct = struct_base(&s->impl, &out_handle->impl);
         memcpy(user_struct, n, s->impl.elem_sz);
         s->impl.alloc(n, 0);
-        return user_struct;
+        return (ccc_entry){.entry = user_struct, .status = CCC_ENTRY_OCCUPIED};
     }
-    return n;
+    return (ccc_entry){.entry = n, .status = CCC_ENTRY_OCCUPIED};
 }
 
 bool

@@ -91,7 +91,8 @@ rtomap_test_prime_shuffle(void)
     CHECK(ccc_rom_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(ccc_rom_remove_entry(ccc_rom_entry(&s, &vals[i].val))
+        CHECK(ccc_entry_occupied(
+                  ccc_rom_remove_entry(ccc_rom_entry(&s, &vals[i].val)))
                   || repeats[i],
               true, "%d");
         CHECK(ccc_rom_validate(&s), true, "%d");

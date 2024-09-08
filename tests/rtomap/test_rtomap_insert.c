@@ -41,8 +41,7 @@ rtomap_test_insert_one(void)
         = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(ccc_entry_unwrap(ccc_rom_insert(&s, &single.elem)) != NULL, true,
-          "%d");
+    CHECK(ccc_entry_occupied(ccc_rom_insert(&s, &single.elem)), false, "%d");
     CHECK(ccc_rom_empty(&s), false, "%d");
     CHECK(((struct val *)ccc_rom_root(&s))->val == single.val, true, "%d");
     return PASS;
