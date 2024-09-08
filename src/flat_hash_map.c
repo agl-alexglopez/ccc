@@ -83,6 +83,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry e, ccc_fh_map_elem *const elem)
         /* It is ok if an insert error was indicated because we do not
            need more space if we are overwriting a previous value. */
         e.impl.entry.status = CCC_FHM_ENTRY_OCCUPIED;
+        elem->impl.hash = e.impl.hash;
         memcpy((void *)e.impl.entry.entry, user_struct,
                ccc_buf_elem_size(&e.impl.h->buf));
         return (void *)e.impl.entry.entry;
@@ -114,15 +115,15 @@ ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
     return NULL;
 }
 
-bool
+ccc_entry
 ccc_fhm_remove_entry(ccc_fh_map_entry e)
 {
     if (e.impl.entry.status != CCC_FHM_ENTRY_OCCUPIED)
     {
-        return false;
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
     }
     erase(e.impl.h, (void *)e.impl.entry.entry);
-    return true;
+    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_OCCUPIED};
 }
 
 ccc_fh_map_entry
@@ -151,7 +152,7 @@ ccc_fhm_and_modify_with(ccc_fh_map_entry e, ccc_update_fn *const fn, void *aux)
     return e;
 }
 
-ccc_fh_map_entry
+ccc_entry
 ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
 {
     void *user_return = struct_base(&h->impl, &out_handle->impl);
@@ -164,23 +165,21 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
            that is ok. We will not need new space yet. Only allow the insert
            error to persist if we actually need more space. */
         ent.entry.status = CCC_FHM_ENTRY_OCCUPIED;
+        out_handle->impl.hash = ent.hash;
         uint8_t tmp[user_struct_size];
         swap(tmp, (void *)ent.entry.entry, user_return, user_struct_size);
-        return (ccc_fh_map_entry){ent};
+        return (ccc_entry){.entry = user_return, .status = CCC_ENTRY_OCCUPIED};
     }
-    if (ent.entry.status & CCC_FHM_ENTRY_NULL)
+    if (ent.entry.status & (CCC_FHM_ENTRY_NULL | CCC_FHM_ENTRY_INSERT_ERROR))
     {
-        ent.entry.status |= CCC_FHM_ENTRY_INSERT_ERROR;
-        return (ccc_fh_map_entry){ent};
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_ERROR};
     }
     ccc_impl_fhm_insert(&h->impl, user_return, ent.hash,
                         ccc_buf_index_of(&h->impl.buf, ent.entry.entry));
-    ent.entry.entry = NULL;
-    ent.entry.status |= (CCC_FHM_ENTRY_VACANT | CCC_FHM_ENTRY_NULL);
-    return (ccc_fh_map_entry){ent};
+    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
 }
 
-void *
+ccc_entry
 ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
 {
     void *ret = struct_base(&h->impl, &out_handle->impl);
@@ -189,11 +188,11 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
         = ccc_impl_fhm_find(&h->impl, key, ccc_impl_fhm_filter(&h->impl, key));
     if (ent.status == CCC_FHM_ENTRY_VACANT)
     {
-        return NULL;
+        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
     }
     memcpy(ret, ent.entry, ccc_buf_elem_size(&h->impl.buf));
     erase(&h->impl, (void *)ent.entry);
-    return ret;
+    return (ccc_entry){.entry = ret, .status = CCC_ENTRY_OCCUPIED};
 }
 
 void *

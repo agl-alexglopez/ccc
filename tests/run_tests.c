@@ -116,7 +116,8 @@ run_test_process(struct path_bin pb)
         (void)fprintf(stderr, "Error running test: %s\n", sv_begin(pb.bin));
         return ERROR;
     }
-    if (WIFEXITED(status) && WEXITSTATUS(status) == FAIL)
+    if (WIFSIGNALED(status)
+        || (WIFEXITED(status) && WEXITSTATUS(status) == FAIL))
     {
         return FAIL;
     }

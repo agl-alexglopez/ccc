@@ -78,19 +78,6 @@ initialization is successful or a failure. */
 @return true if the struct containing key is stored, false if not. */
 bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
 
-/** @brief Removes the entry stored at key, writing stored value to output.
-@param [in] h the hash table to query.
-@param [in] key the key used for the query matching stored key type.
-@param [in] the handle to the struct that will be returned from this function.
-@return a pointer to the struct wrapping out_handle if a value was present,
-NULL if no entry occupied the table at the provided key.
-@warning this function's side effect is overwriting the provided struct with
-the previous hash table entry if one existed.
-
-This function should be used when one wishes to preserve the old value if
-one is present. If such behavior is not needed see the entry API. */
-void *ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
-
 /** @brief Returns a read only reference into the table at entry key.
 @param [in] h the flat hash map to search.
 @param [in]*key the key to search matching stored key type.
@@ -104,6 +91,18 @@ void const *ccc_fhm_get(ccc_flat_hash_map *h, void const *key);
 void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 
 /*========================    Entry API    ==================================*/
+/** @brief Removes the entry stored at key, writing stored value to output.
+@param [in] h the hash table to query.
+@param [in] key the key used for the query matching stored key type.
+@param [in] the handle to the struct that will be returned from this function.
+@return a pointer to the struct wrapping out_handle if a value was present,
+NULL if no entry occupied the table at the provided key.
+@warning this function's side effect is overwriting the provided struct with
+the previous hash table entry if one existed.
+
+This function should be used when one wishes to preserve the old value if
+one is present. If such behavior is not needed see the entry API. */
+ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
 /** @brief Inserts the specified key and value into the hash table invariantly.
 @param [in] h the flat hash table being queried.
@@ -129,8 +128,15 @@ behavior is not needed consider using the entry api.
 If an insertion error occurs, due to a table resizing failure, a NULL and
 vacant entry is returned. Get methods will yeild false/NULL and the
 insertion error checking function will evaluate to true. */
-ccc_fh_map_entry ccc_fhm_insert(ccc_flat_hash_map *h,
-                                ccc_fh_map_elem *out_handle);
+ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
+
+/** @brief Removes the provided entry if it is Occupied.
+@param [in] e the entry to be removed.
+@return true if e was Occupied and now has been removed, false if vacant.
+
+This method does nothing to help preserve the old value if one was present. If
+preserving the old value is of interest see the remove method. */
+ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry e);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
@@ -191,14 +197,6 @@ be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
 void *ccc_fhm_insert_entry(ccc_fh_map_entry e, ccc_fh_map_elem *elem);
-
-/** @brief Removes the provided entry if it is Occupied.
-@param [in] e the entry to be removed.
-@return true if e was Occupied and now has been removed, false if vacant.
-
-This method does nothing to help preserve the old value if one was present. If
-preserving the old value is of interest see the remove method. */
-bool ccc_fhm_remove_entry(ccc_fh_map_entry e);
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.

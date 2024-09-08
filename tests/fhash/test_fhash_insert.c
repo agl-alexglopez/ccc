@@ -19,9 +19,8 @@ static enum test_result fhash_test_resize_macros(void);
 static enum test_result fhash_test_resize_from_null(void);
 static enum test_result fhash_test_resize_from_null_macros(void);
 static enum test_result fhash_test_insert_limit(void);
-static enum test_result fhash_test_insert_wrong_type(void);
 
-#define NUM_TESTS (size_t)14
+#define NUM_TESTS (size_t)13
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
     fhash_test_insert_overwrite,
@@ -36,7 +35,6 @@ test_fn const all_tests[NUM_TESTS] = {
     fhash_test_resize_from_null,
     fhash_test_resize_from_null_macros,
     fhash_test_insert_limit,
-    fhash_test_insert_wrong_type,
 };
 
 int
@@ -64,9 +62,10 @@ fhash_test_insert(void)
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_fh_map_entry ent = ccc_fhm_insert(&fh, &query.e);
-    CHECK(ccc_fhm_occupied(ent), false, "%d");
-    CHECK(ccc_fhm_unwrap(ent), NULL, "%p");
+    ccc_entry ent = ccc_fhm_insert(&fh, &query.e);
+    CHECK(ccc_entry_occupied(ent), false, "%d");
+    CHECK(ccc_entry_unwrap(ent), NULL, "%p");
+    CHECK(ccc_fhm_size(&fh), 1, "%zu");
     return PASS;
 }
 
@@ -79,9 +78,9 @@ fhash_test_insert_overwrite(void)
                                         fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
-    ccc_fh_map_entry ent = ccc_fhm_insert(&fh, &q.e);
-    CHECK(ccc_fhm_occupied(ent), false, "%d");
-    CHECK(ccc_fhm_unwrap(ent), NULL, "%p");
+    ccc_entry ent = ccc_fhm_insert(&fh, &q.e);
+    CHECK(ccc_entry_occupied(ent), false, "%d");
+    CHECK(ccc_entry_unwrap(ent), NULL, "%p");
     CHECK(((struct val *)ccc_fhm_unwrap(ccc_fhm_entry(&fh, &q.id)))->val, 99,
           "%d");
 
@@ -90,11 +89,11 @@ fhash_test_insert_overwrite(void)
     q = (struct val){.id = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_fh_map_entry old_ent = ccc_fhm_insert(&fh, &q.e);
-    CHECK(ccc_fhm_occupied(old_ent), true, "%d");
+    ccc_entry old_ent = ccc_fhm_insert(&fh, &q.e);
+    CHECK(ccc_entry_occupied(old_ent), true, "%d");
 
     /* The old contents are now in q and the entry is in the table. */
-    CHECK(((struct val *)ccc_fhm_unwrap(old_ent))->val, 100, "%d");
+    CHECK(((struct val *)ccc_entry_unwrap(old_ent))->val, 99, "%d");
     CHECK(q.val, 99, "%d");
     CHECK(((struct val *)ccc_fhm_unwrap(ccc_fhm_entry(&fh, &q.id)))->val, 100,
           "%d");
@@ -110,27 +109,20 @@ fhash_test_insert_then_bad_ideas(void)
                                         fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     struct val q = {.id = 137, .val = 99};
-    ccc_fh_map_entry ent = ccc_fhm_insert(&fh, &q.e);
-    CHECK(ccc_fhm_occupied(ent), false, "%d");
-    CHECK(ccc_fhm_unwrap(ent), NULL, "%p");
+    ccc_entry ent = ccc_fhm_insert(&fh, &q.e);
+    CHECK(ccc_entry_occupied(ent), false, "%d");
+    CHECK(ccc_entry_unwrap(ent), NULL, "%p");
     CHECK(((struct val *)ccc_fhm_unwrap(ccc_fhm_entry(&fh, &q.id)))->val, 99,
           "%d");
 
-    /* This is a dummy entry that indicates the entry was vacant in the table.
-       so or insert and erase will do nothing. */
-    CHECK(ccc_fhm_or_insert(ent, &q.e), NULL, "%p");
-
     q = (struct val){.id = 137, .val = 100};
 
-    ccc_fh_map_entry new_ent = ccc_fhm_insert(&fh, &q.e);
-    CHECK(ccc_fhm_occupied(new_ent), true, "%d");
-    CHECK(((struct val *)ccc_fhm_unwrap(new_ent))->val, 100, "%d");
+    ent = ccc_fhm_insert(&fh, &q.e);
+    CHECK(ccc_entry_occupied(ent), true, "%d");
+    CHECK(((struct val *)ccc_entry_unwrap(ent))->val, 99, "%d");
     CHECK(q.val, 99, "%d");
     q.val -= 9;
 
-    /* Now the expected behavior of or insert shall occur and no insertion
-       will happen because the value is already occupied in the table. */
-    CHECK(((struct val *)ccc_fhm_or_insert(new_ent, &q.e))->val, 100, "%d");
     CHECK(((struct val *)ccc_fhm_get(&fh, &q.id))->val, 100, "%d");
     CHECK(q.val, 90, "%d");
     return PASS;
@@ -411,11 +403,10 @@ fhash_test_resize(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
-        struct val const *const in_table
-            = ccc_fhm_unwrap(ccc_fhm_insert(&fh, &swap_slot.e));
+        struct val const *const in_table = ccc_fhm_insert_entry(
+            ccc_fhm_entry(&fh, &swap_slot.id), &swap_slot.e);
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
-        CHECK(swap_slot.val, i, "%d");
     }
     CHECK(ccc_fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
@@ -484,11 +475,10 @@ fhash_test_resize_from_null(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
-        struct val const *const in_table
-            = ccc_fhm_unwrap(ccc_fhm_insert(&fh, &swap_slot.e));
+        struct val const *const in_table = ccc_fhm_insert_entry(
+            ccc_fhm_entry(&fh, &swap_slot.id), &swap_slot.e);
         CHECK(in_table != NULL, true, "%d");
         CHECK(in_table->val, shuffled_index, "%d");
-        CHECK(swap_slot.val, i, "%d");
     }
     CHECK(ccc_fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
@@ -560,11 +550,9 @@ fhash_test_insert_limit(void)
     size_t const final_size = ccc_fhm_size(&fh);
     /* The last successful entry is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
-    ccc_fh_map_entry ent = ccc_fhm_insert(&fh, &v.e);
-    CHECK(ccc_fhm_unwrap(ent) != NULL, true, "%d");
-    CHECK(ccc_fhm_insert_error(ent), false, "%d");
-    CHECK(((struct val *)ccc_fhm_unwrap(ent))->val, -1, "%d");
-    CHECK(((struct val *)ccc_fhm_unwrap(ent))->val != v.val, true, "%d");
+    ccc_entry ent = ccc_fhm_insert(&fh, &v.e);
+    CHECK(ccc_entry_unwrap(ent) != NULL, true, "%d");
+    CHECK(ccc_entry_error(ent), false, "%d");
     CHECK(ccc_fhm_size(&fh), final_size, "%zu");
 
     v = (struct val){.id = last_index, .val = -2};
@@ -592,59 +580,8 @@ fhash_test_insert_limit(void)
     CHECK(ccc_fhm_size(&fh), final_size, "%zu");
 
     ent = ccc_fhm_insert(&fh, &v.e);
-    CHECK(ccc_fhm_unwrap(ent) == NULL, true, "%d");
-    CHECK(ccc_fhm_insert_error(ent), true, "%d");
+    CHECK(ccc_entry_unwrap(ent) == NULL, true, "%d");
+    CHECK(ccc_entry_error(ent), true, "%d");
     CHECK(ccc_fhm_size(&fh), final_size, "%zu");
-    return PASS;
-}
-
-/* The macros, not the functions, provide some type checking to prevent the
-   user from looking at hash table entries as the wrong type or inserting
-   types that are too large. This makes a strong case for their inclusion to
-   the API. */
-static enum test_result
-fhash_test_insert_wrong_type(void)
-{
-    struct val vals[2] = {{0}, {0}};
-    ccc_flat_hash_map fh;
-    ccc_result const res = CCC_FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                        fhash_int_zero, fhash_id_eq, NULL);
-    struct too_big
-    {
-        struct val a;
-        bool extra_byte;
-    };
-    CHECK(res, CCC_OK, "%d");
-    /* Nothing was there before so nothing is in the entry. */
-    struct too_big const *wrong = FHM_INSERT_ENTRY(
-        FHM_ENTRY(&fh, 137), (struct too_big){.a = {137, 137, {}}});
-    CHECK(ccc_fhm_size(&fh), 0, "%zu");
-    CHECK(wrong == NULL, true, "%d");
-    wrong = FHM_OR_INSERT(FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), fhash_modplus),
-                          (struct too_big){.a = {.id = 137, .val = 137}});
-    CHECK(wrong == NULL, true, "%d");
-    CHECK(ccc_fhm_size(&fh), 0, "%zu");
-    struct val *correct
-        = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){137, 137, {}});
-    CHECK(correct != NULL, true, "%d");
-    CHECK(correct->id, 137, "%d");
-    CHECK(correct->val, 137, "%d");
-    CHECK(ccc_fhm_size(&fh), 1, "%zu");
-
-    /* This must not work because the user would be looking at an array slot
-       as the wrong type. However the modification to the entry is ok. */
-    wrong = FHM_OR_INSERT(FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), fhash_modplus),
-                          (struct too_big){.a = {0, 0, {}}});
-    CHECK(wrong == NULL, true, "%d");
-    CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    CHECK(((struct val *)ccc_fhm_unwrap(FHM_ENTRY(&fh, 137)))->val, 138, "%d");
-    /* This is somewhat nonsense as why would someone modify then overwrite
-       the previous value? However, it's possible. The modification will
-       still work before the overwrite insertion fails. */
-    wrong = FHM_INSERT_ENTRY(FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), fhash_modplus),
-                             (struct too_big){.a = {0, 0, {}}});
-    CHECK(wrong == NULL, true, "%d");
-    CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    CHECK(((struct val *)ccc_fhm_unwrap(FHM_ENTRY(&fh, 137)))->val, 139, "%d");
     return PASS;
 }

@@ -40,22 +40,23 @@ fhash_test_erase(void)
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_fh_map_entry ent = ccc_fhm_insert(&fh, &query.e);
-    CHECK(ccc_fhm_occupied(ent), false, "%d");
-    CHECK(ccc_fhm_unwrap(ent), NULL, "%p");
+    ccc_entry ent = ccc_fhm_insert(&fh, &query.e);
+    CHECK(ccc_entry_occupied(ent), false, "%d");
+    CHECK(ccc_entry_unwrap(ent), NULL, "%p");
     CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    struct val *v = ccc_fhm_remove(&fh, &query.e);
-    CHECK(v != NULL, true, "%d");
-    CHECK(v->id, 137, "%d");
-    CHECK(v->val, 99, "%d");
+    ent = ccc_fhm_remove(&fh, &query.e);
+    CHECK(ccc_entry_occupied(ent), true, "%d");
+    CHECK(((struct val *)ccc_entry_unwrap(ent))->id, 137, "%d");
+    CHECK(((struct val *)ccc_entry_unwrap(ent))->val, 99, "%d");
     CHECK(ccc_fhm_size(&fh), 0, "%zu");
     query.id = 101;
-    v = ccc_fhm_remove(&fh, &query.e);
-    CHECK(v == NULL, true, "%d");
+    ent = ccc_fhm_remove(&fh, &query.e);
+    CHECK(ccc_entry_occupied(ent), false, "%d");
     CHECK(ccc_fhm_size(&fh), 0, "%zu");
     FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
     CHECK(ccc_fhm_size(&fh), 1, "%zu");
-    CHECK(ccc_fhm_remove_entry(FHM_ENTRY(&fh, 137)), true, "%d");
+    CHECK(ccc_entry_occupied(ccc_fhm_remove_entry(FHM_ENTRY(&fh, 137))), true,
+          "%d");
     CHECK(ccc_fhm_size(&fh), 0, "%zu");
     return PASS;
 }
@@ -89,14 +90,15 @@ fhash_test_shuffle_insert_erase(void)
         if (i % 2)
         {
             struct val swap_slot = {.id = i};
-            struct val const *const old_val = ccc_fhm_remove(&fh, &swap_slot.e);
+            struct val const *const old_val
+                = ccc_entry_unwrap(ccc_fhm_remove(&fh, &swap_slot.e));
             CHECK(old_val != NULL, true, "%d");
             CHECK(old_val->id, i, "%d");
         }
         else
         {
-            bool const removed = ccc_fhm_remove_entry(FHM_ENTRY(&fh, i));
-            CHECK(removed, true, "%d");
+            ccc_entry removed = ccc_fhm_remove_entry(FHM_ENTRY(&fh, i));
+            CHECK(ccc_entry_occupied(removed), true, "%d");
         }
         --cur_size;
         ++i;

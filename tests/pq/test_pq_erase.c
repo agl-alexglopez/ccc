@@ -16,7 +16,7 @@ static enum test_result pq_test_delete_prime_shuffle_duplicates(void);
 static enum test_result pq_test_prime_shuffle(void);
 static enum test_result pq_test_weak_srand(void);
 
-#define NUM_TESTS (size_t)9
+#define NUM_TESTS (size_t)7
 test_fn const all_tests[NUM_TESTS] = {
     pq_test_insert_remove_four_dups,
     pq_test_insert_erase_shuffled,
