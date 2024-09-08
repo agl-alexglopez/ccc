@@ -1,5 +1,6 @@
 #include "fhash_util.h"
 #include "flat_hash_map.h"
+#include "generics.h"
 #include "test.h"
 #include "types.h"
 

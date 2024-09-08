@@ -61,10 +61,6 @@ bool ccc_depq_is_max(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 
 bool ccc_depq_is_min(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 
-void *ccc_depq_const_max(ccc_double_ended_priority_queue const *);
-
-void *ccc_depq_const_min(ccc_double_ended_priority_queue const *);
-
 void *ccc_depq_erase(ccc_double_ended_priority_queue *, ccc_depq_elem *);
 
 bool ccc_depq_update(ccc_double_ended_priority_queue *, ccc_depq_elem *,
@@ -83,16 +79,8 @@ void *ccc_depq_rnext(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 ccc_range ccc_depq_equal_range(ccc_double_ended_priority_queue *,
                                void const *begin_key, void const *end_key);
 
-void *ccc_depq_begin_range(ccc_range const *);
-
-void *ccc_depq_end_range(ccc_range const *);
-
 ccc_rrange ccc_depq_equal_rrange(ccc_double_ended_priority_queue *,
                                  void const *rbegin_key, void const *end_key);
-
-void *ccc_depq_begin_rrange(ccc_rrange const *);
-
-void *ccc_depq_end_rrange(ccc_rrange const *);
 
 void *ccc_depq_root(ccc_double_ended_priority_queue const *);
 

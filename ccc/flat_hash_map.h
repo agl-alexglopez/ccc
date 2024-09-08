@@ -92,6 +92,8 @@ void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 
 /*========================    Entry API    ==================================*/
 
+/* Preserve old values from stored in the map. See types.h for more. */
+
 /** TODO */
 ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
@@ -100,6 +102,8 @@ ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
 /** TODO */
 ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry e);
+
+/* Standard Entry API */
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.

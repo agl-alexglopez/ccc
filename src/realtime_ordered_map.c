@@ -72,6 +72,9 @@ struct rtom_query
 enum rtom_link const inorder_traversal = L;
 enum rtom_link const reverse_inorder_traversal = R;
 
+enum rtom_link const min = L;
+enum rtom_link const max = R;
+
 /*==============================  Prototypes   ==============================*/
 
 static void init_node(struct ccc_rtom_ *, struct ccc_rtom_elem_ *);
@@ -148,8 +151,9 @@ static void ccc_tree_print(struct ccc_rtom_ const *rom,
 
 static struct ccc_rtom_elem_ const *
 next(struct ccc_rtom_ *, struct ccc_rtom_elem_ const *, enum rtom_link);
-static struct ccc_rtom_elem_ *min_from(struct ccc_rtom_ const *,
-                                       struct ccc_rtom_elem_ *start);
+static struct ccc_rtom_elem_ *min_max_from(struct ccc_rtom_ const *,
+                                           struct ccc_rtom_elem_ *start,
+                                           enum rtom_link);
 
 /*==============================  Interface    ==============================*/
 
@@ -306,13 +310,14 @@ ccc_rom_unwrap_mut(ccc_rtom_entry e)
 }
 
 static struct ccc_rtom_elem_ *
-min_from(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ *start)
+min_max_from(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ *start,
+             enum rtom_link const dir)
 {
     if (start == &rom->end)
     {
         return start;
     }
-    for (; start->link[L] != &rom->end; start = start->link[L])
+    for (; start->link[dir] != &rom->end; start = start->link[dir])
     {}
     return start;
 }
@@ -320,7 +325,7 @@ min_from(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ *start)
 void *
 ccc_rom_begin(ccc_realtime_ordered_map const *rom)
 {
-    struct ccc_rtom_elem_ *m = min_from(&rom->impl, rom->impl.root);
+    struct ccc_rtom_elem_ *m = min_max_from(&rom->impl, rom->impl.root, min);
     return m == &rom->impl.end ? NULL : struct_base(&rom->impl, m);
 }
 
@@ -329,6 +334,25 @@ ccc_rom_next(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n
         = next(&rom->impl, &e->impl, inorder_traversal);
+    if (n == &rom->impl.end)
+    {
+        return NULL;
+    }
+    return struct_base(&rom->impl, n);
+}
+
+void *
+ccc_rom_rbegin(ccc_realtime_ordered_map const *const rom)
+{
+    struct ccc_rtom_elem_ *m = min_max_from(&rom->impl, rom->impl.root, max);
+    return m == &rom->impl.end ? NULL : struct_base(&rom->impl, m);
+}
+
+void *
+ccc_rom_rnext(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
+{
+    struct ccc_rtom_elem_ const *const n
+        = next(&rom->impl, &e->impl, reverse_inorder_traversal);
     if (n == &rom->impl.end)
     {
         return NULL;
@@ -584,7 +608,7 @@ remove_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove)
     }
     else
     {
-        y = min_from(rom, remove->link[R]);
+        y = min_max_from(rom, remove->link[R], min);
         p_of_xy = y->parent;
         x = y->link[y->link[L] == &rom->end];
         x->parent = y->parent;

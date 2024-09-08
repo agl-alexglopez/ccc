@@ -78,17 +78,21 @@ typedef struct
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);
 
-ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
-
 void const *ccc_om_get(ccc_ordered_map *s, void const *key);
 
 void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
 
 /*===========================   Entry API   =================================*/
 
+/* Retain access to old values in the map. See types.h for ccc_entry. */
+
 ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
-bool ccc_om_remove_entry(ccc_o_map_entry e);
+ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+
+ccc_entry ccc_om_remove_entry(ccc_o_map_entry e);
+
+/* Standard Entry API. */
 
 ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
 
@@ -97,17 +101,17 @@ ccc_o_map_entry ccc_om_and_modify(ccc_o_map_entry e, ccc_update_fn *fn);
 ccc_o_map_entry ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn,
                                        void *aux);
 
-void const *ccc_om_unwrap(ccc_o_map_entry e);
-
-void *ccc_om_unwrap_mut(ccc_o_map_entry e);
-
 void *ccc_om_or_insert(ccc_o_map_entry e, ccc_o_map_elem *elem);
 
 void *ccc_om_insert_entry(ccc_o_map_entry e, ccc_o_map_elem *elem);
 
+void const *ccc_om_unwrap(ccc_o_map_entry e);
+
+void *ccc_om_unwrap_mut(ccc_o_map_entry e);
+
 bool ccc_om_insert_error(ccc_o_map_entry e);
 
-bool ccc_om_const_contains(ccc_ordered_map *, ccc_o_map_elem const *);
+/*===========================   Entry API   =================================*/
 
 void *ccc_om_begin(ccc_ordered_map *);
 
@@ -120,16 +124,8 @@ void *ccc_om_rnext(ccc_ordered_map *, ccc_o_map_elem const *);
 ccc_range ccc_om_equal_range(ccc_ordered_map *, void const *begin_key,
                              void const *end_key);
 
-void *ccc_om_begin_range(ccc_range const *);
-
-void *ccc_om_end_range(ccc_range const *);
-
 ccc_rrange ccc_om_equal_rrange(ccc_ordered_map *, void const *rbegin_key,
                                void const *end_key);
-
-void *ccc_om_begin_rrange(ccc_rrange const *);
-
-void *ccc_om_end_rrange(ccc_rrange const *);
 
 void *ccc_om_root(ccc_ordered_map const *);
 

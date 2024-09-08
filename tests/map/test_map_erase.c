@@ -1,3 +1,4 @@
+#include "generics.h"
 #include "map_util.h"
 #include "ordered_map.h"
 #include "test.h"
@@ -66,7 +67,9 @@ map_test_prime_shuffle(void)
     CHECK(ccc_om_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(ccc_om_remove_entry(ccc_om_entry(&s, &vals[i].val)) || repeats[i],
+        CHECK(ccc_entry_occupied(
+                  ccc_om_remove_entry(ccc_om_entry(&s, &vals[i].val)))
+                  || repeats[i],
               true, "%d");
         CHECK(ccc_om_validate(&s), true, "%d");
     }

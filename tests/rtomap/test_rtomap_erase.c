@@ -1,3 +1,4 @@
+#include "generics.h"
 #include "realtime_ordered_map.h"
 #include "rtomap_util.h"
 #include "test.h"

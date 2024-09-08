@@ -1,3 +1,4 @@
+#include "generics.h"
 #include "map_util.h"
 #include "ordered_map.h"
 #include "test.h"
@@ -167,17 +168,17 @@ map_test_valid_range(void)
        value greater than 44, 45. */
     int const range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     ccc_range const range = ccc_om_equal_range(&s, &b.val, &e.val);
-    CHECK(((struct val *)ccc_om_begin_range(&range))->val, range_vals[0], "%d");
-    CHECK(((struct val *)ccc_om_end_range(&range))->val, range_vals[7], "%d");
+    CHECK(((struct val *)ccc_begin_range(&range))->val, range_vals[0], "%d");
+    CHECK(((struct val *)ccc_end_range(&range))->val, range_vals[7], "%d");
     size_t index = 0;
-    struct val *i1 = ccc_om_begin_range(&range);
-    for (; i1 != ccc_om_end_range(&range); i1 = ccc_om_next(&s, &i1->elem))
+    struct val *i1 = ccc_begin_range(&range);
+    for (; i1 != ccc_end_range(&range); i1 = ccc_om_next(&s, &i1->elem))
     {
         int const cur_val = i1->val;
         CHECK(range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1, ccc_om_end_range(&range), "%p");
+    CHECK(i1, ccc_end_range(&range), "%p");
     CHECK(((struct val *)i1)->val, range_vals[7], "%d");
     b.val = 119;
     e.val = 84;
@@ -186,20 +187,19 @@ map_test_valid_range(void)
        be dropped to first value less than 84. */
     int const rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     ccc_rrange const rev_range = ccc_om_equal_rrange(&s, &b.val, &e.val);
-    CHECK(((struct val *)ccc_om_begin_rrange(&rev_range))->val,
-          rev_range_vals[0], "%d");
-    CHECK(((struct val *)ccc_om_end_rrange(&rev_range))->val, rev_range_vals[7],
+    CHECK(((struct val *)ccc_begin_rrange(&rev_range))->val, rev_range_vals[0],
+          "%d");
+    CHECK(((struct val *)ccc_end_rrange(&rev_range))->val, rev_range_vals[7],
           "%d");
     index = 0;
-    struct val *i2 = ccc_om_begin_rrange(&rev_range);
-    for (; i2 != ccc_om_end_rrange(&rev_range);
-         i2 = ccc_om_rnext(&s, &i2->elem))
+    struct val *i2 = ccc_begin_rrange(&rev_range);
+    for (; i2 != ccc_end_rrange(&rev_range); i2 = ccc_om_rnext(&s, &i2->elem))
     {
         int const cur_val = i2->val;
         CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2, ccc_om_end_rrange(&rev_range), "%p");
+    CHECK(i2, ccc_end_rrange(&rev_range), "%p");
     CHECK(i2->val, rev_range_vals[7], "%d");
     return PASS;
 }
@@ -226,19 +226,19 @@ map_test_invalid_range(void)
        value greater than 999, none or the end. */
     int const forward_range_vals[6] = {95, 100, 105, 110, 115, 120};
     ccc_range const rev_range = ccc_om_equal_range(&s, &b.val, &e.val);
-    CHECK(((struct val *)ccc_om_begin_range(&rev_range))->val
+    CHECK(((struct val *)ccc_begin_range(&rev_range))->val
               == forward_range_vals[0],
           true, "%d");
-    CHECK(ccc_om_end_range(&rev_range), NULL, "%p");
+    CHECK(ccc_end_range(&rev_range), NULL, "%p");
     size_t index = 0;
-    struct val *i1 = ccc_om_begin_range(&rev_range);
-    for (; i1 != ccc_om_end_range(&rev_range); i1 = ccc_om_next(&s, &i1->elem))
+    struct val *i1 = ccc_begin_range(&rev_range);
+    for (; i1 != ccc_end_range(&rev_range); i1 = ccc_om_next(&s, &i1->elem))
     {
         int const cur_val = i1->val;
         CHECK(forward_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1, ccc_om_end_range(&rev_range), "%p");
+    CHECK(i1, ccc_end_range(&rev_range), "%p");
     CHECK(i1, NULL, "%p");
     b.val = 36;
     e.val = -999;
@@ -247,18 +247,18 @@ map_test_invalid_range(void)
        be dropped to first value less than -999 which is end. */
     int const rev_range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     ccc_rrange const range = ccc_om_equal_rrange(&s, &b.val, &e.val);
-    CHECK(((struct val *)ccc_om_begin_rrange(&range))->val, rev_range_vals[0],
+    CHECK(((struct val *)ccc_begin_rrange(&range))->val, rev_range_vals[0],
           "%d");
-    CHECK(ccc_om_end_rrange(&range), NULL, "%p");
+    CHECK(ccc_end_rrange(&range), NULL, "%p");
     index = 0;
-    struct val *i2 = ccc_om_begin_rrange(&range);
-    for (; i2 != ccc_om_end_rrange(&range); i2 = ccc_om_rnext(&s, &i2->elem))
+    struct val *i2 = ccc_begin_rrange(&range);
+    for (; i2 != ccc_end_rrange(&range); i2 = ccc_om_rnext(&s, &i2->elem))
     {
         int const cur_val = i2->val;
         CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2, ccc_om_end_rrange(&range), "%p");
+    CHECK(i2, ccc_end_rrange(&range), "%p");
     CHECK(i2, NULL, "%p");
     return PASS;
 }
@@ -284,16 +284,16 @@ map_test_empty_range(void)
     struct val b = {.id = 0, .val = -50};
     struct val e = {.id = 0, .val = -25};
     ccc_range const forward_range = ccc_om_equal_range(&s, &b.val, &e.val);
-    CHECK(((struct val *)ccc_om_begin_range(&forward_range))->val, vals[0].val,
+    CHECK(((struct val *)ccc_begin_range(&forward_range))->val, vals[0].val,
           "%d");
-    CHECK(((struct val *)ccc_om_end_range(&forward_range))->val, vals[0].val,
+    CHECK(((struct val *)ccc_end_range(&forward_range))->val, vals[0].val,
           "%d");
     b.val = 150;
     e.val = 999;
     ccc_rrange const rev_range = ccc_om_equal_rrange(&s, &b.val, &e.val);
-    CHECK(((struct val *)ccc_om_begin_rrange(&rev_range))->val,
+    CHECK(((struct val *)ccc_begin_rrange(&rev_range))->val,
           vals[num_nodes - 1].val, "%d");
-    CHECK(((struct val *)ccc_om_end_rrange(&rev_range))->val,
+    CHECK(((struct val *)ccc_end_rrange(&rev_range))->val,
           vals[num_nodes - 1].val, "%d");
     return PASS;
 }

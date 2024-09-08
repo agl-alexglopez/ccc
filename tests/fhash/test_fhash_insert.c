@@ -1,5 +1,6 @@
 #include "fhash_util.h"
 #include "flat_hash_map.h"
+#include "generics.h"
 #include "test.h"
 #include "types.h"
 
@@ -258,7 +259,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
-            = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, i), (struct val){i, i, {}});
+            = FHM_INSERT_ENTRY(C_ENTRY(&fh, i), (struct val){i, i, {}});
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");

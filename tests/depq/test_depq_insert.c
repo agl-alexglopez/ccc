@@ -118,9 +118,9 @@ depq_test_insert_shuffle(void)
     int const prime = 53;
     struct val vals[size];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS, "%d");
-    struct val const *max = ccc_depq_const_max(&pq);
+    struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1, "%d");
-    struct val const *min = ccc_depq_const_min(&pq);
+    struct val const *min = ccc_depq_min(&pq);
     CHECK(min->val, 0, "%d");
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &pq), size, "%zu");
@@ -145,9 +145,9 @@ depq_test_read_max_min(void)
         CHECK(ccc_depq_size(&pq), (size_t)i + 1, "%zu");
     }
     CHECK(ccc_depq_size(&pq), (size_t)10, "%zu");
-    struct val const *max = ccc_depq_const_max(&pq);
+    struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, 9, "%d");
-    struct val const *min = ccc_depq_const_min(&pq);
+    struct val const *min = ccc_depq_min(&pq);
     CHECK(min->val, 0, "%d");
     return PASS;
 }

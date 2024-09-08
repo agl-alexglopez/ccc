@@ -1,3 +1,11 @@
+add_library(impl_generics INTERFACE impl_generics.h)
+target_link_libraries(impl_generics
+  INTERFACE
+    double_ended_priority_queue
+    ordered_map
+    realtime_ordered_map
+)
+
 add_library(impl_buffer INTERFACE impl_buffer.h)
 target_link_libraries(impl_buffer INTERFACE types)
 

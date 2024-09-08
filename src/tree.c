@@ -102,10 +102,6 @@ static void *max(struct ccc_om_ const *);
 static void *pop_max(struct ccc_om_ *);
 static void *pop_min(struct ccc_om_ *);
 static void *min(struct ccc_om_ const *);
-static void *range_begin(ccc_range const *);
-static void *range_end(ccc_range const *);
-static void *rrange_begin(ccc_rrange const *);
-static void *rrange_end(ccc_rrange const *);
 static ccc_range equal_range(struct ccc_om_ *, void const *, void const *,
                              om_link);
 
@@ -118,7 +114,6 @@ static struct ccc_om_elem_ *
 pop_front_dup(struct ccc_om_ *, struct ccc_om_elem_ *, void const *old_key);
 static struct ccc_om_elem_ *remove_from_tree(struct ccc_om_ *,
                                              struct ccc_om_elem_ *);
-static struct ccc_om_elem_ const *const_seek(struct ccc_om_ *, void const *);
 static struct ccc_om_elem_ const *next(struct ccc_om_ *,
                                        struct ccc_om_elem_ const *, om_link);
 static struct ccc_om_elem_ const *
@@ -187,12 +182,6 @@ ccc_depq_max(ccc_double_ended_priority_queue *const pq)
     return struct_base(&pq->impl, n);
 }
 
-void *
-ccc_depq_const_max(ccc_double_ended_priority_queue const *const pq)
-{
-    return max(&pq->impl);
-}
-
 bool
 ccc_depq_is_max(ccc_double_ended_priority_queue *const pq,
                 ccc_depq_elem const *const e)
@@ -210,12 +199,6 @@ ccc_depq_min(ccc_double_ended_priority_queue *const pq)
         return NULL;
     }
     return struct_base(&pq->impl, n);
-}
-
-void *
-ccc_depq_const_min(ccc_double_ended_priority_queue const *const pq)
-{
-    return min(&pq->impl);
 }
 
 bool
@@ -269,18 +252,6 @@ ccc_depq_equal_range(ccc_double_ended_priority_queue *pq,
                        reverse_inorder_traversal);
 }
 
-void *
-ccc_depq_begin_range(ccc_range const *const r)
-{
-    return range_begin(r);
-}
-
-void *
-ccc_depq_end_range(ccc_range const *const r)
-{
-    return range_end(r);
-}
-
 ccc_rrange
 ccc_depq_equal_rrange(ccc_double_ended_priority_queue *pq,
                       void const *const rbegin_key, void const *const rend_key)
@@ -291,18 +262,6 @@ ccc_depq_equal_rrange(ccc_double_ended_priority_queue *pq,
         .rbegin = ret.begin,
         .end = ret.end,
     };
-}
-
-void *
-ccc_depq_begin_rrange(ccc_rrange const *const rr)
-{
-    return rrange_begin(rr);
-}
-
-void *
-ccc_depq_end_rrange(ccc_rrange const *const rr)
-{
-    return rrange_end(rr);
 }
 
 ccc_result
@@ -557,7 +516,7 @@ ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
     return (ccc_entry){.entry = n, .status = CCC_ENTRY_OCCUPIED};
 }
 
-bool
+ccc_entry
 ccc_om_remove_entry(ccc_o_map_entry e)
 {
     if (e.impl.entry.status == CCC_OM_ENTRY_OCCUPIED)
@@ -568,12 +527,11 @@ ccc_om_remove_entry(ccc_o_map_entry e)
         if (e.impl.t->alloc)
         {
             e.impl.t->alloc(erased, 0);
-            e.impl.entry.entry = NULL;
-            e.impl.entry.status |= CCC_OM_ENTRY_NULL;
+            return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_OCCUPIED};
         }
-        return true;
+        return (ccc_entry){.entry = erased, .status = CCC_ENTRY_OCCUPIED};
     }
-    return false;
+    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
 }
 
 void *
@@ -646,18 +604,6 @@ ccc_om_equal_range(ccc_ordered_map *s, void const *const begin_key,
     return equal_range(&s->impl, begin_key, end_key, inorder_traversal);
 }
 
-void *
-ccc_om_begin_range(ccc_range const *const r)
-{
-    return range_begin(r);
-}
-
-void *
-ccc_om_end_range(ccc_range const *const r)
-{
-    return range_end(r);
-}
-
 ccc_rrange
 ccc_om_equal_rrange(ccc_ordered_map *s, void const *const rbegin_key,
                     void const *const end_key)
@@ -669,29 +615,6 @@ ccc_om_equal_rrange(ccc_ordered_map *s, void const *const rbegin_key,
         .rbegin = r.begin,
         .end = r.end,
     };
-}
-
-void *
-ccc_om_begin_rrange(ccc_rrange const *const rr)
-{
-    return rrange_begin(rr);
-}
-
-void *
-ccc_om_end_rrange(ccc_rrange const *rr)
-{
-    return rrange_end(rr);
-}
-
-bool
-ccc_om_const_contains(ccc_ordered_map *s, ccc_o_map_elem const *e)
-{
-    struct ccc_om_elem_ const *n = const_seek(&s->impl, &e->impl);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&s->impl, n);
 }
 
 void *
@@ -806,22 +729,6 @@ min(struct ccc_om_ const *t)
     for (; m->link[L] != &t->end; m = m->link[L])
     {}
     return struct_base(t, m);
-}
-
-static struct ccc_om_elem_ const *
-const_seek(struct ccc_om_ *const t, void const *const key)
-{
-    struct ccc_om_elem_ const *seek = t->root;
-    while (seek != &t->end)
-    {
-        ccc_threeway_cmp const cur_cmp = cmp(t, key, seek, t->cmp);
-        if (cur_cmp == CCC_EQL)
-        {
-            return seek;
-        }
-        seek = seek->link[CCC_GRT == cur_cmp];
-    }
-    return NULL;
 }
 
 static void *
@@ -950,30 +857,6 @@ equal_range(struct ccc_om_ *t, void const *begin_key, void const *end_key,
         .begin = b ? struct_base(t, b) : NULL,
         .end = e ? struct_base(t, e) : NULL,
     };
-}
-
-static void *
-range_begin(ccc_range const *const r)
-{
-    return r->begin;
-}
-
-static void *
-range_end(ccc_range const *const r)
-{
-    return r->end;
-}
-
-static void *
-rrange_begin(ccc_rrange const *const rr)
-{
-    return rr->rbegin;
-}
-
-static void *
-rrange_end(ccc_rrange const *const rr)
-{
-    return rr->end;
 }
 
 static void *
