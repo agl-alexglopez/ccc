@@ -91,51 +91,14 @@ void const *ccc_fhm_get(ccc_flat_hash_map *h, void const *key);
 void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 
 /*========================    Entry API    ==================================*/
-/** @brief Removes the entry stored at key, writing stored value to output.
-@param [in] h the hash table to query.
-@param [in] key the key used for the query matching stored key type.
-@param [in] the handle to the struct that will be returned from this function.
-@return a pointer to the struct wrapping out_handle if a value was present,
-NULL if no entry occupied the table at the provided key.
-@warning this function's side effect is overwriting the provided struct with
-the previous hash table entry if one existed.
 
-This function should be used when one wishes to preserve the old value if
-one is present. If such behavior is not needed see the entry API. */
+/** TODO */
 ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
-/** @brief Inserts the specified key and value into the hash table invariantly.
-@param [in] h the flat hash table being queried.
-@param [in] key the key being queried for insertion matching stored key type.
-@param [in] out_handle the handle to the struct inserted with the value.
-If a prior entry exists, It's content will be written to this container.
-@return an empty entry indicates no prior value was stored in the table. An
-occupied entry now points to the new value in the table. The old value
-has been written to the out_handle containing struct.
-@warning this function's side effect is overwriting the provided struct with
-the previous hash table entry if one existed.
-
-The hash elem handle must point to the embedded handle within the same struct
-type the user is storing in the table or the behavior is undefined.
-
-If the key did not exist in the table, an empty entry is returned and any
-get methods on it will yeild NULL/false. If a prior entry existed, the
-old entry from the table slot is swapped into the struct containing
-val_handle and the old table slot is overwritten with the new intended
-insertion. The new value in the table is returned as the entry. If such copy
-behavior is not needed consider using the entry api.
-
-If an insertion error occurs, due to a table resizing failure, a NULL and
-vacant entry is returned. Get methods will yeild false/NULL and the
-insertion error checking function will evaluate to true. */
+/** TODO */
 ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
-/** @brief Removes the provided entry if it is Occupied.
-@param [in] e the entry to be removed.
-@return true if e was Occupied and now has been removed, false if vacant.
-
-This method does nothing to help preserve the old value if one was present. If
-preserving the old value is of interest see the remove method. */
+/** TODO */
 ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry e);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
