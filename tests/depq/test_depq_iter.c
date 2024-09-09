@@ -1,6 +1,5 @@
 #include "depq_util.h"
 #include "double_ended_priority_queue.h"
-#include "generics.h"
 #include "test.h"
 
 #include <stdbool.h>

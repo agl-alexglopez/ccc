@@ -1,7 +1,5 @@
 #include "fhash_util.h"
 #include "flat_hash_map.h"
-#define CCC_GENERICS_SHORT_NAMES
-#include "generics.h"
 #include "test.h"
 #include "types.h"
 
@@ -260,7 +258,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
-            = FHM_INSERT_ENTRY(ENTRY(&fh, i), (struct val){i, i, {}});
+            = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, i), (struct val){i, i, {}});
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -270,7 +268,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
-            = FHM_INSERT_ENTRY(ENTRY(&fh, i), (struct val){i, i + 1, {}});
+            = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, i), (struct val){i, i + 1, {}});
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->val, i + 1, "%d");
@@ -306,7 +304,7 @@ fhash_test_entry_api_macros(void)
         /* The macros support functions that will only execute if the or
            insert branch executes. */
         struct val const *const d
-            = OR_INSERT(ENTRY(&fh, i), fhash_create(i, i));
+            = FHM_OR_INSERT(FHM_ENTRY(&fh, i), fhash_create(i, i));
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");

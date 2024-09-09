@@ -335,6 +335,12 @@ ccc_rom_end([[maybe_unused]] ccc_realtime_ordered_map const *const rom)
 }
 
 inline void *
+ccc_rom_rend([[maybe_unused]] ccc_realtime_ordered_map const *const rom)
+{
+    return NULL;
+}
+
+inline void *
 ccc_rom_rnext(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n

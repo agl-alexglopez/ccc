@@ -109,10 +109,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
     })
 
 #define CCC_IMPL_TREE_GET_MUT(tree_ptr, key...)                                \
-    ({                                                                         \
-        void *tree_get_mut_res_ = (void *)CCC_IMPL_TREE_GET(fhash_ptr, key);   \
-        tree_get_mut_res_;                                                     \
-    })
+    (void *)CCC_IMPL_TREE_GET(fhash_ptr, key)
 
 #define CCC_IMPL_TREE_AND_MODIFY(tree_entry, mod_fn)                           \
     ({                                                                         \

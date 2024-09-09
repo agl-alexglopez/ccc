@@ -26,6 +26,11 @@ void *ccc_sll_push_front(ccc_singly_linked_list *sll,
 void *ccc_sll_front(ccc_singly_linked_list const *sll);
 void ccc_sll_pop_front(ccc_singly_linked_list *sll);
 
+void *ccc_sll_begin(ccc_singly_linked_list const *sll);
+void *ccc_sll_end(ccc_singly_linked_list const *sll);
+void *ccc_sll_next(ccc_singly_linked_list const *sll,
+                   ccc_sll_elem const *iter_handle);
+
 ccc_sll_elem *ccc_sll_head(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);

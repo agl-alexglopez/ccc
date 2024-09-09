@@ -63,6 +63,33 @@ ccc_impl_sll_push_front(struct ccc_sll_ *const sll,
     ++sll->sz;
 }
 
+inline void *
+ccc_sll_begin(ccc_singly_linked_list const *const sll)
+{
+    if (!sll || sll->impl.sentinel.n == &sll->impl.sentinel)
+    {
+        return NULL;
+    }
+    return struct_base(&sll->impl, sll->impl.sentinel.n);
+}
+
+inline void *
+ccc_sll_end([[maybe_unused]] ccc_singly_linked_list const *const sll)
+{
+    return NULL;
+}
+
+inline void *
+ccc_sll_next(ccc_singly_linked_list const *const sll,
+             ccc_sll_elem const *const iter_handle)
+{
+    if (!iter_handle || iter_handle->impl.n == &sll->impl.sentinel)
+    {
+        return NULL;
+    }
+    return struct_base(&sll->impl, iter_handle->impl.n);
+}
+
 bool
 ccc_sll_validate(ccc_singly_linked_list const *const sll)
 {

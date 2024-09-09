@@ -43,6 +43,12 @@ void ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin,
 void *ccc_dll_begin(ccc_doubly_linked_list const *);
 void *ccc_dll_next(ccc_doubly_linked_list const *, ccc_dll_elem const *);
 
+void *ccc_dll_rbegin(ccc_doubly_linked_list const *);
+void *ccc_dll_rnext(ccc_doubly_linked_list const *, ccc_dll_elem const *);
+
+void *ccc_dll_end(ccc_doubly_linked_list const *);
+void *ccc_dll_rend(ccc_doubly_linked_list const *);
+
 ccc_dll_elem *ccc_dll_head(ccc_doubly_linked_list const *);
 ccc_dll_elem *ccc_dll_tail(ccc_doubly_linked_list const *);
 

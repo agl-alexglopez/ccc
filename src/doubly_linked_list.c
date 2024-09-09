@@ -172,6 +172,28 @@ ccc_dll_begin(ccc_doubly_linked_list const *const l)
 }
 
 void *
+ccc_dll_rbegin(ccc_doubly_linked_list const *const l)
+{
+    if (!l || l->impl.sentinel.p == &l->impl.sentinel)
+    {
+        return NULL;
+    }
+    return struct_base(&l->impl, l->impl.sentinel.p);
+}
+
+void *
+ccc_dll_end([[maybe_unused]] ccc_doubly_linked_list const *const l)
+{
+    return NULL;
+}
+
+void *
+ccc_dll_rend([[maybe_unused]] ccc_doubly_linked_list const *const l)
+{
+    return NULL;
+}
+
+void *
 ccc_dll_next(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
 {
     if (!e || e->impl.n == &l->impl.sentinel)
@@ -179,6 +201,16 @@ ccc_dll_next(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
         return NULL;
     }
     return struct_base(&l->impl, e->impl.n);
+}
+
+void *
+ccc_dll_rnext(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
+{
+    if (!e || e->impl.p == &l->impl.sentinel)
+    {
+        return NULL;
+    }
+    return struct_base(&l->impl, e->impl.p);
 }
 
 size_t

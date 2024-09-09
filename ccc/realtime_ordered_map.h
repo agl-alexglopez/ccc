@@ -24,7 +24,26 @@ typedef struct
         CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)
 
+#define ROM_GET(entry, key...) CCC_IMPL_ROM_GET(entry, key)
+
+#define ROM_GET_MUT(entry, key...) CCC_IMPL_ROM_GET_MUT(entry, key)
+
+#define ROM_AND_MODIFY(map_entry, mod_fn)                                      \
+    (ccc_rtom_entry)                                                           \
+    {                                                                          \
+        CCC_IMPL_ROM_AND_MODIFY(map_entry, mod_fn)                             \
+    }
+
+#define ROM_AND_MODIFY_W(map_entry, mod_fn, aux_data)                          \
+    (ccc_rtom_entry)                                                           \
+    {                                                                          \
+        CCC_IMPL_ROM_AND_MODIFY_WITH(map_entry, mod_fn, aux_data)              \
+    }
+
 #define ROM_OR_INSERT(entry, key_val...) CCC_IMPL_ROM_OR_INSERT(entry, key_val)
+
+#define ROM_INSERT_ENTRY(map_entry, key_value...)                              \
+    CCC_IMPL_ROM_INSERT_ENTRY(map_entry, key_value)
 
 bool ccc_rom_contains(ccc_realtime_ordered_map const *rom, void const *key);
 void const *ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key);
@@ -52,6 +71,7 @@ void *ccc_rom_rbegin(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_rnext(ccc_realtime_ordered_map *rom, ccc_rtom_elem const *);
 
 void *ccc_rom_end(ccc_realtime_ordered_map const *rom);
+void *ccc_rom_rend(ccc_realtime_ordered_map const *rom);
 
 size_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
 bool ccc_rom_empty(ccc_realtime_ordered_map const *rom);

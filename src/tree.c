@@ -208,19 +208,19 @@ ccc_depq_is_min(ccc_double_ended_priority_queue *const pq,
     return !ccc_depq_next(pq, e);
 }
 
-inline void *
+void *
 ccc_depq_begin(ccc_double_ended_priority_queue *pq)
 {
     return max(&pq->impl);
 }
 
-inline void *
+void *
 ccc_depq_rbegin(ccc_double_ended_priority_queue *pq)
 {
     return min(&pq->impl);
 }
 
-inline void *
+void *
 ccc_depq_next(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
 {
     struct ccc_om_elem_ const *const n
@@ -232,7 +232,7 @@ ccc_depq_next(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
     return struct_base(&pq->impl, n);
 }
 
-inline void *
+void *
 ccc_depq_rnext(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
 {
     struct ccc_om_elem_ const *const n
@@ -244,8 +244,14 @@ ccc_depq_rnext(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
     return struct_base(&pq->impl, n);
 }
 
-inline void *
+void *
 ccc_depq_end([[maybe_unused]] ccc_double_ended_priority_queue const *const pq)
+{
+    return NULL;
+}
+
+void *
+ccc_depq_rend([[maybe_unused]] ccc_double_ended_priority_queue const *const pq)
 {
     return NULL;
 }
@@ -552,13 +558,13 @@ ccc_om_get(ccc_ordered_map *s, void const *const key)
     return find(&s->impl, key);
 }
 
-inline void *
+void *
 ccc_om_unwrap_mut(ccc_o_map_entry e)
 {
     return (void *)ccc_om_unwrap(e);
 }
 
-inline void const *
+void const *
 ccc_om_unwrap(ccc_o_map_entry e)
 {
     if (e.impl.entry.status == CCC_OM_ENTRY_OCCUPIED)
@@ -582,6 +588,12 @@ ccc_om_rbegin(ccc_ordered_map *s)
 
 void *
 ccc_om_end([[maybe_unused]] ccc_ordered_map const *const s)
+{
+    return NULL;
+}
+
+void *
+ccc_om_rend([[maybe_unused]] ccc_ordered_map const *const s)
 {
     return NULL;
 }
@@ -675,20 +687,20 @@ ccc_om_validate(ccc_ordered_map const *const s)
 
 /*==========================  Private Interface  ============================*/
 
-inline void *
+void *
 ccc_impl_tree_key_in_slot(struct ccc_om_ const *const t, void const *const slot)
 {
     return (uint8_t *)slot + t->key_offset;
 }
 
-inline void *
+void *
 ccc_impl_tree_key_from_node(struct ccc_om_ const *const t,
                             struct ccc_om_elem_ const *const n)
 {
     return (uint8_t *)struct_base(t, n) + t->key_offset;
 }
 
-inline struct ccc_om_elem_ *
+struct ccc_om_elem_ *
 ccc_impl_tree_elem_in_slot(struct ccc_om_ const *t, void const *slot)
 {
 

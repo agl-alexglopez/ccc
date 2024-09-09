@@ -119,6 +119,8 @@ void *ccc_om_rbegin(ccc_ordered_map *);
 
 void *ccc_om_end(ccc_ordered_map const *);
 
+void *ccc_om_rend(ccc_ordered_map const *);
+
 void *ccc_om_next(ccc_ordered_map *, ccc_o_map_elem const *);
 
 void *ccc_om_rnext(ccc_ordered_map *, ccc_o_map_elem const *);

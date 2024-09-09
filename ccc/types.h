@@ -80,4 +80,12 @@ typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
 typedef uint64_t ccc_hash_fn(void const *to_hash);
 
+bool ccc_entry_occupied(ccc_entry e);
+bool ccc_entry_error(ccc_entry e);
+void *ccc_entry_unwrap(ccc_entry e);
+void *ccc_begin_range(ccc_range const *r);
+void *ccc_end_range(ccc_range const *r);
+void *ccc_begin_rrange(ccc_rrange const *r);
+void *ccc_end_rrange(ccc_rrange const *r);
+
 #endif /* CCC_TYPES_H */

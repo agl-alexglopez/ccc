@@ -74,6 +74,45 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         rom_ent_;                                                              \
     })
 
+#define CCC_IMPL_ROM_GET(rom_ptr, key...)                                      \
+    ({                                                                         \
+        __auto_type rom_get_ent_key_ = key;                                    \
+        struct ccc_rtom_entry_ rom_get_ent_                                    \
+            = ccc_impl_rom_entry((rom_ptr), &rom_get_ent_key_);                \
+        void const *const rom_get_res_ = NULL;                                 \
+        if (rom_get_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED)                \
+        {                                                                      \
+            rom_get_res_ = rom_get_ent_.entry.entry;                           \
+        }                                                                      \
+        rom_get_res_;                                                          \
+    })
+
+#define CCC_IMPL_ROM_GET_MUT(rom_ptr, key...)                                  \
+    (void *)CCC_IMPL_ROM_GET(rom_ptr, key)
+
+#define CCC_IMPL_ROM_AND_MODIFY(rom_entry, mod_fn)                             \
+    ({                                                                         \
+        struct ccc_om_entry_ rom_mod_ent_ = (rom_entry).impl;                  \
+        if (rom_mod_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED)                \
+        {                                                                      \
+            (mod_fn)(                                                          \
+                (ccc_update){.container = (void *const)e.entry, .aux = NULL}); \
+        }                                                                      \
+        rom_mod_ent_;                                                          \
+    })
+
+#define CCC_IMPL_ROM_AND_MODIFY_W(rom_entry, mod_fn, aux_data)                 \
+    ({                                                                         \
+        struct ccc_om_entry_ rom_mod_ent_ = (rom_entry).impl;                  \
+        if (rom_mod_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED)                \
+        {                                                                      \
+            __auto_type rom_aux_data_ = (aux_data);                            \
+            (mod_fn)((ccc_update){.container = (void *const)e.entry,           \
+                                  .aux = &rom_aux_data_});                     \
+        }                                                                      \
+        rom_mod_ent_;                                                          \
+    })
+
 #define CCC_IMPL_ROM_NEW_INSERT(entry_copy, key_val...)                        \
     ({                                                                         \
         void *rom_ins_alloc_ret_ = NULL;                                       \
@@ -92,6 +131,28 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
             }                                                                  \
         }                                                                      \
         rom_ins_alloc_ret_;                                                    \
+    })
+
+#define CCC_IMPL_ROM_INSERT_ENTRY(rom_entry, key_value...)                     \
+    ({                                                                         \
+        struct ccc_om_entry_ rom_ins_ent_ = (rom_entry).impl;                  \
+        void *rom_ins_ent_ret_ = NULL;                                         \
+        if (!(rom_ins_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED))             \
+        {                                                                      \
+            rom_ins_ent_ret_                                                   \
+                = CCC_IMPL_ROM_NEW_INSERT(rom_ins_ent_, key_value);            \
+        }                                                                      \
+        else if (rom_ins_ent_.entry.status == CCC_ROM_ENTRY_OCCUPIED)          \
+        {                                                                      \
+            struct ccc_om_elem_ ins_ent_saved_ = *ccc_impl_rom_elem_in_slot(   \
+                rom_ins_ent_.t, rom_ins_ent_.entry.entry);                     \
+            *((typeof(key_value) *)rom_ins_ent_.entry.entry) = key_value;      \
+            *ccc_impl_rom_elem_in_slot(rom_ins_ent_.rom,                       \
+                                       rom_ins_ent_.entry.entry)               \
+                = ins_ent_saved_;                                              \
+            rom_ins_ent_ret_ = rom_ins_ent_.entry.entry;                       \
+        }                                                                      \
+        rom_ins_ent_ret_;                                                      \
     })
 
 #define CCC_IMPL_ROM_OR_INSERT(entry_copy, key_val...)                         \

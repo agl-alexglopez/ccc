@@ -45,14 +45,14 @@ struct lru_request
     union {
         void (*put)(struct lru_cache *, int, int);
         int (*get)(struct lru_cache *, int);
-        struct key_val *(*hed)(struct lru_cache *);
+        struct key_val *(*head)(struct lru_cache *);
     };
 };
 
 static enum test_result run_lru_cache(void);
 static void put(struct lru_cache *, int key, int val);
 static int get(struct lru_cache *, int key);
-static struct key_val *hed(struct lru_cache *);
+static struct key_val *head(struct lru_cache *);
 static bool lru_lookup_cmp(ccc_key_cmp);
 
 static ccc_threeway_cmp cmp_by_key(ccc_cmp cmp);
@@ -91,13 +91,13 @@ run_lru_cache(void)
         {PUT, .key = 2, .val = 2, .put = put},
         {GET, .key = 1, .val = 1, .get = get},
         {PUT, .key = 3, .val = 3, .put = put},
-        {HED, .key = 3, .val = 3, .hed = hed},
+        {HED, .key = 3, .val = 3, .head = head},
         {PUT, .key = 4, .val = 4, .put = put},
         {GET, .key = 2, .val = -1, .get = get},
         {GET, .key = 3, .val = 3, .get = get},
         {GET, .key = 4, .val = 4, .get = get},
         {GET, .key = 2, .val = -1, .get = get},
-        {HED, .key = 4, .val = 4, .hed = hed},
+        {HED, .key = 4, .val = 4, .head = head},
     };
     for (size_t i = 0; i < REQS; ++i)
     {
@@ -120,8 +120,8 @@ run_lru_cache(void)
         case HED:
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(requests[i].hed(&lru)->key, requests[i].key, "%d");
-            CHECK(requests[i].hed(&lru)->val, requests[i].val, "%d");
+            CHECK(requests[i].head(&lru)->key, requests[i].key, "%d");
+            CHECK(requests[i].head(&lru)->val, requests[i].val, "%d");
             break;
         default:
             break;
@@ -133,10 +133,10 @@ run_lru_cache(void)
 }
 
 static void
-put(struct lru_cache *const lru, int key, int val)
+put(struct lru_cache *const lru, int const key, int const val)
 {
     ccc_fh_map_entry const ent = FHM_ENTRY(&lru->fh, key);
-    struct lru_lookup const *found = ccc_fhm_unwrap(ent);
+    struct lru_lookup const *const found = ccc_fhm_unwrap(ent);
     if (found)
     {
         found->kv_in_list->key = key;
@@ -144,12 +144,10 @@ put(struct lru_cache *const lru, int key, int val)
         ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
         return;
     }
-    FHM_INSERT_ENTRY(ent,
-                     (struct lru_lookup){
-                         .key = key,
-                         .kv_in_list = DLL_EMPLACE_FRONT(
-                             &lru->l, (struct key_val){.key = key, .val = val}),
-                     });
+    struct lru_lookup *const new
+        = FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
+    new->kv_in_list
+        = DLL_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
@@ -159,9 +157,9 @@ put(struct lru_cache *const lru, int key, int val)
 }
 
 static int
-get(struct lru_cache *const lru, int key)
+get(struct lru_cache *const lru, int const key)
 {
-    struct lru_lookup const *found = ccc_fhm_unwrap(FHM_ENTRY(&lru->fh, key));
+    struct lru_lookup const *const found = ccc_fhm_get(&lru->fh, &key);
     if (!found)
     {
         return -1;
@@ -171,7 +169,7 @@ get(struct lru_cache *const lru, int key)
 }
 
 static struct key_val *
-hed(struct lru_cache *const lru)
+head(struct lru_cache *const lru)
 {
     return ccc_dll_front(&lru->l);
 }
