@@ -419,11 +419,12 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                        realloc, hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_queue bfs = CCC_FQ_INIT(NULL, 0, struct point, realloc);
-    [[maybe_unused]] struct parent_cell *pc = FHM_INSERT_ENTRY(
-        FHM_ENTRY(&parent_map, src->pos), (struct parent_cell){
-                                              .key = src->pos,
-                                              .parent = (struct point){-1, -1},
-                                          });
+    [[maybe_unused]] struct parent_cell *pc
+        = CCC_FHM_INSERT_ENTRY(CCC_FHM_ENTRY(&parent_map, src->pos),
+                               (struct parent_cell){
+                                   .key = src->pos,
+                                   .parent = (struct point){-1, -1},
+                               });
     assert(pc);
     ccc_fq_push(&bfs, &src->pos);
     bool success = false;
@@ -715,7 +716,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         }
         for (int i = 0; i < MAX_DEGREE && cur->v->edges[i].name; ++i)
         {
-            struct prev_vertex *next = FHM_GET_MUT(
+            struct prev_vertex *next = CCC_FHM_GET_MUT(
                 &prev_map, vertex_at(graph, cur->v->edges[i].name));
             assert(next);
             /* The seen map also holds a pointer to the corresponding
@@ -738,12 +739,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = FHM_GET(&prev_map, v);
+        struct prev_vertex const *prev = CCC_FHM_GET(&prev_map, v);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = FHM_GET(&prev_map, prev->prev);
+            prev = CCC_FHM_GET(&prev_map, prev->prev);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -768,12 +769,12 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
             .v = v,
             .dist = v == pr->src ? 0 : INT_MAX,
         };
-        struct prev_vertex const *const inserted
-            = FHM_INSERT_ENTRY(FHM_ENTRY(prev_map, p->v), (struct prev_vertex){
-                                                              .v = p->v,
-                                                              .prev = NULL,
-                                                              .dist_point = p,
-                                                          });
+        struct prev_vertex const *const inserted = CCC_FHM_INSERT_ENTRY(
+            CCC_FHM_ENTRY(prev_map, p->v), (struct prev_vertex){
+                                               .v = p->v,
+                                               .prev = NULL,
+                                               .dist_point = p,
+                                           });
         if (!inserted)
         {
             quit("inserting into map in in loading phase failed.\n", 1);

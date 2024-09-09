@@ -48,32 +48,32 @@ typedef struct
     CCC_TREE_INIT(struct_name, set_elem_field, key_elem_field, set_name,       \
                   alloc_fn, key_cmp, aux)
 
-#define OM_ENTRY(map_ptr, key...)                                              \
+#define CCC_OM_ENTRY(map_ptr, key...)                                          \
     (ccc_o_map_entry)                                                          \
     {                                                                          \
         CCC_IMPL_TREE_ENTRY(map_ptr, key)                                      \
     }
 
-#define OM_GET(map_ptr, key...) CCC_IMPL_TREE_GET(map_ptr, key)
+#define CCC_OM_GET(map_ptr, key...) CCC_IMPL_TREE_GET(map_ptr, key)
 
-#define OM_GET_MUT(map_ptr, key...) CCC_IMPL_TREE_GET_MUT(map_ptr, key)
+#define CCC_OM_GET_MUT(map_ptr, key...) CCC_IMPL_TREE_GET_MUT(map_ptr, key)
 
-#define OM_AND_MODIFY(map_entry, mod_fn)                                       \
+#define CCC_OM_AND_MODIFY(map_entry, mod_fn)                                   \
     (ccc_o_map_entry)                                                          \
     {                                                                          \
         CCC_IMPL_TREE_AND_MODIFY(map_entry, mod_fn)                            \
     }
 
-#define OM_AND_MODIFY_W(map_entry, mod_fn, aux_data)                           \
+#define CCC_OM_AND_MODIFY_W(map_entry, mod_fn, aux_data)                       \
     (ccc_o_map_entry)                                                          \
     {                                                                          \
         CCC_IMPL_TREE_AND_MODIFY_WITH(map_entry, mod_fn, aux_data)             \
     }
 
-#define OM_INSERT_ENTRY(map_entry, key_value...)                               \
+#define CCC_OM_INSERT_ENTRY(map_entry, key_value...)                           \
     CCC_IMPL_TREE_INSERT_ENTRY(map_entry, key_value)
 
-#define OM_OR_INSERT(map_entry, key_value...)                                  \
+#define CCC_OM_OR_INSERT(map_entry, key_value...)                              \
     CCC_IMPL_TREE_OR_INSERT(map_entry, key_value)
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);

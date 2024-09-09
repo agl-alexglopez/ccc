@@ -135,7 +135,7 @@ run_lru_cache(void)
 static void
 put(struct lru_cache *const lru, int const key, int const val)
 {
-    ccc_fh_map_entry const ent = FHM_ENTRY(&lru->fh, key);
+    ccc_fh_map_entry const ent = CCC_FHM_ENTRY(&lru->fh, key);
     struct lru_lookup const *const found = ccc_fhm_unwrap(ent);
     if (found)
     {
@@ -145,13 +145,13 @@ put(struct lru_cache *const lru, int const key, int const val)
         return;
     }
     struct lru_lookup *const new
-        = FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
+        = CCC_FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
     new->kv_in_list
         = DLL_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
-        ccc_fhm_remove_entry(FHM_ENTRY(&lru->fh, to_drop->key));
+        ccc_fhm_remove_entry(CCC_FHM_ENTRY(&lru->fh, to_drop->key));
         ccc_dll_pop_back(&lru->l);
     }
 }

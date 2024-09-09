@@ -69,17 +69,19 @@ map_test_insert_three(void)
     CHECK(ins->id, 137, "%d");
     CHECK(swap_slot.val, 1, "%d");
     CHECK(swap_slot.id, 99, "%d");
-    ins = OM_OR_INSERT(OM_ENTRY(&s, 2), (struct val){.val = 2, .id = 0});
+    ins = CCC_OM_OR_INSERT(CCC_OM_ENTRY(&s, 2),
+                           (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true, "%d");
     CHECK(ins->id, 0, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)2, "%zu");
-    ins = OM_INSERT_ENTRY(OM_ENTRY(&s, 2), (struct val){.val = 2, .id = 1});
+    ins = CCC_OM_INSERT_ENTRY(CCC_OM_ENTRY(&s, 2),
+                              (struct val){.val = 2, .id = 1});
     CHECK(ins != NULL, true, "%d");
     CHECK(ins->id, 1, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)2, "%zu");
-    ins = OM_INSERT_ENTRY(OM_ENTRY(&s, 3), (struct val){.val = 3});
+    ins = CCC_OM_INSERT_ENTRY(CCC_OM_ENTRY(&s, 3), (struct val){.val = 3});
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)3, "%zu");
     ccc_om_clear(&s, NULL);
