@@ -269,7 +269,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     return (ccc_entry){.entry = removed, .status = CCC_ENTRY_OCCUPIED};
 }
 
-void const *
+inline void const *
 ccc_rom_unwrap(ccc_rtom_entry e)
 {
     if (e.impl.entry.status & CCC_ROM_ENTRY_OCCUPIED)
@@ -279,7 +279,7 @@ ccc_rom_unwrap(ccc_rtom_entry e)
     return NULL;
 }
 
-void *
+inline void *
 ccc_rom_unwrap_mut(ccc_rtom_entry e)
 {
     if (e.impl.entry.status & CCC_ROM_ENTRY_OCCUPIED)
@@ -302,14 +302,14 @@ min_max_from(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ *start,
     return start;
 }
 
-void *
+inline void *
 ccc_rom_begin(ccc_realtime_ordered_map const *rom)
 {
     struct ccc_rtom_elem_ *m = min_max_from(&rom->impl, rom->impl.root, min);
     return m == &rom->impl.end ? NULL : struct_base(&rom->impl, m);
 }
 
-void *
+inline void *
 ccc_rom_next(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n
@@ -321,14 +321,20 @@ ccc_rom_next(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
     return struct_base(&rom->impl, n);
 }
 
-void *
+inline void *
 ccc_rom_rbegin(ccc_realtime_ordered_map const *const rom)
 {
     struct ccc_rtom_elem_ *m = min_max_from(&rom->impl, rom->impl.root, max);
     return m == &rom->impl.end ? NULL : struct_base(&rom->impl, m);
 }
 
-void *
+inline void *
+ccc_rom_end([[maybe_unused]] ccc_realtime_ordered_map const *const rom)
+{
+    return NULL;
+}
+
+inline void *
 ccc_rom_rnext(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n
@@ -340,19 +346,19 @@ ccc_rom_rnext(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
     return struct_base(&rom->impl, n);
 }
 
-size_t
+inline size_t
 ccc_rom_size(ccc_realtime_ordered_map const *const rom)
 {
     return rom->impl.sz;
 }
 
-bool
+inline bool
 ccc_rom_empty(ccc_realtime_ordered_map const *const rom)
 {
     return !rom->impl.sz;
 }
 
-void *
+inline void *
 ccc_rom_root(ccc_realtime_ordered_map const *rom)
 {
     if (!rom || rom->impl.root == &rom->impl.end)

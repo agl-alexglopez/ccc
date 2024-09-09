@@ -1,3 +1,4 @@
+#define CCC_GENERICS_SHORT_NAMES
 #include "generics.h"
 #include "map_util.h"
 #include "ordered_map.h"
@@ -45,8 +46,7 @@ map_test_forward_iter(void)
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct val *e = ccc_om_begin(&s); e;
-         e = ccc_om_next(&s, &e->elem), ++j)
+    for (struct val *e = BEGIN(&s); e != END(&s); e = NEXT(&s, &e->elem), ++j)
     {}
     CHECK(j, 0, "%d");
     int const num_nodes = 33;

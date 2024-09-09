@@ -76,6 +76,8 @@ void *ccc_depq_next(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 
 void *ccc_depq_rnext(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
 
+void *ccc_depq_end(ccc_double_ended_priority_queue const *);
+
 ccc_range ccc_depq_equal_range(ccc_double_ended_priority_queue *,
                                void const *begin_key, void const *end_key);
 

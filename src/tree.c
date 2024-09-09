@@ -208,19 +208,19 @@ ccc_depq_is_min(ccc_double_ended_priority_queue *const pq,
     return !ccc_depq_next(pq, e);
 }
 
-void *
+inline void *
 ccc_depq_begin(ccc_double_ended_priority_queue *pq)
 {
     return max(&pq->impl);
 }
 
-void *
+inline void *
 ccc_depq_rbegin(ccc_double_ended_priority_queue *pq)
 {
     return min(&pq->impl);
 }
 
-void *
+inline void *
 ccc_depq_next(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
 {
     struct ccc_om_elem_ const *const n
@@ -232,7 +232,7 @@ ccc_depq_next(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
     return struct_base(&pq->impl, n);
 }
 
-void *
+inline void *
 ccc_depq_rnext(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
 {
     struct ccc_om_elem_ const *const n
@@ -242,6 +242,12 @@ ccc_depq_rnext(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
         return NULL;
     }
     return struct_base(&pq->impl, n);
+}
+
+inline void *
+ccc_depq_end([[maybe_unused]] ccc_double_ended_priority_queue const *const pq)
+{
+    return NULL;
 }
 
 ccc_range
@@ -572,6 +578,12 @@ void *
 ccc_om_rbegin(ccc_ordered_map *s)
 {
     return max(&s->impl);
+}
+
+void *
+ccc_om_end([[maybe_unused]] ccc_ordered_map const *const s)
+{
+    return NULL;
 }
 
 void *

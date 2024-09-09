@@ -42,6 +42,12 @@ void *dumb_sfinae(void);
         ccc_realtime_ordered_map *: ccc_rom_rnext)((container_ptr),            \
                                                    (iter_elem_ptr))
 
+#define CCC_IMPL_END(container_ptr)                                            \
+    _Generic((container_ptr),                                                  \
+        ccc_double_ended_priority_queue *: ccc_depq_end,                       \
+        ccc_ordered_map *: ccc_om_end,                                         \
+        ccc_realtime_ordered_map *: ccc_rom_end)(container_ptr)
+
 #define CCC_IMPL_ENTRY(container_ptr, key...)                                  \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map                                                      \

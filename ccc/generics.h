@@ -14,6 +14,8 @@
 #define CCC_RNEXT(container_ptr, void_iter_ptr)                                \
     CCC_IMPL_RNEXT(container_ptr, void_iter_ptr)
 
+#define CCC_END(container_ptr) CCC_IMPL_END(container_ptr)
+
 #define CCC_ENTRY(container_ptr, key...) CCC_IMPL_ENTRY(container_ptr, key)
 
 #define CCC_OR_INSERT(entry, key_val...) CCC_IMPL_OR_INSERT(entry, key_val)
@@ -33,6 +35,7 @@ void *ccc_end_rrange(ccc_rrange const *);
 #    define RBEGIN CCC_RBEGIN
 #    define NEXT CCC_NEXT
 #    define RNEXT CCC_RNEXT
+#    define END CCC_END
 #    define ENTRY CCC_ENTRY
 #    define OR_INSERT CCC_OR_INSERT
 #    define entry_occupied ccc_entry_occupied

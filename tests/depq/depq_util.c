@@ -1,4 +1,5 @@
 #include "depq_util.h"
+#define CCC_GENERICS_SHORT_NAMES
 #include "generics.h"
 #include "test.h"
 
@@ -57,7 +58,7 @@ inorder_fill(int vals[], size_t size, ccc_double_ended_priority_queue *pq)
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = CCC_RBEGIN(pq); e; e = CCC_RNEXT(pq, &e->elem))
+    for (struct val *e = RBEGIN(pq); e != END(pq); e = RNEXT(pq, &e->elem))
     {
         vals[i++] = e->val;
     }

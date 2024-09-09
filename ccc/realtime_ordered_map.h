@@ -51,6 +51,8 @@ void *ccc_rom_next(ccc_realtime_ordered_map *rom, ccc_rtom_elem const *);
 void *ccc_rom_rbegin(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_rnext(ccc_realtime_ordered_map *rom, ccc_rtom_elem const *);
 
+void *ccc_rom_end(ccc_realtime_ordered_map const *rom);
+
 size_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
 bool ccc_rom_empty(ccc_realtime_ordered_map const *rom);
 

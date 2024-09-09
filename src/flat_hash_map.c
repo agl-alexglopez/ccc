@@ -247,7 +247,7 @@ ccc_fhm_insert_error(ccc_fh_map_entry e)
     return e.impl.entry.status & CCC_FHM_ENTRY_INSERT_ERROR;
 }
 
-void *
+inline void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
     if (ccc_buf_empty(&h->impl.buf))
@@ -259,10 +259,10 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
            && ccc_impl_fhm_in_slot(&h->impl, iter)->hash == CCC_FHM_EMPTY;
          iter = ccc_buf_next(&h->impl.buf, iter))
     {}
-    return iter;
+    return iter == ccc_buf_capacity_end(&h->impl.buf) ? NULL : iter;
 }
 
-void *
+inline void *
 ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
 {
     void *i = struct_base(&h->impl, &iter->impl);
@@ -271,13 +271,13 @@ ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
          && ccc_impl_fhm_in_slot(&h->impl, i)->hash == CCC_FHM_EMPTY;
          i = ccc_buf_next(&h->impl.buf, i))
     {}
-    return i;
+    return i == ccc_buf_capacity_end(&h->impl.buf) ? NULL : i;
 }
 
-void *
-ccc_fhm_end(ccc_flat_hash_map const *const h)
+inline void *
+ccc_fhm_end([[maybe_unused]] ccc_flat_hash_map const *const h)
 {
-    return ccc_buf_capacity_end(&h->impl.buf);
+    return NULL;
 }
 
 static inline ccc_entry
