@@ -57,7 +57,7 @@ inorder_fill(int vals[], size_t size, ccc_double_ended_priority_queue *pq)
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = C_RBEGIN(pq); e; e = C_RNEXT(pq, &e->elem))
+    for (struct val *e = CCC_RBEGIN(pq); e; e = CCC_RNEXT(pq, &e->elem))
     {
         vals[i++] = e->val;
     }

@@ -207,27 +207,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
 ccc_rtom_entry
 ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
 {
-
-    struct rtom_query q = find(&rom->impl, key);
-    if (CCC_EQL == q.last_cmp)
-    {
-        return (ccc_rtom_entry){{
-            .rom = (struct ccc_rtom_ *)&rom->impl,
-            .last_cmp = q.last_cmp,
-            .entry = {
-                .entry = struct_base(&rom->impl, q.found), 
-                .status = CCC_ROM_ENTRY_OCCUPIED,
-            },
-        }};
-    }
-    return (ccc_rtom_entry){{
-        .rom = (struct ccc_rtom_ *)&rom->impl,
-        .last_cmp = q.last_cmp,
-        .entry = {
-            .entry = struct_base(&rom->impl,q.parent), 
-            .status = CCC_ROM_ENTRY_VACANT,
-        },
-    }};
+    return (ccc_rtom_entry){ccc_impl_rom_entry(&rom->impl, key)};
 }
 
 void *
@@ -395,6 +375,51 @@ ccc_rom_print(ccc_realtime_ordered_map const *const rom, ccc_print_fn *const fn)
 }
 
 /*=========================   Private Interface  ============================*/
+
+struct ccc_rtom_entry_
+ccc_impl_rom_entry(struct ccc_rtom_ const *const rom, void const *const key)
+{
+    struct rtom_query q = find(rom, key);
+    if (CCC_EQL == q.last_cmp)
+    {
+        return (struct ccc_rtom_entry_){
+            .rom = (struct ccc_rtom_ *)rom,
+            .last_cmp = q.last_cmp,
+            .entry = {
+                .entry = struct_base(rom, q.found), 
+                .status = CCC_ROM_ENTRY_OCCUPIED,
+            },
+        };
+    }
+    return (struct ccc_rtom_entry_){
+        .rom = (struct ccc_rtom_ *)rom,
+        .last_cmp = q.last_cmp,
+        .entry = {
+            .entry = struct_base(rom,q.parent), 
+            .status = CCC_ROM_ENTRY_VACANT,
+        },
+    };
+}
+
+void *
+ccc_impl_rom_insert(struct ccc_rtom_ *const rom,
+                    struct ccc_rtom_elem_ *const parent,
+                    ccc_threeway_cmp const last_cmp,
+                    struct ccc_rtom_elem_ *const out_handle)
+{
+    init_node(rom, out_handle);
+    assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
+    bool const rank_rule_break
+        = parent->link[L] == &rom->end && parent->link[R] == &rom->end;
+    parent->link[CCC_GRT == last_cmp] = out_handle;
+    out_handle->parent = parent;
+    if (rank_rule_break)
+    {
+        insert_fixup(rom, parent, out_handle);
+    }
+    ++rom->sz;
+    return struct_base(rom, out_handle);
+}
 
 void *
 ccc_impl_rom_key_from_node(struct ccc_rtom_ const *const rom,

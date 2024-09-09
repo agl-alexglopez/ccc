@@ -24,6 +24,8 @@ typedef struct
         CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)
 
+#define ROM_OR_INSERT(entry, key_val...) CCC_IMPL_ROM_OR_INSERT(entry, key_val)
+
 bool ccc_rom_contains(ccc_realtime_ordered_map const *rom, void const *key);
 void const *ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key);
 void *ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key);
