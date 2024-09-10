@@ -67,8 +67,8 @@ typedef enum
 #define PRINTER_INDENT (short)13
 #define LR 2
 
-om_link const inorder_traversal = L;
-om_link const reverse_inorder_traversal = R;
+om_link const inorder_traversal = R;
+om_link const reverse_inorder_traversal = L;
 
 /* =======================        Prototypes         ====================== */
 
@@ -114,15 +114,15 @@ static struct ccc_om_elem_ *
 pop_front_dup(struct ccc_om_ *, struct ccc_om_elem_ *, void const *old_key);
 static struct ccc_om_elem_ *remove_from_tree(struct ccc_om_ *,
                                              struct ccc_om_elem_ *);
-static struct ccc_om_elem_ const *next(struct ccc_om_ *,
+static struct ccc_om_elem_ const *next(struct ccc_om_ const *,
                                        struct ccc_om_elem_ const *, om_link);
 static struct ccc_om_elem_ const *
-multimap_next(struct ccc_om_ *, struct ccc_om_elem_ const *, om_link);
+multimap_next(struct ccc_om_ const *, struct ccc_om_elem_ const *, om_link);
 static struct ccc_om_elem_ *splay(struct ccc_om_ *, struct ccc_om_elem_ *,
                                   void const *key, ccc_key_cmp_fn *);
 static struct ccc_om_elem_ const *
-next_tree_node(struct ccc_om_ *, struct ccc_om_elem_ const *, om_link);
-static struct ccc_om_elem_ *get_parent(struct ccc_om_ *,
+next_tree_node(struct ccc_om_ const *, struct ccc_om_elem_ const *, om_link);
+static struct ccc_om_elem_ *get_parent(struct ccc_om_ const *,
                                        struct ccc_om_elem_ const *);
 
 /* Comparison function returns */
@@ -209,39 +209,33 @@ ccc_depq_is_min(ccc_double_ended_priority_queue *const pq,
 }
 
 void *
-ccc_depq_begin(ccc_double_ended_priority_queue *pq)
+ccc_depq_begin(ccc_double_ended_priority_queue const *const pq)
 {
     return max(&pq->impl);
 }
 
 void *
-ccc_depq_rbegin(ccc_double_ended_priority_queue *pq)
+ccc_depq_rbegin(ccc_double_ended_priority_queue const *const pq)
 {
     return min(&pq->impl);
 }
 
 void *
-ccc_depq_next(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
+ccc_depq_next(ccc_double_ended_priority_queue const *const pq,
+              ccc_depq_elem const *e)
 {
     struct ccc_om_elem_ const *const n
         = multimap_next(&pq->impl, &e->impl, reverse_inorder_traversal);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return n == &pq->impl.end ? NULL : struct_base(&pq->impl, n);
 }
 
 void *
-ccc_depq_rnext(ccc_double_ended_priority_queue *pq, ccc_depq_elem const *e)
+ccc_depq_rnext(ccc_double_ended_priority_queue const *const pq,
+               ccc_depq_elem const *e)
 {
     struct ccc_om_elem_ const *const n
         = multimap_next(&pq->impl, &e->impl, inorder_traversal);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl, n);
+    return n == &pq->impl.end ? NULL : struct_base(&pq->impl, n);
 }
 
 void *
@@ -575,13 +569,13 @@ ccc_om_unwrap(ccc_o_map_entry e)
 }
 
 void *
-ccc_om_begin(ccc_ordered_map *s)
+ccc_om_begin(ccc_ordered_map const *const s)
 {
     return min(&s->impl);
 }
 
 void *
-ccc_om_rbegin(ccc_ordered_map *s)
+ccc_om_rbegin(ccc_ordered_map const *const s)
 {
     return max(&s->impl);
 }
@@ -599,26 +593,18 @@ ccc_om_rend([[maybe_unused]] ccc_ordered_map const *const s)
 }
 
 void *
-ccc_om_next(ccc_ordered_map *s, ccc_o_map_elem const *e)
+ccc_om_next(ccc_ordered_map const *const s, ccc_o_map_elem const *const e)
 {
     struct ccc_om_elem_ const *n = next(&s->impl, &e->impl, inorder_traversal);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&s->impl, n);
+    return n == &s->impl.end ? NULL : struct_base(&s->impl, n);
 }
 
 void *
-ccc_om_rnext(ccc_ordered_map *s, ccc_o_map_elem const *e)
+ccc_om_rnext(ccc_ordered_map const *const s, ccc_o_map_elem const *const e)
 {
     struct ccc_om_elem_ const *n
         = next(&s->impl, &e->impl, reverse_inorder_traversal);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&s->impl, n);
+    return n == &s->impl.end ? NULL : struct_base(&s->impl, n);
 }
 
 ccc_range
@@ -774,13 +760,13 @@ is_dup_head_next(struct ccc_om_elem_ const *i)
 }
 
 static inline bool
-is_dup_head(struct ccc_om_elem_ *end, struct ccc_om_elem_ const *i)
+is_dup_head(struct ccc_om_elem_ const *const end, struct ccc_om_elem_ const *i)
 {
     return i != end && i->link[P] != end && i->link[P]->link[N] == i;
 }
 
 static struct ccc_om_elem_ const *
-multimap_next(struct ccc_om_ *t, struct ccc_om_elem_ const *i,
+multimap_next(struct ccc_om_ const *const t, struct ccc_om_elem_ const *i,
               om_link const traversal)
 {
     /* An arbitrary node in a doubly linked list of duplicates. */
@@ -811,8 +797,8 @@ multimap_next(struct ccc_om_ *t, struct ccc_om_elem_ const *i,
 }
 
 static inline struct ccc_om_elem_ const *
-next_tree_node(struct ccc_om_ *t, struct ccc_om_elem_ const *head,
-               om_link const traversal)
+next_tree_node(struct ccc_om_ const *const t,
+               struct ccc_om_elem_ const *const head, om_link const traversal)
 {
     if (head->parent_or_dups == &t->end)
     {
@@ -827,34 +813,39 @@ next_tree_node(struct ccc_om_ *t, struct ccc_om_elem_ const *head,
     {
         return next(t, parent->link[R], traversal);
     }
-    return NULL;
+    return &t->end;
 }
 
 static struct ccc_om_elem_ const *
-next(struct ccc_om_ *t, struct ccc_om_elem_ const *n, om_link const traversal)
+next(struct ccc_om_ const *const t, struct ccc_om_elem_ const *n,
+     om_link const traversal)
 {
-    if (!n || n == &t->end || get_parent(t, t->root) != &t->end)
+    if (!n || n == &t->end)
     {
         return NULL;
     }
-    /* Using a helper node simplifies the code greatly. */
-    t->end.link[traversal] = t->root;
-    t->end.link[!traversal] = &t->end;
+    assert(get_parent(t, t->root) == &t->end);
     /* The node is a parent, backtracked to, or the end. */
-    if (n->link[!traversal] != &t->end)
+    if (n->link[traversal] != &t->end)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = n->link[!traversal]; n->link[traversal] != &t->end;
-             n = n->link[traversal])
+        for (n = n->link[traversal]; n->link[!traversal] != &t->end;
+             n = n->link[!traversal])
         {}
         return n;
     }
-    /* A leaf. Work our way back up skpping nodes we already visited. */
+    /* A leaf. Now it is time to visit the closest parent not yet visited.
+       The old stack overflow question I read about this type of iteration
+       (Boost's method, can't find the post anymore?) had the sentinel node
+       make the root its traversal child, but this means we would have to
+       write to the sentinel on every call to next. I want multiple threads to
+       iterate freely without undefined data race writes to memory locations.
+       So more expensive loop.*/
     struct ccc_om_elem_ *p = get_parent(t, n);
-    for (; p->link[!traversal] == n; n = p, p = get_parent(t, p))
+    for (; p != &t->end && p->link[!traversal] != n;
+         n = p, p = get_parent(t, n))
     {}
-    /* This is where the end node is helpful. We get to it eventually. */
-    return p == &t->end ? NULL : p;
+    return p;
 }
 
 static ccc_range
@@ -866,7 +857,7 @@ equal_range(struct ccc_om_ *t, void const *begin_key, void const *end_key,
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
-    ccc_threeway_cmp const grt_or_les[2] = {CCC_GRT, CCC_LES};
+    ccc_threeway_cmp const grt_or_les[2] = {CCC_LES, CCC_GRT};
     struct ccc_om_elem_ const *b = splay(t, t->root, begin_key, t->cmp);
     if (cmp(t, begin_key, b, t->cmp) == grt_or_les[traversal])
     {
@@ -878,8 +869,8 @@ equal_range(struct ccc_om_ *t, void const *begin_key, void const *end_key,
         e = next(t, e, traversal);
     }
     return (ccc_range){
-        .begin = b ? struct_base(t, b) : NULL,
-        .end = e ? struct_base(t, e) : NULL,
+        .begin = b == &t->end ? NULL : struct_base(t, b),
+        .end = e == &t->end ? NULL : struct_base(t, e),
     };
 }
 
@@ -1302,7 +1293,7 @@ has_dups(struct ccc_om_elem_ const *const end,
 }
 
 static inline struct ccc_om_elem_ *
-get_parent(struct ccc_om_ *t, struct ccc_om_elem_ const *n)
+get_parent(struct ccc_om_ const *const t, struct ccc_om_elem_ const *const n)
 {
     return has_dups(&t->end, n) ? n->parent_or_dups->parent_or_dups
                                 : n->parent_or_dups;

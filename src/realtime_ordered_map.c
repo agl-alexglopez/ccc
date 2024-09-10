@@ -69,8 +69,8 @@ struct rtom_query
     };
 };
 
-enum rtom_link const inorder_traversal = L;
-enum rtom_link const reverse_inorder_traversal = R;
+enum rtom_link const inorder_traversal = R;
+enum rtom_link const reverse_inorder_traversal = L;
 
 enum rtom_link const min = L;
 enum rtom_link const max = R;
@@ -573,34 +573,34 @@ find(struct ccc_rtom_ const *const rom, void const *const key)
 }
 
 static struct ccc_rtom_elem_ const *
-next(struct ccc_rtom_ *const t, struct ccc_rtom_elem_ const *n,
-     enum rtom_link traversal)
+next(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ const *n,
+     enum rtom_link const traversal)
 {
-    if (!n || n == &t->end)
+    if (!n || n == &rom->end)
     {
-        return &t->end;
+        return &rom->end;
     }
-    assert(t->root->parent == &t->end);
-    /* This setup helps when once all nodes are visited. When ascending up to
-       the root, traversal stops because the sentinel has root as child in the
-       traversal direction. Iterator steps up to sentinel and terminates. */
-    t->end.link[traversal] = t->root;
-    t->end.link[!traversal] = &t->end;
+    assert(rom->root->parent == &rom->end);
     /* The node is an internal one that has a subtree to explore first. */
-    if (n->link[!traversal] != &t->end)
+    if (n->link[traversal] != &rom->end)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = n->link[!traversal]; n->link[traversal] != &t->end;
-             n = n->link[traversal])
+        for (n = n->link[traversal]; n->link[!traversal] != &rom->end;
+             n = n->link[!traversal])
         {}
         return n;
     }
-    /* A leaf. Now it is time to visit the closest parent not yet visited. */
-    struct ccc_rtom_elem_ *p = n->parent;
-    for (; p->link[!traversal] == n; n = p, p = p->parent)
+    /* A leaf. Now it is time to visit the closest parent not yet visited.
+       The old stack overflow question I read about this type of iteration
+       (Boost's method, can't find the post anymore?) had the sentinel node
+       make the root its traversal child, but this means we would have to
+       write to the sentinel on every call to next. I want multiple threads to
+       iterate freely without undefined data race writes to memory locations.
+       So more expensive loop.*/
+    for (; n->parent != &rom->end && n->parent->link[!traversal] != n;
+         n = n->parent)
     {}
-    /* This is an internal node, for example the root, or the end sentinel. */
-    return p;
+    return n->parent;
 }
 
 static inline void

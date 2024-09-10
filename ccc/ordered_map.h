@@ -48,33 +48,35 @@ typedef struct
     CCC_TREE_INIT(struct_name, set_elem_field, key_elem_field, set_name,       \
                   alloc_fn, key_cmp, aux)
 
-#define CCC_OM_ENTRY(map_ptr, key...)                                          \
+#define CCC_OM_ENTRY(ordered_map_ptr, key...)                                  \
     (ccc_o_map_entry)                                                          \
     {                                                                          \
-        CCC_IMPL_TREE_ENTRY(map_ptr, key)                                      \
+        CCC_IMPL_TREE_ENTRY(ordered_map_ptr, key)                              \
     }
 
-#define CCC_OM_GET(map_ptr, key...) CCC_IMPL_TREE_GET(map_ptr, key)
+#define CCC_OM_GET(ordered_map_ptr, key...)                                    \
+    CCC_IMPL_TREE_GET(ordered_map_ptr, key)
 
-#define CCC_OM_GET_MUT(map_ptr, key...) CCC_IMPL_TREE_GET_MUT(map_ptr, key)
+#define CCC_OM_GET_MUT(ordered_map_ptr, key...)                                \
+    CCC_IMPL_TREE_GET_MUT(ordered_map_ptr, key)
 
-#define CCC_OM_AND_MODIFY(map_entry, mod_fn)                                   \
-    (ccc_o_map_entry)                                                          \
+#define CCC_OM_AND_MODIFY(ordered_map_entry, mod_fn)                           \
+    (ccc_o_ordered_map_entry)                                                  \
     {                                                                          \
-        CCC_IMPL_TREE_AND_MODIFY(map_entry, mod_fn)                            \
+        CCC_IMPL_TREE_AND_MODIFY(ordered_map_entry, mod_fn)                    \
     }
 
-#define CCC_OM_AND_MODIFY_W(map_entry, mod_fn, aux_data)                       \
-    (ccc_o_map_entry)                                                          \
+#define CCC_OM_AND_MODIFY_W(ordered_map_entry, mod_fn, aux_data)               \
+    (ccc_o_ordered_map_entry)                                                  \
     {                                                                          \
-        CCC_IMPL_TREE_AND_MODIFY_WITH(map_entry, mod_fn, aux_data)             \
+        CCC_IMPL_TREE_AND_MODIFY_WITH(ordered_map_entry, mod_fn, aux_data)     \
     }
 
-#define CCC_OM_INSERT_ENTRY(map_entry, key_value...)                           \
-    CCC_IMPL_TREE_INSERT_ENTRY(map_entry, key_value)
+#define CCC_OM_INSERT_ENTRY(ordered_map_entry, key_value...)                   \
+    CCC_IMPL_TREE_INSERT_ENTRY(ordered_map_entry, key_value)
 
-#define CCC_OM_OR_INSERT(map_entry, key_value...)                              \
-    CCC_IMPL_TREE_OR_INSERT(map_entry, key_value)
+#define CCC_OM_OR_INSERT(ordered_map_entry, key_value...)                      \
+    CCC_IMPL_TREE_OR_INSERT(ordered_map_entry, key_value)
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);
 
@@ -113,17 +115,17 @@ bool ccc_om_insert_error(ccc_o_map_entry e);
 
 /*===========================   Entry API   =================================*/
 
-void *ccc_om_begin(ccc_ordered_map *);
+void *ccc_om_begin(ccc_ordered_map const *);
 
-void *ccc_om_rbegin(ccc_ordered_map *);
+void *ccc_om_rbegin(ccc_ordered_map const *);
 
 void *ccc_om_end(ccc_ordered_map const *);
 
 void *ccc_om_rend(ccc_ordered_map const *);
 
-void *ccc_om_next(ccc_ordered_map *, ccc_o_map_elem const *);
+void *ccc_om_next(ccc_ordered_map const *, ccc_o_map_elem const *);
 
-void *ccc_om_rnext(ccc_ordered_map *, ccc_o_map_elem const *);
+void *ccc_om_rnext(ccc_ordered_map const *, ccc_o_map_elem const *);
 
 ccc_range ccc_om_equal_range(ccc_ordered_map *, void const *begin_key,
                              void const *end_key);

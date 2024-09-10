@@ -66,19 +66,19 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
                           ccc_threeway_cmp last_cmp,
                           struct ccc_rtom_elem_ *out_handle);
 
-#define CCC_IMPL_ROM_ENTRY(rom_ptr, key...)                                    \
+#define CCC_IMPL_ROM_ENTRY(realtime_ordered_map_ptr, key...)                   \
     ({                                                                         \
         __auto_type rom_ent_key_ = (key);                                      \
-        struct ccc_rtom_entry_ rom_ent_                                        \
-            = ccc_impl_rom_entry(&(rom_ptr)->impl, &rom_ent_key_);             \
+        struct ccc_rtom_entry_ rom_ent_ = ccc_impl_rom_entry(                  \
+            &(realtime_ordered_map_ptr)->impl, &rom_ent_key_);                 \
         rom_ent_;                                                              \
     })
 
-#define CCC_IMPL_ROM_GET(rom_ptr, key...)                                      \
+#define CCC_IMPL_ROM_GET(realtime_ordered_map_ptr, key...)                     \
     ({                                                                         \
         __auto_type rom_get_ent_key_ = key;                                    \
-        struct ccc_rtom_entry_ rom_get_ent_                                    \
-            = ccc_impl_rom_entry((rom_ptr), &rom_get_ent_key_);                \
+        struct ccc_rtom_entry_ rom_get_ent_ = ccc_impl_rom_entry(              \
+            (realtime_ordered_map_ptr), &rom_get_ent_key_);                    \
         void const *const rom_get_res_ = NULL;                                 \
         if (rom_get_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED)                \
         {                                                                      \
@@ -87,12 +87,12 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         rom_get_res_;                                                          \
     })
 
-#define CCC_IMPL_ROM_GET_MUT(rom_ptr, key...)                                  \
-    (void *)CCC_IMPL_ROM_GET(rom_ptr, key)
+#define CCC_IMPL_ROM_GET_MUT(realtime_ordered_map_ptr, key...)                 \
+    (void *)CCC_IMPL_ROM_GET(realtime_ordered_map_ptr, key)
 
-#define CCC_IMPL_ROM_AND_MODIFY(rom_entry, mod_fn)                             \
+#define CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)            \
     ({                                                                         \
-        struct ccc_om_entry_ rom_mod_ent_ = (rom_entry).impl;                  \
+        struct ccc_om_entry_ rom_mod_ent_ = (realtime_ordered_map_entry).impl; \
         if (rom_mod_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED)                \
         {                                                                      \
             (mod_fn)(                                                          \
@@ -101,9 +101,10 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         rom_mod_ent_;                                                          \
     })
 
-#define CCC_IMPL_ROM_AND_MODIFY_W(rom_entry, mod_fn, aux_data)                 \
+#define CCC_IMPL_ROM_AND_MODIFY_W(realtime_ordered_map_entry, mod_fn,          \
+                                  aux_data)                                    \
     ({                                                                         \
-        struct ccc_om_entry_ rom_mod_ent_ = (rom_entry).impl;                  \
+        struct ccc_om_entry_ rom_mod_ent_ = (realtime_ordered_map_entry).impl; \
         if (rom_mod_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED)                \
         {                                                                      \
             __auto_type rom_aux_data_ = (aux_data);                            \
@@ -113,40 +114,45 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         rom_mod_ent_;                                                          \
     })
 
-#define CCC_IMPL_ROM_NEW_INSERT(entry_copy, key_val...)                        \
+#define CCC_IMPL_ROM_NEW_INSERT(realtime_ordered_map_entry, key_value...)      \
     ({                                                                         \
         void *rom_ins_alloc_ret_ = NULL;                                       \
-        if ((entry_copy).rom->alloc)                                           \
+        if ((realtime_ordered_map_entry).rom->alloc)                           \
         {                                                                      \
             rom_ins_alloc_ret_                                                 \
-                = (entry_copy).rom->alloc(NULL, (entry_copy).rom->elem_sz);    \
+                = (realtime_ordered_map_entry)                                 \
+                      .rom->alloc(NULL,                                        \
+                                  (realtime_ordered_map_entry).rom->elem_sz);  \
             if (rom_ins_alloc_ret_)                                            \
             {                                                                  \
-                *((typeof(key_val) *)rom_ins_alloc_ret_) = key_val;            \
+                *((typeof(key_value) *)rom_ins_alloc_ret_) = key_value;        \
                 rom_ins_alloc_ret_ = ccc_impl_rom_insert(                      \
-                    (entry_copy).rom, (entry_copy).entry.entry,                \
-                    (entry_copy).last_cmp,                                     \
-                    ccc_impl_rom_elem_in_slot((entry_copy).rom,                \
-                                              rom_ins_alloc_ret_));            \
+                    (realtime_ordered_map_entry).rom,                          \
+                    (realtime_ordered_map_entry).entry.entry,                  \
+                    (realtime_ordered_map_entry).last_cmp,                     \
+                    ccc_impl_rom_elem_in_slot(                                 \
+                        (realtime_ordered_map_entry).rom,                      \
+                        rom_ins_alloc_ret_));                                  \
             }                                                                  \
         }                                                                      \
         rom_ins_alloc_ret_;                                                    \
     })
 
-#define CCC_IMPL_ROM_INSERT_ENTRY(rom_entry, key_value...)                     \
+#define CCC_IMPL_ROM_INSERT_ENTRY(realtime_ordered_map_entry, key_valueue...)  \
     ({                                                                         \
-        struct ccc_rtom_entry_ rom_ins_ent_ = (rom_entry).impl;                \
-        typeof(key_value) *rom_ins_ent_ret_ = NULL;                            \
+        struct ccc_rtom_entry_ rom_ins_ent_                                    \
+            = (realtime_ordered_map_entry).impl;                               \
+        typeof(key_valueue) *rom_ins_ent_ret_ = NULL;                          \
         if (!(rom_ins_ent_.entry.status & CCC_ROM_ENTRY_OCCUPIED))             \
         {                                                                      \
             rom_ins_ent_ret_                                                   \
-                = CCC_IMPL_ROM_NEW_INSERT(rom_ins_ent_, key_value);            \
+                = CCC_IMPL_ROM_NEW_INSERT(rom_ins_ent_, key_valueue);          \
         }                                                                      \
         else if (rom_ins_ent_.entry.status == CCC_ROM_ENTRY_OCCUPIED)          \
         {                                                                      \
             struct ccc_rtom_elem_ ins_ent_saved_ = *ccc_impl_rom_elem_in_slot( \
                 rom_ins_ent_.rom, rom_ins_ent_.entry.entry);                   \
-            *((typeof(key_value) *)rom_ins_ent_.entry.entry) = key_value;      \
+            *((typeof(key_valueue) *)rom_ins_ent_.entry.entry) = key_valueue;  \
             *ccc_impl_rom_elem_in_slot(rom_ins_ent_.rom,                       \
                                        rom_ins_ent_.entry.entry)               \
                 = ins_ent_saved_;                                              \
@@ -155,10 +161,11 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         rom_ins_ent_ret_;                                                      \
     })
 
-#define CCC_IMPL_ROM_OR_INSERT(entry_copy, key_val...)                         \
+#define CCC_IMPL_ROM_OR_INSERT(realtime_ordered_map_entry, key_value...)       \
     ({                                                                         \
-        struct ccc_rtom_entry_ rom_or_ins_ent_ = (entry_copy).impl;            \
-        typeof(key_val) *rom_or_ins_ret_ = NULL;                               \
+        struct ccc_rtom_entry_ rom_or_ins_ent_                                 \
+            = (realtime_ordered_map_entry).impl;                               \
+        typeof(key_value) *rom_or_ins_ret_ = NULL;                             \
         if (rom_or_ins_ent_.entry.status == CCC_ROM_ENTRY_OCCUPIED)            \
         {                                                                      \
             rom_or_ins_ret_ = rom_or_ins_ent_.entry.entry;                     \
@@ -166,7 +173,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         else                                                                   \
         {                                                                      \
             rom_or_ins_ret_                                                    \
-                = CCC_IMPL_ROM_NEW_INSERT(rom_or_ins_ent_, key_val);           \
+                = CCC_IMPL_ROM_NEW_INSERT(rom_or_ins_ent_, key_value);         \
         }                                                                      \
         rom_or_ins_ret_;                                                       \
     })

@@ -26,11 +26,11 @@ typedef enum test_result (*test_fn)(void);
    the same for both RESULT and EXPECTED (e.g. int, "%d", size_t, "%zu",
    bool, "%b"). If RESULT or EXPECTED are function calls they will only
    be evaluated once, as expected. */
-#define CHECK(result, expected, type_format_specifier)                         \
+#define CHECK(user_test_result, user_test_expected, type_format_specifier)     \
     do                                                                         \
     {                                                                          \
-        __auto_type const result_ = (result);                                  \
-        typeof(result_) const expected_ = (expected);                          \
+        __auto_type const result_ = (user_test_result);                        \
+        typeof(result_) const expected_ = (user_test_expected);                \
         if (result_ != expected_)                                              \
         {                                                                      \
             (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,    \
@@ -38,7 +38,7 @@ typedef enum test_result (*test_fn)(void);
             (void)fprintf(stderr,                                              \
                           GREEN "CHECK: "                                      \
                                 "result( %s ) == expected( %s )" NONE "\n",    \
-                          #result, #expected);                                 \
+                          #user_test_result, #user_test_expected);             \
             (void)fprintf(stderr, RED "ERROR: result( ");                      \
             (void)fprintf(stderr, type_format_specifier, result_);             \
             (void)fprintf(stderr, " ) != expected( ");                         \

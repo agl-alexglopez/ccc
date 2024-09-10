@@ -68,13 +68,15 @@ bool ccc_depq_update(ccc_double_ended_priority_queue *, ccc_depq_elem *,
 
 bool ccc_depq_contains(ccc_double_ended_priority_queue *, void const *key);
 
-void *ccc_depq_begin(ccc_double_ended_priority_queue *);
+void *ccc_depq_begin(ccc_double_ended_priority_queue const *);
 
-void *ccc_depq_rbegin(ccc_double_ended_priority_queue *);
+void *ccc_depq_rbegin(ccc_double_ended_priority_queue const *);
 
-void *ccc_depq_next(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
+void *ccc_depq_next(ccc_double_ended_priority_queue const *,
+                    ccc_depq_elem const *);
 
-void *ccc_depq_rnext(ccc_double_ended_priority_queue *, ccc_depq_elem const *);
+void *ccc_depq_rnext(ccc_double_ended_priority_queue const *,
+                     ccc_depq_elem const *);
 
 void *ccc_depq_end(ccc_double_ended_priority_queue const *);
 

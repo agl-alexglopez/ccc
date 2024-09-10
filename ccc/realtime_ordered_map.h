@@ -24,33 +24,36 @@ typedef struct
         CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)
 
-#define CCC_ROM_ENTRY(entry, key...)                                           \
+#define CCC_ROM_GET(realtime_ordered_map_ptr, key...)                          \
+    CCC_IMPL_ROM_GET(realtime_ordered_map_ptr, key)
+
+#define CCC_ROM_GET_MUT(realtime_ordered_map_ptr, key...)                      \
+    CCC_IMPL_ROM_GET_MUT(realtime_ordered_map_ptr, key)
+
+#define CCC_ROM_ENTRY(realtime_ordered_map_ptr, key...)                        \
     (ccc_rtom_entry)                                                           \
     {                                                                          \
-        CCC_IMPL_ROM_ENTRY(entry, key)                                         \
+        CCC_IMPL_ROM_ENTRY(realtime_ordered_map_ptr, key)                      \
     }
 
-#define CCC_ROM_GET(entry, key...) CCC_IMPL_ROM_GET(entry, key)
-
-#define CCC_ROM_GET_MUT(entry, key...) CCC_IMPL_ROM_GET_MUT(entry, key)
-
-#define CCC_ROM_AND_MODIFY(map_entry, mod_fn)                                  \
+#define CCC_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)                 \
     (ccc_rtom_entry)                                                           \
     {                                                                          \
-        CCC_IMPL_ROM_AND_MODIFY(map_entry, mod_fn)                             \
+        CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)            \
     }
 
-#define CCC_ROM_AND_MODIFY_W(map_entry, mod_fn, aux_data)                      \
+#define CCC_ROM_AND_MODIFY_W(realtime_ordered_map_entry, mod_fn, aux_data)     \
     (ccc_rtom_entry)                                                           \
     {                                                                          \
-        CCC_IMPL_ROM_AND_MODIFY_WITH(map_entry, mod_fn, aux_data)              \
+        CCC_IMPL_ROM_AND_MODIFY_WITH(realtime_ordered_map_entry, mod_fn,       \
+                                     aux_data)                                 \
     }
 
-#define CCC_ROM_OR_INSERT(entry, key_val...)                                   \
-    CCC_IMPL_ROM_OR_INSERT(entry, key_val)
+#define CCC_ROM_OR_INSERT(realtime_ordered_map_entry, key_value...)            \
+    CCC_IMPL_ROM_OR_INSERT(realtime_ordered_map_entry, key_value)
 
-#define CCC_ROM_INSERT_ENTRY(map_entry, key_value...)                          \
-    CCC_IMPL_ROM_INSERT_ENTRY(map_entry, key_value)
+#define CCC_ROM_INSERT_ENTRY(realtime_ordered_map_entry, key_value...)         \
+    CCC_IMPL_ROM_INSERT_ENTRY(realtime_ordered_map_entry, key_value)
 
 /*=================    Membership and Retrieval    ==========================*/
 
@@ -113,9 +116,9 @@ bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
 
 #ifdef REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-#    define rtom_elem ccc_rtom_elem
-#    define realtime_ordered_map ccc_realtime_ordered_map
-#    define rtom_entry ccc_rtom_entry
+typedef ccc_rtom_elem rtom_elem;
+typedef ccc_realtime_ordered_map realtime_ordered_map;
+typedef ccc_rtom_entry rtom_entry;
 #    define ROM_INIT CCC_ROM_INIT
 #    define ROM_ENTRY CCC_ROM_ENTRY
 #    define ROM_GET CCC_ROM_GET

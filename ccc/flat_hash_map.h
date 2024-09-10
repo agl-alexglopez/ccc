@@ -44,33 +44,35 @@ initialization is successful or a failure. */
     CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
-#define CCC_FHM_GET(fhash_ptr, key...) CCC_IMPL_FHM_GET(fhash_ptr, key)
+#define CCC_FHM_GET(flat_hash_map_ptr, key...)                                 \
+    CCC_IMPL_FHM_GET(flat_hash_map_ptr, key)
 
-#define CCC_FHM_GET_MUT(fhash_ptr, key...) CCC_IMPL_FHM_GET_MUT(fhash_ptr, key)
+#define CCC_FHM_GET_MUT(flat_hash_map_ptr, key...)                             \
+    CCC_IMPL_FHM_GET_MUT(flat_hash_map_ptr, key)
 
-#define CCC_FHM_ENTRY(fhash_ptr, key...)                                       \
+#define CCC_FHM_ENTRY(flat_hash_map_ptr, key...)                               \
     (ccc_fh_map_entry)                                                         \
     {                                                                          \
-        CCC_IMPL_FHM_ENTRY(fhash_ptr, key)                                     \
+        CCC_IMPL_FHM_ENTRY(flat_hash_map_ptr, key)                             \
     }
 
-#define CCC_FHM_AND_MODIFY(entry_copy, mod_fn)                                 \
+#define CCC_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                        \
     (ccc_fh_map_entry)                                                         \
     {                                                                          \
-        CCC_IMPL_FHM_AND_MODIFY(entry_copy, mod_fn)                            \
+        CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                   \
     }
 
-#define CCC_FHM_AND_MODIFY_W(entry_copy, mod_fn, aux)                          \
+#define CCC_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)                 \
     (ccc_fh_map_entry)                                                         \
     {                                                                          \
-        CCC_IMPL_FHM_AND_MODIFY_W(entry_copy, mod_fn, aux)                     \
+        CCC_IMPL_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)            \
     }
 
-#define CCC_FHM_INSERT_ENTRY(entry_copy, key_val_struct...)                    \
-    CCC_IMPL_FHM_INSERT_ENTRY(entry_copy, key_val_struct)
+#define CCC_FHM_INSERT_ENTRY(flat_hash_map_entry, key_value...)                \
+    CCC_IMPL_FHM_INSERT_ENTRY(flat_hash_map_entry, key_value)
 
-#define CCC_FHM_OR_INSERT(entry_copy, key_val_struct...)                       \
-    CCC_IMPL_FHM_OR_INSERT(entry_copy, key_val_struct)
+#define CCC_FHM_OR_INSERT(flat_hash_map_entry, key_value...)                   \
+    CCC_IMPL_FHM_OR_INSERT(flat_hash_map_entry, key_value)
 
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
