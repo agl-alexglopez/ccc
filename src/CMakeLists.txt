@@ -1,3 +1,5 @@
+add_library(impl_types INTERFACE impl_types.h)
+
 add_library(impl_buffer INTERFACE impl_buffer.h)
 target_link_libraries(impl_buffer INTERFACE types)
 

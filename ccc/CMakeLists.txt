@@ -1,4 +1,8 @@
 add_library(types types.h ${CMAKE_SOURCE_DIR}/src/types.c)
+target_link_libraries(types
+  PRIVATE
+    impl_types
+)
 
 add_library(buffer buffer.h ${CMAKE_SOURCE_DIR}/src/buffer.c)
 target_link_libraries(buffer
