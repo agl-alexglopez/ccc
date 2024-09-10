@@ -54,7 +54,7 @@ map_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_entry_occupied(ccc_om_insert(&s, &vals[i].elem)))
+        if (ccc_entry_occupied(ccc_om_insert_lv(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }
@@ -67,7 +67,7 @@ map_test_prime_shuffle(void)
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(ccc_entry_occupied(
-                  ccc_om_remove_entry(ccc_om_entry(&s, &vals[i].val)))
+                  ccc_om_remove_entry_lv(ccc_om_entry_lv(&s, &vals[i].val)))
                   || repeats[i],
               true, "%d");
         CHECK(ccc_om_validate(&s), true, "%d");
@@ -93,7 +93,7 @@ map_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = ccc_entry_unwrap(ccc_om_remove(&s, &vals[i].elem));
+        struct val *v = ccc_entry_unwrap(ccc_om_remove_lv(&s, &vals[i].elem));
         CHECK(v != NULL, true, "%d");
         CHECK(v->val, vals[i].val, "%d");
         CHECK(ccc_om_validate(&s), true, "%d");

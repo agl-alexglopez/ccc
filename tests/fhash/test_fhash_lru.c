@@ -1,5 +1,7 @@
 /** File: lru.c
 The leetcode lru problem in C. */
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+
 #include "doubly_linked_list.h"
 #include "fhash/fhash_util.h"
 #include "flat_hash_map.h"
@@ -18,7 +20,7 @@ struct key_val
 
 struct lru_cache
 {
-    ccc_flat_hash_map fh;
+    flat_hash_map fh;
     ccc_doubly_linked_list l;
     size_t cap;
 };
@@ -27,7 +29,7 @@ struct lru_lookup
 {
     int key;
     struct key_val *kv_in_list;
-    ccc_fh_map_elem hash_elem;
+    fh_map_elem hash_elem;
 };
 
 enum lru_call
@@ -84,8 +86,8 @@ run_lru_cache(void)
                           cmp_by_key, NULL),
     };
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
-    CCC_FHM_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
-                 fhash_int_to_u64, lru_lookup_cmp, NULL);
+    FHM_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
+             fhash_int_to_u64, lru_lookup_cmp, NULL);
     struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .put = put},
         {PUT, .key = 2, .val = 2, .put = put},
@@ -107,7 +109,7 @@ run_lru_cache(void)
             requests[i].put(&lru, requests[i].key, requests[i].val);
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(ccc_fhm_validate(&lru.fh), true, "%d");
+            CHECK(fhm_validate(&lru.fh), true, "%d");
             CHECK(ccc_dll_validate(&lru.l), true, "%d");
             break;
         case GET:
@@ -127,7 +129,7 @@ run_lru_cache(void)
             break;
         }
     }
-    ccc_fhm_clear_and_free(&lru.fh, NULL);
+    fhm_clear_and_free(&lru.fh, NULL);
     ccc_dll_clear(&lru.l, NULL);
     return PASS;
 }
@@ -135,8 +137,8 @@ run_lru_cache(void)
 static void
 put(struct lru_cache *const lru, int const key, int const val)
 {
-    ccc_fh_map_entry const ent = CCC_FHM_ENTRY(&lru->fh, key);
-    struct lru_lookup const *const found = ccc_fhm_unwrap(ent);
+    fh_map_entry *ent = FHM_ENTRY(&lru->fh, key);
+    struct lru_lookup const *const found = fhm_unwrap(ent);
     if (found)
     {
         found->kv_in_list->key = key;
@@ -145,13 +147,13 @@ put(struct lru_cache *const lru, int const key, int const val)
         return;
     }
     struct lru_lookup *const new
-        = CCC_FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
+        = FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
     new->kv_in_list
         = DLL_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
-        ccc_fhm_remove_entry(CCC_FHM_ENTRY(&lru->fh, to_drop->key));
+        fhm_remove_entry(FHM_ENTRY(&lru->fh, to_drop->key));
         ccc_dll_pop_back(&lru->l);
     }
 }
@@ -159,7 +161,7 @@ put(struct lru_cache *const lru, int const key, int const val)
 static int
 get(struct lru_cache *const lru, int const key)
 {
-    struct lru_lookup const *const found = ccc_fhm_get(&lru->fh, &key);
+    struct lru_lookup const *const found = fhm_get(&lru->fh, &key);
     if (!found)
     {
         return -1;

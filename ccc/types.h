@@ -1,6 +1,8 @@
 #ifndef CCC_TYPES_H
 #define CCC_TYPES_H
 
+#include "impl_types.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -44,14 +46,12 @@ typedef struct
 
 typedef struct
 {
-    void *begin;
-    void *end;
+    struct ccc_range_ impl;
 } ccc_range;
 
 typedef struct
 {
-    void *rbegin;
-    void *end;
+    struct ccc_rrange_ impl;
 } ccc_rrange;
 
 #define CCC_ENTRY_OCCUPIED 0x1
@@ -60,8 +60,7 @@ typedef struct
 
 typedef struct
 {
-    void *entry;
-    uint8_t status;
+    struct ccc_entry_ impl;
 } ccc_entry;
 
 typedef void *ccc_alloc_fn(void *, size_t);
@@ -80,9 +79,9 @@ typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
 typedef uint64_t ccc_hash_fn(void const *to_hash);
 
-bool ccc_entry_occupied(ccc_entry e);
-bool ccc_entry_error(ccc_entry e);
-void *ccc_entry_unwrap(ccc_entry e);
+bool ccc_entry_occupied(ccc_entry const *e);
+bool ccc_entry_error(ccc_entry const *e);
+void *ccc_entry_unwrap(ccc_entry const *e);
 void *ccc_begin_range(ccc_range const *r);
 void *ccc_end_range(ccc_range const *r);
 void *ccc_begin_rrange(ccc_rrange const *r);

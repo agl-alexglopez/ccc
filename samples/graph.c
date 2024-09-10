@@ -1,3 +1,5 @@
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+
 #include "cli.h"
 #include "flat_hash_map.h"
 #include "flat_queue.h"
@@ -415,16 +417,15 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     ccc_flat_hash_map parent_map;
     [[maybe_unused]] ccc_result res
-        = CCC_FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem,
-                       realloc, hash_parent_cells, eq_parent_cells, NULL);
+        = FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem, realloc,
+                   hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_queue bfs = CCC_FQ_INIT(NULL, 0, struct point, realloc);
-    [[maybe_unused]] struct parent_cell *pc
-        = CCC_FHM_INSERT_ENTRY(CCC_FHM_ENTRY(&parent_map, src->pos),
-                               (struct parent_cell){
-                                   .key = src->pos,
-                                   .parent = (struct point){-1, -1},
-                               });
+    [[maybe_unused]] struct parent_cell *pc = FHM_INSERT_ENTRY(
+        FHM_ENTRY(&parent_map, src->pos), (struct parent_cell){
+                                              .key = src->pos,
+                                              .parent = (struct point){-1, -1},
+                                          });
     assert(pc);
     ccc_fq_push(&bfs, &src->pos);
     bool success = false;
@@ -444,18 +445,18 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (is_dst(next_cell, dst->name))
             {
                 [[maybe_unused]] struct parent_cell *inserted
-                    = ccc_fhm_insert_entry(ccc_fhm_entry(&parent_map, &next),
-                                           &push.elem);
+                    = fhm_insert_entry(fhm_entry_lv(&parent_map, &next),
+                                       &push.elem);
                 assert(inserted);
                 cur = next;
                 success = true;
                 break;
             }
-            if (!is_path(next_cell) && !ccc_fhm_contains(&parent_map, &next))
+            if (!is_path(next_cell) && !fhm_contains(&parent_map, &next))
             {
                 [[maybe_unused]] struct parent_cell *inserted
-                    = ccc_fhm_insert_entry(ccc_fhm_entry(&parent_map, &next),
-                                           &push.elem);
+                    = fhm_insert_entry(fhm_entry_lv(&parent_map, &next),
+                                       &push.elem);
                 assert(inserted != NULL);
                 (void)ccc_fq_push(&bfs, &next);
             }
@@ -463,7 +464,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     }
     if (success)
     {
-        struct parent_cell const *cell = ccc_fhm_get(&parent_map, &cur);
+        struct parent_cell const *cell = fhm_get(&parent_map, &cur);
         assert(cell);
         struct edge edge = {
             .n = {.name = dst->name, .cost = 0},
@@ -471,7 +472,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         };
         while (cell->parent.r > 0)
         {
-            cell = ccc_fhm_get(&parent_map, &cell->parent);
+            cell = fhm_get(&parent_map, &cell->parent);
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -486,7 +487,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         (void)add_edge(dst, &edge);
         add_edge_cost_label(graph, dst, &edge);
     }
-    ccc_fhm_clear_and_free(&parent_map, map_parent_point_destructor);
+    fhm_clear_and_free(&parent_map, map_parent_point_destructor);
     ccc_fq_clear_and_free(&bfs, NULL);
     return success;
 }
@@ -697,8 +698,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                                             NULL, cmp_pq_dist_points, NULL);
     ccc_flat_hash_map prev_map;
     [[maybe_unused]] ccc_result res
-        = CCC_FHM_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
-                       hash_vertex_addr, eq_prev_vertices, NULL);
+        = FHM_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
+                   hash_vertex_addr, eq_prev_vertices, NULL);
     assert(res == CCC_OK);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
@@ -716,7 +717,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         }
         for (int i = 0; i < MAX_DEGREE && cur->v->edges[i].name; ++i)
         {
-            struct prev_vertex *next = CCC_FHM_GET_MUT(
+            struct prev_vertex *next = FHM_GET_MUT(
                 &prev_map, vertex_at(graph, cur->v->edges[i].name));
             assert(next);
             /* The seen map also holds a pointer to the corresponding
@@ -739,19 +740,19 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = CCC_FHM_GET(&prev_map, v);
+        struct prev_vertex const *prev = FHM_GET(&prev_map, v);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = CCC_FHM_GET(&prev_map, prev->prev);
+            prev = FHM_GET(&prev_map, prev->prev);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
        prev map is the last allocation with access to the priority queue
        elements that have been popped but not freed. It will free its
        own map and its references to priority queue elements. */
-    ccc_fhm_clear_and_free(&prev_map, map_pq_prev_vertex_dist_point_destructor);
+    fhm_clear_and_free(&prev_map, map_pq_prev_vertex_dist_point_destructor);
     clear_and_flush_graph(graph);
     return success;
 }
@@ -769,12 +770,12 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
             .v = v,
             .dist = v == pr->src ? 0 : INT_MAX,
         };
-        struct prev_vertex const *const inserted = CCC_FHM_INSERT_ENTRY(
-            CCC_FHM_ENTRY(prev_map, p->v), (struct prev_vertex){
-                                               .v = p->v,
-                                               .prev = NULL,
-                                               .dist_point = p,
-                                           });
+        struct prev_vertex const *const inserted
+            = FHM_INSERT_ENTRY(FHM_ENTRY(prev_map, p->v), (struct prev_vertex){
+                                                              .v = p->v,
+                                                              .prev = NULL,
+                                                              .dist_point = p,
+                                                          });
         if (!inserted)
         {
             quit("inserting into map in in loading phase failed.\n", 1);
