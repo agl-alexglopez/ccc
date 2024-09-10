@@ -8,27 +8,27 @@
 
 typedef struct ccc_sll_elem_
 {
-    struct ccc_sll_elem_ *n;
+    struct ccc_sll_elem_ *n_;
 } ccc_sll_elem_;
 
 struct ccc_sll_
 {
-    struct ccc_sll_elem_ sentinel;
-    size_t sz;
-    size_t elem_sz;
-    size_t sll_elem_offset;
-    ccc_alloc_fn *alloc;
-    void *aux;
+    struct ccc_sll_elem_ sentinel_;
+    size_t sz_;
+    size_t elem_sz_;
+    size_t sll_elem_offset_;
+    ccc_alloc_fn *alloc_;
+    void *aux_;
 };
 
 #define CCC_IMPL_SLL_INIT(sll_ptr, sll_name, struct_name, sll_elem_field,      \
                           alloc_fn, aux_data)                                  \
     {                                                                          \
         {                                                                      \
-            .sentinel.n = &(sll_name).impl_.sentinel,                          \
-            .elem_sz = sizeof(struct_name),                                    \
-            .sll_elem_offset = offsetof(struct_name, sll_elem_field), .sz = 0, \
-            .alloc = (alloc_fn), .aux = (aux_data)                             \
+            .sentinel_.n_ = &(sll_name).impl_.sentinel_,                       \
+            .elem_sz_ = sizeof(struct_name),                                   \
+            .sll_elem_offset_ = offsetof(struct_name, sll_elem_field),         \
+            .sz_ = 0, .alloc_ = (alloc_fn), .aux_ = (aux_data)                 \
         }                                                                      \
     }
 
@@ -40,14 +40,14 @@ struct ccc_sll_elem_ *ccc_sll_elem__in(struct ccc_sll_ const *,
     ({                                                                         \
         typeof(struct_initializer) *sll_res_;                                  \
         struct ccc_sll_ *sll_ = &(list_ptr)->impl_;                            \
-        assert(sizeof(*sll_res_) == sll_->elem_sz);                            \
-        if (!sll_->alloc)                                                      \
+        assert(sizeof(*sll_res_) == sll_->elem_sz_);                           \
+        if (!sll_->alloc_)                                                     \
         {                                                                      \
             sll_res_ = NULL;                                                   \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            sll_res_ = sll_->alloc(NULL, sll_->elem_sz);                       \
+            sll_res_ = sll_->alloc_(NULL, sll_->elem_sz_);                     \
             if (sll_res_)                                                      \
             {                                                                  \
                 *sll_res_ = struct_initializer;                                \
