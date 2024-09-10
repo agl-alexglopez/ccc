@@ -32,8 +32,8 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
                           alloc_fn, cmp_fn, aux_data)                          \
     {                                                                          \
         {                                                                      \
-            .sentinel.n = &(dll_name).impl.sentinel,                           \
-            .sentinel.p = &(dll_name).impl.sentinel,                           \
+            .sentinel.n = &(dll_name).impl_.sentinel,                          \
+            .sentinel.p = &(dll_name).impl_.sentinel,                          \
             .elem_sz = sizeof(struct_name),                                    \
             .dll_elem_offset = offsetof(struct_name, dll_elem_field), .sz = 0, \
             .alloc = (alloc_fn), .cmp = (cmp_fn), .aux = (aux_data),           \
@@ -43,7 +43,7 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
 #define CCC_IMPL_DLL_EMPLACE_BACK(dll_ptr, struct_initializer...)              \
     ({                                                                         \
         typeof(struct_initializer) *dll_res_;                                  \
-        struct ccc_dll_ *dll_ = &(dll_ptr)->impl;                              \
+        struct ccc_dll_ *dll_ = &(dll_ptr)->impl_;                             \
         assert(sizeof(*dll_res_) == dll_->elem_sz);                            \
         if (!dll_->alloc)                                                      \
         {                                                                      \
@@ -65,7 +65,7 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
 #define CCC_IMPL_DLL_EMPLACE_FRONT(dll_ptr, struct_initializer...)             \
     ({                                                                         \
         typeof(struct_initializer) *dll_res_;                                  \
-        struct ccc_dll_ *dll_ = &(dll_ptr)->impl;                              \
+        struct ccc_dll_ *dll_ = &(dll_ptr)->impl_;                             \
         assert(sizeof(*dll_res_) == dll_->elem_sz);                            \
         if (!dll_->alloc)                                                      \
         {                                                                      \

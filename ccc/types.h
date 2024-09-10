@@ -46,12 +46,12 @@ typedef struct
 
 typedef struct
 {
-    struct ccc_range_ impl;
+    struct ccc_range_ impl_;
 } ccc_range;
 
 typedef struct
 {
-    struct ccc_rrange_ impl;
+    struct ccc_rrange_ impl_;
 } ccc_rrange;
 
 #define CCC_ENTRY_OCCUPIED 0x1
@@ -60,7 +60,7 @@ typedef struct
 
 typedef struct
 {
-    struct ccc_entry_ impl;
+    struct ccc_entry_ impl_;
 } ccc_entry;
 
 typedef void *ccc_alloc_fn(void *, size_t);

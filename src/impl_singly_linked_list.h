@@ -25,7 +25,7 @@ struct ccc_sll_
                           alloc_fn, aux_data)                                  \
     {                                                                          \
         {                                                                      \
-            .sentinel.n = &(sll_name).impl.sentinel,                           \
+            .sentinel.n = &(sll_name).impl_.sentinel,                          \
             .elem_sz = sizeof(struct_name),                                    \
             .sll_elem_offset = offsetof(struct_name, sll_elem_field), .sz = 0, \
             .alloc = (alloc_fn), .aux = (aux_data)                             \
@@ -39,7 +39,7 @@ struct ccc_sll_elem_ *ccc_sll_elem__in(struct ccc_sll_ const *,
 #define CCC_IMPL_LIST_EMPLACE_FRONT(list_ptr, struct_initializer...)           \
     ({                                                                         \
         typeof(struct_initializer) *sll_res_;                                  \
-        struct ccc_sll_ *sll_ = &(list_ptr)->impl;                             \
+        struct ccc_sll_ *sll_ = &(list_ptr)->impl_;                            \
         assert(sizeof(*sll_res_) == sll_->elem_sz);                            \
         if (!sll_->alloc)                                                      \
         {                                                                      \

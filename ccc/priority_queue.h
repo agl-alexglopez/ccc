@@ -18,7 +18,7 @@
    Do not access the fields of the struct directly. */
 typedef struct
 {
-    struct ccc_pq_elem_ impl;
+    struct ccc_pq_elem_ impl_;
 } ccc_pq_elem;
 
 /* The structure used to manage the data in a priority queue. Stack allocation
@@ -28,7 +28,7 @@ typedef struct
    provided initialization macro. */
 typedef struct
 {
-    struct ccc_pq_ impl;
+    struct ccc_pq_ impl_;
 } ccc_priority_queue;
 
 /* Given the desired total order of the priority queue, the comparison function,

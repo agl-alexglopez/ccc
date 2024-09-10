@@ -32,7 +32,7 @@ struct ccc_pq_
 #define CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn,       \
                          cmp_fn, aux_data)                                     \
     {                                                                          \
-        .impl = {                                                              \
+        .impl_ = {                                                             \
             .root = NULL,                                                      \
             .sz = 0,                                                           \
             .pq_elem_offset = offsetof(struct_name, pq_elem_field),            \

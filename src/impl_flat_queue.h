@@ -16,7 +16,7 @@ void *ccc_impl_fq_alloc(struct ccc_fq_ *);
 
 #define CCC_IMPL_FQ_INIT(mem_ptr, capacity, type_name, alloc_fn)               \
     {                                                                          \
-        .impl = {                                                              \
+        .impl_ = {                                                             \
             .buf = CCC_BUF_INIT(mem_ptr, type_name, capacity, alloc_fn),       \
             .front = 0,                                                        \
         },                                                                     \
@@ -24,7 +24,7 @@ void *ccc_impl_fq_alloc(struct ccc_fq_ *);
 
 #define CCC_IMPL_FQ_EMPLACE(fq_ptr, value...)                                  \
     ({                                                                         \
-        void *fq_emplace_ret_ = ccc_impl_fq_alloc(&(fq_ptr)->impl);            \
+        void *fq_emplace_ret_ = ccc_impl_fq_alloc(&(fq_ptr)->impl_);           \
         if (fq_emplace_ret_)                                                   \
         {                                                                      \
             *((typeof(value) *)fq_emplace_ret_) = value;                       \

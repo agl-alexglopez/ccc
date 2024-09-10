@@ -17,7 +17,7 @@ struct ccc_buf_
 
 #define CCC_IMPL_BUF_INIT(mem, type, capacity, alloc_fn)                       \
     {                                                                          \
-        .impl = {                                                              \
+        .impl_ = {                                                             \
             (mem), sizeof(type), 0, (capacity), (alloc_fn),                    \
         },                                                                     \
     }

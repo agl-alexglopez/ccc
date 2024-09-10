@@ -16,7 +16,7 @@
    access the fields directly or modify them. */
 typedef struct
 {
-    struct ccc_fpq_ impl;
+    struct ccc_fpq_ impl_;
 } ccc_flat_priority_queue;
 
 #define CCC_FPQ_INIT(mem_ptr, capacity, type_name, cmp_order, alloc_fn,        \

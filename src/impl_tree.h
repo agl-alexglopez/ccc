@@ -61,11 +61,11 @@ struct ccc_om_entry_
 #define CCC_TREE_INIT(struct_name, node_elem_field, key_elem_field, tree_name, \
                       alloc_fn, key_cmp_fn, aux_data)                          \
     {                                                                          \
-        .impl = {                                                              \
-            .root_ = &(tree_name).impl.end_,                                   \
+        .impl_ = {                                                             \
+            .root_ = &(tree_name).impl_.end_,                                  \
             .end_                                                              \
-            = {.link_ = {&(tree_name).impl.end_, &(tree_name).impl.end_},      \
-               .parent_or_dups_ = &(tree_name).impl.end_},                     \
+            = {.link_ = {&(tree_name).impl_.end_, &(tree_name).impl_.end_},    \
+               .parent_or_dups_ = &(tree_name).impl_.end_},                    \
             .alloc_ = (alloc_fn),                                              \
             .cmp_ = (key_cmp_fn),                                              \
             .aux_ = (aux_data),                                                \
@@ -92,7 +92,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
     ({                                                                         \
         __auto_type tree_key_ = key;                                           \
         struct ccc_om_entry_ tree_entry_                                       \
-            = ccc_impl_tree_entry(&(ordered_map_ptr)->impl, &tree_key_);       \
+            = ccc_impl_tree_entry(&(ordered_map_ptr)->impl_, &tree_key_);      \
         tree_entry_;                                                           \
     })
 
@@ -100,7 +100,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
     ({                                                                         \
         __auto_type const tree_key_ = key;                                     \
         struct ccc_fhm_entry_ tree_get_ent_                                    \
-            = ccc_impl_tree_entry(&(ordered_map_ptr)->impl, &tree_key_);       \
+            = ccc_impl_tree_entry(&(ordered_map_ptr)->impl_, &tree_key_);      \
         void const *tree_get_res_ = NULL;                                      \
         if (tree_get_ent_.entry_.stats_ & CCC_OM_ENTRY_OCCUPIED)               \
         {                                                                      \
@@ -114,7 +114,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
 
 #define CCC_IMPL_TREE_AND_MODIFY(ordered_map_entry, mod_fn)                    \
     ({                                                                         \
-        struct ccc_om_entry_ tree_mod_ent_ = (ordered_map_entry)->impl;        \
+        struct ccc_om_entry_ tree_mod_ent_ = (ordered_map_entry)->impl_;       \
         if (tree_mod_ent_.entry_.stats_ & CCC_OM_ENTRY_OCCUPIED)               \
         {                                                                      \
             (mod_fn)((ccc_update){.container                                   \
@@ -126,7 +126,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
 
 #define CCC_IMPL_TREE_AND_MODIFY_W(ordered_map_entry, mod_fn, aux_data)        \
     ({                                                                         \
-        struct ccc_om_entry_ tree_mod_ent_ = (ordered_map_entry)->impl;        \
+        struct ccc_om_entry_ tree_mod_ent_ = (ordered_map_entry)->impl_;       \
         if (tree_mod_ent_.entry_.stats_ & CCC_OM_ENTRY_OCCUPIED)               \
         {                                                                      \
             __auto_type tree_aux_data_ = (aux_data);                           \
@@ -159,7 +159,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
 
 #define CCC_IMPL_TREE_INSERT_ENTRY(ordered_map_entry, key_value...)            \
     ({                                                                         \
-        struct ccc_om_entry_ *tree_ins_ent_ = &(ordered_map_entry)->impl;      \
+        struct ccc_om_entry_ *tree_ins_ent_ = &(ordered_map_entry)->impl_;     \
         void *tree_ins_ent_ret_ = NULL;                                        \
         if (!(tree_ins_ent_->entry_.stats_ & CCC_OM_ENTRY_OCCUPIED))           \
         {                                                                      \
@@ -181,7 +181,7 @@ void *ccc_impl_tree_insert(struct ccc_om_ *t, ccc_om_elem_ *n);
 
 #define CCC_IMPL_TREE_OR_INSERT(ordered_map_entry, key_value...)               \
     ({                                                                         \
-        struct ccc_om_entry_ *tree_or_ins_ent_ = &(ordered_map_entry)->impl;   \
+        struct ccc_om_entry_ *tree_or_ins_ent_ = &(ordered_map_entry)->impl_;  \
         void *or_ins_ret_ = NULL;                                              \
         if (tree_or_ins_ent_->entry_.stats_ == CCC_OM_ENTRY_OCCUPIED)          \
         {                                                                      \

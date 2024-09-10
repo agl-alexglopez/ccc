@@ -5,17 +5,17 @@
 
 typedef struct
 {
-    struct ccc_rtom_elem_ impl;
+    struct ccc_rtom_elem_ impl_;
 } ccc_rtom_elem;
 
 typedef struct
 {
-    struct ccc_rtom_ impl;
+    struct ccc_rtom_ impl_;
 } ccc_realtime_ordered_map;
 
 typedef struct
 {
-    struct ccc_rtom_entry_ impl;
+    struct ccc_rtom_entry_ impl_;
 } ccc_rtom_entry;
 
 #define CCC_ROM_INIT(struct_name, node_elem_field, key_elem_field, map_name,   \
@@ -68,38 +68,38 @@ void *ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key);
 #define ccc_rom_entry_lv(realtime_ordered_map_ptr, key_ptr)                    \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
-        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl              \
+        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
     }
 
 #define ccc_rom_and_modify_lv(realtime_ordered_map_ptr, mod_fn)                \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
-        ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn)).impl          \
+        ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn)).impl_         \
     }
 
 #define ccc_rom_and_modify_with_lv(realtime_ordered_map_ptr, mod_fn, aux_data) \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
         ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn), (aux_data))   \
-            .impl                                                              \
+            .impl_                                                             \
     }
 
 #define ccc_rom_insert_lv(realtime_ordered_map_ptr, out_handle_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_rom_insert((realtime_ordered_map_ptr), (out_handle_ptr)).impl      \
+        ccc_rom_insert((realtime_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
 #define ccc_rom_remove_lv(realtime_ordered_map_ptr, out_handle_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl      \
+        ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
 #define ccc_rom_remove_entry_lv(realtime_ordered_map_entry_ptr)                \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl            \
+        ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl_           \
     }
 
 ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,

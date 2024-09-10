@@ -6,17 +6,17 @@
 
 typedef struct
 {
-    struct ccc_fhm_elem_ impl;
+    struct ccc_fhm_elem_ impl_;
 } ccc_fh_map_elem;
 
 typedef struct
 {
-    struct ccc_fhm_ impl;
+    struct ccc_fhm_ impl_;
 } ccc_flat_hash_map;
 
 typedef struct
 {
-    struct ccc_fhm_entry_ impl;
+    struct ccc_fhm_entry_ impl_;
 } ccc_fh_map_entry;
 
 /** @brief the initialization helper macro for a hash table. Must be called
@@ -99,19 +99,19 @@ void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 #define ccc_fhm_remove_lv(flat_hash_map_ptr, out_handle_ptr)                   \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl             \
+        ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
 #define ccc_fhm_insert_lv(flat_hash_map_ptr, out_handle_ptr)                   \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl             \
+        ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
 #define ccc_fhm_remove_entry_lv(flat_hash_map_entry_ptr)                       \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl                   \
+        ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
     }
 
 /** TODO */
@@ -128,19 +128,19 @@ ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
 #define ccc_fhm_entry_lv(flat_hash_map_ptr, key_ptr)                           \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
-        ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl                     \
+        ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl_                    \
     }
 
 #define ccc_fhm_and_modify_lv(entry_ptr, mod_fn)                               \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
-        ccc_fhm_and_modify((entry_ptr), (mod_fn)).impl                         \
+        ccc_fhm_and_modify((entry_ptr), (mod_fn)).impl_                        \
     }
 
 #define ccc_fhm_and_modify_with_lv(entry_ptr, mod_fn, aux_data_ptr)            \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
-        ccc_fhm_and_modify_with((entry_ptr), (mod_fn), (aux_data_ptr)).impl    \
+        ccc_fhm_and_modify_with((entry_ptr), (mod_fn), (aux_data_ptr)).impl_   \
     }
 
 /** @brief Obtains an entry for the provided key in the table for future use.

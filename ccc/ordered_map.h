@@ -30,17 +30,17 @@ modifications. This may combat such an anti-pattern. */
 
 typedef struct
 {
-    struct ccc_om_ impl;
+    struct ccc_om_ impl_;
 } ccc_ordered_map;
 
 typedef struct
 {
-    ccc_om_elem_ impl;
+    ccc_om_elem_ impl_;
 } ccc_o_map_elem;
 
 typedef struct
 {
-    struct ccc_om_entry_ impl;
+    struct ccc_om_entry_ impl_;
 } ccc_o_map_entry;
 
 #define CCC_OM_INIT(struct_name, set_elem_field, key_elem_field, set_name,     \
@@ -91,19 +91,19 @@ void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
 #define ccc_om_insert_lv(ordered_map_ptr, out_handle_ptr)                      \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_insert((ordered_map_ptr), (out_handle_ptr)).impl                \
+        ccc_om_insert((ordered_map_ptr), (out_handle_ptr)).impl_               \
     }
 
 #define ccc_om_remove_lv(ordered_map_ptr, out_handle_ptr)                      \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl                \
+        ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl_               \
     }
 
 #define ccc_om_remove_entry_lv(ordered_map_entry_ptr)                          \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_remove_entry((ordered_map_entry_ptr)).impl                      \
+        ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
     }
 
 ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
@@ -117,19 +117,19 @@ ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
 #define ccc_om_entry_lv(ordered_map_ptr, key_ptr)                              \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
-        ccc_om_entry((ordered_map_ptr), (key_ptr)).impl                        \
+        ccc_om_entry((ordered_map_ptr), (key_ptr)).impl_                       \
     }
 
 #define ccc_om_and_modify_lv(ordered_map_ptr, mod_fn)                          \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
-        ccc_om_and_modify((ordered_map_ptr), (mod_fn)).impl                    \
+        ccc_om_and_modify((ordered_map_ptr), (mod_fn)).impl_                   \
     }
 
 #define ccc_om_and_modify_with_lv(ordered_map_ptr, mod_fn, aux_data)           \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
-        ccc_om_and_modify((ordered_map_ptr), (mod_fn), (aux_data)).impl        \
+        ccc_om_and_modify((ordered_map_ptr), (mod_fn), (aux_data)).impl_       \
     }
 
 ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);

@@ -24,15 +24,15 @@ ccc_fq_clear(ccc_flat_queue *const fq, ccc_destructor_fn *destructor)
     }
     if (!destructor)
     {
-        fq->impl.buf.impl.sz = fq->impl.front = 0;
+        fq->impl_.buf.impl_.sz = fq->impl_.front = 0;
         return;
     }
-    size_t const cap = ccc_buf_capacity(&fq->impl.buf);
-    size_t const back = (fq->impl.front + ccc_buf_size(&fq->impl.buf))
-                        % ccc_buf_capacity(&fq->impl.buf);
-    for (size_t i = fq->impl.front; i != back; i = (i + 1) % cap)
+    size_t const cap = ccc_buf_capacity(&fq->impl_.buf);
+    size_t const back = (fq->impl_.front + ccc_buf_size(&fq->impl_.buf))
+                        % ccc_buf_capacity(&fq->impl_.buf);
+    for (size_t i = fq->impl_.front; i != back; i = (i + 1) % cap)
     {
-        destructor(ccc_buf_at(&fq->impl.buf, i));
+        destructor(ccc_buf_at(&fq->impl_.buf, i));
     }
 }
 
@@ -45,18 +45,18 @@ ccc_fq_clear_and_free(ccc_flat_queue *const fq, ccc_destructor_fn *destructor)
     }
     if (!destructor)
     {
-        fq->impl.buf.impl.sz = fq->impl.front = 0;
-        ccc_buf_realloc(&fq->impl.buf, 0, fq->impl.buf.impl.alloc);
+        fq->impl_.buf.impl_.sz = fq->impl_.front = 0;
+        ccc_buf_realloc(&fq->impl_.buf, 0, fq->impl_.buf.impl_.alloc);
         return;
     }
-    size_t const cap = ccc_buf_capacity(&fq->impl.buf);
-    size_t const back = (fq->impl.front + ccc_buf_size(&fq->impl.buf))
-                        % ccc_buf_capacity(&fq->impl.buf);
-    for (size_t i = fq->impl.front; i != back; i = (i + 1) % cap)
+    size_t const cap = ccc_buf_capacity(&fq->impl_.buf);
+    size_t const back = (fq->impl_.front + ccc_buf_size(&fq->impl_.buf))
+                        % ccc_buf_capacity(&fq->impl_.buf);
+    for (size_t i = fq->impl_.front; i != back; i = (i + 1) % cap)
     {
-        destructor(ccc_buf_at(&fq->impl.buf, i));
+        destructor(ccc_buf_at(&fq->impl_.buf, i));
     }
-    ccc_buf_realloc(&fq->impl.buf, 0, fq->impl.buf.impl.alloc);
+    ccc_buf_realloc(&fq->impl_.buf, 0, fq->impl_.buf.impl_.alloc);
 }
 
 void *
@@ -66,42 +66,42 @@ ccc_fq_push(ccc_flat_queue *const fq, void *const elem)
     {
         return NULL;
     }
-    void *back = ccc_impl_fq_alloc(&fq->impl);
-    memcpy(back, elem, ccc_buf_elem_size(&fq->impl.buf));
+    void *back = ccc_impl_fq_alloc(&fq->impl_);
+    memcpy(back, elem, ccc_buf_elem_size(&fq->impl_.buf));
     return back;
 }
 
 void
 ccc_fq_pop(ccc_flat_queue *const fq)
 {
-    if (ccc_buf_empty(&fq->impl.buf))
+    if (ccc_buf_empty(&fq->impl_.buf))
     {
         return;
     }
-    fq->impl.front = (fq->impl.front + 1) % ccc_buf_capacity(&fq->impl.buf);
-    --fq->impl.buf.impl.sz;
+    fq->impl_.front = (fq->impl_.front + 1) % ccc_buf_capacity(&fq->impl_.buf);
+    --fq->impl_.buf.impl_.sz;
 }
 
 void *
 ccc_fq_front(ccc_flat_queue const *const fq)
 {
-    if (ccc_buf_empty(&fq->impl.buf))
+    if (ccc_buf_empty(&fq->impl_.buf))
     {
         return NULL;
     }
-    return ccc_buf_at(&fq->impl.buf, fq->impl.front);
+    return ccc_buf_at(&fq->impl_.buf, fq->impl_.front);
 }
 
 bool
 ccc_fq_empty(ccc_flat_queue const *const fq)
 {
-    return !fq || !fq->impl.buf.impl.sz;
+    return !fq || !fq->impl_.buf.impl_.sz;
 }
 
 size_t
 ccc_fq_size(ccc_flat_queue const *const fq)
 {
-    return !fq ? 0 : fq->impl.buf.impl.sz;
+    return !fq ? 0 : fq->impl_.buf.impl_.sz;
 }
 
 void *
@@ -113,7 +113,7 @@ ccc_impl_fq_alloc(struct ccc_fq_ *fq)
     }
     void *new_slot = ccc_buf_at(&fq->buf, (fq->front + ccc_buf_size(&fq->buf))
                                               % ccc_buf_capacity(&fq->buf));
-    ++fq->buf.impl.sz;
+    ++fq->buf.impl_.sz;
     return new_slot;
 }
 
@@ -124,7 +124,7 @@ maybe_resize(struct ccc_fq_ *const q)
     {
         return CCC_OK;
     }
-    if (!q->buf.impl.alloc)
+    if (!q->buf.impl_.alloc)
     {
         return CCC_NO_REALLOC;
     }
@@ -132,7 +132,7 @@ maybe_resize(struct ccc_fq_ *const q)
                                ? (ccc_buf_capacity(&q->buf) * 2)
                                : start_capacity;
     void *new_mem
-        = q->buf.impl.alloc(NULL, ccc_buf_elem_size(&q->buf) * new_cap);
+        = q->buf.impl_.alloc(NULL, ccc_buf_elem_size(&q->buf) * new_cap);
     if (!new_mem)
     {
         return CCC_MEM_ERR;
@@ -146,10 +146,10 @@ maybe_resize(struct ccc_fq_ *const q)
                ccc_buf_base(&q->buf),
                bytes(q, ccc_buf_size(&q->buf) - first_chunk));
     }
-    (void)ccc_buf_realloc(&q->buf, 0, q->buf.impl.alloc);
-    q->buf.impl.mem = new_mem;
+    (void)ccc_buf_realloc(&q->buf, 0, q->buf.impl_.alloc);
+    q->buf.impl_.mem = new_mem;
     q->front = 0;
-    q->buf.impl.capacity = new_cap;
+    q->buf.impl_.capacity = new_cap;
     return CCC_OK;
 }
 

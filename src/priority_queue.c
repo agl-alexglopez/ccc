@@ -31,7 +31,7 @@ static ccc_threeway_cmp cmp(struct ccc_pq_ const *,
 void *
 ccc_pq_front(ccc_priority_queue const *const ppq)
 {
-    return ppq->impl.root ? struct_base(&ppq->impl, ppq->impl.root) : NULL;
+    return ppq->impl_.root ? struct_base(&ppq->impl_, ppq->impl_.root) : NULL;
 }
 
 void
@@ -41,50 +41,50 @@ ccc_pq_push(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
     {
         return;
     }
-    init_node(&e->impl);
-    if (ppq->impl.alloc)
+    init_node(&e->impl_);
+    if (ppq->impl_.alloc)
     {
-        void *node = ppq->impl.alloc(NULL, ppq->impl.elem_sz);
+        void *node = ppq->impl_.alloc(NULL, ppq->impl_.elem_sz);
         if (!node)
         {
             return;
         }
-        memcpy(node, struct_base(&ppq->impl, &e->impl), ppq->impl.elem_sz);
+        memcpy(node, struct_base(&ppq->impl_, &e->impl_), ppq->impl_.elem_sz);
     }
-    ppq->impl.root = merge(&ppq->impl, ppq->impl.root, &e->impl);
-    ++ppq->impl.sz;
+    ppq->impl_.root = merge(&ppq->impl_, ppq->impl_.root, &e->impl_);
+    ++ppq->impl_.sz;
 }
 
 void
 ccc_pq_pop(ccc_priority_queue *const ppq)
 {
-    if (!ppq->impl.root)
+    if (!ppq->impl_.root)
     {
         return;
     }
-    struct ccc_pq_elem_ *const popped = ppq->impl.root;
-    ppq->impl.root = delete_min(&ppq->impl, ppq->impl.root);
-    ppq->impl.sz--;
+    struct ccc_pq_elem_ *const popped = ppq->impl_.root;
+    ppq->impl_.root = delete_min(&ppq->impl_, ppq->impl_.root);
+    ppq->impl_.sz--;
     clear_node(popped);
-    if (ppq->impl.alloc)
+    if (ppq->impl_.alloc)
     {
-        ppq->impl.alloc(struct_base(&ppq->impl, popped), 0);
+        ppq->impl_.alloc(struct_base(&ppq->impl_, popped), 0);
     }
 }
 
 void
 ccc_pq_erase(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
-    if (!ppq->impl.root || !e->impl.next_sibling || !e->impl.prev_sibling)
+    if (!ppq->impl_.root || !e->impl_.next_sibling || !e->impl_.prev_sibling)
     {
         return;
     }
-    ppq->impl.root = delete (&ppq->impl, &e->impl);
-    ppq->impl.sz--;
-    clear_node(&e->impl);
-    if (ppq->impl.alloc)
+    ppq->impl_.root = delete (&ppq->impl_, &e->impl_);
+    ppq->impl_.sz--;
+    clear_node(&e->impl_);
+    if (ppq->impl_.alloc)
     {
-        ppq->impl.alloc(struct_base(&ppq->impl, &e->impl), 0);
+        ppq->impl_.alloc(struct_base(&ppq->impl_, &e->impl_), 0);
     }
 }
 
@@ -101,13 +101,13 @@ ccc_pq_clear(ccc_priority_queue *const ppq, ccc_destructor_fn *fn)
 bool
 ccc_pq_empty(ccc_priority_queue const *const ppq)
 {
-    return !ppq->impl.sz;
+    return !ppq->impl_.sz;
 }
 
 size_t
 ccc_pq_size(ccc_priority_queue const *const ppq)
 {
-    return ppq->impl.sz;
+    return ppq->impl_.sz;
 }
 
 /* This is a difficult function. Without knowing if this new value is greater
@@ -120,21 +120,21 @@ bool
 ccc_pq_update(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
               ccc_update_fn *const fn, void *const aux)
 {
-    if (!e->impl.next_sibling || !e->impl.prev_sibling)
+    if (!e->impl_.next_sibling || !e->impl_.prev_sibling)
     {
         return false;
     }
-    fn((ccc_update){struct_base(&ppq->impl, &e->impl), aux});
-    if (e->impl.parent
-        && cmp(&ppq->impl, &e->impl, e->impl.parent) == ppq->impl.order)
+    fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+    if (e->impl_.parent
+        && cmp(&ppq->impl_, &e->impl_, e->impl_.parent) == ppq->impl_.order)
     {
-        cut_child(&e->impl);
-        ppq->impl.root = merge(&ppq->impl, ppq->impl.root, &e->impl);
+        cut_child(&e->impl_);
+        ppq->impl_.root = merge(&ppq->impl_, ppq->impl_.root, &e->impl_);
         return true;
     }
-    ppq->impl.root = delete (&ppq->impl, &e->impl);
-    init_node(&e->impl);
-    ppq->impl.root = merge(&ppq->impl, ppq->impl.root, &e->impl);
+    ppq->impl_.root = delete (&ppq->impl_, &e->impl_);
+    init_node(&e->impl_);
+    ppq->impl_.root = merge(&ppq->impl_, ppq->impl_.root, &e->impl_);
     return true;
 }
 
@@ -144,22 +144,22 @@ bool
 ccc_pq_increase(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
                 ccc_update_fn *fn, void *aux)
 {
-    if (!e->impl.next_sibling || !e->impl.prev_sibling)
+    if (!e->impl_.next_sibling || !e->impl_.prev_sibling)
     {
         return false;
     }
-    if (ppq->impl.order == CCC_GRT)
+    if (ppq->impl_.order == CCC_GRT)
     {
-        fn((ccc_update){struct_base(&ppq->impl, &e->impl), aux});
-        cut_child(&e->impl);
+        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        cut_child(&e->impl_);
     }
     else
     {
-        ppq->impl.root = delete (&ppq->impl, &e->impl);
-        fn((ccc_update){struct_base(&ppq->impl, &e->impl), aux});
-        init_node(&e->impl);
+        ppq->impl_.root = delete (&ppq->impl_, &e->impl_);
+        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        init_node(&e->impl_);
     }
-    ppq->impl.root = merge(&ppq->impl, ppq->impl.root, &e->impl);
+    ppq->impl_.root = merge(&ppq->impl_, ppq->impl_.root, &e->impl_);
     return true;
 }
 
@@ -169,37 +169,37 @@ bool
 ccc_pq_decrease(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
                 ccc_update_fn *fn, void *aux)
 {
-    if (!e->impl.next_sibling || !e->impl.prev_sibling)
+    if (!e->impl_.next_sibling || !e->impl_.prev_sibling)
     {
         return false;
     }
-    if (ppq->impl.order == CCC_LES)
+    if (ppq->impl_.order == CCC_LES)
     {
-        fn((ccc_update){struct_base(&ppq->impl, &e->impl), aux});
-        cut_child(&e->impl);
+        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        cut_child(&e->impl_);
     }
     else
     {
-        ppq->impl.root = delete (&ppq->impl, &e->impl);
-        fn((ccc_update){struct_base(&ppq->impl, &e->impl), aux});
-        init_node(&e->impl);
+        ppq->impl_.root = delete (&ppq->impl_, &e->impl_);
+        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        init_node(&e->impl_);
     }
-    ppq->impl.root = merge(&ppq->impl, ppq->impl.root, &e->impl);
+    ppq->impl_.root = merge(&ppq->impl_, ppq->impl_.root, &e->impl_);
     return true;
 }
 
 bool
 ccc_pq_validate(ccc_priority_queue const *const ppq)
 {
-    if (ppq->impl.root && ppq->impl.root->parent)
+    if (ppq->impl_.root && ppq->impl_.root->parent)
     {
         return false;
     }
-    if (!has_valid_links(&ppq->impl, NULL, ppq->impl.root))
+    if (!has_valid_links(&ppq->impl_, NULL, ppq->impl_.root))
     {
         return false;
     }
-    if (traversal_size(ppq->impl.root) != ppq->impl.sz)
+    if (traversal_size(ppq->impl_.root) != ppq->impl_.sz)
     {
         return false;
     }
@@ -209,7 +209,7 @@ ccc_pq_validate(ccc_priority_queue const *const ppq)
 ccc_threeway_cmp
 ccc_pq_order(ccc_priority_queue const *const ppq)
 {
-    return ppq->impl.order;
+    return ppq->impl_.order;
 }
 
 /*========================   Static Helpers   ================================*/

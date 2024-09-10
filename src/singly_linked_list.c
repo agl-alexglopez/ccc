@@ -8,50 +8,50 @@ void *
 ccc_sll_push_front(ccc_singly_linked_list *const sll,
                    ccc_sll_elem *const struct_handle)
 {
-    if (sll->impl.alloc)
+    if (sll->impl_.alloc)
     {
-        void *node = sll->impl.alloc(NULL, sll->impl.elem_sz);
+        void *node = sll->impl_.alloc(NULL, sll->impl_.elem_sz);
         if (!node)
         {
             return NULL;
         }
-        memcpy(node, struct_base(&sll->impl, &struct_handle->impl),
-               sll->impl.elem_sz);
+        memcpy(node, struct_base(&sll->impl_, &struct_handle->impl_),
+               sll->impl_.elem_sz);
     }
-    ccc_impl_sll_push_front(&sll->impl, &struct_handle->impl);
-    return struct_base(&sll->impl, sll->impl.sentinel.n);
+    ccc_impl_sll_push_front(&sll->impl_, &struct_handle->impl_);
+    return struct_base(&sll->impl_, sll->impl_.sentinel.n);
 }
 
 void *
 ccc_sll_front(ccc_singly_linked_list const *const sll)
 {
-    if (!sll || sll->impl.sentinel.n == &sll->impl.sentinel)
+    if (!sll || sll->impl_.sentinel.n == &sll->impl_.sentinel)
     {
         return NULL;
     }
-    return struct_base(&sll->impl, sll->impl.sentinel.n);
+    return struct_base(&sll->impl_, sll->impl_.sentinel.n);
 }
 
 ccc_sll_elem *
 ccc_sll_head(ccc_singly_linked_list const *const sll)
 {
-    return (ccc_sll_elem *)sll->impl.sentinel.n;
+    return (ccc_sll_elem *)sll->impl_.sentinel.n;
 }
 
 void
 ccc_sll_pop_front(ccc_singly_linked_list *const sll)
 {
-    if (!sll->impl.sz)
+    if (!sll->impl_.sz)
     {
         return;
     }
-    struct ccc_sll_elem_ *remove = sll->impl.sentinel.n;
-    sll->impl.sentinel.n = remove->n;
-    if (sll->impl.alloc)
+    struct ccc_sll_elem_ *remove = sll->impl_.sentinel.n;
+    sll->impl_.sentinel.n = remove->n;
+    if (sll->impl_.alloc)
     {
-        sll->impl.alloc(struct_base(&sll->impl, remove), 0);
+        sll->impl_.alloc(struct_base(&sll->impl_, remove), 0);
     }
-    --sll->impl.sz;
+    --sll->impl_.sz;
 }
 
 void
@@ -66,11 +66,11 @@ ccc_impl_sll_push_front(struct ccc_sll_ *const sll,
 inline void *
 ccc_sll_begin(ccc_singly_linked_list const *const sll)
 {
-    if (!sll || sll->impl.sentinel.n == &sll->impl.sentinel)
+    if (!sll || sll->impl_.sentinel.n == &sll->impl_.sentinel)
     {
         return NULL;
     }
-    return struct_base(&sll->impl, sll->impl.sentinel.n);
+    return struct_base(&sll->impl_, sll->impl_.sentinel.n);
 }
 
 inline void *
@@ -83,30 +83,30 @@ inline void *
 ccc_sll_next(ccc_singly_linked_list const *const sll,
              ccc_sll_elem const *const iter_handle)
 {
-    if (!iter_handle || iter_handle->impl.n == &sll->impl.sentinel)
+    if (!iter_handle || iter_handle->impl_.n == &sll->impl_.sentinel)
     {
         return NULL;
     }
-    return struct_base(&sll->impl, iter_handle->impl.n);
+    return struct_base(&sll->impl_, iter_handle->impl_.n);
 }
 
 bool
 ccc_sll_validate(ccc_singly_linked_list const *const sll)
 {
     size_t size = 0;
-    for (struct ccc_sll_elem_ *e = sll->impl.sentinel.n;
-         e != &sll->impl.sentinel; e = e->n, ++size)
+    for (struct ccc_sll_elem_ *e = sll->impl_.sentinel.n;
+         e != &sll->impl_.sentinel; e = e->n, ++size)
     {
         if (!e || !e->n)
         {
             return false;
         }
-        if (size > sll->impl.sz)
+        if (size > sll->impl_.sz)
         {
             return false;
         }
     }
-    return size == sll->impl.sz;
+    return size == sll->impl_.sz;
 }
 
 struct ccc_sll_elem_ *
