@@ -7,6 +7,25 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef struct
+{
+    struct ccc_range_ impl_;
+} ccc_range;
+
+typedef struct
+{
+    struct ccc_rrange_ impl_;
+} ccc_rrange;
+
+#define CCC_ENTRY_OCCUPIED 0x1
+#define CCC_ENTRY_VACANT 0
+#define CCC_ENTRY_ERROR 0x2
+
+typedef struct
+{
+    struct ccc_entry_ impl_;
+} ccc_entry;
+
 typedef enum
 {
     CCC_OK = 0,
@@ -43,25 +62,6 @@ typedef struct
     void *container;
     void *aux;
 } ccc_update;
-
-typedef struct
-{
-    struct ccc_range_ impl_;
-} ccc_range;
-
-typedef struct
-{
-    struct ccc_rrange_ impl_;
-} ccc_rrange;
-
-#define CCC_ENTRY_OCCUPIED 0x1
-#define CCC_ENTRY_VACANT 0
-#define CCC_ENTRY_ERROR 0x2
-
-typedef struct
-{
-    struct ccc_entry_ impl_;
-} ccc_entry;
 
 typedef void *ccc_alloc_fn(void *, size_t);
 
@@ -104,15 +104,16 @@ typedef ccc_destructor_fn destructor_fn;
 typedef ccc_key_eq_fn key_eq_fn;
 typedef ccc_key_cmp_fn key_cmp_fn;
 typedef ccc_hash_fn hash_fn;
+#    define ENTRY_OCCUPIED CCC_ENTRY_OCCUPIED
 #    define ENTRY_VACANT CCC_ENTRY_VACANT
 #    define ENTRY_ERROR CCC_ENTRY_ERROR
-#    define entry_occupied ccc_entry_occupied
-#    define entry_error ccc_entry_error
-#    define entry_unwrap ccc_entry_unwrap
-#    define begin_range ccc_begin_range
-#    define end_range ccc_end_range
-#    define begin_rrange ccc_begin_rrange
-#    define end_rrange ccc_end_rrange
+#    define entry_occupied(args...) ccc_entry_occupied(args)
+#    define entry_error(args...) ccc_entry_error(args)
+#    define entry_unwrap(args...) ccc_entry_unwrap(args)
+#    define begin_range(args...) ccc_begin_range(args)
+#    define end_range(args...) ccc_end_range(args)
+#    define begin_rrange(args...) ccc_begin_rrange(args)
+#    define end_rrange(args...) ccc_end_rrange(args)
 #endif
 
 #endif /* CCC_TYPES_H */
