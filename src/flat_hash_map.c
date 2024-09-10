@@ -355,7 +355,7 @@ ccc_impl_fhm_insert(struct ccc_fhm_ *const h, void const *const e,
         if (slot_hash->hash_ == CCC_FHM_EMPTY)
         {
             memcpy(slot, floater, elem_sz);
-            ++h->buf_.impl_.sz;
+            ccc_buf_size_plus(&h->buf_);
             return;
         }
         size_t const slot_dist
@@ -389,7 +389,7 @@ erase(struct ccc_fhm_ *const h, void *const e)
         }
         swap(tmp, next_slot, ccc_buf_at(&h->buf_, stopped_at), elem_sz);
     }
-    --h->buf_.impl_.sz;
+    ccc_buf_size_minus(&h->buf_);
 }
 
 ccc_result
@@ -400,19 +400,19 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
     {
         return CCC_OK;
     }
-    if (!h->buf_.impl_.alloc)
+    if (!h->buf_.impl_.alloc_)
     {
         return CCC_NO_REALLOC;
     }
     struct ccc_fhm_ new_hash = *h;
-    new_hash.buf_.impl_.sz = 0;
-    new_hash.buf_.impl_.capacity
-        = new_hash.buf_.impl_.capacity
+    new_hash.buf_.impl_.sz_ = 0;
+    new_hash.buf_.impl_.capacity_
+        = new_hash.buf_.impl_.capacity_
               ? ccc_fhm_next_prime(ccc_buf_size(&h->buf_) * 2)
               : default_prime;
-    new_hash.buf_.impl_.mem = new_hash.buf_.impl_.alloc(
-        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.impl_.capacity);
-    if (!new_hash.buf_.impl_.mem)
+    new_hash.buf_.impl_.mem_ = new_hash.buf_.impl_.alloc_(
+        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.impl_.capacity_);
+    if (!new_hash.buf_.impl_.mem_)
     {
         return CCC_MEM_ERR;
     }
@@ -434,7 +434,7 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
                                 ccc_buf_index_of(&new_hash.buf_, new_ent.e_));
         }
     }
-    (void)ccc_buf_realloc(&h->buf_, 0, h->buf_.impl_.alloc);
+    (void)ccc_buf_realloc(&h->buf_, 0, h->buf_.impl_.alloc_);
     *h = new_hash;
     return CCC_OK;
 }
@@ -470,7 +470,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (!fn)
     {
-        h->impl_.buf_.impl_.sz = 0;
+        h->impl_.buf_.impl_.sz_ = 0;
         return;
     }
     for (void *slot = ccc_buf_begin(&h->impl_.buf_);
@@ -489,8 +489,8 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (!fn)
     {
-        h->impl_.buf_.impl_.sz = 0;
-        return ccc_buf_free(&h->impl_.buf_, h->impl_.buf_.impl_.alloc);
+        h->impl_.buf_.impl_.sz_ = 0;
+        return ccc_buf_free(&h->impl_.buf_, h->impl_.buf_.impl_.alloc_);
     }
     for (void *slot = ccc_buf_begin(&h->impl_.buf_);
          slot != ccc_buf_capacity_end(&h->impl_.buf_);
@@ -501,7 +501,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn(slot);
         }
     }
-    return ccc_buf_free(&h->impl_.buf_, h->impl_.buf_.impl_.alloc);
+    return ccc_buf_free(&h->impl_.buf_, h->impl_.buf_.impl_.alloc_);
 }
 
 size_t

@@ -19,6 +19,10 @@ typedef struct
 ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);
 size_t ccc_buf_size(ccc_buffer const *);
+
+void ccc_buf_size_plus(ccc_buffer *);
+void ccc_buf_size_minus(ccc_buffer *);
+
 size_t ccc_buf_capacity(ccc_buffer const *);
 size_t ccc_buf_elem_size(ccc_buffer const *);
 size_t ccc_buf_index_of(ccc_buffer const *, void const *slot);

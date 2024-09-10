@@ -8,18 +8,19 @@
 
 struct ccc_buf_
 {
-    void *mem;
-    size_t elem_sz;
-    size_t sz;
-    size_t capacity;
-    ccc_alloc_fn *alloc;
+    void *mem_;
+    size_t elem_sz_;
+    size_t sz_;
+    size_t capacity_;
+    ccc_alloc_fn *alloc_;
 };
 
 #define CCC_IMPL_BUF_INIT(mem, type, capacity, alloc_fn)                       \
     {                                                                          \
-        .impl_ = {                                                             \
-            (mem), sizeof(type), 0, (capacity), (alloc_fn),                    \
-        },                                                                     \
+        {                                                                      \
+            .mem_ = (mem), .elem_sz_ = sizeof(type), .sz_ = 0,                 \
+            .capacity_ = (capacity), .alloc_ = (alloc_fn),                     \
+        }                                                                      \
     }
 
 #define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, type_initializer...)          \

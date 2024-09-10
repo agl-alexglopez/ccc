@@ -132,7 +132,7 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
                 = key_value;                                                   \
             *ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_)                    \
                 = (swap_entry)->hash_;                                         \
-            ++(swap_entry)->h_->buf_.impl_.sz;                                 \
+            ccc_buf_size_plus(&(swap_entry)->h_->buf_);                        \
         }                                                                      \
         else                                                                   \
         {                                                                      \
