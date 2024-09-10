@@ -46,82 +46,82 @@ ccc_result
 ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
                 ccc_alloc_fn *const fn)
 {
-    return (ccc_result)ccc_buf_realloc(&fpq->impl_.buf, new_capacity, fn);
+    return (ccc_result)ccc_buf_realloc(&fpq->impl_.buf_, new_capacity, fn);
 }
 
 void *
 ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
 {
-    void *const new = ccc_buf_alloc(&fpq->impl_.buf);
+    void *const new = ccc_buf_alloc(&fpq->impl_.buf_);
     if (!new)
     {
         return NULL;
     }
     if (new != val)
     {
-        memcpy(new, val, ccc_buf_elem_size(&fpq->impl_.buf));
+        memcpy(new, val, ccc_buf_elem_size(&fpq->impl_.buf_));
     }
-    size_t const buf_sz = ccc_buf_size(&fpq->impl_.buf);
+    size_t const buf_sz = ccc_buf_size(&fpq->impl_.buf_);
     size_t i = buf_sz - 1;
     if (buf_sz > 1)
     {
-        uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf)];
+        uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
         i = ccc_impl_fpq_bubble_up(&fpq->impl_, tmp, i);
     }
     else
     {
         i = 0;
     }
-    return ccc_buf_at(&fpq->impl_.buf, i);
+    return ccc_buf_at(&fpq->impl_.buf_, i);
 }
 
 void
 ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 {
-    if (ccc_buf_empty(&fpq->impl_.buf))
+    if (ccc_buf_empty(&fpq->impl_.buf_))
     {
         return;
     }
-    if (ccc_buf_size(&fpq->impl_.buf) == 1)
+    if (ccc_buf_size(&fpq->impl_.buf_) == 1)
     {
-        ccc_buf_pop_back(&fpq->impl_.buf);
+        ccc_buf_pop_back(&fpq->impl_.buf_);
         return;
     }
-    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf)];
-    swap(&fpq->impl_, tmp, 0, ccc_buf_size(&fpq->impl_.buf) - 1);
-    ccc_buf_pop_back(&fpq->impl_.buf);
+    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
+    swap(&fpq->impl_, tmp, 0, ccc_buf_size(&fpq->impl_.buf_) - 1);
+    ccc_buf_pop_back(&fpq->impl_.buf_);
     bubble_down(&fpq->impl_, tmp, 0);
 }
 
 void *
 ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 {
-    if (ccc_buf_empty(&fpq->impl_.buf))
+    if (ccc_buf_empty(&fpq->impl_.buf_))
     {
         return NULL;
     }
-    if (ccc_buf_size(&fpq->impl_.buf) == 1)
+    if (ccc_buf_size(&fpq->impl_.buf_) == 1)
     {
         void *const ret = at(&fpq->impl_, 0);
-        ccc_buf_pop_back(&fpq->impl_.buf);
+        ccc_buf_pop_back(&fpq->impl_.buf_);
         return ret;
     }
     /* Important to remember this key now to avoid confusion later once the
        elements are swapped and we lose access to original handle index. */
     size_t const swap_location = index_of(&fpq->impl_, e);
-    if (swap_location == ccc_buf_size(&fpq->impl_.buf) - 1)
+    if (swap_location == ccc_buf_size(&fpq->impl_.buf_) - 1)
     {
-        void *const ret = at(&fpq->impl_, ccc_buf_size(&fpq->impl_.buf) - 1);
-        ccc_buf_pop_back(&fpq->impl_.buf);
+        void *const ret = at(&fpq->impl_, ccc_buf_size(&fpq->impl_.buf_) - 1);
+        ccc_buf_pop_back(&fpq->impl_.buf_);
         return ret;
     }
-    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf)];
-    swap(&fpq->impl_, tmp, swap_location, ccc_buf_size(&fpq->impl_.buf) - 1);
-    void *const erased = at(&fpq->impl_, ccc_buf_size(&fpq->impl_.buf) - 1);
-    ccc_buf_pop_back(&fpq->impl_.buf);
-    ccc_threeway_cmp const erased_cmp = fpq->impl_.cmp(
-        (ccc_cmp){at(&fpq->impl_, swap_location), erased, fpq->impl_.aux});
-    if (erased_cmp == fpq->impl_.order)
+    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
+    swap(&fpq->impl_, tmp, swap_location, ccc_buf_size(&fpq->impl_.buf_) - 1);
+    void *const erased = at(&fpq->impl_, ccc_buf_size(&fpq->impl_.buf_) - 1);
+    ccc_buf_pop_back(&fpq->impl_.buf_);
+    ccc_threeway_cmp const erased_cmp = fpq->impl_.cmp_(
+        (ccc_cmp){at(&fpq->impl_, swap_location), erased, fpq->impl_.aux_});
+    if (erased_cmp == fpq->impl_.order_)
     {
         (void)ccc_impl_fpq_bubble_up(&fpq->impl_, tmp, swap_location);
     }
@@ -137,21 +137,21 @@ bool
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
                ccc_update_fn *fn, void *aux)
 {
-    if (ccc_buf_empty(&fpq->impl_.buf))
+    if (ccc_buf_empty(&fpq->impl_.buf_))
     {
         return false;
     }
     fn((ccc_update){e, aux});
-    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf)];
+    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
     size_t const i = index_of(&fpq->impl_, e);
     if (!i)
     {
         bubble_down(&fpq->impl_, tmp, 0);
         return true;
     }
-    ccc_threeway_cmp const parent_cmp = fpq->impl_.cmp((ccc_cmp){
-        at(&fpq->impl_, i), at(&fpq->impl_, (i - 1) / 2), fpq->impl_.aux});
-    if (parent_cmp == fpq->impl_.order)
+    ccc_threeway_cmp const parent_cmp = fpq->impl_.cmp_((ccc_cmp){
+        at(&fpq->impl_, i), at(&fpq->impl_, (i - 1) / 2), fpq->impl_.aux_});
+    if (parent_cmp == fpq->impl_.order_)
     {
         (void)ccc_impl_fpq_bubble_up(&fpq->impl_, tmp, i);
         return true;
@@ -168,7 +168,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
 void *
 ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {
-    if (ccc_buf_empty(&fpq->impl_.buf))
+    if (ccc_buf_empty(&fpq->impl_.buf_))
     {
         return NULL;
     }
@@ -178,36 +178,36 @@ ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 bool
 ccc_fpq_empty(ccc_flat_priority_queue const *const fpq)
 {
-    return ccc_buf_empty(&fpq->impl_.buf);
+    return ccc_buf_empty(&fpq->impl_.buf_);
 }
 
 size_t
 ccc_fpq_size(ccc_flat_priority_queue const *const fpq)
 {
-    return ccc_buf_size(&fpq->impl_.buf);
+    return ccc_buf_size(&fpq->impl_.buf_);
 }
 
 ccc_threeway_cmp
 ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 {
-    return fpq->impl_.order;
+    return fpq->impl_.order_;
 }
 
 void
 ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *fn)
 {
-    size_t const sz = ccc_buf_size(&fpq->impl_.buf);
+    size_t const sz = ccc_buf_size(&fpq->impl_.buf_);
     for (size_t i = 0; i < sz; ++i)
     {
         fn(at(&fpq->impl_, i));
     }
-    ccc_buf_pop_back_n(&fpq->impl_.buf, ccc_buf_size(&fpq->impl_.buf));
+    ccc_buf_pop_back_n(&fpq->impl_.buf_, ccc_buf_size(&fpq->impl_.buf_));
 }
 
 bool
 ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
 {
-    size_t const sz = ccc_buf_size(&fpq->impl_.buf);
+    size_t const sz = ccc_buf_size(&fpq->impl_.buf_);
     if (sz <= 1)
     {
         return true;
@@ -260,7 +260,7 @@ ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t i)
 static void
 bubble_down(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t i)
 {
-    size_t const sz = ccc_buf_size(&fpq->buf);
+    size_t const sz = ccc_buf_size(&fpq->buf_);
     for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
          i = next, left = i * 2 + 1, right = left + 1)
     {
@@ -279,7 +279,7 @@ bubble_down(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t i)
 static inline void
 swap(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t const i, size_t const j)
 {
-    ccc_result const res = ccc_buf_swap(&fpq->buf, tmp, i, j);
+    ccc_result const res = ccc_buf_swap(&fpq->buf_, tmp, i, j);
     (void)res;
     assert(res == CCC_OK);
 }
@@ -289,7 +289,7 @@ swap(struct ccc_fpq_ *const fpq, uint8_t tmp[], size_t const i, size_t const j)
 static inline void *
 at(struct ccc_fpq_ const *const fpq, size_t const i)
 {
-    void *const addr = ccc_buf_at(&fpq->buf, i);
+    void *const addr = ccc_buf_at(&fpq->buf_, i);
     assert(addr);
     return addr;
 }
@@ -300,10 +300,10 @@ at(struct ccc_fpq_ const *const fpq, size_t const i)
 static inline size_t
 index_of(struct ccc_fpq_ const *const fpq, void const *const slot)
 {
-    assert(slot >= ccc_buf_base(&fpq->buf));
-    size_t const i = (((uint8_t *)slot) - ((uint8_t *)ccc_buf_base(&fpq->buf)))
-                     / ccc_buf_elem_size(&fpq->buf);
-    assert(i < ccc_buf_size(&fpq->buf));
+    assert(slot >= ccc_buf_base(&fpq->buf_));
+    size_t const i = (((uint8_t *)slot) - ((uint8_t *)ccc_buf_base(&fpq->buf_)))
+                     / ccc_buf_elem_size(&fpq->buf_);
+    assert(i < ccc_buf_size(&fpq->buf_));
     return i;
 }
 
@@ -311,7 +311,7 @@ static inline bool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {
-    return fpq->cmp((ccc_cmp){winner, loser, fpq->aux}) == fpq->order;
+    return fpq->cmp_((ccc_cmp){winner, loser, fpq->aux_}) == fpq->order_;
 }
 
 /* NOLINTBEGIN(*misc-no-recursion) */
@@ -339,7 +339,7 @@ static void
 print_inner_heap(struct ccc_fpq_ const *const fpq, size_t i, char const *prefix,
                  enum ccc_print_link const node_type, ccc_print_fn *const fn)
 {
-    size_t const sz = ccc_buf_size(&fpq->buf);
+    size_t const sz = ccc_buf_size(&fpq->buf_);
     if (i >= sz)
     {
         return;
@@ -380,7 +380,7 @@ print_inner_heap(struct ccc_fpq_ const *const fpq, size_t i, char const *prefix,
 static void
 print_heap(struct ccc_fpq_ const *const fpq, size_t i, ccc_print_fn *const fn)
 {
-    size_t const sz = ccc_buf_size(&fpq->buf);
+    size_t const sz = ccc_buf_size(&fpq->buf_);
     if (i >= sz)
     {
         return;
