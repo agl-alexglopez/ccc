@@ -29,20 +29,20 @@ ccc_impl_fhm_init(struct ccc_fhm_ *const h, size_t key_offset,
     {
         return CCC_MEM_ERR;
     }
-    h->key_offset = key_offset;
-    h->hash_elem_offset = hash_elem_offset;
-    h->hash_fn = hash_fn;
-    h->eq_fn = eq_fn;
-    h->aux = aux;
-    memset(ccc_buf_begin(&h->buf), CCC_FHM_EMPTY,
-           ccc_buf_capacity(&h->buf) * ccc_buf_elem_size(&h->buf));
+    h->key_offset_ = key_offset;
+    h->hash_elem_offset_ = hash_elem_offset;
+    h->hash_fn_ = hash_fn;
+    h->eq_fn_ = eq_fn;
+    h->aux_ = aux;
+    memset(ccc_buf_begin(&h->buf_), CCC_FHM_EMPTY,
+           ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
     return CCC_OK;
 }
 
 bool
 ccc_fhm_empty(ccc_flat_hash_map const *const h)
 {
-    return !ccc_buf_size(&h->impl.buf);
+    return !ccc_buf_size(&h->impl.buf_);
 }
 
 bool
@@ -55,7 +55,7 @@ ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 size_t
 ccc_fhm_size(ccc_flat_hash_map const *const h)
 {
-    return ccc_buf_size(&h->impl.buf);
+    return ccc_buf_size(&h->impl.buf_);
 }
 
 ccc_fh_map_entry
@@ -69,9 +69,9 @@ ccc_impl_fhm_entry(struct ccc_fhm_ *h, void const *key)
 {
     uint64_t const hash = ccc_impl_fhm_filter(h, key);
     return (struct ccc_fhm_entry_){
-        .h = h,
-        .hash = hash,
-        .entry = entry(h, key, hash),
+        .h_ = h,
+        .hash_ = hash,
+        .entry_ = entry(h, key, hash),
     };
 }
 
@@ -79,23 +79,23 @@ void *
 ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
                      ccc_fh_map_elem *const elem)
 {
-    void *user_struct = struct_base(e->impl.h, &elem->impl);
-    if (e->impl.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    void *user_struct = struct_base(e->impl.h_, &elem->impl);
+    if (e->impl.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
         /* It is ok if an insert error was indicated because we do not
            need more space if we are overwriting a previous value. */
-        elem->impl.hash = e->impl.hash;
-        memcpy(e->impl.entry.e_, user_struct,
-               ccc_buf_elem_size(&e->impl.h->buf));
-        return e->impl.entry.e_;
+        elem->impl.hash_ = e->impl.hash_;
+        memcpy(e->impl.entry_.e_, user_struct,
+               ccc_buf_elem_size(&e->impl.h_->buf_));
+        return e->impl.entry_.e_;
     }
-    if (e->impl.entry.stats_ & ~CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry_.stats_ & ~CCC_FHM_ENTRY_OCCUPIED)
     {
         return NULL;
     }
-    ccc_impl_fhm_insert(e->impl.h, user_struct, e->impl.hash,
-                        ccc_buf_index_of(&e->impl.h->buf, e->impl.entry.e_));
-    return e->impl.entry.e_;
+    ccc_impl_fhm_insert(e->impl.h_, user_struct, e->impl.hash_,
+                        ccc_buf_index_of(&e->impl.h_->buf_, e->impl.entry_.e_));
+    return e->impl.entry_.e_;
 }
 
 inline void *
@@ -119,11 +119,11 @@ ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
 ccc_entry
 ccc_fhm_remove_entry(ccc_fh_map_entry const *const e)
 {
-    if (e->impl.entry.stats_ != CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry_.stats_ != CCC_FHM_ENTRY_OCCUPIED)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
-    erase(e->impl.h, e->impl.entry.e_);
+    erase(e->impl.h_, e->impl.entry_.e_);
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
@@ -137,9 +137,9 @@ struct ccc_fhm_entry_
 ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ const *const e,
                         ccc_update_fn *const fn)
 {
-    if (e->entry.stats_ == CCC_FHM_ENTRY_OCCUPIED)
+    if (e->entry_.stats_ == CCC_FHM_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){e->entry.e_, NULL});
+        fn((ccc_update){e->entry_.e_, NULL});
     }
     return *e;
 }
@@ -148,9 +148,9 @@ ccc_fh_map_entry
 ccc_fhm_and_modify_with(ccc_fh_map_entry const *const e,
                         ccc_update_fn *const fn, void *aux)
 {
-    if (e->impl.entry.stats_ == CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry_.stats_ == CCC_FHM_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){e->impl.entry.e_, aux});
+        fn((ccc_update){e->impl.entry_.e_, aux});
     }
     return *e;
 }
@@ -160,25 +160,25 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
 {
     void *user_return = struct_base(&h->impl, &out_handle->impl);
     void *key = ccc_impl_fhm_key_in_slot(&h->impl, user_return);
-    size_t const user_struct_size = ccc_buf_elem_size(&h->impl.buf);
+    size_t const user_struct_size = ccc_buf_elem_size(&h->impl.buf_);
     struct ccc_fhm_entry_ ent = ccc_impl_fhm_entry(&h->impl, key);
-    if (ent.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    if (ent.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
         /* If an error occured when obtaining the entry and trying to resize,
            that is ok. We will not need new space yet. Only allow the insert
            error to persist if we actually need more space. */
-        ent.entry.stats_ = CCC_FHM_ENTRY_OCCUPIED;
-        out_handle->impl.hash = ent.hash;
+        ent.entry_.stats_ = CCC_FHM_ENTRY_OCCUPIED;
+        out_handle->impl.hash_ = ent.hash_;
         uint8_t tmp[user_struct_size];
-        swap(tmp, ent.entry.e_, user_return, user_struct_size);
+        swap(tmp, ent.entry_.e_, user_return, user_struct_size);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry.stats_ & (CCC_FHM_ENTRY_NULL | CCC_FHM_ENTRY_INSERT_ERROR))
+    if (ent.entry_.stats_ & (CCC_FHM_ENTRY_NULL | CCC_FHM_ENTRY_INSERT_ERROR))
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_ERROR}};
     }
-    ccc_impl_fhm_insert(&h->impl, user_return, ent.hash,
-                        ccc_buf_index_of(&h->impl.buf, ent.entry.e_));
+    ccc_impl_fhm_insert(&h->impl, user_return, ent.hash_,
+                        ccc_buf_index_of(&h->impl.buf_, ent.entry_.e_));
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
 
@@ -193,7 +193,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
-    memcpy(ret, ent.e_, ccc_buf_elem_size(&h->impl.buf));
+    memcpy(ret, ent.e_, ccc_buf_elem_size(&h->impl.buf_));
     erase(&h->impl, ent.e_);
     return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -201,19 +201,19 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
 void *
 ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
 {
-    if (e->impl.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
-        return e->impl.entry.e_;
+        return e->impl.entry_.e_;
     }
-    if (e->impl.entry.stats_ & ~CCC_FHM_ENTRY_VACANT)
+    if (e->impl.entry_.stats_ & ~CCC_FHM_ENTRY_VACANT)
     {
         return NULL;
     }
-    void *user_struct = struct_base(e->impl.h, &elem->impl);
-    elem->impl.hash = e->impl.hash;
-    ccc_impl_fhm_insert(e->impl.h, user_struct, elem->impl.hash,
-                        ccc_buf_index_of(&e->impl.h->buf, e->impl.entry.e_));
-    return e->impl.entry.e_;
+    void *user_struct = struct_base(e->impl.h_, &elem->impl);
+    elem->impl.hash_ = e->impl.hash_;
+    ccc_impl_fhm_insert(e->impl.h_, user_struct, elem->impl.hash_,
+                        ccc_buf_index_of(&e->impl.h_->buf_, e->impl.entry_.e_));
+    return e->impl.entry_.e_;
 }
 
 inline void const *
@@ -231,50 +231,50 @@ ccc_fhm_unwrap_mut(ccc_fh_map_entry const *const e)
 inline void const *
 ccc_impl_fhm_unwrap(struct ccc_fhm_entry_ const *const e)
 {
-    if (!(e->entry.stats_ & CCC_FHM_ENTRY_OCCUPIED))
+    if (!(e->entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return e->entry.e_;
+    return e->entry_.e_;
 }
 
 inline bool
 ccc_fhm_occupied(ccc_fh_map_entry const *const e)
 {
-    return e->impl.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED;
+    return e->impl.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED;
 }
 
 inline bool
 ccc_fhm_insert_error(ccc_fh_map_entry const *const e)
 {
-    return e->impl.entry.stats_ & CCC_FHM_ENTRY_INSERT_ERROR;
+    return e->impl.entry_.stats_ & CCC_FHM_ENTRY_INSERT_ERROR;
 }
 
 inline void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
-    if (ccc_buf_empty(&h->impl.buf))
+    if (ccc_buf_empty(&h->impl.buf_))
     {
         return NULL;
     }
-    void *iter = ccc_buf_begin(&h->impl.buf);
-    for (; iter != ccc_buf_capacity_end(&h->impl.buf)
-           && ccc_impl_fhm_in_slot(&h->impl, iter)->hash == CCC_FHM_EMPTY;
-         iter = ccc_buf_next(&h->impl.buf, iter))
+    void *iter = ccc_buf_begin(&h->impl.buf_);
+    for (; iter != ccc_buf_capacity_end(&h->impl.buf_)
+           && ccc_impl_fhm_in_slot(&h->impl, iter)->hash_ == CCC_FHM_EMPTY;
+         iter = ccc_buf_next(&h->impl.buf_, iter))
     {}
-    return iter == ccc_buf_capacity_end(&h->impl.buf) ? NULL : iter;
+    return iter == ccc_buf_capacity_end(&h->impl.buf_) ? NULL : iter;
 }
 
 inline void *
 ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
 {
     void *i = struct_base(&h->impl, &iter->impl);
-    for (i = ccc_buf_next(&h->impl.buf, i);
-         i != ccc_buf_capacity_end(&h->impl.buf)
-         && ccc_impl_fhm_in_slot(&h->impl, i)->hash == CCC_FHM_EMPTY;
-         i = ccc_buf_next(&h->impl.buf, i))
+    for (i = ccc_buf_next(&h->impl.buf_, i);
+         i != ccc_buf_capacity_end(&h->impl.buf_)
+         && ccc_impl_fhm_in_slot(&h->impl, i)->hash_ == CCC_FHM_EMPTY;
+         i = ccc_buf_next(&h->impl.buf_, i))
     {}
-    return i == ccc_buf_capacity_end(&h->impl.buf) ? NULL : i;
+    return i == ccc_buf_capacity_end(&h->impl.buf_) ? NULL : i;
 }
 
 inline void *
@@ -300,25 +300,25 @@ struct ccc_entry_
 ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
                   uint64_t const hash)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf);
+    size_t const cap = ccc_buf_capacity(&h->buf_);
     size_t cur_i = hash % cap;
     for (size_t dist = 0; dist < cap; ++dist, cur_i = (cur_i + 1) % cap)
     {
-        void *slot = ccc_buf_at(&h->buf, cur_i);
+        void *slot = ccc_buf_at(&h->buf_, cur_i);
         struct ccc_fhm_elem_ *const e = ccc_impl_fhm_in_slot(h, slot);
-        if (e->hash == CCC_FHM_EMPTY)
+        if (e->hash_ == CCC_FHM_EMPTY)
         {
             return (struct ccc_entry_){.e_ = slot,
                                        .stats_ = CCC_FHM_ENTRY_VACANT};
         }
-        if (dist > ccc_impl_fhm_distance(cap, cur_i, e->hash))
+        if (dist > ccc_impl_fhm_distance(cap, cur_i, e->hash_))
         {
             return (struct ccc_entry_){.e_ = slot,
                                        .stats_ = CCC_FHM_ENTRY_VACANT};
         }
-        if (hash == e->hash
-            && h->eq_fn(
-                (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux}))
+        if (hash == e->hash_
+            && h->eq_fn_(
+                (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux_}))
         {
             return (struct ccc_entry_){.e_ = slot,
                                        .stats_ = CCC_FHM_ENTRY_OCCUPIED};
@@ -336,28 +336,28 @@ void
 ccc_impl_fhm_insert(struct ccc_fhm_ *const h, void const *const e,
                     uint64_t const hash, size_t cur_i)
 {
-    size_t const elem_sz = ccc_buf_elem_size(&h->buf);
-    size_t const cap = ccc_buf_capacity(&h->buf);
+    size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
+    size_t const cap = ccc_buf_capacity(&h->buf_);
     uint8_t floater[elem_sz];
     (void)memcpy(floater, e, elem_sz);
 
     /* This function cannot modify e and e may be copied over to new
        insertion from old table. So should this function invariantly assign
        starting hash to this slot copy for insertion? I think yes so far. */
-    ccc_impl_fhm_in_slot(h, floater)->hash = hash;
+    ccc_impl_fhm_in_slot(h, floater)->hash_ = hash;
     size_t dist = ccc_impl_fhm_distance(cap, cur_i, hash);
     for (;; cur_i = (cur_i + 1) % cap, ++dist)
     {
-        void *const slot = ccc_buf_at(&h->buf, cur_i);
+        void *const slot = ccc_buf_at(&h->buf_, cur_i);
         struct ccc_fhm_elem_ const *slot_hash = ccc_impl_fhm_in_slot(h, slot);
-        if (slot_hash->hash == CCC_FHM_EMPTY)
+        if (slot_hash->hash_ == CCC_FHM_EMPTY)
         {
             memcpy(slot, floater, elem_sz);
-            ++h->buf.impl.sz;
+            ++h->buf_.impl.sz;
             return;
         }
         size_t const slot_dist
-            = ccc_impl_fhm_distance(cap, cur_i, slot_hash->hash);
+            = ccc_impl_fhm_distance(cap, cur_i, slot_hash->hash_);
         if (dist > slot_dist)
         {
             uint8_t tmp[elem_sz];
@@ -370,68 +370,69 @@ ccc_impl_fhm_insert(struct ccc_fhm_ *const h, void const *const e,
 static void
 erase(struct ccc_fhm_ *const h, void *const e)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf);
-    size_t const elem_sz = ccc_buf_elem_size(&h->buf);
-    size_t stopped_at = ccc_buf_index_of(&h->buf, e);
+    size_t const cap = ccc_buf_capacity(&h->buf_);
+    size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
+    size_t stopped_at = ccc_buf_index_of(&h->buf_, e);
     *ccc_impl_fhm_hash_at(h, stopped_at) = CCC_FHM_EMPTY;
     size_t next = (stopped_at + 1) % cap;
-    uint8_t tmp[ccc_buf_elem_size(&h->buf)];
+    uint8_t tmp[ccc_buf_elem_size(&h->buf_)];
     for (;; stopped_at = (stopped_at + 1) % cap, next = (next + 1) % cap)
     {
-        void *next_slot = ccc_buf_at(&h->buf, next);
+        void *next_slot = ccc_buf_at(&h->buf_, next);
         struct ccc_fhm_elem_ *next_elem = ccc_impl_fhm_in_slot(h, next_slot);
-        if (next_elem->hash == CCC_FHM_EMPTY
-            || !ccc_impl_fhm_distance(cap, next, next_elem->hash))
+        if (next_elem->hash_ == CCC_FHM_EMPTY
+            || !ccc_impl_fhm_distance(cap, next, next_elem->hash_))
         {
             break;
         }
-        swap(tmp, next_slot, ccc_buf_at(&h->buf, stopped_at), elem_sz);
+        swap(tmp, next_slot, ccc_buf_at(&h->buf_, stopped_at), elem_sz);
     }
-    --h->buf.impl.sz;
+    --h->buf_.impl.sz;
 }
 
 ccc_result
 ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
 {
-    if ((double)ccc_buf_size(&h->buf) / (double)ccc_buf_capacity(&h->buf)
+    if ((double)ccc_buf_size(&h->buf_) / (double)ccc_buf_capacity(&h->buf_)
         <= load_factor)
     {
         return CCC_OK;
     }
-    if (!h->buf.impl.alloc)
+    if (!h->buf_.impl.alloc)
     {
         return CCC_NO_REALLOC;
     }
     struct ccc_fhm_ new_hash = *h;
-    new_hash.buf.impl.sz = 0;
-    new_hash.buf.impl.capacity
-        = new_hash.buf.impl.capacity
-              ? ccc_fhm_next_prime(ccc_buf_size(&h->buf) * 2)
+    new_hash.buf_.impl.sz = 0;
+    new_hash.buf_.impl.capacity
+        = new_hash.buf_.impl.capacity
+              ? ccc_fhm_next_prime(ccc_buf_size(&h->buf_) * 2)
               : default_prime;
-    new_hash.buf.impl.mem = new_hash.buf.impl.alloc(
-        NULL, ccc_buf_elem_size(&h->buf) * new_hash.buf.impl.capacity);
-    if (!new_hash.buf.impl.mem)
+    new_hash.buf_.impl.mem = new_hash.buf_.impl.alloc(
+        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.impl.capacity);
+    if (!new_hash.buf_.impl.mem)
     {
         return CCC_MEM_ERR;
     }
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
-    memset(ccc_buf_base(&new_hash.buf), CCC_FHM_EMPTY,
-           ccc_buf_capacity(&new_hash.buf) * ccc_buf_elem_size(&new_hash.buf));
-    for (void *slot = ccc_buf_begin(&h->buf);
-         slot != ccc_buf_capacity_end(&h->buf);
-         slot = ccc_buf_next(&h->buf, slot))
+    memset(ccc_buf_base(&new_hash.buf_), CCC_FHM_EMPTY,
+           ccc_buf_capacity(&new_hash.buf_)
+               * ccc_buf_elem_size(&new_hash.buf_));
+    for (void *slot = ccc_buf_begin(&h->buf_);
+         slot != ccc_buf_capacity_end(&h->buf_);
+         slot = ccc_buf_next(&h->buf_, slot))
     {
         struct ccc_fhm_elem_ const *const e = ccc_impl_fhm_in_slot(h, slot);
-        if (e->hash != CCC_FHM_EMPTY)
+        if (e->hash_ != CCC_FHM_EMPTY)
         {
             struct ccc_entry_ new_ent = ccc_impl_fhm_find(
-                &new_hash, ccc_impl_fhm_key_in_slot(h, slot), e->hash);
-            ccc_impl_fhm_insert(&new_hash, slot, e->hash,
-                                ccc_buf_index_of(&new_hash.buf, new_ent.e_));
+                &new_hash, ccc_impl_fhm_key_in_slot(h, slot), e->hash_);
+            ccc_impl_fhm_insert(&new_hash, slot, e->hash_,
+                                ccc_buf_index_of(&new_hash.buf_, new_ent.e_));
         }
     }
-    (void)ccc_buf_realloc(&h->buf, 0, h->buf.impl.alloc);
+    (void)ccc_buf_realloc(&h->buf_, 0, h->buf_.impl.alloc);
     *h = new_hash;
     return CCC_OK;
 }
@@ -439,11 +440,11 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
 void
 ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn)
 {
-    for (void const *i = ccc_buf_begin(&h->impl.buf);
-         i != ccc_buf_capacity_end(&h->impl.buf);
-         i = ccc_buf_next(&h->impl.buf, i))
+    for (void const *i = ccc_buf_begin(&h->impl.buf_);
+         i != ccc_buf_capacity_end(&h->impl.buf_);
+         i = ccc_buf_next(&h->impl.buf_, i))
     {
-        if (ccc_impl_fhm_in_slot(&h->impl, i)->hash != CCC_FHM_EMPTY)
+        if (ccc_impl_fhm_in_slot(&h->impl, i)->hash_ != CCC_FHM_EMPTY)
         {
             fn(i);
         }
@@ -467,14 +468,14 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (!fn)
     {
-        h->impl.buf.impl.sz = 0;
+        h->impl.buf_.impl.sz = 0;
         return;
     }
-    for (void *slot = ccc_buf_begin(&h->impl.buf);
-         slot != ccc_buf_capacity_end(&h->impl.buf);
-         slot = ccc_buf_next(&h->impl.buf, slot))
+    for (void *slot = ccc_buf_begin(&h->impl.buf_);
+         slot != ccc_buf_capacity_end(&h->impl.buf_);
+         slot = ccc_buf_next(&h->impl.buf_, slot))
     {
-        if (ccc_impl_fhm_in_slot(&h->impl, slot)->hash != CCC_FHM_EMPTY)
+        if (ccc_impl_fhm_in_slot(&h->impl, slot)->hash_ != CCC_FHM_EMPTY)
         {
             fn(slot);
         }
@@ -486,37 +487,37 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (!fn)
     {
-        h->impl.buf.impl.sz = 0;
-        return ccc_buf_free(&h->impl.buf, h->impl.buf.impl.alloc);
+        h->impl.buf_.impl.sz = 0;
+        return ccc_buf_free(&h->impl.buf_, h->impl.buf_.impl.alloc);
     }
-    for (void *slot = ccc_buf_begin(&h->impl.buf);
-         slot != ccc_buf_capacity_end(&h->impl.buf);
-         slot = ccc_buf_next(&h->impl.buf, slot))
+    for (void *slot = ccc_buf_begin(&h->impl.buf_);
+         slot != ccc_buf_capacity_end(&h->impl.buf_);
+         slot = ccc_buf_next(&h->impl.buf_, slot))
     {
-        if (ccc_impl_fhm_in_slot(&h->impl, slot)->hash != CCC_FHM_EMPTY)
+        if (ccc_impl_fhm_in_slot(&h->impl, slot)->hash_ != CCC_FHM_EMPTY)
         {
             fn(slot);
         }
     }
-    return ccc_buf_free(&h->impl.buf, h->impl.buf.impl.alloc);
+    return ccc_buf_free(&h->impl.buf_, h->impl.buf_.impl.alloc);
 }
 
 size_t
 ccc_fhm_capacity(ccc_flat_hash_map const *const h)
 {
-    return ccc_buf_capacity(&h->impl.buf);
+    return ccc_buf_capacity(&h->impl.buf_);
 }
 
 inline struct ccc_fhm_elem_ *
 ccc_impl_fhm_in_slot(struct ccc_fhm_ const *const h, void const *const slot)
 {
-    return (struct ccc_fhm_elem_ *)((uint8_t *)slot + h->hash_elem_offset);
+    return (struct ccc_fhm_elem_ *)((uint8_t *)slot + h->hash_elem_offset_);
 }
 
 void *
 ccc_impl_fhm_key_in_slot(struct ccc_fhm_ const *h, void const *slot)
 {
-    return (uint8_t *)slot + h->key_offset;
+    return (uint8_t *)slot + h->key_offset_;
 }
 
 inline size_t
@@ -529,11 +530,11 @@ ccc_impl_fhm_distance(size_t const capacity, size_t const index, uint64_t hash)
 bool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
-    for (void const *i = ccc_buf_begin(&h->impl.buf);
-         i != ccc_buf_capacity_end(&h->impl.buf);
-         i = ccc_buf_next(&h->impl.buf, i))
+    for (void const *i = ccc_buf_begin(&h->impl.buf_);
+         i != ccc_buf_capacity_end(&h->impl.buf_);
+         i = ccc_buf_next(&h->impl.buf_, i))
     {
-        if (ccc_impl_fhm_in_slot(&h->impl, i)->hash != CCC_FHM_EMPTY
+        if (ccc_impl_fhm_in_slot(&h->impl, i)->hash_ != CCC_FHM_EMPTY
             && !valid_distance_from_home(&h->impl, i))
         {
             return false;
@@ -547,7 +548,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
 static void *
 struct_base(struct ccc_fhm_ const *const h, struct ccc_fhm_elem_ const *const e)
 {
-    return ((uint8_t *)&e->hash) - h->hash_elem_offset;
+    return ((uint8_t *)&e->hash_) - h->hash_elem_offset_;
 }
 
 static inline void
@@ -565,15 +566,15 @@ swap(uint8_t tmp[], void *const a, void *const b, size_t ab_size)
 inline uint64_t *
 ccc_impl_fhm_hash_at(struct ccc_fhm_ const *const h, size_t const i)
 {
-    return &((struct ccc_fhm_elem_ *)((uint8_t *)ccc_buf_at(&h->buf, i)
-                                      + h->hash_elem_offset))
-                ->hash;
+    return &((struct ccc_fhm_elem_ *)((uint8_t *)ccc_buf_at(&h->buf_, i)
+                                      + h->hash_elem_offset_))
+                ->hash_;
 }
 
 inline uint64_t
 ccc_impl_fhm_filter(struct ccc_fhm_ const *const h, void const *const key)
 {
-    uint64_t const hash = h->hash_fn(key);
+    uint64_t const hash = h->hash_fn_(key);
     return hash == CCC_FHM_EMPTY ? hash + 1 : hash;
 }
 
@@ -605,11 +606,11 @@ is_prime(size_t const n)
 static bool
 valid_distance_from_home(struct ccc_fhm_ const *h, void const *slot)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf);
-    uint64_t const hash = ccc_impl_fhm_in_slot(h, slot)->hash;
+    size_t const cap = ccc_buf_capacity(&h->buf_);
+    uint64_t const hash = ccc_impl_fhm_in_slot(h, slot)->hash_;
     size_t const home = hash % cap;
     size_t const end = home ? home - 1 : cap - 1;
-    for (size_t i = ccc_buf_index_of(&h->buf, slot),
+    for (size_t i = ccc_buf_index_of(&h->buf_, slot),
                 distance_to_home = ccc_impl_fhm_distance(cap, i, hash);
          i != end; --distance_to_home, (i = i ? i - 1 : cap - 1))
     {

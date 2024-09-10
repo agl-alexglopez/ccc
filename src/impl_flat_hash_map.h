@@ -16,31 +16,31 @@
 
 struct ccc_fhm_elem_
 {
-    uint64_t hash;
+    uint64_t hash_;
 };
 
 struct ccc_fhm_
 {
-    ccc_buffer buf;
-    ccc_hash_fn *hash_fn;
-    ccc_key_eq_fn *eq_fn;
-    void *aux;
-    size_t key_offset;
-    size_t hash_elem_offset;
+    ccc_buffer buf_;
+    ccc_hash_fn *hash_fn_;
+    ccc_key_eq_fn *eq_fn_;
+    void *aux_;
+    size_t key_offset_;
+    size_t hash_elem_offset_;
 };
 
 struct ccc_fhm_entry_
 {
-    struct ccc_fhm_ *h;
-    uint64_t hash;
-    struct ccc_entry_ entry;
+    struct ccc_fhm_ *h_;
+    uint64_t hash_;
+    struct ccc_entry_ entry_;
 };
 
 #define CCC_IMPL_FHM_INIT(flat_hash_map_ptr, memory_ptr, capacity,             \
                           struct_name, key_field, fhash_elem_field, alloc_fn,  \
                           hash_fn, key_eq_fn, aux)                             \
     ({                                                                         \
-        (flat_hash_map_ptr)->impl.buf = (ccc_buffer)CCC_BUF_INIT(              \
+        (flat_hash_map_ptr)->impl.buf_ = (ccc_buffer)CCC_BUF_INIT(             \
             (memory_ptr), struct_name, (capacity), (alloc_fn));                \
         ccc_result res_ = ccc_impl_fhm_init(                                   \
             &(flat_hash_map_ptr)->impl, offsetof(struct_name, key_field),      \
@@ -84,9 +84,9 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
         struct ccc_fhm_entry_ fhm_get_ent_                                     \
             = ccc_impl_fhm_entry(&(flat_hash_map_ptr)->impl, &fhm_key_);       \
         void const *fhm_get_res_ = NULL;                                       \
-        if (fhm_get_ent_.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)                \
+        if (fhm_get_ent_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)               \
         {                                                                      \
-            fhm_get_res_ = fhm_get_ent_.entry.e_;                              \
+            fhm_get_res_ = fhm_get_ent_.entry_.e_;                             \
         }                                                                      \
         fhm_get_res_;                                                          \
     })
@@ -101,9 +101,9 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
 #define CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                   \
     ({                                                                         \
         struct ccc_fhm_entry_ fhm_mod_ent_ = (flat_hash_map_entry)->impl;      \
-        if (fhm_mod_ent_.entry.stats_ == CCC_FHM_ENTRY_OCCUPIED)               \
+        if (fhm_mod_ent_.entry_.stats_ == CCC_FHM_ENTRY_OCCUPIED)              \
         {                                                                      \
-            (mod_fn)((ccc_update){(void *)fhm_mod_ent_.entry.e_, NULL});       \
+            (mod_fn)((ccc_update){(void *)fhm_mod_ent_.entry_.e_, NULL});      \
         }                                                                      \
         fhm_mod_ent_;                                                          \
     })
@@ -111,45 +111,46 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
 #define CCC_IMPL_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)            \
     ({                                                                         \
         struct ccc_fhm_entry_ fhm_mod_with_ent_ = (flat_hash_map_entry)->impl; \
-        if (fhm_mod_with_ent_.entry.stats_ == CCC_FHM_ENTRY_OCCUPIED)          \
+        if (fhm_mod_with_ent_.entry_.stats_ == CCC_FHM_ENTRY_OCCUPIED)         \
         {                                                                      \
             __auto_type fhm_aux_ = aux;                                        \
             (mod_fn)(                                                          \
-                (ccc_update){(void *)fhm_mod_with_ent_.entry.e_, &fhm_aux_});  \
+                (ccc_update){(void *)fhm_mod_with_ent_.entry_.e_, &fhm_aux_}); \
         }                                                                      \
         fhm_mod_with_ent_;                                                     \
     })
 
 #define CCC_IMPL_FHM_SWAPS(swap_entry, key_value...)                           \
     ({                                                                         \
-        size_t fhm_i_ = ccc_buf_index_of(&((swap_entry)->h->buf),              \
-                                         (swap_entry)->entry.e_);              \
-        if (*ccc_impl_fhm_hash_at((swap_entry)->h, fhm_i_) == CCC_FHM_EMPTY)   \
+        size_t fhm_i_ = ccc_buf_index_of(&((swap_entry)->h_->buf_),            \
+                                         (swap_entry)->entry_.e_);             \
+        if (*ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_) == CCC_FHM_EMPTY)  \
         {                                                                      \
-            *((typeof(key_value) *)ccc_buf_at(&((swap_entry)->h->buf),         \
+            *((typeof(key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),       \
                                               fhm_i_))                         \
                 = key_value;                                                   \
-            *ccc_impl_fhm_hash_at((swap_entry)->h, fhm_i_)                     \
-                = (swap_entry)->hash;                                          \
-            ++(swap_entry)->h->buf.impl.sz;                                    \
+            *ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_)                    \
+                = (swap_entry)->hash_;                                         \
+            ++(swap_entry)->h_->buf_.impl.sz;                                  \
         }                                                                      \
         else                                                                   \
         {                                                                      \
             typeof(key_value) fhm_cur_slot_                                    \
                 = *((typeof(fhm_cur_slot_) *)ccc_buf_at(                       \
-                    &((swap_entry)->h->buf), fhm_i_));                         \
-            *((typeof(fhm_cur_slot_) *)ccc_buf_at(&((swap_entry)->h->buf),     \
+                    &((swap_entry)->h_->buf_), fhm_i_));                       \
+            *((typeof(fhm_cur_slot_) *)ccc_buf_at(&((swap_entry)->h_->buf_),   \
                                                   fhm_i_))                     \
                 = key_value;                                                   \
-            *ccc_impl_fhm_hash_at((swap_entry)->h, fhm_i_)                     \
-                = (swap_entry)->hash;                                          \
-            fhm_i_ = (fhm_i_ + 1) % ccc_buf_capacity(&((swap_entry)->h->buf)); \
+            *ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_)                    \
+                = (swap_entry)->hash_;                                         \
+            fhm_i_                                                             \
+                = (fhm_i_ + 1) % ccc_buf_capacity(&((swap_entry)->h_->buf_));  \
             ccc_impl_fhm_insert(                                               \
-                (swap_entry)->h, &fhm_cur_slot_,                               \
-                ccc_impl_fhm_in_slot((swap_entry)->h, &fhm_cur_slot_)->hash,   \
+                (swap_entry)->h_, &fhm_cur_slot_,                              \
+                ccc_impl_fhm_in_slot((swap_entry)->h_, &fhm_cur_slot_)->hash_, \
                 fhm_i_);                                                       \
         }                                                                      \
-        (swap_entry)->entry.e_;                                                \
+        (swap_entry)->entry_.e_;                                               \
     })
 
 #define CCC_IMPL_FHM_INSERT_ENTRY(flat_hash_map_entry, key_value...)           \
@@ -157,17 +158,17 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
         typeof(key_value) *fhm_res_;                                           \
         struct ccc_fhm_entry_ *fhm_ins_ent_ = &(flat_hash_map_entry)->impl;    \
         assert(sizeof(*fhm_res_)                                               \
-               == ccc_buf_elem_size(&(fhm_ins_ent_->h->buf)));                 \
-        if (fhm_ins_ent_->entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)               \
+               == ccc_buf_elem_size(&(fhm_ins_ent_->h_->buf_)));               \
+        if (fhm_ins_ent_->entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)              \
         {                                                                      \
-            fhm_ins_ent_->entry.stats_ = CCC_FHM_ENTRY_OCCUPIED;               \
-            *((typeof(fhm_res_))fhm_ins_ent_->entry.e_) = key_value;           \
-            ccc_impl_fhm_in_slot(fhm_ins_ent_->h, fhm_ins_ent_->entry.e_)      \
-                ->hash                                                         \
-                = fhm_ins_ent_->hash;                                          \
-            fhm_res_ = fhm_ins_ent_->entry.e_;                                 \
+            fhm_ins_ent_->entry_.stats_ = CCC_FHM_ENTRY_OCCUPIED;              \
+            *((typeof(fhm_res_))fhm_ins_ent_->entry_.e_) = key_value;          \
+            ccc_impl_fhm_in_slot(fhm_ins_ent_->h_, fhm_ins_ent_->entry_.e_)    \
+                ->hash_                                                        \
+                = fhm_ins_ent_->hash_;                                         \
+            fhm_res_ = fhm_ins_ent_->entry_.e_;                                \
         }                                                                      \
-        else if (fhm_ins_ent_->entry.stats_ & ~CCC_FHM_ENTRY_OCCUPIED)         \
+        else if (fhm_ins_ent_->entry_.stats_ & ~CCC_FHM_ENTRY_OCCUPIED)        \
         {                                                                      \
             fhm_res_ = NULL;                                                   \
         }                                                                      \
@@ -184,12 +185,12 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
         struct ccc_fhm_entry_ *fhm_or_ins_entry_                               \
             = &(flat_hash_map_entry)->impl;                                    \
         assert(sizeof(*res_)                                                   \
-               == ccc_buf_elem_size(&(fhm_or_ins_entry_->h->buf)));            \
-        if (fhm_or_ins_entry_->entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)          \
+               == ccc_buf_elem_size(&(fhm_or_ins_entry_->h_->buf_)));          \
+        if (fhm_or_ins_entry_->entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)         \
         {                                                                      \
-            res_ = (void *)fhm_or_ins_entry_->entry.e_;                        \
+            res_ = (void *)fhm_or_ins_entry_->entry_.e_;                       \
         }                                                                      \
-        else if (fhm_or_ins_entry_->entry.stats_ & ~CCC_FHM_ENTRY_VACANT)      \
+        else if (fhm_or_ins_entry_->entry_.stats_ & ~CCC_FHM_ENTRY_VACANT)     \
         {                                                                      \
             res_ = NULL;                                                       \
         }                                                                      \
