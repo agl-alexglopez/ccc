@@ -170,11 +170,7 @@ void const *
 ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key)
 {
     struct rtom_query q = find(&rom->impl, key);
-    if (CCC_EQL == q.last_cmp)
-    {
-        return struct_base(&rom->impl, q.found);
-    }
-    return NULL;
+    return (CCC_EQL == q.last_cmp) ? struct_base(&rom->impl, q.found) : NULL;
 }
 
 void *
@@ -359,11 +355,7 @@ ccc_rom_rnext(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n
         = next(&rom->impl, &e->impl, reverse_inorder_traversal);
-    if (n == &rom->impl.end_)
-    {
-        return NULL;
-    }
-    return struct_base(&rom->impl, n);
+    return (n == &rom->impl.end_) ? NULL : struct_base(&rom->impl, n);
 }
 
 inline size_t
@@ -404,19 +396,12 @@ void
 ccc_rom_clear(ccc_realtime_ordered_map *const rom,
               ccc_destructor_fn *const destructor)
 {
-    if (destructor)
+    while (!ccc_rom_empty(rom))
     {
-        while (!ccc_rom_empty(rom))
+        void *deleted = remove_fixup(&rom->impl, rom->impl.root_);
+        if (destructor)
         {
-            void *deleted = remove_fixup(&rom->impl, rom->impl.root_);
             destructor(deleted);
-        }
-    }
-    else
-    {
-        while (!ccc_rom_empty(rom))
-        {
-            (void)remove_fixup(&rom->impl, rom->impl.root_);
         }
     }
 }
@@ -429,21 +414,14 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
     {
         return CCC_NO_REALLOC;
     }
-    if (destructor)
+    while (!ccc_rom_empty(rom))
     {
-        while (!ccc_rom_empty(rom))
+        void *deleted = remove_fixup(&rom->impl, rom->impl.root_);
+        if (destructor)
         {
-            void *const deleted = remove_fixup(&rom->impl, rom->impl.root_);
             destructor(deleted);
-            rom->impl.alloc_(deleted, 0);
         }
-    }
-    else
-    {
-        while (!ccc_rom_empty(rom))
-        {
-            rom->impl.alloc_(remove_fixup(&rom->impl, rom->impl.root_), 0);
-        }
+        (void)rom->impl.alloc_(deleted, 0);
     }
     return CCC_OK;
 }
@@ -522,7 +500,6 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom,
                    struct ccc_rtom_elem_ *const parent,
                    ccc_threeway_cmp last_cmp, struct ccc_rtom_elem_ *out_handle)
 {
-    init_node(rom, out_handle);
     if (rom->alloc_)
     {
         void *new = rom->alloc_(NULL, rom->elem_sz_);
@@ -533,23 +510,7 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom,
         memcpy(new, struct_base(rom, out_handle), rom->elem_sz_);
         out_handle = ccc_impl_rom_elem_in_slot(rom, new);
     }
-    if (!rom->sz_)
-    {
-        rom->root_ = out_handle;
-        ++rom->sz_;
-        return struct_base(rom, out_handle);
-    }
-    assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
-    bool const rank_rule_break
-        = parent->link_[L] == &rom->end_ && parent->link_[R] == &rom->end_;
-    parent->link_[CCC_GRT == last_cmp] = out_handle;
-    out_handle->parent_ = parent;
-    if (rank_rule_break)
-    {
-        insert_fixup(rom, parent, out_handle);
-    }
-    ++rom->sz_;
-    return struct_base(rom, out_handle);
+    return ccc_impl_rom_insert(rom, parent, last_cmp, out_handle);
 }
 
 static struct rtom_query
