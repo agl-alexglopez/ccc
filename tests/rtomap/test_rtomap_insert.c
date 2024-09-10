@@ -46,7 +46,7 @@ rtomap_test_insert_one(void)
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(entry_occupied(rom_insert(&s, &single.elem)), false, "%d");
+    CHECK(entry_occupied(rom_insert_lv(&s, &single.elem)), false, "%d");
     CHECK(rom_empty(&s), false, "%d");
     CHECK(((struct val *)rom_root(&s))->val == single.val, true, "%d");
     return PASS;

@@ -1,3 +1,5 @@
+#define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+
 #include "realtime_ordered_map.h"
 #include "rtomap_util.h"
 #include "test.h"
@@ -39,7 +41,7 @@ static enum test_result
 rtomap_test_insert_erase_shuffled(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
@@ -53,12 +55,12 @@ rtomap_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = ccc_entry_unwrap(ccc_rom_remove(&s, &vals[i].elem));
+        struct val *v = ccc_entry_unwrap(rom_remove_lv(&s, &vals[i].elem));
         CHECK(v != NULL, true, "%d");
         CHECK(v->val, vals[i].val, "%d");
-        CHECK(ccc_rom_validate(&s), true, "%d");
+        CHECK(rom_validate(&s), true, "%d");
     }
-    CHECK(ccc_rom_empty(&s), true, "%d");
+    CHECK(rom_empty(&s), true, "%d");
     return PASS;
 }
 
@@ -66,7 +68,7 @@ static enum test_result
 rtomap_test_prime_shuffle(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -80,22 +82,22 @@ rtomap_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_entry_unwrap(ccc_rom_insert(&s, &vals[i].elem)))
+        if (ccc_entry_unwrap(rom_insert_lv(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }
-        CHECK(ccc_rom_validate(&s), true, "%d");
+        CHECK(rom_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    CHECK(ccc_rom_size(&s) < size, true, "%d");
+    CHECK(rom_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(ccc_entry_occupied(
-                  ccc_rom_remove_entry(ccc_rom_entry(&s, &vals[i].val)))
+                  rom_remove_entry_lv(rom_entry_lv(&s, &vals[i].val)))
                   || repeats[i],
               true, "%d");
-        CHECK(ccc_rom_validate(&s), true, "%d");
+        CHECK(rom_validate(&s), true, "%d");
     }
     return PASS;
 }
@@ -104,7 +106,7 @@ static enum test_result
 rtomap_test_weak_srand(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -114,15 +116,15 @@ rtomap_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)ccc_rom_insert(&s, &vals[i].elem);
-        CHECK(ccc_rom_validate(&s), true, "%d");
+        (void)rom_insert(&s, &vals[i].elem);
+        CHECK(rom_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_rom_contains(&s, &vals[i].val), true, "%d");
-        (void)ccc_rom_remove(&s, &vals[i].elem);
-        CHECK(ccc_rom_validate(&s), true, "%d");
+        CHECK(rom_contains(&s, &vals[i].val), true, "%d");
+        (void)rom_remove(&s, &vals[i].elem);
+        CHECK(rom_validate(&s), true, "%d");
     }
-    CHECK(ccc_rom_empty(&s), true, "%d");
+    CHECK(rom_empty(&s), true, "%d");
     return PASS;
 }

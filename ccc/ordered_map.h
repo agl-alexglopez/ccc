@@ -49,7 +49,7 @@ typedef struct
                   alloc_fn, key_cmp, aux)
 
 #define CCC_OM_ENTRY(ordered_map_ptr, key...)                                  \
-    (ccc_o_map_entry)                                                          \
+    &(ccc_o_map_entry)                                                         \
     {                                                                          \
         CCC_IMPL_TREE_ENTRY(ordered_map_ptr, key)                              \
     }
@@ -61,13 +61,13 @@ typedef struct
     CCC_IMPL_TREE_GET_MUT(ordered_map_ptr, key)
 
 #define CCC_OM_AND_MODIFY(ordered_map_entry, mod_fn)                           \
-    (ccc_o_ordered_map_entry)                                                  \
+    &(ccc_o_ordered_map_entry)                                                 \
     {                                                                          \
         CCC_IMPL_TREE_AND_MODIFY(ordered_map_entry, mod_fn)                    \
     }
 
 #define CCC_OM_AND_MODIFY_W(ordered_map_entry, mod_fn, aux_data)               \
-    (ccc_o_ordered_map_entry)                                                  \
+    &(ccc_o_ordered_map_entry)                                                 \
     {                                                                          \
         CCC_IMPL_TREE_AND_MODIFY_WITH(ordered_map_entry, mod_fn, aux_data)     \
     }
@@ -88,30 +88,66 @@ void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
 
 /* Retain access to old values in the map. See types.h for ccc_entry. */
 
+#define ccc_om_insert_lv(ordered_map_ptr, out_handle_ptr)                      \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_om_insert((ordered_map_ptr), (out_handle_ptr)).impl                \
+    }
+
+#define ccc_om_remove_lv(ordered_map_ptr, out_handle_ptr)                      \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl                \
+    }
+
+#define ccc_om_remove_entry_lv(ordered_map_entry_ptr)                          \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_om_remove_entry((ordered_map_entry_ptr)).impl                      \
+    }
+
 ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
 ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
-ccc_entry ccc_om_remove_entry(ccc_o_map_entry e);
+ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
 
 /* Standard Entry API. */
 
+#define ccc_om_entry_lv(ordered_map_ptr, key_ptr)                              \
+    &(ccc_o_map_entry)                                                         \
+    {                                                                          \
+        ccc_om_entry((ordered_map_ptr), (key_ptr)).impl                        \
+    }
+
+#define ccc_om_and_modify_lv(ordered_map_ptr, mod_fn)                          \
+    &(ccc_o_map_entry)                                                         \
+    {                                                                          \
+        ccc_om_and_modify((ordered_map_ptr), (mod_fn)).impl                    \
+    }
+
+#define ccc_om_and_modify_with_lv(ordered_map_ptr, mod_fn, aux_data)           \
+    &(ccc_o_map_entry)                                                         \
+    {                                                                          \
+        ccc_om_and_modify((ordered_map_ptr), (mod_fn), (aux_data)).impl        \
+    }
+
 ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
 
-ccc_o_map_entry ccc_om_and_modify(ccc_o_map_entry e, ccc_update_fn *fn);
+ccc_o_map_entry ccc_om_and_modify(ccc_o_map_entry const *e, ccc_update_fn *fn);
 
-ccc_o_map_entry ccc_om_and_modify_with(ccc_o_map_entry e, ccc_update_fn *fn,
-                                       void *aux);
+ccc_o_map_entry ccc_om_and_modify_with(ccc_o_map_entry const *e,
+                                       ccc_update_fn *fn, void *aux);
 
-void *ccc_om_or_insert(ccc_o_map_entry e, ccc_o_map_elem *elem);
+void *ccc_om_or_insert(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
 
-void *ccc_om_insert_entry(ccc_o_map_entry e, ccc_o_map_elem *elem);
+void *ccc_om_insert_entry(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
 
-void const *ccc_om_unwrap(ccc_o_map_entry e);
+void const *ccc_om_unwrap(ccc_o_map_entry const *e);
 
-void *ccc_om_unwrap_mut(ccc_o_map_entry e);
+void *ccc_om_unwrap_mut(ccc_o_map_entry const *e);
 
-bool ccc_om_insert_error(ccc_o_map_entry e);
+bool ccc_om_insert_error(ccc_o_map_entry const *e);
 
 /*===========================   Entry API   =================================*/
 

@@ -51,19 +51,19 @@ initialization is successful or a failure. */
     CCC_IMPL_FHM_GET_MUT(flat_hash_map_ptr, key)
 
 #define CCC_FHM_ENTRY(flat_hash_map_ptr, key...)                               \
-    (ccc_fh_map_entry)                                                         \
+    &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         CCC_IMPL_FHM_ENTRY(flat_hash_map_ptr, key)                             \
     }
 
 #define CCC_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                        \
-    (ccc_fh_map_entry)                                                         \
+    &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                   \
     }
 
 #define CCC_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)                 \
-    (ccc_fh_map_entry)                                                         \
+    &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         CCC_IMPL_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)            \
     }
@@ -96,6 +96,24 @@ void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 
 /* Preserve old values from stored in the map. See types.h for more. */
 
+#define ccc_fhm_remove_lv(flat_hash_map_ptr, out_handle_ptr)                   \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl             \
+    }
+
+#define ccc_fhm_insert_lv(flat_hash_map_ptr, out_handle_ptr)                   \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl             \
+    }
+
+#define ccc_fhm_remove_entry_lv(flat_hash_map_entry_ptr)                       \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl                   \
+    }
+
 /** TODO */
 ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
@@ -103,9 +121,27 @@ ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
 /** TODO */
-ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry e);
+ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
 
 /* Standard Entry API */
+
+#define ccc_fhm_entry_lv(flat_hash_map_ptr, key_ptr)                           \
+    &(ccc_fh_map_entry)                                                        \
+    {                                                                          \
+        ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl                     \
+    }
+
+#define ccc_fhm_and_modify_lv(entry_ptr, mod_fn)                               \
+    &(ccc_fh_map_entry)                                                        \
+    {                                                                          \
+        ccc_fhm_and_modify((entry_ptr), (mod_fn)).impl                         \
+    }
+
+#define ccc_fhm_and_modify_with_lv(entry_ptr, mod_fn, aux_data_ptr)            \
+    &(ccc_fh_map_entry)                                                        \
+    {                                                                          \
+        ccc_fhm_and_modify_with((entry_ptr), (mod_fn), (aux_data_ptr)).impl    \
+    }
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
@@ -131,7 +167,8 @@ ccc_fh_map_entry ccc_fhm_entry(ccc_flat_hash_map *h, void const *key);
 This function is intended to make the function chaining in the Entry API more
 succinct if the entry will be modified in place based on its own value without
 the need of the auxilliary argument a ccc_update_fn can provide. */
-ccc_fh_map_entry ccc_fhm_and_modify(ccc_fh_map_entry e, ccc_update_fn *fn);
+ccc_fh_map_entry ccc_fhm_and_modify(ccc_fh_map_entry const *e,
+                                    ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -140,8 +177,8 @@ ccc_fh_map_entry ccc_fhm_and_modify(ccc_fh_map_entry e, ccc_update_fn *fn);
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-ccc_fh_map_entry ccc_fhm_and_modify_with(ccc_fh_map_entry e, ccc_update_fn *fn,
-                                         void *aux);
+ccc_fh_map_entry ccc_fhm_and_modify_with(ccc_fh_map_entry const *e,
+                                         ccc_update_fn *fn, void *aux);
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
@@ -152,7 +189,7 @@ Because this functions takes an entry and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
 to resize because no reallocation function is provided. */
-void *ccc_fhm_or_insert(ccc_fh_map_entry e, ccc_fh_map_elem *elem);
+void *ccc_fhm_or_insert(ccc_fh_map_entry const *e, ccc_fh_map_elem *elem);
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
@@ -165,22 +202,22 @@ This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
-void *ccc_fhm_insert_entry(ccc_fh_map_entry e, ccc_fh_map_elem *elem);
+void *ccc_fhm_insert_entry(ccc_fh_map_entry const *e, ccc_fh_map_elem *elem);
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return an immutable view into the table entry if one is present, or NULL. */
-void const *ccc_fhm_unwrap(ccc_fh_map_entry e);
+void const *ccc_fhm_unwrap(ccc_fh_map_entry const *e);
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return a mutable view into the table entry if one is present, or NULL. */
-void *ccc_fhm_unwrap_mut(ccc_fh_map_entry e);
+void *ccc_fhm_unwrap_mut(ccc_fh_map_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if the entry is occupied, false if not. */
-bool ccc_fhm_occupied(ccc_fh_map_entry e);
+bool ccc_fhm_occupied(ccc_fh_map_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
@@ -197,7 +234,7 @@ functions will indicate such a failure. One can also confirm an insertion error
 will occur from an entry with this function. For example, leaving this function
 in an assert for debug builds can be a helpful sanity check if the heap should
 correctly resize by default and errors are not usually expected. */
-bool ccc_fhm_insert_error(ccc_fh_map_entry e);
+bool ccc_fhm_insert_error(ccc_fh_map_entry const *e);
 
 /*==============================   Iteration    =============================*/
 
@@ -280,5 +317,54 @@ void ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn);
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
 bool ccc_fhm_validate(ccc_flat_hash_map const *h);
+
+#ifdef FLAT_HASH_MAP_USING_NAMESPACE_CCC
+typedef ccc_fh_map_elem fh_map_elem;
+typedef ccc_flat_hash_map flat_hash_map;
+typedef ccc_fh_map_entry fh_map_entry;
+#    define FHM_INIT(args...) CCC_FHM_INIT(args)
+#    define FHM_GET(args...) CCC_FHM_GET(args)
+#    define FHM_GET_MUT(args...) CCC_FHM_GET_MUT(args)
+#    define FHM_ENTRY(args...) CCC_FHM_ENTRY(args)
+#    define FHM_AND_MODIFY(args...) CCC_FHM_AND_MODIFY(args)
+#    define FHM_AND_MODIFY_W(args...) CCC_FHM_AND_MODIFY_W(args)
+#    define FHM_INSERT_ENTRY(args...) CCC_FHM_INSERT_ENTRY(args)
+#    define FHM_OR_INSERT(args...) CCC_FHM_OR_INSERT(args)
+#    define fhm_contains(args...) ccc_fhm_contains(args)
+#    define fhm_get(args...) ccc_fhm_get(args)
+#    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
+#    define fhm_insert_lv(args...) ccc_fhm_insert_lv(args)
+#    define fhm_remove_lv(args...) ccc_fhm_remove_lv(args)
+#    define fhm_remove_entry_lv(args...) ccc_fhm_remove_entry_lv(args)
+#    define fhm_remove(args...) ccc_fhm_remove(args)
+#    define fhm_insert(args...) ccc_fhm_insert(args)
+#    define fhm_remove_entry(args...) ccc_fhm_remove_entry(args)
+#    define fhm_entry_lv(args...) ccc_fhm_entry_lv(args)
+#    define fhm_entry(args...) ccc_fhm_entry(args)
+#    define fhm_and_modify_lv(args...) ccc_fhm_and_modify_lv(args)
+#    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
+#    define fhm_and_modify_with_lv(args...) ccc_fhm_and_modify_with_lv(args)
+#    define fhm_and_modify_with(args...) ccc_fhm_and_modify_with(args)
+#    define fhm_entry(args...) ccc_fhm_entry(args)
+#    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
+#    define fhm_and_modify_with(args...) ccc_fhm_and_modify_with(args)
+#    define fhm_or_insert(args...) ccc_fhm_or_insert(args)
+#    define fhm_insert_entry(args...) ccc_fhm_insert_entry(args)
+#    define fhm_unwrap(args...) ccc_fhm_unwrap(args)
+#    define fhm_unwrap_mut(args...) ccc_fhm_unwrap_mut(args)
+#    define fhm_occupied(args...) ccc_fhm_occupied(args)
+#    define fhm_insert_error(args...) ccc_fhm_insert_error(args)
+#    define fhm_begin(args...) ccc_fhm_begin(args)
+#    define fhm_next(args...) ccc_fhm_next(args)
+#    define fhm_end(args...) ccc_fhm_end(args)
+#    define fhm_empty(args...) ccc_fhm_empty(args)
+#    define fhm_size(args...) ccc_fhm_size(args)
+#    define fhm_clear(args...) ccc_fhm_clear(args)
+#    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)
+#    define fhm_next_prime(args...) ccc_fhm_next_prime(args)
+#    define fhm_capacity(args...) ccc_fhm_capacity(args)
+#    define fhm_print(args...) ccc_fhm_print(args)
+#    define fhm_validate(args...) ccc_fhm_validate(args)
+#endif
 
 #endif /* CCC_FLAT_HASH_MAP_H */

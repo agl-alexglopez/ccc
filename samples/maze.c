@@ -242,7 +242,7 @@ animate_maze(struct maze *maze)
             }
             int cur_weight = 0;
             struct point_cost const *const found
-                = ccc_om_unwrap(ccc_om_entry(&cell_costs, &next));
+                = ccc_om_unwrap(ccc_om_entry_lv(&cell_costs, &next));
             if (!found)
             {
                 struct point_cost *new_cost
@@ -253,7 +253,8 @@ animate_maze(struct maze *maze)
                 };
                 cur_weight = new_cost->cost;
                 bool const inserted = ccc_om_insert_entry(
-                    ccc_om_entry(&cell_costs, &new_cost->p), &new_cost->elem);
+                    ccc_om_entry_lv(&cell_costs, &new_cost->p),
+                    &new_cost->elem);
                 (void)inserted;
                 assert(inserted);
             }

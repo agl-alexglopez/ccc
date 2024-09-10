@@ -16,7 +16,8 @@ static void erase(struct ccc_fhm_ *, void *);
 static bool is_prime(size_t);
 static void swap(uint8_t tmp[], void *, void *, size_t);
 static void *struct_base(struct ccc_fhm_ const *, struct ccc_fhm_elem_ const *);
-static ccc_entry entry(struct ccc_fhm_ *, void const *key, uint64_t hash);
+static struct ccc_entry_ entry(struct ccc_fhm_ *, void const *key,
+                               uint64_t hash);
 static bool valid_distance_from_home(struct ccc_fhm_ const *, void const *slot);
 
 ccc_result
@@ -47,7 +48,7 @@ ccc_fhm_empty(ccc_flat_hash_map const *const h)
 bool
 ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 {
-    return entry(&h->impl, key, ccc_impl_fhm_filter(&h->impl, key)).status
+    return entry(&h->impl, key, ccc_impl_fhm_filter(&h->impl, key)).stats_
            & CCC_FHM_ENTRY_OCCUPIED;
 }
 
@@ -75,26 +76,26 @@ ccc_impl_fhm_entry(struct ccc_fhm_ *h, void const *key)
 }
 
 void *
-ccc_fhm_insert_entry(ccc_fh_map_entry e, ccc_fh_map_elem *const elem)
+ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
+                     ccc_fh_map_elem *const elem)
 {
-    void *user_struct = struct_base(e.impl.h, &elem->impl);
-    if (e.impl.entry.status & CCC_FHM_ENTRY_OCCUPIED)
+    void *user_struct = struct_base(e->impl.h, &elem->impl);
+    if (e->impl.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
         /* It is ok if an insert error was indicated because we do not
            need more space if we are overwriting a previous value. */
-        e.impl.entry.status = CCC_FHM_ENTRY_OCCUPIED;
-        elem->impl.hash = e.impl.hash;
-        memcpy((void *)e.impl.entry.entry, user_struct,
-               ccc_buf_elem_size(&e.impl.h->buf));
-        return (void *)e.impl.entry.entry;
+        elem->impl.hash = e->impl.hash;
+        memcpy(e->impl.entry.e_, user_struct,
+               ccc_buf_elem_size(&e->impl.h->buf));
+        return e->impl.entry.e_;
     }
-    if (e.impl.entry.status & ~CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry.stats_ & ~CCC_FHM_ENTRY_OCCUPIED)
     {
         return NULL;
     }
-    ccc_impl_fhm_insert(e.impl.h, user_struct, e.impl.hash,
-                        ccc_buf_index_of(&e.impl.h->buf, e.impl.entry.entry));
-    return (void *)e.impl.entry.entry;
+    ccc_impl_fhm_insert(e->impl.h, user_struct, e->impl.hash,
+                        ccc_buf_index_of(&e->impl.h->buf, e->impl.entry.e_));
+    return e->impl.entry.e_;
 }
 
 inline void *
@@ -106,50 +107,52 @@ ccc_fhm_get_mut(ccc_flat_hash_map *const h, void const *const key)
 void const *
 ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
 {
-    ccc_entry e
+    struct ccc_entry_ e
         = ccc_impl_fhm_find(&h->impl, key, ccc_impl_fhm_filter(&h->impl, key));
-    if (e.status & CCC_FHM_ENTRY_OCCUPIED)
+    if (e.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
-        return e.entry;
+        return e.e_;
     }
     return NULL;
 }
 
 ccc_entry
-ccc_fhm_remove_entry(ccc_fh_map_entry e)
+ccc_fhm_remove_entry(ccc_fh_map_entry const *const e)
 {
-    if (e.impl.entry.status != CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry.stats_ != CCC_FHM_ENTRY_OCCUPIED)
     {
-        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
-    erase(e.impl.h, (void *)e.impl.entry.entry);
-    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_OCCUPIED};
+    erase(e->impl.h, e->impl.entry.e_);
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
 ccc_fh_map_entry
-ccc_fhm_and_modify(ccc_fh_map_entry e, ccc_update_fn *const fn)
+ccc_fhm_and_modify(ccc_fh_map_entry const *const e, ccc_update_fn *const fn)
 {
-    return (ccc_fh_map_entry){ccc_impl_fhm_and_modify(e.impl, fn)};
+    return (ccc_fh_map_entry){ccc_impl_fhm_and_modify(&e->impl, fn)};
 }
 
 struct ccc_fhm_entry_
-ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ e, ccc_update_fn *const fn)
+ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ const *const e,
+                        ccc_update_fn *const fn)
 {
-    if (e.entry.status == CCC_FHM_ENTRY_OCCUPIED)
+    if (e->entry.stats_ == CCC_FHM_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){(void *)e.entry.entry, NULL});
+        fn((ccc_update){e->entry.e_, NULL});
     }
-    return e;
+    return *e;
 }
 
 ccc_fh_map_entry
-ccc_fhm_and_modify_with(ccc_fh_map_entry e, ccc_update_fn *const fn, void *aux)
+ccc_fhm_and_modify_with(ccc_fh_map_entry const *const e,
+                        ccc_update_fn *const fn, void *aux)
 {
-    if (e.impl.entry.status == CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry.stats_ == CCC_FHM_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){(void *)e.impl.entry.entry, aux});
+        fn((ccc_update){e->impl.entry.e_, aux});
     }
-    return e;
+    return *e;
 }
 
 ccc_entry
@@ -159,24 +162,24 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
     void *key = ccc_impl_fhm_key_in_slot(&h->impl, user_return);
     size_t const user_struct_size = ccc_buf_elem_size(&h->impl.buf);
     struct ccc_fhm_entry_ ent = ccc_impl_fhm_entry(&h->impl, key);
-    if (ent.entry.status & CCC_FHM_ENTRY_OCCUPIED)
+    if (ent.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
         /* If an error occured when obtaining the entry and trying to resize,
            that is ok. We will not need new space yet. Only allow the insert
            error to persist if we actually need more space. */
-        ent.entry.status = CCC_FHM_ENTRY_OCCUPIED;
+        ent.entry.stats_ = CCC_FHM_ENTRY_OCCUPIED;
         out_handle->impl.hash = ent.hash;
         uint8_t tmp[user_struct_size];
-        swap(tmp, (void *)ent.entry.entry, user_return, user_struct_size);
-        return (ccc_entry){.entry = user_return, .status = CCC_ENTRY_OCCUPIED};
+        swap(tmp, ent.entry.e_, user_return, user_struct_size);
+        return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry.status & (CCC_FHM_ENTRY_NULL | CCC_FHM_ENTRY_INSERT_ERROR))
+    if (ent.entry.stats_ & (CCC_FHM_ENTRY_NULL | CCC_FHM_ENTRY_INSERT_ERROR))
     {
-        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_ERROR};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_ERROR}};
     }
     ccc_impl_fhm_insert(&h->impl, user_return, ent.hash,
-                        ccc_buf_index_of(&h->impl.buf, ent.entry.entry));
-    return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
+                        ccc_buf_index_of(&h->impl.buf, ent.entry.e_));
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -184,67 +187,67 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
 {
     void *ret = struct_base(&h->impl, &out_handle->impl);
     void *key = ccc_impl_fhm_key_in_slot(&h->impl, ret);
-    ccc_entry const ent
+    struct ccc_entry_ const ent
         = ccc_impl_fhm_find(&h->impl, key, ccc_impl_fhm_filter(&h->impl, key));
-    if (ent.status == CCC_FHM_ENTRY_VACANT)
+    if (ent.stats_ == CCC_FHM_ENTRY_VACANT)
     {
-        return (ccc_entry){.entry = NULL, .status = CCC_ENTRY_VACANT};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
-    memcpy(ret, ent.entry, ccc_buf_elem_size(&h->impl.buf));
-    erase(&h->impl, (void *)ent.entry);
-    return (ccc_entry){.entry = ret, .status = CCC_ENTRY_OCCUPIED};
+    memcpy(ret, ent.e_, ccc_buf_elem_size(&h->impl.buf));
+    erase(&h->impl, ent.e_);
+    return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
 void *
-ccc_fhm_or_insert(ccc_fh_map_entry e, ccc_fh_map_elem *const elem)
+ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
 {
-    if (e.impl.entry.status & CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED)
     {
-        return (void *)e.impl.entry.entry;
+        return e->impl.entry.e_;
     }
-    if (e.impl.entry.status & ~CCC_FHM_ENTRY_VACANT)
+    if (e->impl.entry.stats_ & ~CCC_FHM_ENTRY_VACANT)
     {
         return NULL;
     }
-    void *user_struct = struct_base(e.impl.h, &elem->impl);
-    elem->impl.hash = e.impl.hash;
-    ccc_impl_fhm_insert(e.impl.h, user_struct, elem->impl.hash,
-                        ccc_buf_index_of(&e.impl.h->buf, e.impl.entry.entry));
-    return (void *)e.impl.entry.entry;
+    void *user_struct = struct_base(e->impl.h, &elem->impl);
+    elem->impl.hash = e->impl.hash;
+    ccc_impl_fhm_insert(e->impl.h, user_struct, elem->impl.hash,
+                        ccc_buf_index_of(&e->impl.h->buf, e->impl.entry.e_));
+    return e->impl.entry.e_;
 }
 
 inline void const *
-ccc_fhm_unwrap(ccc_fh_map_entry e)
+ccc_fhm_unwrap(ccc_fh_map_entry const *const e)
 {
-    return ccc_impl_fhm_unwrap(&e.impl);
+    return ccc_impl_fhm_unwrap(&e->impl);
 }
 
 inline void *
-ccc_fhm_unwrap_mut(ccc_fh_map_entry e)
+ccc_fhm_unwrap_mut(ccc_fh_map_entry const *const e)
 {
-    return (void *)ccc_impl_fhm_unwrap(&e.impl);
+    return (void *)ccc_impl_fhm_unwrap(&e->impl);
 }
 
 inline void const *
-ccc_impl_fhm_unwrap(struct ccc_fhm_entry_ *e)
+ccc_impl_fhm_unwrap(struct ccc_fhm_entry_ const *const e)
 {
-    if (!(e->entry.status & CCC_FHM_ENTRY_OCCUPIED))
+    if (!(e->entry.stats_ & CCC_FHM_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return e->entry.entry;
+    return e->entry.e_;
 }
 
 inline bool
-ccc_fhm_occupied(ccc_fh_map_entry const e)
+ccc_fhm_occupied(ccc_fh_map_entry const *const e)
 {
-    return e.impl.entry.status & CCC_FHM_ENTRY_OCCUPIED;
+    return e->impl.entry.stats_ & CCC_FHM_ENTRY_OCCUPIED;
 }
 
 inline bool
-ccc_fhm_insert_error(ccc_fh_map_entry e)
+ccc_fhm_insert_error(ccc_fh_map_entry const *const e)
 {
-    return e.impl.entry.status & CCC_FHM_ENTRY_INSERT_ERROR;
+    return e->impl.entry.stats_ & CCC_FHM_ENTRY_INSERT_ERROR;
 }
 
 inline void *
@@ -280,7 +283,7 @@ ccc_fhm_end([[maybe_unused]] ccc_flat_hash_map const *const h)
     return NULL;
 }
 
-static inline ccc_entry
+static struct ccc_entry_
 entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
 {
     uint8_t upcoming_insertion_error = 0;
@@ -288,12 +291,12 @@ entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
     {
         upcoming_insertion_error = CCC_FHM_ENTRY_INSERT_ERROR;
     }
-    ccc_entry res = ccc_impl_fhm_find(h, key, hash);
-    res.status |= upcoming_insertion_error;
+    struct ccc_entry_ res = ccc_impl_fhm_find(h, key, hash);
+    res.stats_ |= upcoming_insertion_error;
     return res;
 }
 
-ccc_entry
+struct ccc_entry_
 ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
                   uint64_t const hash)
 {
@@ -305,21 +308,24 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
         struct ccc_fhm_elem_ *const e = ccc_impl_fhm_in_slot(h, slot);
         if (e->hash == CCC_FHM_EMPTY)
         {
-            return (ccc_entry){.entry = slot, .status = CCC_FHM_ENTRY_VACANT};
+            return (struct ccc_entry_){.e_ = slot,
+                                       .stats_ = CCC_FHM_ENTRY_VACANT};
         }
         if (dist > ccc_impl_fhm_distance(cap, cur_i, e->hash))
         {
-            return (ccc_entry){.entry = slot, .status = CCC_FHM_ENTRY_VACANT};
+            return (struct ccc_entry_){.e_ = slot,
+                                       .stats_ = CCC_FHM_ENTRY_VACANT};
         }
         if (hash == e->hash
             && h->eq_fn(
                 (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux}))
         {
-            return (ccc_entry){.entry = slot, .status = CCC_FHM_ENTRY_OCCUPIED};
+            return (struct ccc_entry_){.e_ = slot,
+                                       .stats_ = CCC_FHM_ENTRY_OCCUPIED};
         }
     }
-    return (ccc_entry){.entry = NULL,
-                       .status = CCC_FHM_ENTRY_VACANT | CCC_FHM_ENTRY_NULL};
+    return (struct ccc_entry_){
+        .e_ = NULL, .stats_ = CCC_FHM_ENTRY_VACANT | CCC_FHM_ENTRY_NULL};
 }
 
 /* Assumes that element to be inserted does not already exist in the table.
@@ -335,9 +341,9 @@ ccc_impl_fhm_insert(struct ccc_fhm_ *const h, void const *const e,
     uint8_t floater[elem_sz];
     (void)memcpy(floater, e, elem_sz);
 
-    /* This function cannot modify e and e may be copied over to new insertion
-       from old table. So should this function invariantly assign starting
-       hash to this slot copy for insertion? I think yes so far. */
+    /* This function cannot modify e and e may be copied over to new
+       insertion from old table. So should this function invariantly assign
+       starting hash to this slot copy for insertion? I think yes so far. */
     ccc_impl_fhm_in_slot(h, floater)->hash = hash;
     size_t dist = ccc_impl_fhm_distance(cap, cur_i, hash);
     for (;; cur_i = (cur_i + 1) % cap, ++dist)
@@ -419,10 +425,10 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
         struct ccc_fhm_elem_ const *const e = ccc_impl_fhm_in_slot(h, slot);
         if (e->hash != CCC_FHM_EMPTY)
         {
-            ccc_entry new_ent = ccc_impl_fhm_find(
+            struct ccc_entry_ new_ent = ccc_impl_fhm_find(
                 &new_hash, ccc_impl_fhm_key_in_slot(h, slot), e->hash);
             ccc_impl_fhm_insert(&new_hash, slot, e->hash,
-                                ccc_buf_index_of(&new_hash.buf, new_ent.entry));
+                                ccc_buf_index_of(&new_hash.buf, new_ent.e_));
         }
     }
     (void)ccc_buf_realloc(&h->buf, 0, h->buf.impl.alloc);
@@ -536,7 +542,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     return true;
 }
 
-/*=========================   Static Helpers    ============================*/
+/*=========================   Static Helpers ============================*/
 
 static void *
 struct_base(struct ccc_fhm_ const *const h, struct ccc_fhm_elem_ const *const e)
@@ -608,10 +614,10 @@ valid_distance_from_home(struct ccc_fhm_ const *h, void const *slot)
          i != end; --distance_to_home, (i = i ? i - 1 : cap - 1))
     {
         uint64_t const cur_hash = *ccc_impl_fhm_hash_at(h, i);
-        /* The only reason an element is not home is because it has been moved
-           away to help another element be closer to its home. This would
-           break the purpose of doing that. Upon erase everyone needs to
-           shuffle closer to home. */
+        /* The only reason an element is not home is because it has been
+           moved away to help another element be closer to its home. This
+           would break the purpose of doing that. Upon erase everyone needs
+           to shuffle closer to home. */
         if (cur_hash == CCC_FHM_EMPTY)
         {
             return false;
