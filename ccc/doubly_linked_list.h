@@ -18,10 +18,10 @@ typedef struct
     CCC_IMPL_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,       \
                       alloc_fn, cmp_fn, aux_data)
 
-#define DLL_EMPLACE_BACK(list_ptr, struct_initializer...)                      \
+#define CCC_DLL_EMPLACE_BACK(list_ptr, struct_initializer...)                  \
     CCC_IMPL_DLL_EMPLACE_BACK(list_ptr, struct_initializer)
 
-#define DLL_EMPLACE_FRONT(list_ptr, struct_initializer...)                     \
+#define CCC_DLL_EMPLACE_FRONT(list_ptr, struct_initializer...)                 \
     CCC_IMPL_DLL_EMPLACE_FRONT(list_ptr, struct_initializer)
 
 void *ccc_dll_push_front(ccc_doubly_linked_list *l,

@@ -148,8 +148,8 @@ put(struct lru_cache *const lru, int const key, int const val)
     }
     struct lru_lookup *const new
         = FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
-    new->kv_in_list
-        = DLL_EMPLACE_FRONT(&lru->l, (struct key_val){.key = key, .val = val});
+    new->kv_in_list = CCC_DLL_EMPLACE_FRONT(
+        &lru->l, (struct key_val){.key = key, .val = val});
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);

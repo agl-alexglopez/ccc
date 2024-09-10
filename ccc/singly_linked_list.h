@@ -18,7 +18,7 @@ typedef struct
     CCC_IMPL_SLL_INIT(list_ptr, list_name, struct_name, list_elem_field,       \
                       alloc_fn, aux_data)
 
-#define SLL_EMPLACE_FRONT(list_ptr, struct_initializer...)                     \
+#define CCC_SLL_EMPLACE_FRONT(list_ptr, struct_initializer...)                 \
     CCC_IMPL_SLL_EMPLACE_FRONT(list_ptr, struct_initializer)
 
 void *ccc_sll_push_front(ccc_singly_linked_list *sll,
