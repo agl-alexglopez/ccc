@@ -60,23 +60,23 @@ typedef struct
 #define CCC_OM_GET_MUT(ordered_map_ptr, key...)                                \
     CCC_IMPL_TREE_GET_MUT(ordered_map_ptr, key)
 
-#define CCC_OM_AND_MODIFY(ordered_map_entry, mod_fn)                           \
-    &(ccc_o_ordered_map_entry)                                                 \
+#define CCC_OM_AND_MODIFY(ordered_map_entry_ptr, mod_fn)                       \
+    &(ccc_o_ordered_map_entry_ptr)                                             \
     {                                                                          \
-        CCC_IMPL_TREE_AND_MODIFY(ordered_map_entry, mod_fn)                    \
+        CCC_IMPL_TREE_AND_MODIFY(ordered_map_entry_ptr, mod_fn)                \
     }
 
-#define CCC_OM_AND_MODIFY_W(ordered_map_entry, mod_fn, aux_data)               \
-    &(ccc_o_ordered_map_entry)                                                 \
+#define CCC_OM_AND_MODIFY_W(ordered_map_entry_ptr, mod_fn, aux_data)           \
+    &(ccc_o_ordered_map_entry_ptr)                                             \
     {                                                                          \
-        CCC_IMPL_TREE_AND_MODIFY_WITH(ordered_map_entry, mod_fn, aux_data)     \
+        CCC_IMPL_TREE_AND_MODIFY_WITH(ordered_map_entry_ptr, mod_fn, aux_data) \
     }
 
-#define CCC_OM_INSERT_ENTRY(ordered_map_entry, key_value...)                   \
-    CCC_IMPL_TREE_INSERT_ENTRY(ordered_map_entry, key_value)
+#define CCC_OM_INSERT_ENTRY(ordered_map_entry_ptr, key_value...)               \
+    CCC_IMPL_TREE_INSERT_ENTRY(ordered_map_entry_ptr, key_value)
 
-#define CCC_OM_OR_INSERT(ordered_map_entry, key_value...)                      \
-    CCC_IMPL_TREE_OR_INSERT(ordered_map_entry, key_value)
+#define CCC_OM_OR_INSERT(ordered_map_entry_ptr, key_value...)                  \
+    CCC_IMPL_TREE_OR_INSERT(ordered_map_entry_ptr, key_value)
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);
 

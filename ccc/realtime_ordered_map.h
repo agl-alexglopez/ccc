@@ -36,24 +36,24 @@ typedef struct
         CCC_IMPL_ROM_ENTRY(realtime_ordered_map_ptr, key)                      \
     }
 
-#define CCC_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)                 \
+#define CCC_ROM_AND_MODIFY(realtime_ordered_map_entry_ptr, mod_fn)             \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
-        CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)            \
+        CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry_ptr, mod_fn)        \
     }
 
-#define CCC_ROM_AND_MODIFY_W(realtime_ordered_map_entry, mod_fn, aux_data)     \
+#define CCC_ROM_AND_MODIFY_W(realtime_ordered_map_entry_ptr, mod_fn, aux_data) \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
-        CCC_IMPL_ROM_AND_MODIFY_WITH(realtime_ordered_map_entry, mod_fn,       \
+        CCC_IMPL_ROM_AND_MODIFY_WITH(realtime_ordered_map_entry_ptr, mod_fn,   \
                                      aux_data)                                 \
     }
 
-#define CCC_ROM_OR_INSERT(realtime_ordered_map_entry, key_value...)            \
-    CCC_IMPL_ROM_OR_INSERT(realtime_ordered_map_entry, key_value)
+#define CCC_ROM_OR_INSERT(realtime_ordered_map_entry_ptr, key_value...)        \
+    CCC_IMPL_ROM_OR_INSERT(realtime_ordered_map_entry_ptr, key_value)
 
-#define CCC_ROM_INSERT_ENTRY(realtime_ordered_map_entry, key_value...)         \
-    CCC_IMPL_ROM_INSERT_ENTRY(realtime_ordered_map_entry, key_value)
+#define CCC_ROM_INSERT_ENTRY(realtime_ordered_map_entry_ptr, key_value...)     \
+    CCC_IMPL_ROM_INSERT_ENTRY(realtime_ordered_map_entry_ptr, key_value)
 
 /*=================    Membership and Retrieval    ==========================*/
 

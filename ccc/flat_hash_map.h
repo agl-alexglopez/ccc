@@ -56,23 +56,23 @@ initialization is successful or a failure. */
         CCC_IMPL_FHM_ENTRY(flat_hash_map_ptr, key)                             \
     }
 
-#define CCC_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                        \
+#define CCC_FHM_AND_MODIFY(flat_hash_map_entry_ptr, mod_fn)                    \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
-        CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                   \
+        CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry_ptr, mod_fn)               \
     }
 
-#define CCC_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)                 \
+#define CCC_FHM_AND_MODIFY_W(flat_hash_map_entry_ptr, mod_fn, aux)             \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
-        CCC_IMPL_FHM_AND_MODIFY_W(flat_hash_map_entry, mod_fn, aux)            \
+        CCC_IMPL_FHM_AND_MODIFY_W(flat_hash_map_entry_ptr, mod_fn, aux)        \
     }
 
-#define CCC_FHM_INSERT_ENTRY(flat_hash_map_entry, key_value...)                \
-    CCC_IMPL_FHM_INSERT_ENTRY(flat_hash_map_entry, key_value)
+#define CCC_FHM_INSERT_ENTRY(flat_hash_map_entry_ptr, key_value...)            \
+    CCC_IMPL_FHM_INSERT_ENTRY(flat_hash_map_entry_ptr, key_value)
 
-#define CCC_FHM_OR_INSERT(flat_hash_map_entry, key_value...)                   \
-    CCC_IMPL_FHM_OR_INSERT(flat_hash_map_entry, key_value)
+#define CCC_FHM_OR_INSERT(flat_hash_map_entry_ptr, key_value...)               \
+    CCC_IMPL_FHM_OR_INSERT(flat_hash_map_entry_ptr, key_value)
 
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
