@@ -16,7 +16,7 @@
 
 typedef struct ccc_rtom_elem_
 {
-    struct ccc_rtom_elem_ *link_[2];
+    struct ccc_rtom_elem_ *branch_[2];
     struct ccc_rtom_elem_ *parent_;
     uint8_t parity_;
 } ccc_rtom_elem_;
@@ -46,10 +46,10 @@ struct ccc_rtom_entry_
     {                                                                          \
         {                                                                      \
             .root_ = &(map_name).impl_.end_,                                   \
-            .end_                                                              \
-                = {.link_ = {&(map_name).impl_.end_, &(map_name).impl_.end_},  \
-                   .parent_ = &(map_name).impl_.end_,                          \
-                   .parity_ = 1},                                              \
+            .end_ = {.parity_ = 1,                                             \
+                     .parent_ = &(map_name).impl_.end_,                        \
+                     .branch_                                                  \
+                     = {&(map_name).impl_.end_, &(map_name).impl_.end_}},      \
             .sz_ = 0, .key_offset_ = offsetof(struct_name, key_elem_field),    \
             .node_elem_offset_ = offsetof(struct_name, node_elem_field),       \
             .elem_sz_ = sizeof(struct_name), .alloc_ = (alloc_fn),             \

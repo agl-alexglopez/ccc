@@ -310,7 +310,7 @@ min_max_from(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ *start,
     {
         return start;
     }
-    for (; start->link_[dir] != &rom->end_; start = start->link_[dir])
+    for (; start->branch_[dir] != &rom->end_; start = start->branch_[dir])
     {}
     return start;
 }
@@ -471,8 +471,8 @@ ccc_impl_rom_insert(struct ccc_rtom_ *const rom,
     }
     assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
     bool const rank_rule_break
-        = parent->link_[L] == &rom->end_ && parent->link_[R] == &rom->end_;
-    parent->link_[CCC_GRT == last_cmp] = out_handle;
+        = parent->branch_[L] == &rom->end_ && parent->branch_[R] == &rom->end_;
+    parent->branch_[CCC_GRT == last_cmp] = out_handle;
     out_handle->parent_ = parent;
     if (rank_rule_break)
     {
@@ -522,7 +522,7 @@ find(struct ccc_rtom_ const *const rom, void const *const key)
     struct ccc_rtom_elem_ const *parent = &rom->end_;
     ccc_threeway_cmp link = CCC_CMP_ERR;
     for (struct ccc_rtom_elem_ const *seek = rom->root_; seek != &rom->end_;
-         parent = seek, seek = seek->link_[CCC_GRT == link])
+         parent = seek, seek = seek->branch_[CCC_GRT == link])
     {
         link = cmp(rom, key, seek, rom->cmp_);
         if (CCC_EQL == link)
@@ -549,11 +549,11 @@ next(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ const *n,
     }
     assert(rom->root_->parent_ == &rom->end_);
     /* The node is an internal one that has a subtree to explore first. */
-    if (n->link_[traversal] != &rom->end_)
+    if (n->branch_[traversal] != &rom->end_)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = n->link_[traversal]; n->link_[!traversal] != &rom->end_;
-             n = n->link_[!traversal])
+        for (n = n->branch_[traversal]; n->branch_[!traversal] != &rom->end_;
+             n = n->branch_[!traversal])
         {}
         return n;
     }
@@ -564,7 +564,7 @@ next(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ const *n,
        write to the sentinel on every call to next. I want multiple threads to
        iterate freely without undefined data race writes to memory locations.
        So more expensive loop.*/
-    for (; n->parent_ != &rom->end_ && n->parent_->link_[!traversal] != n;
+    for (; n->parent_ != &rom->end_ && n->parent_->branch_[!traversal] != n;
          n = n->parent_)
     {}
     return n->parent_;
@@ -575,8 +575,8 @@ init_node(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const e)
 {
     assert(e != NULL);
     assert(rom != NULL);
-    e->link_[L] = &rom->end_;
-    e->link_[R] = &rom->end_;
+    e->branch_[L] = &rom->end_;
+    e->branch_[R] = &rom->end_;
     e->parent_ = &rom->end_;
     e->parity_ = 0;
 }
@@ -608,7 +608,7 @@ static void *
 struct_base(struct ccc_rtom_ const *const rom,
             struct ccc_rtom_elem_ const *const e)
 {
-    return ((uint8_t *)e->link_) - rom->node_elem_offset_;
+    return ((uint8_t *)e->branch_) - rom->node_elem_offset_;
 }
 
 /*=======================   WAVL Tree Maintenance   =========================*/
@@ -634,22 +634,22 @@ insert_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *z_p_of_xy,
     }
     assert(x != &rom->end_);
     assert(is_0_child(rom, z_p_of_xy, x));
-    enum rtom_link const p_to_x_dir = z_p_of_xy->link_[R] == x;
-    struct ccc_rtom_elem_ *y = x->link_[!p_to_x_dir];
+    enum rtom_link const p_to_x_dir = z_p_of_xy->branch_[R] == x;
+    struct ccc_rtom_elem_ *y = x->branch_[!p_to_x_dir];
     if (y == &rom->end_ || is_2_child(rom, z_p_of_xy, y))
     {
         rotate(rom, z_p_of_xy, x, y, !p_to_x_dir);
-        assert(x->link_[!p_to_x_dir] == z_p_of_xy);
-        assert(z_p_of_xy->link_[p_to_x_dir] == y);
+        assert(x->branch_[!p_to_x_dir] == z_p_of_xy);
+        assert(z_p_of_xy->branch_[p_to_x_dir] == y);
         demote(rom, z_p_of_xy);
     }
     else
     {
         assert(is_1_child(rom, z_p_of_xy, y));
-        rotate(rom, x, y, y->link_[p_to_x_dir], p_to_x_dir);
-        rotate(rom, y->parent_, y, y->link_[!p_to_x_dir], !p_to_x_dir);
-        assert(y->link_[p_to_x_dir] == x);
-        assert(y->link_[!p_to_x_dir] == z_p_of_xy);
+        rotate(rom, x, y, y->branch_[p_to_x_dir], p_to_x_dir);
+        rotate(rom, y->parent_, y, y->branch_[!p_to_x_dir], !p_to_x_dir);
+        assert(y->branch_[p_to_x_dir] == x);
+        assert(y->branch_[!p_to_x_dir] == z_p_of_xy);
         promote(rom, y);
         demote(rom, x);
         demote(rom, z_p_of_xy);
@@ -663,31 +663,31 @@ remove_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove)
     struct ccc_rtom_elem_ *x = NULL;
     struct ccc_rtom_elem_ *p_of_xy = NULL;
     bool two_child = false;
-    if (remove->link_[L] == &rom->end_ || remove->link_[R] == &rom->end_)
+    if (remove->branch_[L] == &rom->end_ || remove->branch_[R] == &rom->end_)
     {
         y = remove;
         p_of_xy = y->parent_;
-        x = y->link_[y->link_[L] == &rom->end_];
+        x = y->branch_[y->branch_[L] == &rom->end_];
         x->parent_ = y->parent_;
         if (p_of_xy == &rom->end_)
         {
             rom->root_ = x;
         }
         two_child = is_2_child(rom, p_of_xy, y);
-        p_of_xy->link_[p_of_xy->link_[R] == y] = x;
+        p_of_xy->branch_[p_of_xy->branch_[R] == y] = x;
     }
     else
     {
-        y = min_max_from(rom, remove->link_[R], min);
+        y = min_max_from(rom, remove->branch_[R], min);
         p_of_xy = y->parent_;
-        x = y->link_[y->link_[L] == &rom->end_];
+        x = y->branch_[y->branch_[L] == &rom->end_];
         x->parent_ = y->parent_;
 
         /* Save if check and improve readability by assuming this is true. */
         assert(p_of_xy != &rom->end_);
 
         two_child = is_2_child(rom, p_of_xy, y);
-        p_of_xy->link_[p_of_xy->link_[R] == y] = x;
+        p_of_xy->branch_[p_of_xy->branch_[R] == y] = x;
         transplant(rom, remove, y);
         if (remove == p_of_xy)
         {
@@ -700,7 +700,7 @@ remove_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove)
         maintain_rank_rules(rom, two_child, p_of_xy, x);
         assert(!is_leaf(rom, p_of_xy) || !p_of_xy->parity_);
     }
-    remove->link_[L] = remove->link_[R] = remove->parent_ = NULL;
+    remove->branch_[L] = remove->branch_[R] = remove->parent_ = NULL;
     remove->parity_ = 0;
     --rom->sz_;
     return struct_base(rom, remove);
@@ -716,7 +716,7 @@ maintain_rank_rules(struct ccc_rtom_ *const rom, bool two_child,
         assert(p_of_xy != &rom->end_);
         rebalance_3_child(rom, p_of_xy, x);
     }
-    else if (x == &rom->end_ && p_of_xy->link_[L] == p_of_xy->link_[R])
+    else if (x == &rom->end_ && p_of_xy->branch_[L] == p_of_xy->branch_[R])
     {
         assert(p_of_xy != &rom->end_);
         bool const demote_makes_3_child
@@ -739,13 +739,13 @@ rebalance_3_child(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *p_of_xy,
     do
     {
         struct ccc_rtom_elem_ *const p_of_p_of_x = p_of_xy->parent_;
-        struct ccc_rtom_elem_ *y = p_of_xy->link_[p_of_xy->link_[L] == x];
+        struct ccc_rtom_elem_ *y = p_of_xy->branch_[p_of_xy->branch_[L] == x];
         made_3_child = is_2_child(rom, p_of_p_of_x, p_of_xy);
         if (is_2_child(rom, p_of_xy, y))
         {
             demote(rom, p_of_xy);
         }
-        else if (is_22_parent(rom, y->link_[L], y, y->link_[R]))
+        else if (is_22_parent(rom, y->branch_[L], y, y->branch_[R]))
         {
             demote(rom, p_of_xy);
             demote(rom, y);
@@ -767,13 +767,13 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom,
                        struct ccc_rtom_elem_ *const x,
                        struct ccc_rtom_elem_ *const y)
 {
-    enum rtom_link const z_to_x_dir = z->link_[R] == x;
-    struct ccc_rtom_elem_ *const w = y->link_[!z_to_x_dir];
+    enum rtom_link const z_to_x_dir = z->branch_[R] == x;
+    struct ccc_rtom_elem_ *const w = y->branch_[!z_to_x_dir];
     if (is_1_child(rom, y, w))
     {
-        rotate(rom, z, y, y->link_[z_to_x_dir], z_to_x_dir);
-        assert(y->link_[z_to_x_dir] == z);
-        assert(y->link_[!z_to_x_dir] == w);
+        rotate(rom, z, y, y->branch_[z_to_x_dir], z_to_x_dir);
+        assert(y->branch_[z_to_x_dir] == z);
+        assert(y->branch_[!z_to_x_dir] == w);
         promote(rom, y);
         demote(rom, z);
         if (is_leaf(rom, z))
@@ -783,13 +783,13 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom,
     }
     else /* w is a 2-child and v will be a 1-child. */
     {
-        struct ccc_rtom_elem_ *const v = y->link_[z_to_x_dir];
+        struct ccc_rtom_elem_ *const v = y->branch_[z_to_x_dir];
         assert(is_2_child(rom, y, w));
         assert(is_1_child(rom, y, v));
-        rotate(rom, y, v, v->link_[!z_to_x_dir], !z_to_x_dir);
-        rotate(rom, v->parent_, v, v->link_[z_to_x_dir], z_to_x_dir);
-        assert(v->link_[z_to_x_dir] == z);
-        assert(v->link_[!z_to_x_dir] == y);
+        rotate(rom, y, v, v->branch_[!z_to_x_dir], !z_to_x_dir);
+        rotate(rom, v->parent_, v, v->branch_[z_to_x_dir], z_to_x_dir);
+        assert(v->branch_[z_to_x_dir] == z);
+        assert(v->branch_[!z_to_x_dir] == y);
         double_promote(rom, v);
         demote(rom, y);
         double_demote(rom, z);
@@ -802,12 +802,13 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom,
            but I am not sure if it is worth including as it does not ultimately
            improve the worst case rotations to less than 2. This should be
            revisited after more performance testing code is in place. */
-        if (!is_leaf(rom, z) && is_11_parent(rom, z->link_[L], z, z->link_[R]))
+        if (!is_leaf(rom, z)
+            && is_11_parent(rom, z->branch_[L], z, z->branch_[R]))
         {
             promote(rom, z);
         }
         else if (!is_leaf(rom, y)
-                 && is_11_parent(rom, y->link_[L], y, y->link_[R]))
+                 && is_11_parent(rom, y->branch_[L], y, y->branch_[R]))
         {
             promote(rom, y);
         }
@@ -827,13 +828,13 @@ transplant(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove,
     }
     else
     {
-        remove->parent_->link_[remove->parent_->link_[R] == remove]
+        remove->parent_->branch_[remove->parent_->branch_[R] == remove]
             = replacement;
     }
-    remove->link_[R]->parent_ = replacement;
-    remove->link_[L]->parent_ = replacement;
-    replacement->link_[R] = remove->link_[R];
-    replacement->link_[L] = remove->link_[L];
+    remove->branch_[R]->parent_ = replacement;
+    remove->branch_[L]->parent_ = replacement;
+    replacement->branch_[R] = remove->branch_[R];
+    replacement->branch_[L] = remove->branch_[L];
     replacement->parity_ = remove->parity_;
 }
 
@@ -850,11 +851,11 @@ rotate(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const p_of_x,
     }
     else
     {
-        p_of_p_of_x->link_[p_of_p_of_x->link_[R] == p_of_x] = x_p_of_y;
+        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == p_of_x] = x_p_of_y;
     }
-    x_p_of_y->link_[dir] = p_of_x;
+    x_p_of_y->branch_[dir] = p_of_x;
     p_of_x->parent_ = x_p_of_y;
-    p_of_x->link_[!dir] = y;
+    p_of_x->branch_[!dir] = y;
     y->parent_ = p_of_x;
 }
 
@@ -997,7 +998,7 @@ double_demote([[maybe_unused]] struct ccc_rtom_ const *const rom,
 static inline bool
 is_leaf(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ const *const x)
 {
-    return x->link_[L] == &rom->end_ && x->link_[R] == &rom->end_;
+    return x->branch_[L] == &rom->end_ && x->branch_[R] == &rom->end_;
 }
 
 static inline struct ccc_rtom_elem_ *
@@ -1006,7 +1007,7 @@ sibling_of([[maybe_unused]] struct ccc_rtom_ const *const rom,
 {
     assert(x->parent_ != &rom->end_);
     /* We want the sibling so we need the truthy value to be opposite of x. */
-    return x->parent_->link_[x->parent_->link_[L] == x];
+    return x->parent_->branch_[x->parent_->branch_[L] == x];
 }
 
 /*===========================   Validation   ===============================*/
@@ -1034,8 +1035,8 @@ recursive_size(struct ccc_rtom_ const *const rom,
     {
         return 0;
     }
-    return 1 + recursive_size(rom, r->link_[R])
-           + recursive_size(rom, r->link_[L]);
+    return 1 + recursive_size(rom, r->branch_[R])
+           + recursive_size(rom, r->branch_[L]);
 }
 
 static bool
@@ -1065,14 +1066,14 @@ are_subtrees_valid(struct ccc_rtom_ const *t, struct ccc_tree_range const r,
     return are_subtrees_valid(t,
                               (struct ccc_tree_range){
                                   .low = r.low,
-                                  .root = r.root->link_[L],
+                                  .root = r.root->branch_[L],
                                   .high = r.root,
                               },
                               nil)
            && are_subtrees_valid(t,
                                  (struct ccc_tree_range){
                                      .low = r.root,
-                                     .root = r.root->link_[R],
+                                     .root = r.root->branch_[R],
                                      .high = r.high,
                                  },
                                  nil);
@@ -1091,8 +1092,8 @@ is_storing_parent(struct ccc_rtom_ const *const t,
     {
         return false;
     }
-    return is_storing_parent(t, root, root->link_[L])
-           && is_storing_parent(t, root, root->link_[R]);
+    return is_storing_parent(t, root, root->branch_[L])
+           && is_storing_parent(t, root, root->branch_[R]);
 }
 
 static bool
@@ -1163,18 +1164,18 @@ print_inner_tree(struct ccc_rtom_elem_ const *const root,
                        node_type == LEAF ? "     " : " │   ");
     }
 
-    if (root->link_[R] == &rom->end_)
+    if (root->branch_[R] == &rom->end_)
     {
-        print_inner_tree(root->link_[L], str, LEAF, L, rom, fn_print);
+        print_inner_tree(root->branch_[L], str, LEAF, L, rom, fn_print);
     }
-    else if (root->link_[L] == &rom->end_)
+    else if (root->branch_[L] == &rom->end_)
     {
-        print_inner_tree(root->link_[R], str, LEAF, R, rom, fn_print);
+        print_inner_tree(root->branch_[R], str, LEAF, R, rom, fn_print);
     }
     else
     {
-        print_inner_tree(root->link_[R], str, BRANCH, R, rom, fn_print);
-        print_inner_tree(root->link_[L], str, LEAF, L, rom, fn_print);
+        print_inner_tree(root->branch_[R], str, BRANCH, R, rom, fn_print);
+        print_inner_tree(root->branch_[L], str, LEAF, L, rom, fn_print);
     }
     free(str);
 }
@@ -1190,18 +1191,18 @@ ccc_tree_print(struct ccc_rtom_ const *const rom,
     }
     print_node(rom, root, fn_print);
 
-    if (root->link_[R] == &rom->end_)
+    if (root->branch_[R] == &rom->end_)
     {
-        print_inner_tree(root->link_[L], "", LEAF, L, rom, fn_print);
+        print_inner_tree(root->branch_[L], "", LEAF, L, rom, fn_print);
     }
-    else if (root->link_[L] == &rom->end_)
+    else if (root->branch_[L] == &rom->end_)
     {
-        print_inner_tree(root->link_[R], "", LEAF, R, rom, fn_print);
+        print_inner_tree(root->branch_[R], "", LEAF, R, rom, fn_print);
     }
     else
     {
-        print_inner_tree(root->link_[R], "", BRANCH, R, rom, fn_print);
-        print_inner_tree(root->link_[L], "", LEAF, L, rom, fn_print);
+        print_inner_tree(root->branch_[R], "", BRANCH, R, rom, fn_print);
+        print_inner_tree(root->branch_[L], "", LEAF, L, rom, fn_print);
     }
 }
 
