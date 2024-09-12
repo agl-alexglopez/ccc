@@ -48,8 +48,10 @@ fhash_test_erase(void)
     CHECK(fhm_size(&fh), 1, "%zu");
     ent = fhm_remove(&fh, &query.e);
     CHECK(ccc_entry_occupied(&ent), true, "%d");
-    CHECK(((struct val *)ccc_entry_unwrap(&ent))->id, 137, "%d");
-    CHECK(((struct val *)ccc_entry_unwrap(&ent))->val, 99, "%d");
+    struct val *v = ccc_entry_unwrap(&ent);
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->id, 137, "%d");
+    CHECK(v->val, 99, "%d");
     CHECK(fhm_size(&fh), 0, "%zu");
     query.id = 101;
     ent = fhm_remove(&fh, &query.e);
@@ -77,6 +79,7 @@ fhash_test_shuffle_insert_erase(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = fhm_insert_entry(fhm_entry_lv(&fh, &elem.id), &elem.e);
+        CHECK(v != NULL, true, "%d");
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
         CHECK(fhm_validate(&fh), true, "%d");

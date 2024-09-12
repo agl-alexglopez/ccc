@@ -52,20 +52,20 @@ target_link_libraries(flat_hash_map
     impl_flat_hash_map
 )
 
-add_library(double_ended_priority_queue double_ended_priority_queue.h ${CMAKE_SOURCE_DIR}/src/tree.c)
+add_library(double_ended_priority_queue double_ended_priority_queue.h ${CMAKE_SOURCE_DIR}/src/double_ended_priority_queue.c)
 target_link_libraries(double_ended_priority_queue
   PUBLIC
     types
   PRIVATE
-    impl_tree
+    impl_double_ended_priority_queue
 )
 
-add_library(ordered_map ordered_map.h ${CMAKE_SOURCE_DIR}/src/tree.c)
+add_library(ordered_map ordered_map.h ${CMAKE_SOURCE_DIR}/src/ordered_map.c)
 target_link_libraries(ordered_map
   PUBLIC
     types
   PRIVATE
-    impl_tree
+    impl_ordered_map
 )
 
 add_library(realtime_ordered_map realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/realtime_ordered_map.c)
@@ -100,8 +100,11 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/impl_flat_priority_queue.h
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/impl_tree.h
-        ${PROJECT_SOURCE_DIR}/src/tree.c
         ${PROJECT_SOURCE_DIR}/src/impl_priority_queue.h
+        ${PROJECT_SOURCE_DIR}/src/impl_ordered_map.h
+        ${PROJECT_SOURCE_DIR}/src/ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/impl_double_ended_priority_queue.h
+        ${PROJECT_SOURCE_DIR}/src/double_ended_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/impl_singly_linked_list.h
         ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c

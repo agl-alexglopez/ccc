@@ -93,7 +93,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
 
 #define CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)            \
     ({                                                                         \
-        struct ccc_om_entry_ rom_mod_ent_                                      \
+        struct ccc_tree_entry_ rom_mod_ent_                                    \
             = (realtime_ordered_map_entry)->impl_;                             \
         if (rom_mod_ent_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED)               \
         {                                                                      \
@@ -106,7 +106,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
 #define CCC_IMPL_ROM_AND_MODIFY_W(realtime_ordered_map_entry, mod_fn,          \
                                   aux_data)                                    \
     ({                                                                         \
-        struct ccc_om_entry_ rom_mod_ent_                                      \
+        struct ccc_tree_entry_ rom_mod_ent_                                    \
             = (realtime_ordered_map_entry)->impl_;                             \
         if (rom_mod_ent_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED)               \
         {                                                                      \

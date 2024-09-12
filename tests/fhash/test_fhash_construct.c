@@ -63,11 +63,15 @@ fhash_test_entry_functional(void)
     struct val def = {.id = 137, .val = 0};
     fh_map_entry ent = fhm_entry(&fh, &def.id);
     CHECK(fhm_unwrap(&ent) == NULL, true, "%d");
-    ((struct val *)fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e))->val += 1;
+    struct val *v = fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e);
+    CHECK(v != NULL, true, "%d");
+    v->val += 1;
     struct val const *const inserted = fhm_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->val, 1, "%d");
-    ((struct val *)fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e))->val += 1;
+    v = fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e);
+    CHECK(v != NULL, true, "%d");
+    v->val += 1;
     CHECK(inserted->val, 2, "%d");
     return PASS;
 }
@@ -91,9 +95,10 @@ fhash_test_entry_macros(void)
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 0, "%d");
     /* The function with a side effect should NOT execute. */
-    FHM_OR_INSERT(FHM_ENTRY(&fh, key),
-                  (struct val){.id = key, .val = def(&mut)})
-        ->val++;
+    struct val *v = FHM_OR_INSERT(FHM_ENTRY(&fh, key),
+                                  (struct val){.id = key, .val = def(&mut)});
+    CHECK(v != NULL, true, "%d");
+    v->val++;
     CHECK(mut, 100, "%d");
     CHECK(inserted->val, 1, "%d");
     return PASS;
@@ -116,7 +121,9 @@ fhash_test_entry_and_modify_functional(void)
     CHECK((fhm_unwrap(&ent) == NULL), true, "%d");
 
     /* Inserting default value before an in place modification is possible. */
-    ((struct val *)fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e))->val += 1;
+    struct val *v = fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e);
+    CHECK(v != NULL, true, "%d");
+    v->val++;
     struct val const *const inserted = fhm_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");

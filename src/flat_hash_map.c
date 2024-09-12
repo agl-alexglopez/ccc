@@ -190,7 +190,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
     void *key = ccc_impl_fhm_key_in_slot(&h->impl_, ret);
     struct ccc_entry_ const ent = ccc_impl_fhm_find(
         &h->impl_, key, ccc_impl_fhm_filter(&h->impl_, key));
-    if (ent.stats_ == CCC_FHM_ENTRY_VACANT)
+    if (ent.stats_ == CCC_FHM_ENTRY_VACANT || !ret || !ent.e_)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
@@ -532,17 +532,28 @@ ccc_impl_fhm_distance(size_t const capacity, size_t const index, uint64_t hash)
 bool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
+    size_t empties = 0;
+    size_t occupied = 0;
     for (void const *i = ccc_buf_begin(&h->impl_.buf_);
          i != ccc_buf_capacity_end(&h->impl_.buf_);
          i = ccc_buf_next(&h->impl_.buf_, i))
     {
+        if (ccc_impl_fhm_in_slot(&h->impl_, i)->hash_ == CCC_FHM_EMPTY)
+        {
+            ++empties;
+        }
+        else
+        {
+            ++occupied;
+        }
         if (ccc_impl_fhm_in_slot(&h->impl_, i)->hash_ != CCC_FHM_EMPTY
             && !valid_distance_from_home(&h->impl_, i))
         {
             return false;
         }
     }
-    return true;
+    return occupied == ccc_fhm_size(h)
+           && empties == (ccc_buf_capacity(&h->impl_.buf_) - occupied);
 }
 
 /*=========================   Static Helpers ============================*/

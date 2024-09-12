@@ -7,6 +7,7 @@ The leetcode lru problem in C. */
 #include "flat_hash_map.h"
 #include "test.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
 #define REQS 11
@@ -148,11 +149,13 @@ put(struct lru_cache *const lru, int const key, int const val)
     }
     struct lru_lookup *const new
         = FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
+    assert(new);
     new->kv_in_list = CCC_DLL_EMPLACE_FRONT(
         &lru->l, (struct key_val){.key = key, .val = val});
     if (ccc_dll_size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = ccc_dll_back(&lru->l);
+        assert(to_drop);
         fhm_remove_entry(FHM_ENTRY(&lru->fh, to_drop->key));
         ccc_dll_pop_back(&lru->l);
     }

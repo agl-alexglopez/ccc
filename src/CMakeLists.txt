@@ -12,6 +12,12 @@ target_link_libraries(impl_singly_linked_list INTERFACE types)
 add_library(impl_tree INTERFACE impl_tree.h)
 target_link_libraries(impl_tree INTERFACE types)
 
+add_library(impl_ordered_map INTERFACE impl_ordered_map.h)
+target_link_libraries(impl_ordered_map INTERFACE impl_tree)
+
+add_library(impl_double_ended_priority_queue INTERFACE impl_double_ended_priority_queue.h)
+target_link_libraries(impl_double_ended_priority_queue INTERFACE impl_tree)
+
 add_library(impl_realtime_ordered_map INTERFACE impl_realtime_ordered_map.h)
 target_link_libraries(impl_realtime_ordered_map INTERFACE types)
 

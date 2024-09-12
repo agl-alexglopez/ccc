@@ -14,7 +14,7 @@
 #ifndef CCC_DOUBLE_ENDED_PRIORITY_QUEUE_H
 #define CCC_DOUBLE_ENDED_PRIORITY_QUEUE_H
 
-#include "impl_tree.h"
+#include "impl_double_ended_priority_queue.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -22,12 +22,12 @@
 
 typedef struct
 {
-    ccc_om_elem_ impl_;
+    struct ccc_node_ impl_;
 } ccc_depq_elem;
 
 typedef struct
 {
-    struct ccc_om_ impl_;
+    struct ccc_tree_ impl_;
 } ccc_double_ended_priority_queue;
 
 /* Initialize the depq on the left hand side with this right hand side
@@ -37,8 +37,8 @@ typedef struct
    this has not been called. */
 #define CCC_DEPQ_INIT(struct_name, depq_elem_field, key_field, depq_name,      \
                       alloc_fn, key_cmp_fn, aux)                               \
-    CCC_TREE_INIT(struct_name, depq_elem_field, key_field, depq_name,          \
-                  alloc_fn, key_cmp_fn, aux)
+    CCC_IMPL_DEPQ_INIT(struct_name, depq_elem_field, key_field, depq_name,     \
+                       alloc_fn, key_cmp_fn, aux)
 
 void ccc_depq_clear(ccc_double_ended_priority_queue *,
                     ccc_destructor_fn *destructor);

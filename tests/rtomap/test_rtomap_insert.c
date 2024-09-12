@@ -48,7 +48,9 @@ rtomap_test_insert_one(void)
     single.val = 0;
     CHECK(entry_occupied(rom_insert_lv(&s, &single.elem)), false, "%d");
     CHECK(rom_empty(&s), false, "%d");
-    CHECK(((struct val *)rom_root(&s))->val == single.val, true, "%d");
+    struct val *v = rom_root(&s);
+    CHECK(v == NULL, false, "%d");
+    CHECK(v->val == single.val, true, "%d");
     return PASS;
 }
 
@@ -58,13 +60,17 @@ rtomap_test_insert_macros(void)
     realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val *v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
+    CHECK(v != NULL, true, "%d");
     CHECK(rom_size(&s), 1, "%zu");
     v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 0, "%d");
     CHECK(rom_size(&s), 1, "%zu");
-    ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0})->id++;
-    CHECK(((struct val *)rom_unwrap(ROM_ENTRY(&s, 0)))->id, 1, "%d");
+    v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
+    CHECK(v != NULL, true, "%d");
+    v->id++;
+    CHECK(v->id, 1, "%d");
+    CHECK(v != NULL, true, "%d");
     CHECK(rom_size(&s), 1, "%zu");
     v = ROM_INSERT_ENTRY(ROM_ENTRY(&s, 0), (struct val){.id = 3, .val = 0});
     CHECK(v != NULL, true, "%d");

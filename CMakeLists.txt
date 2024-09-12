@@ -38,7 +38,7 @@ else()
 endif()
 
 
-option(BUILD_SHARED_LIBS "Building str_view as a shared library is available, but OFF by default." OFF)
+option(BUILD_SHARED_LIBS "Building ccc as a shared library is available, but OFF by default." OFF)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/debug/bin)

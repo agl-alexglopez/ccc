@@ -1,4 +1,4 @@
-.PHONY: ccc default build rel deb crel cdeb clean tests samples all-deb all-rel call-deb call-rel dtest rtest util
+.PHONY: ccc default build rel deb crel cdeb clean tests samples all-deb all-rel call-deb call-rel dtest rtest util tidy format fanalyze
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
@@ -61,6 +61,12 @@ all-deb:
 
 all-rel:
 	$(MAKE) rel
+	$(MAKE) tests
+	$(MAKE) samples
+
+fanalyze:
+	cmake --preset=fanalyze
+	$(MAKE) build
 	$(MAKE) tests
 	$(MAKE) samples
 

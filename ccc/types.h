@@ -14,7 +14,7 @@ typedef struct
 
 typedef struct
 {
-    struct ccc_rrange_ impl_;
+    struct ccc_range_ impl_;
 } ccc_rrange;
 
 #define CCC_ENTRY_OCCUPIED 0x1

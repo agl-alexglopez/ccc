@@ -741,11 +741,13 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     {
         struct vertex *v = cur->v;
         struct prev_vertex const *prev = FHM_GET(&prev_map, v);
+        assert(prev);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
             prev = FHM_GET(&prev_map, prev->prev);
+            assert(prev);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the

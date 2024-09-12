@@ -39,5 +39,5 @@ ccc_begin_rrange(ccc_rrange const *const r)
 void *
 ccc_end_rrange(ccc_rrange const *const r)
 {
-    return r->impl_.end_;
+    return r->impl_.rend_;
 }

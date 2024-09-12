@@ -11,14 +11,14 @@ struct ccc_entry_
 
 struct ccc_range_
 {
-    void *begin_;
-    void *end_;
-};
-
-struct ccc_rrange_
-{
-    void *rbegin_;
-    void *end_;
+    union {
+        void *begin_;
+        void *rbegin_;
+    };
+    union {
+        void *end_;
+        void *rend_;
+    };
 };
 
 #endif /* CCC_IMPL_TYPES_H */

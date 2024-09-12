@@ -24,7 +24,8 @@ ccc_fq_clear(ccc_flat_queue *const fq, ccc_destructor_fn *destructor)
     }
     if (!destructor)
     {
-        fq->impl_.buf.impl_.sz_ = fq->impl_.front = 0;
+        fq->impl_.front = 0;
+        ccc_buf_size_set(&fq->impl_.buf, 0);
         return;
     }
     size_t const cap = ccc_buf_capacity(&fq->impl_.buf);
@@ -67,7 +68,10 @@ ccc_fq_push(ccc_flat_queue *const fq, void *const elem)
         return NULL;
     }
     void *back = ccc_impl_fq_alloc(&fq->impl_);
-    memcpy(back, elem, ccc_buf_elem_size(&fq->impl_.buf));
+    if (back)
+    {
+        memcpy(back, elem, ccc_buf_elem_size(&fq->impl_.buf));
+    }
     return back;
 }
 
@@ -79,7 +83,7 @@ ccc_fq_pop(ccc_flat_queue *const fq)
         return;
     }
     fq->impl_.front = (fq->impl_.front + 1) % ccc_buf_capacity(&fq->impl_.buf);
-    --fq->impl_.buf.impl_.sz_;
+    ccc_buf_size_minus(&fq->impl_.buf);
 }
 
 void *
@@ -113,7 +117,7 @@ ccc_impl_fq_alloc(struct ccc_fq_ *fq)
     }
     void *new_slot = ccc_buf_at(&fq->buf, (fq->front + ccc_buf_size(&fq->buf))
                                               % ccc_buf_capacity(&fq->buf));
-    ++fq->buf.impl_.sz_;
+    ccc_buf_size_plus(&fq->buf);
     return new_slot;
 }
 

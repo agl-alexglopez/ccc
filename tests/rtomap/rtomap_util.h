@@ -3,6 +3,7 @@
 
 #include "realtime_ordered_map.h"
 #include "test.h"
+#include "types.h"
 
 #include <stddef.h>
 

@@ -83,7 +83,9 @@ fhash_test_insert_overwrite(void)
     ccc_entry ent = fhm_insert(&fh, &q.e);
     CHECK(ccc_entry_occupied(&ent), false, "%d");
     CHECK(ccc_entry_unwrap(&ent), NULL, "%p");
-    CHECK(((struct val *)fhm_unwrap(fhm_entry_lv(&fh, &q.id)))->val, 99, "%d");
+    struct val const *v = fhm_unwrap(fhm_entry_lv(&fh, &q.id));
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->val, 99, "%d");
 
     /* Now the second insertion will take place and the old occupying value
        will be written into our struct we used to make the query. */
@@ -94,9 +96,13 @@ fhash_test_insert_overwrite(void)
     CHECK(ccc_entry_occupied(&old_ent), true, "%d");
 
     /* The old contents are now in q and the entry is in the table. */
-    CHECK(((struct val *)ccc_entry_unwrap(&old_ent))->val, 99, "%d");
+    v = ccc_entry_unwrap(&old_ent);
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->val, 99, "%d");
     CHECK(q.val, 99, "%d");
-    CHECK(((struct val *)fhm_unwrap(fhm_entry_lv(&fh, &q.id)))->val, 100, "%d");
+    v = fhm_unwrap(fhm_entry_lv(&fh, &q.id));
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->val, 100, "%d");
     return PASS;
 }
 
@@ -112,17 +118,23 @@ fhash_test_insert_then_bad_ideas(void)
     ccc_entry ent = fhm_insert(&fh, &q.e);
     CHECK(ccc_entry_occupied(&ent), false, "%d");
     CHECK(ccc_entry_unwrap(&ent), NULL, "%p");
-    CHECK(((struct val *)fhm_unwrap(fhm_entry_lv(&fh, &q.id)))->val, 99, "%d");
+    struct val const *v = fhm_unwrap(fhm_entry_lv(&fh, &q.id));
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->val, 99, "%d");
 
     q = (struct val){.id = 137, .val = 100};
 
     ent = fhm_insert(&fh, &q.e);
     CHECK(ccc_entry_occupied(&ent), true, "%d");
-    CHECK(((struct val *)ccc_entry_unwrap(&ent))->val, 99, "%d");
+    v = ccc_entry_unwrap(&ent);
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->val, 99, "%d");
     CHECK(q.val, 99, "%d");
     q.val -= 9;
 
-    CHECK(((struct val *)fhm_get(&fh, &q.id))->val, 100, "%d");
+    v = fhm_get(&fh, &q.id);
+    CHECK(v != NULL, true, "%d");
+    CHECK(v->val, 100, "%d");
     CHECK(q.val, 90, "%d");
     return PASS;
 }
@@ -329,10 +341,11 @@ fhash_test_entry_api_macros(void)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        FHM_OR_INSERT(FHM_ENTRY(&fh, i), (struct val){0})->val++;
+        struct val *v = FHM_OR_INSERT(FHM_ENTRY(&fh, i), (struct val){0});
+        CHECK(v != NULL, true, "%d");
+        v->val++;
         /* All values in the array should be odd now */
-        CHECK(FHM_OR_INSERT(FHM_ENTRY(&fh, i), (struct val){0})->val % 2 == 0,
-              true, "%d");
+        CHECK(v->val % 2 == 0, true, "%d");
     }
     CHECK(fhm_size(&fh), (size / 2), "%zu");
     return PASS;
@@ -374,12 +387,12 @@ fhash_test_resize(void)
 {
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
-    CHECK(vals != NULL, true, "%d");
+    CHECK(vals == NULL, false, "%d");
     flat_hash_map fh;
     ccc_result const res
         = FHM_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, "%d");
+    CHECK(res, CCC_OK, "%d", vals);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -387,21 +400,22 @@ fhash_test_resize(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = fhm_insert_entry(fhm_entry_lv(&fh, &elem.id), &elem.e);
-        CHECK(v->id, shuffled_index, "%d");
-        CHECK(v->val, i, "%d");
-        CHECK(fhm_validate(&fh), true, "%d");
+        CHECK(v != NULL, true, "%d", vals);
+        CHECK(v->id, shuffled_index, "%d", vals);
+        CHECK(v->val, i, "%d", vals);
+        CHECK(fhm_validate(&fh), true, "%d", vals);
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu");
+    CHECK(fhm_size(&fh), to_insert, "%zu", vals);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
             = fhm_insert_entry(fhm_entry_lv(&fh, &swap_slot.id), &swap_slot.e);
-        CHECK(in_table != NULL, true, "%d");
-        CHECK(in_table->val, shuffled_index, "%d");
+        CHECK(in_table != NULL, true, "%d", vals);
+        CHECK(in_table->val, shuffled_index, "%d", vals);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d", vals);
     return PASS;
 }
 
@@ -410,12 +424,12 @@ fhash_test_resize_macros(void)
 {
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
-    CHECK(vals != NULL, true, "%d");
+    CHECK(vals == NULL, false, "%d");
     flat_hash_map fh;
     ccc_result const res
         = FHM_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, "%d");
+    CHECK(res, CCC_OK, "%d", vals);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -423,10 +437,11 @@ fhash_test_resize_macros(void)
     {
         struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
                                          fhash_create(shuffled_index, i));
-        CHECK(v->id, shuffled_index, "%d");
-        CHECK(v->val, i, "%d");
+        CHECK(v != NULL, true, "%d", vals);
+        CHECK(v->id, shuffled_index, "%d", vals);
+        CHECK(v->val, i, "%d", vals);
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu");
+    CHECK(fhm_size(&fh), to_insert, "%zu", vals);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -434,13 +449,17 @@ fhash_test_resize_macros(void)
             = FHM_OR_INSERT(FHM_AND_MODIFY_W(FHM_ENTRY(&fh, shuffled_index),
                                              fhash_swap_val, shuffled_index),
                             (struct val){0});
-        CHECK(in_table != NULL, true, "%d");
-        CHECK(in_table->val, shuffled_index, "%d");
-        FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val const *v = FHM_GET(&fh, shuffled_index);
-        CHECK(v->val, i, "%d");
+        CHECK(in_table != NULL, true, "%d", vals);
+        CHECK(in_table->val, shuffled_index, "%d", vals);
+        struct val *v
+            = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
+        CHECK(v == NULL, false, "%d");
+        v->val = i;
+        v = FHM_GET_MUT(&fh, shuffled_index);
+        CHECK(v != NULL, true, "%d", vals);
+        CHECK(v->val, i, "%d", vals);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d", vals);
     return PASS;
 }
 
@@ -450,7 +469,7 @@ fhash_test_resize_from_null(void)
     flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, "%d");
+    CHECK(res, CCC_OK, "%d", ccc_buf_base(&fh.impl_.buf_));
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -458,18 +477,20 @@ fhash_test_resize_from_null(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = fhm_insert_entry(fhm_entry_lv(&fh, &elem.id), &elem.e);
-        CHECK(v->id, shuffled_index, "%d");
-        CHECK(v->val, i, "%d");
+        CHECK(v != NULL, true, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v->id, shuffled_index, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu");
+    CHECK(fhm_size(&fh), to_insert, "%zu", ccc_buf_base(&fh.impl_.buf_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
             = fhm_insert_entry(fhm_entry_lv(&fh, &swap_slot.id), &swap_slot.e);
-        CHECK(in_table != NULL, true, "%d");
-        CHECK(in_table->val, shuffled_index, "%d");
+        CHECK(in_table != NULL, true, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(in_table->val, shuffled_index, "%d",
+              ccc_buf_base(&fh.impl_.buf_));
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
@@ -491,10 +512,11 @@ fhash_test_resize_from_null_macros(void)
     {
         struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
                                          fhash_create(shuffled_index, i));
-        CHECK(v->id, shuffled_index, "%d");
-        CHECK(v->val, i, "%d");
+        CHECK(v != NULL, true, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v->id, shuffled_index, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu");
+    CHECK(fhm_size(&fh), to_insert, "%zu", ccc_buf_base(&fh.impl_.buf_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -502,11 +524,16 @@ fhash_test_resize_from_null_macros(void)
             = FHM_OR_INSERT(FHM_AND_MODIFY_W(FHM_ENTRY(&fh, shuffled_index),
                                              fhash_swap_val, shuffled_index),
                             (struct val){0});
-        CHECK(in_table != NULL, true, "%d");
-        CHECK(in_table->val, shuffled_index, "%d");
-        FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0})->val = i;
-        struct val *v = FHM_GET_MUT(&fh, shuffled_index);
-        CHECK(v->val, i, "%d");
+        CHECK(in_table != NULL, true, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(in_table->val, shuffled_index, "%d",
+              ccc_buf_base(&fh.impl_.buf_));
+        struct val *v
+            = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
+        CHECK(v == NULL, false, "%d");
+        v->val = i;
+        v = FHM_GET_MUT(&fh, shuffled_index);
+        CHECK(v == NULL, false, "%d", ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;

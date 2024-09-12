@@ -242,6 +242,12 @@ ccc_buf_size_minus(ccc_buffer *const buf)
     --buf->impl_.sz_;
 }
 
+void
+ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
+{
+    buf->impl_.sz_ = n;
+}
+
 /*======================  Static Helpers  ==================================*/
 
 static inline void *
