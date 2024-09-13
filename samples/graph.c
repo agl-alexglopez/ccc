@@ -430,13 +430,13 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                                               .parent = (struct point){-1, -1},
                                           });
     assert(pc);
-    ccc_fdeq_push_back(&bfs, &src->pos);
+    push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {0};
-    while (!ccc_fdeq_empty(&bfs) && !success)
+    while (!empty(&bfs) && !success)
     {
         cur = *((struct point *)ccc_fdeq_front(&bfs));
-        ccc_fdeq_pop_front(&bfs);
+        pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next = {
@@ -454,18 +454,18 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 success = true;
                 break;
             }
-            if (!is_path(next_cell) && !fhm_contains(&parent_map, &next))
+            if (!is_path(next_cell) && !contains(&parent_map, &next))
             {
                 [[maybe_unused]] struct parent_cell *inserted
                     = insert_entry(entry_vr(&parent_map, &next), &push.elem);
                 assert(inserted != NULL);
-                (void)ccc_fdeq_push_back(&bfs, &next);
+                (void)push_back(&bfs, &next);
             }
         }
     }
     if (success)
     {
-        struct parent_cell const *cell = fhm_get(&parent_map, &cur);
+        struct parent_cell const *cell = get(&parent_map, &cur);
         assert(cell);
         struct edge edge = {
             .n = {.name = dst->name, .cost = 0},
@@ -473,7 +473,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         };
         while (cell->parent.r > 0)
         {
-            cell = fhm_get(&parent_map, &cell->parent);
+            cell = get(&parent_map, &cell->parent);
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -705,12 +705,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;
-    while (!ccc_pq_empty(&dist_q))
+    while (!empty(&dist_q))
     {
         /* PQ entries are popped but the map will free the memory at
            the end because it always holds a reference to its pq_elem. */
-        cur = ccc_pq_front(&dist_q);
-        ccc_pq_pop(&dist_q);
+        cur = front(&dist_q);
+        pop(&dist_q);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
@@ -730,8 +730,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev = cur->v;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!ccc_pq_decrease(&dist_q, &dist->pq_elem, pq_update_dist,
-                                     &alt))
+                if (!decrease(&dist_q, &dist->pq_elem, pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -783,7 +782,7 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
         {
             quit("inserting into map in in loading phase failed.\n", 1);
         }
-        ccc_pq_push(dist_q, &p->pq_elem);
+        push(dist_q, &p->pq_elem);
     }
 }
 

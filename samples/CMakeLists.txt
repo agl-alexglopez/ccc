@@ -16,6 +16,7 @@ target_link_libraries(maze PRIVATE
   str_view::str_view
   ordered_map
   double_ended_priority_queue
+  traits
 )
 
 add_executable(graph graph.c)
@@ -27,6 +28,7 @@ target_link_libraries(graph PRIVATE
   flat_double_ended_queue
   priority_queue
   flat_priority_queue
+  traits
 )
 
 add_custom_target(samples)

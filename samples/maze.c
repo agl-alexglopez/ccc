@@ -3,14 +3,17 @@
    ============
    This file provides a simple maze builder that implements Prim's algorithm
    to randomly generate a maze. I chose this algorithm because it can use
-   both a ccc_ordered_map and a priority queue to acheive its purpose. Such data
+   both an ordered and a priority queue to acheive its purpose. Such data
    structures are provided by the library offering a perfect sample program
    opportunity. */
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "cli.h"
 #include "double_ended_priority_queue.h"
 #include "ordered_map.h"
 #include "random.h"
 #include "str_view/str_view.h"
+#include "traits.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -219,12 +222,12 @@ animate_maze(struct maze *maze)
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)ccc_depq_push(&cells, &start->elem);
+    (void)push(&cells, &start->elem);
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
-    while (!ccc_depq_empty(&cells))
+    while (!empty(&cells))
     {
         struct priority_cell const *const cur = ccc_depq_max(&cells);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
@@ -241,8 +244,7 @@ animate_maze(struct maze *maze)
                 continue;
             }
             int cur_weight = 0;
-            struct point_cost const *const found
-                = ccc_om_unwrap(ccc_om_entry_vr(&cell_costs, &next));
+            struct point_cost const *const found = get(&cell_costs, &next);
             if (!found)
             {
                 struct point_cost *new_cost
@@ -252,10 +254,8 @@ animate_maze(struct maze *maze)
                     .cost = rand_range(0, 100),
                 };
                 cur_weight = new_cost->cost;
-                bool const inserted = ccc_om_insert_entry(
-                    ccc_om_entry_vr(&cell_costs, &new_cost->p),
-                    &new_cost->elem);
-                (void)inserted;
+                [[maybe_unused]] bool const inserted = insert_entry(
+                    entry_vr(&cell_costs, &new_cost->p), &new_cost->elem);
                 assert(inserted);
             }
             else
@@ -278,7 +278,7 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            ccc_depq_push(&cells, &new_cell->elem);
+            push(&cells, &new_cell->elem);
         }
         else
         {

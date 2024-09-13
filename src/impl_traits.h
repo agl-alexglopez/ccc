@@ -256,12 +256,12 @@
 
 #define ccc_impl_pop(container_ptr)                                            \
     _Generic((container_ptr),                                                  \
-        ccc_flat_priority_queue *: ccc_om_pop,                                 \
-        ccc_priority_queue *: ccc_rom_pop)((container_ptr))
+        ccc_flat_priority_queue *: ccc_fpq_pop,                                \
+        ccc_priority_queue *: ccc_pq_pop)((container_ptr))
 
 #define ccc_impl_pop_front(container_ptr)                                      \
     _Generic((container_ptr),                                                  \
-        ccc_flat_double_ended_queue *: ccc_fhm_pop_front,                      \
+        ccc_flat_double_ended_queue *: ccc_fdeq_pop_front,                     \
         ccc_doubly_linked_list *: ccc_dll_pop_front,                           \
         ccc_singly_linked_list *: ccc_sll_pop_front)((container_ptr))
 
@@ -273,9 +273,8 @@
 
 #define ccc_impl_front(container_ptr)                                          \
     _Generic((container_ptr),                                                  \
-        ccc_flat_double_ended_queue *: ccc_fhm_front,                          \
+        ccc_flat_double_ended_queue *: ccc_fdeq_front,                         \
         ccc_doubly_linked_list *: ccc_dll_front,                               \
-        ccc_double_ended_priority_queue *: ccc_depq_front,                     \
         ccc_flat_priority_queue *: ccc_fpq_front,                              \
         ccc_priority_queue *: ccc_pq_front,                                    \
         ccc_singly_linked_list *: ccc_sll_front)((container_ptr))
