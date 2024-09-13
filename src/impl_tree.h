@@ -15,13 +15,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define CCC_TREE_ENTRY_VACANT 0x0
-#define CCC_TREE_ENTRY_OCCUPIED 0x1
-#define CCC_TREE_ENTRY_INSERT_ERROR 0x2
-#define CCC_TREE_ENTRY_SEARCH_ERROR 0x4
-#define CCC_TREE_ENTRY_NULL 0x8
-#define CCC_TREE_ENTRY_DELETE_ERROR 0x10
-
 /* This node type will support more expressive implementations of a standard
    map and double ended priority queue. The array of pointers is to support
    unifying left and right symmetric cases. The union is only relevant to

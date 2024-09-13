@@ -128,6 +128,11 @@ bool ccc_rom_occupied(ccc_rtom_entry const *e);
 
 /*======================      Iteration    ==================================*/
 
+ccc_range ccc_rom_equal_range(ccc_realtime_ordered_map const *rom,
+                              void const *begin_key, void const *end_key);
+ccc_rrange ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,
+                                void const *rbegin_key, void const *rend_key);
+
 void *ccc_rom_begin(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_next(ccc_realtime_ordered_map *rom, ccc_rtom_elem const *);
 

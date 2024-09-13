@@ -3,10 +3,20 @@
 
 #include <stdint.h>
 
+enum ccc_entry_status_ : uint8_t
+{
+    CCC_ENTRY_VACANT = 0,
+    CCC_ENTRY_OCCUPIED = 0x1,
+    CCC_ENTRY_INSERT_ERROR = 0x2,
+    CCC_ENTRY_SEARCH_ERROR = 0x4,
+    CCC_ENTRY_CONTAINS_NULL = 0x8,
+    CCC_ENTRY_DELETE_ERROR = 0x10,
+};
+
 struct ccc_entry_
 {
     void *e_;
-    uint8_t stats_;
+    enum ccc_entry_status_ stats_;
 };
 
 struct ccc_range_

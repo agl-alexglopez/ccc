@@ -1,5 +1,6 @@
 #include "ordered_map.h"
 #include "impl_ordered_map.h"
+#include "impl_types.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -69,8 +70,8 @@ static void *connect_new_root(struct ccc_tree_ *, struct ccc_node_ *,
                               ccc_threeway_cmp);
 static void *max(struct ccc_tree_ const *);
 static void *min(struct ccc_tree_ const *);
-static ccc_range equal_range(struct ccc_tree_ *, void const *, void const *,
-                             om_link);
+static struct ccc_range_ equal_range(struct ccc_tree_ *, void const *,
+                                     void const *, om_link);
 
 /* Internal operations that take and return nodes for the tree. */
 
@@ -136,7 +137,7 @@ ccc_impl_om_entry(struct ccc_tree_ *t, void const *key)
             .t_ = t,
             .entry_ = {
                 .e_ = found,
-                .stats_ = CCC_TREE_ENTRY_OCCUPIED,
+                .stats_ = CCC_ENTRY_OCCUPIED,
             },
         };
     }
@@ -144,7 +145,7 @@ ccc_impl_om_entry(struct ccc_tree_ *t, void const *key)
         .t_ = t,
         .entry_ = {
             .e_ = found,
-            .stats_ = CCC_TREE_ENTRY_VACANT,
+            .stats_ = CCC_ENTRY_VACANT,
         },
     };
 }
@@ -158,7 +159,7 @@ ccc_om_entry(ccc_ordered_map *const s, void const *const key)
 void *
 ccc_om_insert_entry(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 {
-    if (e->impl_.entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         elem->impl_
             = *ccc_impl_om_elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
@@ -172,7 +173,7 @@ ccc_om_insert_entry(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 void *
 ccc_om_or_insert(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 {
-    if (e->impl_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         return NULL;
     }
@@ -182,7 +183,7 @@ ccc_om_or_insert(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 ccc_o_map_entry
 ccc_om_and_modify(ccc_o_map_entry const *const e, ccc_update_fn *const fn)
 {
-    if (e->impl_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){
             .container = e->impl_.entry_.e_,
@@ -196,7 +197,7 @@ ccc_o_map_entry
 ccc_om_and_modify_with(ccc_o_map_entry const *const e, ccc_update_fn *fn,
                        void *aux)
 {
-    if (e->impl_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){
             .container = e->impl_.entry_.e_,
@@ -224,7 +225,7 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
     void *inserted = alloc_insert(&s->impl_, &out_handle->impl_);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
@@ -251,7 +252,7 @@ ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 ccc_entry
 ccc_om_remove_entry(ccc_o_map_entry *const e)
 {
-    if (e->impl_.entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *erased
             = erase(e->impl_.t_,
@@ -282,21 +283,20 @@ ccc_om_get(ccc_ordered_map *s, void const *const key)
 void *
 ccc_om_unwrap(ccc_o_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED
-               ? e->impl_.entry_.e_
-               : NULL;
+    return e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED ? e->impl_.entry_.e_
+                                                        : NULL;
 }
 
 bool
 ccc_om_insert_error(ccc_o_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_TREE_ENTRY_INSERT_ERROR;
+    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 bool
 ccc_om_occupied(ccc_o_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED;
+    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
 }
 
 void *
@@ -342,7 +342,8 @@ ccc_range
 ccc_om_equal_range(ccc_ordered_map *s, void const *const begin_key,
                    void const *const end_key)
 {
-    return equal_range(&s->impl_, begin_key, end_key, inorder_traversal);
+    return (ccc_range){
+        equal_range(&s->impl_, begin_key, end_key, inorder_traversal)};
 }
 
 ccc_rrange
@@ -351,8 +352,7 @@ ccc_om_equal_rrange(ccc_ordered_map *s, void const *const rbegin_key,
 
 {
     return (ccc_rrange){
-        equal_range(&s->impl_, rbegin_key, end_key, reverse_inorder_traversal)
-            .impl_};
+        equal_range(&s->impl_, rbegin_key, end_key, reverse_inorder_traversal)};
 }
 
 void *
@@ -480,30 +480,34 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
     return p;
 }
 
-static ccc_range
+static struct ccc_range_
 equal_range(struct ccc_tree_ *t, void const *begin_key, void const *end_key,
             om_link const traversal)
 {
+    if (!t->size_)
+    {
+        return (struct ccc_range_){};
+    }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
        we follow the [inclusive, exclusive) range rule. This means double
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
-    ccc_threeway_cmp const grt_or_les[2] = {CCC_LES, CCC_GRT};
+    ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
     struct ccc_node_ const *b = splay(t, t->root_, begin_key, t->cmp_);
-    if (cmp(t, begin_key, b, t->cmp_) == grt_or_les[traversal])
+    if (cmp(t, begin_key, b, t->cmp_) == les_or_grt[traversal])
     {
         b = next(t, b, traversal);
     }
     struct ccc_node_ const *e = splay(t, t->root_, end_key, t->cmp_);
-    if (cmp(t, end_key, e, t->cmp_) == grt_or_les[traversal])
+    if (cmp(t, end_key, e, t->cmp_) != les_or_grt[!traversal])
     {
         e = next(t, e, traversal);
     }
-    return (ccc_range){{
+    return (struct ccc_range_){
         .begin_ = b == &t->end_ ? NULL : struct_base(t, b),
         .end_ = e == &t->end_ ? NULL : struct_base(t, e),
-    }};
+    };
 }
 
 static void *
@@ -730,14 +734,14 @@ link_trees(struct ccc_node_ *parent, om_link dir, struct ccc_node_ *subtree)
    does not rely upon the implementation of iterators or any other possibly
    buggy implementation. A pure functional range check will provide the most
    reliable check regardless of implementation changes throughout code base. */
-struct ccc_tree_range
+struct tree_range_
 {
     struct ccc_node_ const *low;
     struct ccc_node_ const *root;
     struct ccc_node_ const *high;
 };
 
-struct parent_status
+struct parent_status_
 {
     bool correct;
     struct ccc_node_ const *parent;
@@ -755,7 +759,7 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_ const *t, struct ccc_tree_range const r,
+are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range_ const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)
@@ -779,14 +783,14 @@ are_subtrees_valid(struct ccc_tree_ const *t, struct ccc_tree_range const r,
         return false;
     }
     return are_subtrees_valid(t,
-                              (struct ccc_tree_range){
+                              (struct tree_range_){
                                   .low = r.low,
                                   .root = r.root->branch_[L],
                                   .high = r.root,
                               },
                               nil)
            && are_subtrees_valid(t,
-                                 (struct ccc_tree_range){
+                                 (struct tree_range_){
                                      .low = r.root,
                                      .root = r.root->branch_[R],
                                      .high = r.high,
@@ -794,16 +798,16 @@ are_subtrees_valid(struct ccc_tree_ const *t, struct ccc_tree_range const r,
                                  nil);
 }
 
-static struct parent_status
+static struct parent_status_
 child_tracks_parent(struct ccc_node_ const *const parent,
                     struct ccc_node_ const *const root)
 {
     if (root->parent_ != parent)
     {
         struct ccc_node_ *p = root->parent_->parent_;
-        return (struct parent_status){false, p};
+        return (struct parent_status_){false, p};
     }
-    return (struct parent_status){true, parent};
+    return (struct parent_status_){true, parent};
 }
 
 static bool
@@ -833,7 +837,7 @@ static bool
 ccc_tree_validate(struct ccc_tree_ const *const t)
 {
     if (!are_subtrees_valid(t,
-                            (struct ccc_tree_range){
+                            (struct tree_range_){
                                 .low = &t->end_,
                                 .root = t->root_,
                                 .high = &t->end_,
@@ -882,7 +886,7 @@ print_node(struct ccc_tree_ const *const t,
            struct ccc_node_ const *const root, ccc_print_fn *const fn_print)
 {
     fn_print(struct_base(t, root));
-    struct parent_status stat = child_tracks_parent(parent, root);
+    struct parent_status_ stat = child_tracks_parent(parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);

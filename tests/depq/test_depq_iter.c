@@ -17,16 +17,22 @@ static enum test_result depq_test_insert_iterate_pop(void);
 static enum test_result depq_test_priority_update(void);
 static enum test_result depq_test_priority_removal(void);
 static enum test_result depq_test_priority_valid_range(void);
+static enum test_result depq_test_priority_valid_range_equals(void);
 static enum test_result depq_test_priority_invalid_range(void);
 static enum test_result depq_test_priority_empty_range(void);
 static enum test_result iterator_check(ccc_double_ended_priority_queue *);
 
-#define NUM_TESTS (size_t)8
+#define NUM_TESTS (size_t)9
 test_fn const all_tests[NUM_TESTS] = {
-    depq_test_forward_iter_unique_vals, depq_test_forward_iter_all_vals,
-    depq_test_insert_iterate_pop,       depq_test_priority_update,
-    depq_test_priority_removal,         depq_test_priority_valid_range,
-    depq_test_priority_invalid_range,   depq_test_priority_empty_range,
+    depq_test_forward_iter_unique_vals,
+    depq_test_forward_iter_all_vals,
+    depq_test_insert_iterate_pop,
+    depq_test_priority_update,
+    depq_test_priority_removal,
+    depq_test_priority_valid_range,
+    depq_test_priority_valid_range_equals,
+    depq_test_priority_invalid_range,
+    depq_test_priority_empty_range,
 };
 
 int
@@ -243,7 +249,7 @@ depq_test_priority_valid_range(void)
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int const rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
+    ccc_rrange const rev_range = equal_rrange(&pq, &b, &e);
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val, rev_range_vals[0],
           "%d");
     CHECK(((struct val *)rend_rrange(&rev_range))->val, rev_range_vals[7],
@@ -264,7 +270,66 @@ depq_test_priority_valid_range(void)
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int const range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
+    ccc_range const range = equal_range(&pq, &b, &e);
+    CHECK(((struct val *)begin_range(&range))->val, range_vals[0], "%d");
+    CHECK(((struct val *)end_range(&range))->val, range_vals[7], "%d");
+    index = 0;
+    struct val *i2 = begin_range(&range);
+    for (; i2 != end_range(&range); i2 = next(&pq, &i2->elem))
+    {
+        int const cur_val = i2->val;
+        CHECK(range_vals[index], cur_val, "%d");
+        ++index;
+    }
+    CHECK(i2 == end_range(&range), true, "%d");
+    CHECK(i2->val, range_vals[7], "%d");
+    return PASS;
+}
+
+static enum test_result
+depq_test_priority_valid_range_equals(void)
+{
+    ccc_double_ended_priority_queue pq
+        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
+
+    int const num_nodes = 25;
+    struct val vals[num_nodes];
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    {
+        vals[i].val = val; // NOLINT
+        vals[i].id = i;
+        ccc_depq_push(&pq, &vals[i].elem);
+        CHECK(ccc_depq_validate(&pq), true, "%d");
+    }
+    int b = 10;
+    int e = 40;
+    /* This should be the following range [6,44). 6 should raise to
+       next value not less than 6, 10 and 44 should be the first
+       value greater than 44, 45. */
+    int const rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    ccc_rrange const rev_range = equal_rrange(&pq, &b, &e);
+    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, rev_range_vals[0],
+          "%d");
+    CHECK(((struct val *)rend_rrange(&rev_range))->val, rev_range_vals[7],
+          "%d");
+    size_t index = 0;
+    struct val *i1 = rbegin_rrange(&rev_range);
+    for (; i1 != rend_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
+    {
+        int const cur_val = i1->val;
+        CHECK(rev_range_vals[index], cur_val, "%d");
+        ++index;
+    }
+    CHECK(i1 == rend_rrange(&rev_range), true, "%d");
+    CHECK(i1->val, rev_range_vals[7], "%d");
+    b = 115;
+    e = 85;
+    /* This should be the following range [119,84). 119 should be
+       dropped to first value not greater than 119 and last should
+       be dropped to first value less than 84. */
+    int const range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    ccc_range const range = equal_range(&pq, &b, &e);
     CHECK(((struct val *)begin_range(&range))->val, range_vals[0], "%d");
     CHECK(((struct val *)end_range(&range))->val, range_vals[7], "%d");
     index = 0;
@@ -302,7 +367,7 @@ depq_test_priority_invalid_range(void)
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
     int const rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
-    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
+    ccc_rrange const rev_range = equal_rrange(&pq, &b, &e);
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val, rev_range_vals[0],
           "%d");
     CHECK(rend_rrange(&rev_range), NULL, "%p");
@@ -321,7 +386,7 @@ depq_test_priority_invalid_range(void)
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
     int const range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
-    ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
+    ccc_range const range = equal_range(&pq, &b, &e);
     CHECK(((struct val *)begin_range(&range))->val, range_vals[0], "%d");
     CHECK(end_range(&range), NULL, "%p");
     index = 0;
@@ -357,12 +422,12 @@ depq_test_priority_empty_range(void)
        Normal iteration patterns would consider this empty. */
     int b = -50;
     int e = -25;
-    ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
+    ccc_rrange const rev_range = equal_rrange(&pq, &b, &e);
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val, vals[0].val, "%d");
     CHECK(((struct val *)rend_rrange(&rev_range))->val, vals[0].val, "%d");
     b = 150;
     e = 999;
-    ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
+    ccc_range const range = equal_range(&pq, &b, &e);
     CHECK(((struct val *)begin_range(&range))->val, vals[num_nodes - 1].val,
           "%d");
     CHECK(((struct val *)end_range(&range))->val, vals[num_nodes - 1].val,

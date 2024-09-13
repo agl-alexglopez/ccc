@@ -9,7 +9,7 @@ ccc_entry_occupied(ccc_entry const *const e)
 bool
 ccc_entry_insert_error(ccc_entry const *const e)
 {
-    return e->impl_.stats_ == CCC_ENTRY_ERROR;
+    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 void *

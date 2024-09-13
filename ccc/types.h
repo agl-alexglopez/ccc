@@ -17,10 +17,6 @@ typedef struct
     struct ccc_range_ impl_;
 } ccc_rrange;
 
-#define CCC_ENTRY_OCCUPIED 0x1
-#define CCC_ENTRY_VACANT 0
-#define CCC_ENTRY_ERROR 0x2
-
 typedef struct
 {
     struct ccc_entry_ impl_;

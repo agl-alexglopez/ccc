@@ -33,7 +33,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         struct ccc_fhm_entry_ om_get_ent_                                      \
             = ccc_impl_om_entry(&(ordered_map_ptr)->impl_, &om_key_);          \
         void const *om_get_res_ = NULL;                                        \
-        if (om_get_ent_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED)               \
+        if (om_get_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                    \
         {                                                                      \
             om_get_res_ = om_get_ent_.entry_.e_;                               \
         }                                                                      \
@@ -46,7 +46,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define CCC_IMPL_OM_AND_MODIFY(ordered_map_entry, mod_fn)                      \
     ({                                                                         \
         struct ccc_tree_entry_ om_mod_ent_ = (ordered_map_entry)->impl_;       \
-        if (om_mod_ent_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED)               \
+        if (om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                    \
         {                                                                      \
             (mod_fn)(                                                          \
                 (ccc_update){.container = (void *const)om_mod_ent_.entry_.e_,  \
@@ -58,7 +58,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define CCC_IMPL_OM_AND_MODIFY_W(ordered_map_entry, mod_fn, aux_data)          \
     ({                                                                         \
         struct ccc_tree_entry_ om_mod_ent_ = (ordered_map_entry)->impl_;       \
-        if (om_mod_ent_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED)               \
+        if (om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                    \
         {                                                                      \
             __auto_type om_aux_data_ = (aux_data);                             \
             (mod_fn)(                                                          \
@@ -92,11 +92,11 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
     ({                                                                         \
         struct ccc_tree_entry_ *om_ins_ent_ = &(ordered_map_entry)->impl_;     \
         void *om_ins_ent_ret_ = NULL;                                          \
-        if (!(om_ins_ent_->entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED))           \
+        if (!(om_ins_ent_->entry_.stats_ & CCC_ENTRY_OCCUPIED))                \
         {                                                                      \
             om_ins_ent_ret_ = CCC_IMPL_OM_NEW_INSERT(om_ins_ent_, key_value);  \
         }                                                                      \
-        else if (om_ins_ent_->entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED)        \
+        else if (om_ins_ent_->entry_.stats_ == CCC_ENTRY_OCCUPIED)             \
         {                                                                      \
             struct ccc_node_ ins_ent_saved_ = *ccc_impl_om_elem_in_slot(       \
                 om_ins_ent_->t_, om_ins_ent_->entry_.e_);                      \
@@ -112,7 +112,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
     ({                                                                         \
         struct ccc_tree_entry_ *om_or_ins_ent_ = &(ordered_map_entry)->impl_;  \
         void *or_ins_ret_ = NULL;                                              \
-        if (om_or_ins_ent_->entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED)          \
+        if (om_or_ins_ent_->entry_.stats_ == CCC_ENTRY_OCCUPIED)               \
         {                                                                      \
             or_ins_ret_ = (void *)om_or_ins_ent_->entry_.e_;                   \
         }                                                                      \

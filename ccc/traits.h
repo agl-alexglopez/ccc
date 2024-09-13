@@ -118,6 +118,12 @@
 
 #define ccc_rend(container_ptr) ccc_impl_rend(container_ptr)
 
+#define ccc_equal_range(container_ptr, begin_key_ptr, end_key_ptr)             \
+    ccc_impl_equal_range(container_ptr, begin_key_ptr, end_key_ptr)
+
+#define ccc_equal_rrange(container_ptr, rbegin_key_ptr, rend_key_ptr)          \
+    ccc_impl_equal_rrange(container_ptr, rbegin_key_ptr, rend_key_ptr)
+
 /*===================    Standard Getters API  ==============================*/
 
 #define ccc_size(container_entry_ptr) ccc_impl_size(container_entry_ptr)
@@ -200,6 +206,11 @@
         ccc_rnext(container_ptr, void_iter_ptr)
 #    define end(container_ptr) ccc_end(container_ptr)
 #    define rend(container_ptr) ccc_rend(container_ptr)
+
+#    define equal_range(container_ptr, begin_key_ptr, end_key_ptr)             \
+        ccc_equal_range(container_ptr, begin_key_ptr, end_key_ptr)
+#    define equal_rrange(container_ptr, rbegin_key_ptr, rend_key_ptr)          \
+        ccc_equal_rrange(container_ptr, rbegin_key_ptr, rend_key_ptr)
 
 #    define size(container_ptr) ccc_size(container_ptr)
 #    define empty(container_ptr) ccc_empty(container_ptr)

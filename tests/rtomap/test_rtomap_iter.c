@@ -1,7 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "map_util.h"
-#include "ordered_map.h"
+#include "realtime_ordered_map.h"
+#include "rtomap_util.h"
 #include "test.h"
 #include "traits.h"
 
@@ -10,24 +10,24 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result map_test_forward_iter(void);
-static enum test_result map_test_iterate_removal(void);
-static enum test_result map_test_iterate_remove_reinsert(void);
-static enum test_result map_test_valid_range(void);
-static enum test_result map_test_valid_range_equals(void);
-static enum test_result map_test_invalid_range(void);
-static enum test_result map_test_empty_range(void);
-static enum test_result iterator_check(ccc_ordered_map *);
+static enum test_result rtom_test_forward_iter(void);
+static enum test_result rtom_test_iterate_removal(void);
+static enum test_result rtom_test_iterate_remove_reinsert(void);
+static enum test_result rtom_test_valid_range(void);
+static enum test_result rtom_test_valid_range_equals(void);
+static enum test_result rtom_test_invalid_range(void);
+static enum test_result rtom_test_empty_range(void);
+static enum test_result iterator_check(ccc_realtime_ordered_map *);
 
 #define NUM_TESTS ((size_t)7)
 test_fn const all_tests[NUM_TESTS] = {
-    map_test_forward_iter,
-    map_test_iterate_removal,
-    map_test_valid_range,
-    map_test_invalid_range,
-    map_test_valid_range_equals,
-    map_test_empty_range,
-    map_test_iterate_remove_reinsert,
+    rtom_test_forward_iter,
+    rtom_test_iterate_removal,
+    rtom_test_valid_range,
+    rtom_test_valid_range_equals,
+    rtom_test_invalid_range,
+    rtom_test_empty_range,
+    rtom_test_iterate_remove_reinsert,
 };
 
 int
@@ -46,10 +46,10 @@ main()
 }
 
 static enum test_result
-map_test_forward_iter(void)
+rtom_test_forward_iter(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -64,7 +64,7 @@ map_test_forward_iter(void)
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[num_nodes];
@@ -79,10 +79,10 @@ map_test_forward_iter(void)
 }
 
 static enum test_result
-map_test_iterate_removal(void)
+rtom_test_iterate_removal(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -94,7 +94,7 @@ map_test_iterate_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
     }
     CHECK(iterator_check(&s), PASS, "%d");
     int const limit = 400;
@@ -103,18 +103,18 @@ map_test_iterate_removal(void)
         next = next(&s, &i->elem);
         if (i->val > limit)
         {
-            (void)ccc_om_remove(&s, &i->elem);
-            CHECK(ccc_om_validate(&s), true, "%d");
+            (void)ccc_rom_remove(&s, &i->elem);
+            CHECK(ccc_rom_validate(&s), true, "%d");
         }
     }
     return PASS;
 }
 
 static enum test_result
-map_test_iterate_remove_reinsert(void)
+rtom_test_iterate_remove_reinsert(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -126,7 +126,7 @@ map_test_iterate_remove_reinsert(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
     }
     CHECK(iterator_check(&s), PASS, "%d");
     size_t const old_size = size(&s);
@@ -137,11 +137,11 @@ map_test_iterate_remove_reinsert(void)
         next = next(&s, &i->elem);
         if (i->val < limit)
         {
-            (void)ccc_om_remove(&s, &i->elem);
+            (void)ccc_rom_remove(&s, &i->elem);
             i->val = new_unique_entry_val;
             CHECK(insert_entry(entry_vr(&s, &i->val), &i->elem) != NULL, true,
                   "%d");
-            CHECK(ccc_om_validate(&s), true, "%d");
+            CHECK(ccc_rom_validate(&s), true, "%d");
             ++new_unique_entry_val;
         }
     }
@@ -150,10 +150,10 @@ map_test_iterate_remove_reinsert(void)
 }
 
 static enum test_result
-map_test_valid_range(void)
+rtom_test_valid_range(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -163,7 +163,7 @@ map_test_valid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
     }
     int b = 6;
     int e = 44;
@@ -209,10 +209,10 @@ map_test_valid_range(void)
 }
 
 static enum test_result
-map_test_valid_range_equals(void)
+rtom_test_valid_range_equals(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[num_nodes];
@@ -222,10 +222,12 @@ map_test_valid_range_equals(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
     }
     int b = 10;
     int e = 40;
+    /* This should be the following range [5,50). 5 should stay at the start,
+       and 45 is equal to our end key so is bumped to next greater, 50. */
     int const range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     ccc_range const range = equal_range(&s, &b, &e);
     CHECK(((struct val *)begin_range(&range))->val, range_vals[0], "%d");
@@ -242,6 +244,9 @@ map_test_valid_range_equals(void)
     CHECK(((struct val *)i1)->val, range_vals[7], "%d");
     b = 115;
     e = 85;
+    /* This should be the following range [115,84). 115 should be
+       is a valid start to the range and 85 is eqal to end key so must
+       be dropped to first value less than 85, 80. */
     int const rev_range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     ccc_rrange const rev_range = equal_rrange(&s, &b, &e);
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val, rev_range_vals[0],
@@ -262,10 +267,10 @@ map_test_valid_range_equals(void)
 }
 
 static enum test_result
-map_test_invalid_range(void)
+rtom_test_invalid_range(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -274,7 +279,7 @@ map_test_invalid_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
     }
     int b = 95;
     int e = 999;
@@ -283,8 +288,8 @@ map_test_invalid_range(void)
        value greater than 999, none or the end. */
     int const forward_range_vals[6] = {95, 100, 105, 110, 115, 120};
     ccc_range const rev_range = equal_range(&s, &b, &e);
-    CHECK(((struct val *)begin_range(&rev_range))->val == forward_range_vals[0],
-          true, "%d");
+    CHECK(((struct val *)begin_range(&rev_range))->val, forward_range_vals[0],
+          "%d");
     CHECK(end_range(&rev_range), NULL, "%p");
     size_t index = 0;
     struct val *i1 = begin_range(&rev_range);
@@ -319,10 +324,10 @@ map_test_invalid_range(void)
 }
 
 static enum test_result
-map_test_empty_range(void)
+rtom_test_empty_range(void)
 {
-    ccc_ordered_map s
-        = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+    ccc_realtime_ordered_map s
+        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[num_nodes];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -331,19 +336,19 @@ map_test_empty_range(void)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_rom_validate(&s), true, "%d");
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    int b = -50;
-    int e = -25;
-    ccc_range const forward_range = equal_range(&s, &b, &e);
+    struct val b = {.id = 0, .val = -50};
+    struct val e = {.id = 0, .val = -25};
+    ccc_range const forward_range = equal_range(&s, &b.val, &e.val);
     CHECK(((struct val *)begin_range(&forward_range))->val, vals[0].val, "%d");
     CHECK(((struct val *)end_range(&forward_range))->val, vals[0].val, "%d");
-    b = 150;
-    e = 999;
-    ccc_rrange const rev_range = equal_rrange(&s, &b, &e);
+    b.val = 150;
+    e.val = 999;
+    ccc_rrange const rev_range = equal_rrange(&s, &b.val, &e.val);
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val,
           vals[num_nodes - 1].val, "%d");
     CHECK(((struct val *)rend_rrange(&rev_range))->val, vals[num_nodes - 1].val,
@@ -352,7 +357,7 @@ map_test_empty_range(void)
 }
 
 static enum test_result
-iterator_check(ccc_ordered_map *s)
+iterator_check(ccc_realtime_ordered_map *s)
 {
     size_t const size = size(s);
     size_t iter_count = 0;

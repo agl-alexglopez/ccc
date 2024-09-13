@@ -49,7 +49,7 @@ bool
 ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 {
     return entry(&h->impl_, key, ccc_impl_fhm_filter(&h->impl_, key)).stats_
-           & CCC_FHM_ENTRY_OCCUPIED;
+           & CCC_ENTRY_OCCUPIED;
 }
 
 size_t
@@ -80,7 +80,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
                      ccc_fh_map_elem *const elem)
 {
     void *user_struct = struct_base(e->impl_.h_, &elem->impl_);
-    if (e->impl_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         /* It is ok if an insert error was indicated because we do not
            need more space if we are overwriting a previous value. */
@@ -89,7 +89,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
                ccc_buf_elem_size(&e->impl_.h_->buf_));
         return e->impl_.entry_.e_;
     }
-    if (e->impl_.entry_.stats_ & ~CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & ~CCC_ENTRY_OCCUPIED)
     {
         return NULL;
     }
@@ -110,7 +110,7 @@ ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
 {
     struct ccc_entry_ e = ccc_impl_fhm_find(
         &h->impl_, key, ccc_impl_fhm_filter(&h->impl_, key));
-    if (e.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    if (e.stats_ & CCC_ENTRY_OCCUPIED)
     {
         return e.e_;
     }
@@ -120,7 +120,7 @@ ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
 ccc_entry
 ccc_fhm_remove_entry(ccc_fh_map_entry const *const e)
 {
-    if (e->impl_.entry_.stats_ != CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ != CCC_ENTRY_OCCUPIED)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
@@ -138,7 +138,7 @@ struct ccc_fhm_entry_
 ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ const *const e,
                         ccc_update_fn *const fn)
 {
-    if (e->entry_.stats_ == CCC_FHM_ENTRY_OCCUPIED)
+    if (e->entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){e->entry_.e_, NULL});
     }
@@ -149,7 +149,7 @@ ccc_fh_map_entry
 ccc_fhm_and_modify_with(ccc_fh_map_entry const *const e,
                         ccc_update_fn *const fn, void *aux)
 {
-    if (e->impl_.entry_.stats_ == CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){e->impl_.entry_.e_, aux});
     }
@@ -163,20 +163,20 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
     void *key = ccc_impl_fhm_key_in_slot(&h->impl_, user_return);
     size_t const user_struct_size = ccc_buf_elem_size(&h->impl_.buf_);
     struct ccc_fhm_entry_ ent = ccc_impl_fhm_entry(&h->impl_, key);
-    if (ent.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         /* If an error occured when obtaining the entry and trying to resize,
            that is ok. We will not need new space yet. Only allow the insert
            error to persist if we actually need more space. */
-        ent.entry_.stats_ = CCC_FHM_ENTRY_OCCUPIED;
+        ent.entry_.stats_ = CCC_ENTRY_OCCUPIED;
         out_handle->impl_.hash_ = ent.hash_;
         uint8_t tmp[user_struct_size];
         swap(tmp, ent.entry_.e_, user_return, user_struct_size);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & (CCC_FHM_ENTRY_NULL | CCC_FHM_ENTRY_INSERT_ERROR))
+    if (ent.entry_.stats_ & (CCC_ENTRY_CONTAINS_NULL | CCC_ENTRY_INSERT_ERROR))
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     ccc_impl_fhm_insert(&h->impl_, user_return, ent.hash_,
                         ccc_buf_index_of(&h->impl_.buf_, ent.entry_.e_));
@@ -190,7 +190,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
     void *key = ccc_impl_fhm_key_in_slot(&h->impl_, ret);
     struct ccc_entry_ const ent = ccc_impl_fhm_find(
         &h->impl_, key, ccc_impl_fhm_filter(&h->impl_, key));
-    if (ent.stats_ == CCC_FHM_ENTRY_VACANT || !ret || !ent.e_)
+    if (ent.stats_ == CCC_ENTRY_VACANT || !ret || !ent.e_)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
@@ -202,11 +202,11 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
 void *
 ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
 {
-    if (e->impl_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         return e->impl_.entry_.e_;
     }
-    if (e->impl_.entry_.stats_ & ~CCC_FHM_ENTRY_VACANT)
+    if (e->impl_.entry_.stats_ & ~CCC_ENTRY_VACANT)
     {
         return NULL;
     }
@@ -221,7 +221,7 @@ ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
 void const *
 ccc_fhm_unwrap(ccc_fh_map_entry const *const e)
 {
-    if (!(e->impl_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED))
+    if (!(e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
@@ -231,13 +231,13 @@ ccc_fhm_unwrap(ccc_fh_map_entry const *const e)
 bool
 ccc_fhm_occupied(ccc_fh_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED;
+    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
 }
 
 bool
 ccc_fhm_insert_error(ccc_fh_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_FHM_ENTRY_INSERT_ERROR;
+    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 void *
@@ -279,7 +279,7 @@ entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
     uint8_t upcoming_insertion_error = 0;
     if (ccc_impl_fhm_maybe_resize(h) != CCC_OK)
     {
-        upcoming_insertion_error = CCC_FHM_ENTRY_INSERT_ERROR;
+        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
     }
     struct ccc_entry_ res = ccc_impl_fhm_find(h, key, hash);
     res.stats_ |= upcoming_insertion_error;
@@ -298,24 +298,22 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
         struct ccc_fhm_elem_ *const e = ccc_impl_fhm_in_slot(h, slot);
         if (e->hash_ == CCC_FHM_EMPTY)
         {
-            return (struct ccc_entry_){.e_ = slot,
-                                       .stats_ = CCC_FHM_ENTRY_VACANT};
+            return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
         }
         if (dist > ccc_impl_fhm_distance(cap, cur_i, e->hash_))
         {
-            return (struct ccc_entry_){.e_ = slot,
-                                       .stats_ = CCC_FHM_ENTRY_VACANT};
+            return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
         }
         if (hash == e->hash_
             && h->eq_fn_(
                 (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux_}))
         {
             return (struct ccc_entry_){.e_ = slot,
-                                       .stats_ = CCC_FHM_ENTRY_OCCUPIED};
+                                       .stats_ = CCC_ENTRY_OCCUPIED};
         }
     }
     return (struct ccc_entry_){
-        .e_ = NULL, .stats_ = CCC_FHM_ENTRY_VACANT | CCC_FHM_ENTRY_NULL};
+        .e_ = NULL, .stats_ = CCC_ENTRY_VACANT | CCC_ENTRY_CONTAINS_NULL};
 }
 
 /* Assumes that element to be inserted does not already exist in the table.

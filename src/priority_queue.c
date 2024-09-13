@@ -397,7 +397,7 @@ has_valid_links(struct ccc_pq_ const *const ppq,
         {
             return false;
         }
-        if (!has_valid_links(ppq, cur, cur->left_child_))
+        if (!has_valid_links(ppq, cur, cur->left_child_)) /* ! RECURSE ! */
         {
             return false;
         }

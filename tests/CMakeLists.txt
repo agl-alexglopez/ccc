@@ -172,6 +172,7 @@ endmacro()
 add_rtomap_test(test_rtomap_construct)
 add_rtomap_test(test_rtomap_insert)
 add_rtomap_test(test_rtomap_erase)
+add_rtomap_test(test_rtomap_iter)
 
 #############  Flat Hash Map ##########################
 

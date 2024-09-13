@@ -1,6 +1,7 @@
 #ifndef CCC_IMPL_TRAITS_H
 #define CCC_IMPL_TRAITS_H
 
+/* NOLINTBEGIN */
 #include "buffer.h"
 #include "double_ended_priority_queue.h"
 #include "doubly_linked_list.h"
@@ -12,6 +13,7 @@
 #include "realtime_ordered_map.h"
 #include "singly_linked_list.h"
 #include "types.h"
+/* NOLINTEND */
 
 /*======================     Entry API  =====================================*/
 
@@ -384,8 +386,21 @@
         ccc_doubly_linked_list *: ccc_dll_rend,                                \
         ccc_realtime_ordered_map *: ccc_rom_rend)((container_ptr))
 
-/*===================    Standard Getters API
- * ==============================*/
+#define ccc_impl_equal_range(container_ptr, begin_key_ptr, end_key_ptr)        \
+    _Generic((container_ptr),                                                  \
+        ccc_ordered_map *: ccc_om_equal_range,                                 \
+        ccc_double_ended_priority_queue *: ccc_depq_equal_range,               \
+        ccc_realtime_ordered_map *: ccc_rom_equal_range)(                      \
+        (container_ptr), (begin_key_ptr), (end_key_ptr))
+
+#define ccc_impl_equal_rrange(container_ptr, rbegin_key_ptr, rend_key_ptr)     \
+    _Generic((container_ptr),                                                  \
+        ccc_ordered_map *: ccc_om_equal_rrange,                                \
+        ccc_double_ended_priority_queue *: ccc_depq_equal_rrange,              \
+        ccc_realtime_ordered_map *: ccc_rom_equal_rrange)(                     \
+        (container_ptr), (rbegin_key_ptr), (rend_key_ptr))
+
+/*===================    Standard Getters API ==============================*/
 
 #define ccc_impl_size(container_ptr)                                           \
     _Generic((container_ptr),                                                  \
