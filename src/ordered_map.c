@@ -686,7 +686,7 @@ struct_base(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
     /* Link is the first field of the struct and is an array so no need to get
        pointer address of [0] element of array. That's the same as just the
        array field. */
-    return ((uint8_t *)&n->parent_) - t->node_elem_offset_;
+    return ((uint8_t *)n->branch_) - t->node_elem_offset_;
 }
 
 static inline ccc_threeway_cmp

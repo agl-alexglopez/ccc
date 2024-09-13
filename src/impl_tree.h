@@ -40,12 +40,12 @@
 typedef struct ccc_node_
 {
     union {
-        struct ccc_node_ *parent_;
-        struct ccc_node_ *dup_head_;
-    };
-    union {
         struct ccc_node_ *branch_[2];
         struct ccc_node_ *link_[2];
+    };
+    union {
+        struct ccc_node_ *parent_;
+        struct ccc_node_ *dup_head_;
     };
 } ccc_node_;
 
@@ -73,9 +73,9 @@ struct ccc_tree_entry_
     {                                                                          \
         .impl_ = {                                                             \
             .root_ = &(tree_name).impl_.end_,                                  \
-            .end_ = {{.parent_ = &(tree_name).impl_.end_},                     \
-                     {.branch_                                                 \
-                      = {&(tree_name).impl_.end_, &(tree_name).impl_.end_}}},  \
+            .end_ = {{.branch_                                                 \
+                      = {&(tree_name).impl_.end_, &(tree_name).impl_.end_}},   \
+                     {.parent_ = &(tree_name).impl_.end_}},                    \
             .alloc_ = (alloc_fn),                                              \
             .cmp_ = (key_cmp_fn),                                              \
             .aux_ = (aux_data),                                                \
