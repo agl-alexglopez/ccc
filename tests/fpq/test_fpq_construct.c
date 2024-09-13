@@ -51,10 +51,10 @@ pq_test_macro(void)
     struct val vals[1] = {{0}};
     ccc_flat_priority_queue pq
         = CCC_FPQ_INIT(&vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
-    struct val *res = FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
+    struct val *res = CCC_FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res != NULL, true, "%d");
     CHECK(ccc_fpq_empty(&pq), false, "%d");
-    struct val *res2 = FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
+    struct val *res2 = CCC_FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res2 == NULL, true, "%d");
     return PASS;
 }
@@ -81,7 +81,7 @@ pq_test_raw_type(void)
     int *res = ccc_fpq_push(&pq, &val);
     CHECK(res != NULL, true, "%d");
     CHECK(ccc_fpq_empty(&pq), false, "%d");
-    res = FPQ_EMPLACE(&pq, -1);
+    res = CCC_FPQ_EMPLACE(&pq, -1);
     CHECK(res != NULL, true, "%d");
     CHECK(ccc_fpq_size(&pq), 2, "%zu");
     int *popped = ccc_fpq_front(&pq);

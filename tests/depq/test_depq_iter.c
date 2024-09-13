@@ -244,19 +244,19 @@ depq_test_priority_valid_range(void)
        value greater than 44, 45. */
     int const rev_range_vals[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
-    CHECK(((struct val *)ccc_begin_rrange(&rev_range))->val, rev_range_vals[0],
+    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, rev_range_vals[0],
           "%d");
-    CHECK(((struct val *)ccc_end_rrange(&rev_range))->val, rev_range_vals[7],
+    CHECK(((struct val *)rend_rrange(&rev_range))->val, rev_range_vals[7],
           "%d");
     size_t index = 0;
-    struct val *i1 = ccc_begin_rrange(&rev_range);
-    for (; i1 != ccc_end_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
+    struct val *i1 = rbegin_rrange(&rev_range);
+    for (; i1 != rend_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
     {
         int const cur_val = i1->val;
         CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1 == ccc_end_rrange(&rev_range), true, "%d");
+    CHECK(i1 == rend_rrange(&rev_range), true, "%d");
     CHECK(i1->val, rev_range_vals[7], "%d");
     b = 119;
     e = 84;
@@ -265,17 +265,17 @@ depq_test_priority_valid_range(void)
        be dropped to first value less than 84. */
     int const range_vals[8] = {115, 110, 105, 100, 95, 90, 85, 80};
     ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
-    CHECK(((struct val *)ccc_begin_range(&range))->val, range_vals[0], "%d");
-    CHECK(((struct val *)ccc_end_range(&range))->val, range_vals[7], "%d");
+    CHECK(((struct val *)begin_range(&range))->val, range_vals[0], "%d");
+    CHECK(((struct val *)end_range(&range))->val, range_vals[7], "%d");
     index = 0;
-    struct val *i2 = ccc_begin_range(&range);
-    for (; i2 != ccc_end_range(&range); i2 = next(&pq, &i2->elem))
+    struct val *i2 = begin_range(&range);
+    for (; i2 != end_range(&range); i2 = next(&pq, &i2->elem))
     {
         int const cur_val = i2->val;
         CHECK(range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2 == ccc_end_range(&range), true, "%d");
+    CHECK(i2 == end_range(&range), true, "%d");
     CHECK(i2->val, range_vals[7], "%d");
     return PASS;
 }
@@ -303,18 +303,18 @@ depq_test_priority_invalid_range(void)
        value greater than 999, none or the end. */
     int const rev_range_vals[6] = {95, 100, 105, 110, 115, 120};
     ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
-    CHECK(((struct val *)ccc_begin_rrange(&rev_range))->val, rev_range_vals[0],
+    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, rev_range_vals[0],
           "%d");
-    CHECK(ccc_end_rrange(&rev_range), NULL, "%p");
+    CHECK(rend_rrange(&rev_range), NULL, "%p");
     size_t index = 0;
-    struct val *i1 = ccc_begin_rrange(&rev_range);
-    for (; i1 != ccc_end_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
+    struct val *i1 = rbegin_rrange(&rev_range);
+    for (; i1 != rend_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
     {
         int const cur_val = i1->val;
         CHECK(rev_range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i1 == ccc_end_rrange(&rev_range) && !i1, true, "%d");
+    CHECK(i1 == rend_rrange(&rev_range) && !i1, true, "%d");
     b = 36;
     e = -999;
     /* This should be the following range [36,-999). 36 should be
@@ -322,17 +322,17 @@ depq_test_priority_invalid_range(void)
        be dropped to first value less than -999 which is end. */
     int const range_vals[8] = {35, 30, 25, 20, 15, 10, 5, 0};
     ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
-    CHECK(((struct val *)ccc_begin_range(&range))->val, range_vals[0], "%d");
-    CHECK(ccc_end_range(&range), NULL, "%p");
+    CHECK(((struct val *)begin_range(&range))->val, range_vals[0], "%d");
+    CHECK(end_range(&range), NULL, "%p");
     index = 0;
-    struct val *i2 = ccc_begin_range(&range);
-    for (; i2 != ccc_end_range(&range); i2 = next(&pq, &i2->elem))
+    struct val *i2 = begin_range(&range);
+    for (; i2 != end_range(&range); i2 = next(&pq, &i2->elem))
     {
         int const cur_val = i2->val;
         CHECK(range_vals[index], cur_val, "%d");
         ++index;
     }
-    CHECK(i2 == ccc_end_range(&range) && !i2, true, "%d");
+    CHECK(i2 == end_range(&range) && !i2, true, "%d");
     return PASS;
 }
 
@@ -358,14 +358,14 @@ depq_test_priority_empty_range(void)
     int b = -50;
     int e = -25;
     ccc_rrange const rev_range = ccc_depq_equal_rrange(&pq, &b, &e);
-    CHECK(((struct val *)ccc_begin_rrange(&rev_range))->val, vals[0].val, "%d");
-    CHECK(((struct val *)ccc_end_rrange(&rev_range))->val, vals[0].val, "%d");
+    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, vals[0].val, "%d");
+    CHECK(((struct val *)rend_rrange(&rev_range))->val, vals[0].val, "%d");
     b = 150;
     e = 999;
     ccc_range const range = ccc_depq_equal_range(&pq, &b, &e);
-    CHECK(((struct val *)ccc_begin_range(&range))->val, vals[num_nodes - 1].val,
+    CHECK(((struct val *)begin_range(&range))->val, vals[num_nodes - 1].val,
           "%d");
-    CHECK(((struct val *)ccc_end_range(&range))->val, vals[num_nodes - 1].val,
+    CHECK(((struct val *)end_range(&range))->val, vals[num_nodes - 1].val,
           "%d");
     return PASS;
 }

@@ -76,11 +76,11 @@ fpq_test_priority_removal(void)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res
-            = FPQ_EMPLACE(&fpq, (struct val){
-                                    .val = rand() % (num_nodes + 1), /*NOLINT*/
-                                    .id = (int)i,
-                                });
+        struct val const *res = CCC_FPQ_EMPLACE(
+            &fpq, (struct val){
+                      .val = rand() % (num_nodes + 1), /*NOLINT*/
+                      .id = (int)i,
+                  });
         CHECK(res != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }
@@ -111,11 +111,11 @@ fpq_test_priority_update(void)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res
-            = FPQ_EMPLACE(&fpq, (struct val){
-                                    .val = rand() % (num_nodes + 1), /*NOLINT*/
-                                    .id = (int)i,
-                                });
+        struct val const *res = CCC_FPQ_EMPLACE(
+            &fpq, (struct val){
+                      .val = rand() % (num_nodes + 1), /*NOLINT*/
+                      .id = (int)i,
+                  });
         CHECK(res != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");
     }

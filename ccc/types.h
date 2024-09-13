@@ -85,7 +85,19 @@ void *ccc_entry_unwrap(ccc_entry const *e);
 
 void *ccc_begin_range(ccc_range const *r);
 void *ccc_end_range(ccc_range const *r);
-void *ccc_begin_rrange(ccc_rrange const *r);
-void *ccc_end_rrange(ccc_rrange const *r);
+void *ccc_rbegin_rrange(ccc_rrange const *r);
+void *ccc_rend_rrange(ccc_rrange const *r);
+
+#ifdef TYPES_USING_NAMESPACE_CCC
+
+#    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)
+#    define entry_insert_error(entry_ptr) ccc_entry_insert_error(entry_ptr)
+#    define entry_unwrap(entry_ptr) ccc_entry_unwrap(entry_ptr)
+#    define begin_range(range_ptr) ccc_begin_range(range_ptr)
+#    define end_range(range_ptr) ccc_end_range(range_ptr)
+#    define rbegin_rrange(range_ptr) ccc_rbegin_rrange(range_ptr)
+#    define rend_rrange(range_ptr) ccc_rend_rrange(range_ptr)
+
+#endif /* TYPES_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TYPES_H */

@@ -78,9 +78,9 @@ fpq_test_struct_getter(void)
     for (size_t i = 0; i < size; ++i)
     {
         struct val const *res1
-            = FPQ_EMPLACE(&fpq, (struct val){.id = (int)i, .val = (int)i});
+            = CCC_FPQ_EMPLACE(&fpq, (struct val){.id = (int)i, .val = (int)i});
         CHECK(res1 != NULL, true, "%d");
-        struct val const *res2 = FPQ_EMPLACE(
+        struct val const *res2 = CCC_FPQ_EMPLACE(
             &fpq_clone, (struct val){.id = (int)i, .val = (int)i});
         CHECK(res2 != NULL, true, "%d");
         CHECK(ccc_fpq_validate(&fpq), true, "%d");

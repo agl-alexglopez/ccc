@@ -13,7 +13,7 @@ typedef struct
     (ccc_flat_double_ended_queue)                                              \
         CCC_IMPL_FDEQ_INIT(mem_ptr, capacity, type_name, alloc_fn)
 
-#define FDEQ_EMPLACE(fq_ptr, value...) CCC_IMPL_FDEQ_EMPLACE(fq_ptr, value)
+#define CCC_FDEQ_EMPLACE(fq_ptr, value...) CCC_IMPL_FDEQ_EMPLACE(fq_ptr, value)
 
 void *ccc_fdeq_push_back(ccc_flat_double_ended_queue *fq, void const *elem);
 void *ccc_fdeq_push_front(ccc_flat_double_ended_queue *fq, void const *elem);

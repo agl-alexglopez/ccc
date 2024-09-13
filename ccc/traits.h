@@ -158,8 +158,8 @@
 #    define unwrap(basic_entry_ptr) ccc_unwrap(basic_entry_ptr)
 #    define begin_range(range_ptr) ccc_begin_range(range_ptr)
 #    define end_range(range_ptr) ccc_end_range(range_ptr)
-#    define begin_rrange(range_ptr) ccc_begin_rrange(range_ptr)
-#    define end_rrange(range_ptr) ccc_end_rrange(range_ptr)
+#    define rbegin_rrange(range_ptr) ccc_rbegin_rrange(range_ptr)
+#    define rend_rrange(range_ptr) ccc_rend_rrange(range_ptr)
 
 #    define push(container_ptr, container_handle_ptr)                          \
         ccc_push(container_ptr, container_handle_ptr)

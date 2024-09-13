@@ -69,7 +69,7 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         struct val *const front = ccc_fpq_front(fpq);
         vals[i++] = front->val;
         size_t const prev = ccc_fpq_size(&fpq_copy);
-        struct val *v = FPQ_EMPLACE(
+        struct val *v = CCC_FPQ_EMPLACE(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
         CHECK(v != NULL, true, "%d");
         CHECK(prev < ccc_fpq_size(&fpq_copy), true, "%d");
@@ -81,7 +81,7 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         struct val *const v = ccc_fpq_front(&fpq_copy);
         size_t const prev = ccc_fpq_size(fpq);
         struct val *e
-            = FPQ_EMPLACE(fpq, (struct val){.id = v->id, .val = v->val});
+            = CCC_FPQ_EMPLACE(fpq, (struct val){.id = v->id, .val = v->val});
         CHECK(e != NULL, true, "%d");
         CHECK(prev < ccc_fpq_size(fpq), true, "%d");
         CHECK(vals[i++], v->val, "%d");

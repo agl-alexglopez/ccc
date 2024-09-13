@@ -31,13 +31,13 @@ ccc_end_range(ccc_range const *const r)
 }
 
 void *
-ccc_begin_rrange(ccc_rrange const *const r)
+ccc_rbegin_rrange(ccc_rrange const *const r)
 {
     return r->impl_.rbegin_;
 }
 
 void *
-ccc_end_rrange(ccc_rrange const *const r)
+ccc_rend_rrange(ccc_rrange const *const r)
 {
     return r->impl_.rend_;
 }

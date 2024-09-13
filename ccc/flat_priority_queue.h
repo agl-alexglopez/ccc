@@ -52,7 +52,7 @@ typedef struct
    If generating any values within the struct occurs via expensive function
    calls or calls with side effects, note that such functions do not execute
    if allocation fails due to a full buffer and no reallocation policy. */
-#define FPQ_EMPLACE(fpq, val_initializer...)                                   \
+#define CCC_FPQ_EMPLACE(fpq, val_initializer...)                               \
     CCC_IMPL_FPQ_EMPLACE(fpq, val_initializer)
 
 ccc_result ccc_fpq_realloc(ccc_flat_priority_queue *, size_t new_capacity,
