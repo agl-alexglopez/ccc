@@ -61,7 +61,7 @@ fhash_test_erase(void)
     CHECK(fhm_size(&fh), 0, "%zu");
     FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
     CHECK(fhm_size(&fh), 1, "%zu");
-    CHECK(occupied(remove_entry_lv(FHM_ENTRY(&fh, 137))), true, "%d");
+    CHECK(occupied(remove_entry_vr(FHM_ENTRY(&fh, 137))), true, "%d");
     CHECK(fhm_size(&fh), 0, "%zu");
     return PASS;
 }
@@ -79,7 +79,7 @@ fhash_test_shuffle_insert_erase(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(fhm_entry_lv(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(fhm_entry_vr(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true, "%d");
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
@@ -95,7 +95,7 @@ fhash_test_shuffle_insert_erase(void)
         {
             struct val swap_slot = {.id = i};
             struct val const *const old_val
-                = unwrap(fhm_remove_lv(&fh, &swap_slot.e));
+                = unwrap(fhm_remove_vr(&fh, &swap_slot.e));
             CHECK(old_val != NULL, true, "%d");
             CHECK(old_val->id, i, "%d");
         }

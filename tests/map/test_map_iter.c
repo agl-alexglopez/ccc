@@ -133,7 +133,7 @@ map_test_iterate_remove_reinsert(void)
         {
             (void)ccc_om_remove(&s, &i->elem);
             i->val = new_unique_entry_val;
-            CHECK(ccc_om_insert_entry(ccc_om_entry_lv(&s, &i->val), &i->elem)
+            CHECK(ccc_om_insert_entry(ccc_om_entry_vr(&s, &i->val), &i->elem)
                       != NULL,
                   true, "%d");
             CHECK(ccc_om_validate(&s), true, "%d");

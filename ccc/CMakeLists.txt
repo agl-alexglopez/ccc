@@ -76,12 +76,12 @@ target_link_libraries(realtime_ordered_map
     impl_realtime_ordered_map
 )
 
-add_library(flat_queue flat_queue.h ${CMAKE_SOURCE_DIR}/src/flat_queue.c)
-target_link_libraries(flat_queue
+add_library(flat_double_ended_queue flat_double_ended_queue.h ${CMAKE_SOURCE_DIR}/src/flat_double_ended_queue.c)
+target_link_libraries(flat_double_ended_queue
   PUBLIC
     types
   PRIVATE
-    impl_flat_queue
+    impl_flat_double_ended_queue
 )
 
 add_library(traits INTERFACE traits.h)
@@ -101,8 +101,8 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/buffer.c
         ${PROJECT_SOURCE_DIR}/src/impl_flat_hash_map.h
         ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
-        ${PROJECT_SOURCE_DIR}/src/impl_flat_queue.h
-        ${PROJECT_SOURCE_DIR}/src/flat_queue.c
+        ${PROJECT_SOURCE_DIR}/src/impl_flat_double_ended_queue.h
+        ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
         ${PROJECT_SOURCE_DIR}/src/impl_flat_priority_queue.h
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/impl_tree.h
@@ -127,7 +127,7 @@ target_sources(${PROJECT_NAME}
               types.h
               buffer.h
               flat_hash_map.h
-              flat_queue.h
+              flat_double_ended_queue.h
               flat_priority_queue.h
               ordered_map.h
               realtime_ordered_map.h

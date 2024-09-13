@@ -1,5 +1,8 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "depq_util.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdio.h>
 
@@ -39,11 +42,11 @@ insert_shuffled(ccc_double_ended_priority_queue *pq, struct val vals[],
     {
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_depq_push(pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_size(pq), i + 1, "%zu");
+        CHECK(size(pq), i + 1, "%zu");
         CHECK(ccc_depq_validate(pq), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_depq_size(pq), size, "%zu");
+    CHECK(size(pq), size, "%zu");
     return PASS;
 }
 
@@ -51,13 +54,12 @@ insert_shuffled(ccc_double_ended_priority_queue *pq, struct val vals[],
 size_t
 inorder_fill(int vals[], size_t size, ccc_double_ended_priority_queue *pq)
 {
-    if (ccc_depq_size(pq) != size)
+    if (size(pq) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e != ccc_depq_rend(pq);
-         e = ccc_depq_rnext(pq, &e->elem))
+    for (struct val *e = rbegin(pq); e != rend(pq); e = rnext(pq, &e->elem))
     {
         vals[i++] = e->val;
     }

@@ -88,19 +88,19 @@ void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
 
 /* Retain access to old values in the map. See types.h for ccc_entry. */
 
-#define ccc_om_insert_lv(ordered_map_ptr, out_handle_ptr)                      \
+#define ccc_om_insert_vr(ordered_map_ptr, out_handle_ptr)                      \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_insert((ordered_map_ptr), (out_handle_ptr)).impl_               \
     }
 
-#define ccc_om_remove_lv(ordered_map_ptr, out_handle_ptr)                      \
+#define ccc_om_remove_vr(ordered_map_ptr, out_handle_ptr)                      \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl_               \
     }
 
-#define ccc_om_remove_entry_lv(ordered_map_entry_ptr)                          \
+#define ccc_om_remove_entry_vr(ordered_map_entry_ptr)                          \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
@@ -114,19 +114,19 @@ ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
 
 /* Standard Entry API. */
 
-#define ccc_om_entry_lv(ordered_map_ptr, key_ptr)                              \
+#define ccc_om_entry_vr(ordered_map_ptr, key_ptr)                              \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
         ccc_om_entry((ordered_map_ptr), (key_ptr)).impl_                       \
     }
 
-#define ccc_om_and_modify_lv(ordered_map_ptr, mod_fn)                          \
+#define ccc_om_and_modify_vr(ordered_map_ptr, mod_fn)                          \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
         ccc_om_and_modify((ordered_map_ptr), (mod_fn)).impl_                   \
     }
 
-#define ccc_om_and_modify_with_lv(ordered_map_ptr, mod_fn, aux_data)           \
+#define ccc_om_and_modify_with_vr(ordered_map_ptr, mod_fn, aux_data)           \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
         ccc_om_and_modify((ordered_map_ptr), (mod_fn), (aux_data)).impl_       \

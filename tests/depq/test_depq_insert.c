@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "depq_util.h"
 #include "double_ended_priority_queue.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -43,7 +46,7 @@ depq_test_insert_one(void)
     struct val single;
     single.val = 0;
     ccc_depq_push(&pq, &single.elem);
-    CHECK(ccc_depq_empty(&pq), false, "%d");
+    CHECK(empty(&pq), false, "%d");
     CHECK(((struct val *)ccc_depq_root(&pq))->val == single.val, true, "%d");
     return PASS;
 }
@@ -59,9 +62,9 @@ depq_test_insert_three(void)
         three_vals[i].val = i;
         ccc_depq_push(&pq, &three_vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
-        CHECK(ccc_depq_size(&pq), (size_t)i + 1, "%zu");
+        CHECK(size(&pq), (size_t)i + 1, "%zu");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)3, "%zu");
+    CHECK(size(&pq), (size_t)3, "%zu");
     return PASS;
 }
 
@@ -87,7 +90,7 @@ depq_test_struct_getter(void)
         struct val const *get = &tester_clone[i];
         CHECK(get->val, vals[i].val, "%d");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)10, "%zu");
+    CHECK(size(&pq), (size_t)10, "%zu");
     return PASS;
 }
 
@@ -102,9 +105,9 @@ depq_test_insert_three_dups(void)
         three_vals[i].val = 0;
         ccc_depq_push(&pq, &three_vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
-        CHECK(ccc_depq_size(&pq), (size_t)i + 1, "%zu");
+        CHECK(size(&pq), (size_t)i + 1, "%zu");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)3, "%zu");
+    CHECK(size(&pq), (size_t)3, "%zu");
     return PASS;
 }
 
@@ -142,9 +145,9 @@ depq_test_read_max_min(void)
         vals[i].val = i;
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
-        CHECK(ccc_depq_size(&pq), (size_t)i + 1, "%zu");
+        CHECK(size(&pq), (size_t)i + 1, "%zu");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)10, "%zu");
+    CHECK(size(&pq), (size_t)10, "%zu");
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, 9, "%d");
     struct val const *min = ccc_depq_min(&pq);

@@ -96,19 +96,19 @@ void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
 
 /* Preserve old values from stored in the map. See types.h for more. */
 
-#define ccc_fhm_remove_lv(flat_hash_map_ptr, out_handle_ptr)                   \
+#define ccc_fhm_remove_vr(flat_hash_map_ptr, out_handle_ptr)                   \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-#define ccc_fhm_insert_lv(flat_hash_map_ptr, out_handle_ptr)                   \
+#define ccc_fhm_insert_vr(flat_hash_map_ptr, out_handle_ptr)                   \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-#define ccc_fhm_remove_entry_lv(flat_hash_map_entry_ptr)                       \
+#define ccc_fhm_remove_entry_vr(flat_hash_map_entry_ptr)                       \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
@@ -125,19 +125,19 @@ ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
 
 /* Standard Entry API */
 
-#define ccc_fhm_entry_lv(flat_hash_map_ptr, key_ptr)                           \
+#define ccc_fhm_entry_vr(flat_hash_map_ptr, key_ptr)                           \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl_                    \
     }
 
-#define ccc_fhm_and_modify_lv(entry_ptr, mod_fn)                               \
+#define ccc_fhm_and_modify_vr(entry_ptr, mod_fn)                               \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         ccc_fhm_and_modify((entry_ptr), (mod_fn)).impl_                        \
     }
 
-#define ccc_fhm_and_modify_with_lv(entry_ptr, mod_fn, aux_data_ptr)            \
+#define ccc_fhm_and_modify_with_vr(entry_ptr, mod_fn, aux_data_ptr)            \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         ccc_fhm_and_modify_with((entry_ptr), (mod_fn), (aux_data_ptr)).impl_   \
@@ -328,17 +328,17 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_contains(args...) ccc_fhm_contains(args)
 #    define fhm_get(args...) ccc_fhm_get(args)
 #    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
-#    define fhm_insert_lv(args...) ccc_fhm_insert_lv(args)
-#    define fhm_remove_lv(args...) ccc_fhm_remove_lv(args)
-#    define fhm_remove_entry_lv(args...) ccc_fhm_remove_entry_lv(args)
+#    define fhm_insert_vr(args...) ccc_fhm_insert_vr(args)
+#    define fhm_remove_vr(args...) ccc_fhm_remove_vr(args)
+#    define fhm_remove_entry_vr(args...) ccc_fhm_remove_entry_vr(args)
 #    define fhm_remove(args...) ccc_fhm_remove(args)
 #    define fhm_insert(args...) ccc_fhm_insert(args)
 #    define fhm_remove_entry(args...) ccc_fhm_remove_entry(args)
-#    define fhm_entry_lv(args...) ccc_fhm_entry_lv(args)
+#    define fhm_entry_vr(args...) ccc_fhm_entry_vr(args)
 #    define fhm_entry(args...) ccc_fhm_entry(args)
-#    define fhm_and_modify_lv(args...) ccc_fhm_and_modify_lv(args)
+#    define fhm_and_modify_vr(args...) ccc_fhm_and_modify_vr(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
-#    define fhm_and_modify_with_lv(args...) ccc_fhm_and_modify_with_lv(args)
+#    define fhm_and_modify_with_vr(args...) ccc_fhm_and_modify_with_vr(args)
 #    define fhm_and_modify_with(args...) ccc_fhm_and_modify_with(args)
 #    define fhm_entry(args...) ccc_fhm_entry(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)

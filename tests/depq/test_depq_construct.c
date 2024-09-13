@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "depq_util.h"
 #include "double_ended_priority_queue.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -30,6 +33,6 @@ depq_test_empty(void)
 {
     ccc_double_ended_priority_queue pq
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
-    CHECK(ccc_depq_empty(&pq), true, "%d");
+    CHECK(empty(&pq), true, "%d");
     return PASS;
 }

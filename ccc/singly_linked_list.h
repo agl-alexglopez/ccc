@@ -3,6 +3,8 @@
 
 #include "impl_singly_linked_list.h"
 
+#include <stddef.h>
+
 typedef struct
 {
     struct ccc_sll_elem_ impl_;
@@ -32,6 +34,8 @@ void *ccc_sll_next(ccc_singly_linked_list const *sll,
                    ccc_sll_elem const *iter_handle);
 
 ccc_sll_elem *ccc_sll_head(ccc_singly_linked_list const *sll);
+size_t ccc_sll_size(ccc_singly_linked_list const *sll);
+bool ccc_sll_empty(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);
 

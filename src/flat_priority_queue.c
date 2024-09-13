@@ -165,6 +165,22 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
     return true;
 }
 
+/* There are no efficiency benefits in knowing an increase will occur. */
+bool
+ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
+                 ccc_update_fn *const fn, void *const aux)
+{
+    return ccc_fpq_update(fpq, e, fn, aux);
+}
+
+/* There are no efficiency benefits in knowing an decrease will occur. */
+bool
+ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
+                 ccc_update_fn *const fn, void *const aux)
+{
+    return ccc_fpq_update(fpq, e, fn, aux);
+}
+
 void *
 ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {

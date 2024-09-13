@@ -65,38 +65,38 @@ void *ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key);
 
 /*======================      Entry API    ==================================*/
 
-#define ccc_rom_entry_lv(realtime_ordered_map_ptr, key_ptr)                    \
+#define ccc_rom_entry_vr(realtime_ordered_map_ptr, key_ptr)                    \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
         ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
     }
 
-#define ccc_rom_and_modify_lv(realtime_ordered_map_ptr, mod_fn)                \
+#define ccc_rom_and_modify_vr(realtime_ordered_map_ptr, mod_fn)                \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
         ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn)).impl_         \
     }
 
-#define ccc_rom_and_modify_with_lv(realtime_ordered_map_ptr, mod_fn, aux_data) \
+#define ccc_rom_and_modify_with_vr(realtime_ordered_map_ptr, mod_fn, aux_data) \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
         ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn), (aux_data))   \
             .impl_                                                             \
     }
 
-#define ccc_rom_insert_lv(realtime_ordered_map_ptr, out_handle_ptr)            \
+#define ccc_rom_insert_vr(realtime_ordered_map_ptr, out_handle_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_insert((realtime_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
-#define ccc_rom_remove_lv(realtime_ordered_map_ptr, out_handle_ptr)            \
+#define ccc_rom_remove_vr(realtime_ordered_map_ptr, out_handle_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
-#define ccc_rom_remove_entry_lv(realtime_ordered_map_entry_ptr)                \
+#define ccc_rom_remove_entry_vr(realtime_ordered_map_entry_ptr)                \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl_           \
@@ -170,12 +170,12 @@ typedef ccc_rtom_entry rtom_entry;
 #    define ROM_AND_MODIFY_W(args...) CCC_ROM_AND_MODIFY_W(args)
 #    define ROM_OR_INSERT(args...) CCC_ROM_OR_INSERT(args)
 #    define ROM_INSERT_ENTRY(args...) CCC_ROM_INSERT_ENTRY(args)
-#    define rom_insert_lv(args...) ccc_rom_insert_lv(args)
-#    define rom_remove_lv(args...) ccc_rom_remove_lv(args)
-#    define rom_remove_entry_lv(args...) ccc_rom_remove_entry_lv(args)
-#    define rom_entry_lv(args...) ccc_rom_entry_lv(args)
-#    define rom_and_modify_lv(args...) ccc_rom_and_modify_lv(args)
-#    define rom_and_modify_with_lv(args...) ccc_rom_and_modify_with_lv(args)
+#    define rom_insert_vr(args...) ccc_rom_insert_vr(args)
+#    define rom_remove_vr(args...) ccc_rom_remove_vr(args)
+#    define rom_remove_entry_vr(args...) ccc_rom_remove_entry_vr(args)
+#    define rom_entry_vr(args...) ccc_rom_entry_vr(args)
+#    define rom_and_modify_vr(args...) ccc_rom_and_modify_vr(args)
+#    define rom_and_modify_with_vr(args...) ccc_rom_and_modify_with_vr(args)
 #    define rom_contains(args...) ccc_rom_contains(args)
 #    define rom_get(args...) ccc_rom_get(args)
 #    define rom_get_mut(args...) ccc_rom_get_mut(args)

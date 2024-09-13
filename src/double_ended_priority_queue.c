@@ -298,6 +298,22 @@ ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
 }
 
 bool
+ccc_depq_increase(ccc_double_ended_priority_queue *const pq,
+                  ccc_depq_elem *const elem, ccc_update_fn *const fn,
+                  void *const aux)
+{
+    return ccc_depq_update(pq, elem, fn, aux);
+}
+
+bool
+ccc_depq_decrease(ccc_double_ended_priority_queue *const pq,
+                  ccc_depq_elem *const elem, ccc_update_fn *const fn,
+                  void *const aux)
+{
+    return ccc_depq_update(pq, elem, fn, aux);
+}
+
+bool
 ccc_depq_contains(ccc_double_ended_priority_queue *const pq,
                   void const *const key)
 {

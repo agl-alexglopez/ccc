@@ -62,6 +62,10 @@ void *ccc_fpq_front(ccc_flat_priority_queue const *);
 void ccc_fpq_pop(ccc_flat_priority_queue *);
 void *ccc_fpq_erase(ccc_flat_priority_queue *, void *);
 bool ccc_fpq_update(ccc_flat_priority_queue *, void *, ccc_update_fn *, void *);
+bool ccc_fpq_increase(ccc_flat_priority_queue *, void *, ccc_update_fn *,
+                      void *);
+bool ccc_fpq_decrease(ccc_flat_priority_queue *, void *, ccc_update_fn *,
+                      void *);
 
 void ccc_fpq_clear(ccc_flat_priority_queue *, ccc_destructor_fn *);
 bool ccc_fpq_empty(ccc_flat_priority_queue const *);

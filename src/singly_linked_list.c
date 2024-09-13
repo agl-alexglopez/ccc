@@ -109,9 +109,20 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     return size == sll->impl_.sz_;
 }
 
+size_t
+ccc_sll_size(ccc_singly_linked_list const *const sll)
+{
+    return sll->impl_.sz_;
+}
+
+bool
+ccc_sll_empty(ccc_singly_linked_list const *const sll)
+{
+    return !sll->impl_.sz_;
+}
+
 struct ccc_sll_elem_ *
-ccc_sll_elem__in(struct ccc_sll_ const *const sll,
-                 void const *const user_struct)
+ccc_sll_elem_in(struct ccc_sll_ const *const sll, void const *const user_struct)
 {
     return (struct ccc_sll_elem_ *)((uint8_t *)user_struct
                                     + sll->sll_elem_offset_);

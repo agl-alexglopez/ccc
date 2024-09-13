@@ -27,12 +27,14 @@ target_link_libraries(depq_util
   PRIVATE
     double_ended_priority_queue
     test
+    traits
 )
 
 macro(add_depq_test TEST_NAME)
   add_executable(${TEST_NAME} depq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
+      traits
       double_ended_priority_queue 
       depq_util
       test
@@ -54,6 +56,7 @@ add_depq_test(test_depq_iter)
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
 target_link_libraries(fpq_util
   PRIVATE
+    traits
     flat_priority_queue
     test
 )
@@ -62,6 +65,7 @@ macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
+      traits
       fpq_util
       flat_priority_queue 
       test
@@ -83,6 +87,7 @@ add_fpq_test(test_fpq_update)
 add_library(pq_util pq/pq_util.h pq/pq_util.c)
 target_link_libraries(pq_util
   PRIVATE
+    traits
     priority_queue
     test
 )
@@ -91,6 +96,7 @@ macro(add_pq_test TEST_NAME)
   add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
+      traits
       pq_util
       priority_queue 
       test
@@ -112,6 +118,7 @@ add_pq_test(test_pq_update)
 add_library(map_util map/map_util.h map/map_util.c)
 target_link_libraries(map_util
   PRIVATE
+    traits
     ordered_map
     test
 )
@@ -120,6 +127,7 @@ macro(add_map_test TEST_NAME)
   add_executable(${TEST_NAME} map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
+      traits
       map_util
       ordered_map
       test
@@ -140,6 +148,7 @@ add_map_test(test_map_iter)
 add_library(rtomap_util rtomap/rtomap_util.h rtomap/rtomap_util.c)
 target_link_libraries(rtomap_util
   PRIVATE
+    traits
     realtime_ordered_map
     test
 )
@@ -151,6 +160,7 @@ macro(add_rtomap_test TEST_NAME)
       rtomap_util
       ordered_map
       test
+      traits
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -203,6 +213,7 @@ target_link_libraries(perf
     random
     str_view::str_view
     cli
+    traits
 )
 
 # Create a custom target that will depend on all targets in the subdirectory

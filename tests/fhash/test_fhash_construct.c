@@ -63,13 +63,13 @@ fhash_test_entry_functional(void)
     struct val def = {.id = 137, .val = 0};
     fh_map_entry ent = fhm_entry(&fh, &def.id);
     CHECK(fhm_unwrap(&ent) == NULL, true, "%d");
-    struct val *v = fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e);
+    struct val *v = fhm_or_insert(fhm_entry_vr(&fh, &def.id), &def.e);
     CHECK(v != NULL, true, "%d");
     v->val += 1;
     struct val const *const inserted = fhm_get(&fh, &def.id);
     CHECK((inserted != NULL), true, "%d");
     CHECK(inserted->val, 1, "%d");
-    v = fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e);
+    v = fhm_or_insert(fhm_entry_vr(&fh, &def.id), &def.e);
     CHECK(v != NULL, true, "%d");
     v->val += 1;
     CHECK(inserted->val, 2, "%d");
@@ -116,12 +116,12 @@ fhash_test_entry_and_modify_functional(void)
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    fh_map_entry ent = fhm_and_modify(fhm_entry_lv(&fh, &def.id), mod);
+    fh_map_entry ent = fhm_and_modify(fhm_entry_vr(&fh, &def.id), mod);
     CHECK(fhm_occupied(&ent), false, "%d");
     CHECK((fhm_unwrap(&ent) == NULL), true, "%d");
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v = fhm_or_insert(fhm_entry_lv(&fh, &def.id), &def.e);
+    struct val *v = fhm_or_insert(fhm_entry_vr(&fh, &def.id), &def.e);
     CHECK(v != NULL, true, "%d");
     v->val++;
     struct val const *const inserted = fhm_get(&fh, &def.id);
@@ -132,7 +132,7 @@ fhash_test_entry_and_modify_functional(void)
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
     struct val *v2 = fhm_or_insert(
-        fhm_and_modify_lv(fhm_entry_lv(&fh, &def.id), mod), &def.e);
+        fhm_and_modify_vr(fhm_entry_vr(&fh, &def.id), mod), &def.e);
     CHECK((v2 != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");
     CHECK(v2->val, 6, "%d");
@@ -140,7 +140,7 @@ fhash_test_entry_and_modify_functional(void)
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
     struct val *v3 = fhm_or_insert(
-        fhm_and_modify_with_lv(fhm_entry_lv(&fh, &def.id), modw, &def.id),
+        fhm_and_modify_with_vr(fhm_entry_vr(&fh, &def.id), modw, &def.id),
         &def.e);
     CHECK((v3 != NULL), true, "%d");
     CHECK(inserted->id, 137, "%d");

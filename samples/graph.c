@@ -2,8 +2,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "cli.h"
+#include "flat_double_ended_queue.h"
 #include "flat_hash_map.h"
-#include "flat_queue.h"
 #include "priority_queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
@@ -422,20 +422,21 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         = FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem, realloc,
                    hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
-    ccc_flat_queue bfs = CCC_FQ_INIT(NULL, 0, struct point, realloc);
+    ccc_flat_double_ended_queue bfs
+        = CCC_FDEQ_INIT(NULL, 0, struct point, realloc);
     [[maybe_unused]] struct parent_cell *pc = FHM_INSERT_ENTRY(
         FHM_ENTRY(&parent_map, src->pos), (struct parent_cell){
                                               .key = src->pos,
                                               .parent = (struct point){-1, -1},
                                           });
     assert(pc);
-    ccc_fq_push(&bfs, &src->pos);
+    ccc_fdeq_push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {0};
-    while (!ccc_fq_empty(&bfs) && !success)
+    while (!ccc_fdeq_empty(&bfs) && !success)
     {
-        cur = *((struct point *)ccc_fq_front(&bfs));
-        ccc_fq_pop(&bfs);
+        cur = *((struct point *)ccc_fdeq_front(&bfs));
+        ccc_fdeq_pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next = {
@@ -447,7 +448,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (is_dst(next_cell, dst->name))
             {
                 [[maybe_unused]] struct parent_cell *inserted
-                    = insert_entry(entry_lv(&parent_map, &next), &push.elem);
+                    = insert_entry(entry_vr(&parent_map, &next), &push.elem);
                 assert(inserted);
                 cur = next;
                 success = true;
@@ -456,9 +457,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (!is_path(next_cell) && !fhm_contains(&parent_map, &next))
             {
                 [[maybe_unused]] struct parent_cell *inserted
-                    = insert_entry(entry_lv(&parent_map, &next), &push.elem);
+                    = insert_entry(entry_vr(&parent_map, &next), &push.elem);
                 assert(inserted != NULL);
-                (void)ccc_fq_push(&bfs, &next);
+                (void)ccc_fdeq_push_back(&bfs, &next);
             }
         }
     }
@@ -488,7 +489,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         add_edge_cost_label(graph, dst, &edge);
     }
     fhm_clear_and_free(&parent_map, map_parent_point_destructor);
-    ccc_fq_clear_and_free(&bfs, NULL);
+    ccc_fdeq_clear_and_free(&bfs, NULL);
     return success;
 }
 

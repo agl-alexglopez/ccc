@@ -33,6 +33,8 @@ void *ccc_buf_at(ccc_buffer const *, size_t);
 void *ccc_buf_back(ccc_buffer const *);
 void *ccc_buf_front(ccc_buffer const *);
 void *ccc_buf_alloc(ccc_buffer *);
+
+void *ccc_buf_push_back(ccc_buffer *, void const *);
 ccc_result ccc_buf_pop_back(ccc_buffer *);
 ccc_result ccc_buf_pop_back_n(ccc_buffer *, size_t n);
 void *ccc_buf_copy(ccc_buffer *, size_t dst, size_t src);
@@ -45,7 +47,12 @@ ccc_result ccc_buf_free(ccc_buffer *, ccc_alloc_fn *);
 
 void *ccc_buf_begin(ccc_buffer const *);
 void *ccc_buf_next(ccc_buffer const *, void const *);
-void *ccc_buf_size_end(ccc_buffer const *);
+void *ccc_buf_end(ccc_buffer const *);
+
+void *ccc_buf_rbegin(ccc_buffer const *);
+void *ccc_buf_rnext(ccc_buffer const *, void const *);
+void *ccc_buf_rend(ccc_buffer const *);
+
 void *ccc_buf_capacity_end(ccc_buffer const *);
 
 #endif /* CCC_BUFFER_H */

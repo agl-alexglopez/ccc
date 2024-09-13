@@ -65,6 +65,17 @@ ccc_buf_alloc(ccc_buffer *buf)
     return NULL;
 }
 
+void *
+ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
+{
+    void *const mem = ccc_buf_alloc(buf);
+    if (mem)
+    {
+        memcpy(mem, data, buf->impl_.elem_sz_);
+    }
+    return mem;
+}
+
 ccc_result
 ccc_buf_swap(ccc_buffer *buf, uint8_t tmp[], size_t const i, size_t const j)
 {
@@ -100,7 +111,7 @@ ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
     {
         return CCC_INPUT_ERR;
     }
-    (void)memcpy(pos, data, ccc_buf_elem_size(buf));
+    (void)memcpy(pos, data, buf->impl_.elem_sz_);
     return CCC_OK;
 }
 
@@ -200,16 +211,41 @@ ccc_buf_begin(ccc_buffer const *const buf)
 }
 
 void *
+ccc_buf_rbegin(ccc_buffer const *const buf)
+{
+    return (uint8_t *)buf->impl_.mem_ + (buf->impl_.sz_ * buf->impl_.elem_sz_);
+}
+
+void *
 ccc_buf_next(ccc_buffer const *const buf, void const *const pos)
 {
-    assert(pos < ccc_buf_capacity_end(buf));
+    if (pos >= ccc_buf_capacity_end(buf))
+    {
+        return NULL;
+    }
     return (uint8_t *)pos + buf->impl_.elem_sz_;
 }
 
 void *
-ccc_buf_size_end(ccc_buffer const *const buf)
+ccc_buf_rnext(ccc_buffer const *const buf, void const *const pos)
 {
-    return (uint8_t *)buf->impl_.mem_ + (buf->impl_.elem_sz_ * buf->impl_.sz_);
+    if (pos <= ccc_buf_rend(buf))
+    {
+        return NULL;
+    }
+    return (uint8_t *)pos - buf->impl_.elem_sz_;
+}
+
+void *
+ccc_buf_end([[maybe_unused]] ccc_buffer const *const buf)
+{
+    return (uint8_t *)buf->impl_.mem_ + (buf->impl_.sz_ * buf->impl_.elem_sz_);
+}
+
+void *
+ccc_buf_rend([[maybe_unused]] ccc_buffer const *const buf)
+{
+    return (uint8_t *)buf->impl_.mem_ - buf->impl_.elem_sz_;
 }
 
 void *
@@ -222,12 +258,11 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
 size_t
 ccc_buf_index_of(ccc_buffer const *const buf, void const *const slot)
 {
-    assert(slot >= ccc_buf_base(buf));
-    assert((uint8_t *)slot
-           < ((uint8_t *)ccc_buf_base(buf)
-              + (ccc_buf_capacity(buf) * ccc_buf_elem_size(buf))));
-    return ((uint8_t *)slot - ((uint8_t *)ccc_buf_base(buf)))
-           / ccc_buf_elem_size(buf);
+    assert(slot >= buf->impl_.mem_);
+    assert((uint8_t *)slot < ((uint8_t *)buf->impl_.mem_
+                              + (buf->impl_.capacity_ * buf->impl_.elem_sz_)));
+    return ((uint8_t *)slot - ((uint8_t *)buf->impl_.mem_))
+           / buf->impl_.elem_sz_;
 }
 
 void

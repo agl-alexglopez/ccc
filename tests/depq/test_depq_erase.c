@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "depq_util.h"
 #include "double_ended_priority_queue.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -58,16 +61,16 @@ depq_test_insert_remove_four_dups(void)
         ccc_depq_push(&pq, &three_vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
         size_t const size = i + 1;
-        CHECK(ccc_depq_size(&pq), size, "%zu");
+        CHECK(size(&pq), size, "%zu");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)4, "%zu");
+    CHECK(size(&pq), (size_t)4, "%zu");
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         ccc_depq_pop_max(&pq);
         CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)0, "%zu");
+    CHECK(size(&pq), (size_t)0, "%zu");
     return PASS;
 }
 
@@ -96,7 +99,7 @@ depq_test_insert_erase_shuffled(void)
         (void)ccc_depq_erase(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    CHECK(ccc_depq_size(&pq), (size_t)0, "%zu");
+    CHECK(size(&pq), (size_t)0, "%zu");
     return PASS;
 }
 
@@ -125,7 +128,7 @@ depq_test_pop_max(void)
         CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val, "%d");
         ccc_depq_pop_max(&pq);
     }
-    CHECK(ccc_depq_empty(&pq), true, "%d");
+    CHECK(empty(&pq), true, "%d");
     return PASS;
 }
 
@@ -154,7 +157,7 @@ depq_test_pop_min(void)
         CHECK(((struct val *)ccc_depq_min(&pq))->val, vals[i].val, "%d");
         ccc_depq_pop_min(&pq);
     }
-    CHECK(ccc_depq_empty(&pq), true, "%d");
+    CHECK(empty(&pq), true, "%d");
     return PASS;
 }
 
@@ -185,7 +188,7 @@ depq_test_max_round_robin(void)
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
-    while (!ccc_depq_empty(&depq))
+    while (!empty(&depq))
     {
         struct val const *front = ccc_depq_max(&depq);
         CHECK(front->id, order[i].id, "%d");
@@ -223,7 +226,7 @@ depq_test_min_round_robin(void)
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
-    while (!ccc_depq_empty(&depq))
+    while (!empty(&depq))
     {
         struct val const *front = ccc_depq_min(&depq);
         CHECK(front->id, order[i].id, "%d");
@@ -252,7 +255,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
         size_t const s = i + 1;
-        CHECK(ccc_depq_size(&pq), s, "%zu");
+        CHECK(size(&pq), s, "%zu");
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -264,7 +267,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
         (void)ccc_depq_erase(&pq, &vals[shuffled_index].elem);
         CHECK(ccc_depq_validate(&pq), true, "%d");
         --cur_size;
-        CHECK(ccc_depq_size(&pq), cur_size, "%zu");
+        CHECK(size(&pq), cur_size, "%zu");
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
@@ -302,7 +305,7 @@ depq_test_prime_shuffle(void)
         CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true, "%d");
         CHECK(ccc_depq_validate(&pq), true, "%d");
         --cur_size;
-        CHECK(ccc_depq_size(&pq), cur_size, "%zu");
+        CHECK(size(&pq), cur_size, "%zu");
     }
     return PASS;
 }
@@ -329,6 +332,6 @@ depq_test_weak_srand(void)
         CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true, "%d");
         CHECK(ccc_depq_validate(&pq), true, "%d");
     }
-    CHECK(ccc_depq_empty(&pq), true, "%d");
+    CHECK(empty(&pq), true, "%d");
     return PASS;
 }

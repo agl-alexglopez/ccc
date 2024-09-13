@@ -24,7 +24,7 @@ target_link_libraries(graph PRIVATE
   random
   str_view::str_view
   flat_hash_map
-  flat_queue
+  flat_double_ended_queue
   priority_queue
   flat_priority_queue
 )

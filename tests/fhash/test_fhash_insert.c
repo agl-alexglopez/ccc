@@ -86,7 +86,7 @@ fhash_test_insert_overwrite(void)
     CHECK(occupied(&ent), false, "%d");
     CHECK(unwrap(&ent), NULL, "%p");
 
-    struct val const *v = unwrap(entry_lv(&fh, &q.id));
+    struct val const *v = unwrap(entry_vr(&fh, &q.id));
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 99, "%d");
 
@@ -103,7 +103,7 @@ fhash_test_insert_overwrite(void)
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 99, "%d");
     CHECK(q.val, 99, "%d");
-    v = unwrap(entry_lv(&fh, &q.id));
+    v = unwrap(entry_vr(&fh, &q.id));
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 100, "%d");
     return PASS;
@@ -121,7 +121,7 @@ fhash_test_insert_then_bad_ideas(void)
     ccc_entry ent = insert(&fh, &q.e);
     CHECK(occupied(&ent), false, "%d");
     CHECK(unwrap(&ent), NULL, "%p");
-    struct val const *v = unwrap(entry_lv(&fh, &q.id));
+    struct val const *v = unwrap(entry_vr(&fh, &q.id));
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 99, "%d");
 
@@ -160,7 +160,7 @@ fhash_test_entry_api_functional(void)
     {
         def.id = (int)i;
         def.val = (int)i;
-        struct val const *const d = or_insert(entry_lv(&fh, &def.id), &def.e);
+        struct val const *const d = or_insert(entry_vr(&fh, &def.id), &def.e);
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -172,7 +172,7 @@ fhash_test_entry_api_functional(void)
         def.id = (int)i;
         def.val = (int)i;
         struct val const *const d = or_insert(
-            and_modify_lv(entry_lv(&fh, &def.id), fhash_modplus), &def.e);
+            and_modify_vr(entry_vr(&fh, &def.id), fhash_modplus), &def.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -193,7 +193,7 @@ fhash_test_entry_api_functional(void)
     {
         def.id = (int)i;
         def.val = (int)i;
-        struct val *const in = or_insert(entry_lv(&fh, &def.id), &def.e);
+        struct val *const in = or_insert(entry_vr(&fh, &def.id), &def.e);
         in->val++;
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true, "%d");
@@ -221,7 +221,7 @@ fhash_test_insert_via_entry(void)
         def.id = (int)i;
         def.val = (int)i;
         struct val const *const d
-            = insert_entry(entry_lv(&fh, &def.id), &def.e);
+            = insert_entry(entry_vr(&fh, &def.id), &def.e);
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
@@ -233,7 +233,7 @@ fhash_test_insert_via_entry(void)
         def.id = (int)i;
         def.val = (int)i + 1;
         struct val const *const d
-            = insert_entry(entry_lv(&fh, &def.id), &def.e);
+            = insert_entry(entry_vr(&fh, &def.id), &def.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->val, i + 1, "%d");
@@ -399,7 +399,7 @@ fhash_test_resize(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(entry_lv(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true, "%d", vals);
         CHECK(v->id, shuffled_index, "%d", vals);
         CHECK(v->val, i, "%d", vals);
@@ -411,7 +411,7 @@ fhash_test_resize(void)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = insert_entry(entry_lv(&fh, &swap_slot.id), &swap_slot.e);
+            = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
         CHECK(in_table != NULL, true, "%d", vals);
         CHECK(in_table->val, shuffled_index, "%d", vals);
     }
@@ -476,7 +476,7 @@ fhash_test_resize_from_null(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(entry_lv(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true, "%d", ccc_buf_base(&fh.impl_.buf_));
         CHECK(v->id, shuffled_index, "%d", ccc_buf_base(&fh.impl_.buf_));
         CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
@@ -487,7 +487,7 @@ fhash_test_resize_from_null(void)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = insert_entry(entry_lv(&fh, &swap_slot.id), &swap_slot.e);
+            = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
         CHECK(in_table != NULL, true, "%d", ccc_buf_base(&fh.impl_.buf_));
         CHECK(in_table->val, shuffled_index, "%d",
               ccc_buf_base(&fh.impl_.buf_));
@@ -573,7 +573,7 @@ fhash_test_insert_limit(void)
     CHECK(fhm_size(&fh), final_size, "%zu");
 
     v = (struct val){.id = last_index, .val = -2};
-    struct val *in_table = insert_entry(entry_lv(&fh, &v.id), &v.e);
+    struct val *in_table = insert_entry(entry_vr(&fh, &v.id), &v.e);
     CHECK(in_table != NULL, true, "%d");
     CHECK(in_table->val, -2, "%d");
     CHECK(fhm_size(&fh), final_size, "%zu");
@@ -586,7 +586,7 @@ fhash_test_insert_limit(void)
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct val){.id = shuffled_index, .val = -4};
-    in_table = insert_entry(entry_lv(&fh, &v.id), &v.e);
+    in_table = insert_entry(entry_vr(&fh, &v.id), &v.e);
     CHECK(in_table == NULL, true, "%d");
     CHECK(fhm_size(&fh), final_size, "%zu");
 
