@@ -99,7 +99,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
     return e->impl_.entry_.e_;
 }
 
-inline void *
+void *
 ccc_fhm_get_mut(ccc_flat_hash_map *const h, void const *const key)
 {
     return (void *)ccc_fhm_get(h, key);
@@ -218,41 +218,29 @@ ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
     return e->impl_.entry_.e_;
 }
 
-inline void const *
+void const *
 ccc_fhm_unwrap(ccc_fh_map_entry const *const e)
 {
-    return ccc_impl_fhm_unwrap(&e->impl_);
-}
-
-inline void *
-ccc_fhm_unwrap_mut(ccc_fh_map_entry const *const e)
-{
-    return (void *)ccc_impl_fhm_unwrap(&e->impl_);
-}
-
-inline void const *
-ccc_impl_fhm_unwrap(struct ccc_fhm_entry_ const *const e)
-{
-    if (!(e->entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED))
+    if (!(e->impl_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return e->entry_.e_;
+    return e->impl_.entry_.e_;
 }
 
-inline bool
+bool
 ccc_fhm_occupied(ccc_fh_map_entry const *const e)
 {
     return e->impl_.entry_.stats_ & CCC_FHM_ENTRY_OCCUPIED;
 }
 
-inline bool
+bool
 ccc_fhm_insert_error(ccc_fh_map_entry const *const e)
 {
     return e->impl_.entry_.stats_ & CCC_FHM_ENTRY_INSERT_ERROR;
 }
 
-inline void *
+void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
     if (ccc_buf_empty(&h->impl_.buf_))
@@ -267,7 +255,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
     return iter == ccc_buf_capacity_end(&h->impl_.buf_) ? NULL : iter;
 }
 
-inline void *
+void *
 ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
 {
     void *i = struct_base(&h->impl_, &iter->impl_);
@@ -279,7 +267,7 @@ ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
     return i == ccc_buf_capacity_end(&h->impl_.buf_) ? NULL : i;
 }
 
-inline void *
+void *
 ccc_fhm_end([[maybe_unused]] ccc_flat_hash_map const *const h)
 {
     return NULL;
@@ -453,7 +441,7 @@ ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn)
     }
 }
 
-inline size_t
+size_t
 ccc_fhm_next_prime(size_t n)
 {
     if (n <= 1)

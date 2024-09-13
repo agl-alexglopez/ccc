@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "map_util.h"
 #include "ordered_map.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -42,9 +45,8 @@ map_test_insert_one(void)
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(ccc_om_insert_entry(ccc_om_entry_lv(&s, &single.val), &single.elem)
-              != NULL,
-          true, "%d");
+    CHECK(insert_entry(entry_lv(&s, &single.val), &single.elem) != NULL, true,
+          "%d");
     CHECK(ccc_om_empty(&s), false, "%d");
     CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true, "%d");
     return PASS;
@@ -56,13 +58,11 @@ map_test_insert_three(void)
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val swap_slot = {.val = 1, .id = 99};
-    CHECK(ccc_entry_occupied(ccc_om_insert_lv(&s, &swap_slot.elem)), false,
-          "%d");
+    CHECK(occupied(insert_lv(&s, &swap_slot.elem)), false, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)1, "%zu");
     swap_slot = (struct val){.val = 1, .id = 137};
-    struct val const *ins
-        = ccc_entry_unwrap(ccc_om_insert_lv(&s, &swap_slot.elem));
+    struct val const *ins = unwrap(insert_lv(&s, &swap_slot.elem));
     CHECK(ccc_om_validate(&s), true, "%d");
     CHECK(ccc_om_size(&s), (size_t)1, "%zu");
     CHECK(ins != NULL, true, "%d");
@@ -102,13 +102,10 @@ map_test_struct_getter(void)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        CHECK(ccc_om_insert_entry(ccc_om_entry_lv(&s, &vals[i].val),
-                                  &vals[i].elem)
-                  != NULL,
+        CHECK(insert_entry(entry_lv(&s, &vals[i].val), &vals[i].elem) != NULL,
               true, "%d");
-        CHECK(ccc_om_insert_entry(
-                  ccc_om_entry_lv(&map_tester_clone, &tester_clone[i].val),
-                  &tester_clone[i].elem)
+        CHECK(insert_entry(entry_lv(&map_tester_clone, &tester_clone[i].val),
+                           &tester_clone[i].elem)
                   != NULL,
               true, "%d");
         CHECK(ccc_om_validate(&s), true, "%d");

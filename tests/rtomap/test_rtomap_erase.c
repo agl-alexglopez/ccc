@@ -1,8 +1,10 @@
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
 
 #include "realtime_ordered_map.h"
 #include "rtomap_util.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -55,7 +57,7 @@ rtomap_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = ccc_entry_unwrap(rom_remove_lv(&s, &vals[i].elem));
+        struct val *v = unwrap(remove_lv(&s, &vals[i].elem));
         CHECK(v != NULL, true, "%d");
         CHECK(v->val, vals[i].val, "%d");
         CHECK(rom_validate(&s), true, "%d");
@@ -82,7 +84,7 @@ rtomap_test_prime_shuffle(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (ccc_entry_unwrap(rom_insert_lv(&s, &vals[i].elem)))
+        if (unwrap(insert_lv(&s, &vals[i].elem)))
         {
             repeats[i] = true;
         }
@@ -93,8 +95,7 @@ rtomap_test_prime_shuffle(void)
     CHECK(rom_size(&s) < size, true, "%d");
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(ccc_entry_occupied(
-                  rom_remove_entry_lv(rom_entry_lv(&s, &vals[i].val)))
+        CHECK(occupied(remove_entry_lv(entry_lv(&s, &vals[i].val)))
                   || repeats[i],
               true, "%d");
         CHECK(rom_validate(&s), true, "%d");
@@ -116,13 +117,13 @@ rtomap_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)rom_insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem);
         CHECK(rom_validate(&s), true, "%d");
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CHECK(rom_contains(&s, &vals[i].val), true, "%d");
-        (void)rom_remove(&s, &vals[i].elem);
+        (void)remove(&s, &vals[i].elem);
         CHECK(rom_validate(&s), true, "%d");
     }
     CHECK(rom_empty(&s), true, "%d");

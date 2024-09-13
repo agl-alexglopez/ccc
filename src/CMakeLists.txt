@@ -32,3 +32,19 @@ target_link_libraries(impl_priority_queue INTERFACE types)
 
 add_library(impl_flat_hash_map INTERFACE impl_flat_hash_map.h)
 target_link_libraries(impl_flat_hash_map INTERFACE types buffer)
+
+add_library(impl_traits INTERFACE impl_traits.h)
+target_link_libraries(impl_traits 
+  INTERFACE
+    types
+    buffer
+    doubly_linked_list
+    singly_linked_list
+    ordered_map
+    realtime_ordered_map
+    double_ended_priority_queue
+    flat_hash_map
+    flat_queue
+    flat_priority_queue
+    priority_queue
+)

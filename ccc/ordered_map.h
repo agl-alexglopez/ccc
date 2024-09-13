@@ -143,11 +143,9 @@ void *ccc_om_or_insert(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
 
 void *ccc_om_insert_entry(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
 
-void const *ccc_om_unwrap(ccc_o_map_entry const *e);
-
-void *ccc_om_unwrap_mut(ccc_o_map_entry const *e);
-
+void *ccc_om_unwrap(ccc_o_map_entry const *e);
 bool ccc_om_insert_error(ccc_o_map_entry const *e);
+bool ccc_om_occupied(ccc_o_map_entry const *e);
 
 /*===========================   Entry API   =================================*/
 

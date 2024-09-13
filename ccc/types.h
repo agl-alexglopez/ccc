@@ -80,40 +80,12 @@ typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 typedef uint64_t ccc_hash_fn(void const *to_hash);
 
 bool ccc_entry_occupied(ccc_entry const *e);
-bool ccc_entry_error(ccc_entry const *e);
+bool ccc_entry_insert_error(ccc_entry const *e);
 void *ccc_entry_unwrap(ccc_entry const *e);
+
 void *ccc_begin_range(ccc_range const *r);
 void *ccc_end_range(ccc_range const *r);
 void *ccc_begin_rrange(ccc_rrange const *r);
 void *ccc_end_rrange(ccc_rrange const *r);
-
-#ifdef TYPES_USING_NAMESPACE_CCC
-typedef ccc_result result;
-typedef ccc_threeway_cmp threeway_cmp;
-typedef ccc_cmp cmp;
-typedef ccc_key_cmp key_cmp;
-typedef ccc_update update;
-typedef ccc_range range;
-typedef ccc_rrange rrange;
-typedef ccc_entry entry;
-typedef ccc_alloc_fn alloc_fn;
-typedef ccc_cmp_fn cmp_fn;
-typedef ccc_print_fn print_fn;
-typedef ccc_update_fn update_fn;
-typedef ccc_destructor_fn destructor_fn;
-typedef ccc_key_eq_fn key_eq_fn;
-typedef ccc_key_cmp_fn key_cmp_fn;
-typedef ccc_hash_fn hash_fn;
-#    define ENTRY_OCCUPIED CCC_ENTRY_OCCUPIED
-#    define ENTRY_VACANT CCC_ENTRY_VACANT
-#    define ENTRY_ERROR CCC_ENTRY_ERROR
-#    define entry_occupied(args...) ccc_entry_occupied(args)
-#    define entry_error(args...) ccc_entry_error(args)
-#    define entry_unwrap(args...) ccc_entry_unwrap(args)
-#    define begin_range(args...) ccc_begin_range(args)
-#    define end_range(args...) ccc_end_range(args)
-#    define begin_rrange(args...) ccc_begin_rrange(args)
-#    define end_rrange(args...) ccc_end_rrange(args)
-#endif
 
 #endif /* CCC_TYPES_H */

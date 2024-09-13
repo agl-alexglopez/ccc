@@ -178,6 +178,7 @@ macro(add_fhash_test TEST_NAME)
       doubly_linked_list
       test
       fhash_util
+      traits
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 

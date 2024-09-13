@@ -1,9 +1,10 @@
-#define TYPES_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include "realtime_ordered_map.h"
 #include "rtomap_util.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -46,7 +47,7 @@ rtomap_test_insert_one(void)
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(entry_occupied(rom_insert_lv(&s, &single.elem)), false, "%d");
+    CHECK(occupied(insert_lv(&s, &single.elem)), false, "%d");
     CHECK(rom_empty(&s), false, "%d");
     struct val *v = rom_root(&s);
     CHECK(v == NULL, false, "%d");
@@ -121,7 +122,7 @@ rtomap_test_insert_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)rom_insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem);
         CHECK(rom_validate(&s), true, "%d");
     }
     CHECK(rom_size(&s), (size_t)num_nodes, "%zu");

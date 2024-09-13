@@ -84,6 +84,12 @@ target_link_libraries(flat_queue
     impl_flat_queue
 )
 
+add_library(traits INTERFACE traits.h)
+target_link_libraries(traits
+  INTERFACE
+    impl_traits
+)
+
 add_library(${PROJECT_NAME})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
@@ -112,6 +118,7 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
         ${PROJECT_SOURCE_DIR}/src/impl_realtime_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/impl_traits.h
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS
@@ -128,6 +135,7 @@ target_sources(${PROJECT_NAME}
               priority_queue.h
               singly_linked_list.h
               doubly_linked_list.h
+              traits.h
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC c_std_23)

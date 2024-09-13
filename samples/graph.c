@@ -1,4 +1,5 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
 
 #include "cli.h"
 #include "flat_hash_map.h"
@@ -6,6 +7,7 @@
 #include "priority_queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
+#include "traits.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -445,8 +447,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (is_dst(next_cell, dst->name))
             {
                 [[maybe_unused]] struct parent_cell *inserted
-                    = fhm_insert_entry(fhm_entry_lv(&parent_map, &next),
-                                       &push.elem);
+                    = insert_entry(entry_lv(&parent_map, &next), &push.elem);
                 assert(inserted);
                 cur = next;
                 success = true;
@@ -455,8 +456,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (!is_path(next_cell) && !fhm_contains(&parent_map, &next))
             {
                 [[maybe_unused]] struct parent_cell *inserted
-                    = fhm_insert_entry(fhm_entry_lv(&parent_map, &next),
-                                       &push.elem);
+                    = insert_entry(entry_lv(&parent_map, &next), &push.elem);
                 assert(inserted != NULL);
                 (void)ccc_fq_push(&bfs, &next);
             }

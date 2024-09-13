@@ -1,8 +1,10 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
 
 #include "fhash_util.h"
 #include "flat_hash_map.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
@@ -42,25 +44,24 @@ fhash_test_erase(void)
     CHECK(res, CCC_OK, "%d");
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = fhm_insert(&fh, &query.e);
-    CHECK(ccc_entry_occupied(&ent), false, "%d");
-    CHECK(ccc_entry_unwrap(&ent), NULL, "%p");
+    ccc_entry ent = insert(&fh, &query.e);
+    CHECK(occupied(&ent), false, "%d");
+    CHECK(unwrap(&ent), NULL, "%p");
     CHECK(fhm_size(&fh), 1, "%zu");
     ent = fhm_remove(&fh, &query.e);
-    CHECK(ccc_entry_occupied(&ent), true, "%d");
-    struct val *v = ccc_entry_unwrap(&ent);
+    CHECK(occupied(&ent), true, "%d");
+    struct val *v = unwrap(&ent);
     CHECK(v != NULL, true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 99, "%d");
     CHECK(fhm_size(&fh), 0, "%zu");
     query.id = 101;
     ent = fhm_remove(&fh, &query.e);
-    CHECK(ccc_entry_occupied(&ent), false, "%d");
+    CHECK(occupied(&ent), false, "%d");
     CHECK(fhm_size(&fh), 0, "%zu");
     FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
     CHECK(fhm_size(&fh), 1, "%zu");
-    CHECK(ccc_entry_occupied(fhm_remove_entry_lv(FHM_ENTRY(&fh, 137))), true,
-          "%d");
+    CHECK(occupied(remove_entry_lv(FHM_ENTRY(&fh, 137))), true, "%d");
     CHECK(fhm_size(&fh), 0, "%zu");
     return PASS;
 }
@@ -78,7 +79,7 @@ fhash_test_shuffle_insert_erase(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = fhm_insert_entry(fhm_entry_lv(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(fhm_entry_lv(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true, "%d");
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");
@@ -94,14 +95,14 @@ fhash_test_shuffle_insert_erase(void)
         {
             struct val swap_slot = {.id = i};
             struct val const *const old_val
-                = ccc_entry_unwrap(fhm_remove_lv(&fh, &swap_slot.e));
+                = unwrap(fhm_remove_lv(&fh, &swap_slot.e));
             CHECK(old_val != NULL, true, "%d");
             CHECK(old_val->id, i, "%d");
         }
         else
         {
-            ccc_entry removed = fhm_remove_entry(FHM_ENTRY(&fh, i));
-            CHECK(ccc_entry_occupied(&removed), true, "%d");
+            ccc_entry removed = remove_entry(FHM_ENTRY(&fh, i));
+            CHECK(occupied(&removed), true, "%d");
         }
         --cur_size;
         ++i;

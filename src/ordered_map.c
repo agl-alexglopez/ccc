@@ -280,19 +280,23 @@ ccc_om_get(ccc_ordered_map *s, void const *const key)
 }
 
 void *
-ccc_om_unwrap_mut(ccc_o_map_entry const *const e)
-{
-    return (void *)ccc_om_unwrap(e);
-}
-
-void const *
 ccc_om_unwrap(ccc_o_map_entry const *const e)
 {
-    if (e->impl_.entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED)
-    {
-        return e->impl_.entry_.e_;
-    }
-    return NULL;
+    return e->impl_.entry_.stats_ == CCC_TREE_ENTRY_OCCUPIED
+               ? e->impl_.entry_.e_
+               : NULL;
+}
+
+bool
+ccc_om_insert_error(ccc_o_map_entry const *const e)
+{
+    return e->impl_.entry_.stats_ & CCC_TREE_ENTRY_INSERT_ERROR;
+}
+
+bool
+ccc_om_occupied(ccc_o_map_entry const *const e)
+{
+    return e->impl_.entry_.stats_ & CCC_TREE_ENTRY_OCCUPIED;
 }
 
 void *
@@ -367,12 +371,6 @@ ccc_om_print(ccc_ordered_map const *const s, ccc_o_map_elem const *const root,
              ccc_print_fn *const fn)
 {
     ccc_tree_tree_print(&s->impl_, &root->impl_, fn);
-}
-
-bool
-ccc_om_insert_error(ccc_o_map_entry const *const e)
-{
-    return e->impl_.entry_.stats_ & CCC_TREE_ENTRY_INSERT_ERROR;
 }
 
 bool

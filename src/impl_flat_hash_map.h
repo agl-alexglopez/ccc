@@ -60,8 +60,6 @@ void ccc_impl_fhm_insert(struct ccc_fhm_ *h, void const *e, uint64_t hash,
 struct ccc_fhm_entry_ ccc_impl_fhm_entry(struct ccc_fhm_ *h, void const *key);
 struct ccc_fhm_entry_ ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ const *e,
                                               ccc_update_fn *fn);
-void const *ccc_impl_fhm_unwrap(struct ccc_fhm_entry_ const *e);
-
 struct ccc_fhm_elem_ *ccc_impl_fhm_in_slot(struct ccc_fhm_ const *h,
                                            void const *slot);
 void *ccc_impl_fhm_key_in_slot(struct ccc_fhm_ const *h, void const *slot);

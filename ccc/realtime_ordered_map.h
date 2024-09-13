@@ -110,6 +110,11 @@ ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
 
 ccc_entry ccc_rom_remove_entry(ccc_rtom_entry const *e);
 
+ccc_rtom_entry ccc_rom_and_modify(ccc_rtom_entry const *e, ccc_update_fn *fn);
+
+ccc_rtom_entry ccc_rom_and_modify_with(ccc_rtom_entry const *e,
+                                       ccc_update_fn *fn, void *aux);
+
 ccc_rtom_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
                              void const *key);
 
@@ -117,8 +122,9 @@ void *ccc_rom_or_insert(ccc_rtom_entry const *e, ccc_rtom_elem *elem);
 
 void *ccc_rom_insert_entry(ccc_rtom_entry const *e, ccc_rtom_elem *elem);
 
-void const *ccc_rom_unwrap(ccc_rtom_entry const *e);
-void *ccc_rom_unwrap_mut(ccc_rtom_entry const *e);
+void *ccc_rom_unwrap(ccc_rtom_entry const *e);
+bool ccc_rom_insert_error(ccc_rtom_entry const *e);
+bool ccc_rom_occupied(ccc_rtom_entry const *e);
 
 /*======================      Iteration    ==================================*/
 

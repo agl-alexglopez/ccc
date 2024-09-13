@@ -282,7 +282,27 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     return (ccc_entry){{.e_ = removed, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
-void const *
+ccc_rtom_entry
+ccc_rom_and_modify(ccc_rtom_entry const *e, ccc_update_fn *fn)
+{
+    if (e->impl_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED)
+    {
+        fn((ccc_update){.container = e->impl_.entry_.e_, NULL});
+    }
+    return *e;
+}
+
+ccc_rtom_entry
+ccc_rom_and_modify_with(ccc_rtom_entry const *e, ccc_update_fn *fn, void *aux)
+{
+    if (e->impl_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED)
+    {
+        fn((ccc_update){.container = e->impl_.entry_.e_, aux});
+    }
+    return *e;
+}
+
+void *
 ccc_rom_unwrap(ccc_rtom_entry const *const e)
 {
     if (e->impl_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED)
@@ -292,14 +312,16 @@ ccc_rom_unwrap(ccc_rtom_entry const *const e)
     return NULL;
 }
 
-void *
-ccc_rom_unwrap_mut(ccc_rtom_entry const *const e)
+bool
+ccc_rom_occupied(ccc_rtom_entry const *const e)
 {
-    if (e->impl_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED)
-    {
-        return e->impl_.entry_.e_;
-    }
-    return NULL;
+    return e->impl_.entry_.stats_ & CCC_ROM_ENTRY_OCCUPIED;
+}
+
+bool
+ccc_rom_insert_error(ccc_rtom_entry const *const e)
+{
+    return e->impl_.entry_.stats_ & CCC_ROM_ENTRY_INSERT_ERROR;
 }
 
 static struct ccc_rtom_elem_ *

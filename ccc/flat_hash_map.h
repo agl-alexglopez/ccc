@@ -209,11 +209,6 @@ void *ccc_fhm_insert_entry(ccc_fh_map_entry const *e, ccc_fh_map_elem *elem);
 @return an immutable view into the table entry if one is present, or NULL. */
 void const *ccc_fhm_unwrap(ccc_fh_map_entry const *e);
 
-/** @brief Unwraps the provided entry to obtain a view into the table element.
-@param [in] e the entry from a query to the table via function or macro.
-@return a mutable view into the table entry if one is present, or NULL. */
-void *ccc_fhm_unwrap_mut(ccc_fh_map_entry const *e);
-
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if the entry is occupied, false if not. */
