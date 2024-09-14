@@ -143,9 +143,13 @@ static void double_promote(struct ccc_rtom_ const *rom,
 static void double_demote(struct ccc_rtom_ const *rom,
                           struct ccc_rtom_elem_ *x);
 
-static void rotate(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *p_of_x,
+static void rotate(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *z_p_of_x,
                    struct ccc_rtom_elem_ *x_p_of_y, struct ccc_rtom_elem_ *y,
                    enum rtom_link_ dir);
+static void double_rotate(struct ccc_rtom_ *rom,
+                          struct ccc_rtom_elem_ *z_p_of_x,
+                          struct ccc_rtom_elem_ *x_p_of_y,
+                          struct ccc_rtom_elem_ *y, enum rtom_link_ dir);
 static bool validate(struct ccc_rtom_ const *rom);
 static void ccc_tree_print(struct ccc_rtom_ const *rom,
                            struct ccc_rtom_elem_ const *root,
@@ -226,10 +230,9 @@ ccc_rom_insert_entry(ccc_rtom_entry const *const e, ccc_rtom_elem *const elem)
     {
         elem->impl_
             = *ccc_impl_rom_elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_);
-        memcpy((void *)e->impl_.entry_.e_,
-               struct_base(e->impl_.rom_, &elem->impl_),
+        memcpy(e->impl_.entry_.e_, struct_base(e->impl_.rom_, &elem->impl_),
                e->impl_.rom_->elem_sz_);
-        return (void *)e->impl_.entry_.e_;
+        return e->impl_.entry_.e_;
     }
     return maybe_alloc_insert(
         e->impl_.rom_,
@@ -705,8 +708,7 @@ insert_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *z_p_of_xy,
     else
     {
         assert(is_1_child(rom, z_p_of_xy, y));
-        rotate(rom, x, y, y->branch_[p_to_x_dir], p_to_x_dir);
-        rotate(rom, y->parent_, y, y->branch_[!p_to_x_dir], !p_to_x_dir);
+        double_rotate(rom, z_p_of_xy, x, y, p_to_x_dir);
         assert(y->branch_[p_to_x_dir] == x);
         assert(y->branch_[!p_to_x_dir] == z_p_of_xy);
         promote(rom, y);
@@ -845,22 +847,19 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom,
         struct ccc_rtom_elem_ *const v = y->branch_[z_to_x_dir];
         assert(is_2_child(rom, y, w));
         assert(is_1_child(rom, y, v));
-        rotate(rom, y, v, v->branch_[!z_to_x_dir], !z_to_x_dir);
-        rotate(rom, v->parent_, v, v->branch_[z_to_x_dir], z_to_x_dir);
+        double_rotate(rom, z, y, v, !z_to_x_dir);
         assert(v->branch_[z_to_x_dir] == z);
         assert(v->branch_[!z_to_x_dir] == y);
         double_promote(rom, v);
         demote(rom, y);
         double_demote(rom, z);
-        /* At this point, the original paper mentions "Rebalancing with
-           Promotion," and defines it as follows:
+        /* Optional "Rebalancing with Promotion," defined as follows:
                if node z is a non-leaf 1,1 node, we promote it; otherwise, if y
                is a non-leaf 1,1 node, we promote it. (See Figure 4.)
                (Haeupler et. al. 2014, 17).
            This reduces constants in some of theorems mentioned in the paper
-           but I am not sure if it is worth including as it does not ultimately
-           improve the worst case rotations to less than 2. This should be
-           revisited after more performance testing code is in place. */
+           but may not be worth doing. Rotations stay at 2 worst case. Should
+           revisit after more performance testing. */
         if (!is_leaf(rom, z)
             && is_11_parent(rom, z->branch_[L], z, z->branch_[R]))
         {
@@ -897,12 +896,21 @@ transplant(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove,
     replacement->parity_ = remove->parity_;
 }
 
+/** A single rotation is symmetric. Here is the right case. Lowercase are nodes
+and uppercase are arbitrary subtrees.
+        z            x
+      /   \        /   \
+     x     C      A     z
+    / \      ->        / \
+   A   y              y   C
+       |              |
+       B              B*/
 static inline void
-rotate(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const p_of_x,
+rotate(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const z_p_of_x,
        struct ccc_rtom_elem_ *const x_p_of_y, struct ccc_rtom_elem_ *const y,
        enum rtom_link_ dir)
 {
-    struct ccc_rtom_elem_ *const p_of_p_of_x = p_of_x->parent_;
+    struct ccc_rtom_elem_ *const p_of_p_of_x = z_p_of_x->parent_;
     x_p_of_y->parent_ = p_of_p_of_x;
     if (p_of_p_of_x == &rom->end_)
     {
@@ -910,12 +918,52 @@ rotate(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const p_of_x,
     }
     else
     {
-        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == p_of_x] = x_p_of_y;
+        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = x_p_of_y;
     }
-    x_p_of_y->branch_[dir] = p_of_x;
-    p_of_x->parent_ = x_p_of_y;
-    p_of_x->branch_[!dir] = y;
-    y->parent_ = p_of_x;
+    x_p_of_y->branch_[dir] = z_p_of_x;
+    z_p_of_x->parent_ = x_p_of_y;
+    z_p_of_x->branch_[!dir] = y;
+    y->parent_ = z_p_of_x;
+}
+
+/** A double rotation shouldn't actually be two calls to rotate because that
+would invoke pointless memory writes. Here is an example of double right.
+Lowercase are nodes and uppercase are arbitrary subtrees.
+
+        z            y
+      /   \        /   \
+     x     D      x     z
+    / \      ->  / \   / \
+   A   y        A   B C   D
+      / \
+     B   C */
+static inline void
+double_rotate(struct ccc_rtom_ *const rom,
+              struct ccc_rtom_elem_ *const z_p_of_x,
+              struct ccc_rtom_elem_ *const x_p_of_y,
+              struct ccc_rtom_elem_ *const y, enum rtom_link_ dir)
+{
+    struct ccc_rtom_elem_ *const p_of_p_of_x = z_p_of_x->parent_;
+    y->parent_ = p_of_p_of_x;
+    if (p_of_p_of_x == &rom->end_)
+    {
+        rom->root_ = y;
+    }
+    else
+    {
+        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = y;
+    }
+    /* Fix x. */
+    x_p_of_y->branch_[!dir] = y->branch_[dir];
+    y->branch_[dir]->parent_ = x_p_of_y;
+    y->branch_[dir] = x_p_of_y;
+    x_p_of_y->parent_ = y;
+
+    /* Fix z. */
+    z_p_of_x->branch_[dir] = y->branch_[!dir];
+    y->branch_[!dir]->parent_ = z_p_of_x;
+    y->branch_[!dir] = z_p_of_x;
+    z_p_of_x->parent_ = y;
 }
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
