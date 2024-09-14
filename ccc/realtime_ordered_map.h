@@ -164,9 +164,6 @@ bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
 
 #ifdef REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-typedef ccc_rtom_elem rtom_elem;
-typedef ccc_realtime_ordered_map realtime_ordered_map;
-typedef ccc_rtom_entry rtom_entry;
 #    define ROM_INIT(args...) CCC_ROM_INIT(args)
 #    define ROM_ENTRY(args...) CCC_ROM_ENTRY(args)
 #    define ROM_GET(args...) CCC_ROM_GET(args)

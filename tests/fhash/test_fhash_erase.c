@@ -38,7 +38,7 @@ static enum test_result
 fhash_test_erase(void)
 {
     struct val vals[2] = {{0}, {0}};
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -69,7 +69,7 @@ fhash_test_erase(void)
 static enum test_result
 fhash_test_shuffle_insert_erase(void)
 {
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");

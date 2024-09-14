@@ -43,7 +43,7 @@ main()
 static enum test_result
 rtomap_test_insert_one(void)
 {
-    realtime_ordered_map s
+    ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
@@ -58,7 +58,7 @@ rtomap_test_insert_one(void)
 static enum test_result
 rtomap_test_insert_macros(void)
 {
-    realtime_ordered_map s
+    ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val *v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
     CHECK(v != NULL, true, "%d");
@@ -88,7 +88,7 @@ rtomap_test_insert_macros(void)
 static enum test_result
 rtomap_test_insert_shuffle(void)
 {
-    realtime_ordered_map s
+    ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
@@ -111,7 +111,7 @@ rtomap_test_insert_shuffle(void)
 static enum test_result
 rtomap_test_insert_weak_srand(void)
 {
-    realtime_ordered_map s
+    ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */

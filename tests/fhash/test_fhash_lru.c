@@ -23,7 +23,7 @@ struct key_val
 
 struct lru_cache
 {
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_doubly_linked_list l;
     size_t cap;
 };
@@ -32,7 +32,7 @@ struct lru_lookup
 {
     int key;
     struct key_val *kv_in_list;
-    fh_map_elem hash_elem;
+    ccc_fh_map_elem hash_elem;
 };
 
 enum lru_call
@@ -140,7 +140,7 @@ run_lru_cache(void)
 static void
 lru_put(struct lru_cache *const lru, int const key, int const val)
 {
-    fh_map_entry *ent = entry_vr(&lru->fh, &key);
+    ccc_fh_map_entry *ent = entry_vr(&lru->fh, &key);
     struct lru_lookup const *const found = unwrap(ent);
     if (found)
     {

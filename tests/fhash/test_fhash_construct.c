@@ -43,7 +43,7 @@ static enum test_result
 fhash_test_empty(void)
 {
     struct val vals[2] = {{0}, {0}};
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -55,13 +55,13 @@ static enum test_result
 fhash_test_entry_functional(void)
 {
     struct val vals[2] = {{0}, {0}};
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(fhm_empty(&fh), true, "%d");
     struct val def = {.id = 137, .val = 0};
-    fh_map_entry ent = fhm_entry(&fh, &def.id);
+    ccc_fh_map_entry ent = fhm_entry(&fh, &def.id);
     CHECK(fhm_unwrap(&ent) == NULL, true, "%d");
     struct val *v = fhm_or_insert(fhm_entry_vr(&fh, &def.id), &def.e);
     CHECK(v != NULL, true, "%d");
@@ -80,7 +80,7 @@ static enum test_result
 fhash_test_entry_macros(void)
 {
     struct val vals[2] = {{0}, {0}};
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -108,7 +108,7 @@ static enum test_result
 fhash_test_entry_and_modify_functional(void)
 {
     struct val vals[2] = {{0}, {0}};
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
@@ -116,7 +116,7 @@ fhash_test_entry_and_modify_functional(void)
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    fh_map_entry ent = fhm_and_modify(fhm_entry_vr(&fh, &def.id), mod);
+    ccc_fh_map_entry ent = fhm_and_modify(fhm_entry_vr(&fh, &def.id), mod);
     CHECK(fhm_occupied(&ent), false, "%d");
     CHECK((fhm_unwrap(&ent) == NULL), true, "%d");
 
@@ -152,14 +152,14 @@ static enum test_result
 fhash_test_entry_and_modify_macros(void)
 {
     struct val vals[2] = {{0}, {0}};
-    flat_hash_map fh;
+    ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, "%d");
     CHECK(fhm_empty(&fh), true, "%d");
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    fh_map_entry *ent = FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), mod);
+    ccc_fh_map_entry *ent = FHM_AND_MODIFY(FHM_ENTRY(&fh, 137), mod);
     CHECK(fhm_occupied(ent), false, "%d");
     CHECK((fhm_unwrap(ent) == NULL), true, "%d");
 
