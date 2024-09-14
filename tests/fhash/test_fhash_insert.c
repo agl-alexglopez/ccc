@@ -69,7 +69,7 @@ fhash_test_insert(void)
     ccc_entry ent = insert(&fh, &query.e);
     CHECK(occupied(&ent), false, "%d");
     CHECK(unwrap(&ent), NULL, "%p");
-    CHECK(fhm_size(&fh), 1, "%zu");
+    CHECK(size(&fh), 1, "%zu");
     return PASS;
 }
 
@@ -165,7 +165,7 @@ fhash_test_entry_api_functional(void)
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2) / 2, "%zu");
+    CHECK(size(&fh), (size / 2) / 2, "%zu");
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -186,7 +186,7 @@ fhash_test_entry_api_functional(void)
         }
         CHECK(d->val % 2, true, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2), "%zu");
+    CHECK(size(&fh), (size / 2), "%zu");
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (size_t i = 0; i < size / 2; ++i)
@@ -198,7 +198,7 @@ fhash_test_entry_api_functional(void)
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2), "%zu");
+    CHECK(size(&fh), (size / 2), "%zu");
     return PASS;
 }
 
@@ -226,7 +226,7 @@ fhash_test_insert_via_entry(void)
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2) / 2, "%zu");
+    CHECK(size(&fh), (size / 2) / 2, "%zu");
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -246,7 +246,7 @@ fhash_test_insert_via_entry(void)
             CHECK(d->val % 2, true, "%d");
         }
     }
-    CHECK(fhm_size(&fh), (size / 2), "%zu");
+    CHECK(size(&fh), (size / 2), "%zu");
     return PASS;
 }
 
@@ -271,7 +271,7 @@ fhash_test_insert_via_entry_macros(void)
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2) / 2, "%zu");
+    CHECK(size(&fh), (size / 2) / 2, "%zu");
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -289,7 +289,7 @@ fhash_test_insert_via_entry_macros(void)
             CHECK(d->val % 2, true, "%d");
         }
     }
-    CHECK(fhm_size(&fh), (size / 2), "%zu");
+    CHECK(size(&fh), (size / 2), "%zu");
     return PASS;
 }
 
@@ -316,7 +316,7 @@ fhash_test_entry_api_macros(void)
         CHECK(d->id, i, "%d");
         CHECK(d->val, i, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2) / 2, "%zu");
+    CHECK(size(&fh), (size / 2) / 2, "%zu");
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
@@ -336,7 +336,7 @@ fhash_test_entry_api_macros(void)
         }
         CHECK(d->val % 2, true, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2), "%zu");
+    CHECK(size(&fh), (size / 2), "%zu");
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
@@ -347,7 +347,7 @@ fhash_test_entry_api_macros(void)
         /* All values in the array should be odd now */
         CHECK(v->val % 2 == 0, true, "%d");
     }
-    CHECK(fhm_size(&fh), (size / 2), "%zu");
+    CHECK(size(&fh), (size / 2), "%zu");
     return PASS;
 }
 
@@ -376,7 +376,7 @@ fhash_test_two_sum(void)
         FHM_INSERT_ENTRY(FHM_ENTRY(&fh, addends[i]),
                          (struct val){.id = addends[i], .val = i});
     }
-    CHECK(fhm_size(&fh), indices[0], "%zu");
+    CHECK(size(&fh), indices[0], "%zu");
     CHECK(indices[0], correct[0], "%d");
     CHECK(indices[1], correct[1], "%d");
     return PASS;
@@ -405,7 +405,7 @@ fhash_test_resize(void)
         CHECK(v->val, i, "%d", vals);
         CHECK(fhm_validate(&fh), true, "%d", vals);
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu", vals);
+    CHECK(size(&fh), to_insert, "%zu", vals);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -441,7 +441,7 @@ fhash_test_resize_macros(void)
         CHECK(v->id, shuffled_index, "%d", vals);
         CHECK(v->val, i, "%d", vals);
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu", vals);
+    CHECK(size(&fh), to_insert, "%zu", vals);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -481,7 +481,7 @@ fhash_test_resize_from_null(void)
         CHECK(v->id, shuffled_index, "%d", ccc_buf_base(&fh.impl_.buf_));
         CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu", ccc_buf_base(&fh.impl_.buf_));
+    CHECK(size(&fh), to_insert, "%zu", ccc_buf_base(&fh.impl_.buf_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -516,7 +516,7 @@ fhash_test_resize_from_null_macros(void)
         CHECK(v->id, shuffled_index, "%d", ccc_buf_base(&fh.impl_.buf_));
         CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu", ccc_buf_base(&fh.impl_.buf_));
+    CHECK(size(&fh), to_insert, "%zu", ccc_buf_base(&fh.impl_.buf_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -564,40 +564,40 @@ fhash_test_insert_limit(void)
         CHECK(v->val, i, "%d");
         last_index = shuffled_index;
     }
-    size_t const final_size = fhm_size(&fh);
+    size_t const final_size = size(&fh);
     /* The last successful entry is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
     ccc_entry ent = insert(&fh, &v.e);
     CHECK(unwrap(&ent) != NULL, true, "%d");
     CHECK(insert_error(&ent), false, "%d");
-    CHECK(fhm_size(&fh), final_size, "%zu");
+    CHECK(size(&fh), final_size, "%zu");
 
     v = (struct val){.id = last_index, .val = -2};
     struct val *in_table = insert_entry(entry_vr(&fh, &v.id), &v.e);
     CHECK(in_table != NULL, true, "%d");
     CHECK(in_table->val, -2, "%d");
-    CHECK(fhm_size(&fh), final_size, "%zu");
+    CHECK(size(&fh), final_size, "%zu");
 
     in_table = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, last_index),
                                 (struct val){.id = last_index, .val = -3});
     CHECK(in_table != NULL, true, "%d");
     CHECK(in_table->val, -3, "%d");
-    CHECK(fhm_size(&fh), final_size, "%zu");
+    CHECK(size(&fh), final_size, "%zu");
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct val){.id = shuffled_index, .val = -4};
     in_table = insert_entry(entry_vr(&fh, &v.id), &v.e);
     CHECK(in_table == NULL, true, "%d");
-    CHECK(fhm_size(&fh), final_size, "%zu");
+    CHECK(size(&fh), final_size, "%zu");
 
     in_table = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
                                 (struct val){.id = shuffled_index, .val = -4});
     CHECK(in_table == NULL, true, "%d");
-    CHECK(fhm_size(&fh), final_size, "%zu");
+    CHECK(size(&fh), final_size, "%zu");
 
     ent = insert(&fh, &v.e);
     CHECK(unwrap(&ent) == NULL, true, "%d");
     CHECK(insert_error(&ent), true, "%d");
-    CHECK(fhm_size(&fh), final_size, "%zu");
+    CHECK(size(&fh), final_size, "%zu");
     return PASS;
 }

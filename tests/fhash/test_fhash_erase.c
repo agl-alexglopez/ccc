@@ -90,7 +90,7 @@ fhash_test_shuffle_insert_erase(void)
     int i = 0;
     while (!empty(&fh) && cur_size)
     {
-        CHECK(fhm_contains(&fh, &i), true, "%d");
+        CHECK(contains(&fh, &i), true, "%d");
         if (i % 2)
         {
             struct val swap_slot = {.id = i};
@@ -101,7 +101,7 @@ fhash_test_shuffle_insert_erase(void)
         }
         else
         {
-            ccc_entry removed = remove_entry(FHM_ENTRY(&fh, i));
+            ccc_entry removed = remove_entry(entry_vr(&fh, &i));
             CHECK(occupied(&removed), true, "%d");
         }
         --cur_size;
