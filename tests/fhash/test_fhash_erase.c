@@ -79,7 +79,7 @@ fhash_test_shuffle_insert_erase(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(fhm_entry_vr(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true, "%d");
         CHECK(v->id, shuffled_index, "%d");
         CHECK(v->val, i, "%d");

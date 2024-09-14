@@ -62,24 +62,24 @@ rtomap_test_insert_macros(void)
         = ROM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val *v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
     CHECK(v != NULL, true, "%d");
-    CHECK(rom_size(&s), 1, "%zu");
+    CHECK(size(&s), 1, "%zu");
     v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 0, "%d");
-    CHECK(rom_size(&s), 1, "%zu");
+    CHECK(size(&s), 1, "%zu");
     v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
     CHECK(v != NULL, true, "%d");
     v->id++;
     CHECK(v->id, 1, "%d");
     CHECK(v != NULL, true, "%d");
-    CHECK(rom_size(&s), 1, "%zu");
+    CHECK(size(&s), 1, "%zu");
     v = ROM_INSERT_ENTRY(ROM_ENTRY(&s, 0), (struct val){.id = 3, .val = 0});
     CHECK(v != NULL, true, "%d");
-    CHECK(rom_size(&s), 1, "%zu");
+    CHECK(size(&s), 1, "%zu");
     CHECK(v->id, 3, "%d");
     v = ROM_INSERT_ENTRY(ROM_ENTRY(&s, 7), (struct val){.val = 7});
     CHECK(v != NULL, true, "%d");
-    CHECK(rom_size(&s), 2, "%zu");
+    CHECK(size(&s), 2, "%zu");
     CHECK(v->val, 7, "%d");
     rom_clear_and_free(&s, NULL);
     return PASS;
@@ -125,6 +125,6 @@ rtomap_test_insert_weak_srand(void)
         (void)insert(&s, &vals[i].elem);
         CHECK(rom_validate(&s), true, "%d");
     }
-    CHECK(rom_size(&s), (size_t)num_nodes, "%zu");
+    CHECK(size(&s), (size_t)num_nodes, "%zu");
     return PASS;
 }

@@ -103,7 +103,7 @@ map_test_iterate_removal(void)
         next = next(&s, &i->elem);
         if (i->val > limit)
         {
-            (void)ccc_om_remove(&s, &i->elem);
+            (void)remove(&s, &i->elem);
             CHECK(ccc_om_validate(&s), true, "%d");
         }
     }
@@ -137,7 +137,7 @@ map_test_iterate_remove_reinsert(void)
         next = next(&s, &i->elem);
         if (i->val < limit)
         {
-            (void)ccc_om_remove(&s, &i->elem);
+            (void)remove(&s, &i->elem);
             i->val = new_unique_entry_val;
             CHECK(insert_entry(entry_vr(&s, &i->val), &i->elem) != NULL, true,
                   "%d");

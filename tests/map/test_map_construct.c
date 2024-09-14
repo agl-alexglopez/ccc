@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "map_util.h"
 #include "ordered_map.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -32,6 +35,6 @@ map_test_empty(void)
 {
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(ccc_om_empty(&s), true, "%d");
+    CHECK(empty(&s), true, "%d");
     return PASS;
 }

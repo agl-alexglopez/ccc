@@ -123,7 +123,7 @@ map_test_weak_srand(void)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_om_contains(&s, &vals[i].val), true, "%d");
+        CHECK(contains(&s, &vals[i].val), true, "%d");
         (void)remove(&s, &vals[i].elem);
         CHECK(ccc_om_validate(&s), true, "%d");
     }
