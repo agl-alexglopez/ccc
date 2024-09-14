@@ -135,7 +135,7 @@ fhash_test_insert_then_bad_ideas(void)
     CHECK(q.val, 99, "%d");
     q.val -= 9;
 
-    v = fhm_get(&fh, &q.id);
+    v = get_key_val(&fh, &q.id);
     CHECK(v != NULL, true, "%d");
     CHECK(v->val, 100, "%d");
     CHECK(q.val, 90, "%d");
@@ -172,7 +172,7 @@ fhash_test_entry_api_functional(void)
         def.id = (int)i;
         def.val = (int)i;
         struct val const *const d = or_insert(
-            and_modify_vr(entry_vr(&fh, &def.id), fhash_modplus), &def.e);
+            and_modify(entry_vr(&fh, &def.id), fhash_modplus), &def.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true, "%d");
         CHECK(d->id, i, "%d");
@@ -366,7 +366,7 @@ fhash_test_two_sum(void)
     int indices[2] = {-1, -1};
     for (int i = 0; i < 10; ++i)
     {
-        struct val const *const v = FHM_GET(&fh, target - addends[i]);
+        struct val const *const v = FHM_GET_KEY_VAL(&fh, target - addends[i]);
         if (v)
         {
             indices[0] = i;
@@ -455,7 +455,7 @@ fhash_test_resize_macros(void)
             = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
         CHECK(v == NULL, false, "%d");
         v->val = i;
-        v = FHM_GET_MUT(&fh, shuffled_index);
+        v = FHM_GET_KEY_VAL(&fh, shuffled_index);
         CHECK(v != NULL, true, "%d", vals);
         CHECK(v->val, i, "%d", vals);
     }
@@ -531,7 +531,7 @@ fhash_test_resize_from_null_macros(void)
             = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
         CHECK(v == NULL, false, "%d");
         v->val = i;
-        v = FHM_GET_MUT(&fh, shuffled_index);
+        v = FHM_GET_KEY_VAL(&fh, shuffled_index);
         CHECK(v == NULL, false, "%d", ccc_buf_base(&fh.impl_.buf_));
         CHECK(v->val, i, "%d", ccc_buf_base(&fh.impl_.buf_));
     }

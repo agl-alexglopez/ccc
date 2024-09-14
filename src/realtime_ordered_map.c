@@ -168,17 +168,11 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
     return CCC_EQL == find(&rom->impl_, key).last_cmp_;
 }
 
-void const *
-ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key)
+void *
+ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key)
 {
     struct rtom_query q = find(&rom->impl_, key);
     return (CCC_EQL == q.last_cmp_) ? struct_base(&rom->impl_, q.found_) : NULL;
-}
-
-void *
-ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key)
-{
-    return (void *)ccc_rom_get(rom, key);
 }
 
 ccc_entry
@@ -284,24 +278,24 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     return (ccc_entry){{.e_ = removed, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
-ccc_rtom_entry
-ccc_rom_and_modify(ccc_rtom_entry const *e, ccc_update_fn *fn)
+ccc_rtom_entry *
+ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){.container = e->impl_.entry_.e_, NULL});
     }
-    return *e;
+    return e;
 }
 
-ccc_rtom_entry
-ccc_rom_and_modify_with(ccc_rtom_entry const *e, ccc_update_fn *fn, void *aux)
+ccc_rtom_entry *
+ccc_rom_and_modify_with(ccc_rtom_entry *e, ccc_update_fn *fn, void *aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){.container = e->impl_.entry_.e_, aux});
     }
-    return *e;
+    return e;
 }
 
 void *

@@ -465,7 +465,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     }
     if (success)
     {
-        struct parent_cell const *cell = get(&parent_map, &cur);
+        struct parent_cell const *cell = get_key_val(&parent_map, &cur);
         assert(cell);
         struct edge edge = {
             .n = {.name = dst->name, .cost = 0},
@@ -473,7 +473,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         };
         while (cell->parent.r > 0)
         {
-            cell = get(&parent_map, &cell->parent);
+            cell = get_key_val(&parent_map, &cell->parent);
             if (!cell)
             {
                 quit("Cannot find cell parent to rebuild path.\n", 1);
@@ -718,7 +718,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         }
         for (int i = 0; i < MAX_DEGREE && cur->v->edges[i].name; ++i)
         {
-            struct prev_vertex *next = FHM_GET_MUT(
+            struct prev_vertex *next = FHM_GET_KEY_VAL(
                 &prev_map, vertex_at(graph, cur->v->edges[i].name));
             assert(next);
             /* The seen map also holds a pointer to the corresponding
@@ -740,13 +740,13 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = FHM_GET(&prev_map, v);
+        struct prev_vertex const *prev = FHM_GET_KEY_VAL(&prev_map, v);
         assert(prev);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = FHM_GET(&prev_map, prev->prev);
+            prev = FHM_GET_KEY_VAL(&prev_map, prev->prev);
             assert(prev);
         }
     }

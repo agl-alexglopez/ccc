@@ -30,14 +30,8 @@
 
 #define ccc_and_modify(entry_ptr, mod_fn) ccc_impl_and_modify(entry_ptr, mod_fn)
 
-#define ccc_and_modify_vr(entry_ptr, mod_fn)                                   \
-    ccc_impl_and_modify_vr(entry_ptr, mod_fn)
-
 #define ccc_and_modify_with(entry_ptr, mod_fn, aux_data_ptr)                   \
     ccc_impl_and_modify_with(entry_ptr, mod_fn, aux_data_ptr)
-
-#define ccc_and_modify_with_vr(entry_ptr, mod_fn, aux_data_ptr)                \
-    ccc_impl_and_modify_with_vr(entry_ptr, mod_fn, aux_data_ptr)
 
 #define ccc_insert_entry(entry_ptr, key_val_container_handle_ptr)              \
     ccc_impl_insert_entry(entry_ptr, key_val_container_handle_ptr)
@@ -53,10 +47,8 @@
 
 /*======================    Misc Search API  ================================*/
 
-#define ccc_get(container_ptr, key_ptr) ccc_impl_get(container_ptr, key_ptr)
-
-#define ccc_get_mut(container_ptr, key_ptr)                                    \
-    ccc_impl_get_mut(container_ptr, key_ptr)
+#define ccc_get_key_val(container_ptr, key_ptr)                                \
+    ccc_impl_get_key_val(container_ptr, key_ptr)
 
 #define ccc_contains(container_ptr, key_ptr)                                   \
     ccc_impl_contains(container_ptr, key_ptr)
@@ -155,10 +147,6 @@
         ccc_and_modify(container_entry_ptr, mod_fn)
 #    define and_modify_with(container_entry_ptr, mod_fn, aux_data_ptr)         \
         ccc_and_modify_with(container_entry_ptr, mod_fn, aux_data_ptr)
-#    define and_modify_vr(container_entry_ptr, mod_fn)                         \
-        ccc_and_modify_vr(container_entry_ptr, mod_fn)
-#    define and_modify_with_vr(container_entry_ptr, mod_fn, aux_data_ptr)      \
-        ccc_and_modify_with_vr(container_entry_ptr, mod_fn, aux_data_ptr)
 #    define occupied(basic_entry_ptr) ccc_occupied(basic_entry_ptr)
 #    define insert_error(basic_entry_ptr) ccc_insert_error(basic_entry_ptr)
 #    define unwrap(basic_entry_ptr) ccc_unwrap(basic_entry_ptr)
@@ -193,8 +181,10 @@
 #    define erase(container_ptr, container_handle_ptr)                         \
         ccc_erase(container_ptr, container_handle_ptr)
 
-#    define get(container_ptr, key_ptr) ccc_get(container_ptr, key_ptr)
-#    define get_mut(container_ptr, key_ptr) ccc_get_mut(container_ptr, key_ptr)
+#    define get_key_val(container_ptr, key_ptr)                                \
+        ccc_get_key_val(container_ptr, key_ptr)
+#    define get_mut(container_ptr, key_ptr)                                    \
+        ccc_get_key_val_mut(container_ptr, key_ptr)
 #    define contains(container_ptr, key_ptr)                                   \
         ccc_contains(container_ptr, key_ptr)
 

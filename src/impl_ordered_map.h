@@ -27,21 +27,18 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         om_entry_;                                                             \
     })
 
-#define CCC_IMPL_OM_GET(ordered_map_ptr, key...)                               \
+#define CCC_IMPL_OM_GET_KEY_VAL(ordered_map_ptr, key...)                       \
     ({                                                                         \
         __auto_type const om_key_ = key;                                       \
         struct ccc_fhm_entry_ om_get_ent_                                      \
             = ccc_impl_om_entry(&(ordered_map_ptr)->impl_, &om_key_);          \
-        void const *om_get_res_ = NULL;                                        \
+        void *om_get_res_ = NULL;                                              \
         if (om_get_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                    \
         {                                                                      \
             om_get_res_ = om_get_ent_.entry_.e_;                               \
         }                                                                      \
         om_get_res_;                                                           \
     })
-
-#define CCC_IMPL_OM_GET_MUT(ordered_map_ptr, key...)                           \
-    (void *)CCC_IMPL_OM_GET(fhash_ptr, key)
 
 #define CCC_IMPL_OM_AND_MODIFY(ordered_map_entry, mod_fn)                      \
     ({                                                                         \

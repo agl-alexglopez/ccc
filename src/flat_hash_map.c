@@ -100,13 +100,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
 }
 
 void *
-ccc_fhm_get_mut(ccc_flat_hash_map *const h, void const *const key)
-{
-    return (void *)ccc_fhm_get(h, key);
-}
-
-void const *
-ccc_fhm_get(ccc_flat_hash_map *const h, void const *const key)
+ccc_fhm_get_key_val(ccc_flat_hash_map *const h, void const *const key)
 {
     struct ccc_entry_ e = ccc_impl_fhm_find(
         &h->impl_, key, ccc_impl_fhm_filter(&h->impl_, key));
@@ -128,32 +122,31 @@ ccc_fhm_remove_entry(ccc_fh_map_entry const *const e)
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
-ccc_fh_map_entry
-ccc_fhm_and_modify(ccc_fh_map_entry const *const e, ccc_update_fn *const fn)
+ccc_fh_map_entry *
+ccc_fhm_and_modify(ccc_fh_map_entry *const e, ccc_update_fn *const fn)
 {
-    return (ccc_fh_map_entry){ccc_impl_fhm_and_modify(&e->impl_, fn)};
+    return (ccc_fh_map_entry *)ccc_impl_fhm_and_modify(&e->impl_, fn);
 }
 
-struct ccc_fhm_entry_
-ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ const *const e,
-                        ccc_update_fn *const fn)
+struct ccc_fhm_entry_ *
+ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ *const e, ccc_update_fn *const fn)
 {
     if (e->entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){e->entry_.e_, NULL});
     }
-    return *e;
+    return e;
 }
 
-ccc_fh_map_entry
-ccc_fhm_and_modify_with(ccc_fh_map_entry const *const e,
-                        ccc_update_fn *const fn, void *aux)
+ccc_fh_map_entry *
+ccc_fhm_and_modify_with(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
+                        void *aux)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_update){e->impl_.entry_.e_, aux});
     }
-    return *e;
+    return e;
 }
 
 ccc_entry

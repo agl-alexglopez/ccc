@@ -56,8 +56,8 @@ void ccc_impl_fhm_insert(struct ccc_fhm_ *h, void const *e, uint64_t hash,
                          size_t cur_i);
 
 struct ccc_fhm_entry_ ccc_impl_fhm_entry(struct ccc_fhm_ *h, void const *key);
-struct ccc_fhm_entry_ ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ const *e,
-                                              ccc_update_fn *fn);
+struct ccc_fhm_entry_ *ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ *e,
+                                               ccc_update_fn *fn);
 struct ccc_fhm_elem_ *ccc_impl_fhm_in_slot(struct ccc_fhm_ const *h,
                                            void const *slot);
 void *ccc_impl_fhm_key_in_slot(struct ccc_fhm_ const *h, void const *slot);
@@ -74,24 +74,17 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
         fhm_ent_;                                                              \
     })
 
-#define CCC_IMPL_FHM_GET(flat_hash_map_ptr, key...)                            \
+#define CCC_IMPL_FHM_GET_KEY_VAL(flat_hash_map_ptr, key...)                    \
     ({                                                                         \
         __auto_type const fhm_key_ = key;                                      \
         struct ccc_fhm_entry_ fhm_get_ent_                                     \
             = ccc_impl_fhm_entry(&(flat_hash_map_ptr)->impl_, &fhm_key_);      \
-        void const *fhm_get_res_ = NULL;                                       \
+        void *fhm_get_res_ = NULL;                                             \
         if (fhm_get_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                   \
         {                                                                      \
             fhm_get_res_ = fhm_get_ent_.entry_.e_;                             \
         }                                                                      \
         fhm_get_res_;                                                          \
-    })
-
-#define CCC_IMPL_FHM_GET_MUT(flat_hash_map_ptr, key...)                        \
-    ({                                                                         \
-        void *fhm_get_mut_res_                                                 \
-            = (void *)CCC_IMPL_FHM_GET(flat_hash_map_ptr, key);                \
-        fhm_get_mut_res_;                                                      \
     })
 
 #define CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry, mod_fn)                   \

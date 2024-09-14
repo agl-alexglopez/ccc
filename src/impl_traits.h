@@ -85,52 +85,12 @@
         ccc_o_map_entry *: ccc_om_and_modify,                                  \
         ccc_rtom_entry *: ccc_rom_and_modify)((container_entry_ptr), (mod_fn))
 
-#define ccc_impl_and_modify_vr(container_entry_ptr, mod_fn)                    \
-    _Generic((container_entry_ptr),                                            \
-        ccc_fh_map_entry                                                       \
-            *: &(ccc_fh_map_entry){ccc_fhm_and_modify(                         \
-                                       (ccc_fh_map_entry                       \
-                                            *)(container_entry_ptr),           \
-                                       (mod_fn))                               \
-                                       .impl_},                                \
-        ccc_o_map_entry                                                        \
-            *: &(                                                              \
-                ccc_o_map_entry){ccc_om_and_modify(                            \
-                                     (ccc_o_map_entry *)(container_entry_ptr), \
-                                     (mod_fn))                                 \
-                                     .impl_},                                  \
-        ccc_rtom_entry                                                         \
-            *: &(ccc_rtom_entry){                                              \
-                ccc_rom_and_modify((ccc_rtom_entry *)(container_entry_ptr),    \
-                                   (mod_fn))                                   \
-                    .impl_})
-
 #define ccc_impl_and_modify_with(container_entry_ptr, mod_fn, aux_data_ptr)    \
     _Generic((container_entry_ptr),                                            \
         ccc_fh_map_entry *: ccc_fhm_and_modify_with,                           \
         ccc_o_map_entry *: ccc_om_and_modify_with,                             \
         ccc_rtom_entry *: ccc_rom_and_modify_with)((container_entry_ptr),      \
                                                    (mod_fn), (aux_data_ptr))
-
-#define ccc_impl_and_modify_with_vr(container_entry_ptr, mod_fn, aux_data_ptr) \
-    _Generic((container_entry_ptr),                                            \
-        ccc_fh_map_entry                                                       \
-            *: &(ccc_fh_map_entry){ccc_fhm_and_modify_with(                    \
-                                       (ccc_fh_map_entry                       \
-                                            *)(container_entry_ptr),           \
-                                       (mod_fn), (aux_data_ptr))               \
-                                       .impl_},                                \
-        ccc_o_map_entry                                                        \
-            *: &(                                                              \
-                ccc_o_map_entry){ccc_om_and_modify_with(                       \
-                                     (ccc_o_map_entry *)(container_entry_ptr), \
-                                     (mod_fn), (aux_data_ptr))                 \
-                                     .impl_},                                  \
-        ccc_rtom_entry                                                         \
-            *: &(ccc_rtom_entry){ccc_rom_and_modify_with(                      \
-                                     (ccc_rtom_entry *)(container_entry_ptr),  \
-                                     (mod_fn), (aux_data_ptr))                 \
-                                     .impl_})
 
 #define ccc_impl_insert_entry(container_entry_ptr,                             \
                               key_val_container_handle_ptr)                    \
@@ -170,18 +130,12 @@
 
 /*======================    Misc Search API  ================================*/
 
-#define ccc_impl_get(container_ptr, key_ptr)                                   \
+#define ccc_impl_get_key_val(container_ptr, key_ptr)                           \
     _Generic((container_ptr),                                                  \
-        ccc_flat_hash_map *: ccc_fhm_get,                                      \
-        ccc_ordered_map *: ccc_om_get,                                         \
-        ccc_realtime_ordered_map *: ccc_rom_get)((container_ptr), (key_ptr))
-
-#define ccc_impl_get_mut(container_ptr, key_ptr)                               \
-    _Generic((container_ptr),                                                  \
-        ccc_flat_hash_map *: ccc_fhm_get_mut,                                  \
-        ccc_ordered_map *: ccc_om_get_mut,                                     \
-        ccc_realtime_ordered_map *: ccc_rom_get_mut)((container_ptr),          \
-                                                     (key_ptr))
+        ccc_flat_hash_map *: ccc_fhm_get_key_val,                              \
+        ccc_ordered_map *: ccc_om_get_key_val,                                 \
+        ccc_realtime_ordered_map *: ccc_rom_get_key_val)((container_ptr),      \
+                                                         (key_ptr))
 
 #define ccc_impl_contains(container_ptr, key_ptr)                              \
     _Generic((container_ptr),                                                  \

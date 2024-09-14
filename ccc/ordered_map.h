@@ -54,11 +54,8 @@ typedef struct
         CCC_IMPL_OM_ENTRY(ordered_map_ptr, key)                                \
     }
 
-#define CCC_OM_GET(ordered_map_ptr, key...)                                    \
-    CCC_IMPL_OM_GET(ordered_map_ptr, key)
-
-#define CCC_OM_GET_MUT(ordered_map_ptr, key...)                                \
-    CCC_IMPL_OM_GET_MUT(ordered_map_ptr, key)
+#define CCC_OM_GET_KEY_VAL(ordered_map_ptr, key...)                            \
+    CCC_IMPL_OM_GET_KEY_VAL(ordered_map_ptr, key)
 
 #define CCC_OM_AND_MODIFY(ordered_map_entry_ptr, mod_fn)                       \
     &(ccc_o_ordered_map_entry_ptr)                                             \
@@ -80,9 +77,7 @@ typedef struct
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);
 
-void const *ccc_om_get(ccc_ordered_map *s, void const *key);
-
-void *ccc_om_get_mut(ccc_ordered_map *s, void const *key);
+void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
 
 /*===========================   Entry API   =================================*/
 
@@ -120,24 +115,12 @@ ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
         ccc_om_entry((ordered_map_ptr), (key_ptr)).impl_                       \
     }
 
-#define ccc_om_and_modify_vr(ordered_map_ptr, mod_fn)                          \
-    &(ccc_o_map_entry)                                                         \
-    {                                                                          \
-        ccc_om_and_modify((ordered_map_ptr), (mod_fn)).impl_                   \
-    }
-
-#define ccc_om_and_modify_with_vr(ordered_map_ptr, mod_fn, aux_data)           \
-    &(ccc_o_map_entry)                                                         \
-    {                                                                          \
-        ccc_om_and_modify((ordered_map_ptr), (mod_fn), (aux_data)).impl_       \
-    }
-
 ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
 
-ccc_o_map_entry ccc_om_and_modify(ccc_o_map_entry const *e, ccc_update_fn *fn);
+ccc_o_map_entry *ccc_om_and_modify(ccc_o_map_entry *e, ccc_update_fn *fn);
 
-ccc_o_map_entry ccc_om_and_modify_with(ccc_o_map_entry const *e,
-                                       ccc_update_fn *fn, void *aux);
+ccc_o_map_entry *ccc_om_and_modify_with(ccc_o_map_entry *e, ccc_update_fn *fn,
+                                        void *aux);
 
 void *ccc_om_or_insert(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
 
@@ -188,8 +171,7 @@ typedef ccc_ordered_map ordered_map;
 typedef ccc_o_map_entry o_map_entry;
 #    define OM_INIT(args...) CCC_OM_INIT(args)
 #    define OM_ENTRY(args...) CCC_OM_ENTRY(args)
-#    define OM_GET(args...) CCC_OM_GET(args)
-#    define OM_GET_MUT(args...) CCC_OM_GET_MUT(args)
+#    define OM_GET_KEY_VAL(args...) CCC_OM_GET_KEY_VAL(args)
 #    define OM_AND_MODIFY(args...) CCC_OM_AND_MODIFY(args)
 #    define OM_AND_MODIFY_W(args...) CCC_OM_AND_MODIFY_W(args)
 #    define OM_OR_INSERT(args...) CCC_OM_OR_INSERT(args)
@@ -201,7 +183,7 @@ typedef ccc_o_map_entry o_map_entry;
 #    define om_and_modify_vr(args...) ccc_om_and_modify_vr(args)
 #    define om_and_modify_with_vr(args...) ccc_om_and_modify_with_vr(args)
 #    define om_contains(args...) ccc_om_contains(args)
-#    define om_get(args...) ccc_om_get(args)
+#    define om_get_key_val(args...) ccc_om_get_key_val(args)
 #    define om_get_mut(args...) ccc_om_get_mut(args)
 #    define om_insert(args...) ccc_om_insert(args)
 #    define om_remove(args...) ccc_om_remove(args)

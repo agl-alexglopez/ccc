@@ -100,7 +100,7 @@ map_test_insert_erase_shuffled(void)
         CHECK(v->val, vals[i].val, "%d");
         CHECK(ccc_om_validate(&s), true, "%d");
     }
-    CHECK(ccc_om_empty(&s), true, "%d");
+    CHECK(empty(&s), true, "%d");
     return PASS;
 }
 
@@ -127,6 +127,6 @@ map_test_weak_srand(void)
         (void)remove(&s, &vals[i].elem);
         CHECK(ccc_om_validate(&s), true, "%d");
     }
-    CHECK(ccc_om_empty(&s), true, "%d");
+    CHECK(empty(&s), true, "%d");
     return PASS;
 }

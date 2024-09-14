@@ -24,11 +24,11 @@ typedef struct
         CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)
 
-#define CCC_ROM_GET(realtime_ordered_map_ptr, key...)                          \
-    CCC_IMPL_ROM_GET(realtime_ordered_map_ptr, key)
+#define CCC_ROM_GET_KEY_VAL(realtime_ordered_map_ptr, key...)                  \
+    CCC_IMPL_ROM_GET_KEY_VAL(realtime_ordered_map_ptr, key)
 
-#define CCC_ROM_GET_MUT(realtime_ordered_map_ptr, key...)                      \
-    CCC_IMPL_ROM_GET_MUT(realtime_ordered_map_ptr, key)
+#define CCC_ROM_GET_KEY_VAL_MUT(realtime_ordered_map_ptr, key...)              \
+    CCC_IMPL_ROM_GET_KEY_VAL_MUT(realtime_ordered_map_ptr, key)
 
 #define CCC_ROM_ENTRY(realtime_ordered_map_ptr, key...)                        \
     &(ccc_rtom_entry)                                                          \
@@ -59,9 +59,7 @@ typedef struct
 
 bool ccc_rom_contains(ccc_realtime_ordered_map const *rom, void const *key);
 
-void const *ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key);
-
-void *ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key);
+void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
 
 /*======================      Entry API    ==================================*/
 
@@ -69,19 +67,6 @@ void *ccc_rom_get_mut(ccc_realtime_ordered_map const *rom, void const *key);
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
         ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
-    }
-
-#define ccc_rom_and_modify_vr(realtime_ordered_map_ptr, mod_fn)                \
-    &(ccc_rtom_entry)                                                          \
-    {                                                                          \
-        ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn)).impl_         \
-    }
-
-#define ccc_rom_and_modify_with_vr(realtime_ordered_map_ptr, mod_fn, aux_data) \
-    &(ccc_rtom_entry)                                                          \
-    {                                                                          \
-        ccc_rom_and_modify((realtime_ordered_map_ptr), (mod_fn), (aux_data))   \
-            .impl_                                                             \
     }
 
 #define ccc_rom_insert_vr(realtime_ordered_map_ptr, out_handle_ptr)            \
@@ -110,10 +95,10 @@ ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
 
 ccc_entry ccc_rom_remove_entry(ccc_rtom_entry const *e);
 
-ccc_rtom_entry ccc_rom_and_modify(ccc_rtom_entry const *e, ccc_update_fn *fn);
+ccc_rtom_entry *ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn);
 
-ccc_rtom_entry ccc_rom_and_modify_with(ccc_rtom_entry const *e,
-                                       ccc_update_fn *fn, void *aux);
+ccc_rtom_entry *ccc_rom_and_modify_with(ccc_rtom_entry *e, ccc_update_fn *fn,
+                                        void *aux);
 
 ccc_rtom_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
                              void const *key);
@@ -169,8 +154,7 @@ typedef ccc_realtime_ordered_map realtime_ordered_map;
 typedef ccc_rtom_entry rtom_entry;
 #    define ROM_INIT(args...) CCC_ROM_INIT(args)
 #    define ROM_ENTRY(args...) CCC_ROM_ENTRY(args)
-#    define ROM_GET(args...) CCC_ROM_GET(args)
-#    define ROM_GET_MUT(args...) CCC_ROM_GET_MUT(args)
+#    define ROM_GET_KEY_VAL(args...) CCC_ROM_GET_KEY_VAL(args)
 #    define ROM_AND_MODIFY(args...) CCC_ROM_AND_MODIFY(args)
 #    define ROM_AND_MODIFY_W(args...) CCC_ROM_AND_MODIFY_W(args)
 #    define ROM_OR_INSERT(args...) CCC_ROM_OR_INSERT(args)
@@ -182,7 +166,7 @@ typedef ccc_rtom_entry rtom_entry;
 #    define rom_and_modify_vr(args...) ccc_rom_and_modify_vr(args)
 #    define rom_and_modify_with_vr(args...) ccc_rom_and_modify_with_vr(args)
 #    define rom_contains(args...) ccc_rom_contains(args)
-#    define rom_get(args...) ccc_rom_get(args)
+#    define rom_get_key_val(args...) ccc_rom_get_key_val(args)
 #    define rom_get_mut(args...) ccc_rom_get_mut(args)
 #    define rom_insert(args...) ccc_rom_insert(args)
 #    define rom_remove(args...) ccc_rom_remove(args)

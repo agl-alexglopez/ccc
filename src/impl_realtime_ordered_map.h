@@ -67,21 +67,18 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         rom_ent_;                                                              \
     })
 
-#define CCC_IMPL_ROM_GET(realtime_ordered_map_ptr, key...)                     \
+#define CCC_IMPL_ROM_GET_KEY_VAL(realtime_ordered_map_ptr, key...)             \
     ({                                                                         \
         __auto_type rom_get_ent_key_ = key;                                    \
         struct ccc_rtom_entry_ rom_get_ent_ = ccc_impl_rom_entry(              \
             (realtime_ordered_map_ptr), &rom_get_ent_key_);                    \
-        void const *const rom_get_res_ = NULL;                                 \
+        void *const rom_get_res_ = NULL;                                       \
         if (rom_get_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                   \
         {                                                                      \
             rom_get_res_ = rom_get_ent_.entry_.e_;                             \
         }                                                                      \
         rom_get_res_;                                                          \
     })
-
-#define CCC_IMPL_ROM_GET_MUT(realtime_ordered_map_ptr, key...)                 \
-    (void *)CCC_IMPL_ROM_GET(realtime_ordered_map_ptr, key)
 
 #define CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry, mod_fn)            \
     ({                                                                         \

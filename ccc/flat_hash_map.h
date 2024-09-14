@@ -44,11 +44,8 @@ initialization is successful or a failure. */
     CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
-#define CCC_FHM_GET(flat_hash_map_ptr, key...)                                 \
-    CCC_IMPL_FHM_GET(flat_hash_map_ptr, key)
-
-#define CCC_FHM_GET_MUT(flat_hash_map_ptr, key...)                             \
-    CCC_IMPL_FHM_GET_MUT(flat_hash_map_ptr, key)
+#define CCC_FHM_GET_KEY_VAL(flat_hash_map_ptr, key...)                         \
+    CCC_IMPL_FHM_GET_KEY_VAL(flat_hash_map_ptr, key)
 
 #define CCC_FHM_ENTRY(flat_hash_map_ptr, key...)                               \
     &(ccc_fh_map_entry)                                                        \
@@ -80,17 +77,11 @@ initialization is successful or a failure. */
 @return true if the struct containing key is stored, false if not. */
 bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
 
-/** @brief Returns a read only reference into the table at entry key.
-@param [in] h the flat hash map to search.
-@param [in]*key the key to search matching stored key type.
-@return a read only view of the table entry if it is present, else NULL. */
-void const *ccc_fhm_get(ccc_flat_hash_map *h, void const *key);
-
 /** @brief Returns a reference into the table at entry key.
 @param [in] h the flat hash map to search.
 @param [in]*key the key to search matching stored key type.
 @return a view of the table entry if it is present, else NULL. */
-void *ccc_fhm_get_mut(ccc_flat_hash_map *h, void const *key);
+void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
 /*========================    Entry API    ==================================*/
 
@@ -131,18 +122,6 @@ ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
         ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl_                    \
     }
 
-#define ccc_fhm_and_modify_vr(entry_ptr, mod_fn)                               \
-    &(ccc_fh_map_entry)                                                        \
-    {                                                                          \
-        ccc_fhm_and_modify((entry_ptr), (mod_fn)).impl_                        \
-    }
-
-#define ccc_fhm_and_modify_with_vr(entry_ptr, mod_fn, aux_data_ptr)            \
-    &(ccc_fh_map_entry)                                                        \
-    {                                                                          \
-        ccc_fhm_and_modify_with((entry_ptr), (mod_fn), (aux_data_ptr)).impl_   \
-    }
-
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
 @param [in] key the key used to search the table matching the stored key type.
@@ -167,8 +146,7 @@ ccc_fh_map_entry ccc_fhm_entry(ccc_flat_hash_map *h, void const *key);
 This function is intended to make the function chaining in the Entry API more
 succinct if the entry will be modified in place based on its own value without
 the need of the auxilliary argument a ccc_update_fn can provide. */
-ccc_fh_map_entry ccc_fhm_and_modify(ccc_fh_map_entry const *e,
-                                    ccc_update_fn *fn);
+ccc_fh_map_entry *ccc_fhm_and_modify(ccc_fh_map_entry *e, ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -177,8 +155,8 @@ ccc_fh_map_entry ccc_fhm_and_modify(ccc_fh_map_entry const *e,
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-ccc_fh_map_entry ccc_fhm_and_modify_with(ccc_fh_map_entry const *e,
-                                         ccc_update_fn *fn, void *aux);
+ccc_fh_map_entry *ccc_fhm_and_modify_with(ccc_fh_map_entry *e,
+                                          ccc_update_fn *fn, void *aux);
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
@@ -318,15 +296,14 @@ typedef ccc_fh_map_elem fh_map_elem;
 typedef ccc_flat_hash_map flat_hash_map;
 typedef ccc_fh_map_entry fh_map_entry;
 #    define FHM_INIT(args...) CCC_FHM_INIT(args)
-#    define FHM_GET(args...) CCC_FHM_GET(args)
-#    define FHM_GET_MUT(args...) CCC_FHM_GET_MUT(args)
+#    define FHM_GET_KEY_VAL(args...) CCC_FHM_GET_KEY_VAL(args)
 #    define FHM_ENTRY(args...) CCC_FHM_ENTRY(args)
 #    define FHM_AND_MODIFY(args...) CCC_FHM_AND_MODIFY(args)
 #    define FHM_AND_MODIFY_W(args...) CCC_FHM_AND_MODIFY_W(args)
 #    define FHM_INSERT_ENTRY(args...) CCC_FHM_INSERT_ENTRY(args)
 #    define FHM_OR_INSERT(args...) CCC_FHM_OR_INSERT(args)
 #    define fhm_contains(args...) ccc_fhm_contains(args)
-#    define fhm_get(args...) ccc_fhm_get(args)
+#    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
 #    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
 #    define fhm_insert_vr(args...) ccc_fhm_insert_vr(args)
 #    define fhm_remove_vr(args...) ccc_fhm_remove_vr(args)

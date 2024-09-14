@@ -166,7 +166,7 @@ lru_put(struct lru_cache *const lru, int const key, int const val)
 static int
 lru_get(struct lru_cache *const lru, int const key)
 {
-    struct lru_lookup const *const found = get(&lru->fh, &key);
+    struct lru_lookup const *const found = get_key_val(&lru->fh, &key);
     if (!found)
     {
         return -1;

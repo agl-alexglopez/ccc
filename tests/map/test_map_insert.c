@@ -47,7 +47,7 @@ map_test_insert_one(void)
     single.val = 0;
     CHECK(insert_entry(entry_vr(&s, &single.val), &single.elem) != NULL, true,
           "%d");
-    CHECK(ccc_om_empty(&s), false, "%d");
+    CHECK(empty(&s), false, "%d");
     CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true, "%d");
     return PASS;
 }
@@ -60,11 +60,11 @@ map_test_insert_three(void)
     struct val swap_slot = {.val = 1, .id = 99};
     CHECK(occupied(insert_vr(&s, &swap_slot.elem)), false, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(ccc_om_size(&s), (size_t)1, "%zu");
+    CHECK(size(&s), (size_t)1, "%zu");
     swap_slot = (struct val){.val = 1, .id = 137};
     struct val const *ins = unwrap(insert_vr(&s, &swap_slot.elem));
     CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(ccc_om_size(&s), (size_t)1, "%zu");
+    CHECK(size(&s), (size_t)1, "%zu");
     CHECK(ins != NULL, true, "%d");
     CHECK(ins->val, 1, "%d");
     CHECK(ins->id, 137, "%d");
@@ -75,16 +75,16 @@ map_test_insert_three(void)
     CHECK(ins != NULL, true, "%d");
     CHECK(ins->id, 0, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(ccc_om_size(&s), (size_t)2, "%zu");
+    CHECK(size(&s), (size_t)2, "%zu");
     ins = CCC_OM_INSERT_ENTRY(CCC_OM_ENTRY(&s, 2),
                               (struct val){.val = 2, .id = 1});
     CHECK(ins != NULL, true, "%d");
     CHECK(ins->id, 1, "%d");
     CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(ccc_om_size(&s), (size_t)2, "%zu");
+    CHECK(size(&s), (size_t)2, "%zu");
     ins = CCC_OM_INSERT_ENTRY(CCC_OM_ENTRY(&s, 3), (struct val){.val = 3});
     CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(ccc_om_size(&s), (size_t)3, "%zu");
+    CHECK(size(&s), (size_t)3, "%zu");
     ccc_om_clear(&s, NULL);
     return PASS;
 }
@@ -115,7 +115,7 @@ map_test_struct_getter(void)
         struct val const *get = &tester_clone[i];
         CHECK(get->val, vals[i].val, "%d");
     }
-    CHECK(ccc_om_size(&s), (size_t)10, "%zu");
+    CHECK(size(&s), (size_t)10, "%zu");
     return PASS;
 }
 

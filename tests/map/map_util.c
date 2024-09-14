@@ -1,5 +1,8 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "map_util.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdio.h>
 
@@ -31,12 +34,12 @@ insert_shuffled(ccc_ordered_map *m, struct val vals[], size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        (void)ccc_om_insert(m, &vals[shuffled_index].elem);
-        CHECK(ccc_om_size(m), i + 1, "%zu");
+        (void)insert(m, &vals[shuffled_index].elem);
+        CHECK(size(m), i + 1, "%zu");
         CHECK(ccc_om_validate(m), true, "%d");
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_om_size(m), size, "%zu");
+    CHECK(size(m), size, "%zu");
     return PASS;
 }
 
@@ -44,12 +47,12 @@ insert_shuffled(ccc_ordered_map *m, struct val vals[], size_t const size,
 size_t
 inorder_fill(int vals[], size_t size, ccc_ordered_map *m)
 {
-    if (ccc_om_size(m) != size)
+    if (size(m) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_om_begin(m); e; e = ccc_om_next(m, &e->elem))
+    for (struct val *e = begin(m); e; e = next(m, &e->elem))
     {
         vals[i++] = e->val;
     }

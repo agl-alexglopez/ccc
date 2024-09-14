@@ -244,7 +244,8 @@ animate_maze(struct maze *maze)
                 continue;
             }
             int cur_weight = 0;
-            struct point_cost const *const found = get(&cell_costs, &next);
+            struct point_cost const *const found
+                = get_key_val(&cell_costs, &next);
             if (!found)
             {
                 struct point_cost *new_cost

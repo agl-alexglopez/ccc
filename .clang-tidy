@@ -29,7 +29,6 @@ CheckOptions:
    - { key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals, value: true }
    - { key: readability-identifier-naming.FunctionCase, value: lower_case }
    - { key: readability-identifier-naming.VariableCase, value: lower_case }
-   - { key: readability-identifier-naming.StructCase, value: lower_case }
    - { key: readability-function-cognitive-complexity.IgnoreMacros, value: true }
    - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
 
