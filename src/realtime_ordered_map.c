@@ -60,7 +60,7 @@ enum rtom_print_link_
     LEAF = 1    /* └── */
 };
 
-struct rtom_query_
+struct rtom_query
 {
     ccc_threeway_cmp last_cmp_;
     union {
@@ -83,7 +83,7 @@ static ccc_threeway_cmp cmp(struct ccc_rtom_ const *, void const *key,
                             ccc_key_cmp_fn *);
 static void *struct_base(struct ccc_rtom_ const *,
                          struct ccc_rtom_elem_ const *);
-static struct rtom_query_ find(struct ccc_rtom_ const *, void const *key);
+static struct rtom_query find(struct ccc_rtom_ const *, void const *key);
 static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
 static void *maybe_alloc_insert(struct ccc_rtom_ *,
                                 struct ccc_rtom_elem_ *parent,
@@ -171,7 +171,7 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
 void const *
 ccc_rom_get(ccc_realtime_ordered_map const *rom, void const *key)
 {
-    struct rtom_query_ q = find(&rom->impl_, key);
+    struct rtom_query q = find(&rom->impl_, key);
     return (CCC_EQL == q.last_cmp_) ? struct_base(&rom->impl_, q.found_) : NULL;
 }
 
@@ -185,7 +185,7 @@ ccc_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct rtom_query_ q
+    struct rtom_query q
         = find(&rom->impl_,
                ccc_impl_rom_key_from_node(&rom->impl_, &out_handle->impl_));
     if (CCC_EQL == q.last_cmp_)
@@ -266,7 +266,7 @@ ccc_entry
 ccc_rom_remove(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct rtom_query_ q
+    struct rtom_query q
         = find(&rom->impl_,
                ccc_impl_rom_key_from_node(&rom->impl_, &out_handle->impl_));
     if (q.last_cmp_ != CCC_EQL)
@@ -474,7 +474,7 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
 struct ccc_rtom_entry_
 ccc_impl_rom_entry(struct ccc_rtom_ const *const rom, void const *const key)
 {
-    struct rtom_query_ q = find(rom, key);
+    struct rtom_query q = find(rom, key);
     if (CCC_EQL == q.last_cmp_)
     {
         return (struct ccc_rtom_entry_){
@@ -556,7 +556,7 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom,
     return ccc_impl_rom_insert(rom, parent, last_cmp, out_handle);
 }
 
-static struct rtom_query_
+static struct rtom_query
 find(struct ccc_rtom_ const *const rom, void const *const key)
 {
     struct ccc_rtom_elem_ const *parent = &rom->end_;
@@ -567,13 +567,13 @@ find(struct ccc_rtom_ const *const rom, void const *const key)
         link = cmp(rom, key, seek, rom->cmp_);
         if (CCC_EQL == link)
         {
-            return (struct rtom_query_){
+            return (struct rtom_query){
                 .last_cmp_ = CCC_EQL,
                 .found_ = (struct ccc_rtom_elem_ *)seek,
             };
         }
     }
-    return (struct rtom_query_){
+    return (struct rtom_query){
         .last_cmp_ = link,
         .parent_ = (struct ccc_rtom_elem_ *)parent,
     };
@@ -619,12 +619,12 @@ equal_range(struct ccc_rtom_ const *const rom, void const *const begin_key,
         return (struct ccc_range_){};
     }
     ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
-    struct rtom_query_ b = find(rom, begin_key);
+    struct rtom_query b = find(rom, begin_key);
     if (b.last_cmp_ == les_or_grt[traversal])
     {
         b.found_ = next(rom, b.found_, traversal);
     }
-    struct rtom_query_ e = find(rom, end_key);
+    struct rtom_query e = find(rom, end_key);
     if (e.last_cmp_ != les_or_grt[!traversal])
     {
         e.found_ = next(rom, e.found_, traversal);
@@ -1079,14 +1079,14 @@ sibling_of([[maybe_unused]] struct ccc_rtom_ const *const rom,
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-struct tree_range_
+struct tree_range
 {
     struct ccc_rtom_elem_ const *low;
     struct ccc_rtom_elem_ const *root;
     struct ccc_rtom_elem_ const *high;
 };
 
-struct parent_status_
+struct parent_status
 {
     bool correct;
     struct ccc_rtom_elem_ const *parent;
@@ -1105,7 +1105,7 @@ recursive_size(struct ccc_rtom_ const *const rom,
 }
 
 static bool
-are_subtrees_valid(struct ccc_rtom_ const *t, struct tree_range_ const r,
+are_subtrees_valid(struct ccc_rtom_ const *t, struct tree_range const r,
                    struct ccc_rtom_elem_ const *const nil)
 {
     if (!r.root)
@@ -1129,14 +1129,14 @@ are_subtrees_valid(struct ccc_rtom_ const *t, struct tree_range_ const r,
         return false;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range_){
+                              (struct tree_range){
                                   .low = r.low,
                                   .root = r.root->branch_[L],
                                   .high = r.root,
                               },
                               nil)
            && are_subtrees_valid(t,
-                                 (struct tree_range_){
+                                 (struct tree_range){
                                      .low = r.root,
                                      .root = r.root->branch_[R],
                                      .high = r.high,
@@ -1169,7 +1169,7 @@ validate(struct ccc_rtom_ const *const rom)
         return false;
     }
     if (!are_subtrees_valid(rom,
-                            (struct tree_range_){
+                            (struct tree_range){
                                 .low = &rom->end_,
                                 .root = rom->root_,
                                 .high = &rom->end_,

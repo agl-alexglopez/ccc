@@ -102,6 +102,23 @@ ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
         {
             destructor(popped);
         }
+    }
+}
+
+void
+ccc_om_clear_and_free(ccc_ordered_map *const set,
+                      ccc_destructor_fn *const destructor)
+{
+
+    while (!ccc_om_empty(set))
+    {
+        void *popped
+            = erase(&set->impl_,
+                    ccc_impl_om_key_from_node(&set->impl_, set->impl_.root_));
+        if (destructor)
+        {
+            destructor(popped);
+        }
         if (set->impl_.alloc_)
         {
             set->impl_.alloc_(popped, 0);
@@ -734,14 +751,14 @@ link_trees(struct ccc_node_ *parent, om_link dir, struct ccc_node_ *subtree)
    does not rely upon the implementation of iterators or any other possibly
    buggy implementation. A pure functional range check will provide the most
    reliable check regardless of implementation changes throughout code base. */
-struct tree_range_
+struct tree_range
 {
     struct ccc_node_ const *low;
     struct ccc_node_ const *root;
     struct ccc_node_ const *high;
 };
 
-struct parent_status_
+struct parent_status
 {
     bool correct;
     struct ccc_node_ const *parent;
@@ -759,7 +776,7 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range_ const r,
+are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)
@@ -783,14 +800,14 @@ are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range_ const r,
         return false;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range_){
+                              (struct tree_range){
                                   .low = r.low,
                                   .root = r.root->branch_[L],
                                   .high = r.root,
                               },
                               nil)
            && are_subtrees_valid(t,
-                                 (struct tree_range_){
+                                 (struct tree_range){
                                      .low = r.root,
                                      .root = r.root->branch_[R],
                                      .high = r.high,
@@ -798,16 +815,16 @@ are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range_ const r,
                                  nil);
 }
 
-static struct parent_status_
+static struct parent_status
 child_tracks_parent(struct ccc_node_ const *const parent,
                     struct ccc_node_ const *const root)
 {
     if (root->parent_ != parent)
     {
         struct ccc_node_ *p = root->parent_->parent_;
-        return (struct parent_status_){false, p};
+        return (struct parent_status){false, p};
     }
-    return (struct parent_status_){true, parent};
+    return (struct parent_status){true, parent};
 }
 
 static bool
@@ -837,7 +854,7 @@ static bool
 ccc_tree_validate(struct ccc_tree_ const *const t)
 {
     if (!are_subtrees_valid(t,
-                            (struct tree_range_){
+                            (struct tree_range){
                                 .low = &t->end_,
                                 .root = t->root_,
                                 .high = &t->end_,
@@ -886,7 +903,7 @@ print_node(struct ccc_tree_ const *const t,
            struct ccc_node_ const *const root, ccc_print_fn *const fn_print)
 {
     fn_print(struct_base(t, root));
-    struct parent_status_ stat = child_tracks_parent(parent, root);
+    struct parent_status stat = child_tracks_parent(parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);

@@ -314,6 +314,9 @@ void ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn);
 bool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
 #ifdef FLAT_HASH_MAP_USING_NAMESPACE_CCC
+typedef ccc_fh_map_elem fh_map_elem;
+typedef ccc_flat_hash_map flat_hash_map;
+typedef ccc_fh_map_entry fh_map_entry;
 #    define FHM_INIT(args...) CCC_FHM_INIT(args)
 #    define FHM_GET(args...) CCC_FHM_GET(args)
 #    define FHM_GET_MUT(args...) CCC_FHM_GET_MUT(args)
