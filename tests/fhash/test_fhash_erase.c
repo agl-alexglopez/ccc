@@ -47,22 +47,22 @@ fhash_test_erase(void)
     ccc_entry ent = insert(&fh, &query.e);
     CHECK(occupied(&ent), false, "%d");
     CHECK(unwrap(&ent), NULL, "%p");
-    CHECK(fhm_size(&fh), 1, "%zu");
-    ent = fhm_remove(&fh, &query.e);
+    CHECK(size(&fh), 1, "%zu");
+    ent = remove(&fh, &query.e);
     CHECK(occupied(&ent), true, "%d");
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true, "%d");
     CHECK(v->id, 137, "%d");
     CHECK(v->val, 99, "%d");
-    CHECK(fhm_size(&fh), 0, "%zu");
+    CHECK(size(&fh), 0, "%zu");
     query.id = 101;
-    ent = fhm_remove(&fh, &query.e);
+    ent = remove(&fh, &query.e);
     CHECK(occupied(&ent), false, "%d");
-    CHECK(fhm_size(&fh), 0, "%zu");
+    CHECK(size(&fh), 0, "%zu");
     FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
-    CHECK(fhm_size(&fh), 1, "%zu");
+    CHECK(size(&fh), 1, "%zu");
     CHECK(occupied(remove_entry_vr(FHM_ENTRY(&fh, 137))), true, "%d");
-    CHECK(fhm_size(&fh), 0, "%zu");
+    CHECK(size(&fh), 0, "%zu");
     return PASS;
 }
 
@@ -85,17 +85,17 @@ fhash_test_shuffle_insert_erase(void)
         CHECK(v->val, i, "%d");
         CHECK(fhm_validate(&fh), true, "%d");
     }
-    CHECK(fhm_size(&fh), to_insert, "%zu");
-    size_t cur_size = fhm_size(&fh);
+    CHECK(size(&fh), to_insert, "%zu");
+    size_t cur_size = size(&fh);
     int i = 0;
-    while (!fhm_empty(&fh) && cur_size)
+    while (!empty(&fh) && cur_size)
     {
         CHECK(fhm_contains(&fh, &i), true, "%d");
         if (i % 2)
         {
             struct val swap_slot = {.id = i};
             struct val const *const old_val
-                = unwrap(fhm_remove_vr(&fh, &swap_slot.e));
+                = unwrap(remove_vr(&fh, &swap_slot.e));
             CHECK(old_val != NULL, true, "%d");
             CHECK(old_val->id, i, "%d");
         }
@@ -106,10 +106,10 @@ fhash_test_shuffle_insert_erase(void)
         }
         --cur_size;
         ++i;
-        CHECK(fhm_size(&fh), cur_size, "%zu");
+        CHECK(size(&fh), cur_size, "%zu");
         CHECK(fhm_validate(&fh), true, "%d");
     }
-    CHECK(fhm_size(&fh), 0, "%zu");
+    CHECK(size(&fh), 0, "%zu");
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
     return PASS;
 }

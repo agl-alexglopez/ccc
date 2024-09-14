@@ -25,25 +25,10 @@
         (container_ptr), (key_val_container_handle_ptr))
 
 #define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr)        \
-    _Generic((container_ptr),                                                  \
-        ccc_flat_hash_map                                                      \
-            *: &(ccc_entry){ccc_fhm_insert(                                    \
-                                (ccc_flat_hash_map *)(container_ptr),          \
-                                (ccc_fh_map_elem                               \
-                                     *)(key_val_container_handle_ptr))         \
-                                .impl_},                                       \
-        ccc_ordered_map                                                        \
-            *: &(ccc_entry){ccc_om_insert(                                     \
-                                (ccc_ordered_map *)(container_ptr),            \
-                                (ccc_o_map_elem                                \
-                                     *)(key_val_container_handle_ptr))         \
-                                .impl_},                                       \
-        ccc_realtime_ordered_map                                               \
-            *: &(ccc_entry){                                                   \
-                ccc_rom_insert(                                                \
-                    (ccc_realtime_ordered_map *)(container_ptr),               \
-                    (ccc_rtom_elem *)(key_val_container_handle_ptr))           \
-                    .impl_})
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_insert(container_ptr, key_val_container_handle_ptr).impl_     \
+    }
 
 #define ccc_impl_remove(container_ptr, key_val_container_handle_ptr)           \
     _Generic((container_ptr),                                                  \
@@ -53,25 +38,10 @@
         (container_ptr), (key_val_container_handle_ptr))
 
 #define ccc_impl_remove_vr(container_ptr, key_val_container_handle_ptr)        \
-    _Generic((container_ptr),                                                  \
-        ccc_flat_hash_map                                                      \
-            *: &(ccc_entry){ccc_fhm_remove(                                    \
-                                (ccc_flat_hash_map *)(container_ptr),          \
-                                (ccc_fh_map_elem                               \
-                                     *)(key_val_container_handle_ptr))         \
-                                .impl_},                                       \
-        ccc_ordered_map                                                        \
-            *: &(ccc_entry){ccc_om_remove(                                     \
-                                (ccc_ordered_map *)(container_ptr),            \
-                                (ccc_o_map_elem                                \
-                                     *)(key_val_container_handle_ptr))         \
-                                .impl_},                                       \
-        ccc_realtime_ordered_map                                               \
-            *: &(ccc_entry){                                                   \
-                ccc_rom_remove(                                                \
-                    (ccc_realtime_ordered_map *)(container_ptr),               \
-                    (ccc_rtom_elem *)(key_val_container_handle_ptr))           \
-                    .impl_})
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_remove(container_ptr, key_val_container_handle_ptr).impl_     \
+    }
 
 #define ccc_impl_remove_entry(container_entry_ptr)                             \
     _Generic((container_entry_ptr),                                            \
@@ -80,19 +50,10 @@
         ccc_rtom_entry *: ccc_rom_remove_entry)((container_entry_ptr))
 
 #define ccc_impl_remove_entry_vr(container_entry_ptr)                          \
-    _Generic((container_entry_ptr),                                            \
-        ccc_fh_map_entry                                                       \
-            *: &(ccc_entry){ccc_fhm_remove_entry(                              \
-                                (ccc_fh_map_entry *)(container_entry_ptr))     \
-                                .impl_},                                       \
-        ccc_o_map_entry                                                        \
-            *: &(ccc_entry){ccc_om_remove_entry(                               \
-                                (ccc_o_map_entry *)(container_entry_ptr))      \
-                                .impl_},                                       \
-        ccc_rtom_entry                                                         \
-            *: &(ccc_entry){                                                   \
-                ccc_rom_remove_entry((ccc_rtom_entry *)(container_entry_ptr))  \
-                    .impl_})
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_remove_entry(container_entry_ptr).impl_                       \
+    }
 
 #define ccc_impl_entry(container_ptr, key_ptr)                                 \
     _Generic((container_ptr),                                                  \
