@@ -435,7 +435,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     struct point cur = {0};
     while (!empty(&bfs) && !success)
     {
-        cur = *((struct point *)ccc_fdeq_front(&bfs));
+        cur = *((struct point *)front(&bfs));
         pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
@@ -454,12 +454,11 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 success = true;
                 break;
             }
-            if (!is_path(next_cell) && !contains(&parent_map, &next))
+            if (!is_path(next_cell)
+                && !occupied(try_insert_vr(&parent_map, &push.elem)))
             {
-                [[maybe_unused]] struct parent_cell *inserted
-                    = insert_entry(entry_vr(&parent_map, &next), &push.elem);
-                assert(inserted != NULL);
-                (void)push_back(&bfs, &next);
+                [[maybe_unused]] struct point *pushed = push_back(&bfs, &next);
+                assert(pushed);
             }
         }
     }
@@ -772,15 +771,16 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
             .v = v,
             .dist = v == pr->src ? 0 : INT_MAX,
         };
-        struct prev_vertex const *const inserted
-            = FHM_INSERT_ENTRY(FHM_ENTRY(prev_map, p->v), (struct prev_vertex){
-                                                              .v = p->v,
-                                                              .prev = NULL,
-                                                              .dist_point = p,
-                                                          });
-        if (!inserted)
+        ccc_entry const inserted = try_insert(prev_map,
+                                              &(struct prev_vertex){
+                                                  .v = p->v,
+                                                  .prev = NULL,
+                                                  .dist_point = p,
+                                              }
+                                                   .elem);
+        if (insert_error(&inserted) || occupied(&inserted))
         {
-            quit("inserting into map in in loading phase failed.\n", 1);
+            quit("duplicate vertex during graph prep or insert failed.\n", 1);
         }
         push(dist_q, &p->pq_elem);
     }

@@ -127,6 +127,7 @@
 
 #    define insert(args...) ccc_insert(args)
 #    define try_insert(args...) ccc_try_insert(args)
+#    define try_insert_vr(args...) ccc_try_insert_vr(args)
 #    define insert_vr(args...) ccc_insert_vr(args)
 #    define remove(args...) ccc_remove(args)
 #    define remove_vr(args...) ccc_remove_vr(args)

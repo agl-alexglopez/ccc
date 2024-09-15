@@ -24,6 +24,12 @@
         ccc_realtime_ordered_map *: ccc_rom_insert)((container_ptr),           \
                                                     insert_args)
 
+#define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr...)     \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_insert(container_ptr, key_val_container_handle_ptr).impl_     \
+    }
+
 #define ccc_impl_try_insert(container_ptr, try_insert_args...)                 \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_try_insert,                               \
@@ -31,10 +37,10 @@
         ccc_realtime_ordered_map *: ccc_rom_try_insert)((container_ptr),       \
                                                         try_insert_args)
 
-#define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr...)     \
+#define ccc_impl_try_insert_vr(container_ptr, try_insert_args...)              \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_impl_insert(container_ptr, key_val_container_handle_ptr).impl_     \
+        ccc_impl_try_insert(container_ptr, try_insert_args).impl_              \
     }
 
 #define ccc_impl_remove(container_ptr, key_val_container_handle_ptr...)        \
