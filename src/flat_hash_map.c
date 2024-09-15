@@ -102,6 +102,10 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
 void *
 ccc_fhm_get_key_val(ccc_flat_hash_map *const h, void const *const key)
 {
+    if (!ccc_buf_capacity(&h->impl_.buf_))
+    {
+        return NULL;
+    }
     struct ccc_entry_ e = ccc_impl_fhm_find(
         &h->impl_, key, ccc_impl_fhm_filter(&h->impl_, key));
     if (e.stats_ & CCC_ENTRY_OCCUPIED)
@@ -305,6 +309,7 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
                   uint64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
+    assert(cap);
     size_t cur_i = hash % cap;
     for (size_t dist = 0; dist < cap; ++dist, cur_i = (cur_i + 1) % cap)
     {

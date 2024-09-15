@@ -354,31 +354,31 @@ fhash_test_entry_api_macros(void)
 static enum test_result
 fhash_test_two_sum(void)
 {
-    size_t const size = 50;
-    struct val vals[50];
+    struct val vals[20];
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
-                                    fhash_int_to_u64, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    int const addends[10] = {1, 3, 5, 6, 7, 13, 44, 32, 10, -1};
+    int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
-    int const correct[2] = {8, 2};
-    int indices[2] = {-1, -1};
-    for (int i = 0; i < 10; ++i)
+    int solution_indices[2] = {-1, -1};
+    for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
     {
-        struct val const *const v = FHM_GET_KEY_VAL(&fh, target - addends[i]);
-        if (v)
+        struct val const *const other_addend
+            = get_key_val(&fh, &(int){target - addends[i]});
+        if (other_addend)
         {
-            indices[0] = i;
-            indices[1] = v->val;
+            solution_indices[0] = (int)i;
+            solution_indices[1] = other_addend->val;
             break;
         }
-        FHM_INSERT_ENTRY(FHM_ENTRY(&fh, addends[i]),
-                         (struct val){.id = addends[i], .val = i});
+        ccc_entry const e
+            = try_insert(&fh, &(struct val){.id = addends[i], .val = i}.e);
+        CHECK(insert_error(&e), false);
     }
-    CHECK(size(&fh), indices[0]);
-    CHECK(indices[0], correct[0]);
-    CHECK(indices[1], correct[1]);
+    CHECK(solution_indices[0], 8);
+    CHECK(solution_indices[1], 2);
     return PASS;
 }
 
