@@ -44,11 +44,11 @@ insert_shuffled(ccc_flat_priority_queue *pq, struct val vals[],
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
         ccc_fpq_push(pq, &vals[i]);
-        CHECK(ccc_fpq_size(pq), i + 1, "%zu");
-        CHECK(ccc_fpq_validate(pq), true, "%d");
+        CHECK(ccc_fpq_size(pq), i + 1);
+        CHECK(ccc_fpq_validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_fpq_size(pq), size, "%zu");
+    CHECK(ccc_fpq_size(pq), size);
     return PASS;
 }
 
@@ -61,9 +61,11 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         return FAIL;
     }
     size_t i = 0;
-    struct val copy_buf[sizeof(struct val) * ccc_fpq_size(fpq)];
-    ccc_flat_priority_queue fpq_copy = CCC_FPQ_INIT(
-        &copy_buf, ccc_fpq_size(fpq), struct val, CCC_LES, NULL, val_cmp, NULL);
+    struct val *copy_buf = malloc(sizeof(struct val) * (ccc_fpq_size(fpq) + 1));
+    CHECK(copy_buf == NULL, false);
+    ccc_flat_priority_queue fpq_copy
+        = CCC_FPQ_INIT(copy_buf, ccc_fpq_size(fpq) + 1, struct val, CCC_LES,
+                       NULL, val_cmp, NULL);
     while (!ccc_fpq_empty(fpq) && i < size)
     {
         struct val *const front = ccc_fpq_front(fpq);
@@ -71,8 +73,8 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         size_t const prev = ccc_fpq_size(&fpq_copy);
         struct val *v = CCC_FPQ_EMPLACE(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
-        CHECK(v != NULL, true, "%d");
-        CHECK(prev < ccc_fpq_size(&fpq_copy), true, "%d");
+        CHECK(v != NULL, true, copy_buf);
+        CHECK(prev < ccc_fpq_size(&fpq_copy), true, copy_buf);
         ccc_fpq_pop(fpq);
     }
     i = 0;
@@ -82,10 +84,11 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         size_t const prev = ccc_fpq_size(fpq);
         struct val *e
             = CCC_FPQ_EMPLACE(fpq, (struct val){.id = v->id, .val = v->val});
-        CHECK(e != NULL, true, "%d");
-        CHECK(prev < ccc_fpq_size(fpq), true, "%d");
-        CHECK(vals[i++], v->val, "%d");
+        CHECK(e != NULL, true, copy_buf);
+        CHECK(prev < ccc_fpq_size(fpq), true, copy_buf);
+        CHECK(vals[i++], v->val, copy_buf);
         ccc_fpq_pop(&fpq_copy);
     }
+    free(copy_buf);
     return PASS;
 }

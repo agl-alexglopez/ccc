@@ -61,18 +61,18 @@ map_test_prime_shuffle(void)
         {
             repeats[i] = true;
         }
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_om_validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
     ccc_om_print(&s, &((struct val *)ccc_om_root(&s))->elem, map_printer_fn);
-    CHECK(ccc_om_size(&s) < size, true, "%d");
+    CHECK(ccc_om_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(occupied(remove_entry_vr(entry_vr(&s, &vals[i].val)))
                   || repeats[i],
-              true, "%d");
-        CHECK(ccc_om_validate(&s), true, "%d");
+              true);
+        CHECK(ccc_om_validate(&s), true);
     }
     return PASS;
 }
@@ -85,22 +85,22 @@ map_test_insert_erase_shuffled(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         struct val *v = unwrap(remove_vr(&s, &vals[i].elem));
-        CHECK(v != NULL, true, "%d");
-        CHECK(v->val, vals[i].val, "%d");
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(v != NULL, true);
+        CHECK(v->val, vals[i].val);
+        CHECK(ccc_om_validate(&s), true);
     }
-    CHECK(empty(&s), true, "%d");
+    CHECK(empty(&s), true);
     return PASS;
 }
 
@@ -119,14 +119,14 @@ map_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_om_validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(contains(&s, &vals[i].val), true, "%d");
+        CHECK(contains(&s, &vals[i].val), true);
         (void)remove(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true, "%d");
+        CHECK(ccc_om_validate(&s), true);
     }
-    CHECK(empty(&s), true, "%d");
+    CHECK(empty(&s), true);
     return PASS;
 }

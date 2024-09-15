@@ -52,16 +52,16 @@ pq_test_insert_iterate_pop(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
     }
     size_t pop_count = 0;
     while (!ccc_pq_empty(&pq))
     {
         ccc_pq_pop(&pq);
         ++pop_count;
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
     }
-    CHECK(pop_count, num_nodes, "%zu");
+    CHECK(pop_count, num_nodes);
     return PASS;
 }
 
@@ -81,7 +81,7 @@ pq_test_priority_removal(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -90,7 +90,7 @@ pq_test_priority_removal(void)
         if (i->val > limit)
         {
             (void)ccc_pq_erase(&pq, &i->elem);
-            CHECK(ccc_pq_validate(&pq), true, "%d");
+            CHECK(ccc_pq_validate(&pq), true);
         }
     }
     return PASS;
@@ -112,7 +112,7 @@ pq_test_priority_update(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -121,12 +121,11 @@ pq_test_priority_update(void)
         int backoff = i->val / 2;
         if (i->val > limit)
         {
-            CHECK(ccc_pq_update(&pq, &i->elem, val_update, &backoff), true,
-                  "%d");
-            CHECK(ccc_pq_validate(&pq), true, "%d");
+            CHECK(ccc_pq_update(&pq, &i->elem, val_update, &backoff), true);
+            CHECK(ccc_pq_validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq), num_nodes, "%zu");
+    CHECK(ccc_pq_size(&pq), num_nodes);
     return PASS;
 }
 
@@ -146,7 +145,7 @@ pq_test_priority_increase(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -156,16 +155,16 @@ pq_test_priority_increase(void)
         int dec = i->val / 2;
         if (i->val > limit)
         {
-            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true, "%d");
-            CHECK(ccc_pq_validate(&pq), true, "%d");
+            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true);
+            CHECK(ccc_pq_validate(&pq), true);
         }
         else
         {
-            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true, "%d");
-            CHECK(ccc_pq_validate(&pq), true, "%d");
+            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true);
+            CHECK(ccc_pq_validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq), num_nodes, "%zu");
+    CHECK(ccc_pq_size(&pq), num_nodes);
     return PASS;
 }
 
@@ -185,7 +184,7 @@ pq_test_priority_decrease(void)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -195,15 +194,15 @@ pq_test_priority_decrease(void)
         int dec = i->val / 2;
         if (i->val < limit)
         {
-            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true, "%d");
-            CHECK(ccc_pq_validate(&pq), true, "%d");
+            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true);
+            CHECK(ccc_pq_validate(&pq), true);
         }
         else
         {
-            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true, "%d");
-            CHECK(ccc_pq_validate(&pq), true, "%d");
+            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true);
+            CHECK(ccc_pq_validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq), num_nodes, "%zu");
+    CHECK(ccc_pq_size(&pq), num_nodes);
     return PASS;
 }

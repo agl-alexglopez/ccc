@@ -112,21 +112,20 @@ run_lru_cache(void)
             requests[i].putter(&lru, requests[i].key, requests[i].val);
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(fhm_validate(&lru.fh), true, "%d");
-            CHECK(ccc_dll_validate(&lru.l), true, "%d");
+            CHECK(fhm_validate(&lru.fh), true);
+            CHECK(ccc_dll_validate(&lru.l), true);
             break;
         case GET:
             QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(requests[i].getter(&lru, requests[i].key), requests[i].val,
-                  "%d");
-            CHECK(ccc_dll_validate(&lru.l), true, "%d");
+            CHECK(requests[i].getter(&lru, requests[i].key), requests[i].val);
+            CHECK(ccc_dll_validate(&lru.l), true);
             break;
         case HED:
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(requests[i].header(&lru)->key, requests[i].key, "%d");
-            CHECK(requests[i].header(&lru)->val, requests[i].val, "%d");
+            CHECK(requests[i].header(&lru)->key, requests[i].key);
+            CHECK(requests[i].header(&lru)->val, requests[i].val);
             break;
         default:
             break;

@@ -35,6 +35,6 @@ map_test_empty(void)
 {
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(empty(&s), true, "%d");
+    CHECK(empty(&s), true);
     return PASS;
 }

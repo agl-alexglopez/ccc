@@ -33,6 +33,6 @@ depq_test_empty(void)
 {
     ccc_double_ended_priority_queue pq
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
-    CHECK(empty(&pq), true, "%d");
+    CHECK(empty(&pq), true);
     return PASS;
 }

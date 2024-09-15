@@ -42,7 +42,7 @@ pq_test_insert_one(void)
     struct val single;
     single.val = 0;
     ccc_pq_push(&pq, &single.elem);
-    CHECK(ccc_pq_empty(&pq), false, "%d");
+    CHECK(ccc_pq_empty(&pq), false);
     return PASS;
 }
 
@@ -56,10 +56,10 @@ pq_test_insert_three(void)
     {
         three_vals[i].val = i;
         ccc_pq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
-        CHECK(ccc_pq_size(&pq), (size_t)i + 1, "%zu");
+        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)3, "%zu");
+    CHECK(ccc_pq_size(&pq), (size_t)3);
     return PASS;
 }
 
@@ -78,14 +78,14 @@ pq_test_struct_getter(void)
         tester_clone[i].val = i;
         ccc_pq_push(&pq, &vals[i].elem);
         ccc_pq_push(&pq_tester_clone, &tester_clone[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
+        CHECK(ccc_pq_validate(&pq), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         struct val const *get = &tester_clone[i];
-        CHECK(get->val, vals[i].val, "%d");
+        CHECK(get->val, vals[i].val);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)10, "%zu");
+    CHECK(ccc_pq_size(&pq), (size_t)10);
     return PASS;
 }
 
@@ -99,10 +99,10 @@ pq_test_insert_three_dups(void)
     {
         three_vals[i].val = 0;
         ccc_pq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
-        CHECK(ccc_pq_size(&pq), (size_t)i + 1, "%zu");
+        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)3, "%zu");
+    CHECK(ccc_pq_size(&pq), (size_t)3);
     return PASS;
 }
 
@@ -115,11 +115,11 @@ pq_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &pq), PASS, "%d");
+    CHECK(inorder_fill(sorted_check, size, &pq), PASS);
     return PASS;
 }
 
@@ -133,11 +133,11 @@ pq_test_read_max_min(void)
     {
         vals[i].val = i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true, "%d");
-        CHECK(ccc_pq_size(&pq), (size_t)i + 1, "%zu");
+        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)10, "%zu");
+    CHECK(ccc_pq_size(&pq), (size_t)10);
     struct val const *min = ccc_pq_front(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     return PASS;
 }

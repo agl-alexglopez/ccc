@@ -59,18 +59,18 @@ depq_test_insert_remove_four_dups(void)
     {
         three_vals[i].val = 0;
         ccc_depq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
         size_t const size = i + 1;
-        CHECK(size(&pq), size, "%zu");
+        CHECK(size(&pq), size);
     }
-    CHECK(size(&pq), (size_t)4, "%zu");
+    CHECK(size(&pq), (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         ccc_depq_pop_max(&pq);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(size(&pq), (size_t)0, "%zu");
+    CHECK(size(&pq), (size_t)0);
     return PASS;
 }
 
@@ -82,24 +82,24 @@ depq_test_insert_erase_shuffled(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
-    CHECK(max->val, (int)size - 1, "%d");
+    CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &pq), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &pq), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         (void)ccc_depq_erase(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(size(&pq), (size_t)0, "%zu");
+    CHECK(size(&pq), (size_t)0);
     return PASS;
 }
 
@@ -111,24 +111,24 @@ depq_test_pop_max(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
-    CHECK(max->val, (int)size - 1, "%d");
+    CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &pq), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &pq), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
-        CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val, "%d");
+        CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val);
         ccc_depq_pop_max(&pq);
     }
-    CHECK(empty(&pq), true, "%d");
+    CHECK(empty(&pq), true);
     return PASS;
 }
 
@@ -140,24 +140,24 @@ depq_test_pop_min(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
-    CHECK(max->val, (int)size - 1, "%d");
+    CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &pq), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &pq), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(((struct val *)ccc_depq_min(&pq))->val, vals[i].val, "%d");
+        CHECK(((struct val *)ccc_depq_min(&pq))->val, vals[i].val);
         ccc_depq_pop_min(&pq);
     }
-    CHECK(empty(&pq), true, "%d");
+    CHECK(empty(&pq), true);
     return PASS;
 }
 
@@ -184,15 +184,15 @@ depq_test_max_round_robin(void)
         }
         vals[i].id = i;
         ccc_depq_push(&depq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&depq), true, "%d");
+        CHECK(ccc_depq_validate(&depq), true);
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
     while (!empty(&depq))
     {
         struct val const *front = ccc_depq_max(&depq);
-        CHECK(front->id, order[i].id, "%d");
-        CHECK(front->val, order[i].val, "%d");
+        CHECK(front->id, order[i].id);
+        CHECK(front->val, order[i].val);
         ccc_depq_pop_max(&depq);
         ++i;
     }
@@ -222,15 +222,15 @@ depq_test_min_round_robin(void)
         }
         vals[i].id = i;
         ccc_depq_push(&depq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&depq), true, "%d");
+        CHECK(ccc_depq_validate(&depq), true);
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
     while (!empty(&depq))
     {
         struct val const *front = ccc_depq_min(&depq);
-        CHECK(front->id, order[i].id, "%d");
-        CHECK(front->val, order[i].val, "%d");
+        CHECK(front->id, order[i].id);
+        CHECK(front->val, order[i].val);
         ccc_depq_pop_min(&depq);
         ++i;
     }
@@ -253,9 +253,9 @@ depq_test_delete_prime_shuffle_duplicates(void)
         vals[i].val = shuffled_index;
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
         size_t const s = i + 1;
-        CHECK(size(&pq), s, "%zu");
+        CHECK(size(&pq), s);
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -265,9 +265,9 @@ depq_test_delete_prime_shuffle_duplicates(void)
     for (int i = 0; i < size; ++i)
     {
         (void)ccc_depq_erase(&pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
         --cur_size;
-        CHECK(size(&pq), cur_size, "%zu");
+        CHECK(size(&pq), cur_size);
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
@@ -291,7 +291,7 @@ depq_test_prime_shuffle(void)
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
@@ -302,10 +302,10 @@ depq_test_prime_shuffle(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true, "%d");
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
+        CHECK(ccc_depq_validate(&pq), true);
         --cur_size;
-        CHECK(size(&pq), cur_size, "%zu");
+        CHECK(size(&pq), cur_size);
     }
     return PASS;
 }
@@ -325,13 +325,13 @@ depq_test_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true, "%d");
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
+        CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(empty(&pq), true, "%d");
+    CHECK(empty(&pq), true);
     return PASS;
 }

@@ -30,6 +30,6 @@ pq_test_empty(void)
 {
     ccc_priority_queue pq
         = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
-    CHECK(ccc_pq_empty(&pq), true, "%d");
+    CHECK(ccc_pq_empty(&pq), true);
     return PASS;
 }

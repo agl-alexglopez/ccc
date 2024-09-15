@@ -29,11 +29,11 @@ insert_shuffled(ccc_priority_queue *ppq, struct val vals[], size_t const size,
     {
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_pq_push(ppq, &vals[shuffled_index].elem);
-        CHECK(ccc_pq_size(ppq), i + 1, "%zu");
-        CHECK(ccc_pq_validate(ppq), true, "%d");
+        CHECK(ccc_pq_size(ppq), i + 1);
+        CHECK(ccc_pq_validate(ppq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_pq_size(ppq), size, "%zu");
+    CHECK(ccc_pq_size(ppq), size);
     return PASS;
 }
 
@@ -52,8 +52,8 @@ inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
     {
         struct val *const front = ccc_pq_front(ppq);
         ccc_pq_pop(ppq);
-        CHECK(ccc_pq_validate(ppq), true, "%d");
-        CHECK(ccc_pq_validate(&copy), true, "%d");
+        CHECK(ccc_pq_validate(ppq), true);
+        CHECK(ccc_pq_validate(&copy), true);
         vals[i++] = front->val;
         ccc_pq_push(&copy, &front->elem);
     }
@@ -61,11 +61,11 @@ inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
     while (!ccc_pq_empty(&copy))
     {
         struct val *v = ccc_pq_front(&copy);
-        CHECK(v->val, vals[i++], "%d");
+        CHECK(v->val, vals[i++]);
         ccc_pq_pop(&copy);
         ccc_pq_push(ppq, &v->elem);
-        CHECK(ccc_pq_validate(ppq), true, "%d");
-        CHECK(ccc_pq_validate(&copy), true, "%d");
+        CHECK(ccc_pq_validate(ppq), true);
+        CHECK(ccc_pq_validate(&copy), true);
     }
     return PASS;
 }

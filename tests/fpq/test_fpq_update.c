@@ -41,25 +41,26 @@ fpq_test_insert_iterate_pop(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(1);
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
-    ccc_flat_priority_queue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val,
-                                               CCC_LES, NULL, val_cmp, NULL);
+    struct val vals[1000 + 1];
+    ccc_flat_priority_queue fpq
+        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+                       CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)ccc_fpq_push(&fpq, &vals[i]);
-        CHECK(ccc_fpq_validate(&fpq), true, "%d");
+        CHECK(ccc_fpq_push(&fpq, &vals[i]) != NULL, true);
+        CHECK(ccc_fpq_validate(&fpq), true);
     }
     size_t pop_count = 0;
     while (!ccc_fpq_empty(&fpq))
     {
         ccc_fpq_pop(&fpq);
         ++pop_count;
-        CHECK(ccc_fpq_validate(&fpq), true, "%d");
+        CHECK(ccc_fpq_validate(&fpq), true);
     }
-    CHECK(pop_count, num_nodes, "%zu");
+    CHECK(pop_count, num_nodes);
     return PASS;
 }
 
@@ -70,9 +71,10 @@ fpq_test_priority_removal(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
-    ccc_flat_priority_queue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val,
-                                               CCC_LES, NULL, val_cmp, NULL);
+    struct val vals[1000 + 1];
+    ccc_flat_priority_queue fpq
+        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+                       CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -81,8 +83,8 @@ fpq_test_priority_removal(void)
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
                   });
-        CHECK(res != NULL, true, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, "%d");
+        CHECK(res != NULL, true);
+        CHECK(ccc_fpq_validate(&fpq), true);
     }
     int const limit = 400;
     for (size_t seen = 0, remaining = num_nodes; seen < remaining; ++seen)
@@ -91,7 +93,7 @@ fpq_test_priority_removal(void)
         if (cur->val > limit)
         {
             (void)ccc_fpq_erase(&fpq, cur);
-            CHECK(ccc_fpq_validate(&fpq), true, "%d");
+            CHECK(ccc_fpq_validate(&fpq), true);
             --remaining;
         }
     }
@@ -105,9 +107,10 @@ fpq_test_priority_update(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
-    ccc_flat_priority_queue fpq = CCC_FPQ_INIT(vals, num_nodes, struct val,
-                                               CCC_LES, NULL, val_cmp, NULL);
+    struct val vals[1000 + 1];
+    ccc_flat_priority_queue fpq
+        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+                       CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -116,8 +119,8 @@ fpq_test_priority_update(void)
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
                   });
-        CHECK(res != NULL, true, "%d");
-        CHECK(ccc_fpq_validate(&fpq), true, "%d");
+        CHECK(res != NULL, true);
+        CHECK(ccc_fpq_validate(&fpq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -126,10 +129,10 @@ fpq_test_priority_update(void)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(ccc_fpq_update(&fpq, cur, val_update, &backoff), true, "%d");
-            CHECK(ccc_fpq_validate(&fpq), true, "%d");
+            CHECK(ccc_fpq_update(&fpq, cur, val_update, &backoff), true);
+            CHECK(ccc_fpq_validate(&fpq), true);
         }
     }
-    CHECK(ccc_fpq_size(&fpq), num_nodes, "%zu");
+    CHECK(ccc_fpq_size(&fpq), num_nodes);
     return PASS;
 }

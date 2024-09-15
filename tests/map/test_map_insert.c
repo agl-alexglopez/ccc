@@ -45,10 +45,9 @@ map_test_insert_one(void)
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    CHECK(insert_entry(entry_vr(&s, &single.val), &single.elem) != NULL, true,
-          "%d");
-    CHECK(empty(&s), false, "%d");
-    CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true, "%d");
+    CHECK(insert_entry(entry_vr(&s, &single.val), &single.elem) != NULL, true);
+    CHECK(empty(&s), false);
+    CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true);
     return PASS;
 }
 
@@ -58,33 +57,33 @@ map_test_insert_three(void)
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val swap_slot = {.val = 1, .id = 99};
-    CHECK(occupied(insert_vr(&s, &swap_slot.elem)), false, "%d");
-    CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(size(&s), (size_t)1, "%zu");
+    CHECK(occupied(insert_vr(&s, &swap_slot.elem)), false);
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(size(&s), (size_t)1);
     swap_slot = (struct val){.val = 1, .id = 137};
     struct val const *ins = unwrap(insert_vr(&s, &swap_slot.elem));
-    CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(size(&s), (size_t)1, "%zu");
-    CHECK(ins != NULL, true, "%d");
-    CHECK(ins->val, 1, "%d");
-    CHECK(ins->id, 137, "%d");
-    CHECK(swap_slot.val, 1, "%d");
-    CHECK(swap_slot.id, 99, "%d");
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(size(&s), (size_t)1);
+    CHECK(ins != NULL, true);
+    CHECK(ins->val, 1);
+    CHECK(ins->id, 137);
+    CHECK(swap_slot.val, 1);
+    CHECK(swap_slot.id, 99);
     ins = CCC_OM_OR_INSERT(CCC_OM_ENTRY(&s, 2),
                            (struct val){.val = 2, .id = 0});
-    CHECK(ins != NULL, true, "%d");
-    CHECK(ins->id, 0, "%d");
-    CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(size(&s), (size_t)2, "%zu");
+    CHECK(ins != NULL, true);
+    CHECK(ins->id, 0);
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(size(&s), (size_t)2);
     ins = CCC_OM_INSERT_ENTRY(CCC_OM_ENTRY(&s, 2),
                               (struct val){.val = 2, .id = 1});
-    CHECK(ins != NULL, true, "%d");
-    CHECK(ins->id, 1, "%d");
-    CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(size(&s), (size_t)2, "%zu");
+    CHECK(ins != NULL, true);
+    CHECK(ins->id, 1);
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(size(&s), (size_t)2);
     ins = CCC_OM_INSERT_ENTRY(CCC_OM_ENTRY(&s, 3), (struct val){.val = 3});
-    CHECK(ccc_om_validate(&s), true, "%d");
-    CHECK(size(&s), (size_t)3, "%zu");
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(size(&s), (size_t)3);
     ccc_om_clear(&s, NULL);
     return PASS;
 }
@@ -103,19 +102,19 @@ map_test_struct_getter(void)
         vals[i].val = i;
         tester_clone[i].val = i;
         CHECK(insert_entry(entry_vr(&s, &vals[i].val), &vals[i].elem) != NULL,
-              true, "%d");
+              true);
         CHECK(insert_entry(entry_vr(&map_tester_clone, &tester_clone[i].val),
                            &tester_clone[i].elem)
                   != NULL,
-              true, "%d");
-        CHECK(ccc_om_validate(&s), true, "%d");
+              true);
+        CHECK(ccc_om_validate(&s), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */
         struct val const *get = &tester_clone[i];
-        CHECK(get->val, vals[i].val, "%d");
+        CHECK(get->val, vals[i].val);
     }
-    CHECK(size(&s), (size_t)10, "%zu");
+    CHECK(size(&s), (size_t)10);
     return PASS;
 }
 
@@ -128,12 +127,12 @@ map_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     return PASS;
 }

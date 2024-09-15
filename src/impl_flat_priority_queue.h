@@ -39,12 +39,24 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, uint8_t[], size_t);
         struct ccc_fpq_ *fpq_ = &(fpq)->impl_;                                 \
         assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf_));           \
         fpq_res_ = ccc_buf_alloc(&fpq_->buf_);                                 \
+        if (ccc_buf_size(&fpq_->buf_) == ccc_buf_capacity(&fpq_->buf_))        \
+        {                                                                      \
+            fpq_res_ = NULL;                                                   \
+            ccc_result const extra_space_ = ccc_buf_realloc(                   \
+                &fpq_->buf_, ccc_buf_capacity(&fpq_->buf_) * 2,                \
+                fpq_->buf_.impl_.alloc_);                                      \
+            if (extra_space_ == CCC_OK)                                        \
+            {                                                                  \
+                fpq_res_ = ccc_buf_back(&fpq_->buf_);                          \
+            }                                                                  \
+        }                                                                      \
         if (fpq_res_)                                                          \
         {                                                                      \
             *fpq_res_ = type_initializer;                                      \
             if (ccc_buf_size(&fpq_->buf_) > 1)                                 \
             {                                                                  \
-                uint8_t fpq_tmp_[ccc_buf_elem_size(&fpq_->buf_)];              \
+                void *fpq_tmp_                                                 \
+                    = ccc_buf_at(&fpq_->buf_, ccc_buf_size(&fpq_->buf_));      \
                 fpq_res_ = ccc_buf_at(                                         \
                     &fpq_->buf_,                                               \
                     ccc_impl_fpq_bubble_up(fpq_, fpq_tmp_,                     \

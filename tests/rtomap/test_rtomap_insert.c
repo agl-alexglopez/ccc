@@ -45,13 +45,11 @@ rtomap_test_insert_one(void)
 {
     ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    struct val single;
-    single.val = 0;
-    CHECK(occupied(insert_vr(&s, &single.elem)), false, "%d");
-    CHECK(rom_empty(&s), false, "%d");
+    CHECK(occupied(insert_vr(&s, &(struct val){}.elem)), false);
+    CHECK(rom_empty(&s), false);
     struct val *v = rom_root(&s);
-    CHECK(v == NULL, false, "%d");
-    CHECK(v->val == single.val, true, "%d");
+    CHECK(v == NULL, false);
+    CHECK(v->val, 0);
     return PASS;
 }
 
@@ -60,27 +58,27 @@ rtomap_test_insert_macros(void)
 {
     ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
-    struct val *v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
-    CHECK(v != NULL, true, "%d");
-    CHECK(size(&s), 1, "%zu");
-    v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
-    CHECK(v != NULL, true, "%d");
-    CHECK(v->val, 0, "%d");
-    CHECK(size(&s), 1, "%zu");
-    v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){0});
-    CHECK(v != NULL, true, "%d");
+    struct val *v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){});
+    CHECK(v != NULL, true);
+    CHECK(size(&s), 1);
+    v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){});
+    CHECK(v != NULL, true);
+    CHECK(v->val, 0);
+    CHECK(size(&s), 1);
+    v = ROM_OR_INSERT(ROM_ENTRY(&s, 0), (struct val){});
+    CHECK(v != NULL, true);
     v->id++;
-    CHECK(v->id, 1, "%d");
-    CHECK(v != NULL, true, "%d");
-    CHECK(size(&s), 1, "%zu");
+    CHECK(v->id, 1);
+    CHECK(v != NULL, true);
+    CHECK(size(&s), 1);
     v = ROM_INSERT_ENTRY(ROM_ENTRY(&s, 0), (struct val){.id = 3, .val = 0});
-    CHECK(v != NULL, true, "%d");
-    CHECK(size(&s), 1, "%zu");
-    CHECK(v->id, 3, "%d");
+    CHECK(v != NULL, true);
+    CHECK(size(&s), 1);
+    CHECK(v->id, 3);
     v = ROM_INSERT_ENTRY(ROM_ENTRY(&s, 7), (struct val){.val = 7});
-    CHECK(v != NULL, true, "%d");
-    CHECK(size(&s), 2, "%zu");
-    CHECK(v->val, 7, "%d");
+    CHECK(v != NULL, true);
+    CHECK(size(&s), 2);
+    CHECK(v->val, 7);
     rom_clear_and_free(&s, NULL);
     return PASS;
 }
@@ -94,16 +92,16 @@ rtomap_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
 
     rom_print(&s, map_printer_fn);
     printf("\n");
 
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &s), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     return PASS;
 }
@@ -123,8 +121,8 @@ rtomap_test_insert_weak_srand(void)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem);
-        CHECK(rom_validate(&s), true, "%d");
+        CHECK(rom_validate(&s), true);
     }
-    CHECK(size(&s), (size_t)num_nodes, "%zu");
+    CHECK(size(&s), (size_t)num_nodes);
     return PASS;
 }

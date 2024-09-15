@@ -41,28 +41,28 @@ fhash_test_erase(void)
     ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
                                     fhash_int_zero, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, "%d");
+    CHECK(res, CCC_OK);
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&fh, &query.e);
-    CHECK(occupied(&ent), false, "%d");
-    CHECK(unwrap(&ent), NULL, "%p");
-    CHECK(size(&fh), 1, "%zu");
+    CHECK(occupied(&ent), false);
+    CHECK(unwrap(&ent), NULL);
+    CHECK(size(&fh), 1);
     ent = remove(&fh, &query.e);
-    CHECK(occupied(&ent), true, "%d");
+    CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
-    CHECK(v != NULL, true, "%d");
-    CHECK(v->id, 137, "%d");
-    CHECK(v->val, 99, "%d");
-    CHECK(size(&fh), 0, "%zu");
+    CHECK(v != NULL, true);
+    CHECK(v->id, 137);
+    CHECK(v->val, 99);
+    CHECK(size(&fh), 0);
     query.id = 101;
     ent = remove(&fh, &query.e);
-    CHECK(occupied(&ent), false, "%d");
-    CHECK(size(&fh), 0, "%zu");
+    CHECK(occupied(&ent), false);
+    CHECK(size(&fh), 0);
     FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
-    CHECK(size(&fh), 1, "%zu");
-    CHECK(occupied(remove_entry_vr(FHM_ENTRY(&fh, 137))), true, "%d");
-    CHECK(size(&fh), 0, "%zu");
+    CHECK(size(&fh), 1);
+    CHECK(occupied(remove_entry_vr(FHM_ENTRY(&fh, 137))), true);
+    CHECK(size(&fh), 0);
     return PASS;
 }
 
@@ -72,7 +72,7 @@ fhash_test_shuffle_insert_erase(void)
     ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, "%d");
+    CHECK(res, CCC_OK);
     int const to_insert = 100;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -80,36 +80,36 @@ fhash_test_shuffle_insert_erase(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
-        CHECK(v != NULL, true, "%d");
-        CHECK(v->id, shuffled_index, "%d");
-        CHECK(v->val, i, "%d");
-        CHECK(fhm_validate(&fh), true, "%d");
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
+        CHECK(fhm_validate(&fh), true);
     }
-    CHECK(size(&fh), to_insert, "%zu");
+    CHECK(size(&fh), to_insert);
     size_t cur_size = size(&fh);
     int i = 0;
     while (!empty(&fh) && cur_size)
     {
-        CHECK(contains(&fh, &i), true, "%d");
+        CHECK(contains(&fh, &i), true);
         if (i % 2)
         {
             struct val swap_slot = {.id = i};
             struct val const *const old_val
                 = unwrap(remove_vr(&fh, &swap_slot.e));
-            CHECK(old_val != NULL, true, "%d");
-            CHECK(old_val->id, i, "%d");
+            CHECK(old_val != NULL, true);
+            CHECK(old_val->id, i);
         }
         else
         {
             ccc_entry removed = remove_entry(entry_vr(&fh, &i));
-            CHECK(occupied(&removed), true, "%d");
+            CHECK(occupied(&removed), true);
         }
         --cur_size;
         ++i;
-        CHECK(size(&fh), cur_size, "%zu");
-        CHECK(fhm_validate(&fh), true, "%d");
+        CHECK(size(&fh), cur_size);
+        CHECK(fhm_validate(&fh), true);
     }
-    CHECK(size(&fh), 0, "%zu");
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, "%d");
+    CHECK(size(&fh), 0);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
     return PASS;
 }

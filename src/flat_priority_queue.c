@@ -52,7 +52,18 @@ ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
 void *
 ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
 {
-    void *const new = ccc_buf_alloc(&fpq->impl_.buf_);
+    void *new = ccc_buf_alloc(&fpq->impl_.buf_);
+    if (ccc_buf_size(&fpq->impl_.buf_) == ccc_buf_capacity(&fpq->impl_.buf_))
+    {
+        new = NULL;
+        ccc_result const extra_space = ccc_buf_realloc(
+            &fpq->impl_.buf_, ccc_buf_capacity(&fpq->impl_.buf_) * 2,
+            fpq->impl_.buf_.impl_.alloc_);
+        if (extra_space == CCC_OK)
+        {
+            new = ccc_buf_back(&fpq->impl_.buf_);
+        }
+    }
     if (!new)
     {
         return NULL;
@@ -65,7 +76,8 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
     size_t i = buf_sz - 1;
     if (buf_sz > 1)
     {
-        uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
+        void *tmp
+            = ccc_buf_at(&fpq->impl_.buf_, ccc_buf_size(&fpq->impl_.buf_));
         i = ccc_impl_fpq_bubble_up(&fpq->impl_, tmp, i);
     }
     else
@@ -87,7 +99,7 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
         ccc_buf_pop_back(&fpq->impl_.buf_);
         return;
     }
-    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
+    void *tmp = ccc_buf_at(&fpq->impl_.buf_, ccc_buf_size(&fpq->impl_.buf_));
     swap(&fpq->impl_, tmp, 0, ccc_buf_size(&fpq->impl_.buf_) - 1);
     ccc_buf_pop_back(&fpq->impl_.buf_);
     bubble_down(&fpq->impl_, tmp, 0);
@@ -115,7 +127,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
         ccc_buf_pop_back(&fpq->impl_.buf_);
         return ret;
     }
-    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
+    void *tmp = ccc_buf_at(&fpq->impl_.buf_, ccc_buf_size(&fpq->impl_.buf_));
     swap(&fpq->impl_, tmp, swap_location, ccc_buf_size(&fpq->impl_.buf_) - 1);
     void *const erased = at(&fpq->impl_, ccc_buf_size(&fpq->impl_.buf_) - 1);
     ccc_buf_pop_back(&fpq->impl_.buf_);
@@ -142,7 +154,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
         return false;
     }
     fn((ccc_update){e, aux});
-    uint8_t tmp[ccc_buf_elem_size(&fpq->impl_.buf_)];
+    void *tmp = ccc_buf_at(&fpq->impl_.buf_, ccc_buf_size(&fpq->impl_.buf_));
     size_t const i = index_of(&fpq->impl_, e);
     if (!i)
     {

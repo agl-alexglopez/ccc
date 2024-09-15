@@ -54,8 +54,10 @@ ccc_buf_alloc(ccc_buffer *buf)
 {
     if (buf->impl_.sz_ != buf->impl_.capacity_)
     {
-        return ((uint8_t *)buf->impl_.mem_
-                + (buf->impl_.elem_sz_ * buf->impl_.sz_++));
+        void *const ret = ((uint8_t *)buf->impl_.mem_
+                           + (buf->impl_.elem_sz_ * buf->impl_.sz_));
+        ++buf->impl_.sz_;
+        return ret;
     }
     if (ccc_buf_realloc(buf, buf->impl_.capacity_ * 2, buf->impl_.alloc_)
         == CCC_OK)

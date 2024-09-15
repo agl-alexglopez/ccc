@@ -38,54 +38,57 @@ main()
 static enum test_result
 pq_test_empty(void)
 {
-    struct val vals[1] = {{0}};
+    struct val vals[2] = {};
     ccc_flat_priority_queue pq
-        = CCC_FPQ_INIT(vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
-    CHECK(ccc_fpq_empty(&pq), true, "%d");
+        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(struct val)), struct val,
+                       CCC_LES, NULL, val_cmp, NULL);
+    CHECK(ccc_fpq_empty(&pq), true);
     return PASS;
 }
 
 static enum test_result
 pq_test_macro(void)
 {
-    struct val vals[1] = {{0}};
+    struct val vals[2] = {};
     ccc_flat_priority_queue pq
-        = CCC_FPQ_INIT(&vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        = CCC_FPQ_INIT(&vals, (sizeof(vals) / sizeof(struct val)), struct val,
+                       CCC_LES, NULL, val_cmp, NULL);
     struct val *res = CCC_FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
-    CHECK(res != NULL, true, "%d");
-    CHECK(ccc_fpq_empty(&pq), false, "%d");
+    CHECK(res != NULL, true);
+    CHECK(ccc_fpq_empty(&pq), false);
     struct val *res2 = CCC_FPQ_EMPLACE(&pq, (struct val){.val = 0, .id = 0});
-    CHECK(res2 == NULL, true, "%d");
+    CHECK(res2 == NULL, true);
     return PASS;
 }
 
 static enum test_result
 pq_test_push(void)
 {
-    struct val vals[1] = {{0}};
+    struct val vals[3] = {};
     ccc_flat_priority_queue pq
-        = CCC_FPQ_INIT(&vals, 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        = CCC_FPQ_INIT(&vals, (sizeof(vals) / sizeof(struct val)), struct val,
+                       CCC_LES, NULL, val_cmp, NULL);
     struct val *res = ccc_fpq_push(&pq, &vals[0]);
-    CHECK(res != NULL, true, "%d");
-    CHECK(ccc_fpq_empty(&pq), false, "%d");
+    CHECK(res != NULL, true);
+    CHECK(ccc_fpq_empty(&pq), false);
     return PASS;
 }
 
 static enum test_result
 pq_test_raw_type(void)
 {
-    int vals[3] = {0};
-    ccc_flat_priority_queue pq
-        = CCC_FPQ_INIT(&vals, 3, int, CCC_LES, NULL, int_cmp, NULL);
+    int vals[4] = {};
+    ccc_flat_priority_queue pq = CCC_FPQ_INIT(
+        &vals, (sizeof(vals) / sizeof(int)), int, CCC_LES, NULL, int_cmp, NULL);
     int val = 1;
     int *res = ccc_fpq_push(&pq, &val);
-    CHECK(res != NULL, true, "%d");
-    CHECK(ccc_fpq_empty(&pq), false, "%d");
+    CHECK(res != NULL, true);
+    CHECK(ccc_fpq_empty(&pq), false);
     res = CCC_FPQ_EMPLACE(&pq, -1);
-    CHECK(res != NULL, true, "%d");
-    CHECK(ccc_fpq_size(&pq), 2, "%zu");
+    CHECK(res != NULL, true);
+    CHECK(ccc_fpq_size(&pq), 2);
     int *popped = ccc_fpq_front(&pq);
-    CHECK(*popped, -1, "%d");
+    CHECK(*popped, -1);
     return PASS;
 }
 

@@ -811,7 +811,7 @@ rebalance_3_child(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *p_of_xy,
             demote(rom, p_of_xy);
             demote(rom, y);
         }
-        else /* p(x) is 1,3 and y is not a 2,2 parent and x is 3-child.*/
+        else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
             assert(is_3_child(rom, p_of_xy, x));
             rebalance_via_rotation(rom, p_of_xy, x, y);
@@ -833,8 +833,6 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom,
     if (is_1_child(rom, y, w))
     {
         rotate(rom, z, y, y->branch_[z_to_x_dir], z_to_x_dir);
-        assert(y->branch_[z_to_x_dir] == z);
-        assert(y->branch_[!z_to_x_dir] == w);
         promote(rom, y);
         demote(rom, z);
         if (is_leaf(rom, z))
@@ -848,8 +846,6 @@ rebalance_via_rotation(struct ccc_rtom_ *const rom,
         assert(is_2_child(rom, y, w));
         assert(is_1_child(rom, y, v));
         double_rotate(rom, z, y, v, !z_to_x_dir);
-        assert(v->branch_[z_to_x_dir] == z);
-        assert(v->branch_[!z_to_x_dir] == y);
         double_promote(rom, v);
         demote(rom, y);
         double_demote(rom, z);
@@ -899,17 +895,18 @@ transplant(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove,
 /** A single rotation is symmetric. Here is the right case. Lowercase are nodes
 and uppercase are arbitrary subtrees.
         z            x
-      /   \        /   \
+     ╭──┴──╮      ╭──┴──╮
      x     C      A     z
-    / \      ->        / \
+   ╭─┴─╮      ->      ╭─┴─╮
    A   y              y   C
-       |              |
+       │              │
        B              B*/
 static inline void
 rotate(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const z_p_of_x,
        struct ccc_rtom_elem_ *const x_p_of_y, struct ccc_rtom_elem_ *const y,
        enum rtom_link_ dir)
 {
+    assert(z_p_of_x != &rom->end_);
     struct ccc_rtom_elem_ *const p_of_p_of_x = z_p_of_x->parent_;
     x_p_of_y->parent_ = p_of_p_of_x;
     if (p_of_p_of_x == &rom->end_)
@@ -931,11 +928,11 @@ would invoke pointless memory writes. Here is an example of double right.
 Lowercase are nodes and uppercase are arbitrary subtrees.
 
         z            y
-      /   \        /   \
+     ╭──┴──╮      ╭──┴──╮
      x     D      x     z
-    / \      ->  / \   / \
+   ╭─┴─╮     -> ╭─┴─╮ ╭─┴─╮
    A   y        A   B C   D
-      / \
+     ╭─┴─╮
      B   C */
 static inline void
 double_rotate(struct ccc_rtom_ *const rom,
@@ -943,6 +940,9 @@ double_rotate(struct ccc_rtom_ *const rom,
               struct ccc_rtom_elem_ *const x_p_of_y,
               struct ccc_rtom_elem_ *const y, enum rtom_link_ dir)
 {
+    assert(z_p_of_x != &rom->end_);
+    assert(x_p_of_y != &rom->end_);
+    assert(y != &rom->end_);
     struct ccc_rtom_elem_ *const p_of_p_of_x = z_p_of_x->parent_;
     y->parent_ = p_of_p_of_x;
     if (p_of_p_of_x == &rom->end_)
@@ -953,13 +953,11 @@ double_rotate(struct ccc_rtom_ *const rom,
     {
         p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = y;
     }
-    /* Fix x. */
     x_p_of_y->branch_[!dir] = y->branch_[dir];
     y->branch_[dir]->parent_ = x_p_of_y;
     y->branch_[dir] = x_p_of_y;
     x_p_of_y->parent_ = y;
 
-    /* Fix z. */
     z_p_of_x->branch_[dir] = y->branch_[!dir];
     y->branch_[!dir]->parent_ = z_p_of_x;
     y->branch_[!dir] = z_p_of_x;

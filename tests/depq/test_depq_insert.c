@@ -46,8 +46,8 @@ depq_test_insert_one(void)
     struct val single;
     single.val = 0;
     ccc_depq_push(&pq, &single.elem);
-    CHECK(empty(&pq), false, "%d");
-    CHECK(((struct val *)ccc_depq_root(&pq))->val == single.val, true, "%d");
+    CHECK(empty(&pq), false);
+    CHECK(((struct val *)ccc_depq_root(&pq))->val == single.val, true);
     return PASS;
 }
 
@@ -61,10 +61,10 @@ depq_test_insert_three(void)
     {
         three_vals[i].val = i;
         ccc_depq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
-        CHECK(size(&pq), (size_t)i + 1, "%zu");
+        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(size(&pq), (size_t)i + 1);
     }
-    CHECK(size(&pq), (size_t)3, "%zu");
+    CHECK(size(&pq), (size_t)3);
     return PASS;
 }
 
@@ -83,14 +83,14 @@ depq_test_struct_getter(void)
         tester_clone[i].val = i;
         ccc_depq_push(&pq, &vals[i].elem);
         ccc_depq_push(&pq_tester_clone, &tester_clone[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
+        CHECK(ccc_depq_validate(&pq), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
         struct val const *get = &tester_clone[i];
-        CHECK(get->val, vals[i].val, "%d");
+        CHECK(get->val, vals[i].val);
     }
-    CHECK(size(&pq), (size_t)10, "%zu");
+    CHECK(size(&pq), (size_t)10);
     return PASS;
 }
 
@@ -104,10 +104,10 @@ depq_test_insert_three_dups(void)
     {
         three_vals[i].val = 0;
         ccc_depq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
-        CHECK(size(&pq), (size_t)i + 1, "%zu");
+        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(size(&pq), (size_t)i + 1);
     }
-    CHECK(size(&pq), (size_t)3, "%zu");
+    CHECK(size(&pq), (size_t)3);
     return PASS;
 }
 
@@ -120,16 +120,16 @@ depq_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[size];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS, "%d");
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
-    CHECK(max->val, (int)size - 1, "%d");
+    CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     int sorted_check[size];
-    CHECK(inorder_fill(sorted_check, size, &pq), size, "%zu");
+    CHECK(inorder_fill(sorted_check, size, &pq), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i], "%d");
+        CHECK(vals[i].val, sorted_check[i]);
     }
     return PASS;
 }
@@ -144,13 +144,13 @@ depq_test_read_max_min(void)
     {
         vals[i].val = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true, "%d");
-        CHECK(size(&pq), (size_t)i + 1, "%zu");
+        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(size(&pq), (size_t)i + 1);
     }
-    CHECK(size(&pq), (size_t)10, "%zu");
+    CHECK(size(&pq), (size_t)10);
     struct val const *max = ccc_depq_max(&pq);
-    CHECK(max->val, 9, "%d");
+    CHECK(max->val, 9);
     struct val const *min = ccc_depq_min(&pq);
-    CHECK(min->val, 0, "%d");
+    CHECK(min->val, 0);
     return PASS;
 }

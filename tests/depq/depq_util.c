@@ -42,11 +42,11 @@ insert_shuffled(ccc_double_ended_priority_queue *pq, struct val vals[],
     {
         vals[shuffled_index].val = (int)shuffled_index;
         ccc_depq_push(pq, &vals[shuffled_index].elem);
-        CHECK(size(pq), i + 1, "%zu");
-        CHECK(ccc_depq_validate(pq), true, "%d");
+        CHECK(size(pq), i + 1);
+        CHECK(ccc_depq_validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(size(pq), size, "%zu");
+    CHECK(size(pq), size);
     return PASS;
 }
 

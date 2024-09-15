@@ -17,27 +17,27 @@
 
 /*======================     Entry API  =====================================*/
 
-#define ccc_impl_insert(container_ptr, key_val_container_handle_ptr)           \
+#define ccc_impl_insert(container_ptr, key_val_container_handle_ptr...)        \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_insert,                                   \
         ccc_ordered_map *: ccc_om_insert,                                      \
         ccc_realtime_ordered_map *: ccc_rom_insert)(                           \
         (container_ptr), (key_val_container_handle_ptr))
 
-#define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr)        \
+#define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr...)     \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_insert(container_ptr, key_val_container_handle_ptr).impl_     \
     }
 
-#define ccc_impl_remove(container_ptr, key_val_container_handle_ptr)           \
+#define ccc_impl_remove(container_ptr, key_val_container_handle_ptr...)        \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_remove,                                   \
         ccc_ordered_map *: ccc_om_remove,                                      \
-        ccc_realtime_ordered_map *: ccc_rom_remove)(                           \
-        (container_ptr), (key_val_container_handle_ptr))
+        ccc_realtime_ordered_map                                               \
+            *: ccc_rom_remove)((container_ptr), key_val_container_handle_ptr)
 
-#define ccc_impl_remove_vr(container_ptr, key_val_container_handle_ptr)        \
+#define ccc_impl_remove_vr(container_ptr, key_val_container_handle_ptr...)     \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_remove(container_ptr, key_val_container_handle_ptr).impl_     \
@@ -55,28 +55,28 @@
         ccc_impl_remove_entry(container_entry_ptr).impl_                       \
     }
 
-#define ccc_impl_entry(container_ptr, key_ptr)                                 \
+#define ccc_impl_entry(container_ptr, key_ptr...)                              \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_entry,                                    \
         ccc_ordered_map *: ccc_om_entry,                                       \
-        ccc_realtime_ordered_map *: ccc_rom_entry)((container_ptr), (key_ptr))
+        ccc_realtime_ordered_map *: ccc_rom_entry)((container_ptr), key_ptr)
 
-#define ccc_impl_entry_vr(container_ptr, key_ptr)                              \
+#define ccc_impl_entry_vr(container_ptr, key_ptr...)                           \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map                                                      \
             *: &(ccc_fh_map_entry){ccc_fhm_entry(                              \
                                        (ccc_flat_hash_map *)(container_ptr),   \
-                                       (key_ptr))                              \
+                                       key_ptr)                                \
                                        .impl_},                                \
         ccc_ordered_map                                                        \
             *: &(ccc_o_map_entry){ccc_om_entry(                                \
                                       (ccc_ordered_map *)(container_ptr),      \
-                                      (key_ptr))                               \
+                                      key_ptr)                                 \
                                       .impl_},                                 \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_rtom_entry){                                              \
                 ccc_rom_entry((ccc_realtime_ordered_map *)(container_ptr),     \
-                              (key_ptr))                                       \
+                              key_ptr)                                         \
                     .impl_})
 
 #define ccc_impl_and_modify(container_entry_ptr, mod_fn)                       \
@@ -85,27 +85,28 @@
         ccc_o_map_entry *: ccc_om_and_modify,                                  \
         ccc_rtom_entry *: ccc_rom_and_modify)((container_entry_ptr), (mod_fn))
 
-#define ccc_impl_and_modify_with(container_entry_ptr, mod_fn, aux_data_ptr)    \
+#define ccc_impl_and_modify_with(container_entry_ptr, mod_fn, aux_data_ptr...) \
     _Generic((container_entry_ptr),                                            \
         ccc_fh_map_entry *: ccc_fhm_and_modify_with,                           \
         ccc_o_map_entry *: ccc_om_and_modify_with,                             \
         ccc_rtom_entry *: ccc_rom_and_modify_with)((container_entry_ptr),      \
-                                                   (mod_fn), (aux_data_ptr))
+                                                   (mod_fn), aux_data_ptr)
 
 #define ccc_impl_insert_entry(container_entry_ptr,                             \
-                              key_val_container_handle_ptr)                    \
+                              key_val_container_handle_ptr...)                 \
     _Generic((container_entry_ptr),                                            \
         ccc_fh_map_entry *: ccc_fhm_insert_entry,                              \
         ccc_o_map_entry *: ccc_om_insert_entry,                                \
-        ccc_rtom_entry *: ccc_rom_insert_entry)(                               \
-        (container_entry_ptr), (key_val_container_handle_ptr))
+        ccc_rtom_entry *: ccc_rom_insert_entry)((container_entry_ptr),         \
+                                                key_val_container_handle_ptr)
 
-#define ccc_impl_or_insert(container_entry_ptr, key_val_container_handle_ptr)  \
+#define ccc_impl_or_insert(container_entry_ptr,                                \
+                           key_val_container_handle_ptr...)                    \
     _Generic((container_entry_ptr),                                            \
         ccc_fh_map_entry *: ccc_fhm_or_insert,                                 \
         ccc_o_map_entry *: ccc_om_or_insert,                                   \
         ccc_rtom_entry *: ccc_rom_or_insert)((container_entry_ptr),            \
-                                             (key_val_container_handle_ptr))
+                                             key_val_container_handle_ptr)
 
 #define ccc_impl_unwrap(container_entry_ptr)                                   \
     _Generic((container_entry_ptr),                                            \
@@ -130,44 +131,44 @@
 
 /*======================    Misc Search API  ================================*/
 
-#define ccc_impl_get_key_val(container_ptr, key_ptr)                           \
+#define ccc_impl_get_key_val(container_ptr, key_ptr...)                        \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_get_key_val,                              \
         ccc_ordered_map *: ccc_om_get_key_val,                                 \
         ccc_realtime_ordered_map *: ccc_rom_get_key_val)((container_ptr),      \
-                                                         (key_ptr))
+                                                         key_ptr)
 
-#define ccc_impl_contains(container_ptr, key_ptr)                              \
+#define ccc_impl_contains(container_ptr, key_ptr...)                           \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_contains,                                 \
         ccc_ordered_map *: ccc_om_contains,                                    \
         ccc_realtime_ordered_map *: ccc_rom_contains,                          \
         ccc_double_ended_priority_queue *: ccc_depq_contains)((container_ptr), \
-                                                              (key_ptr))
+                                                              key_ptr)
 
 /*================       Sequential Containers API =====================*/
 
-#define ccc_impl_push(container_ptr, container_handle_ptr)                     \
+#define ccc_impl_push(container_ptr, container_handle_ptr...)                  \
     _Generic((container_ptr),                                                  \
         ccc_double_ended_priority_queue *: ccc_depq_push,                      \
         ccc_flat_priority_queue *: ccc_fpq_push,                               \
         ccc_priority_queue *: ccc_pq_push)((container_ptr),                    \
-                                           (container_handle_ptr))
+                                           container_handle_ptr)
 
-#define ccc_impl_push_back(container_ptr, container_handle_ptr)                \
+#define ccc_impl_push_back(container_ptr, container_handle_ptr...)             \
     _Generic((container_ptr),                                                  \
         ccc_flat_double_ended_queue *: ccc_fdeq_push_back,                     \
         ccc_doubly_linked_list *: ccc_dll_push_back,                           \
         ccc_buffer *: ccc_buf_push_back)((container_ptr),                      \
-                                         (container_handle_ptr))
+                                         container_handle_ptr)
 
-#define ccc_impl_push_front(container_ptr, container_handle_ptr)               \
+#define ccc_impl_push_front(container_ptr, container_handle_ptr...)            \
     _Generic((container_ptr),                                                  \
         ccc_flat_double_ended_queue *: ccc_fdeq_push_front,                    \
         ccc_doubly_linked_list *: ccc_dll_push_front,                          \
         ccc_singly_linked_list *: ccc_sll_push_front,                          \
         ccc_buffer *: ccc_buf_push_front)((container_ptr),                     \
-                                          (container_handle_ptr))
+                                          container_handle_ptr)
 
 #define ccc_impl_pop(container_ptr)                                            \
     _Generic((container_ptr),                                                  \
@@ -202,39 +203,30 @@
 
 /*================       Priority Queue Update API =====================*/
 
-#define ccc_impl_update(container_ptr, container_handle_ptr, update_fn_ptr,    \
-                        aux_data_ptr)                                          \
+#define ccc_impl_update(container_ptr, update_args...)                         \
     _Generic((container_ptr),                                                  \
         ccc_double_ended_priority_queue *: ccc_depq_update,                    \
         ccc_flat_priority_queue *: ccc_fpq_update,                             \
-        ccc_priority_queue *: ccc_pq_update)((container_ptr),                  \
-                                             (container_handle_ptr),           \
-                                             (update_fn_ptr), (aux_data_ptr))
+        ccc_priority_queue *: ccc_pq_update)((container_ptr), update_args)
 
-#define ccc_impl_increase(container_ptr, container_handle_ptr,                 \
-                          increase_fn_ptr, aux_data_ptr)                       \
+#define ccc_impl_increase(container_ptr, increase_args...)                     \
     _Generic((container_ptr),                                                  \
         ccc_double_ended_priority_queue *: ccc_depq_increase,                  \
         ccc_flat_priority_queue *: ccc_fpq_increase,                           \
-        ccc_priority_queue                                                     \
-            *: ccc_pq_increase)((container_ptr), (container_handle_ptr),       \
-                                (increase_fn_ptr), (aux_data_ptr))
+        ccc_priority_queue *: ccc_pq_increase)((container_ptr), increase_args)
 
-#define ccc_impl_decrease(container_ptr, container_handle_ptr,                 \
-                          decrease_fn_ptr, aux_data_ptr)                       \
+#define ccc_impl_decrease(container_ptr, decrease_args...)                     \
     _Generic((container_ptr),                                                  \
         ccc_double_ended_priority_queue *: ccc_depq_decrease,                  \
         ccc_flat_priority_queue *: ccc_fpq_decrease,                           \
-        ccc_priority_queue                                                     \
-            *: ccc_pq_decrease)((container_ptr), (container_handle_ptr),       \
-                                (decrease_fn_ptr), (aux_data_ptr))
+        ccc_priority_queue *: ccc_pq_decrease)((container_ptr), decrease_args)
 
-#define ccc_impl_erase(container_ptr, container_handle_ptr)                    \
+#define ccc_impl_erase(container_ptr, container_handle_ptr...)                 \
     _Generic((container_ptr),                                                  \
         ccc_double_ended_priority_queue *: ccc_depq_erase,                     \
         ccc_flat_priority_queue *: ccc_fpq_erase,                              \
         ccc_priority_queue *: ccc_pq_erase)((container_ptr),                   \
-                                            (container_handle_ptr))
+                                            container_handle_ptr)
 
 /*===================       Iterators API ==============================*/
 
@@ -300,19 +292,19 @@
         ccc_doubly_linked_list *: ccc_dll_rend,                                \
         ccc_realtime_ordered_map *: ccc_rom_rend)((container_ptr))
 
-#define ccc_impl_equal_range(container_ptr, begin_key_ptr, end_key_ptr)        \
+#define ccc_impl_equal_range(container_ptr, begin_and_end_key_ptr...)          \
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_range,                                 \
         ccc_double_ended_priority_queue *: ccc_depq_equal_range,               \
-        ccc_realtime_ordered_map *: ccc_rom_equal_range)(                      \
-        (container_ptr), (begin_key_ptr), (end_key_ptr))
+        ccc_realtime_ordered_map                                               \
+            *: ccc_rom_equal_range)((container_ptr), begin_and_end_key_ptr)
 
-#define ccc_impl_equal_rrange(container_ptr, rbegin_key_ptr, rend_key_ptr)     \
+#define ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr...)       \
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_rrange,                                \
         ccc_double_ended_priority_queue *: ccc_depq_equal_rrange,              \
-        ccc_realtime_ordered_map *: ccc_rom_equal_rrange)(                     \
-        (container_ptr), (rbegin_key_ptr), (rend_key_ptr))
+        ccc_realtime_ordered_map                                               \
+            *: ccc_rom_equal_rrange)((container_ptr), rbegin_and_rend_key_ptr)
 
 /*===================    Standard Getters API ==============================*/
 
