@@ -78,7 +78,7 @@ pq_test_insert_erase_shuffled(void)
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
@@ -101,7 +101,7 @@ pq_test_pop_max(void)
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
@@ -125,7 +125,7 @@ pq_test_pop_min(void)
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)

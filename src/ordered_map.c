@@ -202,7 +202,7 @@ ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){
+        fn(&(ccc_update){
             .container = e->impl_.entry_.e_,
             .aux = NULL,
         });
@@ -215,7 +215,7 @@ ccc_om_and_modify_with(ccc_o_map_entry *const e, ccc_update_fn *fn, void *aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){
+        fn(&(ccc_update){
             .container = e->impl_.entry_.e_,
             .aux = aux,
         });
@@ -726,7 +726,7 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_tree_ const *const t, void const *const key,
     struct ccc_node_ const *const node, ccc_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
+    return fn(&(ccc_key_cmp){
         .container = struct_base(t, node),
         .key = key,
         .aux = t->aux_,

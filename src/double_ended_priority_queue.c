@@ -120,8 +120,8 @@ static struct ccc_node_ *get_parent(struct ccc_tree_ const *,
 
 /* Comparison function returns */
 
-static ccc_threeway_cmp force_find_grt(ccc_key_cmp);
-static ccc_threeway_cmp force_find_les(ccc_key_cmp);
+static ccc_threeway_cmp force_find_grt(ccc_key_cmp const *);
+static ccc_threeway_cmp force_find_les(ccc_key_cmp const *);
 /* The key comes first. It is the "left hand side" of the comparison. */
 static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
                             struct ccc_node_ const *, ccc_key_cmp_fn *);
@@ -294,7 +294,7 @@ ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
     {
         return false;
     }
-    fn((ccc_update){e, aux});
+    fn(&(ccc_update){e, aux});
     multimap_insert(&pq->impl_, &elem->impl_);
     return true;
 }
@@ -926,7 +926,7 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_tree_ const *const t, void const *const key,
     struct ccc_node_ const *const node, ccc_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
+    return fn(&(ccc_key_cmp){
         .container = struct_base(t, node),
         .key = key,
         .aux = t->aux_,
@@ -940,16 +940,14 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters) */
 static ccc_threeway_cmp
-force_find_grt(ccc_key_cmp const cmp)
+force_find_grt([[maybe_unused]] ccc_key_cmp const *const cmp)
 {
-    (void)cmp;
     return CCC_GRT;
 }
 
 static ccc_threeway_cmp
-force_find_les(ccc_key_cmp const cmp)
+force_find_les([[maybe_unused]] ccc_key_cmp const *const cmp)
 {
-    (void)cmp;
     return CCC_LES;
 }
 

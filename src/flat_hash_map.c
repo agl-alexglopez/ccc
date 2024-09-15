@@ -133,7 +133,7 @@ ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ *const e, ccc_update_fn *const fn)
 {
     if (e->entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){e->entry_.e_, NULL});
+        fn(&(ccc_update){e->entry_.e_, NULL});
     }
     return e;
 }
@@ -144,7 +144,7 @@ ccc_fhm_and_modify_with(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){e->impl_.entry_.e_, aux});
+        fn(&(ccc_update){e->impl_.entry_.e_, aux});
     }
     return e;
 }
@@ -320,7 +320,7 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
         }
         if (hash == e->hash_
             && h->eq_fn_(
-                (ccc_key_cmp){.container = slot, .key = key, .aux = h->aux_}))
+                &(ccc_key_cmp){.container = slot, .key = key, .aux = h->aux_}))
         {
             return (struct ccc_entry_){.e_ = slot,
                                        .stats_ = CCC_ENTRY_OCCUPIED};

@@ -125,7 +125,7 @@ depq_test_insert_shuffle(void)
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
     CHECK(min->val, 0);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), size);
     for (size_t i = 0; i < size; ++i)
     {

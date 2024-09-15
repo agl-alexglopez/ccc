@@ -58,9 +58,9 @@ static enum test_result run_lru_cache(void);
 static void lru_put(struct lru_cache *, int key, int val);
 static int lru_get(struct lru_cache *, int key);
 static struct key_val *lru_head(struct lru_cache *);
-static bool lru_lookup_cmp(ccc_key_cmp);
+static bool lru_lookup_cmp(ccc_key_cmp const *);
 
-static ccc_threeway_cmp cmp_by_key(ccc_cmp cmp);
+static ccc_threeway_cmp cmp_by_key(ccc_cmp const *cmp);
 
 /* Disable me if tests start failing! */
 static bool const quiet = true;
@@ -181,16 +181,16 @@ lru_head(struct lru_cache *const lru)
 }
 
 static bool
-lru_lookup_cmp(ccc_key_cmp const cmp)
+lru_lookup_cmp(ccc_key_cmp const *const cmp)
 {
-    struct lru_lookup const *const lookup = cmp.container;
-    return lookup->key == *((int *)cmp.key);
+    struct lru_lookup const *const lookup = cmp->container;
+    return lookup->key == *((int *)cmp->key);
 }
 
 static ccc_threeway_cmp
-cmp_by_key(ccc_cmp const cmp)
+cmp_by_key(ccc_cmp const *const cmp)
 {
-    struct key_val const *const kv_a = cmp.container_a;
-    struct key_val const *const kv_b = cmp.container_b;
+    struct key_val const *const kv_a = cmp->container_a;
+    struct key_val const *const kv_b = cmp->container_b;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }

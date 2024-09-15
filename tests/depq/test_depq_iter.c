@@ -71,7 +71,7 @@ depq_test_forward_iter_unique_vals(void)
         CHECK(ccc_depq_validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
-    int val_keys_inorder[num_nodes];
+    int val_keys_inorder[33];
     CHECK(inorder_fill(val_keys_inorder, num_nodes, &pq), size(&pq));
     j = num_nodes - 1;
     for (struct val *e = begin(&pq); e && j >= 0; e = next(&pq, &e->elem), --j)
@@ -108,7 +108,7 @@ depq_test_forward_iter_all_vals(void)
             CHECK(ccc_depq_validate(&pq), true);
         }
     }
-    int val_keys_inorder[num_nodes];
+    int val_keys_inorder[33];
     (void)inorder_fill(val_keys_inorder, num_nodes, &pq);
     j = num_nodes - 1;
     for (struct val *i = begin(&pq); i && j >= 0; i = next(&pq, &i->elem), --j)

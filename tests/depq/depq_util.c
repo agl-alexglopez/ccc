@@ -7,18 +7,18 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_key_cmp const cmp)
+val_cmp(ccc_key_cmp const *const cmp)
 {
-    struct val const *const c = cmp.container;
-    int key = *((int *)cmp.key);
+    struct val const *const c = cmp->container;
+    int key = *((int *)cmp->key);
     return (key > c->val) - (key < c->val);
 }
 
 void
-val_update(ccc_update const u)
+val_update(ccc_update const *const u)
 {
-    struct val *old = u.container;
-    old->val = *(int *)u.aux;
+    struct val *old = u->container;
+    old->val = *(int *)u->aux;
 }
 
 void

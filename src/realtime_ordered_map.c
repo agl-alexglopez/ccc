@@ -306,7 +306,7 @@ ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){.container = e->impl_.entry_.e_, NULL});
+        fn(&(ccc_update){.container = e->impl_.entry_.e_, NULL});
     }
     return e;
 }
@@ -316,7 +316,7 @@ ccc_rom_and_modify_with(ccc_rtom_entry *e, ccc_update_fn *fn, void *aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_update){.container = e->impl_.entry_.e_, aux});
+        fn(&(ccc_update){.container = e->impl_.entry_.e_, aux});
     }
     return e;
 }
@@ -681,7 +681,7 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_rtom_ const *const rom, void const *const key,
     struct ccc_rtom_elem_ const *const node, ccc_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
+    return fn(&(ccc_key_cmp){
         .key = key,
         .container = struct_base(rom, node),
         .aux = rom->aux_,

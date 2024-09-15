@@ -14,7 +14,7 @@ struct val
     ccc_rtom_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_key_cmp);
+ccc_threeway_cmp val_cmp(ccc_key_cmp const *);
 void map_printer_fn(void const *);
 
 enum test_result insert_shuffled(ccc_realtime_ordered_map *m, struct val vals[],

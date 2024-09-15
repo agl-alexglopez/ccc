@@ -244,15 +244,15 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
 static void help(void);
 
-static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
+static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp const *);
 
-static bool eq_parent_cells(ccc_key_cmp);
+static bool eq_parent_cells(ccc_key_cmp const *);
 static uint64_t hash_parent_cells(void const *point_struct);
-static bool eq_prev_vertices(ccc_key_cmp);
+static bool eq_prev_vertices(ccc_key_cmp const *);
 static uint64_t hash_vertex_addr(void const *pointer_to_vertex);
 static uint64_t hash_64_bits(uint64_t);
 
-static void pq_update_dist(ccc_update);
+static void pq_update_dist(ccc_update const *);
 static void map_pq_prev_vertex_dist_point_destructor(void *);
 static void map_parent_point_destructor(void *);
 static unsigned count_digits(uintmax_t n);
@@ -384,7 +384,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         vertex_title_indices[i] = i;
     }
     /* Cycle through all vertices with which to join an edge randomly. */
-    rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size);
+    rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size, &(size_t){});
     struct vertex *dst = NULL;
     for (size_t i = 0; i < graph_size; ++i)
     {
@@ -1047,10 +1047,10 @@ build_path_outline(struct graph *graph)
 /*====================    Data Structure Helpers    =========================*/
 
 static bool
-eq_parent_cells(ccc_key_cmp const c)
+eq_parent_cells(ccc_key_cmp const *const c)
 {
-    struct parent_cell const *const pc = c.container;
-    struct point const *const p = c.key;
+    struct parent_cell const *const pc = c->container;
+    struct point const *const p = c->key;
     return pc->key.r == p->r && pc->key.c == p->c;
 }
 
@@ -1062,18 +1062,18 @@ hash_parent_cells(void const *const point_struct)
 }
 
 static ccc_threeway_cmp
-cmp_pq_dist_points(ccc_cmp const cmp)
+cmp_pq_dist_points(ccc_cmp const *const cmp)
 {
-    struct dist_point const *const a = cmp.container_a;
-    struct dist_point const *const b = cmp.container_b;
+    struct dist_point const *const a = cmp->container_a;
+    struct dist_point const *const b = cmp->container_b;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static bool
-eq_prev_vertices(ccc_key_cmp const cmp)
+eq_prev_vertices(ccc_key_cmp const *const cmp)
 {
-    struct prev_vertex const *const a = cmp.container;
-    struct vertex const *const *const v = cmp.key;
+    struct prev_vertex const *const a = cmp->container;
+    struct vertex const *const *const v = cmp->key;
     return a->v == *v;
 }
 
@@ -1093,9 +1093,9 @@ hash_64_bits(uint64_t x)
 }
 
 static void
-pq_update_dist(ccc_update const u)
+pq_update_dist(ccc_update const *const u)
 {
-    ((struct dist_point *)u.container)->dist = *((int *)u.aux);
+    ((struct dist_point *)u->container)->dist = *((int *)u->aux);
 }
 
 static void

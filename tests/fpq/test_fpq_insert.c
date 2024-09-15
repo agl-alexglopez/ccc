@@ -133,7 +133,7 @@ fpq_test_insert_shuffle(void)
 
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     int prev = sorted_check[0];
     for (size_t i = 0; i < size; ++i)

@@ -132,7 +132,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     void *const erased = at(&fpq->impl_, ccc_buf_size(&fpq->impl_.buf_) - 1);
     ccc_buf_pop_back(&fpq->impl_.buf_);
     ccc_threeway_cmp const erased_cmp = fpq->impl_.cmp_(
-        (ccc_cmp){at(&fpq->impl_, swap_location), erased, fpq->impl_.aux_});
+        &(ccc_cmp){at(&fpq->impl_, swap_location), erased, fpq->impl_.aux_});
     if (erased_cmp == fpq->impl_.order_)
     {
         (void)ccc_impl_fpq_bubble_up(&fpq->impl_, tmp, swap_location);
@@ -153,7 +153,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
     {
         return false;
     }
-    fn((ccc_update){e, aux});
+    fn(&(ccc_update){e, aux});
     void *tmp = ccc_buf_at(&fpq->impl_.buf_, ccc_buf_size(&fpq->impl_.buf_));
     size_t const i = index_of(&fpq->impl_, e);
     if (!i)
@@ -161,7 +161,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
         bubble_down(&fpq->impl_, tmp, 0);
         return true;
     }
-    ccc_threeway_cmp const parent_cmp = fpq->impl_.cmp_((ccc_cmp){
+    ccc_threeway_cmp const parent_cmp = fpq->impl_.cmp_(&(ccc_cmp){
         at(&fpq->impl_, i), at(&fpq->impl_, (i - 1) / 2), fpq->impl_.aux_});
     if (parent_cmp == fpq->impl_.order_)
     {
@@ -339,7 +339,7 @@ static inline bool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {
-    return fpq->cmp_((ccc_cmp){winner, loser, fpq->aux_}) == fpq->order_;
+    return fpq->cmp_(&(ccc_cmp){winner, loser, fpq->aux_}) == fpq->order_;
 }
 
 /* NOLINTBEGIN(*misc-no-recursion) */

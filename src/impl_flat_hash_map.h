@@ -93,7 +93,7 @@ void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
         struct ccc_fhm_entry_ fhm_mod_ent_ = (flat_hash_map_entry)->impl_;     \
         if (fhm_mod_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)                  \
         {                                                                      \
-            (mod_fn)((ccc_update){(void *)fhm_mod_ent_.entry_.e_, NULL});      \
+            (mod_fn)(&(ccc_update){(void *)fhm_mod_ent_.entry_.e_, NULL});     \
         }                                                                      \
         fhm_mod_ent_;                                                          \
     })
@@ -105,8 +105,8 @@ void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
         if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)             \
         {                                                                      \
             __auto_type fhm_aux_ = aux;                                        \
-            (mod_fn)(                                                          \
-                (ccc_update){(void *)fhm_mod_with_ent_.entry_.e_, &fhm_aux_}); \
+            (mod_fn)(&(ccc_update){(void *)fhm_mod_with_ent_.entry_.e_,        \
+                                   &fhm_aux_});                                \
         }                                                                      \
         fhm_mod_with_ent_;                                                     \
     })

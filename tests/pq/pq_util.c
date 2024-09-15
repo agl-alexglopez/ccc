@@ -1,18 +1,18 @@
 #include "pq_util.h"
 
 ccc_threeway_cmp
-val_cmp(ccc_cmp const cmp)
+val_cmp(ccc_cmp const *const cmp)
 {
-    struct val const *const lhs = cmp.container_a;
-    struct val const *const rhs = cmp.container_b;
+    struct val const *const lhs = cmp->container_a;
+    struct val const *const rhs = cmp->container_b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 void
-val_update(ccc_update const u)
+val_update(ccc_update const *const u)
 {
-    struct val *const old = u.container;
-    old->val = *(int *)u.aux;
+    struct val *const old = u->container;
+    old->val = *(int *)u->aux;
 }
 
 enum test_result

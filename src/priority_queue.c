@@ -124,7 +124,7 @@ ccc_pq_update(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
     {
         return false;
     }
-    fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+    fn(&(ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
     if (e->impl_.parent_
         && cmp(&ppq->impl_, &e->impl_, e->impl_.parent_) == ppq->impl_.order_)
     {
@@ -150,13 +150,13 @@ ccc_pq_increase(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
     }
     if (ppq->impl_.order_ == CCC_GRT)
     {
-        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        fn(&(ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
         cut_child(&e->impl_);
     }
     else
     {
         ppq->impl_.root_ = delete (&ppq->impl_, &e->impl_);
-        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        fn(&(ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
         init_node(&e->impl_);
     }
     ppq->impl_.root_ = merge(&ppq->impl_, ppq->impl_.root_, &e->impl_);
@@ -175,13 +175,13 @@ ccc_pq_decrease(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
     }
     if (ppq->impl_.order_ == CCC_LES)
     {
-        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        fn(&(ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
         cut_child(&e->impl_);
     }
     else
     {
         ppq->impl_.root_ = delete (&ppq->impl_, &e->impl_);
-        fn((ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
+        fn(&(ccc_update){struct_base(&ppq->impl_, &e->impl_), aux});
         init_node(&e->impl_);
     }
     ppq->impl_.root_ = merge(&ppq->impl_, ppq->impl_.root_, &e->impl_);
@@ -219,7 +219,7 @@ cmp(struct ccc_pq_ const *const ppq, struct ccc_pq_elem_ const *const a,
     struct ccc_pq_elem_ const *const b)
 {
     return ppq->cmp_(
-        (ccc_cmp){struct_base(ppq, a), struct_base(ppq, b), ppq->aux_});
+        &(ccc_cmp){struct_base(ppq, a), struct_base(ppq, b), ppq->aux_});
 }
 
 static inline void *

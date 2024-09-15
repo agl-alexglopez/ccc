@@ -12,13 +12,13 @@ rand_range(int const min, int const max)
 }
 
 void
-rand_shuffle(size_t const elem_size, void *const elems, size_t const n)
+rand_shuffle(size_t const elem_size, void *const elems, size_t const n,
+             void *tmp)
 {
     if (n <= 1)
     {
         return;
     }
-    uint8_t tmp[elem_size];
     uint8_t *elem_view = elems;
     size_t const step = elem_size * sizeof(uint8_t);
     for (size_t i = 0; i < n - 1; ++i)

@@ -118,7 +118,7 @@ pq_test_insert_shuffle(void)
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&pq);
     CHECK(min->val, 0);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), PASS);
     return PASS;
 }

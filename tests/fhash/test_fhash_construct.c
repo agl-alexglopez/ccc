@@ -22,8 +22,8 @@ test_fn const all_tests[NUM_TESTS] = {
 };
 
 static int def(int *);
-static void mod(ccc_update);
-static void modw(ccc_update);
+static void mod(ccc_update const *);
+static void modw(ccc_update const *);
 static int gen(int *);
 
 int
@@ -199,17 +199,17 @@ fhash_test_entry_and_modify_macros(void)
 }
 
 static void
-mod(ccc_update const u)
+mod(ccc_update const *const u)
 {
-    struct val *v = u.container;
+    struct val *v = u->container;
     v->val += 5;
 }
 
 static void
-modw(ccc_update const u)
+modw(ccc_update const *const u)
 {
-    struct val *v = u.container;
-    v->val = *((int *)u.aux);
+    struct val *v = u->container;
+    v->val = *((int *)u->aux);
 }
 
 static int

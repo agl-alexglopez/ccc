@@ -61,17 +61,17 @@ typedef struct
 
 typedef void *ccc_alloc_fn(void *, size_t);
 
-typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
+typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp const *);
 
 typedef void ccc_print_fn(void const *container);
 
-typedef void ccc_update_fn(ccc_update);
+typedef void ccc_update_fn(ccc_update const *);
 
 typedef void ccc_destructor_fn(void *container);
 
-typedef bool ccc_key_eq_fn(ccc_key_cmp);
+typedef bool ccc_key_eq_fn(ccc_key_cmp const *);
 
-typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
+typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp const *);
 
 typedef uint64_t ccc_hash_fn(void const *to_hash);
 

@@ -7,10 +7,10 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_key_cmp const cmp)
+val_cmp(ccc_key_cmp const *const cmp)
 {
-    struct val const *const c = cmp.container;
-    int const key = *((int *)cmp.key);
+    struct val const *const c = cmp->container;
+    int const key = *((int *)cmp->key);
     return (key > c->val) - (key < c->val);
 }
 

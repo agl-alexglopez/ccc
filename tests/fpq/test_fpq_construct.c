@@ -18,7 +18,7 @@ test_fn const all_tests[NUM_TESTS] = {
     pq_test_raw_type,
 };
 
-static ccc_threeway_cmp int_cmp(ccc_cmp);
+static ccc_threeway_cmp int_cmp(ccc_cmp const *);
 
 int
 main()
@@ -93,9 +93,9 @@ pq_test_raw_type(void)
 }
 
 static ccc_threeway_cmp
-int_cmp(ccc_cmp const cmp)
+int_cmp(ccc_cmp const *const cmp)
 {
-    int a = *((int *)cmp.container_a);
-    int b = *((int *)cmp.container_b);
+    int a = *((int *)cmp->container_a);
+    int b = *((int *)cmp->container_b);
     return (a > b) - (a < b);
 }

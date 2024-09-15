@@ -32,9 +32,9 @@ static void test_update(void);
 
 static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
-static ccc_threeway_cmp val_key_cmp(ccc_key_cmp);
-static ccc_threeway_cmp val_cmp(ccc_cmp);
-static void val_update(ccc_update);
+static ccc_threeway_cmp val_key_cmp(ccc_key_cmp const *);
+static ccc_threeway_cmp val_cmp(ccc_cmp const *);
+static void val_update(ccc_update const *);
 
 #define NUM_TESTS (size_t)6
 static depq_perf_fn const perf_tests[NUM_TESTS] = {test_push,
@@ -436,23 +436,23 @@ valid_malloc(size_t bytes)
 }
 
 static ccc_threeway_cmp
-val_key_cmp(ccc_key_cmp const cmp)
+val_key_cmp(ccc_key_cmp const *const cmp)
 {
-    struct val const *const x = cmp.container;
-    int const key = *((int *)cmp.key);
+    struct val const *const x = cmp->container;
+    int const key = *((int *)cmp->key);
     return (key > x->val) - (key < x->val);
 }
 
 static ccc_threeway_cmp
-val_cmp(ccc_cmp const cmp)
+val_cmp(ccc_cmp const *const cmp)
 {
-    struct val const *const a = cmp.container_a;
-    struct val const *const b = cmp.container_b;
+    struct val const *const a = cmp->container_a;
+    struct val const *const b = cmp->container_b;
     return (a->val > b->val) - (a->val < b->val);
 }
 
 static void
-val_update(ccc_update const u)
+val_update(ccc_update const *const u)
 {
-    ((struct val *)u.container)->val = *((int *)u.aux);
+    ((struct val *)u->container)->val = *((int *)u->aux);
 }

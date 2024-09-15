@@ -46,8 +46,8 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         if (om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                    \
         {                                                                      \
             (mod_fn)(                                                          \
-                (ccc_update){.container = (void *const)om_mod_ent_.entry_.e_,  \
-                             .aux = NULL});                                    \
+                &(ccc_update){.container = (void *const)om_mod_ent_.entry_.e_, \
+                              .aux = NULL});                                   \
         }                                                                      \
         om_mod_ent_;                                                           \
     })
@@ -59,8 +59,8 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         {                                                                      \
             __auto_type om_aux_data_ = (aux_data);                             \
             (mod_fn)(                                                          \
-                (ccc_update){.container = (void *const)om_mod_ent_.entry_.e_,  \
-                             .aux = &om_aux_data_});                           \
+                &(ccc_update){.container = (void *const)om_mod_ent_.entry_.e_, \
+                              .aux = &om_aux_data_});                          \
         }                                                                      \
         om_mod_ent_;                                                           \
     })

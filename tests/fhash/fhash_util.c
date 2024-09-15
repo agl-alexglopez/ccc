@@ -18,10 +18,10 @@ fhash_int_last_digit(void const *n)
 }
 
 bool
-fhash_id_eq(ccc_key_cmp const cmp)
+fhash_id_eq(ccc_key_cmp const *const cmp)
 {
-    struct val const *const va = cmp.container;
-    return va->id == *((int *)cmp.key);
+    struct val const *const va = cmp->container;
+    return va->id == *((int *)cmp->key);
 }
 
 void
@@ -43,9 +43,9 @@ fhash_int_to_u64(void const *const id)
 }
 
 void
-fhash_modplus(ccc_update const mod)
+fhash_modplus(ccc_update const *const mod)
 {
-    ((struct val *)mod.container)->val++;
+    ((struct val *)mod->container)->val++;
 }
 
 struct val
@@ -55,8 +55,8 @@ fhash_create(int const id, int const val)
 }
 
 void
-fhash_swap_val(ccc_update const u)
+fhash_swap_val(ccc_update const *const u)
 {
-    struct val *v = u.container;
-    v->val = *((int *)u.aux);
+    struct val *v = u->container;
+    v->val = *((int *)u->aux);
 }
