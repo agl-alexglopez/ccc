@@ -237,8 +237,9 @@ static bool is_vertex(Cell);
 static bool is_path(Cell);
 static struct vertex *vertex_at(struct graph const *g, char name);
 
-static void encode_digits(struct graph *, struct digit_encoding);
-static enum label_orientation get_direction(struct point, struct point);
+static void encode_digits(struct graph const *, struct digit_encoding *);
+static enum label_orientation get_direction(struct point const *,
+                                            struct point const *);
 static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
@@ -425,10 +426,8 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     ccc_flat_double_ended_queue bfs
         = CCC_FDEQ_INIT(NULL, 0, struct point, realloc);
     [[maybe_unused]] struct parent_cell *pc = FHM_INSERT_ENTRY(
-        FHM_ENTRY(&parent_map, src->pos), (struct parent_cell){
-                                              .key = src->pos,
-                                              .parent = (struct point){-1, -1},
-                                          });
+        FHM_ENTRY(&parent_map, src->pos),
+        (struct parent_cell){.key = src->pos, .parent = {-1, -1}});
     assert(pc);
     push_back(&bfs, &src->pos);
     bool success = false;
@@ -439,15 +438,13 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
-            struct point next = {
-                .r = cur.r + dirs[i].r,
-                .c = cur.c + dirs[i].c,
-            };
+            struct point next
+                = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
             struct parent_cell push = {.key = next, .parent = cur};
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                [[maybe_unused]] struct parent_cell *inserted
+                [[maybe_unused]] struct parent_cell const *const inserted
                     = insert_entry(entry_vr(&parent_map, &next), &push.elem);
                 assert(inserted);
                 cur = next;
@@ -457,7 +454,8 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (!is_path(next_cell)
                 && !occupied(try_insert_vr(&parent_map, &push.elem)))
             {
-                [[maybe_unused]] struct point *pushed = push_back(&bfs, &next);
+                [[maybe_unused]] struct point const *const pushed
+                    = push_back(&bfs, &next);
                 assert(pushed);
             }
         }
@@ -512,7 +510,7 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
     {
         if (consecutive_spaces_found == spaces_needed_for_cost)
         {
-            encode_digits(g, (struct digit_encoding){
+            encode_digits(g, &(struct digit_encoding){
                                  .start = cur,
                                  .cost = e->n.cost,
                                  .spaces_needed = spaces_needed_for_cost,
@@ -536,7 +534,7 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
             if ((grid_at(g, next) & edge_id_mask) == edge_id
                 && (prev.r != next.r || prev.c != next.c))
             {
-                direction = get_direction(prev, next);
+                direction = get_direction(&prev, &next);
                 direction == DIAGONAL ? consecutive_spaces_found = 0
                                       : ++consecutive_spaces_found;
                 prev = cur;
@@ -553,36 +551,37 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
    numbers must either be handled left to right or right to left as they
    are laid down such that they are read correctly. */
 static void
-encode_digits(struct graph *g, struct digit_encoding e)
+encode_digits(struct graph const *const g, struct digit_encoding *const e)
 {
-    uintmax_t digits = e.cost;
-    if (e.orientation == NORTH || e.orientation == SOUTH)
+    uintmax_t digits = e->cost;
+    if (e->orientation == NORTH || e->orientation == SOUTH)
     {
-        e.start.r = e.orientation == NORTH
-                        ? e.start.r + (int)e.spaces_needed - 2
-                        : e.start.r - 1;
-        for (; digits; digits /= 10, --e.start.r)
+        e->start.r = e->orientation == NORTH
+                         ? e->start.r + (int)e->spaces_needed - 2
+                         : e->start.r - 1;
+        for (; digits; digits /= 10, --e->start.r)
         {
-            *grid_at_mut(g, e.start) |= digit_bit;
-            *grid_at_mut(g, e.start) |= ((digits % 10) << digit_shift);
+            *grid_at_mut(g, e->start) |= digit_bit;
+            *grid_at_mut(g, e->start) |= ((digits % 10) << digit_shift);
         }
     }
     else
     {
-        e.start.c = e.orientation == WEST ? e.start.c + (int)e.spaces_needed - 2
-                                          : e.start.c - 1;
-        for (; digits; digits /= 10, --e.start.c)
+        e->start.c = e->orientation == WEST
+                         ? e->start.c + (int)e->spaces_needed - 2
+                         : e->start.c - 1;
+        for (; digits; digits /= 10, --e->start.c)
         {
-            *grid_at_mut(g, e.start) |= digit_bit;
-            *grid_at_mut(g, e.start) |= ((digits % 10) << digit_shift);
+            *grid_at_mut(g, e->start) |= digit_bit;
+            *grid_at_mut(g, e->start) |= ((digits % 10) << digit_shift);
         }
     }
 }
 
 static enum label_orientation
-get_direction(struct point prev, struct point next)
+get_direction(struct point const *const prev, struct point const *const next)
 {
-    struct point const diff = {.r = next.r - prev.r, .c = next.c - prev.c};
+    struct point const diff = {.r = next->r - prev->r, .c = next->c - prev->c};
     if (diff.c && !diff.r && diff.c > 0)
     {
         return EAST;

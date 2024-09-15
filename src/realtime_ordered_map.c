@@ -60,7 +60,7 @@ enum rtom_print_link_
     LEAF = 1    /* └── */
 };
 
-struct rtom_query
+struct rtom_query_
 {
     ccc_threeway_cmp last_cmp_;
     union {
@@ -69,11 +69,11 @@ struct rtom_query
     };
 };
 
-enum rtom_link_ const inorder_traversal = R;
-enum rtom_link_ const reverse_inorder_traversal = L;
+static enum rtom_link_ const inorder_traversal = R;
+static enum rtom_link_ const reverse_inorder_traversal = L;
 
-enum rtom_link_ const min = L;
-enum rtom_link_ const max = R;
+static enum rtom_link_ const min = L;
+static enum rtom_link_ const max = R;
 
 /*==============================  Prototypes   ==============================*/
 
@@ -83,7 +83,7 @@ static ccc_threeway_cmp cmp(struct ccc_rtom_ const *, void const *key,
                             ccc_key_cmp_fn *);
 static void *struct_base(struct ccc_rtom_ const *,
                          struct ccc_rtom_elem_ const *);
-static struct rtom_query find(struct ccc_rtom_ const *, void const *key);
+static struct rtom_query_ find(struct ccc_rtom_ const *, void const *key);
 static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
 static void *maybe_alloc_insert(struct ccc_rtom_ *,
                                 struct ccc_rtom_elem_ *parent,
@@ -175,7 +175,7 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
 void *
 ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key)
 {
-    struct rtom_query q = find(&rom->impl_, key);
+    struct rtom_query_ q = find(&rom->impl_, key);
     return (CCC_EQL == q.last_cmp_) ? struct_base(&rom->impl_, q.found_) : NULL;
 }
 
@@ -183,7 +183,7 @@ ccc_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle, void *const tmp)
 {
-    struct rtom_query q
+    struct rtom_query_ q
         = find(&rom->impl_,
                ccc_impl_rom_key_from_node(&rom->impl_, &out_handle->impl_));
     if (CCC_EQL == q.last_cmp_)
@@ -207,7 +207,7 @@ ccc_entry
 ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
                    ccc_rtom_elem *const key_val_handle)
 {
-    struct rtom_query q
+    struct rtom_query_ q
         = find(&rom->impl_,
                ccc_impl_rom_key_from_node(&rom->impl_, &key_val_handle->impl_));
     if (CCC_EQL == q.last_cmp_)
@@ -283,7 +283,7 @@ ccc_entry
 ccc_rom_remove(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct rtom_query q
+    struct rtom_query_ q
         = find(&rom->impl_,
                ccc_impl_rom_key_from_node(&rom->impl_, &out_handle->impl_));
     if (q.last_cmp_ != CCC_EQL)
@@ -493,7 +493,7 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
 struct ccc_rtom_entry_
 ccc_impl_rom_entry(struct ccc_rtom_ const *const rom, void const *const key)
 {
-    struct rtom_query q = find(rom, key);
+    struct rtom_query_ q = find(rom, key);
     if (CCC_EQL == q.last_cmp_)
     {
         return (struct ccc_rtom_entry_){
@@ -575,27 +575,21 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom,
     return ccc_impl_rom_insert(rom, parent, last_cmp, out_handle);
 }
 
-static struct rtom_query
+static struct rtom_query_
 find(struct ccc_rtom_ const *const rom, void const *const key)
 {
-    struct ccc_rtom_elem_ const *parent = &rom->end_;
+    struct ccc_rtom_elem_ *parent = (struct ccc_rtom_elem_ *)&rom->end_;
     ccc_threeway_cmp link = CCC_CMP_ERR;
-    for (struct ccc_rtom_elem_ const *seek = rom->root_; seek != &rom->end_;
+    for (struct ccc_rtom_elem_ *seek = rom->root_; seek != &rom->end_;
          parent = seek, seek = seek->branch_[CCC_GRT == link])
     {
         link = cmp(rom, key, seek, rom->cmp_);
         if (CCC_EQL == link)
         {
-            return (struct rtom_query){
-                .last_cmp_ = CCC_EQL,
-                .found_ = (struct ccc_rtom_elem_ *)seek,
-            };
+            return (struct rtom_query_){.last_cmp_ = CCC_EQL, .found_ = seek};
         }
     }
-    return (struct rtom_query){
-        .last_cmp_ = link,
-        .parent_ = (struct ccc_rtom_elem_ *)parent,
-    };
+    return (struct rtom_query_){.last_cmp_ = link, .parent_ = parent};
 }
 
 static struct ccc_rtom_elem_ *
@@ -638,12 +632,12 @@ equal_range(struct ccc_rtom_ const *const rom, void const *const begin_key,
         return (struct ccc_range_){};
     }
     ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
-    struct rtom_query b = find(rom, begin_key);
+    struct rtom_query_ b = find(rom, begin_key);
     if (b.last_cmp_ == les_or_grt[traversal])
     {
         b.found_ = next(rom, b.found_, traversal);
     }
-    struct rtom_query e = find(rom, end_key);
+    struct rtom_query_ e = find(rom, end_key);
     if (e.last_cmp_ != les_or_grt[!traversal])
     {
         e.found_ = next(rom, e.found_, traversal);
@@ -723,16 +717,12 @@ insert_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *z_p_of_xy,
     if (y == &rom->end_ || is_2_child(rom, z_p_of_xy, y))
     {
         rotate(rom, z_p_of_xy, x, y, !p_to_x_dir);
-        assert(x->branch_[!p_to_x_dir] == z_p_of_xy);
-        assert(z_p_of_xy->branch_[p_to_x_dir] == y);
         demote(rom, z_p_of_xy);
     }
     else
     {
         assert(is_1_child(rom, z_p_of_xy, y));
         double_rotate(rom, z_p_of_xy, x, y, p_to_x_dir);
-        assert(y->branch_[p_to_x_dir] == x);
-        assert(y->branch_[!p_to_x_dir] == z_p_of_xy);
         promote(rom, y);
         demote(rom, x);
         demote(rom, z_p_of_xy);
