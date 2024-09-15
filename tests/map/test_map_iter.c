@@ -57,7 +57,7 @@ map_test_forward_iter(void)
     CHECK(j, 0);
     int const num_nodes = 33;
     int const prime = 37;
-    struct val vals[num_nodes];
+    struct val vals[33];
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
@@ -87,7 +87,7 @@ map_test_iterate_removal(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -119,7 +119,7 @@ map_test_iterate_remove_reinsert(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -155,7 +155,7 @@ map_test_valid_range(void)
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
-    struct val vals[num_nodes];
+    struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
     {
@@ -208,7 +208,7 @@ map_test_valid_range_equals(void)
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
-    struct val vals[num_nodes];
+    struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
     {
@@ -254,7 +254,7 @@ map_test_invalid_range(void)
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     int const num_nodes = 25;
-    struct val vals[num_nodes];
+    struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
     {
@@ -307,7 +307,7 @@ map_test_empty_range(void)
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     int const num_nodes = 25;
-    struct val vals[num_nodes];
+    struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
     {

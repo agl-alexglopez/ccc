@@ -81,7 +81,7 @@ depq_test_insert_erase_shuffled(void)
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
@@ -110,7 +110,7 @@ depq_test_pop_max(void)
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
@@ -139,7 +139,7 @@ depq_test_pop_min(void)
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
@@ -167,7 +167,7 @@ depq_test_max_round_robin(void)
     ccc_double_ended_priority_queue depq
         = CCC_DEPQ_INIT(struct val, elem, val, depq, NULL, val_cmp, NULL);
     int const size = 6;
-    struct val vals[size];
+    struct val vals[6];
     struct val const order[6] = {
         {.id = 0, .val = 99}, {.id = 2, .val = 99}, {.id = 4, .val = 99},
         {.id = 1, .val = 1},  {.id = 3, .val = 1},  {.id = 5, .val = 1},
@@ -205,7 +205,7 @@ depq_test_min_round_robin(void)
     ccc_double_ended_priority_queue depq
         = CCC_DEPQ_INIT(struct val, elem, val, depq, NULL, val_cmp, NULL);
     int const size = 6;
-    struct val vals[size];
+    struct val vals[6];
     struct val const order[6] = {
         {.id = 0, .val = 1},  {.id = 2, .val = 1},  {.id = 4, .val = 1},
         {.id = 1, .val = 99}, {.id = 3, .val = 99}, {.id = 5, .val = 99},
@@ -246,7 +246,7 @@ depq_test_delete_prime_shuffle_duplicates(void)
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
     int const less = 77;
-    struct val vals[size];
+    struct val vals[99];
     int shuffled_index = prime % (size - less);
     for (int i = 0; i < size; ++i)
     {
@@ -285,7 +285,7 @@ depq_test_prime_shuffle(void)
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     int shuffled_index = prime % (size - less);
-    struct val vals[size];
+    struct val vals[50];
     for (int i = 0; i < size; ++i)
     {
         vals[i].val = shuffled_index;
@@ -319,7 +319,7 @@ depq_test_weak_srand(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         vals[i].val = rand(); // NOLINT

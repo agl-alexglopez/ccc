@@ -540,7 +540,7 @@ static enum test_result
 fhash_test_insert_limit(void)
 {
     int const size = 101;
-    struct val vals[size];
+    struct val vals[101];
     ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_to_u64, fhash_id_eq, NULL);

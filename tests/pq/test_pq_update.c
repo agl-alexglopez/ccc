@@ -45,7 +45,7 @@ pq_test_insert_iterate_pop(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -74,7 +74,7 @@ pq_test_priority_removal(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -105,7 +105,7 @@ pq_test_priority_update(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -138,7 +138,7 @@ pq_test_priority_increase(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -177,7 +177,7 @@ pq_test_priority_decrease(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */

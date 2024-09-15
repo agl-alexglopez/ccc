@@ -119,7 +119,7 @@ depq_test_insert_shuffle(void)
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);

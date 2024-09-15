@@ -50,7 +50,7 @@ map_test_prime_shuffle(void)
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
-    struct val vals[size];
+    struct val vals[50];
     bool repeats[size];
     memset(repeats, false, sizeof(bool) * size);
     for (size_t i = 0; i < size; ++i)
@@ -84,7 +84,7 @@ map_test_insert_erase_shuffled(void)
         = CCC_OM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &s), size);
@@ -113,7 +113,7 @@ map_test_weak_srand(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         vals[i].val = rand(); // NOLINT

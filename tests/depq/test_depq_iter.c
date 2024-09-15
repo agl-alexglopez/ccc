@@ -338,7 +338,7 @@ depq_test_priority_invalid_range(void)
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
-    struct val vals[num_nodes];
+    struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
     {
@@ -389,7 +389,7 @@ depq_test_priority_empty_range(void)
         = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
-    struct val vals[num_nodes];
+    struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
     {

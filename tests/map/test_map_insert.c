@@ -126,7 +126,7 @@ map_test_insert_shuffle(void)
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[size];
     CHECK(inorder_fill(sorted_check, size, &s), size);

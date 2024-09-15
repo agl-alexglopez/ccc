@@ -91,7 +91,7 @@ rtomap_test_insert_shuffle(void)
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[size];
+    struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
 
     rom_print(&s, map_printer_fn);
@@ -115,7 +115,7 @@ rtomap_test_insert_weak_srand(void)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
-    struct val vals[num_nodes];
+    struct val vals[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         vals[i].val = rand(); // NOLINT
