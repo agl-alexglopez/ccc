@@ -203,6 +203,27 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
 
+ccc_entry
+ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
+                   ccc_rtom_elem *const key_val_handle)
+{
+    struct rtom_query q
+        = find(&rom->impl_,
+               ccc_impl_rom_key_from_node(&rom->impl_, &key_val_handle->impl_));
+    if (CCC_EQL == q.last_cmp_)
+    {
+        return (ccc_entry){{.e_ = struct_base(&rom->impl_, q.found_),
+                            .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *inserted = maybe_alloc_insert(&rom->impl_, q.parent_, q.last_cmp_,
+                                        &key_val_handle->impl_);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
 ccc_rtom_entry
 ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
 {
@@ -343,7 +364,8 @@ ccc_rom_begin(ccc_realtime_ordered_map const *rom)
 }
 
 void *
-ccc_rom_next(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
+ccc_rom_next(ccc_realtime_ordered_map const *const rom,
+             ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n
         = next(&rom->impl_, &e->impl_, inorder_traversal);
@@ -374,7 +396,8 @@ ccc_rom_rend([[maybe_unused]] ccc_realtime_ordered_map const *const rom)
 }
 
 void *
-ccc_rom_rnext(ccc_realtime_ordered_map *const rom, ccc_rtom_elem const *const e)
+ccc_rom_rnext(ccc_realtime_ordered_map const *const rom,
+              ccc_rtom_elem const *const e)
 {
     struct ccc_rtom_elem_ const *const n
         = next(&rom->impl_, &e->impl_, reverse_inorder_traversal);

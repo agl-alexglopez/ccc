@@ -89,6 +89,12 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
         ccc_om_insert((ordered_map_ptr), (out_handle_ptr), (tmp_ptr)).impl_    \
     }
 
+#define ccc_om_try_insert_vr(ordered_map_ptr, out_handle_ptr)                  \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_om_try_insert((ordered_map_ptr), (out_handle_ptr)).impl_           \
+    }
+
 #define ccc_om_remove_vr(ordered_map_ptr, out_handle_ptr)                      \
     &(ccc_entry)                                                               \
     {                                                                          \
@@ -103,6 +109,8 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
 
 ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle,
                         void *tmp);
+
+ccc_entry ccc_om_try_insert(ccc_ordered_map *, ccc_o_map_elem *key_val_handle);
 
 ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 

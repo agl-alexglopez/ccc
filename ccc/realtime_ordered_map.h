@@ -77,6 +77,12 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
             .impl_                                                             \
     }
 
+#define ccc_rom_try_insert_vr(realtime_ordered_map_ptr, out_handle_ptr)        \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_rom_try_insert((realtime_ordered_map_ptr), (out_handle_ptr)).impl_ \
+    }
+
 #define ccc_rom_remove_vr(realtime_ordered_map_ptr, out_handle_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
@@ -91,6 +97,9 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
 
 ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
                          ccc_rtom_elem *out_handle, void *tmp);
+
+ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
+                             ccc_rtom_elem *key_val_handle);
 
 ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
                          ccc_rtom_elem *out_handle);
@@ -121,10 +130,10 @@ ccc_rrange ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,
                                 void const *rbegin_key, void const *rend_key);
 
 void *ccc_rom_begin(ccc_realtime_ordered_map const *rom);
-void *ccc_rom_next(ccc_realtime_ordered_map *rom, ccc_rtom_elem const *);
+void *ccc_rom_next(ccc_realtime_ordered_map const *rom, ccc_rtom_elem const *);
 
 void *ccc_rom_rbegin(ccc_realtime_ordered_map const *rom);
-void *ccc_rom_rnext(ccc_realtime_ordered_map *rom, ccc_rtom_elem const *);
+void *ccc_rom_rnext(ccc_realtime_ordered_map const *rom, ccc_rtom_elem const *);
 
 void *ccc_rom_end(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_rend(ccc_realtime_ordered_map const *rom);

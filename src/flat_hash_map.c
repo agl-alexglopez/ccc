@@ -162,7 +162,6 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle,
         /* If an error occured when obtaining the entry and trying to resize,
            that is ok. We will not need new space yet. Only allow the insert
            error to persist if we actually need more space. */
-        ent.entry_.stats_ = CCC_ENTRY_OCCUPIED;
         out_handle->impl_.hash_ = ent.hash_;
         swap(tmp, ent.entry_.e_, user_return, user_struct_size);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -174,6 +173,28 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle,
     ccc_impl_fhm_insert(&h->impl_, user_return, ent.hash_,
                         ccc_buf_index_of(&h->impl_.buf_, ent.entry_.e_));
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fhm_try_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *key_val_handle)
+{
+    void *user_return = struct_base(&h->impl_, &key_val_handle->impl_);
+    struct ccc_fhm_entry_ ent = ccc_impl_fhm_entry(
+        &h->impl_, ccc_impl_fhm_key_in_slot(&h->impl_, user_return));
+    if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        /* If an error occured when obtaining the entry and trying to resize,
+           that is ok. We will not need new space yet. Only allow the insert
+           error to persist if we actually need more space. */
+        return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    if (ent.entry_.stats_ & (CCC_ENTRY_CONTAINS_NULL | CCC_ENTRY_INSERT_ERROR))
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    ccc_impl_fhm_insert(&h->impl_, user_return, ent.hash_,
+                        ccc_buf_index_of(&h->impl_.buf_, ent.entry_.e_));
+    return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry

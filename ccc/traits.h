@@ -11,6 +11,12 @@
 #define ccc_insert_vr(container_ptr, key_val_container_handle_ptr...)          \
     ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr)
 
+#define ccc_try_insert(container_ptr, try_insert_args...)                      \
+    ccc_impl_try_insert(container_ptr, try_insert_args)
+
+#define ccc_try_insert_vr(container_ptr, key_val_container_handle_ptr...)      \
+    ccc_impl_try_insert_vr(container_ptr, key_val_container_handle_ptr)
+
 #define ccc_remove(container_ptr, key_val_container_handle_ptr...)             \
     ccc_impl_remove(container_ptr, key_val_container_handle_ptr)
 
@@ -120,6 +126,7 @@
 #ifdef TRAITS_USING_NAMESPACE_CCC
 
 #    define insert(args...) ccc_insert(args)
+#    define try_insert(args...) ccc_try_insert(args)
 #    define insert_vr(args...) ccc_insert_vr(args)
 #    define remove(args...) ccc_remove(args)
 #    define remove_vr(args...) ccc_remove_vr(args)

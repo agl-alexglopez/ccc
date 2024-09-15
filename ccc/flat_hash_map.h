@@ -99,6 +99,12 @@ void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
         ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr), (tmp_ptr)).impl_ \
     }
 
+#define ccc_fhm_try_insert_vr(flat_hash_map_ptr, out_handle_ptr)               \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_try_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_        \
+    }
+
 #define ccc_fhm_remove_entry_vr(flat_hash_map_entry_ptr)                       \
     &(ccc_entry)                                                               \
     {                                                                          \
@@ -111,6 +117,10 @@ ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 /** TODO */
 ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle,
                          void *tmp);
+
+/** TODO */
+ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
+                             ccc_fh_map_elem *key_val_handle);
 
 /** TODO */
 ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);

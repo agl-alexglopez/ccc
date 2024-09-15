@@ -19,6 +19,6 @@ void map_printer_fn(void const *);
 
 enum test_result insert_shuffled(ccc_realtime_ordered_map *m, struct val vals[],
                                  size_t size, int larger_prime);
-size_t inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map *m);
+size_t inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map const *m);
 
 #endif /* CCC_RTOMAP_UTIL_H */

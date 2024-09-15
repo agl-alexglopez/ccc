@@ -1,5 +1,8 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "rtomap_util.h"
 #include "test.h"
+#include "traits.h"
 
 #include <stdio.h>
 
@@ -44,14 +47,14 @@ insert_shuffled(ccc_realtime_ordered_map *m, struct val vals[],
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map *m)
+inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map const *const m)
 {
     if (ccc_rom_size(m) != size)
     {
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = ccc_rom_begin(m); e; e = ccc_rom_next(m, &e->elem))
+    for (struct val *e = begin(m); e != end(m); e = next(m, &e->elem))
     {
         vals[i++] = e->val;
     }
