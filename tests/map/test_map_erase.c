@@ -51,13 +51,13 @@ map_test_prime_shuffle(void)
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
     struct val vals[50];
-    bool repeats[size];
+    bool repeats[50];
     memset(repeats, false, sizeof(bool) * size);
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (occupied(insert_vr(&s, &vals[i].elem)))
+        if (occupied(insert_vr(&s, &vals[i].elem, &(struct val){}.elem)))
         {
             repeats[i] = true;
         }
@@ -86,7 +86,7 @@ map_test_insert_erase_shuffled(void)
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
@@ -118,7 +118,7 @@ map_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_om_validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)

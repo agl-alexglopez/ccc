@@ -57,11 +57,13 @@ map_test_insert_three(void)
     ccc_ordered_map s
         = CCC_OM_INIT(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val swap_slot = {.val = 1, .id = 99};
-    CHECK(occupied(insert_vr(&s, &swap_slot.elem)), false);
+    CHECK(occupied(insert_vr(&s, &swap_slot.elem, &(struct val){}.elem)),
+          false);
     CHECK(ccc_om_validate(&s), true);
     CHECK(size(&s), (size_t)1);
     swap_slot = (struct val){.val = 1, .id = 137};
-    struct val const *ins = unwrap(insert_vr(&s, &swap_slot.elem));
+    struct val const *ins
+        = unwrap(insert_vr(&s, &swap_slot.elem, &(struct val){}.elem));
     CHECK(ccc_om_validate(&s), true);
     CHECK(size(&s), (size_t)1);
     CHECK(ins != NULL, true);
@@ -128,7 +130,7 @@ map_test_insert_shuffle(void)
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {

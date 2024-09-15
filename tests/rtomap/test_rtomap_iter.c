@@ -63,11 +63,11 @@ rtom_test_forward_iter(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
-    int val_keys_inorder[num_nodes];
+    int val_keys_inorder[33];
     CHECK(inorder_fill(val_keys_inorder, num_nodes, &s), size(&s));
     j = 0;
     for (struct val *e = begin(&s); e && j < num_nodes;
@@ -93,7 +93,7 @@ rtom_test_iterate_removal(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -125,7 +125,7 @@ rtom_test_iterate_remove_reinsert(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -161,7 +161,7 @@ rtom_test_valid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -214,7 +214,7 @@ rtom_test_valid_range_equals(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
     }
     /* This should be the following range [5,50). 5 should stay at the start,
@@ -265,7 +265,7 @@ rtom_test_invalid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -317,7 +317,7 @@ rtom_test_empty_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        insert(&s, &vals[i].elem);
+        insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(ccc_rom_validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.

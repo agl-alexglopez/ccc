@@ -83,10 +83,11 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
 
 /* Retain access to old values in the map. See types.h for ccc_entry. */
 
-#define ccc_om_insert_vr(ordered_map_ptr, out_handle_ptr)                      \
+#define ccc_om_insert_vr(ordered_map_ptr, out_handle_ptr, tmp_handle_ptr)      \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_insert((ordered_map_ptr), (out_handle_ptr)).impl_               \
+        ccc_om_insert((ordered_map_ptr), (out_handle_ptr), (tmp_handle_ptr))   \
+            .impl_                                                             \
     }
 
 #define ccc_om_remove_vr(ordered_map_ptr, out_handle_ptr)                      \
@@ -101,7 +102,8 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
         ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
     }
 
-ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle,
+                        ccc_o_map_elem *tmp_handle);
 
 ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 

@@ -45,7 +45,8 @@ rtomap_test_insert_one(void)
 {
     ccc_realtime_ordered_map s
         = ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(occupied(insert_vr(&s, &(struct val){}.elem)), false);
+    CHECK(occupied(insert_vr(&s, &(struct val){}.elem, &(struct val){}.elem)),
+          false);
     CHECK(rom_empty(&s), false);
     struct val *v = rom_root(&s);
     CHECK(v == NULL, false);
@@ -97,7 +98,7 @@ rtomap_test_insert_shuffle(void)
     rom_print(&s, map_printer_fn);
     printf("\n");
 
-    int sorted_check[size];
+    int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
@@ -120,7 +121,7 @@ rtomap_test_insert_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(rom_validate(&s), true);
     }
     CHECK(size(&s), (size_t)num_nodes);

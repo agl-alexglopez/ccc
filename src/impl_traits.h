@@ -21,8 +21,8 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_insert,                                   \
         ccc_ordered_map *: ccc_om_insert,                                      \
-        ccc_realtime_ordered_map *: ccc_rom_insert)(                           \
-        (container_ptr), (key_val_container_handle_ptr))
+        ccc_realtime_ordered_map                                               \
+            *: ccc_rom_insert)((container_ptr), key_val_container_handle_ptr)
 
 #define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr...)     \
     &(ccc_entry)                                                               \

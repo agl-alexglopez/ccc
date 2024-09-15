@@ -150,7 +150,8 @@ ccc_fhm_and_modify_with(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
+ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle,
+               ccc_fh_map_elem *const tmp_handle)
 {
     void *user_return = struct_base(&h->impl_, &out_handle->impl_);
     void *key = ccc_impl_fhm_key_in_slot(&h->impl_, user_return);
@@ -163,7 +164,7 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
            error to persist if we actually need more space. */
         ent.entry_.stats_ = CCC_ENTRY_OCCUPIED;
         out_handle->impl_.hash_ = ent.hash_;
-        uint8_t tmp[user_struct_size];
+        void *tmp = struct_base(&h->impl_, &tmp_handle->impl_);
         swap(tmp, ent.entry_.e_, user_return, user_struct_size);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }

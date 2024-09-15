@@ -378,7 +378,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
     size_t const graph_size = graph->vertices;
     /* Bounded at size of the alphabet A-Z so alloca is fine here. */
-    size_t vertex_title_indices[sizeof(size_t) * graph_size];
+    size_t vertex_title_indices[MAX_VERTICES];
     for (size_t i = 0; i < graph_size; ++i)
     {
         vertex_title_indices[i] = i;
