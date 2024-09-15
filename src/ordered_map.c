@@ -225,7 +225,7 @@ ccc_om_and_modify_with(ccc_o_map_entry *const e, ccc_update_fn *fn, void *aux)
 
 ccc_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
-              ccc_o_map_elem *const tmp_handle)
+              void *const tmp)
 {
     void *found = find(
         &s->impl_, ccc_impl_om_key_from_node(&s->impl_, &out_handle->impl_));
@@ -233,7 +233,6 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
     {
         assert(s->impl_.root_ != &s->impl_.end_);
         *out_handle = *(ccc_o_map_elem *)s->impl_.root_;
-        void *tmp = struct_base(&s->impl_, &tmp_handle->impl_);
         void *user_struct = struct_base(&s->impl_, &out_handle->impl_);
         void *ret = struct_base(&s->impl_, s->impl_.root_);
         swap(tmp, user_struct, ret, s->impl_.elem_sz_);

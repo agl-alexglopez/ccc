@@ -63,7 +63,7 @@ map_test_forward_iter(void)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -93,7 +93,7 @@ map_test_iterate_removal(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -125,7 +125,7 @@ map_test_iterate_remove_reinsert(void)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -161,7 +161,7 @@ map_test_valid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -214,7 +214,7 @@ map_test_valid_range_equals(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
     int const *expect_range = (int[8]){10, 15, 20, 25, 30, 35, 40, 45};
@@ -260,7 +260,7 @@ map_test_invalid_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -313,7 +313,7 @@ map_test_empty_range(void)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.

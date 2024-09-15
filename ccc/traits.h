@@ -5,8 +5,8 @@
 
 /*======================     Entry API  =====================================*/
 
-#define ccc_insert(container_ptr, key_val_container_handle_ptr...)             \
-    ccc_impl_insert(container_ptr, key_val_container_handle_ptr)
+#define ccc_insert(container_ptr, insert_args...)                              \
+    ccc_impl_insert(container_ptr, insert_args)
 
 #define ccc_insert_vr(container_ptr, key_val_container_handle_ptr...)          \
     ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr)

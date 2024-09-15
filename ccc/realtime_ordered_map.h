@@ -69,12 +69,11 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
         ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
     }
 
-#define ccc_rom_insert_vr(realtime_ordered_map_ptr, out_handle_ptr,            \
-                          tmp_handle_ptr)                                      \
+#define ccc_rom_insert_vr(realtime_ordered_map_ptr, out_handle_ptr, tmp_ptr)   \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_insert((realtime_ordered_map_ptr), (out_handle_ptr),           \
-                       (tmp_handle_ptr))                                       \
+                       (tmp_ptr))                                              \
             .impl_                                                             \
     }
 
@@ -91,7 +90,7 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
     }
 
 ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
-                         ccc_rtom_elem *out_handle, ccc_rtom_elem *tmp_handle);
+                         ccc_rtom_elem *out_handle, void *tmp);
 
 ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
                          ccc_rtom_elem *out_handle);

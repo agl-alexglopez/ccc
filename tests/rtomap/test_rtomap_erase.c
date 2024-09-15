@@ -117,7 +117,7 @@ rtomap_test_weak_srand(void)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(rom_validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)

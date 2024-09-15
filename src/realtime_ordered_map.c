@@ -181,7 +181,7 @@ ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key)
 
 ccc_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
-               ccc_rtom_elem *const out_handle, ccc_rtom_elem *const tmp_handle)
+               ccc_rtom_elem *const out_handle, void *const tmp)
 {
     struct rtom_query q
         = find(&rom->impl_,
@@ -189,7 +189,6 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
     if (CCC_EQL == q.last_cmp_)
     {
         *out_handle = *(ccc_rtom_elem *)q.found_;
-        void *tmp = struct_base(&rom->impl_, &tmp_handle->impl_);
         void *user_struct = struct_base(&rom->impl_, &out_handle->impl_);
         void *ret = struct_base(&rom->impl_, q.found_);
         swap(tmp, user_struct, ret, rom->impl_.elem_sz_);

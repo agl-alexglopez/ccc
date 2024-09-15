@@ -66,7 +66,7 @@ fhash_test_insert(void)
     CHECK(res, CCC_OK);
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent
-        = insert(&fh, &(struct val){.id = 137, .val = 99}.e, &(struct val){}.e);
+        = insert(&fh, &(struct val){.id = 137, .val = 99}.e, &(struct val){});
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
@@ -82,7 +82,7 @@ fhash_test_insert_overwrite(void)
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
-    ccc_entry ent = insert(&fh, &q.e, &(struct val){}.e);
+    ccc_entry ent = insert(&fh, &q.e, &(struct val){});
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
 
@@ -95,7 +95,7 @@ fhash_test_insert_overwrite(void)
     q = (struct val){.id = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_entry old_ent = insert(&fh, &q.e, &(struct val){}.e);
+    ccc_entry old_ent = insert(&fh, &q.e, &(struct val){});
     CHECK(occupied(&old_ent), true);
 
     /* The old contents are now in q and the entry is in the table. */
@@ -118,7 +118,7 @@ fhash_test_insert_then_bad_ideas(void)
                                     fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
-    ccc_entry ent = insert(&fh, &q.e, &(struct val){}.e);
+    ccc_entry ent = insert(&fh, &q.e, &(struct val){});
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     struct val const *v = unwrap(entry_vr(&fh, &q.id));
@@ -127,7 +127,7 @@ fhash_test_insert_then_bad_ideas(void)
 
     q = (struct val){.id = 137, .val = 100};
 
-    ent = insert(&fh, &q.e, &(struct val){}.e);
+    ent = insert(&fh, &q.e, &(struct val){});
     CHECK(occupied(&ent), true);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -565,7 +565,7 @@ fhash_test_insert_limit(void)
     size_t const final_size = size(&fh);
     /* The last successful entry is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
-    ccc_entry ent = insert(&fh, &v.e, &(struct val){}.e);
+    ccc_entry ent = insert(&fh, &v.e, &(struct val){});
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(insert_error(&ent), false);
     CHECK(size(&fh), final_size);
@@ -593,7 +593,7 @@ fhash_test_insert_limit(void)
     CHECK(in_table == NULL, true);
     CHECK(size(&fh), final_size);
 
-    ent = insert(&fh, &v.e, &(struct val){}.e);
+    ent = insert(&fh, &v.e, &(struct val){});
     CHECK(unwrap(&ent) == NULL, true);
     CHECK(insert_error(&ent), true);
     CHECK(size(&fh), final_size);
