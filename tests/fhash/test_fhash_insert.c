@@ -391,7 +391,7 @@ fhash_test_resize(void)
     ccc_result const res
         = FHM_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, vals);
+    CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -399,22 +399,22 @@ fhash_test_resize(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
-        CHECK(v != NULL, true, vals);
-        CHECK(v->id, shuffled_index, vals);
-        CHECK(v->val, i, vals);
-        CHECK(fhm_validate(&fh), true, vals);
+        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(fhm_validate(&fh), true, ccc_impl_fhm_base(&fh.impl_));
     }
-    CHECK(size(&fh), to_insert, vals);
+    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
             = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
-        CHECK(in_table != NULL, true, vals);
-        CHECK(in_table->val, shuffled_index, vals);
+        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, vals);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     return PASS;
 }
 
@@ -428,7 +428,7 @@ fhash_test_resize_macros(void)
     ccc_result const res
         = FHM_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, vals);
+    CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -436,11 +436,11 @@ fhash_test_resize_macros(void)
     {
         struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
                                          fhash_create(shuffled_index, i));
-        CHECK(v != NULL, true, vals);
-        CHECK(v->id, shuffled_index, vals);
-        CHECK(v->val, i, vals);
+        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
-    CHECK(size(&fh), to_insert, vals);
+    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -448,17 +448,17 @@ fhash_test_resize_macros(void)
             = FHM_OR_INSERT(FHM_AND_MODIFY_W(FHM_ENTRY(&fh, shuffled_index),
                                              fhash_swap_val, shuffled_index),
                             (struct val){0});
-        CHECK(in_table != NULL, true, vals);
-        CHECK(in_table->val, shuffled_index, vals);
+        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
         struct val *v
             = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
         CHECK(v == NULL, false);
         v->val = i;
         v = FHM_GET_KEY_VAL(&fh, shuffled_index);
-        CHECK(v != NULL, true, vals);
-        CHECK(v->val, i, vals);
+        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, vals);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     return PASS;
 }
 
@@ -468,7 +468,7 @@ fhash_test_resize_from_null(void)
     ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_buf_base(&fh.impl_.buf_));
+    CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -476,19 +476,19 @@ fhash_test_resize_from_null(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
-        CHECK(v != NULL, true, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(v->id, shuffled_index, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(v->val, i, ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
-    CHECK(size(&fh), to_insert, ccc_buf_base(&fh.impl_.buf_));
+    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
             = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
-        CHECK(in_table != NULL, true, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(in_table->val, shuffled_index, ccc_buf_base(&fh.impl_.buf_));
+        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
     return PASS;
@@ -510,11 +510,11 @@ fhash_test_resize_from_null_macros(void)
     {
         struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
                                          fhash_create(shuffled_index, i));
-        CHECK(v != NULL, true, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(v->id, shuffled_index, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(v->val, i, ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
-    CHECK(size(&fh), to_insert, ccc_buf_base(&fh.impl_.buf_));
+    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -522,15 +522,15 @@ fhash_test_resize_from_null_macros(void)
             = FHM_OR_INSERT(FHM_AND_MODIFY_W(FHM_ENTRY(&fh, shuffled_index),
                                              fhash_swap_val, shuffled_index),
                             (struct val){0});
-        CHECK(in_table != NULL, true, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(in_table->val, shuffled_index, ccc_buf_base(&fh.impl_.buf_));
+        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
         struct val *v
             = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
         CHECK(v == NULL, false);
         v->val = i;
         v = FHM_GET_KEY_VAL(&fh, shuffled_index);
-        CHECK(v == NULL, false, ccc_buf_base(&fh.impl_.buf_));
-        CHECK(v->val, i, ccc_buf_base(&fh.impl_.buf_));
+        CHECK(v == NULL, false, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
     return PASS;

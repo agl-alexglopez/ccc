@@ -93,9 +93,8 @@ fhash_test_shuffle_insert_erase(void)
         CHECK(contains(&fh, &i), true);
         if (i % 2)
         {
-            struct val swap_slot = {.id = i};
             struct val const *const old_val
-                = unwrap(remove_vr(&fh, &swap_slot.e));
+                = unwrap(remove_vr(&fh, &(struct val){.id = i}.e));
             CHECK(old_val != NULL, true);
             CHECK(old_val->id, i);
         }

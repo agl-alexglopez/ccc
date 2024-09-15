@@ -535,6 +535,12 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
            && empties == (ccc_buf_capacity(&h->impl_.buf_) - occupied);
 }
 
+void *
+ccc_impl_fhm_base(struct ccc_fhm_ const *const h)
+{
+    return ccc_buf_base(&h->buf_);
+}
+
 /*=========================   Static Helpers ============================*/
 
 static void *

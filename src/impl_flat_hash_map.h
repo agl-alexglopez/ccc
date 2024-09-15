@@ -65,6 +65,7 @@ uint64_t *ccc_impl_fhm_hash_at(struct ccc_fhm_ const *h, size_t i);
 size_t ccc_impl_fhm_distance(size_t capacity, size_t index, uint64_t hash);
 ccc_result ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *);
 uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
+void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
 
 #define CCC_IMPL_FHM_ENTRY(flat_hash_map_ptr, key...)                          \
     ({                                                                         \

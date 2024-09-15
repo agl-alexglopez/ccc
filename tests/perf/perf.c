@@ -91,10 +91,10 @@ main(int argc, char **argv)
 static void
 test_push(void)
 {
-    printf("push N elements, priority queue vs heap priority queue:\n");
+    printf("push N elements, pq, vs depq, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
-        struct val *val_array = create_rand_vals(n);
+        struct val *val_array = create_rand_vals(n + 1);
         ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
             struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
@@ -114,7 +114,7 @@ test_push(void)
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
-            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
+            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -131,10 +131,10 @@ test_push(void)
 static void
 test_pop(void)
 {
-    printf("pop N elements, priority queue vs heap priority queue:\n");
+    printf("pop N elements, pq, vs depq, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
-        struct val *val_array = create_rand_vals(n);
+        struct val *val_array = create_rand_vals(n + 1);
         ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
             struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
@@ -162,7 +162,7 @@ test_pop(void)
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
-            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
+            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)ccc_fpq_push(&fpq, &val_array[i]);
@@ -183,12 +183,10 @@ test_pop(void)
 static void
 test_push_pop(void)
 {
-    printf(
-        "push N elements then pop N elements, priority queue vs heap priority "
-        "queue:\n");
+    printf("push N elements then pop N elements, pq, vs depq, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
-        struct val *val_array = create_rand_vals(n);
+        struct val *val_array = create_rand_vals(n + 1);
         ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
             struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
@@ -216,7 +214,7 @@ test_push_pop(void)
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
-            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
+            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -237,11 +235,10 @@ test_push_pop(void)
 static void
 test_push_intermittent_pop(void)
 {
-    printf("push N elements pop every 10, priority queue vs heap priority "
-           "queue:\n");
+    printf("push N elements pop every 10, pq, vs depq, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
-        struct val *val_array = create_rand_vals(n);
+        struct val *val_array = create_rand_vals(n + 1);
         ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
             struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
@@ -269,7 +266,7 @@ test_push_intermittent_pop(void)
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
-            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
+            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -290,11 +287,10 @@ test_push_intermittent_pop(void)
 static void
 test_pop_intermittent_push(void)
 {
-    printf("pop N elements push every 10, priority queue vs heap priority "
-           "queue:\n");
+    printf("pop N elements push every 10, pq, vs depq, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
-        struct val *val_array = create_rand_vals(n);
+        struct val *val_array = create_rand_vals(n + 1);
         ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
             struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
@@ -334,7 +330,7 @@ test_pop_intermittent_push(void)
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
-            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
+            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)ccc_fpq_push(&fpq, &val_array[i]);
@@ -360,11 +356,10 @@ test_pop_intermittent_push(void)
 static void
 test_update(void)
 {
-    printf("push N elements update N elements, priority queue vs heap priority "
-           "queue:\n");
+    printf("push N elements update N elements, pq, vs depq, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
-        struct val *val_array = create_rand_vals(n);
+        struct val *val_array = create_rand_vals(n + 1);
         ccc_double_ended_priority_queue depq = CCC_DEPQ_INIT(
             struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
@@ -396,7 +391,7 @@ test_update(void)
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq = CCC_FPQ_INIT(
-            val_array, n, struct val, CCC_LES, NULL, val_cmp, NULL);
+            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)ccc_fpq_push(&fpq, &val_array[i]);
