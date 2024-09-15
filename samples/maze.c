@@ -216,7 +216,7 @@ animate_maze(struct maze *maze)
         .p = pick_rand_point(maze),
         .cost = rand_range(0, 100),
     };
-    (void)ccc_om_insert(&cell_costs, &odd_point->elem, &(struct point_cost){});
+    (void)insert_entry(entry_vr(&cell_costs, &odd_point->p), &odd_point->elem);
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
     *start = (struct priority_cell){
         .cell = odd_point->p,
