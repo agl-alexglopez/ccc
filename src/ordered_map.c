@@ -268,6 +268,28 @@ ccc_om_try_insert(ccc_ordered_map *const s,
 }
 
 ccc_entry
+ccc_om_insert_or_assign(ccc_ordered_map *const s,
+                        ccc_o_map_elem *const key_val_handle)
+{
+    void *found
+        = find(&s->impl_,
+               ccc_impl_om_key_from_node(&s->impl_, &key_val_handle->impl_));
+    if (found)
+    {
+        assert(s->impl_.root_ != &s->impl_.end_);
+        memcpy(found, struct_base(&s->impl_, &key_val_handle->impl_),
+               s->impl_.elem_sz_);
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *inserted = alloc_insert(&s->impl_, &key_val_handle->impl_);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
 ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
     void *n = erase(&s->impl_,

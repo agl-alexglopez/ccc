@@ -224,6 +224,29 @@ ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
     return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
+ccc_entry
+ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
+                         ccc_rtom_elem *key_val_handle)
+{
+    struct rtom_query_ q
+        = find(&rom->impl_,
+               ccc_impl_rom_key_from_node(&rom->impl_, &key_val_handle->impl_));
+    if (CCC_EQL == q.last_cmp_)
+    {
+        void *const found = struct_base(&rom->impl_, q.found_);
+        memcpy(found, struct_base(&rom->impl_, &key_val_handle->impl_),
+               rom->impl_.elem_sz_);
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *inserted = maybe_alloc_insert(&rom->impl_, q.parent_, q.last_cmp_,
+                                        &key_val_handle->impl_);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
 ccc_rtom_entry
 ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
 {

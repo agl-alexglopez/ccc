@@ -192,4 +192,24 @@ void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
         res_;                                                                  \
     })
 
+#define CCC_IMPL_FHM_TRY_INSERT(flat_hash_map_ptr, key, lazy_key_value...)     \
+    ({                                                                         \
+        __auto_type const fhm_key_ = key;                                      \
+        struct ccc_fhm_entry_ fhm_try_ins_ent_                                 \
+            = ccc_impl_fhm_entry(&(flat_hash_map_ptr)->impl_, &fhm_key_);      \
+        struct ccc_entry_ fhm_try_insert_res_ = {};                            \
+        if ((fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)              \
+            || (fhm_try_ins_ent_.entry_.stats_ & ~CCC_ENTRY_VACANT))           \
+        {                                                                      \
+            fhm_try_insert_res_ = fhm_try_ins_ent_.entry_;                     \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            fhm_try_insert_res_ = (struct ccc_entry_){                         \
+                .e_ = CCC_IMPL_FHM_SWAPS((&fhm_try_ins_ent_), lazy_key_value), \
+                .stats_ = CCC_ENTRY_VACANT};                                   \
+        }                                                                      \
+        fhm_try_insert_res_;                                                   \
+    })
+
 #endif /* CCC_IMPL_FLAT_HASH_MAP_H */

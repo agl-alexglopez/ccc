@@ -14,6 +14,9 @@
 #define ccc_try_insert(container_ptr, try_insert_args...)                      \
     ccc_impl_try_insert(container_ptr, try_insert_args)
 
+#define ccc_insert_or_assign(container_ptr, insert_or_assign_args...)          \
+    ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args)
+
 #define ccc_try_insert_vr(container_ptr, key_val_container_handle_ptr...)      \
     ccc_impl_try_insert_vr(container_ptr, key_val_container_handle_ptr)
 
@@ -127,6 +130,7 @@
 
 #    define insert(args...) ccc_insert(args)
 #    define try_insert(args...) ccc_try_insert(args)
+#    define insert_or_assign(args...) ccc_insert_or_assign(args)
 #    define try_insert_vr(args...) ccc_try_insert_vr(args)
 #    define insert_vr(args...) ccc_insert_vr(args)
 #    define remove(args...) ccc_remove(args)

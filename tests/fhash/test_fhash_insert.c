@@ -373,8 +373,8 @@ fhash_test_two_sum(void)
             solution_indices[1] = other_addend->val;
             break;
         }
-        ccc_entry const e
-            = try_insert(&fh, &(struct val){.id = addends[i], .val = i}.e);
+        ccc_entry const e = insert_or_assign(
+            &fh, &(struct val){.id = addends[i], .val = i}.e);
         CHECK(insert_error(&e), false);
     }
     CHECK(solution_indices[0], 8);

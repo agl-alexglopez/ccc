@@ -101,6 +101,9 @@ ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
 ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
                              ccc_rtom_elem *key_val_handle);
 
+ccc_entry ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
+                                   ccc_rtom_elem *key_val_handle);
+
 ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
                          ccc_rtom_elem *out_handle);
 

@@ -43,6 +43,19 @@
         ccc_impl_try_insert(container_ptr, try_insert_args).impl_              \
     }
 
+#define ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args...)     \
+    _Generic((container_ptr),                                                  \
+        ccc_flat_hash_map *: ccc_fhm_insert_or_assign,                         \
+        ccc_ordered_map *: ccc_om_insert_or_assign,                            \
+        ccc_realtime_ordered_map *: ccc_rom_insert_or_assign)(                 \
+        (container_ptr), insert_or_assign_args)
+
+#define ccc_impl_insert_or_assign_vr(container_ptr, insert_or_assign_args...)  \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args).impl_  \
+    }
+
 #define ccc_impl_remove(container_ptr, key_val_container_handle_ptr...)        \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_remove,                                   \

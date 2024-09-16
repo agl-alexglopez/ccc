@@ -112,6 +112,9 @@ ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle,
 
 ccc_entry ccc_om_try_insert(ccc_ordered_map *, ccc_o_map_elem *key_val_handle);
 
+ccc_entry ccc_om_insert_or_assign(ccc_ordered_map *,
+                                  ccc_o_map_elem *key_val_handle);
+
 ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
 ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);

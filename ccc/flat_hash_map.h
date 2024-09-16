@@ -71,6 +71,12 @@ initialization is successful or a failure. */
 #define CCC_FHM_OR_INSERT(flat_hash_map_entry_ptr, key_value...)               \
     CCC_IMPL_FHM_OR_INSERT(flat_hash_map_entry_ptr, key_value)
 
+#define CCC_FHM_TRY_INSERT(flat_hash_map_ptr, key, lazy_key_value...)          \
+    (ccc_entry)                                                                \
+    {                                                                          \
+        CCC_IMPL_FHM_TRY_INSERT(flat_hash_map_ptr, key, lazy_key_value)        \
+    }
+
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
@@ -121,6 +127,10 @@ ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle,
 /** TODO */
 ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
                              ccc_fh_map_elem *key_val_handle);
+
+/** TODO */
+ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h,
+                                   ccc_fh_map_elem *key_val_handle);
 
 /** TODO */
 ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
@@ -313,6 +323,7 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define FHM_AND_MODIFY_W(args...) CCC_FHM_AND_MODIFY_W(args)
 #    define FHM_INSERT_ENTRY(args...) CCC_FHM_INSERT_ENTRY(args)
 #    define FHM_OR_INSERT(args...) CCC_FHM_OR_INSERT(args)
+#    define FHM_TRY_INSERT(args...) CCC_FHM_TRY_INSERT(args)
 #    define fhm_contains(args...) ccc_fhm_contains(args)
 #    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
 #    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
