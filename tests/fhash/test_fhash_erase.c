@@ -37,10 +37,11 @@ main()
 static enum test_result
 fhash_test_erase(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[10] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */

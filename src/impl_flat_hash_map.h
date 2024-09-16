@@ -62,10 +62,11 @@ struct ccc_fhm_elem_ *ccc_impl_fhm_in_slot(struct ccc_fhm_ const *h,
                                            void const *slot);
 void *ccc_impl_fhm_key_in_slot(struct ccc_fhm_ const *h, void const *slot);
 uint64_t *ccc_impl_fhm_hash_at(struct ccc_fhm_ const *h, size_t i);
-size_t ccc_impl_fhm_distance(size_t capacity, size_t index, uint64_t hash);
+size_t ccc_impl_fhm_distance(size_t capacity, size_t i, size_t j);
 ccc_result ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *);
 uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
 void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
+size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 
 #define CCC_IMPL_FHM_ENTRY(flat_hash_map_ptr, key...)                          \
     ({                                                                         \
@@ -134,8 +135,8 @@ void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
                 = key_value;                                                   \
             *ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_)                    \
                 = (swap_entry)->hash_;                                         \
-            fhm_i_                                                             \
-                = (fhm_i_ + 1) % ccc_buf_capacity(&((swap_entry)->h_->buf_));  \
+            fhm_i_ = ccc_impl_fhm_increment(                                   \
+                ccc_buf_capacity(&(swap_entry)->h_->buf_), fhm_i_);            \
             ccc_impl_fhm_insert(                                               \
                 (swap_entry)->h_, &fhm_cur_slot_,                              \
                 ccc_impl_fhm_in_slot((swap_entry)->h_, &fhm_cur_slot_)->hash_, \

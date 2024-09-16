@@ -44,10 +44,11 @@ main()
 static enum test_result
 fhash_test_empty(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[5] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     return PASS;
@@ -56,10 +57,11 @@ fhash_test_empty(void)
 static enum test_result
 fhash_test_entry_functional(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[5] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
@@ -81,10 +83,11 @@ fhash_test_entry_functional(void)
 static enum test_result
 fhash_test_entry_macros(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[5] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     CHECK(FHM_GET_KEY_VAL(&fh, 137) == NULL, true);
@@ -109,10 +112,11 @@ fhash_test_entry_macros(void)
 static enum test_result
 fhash_test_entry_and_modify_functional(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[5] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
@@ -151,10 +155,11 @@ fhash_test_entry_and_modify_functional(void)
 static enum test_result
 fhash_test_entry_and_modify_macros(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[5] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
 

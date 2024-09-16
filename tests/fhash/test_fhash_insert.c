@@ -59,10 +59,11 @@ main()
 static enum test_result
 fhash_test_insert(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[10] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent
@@ -76,10 +77,11 @@ fhash_test_insert(void)
 static enum test_result
 fhash_test_insert_overwrite(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[10] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e, &(struct val){});
@@ -112,10 +114,11 @@ fhash_test_insert_overwrite(void)
 static enum test_result
 fhash_test_insert_then_bad_ideas(void)
 {
-    struct val vals[2] = {{0}, {0}};
+    struct val vals[10] = {};
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, 2, struct val, id, e, NULL,
-                                    fhash_int_zero, fhash_id_eq, NULL);
+    ccc_result const res
+        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e, &(struct val){});
@@ -146,8 +149,8 @@ static enum test_result
 fhash_test_entry_api_functional(void)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    size_t const size = 200;
     struct val vals[200];
+    size_t const size = sizeof(vals) / sizeof(vals[0]);
     ccc_flat_hash_map fh;
     ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
