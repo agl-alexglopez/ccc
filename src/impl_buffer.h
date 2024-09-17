@@ -15,7 +15,7 @@ struct ccc_buf_
     ccc_alloc_fn *alloc_;
 };
 
-#define CCC_IMPL_BUF_INIT(mem, type, capacity, alloc_fn)                       \
+#define ccc_impl_buf_init(mem, type, capacity, alloc_fn)                       \
     {                                                                          \
         {                                                                      \
             .mem_ = (mem), .elem_sz_ = sizeof(type), .sz_ = 0,                 \
@@ -23,7 +23,7 @@ struct ccc_buf_
         }                                                                      \
     }
 
-#define CCC_IMPL_BUF_EMPLACE(ccc_buf_ptr, index, type_initializer...)          \
+#define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \
     ({                                                                         \
         typeof(type_initializer) *buf_res_;                                    \
         assert(sizeof(typeof(*buf_res_)) == ccc_buf_elem_size(ccc_buf_ptr));   \
@@ -35,7 +35,7 @@ struct ccc_buf_
         buf_res_;                                                              \
     })
 
-#define CCC_IMPL_BUF_EMPLACE_BACK(ccc_buf_ptr, type_initializer...)            \
+#define ccc_impl_buf_emplace_back(ccc_buf_ptr, type_initializer...)            \
     ({                                                                         \
         typeof(type_initializer) *buf_res_;                                    \
         assert(sizeof(typeof(*buf_res_)) == ccc_buf_elem_size(ccc_buf_ptr));   \

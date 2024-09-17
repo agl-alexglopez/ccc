@@ -28,7 +28,7 @@ void ccc_impl_dll_push_front(struct ccc_dll_ *, struct ccc_dll_elem_ *);
 struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
                                        void const *user_struct);
 
-#define CCC_IMPL_DLL_INIT(dll_ptr, dll_name, struct_name, dll_elem_field,      \
+#define ccc_impl_dll_init(dll_ptr, dll_name, struct_name, dll_elem_field,      \
                           alloc_fn, cmp_fn, aux_data)                          \
     {                                                                          \
         {                                                                      \
@@ -41,7 +41,7 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
         }                                                                      \
     }
 
-#define CCC_IMPL_DLL_EMPLACE_BACK(dll_ptr, struct_initializer...)              \
+#define ccc_impl_dll_emplace_back(dll_ptr, struct_initializer...)              \
     ({                                                                         \
         typeof(struct_initializer) *dll_res_;                                  \
         struct ccc_dll_ *dll_ = &(dll_ptr)->impl_;                             \
@@ -63,7 +63,7 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
         dll_res_;                                                              \
     })
 
-#define CCC_IMPL_DLL_EMPLACE_FRONT(dll_ptr, struct_initializer...)             \
+#define ccc_impl_dll_emplace_front(dll_ptr, struct_initializer...)             \
     ({                                                                         \
         typeof(struct_initializer) *dll_res_;                                  \
         struct ccc_dll_ *dll_ = &(dll_ptr)->impl_;                             \

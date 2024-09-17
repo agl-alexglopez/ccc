@@ -13,16 +13,16 @@ typedef struct
     struct ccc_dll_ impl_;
 } ccc_doubly_linked_list;
 
-#define CCC_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,        \
+#define ccc_dll_init(list_ptr, list_name, struct_name, list_elem_field,        \
                      alloc_fn, cmp_fn, aux_data)                               \
-    CCC_IMPL_DLL_INIT(list_ptr, list_name, struct_name, list_elem_field,       \
+    ccc_impl_dll_init(list_ptr, list_name, struct_name, list_elem_field,       \
                       alloc_fn, cmp_fn, aux_data)
 
-#define CCC_DLL_EMPLACE_BACK(list_ptr, struct_initializer...)                  \
-    CCC_IMPL_DLL_EMPLACE_BACK(list_ptr, struct_initializer)
+#define ccc_dll_emplace_back(list_ptr, struct_initializer...)                  \
+    ccc_impl_dll_emplace_back(list_ptr, struct_initializer)
 
-#define CCC_DLL_EMPLACE_FRONT(list_ptr, struct_initializer...)                 \
-    CCC_IMPL_DLL_EMPLACE_FRONT(list_ptr, struct_initializer)
+#define ccc_dll_emplace_front(list_ptr, struct_initializer...)                 \
+    ccc_impl_dll_emplace_front(list_ptr, struct_initializer)
 
 void *ccc_dll_push_front(ccc_doubly_linked_list *l,
                          ccc_dll_elem *struct_handle);

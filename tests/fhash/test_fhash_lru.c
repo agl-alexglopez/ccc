@@ -85,11 +85,11 @@ run_lru_cache(void)
 {
     struct lru_cache lru = {
         .cap = 3,
-        .l = CCC_DLL_INIT(&lru.l, lru.l, struct key_val, list_elem, realloc,
+        .l = ccc_dll_init(&lru.l, lru.l, struct key_val, list_elem, realloc,
                           cmp_by_key, NULL),
     };
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
-    FHM_INIT(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
+    fhm_init(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
              fhash_int_to_u64, lru_lookup_cmp, NULL);
     struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .putter = lru_put},
@@ -149,9 +149,9 @@ lru_put(struct lru_cache *const lru, int const key, int const val)
         return;
     }
     struct lru_lookup *const new
-        = FHM_INSERT_ENTRY(ent, (struct lru_lookup){.key = key});
+        = insert_entry(ent, &(struct lru_lookup){.key = key}.hash_elem);
     assert(new);
-    new->kv_in_list = CCC_DLL_EMPLACE_FRONT(
+    new->kv_in_list = ccc_dll_emplace_front(
         &lru->l, (struct key_val){.key = key, .val = val});
     if (size(&lru->l) > lru->cap)
     {

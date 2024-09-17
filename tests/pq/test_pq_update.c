@@ -40,7 +40,7 @@ static enum test_result
 pq_test_insert_iterate_pop(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -69,7 +69,7 @@ static enum test_result
 pq_test_priority_removal(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -100,7 +100,7 @@ static enum test_result
 pq_test_priority_update(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -133,7 +133,7 @@ static enum test_result
 pq_test_priority_increase(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -172,7 +172,7 @@ static enum test_result
 pq_test_priority_decrease(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_GRT, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_GRT, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

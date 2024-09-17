@@ -420,15 +420,15 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
     ccc_flat_hash_map parent_map;
     [[maybe_unused]] ccc_result res
-        = FHM_INIT(&parent_map, NULL, 0, struct parent_cell, key, elem, realloc,
+        = fhm_init(&parent_map, NULL, 0, struct parent_cell, key, elem, realloc,
                    hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_double_ended_queue bfs
-        = CCC_FDEQ_INIT(NULL, 0, struct point, realloc);
-    [[maybe_unused]] struct parent_cell *pc = FHM_INSERT_ENTRY(
-        FHM_ENTRY(&parent_map, src->pos),
-        (struct parent_cell){.key = src->pos, .parent = {-1, -1}});
-    assert(pc);
+        = ccc_fdeq_init(NULL, 0, struct point, realloc);
+    [[maybe_unused]] ccc_entry e = insert_or_assign(
+        &parent_map,
+        &(struct parent_cell){.key = src->pos, .parent = {-1, -1}}.elem);
+    assert(!insert_error(&e));
     push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {0};
@@ -693,11 +693,11 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
-    ccc_priority_queue dist_q = CCC_PQ_INIT(struct dist_point, pq_elem, CCC_LES,
+    ccc_priority_queue dist_q = ccc_pq_init(struct dist_point, pq_elem, CCC_LES,
                                             NULL, cmp_pq_dist_points, NULL);
     ccc_flat_hash_map prev_map;
     [[maybe_unused]] ccc_result res
-        = FHM_INIT(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
+        = fhm_init(&prev_map, NULL, 0, struct prev_vertex, v, elem, realloc,
                    hash_vertex_addr, eq_prev_vertices, NULL);
     assert(res == CCC_OK);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
@@ -716,8 +716,9 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         }
         for (int i = 0; i < MAX_DEGREE && cur->v->edges[i].name; ++i)
         {
-            struct prev_vertex *next = FHM_GET_KEY_VAL(
-                &prev_map, vertex_at(graph, cur->v->edges[i].name));
+            struct vertex const *const v
+                = vertex_at(graph, cur->v->edges[i].name);
+            struct prev_vertex *next = get_key_val(&prev_map, &v);
             assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -738,13 +739,13 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = FHM_GET_KEY_VAL(&prev_map, v);
+        struct prev_vertex const *prev = get_key_val(&prev_map, &v);
         assert(prev);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = FHM_GET_KEY_VAL(&prev_map, prev->prev);
+            prev = get_key_val(&prev_map, &prev->prev);
             assert(prev);
         }
     }

@@ -46,7 +46,7 @@ static enum test_result
 pq_test_insert_remove_four_dups(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -71,7 +71,7 @@ static enum test_result
 pq_test_insert_erase_shuffled(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -94,7 +94,7 @@ static enum test_result
 pq_test_pop_max(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -118,7 +118,7 @@ static enum test_result
 pq_test_pop_min(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -142,7 +142,7 @@ static enum test_result
 pq_test_delete_prime_shuffle_duplicates(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -179,7 +179,7 @@ static enum test_result
 pq_test_prime_shuffle(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -212,7 +212,7 @@ static enum test_result
 pq_test_weak_srand(void)
 {
     ccc_priority_queue ppq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

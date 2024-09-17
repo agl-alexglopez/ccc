@@ -47,7 +47,7 @@ fpq_test_insert_remove_four_dups(void)
 {
     struct val three_vals[4 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(three_vals, (sizeof(three_vals) / sizeof(three_vals[0])),
+        = ccc_fpq_init(three_vals, (sizeof(three_vals) / sizeof(three_vals[0])),
                        struct val, CCC_LES, NULL, val_cmp, NULL);
     for (int i = 0; i < 4; ++i)
     {
@@ -78,7 +78,7 @@ fpq_test_insert_erase_shuffled(void)
     int const prime = 53;
     struct val vals[50 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = ccc_fpq_front(&fpq);
@@ -103,7 +103,7 @@ fpq_test_pop_max(void)
     int const prime = 53;
     struct val vals[50 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = ccc_fpq_front(&fpq);
@@ -128,7 +128,7 @@ fpq_test_pop_min(void)
     int const prime = 53;
     struct val vals[50 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = ccc_fpq_front(&fpq);
@@ -158,7 +158,7 @@ fpq_test_delete_prime_shuffle_duplicates(void)
     int const less = 77;
     struct val vals[99 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     int shuffled_index = prime % (size - less);
     for (int i = 0; i < size; ++i)
@@ -195,7 +195,7 @@ fpq_test_prime_shuffle(void)
     int shuffled_index = prime % (size - less);
     struct val vals[50 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     for (int i = 0; i < size; ++i)
     {
@@ -228,7 +228,7 @@ fpq_test_weak_srand(void)
     int const num_stack_elems = 1000;
     struct val vals[1000 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     for (int i = 0; i < num_stack_elems; ++i)
     {

@@ -43,7 +43,7 @@ fpq_test_insert_iterate_pop(void)
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -73,12 +73,12 @@ fpq_test_priority_removal(void)
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = CCC_FPQ_EMPLACE(
+        struct val const *res = ccc_fpq_emplace(
             &fpq, (struct val){
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
@@ -109,12 +109,12 @@ fpq_test_priority_update(void)
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
     ccc_flat_priority_queue fpq
-        = CCC_FPQ_INIT(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
+        = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = CCC_FPQ_EMPLACE(
+        struct val const *res = ccc_fpq_emplace(
             &fpq, (struct val){
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,

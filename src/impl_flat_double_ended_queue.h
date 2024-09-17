@@ -20,15 +20,15 @@ enum ccc_impl_fdeq_alloc_slot
 
 void *ccc_impl_fdeq_alloc(struct ccc_fdeq_ *, enum ccc_impl_fdeq_alloc_slot);
 
-#define CCC_IMPL_FDEQ_INIT(mem_ptr, capacity, type_name, alloc_fn)             \
+#define ccc_impl_fdeq_init(mem_ptr, capacity, type_name, alloc_fn)             \
     {                                                                          \
         .impl_ = {                                                             \
-            .buf_ = CCC_BUF_INIT(mem_ptr, type_name, capacity, alloc_fn),      \
+            .buf_ = ccc_buf_init(mem_ptr, type_name, capacity, alloc_fn),      \
             .front_ = 0,                                                       \
         },                                                                     \
     }
 
-#define CCC_IMPL_FDEQ_EMPLACE(fq_ptr, value...)                                \
+#define ccc_impl_fdeq_emplace(fq_ptr, value...)                                \
     ({                                                                         \
         void *fdeq_emplace_ret_ = ccc_impl_fdeq_alloc(&(fq_ptr)->impl_);       \
         if (fdeq_emplace_ret_)                                                 \

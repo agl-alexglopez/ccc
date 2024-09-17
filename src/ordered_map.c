@@ -211,7 +211,7 @@ ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
 }
 
 ccc_o_map_entry *
-ccc_om_and_modify_with(ccc_o_map_entry *const e, ccc_update_fn *fn, void *aux)
+ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *fn, void *aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {

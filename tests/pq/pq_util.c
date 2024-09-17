@@ -47,7 +47,7 @@ inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
     }
     size_t i = 0;
     ccc_priority_queue copy
-        = CCC_PQ_INIT(struct val, elem, ccc_pq_order(ppq), NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), NULL, val_cmp, NULL);
     while (!ccc_pq_empty(ppq))
     {
         struct val *const front = ccc_pq_front(ppq);

@@ -61,7 +61,7 @@ struct ccc_tree_entry_
     struct ccc_entry_ entry_;
 };
 
-#define CCC_TREE_INIT(struct_name, node_elem_field, key_elem_field, tree_name, \
+#define ccc_tree_init(struct_name, node_elem_field, key_elem_field, tree_name, \
                       alloc_fn, key_cmp_fn, aux_data)                          \
     {                                                                          \
         .impl_ = {                                                             \

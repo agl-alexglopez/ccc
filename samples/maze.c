@@ -207,9 +207,9 @@ animate_maze(struct maze *maze)
        costs mapped but the purpose of this program is to test both the set and
        priority queue data structures. Also a 2D vector wastes space. */
     ccc_double_ended_priority_queue cells
-        = CCC_DEPQ_INIT(struct priority_cell, elem, priority, cells, NULL,
+        = ccc_depq_init(struct priority_cell, elem, priority, cells, NULL,
                         cmp_priority_cells, NULL);
-    ccc_ordered_map cell_costs = CCC_OM_INIT(
+    ccc_ordered_map cell_costs = ccc_om_init(
         struct point_cost, elem, p, cell_costs, NULL, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){

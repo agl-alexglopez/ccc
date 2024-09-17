@@ -13,8 +13,8 @@ typedef struct
     struct ccc_buf_ impl_;
 } ccc_buffer;
 
-#define CCC_BUF_INIT(mem, type, capacity, alloc_fn)                            \
-    (ccc_buffer) CCC_IMPL_BUF_INIT(mem, type, capacity, alloc_fn)
+#define ccc_buf_init(mem, type, capacity, alloc_fn)                            \
+    (ccc_buffer) ccc_impl_buf_init(mem, type, capacity, alloc_fn)
 
 ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);

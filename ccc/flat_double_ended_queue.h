@@ -9,11 +9,11 @@ typedef struct
     struct ccc_fdeq_ impl_;
 } ccc_flat_double_ended_queue;
 
-#define CCC_FDEQ_INIT(mem_ptr, capacity, type_name, alloc_fn)                  \
+#define ccc_fdeq_init(mem_ptr, capacity, type_name, alloc_fn)                  \
     (ccc_flat_double_ended_queue)                                              \
-        CCC_IMPL_FDEQ_INIT(mem_ptr, capacity, type_name, alloc_fn)
+        ccc_impl_fdeq_init(mem_ptr, capacity, type_name, alloc_fn)
 
-#define CCC_FDEQ_EMPLACE(fq_ptr, value...) CCC_IMPL_FDEQ_EMPLACE(fq_ptr, value)
+#define ccc_fdeq_emplace(fq_ptr, value...) ccc_impl_fdeq_emplace(fq_ptr, value)
 
 void *ccc_fdeq_push_back(ccc_flat_double_ended_queue *fq, void const *elem);
 void *ccc_fdeq_push_front(ccc_flat_double_ended_queue *fq, void const *elem);

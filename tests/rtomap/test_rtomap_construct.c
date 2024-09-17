@@ -31,7 +31,7 @@ static enum test_result
 rtomap_test_empty(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     CHECK(ccc_rom_empty(&s), true);
     return PASS;
 }

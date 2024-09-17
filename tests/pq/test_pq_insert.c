@@ -38,7 +38,7 @@ static enum test_result
 pq_test_insert_one(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
     ccc_pq_push(&pq, &single.elem);
@@ -50,7 +50,7 @@ static enum test_result
 pq_test_insert_three(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -67,9 +67,9 @@ static enum test_result
 pq_test_struct_getter(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     ccc_priority_queue pq_tester_clone
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -93,7 +93,7 @@ static enum test_result
 pq_test_insert_three_dups(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -110,7 +110,7 @@ static enum test_result
 pq_test_insert_shuffle(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -127,7 +127,7 @@ static enum test_result
 pq_test_read_max_min(void)
 {
     ccc_priority_queue pq
-        = CCC_PQ_INIT(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {

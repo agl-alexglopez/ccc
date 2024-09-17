@@ -40,8 +40,8 @@
 
 #define ccc_and_modify(entry_ptr, mod_fn) ccc_impl_and_modify(entry_ptr, mod_fn)
 
-#define ccc_and_modify_with(entry_ptr, mod_fn, aux_data_ptr...)                \
-    ccc_impl_and_modify_with(entry_ptr, mod_fn, aux_data_ptr)
+#define ccc_and_modify_aux(entry_ptr, mod_fn, aux_data_ptr...)                 \
+    ccc_impl_and_modify_aux(entry_ptr, mod_fn, aux_data_ptr)
 
 #define ccc_insert_entry(entry_ptr, key_val_container_handle_ptr...)           \
     ccc_impl_insert_entry(entry_ptr, key_val_container_handle_ptr)
@@ -142,7 +142,7 @@
 #    define or_insert(args...) ccc_or_insert(args)
 #    define insert_entry(args...) ccc_insert_entry(args)
 #    define and_modify(args...) ccc_and_modify(args)
-#    define and_modify_with(args...) ccc_and_modify_with(args)
+#    define and_modify_aux(args...) ccc_and_modify_aux(args)
 #    define occupied(args...) ccc_occupied(args)
 #    define insert_error(args...) ccc_insert_error(args)
 #    define unwrap(args...) ccc_unwrap(args)

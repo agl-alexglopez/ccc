@@ -25,7 +25,7 @@ struct ccc_pq_
     void *aux_;
 };
 
-#define CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn,       \
+#define ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn,       \
                          cmp_fn, aux_data)                                     \
     {                                                                          \
         {                                                                      \

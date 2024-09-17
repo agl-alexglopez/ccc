@@ -21,7 +21,7 @@ struct ccc_sll_
     void *aux_;
 };
 
-#define CCC_IMPL_SLL_INIT(sll_ptr, sll_name, struct_name, sll_elem_field,      \
+#define ccc_impl_sll_init(sll_ptr, sll_name, struct_name, sll_elem_field,      \
                           alloc_fn, aux_data)                                  \
     {                                                                          \
         {                                                                      \
@@ -36,7 +36,7 @@ void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
 struct ccc_sll_elem_ *ccc_sll_elem__in(struct ccc_sll_ const *,
                                        void const *user_struct);
 
-#define CCC_IMPL_LIST_EMPLACE_FRONT(list_ptr, struct_initializer...)           \
+#define ccc_impl_list_emplace_front(list_ptr, struct_initializer...)           \
     ({                                                                         \
         typeof(struct_initializer) *sll_res_;                                  \
         struct ccc_sll_ *sll_ = &(list_ptr)->impl_;                            \

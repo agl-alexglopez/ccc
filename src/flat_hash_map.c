@@ -25,9 +25,9 @@ static size_t to_index(size_t capacity, uint64_t hash);
 static size_t decrement(size_t capacity, size_t i);
 
 ccc_result
-ccc_impl_fhm_init(struct ccc_fhm_ *const h, size_t key_offset,
-                  size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
-                  ccc_key_eq_fn *const eq_fn, void *const aux)
+ccc_impl_fhm_init_buf(struct ccc_fhm_ *const h, size_t key_offset,
+                      size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
+                      ccc_key_eq_fn *const eq_fn, void *const aux)
 {
     if (!h || !hash_fn || !eq_fn)
     {
@@ -147,8 +147,8 @@ ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ *const e, ccc_update_fn *const fn)
 }
 
 ccc_fh_map_entry *
-ccc_fhm_and_modify_with(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
-                        void *aux)
+ccc_fhm_and_modify_aux(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
+                       void *aux)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {

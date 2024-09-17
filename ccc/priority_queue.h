@@ -35,12 +35,12 @@ typedef struct
    and any auxilliarry data needed for comparison, initialize an empty priority
    queue on the right hand side of it's declaration. This can be used at
    compile time or runtime. For example:
-     ccc_priority_queue my_pq = CCC_PQ_INIT(CCC_PQ_LES, my_cmp_fn, NULL);
+     ccc_priority_queue my_pq = ccc_pq_init(CCC_PQ_LES, my_cmp_fn, NULL);
    Such initialization must always occur or use of the priority queue is
    undefined. */
-#define CCC_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,    \
+#define ccc_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,    \
                     aux_data)                                                  \
-    CCC_IMPL_PQ_INIT(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
+    ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
                      aux_data)
 
 /* Obtain a reference to the front of the priority queue. This will be a min

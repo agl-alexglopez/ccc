@@ -18,42 +18,40 @@ typedef struct
     struct ccc_rtom_entry_ impl_;
 } ccc_rtom_entry;
 
-#define CCC_ROM_INIT(struct_name, node_elem_field, key_elem_field, map_name,   \
+#define ccc_rom_init(struct_name, node_elem_field, key_elem_field, map_name,   \
                      alloc_fn, key_cmp_fn, aux_data)                           \
     (ccc_realtime_ordered_map)                                                 \
-        CCC_IMPL_ROM_INIT(struct_name, node_elem_field, key_elem_field,        \
+        ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)
 
-#define CCC_ROM_GET_KEY_VAL(realtime_ordered_map_ptr, key...)                  \
-    CCC_IMPL_ROM_GET_KEY_VAL(realtime_ordered_map_ptr, key)
-
-#define CCC_ROM_GET_KEY_VAL_MUT(realtime_ordered_map_ptr, key...)              \
-    CCC_IMPL_ROM_GET_KEY_VAL_MUT(realtime_ordered_map_ptr, key)
-
-#define CCC_ROM_ENTRY(realtime_ordered_map_ptr, key...)                        \
+#define ccc_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,           \
+                             aux_data...)                                      \
     &(ccc_rtom_entry)                                                          \
     {                                                                          \
-        CCC_IMPL_ROM_ENTRY(realtime_ordered_map_ptr, key)                      \
+        ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,      \
+                                  aux_data)                                    \
     }
 
-#define CCC_ROM_AND_MODIFY(realtime_ordered_map_entry_ptr, mod_fn)             \
-    &(ccc_rtom_entry)                                                          \
+#define ccc_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value...) \
+    ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value)
+
+#define ccc_rom_insert_entry_w(realtime_ordered_map_entry_ptr,                 \
+                               lazy_key_value...)                              \
+    ccc_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr, lazy_key_value)
+
+#define ccc_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value...)     \
+    &(ccc_entry)                                                               \
     {                                                                          \
-        CCC_IMPL_ROM_AND_MODIFY(realtime_ordered_map_entry_ptr, mod_fn)        \
+        ccc_impl_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value)   \
     }
 
-#define CCC_ROM_AND_MODIFY_W(realtime_ordered_map_entry_ptr, mod_fn, aux_data) \
-    &(ccc_rtom_entry)                                                          \
+#define ccc_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,              \
+                                   lazy_value...)                              \
+    &(ccc_entry)                                                               \
     {                                                                          \
-        CCC_IMPL_ROM_AND_MODIFY_WITH(realtime_ordered_map_entry_ptr, mod_fn,   \
-                                     aux_data)                                 \
+        ccc_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
+                                        lazy_value)                            \
     }
-
-#define CCC_ROM_OR_INSERT(realtime_ordered_map_entry_ptr, key_value...)        \
-    CCC_IMPL_ROM_OR_INSERT(realtime_ordered_map_entry_ptr, key_value)
-
-#define CCC_ROM_INSERT_ENTRY(realtime_ordered_map_entry_ptr, key_value...)     \
-    CCC_IMPL_ROM_INSERT_ENTRY(realtime_ordered_map_entry_ptr, key_value)
 
 /*=================    Membership and Retrieval    ==========================*/
 
@@ -111,8 +109,8 @@ ccc_entry ccc_rom_remove_entry(ccc_rtom_entry const *e);
 
 ccc_rtom_entry *ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn);
 
-ccc_rtom_entry *ccc_rom_and_modify_with(ccc_rtom_entry *e, ccc_update_fn *fn,
-                                        void *aux);
+ccc_rtom_entry *ccc_rom_and_modify_aux(ccc_rtom_entry *e, ccc_update_fn *fn,
+                                       void *aux);
 
 ccc_rtom_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
                              void const *key);
@@ -166,19 +164,18 @@ void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
 typedef ccc_rtom_elem rtom_elem;
 typedef ccc_realtime_ordered_map realtime_ordered_map;
 typedef ccc_rtom_entry rtom_entry;
-#    define ROM_INIT(args...) CCC_ROM_INIT(args)
-#    define ROM_ENTRY(args...) CCC_ROM_ENTRY(args)
-#    define ROM_GET_KEY_VAL(args...) CCC_ROM_GET_KEY_VAL(args)
-#    define ROM_AND_MODIFY(args...) CCC_ROM_AND_MODIFY(args)
-#    define ROM_AND_MODIFY_W(args...) CCC_ROM_AND_MODIFY_W(args)
-#    define ROM_OR_INSERT(args...) CCC_ROM_OR_INSERT(args)
-#    define ROM_INSERT_ENTRY(args...) CCC_ROM_INSERT_ENTRY(args)
+#    define rom_init(args...) ccc_rom_init(args)
+#    define rom_and_modify_w(args...) ccc_rom_and_modify_w(args)
+#    define rom_or_insert_w(args...) ccc_rom_or_insert_w(args)
+#    define rom_insert_entry_w(args...) ccc_rom_insert_entry_w(args)
+#    define rom_try_insert_w(args...) ccc_rom_try_insert_w(args)
+#    define rom_insert_or_assign_w(args...) ccc_rom_insert_or_assign_w(args)
 #    define rom_insert_vr(args...) ccc_rom_insert_vr(args)
 #    define rom_remove_vr(args...) ccc_rom_remove_vr(args)
 #    define rom_remove_entry_vr(args...) ccc_rom_remove_entry_vr(args)
 #    define rom_entry_vr(args...) ccc_rom_entry_vr(args)
 #    define rom_and_modify_vr(args...) ccc_rom_and_modify_vr(args)
-#    define rom_and_modify_with_vr(args...) ccc_rom_and_modify_with_vr(args)
+#    define rom_and_modify_aux_vr(args...) ccc_rom_and_modify_aux_vr(args)
 #    define rom_contains(args...) ccc_rom_contains(args)
 #    define rom_get_key_val(args...) ccc_rom_get_key_val(args)
 #    define rom_get_mut(args...) ccc_rom_get_mut(args)

@@ -39,42 +39,33 @@ resizing is allowed.
 @param [in] aux auxilliary data that is needed for key comparison.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
-#define CCC_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
+#define ccc_fhm_init(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
                      fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)      \
-    CCC_IMPL_FHM_INIT(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
+    ccc_impl_fhm_init(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
-#define CCC_FHM_GET_KEY_VAL(flat_hash_map_ptr, key...)                         \
-    CCC_IMPL_FHM_GET_KEY_VAL(flat_hash_map_ptr, key)
-
-#define CCC_FHM_ENTRY(flat_hash_map_ptr, key...)                               \
+#define ccc_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux...)          \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
-        CCC_IMPL_FHM_ENTRY(flat_hash_map_ptr, key)                             \
+        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux)        \
     }
 
-#define CCC_FHM_AND_MODIFY(flat_hash_map_entry_ptr, mod_fn)                    \
-    &(ccc_fh_map_entry)                                                        \
+#define ccc_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)        \
+    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)
+
+#define ccc_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value...)     \
+    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)
+
+#define ccc_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)            \
+    &(ccc_entry)                                                               \
     {                                                                          \
-        CCC_IMPL_FHM_AND_MODIFY(flat_hash_map_entry_ptr, mod_fn)               \
+        ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value)          \
     }
 
-#define CCC_FHM_AND_MODIFY_W(flat_hash_map_entry_ptr, mod_fn, aux)             \
-    &(ccc_fh_map_entry)                                                        \
+#define ccc_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...)      \
+    &(ccc_entry)                                                               \
     {                                                                          \
-        CCC_IMPL_FHM_AND_MODIFY_W(flat_hash_map_entry_ptr, mod_fn, aux)        \
-    }
-
-#define CCC_FHM_INSERT_ENTRY(flat_hash_map_entry_ptr, key_value...)            \
-    CCC_IMPL_FHM_INSERT_ENTRY(flat_hash_map_entry_ptr, key_value)
-
-#define CCC_FHM_OR_INSERT(flat_hash_map_entry_ptr, key_value...)               \
-    CCC_IMPL_FHM_OR_INSERT(flat_hash_map_entry_ptr, key_value)
-
-#define CCC_FHM_TRY_INSERT(flat_hash_map_ptr, key, lazy_key_value...)          \
-    (ccc_entry)                                                                \
-    {                                                                          \
-        CCC_IMPL_FHM_TRY_INSERT(flat_hash_map_ptr, key, lazy_key_value)        \
+        ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value)    \
     }
 
 /** @brief Searches the table for the presence of key.
@@ -172,12 +163,13 @@ ccc_fh_map_entry *ccc_fhm_and_modify(ccc_fh_map_entry *e, ccc_update_fn *fn);
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
 @param [in] fn an update function that requires auxilliary data.
+@param [in] aux auxilliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-ccc_fh_map_entry *ccc_fhm_and_modify_with(ccc_fh_map_entry *e,
-                                          ccc_update_fn *fn, void *aux);
+ccc_fh_map_entry *ccc_fhm_and_modify_aux(ccc_fh_map_entry *e, ccc_update_fn *fn,
+                                         void *aux);
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
@@ -316,14 +308,11 @@ bool ccc_fhm_validate(ccc_flat_hash_map const *h);
 typedef ccc_fh_map_elem fh_map_elem;
 typedef ccc_flat_hash_map flat_hash_map;
 typedef ccc_fh_map_entry fh_map_entry;
-#    define FHM_INIT(args...) CCC_FHM_INIT(args)
-#    define FHM_GET_KEY_VAL(args...) CCC_FHM_GET_KEY_VAL(args)
-#    define FHM_ENTRY(args...) CCC_FHM_ENTRY(args)
-#    define FHM_AND_MODIFY(args...) CCC_FHM_AND_MODIFY(args)
-#    define FHM_AND_MODIFY_W(args...) CCC_FHM_AND_MODIFY_W(args)
-#    define FHM_INSERT_ENTRY(args...) CCC_FHM_INSERT_ENTRY(args)
-#    define FHM_OR_INSERT(args...) CCC_FHM_OR_INSERT(args)
-#    define FHM_TRY_INSERT(args...) CCC_FHM_TRY_INSERT(args)
+#    define fhm_init(args...) ccc_fhm_init(args)
+#    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
+#    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
+#    define fhm_insert_or_assign_w(args...) ccc_fhm_insert_or_assign_w(args)
+#    define fhm_try_insert_w(args...) ccc_fhm_try_insert_w(args)
 #    define fhm_contains(args...) ccc_fhm_contains(args)
 #    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
 #    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
@@ -337,11 +326,11 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_entry(args...) ccc_fhm_entry(args)
 #    define fhm_and_modify_vr(args...) ccc_fhm_and_modify_vr(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
-#    define fhm_and_modify_with_vr(args...) ccc_fhm_and_modify_with_vr(args)
-#    define fhm_and_modify_with(args...) ccc_fhm_and_modify_with(args)
+#    define fhm_and_modify_aux_vr(args...) ccc_fhm_and_modify_aux_vr(args)
+#    define fhm_and_modify_aux(args...) ccc_fhm_and_modify_aux(args)
 #    define fhm_entry(args...) ccc_fhm_entry(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
-#    define fhm_and_modify_with(args...) ccc_fhm_and_modify_with(args)
+#    define fhm_and_modify_aux(args...) ccc_fhm_and_modify_aux(args)
 #    define fhm_or_insert(args...) ccc_fhm_or_insert(args)
 #    define fhm_insert_entry(args...) ccc_fhm_insert_entry(args)
 #    define fhm_unwrap(args...) ccc_fhm_unwrap(args)

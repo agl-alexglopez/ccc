@@ -49,7 +49,7 @@ static enum test_result
 rtom_test_forward_iter(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -82,7 +82,7 @@ static enum test_result
 rtom_test_iterate_removal(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -114,7 +114,7 @@ static enum test_result
 rtom_test_iterate_remove_reinsert(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -152,7 +152,7 @@ static enum test_result
 rtom_test_valid_range(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -205,7 +205,7 @@ static enum test_result
 rtom_test_valid_range_equals(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -257,7 +257,7 @@ static enum test_result
 rtom_test_invalid_range(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -309,7 +309,7 @@ static enum test_result
 rtom_test_empty_range(void)
 {
     ccc_realtime_ordered_map s
-        = CCC_ROM_INIT(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */

@@ -62,7 +62,7 @@ fhash_test_insert(void)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Nothing was there before so nothing is in the entry. */
@@ -80,7 +80,7 @@ fhash_test_insert_overwrite(void)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
@@ -117,7 +117,7 @@ fhash_test_insert_then_bad_ideas(void)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
@@ -152,7 +152,7 @@ fhash_test_entry_api_functional(void)
     struct val vals[200];
     size_t const size = sizeof(vals) / sizeof(vals[0]);
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -212,7 +212,7 @@ fhash_test_insert_via_entry(void)
     size_t const size = 200;
     struct val vals[200];
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -260,7 +260,7 @@ fhash_test_insert_via_entry_macros(void)
     size_t const size = 200;
     struct val vals[200];
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -269,7 +269,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
-            = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, i), (struct val){i, i, {}});
+            = insert_entry(entry_vr(&fh, &i), &(struct val){i, i, {}}.e);
         CHECK((d != NULL), true);
         CHECK(d->id, i);
         CHECK(d->val, i);
@@ -279,7 +279,7 @@ fhash_test_insert_via_entry_macros(void)
     for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
-            = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, i), (struct val){i, i + 1, {}});
+            = insert_entry(entry_vr(&fh, &i), &(struct val){i, i + 1, {}}.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->val, i + 1);
@@ -303,7 +303,7 @@ fhash_test_entry_api_macros(void)
     int const size = 200;
     struct val vals[200];
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -314,7 +314,7 @@ fhash_test_entry_api_macros(void)
         /* The macros support functions that will only execute if the or
            insert branch executes. */
         struct val const *const d
-            = FHM_OR_INSERT(FHM_ENTRY(&fh, i), fhash_create(i, i));
+            = fhm_or_insert_w(entry_vr(&fh, &i), fhash_create(i, i));
         CHECK((d != NULL), true);
         CHECK(d->id, i);
         CHECK(d->val, i);
@@ -323,9 +323,8 @@ fhash_test_entry_api_macros(void)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val const *const d
-            = FHM_OR_INSERT(FHM_AND_MODIFY(FHM_ENTRY(&fh, i), fhash_modplus),
-                            fhash_create(i, i));
+        struct val const *const d = fhm_or_insert_w(
+            and_modify(entry_vr(&fh, &i), fhash_modplus), fhash_create(i, i));
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->id, i);
@@ -344,7 +343,7 @@ fhash_test_entry_api_macros(void)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val *v = FHM_OR_INSERT(FHM_ENTRY(&fh, i), (struct val){0});
+        struct val *v = fhm_or_insert_w(entry_vr(&fh, &i), (struct val){});
         CHECK(v != NULL, true);
         v->val++;
         /* All values in the array should be odd now */
@@ -360,7 +359,7 @@ fhash_test_two_sum(void)
     struct val vals[20];
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
@@ -393,7 +392,7 @@ fhash_test_resize(void)
     CHECK(vals == NULL, false);
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
+        = fhm_init(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     int const to_insert = 1000;
@@ -430,7 +429,7 @@ fhash_test_resize_macros(void)
     CHECK(vals == NULL, false);
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, prime_start, struct val, id, e, realloc,
+        = fhm_init(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     int const to_insert = 1000;
@@ -438,8 +437,8 @@ fhash_test_resize_macros(void)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
-                                         fhash_create(shuffled_index, i));
+        struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
+                                     &(struct val){shuffled_index, i, {}}.e);
         CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
         CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
         CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
@@ -449,16 +448,16 @@ fhash_test_resize_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = FHM_OR_INSERT(FHM_AND_MODIFY_W(FHM_ENTRY(&fh, shuffled_index),
-                                             fhash_swap_val, shuffled_index),
-                            (struct val){0});
+            = fhm_or_insert_w(fhm_and_modify_w(entry_vr(&fh, &shuffled_index),
+                                               fhash_swap_val, shuffled_index),
+                              (struct val){});
         CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
         CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
         struct val *v
-            = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
+            = fhm_or_insert_w(entry_vr(&fh, &shuffled_index), (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
-        v = FHM_GET_KEY_VAL(&fh, shuffled_index);
+        v = get_key_val(&fh, &shuffled_index);
         CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
         CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
@@ -470,7 +469,7 @@ static enum test_result
 fhash_test_resize_from_null(void)
 {
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, NULL, 0, struct val, id, e, realloc,
+    ccc_result const res = fhm_init(&fh, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
     int const to_insert = 1000;
@@ -504,7 +503,7 @@ fhash_test_resize_from_null_macros(void)
     size_t const prime_start = 0;
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, NULL, prime_start, struct val, id, e, realloc,
+        = fhm_init(&fh, NULL, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
@@ -512,8 +511,8 @@ fhash_test_resize_from_null_macros(void)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
-                                         fhash_create(shuffled_index, i));
+        struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
+                                     &(struct val){shuffled_index, i, {}}.e);
         CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
         CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
         CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
@@ -523,16 +522,16 @@ fhash_test_resize_from_null_macros(void)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = FHM_OR_INSERT(FHM_AND_MODIFY_W(FHM_ENTRY(&fh, shuffled_index),
-                                             fhash_swap_val, shuffled_index),
-                            (struct val){0});
+            = fhm_or_insert_w(fhm_and_modify_w(entry_vr(&fh, &shuffled_index),
+                                               fhash_swap_val, shuffled_index),
+                              (struct val){});
         CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
         CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
         struct val *v
-            = FHM_OR_INSERT(FHM_ENTRY(&fh, shuffled_index), (struct val){0});
+            = fhm_or_insert_w(entry_vr(&fh, &shuffled_index), (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
-        v = FHM_GET_KEY_VAL(&fh, shuffled_index);
+        v = get_key_val(&fh, &shuffled_index);
         CHECK(v == NULL, false, ccc_impl_fhm_base(&fh.impl_));
         CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
     }
@@ -546,7 +545,7 @@ fhash_test_insert_limit(void)
     int const size = 101;
     struct val vals[101];
     ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const larger_prime = (int)fhm_next_prime(size);
@@ -555,8 +554,8 @@ fhash_test_insert_limit(void)
     for (int i = 0; i < size;
          ++i, shuffled_index = (shuffled_index + larger_prime) % size)
     {
-        struct val *v = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
-                                         fhash_create(shuffled_index, i));
+        struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
+                                     &(struct val){shuffled_index, i, {}}.e);
         if (!v)
         {
             break;
@@ -579,8 +578,8 @@ fhash_test_insert_limit(void)
     CHECK(in_table->val, -2);
     CHECK(size(&fh), final_size);
 
-    in_table = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, last_index),
-                                (struct val){.id = last_index, .val = -3});
+    in_table = insert_entry(entry_vr(&fh, &last_index),
+                            &(struct val){.id = last_index, .val = -3}.e);
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -3);
     CHECK(size(&fh), final_size);
@@ -591,8 +590,8 @@ fhash_test_insert_limit(void)
     CHECK(in_table == NULL, true);
     CHECK(size(&fh), final_size);
 
-    in_table = FHM_INSERT_ENTRY(FHM_ENTRY(&fh, shuffled_index),
-                                (struct val){.id = shuffled_index, .val = -4});
+    in_table = insert_entry(entry_vr(&fh, &shuffled_index),
+                            &(struct val){.id = shuffled_index, .val = -4}.e);
     CHECK(in_table == NULL, true);
     CHECK(size(&fh), final_size);
 

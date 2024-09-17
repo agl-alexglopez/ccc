@@ -40,7 +40,7 @@ fhash_test_erase(void)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = FHM_INIT(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val query = {.id = 137, .val = 99};
@@ -60,9 +60,10 @@ fhash_test_erase(void)
     ent = remove(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), 0);
-    FHM_INSERT_ENTRY(FHM_ENTRY(&fh, 137), (struct val){.id = 137, .val = 99});
+    ccc_fhm_insert_entry_w(entry_vr(&fh, &(int){137}),
+                           (struct val){.id = 137, .val = 99});
     CHECK(size(&fh), 1);
-    CHECK(occupied(remove_entry_vr(FHM_ENTRY(&fh, 137))), true);
+    CHECK(occupied(remove_entry_vr(entry_vr(&fh, &(int){137}))), true);
     CHECK(size(&fh), 0);
     return PASS;
 }
@@ -70,46 +71,46 @@ fhash_test_erase(void)
 static enum test_result
 fhash_test_shuffle_insert_erase(void)
 {
-    ccc_flat_hash_map fh;
-    ccc_result const res = FHM_INIT(&fh, NULL, 0, struct val, id, e, realloc,
+    ccc_flat_hash_map h;
+    ccc_result const res = fhm_init(&h, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 100;
     int const larger_prime = (int)fhm_next_prime(to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
+         ++i, shuffle = (shuffle + larger_prime) % to_insert)
     {
-        struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
+        struct val *v = unwrap(
+            fhm_insert_or_assign_w(&h, shuffle, (struct val){.val = i}));
         CHECK(v != NULL, true);
-        CHECK(v->id, shuffled_index);
+        CHECK(v->id, shuffle);
         CHECK(v->val, i);
-        CHECK(fhm_validate(&fh), true);
+        CHECK(fhm_validate(&h), true);
     }
-    CHECK(size(&fh), to_insert);
-    size_t cur_size = size(&fh);
+    CHECK(size(&h), to_insert);
+    size_t cur_size = size(&h);
     int i = 0;
-    while (!empty(&fh) && cur_size)
+    while (!empty(&h) && cur_size)
     {
-        CHECK(contains(&fh, &i), true);
+        CHECK(contains(&h, &i), true);
         if (i % 2)
         {
             struct val const *const old_val
-                = unwrap(remove_vr(&fh, &(struct val){.id = i}.e));
+                = unwrap(remove_vr(&h, &(struct val){.id = i}.e));
             CHECK(old_val != NULL, true);
             CHECK(old_val->id, i);
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_vr(&fh, &i));
+            ccc_entry removed = remove_entry(entry_vr(&h, &i));
             CHECK(occupied(&removed), true);
         }
         --cur_size;
         ++i;
-        CHECK(size(&fh), cur_size);
-        CHECK(fhm_validate(&fh), true);
+        CHECK(size(&h), cur_size);
+        CHECK(fhm_validate(&h), true);
     }
-    CHECK(size(&fh), 0);
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    CHECK(size(&h), 0);
+    CHECK(fhm_clear_and_free(&h, NULL), CCC_OK);
     return PASS;
 }

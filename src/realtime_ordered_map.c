@@ -335,7 +335,7 @@ ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn)
 }
 
 ccc_rtom_entry *
-ccc_rom_and_modify_with(ccc_rtom_entry *e, ccc_update_fn *fn, void *aux)
+ccc_rom_and_modify_aux(ccc_rtom_entry *e, ccc_update_fn *fn, void *aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
@@ -569,6 +569,13 @@ ccc_impl_rom_key_from_node(struct ccc_rtom_ const *const rom,
                            struct ccc_rtom_elem_ const *const elem)
 {
     return (uint8_t *)struct_base(rom, elem) + rom->key_offset_;
+}
+
+void *
+ccc_impl_rom_key_in_slot(struct ccc_rtom_ const *const rom,
+                         void const *const slot)
+{
+    return (uint8_t *)slot + rom->key_offset_;
 }
 
 struct ccc_rtom_elem_ *

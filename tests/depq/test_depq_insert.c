@@ -42,7 +42,7 @@ static enum test_result
 depq_test_insert_one(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
+        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
     ccc_depq_push(&pq, &single.elem);
@@ -55,7 +55,7 @@ static enum test_result
 depq_test_insert_three(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
+        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -72,8 +72,8 @@ static enum test_result
 depq_test_struct_getter(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
-    ccc_double_ended_priority_queue pq_tester_clone = CCC_DEPQ_INIT(
+        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_double_ended_priority_queue pq_tester_clone = ccc_depq_init(
         struct val, elem, val, pq_tester_clone, NULL, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
@@ -98,7 +98,7 @@ static enum test_result
 depq_test_insert_three_dups(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
+        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -115,7 +115,7 @@ static enum test_result
 depq_test_insert_shuffle(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
+        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -138,7 +138,7 @@ static enum test_result
 depq_test_read_max_min(void)
 {
     ccc_double_ended_priority_queue pq
-        = CCC_DEPQ_INIT(struct val, elem, val, pq, NULL, val_cmp, NULL);
+        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {

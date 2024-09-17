@@ -6,9 +6,9 @@
 struct ccc_node_;
 struct ccc_tree_;
 
-#define CCC_IMPL_DEPQ_INIT(struct_name, node_elem_field, key_elem_field,       \
+#define ccc_impl_depq_init(struct_name, node_elem_field, key_elem_field,       \
                            tree_name, alloc_fn, key_cmp_fn, aux_data)          \
-    CCC_TREE_INIT(struct_name, node_elem_field, key_elem_field, tree_name,     \
+    ccc_tree_init(struct_name, node_elem_field, key_elem_field, tree_name,     \
                   alloc_fn, key_cmp_fn, aux_data)
 
 void *ccc_impl_depq_key_in_slot(struct ccc_tree_ const *t, void const *slot);

@@ -130,14 +130,14 @@
         ccc_rtom_entry const *: ccc_rom_and_modify)((container_entry_ptr),     \
                                                     (mod_fn))
 
-#define ccc_impl_and_modify_with(container_entry_ptr, mod_fn, aux_data_ptr...) \
+#define ccc_impl_and_modify_aux(container_entry_ptr, mod_fn, aux_data_ptr...)  \
     _Generic((container_entry_ptr),                                            \
-        ccc_fh_map_entry *: ccc_fhm_and_modify_with,                           \
-        ccc_o_map_entry *: ccc_om_and_modify_with,                             \
-        ccc_rtom_entry *: ccc_rom_and_modify_with,                             \
-        ccc_fh_map_entry const *: ccc_fhm_and_modify_with,                     \
-        ccc_o_map_entry const *: ccc_om_and_modify_with,                       \
-        ccc_rtom_entry const *: ccc_rom_and_modify_with)(                      \
+        ccc_fh_map_entry *: ccc_fhm_and_modify_aux,                            \
+        ccc_o_map_entry *: ccc_om_and_modify_aux,                              \
+        ccc_rtom_entry *: ccc_rom_and_modify_aux,                              \
+        ccc_fh_map_entry const *: ccc_fhm_and_modify_aux,                      \
+        ccc_o_map_entry const *: ccc_om_and_modify_aux,                        \
+        ccc_rtom_entry const *: ccc_rom_and_modify_aux)(                       \
         (container_entry_ptr), (mod_fn), aux_data_ptr)
 
 #define ccc_impl_insert_entry(container_entry_ptr,                             \

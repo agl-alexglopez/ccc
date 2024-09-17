@@ -35,9 +35,9 @@ typedef struct
    with the comparison function and any necessary auxilliary data. This may
    be used at compile time or runtime. It is undefined to use the depq if
    this has not been called. */
-#define CCC_DEPQ_INIT(struct_name, depq_elem_field, key_field, depq_name,      \
+#define ccc_depq_init(struct_name, depq_elem_field, key_field, depq_name,      \
                       alloc_fn, key_cmp_fn, aux)                               \
-    CCC_IMPL_DEPQ_INIT(struct_name, depq_elem_field, key_field, depq_name,     \
+    ccc_impl_depq_init(struct_name, depq_elem_field, key_field, depq_name,     \
                        alloc_fn, key_cmp_fn, aux)
 
 void ccc_depq_clear(ccc_double_ended_priority_queue *,
