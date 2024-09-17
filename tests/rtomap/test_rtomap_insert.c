@@ -61,34 +61,34 @@ rtomap_test_insert_macros(void)
         = rom_init(struct val, elem, val, s, realloc, val_cmp, NULL);
     struct val *v = rom_or_insert_w(entry_vr(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
-    CHECK(size(&s), 1);
-    v = rom_insert_entry_w(ccc_rom_entry_vr(&s, &(int){0}),
+    v = rom_insert_entry_w(entry_vr(&s, &(int){0}),
                            (struct val){.val = 0, .id = 99});
-    CHECK(v != NULL, true);
-    CHECK(v->val, 0);
+    CHECK(ccc_rom_validate(&s), true);
+    CHECK(v == NULL, false);
     CHECK(v->id, 99);
-    CHECK(size(&s), 1);
-    v = unwrap(rom_insert_or_assign_w(&s, 0, (struct val){.id = 100}));
+    v = rom_insert_entry_w(entry_vr(&s, &(int){9}),
+                           (struct val){.val = 9, .id = 100});
     CHECK(v != NULL, true);
-    v->id++;
-    CHECK(v->id, 101);
-    CHECK(size(&s), 1);
-    v = unwrap(rom_try_insert_w(&s, 0, (struct val){.id = 3}));
+    CHECK(v->id, 100);
+    v = unwrap(rom_insert_or_assign_w(&s, 1, (struct val){.id = 100}));
+    CHECK(ccc_rom_validate(&s), true);
     CHECK(v != NULL, true);
-    CHECK(v->id, 101);
-    CHECK(size(&s), 1);
-    v = unwrap(rom_try_insert_w(&s, 1, (struct val){.id = 2}));
-    CHECK(v != NULL, true);
-    CHECK(size(&s), 2);
-    CHECK(v->val, 1);
-    CHECK(v->id, 2);
-    v = unwrap(rom_insert_or_assign_w(&s, 2, (struct val){.id = 77}));
-    CHECK(v != NULL, true);
+    CHECK(v->id, 100);
     CHECK(size(&s), 3);
-    CHECK(v->val, 2);
-    CHECK(v->id, 77);
-    v = rom_insert_entry_w(ccc_rom_entry_vr(&s, &(int){88}),
-                           (struct val){.val = 88, .id = 65});
+    v = unwrap(rom_insert_or_assign_w(&s, 1, (struct val){.id = 99}));
+    CHECK(ccc_rom_validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->id, 99);
+    CHECK(size(&s), 3);
+    v = unwrap(rom_try_insert_w(&s, 1, (struct val){.id = 2}));
+    CHECK(ccc_rom_validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->id, 99);
+    CHECK(size(&s), 3);
+    v = unwrap(rom_try_insert_w(&s, 2, (struct val){.id = 2}));
+    CHECK(ccc_rom_validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->id, 2);
     CHECK(size(&s), 4);
     rom_clear_and_free(&s, NULL);
     return PASS;

@@ -68,18 +68,7 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
 void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
 size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 
-#define ccc_impl_fhm_and_modify_w(flat_hash_map_entry, mod_fn, aux...)         \
-    ({                                                                         \
-        struct ccc_fhm_entry_ fhm_mod_with_ent_                                \
-            = (flat_hash_map_entry)->impl_;                                    \
-        if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)             \
-        {                                                                      \
-            __auto_type fhm_aux_ = aux;                                        \
-            (mod_fn)(&(ccc_update){(void *)fhm_mod_with_ent_.entry_.e_,        \
-                                   &fhm_aux_});                                \
-        }                                                                      \
-        fhm_mod_with_ent_;                                                     \
-    })
+/*==================   Helper Macros for Repeated Logic     =================*/
 
 #define ccc_impl_fhm_swaps(swap_entry, lazy_key_value...)                      \
     ({                                                                         \
@@ -114,6 +103,21 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         (swap_entry)->entry_.e_;                                               \
     })
 
+/*=====================     Core Macro Implementations     ==================*/
+
+#define ccc_impl_fhm_and_modify_w(flat_hash_map_entry, mod_fn, aux...)         \
+    ({                                                                         \
+        struct ccc_fhm_entry_ fhm_mod_with_ent_                                \
+            = (flat_hash_map_entry)->impl_;                                    \
+        if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)             \
+        {                                                                      \
+            __auto_type fhm_aux_ = aux;                                        \
+            (mod_fn)(&(ccc_update){(void *)fhm_mod_with_ent_.entry_.e_,        \
+                                   &fhm_aux_});                                \
+        }                                                                      \
+        fhm_mod_with_ent_;                                                     \
+    })
+
 #define ccc_impl_fhm_or_insert_w(flat_hash_map_entry, lazy_key_value...)       \
     ({                                                                         \
         typeof(lazy_key_value) *res_;                                          \
@@ -123,7 +127,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                == ccc_buf_elem_size(&(fhm_or_ins_entry_->h_->buf_)));          \
         if (fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_OCCUPIED)             \
         {                                                                      \
-            res_ = (void *)fhm_or_ins_entry_->entry_.e_;                       \
+            res_ = fhm_or_ins_entry_->entry_.e_;                               \
         }                                                                      \
         else if (fhm_or_ins_entry_->entry_.stats_ & ~CCC_ENTRY_VACANT)         \
         {                                                                      \
@@ -182,7 +186,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 .stats_ = CCC_ENTRY_VACANT};                                   \
             *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                    \
                 &(flat_hash_map_ptr)->impl_, fhm_try_insert_res_.e_))          \
-                = key;                                                         \
+                = fhm_key_;                                                    \
         }                                                                      \
         fhm_try_insert_res_;                                                   \
     })
@@ -199,7 +203,11 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             *((typeof(lazy_value) *)fhm_ins_or_assign_res_.e_) = lazy_value;   \
             *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                    \
                 &(flat_hash_map_ptr)->impl_, fhm_ins_or_assign_res_.e_))       \
-                = key;                                                         \
+                = fhm_key_;                                                    \
+            ccc_impl_fhm_in_slot(fhm_ins_or_assign_ent_.h_,                    \
+                                 fhm_ins_or_assign_ent_.entry_.e_)             \
+                ->hash_                                                        \
+                = fhm_ins_or_assign_ent_.hash_;                                \
         }                                                                      \
         else if (fhm_ins_or_assign_ent_.entry_.stats_ & ~CCC_ENTRY_VACANT)     \
         {                                                                      \
@@ -214,7 +222,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             };                                                                 \
             *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                    \
                 &(flat_hash_map_ptr)->impl_, fhm_ins_or_assign_res_.e_))       \
-                = key;                                                         \
+                = fhm_key_;                                                    \
         }                                                                      \
         fhm_ins_or_assign_res_;                                                \
     })

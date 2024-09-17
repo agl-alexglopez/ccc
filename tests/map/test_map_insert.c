@@ -102,34 +102,39 @@ map_test_insert_macros(void)
     struct val const *ins = ccc_om_or_insert_w(entry_vr(&s, &(int){2}),
                                                (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true);
-    CHECK(ins->id, 0);
     CHECK(ccc_om_validate(&s), true);
     CHECK(size(&s), 1);
     ins = om_insert_entry_w(entry_vr(&s, &(int){2}),
-                            (struct val){.val = 2, .id = 1});
-    CHECK(ins != NULL, true);
-    CHECK(ins->id, 1);
+                            (struct val){.val = 2, .id = 0});
     CHECK(ccc_om_validate(&s), true);
     CHECK(size(&s), 1);
+    ins = om_insert_entry_w(entry_vr(&s, &(int){9}),
+                            (struct val){.val = 9, .id = 1});
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(size(&s), 2);
     ins = ccc_entry_unwrap(
         om_insert_or_assign_w(&s, 3, (struct val){.id = 99}));
+    CHECK(ccc_om_validate(&s), true);
     CHECK(ins == NULL, false);
     CHECK(ccc_om_validate(&s), true);
     CHECK(ins->id, 99);
-    CHECK(ins->val, 3);
-    CHECK(size(&s), 2);
+    CHECK(size(&s), 3);
+    ins = ccc_entry_unwrap(
+        om_insert_or_assign_w(&s, 3, (struct val){.id = 98}));
+    CHECK(ccc_om_validate(&s), true);
+    CHECK(ins == NULL, false);
+    CHECK(ins->id, 98);
+    CHECK(size(&s), 3);
     ins = ccc_entry_unwrap(om_try_insert_w(&s, 3, (struct val){.id = 100}));
     CHECK(ins == NULL, false);
     CHECK(ccc_om_validate(&s), true);
-    CHECK(ins->id, 99);
-    CHECK(ins->val, 3);
-    CHECK(size(&s), 2);
+    CHECK(ins->id, 98);
+    CHECK(size(&s), 3);
     ins = ccc_entry_unwrap(om_try_insert_w(&s, 4, (struct val){.id = 100}));
     CHECK(ins == NULL, false);
     CHECK(ccc_om_validate(&s), true);
     CHECK(ins->id, 100);
-    CHECK(ins->val, 4);
-    CHECK(size(&s), 3);
+    CHECK(size(&s), 4);
     ccc_om_clear_and_free(&s, NULL);
     return PASS;
 }

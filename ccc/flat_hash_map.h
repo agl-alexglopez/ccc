@@ -311,6 +311,7 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_init(args...) ccc_fhm_init(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
 #    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
+#    define fhm_insert_entry_w(args...) ccc_fhm_insert_entry_w(args)
 #    define fhm_insert_or_assign_w(args...) ccc_fhm_insert_or_assign_w(args)
 #    define fhm_try_insert_w(args...) ccc_fhm_try_insert_w(args)
 #    define fhm_contains(args...) ccc_fhm_contains(args)

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 static enum test_result fhash_test_insert(void);
+static enum test_result fhash_test_insert_macros(void);
 static enum test_result fhash_test_insert_overwrite(void);
 static enum test_result fhash_test_insert_via_entry(void);
 static enum test_result fhash_test_insert_via_entry_macros(void);
@@ -24,9 +25,10 @@ static enum test_result fhash_test_resize_from_null(void);
 static enum test_result fhash_test_resize_from_null_macros(void);
 static enum test_result fhash_test_insert_limit(void);
 
-#define NUM_TESTS (size_t)13
+#define NUM_TESTS (size_t)14
 test_fn const all_tests[NUM_TESTS] = {
     fhash_test_insert,
+    fhash_test_insert_macros,
     fhash_test_insert_overwrite,
     fhash_test_insert_then_bad_ideas,
     fhash_test_insert_via_entry,
@@ -71,6 +73,55 @@ fhash_test_insert(void)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
+    return PASS;
+}
+
+static enum test_result
+fhash_test_insert_macros(void)
+{
+    struct val vals[10] = {};
+    ccc_flat_hash_map fh;
+    ccc_result const res
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+    CHECK(res, CCC_OK);
+    struct val const *ins = ccc_fhm_or_insert_w(
+        entry_vr(&fh, &(int){2}), (struct val){.id = 2, .val = 0});
+    CHECK(ins != NULL, true);
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(size(&fh), 1);
+    ins = fhm_insert_entry_w(entry_vr(&fh, &(int){2}),
+                             (struct val){.id = 2, .val = 0});
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(size(&fh), 1);
+    ins = fhm_insert_entry_w(entry_vr(&fh, &(int){9}),
+                             (struct val){.id = 9, .val = 1});
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(size(&fh), 2);
+    ins = ccc_entry_unwrap(
+        fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 99}));
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(ins == NULL, false);
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(ins->val, 99);
+    CHECK(size(&fh), 3);
+    ins = ccc_entry_unwrap(
+        fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 98}));
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(ins == NULL, false);
+    CHECK(ins->val, 98);
+    CHECK(size(&fh), 3);
+    ins = ccc_entry_unwrap(fhm_try_insert_w(&fh, 3, (struct val){.val = 100}));
+    CHECK(ins == NULL, false);
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(ins->val, 98);
+    CHECK(size(&fh), 3);
+    ins = ccc_entry_unwrap(fhm_try_insert_w(&fh, 4, (struct val){.val = 100}));
+    CHECK(ins == NULL, false);
+    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(ins->val, 100);
+    CHECK(size(&fh), 4);
+    ccc_fhm_clear_and_free(&fh, NULL);
     return PASS;
 }
 
