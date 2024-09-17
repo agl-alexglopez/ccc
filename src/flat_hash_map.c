@@ -86,8 +86,6 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
     void *user_struct = struct_base(e->impl_.h_, &elem->impl_);
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        /* It is ok if an insert error was indicated because we do not
-           need more space if we are overwriting a previous value. */
         elem->impl_.hash_ = e->impl_.hash_;
         memcpy(e->impl_.entry_.e_, user_struct,
                ccc_buf_elem_size(&e->impl_.h_->buf_));
