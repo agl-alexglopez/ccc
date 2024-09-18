@@ -1,5 +1,9 @@
 #include "singly_linked_list.h"
+#include "impl_singly_linked_list.h"
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);

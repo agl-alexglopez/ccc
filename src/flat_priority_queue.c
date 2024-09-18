@@ -1,4 +1,5 @@
 #include "flat_priority_queue.h"
+#include "buffer.h"
 #include "impl_flat_priority_queue.h"
 #include "types.h"
 
@@ -46,7 +47,7 @@ ccc_result
 ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
                 ccc_alloc_fn *const fn)
 {
-    return (ccc_result)ccc_buf_realloc(&fpq->impl_.buf_, new_capacity, fn);
+    return ccc_buf_realloc(&fpq->impl_.buf_, new_capacity, fn);
 }
 
 void *

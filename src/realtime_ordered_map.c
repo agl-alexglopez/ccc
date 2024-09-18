@@ -28,6 +28,7 @@
    and flexible in how it can be implemented. */
 #include "realtime_ordered_map.h"
 #include "impl_realtime_ordered_map.h"
+#include "impl_types.h"
 #include "types.h"
 
 #include <assert.h>

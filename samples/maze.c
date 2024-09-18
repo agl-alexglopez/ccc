@@ -14,6 +14,7 @@
 #include "random.h"
 #include "str_view/str_view.h"
 #include "traits.h"
+#include "types.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -150,6 +151,7 @@ main(int argc, char **argv)
             if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
             {
                 quit("rows below required minimum or negative.\n", 1);
+                return 1;
             }
             maze.rows = row_arg.conversion;
         }
@@ -159,6 +161,7 @@ main(int argc, char **argv)
             if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
             {
                 quit("cols below required minimum or negative.\n", 1);
+                return 1;
             }
             maze.cols = col_arg.conversion;
         }
@@ -169,6 +172,7 @@ main(int argc, char **argv)
                 || speed_arg.conversion < 0)
             {
                 quit("speed outside of valid range.\n", 1);
+                return 1;
             }
             maze.speed = speed_arg.conversion;
         }

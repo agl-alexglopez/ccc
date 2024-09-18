@@ -1,8 +1,10 @@
 #include "flat_hash_map.h"
 #include "buffer.h"
 #include "impl_flat_hash_map.h"
+#include "impl_types.h"
 #include "types.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -613,7 +615,7 @@ to_index(size_t const capacity, uint64_t hash)
     return hash <= last_swap_slot ? last_swap_slot + 1 : hash;
 }
 
-static void *
+static inline void *
 struct_base(struct ccc_fhm_ const *const h, struct ccc_fhm_elem_ const *const e)
 {
     return ((uint8_t *)&e->hash_) - h->hash_elem_offset_;
@@ -634,12 +636,12 @@ swap(uint8_t tmp[], void *const a, void *const b, size_t ab_size)
 inline uint64_t *
 ccc_impl_fhm_hash_at(struct ccc_fhm_ const *const h, size_t const i)
 {
-    return &((struct ccc_fhm_elem_ *)((uint8_t *)ccc_buf_at(&h->buf_, i)
+    return &((struct ccc_fhm_elem_ *)((char *)ccc_buf_at(&h->buf_, i)
                                       + h->hash_elem_offset_))
                 ->hash_;
 }
 
-inline uint64_t
+uint64_t
 ccc_impl_fhm_filter(struct ccc_fhm_ const *const h, void const *const key)
 {
     uint64_t const hash = h->hash_fn_(key);

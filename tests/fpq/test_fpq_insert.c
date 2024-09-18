@@ -1,6 +1,7 @@
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "test.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

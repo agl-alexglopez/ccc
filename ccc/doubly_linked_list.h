@@ -2,6 +2,7 @@
 #define CCC_DOUBLY_LINKED_LIST_H
 
 #include "impl_doubly_linked_list.h"
+#include "types.h"
 
 typedef struct
 {

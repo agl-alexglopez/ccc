@@ -23,6 +23,7 @@ modifications. This may combat such an anti-pattern. */
 #define CCC_ORDERED_MAP_H
 
 #include "impl_ordered_map.h"
+#include "impl_tree.h"
 #include "types.h"
 
 #include <stdbool.h>

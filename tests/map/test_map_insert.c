@@ -5,6 +5,7 @@
 #include "ordered_map.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -106,10 +107,12 @@ map_test_insert_macros(void)
     CHECK(size(&s), 1);
     ins = om_insert_entry_w(entry_vr(&s, &(int){2}),
                             (struct val){.val = 2, .id = 0});
+    CHECK(ins != NULL, true);
     CHECK(ccc_om_validate(&s), true);
     CHECK(size(&s), 1);
     ins = om_insert_entry_w(entry_vr(&s, &(int){9}),
                             (struct val){.val = 9, .id = 1});
+    CHECK(ins != NULL, true);
     CHECK(ccc_om_validate(&s), true);
     CHECK(size(&s), 2);
     ins = ccc_entry_unwrap(

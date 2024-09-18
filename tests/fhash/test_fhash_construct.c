@@ -5,6 +5,9 @@
 #include "flat_hash_map.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
+
+#include <stddef.h>
 
 static enum test_result fhash_test_empty(void);
 static enum test_result fhash_test_entry_macros(void);

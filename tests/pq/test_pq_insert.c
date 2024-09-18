@@ -1,6 +1,7 @@
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "test.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

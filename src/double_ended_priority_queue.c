@@ -17,8 +17,13 @@ differences warranted slight code duplication for the benefit of better
 maintainability and performance. */
 #include "double_ended_priority_queue.h"
 #include "impl_double_ended_priority_queue.h"
+#include "impl_tree.h"
+#include "impl_types.h"
+#include "types.h"
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

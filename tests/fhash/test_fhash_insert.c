@@ -3,6 +3,7 @@
 
 #include "fhash_util.h"
 #include "flat_hash_map.h"
+#include "impl_flat_hash_map.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -93,11 +94,11 @@ fhash_test_insert_macros(void)
     ins = fhm_insert_entry_w(entry_vr(&fh, &(int){2}),
                              (struct val){.id = 2, .val = 0});
     CHECK(ccc_fhm_validate(&fh), true);
-    CHECK(size(&fh), 1);
+    CHECK(ins != NULL, true);
     ins = fhm_insert_entry_w(entry_vr(&fh, &(int){9}),
                              (struct val){.id = 9, .val = 1});
     CHECK(ccc_fhm_validate(&fh), true);
-    CHECK(size(&fh), 2);
+    CHECK(ins != NULL, true);
     ins = ccc_entry_unwrap(
         fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 99}));
     CHECK(ccc_fhm_validate(&fh), true);

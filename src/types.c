@@ -1,4 +1,5 @@
 #include "types.h"
+#include "impl_types.h"
 
 bool
 ccc_entry_occupied(ccc_entry const *const e)

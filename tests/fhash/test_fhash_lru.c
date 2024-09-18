@@ -8,8 +8,10 @@ The leetcode lru problem in C. */
 #include "flat_hash_map.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #define REQS 11

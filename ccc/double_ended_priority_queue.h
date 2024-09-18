@@ -15,6 +15,7 @@
 #define CCC_DOUBLE_ENDED_PRIORITY_QUEUE_H
 
 #include "impl_double_ended_priority_queue.h"
+#include "impl_tree.h"
 #include "types.h"
 
 #include <stdbool.h>

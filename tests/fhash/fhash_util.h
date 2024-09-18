@@ -2,6 +2,7 @@
 #define CCC_FHASH_UTIL_H
 
 #include "flat_hash_map.h"
+#include "types.h"
 
 #include <stdint.h>
 

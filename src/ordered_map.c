@@ -1,8 +1,11 @@
 #include "ordered_map.h"
 #include "impl_ordered_map.h"
+#include "impl_tree.h"
 #include "impl_types.h"
+#include "types.h"
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -774,7 +777,7 @@ link_trees(struct ccc_node_ *parent, om_link dir, struct ccc_node_ *subtree)
     subtree->parent_ = parent;
 }
 
-/* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
+/* NOLINTBEGIN(*misc-no-recursion) */
 
 /* ======================        Debugging           ====================== */
 

@@ -11,6 +11,8 @@ enum ccc_entry_status_ : uint8_t
     CCC_ENTRY_SEARCH_ERROR = 0x4,
     CCC_ENTRY_CONTAINS_NULL = 0x8,
     CCC_ENTRY_DELETE_ERROR = 0x10,
+    CCC_ENTRY_INSERT_ERROR_CONTAINS_NULL
+    = (CCC_ENTRY_CONTAINS_NULL | CCC_ENTRY_INSERT_ERROR),
 };
 
 struct ccc_entry_

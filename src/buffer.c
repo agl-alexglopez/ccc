@@ -2,8 +2,9 @@
 #include "impl_buffer.h"
 #include "types.h"
 
-#include <alloca.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 

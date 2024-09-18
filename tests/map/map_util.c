@@ -1,8 +1,10 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "map_util.h"
+#include "ordered_map.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stdio.h>
 

@@ -10,6 +10,7 @@
 #ifndef CCC_IMPL_TREE_H
 #define CCC_IMPL_TREE_H
 
+#include "impl_types.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -29,7 +30,8 @@
    current underlying implementation, do not support duplicate values by
    default and I have found trimming the tree with these "fat" tree nodes
    holding duplicates can net a nice performance boost in the pop operation for
-   the priority queue. */
+   the priority queue. The normal map does not pay for the complexity of this
+   cycle detection because its implementation is seperate from the depq. */
 typedef struct ccc_node_
 {
     union {

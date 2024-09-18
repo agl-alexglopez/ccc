@@ -4,6 +4,7 @@
 #include "ordered_map.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

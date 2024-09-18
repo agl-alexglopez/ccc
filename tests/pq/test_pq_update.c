@@ -1,6 +1,7 @@
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "test.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -89,7 +90,7 @@ pq_test_priority_removal(void)
         struct val *i = &vals[val];
         if (i->val > limit)
         {
-            (void)ccc_pq_erase(&pq, &i->elem);
+            ccc_pq_erase(&pq, &i->elem);
             CHECK(ccc_pq_validate(&pq), true);
         }
     }

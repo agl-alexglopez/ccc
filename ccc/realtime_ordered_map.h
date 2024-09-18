@@ -2,6 +2,7 @@
 #define CCC_REALTIME_ORDERED_MAP_H
 
 #include "impl_realtime_ordered_map.h"
+#include "types.h"
 
 typedef struct
 {

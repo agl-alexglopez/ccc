@@ -1,6 +1,7 @@
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "test.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -83,7 +84,7 @@ pq_test_insert_erase_shuffled(void)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[i].elem);
+        ccc_pq_erase(&ppq, &vals[i].elem);
         CHECK(ccc_pq_validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
@@ -165,7 +166,7 @@ pq_test_delete_prime_shuffle_duplicates(void)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[shuffled_index].elem);
+        ccc_pq_erase(&ppq, &vals[shuffled_index].elem);
         CHECK(ccc_pq_validate(&ppq), true);
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);

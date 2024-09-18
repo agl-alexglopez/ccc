@@ -1,4 +1,9 @@
 #include "fpq_util.h"
+#include "flat_priority_queue.h"
+#include "test.h"
+#include "types.h"
+
+#include <stdio.h>
 #include <stdlib.h>
 
 ccc_threeway_cmp

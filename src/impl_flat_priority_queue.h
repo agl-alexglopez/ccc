@@ -8,6 +8,8 @@
 #include "types.h"
 
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 
 struct ccc_fpq_
 {

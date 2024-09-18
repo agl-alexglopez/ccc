@@ -1,4 +1,5 @@
 #include "fhash_util.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stdint.h>

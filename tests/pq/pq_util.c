@@ -1,4 +1,9 @@
 #include "pq_util.h"
+#include "priority_queue.h"
+#include "test.h"
+#include "types.h"
+
+#include <stddef.h>
 
 ccc_threeway_cmp
 val_cmp(ccc_cmp const *const cmp)

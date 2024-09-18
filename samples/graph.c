@@ -8,6 +8,7 @@
 #include "random.h"
 #include "str_view/str_view.h"
 #include "traits.h"
+#include "types.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -316,10 +317,15 @@ main(int argc, char **argv)
                  1);
         }
     }
+    if (!graph.rows || !graph.cols)
+    {
+        quit("graph rows or cols is 0.\n", 1);
+        return 1;
+    }
     graph.grid = calloc((size_t)graph.rows * graph.cols, sizeof(Cell));
     if (!graph.grid)
     {
-        (void)fprintf(stderr, "allocation failure for specified maze size.\n");
+        quit("allocation failure for specified graph size.\n", 1);
         return 1;
     }
     build_graph(&graph);
@@ -399,6 +405,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         {
             quit("Broken or corrupted adjacency list.\n", 1);
         }
+        assert(dst);
         if (!has_edge_with(src_vertex, dst->name)
             && vertex_degree(dst) < MAX_DEGREE
             && has_built_edge(graph, src_vertex, dst))
@@ -718,7 +725,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         {
             struct vertex const *const v
                 = vertex_at(graph, cur->v->edges[i].name);
-            struct prev_vertex *next = get_key_val(&prev_map, &v);
+            struct prev_vertex *next = get_key_val(&prev_map, (void const *)&v);
             assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -739,13 +746,14 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct vertex *v = cur->v;
-        struct prev_vertex const *prev = get_key_val(&prev_map, &v);
+        struct prev_vertex const *prev
+            = get_key_val(&prev_map, (void const *)&v);
         assert(prev);
         while (prev->prev)
         {
             paint_edge(graph, v, prev->prev);
             v = prev->prev;
-            prev = get_key_val(&prev_map, &prev->prev);
+            prev = get_key_val(&prev_map, (void const *)&prev->prev);
             assert(prev);
         }
     }
@@ -1073,7 +1081,8 @@ static bool
 eq_prev_vertices(ccc_key_cmp const *const cmp)
 {
     struct prev_vertex const *const a = cmp->container;
-    struct vertex const *const *const v = cmp->key;
+    struct vertex const *const *const v
+        = (struct vertex const *const *const)cmp->key;
     return a->v == *v;
 }
 

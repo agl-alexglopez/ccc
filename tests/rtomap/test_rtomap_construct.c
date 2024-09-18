@@ -1,6 +1,7 @@
 #include "realtime_ordered_map.h"
 #include "rtomap_util.h"
 #include "test.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

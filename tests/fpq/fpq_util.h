@@ -3,6 +3,7 @@
 
 #include "flat_priority_queue.h"
 #include "test.h"
+#include "types.h"
 
 struct val
 {

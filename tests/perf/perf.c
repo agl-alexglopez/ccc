@@ -4,6 +4,7 @@
 #include "priority_queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
+#include "types.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -21,7 +22,7 @@ size_t const step = 100000;
 size_t const end_size = 1100000;
 int const max_rand_range = RAND_MAX;
 
-typedef void (*depq_perf_fn)(void);
+typedef void (*perf_fn)(void);
 
 static void test_push(void);
 static void test_pop(void);
@@ -37,12 +38,12 @@ static ccc_threeway_cmp val_cmp(ccc_cmp const *);
 static void val_update(ccc_update const *);
 
 #define NUM_TESTS (size_t)6
-static depq_perf_fn const perf_tests[NUM_TESTS] = {test_push,
-                                                   test_pop,
-                                                   test_push_pop,
-                                                   test_push_intermittent_pop,
-                                                   test_pop_intermittent_push,
-                                                   test_update};
+static perf_fn const perf_tests[NUM_TESTS] = {test_push,
+                                              test_pop,
+                                              test_push_pop,
+                                              test_push_intermittent_pop,
+                                              test_pop_intermittent_push,
+                                              test_update};
 
 int
 main(int argc, char **argv)
@@ -146,7 +147,7 @@ test_pop(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)ccc_depq_pop_min(&depq);
+            ccc_depq_pop_min(&depq);
         }
         clock_t end = clock();
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -198,7 +199,7 @@ test_push_pop(void)
         }
         for (size_t i = 0; i < n; ++i)
         {
-            (void)ccc_depq_pop_min(&depq);
+            ccc_depq_pop_min(&depq);
         }
         clock_t end = clock();
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -338,7 +339,7 @@ test_pop_intermittent_push(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)ccc_fpq_pop(&fpq);
+            ccc_fpq_pop(&fpq);
             if (i % 10 == 0)
             {
                 (void)ccc_fpq_emplace(

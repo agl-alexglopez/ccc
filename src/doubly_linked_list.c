@@ -1,5 +1,9 @@
 #include "doubly_linked_list.h"
 #include "impl_doubly_linked_list.h"
+#include "types.h"
+
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
