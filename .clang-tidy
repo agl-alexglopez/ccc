@@ -4,7 +4,6 @@ Checks: >
    -altera-*,
    -llvmlibc-*,
    -llvm-header-guard,
-   -llvm-include-order,
    -google-*,
    -abseil-*,
    -fuchsia-*,
@@ -14,14 +13,10 @@ Checks: >
    -cppcoreguidelines-*,
    -readability-implicit-bool-conversion,
    -readability-named-parameter,
-   -readability-isolate-declaration,
-   -readability-braces-around-statements,
    -readability-identifier-length,
-   -performance-no-int-to-ptr,
    -*-non-private-member-variables-in-classes,
    -*-magic-numbers,
    -concurrency-*,
-   -Wpointer-bool-conversion,
    -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
    -bugprone-easily-swappable-parameters
 
