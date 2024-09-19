@@ -73,7 +73,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_shuffle)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &s, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
 
     rom_print(&s, map_printer_fn);
     printf("\n");

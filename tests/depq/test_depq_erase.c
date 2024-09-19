@@ -43,7 +43,7 @@ BEGIN_STATIC_TEST(depq_test_insert_erase_shuffled)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
@@ -71,7 +71,7 @@ BEGIN_STATIC_TEST(depq_test_pop_max)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
@@ -99,7 +99,7 @@ BEGIN_STATIC_TEST(depq_test_pop_min)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);

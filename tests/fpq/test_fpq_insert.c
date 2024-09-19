@@ -94,7 +94,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
     ccc_flat_priority_queue fpq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
-    CHECK(insert_shuffled((enum test_result){}, &fpq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
 
     /* Test the printing function at least once. */
     ccc_fpq_print(&fpq, 0, val_print);
@@ -102,7 +102,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &fpq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     int prev = sorted_check[0];
     for (size_t i = 0; i < size; ++i)
     {

@@ -40,11 +40,11 @@ BEGIN_STATIC_TEST(pq_test_insert_erase_shuffled)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &ppq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &ppq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
@@ -62,11 +62,11 @@ BEGIN_STATIC_TEST(pq_test_pop_max)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &ppq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &ppq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
@@ -85,11 +85,11 @@ BEGIN_STATIC_TEST(pq_test_pop_min)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &ppq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &ppq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {

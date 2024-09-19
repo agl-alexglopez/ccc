@@ -50,8 +50,7 @@ struct lru_request
     int key;
     int val;
     union {
-        enum test_result (*putter)(enum test_result, struct lru_cache *, int,
-                                   int);
+        enum test_result (*putter)(struct lru_cache *, int, int);
         int (*getter)(struct lru_cache *, int);
         struct key_val *(*header)(struct lru_cache *);
     };
@@ -164,8 +163,7 @@ BEGIN_STATIC_TEST(run_lru_cache)
         switch (requests[i].call)
         {
         case PUT:
-            CHECK(requests[i].putter(PASS, &lru, requests[i].key,
-                                     requests[i].val),
+            CHECK(requests[i].putter(&lru, requests[i].key, requests[i].val),
                   PASS);
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);

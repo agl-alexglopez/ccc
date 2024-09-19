@@ -45,11 +45,11 @@ BEGIN_STATIC_TEST(fpq_test_insert_erase_shuffled)
     ccc_flat_priority_queue fpq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
-    CHECK(insert_shuffled((enum test_result){}, &fpq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &fpq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     /* Now let's delete everything with no errors. */
     while (!ccc_fpq_empty(&fpq))
     {
@@ -69,11 +69,11 @@ BEGIN_STATIC_TEST(fpq_test_pop_max)
     ccc_flat_priority_queue fpq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
-    CHECK(insert_shuffled((enum test_result){}, &fpq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &fpq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
@@ -93,11 +93,11 @@ BEGIN_STATIC_TEST(fpq_test_pop_min)
     ccc_flat_priority_queue fpq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
-    CHECK(insert_shuffled((enum test_result){}, &fpq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &fpq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {

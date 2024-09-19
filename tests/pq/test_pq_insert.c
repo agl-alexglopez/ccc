@@ -83,11 +83,11 @@ BEGIN_STATIC_TEST(pq_test_insert_shuffle)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&pq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &pq), PASS);
+    CHECK(inorder_fill(sorted_check, size, &pq), PASS);
     END_TEST();
 }
 

@@ -80,7 +80,7 @@ BEGIN_STATIC_TEST(map_test_iterate_removal)
         (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
-    CHECK(iterator_check((enum test_result){}, &s), PASS);
+    CHECK(iterator_check(&s), PASS);
     int const limit = 400;
     for (struct val *i = begin(&s), *next = NULL; i; i = next)
     {
@@ -111,7 +111,7 @@ BEGIN_STATIC_TEST(map_test_iterate_remove_reinsert)
         (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_om_validate(&s), true);
     }
-    CHECK(iterator_check((enum test_result){}, &s), PASS);
+    CHECK(iterator_check(&s), PASS);
     size_t const old_size = size(&s);
     int const limit = 400;
     int new_unique_entry_val = 1001;

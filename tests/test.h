@@ -17,7 +17,7 @@ enum test_result
     FAIL,
 };
 
-typedef enum test_result (*test_fn)(enum test_result);
+typedef enum test_result (*test_fn)(void);
 
 #define TEST_PRINT_FAIL(result, result_string, expected, expected_string)      \
     do                                                                         \
@@ -57,6 +57,10 @@ typedef enum test_result (*test_fn)(enum test_result);
         (void)fprintf(stderr, format_string_, expected_);                      \
         (void)fprintf(stderr, " )" CYAN "\n" NONE);                            \
     } while (0)
+
+#define NON_DEFAULT_PARAMS(...) __VA_ARGS__
+#define DEFAULT_PARAMS(...) void
+#define OPTIONAL_PARAMS(...) __VA_OPT__(NON_)##DEFAULT_PARAMS(__VA_ARGS__)
 
 /** @brief Define a static test function that has a name and optionally
 additional parameters that one may wish to pass to such a function. If the test
@@ -101,8 +105,10 @@ BEGIN_STATIC_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
     END_TEST();
 }*/
 #define BEGIN_STATIC_TEST(test_name, ...)                                      \
-    static enum test_result(test_name)(                                        \
-        enum test_result macro_test_res_ __VA_OPT__(, ) __VA_ARGS__)
+    static enum test_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))           \
+    {                                                                          \
+        enum test_result macro_test_res_ = PASS;                               \
+        do
 
 /** @brief Define a test function that has a name and optionally
 additional parameters that one may wish to pass to such a function. If the test
@@ -115,8 +121,10 @@ It is possible to return early from a test before the end test macro, but it
 is discouraged, especially if any memory allocations need to be cleaned up if
 a test fails. See begin static test for examples. */
 #define BEGIN_TEST(test_name, ...)                                             \
-    enum test_result(test_name)(                                               \
-        enum test_result macro_test_res_ __VA_OPT__(, ) __VA_ARGS__)
+    enum test_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))                  \
+    {                                                                          \
+        enum test_result macro_test_res_ = PASS;                               \
+        do
 
 /** @brief execute a check within the context of a test.
 @param [in] test_result the result value of some action.
@@ -160,7 +168,9 @@ recommended. */
 #define END_TEST(...)                                                          \
 please_insert_end_test_macro_at_the_end_of_this_test_:                         \
     __VA_OPT__((void)__VA_ARGS__;)                                             \
-    return macro_test_res_
+    return macro_test_res_;                                                    \
+    }                                                                          \
+    while (0)
 
 /** @brief Runs a list of test functions and returns the result.
 @param [in] test_fn_list all test functions to run in main.
@@ -174,7 +184,7 @@ upon the first failure. */
         enum test_result all_tests_res_ = PASS;                                \
         for (unsigned i = 0; i < sizeof(all_tests_) / sizeof(test_fn); ++i)    \
         {                                                                      \
-            if (all_tests_[i](PASS) == FAIL)                                   \
+            if (all_tests_[i]() == FAIL)                                       \
             {                                                                  \
                 all_tests_res_ = FAIL;                                         \
             }                                                                  \

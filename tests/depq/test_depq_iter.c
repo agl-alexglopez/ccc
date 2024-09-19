@@ -118,7 +118,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(iterator_check(PASS, &pq), PASS);
+    CHECK(iterator_check(&pq), PASS);
     size_t pop_count = 0;
     while (!empty(&pq))
     {
@@ -127,7 +127,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
         CHECK(ccc_depq_validate(&pq), true);
         if (pop_count % 200)
         {
-            CHECK(iterator_check(PASS, &pq), PASS);
+            CHECK(iterator_check(&pq), PASS);
         }
     }
     CHECK(pop_count, num_nodes);
@@ -151,7 +151,7 @@ BEGIN_STATIC_TEST(depq_test_priority_removal)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(iterator_check(PASS, &pq), PASS);
+    CHECK(iterator_check(&pq), PASS);
     int const limit = 400;
     for (struct val *i = begin(&pq); i;)
     {
@@ -185,7 +185,7 @@ BEGIN_STATIC_TEST(depq_test_priority_update)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(iterator_check(PASS, &pq), PASS);
+    CHECK(iterator_check(&pq), PASS);
     int const limit = 400;
     for (struct val *i = begin(&pq); i;)
     {
