@@ -26,8 +26,11 @@ struct ccc_buf_
 #define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \
     ({                                                                         \
         typeof(type_initializer) *buf_res_;                                    \
-        assert(sizeof(typeof(*buf_res_)) == ccc_buf_elem_size(ccc_buf_ptr));   \
-        buf_res_ = ccc_buf_at(ccc_buf_ptr, index);                             \
+        __auto_type i_ = (index);                                              \
+        __auto_type emplace_buff_ptr_ = (ccc_buf_ptr);                         \
+        assert(sizeof(typeof(*buf_res_))                                       \
+               == ccc_buf_elem_size(emplace_buff_ptr_));                       \
+        buf_res_ = ccc_buf_at(emplace_buff_ptr_, index);                       \
         if (buf_res_)                                                          \
         {                                                                      \
             *buf_res_ = type_initializer;                                      \
@@ -38,8 +41,10 @@ struct ccc_buf_
 #define ccc_impl_buf_emplace_back(ccc_buf_ptr, type_initializer...)            \
     ({                                                                         \
         typeof(type_initializer) *buf_res_;                                    \
-        assert(sizeof(typeof(*buf_res_)) == ccc_buf_elem_size(ccc_buf_ptr));   \
-        buf_res_ = ccc_buf_alloc((ccc_buf_ptr));                               \
+        __auto_type emplace_back_buf_ptr_ = (ccc_buf_ptr);                     \
+        assert(sizeof(typeof(*buf_res_))                                       \
+               == ccc_buf_elem_size(emplace_back_buf_ptr_));                   \
+        buf_res_ = ccc_buf_alloc((emplace_back_buf_ptr_));                     \
         if (buf_res_)                                                          \
         {                                                                      \
             *buf_res_ = type_initializer;                                      \

@@ -202,8 +202,9 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
                                         lazy_value...)                         \
     ({                                                                         \
         __auto_type rom_key_ = (key);                                          \
-        struct ccc_rtom_entry_ rom_ins_or_assign_ent_ = ccc_impl_rom_entry(    \
-            &(realtime_ordered_map_ptr)->impl_, &rom_key_);                    \
+        struct ccc_rtom_ *rtom_ptr_ = &(realtime_ordered_map_ptr)->impl_;      \
+        struct ccc_rtom_entry_ rom_ins_or_assign_ent_                          \
+            = ccc_impl_rom_entry(rtom_ptr_, &rom_key_);                        \
         struct ccc_entry_ rom_ins_or_assign_ent_ret_ = {};                     \
         if (!(rom_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))      \
         {                                                                      \
@@ -223,8 +224,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
                 = ins_ent_saved_;                                              \
             rom_ins_or_assign_ent_ret_ = rom_ins_or_assign_ent_.entry_;        \
             *((typeof(rom_key_) *)ccc_impl_rom_key_in_slot(                    \
-                &(realtime_ordered_map_ptr)->impl_,                            \
-                rom_ins_or_assign_ent_ret_.e_))                                \
+                rtom_ptr_, rom_ins_or_assign_ent_ret_.e_))                     \
                 = rom_key_;                                                    \
         }                                                                      \
         rom_ins_or_assign_ent_ret_;                                            \

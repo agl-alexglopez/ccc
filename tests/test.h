@@ -121,12 +121,18 @@ a test fails. See begin static test for examples. */
 /** @brief execute a check within the context of a test.
 @param [in] test_result the result value of some action.
 @param [in] test_expected the expection of what the result is equal to.
+@param [in] ... any additional function call that should execute on failure
+that cannot be performed by the end test macro.
 
 test_result and test_expected should be comparable with ==/!=. If a test
 passes nothing happens. If a test fails output shows the failure. Upon
 failure any cleanup function specified by the end test macro will execute
-to prevent memory leaks. See the end test macro for more. */
-#define CHECK(test_result, test_expected)                                      \
+to prevent memory leaks. See the end test macro for more. If the test end
+macro will not have access to some memory or operation in the scope of the
+current check one may provide an additional function call they wish to have
+executed on failure. This should only be used in special cases where such a
+function is unusable by the end test macro. */
+#define CHECK(test_result, test_expected, ...)                                 \
     do                                                                         \
     {                                                                          \
         const __auto_type result_ = (test_result);                             \
@@ -135,6 +141,7 @@ to prevent memory leaks. See the end test macro for more. */
         {                                                                      \
             TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
             macro_test_res_ = FAIL;                                            \
+            __VA_OPT__((void)__VA_ARGS__;)                                     \
             goto please_insert_end_test_macro_at_the_end_of_this_test_;        \
         }                                                                      \
     } while (0)

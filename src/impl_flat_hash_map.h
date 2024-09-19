@@ -72,6 +72,8 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
+/* Internal helper assumes that swap_entry has already been evaluated once
+   which it must have to make it to this point. */
 #define ccc_impl_fhm_swaps(swap_entry, lazy_key_value...)                      \
     ({                                                                         \
         size_t fhm_i_ = ccc_buf_index_of(&((swap_entry)->h_->buf_),            \
@@ -172,8 +174,9 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 #define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
     ({                                                                         \
         __auto_type fhm_key_ = key;                                            \
+        struct ccc_fhm_ *flat_hash_map_ptr_ = &(flat_hash_map_ptr)->impl_;     \
         struct ccc_fhm_entry_ fhm_try_ins_ent_                                 \
-            = ccc_impl_fhm_entry(&(flat_hash_map_ptr)->impl_, &fhm_key_);      \
+            = ccc_impl_fhm_entry(flat_hash_map_ptr_, &fhm_key_);               \
         struct ccc_entry_ fhm_try_insert_res_ = {};                            \
         if ((fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)              \
             || (fhm_try_ins_ent_.entry_.stats_ & ~CCC_ENTRY_VACANT))           \
@@ -187,7 +190,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 CCC_ENTRY_VACANT,                                              \
             };                                                                 \
             *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                    \
-                &(flat_hash_map_ptr)->impl_, fhm_try_insert_res_.e_))          \
+                flat_hash_map_ptr_, fhm_try_insert_res_.e_))                   \
                 = fhm_key_;                                                    \
         }                                                                      \
         fhm_try_insert_res_;                                                   \
@@ -196,15 +199,16 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 #define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
     ({                                                                         \
         __auto_type fhm_key_ = key;                                            \
+        struct ccc_fhm_ *flat_hash_map_ptr_ = &(flat_hash_map_ptr)->impl_;     \
         struct ccc_fhm_entry_ fhm_ins_or_assign_ent_                           \
-            = ccc_impl_fhm_entry(&(flat_hash_map_ptr)->impl_, &fhm_key_);      \
+            = ccc_impl_fhm_entry(flat_hash_map_ptr_, &fhm_key_);               \
         struct ccc_entry_ fhm_ins_or_assign_res_ = {};                         \
         if (fhm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)         \
         {                                                                      \
             fhm_ins_or_assign_res_ = fhm_ins_or_assign_ent_.entry_;            \
             *((typeof(lazy_value) *)fhm_ins_or_assign_res_.e_) = lazy_value;   \
             *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                    \
-                &(flat_hash_map_ptr)->impl_, fhm_ins_or_assign_res_.e_))       \
+                flat_hash_map_ptr_, fhm_ins_or_assign_res_.e_))                \
                 = fhm_key_;                                                    \
             ccc_impl_fhm_in_slot(fhm_ins_or_assign_ent_.h_,                    \
                                  fhm_ins_or_assign_ent_.entry_.e_)             \
@@ -222,7 +226,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 CCC_ENTRY_VACANT,                                              \
             };                                                                 \
             *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                    \
-                &(flat_hash_map_ptr)->impl_, fhm_ins_or_assign_res_.e_))       \
+                flat_hash_map_ptr_, fhm_ins_or_assign_res_.e_))                \
                 = fhm_key_;                                                    \
         }                                                                      \
         fhm_ins_or_assign_res_;                                                \

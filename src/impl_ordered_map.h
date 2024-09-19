@@ -127,8 +127,9 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_om_try_insert_w(ordered_map_ptr, key, lazy_value...)          \
     ({                                                                         \
         __auto_type om_key_ = (key);                                           \
+        struct ccc_tree_ *om_try_ins_map_ptr_ = &(ordered_map_ptr)->impl_;     \
         struct ccc_tree_entry_ om_try_ins_ent_                                 \
-            = ccc_impl_om_entry(&(ordered_map_ptr)->impl_, &om_key_);          \
+            = ccc_impl_om_entry(om_try_ins_map_ptr_, &om_key_);                \
         struct ccc_entry_ om_try_ins_ent_ret_ = {};                            \
         if (!(om_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))             \
         {                                                                      \
@@ -145,8 +146,9 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)    \
     ({                                                                         \
         __auto_type om_key_ = (key);                                           \
+        struct ccc_tree_ *ordered_map_ptr_ = &(ordered_map_ptr)->impl_;        \
         struct ccc_tree_entry_ om_ins_or_assign_ent_                           \
-            = ccc_impl_om_entry(&(ordered_map_ptr)->impl_, &om_key_);          \
+            = ccc_impl_om_entry(ordered_map_ptr_, &om_key_);                   \
         struct ccc_entry_ om_ins_or_assign_ent_ret_ = {};                      \
         if (!(om_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))       \
         {                                                                      \
@@ -165,7 +167,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 = ins_ent_saved_;                                              \
             om_ins_or_assign_ent_ret_ = om_ins_or_assign_ent_.entry_;          \
             *((typeof(om_key_) *)ccc_impl_om_key_in_slot(                      \
-                &(ordered_map_ptr)->impl_, om_ins_or_assign_ent_ret_.e_))      \
+                ordered_map_ptr_, om_ins_or_assign_ent_ret_.e_))               \
                 = om_key_;                                                     \
         }                                                                      \
         om_ins_or_assign_ent_ret_;                                             \
