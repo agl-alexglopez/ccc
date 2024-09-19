@@ -1125,7 +1125,7 @@ parse_path_request(struct graph *const g, str_view r)
     {
         quit("Exiting now.\n", 0);
     }
-    struct path_request res = {0};
+    struct path_request res = {};
     char const end_title = (char)(start_vertex_title + g->vertices - 1);
     for (char const *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
@@ -1136,7 +1136,7 @@ parse_path_request(struct graph *const g, str_view r)
             res.src ? (res.dst = v) : (res.src = v);
         }
     }
-    return res.src && res.dst ? res : (struct path_request){0};
+    return res.src && res.dst ? res : (struct path_request){};
 }
 
 static struct int_conversion
@@ -1183,11 +1183,13 @@ help(void)
 {
     (void)fprintf(
         stdout,
-        "Graph Builder:\nBuilds weighted graphs for Dijkstra's"
-        "Algorithm to demonstrate usage of the priority "
-        "queue and map provided by this library.\nUsage:\n-r=N The "
-        "row flag lets you specify area for grid rows > 7.\n-c=N The col flag "
-        "lets you specify area for grid cols > 7.\n-s=N The speed flag lets "
-        "you specify the speed of the animation while building the grid"
-        "0-7.\nExample:\n./build/rel/graph -c=111 -r=33 -v=4\n");
+        "graph.c\nBuilds weighted graphs for Dijkstra's Algorithm to "
+        "demonstrate usage of the priority queue and map provided by this "
+        "library.\nUsage:\n-r=N The row flag lets you specify area for grid "
+        "rows > 7.\n-c=N The col flag lets you specify area for grid cols > "
+        "7.\n-v=N specify 1 to 26 vertices for the randomly generated and "
+        "connected graph.\nExample:\n./build/rel/graph -c=111 -r=33 -v=4\n"
+        "Once the graph is built seek the shortest path between two uppercase "
+        "vertices. Examples:\nAB\nA->B\nCtoD\nEnter 'q' to quit.\n");
+    exit(0);
 }
