@@ -23,9 +23,8 @@ map_printer_fn(void const *const container)
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-enum test_result
-insert_shuffled(ccc_ordered_map *m, struct val vals[], size_t const size,
-                int const larger_prime)
+BEGIN_TEST(insert_shuffled, ccc_ordered_map *m, struct val vals[],
+           size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -42,7 +41,7 @@ insert_shuffled(ccc_ordered_map *m, struct val vals[], size_t const size,
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(m), size);
-    return PASS;
+    END_TEST();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

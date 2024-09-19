@@ -4,6 +4,9 @@ project("ccc"
   LANGUAGES C
   DESCRIPTION "The C Container Collection (ccc). A collection of containers written in C."
 )
+# Specify that C23 should be used
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(namespace "ccc")
 

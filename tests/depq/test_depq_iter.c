@@ -12,46 +12,29 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result depq_test_forward_iter_unique_vals(void);
-static enum test_result depq_test_forward_iter_all_vals(void);
-static enum test_result depq_test_insert_iterate_pop(void);
-static enum test_result depq_test_priority_update(void);
-static enum test_result depq_test_priority_removal(void);
-static enum test_result depq_test_priority_valid_range(void);
-static enum test_result depq_test_priority_valid_range_equals(void);
-static enum test_result depq_test_priority_invalid_range(void);
-static enum test_result depq_test_priority_empty_range(void);
-static enum test_result iterator_check(ccc_double_ended_priority_queue *);
-
-#define NUM_TESTS (size_t)9
-test_fn const all_tests[NUM_TESTS] = {
-    depq_test_forward_iter_unique_vals,
-    depq_test_forward_iter_all_vals,
-    depq_test_insert_iterate_pop,
-    depq_test_priority_update,
-    depq_test_priority_removal,
-    depq_test_priority_valid_range,
-    depq_test_priority_valid_range_equals,
-    depq_test_priority_invalid_range,
-    depq_test_priority_empty_range,
-};
-
-int
-main()
+BEGIN_STATIC_TEST(iterator_check, ccc_double_ended_priority_queue *pq)
 {
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
+    size_t const size = size(pq);
+    size_t iter_count = 0;
+    for (struct val *e = begin(pq); e; e = next(pq, &e->elem))
     {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
+        ++iter_count;
+        CHECK(iter_count != size || ccc_depq_is_min(pq, &e->elem), true);
+        CHECK(iter_count == size || !ccc_depq_is_min(pq, &e->elem), true);
     }
-    return res;
+    CHECK(iter_count, size);
+    iter_count = 0;
+    for (struct val *e = ccc_depq_rbegin(pq); e; e = rnext(pq, &e->elem))
+    {
+        ++iter_count;
+        CHECK(iter_count != size || ccc_depq_is_max(pq, &e->elem), true);
+        CHECK(iter_count == size || !ccc_depq_is_max(pq, &e->elem), true);
+    }
+    CHECK(iter_count, size);
+    END_TEST();
 }
-static enum test_result
-depq_test_forward_iter_unique_vals(void)
+
+BEGIN_STATIC_TEST(depq_test_forward_iter_unique_vals)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -79,11 +62,10 @@ depq_test_forward_iter_unique_vals(void)
     {
         CHECK(e->val, val_keys_inorder[j]);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_forward_iter_all_vals(void)
+BEGIN_STATIC_TEST(depq_test_forward_iter_all_vals)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -116,11 +98,10 @@ depq_test_forward_iter_all_vals(void)
     {
         CHECK(i->val, val_keys_inorder[j]);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_insert_iterate_pop(void)
+BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -137,7 +118,7 @@ depq_test_insert_iterate_pop(void)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(iterator_check(&pq), PASS);
+    CHECK(iterator_check(PASS, &pq), PASS);
     size_t pop_count = 0;
     while (!empty(&pq))
     {
@@ -146,15 +127,14 @@ depq_test_insert_iterate_pop(void)
         CHECK(ccc_depq_validate(&pq), true);
         if (pop_count % 200)
         {
-            CHECK(iterator_check(&pq), PASS);
+            CHECK(iterator_check(PASS, &pq), PASS);
         }
     }
     CHECK(pop_count, num_nodes);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_priority_removal(void)
+BEGIN_STATIC_TEST(depq_test_priority_removal)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -171,7 +151,7 @@ depq_test_priority_removal(void)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(iterator_check(&pq), PASS);
+    CHECK(iterator_check(PASS, &pq), PASS);
     int const limit = 400;
     for (struct val *i = begin(&pq); i;)
     {
@@ -185,11 +165,10 @@ depq_test_priority_removal(void)
             i = next(&pq, &i->elem);
         }
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_priority_update(void)
+BEGIN_STATIC_TEST(depq_test_priority_update)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -206,7 +185,7 @@ depq_test_priority_update(void)
         ccc_depq_push(&pq, &vals[i].elem);
         CHECK(ccc_depq_validate(&pq), true);
     }
-    CHECK(iterator_check(&pq), PASS);
+    CHECK(iterator_check(PASS, &pq), PASS);
     int const limit = 400;
     for (struct val *i = begin(&pq); i;)
     {
@@ -223,11 +202,10 @@ depq_test_priority_update(void)
         }
     }
     CHECK(size(&pq), num_nodes);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_priority_valid_range(void)
+BEGIN_STATIC_TEST(depq_test_priority_valid_range)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -276,11 +254,10 @@ depq_test_priority_valid_range(void)
     }
     CHECK(i2 == end_range(&range), true);
     CHECK(i2->val, expect_range[7]);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_priority_valid_range_equals(void)
+BEGIN_STATIC_TEST(depq_test_priority_valid_range_equals)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -329,11 +306,10 @@ depq_test_priority_valid_range_equals(void)
     }
     CHECK(i2 == end_range(&range), true);
     CHECK(i2->val, expect_range[7]);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_priority_invalid_range(void)
+BEGIN_STATIC_TEST(depq_test_priority_invalid_range)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -380,11 +356,10 @@ depq_test_priority_invalid_range(void)
         ++index;
     }
     CHECK(i2 == end_range(&range) && !i2, true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_priority_empty_range(void)
+BEGIN_STATIC_TEST(depq_test_priority_empty_range)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -408,28 +383,16 @@ depq_test_priority_empty_range(void)
     ccc_range const range = equal_range(&pq, &(int){150}, &(int){999});
     CHECK(((struct val *)begin_range(&range))->val, vals[num_nodes - 1].val);
     CHECK(((struct val *)end_range(&range))->val, vals[num_nodes - 1].val);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-iterator_check(ccc_double_ended_priority_queue *pq)
+int
+main()
 {
-    size_t const size = size(pq);
-    size_t iter_count = 0;
-    for (struct val *e = begin(pq); e; e = next(pq, &e->elem))
-    {
-        ++iter_count;
-        CHECK(iter_count != size || ccc_depq_is_min(pq, &e->elem), true);
-        CHECK(iter_count == size || !ccc_depq_is_min(pq, &e->elem), true);
-    }
-    CHECK(iter_count, size);
-    iter_count = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e; e = rnext(pq, &e->elem))
-    {
-        ++iter_count;
-        CHECK(iter_count != size || ccc_depq_is_max(pq, &e->elem), true);
-        CHECK(iter_count == size || !ccc_depq_is_max(pq, &e->elem), true);
-    }
-    CHECK(iter_count, size);
-    return PASS;
+    return RUN_TESTS(
+        depq_test_forward_iter_unique_vals, depq_test_forward_iter_all_vals,
+        depq_test_insert_iterate_pop, depq_test_priority_update,
+        depq_test_priority_removal, depq_test_priority_valid_range,
+        depq_test_priority_valid_range_equals, depq_test_priority_invalid_range,
+        depq_test_priority_empty_range);
 }

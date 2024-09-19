@@ -8,36 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static enum test_result fpq_test_insert_one(void);
-static enum test_result fpq_test_insert_three(void);
-static enum test_result fpq_test_insert_shuffle(void);
-static enum test_result fpq_test_struct_getter(void);
-static enum test_result fpq_test_insert_three_dups(void);
-static enum test_result fpq_test_read_max_min(void);
-
-#define NUM_TESTS (size_t)6
-test_fn const all_tests[NUM_TESTS] = {
-    fpq_test_insert_one,        fpq_test_insert_three,   fpq_test_struct_getter,
-    fpq_test_insert_three_dups, fpq_test_insert_shuffle, fpq_test_read_max_min,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-fpq_test_insert_one(void)
+BEGIN_STATIC_TEST(fpq_test_insert_one)
 {
     struct val single[2] = {};
     ccc_flat_priority_queue fpq
@@ -46,11 +17,10 @@ fpq_test_insert_one(void)
     single[0].val = 0;
     ccc_fpq_push(&fpq, &single[0]);
     CHECK(ccc_fpq_empty(&fpq), false);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_insert_three(void)
+BEGIN_STATIC_TEST(fpq_test_insert_three)
 {
     size_t size = 3;
     struct val three_vals[4] = {};
@@ -65,11 +35,10 @@ fpq_test_insert_three(void)
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), size);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_struct_getter(void)
+BEGIN_STATIC_TEST(fpq_test_struct_getter)
 {
     size_t const size = 10;
     struct val vals[10 + 1];
@@ -96,11 +65,10 @@ fpq_test_struct_getter(void)
         CHECK(get->val, vals[i].val);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)10);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_insert_three_dups(void)
+BEGIN_STATIC_TEST(fpq_test_insert_three_dups)
 {
     struct val three_vals[3 + 1];
     ccc_flat_priority_queue fpq
@@ -114,11 +82,10 @@ fpq_test_insert_three_dups(void)
         CHECK(ccc_fpq_size(&fpq), (size_t)i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)3);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_insert_shuffle(void)
+BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
 {
     /* Math magic ahead... */
     size_t const size = 50;
@@ -127,7 +94,7 @@ fpq_test_insert_shuffle(void)
     ccc_flat_priority_queue fpq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(vals[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
-    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &fpq, vals, size, prime), PASS);
 
     /* Test the printing function at least once. */
     ccc_fpq_print(&fpq, 0, val_print);
@@ -135,18 +102,17 @@ fpq_test_insert_shuffle(void)
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
+    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &fpq), PASS);
     int prev = sorted_check[0];
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(prev <= sorted_check[i], true);
         prev = sorted_check[i];
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_read_max_min(void)
+BEGIN_STATIC_TEST(fpq_test_read_max_min)
 {
     size_t const size = 10;
     struct val vals[10 + 1];
@@ -163,5 +129,13 @@ fpq_test_read_max_min(void)
     CHECK(ccc_fpq_size(&fpq), (size_t)10);
     struct val const *min = ccc_fpq_front(&fpq);
     CHECK(min->val, 0);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(fpq_test_insert_one, fpq_test_insert_three,
+                     fpq_test_struct_getter, fpq_test_insert_three_dups,
+                     fpq_test_insert_shuffle, fpq_test_read_max_min);
 }

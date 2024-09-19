@@ -9,34 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result fpq_test_insert_iterate_pop(void);
-static enum test_result fpq_test_priority_update(void);
-static enum test_result fpq_test_priority_removal(void);
-
-#define NUM_TESTS (size_t)3
-test_fn const all_tests[NUM_TESTS] = {
-    fpq_test_insert_iterate_pop,
-    fpq_test_priority_update,
-    fpq_test_priority_removal,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-fpq_test_insert_iterate_pop(void)
+BEGIN_STATIC_TEST(fpq_test_insert_iterate_pop)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -62,11 +35,10 @@ fpq_test_insert_iterate_pop(void)
         CHECK(ccc_fpq_validate(&fpq), true);
     }
     CHECK(pop_count, num_nodes);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_priority_removal(void)
+BEGIN_STATIC_TEST(fpq_test_priority_removal)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -98,11 +70,10 @@ fpq_test_priority_removal(void)
             --remaining;
         }
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fpq_test_priority_update(void)
+BEGIN_STATIC_TEST(fpq_test_priority_update)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -135,5 +106,12 @@ fpq_test_priority_update(void)
         }
     }
     CHECK(ccc_fpq_size(&fpq), num_nodes);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(fpq_test_insert_iterate_pop, fpq_test_priority_update,
+                     fpq_test_priority_removal);
 }

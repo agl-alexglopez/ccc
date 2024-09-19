@@ -17,6 +17,7 @@ Checks: >
    -*-non-private-member-variables-in-classes,
    -*-magic-numbers,
    -concurrency-*,
+   -Wvariadic-macros,
    -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
    -bugprone-easily-swappable-parameters
 

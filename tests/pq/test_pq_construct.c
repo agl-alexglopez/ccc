@@ -6,31 +6,16 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-static enum test_result pq_test_empty(void);
-
-#define NUM_TESTS (size_t)1
-test_fn const all_tests[NUM_TESTS] = {pq_test_empty};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-pq_test_empty(void)
+BEGIN_STATIC_TEST(pq_test_empty)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     CHECK(ccc_pq_empty(&pq), true);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    RUN_TESTS(pq_test_empty);
 }

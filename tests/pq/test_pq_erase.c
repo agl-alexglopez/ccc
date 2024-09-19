@@ -9,42 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result pq_test_insert_remove_four_dups(void);
-static enum test_result pq_test_insert_erase_shuffled(void);
-static enum test_result pq_test_pop_max(void);
-static enum test_result pq_test_pop_min(void);
-static enum test_result pq_test_delete_prime_shuffle_duplicates(void);
-static enum test_result pq_test_prime_shuffle(void);
-static enum test_result pq_test_weak_srand(void);
-
-#define NUM_TESTS (size_t)7
-test_fn const all_tests[NUM_TESTS] = {
-    pq_test_insert_remove_four_dups,
-    pq_test_insert_erase_shuffled,
-    pq_test_pop_max,
-    pq_test_pop_min,
-    pq_test_delete_prime_shuffle_duplicates,
-    pq_test_prime_shuffle,
-    pq_test_weak_srand,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-pq_test_insert_remove_four_dups(void)
+BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -65,22 +30,21 @@ pq_test_insert_remove_four_dups(void)
         CHECK(ccc_pq_validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_insert_erase_shuffled(void)
+BEGIN_STATIC_TEST(pq_test_insert_erase_shuffled)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
+    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &ppq), PASS);
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
@@ -88,22 +52,21 @@ pq_test_insert_erase_shuffled(void)
         CHECK(ccc_pq_validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_pop_max(void)
+BEGIN_STATIC_TEST(pq_test_pop_max)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
+    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
@@ -112,22 +75,21 @@ pq_test_pop_max(void)
         ccc_pq_pop(&ppq);
     }
     CHECK(ccc_pq_empty(&ppq), true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_pop_min(void)
+BEGIN_STATIC_TEST(pq_test_pop_min)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &ppq, vals, size, prime), PASS);
     struct val const *min = ccc_pq_front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
+    CHECK(inorder_fill((enum test_result){}, sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
@@ -136,11 +98,10 @@ pq_test_pop_min(void)
         ccc_pq_pop(&ppq);
     }
     CHECK(ccc_pq_empty(&ppq), true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_delete_prime_shuffle_duplicates(void)
+BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -173,11 +134,10 @@ pq_test_delete_prime_shuffle_duplicates(void)
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_prime_shuffle(void)
+BEGIN_STATIC_TEST(pq_test_prime_shuffle)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -206,11 +166,10 @@ pq_test_prime_shuffle(void)
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_weak_srand(void)
+BEGIN_STATIC_TEST(pq_test_weak_srand)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -232,5 +191,14 @@ pq_test_weak_srand(void)
         CHECK(ccc_pq_validate(&ppq), true);
     }
     CHECK(ccc_pq_empty(&ppq), true);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(pq_test_insert_remove_four_dups,
+                     pq_test_insert_erase_shuffled, pq_test_pop_max,
+                     pq_test_pop_min, pq_test_delete_prime_shuffle_duplicates,
+                     pq_test_prime_shuffle, pq_test_weak_srand);
 }

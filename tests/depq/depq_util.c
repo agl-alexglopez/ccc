@@ -30,9 +30,8 @@ depq_printer_fn(void const *const e)
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-enum test_result
-insert_shuffled(ccc_double_ended_priority_queue *pq, struct val vals[],
-                size_t const size, int const larger_prime)
+BEGIN_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
+           struct val vals[], size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -43,13 +42,13 @@ insert_shuffled(ccc_double_ended_priority_queue *pq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        ccc_depq_push(pq, &vals[shuffled_index].elem);
-        CHECK(size(pq), i + 1);
+        push(pq, &vals[shuffled_index].elem);
         CHECK(ccc_depq_validate(pq), true);
+        CHECK(size(pq), i + 1);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(pq), size);
-    return PASS;
+    END_TEST();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

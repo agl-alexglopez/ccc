@@ -13,36 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result rtomap_test_insert_one(void);
-static enum test_result rtomap_test_insert_macros(void);
-static enum test_result rtomap_test_insert_shuffle(void);
-static enum test_result rtomap_test_insert_weak_srand(void);
-
-#define NUM_TESTS ((size_t)4)
-test_fn const all_tests[NUM_TESTS] = {
-    rtomap_test_insert_one,
-    rtomap_test_insert_macros,
-    rtomap_test_insert_shuffle,
-    rtomap_test_insert_weak_srand,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-rtomap_test_insert_one(void)
+BEGIN_STATIC_TEST(rtomap_test_insert_one)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -52,11 +23,10 @@ rtomap_test_insert_one(void)
     struct val *v = rom_root(&s);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtomap_test_insert_macros(void)
+BEGIN_STATIC_TEST(rtomap_test_insert_macros)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, realloc, val_cmp, NULL);
@@ -92,11 +62,10 @@ rtomap_test_insert_macros(void)
     CHECK(v->id, 2);
     CHECK(size(&s), 4);
     rom_clear_and_free(&s, NULL);
-    return PASS;
+    END_TEST(rom_clear_and_free(&s, NULL));
 }
 
-static enum test_result
-rtomap_test_insert_shuffle(void)
+BEGIN_STATIC_TEST(rtomap_test_insert_shuffle)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -104,7 +73,7 @@ rtomap_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &s, vals, size, prime), PASS);
 
     rom_print(&s, map_printer_fn);
     printf("\n");
@@ -115,11 +84,10 @@ rtomap_test_insert_shuffle(void)
     {
         CHECK(vals[i].val, sorted_check[i]);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtomap_test_insert_weak_srand(void)
+BEGIN_STATIC_TEST(rtomap_test_insert_weak_srand)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -137,5 +105,12 @@ rtomap_test_insert_weak_srand(void)
         CHECK(rom_validate(&s), true);
     }
     CHECK(size(&s), (size_t)num_nodes);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(rtomap_test_insert_one, rtomap_test_insert_macros,
+                     rtomap_test_insert_shuffle, rtomap_test_insert_weak_srand);
 }

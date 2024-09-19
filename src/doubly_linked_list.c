@@ -243,6 +243,20 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
     }
 }
 
+void
+ccc_dll_clear_and_free(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
+{
+    while (!ccc_dll_empty(l))
+    {
+        void *const node = ccc_dll_front(l);
+        if (fn)
+        {
+            fn(node);
+        }
+        ccc_dll_pop_front(l);
+    }
+}
+
 bool
 ccc_dll_validate(ccc_doubly_linked_list const *const l)
 {

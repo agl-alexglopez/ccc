@@ -11,43 +11,27 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result rtom_test_forward_iter(void);
-static enum test_result rtom_test_iterate_removal(void);
-static enum test_result rtom_test_iterate_remove_reinsert(void);
-static enum test_result rtom_test_valid_range(void);
-static enum test_result rtom_test_valid_range_equals(void);
-static enum test_result rtom_test_invalid_range(void);
-static enum test_result rtom_test_empty_range(void);
-static enum test_result iterator_check(ccc_realtime_ordered_map *);
-
-#define NUM_TESTS ((size_t)7)
-test_fn const all_tests[NUM_TESTS] = {
-    rtom_test_forward_iter,
-    rtom_test_iterate_removal,
-    rtom_test_valid_range,
-    rtom_test_valid_range_equals,
-    rtom_test_invalid_range,
-    rtom_test_empty_range,
-    rtom_test_iterate_remove_reinsert,
-};
-
-int
-main()
+BEGIN_STATIC_TEST(iterator_check, ccc_realtime_ordered_map *s)
 {
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
+    size_t const size = size(s);
+    size_t iter_count = 0;
+    for (struct val *e = begin(s); e != end(s); e = next(s, &e->elem))
     {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
+        ++iter_count;
+        CHECK(iter_count <= size, true);
     }
-    return res;
+    CHECK(iter_count, size);
+    iter_count = 0;
+    for (struct val *e = rbegin(s); e != end(s); e = rnext(s, &e->elem))
+    {
+        ++iter_count;
+        CHECK(iter_count <= size, true);
+    }
+    CHECK(iter_count, size);
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_forward_iter(void)
+BEGIN_STATIC_TEST(rtom_test_forward_iter)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -76,11 +60,10 @@ rtom_test_forward_iter(void)
     {
         CHECK(e->val, val_keys_inorder[j]);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_iterate_removal(void)
+BEGIN_STATIC_TEST(rtom_test_iterate_removal)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -97,7 +80,7 @@ rtom_test_iterate_removal(void)
         (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_rom_validate(&s), true);
     }
-    CHECK(iterator_check(&s), PASS);
+    CHECK(iterator_check((enum test_result){}, &s), PASS);
     int const limit = 400;
     for (struct val *i = begin(&s), *next = NULL; i; i = next)
     {
@@ -108,11 +91,10 @@ rtom_test_iterate_removal(void)
             CHECK(ccc_rom_validate(&s), true);
         }
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_iterate_remove_reinsert(void)
+BEGIN_STATIC_TEST(rtom_test_iterate_remove_reinsert)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -129,7 +111,7 @@ rtom_test_iterate_remove_reinsert(void)
         (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(ccc_rom_validate(&s), true);
     }
-    CHECK(iterator_check(&s), PASS);
+    CHECK(iterator_check((enum test_result){}, &s), PASS);
     size_t const old_size = size(&s);
     int const limit = 400;
     int new_unique_entry_val = 1001;
@@ -146,11 +128,10 @@ rtom_test_iterate_remove_reinsert(void)
         }
     }
     CHECK(size(&s), old_size);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_valid_range(void)
+BEGIN_STATIC_TEST(rtom_test_valid_range)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -199,11 +180,10 @@ rtom_test_valid_range(void)
     }
     CHECK(i2, rend_rrange(&rev_range));
     CHECK(i2->val, expect_range[7]);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_valid_range_equals(void)
+BEGIN_STATIC_TEST(rtom_test_valid_range_equals)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -251,11 +231,10 @@ rtom_test_valid_range_equals(void)
     }
     CHECK(i2, rend_rrange(&rev_range));
     CHECK(i2->val, expect_range[7]);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_invalid_range(void)
+BEGIN_STATIC_TEST(rtom_test_invalid_range)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -303,11 +282,10 @@ rtom_test_invalid_range(void)
     }
     CHECK(i2, rend_rrange(&range));
     CHECK(i2, NULL);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-rtom_test_empty_range(void)
+BEGIN_STATIC_TEST(rtom_test_empty_range)
 {
     ccc_realtime_ordered_map s
         = ccc_rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -332,26 +310,14 @@ rtom_test_empty_range(void)
           vals[num_nodes - 1].val);
     CHECK(((struct val *)rend_rrange(&rev_range))->val,
           vals[num_nodes - 1].val);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-iterator_check(ccc_realtime_ordered_map *s)
+int
+main()
 {
-    size_t const size = size(s);
-    size_t iter_count = 0;
-    for (struct val *e = begin(s); e != end(s); e = next(s, &e->elem))
-    {
-        ++iter_count;
-        CHECK(iter_count <= size, true);
-    }
-    CHECK(iter_count, size);
-    iter_count = 0;
-    for (struct val *e = rbegin(s); e != end(s); e = rnext(s, &e->elem))
-    {
-        ++iter_count;
-        CHECK(iter_count <= size, true);
-    }
-    CHECK(iter_count, size);
-    return PASS;
+    return RUN_TESTS(rtom_test_forward_iter, rtom_test_iterate_removal,
+                     rtom_test_valid_range, rtom_test_valid_range_equals,
+                     rtom_test_invalid_range, rtom_test_empty_range,
+                     rtom_test_iterate_remove_reinsert);
 }

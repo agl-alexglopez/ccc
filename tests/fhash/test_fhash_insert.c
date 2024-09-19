@@ -3,7 +3,6 @@
 
 #include "fhash_util.h"
 #include "flat_hash_map.h"
-#include "impl_flat_hash_map.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -11,56 +10,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static enum test_result fhash_test_insert(void);
-static enum test_result fhash_test_insert_macros(void);
-static enum test_result fhash_test_insert_overwrite(void);
-static enum test_result fhash_test_insert_via_entry(void);
-static enum test_result fhash_test_insert_via_entry_macros(void);
-static enum test_result fhash_test_insert_then_bad_ideas(void);
-static enum test_result fhash_test_entry_api_functional(void);
-static enum test_result fhash_test_entry_api_macros(void);
-static enum test_result fhash_test_two_sum(void);
-static enum test_result fhash_test_resize(void);
-static enum test_result fhash_test_resize_macros(void);
-static enum test_result fhash_test_resize_from_null(void);
-static enum test_result fhash_test_resize_from_null_macros(void);
-static enum test_result fhash_test_insert_limit(void);
-
-#define NUM_TESTS (size_t)14
-test_fn const all_tests[NUM_TESTS] = {
-    fhash_test_insert,
-    fhash_test_insert_macros,
-    fhash_test_insert_overwrite,
-    fhash_test_insert_then_bad_ideas,
-    fhash_test_insert_via_entry,
-    fhash_test_insert_via_entry_macros,
-    fhash_test_entry_api_functional,
-    fhash_test_entry_api_macros,
-    fhash_test_two_sum,
-    fhash_test_resize,
-    fhash_test_resize_macros,
-    fhash_test_resize_from_null,
-    fhash_test_resize_from_null_macros,
-    fhash_test_insert_limit,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-fhash_test_insert(void)
+BEGIN_STATIC_TEST(fhash_test_insert)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -74,11 +24,10 @@ fhash_test_insert(void)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_insert_macros(void)
+BEGIN_STATIC_TEST(fhash_test_insert_macros)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -122,12 +71,10 @@ fhash_test_insert_macros(void)
     CHECK(ccc_fhm_validate(&fh), true);
     CHECK(ins->val, 100);
     CHECK(size(&fh), 4);
-    ccc_fhm_clear_and_free(&fh, NULL);
-    return PASS;
+    END_TEST(ccc_fhm_clear_and_free(&fh, NULL));
 }
 
-static enum test_result
-fhash_test_insert_overwrite(void)
+BEGIN_STATIC_TEST(fhash_test_insert_overwrite)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -160,11 +107,10 @@ fhash_test_insert_overwrite(void)
     v = unwrap(entry_vr(&fh, &q.id));
     CHECK(v != NULL, true);
     CHECK(v->val, 100);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_insert_then_bad_ideas(void)
+BEGIN_STATIC_TEST(fhash_test_insert_then_bad_ideas)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -194,11 +140,10 @@ fhash_test_insert_then_bad_ideas(void)
     CHECK(v != NULL, true);
     CHECK(v->val, 100);
     CHECK(q.val, 90);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_entry_api_functional(void)
+BEGIN_STATIC_TEST(fhash_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     struct val vals[200];
@@ -254,11 +199,10 @@ fhash_test_entry_api_functional(void)
         CHECK((in->val % 2 == 0), true);
     }
     CHECK(size(&fh), (size / 2));
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_insert_via_entry(void)
+BEGIN_STATIC_TEST(fhash_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
@@ -302,11 +246,10 @@ fhash_test_insert_via_entry(void)
         }
     }
     CHECK(size(&fh), (size / 2));
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_insert_via_entry_macros(void)
+BEGIN_STATIC_TEST(fhash_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
@@ -345,11 +288,10 @@ fhash_test_insert_via_entry_macros(void)
         }
     }
     CHECK(size(&fh), (size / 2));
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_entry_api_macros(void)
+BEGIN_STATIC_TEST(fhash_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
@@ -402,11 +344,10 @@ fhash_test_entry_api_macros(void)
         CHECK(v->val % 2 == 0, true);
     }
     CHECK(size(&fh), (size / 2));
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_two_sum(void)
+BEGIN_STATIC_TEST(fhash_test_two_sum)
 {
     struct val vals[20];
     ccc_flat_hash_map fh;
@@ -433,11 +374,10 @@ fhash_test_two_sum(void)
     }
     CHECK(solution_indices[0], 8);
     CHECK(solution_indices[1], 2);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_resize(void)
+BEGIN_STATIC_TEST(fhash_test_resize)
 {
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
@@ -446,7 +386,7 @@ fhash_test_resize(void)
     ccc_result const res
         = fhm_init(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(res, CCC_OK);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -454,27 +394,26 @@ fhash_test_resize(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
-        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(fhm_validate(&fh), true, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
+        CHECK(fhm_validate(&fh), true);
     }
-    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(size(&fh), to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
             = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
-        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table != NULL, true);
+        CHECK(in_table->val, shuffled_index);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, ccc_impl_fhm_base(&fh.impl_));
-    return PASS;
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_resize_macros(void)
+BEGIN_STATIC_TEST(fhash_test_resize_macros)
 {
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
@@ -483,7 +422,7 @@ fhash_test_resize_macros(void)
     ccc_result const res
         = fhm_init(&fh, vals, prime_start, struct val, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(res, CCC_OK);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -491,11 +430,11 @@ fhash_test_resize_macros(void)
     {
         struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
                                      &(struct val){shuffled_index, i, {}}.e);
-        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
     }
-    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(size(&fh), to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -503,27 +442,26 @@ fhash_test_resize_macros(void)
             = fhm_or_insert_w(fhm_and_modify_w(entry_vr(&fh, &shuffled_index),
                                                fhash_swap_val, shuffled_index),
                               (struct val){});
-        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table != NULL, true);
+        CHECK(in_table->val, shuffled_index);
         struct val *v
             = fhm_or_insert_w(entry_vr(&fh, &shuffled_index), (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
         v = get_key_val(&fh, &shuffled_index);
-        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v != NULL, true);
+        CHECK(v->val, i);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK, ccc_impl_fhm_base(&fh.impl_));
-    return PASS;
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_resize_from_null(void)
+BEGIN_STATIC_TEST(fhash_test_resize_from_null)
 {
     ccc_flat_hash_map fh;
     ccc_result const res = fhm_init(&fh, NULL, 0, struct val, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
-    CHECK(res, CCC_OK, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(res, CCC_OK);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -531,26 +469,25 @@ fhash_test_resize_from_null(void)
     {
         struct val elem = {.id = shuffled_index, .val = i};
         struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
-        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
     }
-    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(size(&fh), to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
             = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
-        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table != NULL, true);
+        CHECK(in_table->val, shuffled_index);
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_resize_from_null_macros(void)
+BEGIN_STATIC_TEST(fhash_test_resize_from_null_macros)
 {
     size_t const prime_start = 0;
     ccc_flat_hash_map fh;
@@ -565,11 +502,11 @@ fhash_test_resize_from_null_macros(void)
     {
         struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
                                      &(struct val){shuffled_index, i, {}}.e);
-        CHECK(v != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->id, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
     }
-    CHECK(size(&fh), to_insert, ccc_impl_fhm_base(&fh.impl_));
+    CHECK(size(&fh), to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -577,22 +514,21 @@ fhash_test_resize_from_null_macros(void)
             = fhm_or_insert_w(fhm_and_modify_w(entry_vr(&fh, &shuffled_index),
                                                fhash_swap_val, shuffled_index),
                               (struct val){});
-        CHECK(in_table != NULL, true, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(in_table->val, shuffled_index, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(in_table != NULL, true);
+        CHECK(in_table->val, shuffled_index);
         struct val *v
             = fhm_or_insert_w(entry_vr(&fh, &shuffled_index), (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
         v = get_key_val(&fh, &shuffled_index);
-        CHECK(v == NULL, false, ccc_impl_fhm_base(&fh.impl_));
-        CHECK(v->val, i, ccc_impl_fhm_base(&fh.impl_));
+        CHECK(v == NULL, false);
+        CHECK(v->val, i);
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_insert_limit(void)
+BEGIN_STATIC_TEST(fhash_test_insert_limit)
 {
     int const size = 101;
     struct val vals[101];
@@ -651,5 +587,18 @@ fhash_test_insert_limit(void)
     CHECK(unwrap(&ent) == NULL, true);
     CHECK(insert_error(&ent), true);
     CHECK(size(&fh), final_size);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(
+        fhash_test_insert, fhash_test_insert_macros,
+        fhash_test_insert_overwrite, fhash_test_insert_then_bad_ideas,
+        fhash_test_insert_via_entry, fhash_test_insert_via_entry_macros,
+        fhash_test_entry_api_functional, fhash_test_entry_api_macros,
+        fhash_test_two_sum, fhash_test_resize, fhash_test_resize_macros,
+        fhash_test_resize_from_null, fhash_test_resize_from_null_macros,
+        fhash_test_insert_limit);
 }

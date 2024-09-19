@@ -20,9 +20,8 @@ val_update(ccc_update const *const u)
     old->val = *(int *)u->aux;
 }
 
-enum test_result
-insert_shuffled(ccc_priority_queue *ppq, struct val vals[], size_t const size,
-                int const larger_prime)
+BEGIN_TEST(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
+           size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -39,17 +38,13 @@ insert_shuffled(ccc_priority_queue *ppq, struct val vals[], size_t const size,
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_pq_size(ppq), size);
-    return PASS;
+    END_TEST();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-enum test_result
-inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
+BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
 {
-    if (ccc_pq_size(ppq) != size)
-    {
-        return FAIL;
-    }
+    CHECK(ccc_pq_size(ppq), size);
     size_t i = 0;
     ccc_priority_queue copy
         = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), NULL, val_cmp, NULL);
@@ -72,5 +67,5 @@ inorder_fill(int vals[], size_t size, ccc_priority_queue *ppq)
         CHECK(ccc_pq_validate(ppq), true);
         CHECK(ccc_pq_validate(&copy), true);
     }
-    return PASS;
+    END_TEST();
 }

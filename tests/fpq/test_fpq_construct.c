@@ -6,49 +6,25 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-static enum test_result pq_test_empty(void);
-static enum test_result pq_test_macro(void);
-static enum test_result pq_test_push(void);
-static enum test_result pq_test_raw_type(void);
-
-#define NUM_TESTS (size_t)4
-test_fn const all_tests[NUM_TESTS] = {
-    pq_test_empty,
-    pq_test_macro,
-    pq_test_push,
-    pq_test_raw_type,
-};
-
-static ccc_threeway_cmp int_cmp(ccc_cmp const *);
-
-int
-main()
+static ccc_threeway_cmp
+int_cmp(ccc_cmp const *const cmp)
 {
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
+    int a = *((int *)cmp->container_a);
+    int b = *((int *)cmp->container_b);
+    return (a > b) - (a < b);
 }
 
-static enum test_result
-pq_test_empty(void)
+BEGIN_STATIC_TEST(pq_test_empty)
 {
     struct val vals[2] = {};
     ccc_flat_priority_queue pq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(struct val)), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     CHECK(ccc_fpq_empty(&pq), true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_macro(void)
+BEGIN_STATIC_TEST(pq_test_macro)
 {
     struct val vals[2] = {};
     ccc_flat_priority_queue pq
@@ -59,11 +35,10 @@ pq_test_macro(void)
     CHECK(ccc_fpq_empty(&pq), false);
     struct val *res2 = ccc_fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res2 == NULL, true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_push(void)
+BEGIN_STATIC_TEST(pq_test_push)
 {
     struct val vals[3] = {};
     ccc_flat_priority_queue pq
@@ -72,11 +47,10 @@ pq_test_push(void)
     struct val *res = ccc_fpq_push(&pq, &vals[0]);
     CHECK(res != NULL, true);
     CHECK(ccc_fpq_empty(&pq), false);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_raw_type(void)
+BEGIN_STATIC_TEST(pq_test_raw_type)
 {
     int vals[4] = {};
     ccc_flat_priority_queue pq = ccc_fpq_init(
@@ -90,13 +64,12 @@ pq_test_raw_type(void)
     CHECK(ccc_fpq_size(&pq), 2);
     int *popped = ccc_fpq_front(&pq);
     CHECK(*popped, -1);
-    return PASS;
+    END_TEST();
 }
 
-static ccc_threeway_cmp
-int_cmp(ccc_cmp const *const cmp)
+int
+main()
 {
-    int a = *((int *)cmp->container_a);
-    int b = *((int *)cmp->container_b);
-    return (a > b) - (a < b);
+    return RUN_TESTS(pq_test_empty, pq_test_macro, pq_test_push,
+                     pq_test_raw_type);
 }

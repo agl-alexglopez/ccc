@@ -12,46 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result depq_test_insert_remove_four_dups(void);
-static enum test_result depq_test_insert_erase_shuffled(void);
-static enum test_result depq_test_pop_max(void);
-static enum test_result depq_test_pop_min(void);
-static enum test_result depq_test_max_round_robin(void);
-static enum test_result depq_test_min_round_robin(void);
-static enum test_result depq_test_delete_prime_shuffle_duplicates(void);
-static enum test_result depq_test_prime_shuffle(void);
-static enum test_result depq_test_weak_srand(void);
-
-#define NUM_TESTS (size_t)9
-test_fn const all_tests[NUM_TESTS] = {
-    depq_test_insert_remove_four_dups,
-    depq_test_insert_erase_shuffled,
-    depq_test_pop_max,
-    depq_test_pop_min,
-    depq_test_max_round_robin,
-    depq_test_min_round_robin,
-    depq_test_delete_prime_shuffle_duplicates,
-    depq_test_prime_shuffle,
-    depq_test_weak_srand,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-depq_test_insert_remove_four_dups(void)
+BEGIN_STATIC_TEST(depq_test_insert_remove_four_dups)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -72,18 +33,17 @@ depq_test_insert_remove_four_dups(void)
         CHECK(ccc_depq_validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_insert_erase_shuffled(void)
+BEGIN_STATIC_TEST(depq_test_insert_erase_shuffled)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
@@ -101,18 +61,17 @@ depq_test_insert_erase_shuffled(void)
         CHECK(ccc_depq_validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_pop_max(void)
+BEGIN_STATIC_TEST(depq_test_pop_max)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
@@ -130,18 +89,17 @@ depq_test_pop_max(void)
         ccc_depq_pop_max(&pq);
     }
     CHECK(empty(&pq), true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_pop_min(void)
+BEGIN_STATIC_TEST(depq_test_pop_min)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &pq, vals, size, prime), PASS);
     struct val const *max = ccc_depq_max(&pq);
     CHECK(max->val, (int)size - 1);
     struct val const *min = ccc_depq_min(&pq);
@@ -159,11 +117,10 @@ depq_test_pop_min(void)
         ccc_depq_pop_min(&pq);
     }
     CHECK(empty(&pq), true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_max_round_robin(void)
+BEGIN_STATIC_TEST(depq_test_max_round_robin)
 {
     ccc_double_ended_priority_queue depq
         = ccc_depq_init(struct val, elem, val, depq, NULL, val_cmp, NULL);
@@ -197,11 +154,10 @@ depq_test_max_round_robin(void)
         ccc_depq_pop_max(&depq);
         ++i;
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_min_round_robin(void)
+BEGIN_STATIC_TEST(depq_test_min_round_robin)
 {
     ccc_double_ended_priority_queue depq
         = ccc_depq_init(struct val, elem, val, depq, NULL, val_cmp, NULL);
@@ -235,11 +191,10 @@ depq_test_min_round_robin(void)
         ccc_depq_pop_min(&depq);
         ++i;
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_delete_prime_shuffle_duplicates(void)
+BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -272,11 +227,10 @@ depq_test_delete_prime_shuffle_duplicates(void)
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_prime_shuffle(void)
+BEGIN_STATIC_TEST(depq_test_prime_shuffle)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -308,11 +262,10 @@ depq_test_prime_shuffle(void)
         --cur_size;
         CHECK(size(&pq), cur_size);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-depq_test_weak_srand(void)
+BEGIN_STATIC_TEST(depq_test_weak_srand)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
@@ -334,5 +287,15 @@ depq_test_weak_srand(void)
         CHECK(ccc_depq_validate(&pq), true);
     }
     CHECK(empty(&pq), true);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(
+        depq_test_insert_remove_four_dups, depq_test_insert_erase_shuffled,
+        depq_test_pop_max, depq_test_pop_min, depq_test_max_round_robin,
+        depq_test_min_round_robin, depq_test_delete_prime_shuffle_duplicates,
+        depq_test_prime_shuffle, depq_test_weak_srand);
 }

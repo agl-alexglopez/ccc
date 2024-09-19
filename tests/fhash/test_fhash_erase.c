@@ -10,32 +10,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static enum test_result fhash_test_erase(void);
-static enum test_result fhash_test_shuffle_insert_erase(void);
-
-#define NUM_TESTS (size_t)2
-test_fn const all_tests[NUM_TESTS] = {
-    fhash_test_erase,
-    fhash_test_shuffle_insert_erase,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-fhash_test_erase(void)
+BEGIN_STATIC_TEST(fhash_test_erase)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -65,11 +40,10 @@ fhash_test_erase(void)
     CHECK(size(&fh), 1);
     CHECK(occupied(remove_entry_vr(entry_vr(&fh, &(int){137}))), true);
     CHECK(size(&fh), 0);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_shuffle_insert_erase(void)
+BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
 {
     ccc_flat_hash_map h;
     ccc_result const res = fhm_init(&h, NULL, 0, struct val, id, e, realloc,
@@ -111,6 +85,11 @@ fhash_test_shuffle_insert_erase(void)
         CHECK(fhm_validate(&h), true);
     }
     CHECK(size(&h), 0);
-    CHECK(fhm_clear_and_free(&h, NULL), CCC_OK);
-    return PASS;
+    END_TEST(fhm_clear_and_free(&h, NULL));
+}
+
+int
+main()
+{
+    return RUN_TESTS(fhash_test_erase, fhash_test_shuffle_insert_erase);
 }

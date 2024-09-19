@@ -12,35 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static enum test_result map_test_insert_one(void);
-static enum test_result map_test_insert_three(void);
-static enum test_result map_test_insert_macros(void);
-static enum test_result map_test_struct_getter(void);
-static enum test_result map_test_insert_shuffle(void);
-
-#define NUM_TESTS ((size_t)5)
-test_fn const all_tests[NUM_TESTS] = {
-    map_test_insert_one,    map_test_insert_three,   map_test_insert_macros,
-    map_test_struct_getter, map_test_insert_shuffle,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-map_test_insert_one(void)
+BEGIN_STATIC_TEST(map_test_insert_one)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -49,11 +21,10 @@ map_test_insert_one(void)
     CHECK(insert_entry(entry_vr(&s, &single.val), &single.elem) != NULL, true);
     CHECK(empty(&s), false);
     CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-map_test_insert_three(void)
+BEGIN_STATIC_TEST(map_test_insert_three)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, realloc, val_cmp, NULL);
@@ -92,11 +63,10 @@ map_test_insert_three(void)
     CHECK(ins->val, 3);
     CHECK(size(&s), 3);
     ccc_om_clear_and_free(&s, NULL);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-map_test_insert_macros(void)
+BEGIN_STATIC_TEST(map_test_insert_macros)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, realloc, val_cmp, NULL);
@@ -138,12 +108,10 @@ map_test_insert_macros(void)
     CHECK(ccc_om_validate(&s), true);
     CHECK(ins->id, 100);
     CHECK(size(&s), 4);
-    ccc_om_clear_and_free(&s, NULL);
-    return PASS;
+    END_TEST(ccc_om_clear_and_free(&s, NULL));
 }
 
-static enum test_result
-map_test_struct_getter(void)
+BEGIN_STATIC_TEST(map_test_struct_getter)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -169,11 +137,10 @@ map_test_struct_getter(void)
         CHECK(get->val, vals[i].val);
     }
     CHECK(size(&s), (size_t)10);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-map_test_insert_shuffle(void)
+BEGIN_STATIC_TEST(map_test_insert_shuffle)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -181,12 +148,20 @@ map_test_insert_shuffle(void)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &s, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(vals[i].val, sorted_check[i]);
     }
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(map_test_insert_one, map_test_insert_three,
+                     map_test_insert_macros, map_test_struct_getter,
+                     map_test_insert_shuffle);
 }

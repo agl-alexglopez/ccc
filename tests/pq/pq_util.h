@@ -14,8 +14,9 @@ struct val
 
 void val_update(ccc_update const *);
 ccc_threeway_cmp val_cmp(ccc_cmp const *);
-enum test_result insert_shuffled(ccc_priority_queue *, struct val[], size_t,
-                                 int);
-enum test_result inorder_fill(int[], size_t, ccc_priority_queue *);
+enum test_result insert_shuffled(enum test_result, ccc_priority_queue *,
+                                 struct val[], size_t, int);
+enum test_result inorder_fill(enum test_result, int[], size_t,
+                              ccc_priority_queue *);
 
 #endif /* CCC_PQ_UTIL_H */

@@ -35,9 +35,8 @@ rand_range(size_t const min, size_t const max)
     return min + rand() / (RAND_MAX / (max - min + 1) + 1);
 }
 
-enum test_result
-insert_shuffled(ccc_flat_priority_queue *pq, struct val vals[],
-                size_t const size, int const larger_prime)
+BEGIN_TEST(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
+           size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -54,12 +53,11 @@ insert_shuffled(ccc_flat_priority_queue *pq, struct val vals[],
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_fpq_size(pq), size);
-    return PASS;
+    END_TEST();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-enum test_result
-inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
+BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_flat_priority_queue *fpq)
 {
     if (ccc_fpq_size(fpq) != size)
     {
@@ -78,8 +76,8 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         size_t const prev = ccc_fpq_size(&fpq_copy);
         struct val *v = ccc_fpq_emplace(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
-        CHECK(v != NULL, true, copy_buf);
-        CHECK(prev < ccc_fpq_size(&fpq_copy), true, copy_buf);
+        CHECK(v != NULL, true);
+        CHECK(prev < ccc_fpq_size(&fpq_copy), true);
         ccc_fpq_pop(fpq);
     }
     i = 0;
@@ -89,11 +87,10 @@ inorder_fill(int vals[], size_t size, ccc_flat_priority_queue *fpq)
         size_t const prev = ccc_fpq_size(fpq);
         struct val *e
             = ccc_fpq_emplace(fpq, (struct val){.id = v->id, .val = v->val});
-        CHECK(e != NULL, true, copy_buf);
-        CHECK(prev < ccc_fpq_size(fpq), true, copy_buf);
-        CHECK(vals[i++], v->val, copy_buf);
+        CHECK(e != NULL, true);
+        CHECK(prev < ccc_fpq_size(fpq), true);
+        CHECK(vals[i++], v->val);
         ccc_fpq_pop(&fpq_copy);
-    }
-    free(copy_buf);
-    return PASS;
+    };
+    END_TEST(free(copy_buf));
 }

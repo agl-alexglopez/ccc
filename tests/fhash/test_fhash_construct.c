@@ -9,43 +9,35 @@
 
 #include <stddef.h>
 
-static enum test_result fhash_test_empty(void);
-static enum test_result fhash_test_entry_macros(void);
-static enum test_result fhash_test_entry_functional(void);
-static enum test_result fhash_test_entry_and_modify_functional(void);
-static enum test_result fhash_test_entry_and_modify_macros(void);
-
-#define NUM_TESTS (size_t)5
-test_fn const all_tests[NUM_TESTS] = {
-    fhash_test_empty,
-    fhash_test_entry_macros,
-    fhash_test_entry_functional,
-    fhash_test_entry_and_modify_functional,
-    fhash_test_entry_and_modify_macros,
-};
-
-static int def(int *);
-static void mod(ccc_update const *);
-static void modw(ccc_update const *);
-static int gen(int *);
-
-int
-main()
+static void
+mod(ccc_update const *const u)
 {
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
+    struct val *v = u->container;
+    v->val += 5;
 }
 
-static enum test_result
-fhash_test_empty(void)
+static void
+modw(ccc_update const *const u)
+{
+    struct val *v = u->container;
+    v->val = *((int *)u->aux);
+}
+
+static int
+def(int *to_affect)
+{
+    *to_affect += 1;
+    return 0;
+}
+
+static int
+gen(int *to_affect)
+{
+    *to_affect = 0;
+    return 42;
+}
+
+BEGIN_STATIC_TEST(fhash_test_empty)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -53,12 +45,11 @@ fhash_test_empty(void)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    CHECK(fhm_empty(&fh), true);
-    return PASS;
+    CHECK(empty(&fh), true);
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_entry_functional(void)
+BEGIN_STATIC_TEST(fhash_test_entry_functional)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -81,10 +72,10 @@ fhash_test_entry_functional(void)
     v->val += 1;
     CHECK(inserted->val, 2);
     return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_entry_macros(void)
+BEGIN_STATIC_TEST(fhash_test_entry_macros)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -109,11 +100,10 @@ fhash_test_entry_macros(void)
     v->val++;
     CHECK(mut, 100);
     CHECK(inserted->val, 1);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_entry_and_modify_functional(void)
+BEGIN_STATIC_TEST(fhash_test_entry_and_modify_functional)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -152,11 +142,10 @@ fhash_test_entry_and_modify_functional(void)
     CHECK((v3 != NULL), true);
     CHECK(inserted->id, 137);
     CHECK(v3->val, 137);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-fhash_test_entry_and_modify_macros(void)
+BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -204,33 +193,14 @@ fhash_test_entry_and_modify_macros(void)
     CHECK(v3->id, 137);
     CHECK(v3->val, 42);
     CHECK(mut, 0);
-    return PASS;
+    END_TEST();
 }
 
-static void
-mod(ccc_update const *const u)
+int
+main()
 {
-    struct val *v = u->container;
-    v->val += 5;
-}
-
-static void
-modw(ccc_update const *const u)
-{
-    struct val *v = u->container;
-    v->val = *((int *)u->aux);
-}
-
-static int
-def(int *to_affect)
-{
-    *to_affect += 1;
-    return 0;
-}
-
-static int
-gen(int *to_affect)
-{
-    *to_affect = 0;
-    return 42;
+    return RUN_TESTS(fhash_test_empty, fhash_test_entry_macros,
+                     fhash_test_entry_functional,
+                     fhash_test_entry_and_modify_functional,
+                     fhash_test_entry_and_modify_macros);
 }

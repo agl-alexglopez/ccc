@@ -56,7 +56,7 @@ ccc_dll_elem *ccc_dll_tail(ccc_doubly_linked_list const *);
 size_t ccc_dll_size(ccc_doubly_linked_list const *);
 bool ccc_dll_empty(ccc_doubly_linked_list const *);
 
-void ccc_dll_clear(ccc_doubly_linked_list *, ccc_destructor_fn *);
+void ccc_dll_clear_and_free(ccc_doubly_linked_list *, ccc_destructor_fn *);
 
 bool ccc_dll_validate(ccc_doubly_linked_list const *);
 

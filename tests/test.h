@@ -1,9 +1,8 @@
-#ifndef TEST
-#define TEST
+#ifndef CCC_TEST
+#define CCC_TEST
 
 /* NOLINTBEGIN */
 #include <stdio.h>
-#include <stdlib.h>
 /* NOLINTEND */
 
 #define RED "\033[38;5;9m"
@@ -18,71 +17,162 @@ enum test_result
     FAIL,
 };
 
-typedef enum test_result (*test_fn)(void);
+typedef enum test_result (*test_fn)(enum test_result);
 
-/* The CHECK macro evaluates a result against an expecation as one
-   may be familiar with in many testing frameworks. However, it is
-   expected to execute in a function where a test_result is returned.
-   Provide the resulting operation against the expected outcome. The
-   types must be comparable with ==/!=. If the result or expectation are
-   function calls they will only be evaluated once. Finally, if memory has
-   been allocted in the context of a test the requires a call to free, pass
-   those memory pointers on which free must be called. Custom allocator
-   functions are not supported and must override the library default free for
-   now if such specialization is needed. Pass the pointers as simple arguments.
-   No special formatting is needed. */
-#define CHECK(test_result, test_expected, optional_free_on_fail...)            \
+#define TEST_PRINT_FAIL(result, result_string, expected, expected_string)      \
+    do                                                                         \
+    {                                                                          \
+        char const *const format_string_ = _Generic((result_),                 \
+            _Bool: "%d",                                                       \
+            char: "%c",                                                        \
+            signed char: "%hhd",                                               \
+            unsigned char: "%hhu",                                             \
+            short: "%hd",                                                      \
+            int: "%d",                                                         \
+            long: "%ld",                                                       \
+            long long: "%lld",                                                 \
+            unsigned short: "%hu",                                             \
+            unsigned int: "%u",                                                \
+            unsigned long: "%lu",                                              \
+            unsigned long long: "%llu",                                        \
+            float: "%f",                                                       \
+            double: "%f",                                                      \
+            long double: "%Lf",                                                \
+            char *: "%s",                                                      \
+            char const *: "%s",                                                \
+            wchar_t *: "%ls",                                                  \
+            wchar_t const *: "%ls",                                            \
+            void *: "%p",                                                      \
+            void const *: "%p",                                                \
+            default: "%p");                                                    \
+        (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,        \
+                      __func__, __LINE__);                                     \
+        (void)fprintf(stderr,                                                  \
+                      GREEN "CHECK: "                                          \
+                            "result( %s ) == expected( %s )" NONE "\n",        \
+                      result_string, expected_string);                         \
+        (void)fprintf(stderr, RED "ERROR: result( ");                          \
+        (void)fprintf(stderr, format_string_, result_);                        \
+        (void)fprintf(stderr, " ) != expected( ");                             \
+        (void)fprintf(stderr, format_string_, expected_);                      \
+        (void)fprintf(stderr, " )" CYAN "\n" NONE);                            \
+    } while (0)
+
+/** @brief Define a static test function that has a name and optionally
+additional parameters that one may wish to pass to such a function. If the test
+function must be declared elsewhere the first parameter is an enum test_result.
+@param [in] test_name the name of the static function.
+@param [in] ... any additional parameters required for the function.
+@return see the end test macro. This will return a enum test_result.
+
+It is possible to return early from a test before the end test macro, but it
+is discouraged, especially if any memory allocations need to be cleaned up if
+a test fails.
+
+Example with no additional parameters:
+
+BEGIN_STATIC_TEST(fhash_test_empty)
+{
+    struct val vals[5] = {};
+    ccc_flat_hash_map fh;
+    ccc_result const res
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+    CHECK(empty(&fh), true);
+    END_TEST();
+}
+
+Example with multiple parameters:
+
+enum test_result insert_shuffled(enum test_result,
+                                 ccc_double_ended_priority_queue *,
+                                 struct val[], size_t, int);
+
+BEGIN_STATIC_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
+           struct val vals[], size_t const size, int const larger_prime)
+{
+    for (int i = 0 shuffled_index = larger_prime % size; i < size; ++i)
+    {
+        vals[shuffled_index].val = shuffled_index;
+        push(pq, &vals[shuffled_index].elem);
+        CHECK(ccc_depq_validate(pq), true);
+        shuffled_index = (shuffled_index + larger_prime) % size;
+    }
+    END_TEST();
+}*/
+#define BEGIN_STATIC_TEST(test_name, ...)                                      \
+    static enum test_result(test_name)(                                        \
+        enum test_result macro_test_res_ __VA_OPT__(, ) __VA_ARGS__)
+
+/** @brief Define a test function that has a name and optionally
+additional parameters that one may wish to pass to such a function. If the test
+function must be declared elsewhere the first parameter is an enum test_result.
+@param [in] test_name the name of the function.
+@param [in] ... any additional parameters required for the function.
+@return see the end test macro. This will return a enum test_result.
+
+It is possible to return early from a test before the end test macro, but it
+is discouraged, especially if any memory allocations need to be cleaned up if
+a test fails. See begin static test for examples. */
+#define BEGIN_TEST(test_name, ...)                                             \
+    enum test_result(test_name)(                                               \
+        enum test_result macro_test_res_ __VA_OPT__(, ) __VA_ARGS__)
+
+/** @brief execute a check within the context of a test.
+@param [in] test_result the result value of some action.
+@param [in] test_expected the expection of what the result is equal to.
+
+test_result and test_expected should be comparable with ==/!=. If a test
+passes nothing happens. If a test fails output shows the failure. Upon
+failure any cleanup function specified by the end test macro will execute
+to prevent memory leaks. See the end test macro for more. */
+#define CHECK(test_result, test_expected)                                      \
     do                                                                         \
     {                                                                          \
         const __auto_type result_ = (test_result);                             \
         typeof(result_) const expected_ = (test_expected);                     \
         if (result_ != expected_)                                              \
         {                                                                      \
-            char const *const format_string_ = _Generic((result_),             \
-                _Bool: "%d",                                                   \
-                char: "%c",                                                    \
-                signed char: "%hhd",                                           \
-                unsigned char: "%hhu",                                         \
-                short: "%hd",                                                  \
-                int: "%d",                                                     \
-                long: "%ld",                                                   \
-                long long: "%lld",                                             \
-                unsigned short: "%hu",                                         \
-                unsigned int: "%u",                                            \
-                unsigned long: "%lu",                                          \
-                unsigned long long: "%llu",                                    \
-                float: "%f",                                                   \
-                double: "%f",                                                  \
-                long double: "%Lf",                                            \
-                char *: "%s",                                                  \
-                char const *: "%s",                                            \
-                wchar_t *: "%ls",                                              \
-                wchar_t const *: "%ls",                                        \
-                void *: "%p",                                                  \
-                void const *: "%p",                                            \
-                default: "%p");                                                \
-            (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,    \
-                          __func__, __LINE__);                                 \
-            (void)fprintf(stderr,                                              \
-                          GREEN "CHECK: "                                      \
-                                "result( %s ) == expected( %s )" NONE "\n",    \
-                          #test_result, #test_expected);                       \
-            (void)fprintf(stderr, RED "ERROR: result( ");                      \
-            (void)fprintf(stderr, format_string_, result_);                    \
-            (void)fprintf(stderr, " ) != expected( ");                         \
-            (void)fprintf(stderr, format_string_, expected_);                  \
-            (void)fprintf(stderr, " )" CYAN "\n" NONE);                        \
-            void *to_free_[] = {optional_free_on_fail};                        \
-            unsigned const stop_ = sizeof(to_free_) / sizeof(void *);          \
-            if (stop_)                                                         \
-            {                                                                  \
-                for (unsigned i_ = 0; i_ < stop_; i_++)                        \
-                {                                                              \
-                    free(to_free_[i_]);                                        \
-                }                                                              \
-            }                                                                  \
-            return FAIL;                                                       \
+            TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
+            macro_test_res_ = FAIL;                                            \
+            goto please_insert_end_test_macro_at_the_end_of_this_test_;        \
         }                                                                      \
     } while (0)
 
-#endif
+/** @brief End every test started with the begin test macros.
+@param [in] ... optional function call with any number of arguments that shall
+be executed to clean up any allocated memory upon a test failure.
+@return the test result from the currently executing test. FAIL upon the first
+check failure or PASS if all checks have passed.
+
+The call provided will be transposed directly as is. This also means that any
+arguments provided to the cleanup function must be in the same scope as the
+end test macro. Nested allocations within loops or if checks cannot be cleaned
+up by this macro. Simpler tests and allocation strategies are therefore
+recommended. */
+#define END_TEST(...)                                                          \
+please_insert_end_test_macro_at_the_end_of_this_test_:                         \
+    __VA_OPT__((void)__VA_ARGS__;)                                             \
+    return macro_test_res_
+
+/** @brief Runs a list of test functions and returns the result.
+@param [in] test_fn_list all test functions to run in main.
+
+Return this macro from the main function of the test program. All tests
+will run but the testing result for the entire program will be set to FAIL
+upon the first failure. */
+#define RUN_TESTS(test_fn_list...)                                             \
+    ({                                                                         \
+        test_fn const all_tests_[] = {test_fn_list};                           \
+        enum test_result all_tests_res_ = PASS;                                \
+        for (unsigned i = 0; i < sizeof(all_tests_) / sizeof(test_fn); ++i)    \
+        {                                                                      \
+            if (all_tests_[i](PASS) == FAIL)                                   \
+            {                                                                  \
+                all_tests_res_ = FAIL;                                         \
+            }                                                                  \
+        }                                                                      \
+        all_tests_res_;                                                        \
+    })
+
+#endif /* CCC_TEST */

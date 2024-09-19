@@ -13,34 +13,7 @@
 #include <string.h>
 #include <time.h>
 
-static enum test_result map_test_insert_erase_shuffled(void);
-static enum test_result map_test_prime_shuffle(void);
-static enum test_result map_test_weak_srand(void);
-
-#define NUM_TESTS ((size_t)3)
-test_fn const all_tests[NUM_TESTS] = {
-    map_test_insert_erase_shuffled,
-    map_test_prime_shuffle,
-    map_test_weak_srand,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-map_test_prime_shuffle(void)
+BEGIN_STATIC_TEST(map_test_prime_shuffle)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -74,18 +47,17 @@ map_test_prime_shuffle(void)
               true);
         CHECK(ccc_om_validate(&s), true);
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-map_test_insert_erase_shuffled(void)
+BEGIN_STATIC_TEST(map_test_insert_erase_shuffled)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
+    CHECK(insert_shuffled((enum test_result){}, &s, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
@@ -101,11 +73,10 @@ map_test_insert_erase_shuffled(void)
         CHECK(ccc_om_validate(&s), true);
     }
     CHECK(empty(&s), true);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-map_test_weak_srand(void)
+BEGIN_STATIC_TEST(map_test_weak_srand)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -128,5 +99,12 @@ map_test_weak_srand(void)
         CHECK(ccc_om_validate(&s), true);
     }
     CHECK(empty(&s), true);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(map_test_insert_erase_shuffled, map_test_prime_shuffle,
+                     map_test_weak_srand);
 }

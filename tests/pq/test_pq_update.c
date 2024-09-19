@@ -9,36 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static enum test_result pq_test_insert_iterate_pop(void);
-static enum test_result pq_test_priority_update(void);
-static enum test_result pq_test_priority_increase(void);
-static enum test_result pq_test_priority_decrease(void);
-static enum test_result pq_test_priority_removal(void);
-
-#define NUM_TESTS (size_t)5
-test_fn const all_tests[NUM_TESTS] = {
-    pq_test_insert_iterate_pop, pq_test_priority_update,
-    pq_test_priority_removal,   pq_test_priority_increase,
-    pq_test_priority_decrease,
-};
-
-int
-main()
-{
-    enum test_result res = PASS;
-    for (size_t i = 0; i < NUM_TESTS; ++i)
-    {
-        bool const fail = all_tests[i]() == FAIL;
-        if (fail)
-        {
-            res = FAIL;
-        }
-    }
-    return res;
-}
-
-static enum test_result
-pq_test_insert_iterate_pop(void)
+BEGIN_STATIC_TEST(pq_test_insert_iterate_pop)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -63,11 +34,10 @@ pq_test_insert_iterate_pop(void)
         CHECK(ccc_pq_validate(&pq), true);
     }
     CHECK(pop_count, num_nodes);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_priority_removal(void)
+BEGIN_STATIC_TEST(pq_test_priority_removal)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -94,11 +64,10 @@ pq_test_priority_removal(void)
             CHECK(ccc_pq_validate(&pq), true);
         }
     }
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_priority_update(void)
+BEGIN_STATIC_TEST(pq_test_priority_update)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -127,11 +96,10 @@ pq_test_priority_update(void)
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_priority_increase(void)
+BEGIN_STATIC_TEST(pq_test_priority_increase)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -166,11 +134,10 @@ pq_test_priority_increase(void)
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
-    return PASS;
+    END_TEST();
 }
 
-static enum test_result
-pq_test_priority_decrease(void)
+BEGIN_STATIC_TEST(pq_test_priority_decrease)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_GRT, NULL, val_cmp, NULL);
@@ -205,5 +172,13 @@ pq_test_priority_decrease(void)
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
-    return PASS;
+    END_TEST();
+}
+
+int
+main()
+{
+    return RUN_TESTS(pq_test_insert_iterate_pop, pq_test_priority_update,
+                     pq_test_priority_removal, pq_test_priority_increase,
+                     pq_test_priority_decrease);
 }
