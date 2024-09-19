@@ -432,10 +432,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     assert(res == CCC_OK);
     ccc_flat_double_ended_queue bfs
         = ccc_fdeq_init(NULL, 0, struct point, realloc);
-    [[maybe_unused]] ccc_entry e = insert_or_assign(
-        &parent_map,
-        &(struct parent_cell){.key = src->pos, .parent = {-1, -1}}.elem);
-    assert(!insert_error(&e));
+    [[maybe_unused]] ccc_entry *e = fhm_insert_or_assign_w(
+        &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
+    assert(!insert_error(e));
     push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {0};
@@ -451,9 +450,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                [[maybe_unused]] struct parent_cell const *const inserted
-                    = insert_entry(entry_vr(&parent_map, &next), &push.elem);
-                assert(inserted);
+                [[maybe_unused]] ccc_entry const inserted
+                    = insert_or_assign(&parent_map, &push.elem);
+                assert(unwrap(&inserted) != NULL);
                 cur = next;
                 success = true;
                 break;
@@ -779,16 +778,13 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
             .v = v,
             .dist = v == pr->src ? 0 : INT_MAX,
         };
-        ccc_entry const inserted = try_insert(prev_map,
-                                              &(struct prev_vertex){
-                                                  .v = p->v,
-                                                  .prev = NULL,
-                                                  .dist_point = p,
-                                              }
-                                                   .elem);
-        if (insert_error(&inserted) || occupied(&inserted))
+        ccc_entry const *const inserted = fhm_try_insert_w(
+            prev_map, p->v,
+            (struct prev_vertex){.prev = NULL, .dist_point = p});
+        if (insert_error(inserted) || occupied(inserted))
         {
             quit("duplicate vertex during graph prep or insert failed.\n", 1);
+            return;
         }
         push(dist_q, &p->pq_elem);
     }
