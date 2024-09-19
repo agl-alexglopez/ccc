@@ -63,11 +63,11 @@ typedef enum test_result (*test_fn)(void);
 #define OPTIONAL_PARAMS(...) __VA_OPT__(NON_)##DEFAULT_PARAMS(__VA_ARGS__)
 
 /** @brief Define a static test function that has a name and optionally
-additional parameters that one may wish to pass to such a function. If the test
-function must be declared elsewhere the first parameter is an enum test_result.
+additional parameters that one may wish to define for a test function.
 @param [in] test_name the name of the static function.
 @param [in] ... any additional parameters required for the function.
-@return see the end test macro. This will return a enum test_result.
+@return see the end test macro. This will return a enum test_result that is
+PASS or FAIL to be handled as the user sees fit.
 
 It is possible to return early from a test before the end test macro, but it
 is discouraged, especially if any memory allocations need to be cleaned up if
@@ -88,12 +88,11 @@ BEGIN_STATIC_TEST(fhash_test_empty)
 
 Example with multiple parameters:
 
-enum test_result insert_shuffled(enum test_result,
-                                 ccc_double_ended_priority_queue *,
+enum test_result insert_shuffled(ccc_double_ended_priority_queue *,
                                  struct val[], size_t, int);
 
 BEGIN_STATIC_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
-           struct val vals[], size_t const size, int const larger_prime)
+                  struct val vals[], size_t const size, int const larger_prime)
 {
     for (int i = 0 shuffled_index = larger_prime % size; i < size; ++i)
     {
@@ -111,8 +110,7 @@ BEGIN_STATIC_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
         do
 
 /** @brief Define a test function that has a name and optionally
-additional parameters that one may wish to pass to such a function. If the test
-function must be declared elsewhere the first parameter is an enum test_result.
+additional parameters that one may wish to define a test function.
 @param [in] test_name the name of the function.
 @param [in] ... any additional parameters required for the function.
 @return see the end test macro. This will return a enum test_result.
@@ -139,7 +137,7 @@ to prevent memory leaks. See the end test macro for more. If the test end
 macro will not have access to some memory or operation in the scope of the
 current check one may provide an additional function call they wish to have
 executed on failure. This should only be used in special cases where such a
-function is unusable by the end test macro. */
+function is unusable by the end test macro due to scoping. */
 #define CHECK(test_result, test_expected, ...)                                 \
     do                                                                         \
     {                                                                          \
@@ -150,7 +148,7 @@ function is unusable by the end test macro. */
             TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
             macro_test_res_ = FAIL;                                            \
             __VA_OPT__((void)__VA_ARGS__;)                                     \
-            goto please_insert_end_test_macro_at_the_end_of_this_test_;        \
+            goto please_call_the_END_TEST_macro_at_the_end_of_this_test_;      \
         }                                                                      \
     } while (0)
 
@@ -166,7 +164,7 @@ end test macro. Nested allocations within loops or if checks cannot be cleaned
 up by this macro. Simpler tests and allocation strategies are therefore
 recommended. */
 #define END_TEST(...)                                                          \
-please_insert_end_test_macro_at_the_end_of_this_test_:                         \
+please_call_the_END_TEST_macro_at_the_end_of_this_test_:                       \
     __VA_OPT__((void)__VA_ARGS__;)                                             \
     return macro_test_res_;                                                    \
     }                                                                          \
@@ -177,7 +175,8 @@ please_insert_end_test_macro_at_the_end_of_this_test_:                         \
 
 Return this macro from the main function of the test program. All tests
 will run but the testing result for the entire program will be set to FAIL
-upon the first failure. */
+upon the first failure. All functions must share the same signature, returning
+a test_result and taking no arguments. */
 #define RUN_TESTS(test_fn_list...)                                             \
     ({                                                                         \
         test_fn const all_tests_[] = {test_fn_list};                           \
