@@ -2,6 +2,7 @@
 #include "impl_doubly_linked_list.h"
 #include "types.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -349,12 +350,12 @@ erase_range([[maybe_unused]] struct ccc_dll_ const *const l,
     {
         return sz;
     }
-    for (struct ccc_dll_elem_ *i = begin->n_, *next = i; i != end;
-         i = next, ++sz)
+    for (struct ccc_dll_elem_ *i = begin->n_; i != end; ++sz)
     {
-        next = i->n_;
-        i->n_ = i->p_ = NULL;
         assert(sz <= l->sz_);
+        struct ccc_dll_elem_ *const next = i->n_;
+        i->n_ = i->p_ = NULL;
+        i = next;
     }
     return sz;
 }
