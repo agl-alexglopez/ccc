@@ -117,8 +117,14 @@
 #define ccc_equal_range(container_ptr, begin_and_end_args...)                  \
     ccc_impl_equal_range(container_ptr, begin_and_end_args)
 
+#define ccc_equal_range_vr(container_ptr, begin_and_end_args...)               \
+    ccc_impl_equal_range_vr(container_ptr, begin_and_end_args)
+
 #define ccc_equal_rrange(container_ptr, rbegin_and_rend_args...)               \
     ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_args)
+
+#define ccc_equal_rrange_vr(container_ptr, rbegin_and_rend_args...)            \
+    ccc_impl_equal_rrange_vr(container_ptr, rbegin_and_rend_args)
 
 /*===================    Standard Getters API  ==============================*/
 
@@ -148,10 +154,6 @@
 #    define occupied(args...) ccc_occupied(args)
 #    define insert_error(args...) ccc_insert_error(args)
 #    define unwrap(args...) ccc_unwrap(args)
-#    define begin_range(args...) ccc_begin_range(args)
-#    define end_range(args...) ccc_end_range(args)
-#    define rbegin_rrange(args...) ccc_rbegin_rrange(args)
-#    define rend_rrange(args...) ccc_rend_rrange(args)
 
 #    define push(args...) ccc_push(args)
 #    define push_back(args...) ccc_push_back(args)
@@ -179,6 +181,8 @@
 
 #    define equal_range(args...) ccc_equal_range(args)
 #    define equal_rrange(args...) ccc_equal_rrange(args)
+#    define equal_range_vr(args...) ccc_equal_range_vr(args)
+#    define equal_rrange_vr(args...) ccc_equal_rrange_vr(args)
 
 #    define size(args...) ccc_size(args)
 #    define empty(args...) ccc_empty(args)

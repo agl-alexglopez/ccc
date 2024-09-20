@@ -1,4 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#define ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include "map_util.h"
 #include "ordered_map.h"
@@ -10,6 +12,62 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
+
+BEGIN_STATIC_TEST(check_range, ordered_map const *const rom,
+                  range const *const r, size_t const n,
+                  int const expect_range[])
+{
+    if (begin_range(r))
+    {
+        CHECK(((struct val *)begin_range(r))->val, expect_range[0]);
+    }
+    if (ccc_end_range(r))
+    {
+        CHECK(((struct val *)end_range(r))->val, expect_range[n - 1]);
+    }
+    size_t index = 0;
+    struct val *iter = begin_range(r);
+    for (; iter != end_range(r) && index < n;
+         iter = next(rom, &iter->elem), ++index)
+    {
+        int const cur_val = iter->val;
+        CHECK(expect_range[index], cur_val);
+    }
+    CHECK(iter, end_range(r));
+    if (iter)
+    {
+        CHECK(((struct val *)iter)->val, expect_range[n - 1]);
+    }
+    END_TEST();
+}
+
+BEGIN_STATIC_TEST(check_rrange, ordered_map const *const rom,
+                  rrange const *const r, size_t const n,
+                  int const expect_rrange[])
+{
+    if (rbegin_rrange(r))
+    {
+        CHECK(((struct val *)rbegin_rrange(r))->val, expect_rrange[0]);
+    }
+    if (rend_rrange(r))
+    {
+        CHECK(((struct val *)rend_rrange(r))->val, expect_rrange[n - 1]);
+    }
+    struct val *iter = rbegin_rrange(r);
+    size_t index = 0;
+    for (; iter != rend_rrange(r); iter = rnext(rom, &iter->elem))
+    {
+        int const cur_val = iter->val;
+        CHECK(expect_rrange[index], cur_val);
+        ++index;
+    }
+    CHECK(iter, rend_rrange(r));
+    if (iter)
+    {
+        CHECK(((struct val *)iter)->val, expect_rrange[n - 1]);
+    }
+    END_TEST();
+}
 
 BEGIN_STATIC_TEST(iterator_check, ccc_ordered_map *s)
 {
@@ -149,37 +207,15 @@ BEGIN_STATIC_TEST(map_test_valid_range)
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    int const *expect_range = (int[8]){10, 15, 20, 25, 30, 35, 40, 45};
-    ccc_range const range = equal_range(&s, &(int){6}, &(int){44});
-    CHECK(((struct val *)begin_range(&range))->val, expect_range[0]);
-    CHECK(((struct val *)end_range(&range))->val, expect_range[7]);
-    size_t index = 0;
-    struct val *i1 = begin_range(&range);
-    for (; i1 != end_range(&range); i1 = next(&s, &i1->elem))
-    {
-        int const cur_val = i1->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i1, end_range(&range));
-    CHECK(((struct val *)i1)->val, expect_range[7]);
+    CHECK(check_range(&s, equal_range_vr(&s, &(int){6}, &(int){44}), 8,
+                      (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
+          PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    expect_range = (int[8]){115, 110, 105, 100, 95, 90, 85, 80};
-    ccc_rrange const rev_range = equal_rrange(&s, &(int){119}, &(int){84});
-    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, expect_range[0]);
-    CHECK(((struct val *)rend_rrange(&rev_range))->val, expect_range[7]);
-    index = 0;
-    struct val *i2 = rbegin_rrange(&rev_range);
-    for (; i2 != rend_rrange(&rev_range); i2 = rnext(&s, &i2->elem))
-    {
-        int const cur_val = i2->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i2, rend_rrange(&rev_range));
-    CHECK(i2->val, expect_range[7]);
+    CHECK(check_rrange(&s, equal_rrange_vr(&s, &(int){119}, &(int){84}), 8,
+                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+          PASS);
     END_TEST();
 }
 
@@ -198,34 +234,12 @@ BEGIN_STATIC_TEST(map_test_valid_range_equals)
         (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(validate(&s), true);
     }
-    int const *expect_range = (int[8]){10, 15, 20, 25, 30, 35, 40, 45};
-    ccc_range const range = equal_range(&s, &(int){10}, &(int){40});
-    CHECK(((struct val *)begin_range(&range))->val, expect_range[0]);
-    CHECK(((struct val *)end_range(&range))->val, expect_range[7]);
-    size_t index = 0;
-    struct val *i1 = begin_range(&range);
-    for (; i1 != end_range(&range); i1 = next(&s, &i1->elem))
-    {
-        int const cur_val = i1->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i1, end_range(&range));
-    CHECK(((struct val *)i1)->val, expect_range[7]);
-    expect_range = (int[8]){115, 110, 105, 100, 95, 90, 85, 80};
-    ccc_rrange const rev_range = equal_rrange(&s, &(int){115}, &(int){85});
-    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, expect_range[0]);
-    CHECK(((struct val *)rend_rrange(&rev_range))->val, expect_range[7]);
-    index = 0;
-    struct val *i2 = rbegin_rrange(&rev_range);
-    for (; i2 != rend_rrange(&rev_range); i2 = rnext(&s, &i2->elem))
-    {
-        int const cur_val = i2->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i2, rend_rrange(&rev_range));
-    CHECK(i2->val, expect_range[7]);
+    CHECK(check_range(&s, equal_range_vr(&s, &(int){10}, &(int){40}), 8,
+                      (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
+          PASS);
+    CHECK(check_rrange(&s, equal_rrange_vr(&s, &(int){115}, &(int){85}), 8,
+                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+          PASS);
     END_TEST();
 }
 
@@ -246,38 +260,15 @@ BEGIN_STATIC_TEST(map_test_invalid_range)
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    int const *expect_range = (int[6]){95, 100, 105, 110, 115, 120};
-    ccc_range const rev_range = equal_range(&s, &(int){95}, &(int){999});
-    CHECK(((struct val *)begin_range(&rev_range))->val == expect_range[0],
-          true);
-    CHECK(end_range(&rev_range), NULL);
-    size_t index = 0;
-    struct val *i1 = begin_range(&rev_range);
-    for (; i1 != end_range(&rev_range); i1 = next(&s, &i1->elem))
-    {
-        int const cur_val = i1->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i1, end_range(&rev_range));
-    CHECK(i1, NULL);
+    CHECK(check_range(&s, equal_range_vr(&s, &(int){95}, &(int){999}), 6,
+                      (int[6]){95, 100, 105, 110, 115, 120}),
+          PASS);
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    expect_range = (int[8]){35, 30, 25, 20, 15, 10, 5, 0};
-    ccc_rrange const range = equal_rrange(&s, &(int){36}, &(int){-999});
-    CHECK(((struct val *)rbegin_rrange(&range))->val, expect_range[0]);
-    CHECK(rend_rrange(&range), NULL);
-    index = 0;
-    struct val *i2 = rbegin_rrange(&range);
-    for (; i2 != rend_rrange(&range); i2 = rnext(&s, &i2->elem))
-    {
-        int const cur_val = i2->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i2, rend_rrange(&range));
-    CHECK(i2, NULL);
+    CHECK(check_rrange(&s, equal_rrange_vr(&s, &(int){36}, &(int){-999}), 8,
+                       (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
+          PASS);
     END_TEST();
 }
 

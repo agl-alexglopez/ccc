@@ -18,7 +18,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_one)
         = ccc_fpq_init(single, (sizeof(single) / sizeof(single[0])), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
     single[0].val = 0;
-    ccc_fpq_push(&fpq, &single[0]);
+    push(&fpq, &single[0]);
     CHECK(ccc_fpq_empty(&fpq), false);
     END_TEST();
 }
@@ -33,7 +33,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_three)
     for (size_t i = 0; i < size; ++i)
     {
         three_vals[i].val = (int)i;
-        ccc_fpq_push(&fpq, &three_vals[i]);
+        push(&fpq, &three_vals[i]);
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
@@ -80,7 +80,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_three_dups)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        ccc_fpq_push(&fpq, &three_vals[i]);
+        push(&fpq, &three_vals[i]);
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), (size_t)i + 1);
     }
@@ -102,7 +102,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
     /* Test the printing function at least once. */
     ccc_fpq_print(&fpq, 0, val_print);
 
-    struct val const *min = ccc_fpq_front(&fpq);
+    struct val const *min = front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
@@ -125,12 +125,12 @@ BEGIN_STATIC_TEST(fpq_test_read_max_min)
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)i;
-        (void)ccc_fpq_push(&fpq, &vals[i]);
+        (void)push(&fpq, &vals[i]);
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)10);
-    struct val const *min = ccc_fpq_front(&fpq);
+    struct val const *min = front(&fpq);
     CHECK(min->val, 0);
     END_TEST();
 }

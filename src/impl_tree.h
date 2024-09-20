@@ -34,11 +34,13 @@
    cycle detection because its implementation is seperate from the depq. */
 typedef struct ccc_node_
 {
-    union {
+    union
+    {
         struct ccc_node_ *branch_[2];
         struct ccc_node_ *link_[2];
     };
-    union {
+    union
+    {
         struct ccc_node_ *parent_;
         struct ccc_node_ *dup_head_;
     };

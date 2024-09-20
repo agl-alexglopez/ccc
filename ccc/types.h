@@ -7,17 +7,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct
+typedef union
 {
     struct ccc_range_ impl_;
 } ccc_range;
 
-typedef struct
+typedef union
 {
     struct ccc_range_ impl_;
 } ccc_rrange;
 
-typedef struct
+typedef union
 {
     struct ccc_entry_ impl_;
 } ccc_entry;
@@ -85,7 +85,22 @@ void *ccc_rbegin_rrange(ccc_rrange const *r);
 void *ccc_rend_rrange(ccc_rrange const *r);
 
 #ifdef TYPES_USING_NAMESPACE_CCC
-
+typedef ccc_range range;
+typedef ccc_rrange rrange;
+typedef ccc_entry entry;
+typedef ccc_result result;
+typedef ccc_threeway_cmp threeway_cmp;
+typedef ccc_cmp cmp;
+typedef ccc_key_cmp key_cmp;
+typedef ccc_update update;
+typedef ccc_alloc_fn alloc_fn;
+typedef ccc_cmp_fn cmp_fn;
+typedef ccc_print_fn print_fn;
+typedef ccc_update_fn update_fn;
+typedef ccc_destructor_fn destructor_fn;
+typedef ccc_key_eq_fn key_eq_fn;
+typedef ccc_key_cmp_fn key_cmp_fn;
+typedef ccc_hash_fn hash_fn;
 #    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)
 #    define entry_insert_error(entry_ptr) ccc_entry_insert_error(entry_ptr)
 #    define entry_unwrap(entry_ptr) ccc_entry_unwrap(entry_ptr)

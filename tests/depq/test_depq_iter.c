@@ -1,4 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#define DOUBLE_ENDED_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 
 #include "depq_util.h"
 #include "double_ended_priority_queue.h"
@@ -11,6 +13,62 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+BEGIN_STATIC_TEST(check_range, double_ended_priority_queue const *const rom,
+                  range const *const r, size_t const n,
+                  int const expect_range[])
+{
+    if (begin_range(r))
+    {
+        CHECK(((struct val *)begin_range(r))->val, expect_range[0]);
+    }
+    if (ccc_end_range(r))
+    {
+        CHECK(((struct val *)end_range(r))->val, expect_range[n - 1]);
+    }
+    size_t index = 0;
+    struct val *iter = begin_range(r);
+    for (; iter != end_range(r) && index < n;
+         iter = next(rom, &iter->elem), ++index)
+    {
+        int const cur_val = iter->val;
+        CHECK(expect_range[index], cur_val);
+    }
+    CHECK(iter, end_range(r));
+    if (iter)
+    {
+        CHECK(((struct val *)iter)->val, expect_range[n - 1]);
+    }
+    END_TEST();
+}
+
+BEGIN_STATIC_TEST(check_rrange, double_ended_priority_queue const *const rom,
+                  rrange const *const r, size_t const n,
+                  int const expect_rrange[])
+{
+    if (rbegin_rrange(r))
+    {
+        CHECK(((struct val *)rbegin_rrange(r))->val, expect_rrange[0]);
+    }
+    if (rend_rrange(r))
+    {
+        CHECK(((struct val *)rend_rrange(r))->val, expect_rrange[n - 1]);
+    }
+    struct val *iter = rbegin_rrange(r);
+    size_t index = 0;
+    for (; iter != rend_rrange(r); iter = rnext(rom, &iter->elem))
+    {
+        int const cur_val = iter->val;
+        CHECK(expect_rrange[index], cur_val);
+        ++index;
+    }
+    CHECK(iter, rend_rrange(r));
+    if (iter)
+    {
+        CHECK(((struct val *)iter)->val, expect_rrange[n - 1]);
+    }
+    END_TEST();
+}
 
 BEGIN_STATIC_TEST(iterator_check, ccc_double_ended_priority_queue *pq)
 {
@@ -51,7 +109,7 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_unique_vals)
     {
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -78,7 +136,7 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_all_vals)
     struct val vals[33];
     vals[0].val = 0; // NOLINT
     vals[0].id = 0;
-    ccc_depq_push(&pq, &vals[0].elem);
+    push(&pq, &vals[0].elem);
     /* This will test iterating through every possible length list. */
     for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
     {
@@ -87,7 +145,7 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_all_vals)
         {
             vals[index].val = val; // NOLINT
             vals[index].id = index;
-            ccc_depq_push(&pq, &vals[index].elem);
+            push(&pq, &vals[index].elem);
             CHECK(validate(&pq), true);
         }
     }
@@ -115,7 +173,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
@@ -148,7 +206,7 @@ BEGIN_STATIC_TEST(depq_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
@@ -182,7 +240,7 @@ BEGIN_STATIC_TEST(depq_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
@@ -217,43 +275,21 @@ BEGIN_STATIC_TEST(depq_test_priority_valid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    int const *expect_range = (int[8]){10, 15, 20, 25, 30, 35, 40, 45};
-    ccc_rrange const rev_range = equal_rrange(&pq, &(int){6}, &(int){44});
-    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, expect_range[0]);
-    CHECK(((struct val *)rend_rrange(&rev_range))->val, expect_range[7]);
-    size_t index = 0;
-    struct val *i1 = rbegin_rrange(&rev_range);
-    for (; i1 != rend_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
-    {
-        int const cur_val = i1->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i1 == rend_rrange(&rev_range), true);
-    CHECK(i1->val, expect_range[7]);
+    CHECK(check_rrange(&pq, equal_rrange_vr(&pq, &(int){6}, &(int){44}), 8,
+                       (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
+          PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    expect_range = (int[8]){115, 110, 105, 100, 95, 90, 85, 80};
-    ccc_range const range = equal_range(&pq, &(int){119}, &(int){84});
-    CHECK(((struct val *)begin_range(&range))->val, expect_range[0]);
-    CHECK(((struct val *)end_range(&range))->val, expect_range[7]);
-    index = 0;
-    struct val *i2 = begin_range(&range);
-    for (; i2 != end_range(&range); i2 = next(&pq, &i2->elem))
-    {
-        int const cur_val = i2->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i2 == end_range(&range), true);
-    CHECK(i2->val, expect_range[7]);
+    CHECK(check_range(&pq, equal_range_vr(&pq, &(int){119}, &(int){84}), 8,
+                      (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+          PASS);
     END_TEST();
 }
 
@@ -269,43 +305,21 @@ BEGIN_STATIC_TEST(depq_test_priority_valid_range_equals)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    int *expect_range = (int[8]){10, 15, 20, 25, 30, 35, 40, 45};
-    ccc_rrange const rev_range = equal_rrange(&pq, &(int){10}, &(int){40});
-    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, expect_range[0]);
-    CHECK(((struct val *)rend_rrange(&rev_range))->val, expect_range[7]);
-    size_t index = 0;
-    struct val *i1 = rbegin_rrange(&rev_range);
-    for (; i1 != rend_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
-    {
-        int const cur_val = i1->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i1 == rend_rrange(&rev_range), true);
-    CHECK(i1->val, expect_range[7]);
+    CHECK(check_rrange(&pq, equal_rrange_vr(&pq, &(int){10}, &(int){40}), 8,
+                       (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
+          PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    expect_range = (int[8]){115, 110, 105, 100, 95, 90, 85, 80};
-    ccc_range const range = equal_range(&pq, &(int){115}, &(int){85});
-    CHECK(((struct val *)begin_range(&range))->val, expect_range[0]);
-    CHECK(((struct val *)end_range(&range))->val, expect_range[7]);
-    index = 0;
-    struct val *i2 = begin_range(&range);
-    for (; i2 != end_range(&range); i2 = next(&pq, &i2->elem))
-    {
-        int const cur_val = i2->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i2 == end_range(&range), true);
-    CHECK(i2->val, expect_range[7]);
+    CHECK(check_range(&pq, equal_range_vr(&pq, &(int){115}, &(int){85}), 8,
+                      (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+          PASS);
     END_TEST();
 }
 
@@ -321,41 +335,21 @@ BEGIN_STATIC_TEST(depq_test_priority_invalid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    int const *expect_range = (int[6]){95, 100, 105, 110, 115, 120};
-    ccc_rrange const rev_range = equal_rrange(&pq, &(int){95}, &(int){999});
-    CHECK(((struct val *)rbegin_rrange(&rev_range))->val, expect_range[0]);
-    CHECK(rend_rrange(&rev_range), NULL);
-    size_t index = 0;
-    struct val *i1 = rbegin_rrange(&rev_range);
-    for (; i1 != rend_rrange(&rev_range); i1 = rnext(&pq, &i1->elem))
-    {
-        int const cur_val = i1->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i1 == rend_rrange(&rev_range) && !i1, true);
+    CHECK(check_rrange(&pq, equal_rrange_vr(&pq, &(int){95}, &(int){999}), 6,
+                       (int[6]){95, 100, 105, 110, 115, 120}),
+          PASS);
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    expect_range = (int[8]){35, 30, 25, 20, 15, 10, 5, 0};
-    ccc_range const range = equal_range(&pq, &(int){36}, &(int){-999});
-    CHECK(((struct val *)begin_range(&range))->val, expect_range[0]);
-    CHECK(end_range(&range), NULL);
-    index = 0;
-    struct val *i2 = begin_range(&range);
-    for (; i2 != end_range(&range); i2 = next(&pq, &i2->elem))
-    {
-        int const cur_val = i2->val;
-        CHECK(expect_range[index], cur_val);
-        ++index;
-    }
-    CHECK(i2 == end_range(&range) && !i2, true);
+    CHECK(check_range(&pq, equal_range_vr(&pq, &(int){36}, &(int){-999}), 8,
+                      (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
+          PASS);
     END_TEST();
 }
 
@@ -371,7 +365,7 @@ BEGIN_STATIC_TEST(depq_test_priority_empty_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        ccc_depq_push(&pq, &vals[i].elem);
+        push(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.
@@ -380,9 +374,9 @@ BEGIN_STATIC_TEST(depq_test_priority_empty_range)
     ccc_rrange const rev_range = equal_rrange(&pq, &(int){-50}, &(int){-25});
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val, vals[0].val);
     CHECK(((struct val *)rend_rrange(&rev_range))->val, vals[0].val);
-    ccc_range const range = equal_range(&pq, &(int){150}, &(int){999});
-    CHECK(((struct val *)begin_range(&range))->val, vals[num_nodes - 1].val);
-    CHECK(((struct val *)end_range(&range))->val, vals[num_nodes - 1].val);
+    ccc_range const eq_range = equal_range(&pq, &(int){150}, &(int){999});
+    CHECK(((struct val *)begin_range(&eq_range))->val, vals[num_nodes - 1].val);
+    CHECK(((struct val *)end_range(&eq_range))->val, vals[num_nodes - 1].val);
     END_TEST();
 }
 

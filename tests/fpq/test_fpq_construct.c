@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -9,8 +12,8 @@
 static ccc_threeway_cmp
 int_cmp(ccc_cmp const *const cmp)
 {
-    int a = *((int *)cmp->container_a);
-    int b = *((int *)cmp->container_b);
+    int a = *((int const *const)cmp->container_a);
+    int b = *((int const *const)cmp->container_b);
     return (a > b) - (a < b);
 }
 
@@ -44,7 +47,7 @@ BEGIN_STATIC_TEST(pq_test_push)
     ccc_flat_priority_queue pq
         = ccc_fpq_init(&vals, (sizeof(vals) / sizeof(struct val)), struct val,
                        CCC_LES, NULL, val_cmp, NULL);
-    struct val *res = ccc_fpq_push(&pq, &vals[0]);
+    struct val *res = push(&pq, &vals[0]);
     CHECK(res != NULL, true);
     CHECK(ccc_fpq_empty(&pq), false);
     END_TEST();
@@ -56,13 +59,13 @@ BEGIN_STATIC_TEST(pq_test_raw_type)
     ccc_flat_priority_queue pq = ccc_fpq_init(
         &vals, (sizeof(vals) / sizeof(int)), int, CCC_LES, NULL, int_cmp, NULL);
     int val = 1;
-    int *res = ccc_fpq_push(&pq, &val);
+    int *res = push(&pq, &val);
     CHECK(res != NULL, true);
     CHECK(ccc_fpq_empty(&pq), false);
     res = ccc_fpq_emplace(&pq, -1);
     CHECK(res != NULL, true);
     CHECK(ccc_fpq_size(&pq), 2);
-    int *popped = ccc_fpq_front(&pq);
+    int *popped = front(&pq);
     CHECK(*popped, -1);
     END_TEST();
 }

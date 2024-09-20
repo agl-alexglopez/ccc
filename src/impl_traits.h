@@ -419,6 +419,12 @@
         ccc_realtime_ordered_map const *: ccc_rom_equal_range)(                \
         (container_ptr), begin_and_end_key_ptr)
 
+#define ccc_impl_equal_range_vr(container_ptr, begin_and_end_key_ptr...)       \
+    &(ccc_range)                                                               \
+    {                                                                          \
+        ccc_impl_equal_range(container_ptr, begin_and_end_key_ptr).impl_       \
+    }
+
 #define ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr...)       \
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_rrange,                                \
@@ -426,6 +432,12 @@
         ccc_realtime_ordered_map *: ccc_rom_equal_rrange,                      \
         ccc_realtime_ordered_map const *: ccc_rom_equal_rrange)(               \
         (container_ptr), rbegin_and_rend_key_ptr)
+
+#define ccc_impl_equal_rrange_vr(container_ptr, rbegin_and_rend_key_ptr...)    \
+    &(ccc_rrange)                                                              \
+    {                                                                          \
+        ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr).impl_    \
+    }
 
 /*===================    Standard Getters API ==============================*/
 

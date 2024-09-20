@@ -140,7 +140,25 @@ void *ccc_om_unwrap(ccc_o_map_entry const *e);
 bool ccc_om_insert_error(ccc_o_map_entry const *e);
 bool ccc_om_occupied(ccc_o_map_entry const *e);
 
-/*===========================   Entry API   =================================*/
+/*===========================   Iterators   =================================*/
+
+#define ccc_om_equal_range_vr(ordered_map_ptr, begin_and_end_key_ptrs...)      \
+    &(ccc_range)                                                               \
+    {                                                                          \
+        ccc_om_equal_range(ordered_map_ptr, begin_and_end_key_ptrs).impl_      \
+    }
+
+#define ccc_om_equal_rrange_vr(ordered_map_ptr, rbegin_and_rend_key_ptrs...)   \
+    &(ccc_rrange)                                                              \
+    {                                                                          \
+        ccc_om_equal_rrange(ordered_map_ptr, rbegin_and_rend_key_ptrs).impl_   \
+    }
+
+ccc_range ccc_om_equal_range(ccc_ordered_map *, void const *begin_key,
+                             void const *end_key);
+
+ccc_rrange ccc_om_equal_rrange(ccc_ordered_map *, void const *rbegin_key,
+                               void const *end_key);
 
 void *ccc_om_begin(ccc_ordered_map const *);
 
@@ -153,12 +171,6 @@ void *ccc_om_rend(ccc_ordered_map const *);
 void *ccc_om_next(ccc_ordered_map const *, ccc_o_map_elem const *);
 
 void *ccc_om_rnext(ccc_ordered_map const *, ccc_o_map_elem const *);
-
-ccc_range ccc_om_equal_range(ccc_ordered_map *, void const *begin_key,
-                             void const *end_key);
-
-ccc_rrange ccc_om_equal_rrange(ccc_ordered_map *, void const *rbegin_key,
-                               void const *end_key);
 
 void *ccc_om_root(ccc_ordered_map const *);
 

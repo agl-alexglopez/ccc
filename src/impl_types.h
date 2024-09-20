@@ -23,11 +23,13 @@ struct ccc_entry_
 
 struct ccc_range_
 {
-    union {
+    union
+    {
         void *begin_;
         void *rbegin_;
     };
-    union {
+    union
+    {
         void *end_;
         void *rend_;
     };

@@ -50,7 +50,7 @@ BEGIN_TEST(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
-        ccc_fpq_push(pq, &vals[i]);
+        push(pq, &vals[i]);
         CHECK(ccc_fpq_size(pq), i + 1);
         CHECK(validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -74,26 +74,26 @@ BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_flat_priority_queue *fpq)
                        NULL, val_cmp, NULL);
     while (!ccc_fpq_empty(fpq) && i < size)
     {
-        struct val *const front = ccc_fpq_front(fpq);
+        struct val *const front = front(fpq);
         vals[i++] = front->val;
         size_t const prev = ccc_fpq_size(&fpq_copy);
         struct val *v = ccc_fpq_emplace(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
         CHECK(v != NULL, true);
         CHECK(prev < ccc_fpq_size(&fpq_copy), true);
-        ccc_fpq_pop(fpq);
+        pop(fpq);
     }
     i = 0;
     while (!ccc_fpq_empty(&fpq_copy) && i < size)
     {
-        struct val *const v = ccc_fpq_front(&fpq_copy);
+        struct val *const v = front(&fpq_copy);
         size_t const prev = ccc_fpq_size(fpq);
         struct val *e
             = ccc_fpq_emplace(fpq, (struct val){.id = v->id, .val = v->val});
         CHECK(e != NULL, true);
         CHECK(prev < ccc_fpq_size(fpq), true);
         CHECK(vals[i++], v->val);
-        ccc_fpq_pop(&fpq_copy);
+        pop(&fpq_copy);
     };
     END_TEST(free(copy_buf););
 }

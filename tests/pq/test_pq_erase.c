@@ -20,7 +20,7 @@ BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        ccc_pq_push(&ppq, &three_vals[i].elem);
+        push(&ppq, &three_vals[i].elem);
         CHECK(validate(&ppq), true);
         size_t const size = i + 1;
         CHECK(ccc_pq_size(&ppq), size);
@@ -29,7 +29,7 @@ BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        ccc_pq_pop(&ppq);
+        pop(&ppq);
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
@@ -44,7 +44,7 @@ BEGIN_STATIC_TEST(pq_test_insert_erase_shuffled)
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
-    struct val const *min = ccc_pq_front(&ppq);
+    struct val const *min = front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
@@ -66,16 +66,16 @@ BEGIN_STATIC_TEST(pq_test_pop_max)
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
-    struct val const *min = ccc_pq_front(&ppq);
+    struct val const *min = front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *front = ccc_pq_front(&ppq);
+        struct val const *front = front(&ppq);
         CHECK(front->val, vals[i].val);
-        ccc_pq_pop(&ppq);
+        pop(&ppq);
     }
     CHECK(ccc_pq_empty(&ppq), true);
     END_TEST();
@@ -89,16 +89,16 @@ BEGIN_STATIC_TEST(pq_test_pop_min)
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
-    struct val const *min = ccc_pq_front(&ppq);
+    struct val const *min = front(&ppq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val const *front = ccc_pq_front(&ppq);
+        struct val const *front = front(&ppq);
         CHECK(front->val, vals[i].val);
-        ccc_pq_pop(&ppq);
+        pop(&ppq);
     }
     CHECK(ccc_pq_empty(&ppq), true);
     END_TEST();
@@ -118,7 +118,7 @@ BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        ccc_pq_push(&ppq, &vals[i].elem);
+        push(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
         size_t const s = i + 1;
         CHECK(ccc_pq_size(&ppq), s);
@@ -155,7 +155,7 @@ BEGIN_STATIC_TEST(pq_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        ccc_pq_push(&ppq, &vals[i].elem);
+        push(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -185,7 +185,7 @@ BEGIN_STATIC_TEST(pq_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_pq_push(&ppq, &vals[i].elem);
+        push(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
     }
     for (int i = 0; i < num_heap_elems; ++i)

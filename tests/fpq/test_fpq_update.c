@@ -27,13 +27,13 @@ BEGIN_STATIC_TEST(fpq_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(ccc_fpq_push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i]) != NULL, true);
         CHECK(validate(&fpq), true);
     }
     size_t pop_count = 0;
     while (!ccc_fpq_empty(&fpq))
     {
-        ccc_fpq_pop(&fpq);
+        pop(&fpq);
         ++pop_count;
         CHECK(validate(&fpq), true);
     }
