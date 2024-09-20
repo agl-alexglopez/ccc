@@ -1,11 +1,9 @@
 #include "buffer.h"
-#include "impl_buffer.h"
 #include "types.h"
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 static void *at(ccc_buffer const *, size_t);
@@ -18,30 +16,30 @@ ccc_buf_realloc(ccc_buffer *buf, size_t const new_capacity,
     {
         return CCC_NO_REALLOC;
     }
-    void *const new_mem = fn(buf->impl_.mem_, new_capacity);
+    void *const new_mem = fn(buf->mem_, new_capacity);
     if (new_capacity && !new_mem)
     {
         return CCC_MEM_ERR;
     }
-    buf->impl_.mem_ = new_mem;
-    buf->impl_.capacity_ = new_capacity;
+    buf->mem_ = new_mem;
+    buf->capacity_ = new_capacity;
     return CCC_OK;
 }
 
 void *
 ccc_buf_at(ccc_buffer const *buf, size_t const i)
 {
-    if (i >= buf->impl_.capacity_)
+    if (i >= buf->capacity_)
     {
         return NULL;
     }
-    return ((uint8_t *)buf->impl_.mem_ + (i * buf->impl_.elem_sz_));
+    return ((char *)buf->mem_ + (i * buf->elem_sz_));
 }
 
 void *
 ccc_buf_back(ccc_buffer const *buf)
 {
-    return ccc_buf_at(buf, buf->impl_.sz_ - (size_t)1);
+    return ccc_buf_at(buf, buf->sz_ - (size_t)1);
 }
 
 void *
@@ -53,15 +51,13 @@ ccc_buf_front(ccc_buffer const *buf)
 void *
 ccc_buf_alloc(ccc_buffer *buf)
 {
-    if (buf->impl_.sz_ != buf->impl_.capacity_)
+    if (buf->sz_ != buf->capacity_)
     {
-        void *const ret = ((uint8_t *)buf->impl_.mem_
-                           + (buf->impl_.elem_sz_ * buf->impl_.sz_));
-        ++buf->impl_.sz_;
+        void *const ret = ((char *)buf->mem_ + (buf->elem_sz_ * buf->sz_));
+        ++buf->sz_;
         return ret;
     }
-    if (ccc_buf_realloc(buf, buf->impl_.capacity_ * 2, buf->impl_.alloc_)
-        == CCC_OK)
+    if (ccc_buf_realloc(buf, buf->capacity_ * 2, buf->alloc_) == CCC_OK)
     {
         return ccc_buf_back(buf);
     }
@@ -74,28 +70,28 @@ ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
     void *const mem = ccc_buf_alloc(buf);
     if (mem)
     {
-        memcpy(mem, data, buf->impl_.elem_sz_);
+        memcpy(mem, data, buf->elem_sz_);
     }
     return mem;
 }
 
 ccc_result
-ccc_buf_swap(ccc_buffer *buf, uint8_t tmp[], size_t const i, size_t const j)
+ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t const i, size_t const j)
 {
-    if (!buf->impl_.sz_ || i >= buf->impl_.sz_ || j >= buf->impl_.sz_ || j == i)
+    if (!buf->sz_ || i >= buf->sz_ || j >= buf->sz_ || j == i)
     {
         return CCC_MEM_ERR;
     }
-    (void)memcpy(tmp, at(buf, i), buf->impl_.elem_sz_);
-    (void)memcpy(at(buf, i), at(buf, j), buf->impl_.elem_sz_);
-    (void)memcpy(at(buf, j), tmp, buf->impl_.elem_sz_);
+    (void)memcpy(tmp, at(buf, i), buf->elem_sz_);
+    (void)memcpy(at(buf, i), at(buf, j), buf->elem_sz_);
+    (void)memcpy(at(buf, j), tmp, buf->elem_sz_);
     return CCC_OK;
 }
 
 void *
 ccc_buf_copy(ccc_buffer *buf, size_t const dst, size_t const src)
 {
-    if (!buf->impl_.sz_ || dst >= buf->impl_.sz_ || src >= buf->impl_.sz_)
+    if (!buf->sz_ || dst >= buf->sz_ || src >= buf->sz_)
     {
         return NULL;
     }
@@ -103,7 +99,7 @@ ccc_buf_copy(ccc_buffer *buf, size_t const dst, size_t const src)
     {
         return at(buf, dst);
     }
-    return memcpy(at(buf, dst), at(buf, src), buf->impl_.elem_sz_);
+    return memcpy(at(buf, dst), at(buf, src), buf->elem_sz_);
 }
 
 ccc_result
@@ -114,54 +110,54 @@ ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
     {
         return CCC_INPUT_ERR;
     }
-    (void)memcpy(pos, data, buf->impl_.elem_sz_);
+    (void)memcpy(pos, data, buf->elem_sz_);
     return CCC_OK;
 }
 
 ccc_result
 ccc_buf_erase(ccc_buffer *buf, size_t const i)
 {
-    if (!buf->impl_.sz_ || i >= buf->impl_.sz_)
+    if (!buf->sz_ || i >= buf->sz_)
     {
         return CCC_MEM_ERR;
     }
-    if (1 == buf->impl_.sz_)
+    if (1 == buf->sz_)
     {
-        buf->impl_.sz_ = 0;
+        buf->sz_ = 0;
         return CCC_OK;
     }
-    if (i == buf->impl_.sz_ - 1)
+    if (i == buf->sz_ - 1)
     {
-        --buf->impl_.sz_;
+        --buf->sz_;
         return CCC_OK;
     }
     (void)memcpy(at(buf, i), at(buf, i + 1),
-                 buf->impl_.elem_sz_ * (buf->impl_.sz_ - (i + 1)));
-    --buf->impl_.sz_;
+                 buf->elem_sz_ * (buf->sz_ - (i + 1)));
+    --buf->sz_;
     return CCC_OK;
 }
 
 ccc_result
 ccc_buf_free(ccc_buffer *buf, ccc_alloc_fn *fn)
 {
-    if (!buf->impl_.capacity_ || !fn)
+    if (!buf->capacity_ || !fn)
     {
         return CCC_MEM_ERR;
     }
-    buf->impl_.capacity_ = 0;
-    buf->impl_.sz_ = 0;
-    fn(buf->impl_.mem_, 0);
+    buf->capacity_ = 0;
+    buf->sz_ = 0;
+    fn(buf->mem_, 0);
     return CCC_OK;
 }
 
 ccc_result
 ccc_buf_pop_back_n(ccc_buffer *buf, size_t n)
 {
-    if (n > buf->impl_.sz_)
+    if (n > buf->sz_)
     {
         return CCC_MEM_ERR;
     }
-    buf->impl_.sz_ -= n;
+    buf->sz_ -= n;
     return CCC_OK;
 }
 
@@ -174,49 +170,49 @@ ccc_buf_pop_back(ccc_buffer *buf)
 size_t
 ccc_buf_size(ccc_buffer const *buf)
 {
-    return buf->impl_.sz_;
+    return buf->sz_;
 }
 
 size_t
 ccc_buf_capacity(ccc_buffer const *buf)
 {
-    return buf->impl_.capacity_;
+    return buf->capacity_;
 }
 
 size_t
 ccc_buf_elem_size(ccc_buffer const *buf)
 {
-    return buf->impl_.elem_sz_;
+    return buf->elem_sz_;
 }
 
 bool
 ccc_buf_full(ccc_buffer const *buf)
 {
-    return buf->impl_.sz_ == buf->impl_.capacity_;
+    return buf->sz_ == buf->capacity_;
 }
 
 bool
 ccc_buf_empty(ccc_buffer const *buf)
 {
-    return !buf->impl_.sz_;
+    return !buf->sz_;
 }
 
 void *
 ccc_buf_base(ccc_buffer const *const buf)
 {
-    return buf->impl_.mem_;
+    return buf->mem_;
 }
 
 void *
 ccc_buf_begin(ccc_buffer const *const buf)
 {
-    return buf->impl_.mem_;
+    return buf->mem_;
 }
 
 void *
 ccc_buf_rbegin(ccc_buffer const *const buf)
 {
-    return (uint8_t *)buf->impl_.mem_ + (buf->impl_.sz_ * buf->impl_.elem_sz_);
+    return (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_);
 }
 
 void *
@@ -226,7 +222,7 @@ ccc_buf_next(ccc_buffer const *const buf, void const *const pos)
     {
         return NULL;
     }
-    return (uint8_t *)pos + buf->impl_.elem_sz_;
+    return (char *)pos + buf->elem_sz_;
 }
 
 void *
@@ -236,54 +232,52 @@ ccc_buf_rnext(ccc_buffer const *const buf, void const *const pos)
     {
         return NULL;
     }
-    return (uint8_t *)pos - buf->impl_.elem_sz_;
+    return (char *)pos - buf->elem_sz_;
 }
 
 void *
 ccc_buf_end([[maybe_unused]] ccc_buffer const *const buf)
 {
-    return (uint8_t *)buf->impl_.mem_ + (buf->impl_.sz_ * buf->impl_.elem_sz_);
+    return (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_);
 }
 
 void *
 ccc_buf_rend([[maybe_unused]] ccc_buffer const *const buf)
 {
-    return (uint8_t *)buf->impl_.mem_ - buf->impl_.elem_sz_;
+    return (char *)buf->mem_ - buf->elem_sz_;
 }
 
 void *
 ccc_buf_capacity_end(ccc_buffer const *const buf)
 {
-    return (uint8_t *)buf->impl_.mem_
-           + (buf->impl_.elem_sz_ * buf->impl_.capacity_);
+    return (char *)buf->mem_ + (buf->elem_sz_ * buf->capacity_);
 }
 
 size_t
 ccc_buf_index_of(ccc_buffer const *const buf, void const *const slot)
 {
-    assert(slot >= buf->impl_.mem_);
-    assert((uint8_t *)slot < ((uint8_t *)buf->impl_.mem_
-                              + (buf->impl_.capacity_ * buf->impl_.elem_sz_)));
-    return ((uint8_t *)slot - ((uint8_t *)buf->impl_.mem_))
-           / buf->impl_.elem_sz_;
+    assert(slot >= buf->mem_);
+    assert((char *)slot
+           < ((char *)buf->mem_ + (buf->capacity_ * buf->elem_sz_)));
+    return ((char *)slot - ((char *)buf->mem_)) / buf->elem_sz_;
 }
 
 void
 ccc_buf_size_plus(ccc_buffer *const buf)
 {
-    ++buf->impl_.sz_;
+    ++buf->sz_;
 }
 
 void
 ccc_buf_size_minus(ccc_buffer *const buf)
 {
-    --buf->impl_.sz_;
+    --buf->sz_;
 }
 
 void
 ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
 {
-    buf->impl_.sz_ = n;
+    buf->sz_ = n;
 }
 
 /*======================  Static Helpers  ==================================*/
@@ -291,5 +285,5 @@ ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
 static inline void *
 at(ccc_buffer const *buf, size_t const i)
 {
-    return ((uint8_t *)buf->impl_.mem_ + (i * buf->impl_.elem_sz_));
+    return ((char *)buf->mem_ + (i * buf->elem_sz_));
 }

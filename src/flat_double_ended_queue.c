@@ -59,8 +59,8 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
     }
     if (!destructor)
     {
-        fq->impl_.buf_.impl_.sz_ = fq->impl_.front_ = 0;
-        ccc_buf_realloc(&fq->impl_.buf_, 0, fq->impl_.buf_.impl_.alloc_);
+        fq->impl_.buf_.sz_ = fq->impl_.front_ = 0;
+        ccc_buf_realloc(&fq->impl_.buf_, 0, fq->impl_.buf_.alloc_);
         return;
     }
     size_t const cap = ccc_buf_capacity(&fq->impl_.buf_);
@@ -70,7 +70,7 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
     {
         destructor(ccc_buf_at(&fq->impl_.buf_, i));
     }
-    ccc_buf_realloc(&fq->impl_.buf_, 0, fq->impl_.buf_.impl_.alloc_);
+    ccc_buf_realloc(&fq->impl_.buf_, 0, fq->impl_.buf_.alloc_);
 }
 
 static void *
@@ -251,15 +251,14 @@ maybe_resize(struct ccc_fdeq_ *const q)
     {
         return CCC_OK;
     }
-    if (!q->buf_.impl_.alloc_)
+    if (!q->buf_.alloc_)
     {
         return CCC_NO_REALLOC;
     }
     size_t const new_cap = ccc_buf_capacity(&q->buf_)
                                ? (ccc_buf_capacity(&q->buf_) * 2)
                                : start_capacity;
-    void *new_mem
-        = q->buf_.impl_.alloc_(NULL, ccc_buf_elem_size(&q->buf_) * new_cap);
+    void *new_mem = q->buf_.alloc_(NULL, ccc_buf_elem_size(&q->buf_) * new_cap);
     if (!new_mem)
     {
         return CCC_MEM_ERR;
@@ -273,10 +272,10 @@ maybe_resize(struct ccc_fdeq_ *const q)
                ccc_buf_base(&q->buf_),
                bytes(q, ccc_buf_size(&q->buf_) - first_chunk));
     }
-    (void)ccc_buf_realloc(&q->buf_, 0, q->buf_.impl_.alloc_);
-    q->buf_.impl_.mem_ = new_mem;
+    (void)ccc_buf_realloc(&q->buf_, 0, q->buf_.alloc_);
+    q->buf_.mem_ = new_mem;
     q->front_ = 0;
-    q->buf_.impl_.capacity_ = new_cap;
+    q->buf_.capacity_ = new_cap;
     return CCC_OK;
 }
 

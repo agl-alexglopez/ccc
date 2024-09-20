@@ -7,7 +7,6 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 static double const load_factor = 0.8;
@@ -18,7 +17,7 @@ static size_t const num_swap_slots = 2;
 static void erase(struct ccc_fhm_ *, void *);
 
 static bool is_prime(size_t);
-static void swap(uint8_t tmp[], void *, void *, size_t);
+static void swap(char tmp[], void *, void *, size_t);
 static void *struct_base(struct ccc_fhm_ const *, struct ccc_fhm_elem_ const *);
 static struct ccc_entry_ entry(struct ccc_fhm_ *, void const *key,
                                uint64_t hash);
@@ -313,7 +312,7 @@ ccc_fhm_end([[maybe_unused]] ccc_flat_hash_map const *const h)
 static struct ccc_entry_
 entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
 {
-    uint8_t upcoming_insertion_error = 0;
+    char upcoming_insertion_error = 0;
     if (ccc_impl_fhm_maybe_resize(h) != CCC_OK)
     {
         upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
@@ -431,19 +430,19 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
     {
         return CCC_OK;
     }
-    if (!h->buf_.impl_.alloc_)
+    if (!h->buf_.alloc_)
     {
         return CCC_NO_REALLOC;
     }
     struct ccc_fhm_ new_hash = *h;
-    new_hash.buf_.impl_.sz_ = 0;
-    new_hash.buf_.impl_.capacity_
-        = new_hash.buf_.impl_.capacity_
+    new_hash.buf_.sz_ = 0;
+    new_hash.buf_.capacity_
+        = new_hash.buf_.capacity_
               ? ccc_fhm_next_prime(ccc_buf_size(&h->buf_) * 2)
               : default_prime;
-    new_hash.buf_.impl_.mem_ = new_hash.buf_.impl_.alloc_(
-        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.impl_.capacity_);
-    if (!new_hash.buf_.impl_.mem_)
+    new_hash.buf_.mem_ = new_hash.buf_.alloc_(
+        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_);
+    if (!new_hash.buf_.mem_)
     {
         return CCC_MEM_ERR;
     }
@@ -465,7 +464,7 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
                                 ccc_buf_index_of(&new_hash.buf_, new_ent.e_));
         }
     }
-    (void)ccc_buf_realloc(&h->buf_, 0, h->buf_.impl_.alloc_);
+    (void)ccc_buf_realloc(&h->buf_, 0, h->buf_.alloc_);
     *h = new_hash;
     return CCC_OK;
 }
@@ -500,7 +499,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (!fn)
     {
-        h->buf_.impl_.sz_ = 0;
+        h->buf_.sz_ = 0;
         return;
     }
     for (void *slot = ccc_buf_begin(&h->buf_);
@@ -519,8 +518,8 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (!fn)
     {
-        h->buf_.impl_.sz_ = 0;
-        return ccc_buf_free(&h->buf_, h->buf_.impl_.alloc_);
+        h->buf_.sz_ = 0;
+        return ccc_buf_free(&h->buf_, h->buf_.alloc_);
     }
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
@@ -531,7 +530,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn(slot);
         }
     }
-    return ccc_buf_free(&h->buf_, h->buf_.impl_.alloc_);
+    return ccc_buf_free(&h->buf_, h->buf_.alloc_);
 }
 
 size_t
@@ -543,13 +542,13 @@ ccc_fhm_capacity(ccc_flat_hash_map const *const h)
 inline struct ccc_fhm_elem_ *
 ccc_impl_fhm_in_slot(struct ccc_fhm_ const *const h, void const *const slot)
 {
-    return (struct ccc_fhm_elem_ *)((uint8_t *)slot + h->hash_elem_offset_);
+    return (struct ccc_fhm_elem_ *)((char *)slot + h->hash_elem_offset_);
 }
 
 void *
 ccc_impl_fhm_key_in_slot(struct ccc_fhm_ const *h, void const *slot)
 {
-    return (uint8_t *)slot + h->key_offset_;
+    return (char *)slot + h->key_offset_;
 }
 
 inline size_t
@@ -616,11 +615,11 @@ to_index(size_t const capacity, uint64_t hash)
 static inline void *
 struct_base(struct ccc_fhm_ const *const h, struct ccc_fhm_elem_ const *const e)
 {
-    return ((uint8_t *)&e->hash_) - h->hash_elem_offset_;
+    return ((char *)&e->hash_) - h->hash_elem_offset_;
 }
 
 static inline void
-swap(uint8_t tmp[], void *const a, void *const b, size_t ab_size)
+swap(char tmp[], void *const a, void *const b, size_t ab_size)
 {
     if (a == b)
     {

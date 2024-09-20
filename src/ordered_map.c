@@ -5,7 +5,6 @@
 #include "types.h"
 
 #include <assert.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,7 +50,7 @@ static om_link const reverse_inorder_traversal = L;
 /* No return value. */
 
 static void init_node(struct ccc_tree_ *, struct ccc_node_ *);
-static void swap(uint8_t tmp[], void *, void *, size_t);
+static void swap(char tmp[], void *, void *, size_t);
 static void link_trees(struct ccc_node_ *, om_link, struct ccc_node_ *);
 static void ccc_tree_tree_print(struct ccc_tree_ const *t,
                                 struct ccc_node_ const *root,
@@ -235,7 +234,7 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
     if (found)
     {
         assert(s->impl_.root_ != &s->impl_.end_);
-        *out_handle = *(ccc_o_map_elem *)s->impl_.root_;
+        *out_handle = (ccc_o_map_elem){*s->impl_.root_};
         void *user_struct = struct_base(&s->impl_, &out_handle->impl_);
         void *ret = struct_base(&s->impl_, s->impl_.root_);
         swap(tmp, user_struct, ret, s->impl_.elem_sz_);
@@ -440,21 +439,21 @@ ccc_om_validate(ccc_ordered_map const *const s)
 void *
 ccc_impl_om_key_in_slot(struct ccc_tree_ const *const t, void const *const slot)
 {
-    return (uint8_t *)slot + t->key_offset_;
+    return (char *)slot + t->key_offset_;
 }
 
 void *
 ccc_impl_om_key_from_node(struct ccc_tree_ const *const t,
                           struct ccc_node_ const *const n)
 {
-    return (uint8_t *)struct_base(t, n) + t->key_offset_;
+    return (char *)struct_base(t, n) + t->key_offset_;
 }
 
 struct ccc_node_ *
 ccc_impl_om_elem_in_slot(struct ccc_tree_ const *t, void const *slot)
 {
 
-    return (struct ccc_node_ *)((uint8_t *)slot + t->node_elem_offset_);
+    return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
 }
 
 /*======================  Static Splay Tree Helpers  ========================*/
@@ -744,7 +743,7 @@ struct_base(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
     /* Link is the first field of the struct and is an array so no need to get
        pointer address of [0] element of array. That's the same as just the
        array field. */
-    return ((uint8_t *)n->branch_) - t->node_elem_offset_;
+    return ((char *)n->branch_) - t->node_elem_offset_;
 }
 
 static inline ccc_threeway_cmp
@@ -759,7 +758,7 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
 }
 
 static inline void
-swap(uint8_t tmp[], void *const a, void *const b, size_t elem_sz)
+swap(char tmp[], void *const a, void *const b, size_t elem_sz)
 {
     if (a == b)
     {

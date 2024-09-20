@@ -17,10 +17,8 @@ struct ccc_buf_
 
 #define ccc_impl_buf_init(mem, type, capacity, alloc_fn)                       \
     {                                                                          \
-        {                                                                      \
-            .mem_ = (mem), .elem_sz_ = sizeof(type), .sz_ = 0,                 \
-            .capacity_ = (capacity), .alloc_ = (alloc_fn),                     \
-        }                                                                      \
+        .mem_ = (mem), .elem_sz_ = sizeof(type), .sz_ = 0,                     \
+        .capacity_ = (capacity), .alloc_ = (alloc_fn),                         \
     }
 
 #define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \

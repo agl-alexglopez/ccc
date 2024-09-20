@@ -14,10 +14,7 @@
    time for static/global data, or runtime for dynamic data so initialization
    via construction of const fields is always possible. There is no reason to
    access the fields directly or modify them. */
-typedef union
-{
-    struct ccc_fpq_ impl_;
-} ccc_flat_priority_queue;
+typedef struct ccc_fpq_ ccc_flat_priority_queue;
 
 #define ccc_fpq_init(mem_ptr, capacity, type_name, cmp_order, alloc_fn,        \
                      cmp_fn, aux_data)                                         \

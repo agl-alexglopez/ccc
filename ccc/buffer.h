@@ -6,15 +6,11 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
-typedef union
-{
-    struct ccc_buf_ impl_;
-} ccc_buffer;
+typedef struct ccc_buf_ ccc_buffer;
 
 #define ccc_buf_init(mem, type, capacity, alloc_fn)                            \
-    (ccc_buffer) ccc_impl_buf_init(mem, type, capacity, alloc_fn)
+    ccc_impl_buf_init(mem, type, capacity, alloc_fn)
 
 ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);
@@ -38,7 +34,7 @@ void *ccc_buf_push_back(ccc_buffer *, void const *);
 ccc_result ccc_buf_pop_back(ccc_buffer *);
 ccc_result ccc_buf_pop_back_n(ccc_buffer *, size_t n);
 void *ccc_buf_copy(ccc_buffer *, size_t dst, size_t src);
-ccc_result ccc_buf_swap(ccc_buffer *, uint8_t tmp[], size_t i, size_t j);
+ccc_result ccc_buf_swap(ccc_buffer *, char tmp[], size_t i, size_t j);
 
 ccc_result ccc_buf_write(ccc_buffer *, size_t i, void const *data);
 ccc_result ccc_buf_erase(ccc_buffer *, size_t i);
