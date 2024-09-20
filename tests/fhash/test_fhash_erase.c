@@ -85,7 +85,7 @@ BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
         CHECK(fhm_validate(&h), true);
     }
     CHECK(size(&h), 0);
-    END_TEST(fhm_clear_and_free(&h, NULL));
+    END_TEST(fhm_clear_and_free(&h, NULL););
 }
 
 int

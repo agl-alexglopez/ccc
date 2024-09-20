@@ -108,7 +108,7 @@ BEGIN_STATIC_TEST(map_test_insert_macros)
     CHECK(ccc_om_validate(&s), true);
     CHECK(ins->id, 100);
     CHECK(size(&s), 4);
-    END_TEST(ccc_om_clear_and_free(&s, NULL));
+    END_TEST(ccc_om_clear_and_free(&s, NULL););
 }
 
 BEGIN_STATIC_TEST(map_test_struct_getter)

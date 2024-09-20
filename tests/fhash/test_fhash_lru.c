@@ -49,7 +49,8 @@ struct lru_request
     enum lru_call call;
     int key;
     int val;
-    union {
+    union
+    {
         enum test_result (*putter)(struct lru_cache *, int, int);
         int (*getter)(struct lru_cache *, int);
         struct key_val *(*header)(struct lru_cache *);
@@ -186,7 +187,7 @@ BEGIN_STATIC_TEST(run_lru_cache)
             break;
         }
     }
-    END_TEST(lru_clear(&lru));
+    END_TEST(lru_clear(&lru););
 }
 
 int

@@ -137,7 +137,13 @@ to prevent memory leaks. See the end test macro for more. If the test end
 macro will not have access to some memory or operation in the scope of the
 current check one may provide an additional function call they wish to have
 executed on failure. This should only be used in special cases where such a
-function is unusable by the end test macro due to scoping. */
+function is unusable by the end test macro due to scoping. Even then, consider
+tracking allocations in an array of some sort to be cleaned up upon failure
+or success in the end test macro. Function calls should be a semicolon
+seperated list of calls with their appropriate args. If more complex code
+needs to be written in the cleanup case a code block can be surrounded by
+{...any code goes here...} braces for the formatting assistance braces provide,
+though the braces are not required. */
 #define CHECK(test_result, test_expected, ...)                                 \
     do                                                                         \
     {                                                                          \
@@ -147,7 +153,7 @@ function is unusable by the end test macro due to scoping. */
         {                                                                      \
             TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
             macro_test_res_ = FAIL;                                            \
-            __VA_OPT__((void)__VA_ARGS__;)                                     \
+            __VA_OPT__((void)({__VA_ARGS__}););                                \
             goto use_at_least_one_check_and_finish_with_END_TEST_call_;        \
         }                                                                      \
     } while (0)
@@ -162,10 +168,14 @@ The call provided will be transposed directly as is. This also means that any
 arguments provided to the cleanup function must be in the same scope as the
 end test macro. Nested allocations within loops or if checks cannot be cleaned
 up by this macro. Simpler tests and allocation strategies are therefore
-recommended. */
+recommended. Function calls  should be a semicolon seperated list of calls
+with their appropriate args. If more complex code needs to be written in the
+cleanup case a code block can be surrounded by {...any code goes here...}
+braces for the formatting assistance this provided, though the braces are not
+required. */
 #define END_TEST(...)                                                          \
 use_at_least_one_check_and_finish_with_END_TEST_call_:                         \
-    __VA_OPT__((void)__VA_ARGS__;)                                             \
+    __VA_OPT__((void)({__VA_ARGS__});)                                         \
     return macro_test_res_;                                                    \
     }                                                                          \
     while (0)

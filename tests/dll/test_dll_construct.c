@@ -6,6 +6,8 @@
 #include "test.h"
 #include "traits.h"
 
+#include <stddef.h>
+
 BEGIN_STATIC_TEST(dll_test_construct)
 {
     struct val val = {};

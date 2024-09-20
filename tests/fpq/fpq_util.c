@@ -92,5 +92,5 @@ BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_flat_priority_queue *fpq)
         CHECK(vals[i++], v->val);
         ccc_fpq_pop(&fpq_copy);
     };
-    END_TEST(free(copy_buf));
+    END_TEST(free(copy_buf););
 }

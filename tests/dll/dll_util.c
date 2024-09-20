@@ -1,4 +1,5 @@
 #include "dll_util.h"
+#include "types.h"
 
 ccc_threeway_cmp
 val_cmp(ccc_cmp const *const c)

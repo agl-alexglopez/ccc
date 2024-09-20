@@ -71,7 +71,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_macros)
     CHECK(ccc_fhm_validate(&fh), true);
     CHECK(ins->val, 100);
     CHECK(size(&fh), 4);
-    END_TEST(ccc_fhm_clear_and_free(&fh, NULL));
+    END_TEST(ccc_fhm_clear_and_free(&fh, NULL););
 }
 
 BEGIN_STATIC_TEST(fhash_test_insert_overwrite)

@@ -783,7 +783,8 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
             (struct prev_vertex){.prev = NULL, .dist_point = p});
         if (insert_error(inserted) || occupied(inserted))
         {
-            quit("duplicate vertex during graph prep or insert failed.\n", 1);
+            quit_and("duplicate vertex during graph prep or insert failed.\n",
+                     1, free(p););
             return;
         }
         push(dist_q, &p->pq_elem);

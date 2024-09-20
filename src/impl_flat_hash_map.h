@@ -176,7 +176,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         __auto_type fhm_key_ = key;                                            \
         struct ccc_fhm_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);             \
         struct ccc_fhm_entry_ fhm_try_ins_ent_                                 \
-            = ccc_impl_fhm_entry(flat_hash_map_ptr_, &fhm_key_);               \
+            = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);       \
         struct ccc_entry_ fhm_try_insert_res_ = {};                            \
         if ((fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)              \
             || (fhm_try_ins_ent_.entry_.stats_ & ~CCC_ENTRY_VACANT))           \
@@ -201,7 +201,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         __auto_type fhm_key_ = key;                                            \
         struct ccc_fhm_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);             \
         struct ccc_fhm_entry_ fhm_ins_or_assign_ent_                           \
-            = ccc_impl_fhm_entry(flat_hash_map_ptr_, &fhm_key_);               \
+            = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);       \
         struct ccc_entry_ fhm_ins_or_assign_res_ = {};                         \
         if (fhm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)         \
         {                                                                      \
