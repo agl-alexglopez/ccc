@@ -16,7 +16,7 @@
                 "CMAKE_C_STANDARD": "23",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/debug/bin",
-                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wvla -Wfloat-equal -fno-strict-aliasing -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
@@ -29,7 +29,7 @@
                 "CMAKE_C_STANDARD": "23",
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin",
-                "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -fno-strict-aliasing -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {

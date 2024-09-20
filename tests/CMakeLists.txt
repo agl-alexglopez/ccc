@@ -203,6 +203,32 @@ add_fhash_test(test_fhash_insert)
 add_fhash_test(test_fhash_erase)
 add_fhash_test(test_fhash_lru)
 
+#############  Doubly Linked List ##########################
+
+add_library(dll_util dll/dll_util.h dll/dll_util.c)
+target_link_libraries(dll_util
+  doubly_linked_list
+)
+
+macro(add_dll_test TEST_NAME)
+  add_executable(${TEST_NAME} dll/${TEST_NAME}.c)
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      doubly_linked_list
+      test
+      dll_util
+      traits
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_dll_test(test_dll_construct)
+add_dll_test(test_dll_insert)
+
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
 target_link_libraries(perf 

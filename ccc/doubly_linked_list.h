@@ -4,9 +4,14 @@
 #include "impl_doubly_linked_list.h"
 #include "types.h"
 
-typedef struct
+struct ccc_dll_elem_
 {
-    struct ccc_dll_elem_ impl_;
+    struct ccc_dll_el_ impl_;
+};
+
+typedef union {
+    struct ccc_dll_el_ impl_;
+    struct ccc_dll_elem_ _;
 } ccc_dll_elem;
 
 typedef struct
@@ -14,10 +19,10 @@ typedef struct
     struct ccc_dll_ impl_;
 } ccc_doubly_linked_list;
 
-#define ccc_dll_init(list_ptr, list_name, struct_name, list_elem_field,        \
-                     alloc_fn, cmp_fn, aux_data)                               \
-    ccc_impl_dll_init(list_ptr, list_name, struct_name, list_elem_field,       \
-                      alloc_fn, cmp_fn, aux_data)
+#define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
+                     cmp_fn, aux_data)                                         \
+    ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
+                      cmp_fn, aux_data)
 
 #define ccc_dll_emplace_back(list_ptr, struct_initializer...)                  \
     ccc_impl_dll_emplace_back(list_ptr, struct_initializer)
@@ -59,5 +64,34 @@ bool ccc_dll_empty(ccc_doubly_linked_list const *);
 void ccc_dll_clear_and_free(ccc_doubly_linked_list *, ccc_destructor_fn *);
 
 bool ccc_dll_validate(ccc_doubly_linked_list const *);
+
+#ifdef DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
+
+typedef ccc_dll_elem dll_elem;
+typedef ccc_doubly_linked_list doubly_linked_list;
+#    define dll_init(args...) ccc_dll_init(args)
+#    define dll_emplace_back(args...) ccc_dll_emplace_back(args)
+#    define dll_emplace_front(args...) ccc_dll_emplace_front(args)
+#    define dll_push_front(args...) ccc_dll_push_front(args)
+#    define dll_push_back(args...) ccc_dll_push_back(args)
+#    define dll_front(args...) ccc_dll_front(args)
+#    define dll_back(args...) ccc_dll_back(args)
+#    define dll_pop_front(args...) ccc_dll_pop_front(args)
+#    define dll_pop_back(args...) ccc_dll_pop_back(args)
+#    define dll_splice(args...) ccc_dll_splice(args)
+#    define dll_splice_range(args...) ccc_dll_splice_range(args)
+#    define dll_begin(args...) ccc_dll_begin(args)
+#    define dll_next(args...) ccc_dll_next(args)
+#    define dll_rbegin(args...) ccc_dll_rbegin(args)
+#    define dll_rnext(args...) ccc_dll_rnext(args)
+#    define dll_end(args...) ccc_dll_end(args)
+#    define dll_rend(args...) ccc_dll_rend(args)
+#    define dll_head(args...) ccc_dll_head(args)
+#    define dll_tail(args...) ccc_dll_tail(args)
+#    define dll_size(args...) ccc_dll_size(args)
+#    define dll_empty(args...) ccc_dll_empty(args)
+#    define dll_clear_and_free(args...) ccc_dll_clear_and_free(args)
+#    define dll_validate(args...) ccc_dll_validate(args)
+#endif /* DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC */
 
 #endif /* CCC_LIST_H */

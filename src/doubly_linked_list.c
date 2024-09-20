@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 
-static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
+static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_el_ const *);
 
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
@@ -70,7 +70,7 @@ ccc_dll_pop_front(ccc_doubly_linked_list *l)
     {
         return;
     }
-    struct ccc_dll_elem_ *remove = l->impl_.sentinel_.n_;
+    struct ccc_dll_el_ *remove = l->impl_.sentinel_.n_;
     remove->n_->p_ = &l->impl_.sentinel_;
     l->impl_.sentinel_.n_ = remove->n_;
     if (l->impl_.alloc_)
@@ -87,7 +87,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
     {
         return;
     }
-    struct ccc_dll_elem_ *remove = l->impl_.sentinel_.p_;
+    struct ccc_dll_el_ *remove = l->impl_.sentinel_.p_;
     remove->p_->n_ = &l->impl_.sentinel_;
     l->impl_.sentinel_.p_ = remove->p_;
     if (l->impl_.alloc_)
@@ -98,7 +98,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
 }
 
 void
-ccc_impl_dll_push_back(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
+ccc_impl_dll_push_back(struct ccc_dll_ *const l, struct ccc_dll_el_ *const e)
 {
     e->n_ = &l->sentinel_;
     e->p_ = l->sentinel_.p_;
@@ -108,7 +108,7 @@ ccc_impl_dll_push_back(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
 }
 
 void
-ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
+ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_el_ *const e)
 {
     e->p_ = &l->sentinel_;
     e->n_ = l->sentinel_.n_;
@@ -261,7 +261,7 @@ bool
 ccc_dll_validate(ccc_doubly_linked_list const *const l)
 {
     size_t size = 0;
-    for (struct ccc_dll_elem_ *e = l->impl_.sentinel_.n_;
+    for (struct ccc_dll_el_ *e = l->impl_.sentinel_.n_;
          e != &l->impl_.sentinel_; e = e->n_, ++size)
     {
         if (!e || !e->n_ || !e->p_)
@@ -276,15 +276,14 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     return size == l->impl_.sz_;
 }
 
-struct ccc_dll_elem_ *
-ccc_dll_elem__in(struct ccc_dll_ const *const l, void const *const user_struct)
+struct ccc_dll_el_ *
+ccc_dll_el__in(struct ccc_dll_ const *const l, void const *const user_struct)
 {
-    return (struct ccc_dll_elem_ *)((uint8_t *)user_struct
-                                    + l->dll_elem_offset_);
+    return (struct ccc_dll_el_ *)((char *)user_struct + l->dll_elem_offset_);
 }
 
 static inline void *
-struct_base(struct ccc_dll_ const *const l, struct ccc_dll_elem_ const *const e)
+struct_base(struct ccc_dll_ const *const l, struct ccc_dll_el_ const *const e)
 {
-    return ((uint8_t *)&e->n_) - l->dll_elem_offset_;
+    return ((char *)&e->n_) - l->dll_elem_offset_;
 }

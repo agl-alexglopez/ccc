@@ -139,8 +139,8 @@ BEGIN_STATIC_TEST(run_lru_cache)
 {
     struct lru_cache lru = {
         .cap = 3,
-        .l = ccc_dll_init(&lru.l, lru.l, struct key_val, list_elem, realloc,
-                          cmp_by_key, NULL),
+        .l = ccc_dll_init(lru.l, struct key_val, list_elem, realloc, cmp_by_key,
+                          NULL),
     };
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
     fhm_init(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,

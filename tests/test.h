@@ -148,7 +148,7 @@ function is unusable by the end test macro due to scoping. */
             TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
             macro_test_res_ = FAIL;                                            \
             __VA_OPT__((void)__VA_ARGS__;)                                     \
-            goto please_call_the_END_TEST_macro_at_the_end_of_this_test_;      \
+            goto use_at_least_one_check_and_finish_with_END_TEST_call_;        \
         }                                                                      \
     } while (0)
 
@@ -164,7 +164,7 @@ end test macro. Nested allocations within loops or if checks cannot be cleaned
 up by this macro. Simpler tests and allocation strategies are therefore
 recommended. */
 #define END_TEST(...)                                                          \
-please_call_the_END_TEST_macro_at_the_end_of_this_test_:                       \
+use_at_least_one_check_and_finish_with_END_TEST_call_:                         \
     __VA_OPT__((void)__VA_ARGS__;)                                             \
     return macro_test_res_;                                                    \
     }                                                                          \
