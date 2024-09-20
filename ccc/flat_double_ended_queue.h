@@ -4,10 +4,7 @@
 #include "impl_flat_double_ended_queue.h"
 #include "types.h"
 
-typedef union
-{
-    struct ccc_fdeq_ impl_;
-} ccc_flat_double_ended_queue;
+typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 
 #define ccc_fdeq_init(mem_ptr, capacity, type_name, alloc_fn)                  \
     (ccc_flat_double_ended_queue)                                              \

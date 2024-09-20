@@ -22,15 +22,13 @@ void *ccc_impl_fdeq_alloc(struct ccc_fdeq_ *, enum ccc_impl_fdeq_alloc_slot);
 
 #define ccc_impl_fdeq_init(mem_ptr, capacity, type_name, alloc_fn)             \
     {                                                                          \
-        .impl_ = {                                                             \
-            .buf_ = ccc_buf_init(mem_ptr, type_name, capacity, alloc_fn),      \
-            .front_ = 0,                                                       \
-        },                                                                     \
+        .buf_ = ccc_buf_init(mem_ptr, type_name, capacity, alloc_fn),          \
+        .front_ = 0,                                                           \
     }
 
 #define ccc_impl_fdeq_emplace(fq_ptr, value...)                                \
     ({                                                                         \
-        void *fdeq_emplace_ret_ = ccc_impl_fdeq_alloc(&(fq_ptr)->impl_);       \
+        void *const fdeq_emplace_ret_ = ccc_impl_fdeq_alloc((fq_ptr));         \
         if (fdeq_emplace_ret_)                                                 \
         {                                                                      \
             *((typeof(value) *)fdeq_emplace_ret_) = value;                     \
