@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -31,7 +34,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_three)
     {
         three_vals[i].val = (int)i;
         ccc_fpq_push(&fpq, &three_vals[i]);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), size);
@@ -57,7 +60,7 @@ BEGIN_STATIC_TEST(fpq_test_struct_getter)
         struct val const *res2 = ccc_fpq_emplace(
             &fpq_clone, (struct val){.id = (int)i, .val = (int)i});
         CHECK(res2 != NULL, true);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
            to uncorrupted data. */
@@ -78,7 +81,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_three_dups)
     {
         three_vals[i].val = 0;
         ccc_fpq_push(&fpq, &three_vals[i]);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), (size_t)i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)3);
@@ -123,7 +126,7 @@ BEGIN_STATIC_TEST(fpq_test_read_max_min)
     {
         vals[i].val = (int)i;
         (void)ccc_fpq_push(&fpq, &vals[i]);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)10);

@@ -49,7 +49,7 @@ BEGIN_STATIC_TEST(rtom_test_forward_iter)
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[33];
@@ -78,7 +78,7 @@ BEGIN_STATIC_TEST(rtom_test_iterate_removal)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
     int const limit = 400;
@@ -88,7 +88,7 @@ BEGIN_STATIC_TEST(rtom_test_iterate_removal)
         if (i->val > limit)
         {
             (void)remove(&s, &i->elem);
-            CHECK(ccc_rom_validate(&s), true);
+            CHECK(validate(&s), true);
         }
     }
     END_TEST();
@@ -109,7 +109,7 @@ BEGIN_STATIC_TEST(rtom_test_iterate_remove_reinsert)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
     size_t const old_size = size(&s);
@@ -123,7 +123,7 @@ BEGIN_STATIC_TEST(rtom_test_iterate_remove_reinsert)
             (void)remove(&s, &i->elem);
             i->val = new_unique_entry_val;
             CHECK(insert_entry(entry_vr(&s, &i->val), &i->elem) != NULL, true);
-            CHECK(ccc_rom_validate(&s), true);
+            CHECK(validate(&s), true);
             ++new_unique_entry_val;
         }
     }
@@ -144,7 +144,7 @@ BEGIN_STATIC_TEST(rtom_test_valid_range)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
@@ -196,7 +196,7 @@ BEGIN_STATIC_TEST(rtom_test_valid_range_equals)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     /* This should be the following range [5,50). 5 should stay at the start,
        and 45 is equal to our end key so is bumped to next greater, 50. */
@@ -246,7 +246,7 @@ BEGIN_STATIC_TEST(rtom_test_invalid_range)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
@@ -297,7 +297,7 @@ BEGIN_STATIC_TEST(rtom_test_empty_range)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,

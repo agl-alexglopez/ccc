@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -25,14 +28,14 @@ BEGIN_STATIC_TEST(fpq_test_insert_iterate_pop)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         CHECK(ccc_fpq_push(&fpq, &vals[i]) != NULL, true);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
     }
     size_t pop_count = 0;
     while (!ccc_fpq_empty(&fpq))
     {
         ccc_fpq_pop(&fpq);
         ++pop_count;
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
     }
     CHECK(pop_count, num_nodes);
     END_TEST();
@@ -57,7 +60,7 @@ BEGIN_STATIC_TEST(fpq_test_priority_removal)
                       .id = (int)i,
                   });
         CHECK(res != NULL, true);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
     }
     int const limit = 400;
     for (size_t seen = 0, remaining = num_nodes; seen < remaining; ++seen)
@@ -66,7 +69,7 @@ BEGIN_STATIC_TEST(fpq_test_priority_removal)
         if (cur->val > limit)
         {
             (void)ccc_fpq_erase(&fpq, cur);
-            CHECK(ccc_fpq_validate(&fpq), true);
+            CHECK(validate(&fpq), true);
             --remaining;
         }
     }
@@ -92,7 +95,7 @@ BEGIN_STATIC_TEST(fpq_test_priority_update)
                       .id = (int)i,
                   });
         CHECK(res != NULL, true);
-        CHECK(ccc_fpq_validate(&fpq), true);
+        CHECK(validate(&fpq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -102,7 +105,7 @@ BEGIN_STATIC_TEST(fpq_test_priority_update)
         if (cur->val > limit)
         {
             CHECK(ccc_fpq_update(&fpq, cur, val_update, &backoff), true);
-            CHECK(ccc_fpq_validate(&fpq), true);
+            CHECK(validate(&fpq), true);
         }
     }
     CHECK(ccc_fpq_size(&fpq), num_nodes);

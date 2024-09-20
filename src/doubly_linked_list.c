@@ -7,9 +7,9 @@
 #include <string.h>
 
 static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
-static size_t run_len(struct ccc_dll_ const *,
-                      struct ccc_dll_elem_ const *begin,
-                      struct ccc_dll_elem_ const *end);
+static inline size_t erase_range([[maybe_unused]] struct ccc_dll_ const *l,
+                                 struct ccc_dll_elem_ const *begin,
+                                 struct ccc_dll_elem_ const *end);
 
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
@@ -171,10 +171,10 @@ ccc_dll_erase(ccc_doubly_linked_list *const l,
 void
 ccc_dll_erase_range(ccc_doubly_linked_list *const l,
                     ccc_dll_elem *const struct_handle_in_list_begin,
-                    ccc_dll_elem *const struct_handle_in_list_end)
+                    ccc_dll_elem *struct_handle_in_list_end)
 {
     if (!struct_handle_in_list_begin->n_ || !struct_handle_in_list_begin->p_
-        || struct_handle_in_list_end->n_ || struct_handle_in_list_end->p_
+        || !struct_handle_in_list_end->n_ || !struct_handle_in_list_end->p_
         || !l->sz_)
     {
         return;
@@ -184,15 +184,15 @@ ccc_dll_erase_range(ccc_doubly_linked_list *const l,
         ccc_dll_erase(l, struct_handle_in_list_begin);
         return;
     }
-    size_t const deleted
-        = run_len(l, struct_handle_in_list_begin, struct_handle_in_list_end);
+    struct_handle_in_list_end = struct_handle_in_list_end->p_;
+    size_t const deleted = erase_range(l, struct_handle_in_list_begin,
+                                       struct_handle_in_list_end);
 
-    struct_handle_in_list_begin->n_->p_ = struct_handle_in_list_begin->p_;
-    struct_handle_in_list_begin->p_->n_ = struct_handle_in_list_begin->n_;
+    struct_handle_in_list_end->n_->p_ = struct_handle_in_list_begin->p_;
+    struct_handle_in_list_begin->p_->n_ = struct_handle_in_list_end->n_;
 
-    struct_handle_in_list_end->n_->p_ = struct_handle_in_list_end->p_;
-    struct_handle_in_list_end->p_->n_ = struct_handle_in_list_end->n_;
-
+    struct_handle_in_list_begin->n_ = struct_handle_in_list_begin->p_ = NULL;
+    struct_handle_in_list_end->n_ = struct_handle_in_list_end->p_ = NULL;
     assert(deleted <= l->sz_);
     l->sz_ -= deleted;
 }
@@ -340,13 +340,20 @@ ccc_dll_elem_in(struct ccc_dll_ const *const l, void const *const user_struct)
 }
 
 static inline size_t
-run_len([[maybe_unused]] struct ccc_dll_ const *const l,
-        struct ccc_dll_elem_ const *begin,
-        struct ccc_dll_elem_ const *const end)
+erase_range([[maybe_unused]] struct ccc_dll_ const *const l,
+            struct ccc_dll_elem_ const *begin,
+            struct ccc_dll_elem_ const *const end)
 {
-    size_t sz = 1;
-    for (; begin != end; begin = begin->n_, ++sz)
+    size_t sz = 2;
+    if (begin->n_ == end)
     {
+        return sz;
+    }
+    for (struct ccc_dll_elem_ *i = begin->n_, *next = i; i != end;
+         i = next, ++sz)
+    {
+        next = i->n_;
+        i->n_ = i->p_ = NULL;
         assert(sz <= l->sz_);
     }
     return sz;

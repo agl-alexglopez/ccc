@@ -38,7 +38,7 @@ BEGIN_TEST(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
         vals[shuffled_index].id = (int)i;
         (void)ccc_rom_insert(m, &vals[shuffled_index].elem,
                              &(struct val){}.elem);
-        CHECK(ccc_rom_validate(m), true);
+        CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_rom_size(m), size);

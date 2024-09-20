@@ -34,7 +34,7 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
         {
             repeats[i] = true;
         }
-        CHECK(ccc_om_validate(&s), true);
+        CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
@@ -45,7 +45,7 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
         CHECK(occupied(remove_entry_vr(entry_vr(&s, &vals[i].val)))
                   || repeats[i],
               true);
-        CHECK(ccc_om_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     END_TEST();
 }
@@ -70,7 +70,7 @@ BEGIN_STATIC_TEST(map_test_insert_erase_shuffled)
         struct val *v = unwrap(remove_vr(&s, &vals[i].elem));
         CHECK(v != NULL, true);
         CHECK(v->val, vals[i].val);
-        CHECK(ccc_om_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     CHECK(empty(&s), true);
     END_TEST();
@@ -90,13 +90,13 @@ BEGIN_STATIC_TEST(map_test_weak_srand)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         (void)insert(&s, &vals[i].elem, &(struct val){});
-        CHECK(ccc_om_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CHECK(contains(&s, &vals[i].val), true);
         (void)remove(&s, &vals[i].elem);
-        CHECK(ccc_om_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     CHECK(empty(&s), true);
     END_TEST();

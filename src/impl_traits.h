@@ -475,4 +475,23 @@
         ccc_doubly_linked_list const *: ccc_dll_empty,                         \
         ccc_realtime_ordered_map const *: ccc_rom_empty)((container_ptr))
 
+#define ccc_impl_validate(container_ptr)                                       \
+    _Generic((container_ptr),                                                  \
+        ccc_flat_hash_map *: ccc_fhm_validate,                                 \
+        ccc_ordered_map *: ccc_om_validate,                                    \
+        ccc_flat_priority_queue *: ccc_fpq_validate,                           \
+        ccc_double_ended_priority_queue *: ccc_depq_validate,                  \
+        ccc_priority_queue *: ccc_pq_validate,                                 \
+        ccc_singly_linked_list *: ccc_sll_validate,                            \
+        ccc_doubly_linked_list *: ccc_dll_validate,                            \
+        ccc_realtime_ordered_map *: ccc_rom_validate,                          \
+        ccc_flat_hash_map const *: ccc_fhm_validate,                           \
+        ccc_ordered_map const *: ccc_om_validate,                              \
+        ccc_flat_priority_queue const *: ccc_fpq_validate,                     \
+        ccc_double_ended_priority_queue const *: ccc_depq_validate,            \
+        ccc_priority_queue const *: ccc_pq_validate,                           \
+        ccc_singly_linked_list const *: ccc_sll_validate,                      \
+        ccc_doubly_linked_list const *: ccc_dll_validate,                      \
+        ccc_realtime_ordered_map const *: ccc_rom_validate)((container_ptr))
+
 #endif /* CCC_IMPL_TRAITS_H */

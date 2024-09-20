@@ -43,7 +43,7 @@ BEGIN_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
     {
         vals[shuffled_index].val = (int)shuffled_index;
         push(pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_validate(pq), true);
+        CHECK(validate(pq), true);
         CHECK(size(pq), i + 1);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }

@@ -228,6 +228,7 @@ endmacro()
 
 add_dll_test(test_dll_construct)
 add_dll_test(test_dll_insert)
+add_dll_test(test_dll_erase)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)

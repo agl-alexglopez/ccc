@@ -38,37 +38,37 @@ BEGIN_STATIC_TEST(fhash_test_insert_macros)
     struct val const *ins = ccc_fhm_or_insert_w(
         entry_vr(&fh, &(int){2}), (struct val){.id = 2, .val = 0});
     CHECK(ins != NULL, true);
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(size(&fh), 1);
     ins = fhm_insert_entry_w(entry_vr(&fh, &(int){2}),
                              (struct val){.id = 2, .val = 0});
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins != NULL, true);
     ins = fhm_insert_entry_w(entry_vr(&fh, &(int){9}),
                              (struct val){.id = 9, .val = 1});
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins != NULL, true);
     ins = ccc_entry_unwrap(
         fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 99}));
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins == NULL, false);
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins->val, 99);
     CHECK(size(&fh), 3);
     ins = ccc_entry_unwrap(
         fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 98}));
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
     CHECK(size(&fh), 3);
     ins = ccc_entry_unwrap(fhm_try_insert_w(&fh, 3, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins->val, 98);
     CHECK(size(&fh), 3);
     ins = ccc_entry_unwrap(fhm_try_insert_w(&fh, 4, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
-    CHECK(ccc_fhm_validate(&fh), true);
+    CHECK(validate(&fh), true);
     CHECK(ins->val, 100);
     CHECK(size(&fh), 4);
     END_TEST(ccc_fhm_clear_and_free(&fh, NULL););
@@ -397,7 +397,7 @@ BEGIN_STATIC_TEST(fhash_test_resize)
         CHECK(v != NULL, true);
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
-        CHECK(fhm_validate(&fh), true);
+        CHECK(validate(&fh), true);
     }
     CHECK(size(&fh), to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;

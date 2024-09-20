@@ -52,7 +52,7 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_unique_vals)
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[33];
@@ -88,7 +88,7 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_all_vals)
             vals[index].val = val; // NOLINT
             vals[index].id = index;
             ccc_depq_push(&pq, &vals[index].elem);
-            CHECK(ccc_depq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
     }
     int val_keys_inorder[33];
@@ -116,7 +116,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
     size_t pop_count = 0;
@@ -124,7 +124,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
     {
         ccc_depq_pop_max(&pq);
         ++pop_count;
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         if (pop_count % 200)
         {
             CHECK(iterator_check(&pq), PASS);
@@ -149,7 +149,7 @@ BEGIN_STATIC_TEST(depq_test_priority_removal)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
     int const limit = 400;
@@ -158,7 +158,7 @@ BEGIN_STATIC_TEST(depq_test_priority_removal)
         if (i->val > limit)
         {
             i = ccc_depq_erase(&pq, &i->elem);
-            CHECK(ccc_depq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
         else
         {
@@ -183,7 +183,7 @@ BEGIN_STATIC_TEST(depq_test_priority_update)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
     int const limit = 400;
@@ -193,7 +193,7 @@ BEGIN_STATIC_TEST(depq_test_priority_update)
         {
             struct val *next = next(&pq, &i->elem);
             CHECK(update(&pq, &i->elem, val_update, &(int){i->val / 2}), true);
-            CHECK(ccc_depq_validate(&pq), true);
+            CHECK(validate(&pq), true);
             i = next;
         }
         else
@@ -218,7 +218,7 @@ BEGIN_STATIC_TEST(depq_test_priority_valid_range)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
@@ -270,7 +270,7 @@ BEGIN_STATIC_TEST(depq_test_priority_valid_range_equals)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
@@ -322,7 +322,7 @@ BEGIN_STATIC_TEST(depq_test_priority_invalid_range)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
@@ -372,7 +372,7 @@ BEGIN_STATIC_TEST(depq_test_priority_empty_range)
         vals[i].val = val; // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,

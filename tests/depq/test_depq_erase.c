@@ -21,7 +21,7 @@ BEGIN_STATIC_TEST(depq_test_insert_remove_four_dups)
     {
         three_vals[i].val = 0;
         ccc_depq_push(&pq, &three_vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         size_t const size = i + 1;
         CHECK(size(&pq), size);
     }
@@ -30,7 +30,7 @@ BEGIN_STATIC_TEST(depq_test_insert_remove_four_dups)
     {
         three_vals[i].val = 0;
         ccc_depq_pop_max(&pq);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
     END_TEST();
@@ -58,7 +58,7 @@ BEGIN_STATIC_TEST(depq_test_insert_erase_shuffled)
     for (size_t i = 0; i < size; ++i)
     {
         (void)ccc_depq_erase(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
     END_TEST();
@@ -142,7 +142,7 @@ BEGIN_STATIC_TEST(depq_test_max_round_robin)
         }
         vals[i].id = i;
         ccc_depq_push(&depq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&depq), true);
+        CHECK(validate(&depq), true);
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
@@ -179,7 +179,7 @@ BEGIN_STATIC_TEST(depq_test_min_round_robin)
         }
         vals[i].id = i;
         ccc_depq_push(&depq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&depq), true);
+        CHECK(validate(&depq), true);
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
@@ -209,7 +209,7 @@ BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
         vals[i].val = shuffled_index;
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         size_t const s = i + 1;
         CHECK(size(&pq), s);
         /* Shuffle like this only on insertions to create more dups. */
@@ -221,7 +221,7 @@ BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
     for (int i = 0; i < size; ++i)
     {
         (void)ccc_depq_erase(&pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         --cur_size;
         CHECK(size(&pq), cur_size);
         /* Shuffle normally here so we only remove each elem once. */
@@ -246,7 +246,7 @@ BEGIN_STATIC_TEST(depq_test_prime_shuffle)
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
@@ -258,7 +258,7 @@ BEGIN_STATIC_TEST(depq_test_prime_shuffle)
     for (int i = 0; i < size; ++i)
     {
         CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
         --cur_size;
         CHECK(size(&pq), cur_size);
     }
@@ -279,12 +279,12 @@ BEGIN_STATIC_TEST(depq_test_weak_srand)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         ccc_depq_push(&pq, &vals[i].elem);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
-        CHECK(ccc_depq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(empty(&pq), true);
     END_TEST();

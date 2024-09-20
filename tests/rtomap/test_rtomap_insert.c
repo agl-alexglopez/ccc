@@ -34,7 +34,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_macros)
     CHECK(v != NULL, true);
     v = rom_insert_entry_w(entry_vr(&s, &(int){0}),
                            (struct val){.val = 0, .id = 99});
-    CHECK(ccc_rom_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(v == NULL, false);
     CHECK(v->id, 99);
     v = rom_insert_entry_w(entry_vr(&s, &(int){9}),
@@ -42,22 +42,22 @@ BEGIN_STATIC_TEST(rtomap_test_insert_macros)
     CHECK(v != NULL, true);
     CHECK(v->id, 100);
     v = unwrap(rom_insert_or_assign_w(&s, 1, (struct val){.id = 100}));
-    CHECK(ccc_rom_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(v != NULL, true);
     CHECK(v->id, 100);
     CHECK(size(&s), 3);
     v = unwrap(rom_insert_or_assign_w(&s, 1, (struct val){.id = 99}));
-    CHECK(ccc_rom_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(v != NULL, true);
     CHECK(v->id, 99);
     CHECK(size(&s), 3);
     v = unwrap(rom_try_insert_w(&s, 1, (struct val){.id = 2}));
-    CHECK(ccc_rom_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(v != NULL, true);
     CHECK(v->id, 99);
     CHECK(size(&s), 3);
     v = unwrap(rom_try_insert_w(&s, 2, (struct val){.id = 2}));
-    CHECK(ccc_rom_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(v != NULL, true);
     CHECK(v->id, 2);
     CHECK(size(&s), 4);
@@ -102,7 +102,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_weak_srand)
         vals[i].id = i;
         ccc_entry const e = insert(&s, &vals[i].elem, &(struct val){});
         CHECK(insert_error(&e), false);
-        CHECK(rom_validate(&s), true);
+        CHECK(validate(&s), true);
     }
     CHECK(size(&s), (size_t)num_nodes);
     END_TEST();

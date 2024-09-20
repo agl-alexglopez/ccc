@@ -169,14 +169,14 @@ BEGIN_STATIC_TEST(run_lru_cache)
                   PASS);
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(fhm_validate(&lru.fh), true);
-            CHECK(dll_validate(&lru.l), true);
+            CHECK(validate(&lru.fh), true);
+            CHECK(validate(&lru.l), true);
             break;
         case GET:
             QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
             CHECK(requests[i].getter(&lru, requests[i].key), requests[i].val);
-            CHECK(dll_validate(&lru.l), true);
+            CHECK(validate(&lru.l), true);
             break;
         case HED:
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,

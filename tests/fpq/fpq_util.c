@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "fpq_util.h"
 #include "flat_priority_queue.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stdio.h>
@@ -49,7 +52,7 @@ BEGIN_TEST(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
         vals[i].id = vals[i].val = (int)shuffled_index;
         ccc_fpq_push(pq, &vals[i]);
         CHECK(ccc_fpq_size(pq), i + 1);
-        CHECK(ccc_fpq_validate(pq), true);
+        CHECK(validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_fpq_size(pq), size);

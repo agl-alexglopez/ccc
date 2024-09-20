@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -24,14 +27,14 @@ BEGIN_STATIC_TEST(pq_test_insert_iterate_pop)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     size_t pop_count = 0;
     while (!ccc_pq_empty(&pq))
     {
         ccc_pq_pop(&pq);
         ++pop_count;
-        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     CHECK(pop_count, num_nodes);
     END_TEST();
@@ -52,7 +55,7 @@ BEGIN_STATIC_TEST(pq_test_priority_removal)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -61,7 +64,7 @@ BEGIN_STATIC_TEST(pq_test_priority_removal)
         if (i->val > limit)
         {
             ccc_pq_erase(&pq, &i->elem);
-            CHECK(ccc_pq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
     }
     END_TEST();
@@ -82,7 +85,7 @@ BEGIN_STATIC_TEST(pq_test_priority_update)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -92,7 +95,7 @@ BEGIN_STATIC_TEST(pq_test_priority_update)
         if (i->val > limit)
         {
             CHECK(ccc_pq_update(&pq, &i->elem, val_update, &backoff), true);
-            CHECK(ccc_pq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
@@ -114,7 +117,7 @@ BEGIN_STATIC_TEST(pq_test_priority_increase)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -125,12 +128,12 @@ BEGIN_STATIC_TEST(pq_test_priority_increase)
         if (i->val > limit)
         {
             CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true);
-            CHECK(ccc_pq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
         else
         {
             CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true);
-            CHECK(ccc_pq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
@@ -152,7 +155,7 @@ BEGIN_STATIC_TEST(pq_test_priority_decrease)
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
         ccc_pq_push(&pq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&pq), true);
+        CHECK(validate(&pq), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -163,12 +166,12 @@ BEGIN_STATIC_TEST(pq_test_priority_decrease)
         if (i->val < limit)
         {
             CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true);
-            CHECK(ccc_pq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
         else
         {
             CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true);
-            CHECK(ccc_pq_validate(&pq), true);
+            CHECK(validate(&pq), true);
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);

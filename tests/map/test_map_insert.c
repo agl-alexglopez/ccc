@@ -31,12 +31,12 @@ BEGIN_STATIC_TEST(map_test_insert_three)
     struct val swap_slot = {.val = 1, .id = 99};
     CHECK(occupied(insert_vr(&s, &swap_slot.elem, &(struct val){}.elem)),
           false);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), (size_t)1);
     swap_slot = (struct val){.val = 1, .id = 137};
     struct val const *ins
         = unwrap(insert_vr(&s, &swap_slot.elem, &(struct val){}.elem));
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), (size_t)1);
     CHECK(ins != NULL, true);
     CHECK(ins->val, 1);
@@ -47,18 +47,18 @@ BEGIN_STATIC_TEST(map_test_insert_three)
                              (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true);
     CHECK(ins->id, 0);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), (size_t)2);
     ins = insert_entry(entry_vr(&s, &(int){2}),
                        &(struct val){.val = 2, .id = 1}.elem);
     CHECK(ins != NULL, true);
     CHECK(ins->id, 1);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), (size_t)2);
     ins = ccc_entry_unwrap(
         om_insert_or_assign_w(&s, 3, (struct val){.id = 99}));
     CHECK(ins == NULL, false);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(ins->id, 99);
     CHECK(ins->val, 3);
     CHECK(size(&s), 3);
@@ -73,39 +73,39 @@ BEGIN_STATIC_TEST(map_test_insert_macros)
     struct val const *ins = ccc_om_or_insert_w(entry_vr(&s, &(int){2}),
                                                (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), 1);
     ins = om_insert_entry_w(entry_vr(&s, &(int){2}),
                             (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), 1);
     ins = om_insert_entry_w(entry_vr(&s, &(int){9}),
                             (struct val){.val = 9, .id = 1});
     CHECK(ins != NULL, true);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(size(&s), 2);
     ins = ccc_entry_unwrap(
         om_insert_or_assign_w(&s, 3, (struct val){.id = 99}));
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(ins == NULL, false);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(ins->id, 99);
     CHECK(size(&s), 3);
     ins = ccc_entry_unwrap(
         om_insert_or_assign_w(&s, 3, (struct val){.id = 98}));
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(ins == NULL, false);
     CHECK(ins->id, 98);
     CHECK(size(&s), 3);
     ins = ccc_entry_unwrap(om_try_insert_w(&s, 3, (struct val){.id = 100}));
     CHECK(ins == NULL, false);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(ins->id, 98);
     CHECK(size(&s), 3);
     ins = ccc_entry_unwrap(om_try_insert_w(&s, 4, (struct val){.id = 100}));
     CHECK(ins == NULL, false);
-    CHECK(ccc_om_validate(&s), true);
+    CHECK(validate(&s), true);
     CHECK(ins->id, 100);
     CHECK(size(&s), 4);
     END_TEST(ccc_om_clear_and_free(&s, NULL););
@@ -129,7 +129,7 @@ BEGIN_STATIC_TEST(map_test_struct_getter)
                            &tester_clone[i].elem)
                   != NULL,
               true);
-        CHECK(ccc_om_validate(&s), true);
+        CHECK(validate(&s), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our
            get to uncorrupted data. */

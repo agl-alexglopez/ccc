@@ -1,6 +1,9 @@
+#define TRAITS_USING_NAMESPACE_CCC
+
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "test.h"
+#include "traits.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -18,7 +21,7 @@ BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
     {
         three_vals[i].val = 0;
         ccc_pq_push(&ppq, &three_vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
         size_t const size = i + 1;
         CHECK(ccc_pq_size(&ppq), size);
     }
@@ -27,7 +30,7 @@ BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
     {
         three_vals[i].val = 0;
         ccc_pq_pop(&ppq);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
     END_TEST();
@@ -49,7 +52,7 @@ BEGIN_STATIC_TEST(pq_test_insert_erase_shuffled)
     for (size_t i = 0; i < size; ++i)
     {
         ccc_pq_erase(&ppq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
     END_TEST();
@@ -116,7 +119,7 @@ BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
         vals[i].val = shuffled_index;
         vals[i].id = i;
         ccc_pq_push(&ppq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
         size_t const s = i + 1;
         CHECK(ccc_pq_size(&ppq), s);
         /* Shuffle like this only on insertions to create more dups. */
@@ -128,7 +131,7 @@ BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
     for (int i = 0; i < size; ++i)
     {
         ccc_pq_erase(&ppq, &vals[shuffled_index].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);
         /* Shuffle normally here so we only remove each elem once. */
@@ -153,7 +156,7 @@ BEGIN_STATIC_TEST(pq_test_prime_shuffle)
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
         ccc_pq_push(&ppq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* Now we go through and free all the elements in order but
@@ -162,7 +165,7 @@ BEGIN_STATIC_TEST(pq_test_prime_shuffle)
     for (int i = 0; i < size; ++i)
     {
         ccc_pq_erase(&ppq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);
     }
@@ -183,12 +186,12 @@ BEGIN_STATIC_TEST(pq_test_weak_srand)
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
         ccc_pq_push(&ppq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
     }
     for (int i = 0; i < num_heap_elems; ++i)
     {
         ccc_pq_erase(&ppq, &vals[i].elem);
-        CHECK(ccc_pq_validate(&ppq), true);
+        CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_empty(&ppq), true);
     END_TEST();

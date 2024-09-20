@@ -59,7 +59,7 @@ BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
         CHECK(v != NULL, true);
         CHECK(v->id, shuffle);
         CHECK(v->val, i);
-        CHECK(fhm_validate(&h), true);
+        CHECK(validate(&h), true);
     }
     CHECK(size(&h), to_insert);
     size_t cur_size = size(&h);
@@ -82,7 +82,7 @@ BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
         --cur_size;
         ++i;
         CHECK(size(&h), cur_size);
-        CHECK(fhm_validate(&h), true);
+        CHECK(validate(&h), true);
     }
     CHECK(size(&h), 0);
     END_TEST(fhm_clear_and_free(&h, NULL););

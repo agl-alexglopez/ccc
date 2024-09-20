@@ -37,7 +37,7 @@ BEGIN_TEST(insert_shuffled, ccc_ordered_map *m, struct val vals[],
         vals[shuffled_index].val = (int)shuffled_index;
         (void)insert(m, &vals[shuffled_index].elem, &(struct val){});
         CHECK(size(m), i + 1);
-        CHECK(ccc_om_validate(m), true);
+        CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(m), size);
