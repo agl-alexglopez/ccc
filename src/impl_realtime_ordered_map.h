@@ -37,17 +37,14 @@ struct ccc_rtom_entry_
 #define ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field,        \
                           map_name, alloc_fn, key_cmp_fn, aux_data)            \
     {                                                                          \
-        {                                                                      \
-            .root_ = &(map_name).impl_.end_,                                   \
-            .end_ = {.parity_ = 1,                                             \
-                     .parent_ = &(map_name).impl_.end_,                        \
-                     .branch_                                                  \
-                     = {&(map_name).impl_.end_, &(map_name).impl_.end_}},      \
-            .sz_ = 0, .key_offset_ = offsetof(struct_name, key_elem_field),    \
-            .node_elem_offset_ = offsetof(struct_name, node_elem_field),       \
-            .elem_sz_ = sizeof(struct_name), .alloc_ = (alloc_fn),             \
-            .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                          \
-        }                                                                      \
+        .root_ = &(map_name).end_,                                             \
+        .end_ = {.parity_ = 1,                                                 \
+                 .parent_ = &(map_name).end_,                                  \
+                 .branch_ = {&(map_name).end_, &(map_name).end_}},             \
+        .sz_ = 0, .key_offset_ = offsetof(struct_name, key_elem_field),        \
+        .node_elem_offset_ = offsetof(struct_name, node_elem_field),           \
+        .elem_sz_ = sizeof(struct_name), .alloc_ = (alloc_fn),                 \
+        .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                              \
     }
 
 void *ccc_impl_rom_key_from_node(struct ccc_rtom_ const *rom,
@@ -123,8 +120,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
 #define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry, mod_fn,          \
                                   aux_data...)                                 \
     ({                                                                         \
-        struct ccc_rtom_entry_ rom_mod_ent_                                    \
-            = (realtime_ordered_map_entry)->impl_;                             \
+        struct ccc_rtom_entry_ rom_mod_ent_ = (realtime_ordered_map_entry);    \
         if (rom_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                   \
         {                                                                      \
             __auto_type rom_aux_data_ = aux_data;                              \
@@ -183,8 +179,8 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
                                   lazy_value...)                               \
     ({                                                                         \
         __auto_type rom_key_ = (key);                                          \
-        struct ccc_rtom_entry_ rom_try_ins_ent_ = ccc_impl_rom_entry(          \
-            &(realtime_ordered_map_ptr)->impl_, &rom_key_);                    \
+        struct ccc_rtom_entry_ rom_try_ins_ent_                                \
+            = ccc_impl_rom_entry((realtime_ordered_map_ptr), &rom_key_);       \
         struct ccc_entry_ rom_try_ins_ent_ret_ = {};                           \
         if (!(rom_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))            \
         {                                                                      \
@@ -202,7 +198,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
                                         lazy_value...)                         \
     ({                                                                         \
         __auto_type rom_key_ = (key);                                          \
-        struct ccc_rtom_ *rtom_ptr_ = &(realtime_ordered_map_ptr)->impl_;      \
+        struct ccc_rtom_ *rtom_ptr_ = (realtime_ordered_map_ptr);              \
         struct ccc_rtom_entry_ rom_ins_or_assign_ent_                          \
             = ccc_impl_rom_entry(rtom_ptr_, &rom_key_);                        \
         struct ccc_entry_ rom_ins_or_assign_ent_ret_ = {};                     \

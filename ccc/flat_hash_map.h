@@ -4,17 +4,11 @@
 #include "impl_flat_hash_map.h"
 #include "types.h"
 
-typedef struct
-{
-    struct ccc_fhm_elem_ impl_;
-} ccc_fh_map_elem;
+typedef struct ccc_fhm_elem_ ccc_fh_map_elem;
 
-typedef struct
-{
-    struct ccc_fhm_ impl_;
-} ccc_flat_hash_map;
+typedef struct ccc_fhm_ ccc_flat_hash_map;
 
-typedef struct
+typedef union
 {
     struct ccc_fhm_entry_ impl_;
 } ccc_fh_map_entry;

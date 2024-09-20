@@ -28,12 +28,10 @@ struct ccc_pq_
 #define ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn,       \
                          cmp_fn, aux_data)                                     \
     {                                                                          \
-        {                                                                      \
-            .root_ = NULL, .sz_ = 0,                                           \
-            .pq_elem_offset_ = offsetof(struct_name, pq_elem_field),           \
-            .elem_sz_ = sizeof(struct_name), .alloc_ = (alloc_fn),             \
-            .cmp_ = (cmp_fn), .order_ = (pq_order), .aux_ = (aux_data),        \
-        }                                                                      \
+        .root_ = NULL, .sz_ = 0,                                               \
+        .pq_elem_offset_ = offsetof(struct_name, pq_elem_field),               \
+        .elem_sz_ = sizeof(struct_name), .alloc_ = (alloc_fn),                 \
+        .cmp_ = (cmp_fn), .order_ = (pq_order), .aux_ = (aux_data),            \
     }
 
 #endif /* CCC_IMPL_PRIORITY_QUEUE_H */

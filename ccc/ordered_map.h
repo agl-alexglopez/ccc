@@ -29,17 +29,17 @@ modifications. This may combat such an anti-pattern. */
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct
+typedef union
 {
     struct ccc_tree_ impl_;
 } ccc_ordered_map;
 
-typedef struct
+typedef union
 {
     ccc_node_ impl_;
 } ccc_o_map_elem;
 
-typedef struct
+typedef union
 {
     struct ccc_tree_entry_ impl_;
 } ccc_o_map_entry;

@@ -24,12 +24,10 @@ struct ccc_sll_
 #define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, alloc_fn,     \
                           aux_data)                                            \
     {                                                                          \
-        {                                                                      \
-            .sentinel_.n_ = &(sll_name).impl_.sentinel_,                       \
-            .elem_sz_ = sizeof(struct_name),                                   \
-            .sll_elem_offset_ = offsetof(struct_name, sll_elem_field),         \
-            .sz_ = 0, .alloc_ = (alloc_fn), .aux_ = (aux_data)                 \
-        }                                                                      \
+        .sentinel_.n_ = &(sll_name).sentinel_,                                 \
+        .elem_sz_ = sizeof(struct_name),                                       \
+        .sll_elem_offset_ = offsetof(struct_name, sll_elem_field), .sz_ = 0,   \
+        .alloc_ = (alloc_fn), .aux_ = (aux_data)                               \
     }
 
 void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
@@ -39,7 +37,7 @@ struct ccc_sll_elem_ *ccc_sll_elem__in(struct ccc_sll_ const *,
 #define ccc_impl_list_emplace_front(list_ptr, struct_initializer...)           \
     ({                                                                         \
         typeof(struct_initializer) *sll_res_;                                  \
-        struct ccc_sll_ *sll_ = &(list_ptr)->impl_;                            \
+        struct ccc_sll_ *sll_ = (list_ptr);                                    \
         assert(sizeof(*sll_res_) == sll_->elem_sz_);                           \
         if (!sll_->alloc_)                                                     \
         {                                                                      \

@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct
+typedef union
 {
     struct ccc_buf_ impl_;
 } ccc_buffer;

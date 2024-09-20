@@ -4,17 +4,11 @@
 #include "impl_realtime_ordered_map.h"
 #include "types.h"
 
-typedef struct
-{
-    struct ccc_rtom_elem_ impl_;
-} ccc_rtom_elem;
+typedef struct ccc_rtom_elem_ ccc_rtom_elem;
 
-typedef struct
-{
-    struct ccc_rtom_ impl_;
-} ccc_realtime_ordered_map;
+typedef struct ccc_rtom_ ccc_realtime_ordered_map;
 
-typedef struct
+typedef union
 {
     struct ccc_rtom_entry_ impl_;
 } ccc_rtom_entry;

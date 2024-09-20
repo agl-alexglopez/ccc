@@ -4,20 +4,8 @@
 #include "impl_doubly_linked_list.h"
 #include "types.h"
 
-struct ccc_dll_elem_
-{
-    struct ccc_dll_el_ impl_;
-};
-
-typedef union {
-    struct ccc_dll_el_ impl_;
-    struct ccc_dll_elem_ _;
-} ccc_dll_elem;
-
-typedef struct
-{
-    struct ccc_dll_ impl_;
-} ccc_doubly_linked_list;
+typedef struct ccc_dll_elem_ ccc_dll_elem;
+typedef struct ccc_dll_ ccc_doubly_linked_list;
 
 #define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
                      cmp_fn, aux_data)                                         \

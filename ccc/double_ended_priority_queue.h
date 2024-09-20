@@ -21,12 +21,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct
+typedef union
 {
     struct ccc_node_ impl_;
 } ccc_depq_elem;
 
-typedef struct
+typedef union
 {
     struct ccc_tree_ impl_;
 } ccc_double_ended_priority_queue;

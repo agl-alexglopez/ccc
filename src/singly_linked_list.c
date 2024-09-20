@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);
@@ -12,50 +11,49 @@ void *
 ccc_sll_push_front(ccc_singly_linked_list *const sll,
                    ccc_sll_elem *const struct_handle)
 {
-    if (sll->impl_.alloc_)
+    if (sll->alloc_)
     {
-        void *node = sll->impl_.alloc_(NULL, sll->impl_.elem_sz_);
+        void *node = sll->alloc_(NULL, sll->elem_sz_);
         if (!node)
         {
             return NULL;
         }
-        memcpy(node, struct_base(&sll->impl_, &struct_handle->impl_),
-               sll->impl_.elem_sz_);
+        memcpy(node, struct_base(sll, struct_handle), sll->elem_sz_);
     }
-    ccc_impl_sll_push_front(&sll->impl_, &struct_handle->impl_);
-    return struct_base(&sll->impl_, sll->impl_.sentinel_.n_);
+    ccc_impl_sll_push_front(sll, struct_handle);
+    return struct_base(sll, sll->sentinel_.n_);
 }
 
 void *
 ccc_sll_front(ccc_singly_linked_list const *const sll)
 {
-    if (!sll || sll->impl_.sentinel_.n_ == &sll->impl_.sentinel_)
+    if (!sll || sll->sentinel_.n_ == &sll->sentinel_)
     {
         return NULL;
     }
-    return struct_base(&sll->impl_, sll->impl_.sentinel_.n_);
+    return struct_base(sll, sll->sentinel_.n_);
 }
 
 ccc_sll_elem *
 ccc_sll_head(ccc_singly_linked_list const *const sll)
 {
-    return (ccc_sll_elem *)sll->impl_.sentinel_.n_;
+    return sll->sentinel_.n_;
 }
 
 void
 ccc_sll_pop_front(ccc_singly_linked_list *const sll)
 {
-    if (!sll->impl_.sz_)
+    if (!sll->sz_)
     {
         return;
     }
-    struct ccc_sll_elem_ *remove = sll->impl_.sentinel_.n_;
-    sll->impl_.sentinel_.n_ = remove->n_;
-    if (sll->impl_.alloc_)
+    struct ccc_sll_elem_ *remove = sll->sentinel_.n_;
+    sll->sentinel_.n_ = remove->n_;
+    if (sll->alloc_)
     {
-        sll->impl_.alloc_(struct_base(&sll->impl_, remove), 0);
+        sll->alloc_(struct_base(sll, remove), 0);
     }
-    --sll->impl_.sz_;
+    --sll->sz_;
 }
 
 void
@@ -70,11 +68,11 @@ ccc_impl_sll_push_front(struct ccc_sll_ *const sll,
 inline void *
 ccc_sll_begin(ccc_singly_linked_list const *const sll)
 {
-    if (!sll || sll->impl_.sentinel_.n_ == &sll->impl_.sentinel_)
+    if (!sll || sll->sentinel_.n_ == &sll->sentinel_)
     {
         return NULL;
     }
-    return struct_base(&sll->impl_, sll->impl_.sentinel_.n_);
+    return struct_base(sll, sll->sentinel_.n_);
 }
 
 inline void *
@@ -87,53 +85,53 @@ inline void *
 ccc_sll_next(ccc_singly_linked_list const *const sll,
              ccc_sll_elem const *const iter_handle)
 {
-    if (!iter_handle || iter_handle->impl_.n_ == &sll->impl_.sentinel_)
+    if (!iter_handle || iter_handle->n_ == &sll->sentinel_)
     {
         return NULL;
     }
-    return struct_base(&sll->impl_, iter_handle->impl_.n_);
+    return struct_base(sll, iter_handle->n_);
 }
 
 bool
 ccc_sll_validate(ccc_singly_linked_list const *const sll)
 {
     size_t size = 0;
-    for (struct ccc_sll_elem_ *e = sll->impl_.sentinel_.n_;
-         e != &sll->impl_.sentinel_; e = e->n_, ++size)
+    for (struct ccc_sll_elem_ *e = sll->sentinel_.n_; e != &sll->sentinel_;
+         e = e->n_, ++size)
     {
         if (!e || !e->n_)
         {
             return false;
         }
-        if (size > sll->impl_.sz_)
+        if (size > sll->sz_)
         {
             return false;
         }
     }
-    return size == sll->impl_.sz_;
+    return size == sll->sz_;
 }
 
 size_t
 ccc_sll_size(ccc_singly_linked_list const *const sll)
 {
-    return sll->impl_.sz_;
+    return sll->sz_;
 }
 
 bool
 ccc_sll_empty(ccc_singly_linked_list const *const sll)
 {
-    return !sll->impl_.sz_;
+    return !sll->sz_;
 }
 
 struct ccc_sll_elem_ *
 ccc_sll_elem_in(struct ccc_sll_ const *const sll, void const *const user_struct)
 {
-    return (struct ccc_sll_elem_ *)((uint8_t *)user_struct
+    return (struct ccc_sll_elem_ *)((char *)user_struct
                                     + sll->sll_elem_offset_);
 }
 
 static inline void *
 struct_base(struct ccc_sll_ const *const l, struct ccc_sll_elem_ const *const e)
 {
-    return ((uint8_t *)&e->n_) - l->sll_elem_offset_;
+    return ((char *)&e->n_) - l->sll_elem_offset_;
 }

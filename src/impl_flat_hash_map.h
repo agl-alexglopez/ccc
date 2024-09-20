@@ -40,10 +40,10 @@ struct ccc_fhm_entry_
                           struct_name, key_field, fhash_elem_field, alloc_fn,  \
                           hash_fn, key_eq_fn, aux)                             \
     ({                                                                         \
-        (flat_hash_map_ptr)->impl_.buf_ = (ccc_buffer)ccc_buf_init(            \
+        (flat_hash_map_ptr)->buf_ = (ccc_buffer)ccc_buf_init(                  \
             (memory_ptr), struct_name, (capacity), (alloc_fn));                \
         ccc_result res_ = ccc_impl_fhm_init_buf(                               \
-            &(flat_hash_map_ptr)->impl_, offsetof(struct_name, key_field),     \
+            (flat_hash_map_ptr), offsetof(struct_name, key_field),             \
             offsetof(struct_name, fhash_elem_field), (hash_fn), (key_eq_fn),   \
             (aux));                                                            \
         res_;                                                                  \
@@ -174,7 +174,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 #define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
     ({                                                                         \
         __auto_type fhm_key_ = key;                                            \
-        struct ccc_fhm_ *flat_hash_map_ptr_ = &(flat_hash_map_ptr)->impl_;     \
+        struct ccc_fhm_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);             \
         struct ccc_fhm_entry_ fhm_try_ins_ent_                                 \
             = ccc_impl_fhm_entry(flat_hash_map_ptr_, &fhm_key_);               \
         struct ccc_entry_ fhm_try_insert_res_ = {};                            \
@@ -199,7 +199,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 #define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
     ({                                                                         \
         __auto_type fhm_key_ = key;                                            \
-        struct ccc_fhm_ *flat_hash_map_ptr_ = &(flat_hash_map_ptr)->impl_;     \
+        struct ccc_fhm_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);             \
         struct ccc_fhm_entry_ fhm_ins_or_assign_ent_                           \
             = ccc_impl_fhm_entry(flat_hash_map_ptr_, &fhm_key_);               \
         struct ccc_entry_ fhm_ins_or_assign_res_ = {};                         \

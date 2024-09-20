@@ -5,15 +5,9 @@
 
 #include <stddef.h>
 
-typedef struct
-{
-    struct ccc_sll_elem_ impl_;
-} ccc_sll_elem;
+typedef struct ccc_sll_elem_ ccc_sll_elem;
 
-typedef struct
-{
-    struct ccc_sll_ impl_;
-} ccc_singly_linked_list;
+typedef struct ccc_sll_ ccc_singly_linked_list;
 
 #define ccc_sll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
                      aux_data)                                                 \

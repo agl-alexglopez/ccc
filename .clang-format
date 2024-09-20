@@ -20,6 +20,7 @@ BraceWrapping:
   AfterCaseLabel: true
   AfterFunction: true
   AfterStruct: true
+  AfterUnion: true
   AfterEnum: true
   BeforeElse: true
   SplitEmptyFunction: false
