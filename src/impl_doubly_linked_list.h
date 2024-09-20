@@ -25,8 +25,8 @@ struct ccc_dll_
 
 void ccc_impl_dll_push_back(struct ccc_dll_ *, struct ccc_dll_elem_ *);
 void ccc_impl_dll_push_front(struct ccc_dll_ *, struct ccc_dll_elem_ *);
-struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
-                                       void const *user_struct);
+struct ccc_dll_elem_ *ccc_dll_elem_in(struct ccc_dll_ const *,
+                                      void const *user_struct);
 
 #define ccc_impl_dll_init(dll_name, struct_name, dll_elem_field, alloc_fn,     \
                           cmp_fn, aux_data)                                    \
@@ -53,8 +53,7 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
             if (dll_res_)                                                      \
             {                                                                  \
                 *dll_res_ = (typeof(*dll_res_))struct_initializer;             \
-                ccc_impl_dll_push_back(dll_,                                   \
-                                       ccc_dll_elem__in(dll_, dll_res_));      \
+                ccc_impl_dll_push_back(dll_, ccc_dll_elem_in(dll_, dll_res_)); \
             }                                                                  \
         }                                                                      \
         dll_res_;                                                              \
@@ -76,7 +75,7 @@ struct ccc_dll_elem_ *ccc_dll_elem__in(struct ccc_dll_ const *,
             {                                                                  \
                 *dll_res_ = struct_initializer;                                \
                 ccc_impl_dll_push_front(dll_,                                  \
-                                        ccc_dll_elem__in(dll_, dll_res_));     \
+                                        ccc_dll_elem_in(dll_, dll_res_));      \
             }                                                                  \
         }                                                                      \
         dll_res_;                                                              \

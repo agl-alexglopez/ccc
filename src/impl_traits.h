@@ -236,9 +236,8 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_double_ended_queue *: ccc_fdeq_push_front,                    \
         ccc_doubly_linked_list *: ccc_dll_push_front,                          \
-        ccc_singly_linked_list *: ccc_sll_push_front,                          \
-        ccc_buffer *: ccc_buf_push_front)((container_ptr),                     \
-                                          container_handle_ptr)
+        ccc_singly_linked_list *: ccc_sll_push_front)((container_ptr),         \
+                                                      container_handle_ptr)
 
 #define ccc_impl_pop(container_ptr)                                            \
     _Generic((container_ptr),                                                  \

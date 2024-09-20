@@ -86,7 +86,7 @@ static ccc_threeway_cmp cmp(struct ccc_rtom_ const *, void const *key,
 static void *struct_base(struct ccc_rtom_ const *,
                          struct ccc_rtom_elem_ const *);
 static struct rtom_query_ find(struct ccc_rtom_ const *, void const *key);
-static void swap(uint8_t tmp[], void *a, void *b, size_t elem_sz);
+static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 static void *maybe_alloc_insert(struct ccc_rtom_ *,
                                 struct ccc_rtom_elem_ *parent,
                                 ccc_threeway_cmp last_cmp,
@@ -562,21 +562,21 @@ void *
 ccc_impl_rom_key_from_node(struct ccc_rtom_ const *const rom,
                            struct ccc_rtom_elem_ const *const elem)
 {
-    return (uint8_t *)struct_base(rom, elem) + rom->key_offset_;
+    return (char *)struct_base(rom, elem) + rom->key_offset_;
 }
 
 void *
 ccc_impl_rom_key_in_slot(struct ccc_rtom_ const *const rom,
                          void const *const slot)
 {
-    return (uint8_t *)slot + rom->key_offset_;
+    return (char *)slot + rom->key_offset_;
 }
 
 struct ccc_rtom_elem_ *
 ccc_impl_rom_elem_in_slot(struct ccc_rtom_ const *const rom,
                           void const *const slot)
 {
-    return (struct ccc_rtom_elem_ *)((uint8_t *)slot + rom->node_elem_offset_);
+    return (struct ccc_rtom_elem_ *)((char *)slot + rom->node_elem_offset_);
 }
 
 /*=========================    Static Helpers    ============================*/
@@ -684,7 +684,7 @@ init_node(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const e)
 }
 
 static inline void
-swap(uint8_t tmp[], void *const a, void *const b, size_t elem_sz)
+swap(char tmp[], void *const a, void *const b, size_t elem_sz)
 {
     if (a == b)
     {
@@ -710,7 +710,7 @@ static void *
 struct_base(struct ccc_rtom_ const *const rom,
             struct ccc_rtom_elem_ const *const e)
 {
-    return ((uint8_t *)e->branch_) - rom->node_elem_offset_;
+    return ((char *)e->branch_) - rom->node_elem_offset_;
 }
 
 /*=======================   WAVL Tree Maintenance   =========================*/

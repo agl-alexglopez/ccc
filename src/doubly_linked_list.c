@@ -7,6 +7,9 @@
 #include <string.h>
 
 static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
+static size_t run_len(struct ccc_dll_ const *,
+                      struct ccc_dll_elem_ const *begin,
+                      struct ccc_dll_elem_ const *end);
 
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
@@ -70,6 +73,7 @@ ccc_dll_pop_front(ccc_doubly_linked_list *l)
     struct ccc_dll_elem_ *remove = l->sentinel_.n_;
     remove->n_->p_ = &l->sentinel_;
     l->sentinel_.n_ = remove->n_;
+    remove->n_ = remove->p_ = NULL;
     if (l->alloc_)
     {
         l->alloc_(struct_base(l, remove), 0);
@@ -87,6 +91,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
     struct ccc_dll_elem_ *remove = l->sentinel_.p_;
     remove->p_->n_ = &l->sentinel_;
     l->sentinel_.p_ = remove->p_;
+    remove->n_ = remove->p_ = NULL;
     if (l->alloc_)
     {
         l->alloc_(struct_base(l, remove), 0);
@@ -114,16 +119,82 @@ ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
     ++l->sz_;
 }
 
-ccc_dll_elem *
-ccc_dll_head(ccc_doubly_linked_list const *const l)
+void *
+ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
+               ccc_dll_elem *const struct_handle)
 {
-    return (ccc_dll_elem *)l->sentinel_.n_;
+    if (!pos->n_ || !pos->p_)
+    {
+        return NULL;
+    }
+    struct_handle->n_ = pos;
+    struct_handle->p_ = pos->p_;
+
+    pos->p_->n_ = struct_handle;
+    pos->p_ = struct_handle;
+    ++l->sz_;
+    return struct_base(l, struct_handle);
 }
 
 ccc_dll_elem *
-ccc_dll_tail(ccc_doubly_linked_list const *const l)
+ccc_dll_begin_elem(ccc_doubly_linked_list const *const l)
 {
-    return (ccc_dll_elem *)l->sentinel_.p_;
+    return l->sentinel_.n_;
+}
+
+ccc_dll_elem *
+ccc_dll_end_elem(ccc_doubly_linked_list const *const l)
+{
+    return l->sentinel_.p_;
+}
+
+ccc_dll_elem *
+ccc_dll_end_sentinel(ccc_doubly_linked_list const *const l)
+{
+    return (ccc_dll_elem *)&l->sentinel_;
+}
+
+void
+ccc_dll_erase(ccc_doubly_linked_list *const l,
+              ccc_dll_elem *const struct_handle_in_list)
+{
+    if (!struct_handle_in_list->n_ || !struct_handle_in_list->p_ || !l->sz_)
+    {
+        return;
+    }
+    struct_handle_in_list->n_->p_ = struct_handle_in_list->p_;
+    struct_handle_in_list->p_->n_ = struct_handle_in_list->n_;
+    struct_handle_in_list->n_ = struct_handle_in_list->p_ = NULL;
+    --l->sz_;
+}
+
+void
+ccc_dll_erase_range(ccc_doubly_linked_list *const l,
+                    ccc_dll_elem *const struct_handle_in_list_begin,
+                    ccc_dll_elem *const struct_handle_in_list_end)
+{
+    if (!struct_handle_in_list_begin->n_ || !struct_handle_in_list_begin->p_
+        || struct_handle_in_list_end->n_ || struct_handle_in_list_end->p_
+        || !l->sz_)
+    {
+        return;
+    }
+    if (struct_handle_in_list_begin == struct_handle_in_list_end)
+    {
+        ccc_dll_erase(l, struct_handle_in_list_begin);
+        return;
+    }
+    size_t const deleted
+        = run_len(l, struct_handle_in_list_begin, struct_handle_in_list_end);
+
+    struct_handle_in_list_begin->n_->p_ = struct_handle_in_list_begin->p_;
+    struct_handle_in_list_begin->p_->n_ = struct_handle_in_list_begin->n_;
+
+    struct_handle_in_list_end->n_->p_ = struct_handle_in_list_end->p_;
+    struct_handle_in_list_end->p_->n_ = struct_handle_in_list_end->n_;
+
+    assert(deleted <= l->sz_);
+    l->sz_ -= deleted;
 }
 
 void
@@ -145,13 +216,11 @@ ccc_dll_splice(ccc_dll_elem *pos, ccc_dll_elem *const to_cut)
 void
 ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin, ccc_dll_elem *end)
 {
-    if (!begin || !end || !pos || pos == begin || begin->n_ == pos
-        || begin == end)
+    if (!begin || !end || !pos || pos == begin || pos == end || begin == end)
     {
         return;
     }
     end = end->p_;
-
     end->n_->p_ = begin->p_;
     begin->p_->n_ = end->n_;
 
@@ -242,15 +311,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
 void
 ccc_dll_clear_and_free(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
 {
-    while (!ccc_dll_empty(l))
-    {
-        void *const node = ccc_dll_front(l);
-        if (fn)
-        {
-            fn(node);
-        }
-        ccc_dll_pop_front(l);
-    }
+    ccc_dll_clear(l, fn);
 }
 
 bool
@@ -273,9 +334,22 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
 }
 
 struct ccc_dll_elem_ *
-ccc_dll_elem__in(struct ccc_dll_ const *const l, void const *const user_struct)
+ccc_dll_elem_in(struct ccc_dll_ const *const l, void const *const user_struct)
 {
     return (struct ccc_dll_elem_ *)((char *)user_struct + l->dll_elem_offset_);
+}
+
+static inline size_t
+run_len([[maybe_unused]] struct ccc_dll_ const *const l,
+        struct ccc_dll_elem_ const *begin,
+        struct ccc_dll_elem_ const *const end)
+{
+    size_t sz = 1;
+    for (; begin != end; begin = begin->n_, ++sz)
+    {
+        assert(sz <= l->sz_);
+    }
+    return sz;
 }
 
 static inline void *

@@ -1,6 +1,7 @@
 /** File: lru.c
 The leetcode lru problem in C. */
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "doubly_linked_list.h"
@@ -20,7 +21,7 @@ struct key_val
 {
     int key;
     int val;
-    ccc_dll_elem list_elem;
+    dll_elem list_elem;
 };
 
 struct lru_cache
@@ -72,14 +73,14 @@ static bool const quiet = true;
 static struct key_val *
 lru_head(struct lru_cache *const lru)
 {
-    return ccc_dll_front(&lru->l);
+    return dll_front(&lru->l);
 }
 
 static void
 lru_clear(struct lru_cache *const lru)
 {
     ccc_fhm_clear_and_free(&lru->fh, NULL);
-    ccc_dll_clear_and_free(&lru->l, NULL);
+    dll_clear_and_free(&lru->l, NULL);
 }
 
 static bool
@@ -106,14 +107,14 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
     {
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
+        dll_splice(dll_begin_elem(&lru->l), &found->kv_in_list->list_elem);
         return PASS;
     }
     struct lru_lookup *const new
         = insert_entry(ent, &(struct lru_lookup){.key = key}.hash_elem);
     CHECK(new == NULL, false);
-    new->kv_in_list = ccc_dll_emplace_front(
-        &lru->l, (struct key_val){.key = key, .val = val});
+    new->kv_in_list
+        = dll_emplace_front(&lru->l, (struct key_val){.key = key, .val = val});
     if (size(&lru->l) > lru->cap)
     {
         struct key_val const *const to_drop = back(&lru->l);
@@ -132,7 +133,7 @@ lru_get(struct lru_cache *const lru, int const key)
     {
         return -1;
     }
-    ccc_dll_splice(ccc_dll_head(&lru->l), &found->kv_in_list->list_elem);
+    dll_splice(dll_begin_elem(&lru->l), &found->kv_in_list->list_elem);
     return found->kv_in_list->val;
 }
 
@@ -140,8 +141,8 @@ BEGIN_STATIC_TEST(run_lru_cache)
 {
     struct lru_cache lru = {
         .cap = 3,
-        .l = ccc_dll_init(lru.l, struct key_val, list_elem, realloc, cmp_by_key,
-                          NULL),
+        .l
+        = dll_init(lru.l, struct key_val, list_elem, realloc, cmp_by_key, NULL),
     };
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
     fhm_init(&lru.fh, NULL, 0, struct lru_lookup, key, hash_elem, realloc,
@@ -169,13 +170,13 @@ BEGIN_STATIC_TEST(run_lru_cache)
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
             CHECK(fhm_validate(&lru.fh), true);
-            CHECK(ccc_dll_validate(&lru.l), true);
+            CHECK(dll_validate(&lru.l), true);
             break;
         case GET:
             QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
             CHECK(requests[i].getter(&lru, requests[i].key), requests[i].val);
-            CHECK(ccc_dll_validate(&lru.l), true);
+            CHECK(dll_validate(&lru.l), true);
             break;
         case HED:
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,

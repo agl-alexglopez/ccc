@@ -234,7 +234,7 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
     if (found)
     {
         assert(s->impl_.root_ != &s->impl_.end_);
-        *out_handle = (ccc_o_map_elem){*s->impl_.root_};
+        out_handle->impl_ = *s->impl_.root_;
         void *user_struct = struct_base(&s->impl_, &out_handle->impl_);
         void *ret = struct_base(&s->impl_, s->impl_.root_);
         swap(tmp, user_struct, ret, s->impl_.elem_sz_);
@@ -278,6 +278,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const s,
                ccc_impl_om_key_from_node(&s->impl_, &key_val_handle->impl_));
     if (found)
     {
+        key_val_handle->impl_ = *ccc_impl_om_elem_in_slot(&s->impl_, found);
         assert(s->impl_.root_ != &s->impl_.end_);
         memcpy(found, struct_base(&s->impl_, &key_val_handle->impl_),
                s->impl_.elem_sz_);
