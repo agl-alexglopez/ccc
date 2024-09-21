@@ -73,13 +73,13 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle)
     (void)push_back(&dll, &v3->e);
     dll_erase(&dll, &v2->e);
     CHECK(validate(&dll), true);
-    CHECK(check_order(&dll, 3, (int[]){0, 1, 3}), PASS);
+    CHECK(check_order(&dll, 3, (int[3]){0, 1, 3}), PASS);
     dll_erase(&dll, &v1->e);
     CHECK(validate(&dll), true);
-    CHECK(check_order(&dll, 2, (int[]){0, 3}), PASS);
+    CHECK(check_order(&dll, 2, (int[2]){0, 3}), PASS);
     dll_erase(&dll, &v3->e);
     CHECK(validate(&dll), true);
-    CHECK(check_order(&dll, 1, (int[]){0}), PASS);
+    CHECK(check_order(&dll, 1, (int[1]){0}), PASS);
     dll_erase(&dll, &v0->e);
     CHECK(validate(&dll), true);
     CHECK(empty(&dll), true);
@@ -102,7 +102,7 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle_range)
     dll_erase_range(&dll, &v1->e, &v4->e);
     CHECK(validate(&dll), true);
     CHECK(size(&dll), 2);
-    CHECK(check_order(&dll, 2, (int[]){0, 4}), PASS);
+    CHECK(check_order(&dll, 2, (int[2]){0, 4}), PASS);
     CHECK(v1->e.n_ == NULL, true);
     CHECK(v1->e.p_ == NULL, true);
     CHECK(v2->e.n_ == NULL, true);

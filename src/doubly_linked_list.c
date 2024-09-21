@@ -9,8 +9,8 @@
 
 static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
 static inline size_t erase_range([[maybe_unused]] struct ccc_dll_ const *l,
-                                 struct ccc_dll_elem_ const *begin,
-                                 struct ccc_dll_elem_ const *end);
+                                 struct ccc_dll_elem_ *begin,
+                                 struct ccc_dll_elem_ *end);
 
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
@@ -77,7 +77,7 @@ ccc_dll_pop_front(ccc_doubly_linked_list *l)
     remove->n_ = remove->p_ = NULL;
     if (l->alloc_)
     {
-        l->alloc_(struct_base(l, remove), 0);
+        (void)l->alloc_(struct_base(l, remove), 0);
     }
     --l->sz_;
 }
@@ -95,7 +95,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *l)
     remove->n_ = remove->p_ = NULL;
     if (l->alloc_)
     {
-        l->alloc_(struct_base(l, remove), 0);
+        (void)l->alloc_(struct_base(l, remove), 0);
     }
     --l->sz_;
 }
@@ -186,14 +186,12 @@ ccc_dll_erase_range(ccc_doubly_linked_list *const l,
         return;
     }
     struct_handle_in_list_end = struct_handle_in_list_end->p_;
-    size_t const deleted = erase_range(l, struct_handle_in_list_begin,
-                                       struct_handle_in_list_end);
-
     struct_handle_in_list_end->n_->p_ = struct_handle_in_list_begin->p_;
     struct_handle_in_list_begin->p_->n_ = struct_handle_in_list_end->n_;
 
-    struct_handle_in_list_begin->n_ = struct_handle_in_list_begin->p_ = NULL;
-    struct_handle_in_list_end->n_ = struct_handle_in_list_end->p_ = NULL;
+    size_t const deleted = erase_range(l, struct_handle_in_list_begin,
+                                       struct_handle_in_list_end);
+
     assert(deleted <= l->sz_);
     l->sz_ -= deleted;
 }
@@ -342,21 +340,18 @@ ccc_dll_elem_in(struct ccc_dll_ const *const l, void const *const user_struct)
 
 static inline size_t
 erase_range([[maybe_unused]] struct ccc_dll_ const *const l,
-            struct ccc_dll_elem_ const *begin,
-            struct ccc_dll_elem_ const *const end)
+            struct ccc_dll_elem_ *begin, struct ccc_dll_elem_ *const end)
 {
-    size_t sz = 2;
-    if (begin->n_ == end)
-    {
-        return sz;
-    }
-    for (struct ccc_dll_elem_ *i = begin->n_; i != end; ++sz)
+    size_t sz = 1;
+    for (; begin != end; ++sz)
     {
         assert(sz <= l->sz_);
-        struct ccc_dll_elem_ *const next = i->n_;
-        i->n_ = i->p_ = NULL;
-        i = next;
+        struct ccc_dll_elem_ *const next = begin->n_;
+        begin->n_ = begin->p_ = NULL;
+        begin = next;
     }
+    assert(end != &l->sentinel_);
+    end->n_ = end->p_ = NULL;
     return sz;
 }
 
