@@ -72,4 +72,24 @@ ccc_threeway_cmp ccc_fpq_order(ccc_flat_priority_queue const *);
 
 void ccc_fpq_print(ccc_flat_priority_queue const *, size_t, ccc_print_fn *);
 
+#ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+typedef ccc_flat_priority_queue flat_priority_queue;
+#    define fpq_init(args...) ccc_fpq_init(args)
+#    define fpq_emplace(args...) ccc_fpq_emplace(args)
+#    define fpq_realloc(args...) ccc_fpq_realloc(args)
+#    define fpq_push(args...) ccc_fpq_push(args)
+#    define fpq_front(args...) ccc_fpq_front(args)
+#    define fpq_pop(args...) ccc_fpq_pop(args)
+#    define fpq_erase(args...) ccc_fpq_erase(args)
+#    define fpq_update(args...) ccc_fpq_update(args)
+#    define fpq_increase(args...) ccc_fpq_increase(args)
+#    define fpq_decrease(args...) ccc_fpq_decrease(args)
+#    define fpq_clear(args...) ccc_fpq_clear(args)
+#    define fpq_empty(args...) ccc_fpq_empty(args)
+#    define fpq_size(args...) ccc_fpq_size(args)
+#    define fpq_validate(args...) ccc_fpq_validate(args)
+#    define fpq_order(args...) ccc_fpq_order(args)
+#    define fpq_print(args...) ccc_fpq_print(args)
+#endif /* FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC */
+
 #endif /* CCC_FLAT_PRIORITY_QUEUE_H */

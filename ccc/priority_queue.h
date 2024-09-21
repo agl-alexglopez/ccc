@@ -89,4 +89,22 @@ void ccc_pq_clear(ccc_priority_queue *, ccc_destructor_fn *);
    little interest to the user. */
 bool ccc_pq_validate(ccc_priority_queue const *);
 
+#ifndef PRIORITY_QUEUE_USING_NAMESPACE_CCC
+typedef ccc_pq_elem pq_elem;
+typedef ccc_priority_queue priority_queue;
+#    define pq_init(args...) ccc_pq_init(args)
+#    define pq_front(args...) ccc_pq_front(args)
+#    define pq_push(args...) ccc_pq_push(args)
+#    define pq_pop(args...) ccc_pq_pop(args)
+#    define pq_erase(args...) ccc_pq_erase(args)
+#    define pq_empty(args...) ccc_pq_empty(args)
+#    define pq_size(args...) ccc_pq_size(args)
+#    define pq_update(args...) ccc_pq_update(args)
+#    define pq_increase(args...) ccc_pq_increase(args)
+#    define pq_decrease(args...) ccc_pq_decrease(args)
+#    define pq_order(args...) ccc_pq_order(args)
+#    define pq_clear(args...) ccc_pq_clear(args)
+#    define pq_validate(args...) ccc_pq_validate(args)
+#endif /* PRIORITY_QUEUE_USING_NAMESPACE_CCC */
+
 #endif /* CCC_PRIORITY_QUEUE_H */

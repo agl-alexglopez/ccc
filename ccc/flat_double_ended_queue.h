@@ -38,4 +38,26 @@ void *ccc_fdeq_rnext(ccc_flat_double_ended_queue const *fq,
 void *ccc_fdeq_end(ccc_flat_double_ended_queue const *fq);
 void *ccc_fdeq_rend(ccc_flat_double_ended_queue const *fq);
 
+#ifdef FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+typedef ccc_flat_double_ended_queue flat_double_ended_queue;
+#    define fdeq_init(args...) ccc_fdeq_init(args)
+#    define fdeq_emplace(args...) ccc_fdeq_emplace(args)
+#    define fdeq_push_back(args...) ccc_fdeq_push_back(args)
+#    define fdeq_push_front(args...) ccc_fdeq_push_front(args)
+#    define fdeq_pop_front(args...) ccc_fdeq_pop_front(args)
+#    define fdeq_pop_back(args...) ccc_fdeq_pop_back(args)
+#    define fdeq_front(args...) ccc_fdeq_front(args)
+#    define fdeq_back(args...) ccc_fdeq_back(args)
+#    define fdeq_empty(args...) ccc_fdeq_empty(args)
+#    define fdeq_size(args...) ccc_fdeq_size(args)
+#    define fdeq_clear(args...) ccc_fdeq_clear(args)
+#    define fdeq_clear_and_free(args...) ccc_fdeq_clear_and_free(args)
+#    define fdeq_begin(args...) ccc_fdeq_begin(args)
+#    define fdeq_rbegin(args...) ccc_fdeq_rbegin(args)
+#    define fdeq_next(args...) ccc_fdeq_next(args)
+#    define fdeq_rnext(args...) ccc_fdeq_rnext(args)
+#    define fdeq_end(args...) ccc_fdeq_end(args)
+#    define fdeq_rend(args...) ccc_fdeq_rend(args)
+#endif /* FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC */
+
 #endif /* CCC_FLAT_DOUBLE_ENDED_QUEUE_H */
