@@ -33,4 +33,21 @@ bool ccc_sll_empty(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);
 
+#ifndef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
+typedef ccc_sll_elem sll_elem;
+typedef ccc_singly_linked_list singly_linked_list;
+#    define sll_init(args...) ccc_sll_init(args)
+#    define sll_emplace_front(args...) ccc_sll_emplace_front(args)
+#    define sll_push_front(args...) ccc_sll_push_front(args)
+#    define sll_front(args...) ccc_sll_front(args)
+#    define sll_pop_front(args...) ccc_sll_pop_front(args)
+#    define sll_begin(args...) ccc_sll_begin(args)
+#    define sll_end(args...) ccc_sll_end(args)
+#    define sll_next(args...) ccc_sll_next(args)
+#    define sll_head(args...) ccc_sll_head(args)
+#    define sll_size(args...) ccc_sll_size(args)
+#    define sll_empty(args...) ccc_sll_empty(args)
+#    define sll_validate(args...) ccc_sll_validate(args)
+#endif /* SINGLY_LINKED_LIST_USING_NAMESPACE_CCC */
+
 #endif /* CCC_FORWARD_LIST_H */
