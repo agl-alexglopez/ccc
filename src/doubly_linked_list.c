@@ -11,6 +11,8 @@ static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
 static inline size_t erase_range([[maybe_unused]] struct ccc_dll_ const *l,
                                  struct ccc_dll_elem_ *begin,
                                  struct ccc_dll_elem_ *end);
+static size_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
+                  struct ccc_dll_elem_ const *end);
 
 void *
 ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle)
@@ -197,9 +199,12 @@ ccc_dll_erase_range(ccc_doubly_linked_list *const l,
 }
 
 void
-ccc_dll_splice(ccc_dll_elem *pos, ccc_dll_elem *const to_cut)
+ccc_dll_splice(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
+               ccc_doubly_linked_list *const to_cut_sll,
+               ccc_dll_elem *const to_cut)
 {
-    if (!to_cut || !pos || pos == to_cut || to_cut->n_ == pos)
+    if (!to_cut || !pos || !pos_sll || !to_cut_sll || pos == to_cut
+        || to_cut->n_ == pos || to_cut == &to_cut_sll->sentinel_)
     {
         return;
     }
@@ -210,12 +215,21 @@ ccc_dll_splice(ccc_dll_elem *pos, ccc_dll_elem *const to_cut)
     to_cut->n_ = pos;
     pos->p_->n_ = to_cut;
     pos->p_ = to_cut;
+    if (pos_sll != to_cut_sll)
+    {
+        ++pos_sll->sz_;
+        --to_cut_sll->sz_;
+    }
 }
 
 void
-ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin, ccc_dll_elem *end)
+ccc_dll_splice_range(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
+                     ccc_doubly_linked_list *const to_cut_sll,
+                     ccc_dll_elem *begin, ccc_dll_elem *end)
 {
-    if (!begin || !end || !pos || pos == begin || pos == end || begin == end)
+    if (!begin || !end || !pos || !pos_sll || !to_cut_sll || pos == begin
+        || pos == end || begin == end || begin == &to_cut_sll->sentinel_
+        || end->p_ == &to_cut_sll->sentinel_)
     {
         return;
     }
@@ -227,6 +241,13 @@ ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin, ccc_dll_elem *end)
     end->n_ = pos;
     pos->p_->n_ = begin;
     pos->p_ = end;
+    if (pos_sll != to_cut_sll)
+    {
+        size_t const sz = len(pos_sll, begin, end);
+        assert(sz <= to_cut_sll->sz_);
+        pos_sll->sz_ += sz;
+        to_cut_sll->sz_ -= sz;
+    }
 }
 
 void *
@@ -353,6 +374,18 @@ erase_range([[maybe_unused]] struct ccc_dll_ const *const l,
     assert(end != &l->sentinel_);
     end->n_ = end->p_ = NULL;
     return sz;
+}
+
+static inline size_t
+len(struct ccc_dll_ const *const sll, struct ccc_dll_elem_ const *begin,
+    struct ccc_dll_elem_ const *const end)
+{
+    size_t s = 1;
+    for (; begin != end; begin = begin->n_, ++s)
+    {
+        assert(s <= sll->sz_);
+    }
+    return s;
 }
 
 static inline void *

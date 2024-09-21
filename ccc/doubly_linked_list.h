@@ -36,10 +36,12 @@ void ccc_dll_erase_range(ccc_doubly_linked_list *l,
 /** @brief Repositions to_cut before pos. Only list pointers are modified.
 @param [in] pos the position before which to_cut will be moved.
 @param [in] to_cut the element to cut out of its current position. */
-void ccc_dll_splice(ccc_dll_elem *pos, ccc_dll_elem *to_cut);
+void ccc_dll_splice(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
+                    ccc_doubly_linked_list *to_cut_sll, ccc_dll_elem *to_cut);
 
-void ccc_dll_splice_range(ccc_dll_elem *pos, ccc_dll_elem *begin,
-                          ccc_dll_elem *end);
+void ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
+                          ccc_doubly_linked_list *to_cut_sll,
+                          ccc_dll_elem *begin, ccc_dll_elem *end);
 void *ccc_dll_begin(ccc_doubly_linked_list const *);
 void *ccc_dll_next(ccc_doubly_linked_list const *, ccc_dll_elem const *);
 

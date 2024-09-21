@@ -115,6 +115,6 @@ BEGIN_STATIC_TEST(fpq_test_priority_update)
 int
 main()
 {
-    return RUN_TESTS(fpq_test_insert_iterate_pop, fpq_test_priority_update,
-                     fpq_test_priority_removal);
+    return RUN_TESTS(fpq_test_insert_iterate_pop(), fpq_test_priority_update(),
+                     fpq_test_priority_removal());
 }

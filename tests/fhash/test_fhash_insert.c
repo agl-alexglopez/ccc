@@ -594,11 +594,11 @@ int
 main()
 {
     return RUN_TESTS(
-        fhash_test_insert, fhash_test_insert_macros,
-        fhash_test_insert_overwrite, fhash_test_insert_then_bad_ideas,
-        fhash_test_insert_via_entry, fhash_test_insert_via_entry_macros,
-        fhash_test_entry_api_functional, fhash_test_entry_api_macros,
-        fhash_test_two_sum, fhash_test_resize, fhash_test_resize_macros,
-        fhash_test_resize_from_null, fhash_test_resize_from_null_macros,
-        fhash_test_insert_limit);
+        fhash_test_insert(), fhash_test_insert_macros(),
+        fhash_test_insert_overwrite(), fhash_test_insert_then_bad_ideas(),
+        fhash_test_insert_via_entry(), fhash_test_insert_via_entry_macros(),
+        fhash_test_entry_api_functional(), fhash_test_entry_api_macros(),
+        fhash_test_two_sum(), fhash_test_resize(), fhash_test_resize_macros(),
+        fhash_test_resize_from_null(), fhash_test_resize_from_null_macros(),
+        fhash_test_insert_limit());
 }

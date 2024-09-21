@@ -138,7 +138,7 @@ BEGIN_STATIC_TEST(fpq_test_read_max_min)
 int
 main()
 {
-    return RUN_TESTS(fpq_test_insert_one, fpq_test_insert_three,
-                     fpq_test_struct_getter, fpq_test_insert_three_dups,
-                     fpq_test_insert_shuffle, fpq_test_read_max_min);
+    return RUN_TESTS(fpq_test_insert_one(), fpq_test_insert_three(),
+                     fpq_test_struct_getter(), fpq_test_insert_three_dups(),
+                     fpq_test_insert_shuffle(), fpq_test_read_max_min());
 }

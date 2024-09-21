@@ -308,8 +308,8 @@ BEGIN_STATIC_TEST(rtom_test_empty_range)
 int
 main()
 {
-    return RUN_TESTS(rtom_test_forward_iter, rtom_test_iterate_removal,
-                     rtom_test_valid_range, rtom_test_valid_range_equals,
-                     rtom_test_invalid_range, rtom_test_empty_range,
-                     rtom_test_iterate_remove_reinsert);
+    return RUN_TESTS(rtom_test_forward_iter(), rtom_test_iterate_removal(),
+                     rtom_test_valid_range(), rtom_test_valid_range_equals(),
+                     rtom_test_invalid_range(), rtom_test_empty_range(),
+                     rtom_test_iterate_remove_reinsert());
 }

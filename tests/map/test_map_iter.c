@@ -303,8 +303,8 @@ BEGIN_STATIC_TEST(map_test_empty_range)
 int
 main()
 {
-    return RUN_TESTS(map_test_forward_iter, map_test_iterate_removal,
-                     map_test_valid_range, map_test_invalid_range,
-                     map_test_valid_range_equals, map_test_empty_range,
-                     map_test_iterate_remove_reinsert);
+    return RUN_TESTS(map_test_forward_iter(), map_test_iterate_removal(),
+                     map_test_valid_range(), map_test_invalid_range(),
+                     map_test_valid_range_equals(), map_test_empty_range(),
+                     map_test_iterate_remove_reinsert());
 }

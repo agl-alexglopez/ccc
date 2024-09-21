@@ -199,8 +199,8 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
 int
 main()
 {
-    return RUN_TESTS(fhash_test_empty, fhash_test_entry_macros,
-                     fhash_test_entry_functional,
-                     fhash_test_entry_and_modify_functional,
-                     fhash_test_entry_and_modify_macros);
+    return RUN_TESTS(fhash_test_empty(), fhash_test_entry_macros(),
+                     fhash_test_entry_functional(),
+                     fhash_test_entry_and_modify_functional(),
+                     fhash_test_entry_and_modify_macros());
 }

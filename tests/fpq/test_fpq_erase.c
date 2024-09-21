@@ -213,8 +213,9 @@ BEGIN_STATIC_TEST(fpq_test_weak_srand)
 int
 main()
 {
-    return RUN_TESTS(fpq_test_insert_remove_four_dups,
-                     fpq_test_insert_erase_shuffled, fpq_test_pop_max,
-                     fpq_test_pop_min, fpq_test_delete_prime_shuffle_duplicates,
-                     fpq_test_prime_shuffle, fpq_test_weak_srand);
+    return RUN_TESTS(fpq_test_insert_remove_four_dups(),
+                     fpq_test_insert_erase_shuffled(), fpq_test_pop_max(),
+                     fpq_test_pop_min(),
+                     fpq_test_delete_prime_shuffle_duplicates(),
+                     fpq_test_prime_shuffle(), fpq_test_weak_srand());
 }

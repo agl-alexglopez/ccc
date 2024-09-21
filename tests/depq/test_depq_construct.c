@@ -19,5 +19,5 @@ BEGIN_STATIC_TEST(depq_test_empty)
 int
 main()
 {
-    return RUN_TESTS(depq_test_empty);
+    return RUN_TESTS(depq_test_empty());
 }

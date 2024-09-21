@@ -73,6 +73,6 @@ BEGIN_STATIC_TEST(pq_test_raw_type)
 int
 main()
 {
-    return RUN_TESTS(pq_test_empty, pq_test_macro, pq_test_push,
-                     pq_test_raw_type);
+    return RUN_TESTS(pq_test_empty(), pq_test_macro(), pq_test_push(),
+                     pq_test_raw_type());
 }

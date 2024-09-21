@@ -119,9 +119,48 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle_range)
     END_TEST();
 }
 
+BEGIN_STATIC_TEST(dll_test_splice_two_lists)
+{
+    doubly_linked_list to_gain
+        = dll_init(to_gain, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list to_lose
+        = dll_init(to_lose, struct val, e, NULL, val_cmp, NULL);
+    struct val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
+    struct val to_lose_vals[5]
+        = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
+    for (int i = 0; (size_t)i < sizeof(to_gain_vals) / sizeof(struct val); ++i)
+    {
+        CHECK(push_back(&to_gain, &to_gain_vals[i].e) == NULL, false);
+    }
+    CHECK(check_order(&to_gain, 2, (int[2]){0, 1}), PASS);
+    for (int i = 0; (size_t)i < sizeof(to_lose_vals) / sizeof(struct val); ++i)
+    {
+        CHECK(push_back(&to_lose, &to_lose_vals[i].e) == NULL, false);
+    }
+    CHECK(check_order(&to_lose, 5, (int[5]){0, 1, 2, 3, 4}), PASS);
+    dll_splice(&to_gain, dll_end_sentinel(&to_gain), &to_lose,
+               &to_lose_vals[0].e);
+    CHECK(validate(&to_gain), true);
+    CHECK(validate(&to_lose), true);
+    CHECK(size(&to_gain), 3);
+    CHECK(size(&to_lose), 4);
+    CHECK(check_order(&to_gain, 3, (int[3]){0, 1, 0}), PASS);
+    CHECK(check_order(&to_lose, 4, (int[4]){1, 2, 3, 4}), PASS);
+    dll_splice_range(&to_gain, dll_end_elem(&to_gain), &to_lose,
+                     dll_begin_elem(&to_lose), dll_end_sentinel(&to_lose));
+    CHECK(validate(&to_gain), true);
+    CHECK(validate(&to_lose), true);
+    CHECK(size(&to_gain), 7);
+    CHECK(size(&to_lose), 0);
+    CHECK(check_order(&to_gain, 7, (int[7]){0, 1, 1, 2, 3, 4, 0}), PASS);
+    END_TEST();
+}
+
 int
 main()
 {
-    return RUN_TESTS(dll_test_push_pop_front, dll_test_push_pop_back,
-                     dll_test_push_pop_middle, dll_test_push_pop_middle_range);
+    return RUN_TESTS(dll_test_push_pop_front(), dll_test_push_pop_back(),
+                     dll_test_push_pop_middle(),
+                     dll_test_push_pop_middle_range(),
+                     dll_test_splice_two_lists());
 }

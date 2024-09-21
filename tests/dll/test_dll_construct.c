@@ -22,5 +22,5 @@ BEGIN_STATIC_TEST(dll_test_construct)
 int
 main()
 {
-    return RUN_TESTS(dll_test_construct);
+    return RUN_TESTS(dll_test_construct());
 }

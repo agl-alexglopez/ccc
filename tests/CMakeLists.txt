@@ -230,6 +230,33 @@ add_dll_test(test_dll_construct)
 add_dll_test(test_dll_insert)
 add_dll_test(test_dll_erase)
 
+#############  Singly Linked List ##########################
+
+add_library(sll_util sll/sll_util.h sll/sll_util.c)
+target_link_libraries(sll_util
+  singly_linked_list
+)
+
+macro(add_sll_test TEST_NAME)
+  add_executable(${TEST_NAME} sll/${TEST_NAME}.c)
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      singly_linked_list
+      test
+      sll_util
+      traits
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_sll_test(test_sll_construct)
+add_sll_test(test_sll_insert)
+add_sll_test(test_sll_erase)
+
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
 target_link_libraries(perf 

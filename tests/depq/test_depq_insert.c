@@ -124,7 +124,7 @@ BEGIN_STATIC_TEST(depq_test_read_max_min)
 int
 main()
 {
-    return RUN_TESTS(depq_test_insert_one, depq_test_insert_three,
-                     depq_test_struct_getter, depq_test_insert_three_dups,
-                     depq_test_insert_shuffle, depq_test_read_max_min);
+    return RUN_TESTS(depq_test_insert_one(), depq_test_insert_three(),
+                     depq_test_struct_getter(), depq_test_insert_three_dups(),
+                     depq_test_insert_shuffle(), depq_test_read_max_min());
 }

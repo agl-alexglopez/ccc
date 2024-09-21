@@ -21,6 +21,14 @@ void *ccc_sll_push_front(ccc_singly_linked_list *sll,
                          ccc_sll_elem *struct_handle);
 void *ccc_sll_front(ccc_singly_linked_list const *sll);
 void ccc_sll_pop_front(ccc_singly_linked_list *sll);
+void ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos_before,
+                    ccc_singly_linked_list *to_splice_sll,
+                    ccc_sll_elem *to_splice);
+void ccc_sll_splice_range(ccc_singly_linked_list *pos_sll,
+                          ccc_sll_elem *pos_before,
+                          ccc_singly_linked_list *to_splice_sll,
+                          ccc_sll_elem *to_splice_begin,
+                          ccc_sll_elem *to_splice_end);
 
 void *ccc_sll_begin(ccc_singly_linked_list const *sll);
 void *ccc_sll_end(ccc_singly_linked_list const *sll);
@@ -33,7 +41,7 @@ bool ccc_sll_empty(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);
 
-#ifndef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
+#ifdef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef ccc_sll_elem sll_elem;
 typedef ccc_singly_linked_list singly_linked_list;
 #    define sll_init(args...) ccc_sll_init(args)

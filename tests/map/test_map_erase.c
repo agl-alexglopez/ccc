@@ -105,6 +105,6 @@ BEGIN_STATIC_TEST(map_test_weak_srand)
 int
 main()
 {
-    return RUN_TESTS(map_test_insert_erase_shuffled, map_test_prime_shuffle,
-                     map_test_weak_srand);
+    return RUN_TESTS(map_test_insert_erase_shuffled(), map_test_prime_shuffle(),
+                     map_test_weak_srand());
 }

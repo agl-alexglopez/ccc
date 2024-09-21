@@ -17,5 +17,5 @@ BEGIN_STATIC_TEST(pq_test_empty)
 int
 main()
 {
-    return RUN_TESTS(pq_test_empty);
+    return RUN_TESTS(pq_test_empty());
 }

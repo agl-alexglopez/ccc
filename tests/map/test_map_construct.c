@@ -19,5 +19,5 @@ BEGIN_STATIC_TEST(map_test_empty)
 int
 main()
 {
-    return RUN_TESTS(map_test_empty);
+    return RUN_TESTS(map_test_empty());
 }

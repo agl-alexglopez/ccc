@@ -200,8 +200,9 @@ BEGIN_STATIC_TEST(pq_test_weak_srand)
 int
 main()
 {
-    return RUN_TESTS(pq_test_insert_remove_four_dups,
-                     pq_test_insert_erase_shuffled, pq_test_pop_max,
-                     pq_test_pop_min, pq_test_delete_prime_shuffle_duplicates,
-                     pq_test_prime_shuffle, pq_test_weak_srand);
+    return RUN_TESTS(pq_test_insert_remove_four_dups(),
+                     pq_test_insert_erase_shuffled(), pq_test_pop_max(),
+                     pq_test_pop_min(),
+                     pq_test_delete_prime_shuffle_duplicates(),
+                     pq_test_prime_shuffle(), pq_test_weak_srand());
 }

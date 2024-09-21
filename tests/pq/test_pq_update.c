@@ -181,7 +181,7 @@ BEGIN_STATIC_TEST(pq_test_priority_decrease)
 int
 main()
 {
-    return RUN_TESTS(pq_test_insert_iterate_pop, pq_test_priority_update,
-                     pq_test_priority_removal, pq_test_priority_increase,
-                     pq_test_priority_decrease);
+    return RUN_TESTS(pq_test_insert_iterate_pop(), pq_test_priority_update(),
+                     pq_test_priority_removal(), pq_test_priority_increase(),
+                     pq_test_priority_decrease());
 }

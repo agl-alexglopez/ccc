@@ -54,10 +54,11 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice)
     (void)push_back(&dll, &(struct val){.id = 2, .val = 2}.e);
     (void)push_back(&dll, &(struct val){.id = 3, .val = 3}.e);
     struct val *v = back(&dll);
-    dll_splice(dll_begin_elem(&dll), &v->e);
+    dll_splice(&dll, dll_begin_elem(&dll), &dll, &v->e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){3, 0, 1, 2}), PASS);
-    dll_splice(&((struct val *)back(&dll))->e, &((struct val *)front(&dll))->e);
+    dll_splice(&dll, &((struct val *)back(&dll))->e, &dll,
+               &((struct val *)front(&dll))->e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 3, 2}), PASS);
     END_TEST();
@@ -74,13 +75,15 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice_range)
     (void)push_back(&dll, &v1->e);
     (void)push_back(&dll, &v2->e);
     (void)push_back(&dll, &v3->e);
-    dll_splice_range(dll_begin_elem(&dll), &v1->e, dll_end_sentinel(&dll));
+    dll_splice_range(&dll, dll_begin_elem(&dll), &dll, &v1->e,
+                     dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){1, 2, 3, 0}), PASS);
-    dll_splice_range(dll_begin_elem(&dll), &v2->e, dll_end_sentinel(&dll));
+    dll_splice_range(&dll, dll_begin_elem(&dll), &dll, &v2->e,
+                     dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){2, 3, 0, 1}), PASS);
-    dll_splice_range(&v2->e, &v3->e, &v1->e);
+    dll_splice_range(&dll, &v2->e, &dll, &v3->e, &v1->e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){3, 0, 2, 1}), PASS);
     END_TEST();
@@ -97,10 +100,10 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice_no_ops)
     (void)push_back(&dll, &v1->e);
     (void)push_back(&dll, &v2->e);
     (void)push_back(&dll, &v3->e);
-    dll_splice_range(&v0->e, &v0->e, dll_end_sentinel(&dll));
+    dll_splice_range(&dll, &v0->e, &dll, &v0->e, dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 2, 3}), PASS);
-    dll_splice_range(&v3->e, &v1->e, &v3->e);
+    dll_splice_range(&dll, &v3->e, &dll, &v1->e, &v3->e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 2, 3}), PASS);
     END_TEST();
@@ -109,7 +112,8 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice_no_ops)
 int
 main()
 {
-    return RUN_TESTS(dll_test_push_three_front, dll_test_push_three_back,
-                     dll_test_push_and_splice, dll_test_push_and_splice_range,
-                     dll_test_push_and_splice_no_ops);
+    return RUN_TESTS(dll_test_push_three_front(), dll_test_push_three_back(),
+                     dll_test_push_and_splice(),
+                     dll_test_push_and_splice_range(),
+                     dll_test_push_and_splice_no_ops());
 }

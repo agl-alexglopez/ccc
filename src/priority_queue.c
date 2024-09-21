@@ -4,7 +4,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 /*=========================  Function Prototypes   ==========================*/
@@ -49,7 +48,7 @@ ccc_pq_push(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
         {
             return;
         }
-        memcpy(node, struct_base(ppq, e), ppq->elem_sz_);
+        (void)memcpy(node, struct_base(ppq, e), ppq->elem_sz_);
     }
     ppq->root_ = merge(ppq, ppq->root_, e);
     ++ppq->sz_;
@@ -224,7 +223,7 @@ cmp(struct ccc_pq_ const *const ppq, struct ccc_pq_elem_ const *const a,
 static inline void *
 struct_base(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *e)
 {
-    return ((uint8_t *)&(e->left_child_)) - pq->pq_elem_offset_;
+    return ((char *)&(e->left_child_)) - pq->pq_elem_offset_;
 }
 
 static inline void
@@ -369,11 +368,10 @@ has_valid_links(struct ccc_pq_ const *const ppq,
     {
         return true;
     }
-    bool sibling_ring_lapped = false;
     struct ccc_pq_elem_ const *cur = child;
     ccc_threeway_cmp const wrong_order
         = ppq->order_ == CCC_LES ? CCC_GRT : CCC_LES;
-    while (!sibling_ring_lapped)
+    do
     {
         if (!cur)
         {
@@ -400,9 +398,7 @@ has_valid_links(struct ccc_pq_ const *const ppq,
         {
             return false;
         }
-        cur = cur->next_sibling_;
-        sibling_ring_lapped = cur == child;
-    }
+    } while ((cur = cur->next_sibling_) != child);
     return true;
 }
 

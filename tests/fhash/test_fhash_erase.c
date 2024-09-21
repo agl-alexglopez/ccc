@@ -91,5 +91,5 @@ BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
 int
 main()
 {
-    return RUN_TESTS(fhash_test_erase, fhash_test_shuffle_insert_erase);
+    return RUN_TESTS(fhash_test_erase(), fhash_test_shuffle_insert_erase());
 }

@@ -384,9 +384,9 @@ int
 main()
 {
     return RUN_TESTS(
-        depq_test_forward_iter_unique_vals, depq_test_forward_iter_all_vals,
-        depq_test_insert_iterate_pop, depq_test_priority_update,
-        depq_test_priority_removal, depq_test_priority_valid_range,
-        depq_test_priority_valid_range_equals, depq_test_priority_invalid_range,
-        depq_test_priority_empty_range);
+        depq_test_forward_iter_unique_vals(), depq_test_forward_iter_all_vals(),
+        depq_test_insert_iterate_pop(), depq_test_priority_update(),
+        depq_test_priority_removal(), depq_test_priority_valid_range(),
+        depq_test_priority_valid_range_equals(),
+        depq_test_priority_invalid_range(), depq_test_priority_empty_range());
 }

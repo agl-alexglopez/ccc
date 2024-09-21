@@ -161,7 +161,7 @@ BEGIN_STATIC_TEST(map_test_insert_shuffle)
 int
 main()
 {
-    return RUN_TESTS(map_test_insert_one, map_test_insert_three,
-                     map_test_insert_macros, map_test_struct_getter,
-                     map_test_insert_shuffle);
+    return RUN_TESTS(map_test_insert_one(), map_test_insert_three(),
+                     map_test_insert_macros(), map_test_struct_getter(),
+                     map_test_insert_shuffle());
 }

@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 static size_t const start_capacity = 8;
@@ -84,7 +83,7 @@ push(struct ccc_fdeq_ *const fq, void const *const elem,
     void *slot = ccc_impl_fdeq_alloc(fq, dir);
     if (slot)
     {
-        memcpy(slot, elem, ccc_buf_elem_size(&fq->buf_));
+        (void)memcpy(slot, elem, ccc_buf_elem_size(&fq->buf_));
     }
     return slot;
 }
@@ -259,12 +258,13 @@ maybe_resize(struct ccc_fdeq_ *const q)
     }
     size_t const first_chunk
         = MIN(ccc_buf_size(&q->buf_), ccc_buf_capacity(&q->buf_) - q->front_);
-    memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_), bytes(q, first_chunk));
+    (void)memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_),
+                 bytes(q, first_chunk));
     if (first_chunk < ccc_buf_size(&q->buf_))
     {
-        memcpy((uint8_t *)new_mem + bytes(q, first_chunk),
-               ccc_buf_base(&q->buf_),
-               bytes(q, ccc_buf_size(&q->buf_) - first_chunk));
+        (void)memcpy((char *)new_mem + bytes(q, first_chunk),
+                     ccc_buf_base(&q->buf_),
+                     bytes(q, ccc_buf_size(&q->buf_) - first_chunk));
     }
     (void)ccc_buf_realloc(&q->buf_, 0, q->buf_.alloc_);
     q->buf_.mem_ = new_mem;
@@ -294,7 +294,7 @@ index_of(struct ccc_fdeq_ const *const fq, void const *const pos)
 {
     assert(pos > ccc_buf_base(&fq->buf_));
     assert(pos < ccc_buf_capacity_end(&fq->buf_));
-    return ((uint8_t *)pos - (uint8_t *)ccc_buf_base(&fq->buf_))
+    return ((char *)pos - (char *)ccc_buf_base(&fq->buf_))
            / ccc_buf_elem_size(&fq->buf_);
 }
 

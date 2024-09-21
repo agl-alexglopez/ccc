@@ -107,7 +107,8 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
     {
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        dll_splice(dll_begin_elem(&lru->l), &found->kv_in_list->list_elem);
+        dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                   &found->kv_in_list->list_elem);
         return PASS;
     }
     struct lru_lookup *const new
@@ -133,7 +134,8 @@ lru_get(struct lru_cache *const lru, int const key)
     {
         return -1;
     }
-    dll_splice(dll_begin_elem(&lru->l), &found->kv_in_list->list_elem);
+    dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+               &found->kv_in_list->list_elem);
     return found->kv_in_list->val;
 }
 
@@ -194,5 +196,5 @@ BEGIN_STATIC_TEST(run_lru_cache)
 int
 main()
 {
-    return RUN_TESTS(run_lru_cache);
+    return RUN_TESTS(run_lru_cache());
 }

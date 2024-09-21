@@ -105,6 +105,6 @@ BEGIN_STATIC_TEST(rtomap_test_weak_srand)
 int
 main()
 {
-    return RUN_TESTS(rtomap_test_insert_erase_shuffled,
-                     rtomap_test_prime_shuffle, rtomap_test_weak_srand);
+    return RUN_TESTS(rtomap_test_insert_erase_shuffled(),
+                     rtomap_test_prime_shuffle(), rtomap_test_weak_srand());
 }
