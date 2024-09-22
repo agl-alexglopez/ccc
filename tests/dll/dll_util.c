@@ -61,6 +61,10 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
                 (void)fprintf(stderr, "%s%d, %s", RED, v->val, NONE);
             }
         }
+        for (; v != end(dll); v = next(dll, &v->e))
+        {
+            (void)fprintf(stderr, "%s%d, %s", RED, v->val, NONE);
+        }
         (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
     });
 }

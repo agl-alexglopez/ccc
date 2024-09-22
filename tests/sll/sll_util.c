@@ -53,6 +53,10 @@ BEGIN_TEST(check_order, singly_linked_list const *const sll, size_t const n,
                 (void)fprintf(stderr, "%s%d, %s", RED, v->val, NONE);
             }
         }
+        for (; v != end(sll); v = next(sll, &v->e))
+        {
+            (void)fprintf(stderr, "%s%d, %s", RED, v->val, NONE);
+        }
         (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
     });
 }

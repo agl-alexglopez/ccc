@@ -38,7 +38,37 @@ BEGIN_STATIC_TEST(check_range, realtime_ordered_map const *const rom,
     {
         CHECK(((struct val *)iter)->val, expect_range[n - 1]);
     }
-    END_TEST();
+    END_FAIL({
+        (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
+        for (size_t j = 0; j < n; ++j)
+        {
+            (void)fprintf(stderr, "%d, ", expect_range[j]);
+        }
+        (void)fprintf(stderr, "}\n%s", NONE);
+        (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
+        iter = begin_range(r);
+        for (size_t j = 0; j < n && iter != end_range(r);
+             ++j, iter = next(rom, &iter->elem))
+        {
+            if (!iter)
+            {
+                return TEST_STATUS;
+            }
+            if (expect_range[j] == iter->val)
+            {
+                (void)fprintf(stderr, "%s%d, %s", GREEN, expect_range[j], NONE);
+            }
+            else
+            {
+                (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+            }
+        }
+        for (; iter != end_range(r); iter = next(rom, &iter->elem))
+        {
+            (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+        }
+        (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
+    });
 }
 
 BEGIN_STATIC_TEST(check_rrange, realtime_ordered_map const *const rom,
@@ -66,7 +96,39 @@ BEGIN_STATIC_TEST(check_rrange, realtime_ordered_map const *const rom,
     {
         CHECK(((struct val *)iter)->val, expect_rrange[n - 1]);
     }
-    END_TEST();
+    END_FAIL({
+        (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
+        size_t j = 0;
+        for (; j < n; ++j)
+        {
+            (void)fprintf(stderr, "%d, ", expect_rrange[j]);
+        }
+        (void)fprintf(stderr, "}\n%s", NONE);
+        (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
+        iter = rbegin_rrange(r);
+        for (j = 0; j < n && iter != rend_rrange(r);
+             ++j, iter = rnext(rom, &iter->elem))
+        {
+            if (!iter)
+            {
+                return TEST_STATUS;
+            }
+            if (expect_rrange[j] == iter->val)
+            {
+                (void)fprintf(stderr, "%s%d, %s", GREEN, expect_rrange[j],
+                              NONE);
+            }
+            else
+            {
+                (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+            }
+        }
+        for (; iter != rend_rrange(r); iter = rnext(rom, &iter->elem))
+        {
+            (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+        }
+        (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
+    });
 }
 
 BEGIN_STATIC_TEST(iterator_check, realtime_ordered_map *s)
