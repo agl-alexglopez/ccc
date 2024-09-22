@@ -13,7 +13,15 @@ typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 #define ccc_fdeq_emplace(fq_ptr, value...) ccc_impl_fdeq_emplace(fq_ptr, value)
 
 void *ccc_fdeq_push_back(ccc_flat_double_ended_queue *fq, void const *elem);
+ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fq, size_t n,
+                                    void const *elems);
 void *ccc_fdeq_push_front(ccc_flat_double_ended_queue *fq, void const *elem);
+ccc_result ccc_fdeq_push_front_range(ccc_flat_double_ended_queue *fq, size_t n,
+                                     void const *elems);
+void *ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void const *pos,
+                            size_t n, void const *elems);
+void *ccc_fdeq_at(ccc_flat_double_ended_queue const *fq, size_t i);
+
 void ccc_fdeq_pop_front(ccc_flat_double_ended_queue *fq);
 void ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fq);
 
@@ -38,12 +46,16 @@ void *ccc_fdeq_rnext(ccc_flat_double_ended_queue const *fq,
 void *ccc_fdeq_end(ccc_flat_double_ended_queue const *fq);
 void *ccc_fdeq_rend(ccc_flat_double_ended_queue const *fq);
 
+bool ccc_fdeq_validate(ccc_flat_double_ended_queue const *fq);
+
 #ifdef FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_init(args...) ccc_fdeq_init(args)
 #    define fdeq_emplace(args...) ccc_fdeq_emplace(args)
 #    define fdeq_push_back(args...) ccc_fdeq_push_back(args)
+#    define fdeq_push_back_range(args...) ccc_fdeq_push_back_range(args)
 #    define fdeq_push_front(args...) ccc_fdeq_push_front(args)
+#    define fdeq_push_front_range(args...) ccc_fdeq_push_front_range(args)
 #    define fdeq_pop_front(args...) ccc_fdeq_pop_front(args)
 #    define fdeq_pop_back(args...) ccc_fdeq_pop_back(args)
 #    define fdeq_front(args...) ccc_fdeq_front(args)

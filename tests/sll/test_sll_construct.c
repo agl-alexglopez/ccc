@@ -6,6 +6,8 @@
 #include "test.h"
 #include "traits.h"
 
+#include <stddef.h>
+
 BEGIN_STATIC_TEST(sll_test_construct)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);

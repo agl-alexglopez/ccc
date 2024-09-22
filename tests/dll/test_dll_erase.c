@@ -7,6 +7,7 @@
 #include "traits.h"
 
 #include <stddef.h>
+
 BEGIN_STATIC_TEST(dll_test_push_pop_front)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);

@@ -1,6 +1,8 @@
 #include "singly_linked_list.h"
 #include "impl_singly_linked_list.h"
+#include "types.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>

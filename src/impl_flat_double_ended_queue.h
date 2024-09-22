@@ -26,9 +26,21 @@ void *ccc_impl_fdeq_alloc(struct ccc_fdeq_ *, enum ccc_impl_fdeq_alloc_slot);
         .front_ = 0,                                                           \
     }
 
-#define ccc_impl_fdeq_emplace(fq_ptr, value...)                                \
+#define ccc_impl_fdeq_emplace_back(fq_ptr, value...)                           \
     ({                                                                         \
-        void *const fdeq_emplace_ret_ = ccc_impl_fdeq_alloc((fq_ptr));         \
+        void *const fdeq_emplace_ret_                                          \
+            = ccc_impl_fdeq_alloc((fq_ptr), CCC_IMPL_FDEQ_BACK);               \
+        if (fdeq_emplace_ret_)                                                 \
+        {                                                                      \
+            *((typeof(value) *)fdeq_emplace_ret_) = value;                     \
+        }                                                                      \
+        fdeq_emplace_ret_;                                                     \
+    })
+
+#define ccc_impl_fdeq_emplace_front(fq_ptr, value...)                          \
+    ({                                                                         \
+        void *const fdeq_emplace_ret_                                          \
+            = ccc_impl_fdeq_alloc((fq_ptr), CCC_IMPL_FDEQ_FRONT);              \
         if (fdeq_emplace_ret_)                                                 \
         {                                                                      \
             *((typeof(value) *)fdeq_emplace_ret_) = value;                     \

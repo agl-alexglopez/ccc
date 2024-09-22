@@ -7,6 +7,8 @@
 #include "traits.h"
 #include "types.h"
 
+#include <stddef.h>
+
 BEGIN_STATIC_TEST(sll_test_push_pop_three)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);

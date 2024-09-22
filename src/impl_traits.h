@@ -516,6 +516,7 @@
         ccc_flat_hash_map *: ccc_fhm_validate,                                 \
         ccc_ordered_map *: ccc_om_validate,                                    \
         ccc_flat_priority_queue *: ccc_fpq_validate,                           \
+        ccc_flat_double_ended_queue *: ccc_fdeq_validate,                      \
         ccc_double_ended_priority_queue *: ccc_depq_validate,                  \
         ccc_priority_queue *: ccc_pq_validate,                                 \
         ccc_singly_linked_list *: ccc_sll_validate,                            \
@@ -524,6 +525,7 @@
         ccc_flat_hash_map const *: ccc_fhm_validate,                           \
         ccc_ordered_map const *: ccc_om_validate,                              \
         ccc_flat_priority_queue const *: ccc_fpq_validate,                     \
+        ccc_flat_double_ended_queue const *: ccc_fdeq_validate,                \
         ccc_double_ended_priority_queue const *: ccc_depq_validate,            \
         ccc_priority_queue const *: ccc_pq_validate,                           \
         ccc_singly_linked_list const *: ccc_sll_validate,                      \

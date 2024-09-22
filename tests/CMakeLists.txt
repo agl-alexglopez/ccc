@@ -257,6 +257,33 @@ add_sll_test(test_sll_construct)
 add_sll_test(test_sll_insert)
 add_sll_test(test_sll_erase)
 
+#############  Flat Double Ended Queue ##########################
+
+add_library(fdeq_util fdeq/fdeq_util.h fdeq/fdeq_util.c)
+target_link_libraries(fdeq_util
+  flat_double_ended_queue
+)
+
+macro(add_fdeq_test TEST_NAME)
+  add_executable(${TEST_NAME} fdeq/${TEST_NAME}.c)
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      flat_double_ended_queue
+      test
+      fdeq_util
+      traits
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_fdeq_test(test_fdeq_construct)
+add_fdeq_test(test_fdeq_insert)
+# add_fdeq_test(test_fdeq_erase)
+
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
 target_link_libraries(perf 
