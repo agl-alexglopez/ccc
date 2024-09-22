@@ -126,6 +126,12 @@
 #define ccc_equal_rrange_vr(container_ptr, rbegin_and_rend_args...)            \
     ccc_impl_equal_rrange_vr(container_ptr, rbegin_and_rend_args)
 
+#define ccc_splice(container_ptr, splice_args...)                              \
+    ccc_impl_splice(container_ptr, splice_args)
+
+#define ccc_splice_range(container_ptr, splice_args...)                        \
+    ccc_impl_splice_range(container_ptr, splice_args)
+
 /*===================    Standard Getters API  ==============================*/
 
 #define ccc_size(container_entry_ptr) ccc_impl_size(container_entry_ptr)
@@ -183,6 +189,8 @@
 #    define equal_rrange(args...) ccc_equal_rrange(args)
 #    define equal_range_vr(args...) ccc_equal_range_vr(args)
 #    define equal_rrange_vr(args...) ccc_equal_rrange_vr(args)
+#    define splice(args...) ccc_splice(args)
+#    define splice_range(args...) ccc_splice_range(args)
 
 #    define size(args...) ccc_size(args)
 #    define empty(args...) ccc_empty(args)

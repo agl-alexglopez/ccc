@@ -439,6 +439,22 @@
         ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr).impl_    \
     }
 
+#define ccc_impl_splice(container_ptr, splice_args...)                         \
+    _Generic((container_ptr),                                                  \
+        ccc_singly_linked_list *: ccc_sll_splice,                              \
+        ccc_singly_linked_list const *: ccc_sll_splice,                        \
+        ccc_doubly_linked_list *: ccc_dll_splice,                              \
+        ccc_doubly_linked_list const *: ccc_dll_splice)((container_ptr),       \
+                                                        splice_args)
+
+#define ccc_impl_splice_range(container_ptr, splice_range_args...)             \
+    _Generic((container_ptr),                                                  \
+        ccc_singly_linked_list *: ccc_sll_splice_range,                        \
+        ccc_singly_linked_list const *: ccc_sll_splice_range,                  \
+        ccc_doubly_linked_list *: ccc_dll_splice_range,                        \
+        ccc_doubly_linked_list const *: ccc_dll_splice_range)(                 \
+        (container_ptr), splice_range_args)
+
 /*===================    Standard Getters API ==============================*/
 
 #define ccc_impl_size(container_ptr)                                           \

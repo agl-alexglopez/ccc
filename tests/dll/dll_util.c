@@ -28,11 +28,13 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
     struct val *v = begin(dll);
     for (; v != end(dll) && i < n; v = next(dll, &v->e), ++i)
     {
+        CHECK(v == NULL, false);
         CHECK(order[i], v->val);
     }
     i = n;
     for (v = rbegin(dll); v != rend(dll) && i--; v = rnext(dll, &v->e))
     {
+        CHECK(v == NULL, false);
         CHECK(order[i], v->val);
     }
     END_FAIL({
@@ -46,6 +48,10 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
         v = begin(dll);
         for (size_t j = 0; j < n && v != end(dll); ++j, v = next(dll, &v->e))
         {
+            if (!v)
+            {
+                return TEST_STATUS;
+            }
             if (order[j] == v->val)
             {
                 (void)fprintf(stderr, "%s%d, %s", GREEN, order[j], NONE);
@@ -57,4 +63,22 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
         }
         (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
     });
+}
+
+BEGIN_TEST(create_list, ccc_doubly_linked_list *const dll,
+           enum push_end const dir, size_t const n, struct val vals[])
+{
+    for (size_t i = 0; i < n; ++i)
+    {
+        if (dir == UTIL_PUSH_FRONT)
+        {
+            CHECK(push_front(dll, &vals[i].e) == NULL, false);
+        }
+        else
+        {
+            CHECK(push_back(dll, &vals[i].e) == NULL, false);
+        }
+    }
+    CHECK(validate(dll), true);
+    END_TEST();
 }

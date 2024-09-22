@@ -39,9 +39,15 @@ ccc_sll_front(ccc_singly_linked_list const *const sll)
 }
 
 ccc_sll_elem *
-ccc_sll_head(ccc_singly_linked_list const *const sll)
+ccc_sll_begin_elem(ccc_singly_linked_list const *const sll)
 {
     return sll->sentinel_.n_;
+}
+
+ccc_sll_elem *
+ccc_sll_begin_sentinel(ccc_singly_linked_list const *const sll)
+{
+    return (ccc_sll_elem *)&sll->sentinel_;
 }
 
 void
@@ -103,7 +109,14 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
     {
         return;
     }
-    before(to_splice_sll, to_splice_begin)->n_ = to_splice_end->n_;
+    if (to_splice_begin == to_splice_end)
+    {
+        ccc_sll_splice(pos_sll, pos_before, to_splice_sll, to_splice_begin);
+        return;
+    }
+    struct ccc_sll_elem_ *found = before(to_splice_sll, to_splice_begin);
+    found->n_ = to_splice_end->n_;
+
     to_splice_end->n_ = pos_before->n_;
     pos_before->n_ = to_splice_begin;
     if (pos_sll != to_splice_sll)

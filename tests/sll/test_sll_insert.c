@@ -29,8 +29,63 @@ BEGIN_STATIC_TEST(sll_test_insert_three)
     END_TEST();
 }
 
+BEGIN_STATIC_TEST(sll_push_and_splice)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, NULL, NULL);
+    struct val *vals = NULL;
+    enum test_result const t = create_list(&sll, 4,
+                                           (vals = (struct val[4]){
+                                                {.val = 0},
+                                                {.val = 1},
+                                                {.val = 2},
+                                                {.val = 3},
+                                            }));
+    CHECK(t, PASS);
+    CHECK(check_order(&sll, 4, (int[4]){3, 2, 1, 0}), PASS);
+    splice(&sll, sll_begin_elem(&sll), &sll, &vals[0].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 4, (int[4]){3, 0, 2, 1}), PASS);
+    splice(&sll, &vals[0].e, &sll, &vals[3].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 4, (int[4]){0, 3, 2, 1}), PASS);
+    splice(&sll, &vals[1].e, &sll, &vals[0].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 4, (int[4]){3, 2, 1, 0}), PASS);
+    END_TEST();
+}
+
+BEGIN_STATIC_TEST(sll_push_and_splice_range)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, NULL, NULL);
+    struct val *vals = NULL;
+    enum test_result const t = create_list(&sll, 5,
+                                           (vals = (struct val[5]){
+                                                {.val = 0},
+                                                {.val = 1},
+                                                {.val = 2},
+                                                {.val = 3},
+                                                {.val = 4},
+                                            }));
+    CHECK(t, PASS);
+    CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
+    splice_range(&sll, sll_begin_sentinel(&sll), &sll, &vals[2].e, &vals[0].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 5, (int[5]){2, 1, 0, 4, 3}), PASS);
+    splice_range(&sll, &vals[3].e, &sll, &vals[2].e, &vals[0].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
+    splice_range(&sll, sll_begin_sentinel(&sll), &sll, &vals[3].e, &vals[1].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 5, (int[5]){3, 2, 1, 4, 0}), PASS);
+    splice_range(&sll, &vals[0].e, &sll, &vals[2].e, &vals[4].e);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 5, (int[5]){3, 0, 2, 1, 4}), PASS);
+    END_TEST();
+}
+
 int
 main()
 {
-    return RUN_TESTS(sll_test_insert_three());
+    return RUN_TESTS(sll_test_insert_three(), sll_push_and_splice(),
+                     sll_push_and_splice_range());
 }

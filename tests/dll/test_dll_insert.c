@@ -49,16 +49,19 @@ BEGIN_STATIC_TEST(dll_test_push_three_back)
 BEGIN_STATIC_TEST(dll_test_push_and_splice)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    (void)push_back(&dll, &(struct val){}.e);
-    (void)push_back(&dll, &(struct val){.id = 1, .val = 1}.e);
-    (void)push_back(&dll, &(struct val){.id = 2, .val = 2}.e);
-    (void)push_back(&dll, &(struct val){.id = 3, .val = 3}.e);
-    struct val *v = back(&dll);
-    dll_splice(&dll, dll_begin_elem(&dll), &dll, &v->e);
+    struct val *vals = NULL;
+    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4,
+                                           (vals = (struct val[4]){
+                                                {.val = 0},
+                                                {.val = 1},
+                                                {.val = 2},
+                                                {.val = 3},
+                                            }));
+    CHECK(t, PASS);
+    splice(&dll, dll_begin_elem(&dll), &dll, &vals[3].e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){3, 0, 1, 2}), PASS);
-    dll_splice(&dll, &((struct val *)back(&dll))->e, &dll,
-               &((struct val *)front(&dll))->e);
+    splice(&dll, &vals[2].e, &dll, &vals[3].e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 3, 2}), PASS);
     END_TEST();
@@ -67,23 +70,24 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice)
 BEGIN_STATIC_TEST(dll_test_push_and_splice_range)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    struct val *v0 = &(struct val){};
-    struct val *v1 = &(struct val){.id = 1, .val = 1};
-    struct val *v2 = &(struct val){.id = 2, .val = 2};
-    struct val *v3 = &(struct val){.id = 3, .val = 3};
-    (void)push_back(&dll, &v0->e);
-    (void)push_back(&dll, &v1->e);
-    (void)push_back(&dll, &v2->e);
-    (void)push_back(&dll, &v3->e);
-    dll_splice_range(&dll, dll_begin_elem(&dll), &dll, &v1->e,
-                     dll_end_sentinel(&dll));
+    struct val *vals = NULL;
+    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4,
+                                           (vals = (struct val[4]){
+                                                {.val = 0},
+                                                {.val = 1},
+                                                {.val = 2},
+                                                {.val = 3},
+                                            }));
+    CHECK(t, PASS);
+    splice_range(&dll, dll_begin_elem(&dll), &dll, &vals[1].e,
+                 dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){1, 2, 3, 0}), PASS);
-    dll_splice_range(&dll, dll_begin_elem(&dll), &dll, &v2->e,
-                     dll_end_sentinel(&dll));
+    splice_range(&dll, dll_begin_elem(&dll), &dll, &vals[2].e,
+                 dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){2, 3, 0, 1}), PASS);
-    dll_splice_range(&dll, &v2->e, &dll, &v3->e, &v1->e);
+    splice_range(&dll, &vals[2].e, &dll, &vals[3].e, &vals[1].e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){3, 0, 2, 1}), PASS);
     END_TEST();
@@ -92,18 +96,19 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice_range)
 BEGIN_STATIC_TEST(dll_test_push_and_splice_no_ops)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    struct val *v0 = &(struct val){};
-    struct val *v1 = &(struct val){.id = 1, .val = 1};
-    struct val *v2 = &(struct val){.id = 2, .val = 2};
-    struct val *v3 = &(struct val){.id = 3, .val = 3};
-    (void)push_back(&dll, &v0->e);
-    (void)push_back(&dll, &v1->e);
-    (void)push_back(&dll, &v2->e);
-    (void)push_back(&dll, &v3->e);
-    dll_splice_range(&dll, &v0->e, &dll, &v0->e, dll_end_sentinel(&dll));
+    struct val *vals = NULL;
+    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4,
+                                           (vals = (struct val[4]){
+                                                {.val = 0},
+                                                {.val = 1},
+                                                {.val = 2},
+                                                {.val = 3},
+                                            }));
+    CHECK(t, PASS);
+    splice_range(&dll, &vals[0].e, &dll, &vals[0].e, dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 2, 3}), PASS);
-    dll_splice_range(&dll, &v3->e, &dll, &v1->e, &v3->e);
+    splice_range(&dll, &vals[3].e, &dll, &vals[1].e, &vals[3].e);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 2, 3}), PASS);
     END_TEST();
