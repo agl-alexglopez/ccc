@@ -49,14 +49,8 @@ BEGIN_STATIC_TEST(dll_test_push_three_back)
 BEGIN_STATIC_TEST(dll_test_push_and_splice)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    struct val *vals = NULL;
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4,
-                                           (vals = (struct val[4]){
-                                                {.val = 0},
-                                                {.val = 1},
-                                                {.val = 2},
-                                                {.val = 3},
-                                            }));
+    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     splice(&dll, dll_begin_elem(&dll), &dll, &vals[3].e);
     CHECK(validate(&dll), true);
@@ -70,14 +64,8 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice)
 BEGIN_STATIC_TEST(dll_test_push_and_splice_range)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    struct val *vals = NULL;
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4,
-                                           (vals = (struct val[4]){
-                                                {.val = 0},
-                                                {.val = 1},
-                                                {.val = 2},
-                                                {.val = 3},
-                                            }));
+    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     splice_range(&dll, dll_begin_elem(&dll), &dll, &vals[1].e,
                  dll_end_sentinel(&dll));
@@ -96,14 +84,8 @@ BEGIN_STATIC_TEST(dll_test_push_and_splice_range)
 BEGIN_STATIC_TEST(dll_test_push_and_splice_no_ops)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    struct val *vals = NULL;
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4,
-                                           (vals = (struct val[4]){
-                                                {.val = 0},
-                                                {.val = 1},
-                                                {.val = 2},
-                                                {.val = 3},
-                                            }));
+    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     splice_range(&dll, &vals[0].e, &dll, &vals[0].e, dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);

@@ -27,11 +27,11 @@ void *ccc_dll_front(ccc_doubly_linked_list const *l);
 void *ccc_dll_back(ccc_doubly_linked_list const *l);
 void ccc_dll_pop_front(ccc_doubly_linked_list *l);
 void ccc_dll_pop_back(ccc_doubly_linked_list *l);
-void ccc_dll_erase(ccc_doubly_linked_list *l,
-                   ccc_dll_elem *struct_handle_in_list);
-void ccc_dll_erase_range(ccc_doubly_linked_list *l,
-                         ccc_dll_elem *struct_handle_in_list_begin,
-                         ccc_dll_elem *struct_handle_in_list_end);
+void *ccc_dll_erase(ccc_doubly_linked_list *l,
+                    ccc_dll_elem *struct_handle_in_list);
+void *ccc_dll_erase_range(ccc_doubly_linked_list *l,
+                          ccc_dll_elem *struct_handle_in_list_begin,
+                          ccc_dll_elem *struct_handle_in_list_end);
 
 /** @brief Repositions to_cut before pos. Only list pointers are modified.
 @param [in] pos the position before which to_cut will be moved.
@@ -58,7 +58,6 @@ ccc_dll_elem *ccc_dll_end_sentinel(ccc_doubly_linked_list const *);
 size_t ccc_dll_size(ccc_doubly_linked_list const *);
 bool ccc_dll_empty(ccc_doubly_linked_list const *);
 
-void ccc_dll_clear(ccc_doubly_linked_list *, ccc_destructor_fn *);
 void ccc_dll_clear_and_free(ccc_doubly_linked_list *, ccc_destructor_fn *);
 
 bool ccc_dll_validate(ccc_doubly_linked_list const *);

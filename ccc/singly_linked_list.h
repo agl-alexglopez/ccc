@@ -2,6 +2,7 @@
 #define CCC_SINGLY_LINKED_LIST_H
 
 #include "impl_singly_linked_list.h"
+#include "types.h"
 
 #include <stddef.h>
 
@@ -10,9 +11,9 @@ typedef struct ccc_sll_elem_ ccc_sll_elem;
 typedef struct ccc_sll_ ccc_singly_linked_list;
 
 #define ccc_sll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
-                     aux_data)                                                 \
+                     cmp_fn, aux_data)                                         \
     ccc_impl_sll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
-                      aux_data)
+                      cmp_fn, aux_data)
 
 #define ccc_sll_emplace_front(list_ptr, struct_initializer...)                 \
     ccc_impl_sll_emplace_front(list_ptr, struct_initializer)
@@ -22,13 +23,15 @@ void *ccc_sll_push_front(ccc_singly_linked_list *sll,
 void *ccc_sll_front(ccc_singly_linked_list const *sll);
 void ccc_sll_pop_front(ccc_singly_linked_list *sll);
 void ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos_before,
-                    ccc_singly_linked_list *to_splice_sll,
-                    ccc_sll_elem *to_splice);
+                    ccc_singly_linked_list *splice_sll, ccc_sll_elem *splice);
 void ccc_sll_splice_range(ccc_singly_linked_list *pos_sll,
                           ccc_sll_elem *pos_before,
-                          ccc_singly_linked_list *to_splice_sll,
-                          ccc_sll_elem *to_splice_begin,
-                          ccc_sll_elem *to_splice_end);
+                          ccc_singly_linked_list *splice_sll,
+                          ccc_sll_elem *splice_begin, ccc_sll_elem *splice_end);
+
+void *ccc_sll_erase(ccc_singly_linked_list *erase_sll, ccc_sll_elem *erase);
+void *ccc_sll_erase_range(ccc_singly_linked_list *erase_sll,
+                          ccc_sll_elem *erase_begin, ccc_sll_elem *erase_end);
 
 void *ccc_sll_begin(ccc_singly_linked_list const *sll);
 void *ccc_sll_end(ccc_singly_linked_list const *sll);
@@ -41,6 +44,7 @@ size_t ccc_sll_size(ccc_singly_linked_list const *sll);
 bool ccc_sll_empty(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);
+void ccc_sll_clear_and_free(ccc_singly_linked_list *sll, ccc_destructor_fn *fn);
 
 #ifdef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef ccc_sll_elem sll_elem;

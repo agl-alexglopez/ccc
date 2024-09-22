@@ -301,9 +301,17 @@
 #define ccc_impl_erase(container_ptr, container_handle_ptr...)                 \
     _Generic((container_ptr),                                                  \
         ccc_double_ended_priority_queue *: ccc_depq_erase,                     \
+        ccc_doubly_linked_list *: ccc_dll_erase,                               \
+        ccc_singly_linked_list *: ccc_sll_erase,                               \
         ccc_flat_priority_queue *: ccc_fpq_erase,                              \
         ccc_priority_queue *: ccc_pq_erase)((container_ptr),                   \
                                             container_handle_ptr)
+
+#define ccc_impl_erase_range(container_ptr, container_handle_begin_end_ptr...) \
+    _Generic((container_ptr),                                                  \
+        ccc_doubly_linked_list *: ccc_dll_erase_range,                         \
+        ccc_singly_linked_list *: ccc_sll_erase_range)(                        \
+        (container_ptr), container_handle_begin_end_ptr)
 
 /*===================       Iterators API ==============================*/
 

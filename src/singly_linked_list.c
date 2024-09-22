@@ -10,6 +10,9 @@ static struct ccc_sll_elem_ *before(struct ccc_sll_ const *,
                                     struct ccc_sll_elem_ const *to_find);
 static size_t len(struct ccc_sll_ const *, struct ccc_sll_elem_ const *begin,
                   struct ccc_sll_elem_ const *end);
+static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
+                          struct ccc_sll_elem_ *end);
+static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 
 void *
 ccc_sll_push_front(ccc_singly_linked_list *const sll,
@@ -57,13 +60,11 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
     {
         return;
     }
-    struct ccc_sll_elem_ *remove = sll->sentinel_.n_;
-    sll->sentinel_.n_ = remove->n_;
+    struct ccc_sll_elem_ *remove = pop_front(sll);
     if (sll->alloc_)
     {
         (void)sll->alloc_(struct_base(sll, remove), 0);
     }
-    --sll->sz_;
 }
 
 void
@@ -82,7 +83,7 @@ ccc_sll_splice(ccc_singly_linked_list *const pos_sll,
                ccc_sll_elem *const to_splice)
 {
     if (!pos_sll || !pos_before || !to_splice || !to_splice_sll
-        || to_splice == pos_before)
+        || to_splice == pos_before || pos_before->n_ == to_splice)
     {
         return;
     }
@@ -127,6 +128,40 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
     }
 }
 
+void *
+ccc_sll_erase(ccc_singly_linked_list *const erase_sll,
+              ccc_sll_elem *const erase)
+{
+    if (!erase_sll || !erase || !erase_sll->sz_
+        || erase == &erase_sll->sentinel_)
+    {
+        return NULL;
+    }
+    struct ccc_sll_elem_ const *const ret = erase->n_;
+    before(erase_sll, erase)->n_ = erase->n_;
+    erase->n_ = NULL;
+    --erase_sll->sz_;
+    return ret == &erase_sll->sentinel_ ? NULL : struct_base(erase_sll, ret);
+}
+
+void *
+ccc_sll_erase_range(ccc_singly_linked_list *const erase_sll,
+                    ccc_sll_elem *const erase_begin, ccc_sll_elem *erase_end)
+{
+    if (!erase_sll || !erase_begin || !erase_end || !erase_sll->sz_
+        || erase_begin == &erase_sll->sentinel_
+        || erase_end == &erase_sll->sentinel_)
+    {
+        return NULL;
+    }
+    struct ccc_sll_elem_ const *const ret = erase_end->n_;
+    before(erase_sll, erase_begin)->n_ = erase_end->n_;
+    size_t const deleted = erase_range(erase_sll, erase_begin, erase_end);
+    assert(deleted <= erase_sll->sz_);
+    erase_sll->sz_ -= deleted;
+    return ret == &erase_sll->sentinel_ ? NULL : struct_base(erase_sll, ret);
+}
+
 inline void *
 ccc_sll_begin(ccc_singly_linked_list const *const sll)
 {
@@ -152,6 +187,24 @@ ccc_sll_next(ccc_singly_linked_list const *const sll,
         return NULL;
     }
     return struct_base(sll, iter_handle->n_);
+}
+
+void
+ccc_sll_clear_and_free(ccc_singly_linked_list *const sll,
+                       ccc_destructor_fn *const fn)
+{
+    while (!ccc_sll_empty(sll))
+    {
+        void *mem = struct_base(sll, pop_front(sll));
+        if (fn)
+        {
+            fn(mem);
+        }
+        if (sll->alloc_)
+        {
+            (void)sll->alloc_(mem, 0);
+        }
+    }
 }
 
 bool
@@ -193,6 +246,16 @@ ccc_sll_elem_in(struct ccc_sll_ const *const sll, void const *const user_struct)
 }
 
 static inline struct ccc_sll_elem_ *
+pop_front(struct ccc_sll_ *const sll)
+{
+    struct ccc_sll_elem_ *remove = sll->sentinel_.n_;
+    sll->sentinel_.n_ = remove->n_;
+    remove->n_ = NULL;
+    --sll->sz_;
+    return remove;
+}
+
+static inline struct ccc_sll_elem_ *
 before(struct ccc_sll_ const *const sll,
        struct ccc_sll_elem_ const *const to_find)
 {
@@ -202,7 +265,22 @@ before(struct ccc_sll_ const *const sll,
     return (struct ccc_sll_elem_ *)i;
 }
 
-static size_t
+static inline size_t
+erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
+            struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
+{
+    size_t sz = 1;
+    for (struct ccc_sll_elem_ *next = NULL; begin != end; begin = next, ++sz)
+    {
+        assert(sz <= sll->sz_);
+        next = begin->n_;
+        begin->n_ = NULL;
+    }
+    begin->n_ = NULL;
+    return sz;
+}
+
+static inline size_t
 len([[maybe_unused]] struct ccc_sll_ const *const sll,
     struct ccc_sll_elem_ const *begin, struct ccc_sll_elem_ const *const end)
 {

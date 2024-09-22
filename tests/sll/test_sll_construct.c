@@ -8,7 +8,7 @@
 
 BEGIN_STATIC_TEST(sll_test_construct)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
     CHECK(empty(&sll), true);
     END_TEST();
 }
