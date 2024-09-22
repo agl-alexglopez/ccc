@@ -214,7 +214,7 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     for (struct ccc_sll_elem_ *e = sll->sentinel_.n_; e != &sll->sentinel_;
          e = e->n_, ++size)
     {
-        if (size > sll->sz_)
+        if (size >= sll->sz_)
         {
             return false;
         }
