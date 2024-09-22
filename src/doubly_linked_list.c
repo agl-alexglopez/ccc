@@ -338,11 +338,11 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     for (struct ccc_dll_elem_ *e = l->sentinel_.n_; e != &l->sentinel_;
          e = e->n_, ++size)
     {
-        if (!e || !e->n_ || !e->p_)
+        if (size > l->sz_)
         {
             return false;
         }
-        if (size > l->sz_)
+        if (!e || !e->n_ || !e->p_ || e->n_ == e || e->p_ == e)
         {
             return false;
         }
