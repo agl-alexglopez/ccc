@@ -48,6 +48,8 @@ push_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems,
            enum ccc_impl_fdeq_alloc_slot const dir)
 {
     size_t const elem_sz = ccc_buf_elem_size(&fq->buf_);
+    /* TODO: Ew. This should precalculate space needed or chunking for wrapping
+       and perform at most two memcpy calls. No loops. */
     switch (dir)
     {
     case CCC_IMPL_FDEQ_BACK:
@@ -72,6 +74,7 @@ push_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems,
             }
         }
     }
+    break;
     }
     return CCC_OK;
 }
@@ -144,6 +147,8 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void const *pos,
                    ? NULL
                    : at(fq, ccc_buf_size(&fq->buf_) - n);
     }
+    /* TODO: Implementing insert range in a flat queue is non trivial and will
+       vary depending on resizing or not. */
     return NULL;
 }
 
