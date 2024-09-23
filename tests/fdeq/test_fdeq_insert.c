@@ -54,24 +54,67 @@ BEGIN_STATIC_TEST(fdeq_test_insert_overwrite_three)
     v = back(&q);
     CHECK(v == NULL, false);
     CHECK(*v, 10);
+    (void)fdeq_push_front_range(&q, 2, (int[2]){11, 12});
+    CHECK(validate(&q), true);
+    CHECK(check_order(&q, 3, (int[3]){11, 12, 8}), PASS);
+    v = front(&q);
+    CHECK(v == NULL, false);
+    CHECK(*v, 11);
+    v = back(&q);
+    CHECK(v == NULL, false);
+    CHECK(*v, 8);
     CHECK(size(&q), 3);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_insert_three_with_extra_capacity)
+BEGIN_STATIC_TEST(fdeq_test_push_back_ranges)
 {
-    int vals[5] = {};
+    int vals[6] = {};
     flat_double_ended_queue q
         = fdeq_init(vals, sizeof(vals) / sizeof(int), int, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
-    CHECK(size(&q), 3);
+    CHECK(check_order(&q, 3, (int[5]){0, 1, 2}), PASS);
+    (void)fdeq_push_back_range(&q, 2, (int[2]){3, 4});
+    CHECK(check_order(&q, 5, (int[5]){0, 1, 2, 3, 4}), PASS);
+    (void)fdeq_push_back_range(&q, 3, (int[3]){5, 6, 7});
+    CHECK(check_order(&q, 6, (int[6]){2, 3, 4, 5, 6, 7}), PASS);
+    (void)fdeq_push_back_range(&q, 4, (int[4]){9, 10, 11, 12});
+    CHECK(check_order(&q, 6, (int[6]){6, 7, 9, 10, 11, 12}), PASS);
+    (void)fdeq_push_back_range(&q, 5, (int[5]){13, 14, 15, 16, 17});
+    CHECK(check_order(&q, 6, (int[6]){12, 13, 14, 15, 16, 17}), PASS);
+    (void)fdeq_push_back_range(&q, 6, (int[6]){18, 19, 20, 21, 22, 23});
+    CHECK(check_order(&q, 6, (int[6]){18, 19, 20, 21, 22, 23}), PASS);
+    (void)fdeq_push_back_range(&q, 7, (int[7]){24, 25, 26, 27, 28, 29, 30});
+    CHECK(check_order(&q, 6, (int[6]){25, 26, 27, 28, 29, 30}), PASS);
+    END_TEST();
+}
+
+BEGIN_STATIC_TEST(fdeq_test_push_front_ranges)
+{
+    int vals[6] = {};
+    flat_double_ended_queue q
+        = fdeq_init(vals, sizeof(vals) / sizeof(int), int, NULL);
+    CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
+    CHECK(check_order(&q, 3, (int[5]){0, 1, 2}), PASS);
+    (void)fdeq_push_front_range(&q, 2, (int[2]){3, 4});
+    CHECK(check_order(&q, 5, (int[5]){3, 4, 0, 1, 2}), PASS);
+    (void)fdeq_push_front_range(&q, 3, (int[3]){5, 6, 7});
+    CHECK(check_order(&q, 6, (int[6]){5, 6, 7, 3, 4, 0}), PASS);
+    (void)fdeq_push_front_range(&q, 4, (int[4]){9, 10, 11, 12});
+    CHECK(check_order(&q, 6, (int[6]){9, 10, 11, 12, 5, 6}), PASS);
+    (void)fdeq_push_front_range(&q, 5, (int[5]){13, 14, 15, 16, 17});
+    CHECK(check_order(&q, 6, (int[6]){13, 14, 15, 16, 17, 9}), PASS);
+    (void)fdeq_push_front_range(&q, 6, (int[6]){18, 19, 20, 21, 22, 23});
+    CHECK(check_order(&q, 6, (int[6]){18, 19, 20, 21, 22, 23}), PASS);
+    (void)fdeq_push_front_range(&q, 7, (int[7]){24, 25, 26, 27, 28, 29, 30});
+    CHECK(check_order(&q, 6, (int[6]){25, 26, 27, 28, 29, 30}), PASS);
     END_TEST();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fdeq_test_insert_three(),
-                     fdeq_test_insert_overwrite_three(),
-                     fdeq_test_insert_three_with_extra_capacity());
+    return RUN_TESTS(
+        fdeq_test_insert_three(), fdeq_test_insert_overwrite_three(),
+        fdeq_test_push_back_ranges(), fdeq_test_push_front_ranges());
 }

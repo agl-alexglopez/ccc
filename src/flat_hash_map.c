@@ -380,7 +380,7 @@ ccc_impl_fhm_insert(struct ccc_fhm_ *const h, void const *const e,
         if (slot_hash->hash_ == CCC_FHM_EMPTY)
         {
             memcpy(slot, floater, elem_sz);
-            ccc_buf_size_plus(&h->buf_);
+            ccc_buf_size_plus(&h->buf_, 1);
             *ccc_impl_fhm_hash_at(h, 0) = CCC_FHM_EMPTY;
             *ccc_impl_fhm_hash_at(h, 1) = CCC_FHM_EMPTY;
             return;
@@ -419,7 +419,7 @@ erase(struct ccc_fhm_ *const h, void *const e)
         swap(tmp, next_slot, ccc_buf_at(&h->buf_, stopped_at), elem_sz);
     }
     *ccc_impl_fhm_hash_at(h, 0) = CCC_FHM_EMPTY;
-    ccc_buf_size_minus(&h->buf_);
+    ccc_buf_size_minus(&h->buf_, 1);
 }
 
 ccc_result

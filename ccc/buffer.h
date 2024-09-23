@@ -16,8 +16,8 @@ ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);
 size_t ccc_buf_size(ccc_buffer const *);
 
-void ccc_buf_size_plus(ccc_buffer *);
-void ccc_buf_size_minus(ccc_buffer *);
+void ccc_buf_size_plus(ccc_buffer *, size_t n);
+void ccc_buf_size_minus(ccc_buffer *, size_t n);
 void ccc_buf_size_set(ccc_buffer *, size_t n);
 
 size_t ccc_buf_capacity(ccc_buffer const *);

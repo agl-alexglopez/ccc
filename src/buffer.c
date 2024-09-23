@@ -263,15 +263,15 @@ ccc_buf_index_of(ccc_buffer const *const buf, void const *const slot)
 }
 
 void
-ccc_buf_size_plus(ccc_buffer *const buf)
+ccc_buf_size_plus(ccc_buffer *const buf, size_t const n)
 {
-    ++buf->sz_;
+    buf->sz_ += n;
 }
 
 void
-ccc_buf_size_minus(ccc_buffer *const buf)
+ccc_buf_size_minus(ccc_buffer *const buf, size_t const n)
 {
-    --buf->sz_;
+    buf->sz_ = n > buf->sz_ ? 0 : buf->sz_ - n;
 }
 
 void
