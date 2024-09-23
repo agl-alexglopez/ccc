@@ -56,9 +56,16 @@ push_range(struct ccc_fdeq_ *const fq, size_t n, char const *elems,
         return CCC_MEM_ERR;
     }
     size_t const cap = ccc_buf_capacity(&fq->buf_);
+    /* If a range is too large we can make various simplifications to preserve
+       the final capacity elements. */
     if (n >= cap)
     {
         dir = CCC_IMPL_FDEQ_BACK;
+        elems += ((n - cap) * elem_sz);
+        fq->front_ = 0;
+        (void)memcpy(ccc_buf_at(&fq->buf_, 0), elems, elem_sz * cap);
+        ccc_buf_size_set(&fq->buf_, cap);
+        return CCC_OK;
     }
     switch (dir)
     {
