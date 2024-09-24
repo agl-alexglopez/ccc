@@ -53,6 +53,7 @@ push_back_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
         ccc_buf_size_set(&fq->buf_, cap);
         return CCC_OK;
     }
+    size_t const new_size = ccc_buf_size(&fq->buf_) + n;
     size_t const back_slot = back_free_slot(fq);
     size_t const chunk = MIN(n, cap - back_slot);
     size_t const remainder_back_slot = (back_slot + chunk) % cap;
@@ -64,15 +65,11 @@ push_back_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
         (void)memcpy(ccc_buf_at(&fq->buf_, remainder_back_slot), second_chunk,
                      remainder * elem_sz);
     }
-    if (full && fq->front_ == back_slot)
+    if (new_size > cap)
     {
-        fq->front_ = (fq->front_ + chunk) % cap;
+        fq->front_ += (new_size - cap);
     }
-    if (full && remainder && fq->front_ == remainder_back_slot)
-    {
-        fq->front_ = (fq->front_ + remainder) % cap;
-    }
-    ccc_buf_size_set(&fq->buf_, MIN(cap, ccc_buf_size(&fq->buf_) + n));
+    ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
     return CCC_OK;
 }
 
@@ -98,18 +95,16 @@ push_front_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
     }
     size_t const space_ahead = front_free_slot(fq->front_, cap) + 1;
     size_t const front_i = n > space_ahead ? 0 : space_ahead - n;
+    size_t const remainder_ahead = front_free_slot(front_i, cap) + 1;
     size_t const chunk = MIN(n, space_ahead);
     size_t const remainder = (n - chunk);
-    size_t const remainder_ahead = front_free_slot(front_i, cap) + 1;
-    size_t const remainder_chunk = MIN(remainder, remainder_ahead);
-    size_t const remainder_front_i
-        = remainder > remainder_ahead ? 0 : remainder_ahead - remainder;
+    size_t const remainder_front_i = remainder_ahead - remainder;
     char const *const first_chunk = elems + ((n - chunk) * elem_sz);
     (void)memcpy(ccc_buf_at(&fq->buf_, front_i), first_chunk, chunk * elem_sz);
     if (remainder)
     {
         (void)memcpy(ccc_buf_at(&fq->buf_, remainder_front_i), elems,
-                     remainder_chunk * elem_sz);
+                     remainder * elem_sz);
     }
     ccc_buf_size_set(&fq->buf_, MIN(cap, ccc_buf_size(&fq->buf_) + n));
     fq->front_ = remainder ? remainder_front_i : front_i;
