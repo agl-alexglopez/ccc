@@ -165,7 +165,8 @@ push_range(struct ccc_fdeq_ *const fq, char const *const pos, size_t n,
            the range as possible. If wrapping occurs the range is the new
            front. */
         if ((fq->front_ <= pos_i && fq->front_ + excess >= pos_i)
-            || (fq->front_ + excess > cap && (excess - cap) >= pos_i))
+            || (fq->front_ + excess > cap
+                && ((fq->front_ + excess) - cap) >= pos_i))
         {
             fq->front_ = pos_i;
         }
