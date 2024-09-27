@@ -172,7 +172,7 @@ push_range(struct ccc_fdeq_ *const fq, char const *const pos, size_t n,
         }
         else
         {
-            fq->front_ = (fq->front_ + (new_size - cap)) % cap;
+            fq->front_ = (fq->front_ + excess) % cap;
         }
     }
     ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
