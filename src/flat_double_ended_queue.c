@@ -18,7 +18,6 @@ static size_t const start_capacity = 8;
     })
 
 static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t);
-static size_t bytes(struct ccc_fdeq_ const *, size_t);
 static size_t index_of(struct ccc_fdeq_ const *, void const *);
 static void *at(struct ccc_fdeq_ const *, size_t i);
 size_t increment(struct ccc_fdeq_ const *, size_t i);
@@ -32,6 +31,8 @@ static ccc_result push_back_range(struct ccc_fdeq_ *fq, size_t n,
 static size_t back_free_slot(struct ccc_fdeq_ const *);
 static size_t front_free_slot(size_t front, size_t cap);
 static size_t last_elem_index(struct ccc_fdeq_ const *);
+static inline void *push_range(struct ccc_fdeq_ *fq, char const *pos, size_t n,
+                               char const *elems);
 
 static inline ccc_result
 push_back_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
@@ -67,7 +68,7 @@ push_back_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
     }
     if (new_size > cap)
     {
-        fq->front_ += (new_size - cap);
+        fq->front_ = (fq->front_ + (new_size - cap)) % cap;
     }
     ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
     return CCC_OK;
@@ -94,21 +95,83 @@ push_front_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
         return CCC_OK;
     }
     size_t const space_ahead = front_free_slot(fq->front_, cap) + 1;
-    size_t const front_i = n > space_ahead ? 0 : space_ahead - n;
-    size_t const remainder_ahead = front_free_slot(front_i, cap) + 1;
+    size_t const i = n > space_ahead ? 0 : space_ahead - n;
     size_t const chunk = MIN(n, space_ahead);
     size_t const remainder = (n - chunk);
-    size_t const remainder_front_i = remainder_ahead - remainder;
     char const *const first_chunk = elems + ((n - chunk) * elem_sz);
-    (void)memcpy(ccc_buf_at(&fq->buf_, front_i), first_chunk, chunk * elem_sz);
+    (void)memcpy(ccc_buf_at(&fq->buf_, i), first_chunk, chunk * elem_sz);
     if (remainder)
     {
-        (void)memcpy(ccc_buf_at(&fq->buf_, remainder_front_i), elems,
+        (void)memcpy(ccc_buf_at(&fq->buf_, cap - remainder), elems,
                      remainder * elem_sz);
     }
     ccc_buf_size_set(&fq->buf_, MIN(cap, ccc_buf_size(&fq->buf_) + n));
-    fq->front_ = remainder ? remainder_front_i : front_i;
+    fq->front_ = remainder ? cap - remainder : i;
     return CCC_OK;
+}
+
+static inline void *
+push_range(struct ccc_fdeq_ *const fq, char const *const pos, size_t n,
+           char const *elems)
+{
+    size_t const elem_sz = ccc_buf_elem_size(&fq->buf_);
+    bool const full = maybe_resize(fq, n) != CCC_OK;
+    if (fq->buf_.alloc_ && full)
+    {
+        return NULL;
+    }
+    size_t const cap = ccc_buf_capacity(&fq->buf_);
+    size_t const new_size = ccc_buf_size(&fq->buf_) + n;
+    if (n >= cap)
+    {
+        elems += ((n - cap) * elem_sz);
+        fq->front_ = 0;
+        void *ret = ccc_buf_at(&fq->buf_, 0);
+        (void)memcpy(ret, elems, elem_sz * cap);
+        ccc_buf_size_set(&fq->buf_, cap);
+        return ret;
+    }
+    size_t const pos_i = index_of(fq, pos);
+    size_t const back = back_free_slot(fq);
+    size_t const to_move = back > pos_i ? back - pos_i : cap - pos_i + back;
+    size_t const move_i = (pos_i + n) % cap;
+    size_t const move_chunk = move_i + to_move > cap ? cap - move_i : to_move;
+    size_t const move_remain = to_move - move_chunk;
+    memmove(ccc_buf_at(&fq->buf_, move_i), ccc_buf_at(&fq->buf_, pos_i),
+            move_chunk * elem_sz);
+    if (move_remain)
+    {
+        size_t const move_remain_i = (move_i + move_chunk) % cap;
+        size_t const remaining_start_i = (pos_i + move_chunk) % cap;
+        memmove(ccc_buf_at(&fq->buf_, move_remain_i),
+                ccc_buf_at(&fq->buf_, remaining_start_i),
+                move_remain * elem_sz);
+    }
+    size_t const elems_chunk = MIN(n, cap - pos_i);
+    size_t const elems_remain = n - elems_chunk;
+    memcpy(ccc_buf_at(&fq->buf_, pos_i), elems, elems_chunk * elem_sz);
+    if (elems_remain)
+    {
+        char const *const second_chunk = elems + (elems_chunk * elem_sz);
+        size_t const second_chunk_i = (pos_i + elems_chunk) % cap;
+        memcpy(ccc_buf_at(&fq->buf_, second_chunk_i), second_chunk,
+               elems_remain * elem_sz);
+    }
+    if (new_size > cap)
+    {
+        size_t const excess = (new_size - cap);
+        if ((fq->front_ <= pos_i && fq->front_ + excess >= pos_i)
+            || (fq->front_ + excess > cap && (excess - cap) >= pos_i))
+        {
+            fq->front_ = pos_i;
+        }
+        else
+        {
+            fq->front_ = (fq->front_ + (new_size - cap)) % cap;
+        }
+    }
+    ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
+    return ccc_buf_at(&fq->buf_, pos_i);
 }
 
 void *
@@ -166,8 +229,8 @@ ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *const fq, size_t const n,
 }
 
 void *
-ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void const *pos,
-                      size_t n, void const *elems)
+ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void *pos, size_t n,
+                      void const *elems)
 {
     if (!fq)
     {
@@ -189,7 +252,7 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void const *pos,
     }
     /* TODO: Implementing insert range in a flat queue is non trivial and will
        vary depending on resizing or not. */
-    return NULL;
+    return push_range(fq, pos, n, elems);
 }
 
 void
@@ -301,6 +364,10 @@ ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *fq)
 void *
 ccc_fdeq_begin(ccc_flat_double_ended_queue const *fq)
 {
+    if (ccc_fdeq_empty(fq))
+    {
+        return NULL;
+    }
     return ccc_buf_at(&fq->buf_, fq->front_);
 }
 
@@ -355,6 +422,10 @@ ccc_fdeq_rend([[maybe_unused]] ccc_flat_double_ended_queue const *const fq)
 bool
 ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
 {
+    if (ccc_fdeq_empty(fq))
+    {
+        return true;
+    }
     void *iter = ccc_fdeq_begin(fq);
     if (ccc_buf_index_of(&fq->buf_, iter) != fq->front_)
     {
@@ -443,6 +514,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     {
         return CCC_NO_REALLOC;
     }
+    size_t const elem_sz = ccc_buf_elem_size(&q->buf_);
     size_t const new_cap
         = ccc_buf_capacity(&q->buf_)
               ? ((ccc_buf_capacity(&q->buf_) + additional_elems_to_add) * 2)
@@ -455,12 +527,12 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     size_t const first_chunk
         = MIN(ccc_buf_size(&q->buf_), ccc_buf_capacity(&q->buf_) - q->front_);
     (void)memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_),
-                 bytes(q, first_chunk));
+                 elem_sz * first_chunk);
     if (first_chunk < ccc_buf_size(&q->buf_))
     {
-        (void)memcpy((char *)new_mem + bytes(q, first_chunk),
+        (void)memcpy((char *)new_mem + (elem_sz * first_chunk),
                      ccc_buf_base(&q->buf_),
-                     bytes(q, ccc_buf_size(&q->buf_) - first_chunk));
+                     elem_sz * (ccc_buf_size(&q->buf_) - first_chunk));
     }
     (void)ccc_buf_realloc(&q->buf_, 0, q->buf_.alloc_);
     q->buf_.mem_ = new_mem;
@@ -535,10 +607,4 @@ last_elem_index(struct ccc_fdeq_ const *const fq)
 {
     return (fq->front_ + (ccc_buf_size(&fq->buf_) - 1))
            % ccc_buf_capacity(&fq->buf_);
-}
-
-static inline size_t
-bytes(struct ccc_fdeq_ const *q, size_t n)
-{
-    return ccc_buf_elem_size(&q->buf_) * n;
 }

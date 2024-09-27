@@ -18,7 +18,7 @@ ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fq, size_t n,
 void *ccc_fdeq_push_front(ccc_flat_double_ended_queue *fq, void const *elem);
 ccc_result ccc_fdeq_push_front_range(ccc_flat_double_ended_queue *fq, size_t n,
                                      void const *elems);
-void *ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void const *pos,
+void *ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void *pos,
                             size_t n, void const *elems);
 void *ccc_fdeq_at(ccc_flat_double_ended_queue const *fq, size_t i);
 
@@ -56,6 +56,7 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_push_back_range(args...) ccc_fdeq_push_back_range(args)
 #    define fdeq_push_front(args...) ccc_fdeq_push_front(args)
 #    define fdeq_push_front_range(args...) ccc_fdeq_push_front_range(args)
+#    define fdeq_insert_range(args...) ccc_fdeq_insert_range(args)
 #    define fdeq_pop_front(args...) ccc_fdeq_pop_front(args)
 #    define fdeq_pop_back(args...) ccc_fdeq_pop_back(args)
 #    define fdeq_front(args...) ccc_fdeq_front(args)
@@ -64,6 +65,7 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_size(args...) ccc_fdeq_size(args)
 #    define fdeq_clear(args...) ccc_fdeq_clear(args)
 #    define fdeq_clear_and_free(args...) ccc_fdeq_clear_and_free(args)
+#    define fdeq_at(args...) ccc_fdeq_at(args)
 #    define fdeq_begin(args...) ccc_fdeq_begin(args)
 #    define fdeq_rbegin(args...) ccc_fdeq_rbegin(args)
 #    define fdeq_next(args...) ccc_fdeq_next(args)

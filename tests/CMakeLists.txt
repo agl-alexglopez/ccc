@@ -282,7 +282,7 @@ endmacro()
 
 add_fdeq_test(test_fdeq_construct)
 add_fdeq_test(test_fdeq_insert)
-# add_fdeq_test(test_fdeq_erase)
+add_fdeq_test(test_fdeq_erase)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
