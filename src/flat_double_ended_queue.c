@@ -160,6 +160,10 @@ push_range(struct ccc_fdeq_ *const fq, char const *const pos, size_t n,
     if (new_size > cap)
     {
         size_t const excess = (new_size - cap);
+        /* Wrapping behavior stops if it would overwrite the start of the
+           range being inserted. This is to preserve as much info about
+           the range as possible. If wrapping occurs the range is the new
+           front. */
         if ((fq->front_ <= pos_i && fq->front_ + excess >= pos_i)
             || (fq->front_ + excess > cap && (excess - cap) >= pos_i))
         {
