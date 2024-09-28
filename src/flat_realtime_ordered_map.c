@@ -469,7 +469,7 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
     assert(x);
     assert(is_0_child(t, z_p_of_xy, x));
     enum frm_link_ const p_to_x_dir = child(t, z_p_of_xy, R) == x;
-    size_t y = child(t, x, !p_to_x_dir);
+    size_t const y = child(t, x, !p_to_x_dir);
     if (!y || is_2_child(t, z_p_of_xy, y))
     {
         rotate(t, z_p_of_xy, x, y, !p_to_x_dir);
