@@ -58,8 +58,11 @@ static struct ccc_frm_elem_ *at(struct ccc_frm_ const *, size_t);
 static void *base_at(struct ccc_frm_ const *, size_t);
 static ccc_threeway_cmp cmp_elems(struct ccc_frm_ const *frm, void const *key,
                                   size_t node, ccc_key_cmp_fn *fn);
-static inline struct frm_query_ find(struct ccc_frm_ const *frm,
-                                     void const *key);
+static struct frm_query_ find(struct ccc_frm_ const *frm, void const *key);
+static void *insert(struct ccc_frm_ *frm, size_t parent_i,
+                    ccc_threeway_cmp last_cmp, size_t elem_i);
+static inline struct ccc_frm_entry_ entry(struct ccc_frm_ const *frm,
+                                          void const *key);
 static void *maybe_alloc_insert(struct ccc_frm_ *frm, size_t parent,
                                 ccc_threeway_cmp last_cmp,
                                 struct ccc_frm_elem_ *elem);
@@ -193,7 +196,7 @@ ccc_frtm_entry
 ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
               void const *const key)
 {
-    return (ccc_frtm_entry){ccc_impl_frm_entry(frm, key)};
+    return (ccc_frtm_entry){entry(frm, key)};
 }
 
 bool
@@ -276,48 +279,13 @@ void *
 ccc_impl_frm_insert(struct ccc_frm_ *const frm, size_t const parent_i,
                     ccc_threeway_cmp const last_cmp, size_t const elem_i)
 {
-    struct ccc_frm_elem_ *elem = at(frm, elem_i);
-    init_node(elem);
-    if (ccc_buf_size(&frm->buf_) == 2)
-    {
-        frm->root_ = elem_i;
-        return struct_base(frm, elem);
-    }
-    assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
-    struct ccc_frm_elem_ *parent = at(frm, parent_i);
-    bool const rank_rule_break = !parent->branch_[L] && !parent->branch_[R];
-    parent->branch_[CCC_GRT == last_cmp] = elem_i;
-    elem->parent_ = parent_i;
-    if (rank_rule_break)
-    {
-        insert_fixup(frm, parent_i, elem_i);
-    }
-    return struct_base(frm, elem);
+    return insert(frm, parent_i, last_cmp, elem_i);
 }
 
 struct ccc_frm_entry_
 ccc_impl_frm_entry(struct ccc_frm_ const *const frm, void const *const key)
 {
-    struct frm_query_ q = find(frm, key);
-    if (CCC_EQL == q.last_cmp_)
-    {
-        return (struct ccc_frm_entry_){
-            .frm_ = (struct ccc_frm_ *)frm,
-            .last_cmp_ = q.last_cmp_,
-            .entry_ = {
-                .e_ = base_at(frm, q.found_),
-                .stats_ = CCC_ENTRY_OCCUPIED,
-            },
-        };
-    }
-    return (struct ccc_frm_entry_){
-        .frm_ = (struct ccc_frm_ *)frm,
-        .last_cmp_ = q.last_cmp_,
-        .entry_ = {
-            .e_ = base_at(frm, q.parent_),
-            .stats_ = CCC_ENTRY_VACANT,
-        },
-    };
+    return entry(frm, key);
 }
 
 void *
@@ -365,7 +333,55 @@ maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
     }
     size_t const node = ccc_buf_size(&frm->buf_) - 1;
     ccc_buf_write(&frm->buf_, node, struct_base(frm, elem));
-    return ccc_impl_frm_insert(frm, parent, last_cmp, node);
+    return insert(frm, parent, last_cmp, node);
+}
+
+static inline void *
+insert(struct ccc_frm_ *const frm, size_t const parent_i,
+       ccc_threeway_cmp const last_cmp, size_t const elem_i)
+{
+    struct ccc_frm_elem_ *elem = at(frm, elem_i);
+    init_node(elem);
+    if (ccc_buf_size(&frm->buf_) == 2)
+    {
+        frm->root_ = elem_i;
+        return struct_base(frm, elem);
+    }
+    assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
+    struct ccc_frm_elem_ *parent = at(frm, parent_i);
+    bool const rank_rule_break = !parent->branch_[L] && !parent->branch_[R];
+    parent->branch_[CCC_GRT == last_cmp] = elem_i;
+    elem->parent_ = parent_i;
+    if (rank_rule_break)
+    {
+        insert_fixup(frm, parent_i, elem_i);
+    }
+    return struct_base(frm, elem);
+}
+
+static inline struct ccc_frm_entry_
+entry(struct ccc_frm_ const *const frm, void const *const key)
+{
+    struct frm_query_ q = find(frm, key);
+    if (CCC_EQL == q.last_cmp_)
+    {
+        return (struct ccc_frm_entry_){
+            .frm_ = (struct ccc_frm_ *)frm,
+            .last_cmp_ = q.last_cmp_,
+            .entry_ = {
+                .e_ = base_at(frm, q.found_),
+                .stats_ = CCC_ENTRY_OCCUPIED,
+            },
+        };
+    }
+    return (struct ccc_frm_entry_){
+        .frm_ = (struct ccc_frm_ *)frm,
+        .last_cmp_ = q.last_cmp_,
+        .entry_ = {
+            .e_ = base_at(frm, q.parent_),
+            .stats_ = CCC_ENTRY_VACANT,
+        },
+    };
 }
 
 static inline struct frm_query_
