@@ -299,7 +299,7 @@ next(struct ccc_frm_ const *const t, size_t n, enum frm_link_ const traversal)
     {
         return 0;
     }
-    assert(parent(t, t->root_) == 0);
+    assert(!parent(t, t->root_));
     /* The node is an internal one that has a subtree to explore first. */
     if (child(t, n, traversal))
     {
