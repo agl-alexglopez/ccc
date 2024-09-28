@@ -22,13 +22,13 @@
 #define PRINTER_INDENT (short)13
 #define LR 2
 
-enum frm_link_
+enum frm_branch_
 {
     L = 0,
     R,
 };
 
-enum frm_print_link_
+enum frm_print_branch_
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
@@ -44,11 +44,11 @@ struct frm_query_
     };
 };
 
-static enum frm_link_ const inorder_traversal = R;
-static enum frm_link_ const reverse_inorder_traversal = L;
+static enum frm_branch_ const inorder_traversal = R;
+static enum frm_branch_ const reverse_inorder_traversal = L;
 
-static enum frm_link_ const min = L;
-static enum frm_link_ const max = R;
+static enum frm_branch_ const min = L;
+static enum frm_branch_ const max = R;
 
 /*==============================  Prototypes   ==============================*/
 
@@ -86,19 +86,19 @@ static void double_promote(struct ccc_frm_ const *t, size_t x);
 static void double_demote(struct ccc_frm_ const *t, size_t x);
 
 static void rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
-                   size_t y, enum frm_link_ dir);
+                   size_t y, enum frm_branch_ dir);
 static void double_rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
-                          size_t y, enum frm_link_ dir);
+                          size_t y, enum frm_branch_ dir);
 static size_t next(struct ccc_frm_ const *t, size_t n,
-                   enum frm_link_ traversal);
+                   enum frm_branch_ traversal);
 static size_t min_max_from(struct ccc_frm_ const *t, size_t start,
-                           enum frm_link_ dir);
-static size_t child(struct ccc_frm_ const *t, size_t parent,
-                    enum frm_link_ dir);
+                           enum frm_branch_ dir);
+static size_t branch_i(struct ccc_frm_ const *t, size_t parent,
+                       enum frm_branch_ dir);
+static size_t parent_i(struct ccc_frm_ const *t, size_t child);
 static size_t *branch_ref(struct ccc_frm_ const *t, size_t node,
-                          enum frm_link_ branch);
+                          enum frm_branch_ branch);
 static size_t *parent_ref(struct ccc_frm_ const *t, size_t node);
-static size_t parent(struct ccc_frm_ const *t, size_t child);
 static uint8_t parity(struct ccc_frm_ const *t, size_t node);
 static size_t index_of(struct ccc_frm_ const *t,
                        struct ccc_frm_elem_ const *elem);
@@ -144,6 +144,47 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_rom_try_insert(ccc_flat_realtime_ordered_map *const rom,
+                   ccc_frtm_elem *const key_val_handle)
+{
+    struct frm_query_ q
+        = find(rom, ccc_impl_frm_key_from_node(rom, key_val_handle));
+    if (CCC_EQL == q.last_cmp_)
+    {
+        return (ccc_entry){
+            {.e_ = base_at(rom, q.found_), .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *inserted
+        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_rom_insert_or_assign(ccc_flat_realtime_ordered_map *const rom,
+                         ccc_frtm_elem *const key_val_handle)
+{
+    struct frm_query_ q
+        = find(rom, ccc_impl_frm_key_from_node(rom, key_val_handle));
+    if (CCC_EQL == q.last_cmp_)
+    {
+        void *const found = base_at(rom, q.found_);
+        ccc_buf_write(&rom->buf_, q.found_, struct_base(rom, key_val_handle));
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *inserted
+        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 bool
@@ -284,14 +325,13 @@ maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
         }
         ccc_impl_frm_elem_in_slot(frm, sentinel)->parity_ = 1;
     }
-    void *const new = ccc_buf_alloc(&frm->buf_);
-    if (!new)
+    if (!ccc_buf_alloc(&frm->buf_))
     {
         return NULL;
     }
-    memcpy(new, struct_base(frm, elem), ccc_buf_elem_size(&frm->buf_));
-    return ccc_impl_frm_insert(frm, parent, last_cmp,
-                               ccc_buf_size(&frm->buf_) - 1);
+    size_t const node = ccc_buf_size(&frm->buf_) - 1;
+    ccc_buf_write(&frm->buf_, node, struct_base(frm, elem));
+    return ccc_impl_frm_insert(frm, parent, last_cmp, node);
 }
 
 static inline struct frm_query_
@@ -300,7 +340,7 @@ find(struct ccc_frm_ const *const frm, void const *const key)
     size_t parent = 0;
     ccc_threeway_cmp link = CCC_CMP_ERR;
     for (size_t seek = frm->root_; seek;
-         parent = seek, seek = child(frm, seek, CCC_GRT == link))
+         parent = seek, seek = branch_i(frm, seek, CCC_GRT == link))
     {
         link = cmp_elems(frm, key, seek, frm->cmp_);
         if (CCC_EQL == link)
@@ -312,19 +352,19 @@ find(struct ccc_frm_ const *const frm, void const *const key)
 }
 
 static inline size_t
-next(struct ccc_frm_ const *const t, size_t n, enum frm_link_ const traversal)
+next(struct ccc_frm_ const *const t, size_t n, enum frm_branch_ const traversal)
 {
     if (!n)
     {
         return 0;
     }
-    assert(!parent(t, t->root_));
+    assert(!parent_i(t, t->root_));
     /* The node is an internal one that has a subtree to explore first. */
-    if (child(t, n, traversal))
+    if (branch_i(t, n, traversal))
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = child(t, n, traversal); child(t, n, !traversal);
-             n = child(t, n, !traversal))
+        for (n = branch_i(t, n, traversal); branch_i(t, n, !traversal);
+             n = branch_i(t, n, !traversal))
         {}
         return n;
     }
@@ -335,21 +375,21 @@ next(struct ccc_frm_ const *const t, size_t n, enum frm_link_ const traversal)
        write to the sentinel on every call to next. I want multiple threads to
        iterate freely without undefined data race writes to memory locations.
        So more expensive loop.*/
-    for (; parent(t, n) && child(t, parent(t, n), !traversal) != n;
-         n = parent(t, n))
+    for (; parent_i(t, n) && branch_i(t, parent_i(t, n), !traversal) != n;
+         n = parent_i(t, n))
     {}
-    return parent(t, n);
+    return parent_i(t, n);
 }
 
 static inline size_t
 min_max_from(struct ccc_frm_ const *const t, size_t start,
-             enum frm_link_ const dir)
+             enum frm_branch_ const dir)
 {
     if (!start)
     {
         return 0;
     }
-    for (; child(t, start, dir); start = child(t, start, dir))
+    for (; branch_i(t, start, dir); start = branch_i(t, start, dir))
     {}
     return start;
 }
@@ -393,15 +433,15 @@ at(struct ccc_frm_ const *const t, size_t const i)
 }
 
 static inline size_t
-child(struct ccc_frm_ const *const t, size_t const parent,
-      enum frm_link_ const dir)
+branch_i(struct ccc_frm_ const *const t, size_t const parent,
+         enum frm_branch_ const dir)
 {
     return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, parent))
         ->branch_[dir];
 }
 
 static inline size_t
-parent(struct ccc_frm_ const *const t, size_t const child)
+parent_i(struct ccc_frm_ const *const t, size_t const child)
 {
     return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, child))->parent_;
 }
@@ -420,7 +460,7 @@ parity(struct ccc_frm_ const *t, size_t const node)
 
 static inline size_t *
 branch_ref(struct ccc_frm_ const *t, size_t const node,
-           enum frm_link_ const branch)
+           enum frm_branch_ const branch)
 {
     return &ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))
                 ->branch_[branch];
@@ -455,7 +495,7 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
     {
         promote(t, z_p_of_xy);
         x = z_p_of_xy;
-        z_p_of_xy = parent(t, z_p_of_xy);
+        z_p_of_xy = parent_i(t, z_p_of_xy);
         if (!z_p_of_xy)
         {
             return;
@@ -468,8 +508,8 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
     }
     assert(x);
     assert(is_0_child(t, z_p_of_xy, x));
-    enum frm_link_ const p_to_x_dir = child(t, z_p_of_xy, R) == x;
-    size_t const y = child(t, x, !p_to_x_dir);
+    enum frm_branch_ const p_to_x_dir = branch_i(t, z_p_of_xy, R) == x;
+    size_t const y = branch_i(t, x, !p_to_x_dir);
     if (!y || is_2_child(t, z_p_of_xy, y))
     {
         rotate(t, z_p_of_xy, x, y, !p_to_x_dir);
@@ -496,12 +536,12 @@ and uppercase are arbitrary subtrees.
        B              B*/
 static inline void
 rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
-       size_t const y, enum frm_link_ const dir)
+       size_t const y, enum frm_branch_ const dir)
 {
     assert(z_p_of_x);
     struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
     struct ccc_frm_elem_ *const x_ref = at(t, x_p_of_y);
-    size_t const p_of_p_of_x = parent(t, z_p_of_x);
+    size_t const p_of_p_of_x = parent_i(t, z_p_of_x);
     x_ref->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
     {
@@ -531,7 +571,7 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      B   C */
 static inline void
 double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
-              size_t const x_p_of_y, size_t const y, enum frm_link_ const dir)
+              size_t const x_p_of_y, size_t const y, enum frm_branch_ const dir)
 {
     assert(z_p_of_x && x_p_of_y && y);
     struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
@@ -546,7 +586,8 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
     }
     else
     {
-        *branch_ref(t, p_of_p_of_x, child(t, p_of_p_of_x, R) == z_p_of_x) = y;
+        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+        g->branch_[g->branch_[R] == z_p_of_x] = y;
     }
     x_ref->branch_[!dir] = y_ref->branch_[dir];
     *parent_ref(t, y_ref->branch_[dir]) = x_p_of_y;
@@ -686,15 +727,15 @@ double_demote([[maybe_unused]] struct ccc_frm_ const *const t,
 static inline bool
 is_leaf(struct ccc_frm_ const *const t, size_t const x)
 {
-    return !child(t, x, L) && !child(t, x, R);
+    return !branch_i(t, x, L) && !branch_i(t, x, R);
 }
 
 static inline size_t
 sibling_of(struct ccc_frm_ const *const t, size_t const x)
 {
-    assert(parent(t, x));
+    assert(parent_i(t, x));
     /* We want the sibling so we need the truthy value to be opposite of x. */
-    return at(t, parent(t, x))->branch_[child(t, parent(t, x), L) == x];
+    return at(t, parent_i(t, x))->branch_[branch_i(t, parent_i(t, x), L) == x];
 }
 
 /*===========================   Validation   ===============================*/
@@ -721,8 +762,8 @@ recursive_size(struct ccc_frm_ const *const t, size_t const r)
     {
         return 0;
     }
-    return 1 + recursive_size(t, child(t, r, R))
-           + recursive_size(t, child(t, r, L));
+    return 1 + recursive_size(t, branch_i(t, r, R))
+           + recursive_size(t, branch_i(t, r, L));
 }
 
 static bool
@@ -746,13 +787,13 @@ are_subtrees_valid(struct ccc_frm_ const *t, struct tree_range const r)
     {
         return false;
     }
-    return are_subtrees_valid(t,
-                              (struct tree_range){.low = r.low,
-                                                  .root = child(t, r.root, L),
-                                                  .high = r.root})
+    return are_subtrees_valid(
+               t, (struct tree_range){.low = r.low,
+                                      .root = branch_i(t, r.root, L),
+                                      .high = r.root})
            && are_subtrees_valid(
                t, (struct tree_range){.low = r.root,
-                                      .root = child(t, r.root, R),
+                                      .root = branch_i(t, r.root, R),
                                       .high = r.high});
 }
 
@@ -764,12 +805,12 @@ is_storing_parent(struct ccc_frm_ const *const t, size_t const p,
     {
         return true;
     }
-    if (parent(t, root) != p)
+    if (parent_i(t, root) != p)
     {
         return false;
     }
-    return is_storing_parent(t, root, child(t, root, L))
-           && is_storing_parent(t, root, child(t, root, R));
+    return is_storing_parent(t, root, branch_i(t, root, L))
+           && is_storing_parent(t, root, branch_i(t, root, R));
 }
 
 static bool
@@ -806,8 +847,9 @@ print_node(struct ccc_frm_ const *const t, size_t const root,
 
 static void
 print_inner_tree(size_t const root, char const *const prefix,
-                 enum frm_print_link_ const node_type, enum frm_link_ const dir,
-                 struct ccc_frm_ const *const t, ccc_print_fn *const fn_print)
+                 enum frm_print_branch_ const node_type,
+                 enum frm_branch_ const dir, struct ccc_frm_ const *const t,
+                 ccc_print_fn *const fn_print)
 {
     if (!root)
     {
@@ -833,18 +875,18 @@ print_inner_tree(size_t const root, char const *const prefix,
                        node_type == LEAF ? "     " : " │   ");
     }
 
-    if (!child(t, root, R))
+    if (!branch_i(t, root, R))
     {
-        print_inner_tree(child(t, root, L), str, LEAF, L, t, fn_print);
+        print_inner_tree(branch_i(t, root, L), str, LEAF, L, t, fn_print);
     }
-    else if (!child(t, root, L))
+    else if (!branch_i(t, root, L))
     {
-        print_inner_tree(child(t, root, R), str, LEAF, R, t, fn_print);
+        print_inner_tree(branch_i(t, root, R), str, LEAF, R, t, fn_print);
     }
     else
     {
-        print_inner_tree(child(t, root, R), str, BRANCH, R, t, fn_print);
-        print_inner_tree(child(t, root, L), str, LEAF, L, t, fn_print);
+        print_inner_tree(branch_i(t, root, R), str, BRANCH, R, t, fn_print);
+        print_inner_tree(branch_i(t, root, L), str, LEAF, L, t, fn_print);
     }
     free(str);
 }
@@ -859,18 +901,18 @@ ccc_tree_print(struct ccc_frm_ const *const t, size_t const root,
     }
     print_node(t, root, fn_print);
 
-    if (!child(t, root, R))
+    if (!branch_i(t, root, R))
     {
-        print_inner_tree(child(t, root, L), "", LEAF, L, t, fn_print);
+        print_inner_tree(branch_i(t, root, L), "", LEAF, L, t, fn_print);
     }
-    else if (!child(t, root, L))
+    else if (!branch_i(t, root, L))
     {
-        print_inner_tree(child(t, root, R), "", LEAF, R, t, fn_print);
+        print_inner_tree(branch_i(t, root, R), "", LEAF, R, t, fn_print);
     }
     else
     {
-        print_inner_tree(child(t, root, R), "", BRANCH, R, t, fn_print);
-        print_inner_tree(child(t, root, L), "", LEAF, L, t, fn_print);
+        print_inner_tree(branch_i(t, root, R), "", BRANCH, R, t, fn_print);
+        print_inner_tree(branch_i(t, root, L), "", LEAF, L, t, fn_print);
     }
 }
 

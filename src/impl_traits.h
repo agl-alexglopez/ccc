@@ -204,6 +204,8 @@
         ccc_flat_hash_map *: ccc_fhm_get_key_val,                              \
         ccc_flat_hash_map const *: ccc_fhm_get_key_val,                        \
         ccc_ordered_map *: ccc_om_get_key_val,                                 \
+        ccc_flat_realtime_ordered_map *: ccc_frm_get_key_val,                  \
+        ccc_flat_realtime_ordered_map const *: ccc_frm_get_key_val,            \
         ccc_realtime_ordered_map *: ccc_rom_get_key_val,                       \
         ccc_realtime_ordered_map const *: ccc_rom_get_key_val)(                \
         (container_ptr), key_ptr)
@@ -213,6 +215,8 @@
         ccc_flat_hash_map *: ccc_fhm_contains,                                 \
         ccc_flat_hash_map const *: ccc_fhm_contains,                           \
         ccc_ordered_map *: ccc_om_contains,                                    \
+        ccc_flat_realtime_ordered_map *: ccc_frm_contains,                     \
+        ccc_flat_realtime_ordered_map const *: ccc_frm_contains,               \
         ccc_realtime_ordered_map *: ccc_rom_contains,                          \
         ccc_realtime_ordered_map const *: ccc_rom_contains,                    \
         ccc_double_ended_priority_queue *: ccc_depq_contains)((container_ptr), \
