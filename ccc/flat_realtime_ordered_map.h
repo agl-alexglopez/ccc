@@ -30,6 +30,12 @@ typedef union
             .impl_                                                             \
     }
 
+bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
+                      void const *key);
+
+void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
+                          void const *key);
+
 ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
                          ccc_frtm_elem *out_handle, void *tmp);
 

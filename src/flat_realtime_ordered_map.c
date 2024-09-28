@@ -95,7 +95,11 @@ static size_t min_max_from(struct ccc_frm_ const *t, size_t start,
                            enum frm_link_ dir);
 static size_t child(struct ccc_frm_ const *t, size_t parent,
                     enum frm_link_ dir);
+static size_t *branch_ref(struct ccc_frm_ const *t, size_t node,
+                          enum frm_link_ branch);
+static size_t *parent_ref(struct ccc_frm_ const *t, size_t node);
 static size_t parent(struct ccc_frm_ const *t, size_t child);
+static uint8_t parity(struct ccc_frm_ const *t, size_t node);
 static size_t index_of(struct ccc_frm_ const *t,
                        struct ccc_frm_elem_ const *elem);
 static bool validate(struct ccc_frm_ const *frm);
@@ -104,9 +108,24 @@ static void ccc_tree_print(struct ccc_frm_ const *t, size_t root,
 
 /*==============================  Interface    ==============================*/
 
+bool
+ccc_frm_contains(ccc_flat_realtime_ordered_map const *const frm,
+                 void const *const key)
+{
+    return CCC_EQL == find(frm, key).last_cmp_;
+}
+
+void *
+ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
+                    void const *const key)
+{
+    struct frm_query_ q = find(frm, key);
+    return (CCC_EQL == q.last_cmp_) ? base_at(frm, q.found_) : NULL;
+}
+
 ccc_entry
 ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
-               ccc_frtm_elem *const out_handle, void *tmp)
+               ccc_frtm_elem *const out_handle, void *const tmp)
 {
     struct frm_query_ q
         = find(frm, ccc_impl_frm_key_from_node(frm, out_handle));
@@ -204,8 +223,8 @@ ccc_frm_print(ccc_flat_realtime_ordered_map const *const frm,
 /*========================  Private Interface  ==============================*/
 
 void *
-ccc_impl_frm_insert(struct ccc_frm_ *const frm, size_t parent_i,
-                    ccc_threeway_cmp const last_cmp, size_t elem_i)
+ccc_impl_frm_insert(struct ccc_frm_ *const frm, size_t const parent_i,
+                    ccc_threeway_cmp const last_cmp, size_t const elem_i)
 {
     struct ccc_frm_elem_ *elem = at(frm, elem_i);
     init_node(elem);
@@ -393,6 +412,27 @@ index_of(struct ccc_frm_ const *const t, struct ccc_frm_elem_ const *const elem)
     return ccc_buf_index_of(&t->buf_, struct_base(t, elem));
 }
 
+static inline uint8_t
+parity(struct ccc_frm_ const *t, size_t const node)
+{
+    return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parity_;
+}
+
+static inline size_t *
+branch_ref(struct ccc_frm_ const *t, size_t const node,
+           enum frm_link_ const branch)
+{
+    return &ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))
+                ->branch_[branch];
+}
+
+static inline size_t *
+parent_ref(struct ccc_frm_ const *t, size_t node)
+{
+
+    return &ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
+}
+
 static inline void *
 base_at(struct ccc_frm_ const *const frm, size_t const i)
 {
@@ -455,25 +495,27 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B*/
 static inline void
-rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t x_p_of_y,
-       size_t const y, enum frm_link_ dir)
+rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
+       size_t const y, enum frm_link_ const dir)
 {
     assert(z_p_of_x);
-    size_t p_of_p_of_x = at(t, z_p_of_x)->parent_;
-    at(t, x_p_of_y)->parent_ = p_of_p_of_x;
+    struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
+    struct ccc_frm_elem_ *const x_ref = at(t, x_p_of_y);
+    size_t const p_of_p_of_x = parent(t, z_p_of_x);
+    x_ref->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
     {
         t->root_ = x_p_of_y;
     }
     else
     {
-        at(t, p_of_p_of_x)->branch_[at(t, p_of_p_of_x)->branch_[R] == z_p_of_x]
-            = x_p_of_y;
+        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+        g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
     }
-    at(t, x_p_of_y)->branch_[dir] = z_p_of_x;
-    at(t, z_p_of_x)->parent_ = x_p_of_y;
-    at(t, z_p_of_x)->branch_[!dir] = y;
-    at(t, y)->parent_ = z_p_of_x;
+    x_ref->branch_[dir] = z_p_of_x;
+    z_ref->parent_ = x_p_of_y;
+    z_ref->branch_[!dir] = y;
+    *parent_ref(t, y) = z_p_of_x;
 }
 
 /** A double rotation shouldn't actually be two calls to rotate because that
@@ -489,29 +531,32 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      B   C */
 static inline void
 double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
-              size_t const x_p_of_y, size_t const y, enum frm_link_ dir)
+              size_t const x_p_of_y, size_t const y, enum frm_link_ const dir)
 {
     assert(z_p_of_x && x_p_of_y && y);
-    size_t const p_of_p_of_x = at(t, z_p_of_x)->parent_;
-    at(t, y)->parent_ = p_of_p_of_x;
+    struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
+    struct ccc_frm_elem_ *const x_ref = at(t, x_p_of_y);
+    struct ccc_frm_elem_ *const y_ref = at(t, y);
+    // struct ccc_frm_elem_ *const y = at(t, y);
+    size_t const p_of_p_of_x = z_ref->parent_;
+    y_ref->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
     {
         t->root_ = y;
     }
     else
     {
-        at(t, p_of_p_of_x)->branch_[at(t, p_of_p_of_x)->branch_[R] == z_p_of_x]
-            = y;
+        *branch_ref(t, p_of_p_of_x, child(t, p_of_p_of_x, R) == z_p_of_x) = y;
     }
-    at(t, x_p_of_y)->branch_[!dir] = at(t, y)->branch_[dir];
-    at(t, at(t, y)->branch_[dir])->parent_ = x_p_of_y;
-    at(t, y)->branch_[dir] = x_p_of_y;
-    at(t, x_p_of_y)->parent_ = y;
+    x_ref->branch_[!dir] = y_ref->branch_[dir];
+    *parent_ref(t, y_ref->branch_[dir]) = x_p_of_y;
+    y_ref->branch_[dir] = x_p_of_y;
+    x_ref->parent_ = y;
 
-    at(t, z_p_of_x)->branch_[dir] = at(t, y)->branch_[!dir];
-    at(t, at(t, y)->branch_[!dir])->parent_ = z_p_of_x;
-    at(t, y)->branch_[!dir] = z_p_of_x;
-    at(t, z_p_of_x)->parent_ = y;
+    z_ref->branch_[dir] = y_ref->branch_[!dir];
+    *parent_ref(t, y_ref->branch_[!dir]) = z_p_of_x;
+    y_ref->branch_[!dir] = z_p_of_x;
+    z_ref->parent_ = y;
 }
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
@@ -521,7 +566,7 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
 [[maybe_unused]] static inline bool
 is_0_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 {
-    return p_of_x && at(t, p_of_x)->parity_ == at(t, x)->parity_;
+    return p_of_x && parity(t, p_of_x) == parity(t, x);
 }
 
 /* Returns true for rank difference 1 between the parent and node.
@@ -531,7 +576,7 @@ is_0_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 static inline bool
 is_1_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 {
-    return p_of_x && at(t, p_of_x)->parity_ != at(t, x)->parity_;
+    return p_of_x && parity(t, p_of_x) != parity(t, x);
 }
 
 /* Returns true for rank difference 2 between the parent and node.
@@ -541,7 +586,7 @@ is_1_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 static inline bool
 is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 {
-    return p_of_x && at(t, p_of_x)->parity_ == at(t, x)->parity_;
+    return p_of_x && parity(t, p_of_x) == parity(t, x);
 }
 
 /* Returns true for rank difference 3 between the parent and node.
@@ -551,7 +596,7 @@ is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 [[maybe_unused]] static inline bool
 is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 {
-    return p_of_x && at(t, p_of_x)->parity_ != at(t, x)->parity_;
+    return p_of_x && parity(t, p_of_x) != parity(t, x);
 }
 
 /* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
@@ -564,9 +609,8 @@ is_01_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
-    return (!at(t, x)->parity_ && !at(t, p_of_xy)->parity_ && at(t, y)->parity_)
-           || (at(t, x)->parity_ && at(t, p_of_xy)->parity_
-               && !at(t, y)->parity_);
+    return (!parity(t, x) && !parity(t, p_of_xy) && parity(t, y))
+           || (parity(t, x) && parity(t, p_of_xy) && !parity(t, y));
 }
 
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
@@ -579,9 +623,8 @@ is_11_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
-    return (!at(t, x)->parity_ && at(t, p_of_xy)->parity_ && !at(t, y)->parity_)
-           || (at(t, x)->parity_ && !at(t, p_of_xy)->parity_
-               && at(t, y)->parity_);
+    return (!parity(t, x) && parity(t, p_of_xy) && !parity(t, y))
+           || (parity(t, x) && !parity(t, p_of_xy) && parity(t, y));
 }
 
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
@@ -594,8 +637,8 @@ is_02_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
-    return (at(t, x)->parity_ == at(t, p_of_xy)->parity_)
-           && (at(t, p_of_xy)->parity_ == at(t, y)->parity_);
+    return (parity(t, x) == parity(t, p_of_xy))
+           && (parity(t, p_of_xy) == parity(t, y));
 }
 
 /* Returns true if a parent is a 2,2 or 2,2 node, which is allowed. 2,2 nodes
@@ -611,8 +654,8 @@ is_22_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
-    return (at(t, x)->parity_ == at(t, p_of_xy)->parity_)
-           && (at(t, p_of_xy)->parity_ == at(t, y)->parity_);
+    return (parity(t, x) == parity(t, p_of_xy))
+           && (parity(t, p_of_xy) == parity(t, y));
 }
 
 static inline void
@@ -620,7 +663,7 @@ promote(struct ccc_frm_ const *const t, size_t const x)
 {
     if (x)
     {
-        at(t, x)->parity_ = !at(t, x)->parity_;
+        at(t, x)->parity_ = !parity(t, x);
     }
 }
 
@@ -643,16 +686,15 @@ double_demote([[maybe_unused]] struct ccc_frm_ const *const t,
 static inline bool
 is_leaf(struct ccc_frm_ const *const t, size_t const x)
 {
-    return !at(t, x)->branch_[L] && !at(t, x)->branch_[R];
+    return !child(t, x, L) && !child(t, x, R);
 }
 
 static inline size_t
 sibling_of(struct ccc_frm_ const *const t, size_t const x)
 {
-    assert(at(t, x)->parent_);
+    assert(parent(t, x));
     /* We want the sibling so we need the truthy value to be opposite of x. */
-    return at(t, at(t, x)->parent_)
-        ->branch_[at(t, at(t, x)->parent_)->branch_[L] == x];
+    return at(t, parent(t, x))->branch_[child(t, parent(t, x), L) == x];
 }
 
 /*===========================   Validation   ===============================*/

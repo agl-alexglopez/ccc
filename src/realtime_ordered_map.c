@@ -175,7 +175,8 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
 }
 
 void *
-ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key)
+ccc_rom_get_key_val(ccc_realtime_ordered_map const *const rom,
+                    void const *const key)
 {
     struct rtom_query_ q = find(rom, key);
     return (CCC_EQL == q.last_cmp_) ? struct_base(rom, q.found_) : NULL;
@@ -225,8 +226,8 @@ ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
 }
 
 ccc_entry
-ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
-                         ccc_rtom_elem *key_val_handle)
+ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
+                         ccc_rtom_elem *const key_val_handle)
 {
     struct rtom_query_ q
         = find(rom, ccc_impl_rom_key_from_node(rom, key_val_handle));
@@ -246,7 +247,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
 }
 
 ccc_rtom_entry
-ccc_rom_entry(ccc_realtime_ordered_map const *rom, void const *key)
+ccc_rom_entry(ccc_realtime_ordered_map const *const rom, void const *const key)
 {
     return (ccc_rtom_entry){ccc_impl_rom_entry(rom, key)};
 }
