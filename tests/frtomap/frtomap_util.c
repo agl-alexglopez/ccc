@@ -1,7 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
-
-#include "rtomap_util.h"
-#include "realtime_ordered_map.h"
+#include "frtomap_util.h"
+#include "flat_realtime_ordered_map.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -13,7 +12,7 @@ val_cmp(ccc_key_cmp const *const cmp)
 {
     struct val const *const c = cmp->container;
     int const key = *((int *)cmp->key);
-    return (key > c->val) - (key < c->val);
+    return (key > c->id) - (key < c->id);
 }
 
 void
@@ -23,7 +22,7 @@ map_printer_fn(void const *const container)
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-BEGIN_TEST(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
+BEGIN_TEST(insert_shuffled, ccc_flat_realtime_ordered_map *m, struct val vals[],
            size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -31,20 +30,21 @@ BEGIN_TEST(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
     {
         vals[shuffled_index].val = (int)shuffled_index;
         vals[shuffled_index].id = (int)i;
-        (void)ccc_rom_insert(m, &vals[shuffled_index].elem,
+        (void)ccc_frm_insert(m, &vals[shuffled_index].elem,
                              &(struct val){}.elem);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_rom_size(m), size);
+    CHECK(size(m), size);
     END_TEST();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map const *const m)
+inorder_fill(int vals[], size_t size,
+             ccc_flat_realtime_ordered_map const *const m)
 {
-    if (ccc_rom_size(m) != size)
+    if (ccc_frm_size(m) != size)
     {
         return 0;
     }

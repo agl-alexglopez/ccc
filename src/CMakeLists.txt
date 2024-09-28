@@ -21,6 +21,9 @@ target_link_libraries(impl_double_ended_priority_queue INTERFACE impl_tree)
 add_library(impl_realtime_ordered_map INTERFACE impl_realtime_ordered_map.h)
 target_link_libraries(impl_realtime_ordered_map INTERFACE types)
 
+add_library(impl_flat_realtime_ordered_map INTERFACE impl_flat_realtime_ordered_map.h)
+target_link_libraries(impl_flat_realtime_ordered_map INTERFACE buffer types)
+
 add_library(impl_flat_double_ended_queue INTERFACE impl_flat_double_ended_queue.h)
 target_link_libraries(impl_flat_double_ended_queue INTERFACE buffer types)
 

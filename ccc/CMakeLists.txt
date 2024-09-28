@@ -76,6 +76,14 @@ target_link_libraries(realtime_ordered_map
     impl_realtime_ordered_map
 )
 
+add_library(flat_realtime_ordered_map flat_realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/flat_realtime_ordered_map.c)
+target_link_libraries(flat_realtime_ordered_map
+  PUBLIC
+    types
+  PRIVATE
+    impl_flat_realtime_ordered_map
+)
+
 add_library(flat_double_ended_queue flat_double_ended_queue.h ${CMAKE_SOURCE_DIR}/src/flat_double_ended_queue.c)
 target_link_libraries(flat_double_ended_queue
   PUBLIC

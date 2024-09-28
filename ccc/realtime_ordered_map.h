@@ -15,9 +15,8 @@ typedef union
 
 #define ccc_rom_init(struct_name, node_elem_field, key_elem_field, map_name,   \
                      alloc_fn, key_cmp_fn, aux_data)                           \
-    (ccc_realtime_ordered_map)                                                 \
-        ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field,        \
-                          map_name, alloc_fn, key_cmp_fn, aux_data)
+    ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field, map_name,  \
+                      alloc_fn, key_cmp_fn, aux_data)
 
 #define ccc_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,           \
                              aux_data...)                                      \

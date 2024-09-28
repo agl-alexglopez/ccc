@@ -255,8 +255,6 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void *pos, size_t n,
                    ? NULL
                    : at(fq, ccc_buf_size(&fq->buf_) - n);
     }
-    /* TODO: Implementing insert range in a flat queue is non trivial and will
-       vary depending on resizing or not. */
     return push_range(fq, pos, n, elems);
 }
 

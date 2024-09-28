@@ -599,7 +599,7 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom,
     return ccc_impl_rom_insert(rom, parent, last_cmp, out_handle);
 }
 
-static struct rtom_query_
+static inline struct rtom_query_
 find(struct ccc_rtom_ const *const rom, void const *const key)
 {
     struct ccc_rtom_elem_ *parent = (struct ccc_rtom_elem_ *)&rom->end_;
@@ -684,7 +684,7 @@ init_node(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const e)
 }
 
 static inline void
-swap(char tmp[], void *const a, void *const b, size_t elem_sz)
+swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
 {
     if (a == b)
     {
@@ -706,7 +706,7 @@ cmp(struct ccc_rtom_ const *const rom, void const *const key,
     });
 }
 
-static void *
+static inline void *
 struct_base(struct ccc_rtom_ const *const rom,
             struct ccc_rtom_elem_ const *const e)
 {

@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <string.h>
 
+static size_t const start_capacity = 8;
+
 static void *at(ccc_buffer const *, size_t);
 
 ccc_result
@@ -39,7 +41,7 @@ ccc_buf_at(ccc_buffer const *buf, size_t const i)
 void *
 ccc_buf_back(ccc_buffer const *buf)
 {
-    return ccc_buf_at(buf, buf->sz_ - (size_t)1);
+    return ccc_buf_at(buf, buf->sz_ - 1);
 }
 
 void *
@@ -51,17 +53,16 @@ ccc_buf_front(ccc_buffer const *buf)
 void *
 ccc_buf_alloc(ccc_buffer *buf)
 {
-    if (buf->sz_ != buf->capacity_)
+    if (buf->sz_ == buf->capacity_
+        && (CCC_OK != buf->capacity_
+                ? ccc_buf_realloc(buf, buf->capacity_ * 2, buf->alloc_)
+                : ccc_buf_realloc(buf, start_capacity, buf->alloc_)))
     {
-        void *const ret = ((char *)buf->mem_ + (buf->elem_sz_ * buf->sz_));
-        ++buf->sz_;
-        return ret;
+        return NULL;
     }
-    if (ccc_buf_realloc(buf, buf->capacity_ * 2, buf->alloc_) == CCC_OK)
-    {
-        return ccc_buf_back(buf);
-    }
-    return NULL;
+    void *const ret = ((char *)buf->mem_ + (buf->elem_sz_ * buf->sz_));
+    ++buf->sz_;
+    return ret;
 }
 
 void *

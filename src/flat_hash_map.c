@@ -335,11 +335,9 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
     {
         void *slot = ccc_buf_at(&h->buf_, cur_i);
         struct ccc_fhm_elem_ *const e = ccc_impl_fhm_in_slot(h, slot);
-        if (e->hash_ == CCC_FHM_EMPTY)
-        {
-            return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
-        }
-        if (dist > ccc_impl_fhm_distance(cap, cur_i, to_index(cap, e->hash_)))
+        if (e->hash_ == CCC_FHM_EMPTY
+            || dist
+                   > ccc_impl_fhm_distance(cap, cur_i, to_index(cap, e->hash_)))
         {
             return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
         }
