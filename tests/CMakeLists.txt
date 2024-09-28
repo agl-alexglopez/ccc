@@ -200,7 +200,7 @@ macro(add_frtomap_test TEST_NAME)
 endmacro()
 
 add_frtomap_test(test_frtomap_construct)
-# add_frtomap_test(test_frtomap_insert)
+add_frtomap_test(test_frtomap_insert)
 # add_frtomap_test(test_frtomap_erase)
 # add_frtomap_test(test_frtomap_iter)
 

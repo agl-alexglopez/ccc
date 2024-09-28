@@ -22,16 +22,15 @@ map_printer_fn(void const *const container)
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-BEGIN_TEST(insert_shuffled, ccc_flat_realtime_ordered_map *m, struct val vals[],
-           size_t const size, int const larger_prime)
+BEGIN_TEST(insert_shuffled, ccc_flat_realtime_ordered_map *m, size_t const size,
+           int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        vals[shuffled_index].val = (int)shuffled_index;
-        vals[shuffled_index].id = (int)i;
-        (void)ccc_frm_insert(m, &vals[shuffled_index].elem,
-                             &(struct val){}.elem);
+        (void)insert(
+            m, &(struct val){.id = (int)shuffled_index, .val = (int)i}.elem,
+            &(struct val){}.elem);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
@@ -51,7 +50,7 @@ inorder_fill(int vals[], size_t size,
     size_t i = 0;
     for (struct val *e = begin(m); e != end(m); e = next(m, &e->elem))
     {
-        vals[i++] = e->val;
+        vals[i++] = e->id;
     }
     return i;
 }

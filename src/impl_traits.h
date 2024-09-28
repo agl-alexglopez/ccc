@@ -22,6 +22,7 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_insert,                                   \
         ccc_ordered_map *: ccc_om_insert,                                      \
+        ccc_flat_realtime_ordered_map *: ccc_frm_insert,                       \
         ccc_realtime_ordered_map *: ccc_rom_insert)((container_ptr),           \
                                                     insert_args)
 
