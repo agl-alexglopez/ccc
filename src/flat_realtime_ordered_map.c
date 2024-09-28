@@ -56,7 +56,7 @@ static void *struct_base(struct ccc_frm_ const *, struct ccc_frm_elem_ const *);
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 static struct ccc_frm_elem_ *at(struct ccc_frm_ const *, size_t);
 static void *base_at(struct ccc_frm_ const *, size_t);
-static ccc_threeway_cmp cmp_elems(struct ccc_frm_ const *rom, void const *key,
+static ccc_threeway_cmp cmp_elems(struct ccc_frm_ const *frm, void const *key,
                                   size_t node, ccc_key_cmp_fn *fn);
 static inline struct frm_query_ find(struct ccc_frm_ const *frm,
                                      void const *key);
@@ -80,9 +80,9 @@ static bool is_22_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
                          size_t y);
 static bool is_leaf(struct ccc_frm_ const *t, size_t x);
 static size_t sibling_of(struct ccc_frm_ const *t, size_t x);
-static void promote(struct ccc_frm_ const *t, size_t x);
+static void pfrmote(struct ccc_frm_ const *t, size_t x);
 static void demote(struct ccc_frm_ const *t, size_t x);
-static void double_promote(struct ccc_frm_ const *t, size_t x);
+static void double_pfrmote(struct ccc_frm_ const *t, size_t x);
 static void double_demote(struct ccc_frm_ const *t, size_t x);
 
 static void rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
@@ -105,6 +105,11 @@ static size_t index_of(struct ccc_frm_ const *t,
 static bool validate(struct ccc_frm_ const *frm);
 static void ccc_tree_print(struct ccc_frm_ const *t, size_t root,
                            ccc_print_fn *fn_print);
+static void *key_from_node(struct ccc_frm_ const *t,
+                           struct ccc_frm_elem_ const *);
+static struct ccc_frm_elem_ *elem_in_slot(struct ccc_frm_ const *t,
+                                          void const *slot);
+static void *key_at(struct ccc_frm_ const *t, size_t i);
 
 /*==============================  Interface    ==============================*/
 
@@ -127,12 +132,11 @@ ccc_entry
 ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
                ccc_frtm_elem *const out_handle, void *const tmp)
 {
-    struct frm_query_ q
-        = find(frm, ccc_impl_frm_key_from_node(frm, out_handle));
+    struct frm_query_ q = find(frm, key_from_node(frm, out_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         void *const slot = ccc_buf_at(&frm->buf_, q.found_);
-        *out_handle = *ccc_impl_frm_elem_in_slot(frm, slot);
+        *out_handle = *elem_in_slot(frm, slot);
         void *user_struct = struct_base(frm, out_handle);
         swap(tmp, user_struct, slot, ccc_buf_elem_size(&frm->buf_));
         return (ccc_entry){{.e_ = slot, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -147,18 +151,17 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
 }
 
 ccc_entry
-ccc_rom_try_insert(ccc_flat_realtime_ordered_map *const rom,
+ccc_frm_try_insert(ccc_flat_realtime_ordered_map *const frm,
                    ccc_frtm_elem *const key_val_handle)
 {
-    struct frm_query_ q
-        = find(rom, ccc_impl_frm_key_from_node(rom, key_val_handle));
+    struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         return (ccc_entry){
-            {.e_ = base_at(rom, q.found_), .stats_ = CCC_ENTRY_OCCUPIED}};
+            {.e_ = base_at(frm, q.found_), .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     void *inserted
-        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
+        = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
@@ -167,24 +170,30 @@ ccc_rom_try_insert(ccc_flat_realtime_ordered_map *const rom,
 }
 
 ccc_entry
-ccc_rom_insert_or_assign(ccc_flat_realtime_ordered_map *const rom,
+ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
                          ccc_frtm_elem *const key_val_handle)
 {
-    struct frm_query_ q
-        = find(rom, ccc_impl_frm_key_from_node(rom, key_val_handle));
+    struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
-        void *const found = base_at(rom, q.found_);
-        ccc_buf_write(&rom->buf_, q.found_, struct_base(rom, key_val_handle));
+        void *const found = base_at(frm, q.found_);
+        ccc_buf_write(&frm->buf_, q.found_, struct_base(frm, key_val_handle));
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     void *inserted
-        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
+        = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_frtm_entry
+ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
+              void const *const key)
+{
+    return (ccc_frtm_entry){ccc_impl_frm_entry(frm, key)};
 }
 
 bool
@@ -286,11 +295,36 @@ ccc_impl_frm_insert(struct ccc_frm_ *const frm, size_t const parent_i,
     return struct_base(frm, elem);
 }
 
+struct ccc_frm_entry_
+ccc_impl_frm_entry(struct ccc_frm_ const *const frm, void const *const key)
+{
+    struct frm_query_ q = find(frm, key);
+    if (CCC_EQL == q.last_cmp_)
+    {
+        return (struct ccc_frm_entry_){
+            .frm_ = (struct ccc_frm_ *)frm,
+            .last_cmp_ = q.last_cmp_,
+            .entry_ = {
+                .e_ = base_at(frm, q.found_),
+                .stats_ = CCC_ENTRY_OCCUPIED,
+            },
+        };
+    }
+    return (struct ccc_frm_entry_){
+        .frm_ = (struct ccc_frm_ *)frm,
+        .last_cmp_ = q.last_cmp_,
+        .entry_ = {
+            .e_ = base_at(frm, q.parent_),
+            .stats_ = CCC_ENTRY_VACANT,
+        },
+    };
+}
+
 void *
 ccc_impl_frm_key_from_node(struct ccc_frm_ const *const frm,
                            struct ccc_frm_elem_ const *const elem)
 {
-    return (char *)struct_base(frm, elem) + frm->key_offset_;
+    return key_from_node(frm, elem);
 }
 
 void *
@@ -304,7 +338,7 @@ struct ccc_frm_elem_ *
 ccc_impl_frm_elem_in_slot(struct ccc_frm_ const *const frm,
                           void const *const slot)
 {
-    return (struct ccc_frm_elem_ *)((char *)slot + frm->node_elem_offset_);
+    return elem_in_slot(frm, slot);
 }
 
 /*==========================  Static Helpers   ==============================*/
@@ -323,7 +357,7 @@ maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
         {
             return NULL;
         }
-        ccc_impl_frm_elem_in_slot(frm, sentinel)->parity_ = 1;
+        elem_in_slot(frm, sentinel)->parity_ = 1;
     }
     if (!ccc_buf_alloc(&frm->buf_))
     {
@@ -395,13 +429,13 @@ min_max_from(struct ccc_frm_ const *const t, size_t start,
 }
 
 static inline ccc_threeway_cmp
-cmp_elems(struct ccc_frm_ const *const rom, void const *const key,
+cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn(&(ccc_key_cmp){
         .key = key,
-        .container = base_at(rom, node),
-        .aux = rom->aux_,
+        .container = base_at(frm, node),
+        .aux = frm->aux_,
     });
 }
 
@@ -429,21 +463,20 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
 static inline struct ccc_frm_elem_ *
 at(struct ccc_frm_ const *const t, size_t const i)
 {
-    return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, i));
+    return elem_in_slot(t, ccc_buf_at(&t->buf_, i));
 }
 
 static inline size_t
 branch_i(struct ccc_frm_ const *const t, size_t const parent,
          enum frm_branch_ const dir)
 {
-    return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, parent))
-        ->branch_[dir];
+    return elem_in_slot(t, ccc_buf_at(&t->buf_, parent))->branch_[dir];
 }
 
 static inline size_t
 parent_i(struct ccc_frm_ const *const t, size_t const child)
 {
-    return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, child))->parent_;
+    return elem_in_slot(t, ccc_buf_at(&t->buf_, child))->parent_;
 }
 
 static inline size_t
@@ -455,22 +488,21 @@ index_of(struct ccc_frm_ const *const t, struct ccc_frm_elem_ const *const elem)
 static inline uint8_t
 parity(struct ccc_frm_ const *t, size_t const node)
 {
-    return ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parity_;
+    return elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parity_;
 }
 
 static inline size_t *
 branch_ref(struct ccc_frm_ const *t, size_t const node,
            enum frm_branch_ const branch)
 {
-    return &ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))
-                ->branch_[branch];
+    return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->branch_[branch];
 }
 
 static inline size_t *
 parent_ref(struct ccc_frm_ const *t, size_t node)
 {
 
-    return &ccc_impl_frm_elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
+    return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
 }
 
 static inline void *
@@ -486,6 +518,26 @@ struct_base(struct ccc_frm_ const *const frm,
     return ((char *)e->branch_) - frm->node_elem_offset_;
 }
 
+static struct ccc_frm_elem_ *
+elem_in_slot(struct ccc_frm_ const *const t, void const *const slot)
+{
+
+    return (struct ccc_frm_elem_ *)((char *)slot + t->node_elem_offset_);
+}
+
+static inline void *
+key_from_node(struct ccc_frm_ const *const t,
+              struct ccc_frm_elem_ const *const elem)
+{
+    return (char *)struct_base(t, elem) + t->key_offset_;
+}
+
+static inline void *
+key_at(struct ccc_frm_ const *const t, size_t const i)
+{
+    return (char *)ccc_buf_at(&t->buf_, i) + t->key_offset_;
+}
+
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
@@ -493,7 +545,7 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
 {
     do
     {
-        promote(t, z_p_of_xy);
+        pfrmote(t, z_p_of_xy);
         x = z_p_of_xy;
         z_p_of_xy = parent_i(t, z_p_of_xy);
         if (!z_p_of_xy)
@@ -519,7 +571,7 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
     {
         assert(is_1_child(t, z_p_of_xy, y));
         double_rotate(t, z_p_of_xy, x, y, p_to_x_dir);
-        promote(t, y);
+        pfrmote(t, y);
         demote(t, x);
         demote(t, z_p_of_xy);
     }
@@ -700,7 +752,7 @@ is_22_parent(struct ccc_frm_ const *const t, size_t const x,
 }
 
 static inline void
-promote(struct ccc_frm_ const *const t, size_t const x)
+pfrmote(struct ccc_frm_ const *const t, size_t const x)
 {
     if (x)
     {
@@ -711,11 +763,11 @@ promote(struct ccc_frm_ const *const t, size_t const x)
 static inline void
 demote(struct ccc_frm_ const *const t, size_t const x)
 {
-    promote(t, x);
+    pfrmote(t, x);
 }
 
 static inline void
-double_promote([[maybe_unused]] struct ccc_frm_ const *const t,
+double_pfrmote([[maybe_unused]] struct ccc_frm_ const *const t,
                [[maybe_unused]] size_t const x)
 {}
 
@@ -773,17 +825,11 @@ are_subtrees_valid(struct ccc_frm_ const *t, struct tree_range const r)
     {
         return true;
     }
-    if (r.low
-        && cmp_elems(t, ccc_impl_frm_key_from_node(t, at(t, r.low)), r.root,
-                     t->cmp_)
-               != CCC_LES)
+    if (r.low && cmp_elems(t, key_at(t, r.low), r.root, t->cmp_) != CCC_LES)
     {
         return false;
     }
-    if (r.high
-        && cmp_elems(t, ccc_impl_frm_key_from_node(t, at(t, r.high)), r.root,
-                     t->cmp_)
-               != CCC_GRT)
+    if (r.high && cmp_elems(t, key_at(t, r.high), r.root, t->cmp_) != CCC_GRT)
     {
         return false;
     }

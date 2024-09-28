@@ -42,11 +42,14 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
 ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
                          ccc_frtm_elem *out_handle, void *tmp);
 
-ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *rom,
+ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
                              ccc_frtm_elem *key_val_handle);
 
-ccc_entry ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *rom,
+ccc_entry ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *frm,
                                    ccc_frtm_elem *key_val_handle);
+
+ccc_frtm_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
+                             void const *key);
 
 /*======================      Iteration    ==================================*/
 
