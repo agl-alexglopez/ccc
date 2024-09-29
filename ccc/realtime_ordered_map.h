@@ -119,17 +119,24 @@ bool ccc_rom_occupied(ccc_rtom_entry const *e);
 
 /*======================      Iteration    ==================================*/
 
-#define ccc_rom_equal_range_vr(ordered_map_ptr, begin_and_end_key_ptrs...)     \
+#define ccc_rom_equal_range_vr(realtime_ordered_map_ptr,                       \
+                               begin_and_end_key_ptrs...)                      \
     &(ccc_range)                                                               \
     {                                                                          \
-        ccc_rom_equal_range(ordered_map_ptr, begin_and_end_key_ptrs).impl_     \
+        ccc_rom_equal_range((realtime_ordered_map_ptr),                        \
+                            (begin_and_end_key_ptrs))                          \
+            .impl_                                                             \
     }
 
-#define ccc_rom_equal_rrange_vr(ordered_map_ptr, rbegin_and_rend_key_ptrs...)  \
+#define ccc_rom_equal_rrange_vr(realtime_ordered_map_ptr,                      \
+                                rbegin_and_rend_key_ptrs...)                   \
     &(ccc_rrange)                                                              \
     {                                                                          \
-        ccc_rom_equal_rrange(ordered_map_ptr, rbegin_and_rend_key_ptrs).impl_  \
+        ccc_rom_equal_rrange((realtime_ordered_map_ptr),                       \
+                             (rbegin_and_rend_key_ptrs))                       \
+            .impl_                                                             \
     }
+
 ccc_range ccc_rom_equal_range(ccc_realtime_ordered_map const *rom,
                               void const *begin_key, void const *end_key);
 ccc_rrange ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,

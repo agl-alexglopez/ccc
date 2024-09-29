@@ -66,8 +66,18 @@ static inline struct ccc_frm_entry_ entry(struct ccc_frm_ const *frm,
 static void *maybe_alloc_insert(struct ccc_frm_ *frm, size_t parent,
                                 ccc_threeway_cmp last_cmp,
                                 struct ccc_frm_elem_ *elem);
+static struct ccc_range_ equal_range(struct ccc_frm_ const *, void const *,
+                                     void const *, enum frm_branch_);
 static void init_node(struct ccc_frm_elem_ *e);
 static void insert_fixup(struct ccc_frm_ *t, size_t z_p_of_xy, size_t x);
+static void *remove_fixup(struct ccc_frm_ *t, size_t remove);
+static void maintain_rank_rules(struct ccc_frm_ *t, bool two_child,
+                                size_t p_of_xy, size_t x);
+static void rebalance_3_child(struct ccc_frm_ *t, size_t p_of_xy, size_t x);
+static void rebalance_via_rotation(struct ccc_frm_ *t, size_t z, size_t x,
+                                   size_t y);
+static void transplant(struct ccc_frm_ *t, size_t remove, size_t replacement);
+static void swap_and_pop(struct ccc_frm_ *t, size_t remove);
 
 static bool is_0_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
 static bool is_1_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
@@ -83,9 +93,9 @@ static bool is_22_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
                          size_t y);
 static bool is_leaf(struct ccc_frm_ const *t, size_t x);
 static size_t sibling_of(struct ccc_frm_ const *t, size_t x);
-static void pfrmote(struct ccc_frm_ const *t, size_t x);
+static void promote(struct ccc_frm_ const *t, size_t x);
 static void demote(struct ccc_frm_ const *t, size_t x);
-static void double_pfrmote(struct ccc_frm_ const *t, size_t x);
+static void double_promote(struct ccc_frm_ const *t, size_t x);
 static void double_demote(struct ccc_frm_ const *t, size_t x);
 
 static void rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
@@ -251,6 +261,50 @@ ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
     return (ccc_frtm_entry){entry(frm, key)};
 }
 
+ccc_entry
+ccc_frm_remove_entry(ccc_frtm_entry const *const e)
+{
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    {
+        void *const erased = remove_fixup(
+            e->impl_.frm_, index_of(e->impl_.frm_, e->impl_.entry_.e_));
+        assert(erased);
+        return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_rom_remove(ccc_flat_realtime_ordered_map *const frm,
+               ccc_frtm_elem *const out_handle)
+{
+    struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
+    if (q.last_cmp_ != CCC_EQL)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    }
+    void const *const removed = remove_fixup(frm, q.found_);
+    assert(removed);
+    void *const user_struct = struct_base(frm, out_handle);
+    memcpy(user_struct, removed, ccc_buf_elem_size(&frm->buf_));
+    return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+}
+
+ccc_range
+ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
+                    void const *begin_key, void const *end_key)
+{
+    return (ccc_range){equal_range(frm, begin_key, end_key, inorder_traversal)};
+}
+
+ccc_rrange
+ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
+                     void const *rbegin_key, void const *rend_key)
+{
+    return (ccc_rrange){
+        equal_range(frm, rbegin_key, rend_key, reverse_inorder_traversal)};
+}
+
 void *
 ccc_frm_unwrap(ccc_frtm_entry const *const e)
 {
@@ -289,6 +343,10 @@ ccc_frm_size(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm)
 {
+    if (ccc_buf_empty(&frm->buf_))
+    {
+        return NULL;
+    }
     size_t const n = min_max_from(frm, frm->root_, min);
     return base_at(frm, n);
 }
@@ -296,6 +354,10 @@ ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm)
 void *
 ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *frm)
 {
+    if (ccc_buf_empty(&frm->buf_))
+    {
+        return NULL;
+    }
     size_t const n = min_max_from(frm, frm->root_, max);
     return base_at(frm, n);
 }
@@ -304,6 +366,10 @@ void *
 ccc_frm_next(ccc_flat_realtime_ordered_map const *frm,
              ccc_frtm_elem const *const e)
 {
+    if (ccc_buf_empty(&frm->buf_))
+    {
+        return NULL;
+    }
     size_t const n = next(frm, index_of(frm, e), inorder_traversal);
     return base_at(frm, n);
 }
@@ -312,6 +378,10 @@ void *
 ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
               ccc_frtm_elem const *const e)
 {
+    if (ccc_buf_empty(&frm->buf_))
+    {
+        return NULL;
+    }
     size_t const n = next(frm, index_of(frm, e), reverse_inorder_traversal);
     return base_at(frm, n);
 }
@@ -319,12 +389,20 @@ ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
 void *
 ccc_frm_end(ccc_flat_realtime_ordered_map const *const frm)
 {
+    if (ccc_buf_empty(&frm->buf_))
+    {
+        return NULL;
+    }
     return base_at(frm, 0);
 }
 
 void *
 ccc_frm_rend(ccc_flat_realtime_ordered_map const *const frm)
 {
+    if (ccc_buf_empty(&frm->buf_))
+    {
+        return NULL;
+    }
     return base_at(frm, 0);
 }
 
@@ -499,6 +577,31 @@ next(struct ccc_frm_ const *const t, size_t n, enum frm_branch_ const traversal)
     return parent_i(t, n);
 }
 
+static struct ccc_range_
+equal_range(struct ccc_frm_ const *const t, void const *const begin_key,
+            void const *const end_key, enum frm_branch_ const traversal)
+{
+    if (ccc_frm_empty(t))
+    {
+        return (struct ccc_range_){};
+    }
+    ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
+    struct frm_query_ b = find(t, begin_key);
+    if (b.last_cmp_ == les_or_grt[traversal])
+    {
+        b.found_ = next(t, b.found_, traversal);
+    }
+    struct frm_query_ e = find(t, end_key);
+    if (e.last_cmp_ != les_or_grt[!traversal])
+    {
+        e.found_ = next(t, e.found_, traversal);
+    }
+    return (struct ccc_range_){
+        .begin_ = b.found_ ? base_at(t, b.found_) : NULL,
+        .end_ = e.found_ ? base_at(t, e.found_) : NULL,
+    };
+}
+
 static inline size_t
 min_max_from(struct ccc_frm_ const *const t, size_t start,
              enum frm_branch_ const dir)
@@ -624,7 +727,7 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
 {
     do
     {
-        pfrmote(t, z_p_of_xy);
+        promote(t, z_p_of_xy);
         x = z_p_of_xy;
         z_p_of_xy = parent_i(t, z_p_of_xy);
         if (!z_p_of_xy)
@@ -650,9 +753,200 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
     {
         assert(is_1_child(t, z_p_of_xy, y));
         double_rotate(t, z_p_of_xy, x, y, p_to_x_dir);
-        pfrmote(t, y);
+        promote(t, y);
         demote(t, x);
         demote(t, z_p_of_xy);
+    }
+}
+
+static void *
+remove_fixup(struct ccc_frm_ *const t, size_t const remove)
+{
+    size_t y = 0;
+    size_t x = 0;
+    size_t p_of_xy = 0;
+    bool two_child = false;
+    if (!branch_i(t, remove, R) || !branch_i(t, remove, L))
+    {
+        y = remove;
+        p_of_xy = parent_i(t, y);
+        x = branch_i(t, y, !branch_i(t, y, L));
+        *parent_ref(t, x) = parent_i(t, y);
+        if (!p_of_xy)
+        {
+            t->root_ = x;
+        }
+        two_child = is_2_child(t, p_of_xy, y);
+        *branch_ref(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
+    }
+    else
+    {
+        y = min_max_from(t, branch_i(t, remove, R), min);
+        p_of_xy = parent_i(t, y);
+        x = branch_i(t, y, !branch_i(t, y, L));
+        *parent_ref(t, x) = parent_i(t, y);
+
+        /* Save if check and improve readability by assuming this is true. */
+        assert(p_of_xy);
+
+        two_child = is_2_child(t, p_of_xy, y);
+        *branch_ref(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
+        transplant(t, remove, y);
+        if (remove == p_of_xy)
+        {
+            p_of_xy = y;
+        }
+    }
+
+    if (!p_of_xy)
+    {
+        maintain_rank_rules(t, two_child, p_of_xy, x);
+        assert(!is_leaf(t, p_of_xy) || !parity(t, p_of_xy));
+    }
+    struct ccc_frm_elem_ *const r = at(t, remove);
+    r->branch_[L] = r->branch_[R] = r->parent_ = r->parity_ = 0;
+    if (remove != ccc_buf_size(&t->buf_) - 1)
+    {
+        swap_and_pop(t, remove);
+    }
+    ccc_buf_size_minus(&t->buf_, 1);
+    return base_at(t, ccc_buf_size(&t->buf_));
+}
+
+static inline void
+swap_and_pop(struct ccc_frm_ *const t, size_t const remove)
+{
+    size_t const back_i = ccc_buf_size(&t->buf_) - 1;
+    assert(remove);
+    assert(back_i);
+    struct ccc_frm_elem_ *const back_elem = at(t, back_i);
+    struct ccc_frm_elem_ *const back_elem_parent = at(t, back_elem->parent_);
+    *parent_ref(t, back_elem->branch_[R]) = remove;
+    *parent_ref(t, back_elem->branch_[L]) = remove;
+    back_elem_parent->branch_[back_elem_parent->branch_[R] == back_i] = remove;
+    ccc_buf_swap(&t->buf_, base_at(t, 0), remove, back_i);
+    at(t, 0)->parity_ = 1;
+}
+
+static inline void
+transplant(struct ccc_frm_ *const t, size_t remove, size_t replacement)
+{
+    assert(remove);
+    assert(replacement);
+    *parent_ref(t, replacement) = parent_i(t, remove);
+    if (!parent_i(t, remove))
+    {
+        t->root_ = replacement;
+    }
+    else
+    {
+        size_t const r_parent = parent_i(t, remove);
+        *branch_ref(t, r_parent, branch_i(t, r_parent, R) == remove)
+            = replacement;
+    }
+    struct ccc_frm_elem_ *const remove_ref = at(t, remove);
+    struct ccc_frm_elem_ *const replace_ref = at(t, replacement);
+    *parent_ref(t, remove_ref->branch_[R]) = replacement;
+    *parent_ref(t, remove_ref->branch_[L]) = replacement;
+    replace_ref->branch_[R] = remove_ref->branch_[R];
+    replace_ref->branch_[L] = remove_ref->branch_[L];
+    replace_ref->parity_ = remove_ref->parity_;
+}
+
+static inline void
+maintain_rank_rules(struct ccc_frm_ *const t, bool const two_child,
+                    size_t p_of_xy, size_t x)
+{
+    if (two_child)
+    {
+        assert(p_of_xy);
+        rebalance_3_child(t, p_of_xy, x);
+    }
+    else if (!x && branch_i(t, p_of_xy, L) == branch_i(t, p_of_xy, R))
+    {
+        assert(p_of_xy);
+        bool const demote_makes_3_child
+            = is_2_child(t, parent_i(t, p_of_xy), p_of_xy);
+        demote(t, p_of_xy);
+        if (demote_makes_3_child)
+        {
+            rebalance_3_child(t, parent_i(t, p_of_xy), p_of_xy);
+        }
+    }
+    assert(!is_leaf(t, p_of_xy) || !parity(t, p_of_xy));
+}
+
+static inline void
+rebalance_3_child(struct ccc_frm_ *const t, size_t p_of_xy, size_t x)
+{
+    assert(p_of_xy);
+    bool made_3_child = false;
+    do
+    {
+        size_t p_of_p_of_x = parent_i(t, p_of_xy);
+        size_t y = branch_i(t, p_of_xy, branch_i(t, p_of_xy, L) == x);
+        made_3_child = is_2_child(t, p_of_p_of_x, p_of_xy);
+        if (is_2_child(t, p_of_xy, y))
+        {
+            demote(t, p_of_xy);
+        }
+        else if (is_22_parent(t, branch_i(t, y, L), y, branch_i(t, y, R)))
+        {
+            demote(t, p_of_xy);
+            demote(t, y);
+        }
+        else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
+        {
+            assert(is_3_child(t, p_of_xy, x));
+            rebalance_via_rotation(t, p_of_xy, x, y);
+            return;
+        }
+        x = p_of_xy;
+        p_of_xy = p_of_p_of_x;
+    } while (p_of_xy && made_3_child);
+}
+
+static inline void
+rebalance_via_rotation(struct ccc_frm_ *const t, size_t z, size_t x, size_t y)
+{
+    enum frm_branch_ const z_to_x_dir = branch_i(t, z, R) == x;
+    size_t w = branch_i(t, y, !z_to_x_dir);
+    if (is_1_child(t, y, w))
+    {
+        rotate(t, z, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
+        promote(t, y);
+        demote(t, z);
+        if (is_leaf(t, z))
+        {
+            demote(t, z);
+        }
+    }
+    else /* w is a 2-child and v will be a 1-child. */
+    {
+        size_t v = branch_i(t, y, z_to_x_dir);
+        assert(is_2_child(t, y, w));
+        assert(is_1_child(t, y, v));
+        double_rotate(t, z, y, v, !z_to_x_dir);
+        double_promote(t, v);
+        demote(t, y);
+        double_demote(t, z);
+        /* Optional "Rebalancing with Promotion," defined as follows:
+               if node z is a non-leaf 1,1 node, we promote it; otherwise, if y
+               is a non-leaf 1,1 node, we promote it. (See Figure 4.)
+               (Haeupler et. al. 2014, 17).
+           This reduces constants in some of theorems mentioned in the paper
+           but may not be worth doing. Rotations stay at 2 worst case. Should
+           revisit after more performance testing. */
+        if (!is_leaf(t, z)
+            && is_11_parent(t, branch_i(t, z, L), z, branch_i(t, z, R)))
+        {
+            promote(t, z);
+        }
+        else if (!is_leaf(t, y)
+                 && is_11_parent(t, branch_i(t, y, L), y, branch_i(t, y, R)))
+        {
+            promote(t, y);
+        }
     }
 }
 
@@ -831,7 +1125,7 @@ is_22_parent(struct ccc_frm_ const *const t, size_t const x,
 }
 
 static inline void
-pfrmote(struct ccc_frm_ const *const t, size_t const x)
+promote(struct ccc_frm_ const *const t, size_t const x)
 {
     if (x)
     {
@@ -842,11 +1136,11 @@ pfrmote(struct ccc_frm_ const *const t, size_t const x)
 static inline void
 demote(struct ccc_frm_ const *const t, size_t const x)
 {
-    pfrmote(t, x);
+    promote(t, x);
 }
 
 static inline void
-double_pfrmote([[maybe_unused]] struct ccc_frm_ const *const t,
+double_promote([[maybe_unused]] struct ccc_frm_ const *const t,
                [[maybe_unused]] size_t const x)
 {}
 

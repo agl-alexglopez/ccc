@@ -303,7 +303,7 @@ ccc_entry
 ccc_rom_remove(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct rtom_query_ q
+    struct rtom_query_ const q
         = find(rom, ccc_impl_rom_key_from_node(rom, out_handle));
     if (q.last_cmp_ != CCC_EQL)
     {

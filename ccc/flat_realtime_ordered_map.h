@@ -30,6 +30,12 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
 
 /*======================      Entry API    ==================================*/
 
+#define ccc_frm_entry_vr(flat_realtime_ordered_map_ptr, key_ptr)               \
+    &(ccc_frtm_entry)                                                          \
+    {                                                                          \
+        ccc_frm_entry((flat_realtime_ordered_map_ptr), (key_ptr)).impl_        \
+    }
+
 #define ccc_frm_insert_vr(flat_realtime_ordered_map_ptr, out_handle_ptr,       \
                           tmp_ptr)                                             \
     &(ccc_entry)                                                               \
@@ -37,6 +43,26 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
         ccc_frm_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr),      \
                        (tmp_ptr))                                              \
             .impl_                                                             \
+    }
+
+#define ccc_frm_try_insert_vr(flat_realtime_ordered_map_ptr, out_handle_ptr)   \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_frm_try_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))  \
+            .impl_                                                             \
+    }
+
+#define ccc_frm_remove_vr(flat_realtime_ordered_map_ptr, out_handle_ptr)       \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_frm_remove((flat_realtime_ordered_map_ptr), (out_handle_ptr))      \
+            .impl_                                                             \
+    }
+
+#define ccc_frm_remove_entry_vr(flat_realtime_ordered_map_entry_ptr)           \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_frm_remove_entry((flat_realtime_ordered_map_entry_ptr)).impl_      \
     }
 
 ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
@@ -63,6 +89,29 @@ bool ccc_frm_insert_error(ccc_frtm_entry const *e);
 bool ccc_frm_occupied(ccc_frtm_entry const *e);
 
 /*======================      Iteration    ==================================*/
+
+#define ccc_frm_equal_range_vr(flat_realtime_ordered_map_ptr,                  \
+                               begin_and_end_key_ptrs...)                      \
+    &(ccc_range)                                                               \
+    {                                                                          \
+        ccc_frm_equal_range((flat_realtime_ordered_map_ptr),                   \
+                            (begin_and_end_key_ptrs))                          \
+            .impl_                                                             \
+    }
+
+#define ccc_frm_equal_rrange_vr(flat_realtime_ordered_map_ptr,                 \
+                                rbegin_and_rend_key_ptrs...)                   \
+    &(ccc_rrange)                                                              \
+    {                                                                          \
+        ccc_frm_equal_rrange((flat_realtime_ordered_map_ptr),                  \
+                             (rbegin_and_rend_key_ptrs))                       \
+            .impl_                                                             \
+    }
+
+ccc_range ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
+                              void const *begin_key, void const *end_key);
+ccc_rrange ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
+                                void const *rbegin_key, void const *rend_key);
 
 void *ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm);
 void *ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *frm);
