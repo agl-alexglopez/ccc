@@ -19,7 +19,7 @@
 #define COLOR_GRN "\033[32;1m"
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-#define PRINTER_INDENT (short)13
+#define PRINTER_INDENT 13
 #define LR 2
 
 enum frm_branch_
@@ -192,11 +192,85 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
     return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
+ccc_frtm_entry *
+ccc_frm_and_modify(ccc_frtm_entry *const e, ccc_update_fn *const fn)
+{
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        fn(&(ccc_update){.container = e->impl_.entry_.e_, NULL});
+    }
+    return e;
+}
+
+ccc_frtm_entry *
+ccc_frm_and_modify_aux(ccc_frtm_entry *const e, ccc_update_fn *const fn,
+                       void *const aux)
+{
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        fn(&(ccc_update){.container = e->impl_.entry_.e_, aux});
+    }
+    return e;
+}
+
+void *
+ccc_frm_or_insert(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
+{
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    {
+        return e->impl_.entry_.e_;
+    }
+    return maybe_alloc_insert(e->impl_.frm_,
+                              e->impl_.entry_.e_ ? ccc_buf_index_of(
+                                  &e->impl_.frm_->buf_, e->impl_.entry_.e_)
+                                                 : 0,
+                              e->impl_.last_cmp_, elem);
+}
+
+void *
+ccc_frm_insert_entry(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
+{
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    {
+        *elem = *elem_in_slot(e->impl_.frm_, e->impl_.entry_.e_);
+        (void)memcpy(e->impl_.entry_.e_, struct_base(e->impl_.frm_, elem),
+                     ccc_buf_elem_size(&e->impl_.frm_->buf_));
+        return e->impl_.entry_.e_;
+    }
+    return maybe_alloc_insert(e->impl_.frm_,
+                              e->impl_.entry_.e_ ? ccc_buf_index_of(
+                                  &e->impl_.frm_->buf_, e->impl_.entry_.e_)
+                                                 : 0,
+                              e->impl_.last_cmp_, elem);
+}
+
 ccc_frtm_entry
 ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
               void const *const key)
 {
     return (ccc_frtm_entry){entry(frm, key)};
+}
+
+void *
+ccc_frm_unwrap(ccc_frtm_entry const *const e)
+{
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        return e->impl_.entry_.e_;
+    }
+    return NULL;
+}
+
+bool
+ccc_frm_insert_error(ccc_frtm_entry const *const e)
+{
+    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
+}
+
+bool
+ccc_frm_occupied(ccc_frtm_entry const *const e)
+{
+    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 bool
@@ -368,19 +442,13 @@ entry(struct ccc_frm_ const *const frm, void const *const key)
         return (struct ccc_frm_entry_){
             .frm_ = (struct ccc_frm_ *)frm,
             .last_cmp_ = q.last_cmp_,
-            .entry_ = {
-                .e_ = base_at(frm, q.found_),
-                .stats_ = CCC_ENTRY_OCCUPIED,
-            },
+            .entry_ = {base_at(frm, q.found_), CCC_ENTRY_OCCUPIED},
         };
     }
     return (struct ccc_frm_entry_){
         .frm_ = (struct ccc_frm_ *)frm,
         .last_cmp_ = q.last_cmp_,
-        .entry_ = {
-            .e_ = base_at(frm, q.parent_),
-            .stats_ = CCC_ENTRY_VACANT,
-        },
+        .entry_ = {base_at(frm, q.parent_), CCC_ENTRY_VACANT},
     };
 }
 
@@ -449,19 +517,14 @@ cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn(&(ccc_key_cmp){
-        .key = key,
-        .container = base_at(frm, node),
-        .aux = frm->aux_,
-    });
+        .container = base_at(frm, node), .key = key, .aux = frm->aux_});
 }
 
 static inline void
 init_node(struct ccc_frm_elem_ *const e)
 {
     assert(e != NULL);
-    e->branch_[L] = e->branch_[R] = 0;
-    e->parent_ = 0;
-    e->parity_ = 0;
+    e->branch_[L] = e->branch_[R] = e->parent_ = e->parity_ = 0;
 }
 
 static inline void
@@ -601,7 +664,7 @@ and uppercase are arbitrary subtrees.
    ╭─┴─╮      ->      ╭─┴─╮
    A   y              y   C
        │              │
-       B              B*/
+       B              B */
 static inline void
 rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
        size_t const y, enum frm_branch_ const dir)
@@ -671,7 +734,7 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
 /* Returns true for rank difference 0 (rule break) between the parent and node.
          p
        0/
-       x*/
+       x */
 [[maybe_unused]] static inline bool
 is_0_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 {
@@ -681,7 +744,7 @@ is_0_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 /* Returns true for rank difference 1 between the parent and node.
          p
        1/
-       x*/
+       x */
 static inline bool
 is_1_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 {
@@ -691,7 +754,7 @@ is_1_child(struct ccc_frm_ const *const t, size_t p_of_x, size_t x)
 /* Returns true for rank difference 2 between the parent and node.
          p
        2/
-       x*/
+       x */
 static inline bool
 is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 {
@@ -701,7 +764,7 @@ is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 /* Returns true for rank difference 3 between the parent and node.
          p
        3/
-       x*/
+       x */
 [[maybe_unused]] static inline bool
 is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 {
@@ -712,7 +775,7 @@ is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
    child may be the sentinel node which has a parity of 1 and rank -1.
          p
        0/ \1
-       x   y*/
+       x   y */
 static inline bool
 is_01_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
@@ -726,7 +789,7 @@ is_01_parent(struct ccc_frm_ const *const t, size_t const x,
    node which has a parity of 1 and rank -1.
          p
        1/ \1
-       x   y*/
+       x   y */
 static inline bool
 is_11_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
@@ -740,7 +803,7 @@ is_11_parent(struct ccc_frm_ const *const t, size_t const x,
    child may be the sentinel node which has a parity of 1 and rank -1.
          p
        2/ \0
-       x   y*/
+       x   y */
 static inline bool
 is_02_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
@@ -757,7 +820,7 @@ is_02_parent(struct ccc_frm_ const *const t, size_t const x,
    1 and rank -1.
          p
        2/ \2
-       x   y*/
+       x   y */
 static inline bool
 is_22_parent(struct ccc_frm_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)

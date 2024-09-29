@@ -33,7 +33,6 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +45,7 @@
 #define COLOR_GRN "\033[32;1m"
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-#define PRINTER_INDENT (short)13
+#define PRINTER_INDENT 13
 #define LR 2
 
 enum rtom_link_

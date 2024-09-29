@@ -51,6 +51,17 @@ ccc_entry ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *frm,
 ccc_frtm_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
                              void const *key);
 
+ccc_frtm_entry *ccc_frm_and_modify(ccc_frtm_entry *e, ccc_update_fn *fn);
+
+ccc_frtm_entry *ccc_frm_and_modify_aux(ccc_frtm_entry *e, ccc_update_fn *fn,
+                                       void *aux);
+void *ccc_frm_or_insert(ccc_frtm_entry const *e, ccc_frtm_elem *elem);
+void *ccc_frm_insert_entry(ccc_frtm_entry const *e, ccc_frtm_elem *elem);
+
+void *ccc_frm_unwrap(ccc_frtm_entry const *e);
+bool ccc_frm_insert_error(ccc_frtm_entry const *e);
+bool ccc_frm_occupied(ccc_frtm_entry const *e);
+
 /*======================      Iteration    ==================================*/
 
 void *ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm);
