@@ -57,7 +57,7 @@ enum rtom_link_
 enum rtom_print_link_
 {
     BRANCH = 0, /* ├── */
-    LEAF = 1    /* └── */
+    LEAF,       /* └── */
 };
 
 struct rtom_query_

@@ -31,7 +31,7 @@ enum frm_branch_
 enum frm_print_branch_
 {
     BRANCH = 0, /* ├── */
-    LEAF = 1    /* └── */
+    LEAF,       /* └── */
 };
 
 struct frm_query_
