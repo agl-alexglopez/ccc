@@ -635,8 +635,8 @@ equal_range(struct ccc_frm_ const *const t, void const *const begin_key,
         e.found_ = next(t, e.found_, traversal);
     }
     return (struct ccc_range_){
-        .begin_ = b.found_ ? base_at(t, b.found_) : NULL,
-        .end_ = e.found_ ? base_at(t, e.found_) : NULL,
+        .begin_ = base_at(t, b.found_),
+        .end_ = base_at(t, e.found_),
     };
 }
 

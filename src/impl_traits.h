@@ -472,6 +472,8 @@
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_range,                                 \
         ccc_double_ended_priority_queue *: ccc_depq_equal_range,               \
+        ccc_flat_realtime_ordered_map *: ccc_frm_equal_range,                  \
+        ccc_flat_realtime_ordered_map const *: ccc_frm_equal_range,            \
         ccc_realtime_ordered_map *: ccc_rom_equal_range,                       \
         ccc_realtime_ordered_map const *: ccc_rom_equal_range)(                \
         (container_ptr), begin_and_end_key_ptr)
@@ -486,6 +488,8 @@
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_rrange,                                \
         ccc_double_ended_priority_queue *: ccc_depq_equal_rrange,              \
+        ccc_flat_realtime_ordered_map *: ccc_frm_equal_rrange,                 \
+        ccc_flat_realtime_ordered_map const *: ccc_frm_equal_rrange,           \
         ccc_realtime_ordered_map *: ccc_rom_equal_rrange,                      \
         ccc_realtime_ordered_map const *: ccc_rom_equal_rrange)(               \
         (container_ptr), rbegin_and_rend_key_ptr)
