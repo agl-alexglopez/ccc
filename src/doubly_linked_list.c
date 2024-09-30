@@ -385,8 +385,8 @@ erase_range([[maybe_unused]] struct ccc_dll_ const *const l,
 }
 
 static inline size_t
-len(struct ccc_dll_ const *const sll, struct ccc_dll_elem_ const *begin,
-    struct ccc_dll_elem_ const *const end)
+len([[maybe_unused]] struct ccc_dll_ const *const sll,
+    struct ccc_dll_elem_ const *begin, struct ccc_dll_elem_ const *const end)
 {
     size_t s = 1;
     for (; begin != end; begin = begin->n_, ++s)

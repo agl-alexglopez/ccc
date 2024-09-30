@@ -126,6 +126,8 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
         ${PROJECT_SOURCE_DIR}/src/impl_realtime_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/impl_flat_realtime_ordered_map.h
+        ${PROJECT_SOURCE_DIR}/src/flat_realtime_ordered_map.c
         ${PROJECT_SOURCE_DIR}/src/impl_traits.h
     PUBLIC 
         FILE_SET public_headers
@@ -139,6 +141,7 @@ target_sources(${PROJECT_NAME}
               flat_priority_queue.h
               ordered_map.h
               realtime_ordered_map.h
+              flat_realtime_ordered_map.h
               double_ended_priority_queue.h
               priority_queue.h
               singly_linked_list.h
