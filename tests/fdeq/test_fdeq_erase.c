@@ -5,6 +5,7 @@
 #include "flat_double_ended_queue.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stddef.h>
 

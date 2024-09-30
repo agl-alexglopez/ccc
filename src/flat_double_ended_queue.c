@@ -243,7 +243,7 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void *pos, size_t n,
     }
     if (!n)
     {
-        return (void *)pos;
+        return pos;
     }
     if (pos == ccc_fdeq_begin(fq))
     {
