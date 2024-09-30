@@ -52,33 +52,51 @@ static enum frm_branch_ const max = R;
 
 /*==============================  Prototypes   ==============================*/
 
-static void *struct_base(struct ccc_frm_ const *, struct ccc_frm_elem_ const *);
-static void swap(char tmp[], void *a, void *b, size_t elem_sz);
-static struct ccc_frm_elem_ *at(struct ccc_frm_ const *, size_t);
-static void *base_at(struct ccc_frm_ const *, size_t);
-static ccc_threeway_cmp cmp_elems(struct ccc_frm_ const *frm, void const *key,
-                                  size_t node, ccc_key_cmp_fn *fn);
-static struct frm_query_ find(struct ccc_frm_ const *frm, void const *key);
+/* Returning the user struct type with stored offsets. */
 static void *insert(struct ccc_frm_ *frm, size_t parent_i,
                     ccc_threeway_cmp last_cmp, size_t elem_i);
-static inline struct ccc_frm_entry_ entry(struct ccc_frm_ const *frm,
-                                          void const *key);
+static void *struct_base(struct ccc_frm_ const *, struct ccc_frm_elem_ const *);
 static void *maybe_alloc_insert(struct ccc_frm_ *frm, size_t parent,
                                 ccc_threeway_cmp last_cmp,
                                 struct ccc_frm_elem_ *elem);
+static void *remove_fixup(struct ccc_frm_ *t, size_t remove);
+static void *base_at(struct ccc_frm_ const *, size_t);
+static void *alloc_back(struct ccc_frm_ *t);
+/* Returning the user key with stored offsets. */
+static void *key_from_node(struct ccc_frm_ const *t,
+                           struct ccc_frm_elem_ const *);
+static void *key_at(struct ccc_frm_ const *t, size_t i);
+/* Returning the internal elem type with stored offsets. */
+static struct ccc_frm_elem_ *at(struct ccc_frm_ const *, size_t);
+static struct ccc_frm_elem_ *elem_in_slot(struct ccc_frm_ const *t,
+                                          void const *slot);
+/* Returning the internal query helper to aid in entry handling. */
+static struct frm_query_ find(struct ccc_frm_ const *frm, void const *key);
+/* Returning the entry core to the Entry API. */
+static inline struct ccc_frm_entry_ entry(struct ccc_frm_ const *frm,
+                                          void const *key);
+/* Returning a generic range that can be use for range or rrange. */
 static struct ccc_range_ equal_range(struct ccc_frm_ const *, void const *,
                                      void const *, enum frm_branch_);
-static void init_node(struct ccc_frm_elem_ *e);
-static void insert_fixup(struct ccc_frm_ *t, size_t z_p_of_xy, size_t x);
-static void *remove_fixup(struct ccc_frm_ *t, size_t remove);
-static void maintain_rank_rules(struct ccc_frm_ *t, bool two_child,
-                                size_t p_of_xy, size_t x);
-static void rebalance_3_child(struct ccc_frm_ *t, size_t p_of_xy, size_t x);
-static void rebalance_via_rotation(struct ccc_frm_ *t, size_t z, size_t x,
-                                   size_t y);
-static void transplant(struct ccc_frm_ *t, size_t remove, size_t replacement);
-static void swap_and_pop(struct ccc_frm_ *t, size_t remove);
-
+/* Returning threeway comparison with user callback. */
+static ccc_threeway_cmp cmp_elems(struct ccc_frm_ const *frm, void const *key,
+                                  size_t node, ccc_key_cmp_fn *fn);
+/* Returning read only indices for tree nodes. */
+static size_t sibling_of(struct ccc_frm_ const *t, size_t x);
+static size_t next(struct ccc_frm_ const *t, size_t n,
+                   enum frm_branch_ traversal);
+static size_t min_max_from(struct ccc_frm_ const *t, size_t start,
+                           enum frm_branch_ dir);
+static size_t branch_i(struct ccc_frm_ const *t, size_t parent,
+                       enum frm_branch_ dir);
+static size_t parent_i(struct ccc_frm_ const *t, size_t child);
+static size_t index_of(struct ccc_frm_ const *t,
+                       struct ccc_frm_elem_ const *elem);
+/* Returning references to index fields for tree nodes. */
+static size_t *branch_ref(struct ccc_frm_ const *t, size_t node,
+                          enum frm_branch_ branch);
+static size_t *parent_ref(struct ccc_frm_ const *t, size_t node);
+/* Returning WAVL tree status. */
 static bool is_0_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
 static bool is_1_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
 static bool is_2_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
@@ -92,7 +110,18 @@ static bool is_02_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
 static bool is_22_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
                          size_t y);
 static bool is_leaf(struct ccc_frm_ const *t, size_t x);
-static size_t sibling_of(struct ccc_frm_ const *t, size_t x);
+static uint8_t parity(struct ccc_frm_ const *t, size_t node);
+static bool validate(struct ccc_frm_ const *frm);
+/* Returning void and maintaining the WAVL tree. */
+static void init_node(struct ccc_frm_elem_ *e);
+static void insert_fixup(struct ccc_frm_ *t, size_t z_p_of_xy, size_t x);
+static void maintain_rank_rules(struct ccc_frm_ *t, bool two_child,
+                                size_t p_of_xy, size_t x);
+static void rebalance_3_child(struct ccc_frm_ *t, size_t p_of_xy, size_t x);
+static void rebalance_via_rotation(struct ccc_frm_ *t, size_t z, size_t x,
+                                   size_t y);
+static void transplant(struct ccc_frm_ *t, size_t remove, size_t replacement);
+static void swap_for_pop(struct ccc_frm_ *t, size_t remove);
 static void promote(struct ccc_frm_ const *t, size_t x);
 static void demote(struct ccc_frm_ const *t, size_t x);
 static void double_promote(struct ccc_frm_ const *t, size_t x);
@@ -102,28 +131,10 @@ static void rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
                    size_t y, enum frm_branch_ dir);
 static void double_rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
                           size_t y, enum frm_branch_ dir);
-static size_t next(struct ccc_frm_ const *t, size_t n,
-                   enum frm_branch_ traversal);
-static size_t min_max_from(struct ccc_frm_ const *t, size_t start,
-                           enum frm_branch_ dir);
-static size_t branch_i(struct ccc_frm_ const *t, size_t parent,
-                       enum frm_branch_ dir);
-static size_t parent_i(struct ccc_frm_ const *t, size_t child);
-static size_t *branch_ref(struct ccc_frm_ const *t, size_t node,
-                          enum frm_branch_ branch);
-static size_t *parent_ref(struct ccc_frm_ const *t, size_t node);
-static uint8_t parity(struct ccc_frm_ const *t, size_t node);
-static size_t index_of(struct ccc_frm_ const *t,
-                       struct ccc_frm_elem_ const *elem);
-static bool validate(struct ccc_frm_ const *frm);
+/* Returning void as miscellaneous helpers. */
+static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 static void ccc_tree_print(struct ccc_frm_ const *t, size_t root,
                            ccc_print_fn *fn_print);
-static void *key_from_node(struct ccc_frm_ const *t,
-                           struct ccc_frm_elem_ const *);
-static struct ccc_frm_elem_ *elem_in_slot(struct ccc_frm_ const *t,
-                                          void const *slot);
-static void *key_at(struct ccc_frm_ const *t, size_t i);
-static void *alloc_back(struct ccc_frm_ *t);
 
 /*==============================  Interface    ==============================*/
 
@@ -862,14 +873,14 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
     r->branch_[L] = r->branch_[R] = r->parent_ = r->parity_ = 0;
     if (remove != ccc_buf_size(&t->buf_) - 1)
     {
-        swap_and_pop(t, remove);
+        swap_for_pop(t, remove);
     }
     ccc_buf_size_minus(&t->buf_, 1);
     return base_at(t, ccc_buf_size(&t->buf_));
 }
 
 static inline void
-swap_and_pop(struct ccc_frm_ *const t, size_t const remove)
+swap_for_pop(struct ccc_frm_ *const t, size_t const remove)
 {
     size_t const back_i = ccc_buf_size(&t->buf_) - 1;
     struct ccc_frm_elem_ *const back_elem = at(t, back_i);
