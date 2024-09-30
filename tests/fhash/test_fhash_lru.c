@@ -76,13 +76,6 @@ lru_head(struct lru_cache *const lru)
     return dll_front(&lru->l);
 }
 
-static void
-lru_clear(struct lru_cache *const lru)
-{
-    ccc_fhm_clear_and_free(&lru->fh, NULL);
-    dll_clear_and_free(&lru->l, NULL);
-}
-
 static bool
 lru_lookup_cmp(ccc_key_cmp const *const cmp)
 {
@@ -101,7 +94,7 @@ cmp_by_key(ccc_cmp const *const cmp)
 BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
                   int const val)
 {
-    ccc_fh_map_entry *ent = entry_vr(&lru->fh, &key);
+    ccc_fh_map_entry *const ent = entry_vr(&lru->fh, &key);
     struct lru_lookup const *const found = unwrap(ent);
     if (found)
     {
@@ -120,7 +113,8 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
     {
         struct key_val const *const to_drop = back(&lru->l);
         CHECK(to_drop == NULL, false);
-        remove_entry(entry_vr(&lru->fh, &to_drop->key));
+        ccc_entry const e = remove_entry(entry_vr(&lru->fh, &to_drop->key));
+        CHECK(occupied(&e), true);
         pop_back(&lru->l);
     }
     END_TEST();
@@ -190,7 +184,10 @@ BEGIN_STATIC_TEST(run_lru_cache)
             break;
         }
     }
-    END_TEST(lru_clear(&lru););
+    END_TEST({
+        ccc_fhm_clear_and_free(&lru.fh, NULL);
+        dll_clear_and_free(&lru.l, NULL);
+    });
 }
 
 int
