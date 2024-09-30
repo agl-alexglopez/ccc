@@ -151,7 +151,7 @@ though the braces are not required. */
         {                                                                      \
             TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
             macro_test_res_ = FAIL;                                            \
-            __VA_OPT__((void)({__VA_ARGS__}););                                \
+            __VA_OPT__((void)({__VA_ARGS__});)                                 \
             goto use_at_least_one_check_and_finish_with_END_macro_call_;       \
         }                                                                      \
     } while (0)

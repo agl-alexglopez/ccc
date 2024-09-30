@@ -101,7 +101,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         };                                                                     \
         if (rom_new_ins_base_)                                                 \
         {                                                                      \
-            *((typeof(lazy_value) *)rom_new_ins_base_) = lazy_value;           \
+            *rom_new_ins_base_ = lazy_value;                                   \
             *((typeof(key) *)ccc_impl_rom_key_in_slot(rom_insert_entry.rom_,   \
                                                       rom_new_ins_base_))      \
                 = key;                                                         \

@@ -123,6 +123,7 @@ static void *key_from_node(struct ccc_frm_ const *t,
 static struct ccc_frm_elem_ *elem_in_slot(struct ccc_frm_ const *t,
                                           void const *slot);
 static void *key_at(struct ccc_frm_ const *t, size_t i);
+static void *alloc_back(struct ccc_frm_ *t);
 
 /*==============================  Interface    ==============================*/
 
@@ -205,9 +206,10 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
 ccc_frtm_entry *
 ccc_frm_and_modify(ccc_frtm_entry *const e, ccc_update_fn *const fn)
 {
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){.container = e->impl_.entry_.e_, NULL});
+        fn(&(ccc_update){.container = base_at(e->impl_.frm_, e->impl_.i_),
+                         NULL});
     }
     return e;
 }
@@ -216,9 +218,10 @@ ccc_frtm_entry *
 ccc_frm_and_modify_aux(ccc_frtm_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){.container = e->impl_.entry_.e_, aux});
+        fn(&(ccc_update){.container = base_at(e->impl_.frm_, e->impl_.i_),
+                         aux});
     }
     return e;
 }
@@ -226,32 +229,27 @@ ccc_frm_and_modify_aux(ccc_frtm_entry *const e, ccc_update_fn *const fn,
 void *
 ccc_frm_or_insert(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
 {
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        return e->impl_.entry_.e_;
+        return base_at(e->impl_.frm_, e->impl_.i_);
     }
-    return maybe_alloc_insert(e->impl_.frm_,
-                              e->impl_.entry_.e_ ? ccc_buf_index_of(
-                                  &e->impl_.frm_->buf_, e->impl_.entry_.e_)
-                                                 : 0,
-                              e->impl_.last_cmp_, elem);
+    return maybe_alloc_insert(e->impl_.frm_, e->impl_.i_, e->impl_.last_cmp_,
+                              elem);
 }
 
 void *
 ccc_frm_insert_entry(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
 {
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        *elem = *elem_in_slot(e->impl_.frm_, e->impl_.entry_.e_);
-        (void)memcpy(e->impl_.entry_.e_, struct_base(e->impl_.frm_, elem),
+        void *const ret = base_at(e->impl_.frm_, e->impl_.i_);
+        *elem = *elem_in_slot(e->impl_.frm_, ret);
+        (void)memcpy(ret, struct_base(e->impl_.frm_, elem),
                      ccc_buf_elem_size(&e->impl_.frm_->buf_));
-        return e->impl_.entry_.e_;
+        return ret;
     }
-    return maybe_alloc_insert(e->impl_.frm_,
-                              e->impl_.entry_.e_ ? ccc_buf_index_of(
-                                  &e->impl_.frm_->buf_, e->impl_.entry_.e_)
-                                                 : 0,
-                              e->impl_.last_cmp_, elem);
+    return maybe_alloc_insert(e->impl_.frm_, e->impl_.i_, e->impl_.last_cmp_,
+                              elem);
 }
 
 ccc_frtm_entry
@@ -264,10 +262,9 @@ ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
 ccc_entry
 ccc_frm_remove_entry(ccc_frtm_entry const *const e)
 {
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        void *const erased = remove_fixup(
-            e->impl_.frm_, index_of(e->impl_.frm_, e->impl_.entry_.e_));
+        void *const erased = remove_fixup(e->impl_.frm_, e->impl_.i_);
         assert(erased);
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -275,7 +272,7 @@ ccc_frm_remove_entry(ccc_frtm_entry const *const e)
 }
 
 ccc_entry
-ccc_rom_remove(ccc_flat_realtime_ordered_map *const frm,
+ccc_frm_remove(ccc_flat_realtime_ordered_map *const frm,
                ccc_frtm_elem *const out_handle)
 {
     struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
@@ -308,9 +305,9 @@ ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
 void *
 ccc_frm_unwrap(ccc_frtm_entry const *const e)
 {
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        return e->impl_.entry_.e_;
+        return ccc_buf_at(&e->impl_.frm_->buf_, e->impl_.i_);
     }
     return NULL;
 }
@@ -318,13 +315,13 @@ ccc_frm_unwrap(ccc_frtm_entry const *const e)
 bool
 ccc_frm_insert_error(ccc_frtm_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
+    return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
 }
 
 bool
 ccc_frm_occupied(ccc_frtm_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
+    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 bool
@@ -406,6 +403,48 @@ ccc_frm_rend(ccc_flat_realtime_ordered_map const *const frm)
     return base_at(frm, 0);
 }
 
+void
+ccc_frm_clear(ccc_flat_realtime_ordered_map *const frm,
+              ccc_destructor_fn *const fn)
+{
+    if (!frm)
+    {
+        return;
+    }
+    if (!fn)
+    {
+        ccc_buf_size_set(&frm->buf_, 1);
+        frm->root_ = 0;
+        return;
+    }
+    while (!ccc_frm_empty(frm))
+    {
+        void *const deleted = remove_fixup(frm, frm->root_);
+        fn(deleted);
+    }
+}
+
+ccc_result
+ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *const frm,
+                       ccc_destructor_fn *const fn)
+{
+    if (!frm)
+    {
+        return CCC_INPUT_ERR;
+    }
+    if (!fn)
+    {
+        frm->root_ = 0;
+        return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
+    }
+    while (!ccc_frm_empty(frm))
+    {
+        void *const deleted = remove_fixup(frm, frm->root_);
+        fn(deleted);
+    }
+    return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
+}
+
 bool
 ccc_frm_validate(ccc_flat_realtime_ordered_map const *const frm)
 {
@@ -461,6 +500,12 @@ ccc_impl_frm_elem_in_slot(struct ccc_frm_ const *const frm,
     return elem_in_slot(frm, slot);
 }
 
+void *
+ccc_impl_frm_alloc_back(struct ccc_frm_ *const frm)
+{
+    return alloc_back(frm);
+}
+
 /*==========================  Static Helpers   ==============================*/
 
 static void *
@@ -470,16 +515,7 @@ maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementor is always at least 1. */
-    if (ccc_buf_empty(&frm->buf_))
-    {
-        void *const sentinel = ccc_buf_alloc(&frm->buf_);
-        if (!sentinel)
-        {
-            return NULL;
-        }
-        elem_in_slot(frm, sentinel)->parity_ = 1;
-    }
-    if (!ccc_buf_alloc(&frm->buf_))
+    if (!alloc_back(frm))
     {
         return NULL;
     }
@@ -520,13 +556,15 @@ entry(struct ccc_frm_ const *const frm, void const *const key)
         return (struct ccc_frm_entry_){
             .frm_ = (struct ccc_frm_ *)frm,
             .last_cmp_ = q.last_cmp_,
-            .entry_ = {base_at(frm, q.found_), CCC_ENTRY_OCCUPIED},
+            .i_ = q.found_,
+            .stats_ = CCC_ENTRY_OCCUPIED,
         };
     }
     return (struct ccc_frm_entry_){
         .frm_ = (struct ccc_frm_ *)frm,
         .last_cmp_ = q.last_cmp_,
-        .entry_ = {base_at(frm, q.parent_), CCC_ENTRY_VACANT},
+        .i_ = q.parent_,
+        .stats_ = CCC_ENTRY_VACANT,
     };
 }
 
@@ -621,6 +659,23 @@ cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
 {
     return fn(&(ccc_key_cmp){
         .container = base_at(frm, node), .key = key, .aux = frm->aux_});
+}
+
+static inline void *
+alloc_back(struct ccc_frm_ *const t)
+{
+    /* The end sentinel node will always be at 0. This also means once
+       initialized the internal size for implementor is always at least 1. */
+    if (ccc_buf_empty(&t->buf_))
+    {
+        void *const sentinel = ccc_buf_alloc(&t->buf_);
+        if (!sentinel)
+        {
+            return NULL;
+        }
+        elem_in_slot(t, sentinel)->parity_ = 1;
+    }
+    return ccc_buf_alloc(&t->buf_);
 }
 
 static inline void

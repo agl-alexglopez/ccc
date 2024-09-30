@@ -18,7 +18,7 @@ ccc_buf_realloc(ccc_buffer *buf, size_t const new_capacity,
     {
         return CCC_NO_REALLOC;
     }
-    void *const new_mem = fn(buf->mem_, new_capacity);
+    void *const new_mem = fn(buf->mem_, buf->elem_sz_ * new_capacity);
     if (new_capacity && !new_mem)
     {
         return CCC_MEM_ERR;

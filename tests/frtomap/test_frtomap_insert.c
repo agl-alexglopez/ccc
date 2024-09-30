@@ -26,44 +26,45 @@ BEGIN_STATIC_TEST(frtomap_test_insert_one)
     END_TEST();
 }
 
-// BEGIN_STATIC_TEST(frtomap_test_insert_macros)
-// {
-//     ccc_realtime_ordered_map s
-//         = frm_init(struct val, elem, val, s, realloc, val_cmp, NULL);
-//     struct val *v = frm_or_insert_w(entry_vr(&s, &(int){0}), (struct val){});
-//     CHECK(v != NULL, true);
-//     v = frm_insert_entry_w(entry_vr(&s, &(int){0}),
-//                            (struct val){.val = 0, .id = 99});
-//     CHECK(validate(&s), true);
-//     CHECK(v == NULL, false);
-//     CHECK(v->id, 99);
-//     v = frm_insert_entry_w(entry_vr(&s, &(int){9}),
-//                            (struct val){.val = 9, .id = 100});
-//     CHECK(v != NULL, true);
-//     CHECK(v->id, 100);
-//     v = unwrap(frm_insert_or_assign_w(&s, 1, (struct val){.id = 100}));
-//     CHECK(validate(&s), true);
-//     CHECK(v != NULL, true);
-//     CHECK(v->id, 100);
-//     CHECK(size(&s), 3);
-//     v = unwrap(frm_insert_or_assign_w(&s, 1, (struct val){.id = 99}));
-//     CHECK(validate(&s), true);
-//     CHECK(v != NULL, true);
-//     CHECK(v->id, 99);
-//     CHECK(size(&s), 3);
-//     v = unwrap(frm_try_insert_w(&s, 1, (struct val){.id = 2}));
-//     CHECK(validate(&s), true);
-//     CHECK(v != NULL, true);
-//     CHECK(v->id, 99);
-//     CHECK(size(&s), 3);
-//     v = unwrap(frm_try_insert_w(&s, 2, (struct val){.id = 2}));
-//     CHECK(validate(&s), true);
-//     CHECK(v != NULL, true);
-//     CHECK(v->id, 2);
-//     CHECK(size(&s), 4);
-//     frm_clear_and_free(&s, NULL);
-//     END_TEST(frm_clear_and_free(&s, NULL););
-// }
+BEGIN_STATIC_TEST(frtomap_test_insert_macros)
+{
+    /* This is also a good test to see if the buffer can manage its own memory
+       when provided with a realloc function starting from NULL. */
+    flat_realtime_ordered_map s
+        = frm_init(NULL, 0, struct val, elem, id, realloc, val_cmp, NULL);
+    struct val *v = frm_or_insert_w(entry_vr(&s, &(int){0}), (struct val){});
+    CHECK(v != NULL, true);
+    v = frm_insert_entry_w(entry_vr(&s, &(int){0}),
+                           (struct val){.id = 0, .val = 99});
+    CHECK(validate(&s), true);
+    CHECK(v == NULL, false);
+    CHECK(v->val, 99);
+    v = frm_insert_entry_w(entry_vr(&s, &(int){9}),
+                           (struct val){.id = 9, .val = 100});
+    CHECK(v != NULL, true);
+    CHECK(v->val, 100);
+    v = unwrap(frm_insert_or_assign_w(&s, 1, (struct val){.val = 100}));
+    CHECK(validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->val, 100);
+    CHECK(size(&s), 3);
+    v = unwrap(frm_insert_or_assign_w(&s, 1, (struct val){.val = 99}));
+    CHECK(validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->val, 99);
+    CHECK(size(&s), 3);
+    v = unwrap(frm_try_insert_w(&s, 1, (struct val){.val = 2}));
+    CHECK(validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->val, 99);
+    CHECK(size(&s), 3);
+    v = unwrap(frm_try_insert_w(&s, 2, (struct val){.val = 2}));
+    CHECK(validate(&s), true);
+    CHECK(v != NULL, true);
+    CHECK(v->val, 2);
+    CHECK(size(&s), 4);
+    END_TEST(frm_clear_and_free(&s, NULL););
+}
 
 BEGIN_STATIC_TEST(frtomap_test_insert_shuffle)
 {
@@ -107,7 +108,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_weak_srand)
 int
 main()
 {
-    return RUN_TESTS(
-        frtomap_test_insert_one(), /*frtomap_test_insert_macros() ,*/
-        frtomap_test_insert_shuffle(), frtomap_test_insert_weak_srand());
+    return RUN_TESTS(frtomap_test_insert_one(), frtomap_test_insert_macros(),
+                     frtomap_test_insert_shuffle(),
+                     frtomap_test_insert_weak_srand());
 }
