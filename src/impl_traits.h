@@ -78,10 +78,10 @@
     _Generic((container_entry_ptr),                                            \
         ccc_fh_map_entry *: ccc_fhm_remove_entry,                              \
         ccc_o_map_entry *: ccc_om_remove_entry,                                \
-        ccc_flat_realtime_ordered_map *: ccc_frm_remove_entry,                 \
+        ccc_frtm_entry *: ccc_frm_remove_entry,                                \
         ccc_rtom_entry *: ccc_rom_remove_entry,                                \
         ccc_fh_map_entry const *: ccc_fhm_remove_entry,                        \
-        ccc_flat_realtime_ordered_map const *: ccc_frm_remove_entry,           \
+        ccc_frtm_entry const *: ccc_frm_remove_entry,                          \
         ccc_o_map_entry const *: ccc_om_remove_entry,                          \
         ccc_rtom_entry const *: ccc_rom_remove_entry)((container_entry_ptr))
 
