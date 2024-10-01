@@ -68,6 +68,7 @@ static void *struct_base(struct ccc_tree_ const *, struct ccc_node_ const *);
 static void *find(struct ccc_tree_ *, void const *);
 static void *erase(struct ccc_tree_ *, void const *key);
 static void *alloc_insert(struct ccc_tree_ *, struct ccc_node_ *);
+static void *insert(struct ccc_tree_ *, struct ccc_node_ *);
 static void *connect_new_root(struct ccc_tree_ *, struct ccc_node_ *,
                               ccc_threeway_cmp);
 static void *max(struct ccc_tree_ const *);
@@ -141,13 +142,13 @@ ccc_om_size(ccc_ordered_map const *const s)
 }
 
 bool
-ccc_om_contains(ccc_ordered_map *s, void const *const key)
+ccc_om_contains(ccc_ordered_map *const s, void const *const key)
 {
     return contains(&s->impl_, key);
 }
 
 struct ccc_tree_entry_
-ccc_impl_om_entry(struct ccc_tree_ *t, void const *key)
+ccc_impl_om_entry(struct ccc_tree_ *const t, void const *key)
 {
     void *found = find(t, key);
     if (found)
@@ -213,7 +214,8 @@ ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
 }
 
 ccc_o_map_entry *
-ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *fn, void *aux)
+ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *const fn,
+                      void *const aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
@@ -331,7 +333,7 @@ ccc_om_remove_entry(ccc_o_map_entry *const e)
 }
 
 void *
-ccc_om_get_key_val(ccc_ordered_map *s, void const *const key)
+ccc_om_get_key_val(ccc_ordered_map *const s, void const *const key)
 {
     return find(&s->impl_, key);
 }
@@ -395,7 +397,7 @@ ccc_om_rnext(ccc_ordered_map const *const s, ccc_o_map_elem const *const e)
 }
 
 ccc_range
-ccc_om_equal_range(ccc_ordered_map *s, void const *const begin_key,
+ccc_om_equal_range(ccc_ordered_map *const s, void const *const begin_key,
                    void const *const end_key)
 {
     return (ccc_range){
@@ -403,7 +405,7 @@ ccc_om_equal_range(ccc_ordered_map *s, void const *const begin_key,
 }
 
 ccc_rrange
-ccc_om_equal_rrange(ccc_ordered_map *s, void const *const rbegin_key,
+ccc_om_equal_rrange(ccc_ordered_map *const s, void const *const rbegin_key,
                     void const *const end_key)
 
 {
@@ -438,6 +440,12 @@ ccc_om_validate(ccc_ordered_map const *const s)
 /*==========================  Private Interface  ============================*/
 
 void *
+ccc_impl_om_insert(struct ccc_tree_ *const t, struct ccc_node_ *n)
+{
+    return insert(t, n);
+}
+
+void *
 ccc_impl_om_key_in_slot(struct ccc_tree_ const *const t, void const *const slot)
 {
     return (char *)slot + t->key_offset_;
@@ -451,7 +459,7 @@ ccc_impl_om_key_from_node(struct ccc_tree_ const *const t,
 }
 
 struct ccc_node_ *
-ccc_impl_om_elem_in_slot(struct ccc_tree_ const *t, void const *slot)
+ccc_impl_om_elem_in_slot(struct ccc_tree_ const *const t, void const *slot)
 {
 
     return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
@@ -459,27 +467,27 @@ ccc_impl_om_elem_in_slot(struct ccc_tree_ const *t, void const *slot)
 
 /*======================  Static Splay Tree Helpers  ========================*/
 
-static void
-init_node(struct ccc_tree_ *t, struct ccc_node_ *n)
+static inline void
+init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)
 {
     n->branch_[L] = &t->end_;
     n->branch_[R] = &t->end_;
     n->parent_ = &t->end_;
 }
 
-static bool
+static inline bool
 empty(struct ccc_tree_ const *const t)
 {
     return !t->size_;
 }
 
-static struct ccc_node_ *
+static inline struct ccc_node_ *
 root(struct ccc_tree_ const *const t)
 {
     return t->root_;
 }
 
-static void *
+static inline void *
 max(struct ccc_tree_ const *const t)
 {
     if (!t->size_)
@@ -492,7 +500,7 @@ max(struct ccc_tree_ const *const t)
     return struct_base(t, m);
 }
 
-static void *
+static inline void *
 min(struct ccc_tree_ const *t)
 {
     if (!t->size_)
@@ -505,7 +513,7 @@ min(struct ccc_tree_ const *t)
     return struct_base(t, m);
 }
 
-static struct ccc_node_ const *
+static inline struct ccc_node_ const *
 next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
      om_link const traversal)
 {
@@ -536,9 +544,9 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
     return p;
 }
 
-static struct ccc_range_
-equal_range(struct ccc_tree_ *t, void const *begin_key, void const *end_key,
-            om_link const traversal)
+static inline struct ccc_range_
+equal_range(struct ccc_tree_ *const t, void const *const begin_key,
+            void const *const end_key, om_link const traversal)
 {
     if (!t->size_)
     {
@@ -566,8 +574,8 @@ equal_range(struct ccc_tree_ *t, void const *begin_key, void const *end_key,
     };
 }
 
-static void *
-find(struct ccc_tree_ *t, void const *const key)
+static inline void *
+find(struct ccc_tree_ *const t, void const *const key)
 {
     if (t->root_ == &t->end_)
     {
@@ -578,15 +586,15 @@ find(struct ccc_tree_ *t, void const *const key)
                                                      : NULL;
 }
 
-static bool
-contains(struct ccc_tree_ *t, void const *key)
+static inline bool
+contains(struct ccc_tree_ *const t, void const *key)
 {
     t->root_ = splay(t, t->root_, key, t->cmp_);
     return cmp(t, key, t->root_, t->cmp_) == CCC_EQL;
 }
 
-static void *
-alloc_insert(struct ccc_tree_ *t, struct ccc_node_ *out_handle)
+static inline void *
+alloc_insert(struct ccc_tree_ *const t, struct ccc_node_ *out_handle)
 {
     init_node(t, out_handle);
     ccc_threeway_cmp root_cmp = CCC_CMP_ERR;
@@ -621,8 +629,8 @@ alloc_insert(struct ccc_tree_ *t, struct ccc_node_ *out_handle)
     return connect_new_root(t, out_handle, root_cmp);
 }
 
-void *
-ccc_impl_om_insert(struct ccc_tree_ *t, struct ccc_node_ *n)
+static inline void *
+insert(struct ccc_tree_ *const t, struct ccc_node_ *const n)
 {
     init_node(t, n);
     if (empty(t))
@@ -642,8 +650,8 @@ ccc_impl_om_insert(struct ccc_tree_ *t, struct ccc_node_ *n)
     return connect_new_root(t, n, root_cmp);
 }
 
-static void *
-connect_new_root(struct ccc_tree_ *t, struct ccc_node_ *new_root,
+static inline void *
+connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *new_root,
                  ccc_threeway_cmp cmp_result)
 {
     om_link const link = CCC_GRT == cmp_result;
@@ -656,8 +664,8 @@ connect_new_root(struct ccc_tree_ *t, struct ccc_node_ *new_root,
     return struct_base(t, new_root);
 }
 
-static void *
-erase(struct ccc_tree_ *t, void const *const key)
+static inline void *
+erase(struct ccc_tree_ *const t, void const *const key)
 {
     if (empty(t))
     {
@@ -676,7 +684,7 @@ erase(struct ccc_tree_ *t, void const *const key)
 }
 
 static inline struct ccc_node_ *
-remove_from_tree(struct ccc_tree_ *t, struct ccc_node_ *ret)
+remove_from_tree(struct ccc_tree_ *const t, struct ccc_node_ *const ret)
 {
     if (ret->branch_[L] == &t->end_)
     {
@@ -692,9 +700,9 @@ remove_from_tree(struct ccc_tree_ *t, struct ccc_node_ *ret)
     return ret;
 }
 
-static struct ccc_node_ *
-splay(struct ccc_tree_ *t, struct ccc_node_ *root, void const *const key,
-      ccc_key_cmp_fn *cmp_fn)
+static inline struct ccc_node_ *
+splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
+      ccc_key_cmp_fn *const cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -771,7 +779,8 @@ swap(char tmp[], void *const a, void *const b, size_t elem_sz)
 }
 
 static inline void
-link_trees(struct ccc_node_ *parent, om_link dir, struct ccc_node_ *subtree)
+link_trees(struct ccc_node_ *const parent, om_link const dir,
+           struct ccc_node_ *const subtree)
 {
     parent->branch_[dir] = subtree;
     subtree->parent_ = parent;
@@ -815,7 +824,7 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range const r,
+are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)
