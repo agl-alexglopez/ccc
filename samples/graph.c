@@ -666,16 +666,14 @@ find_shortest_paths(struct graph *const graph)
         sv_print(stdout, prompt_msg);
         size_t len = 0;
         ssize_t read = 0;
-        while ((read = getline(&lineptr, &len, stdin)) != -1)
+        while ((read = getline(&lineptr, &len, stdin)) > 0)
         {
-            str_view line = (str_view){
-                .s = lineptr,
-                .sz = read - 1,
-            };
-            struct path_request pr = parse_path_request(graph, line);
+            struct path_request pr = parse_path_request(
+                graph, (str_view){.s = lineptr, .sz = read - 1});
             if (!pr.src)
             {
                 clear_line();
+                free(lineptr);
                 quit("Please provide any source and destination vertex "
                      "represented in the grid\nExamples: AB, A B, B-C, X->Y, "
                      "DtoF\nMost formats work but two capital vertices are "
