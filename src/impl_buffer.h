@@ -42,7 +42,7 @@ struct ccc_buf_
         __auto_type emplace_back_buf_ptr_ = (ccc_buf_ptr);                     \
         assert(sizeof(typeof(*buf_res_))                                       \
                == ccc_buf_elem_size(emplace_back_buf_ptr_));                   \
-        buf_res_ = ccc_buf_alloc((emplace_back_buf_ptr_));                     \
+        buf_res_ = ccc_buf_alloc_back((emplace_back_buf_ptr_));                     \
         if (buf_res_)                                                          \
         {                                                                      \
             *buf_res_ = type_initializer;                                      \

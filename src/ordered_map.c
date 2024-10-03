@@ -17,7 +17,7 @@
 #define COLOR_GRN "\033[32;1m"
 #define COLOR_NIL "\033[0m"
 #define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-#define PRINTER_INDENT (short)13
+#define PRINTER_INDENT 13
 #define LR 2
 
 /* Instead of thinking about left and right consider only links
@@ -27,31 +27,23 @@ typedef enum
 {
     L = 0,
     R = 1
-} om_link;
-
-/* Trees are just a different interpretation of the same links used
-   for doubly linked lists. We take advantage of this for duplicates. */
-typedef enum
-{
-    P = 0,
-    N = 1
-} om_list_link;
+} om_branch_;
 
 /* Printing enum for printing tree structures if heap available. */
 typedef enum
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
-} om_print_link;
+} om_print_branch_;
 
-static om_link const inorder_traversal = R;
-static om_link const reverse_inorder_traversal = L;
+static om_branch_ const inorder_traversal = R;
+static om_branch_ const reverse_inorder_traversal = L;
 
 /* No return value. */
 
 static void init_node(struct ccc_tree_ *, struct ccc_node_ *);
 static void swap(char tmp[], void *, void *, size_t);
-static void link_trees(struct ccc_node_ *, om_link, struct ccc_node_ *);
+static void link_trees(struct ccc_node_ *, om_branch_, struct ccc_node_ *);
 static void ccc_tree_tree_print(struct ccc_tree_ const *t,
                                 struct ccc_node_ const *root,
                                 ccc_print_fn *fn_print);
@@ -74,7 +66,7 @@ static void *connect_new_root(struct ccc_tree_ *, struct ccc_node_ *,
 static void *max(struct ccc_tree_ const *);
 static void *min(struct ccc_tree_ const *);
 static struct ccc_range_ equal_range(struct ccc_tree_ *, void const *,
-                                     void const *, om_link);
+                                     void const *, om_branch_);
 
 /* Internal operations that take and return nodes for the tree. */
 
@@ -82,7 +74,7 @@ static struct ccc_node_ *root(struct ccc_tree_ const *);
 static struct ccc_node_ *remove_from_tree(struct ccc_tree_ *,
                                           struct ccc_node_ *);
 static struct ccc_node_ const *next(struct ccc_tree_ const *,
-                                    struct ccc_node_ const *, om_link);
+                                    struct ccc_node_ const *, om_branch_);
 static struct ccc_node_ *splay(struct ccc_tree_ *, struct ccc_node_ *,
                                void const *key, ccc_key_cmp_fn *);
 
@@ -515,7 +507,7 @@ min(struct ccc_tree_ const *t)
 
 static inline struct ccc_node_ const *
 next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
-     om_link const traversal)
+     om_branch_ const traversal)
 {
     if (!n || n == &t->end_)
     {
@@ -546,7 +538,7 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
 
 static inline struct ccc_range_
 equal_range(struct ccc_tree_ *const t, void const *const begin_key,
-            void const *const end_key, om_link const traversal)
+            void const *const end_key, om_branch_ const traversal)
 {
     if (!t->size_)
     {
@@ -654,7 +646,7 @@ static inline void *
 connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *new_root,
                  ccc_threeway_cmp cmp_result)
 {
-    om_link const link = CCC_GRT == cmp_result;
+    om_branch_ const link = CCC_GRT == cmp_result;
     link_trees(new_root, link, t->root_->branch_[link]);
     link_trees(new_root, !link, t->root_);
     t->root_->branch_[link] = &t->end_;
@@ -712,14 +704,14 @@ splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
     for (;;)
     {
         ccc_threeway_cmp const root_cmp = cmp(t, key, root, cmp_fn);
-        om_link const dir = CCC_GRT == root_cmp;
+        om_branch_ const dir = CCC_GRT == root_cmp;
         if (CCC_EQL == root_cmp || root->branch_[dir] == &t->end_)
         {
             break;
         }
         ccc_threeway_cmp const child_cmp
             = cmp(t, key, root->branch_[dir], cmp_fn);
-        om_link const dir_from_child = CCC_GRT == child_cmp;
+        om_branch_ const dir_from_child = CCC_GRT == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
         if (CCC_EQL != child_cmp && dir == dir_from_child)
@@ -779,7 +771,7 @@ swap(char tmp[], void *const a, void *const b, size_t elem_sz)
 }
 
 static inline void
-link_trees(struct ccc_node_ *const parent, om_link const dir,
+link_trees(struct ccc_node_ *const parent, om_branch_ const dir,
            struct ccc_node_ *const subtree)
 {
     parent->branch_[dir] = subtree;
@@ -848,18 +840,14 @@ are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range const r,
         return false;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range){
-                                  .low = r.low,
-                                  .root = r.root->branch_[L],
-                                  .high = r.root,
-                              },
+                              (struct tree_range){.low = r.low,
+                                                  .root = r.root->branch_[L],
+                                                  .high = r.root},
                               nil)
            && are_subtrees_valid(t,
-                                 (struct tree_range){
-                                     .low = r.root,
-                                     .root = r.root->branch_[R],
-                                     .high = r.high,
-                                 },
+                                 (struct tree_range){.low = r.root,
+                                                     .root = r.root->branch_[R],
+                                                     .high = r.high},
                                  nil);
 }
 
@@ -967,9 +955,9 @@ print_node(struct ccc_tree_ const *const t,
 static void
 print_inner_tree(struct ccc_node_ const *const root, size_t const parent_size,
                  struct ccc_node_ const *const parent, char const *const prefix,
-                 char const *const prefix_color, om_print_link const node_type,
-                 om_link const dir, struct ccc_tree_ const *const t,
-                 ccc_print_fn *const fn_print)
+                 char const *const prefix_color,
+                 om_print_branch_ const node_type, om_branch_ const dir,
+                 struct ccc_tree_ const *const t, ccc_print_fn *const fn_print)
 {
     if (root == &t->end_)
     {

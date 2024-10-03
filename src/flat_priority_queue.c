@@ -52,7 +52,7 @@ ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
 void *
 ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
 {
-    void *new = ccc_buf_alloc(&fpq->buf_);
+    void *new = ccc_buf_alloc_back(&fpq->buf_);
     if (ccc_buf_size(&fpq->buf_) == ccc_buf_capacity(&fpq->buf_))
     {
         new = NULL;

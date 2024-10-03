@@ -50,6 +50,8 @@ static enum frm_branch_ const reverse_inorder_traversal = L;
 static enum frm_branch_ const min = L;
 static enum frm_branch_ const max = R;
 
+static size_t const single_tree_node = 2;
+
 /*==============================  Prototypes   ==============================*/
 
 /* Returning the user struct type with stored offsets. */
@@ -121,7 +123,7 @@ static void rebalance_3_child(struct ccc_frm_ *t, size_t p_of_xy, size_t x);
 static void rebalance_via_rotation(struct ccc_frm_ *t, size_t z, size_t x,
                                    size_t y);
 static void transplant(struct ccc_frm_ *t, size_t remove, size_t replacement);
-static void swap_for_pop(struct ccc_frm_ *t, size_t remove);
+static void swap_and_pop(struct ccc_frm_ *t, size_t vacant_i);
 static void promote(struct ccc_frm_ const *t, size_t x);
 static void demote(struct ccc_frm_ const *t, size_t x);
 static void double_promote(struct ccc_frm_ const *t, size_t x);
@@ -541,7 +543,7 @@ insert(struct ccc_frm_ *const frm, size_t const parent_i,
 {
     struct ccc_frm_elem_ *elem = at(frm, elem_i);
     init_node(elem);
-    if (ccc_buf_size(&frm->buf_) == 2)
+    if (ccc_buf_size(&frm->buf_) == single_tree_node)
     {
         frm->root_ = elem_i;
         return struct_base(frm, elem);
@@ -679,14 +681,14 @@ alloc_back(struct ccc_frm_ *const t)
        initialized the internal size for implementor is always at least 1. */
     if (ccc_buf_empty(&t->buf_))
     {
-        void *const sentinel = ccc_buf_alloc(&t->buf_);
+        void *const sentinel = ccc_buf_alloc_back(&t->buf_);
         if (!sentinel)
         {
             return NULL;
         }
         elem_in_slot(t, sentinel)->parity_ = 1;
     }
-    return ccc_buf_alloc(&t->buf_);
+    return ccc_buf_alloc_back(&t->buf_);
 }
 
 static inline void
@@ -871,35 +873,36 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
     }
     struct ccc_frm_elem_ *const r = at(t, remove);
     r->branch_[L] = r->branch_[R] = r->parent_ = r->parity_ = 0;
-    if (remove != ccc_buf_size(&t->buf_) - 1)
-    {
-        swap_for_pop(t, remove);
-    }
-    ccc_buf_size_minus(&t->buf_, 1);
+    swap_and_pop(t, remove);
     return base_at(t, ccc_buf_size(&t->buf_));
 }
 
+/** Swaps in the back buffer element into vacated slot*/
 static inline void
-swap_for_pop(struct ccc_frm_ *const t, size_t const remove)
+swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
 {
-    size_t const back_i = ccc_buf_size(&t->buf_) - 1;
-    struct ccc_frm_elem_ *const back_elem = at(t, back_i);
-    assert(remove);
-    assert(back_i);
-    if (back_i == t->root_)
+    ccc_buf_size_minus(&t->buf_, 1);
+    if (vacant_i == ccc_buf_size(&t->buf_))
     {
-        t->root_ = remove;
+        return;
+    }
+    size_t const x_i = ccc_buf_size(&t->buf_);
+    struct ccc_frm_elem_ *const x = at(t, x_i);
+    assert(vacant_i);
+    assert(x_i);
+    assert(x);
+    if (x_i == t->root_)
+    {
+        t->root_ = vacant_i;
     }
     else
     {
-        struct ccc_frm_elem_ *const back_elem_parent
-            = at(t, back_elem->parent_);
-        back_elem_parent->branch_[back_elem_parent->branch_[R] == back_i]
-            = remove;
+        struct ccc_frm_elem_ *const p = at(t, x->parent_);
+        p->branch_[p->branch_[R] == x_i] = vacant_i;
     }
-    *parent_ref(t, back_elem->branch_[R]) = remove;
-    *parent_ref(t, back_elem->branch_[L]) = remove;
-    ccc_buf_swap(&t->buf_, base_at(t, 0), remove, back_i);
+    *parent_ref(t, x->branch_[R]) = vacant_i;
+    *parent_ref(t, x->branch_[L]) = vacant_i;
+    ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     at(t, 0)->parity_ = 1;
 }
 

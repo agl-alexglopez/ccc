@@ -51,7 +51,7 @@ ccc_buf_front(ccc_buffer const *buf)
 }
 
 void *
-ccc_buf_alloc(ccc_buffer *buf)
+ccc_buf_alloc_back(ccc_buffer *buf)
 {
     if (buf->sz_ == buf->capacity_
         && (CCC_OK != buf->capacity_
@@ -68,7 +68,7 @@ ccc_buf_alloc(ccc_buffer *buf)
 void *
 ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
 {
-    void *const mem = ccc_buf_alloc(buf);
+    void *const mem = ccc_buf_alloc_back(buf);
     if (mem)
     {
         memcpy(mem, data, buf->elem_sz_);
@@ -79,7 +79,7 @@ ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
 ccc_result
 ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t const i, size_t const j)
 {
-    if (!buf->sz_ || i >= buf->sz_ || j >= buf->sz_ || j == i)
+    if (!buf->sz_ || i >= buf->capacity_ || j >= buf->capacity_ || j == i)
     {
         return CCC_MEM_ERR;
     }
@@ -92,7 +92,7 @@ ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t const i, size_t const j)
 void *
 ccc_buf_copy(ccc_buffer *buf, size_t const dst, size_t const src)
 {
-    if (!buf->sz_ || dst >= buf->sz_ || src >= buf->sz_)
+    if (!buf->sz_ || dst >= buf->capacity_ || src >= buf->capacity_)
     {
         return NULL;
     }

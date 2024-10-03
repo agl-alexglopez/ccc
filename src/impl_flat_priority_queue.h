@@ -37,7 +37,7 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
         typeof(type_initializer) *fpq_res_;                                    \
         struct ccc_fpq_ *fpq_ = (fpq);                                         \
         assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf_));           \
-        fpq_res_ = ccc_buf_alloc(&fpq_->buf_);                                 \
+        fpq_res_ = ccc_buf_alloc_back(&fpq_->buf_);                                 \
         if (ccc_buf_size(&fpq_->buf_) == ccc_buf_capacity(&fpq_->buf_))        \
         {                                                                      \
             fpq_res_ = NULL;                                                   \

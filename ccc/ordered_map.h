@@ -1,24 +1,3 @@
-/* Author: Alexander G. Lopez
---------------------------
-This is the Map interface for the Splay Tree
-Map. In this case we modify a Splay Tree to allow for
-a true set (naturally sorted unique elements). See the
-priority queue for another use case of this data
-structure. A set can be an interesting option for a
-LRU cache. Any application such that there is biased
-distribution of access via lookup, insertion, and
-removal brings those elements closer to the root of
-the tree, approaching constant time operations. See
-also the multiset for great benefits of duplicates
-being taken from a data structure. The runtime is
-amortized O(lgN) but with the right use cases we
-may benefit from the O(1) capabilities of the working
-set. The anti-pattern is to seek and splay all elements
-to the tree in sequential order. However, any random
-variants will help maintain tree health and this interface
-provides robust iterators that can be used if read only
-access is required of all elements or only conditional
-modifications. This may combat such an anti-pattern. */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 

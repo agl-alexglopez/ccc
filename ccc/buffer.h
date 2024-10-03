@@ -28,7 +28,7 @@ bool ccc_buf_empty(ccc_buffer const *);
 void *ccc_buf_at(ccc_buffer const *, size_t);
 void *ccc_buf_back(ccc_buffer const *);
 void *ccc_buf_front(ccc_buffer const *);
-void *ccc_buf_alloc(ccc_buffer *);
+void *ccc_buf_alloc_back(ccc_buffer *);
 
 void *ccc_buf_push_back(ccc_buffer *, void const *);
 ccc_result ccc_buf_pop_back(ccc_buffer *);
@@ -68,7 +68,7 @@ typedef ccc_buffer buffer;
 #    define buf_at(args...) ccc_buf_at(args)
 #    define buf_back(args...) ccc_buf_back(args)
 #    define buf_front(args...) ccc_buf_front(args)
-#    define buf_alloc(args...) ccc_buf_alloc(args)
+#    define buf_alloc_back(args...) ccc_buf_alloc_back(args)
 #    define buf_push_back(args...) ccc_buf_push_back(args)
 #    define buf_pop_back(args...) ccc_buf_pop_back(args)
 #    define buf_pop_back_n(args...) ccc_buf_pop_back_n(args)
