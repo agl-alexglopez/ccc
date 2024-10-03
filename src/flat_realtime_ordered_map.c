@@ -918,8 +918,11 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
     {
         t->root_ = replacement;
     }
-    size_t const p = parent_i(t, remove);
-    *branch_ref(t, p, branch_i(t, p, R) == remove) = replacement;
+    else
+    {
+        size_t const p = parent_i(t, remove);
+        *branch_ref(t, p, branch_i(t, p, R) == remove) = replacement;
+    }
     struct ccc_frm_elem_ *const remove_ref = at(t, remove);
     struct ccc_frm_elem_ *const replace_ref = at(t, replacement);
     *parent_ref(t, remove_ref->branch_[R]) = replacement;
@@ -1049,8 +1052,11 @@ rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
     {
         t->root_ = x_p_of_y;
     }
-    struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
-    g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
+    else
+    {
+        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+        g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
+    }
     x_ref->branch_[dir] = z_p_of_x;
     z_ref->parent_ = x_p_of_y;
     z_ref->branch_[!dir] = y;
@@ -1083,8 +1089,11 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
     {
         t->root_ = y;
     }
-    struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
-    g->branch_[g->branch_[R] == z_p_of_x] = y;
+    else
+    {
+        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+        g->branch_[g->branch_[R] == z_p_of_x] = y;
+    }
     x_ref->branch_[!dir] = y_ref->branch_[dir];
     *parent_ref(t, y_ref->branch_[dir]) = x_p_of_y;
     y_ref->branch_[dir] = x_p_of_y;
