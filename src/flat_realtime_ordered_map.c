@@ -882,12 +882,12 @@ static inline void
 swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
 {
     ccc_buf_size_minus(&t->buf_, 1);
-    if (vacant_i == ccc_buf_size(&t->buf_))
+    size_t const x_i = ccc_buf_size(&t->buf_);
+    if (vacant_i == x_i)
     {
         return;
     }
-    size_t const x_i = ccc_buf_size(&t->buf_);
-    struct ccc_frm_elem_ *const x = at(t, x_i);
+    struct ccc_frm_elem_ const *const x = at(t, x_i);
     assert(vacant_i);
     assert(x_i);
     assert(x);
@@ -902,6 +902,7 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     }
     *parent_ref(t, x->branch_[R]) = vacant_i;
     *parent_ref(t, x->branch_[L]) = vacant_i;
+    /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
     ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     at(t, 0)->parity_ = 1;
 }
@@ -917,12 +918,8 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
     {
         t->root_ = replacement;
     }
-    else
-    {
-        size_t const r_parent = parent_i(t, remove);
-        *branch_ref(t, r_parent, branch_i(t, r_parent, R) == remove)
-            = replacement;
-    }
+    size_t const p = parent_i(t, remove);
+    *branch_ref(t, p, branch_i(t, p, R) == remove) = replacement;
     struct ccc_frm_elem_ *const remove_ref = at(t, remove);
     struct ccc_frm_elem_ *const replace_ref = at(t, replacement);
     *parent_ref(t, remove_ref->branch_[R]) = replacement;
@@ -962,8 +959,8 @@ rebalance_3_child(struct ccc_frm_ *const t, size_t p_of_xy, size_t x)
     bool made_3_child = false;
     do
     {
-        size_t p_of_p_of_x = parent_i(t, p_of_xy);
-        size_t y = branch_i(t, p_of_xy, branch_i(t, p_of_xy, L) == x);
+        size_t const p_of_p_of_x = parent_i(t, p_of_xy);
+        size_t const y = branch_i(t, p_of_xy, branch_i(t, p_of_xy, L) == x);
         made_3_child = is_2_child(t, p_of_p_of_x, p_of_xy);
         if (is_2_child(t, p_of_xy, y))
         {
@@ -990,7 +987,7 @@ rebalance_via_rotation(struct ccc_frm_ *const t, size_t const z, size_t const x,
                        size_t const y)
 {
     enum frm_branch_ const z_to_x_dir = branch_i(t, z, R) == x;
-    size_t w = branch_i(t, y, !z_to_x_dir);
+    size_t const w = branch_i(t, y, !z_to_x_dir);
     if (is_1_child(t, y, w))
     {
         rotate(t, z, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
@@ -1003,7 +1000,7 @@ rebalance_via_rotation(struct ccc_frm_ *const t, size_t const z, size_t const x,
     }
     else /* w is a 2-child and v will be a 1-child. */
     {
-        size_t v = branch_i(t, y, z_to_x_dir);
+        size_t const v = branch_i(t, y, z_to_x_dir);
         assert(is_2_child(t, y, w));
         assert(is_1_child(t, y, v));
         double_rotate(t, z, y, v, !z_to_x_dir);
@@ -1052,11 +1049,8 @@ rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
     {
         t->root_ = x_p_of_y;
     }
-    else
-    {
-        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
-        g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
-    }
+    struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+    g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
     x_ref->branch_[dir] = z_p_of_x;
     z_ref->parent_ = x_p_of_y;
     z_ref->branch_[!dir] = y;
@@ -1089,11 +1083,8 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
     {
         t->root_ = y;
     }
-    else
-    {
-        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
-        g->branch_[g->branch_[R] == z_p_of_x] = y;
-    }
+    struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+    g->branch_[g->branch_[R] == z_p_of_x] = y;
     x_ref->branch_[!dir] = y_ref->branch_[dir];
     *parent_ref(t, y_ref->branch_[dir]) = x_p_of_y;
     y_ref->branch_[dir] = x_p_of_y;

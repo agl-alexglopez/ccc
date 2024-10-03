@@ -916,11 +916,8 @@ transplant(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove,
     {
         rom->root_ = replacement;
     }
-    else
-    {
-        remove->parent_->branch_[remove->parent_->branch_[R] == remove]
-            = replacement;
-    }
+    remove->parent_->branch_[remove->parent_->branch_[R] == remove]
+        = replacement;
     remove->branch_[R]->parent_ = replacement;
     remove->branch_[L]->parent_ = replacement;
     replacement->branch_[R] = remove->branch_[R];
@@ -949,10 +946,7 @@ rotate(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const z_p_of_x,
     {
         rom->root_ = x_p_of_y;
     }
-    else
-    {
-        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = x_p_of_y;
-    }
+    p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = x_p_of_y;
     x_p_of_y->branch_[dir] = z_p_of_x;
     z_p_of_x->parent_ = x_p_of_y;
     z_p_of_x->branch_[!dir] = y;
@@ -985,10 +979,7 @@ double_rotate(struct ccc_rtom_ *const rom,
     {
         rom->root_ = y;
     }
-    else
-    {
-        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = y;
-    }
+    p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = y;
     x_p_of_y->branch_[!dir] = y->branch_[dir];
     y->branch_[dir]->parent_ = x_p_of_y;
     y->branch_[dir] = x_p_of_y;
