@@ -135,8 +135,8 @@ static void double_rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
                           size_t y, enum frm_branch_ dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
-static void ccc_tree_print(struct ccc_frm_ const *t, size_t root,
-                           ccc_print_fn *fn_print);
+static void tree_print(struct ccc_frm_ const *t, size_t root,
+                       ccc_print_fn *fn_print);
 
 /*==============================  Interface    ==============================*/
 
@@ -328,13 +328,13 @@ ccc_frm_unwrap(ccc_frtm_entry const *const e)
 bool
 ccc_frm_insert_error(ccc_frtm_entry const *const e)
 {
-    return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
+    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 bool
 ccc_frm_occupied(ccc_frtm_entry const *const e)
 {
-    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
+    return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
 }
 
 bool
@@ -474,7 +474,7 @@ void
 ccc_frm_print(ccc_flat_realtime_ordered_map const *const frm,
               ccc_print_fn *const fn)
 {
-    ccc_tree_print(frm, frm->root_, fn);
+    tree_print(frm, frm->root_, fn);
 }
 
 /*========================  Private Interface  ==============================*/
@@ -1391,8 +1391,8 @@ print_inner_tree(size_t const root, char const *const prefix,
 }
 
 static void
-ccc_tree_print(struct ccc_frm_ const *const t, size_t const root,
-               ccc_print_fn *const fn_print)
+tree_print(struct ccc_frm_ const *const t, size_t const root,
+           ccc_print_fn *const fn_print)
 {
     if (!root)
     {

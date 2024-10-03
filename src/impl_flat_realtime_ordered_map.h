@@ -31,7 +31,7 @@ struct ccc_frm_entry_
     /* The types.h entry is not quite suitable for this container so change. */
     size_t i_;
     /* Keep these types in sync in cases status reporting changes. */
-    typeof((struct ccc_entry_){}.stats_) stats_;
+    typeof((ccc_entry){}.impl_.stats_) stats_;
 };
 
 void *ccc_impl_frm_key_from_node(struct ccc_frm_ const *frm,
@@ -55,8 +55,6 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
         .node_elem_offset_ = offsetof(struct_name, node_elem_field),           \
         .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                              \
     }
-
-/*==================   Helper Macros for Repeated Logic     =================*/
 
 /*==================     Core Macro Implementations     =====================*/
 

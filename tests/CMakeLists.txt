@@ -144,6 +144,36 @@ add_map_test(test_map_insert)
 add_map_test(test_map_erase)
 add_map_test(test_map_iter)
 
+#############  Flat Map  ##########################
+add_library(fmap_util fmap/fmap_util.h fmap/fmap_util.c)
+target_link_libraries(fmap_util
+  PRIVATE
+    traits
+    flat_ordered_map
+    test
+)
+
+macro(add_fmap_test TEST_NAME)
+  add_executable(${TEST_NAME} fmap/${TEST_NAME}.c)
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      traits
+      fmap_util
+      flat_ordered_map
+      test
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_fmap_test(test_fmap_construct)
+# add_fmap_test(test_fmap_insert)
+# add_fmap_test(test_fmap_erase)
+# add_fmap_test(test_fmap_iter)
+
 #############  Realtime Map  ##########################
 add_library(rtomap_util rtomap/rtomap_util.h rtomap/rtomap_util.c)
 target_link_libraries(rtomap_util

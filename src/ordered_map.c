@@ -26,7 +26,7 @@
 typedef enum
 {
     L = 0,
-    R = 1
+    R,
 } om_branch_;
 
 /* Printing enum for printing tree structures if heap available. */
@@ -643,8 +643,8 @@ insert(struct ccc_tree_ *const t, struct ccc_node_ *const n)
 }
 
 static inline void *
-connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *new_root,
-                 ccc_threeway_cmp cmp_result)
+connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *const new_root,
+                 ccc_threeway_cmp const cmp_result)
 {
     om_branch_ const link = CCC_GRT == cmp_result;
     link_trees(new_root, link, t->root_->branch_[link]);
