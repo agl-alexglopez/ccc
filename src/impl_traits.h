@@ -7,6 +7,7 @@
 #include "doubly_linked_list.h"
 #include "flat_double_ended_queue.h"
 #include "flat_hash_map.h"
+#include "flat_ordered_map.h"
 #include "flat_priority_queue.h"
 #include "flat_realtime_ordered_map.h"
 #include "ordered_map.h"
@@ -22,6 +23,7 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_insert,                                   \
         ccc_ordered_map *: ccc_om_insert,                                      \
+        ccc_flat_ordered_map *: ccc_fom_insert,                                \
         ccc_flat_realtime_ordered_map *: ccc_frm_insert,                       \
         ccc_realtime_ordered_map *: ccc_rom_insert)((container_ptr),           \
                                                     insert_args)
@@ -357,6 +359,7 @@
         ccc_buffer *: ccc_buf_begin,                                           \
         ccc_flat_hash_map *: ccc_fhm_begin,                                    \
         ccc_ordered_map *: ccc_om_begin,                                       \
+        ccc_flat_ordered_map *: ccc_fom_begin,                                 \
         ccc_flat_double_ended_queue *: ccc_fdeq_begin,                         \
         ccc_double_ended_priority_queue *: ccc_depq_begin,                     \
         ccc_singly_linked_list *: ccc_sll_begin,                               \
@@ -366,6 +369,7 @@
         ccc_buffer const *: ccc_buf_begin,                                     \
         ccc_flat_hash_map const *: ccc_fhm_begin,                              \
         ccc_ordered_map const *: ccc_om_begin,                                 \
+        ccc_flat_ordered_map const *: ccc_fom_begin,                           \
         ccc_flat_double_ended_queue const *: ccc_fdeq_begin,                   \
         ccc_double_ended_priority_queue const *: ccc_depq_begin,               \
         ccc_singly_linked_list const *: ccc_sll_begin,                         \
@@ -377,6 +381,7 @@
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_rbegin,                                          \
         ccc_ordered_map *: ccc_om_rbegin,                                      \
+        ccc_flat_ordered_map *: ccc_fom_rbegin,                                \
         ccc_flat_double_ended_queue *: ccc_fdeq_rbegin,                        \
         ccc_double_ended_priority_queue *: ccc_depq_rbegin,                    \
         ccc_doubly_linked_list *: ccc_dll_rbegin,                              \
@@ -384,6 +389,7 @@
         ccc_flat_realtime_ordered_map *: ccc_frm_rbegin,                       \
         ccc_buffer const *: ccc_buf_rbegin,                                    \
         ccc_ordered_map const *: ccc_om_rbegin,                                \
+        ccc_flat_ordered_map const *: ccc_fom_rbegin,                          \
         ccc_flat_double_ended_queue const *: ccc_fdeq_rbegin,                  \
         ccc_double_ended_priority_queue const *: ccc_depq_rbegin,              \
         ccc_doubly_linked_list const *: ccc_dll_rbegin,                        \
@@ -395,6 +401,7 @@
         ccc_buffer *: ccc_buf_next,                                            \
         ccc_flat_hash_map *: ccc_fhm_next,                                     \
         ccc_ordered_map *: ccc_om_next,                                        \
+        ccc_flat_ordered_map *: ccc_fom_next,                                  \
         ccc_flat_double_ended_queue *: ccc_fdeq_next,                          \
         ccc_double_ended_priority_queue *: ccc_depq_next,                      \
         ccc_singly_linked_list *: ccc_sll_next,                                \
@@ -404,6 +411,7 @@
         ccc_buffer const *: ccc_buf_next,                                      \
         ccc_flat_hash_map const *: ccc_fhm_next,                               \
         ccc_ordered_map const *: ccc_om_next,                                  \
+        ccc_flat_ordered_map const *: ccc_fom_next,                            \
         ccc_flat_double_ended_queue const *: ccc_fdeq_next,                    \
         ccc_double_ended_priority_queue const *: ccc_depq_next,                \
         ccc_singly_linked_list const *: ccc_sll_next,                          \
@@ -416,6 +424,7 @@
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_rnext,                                           \
         ccc_ordered_map *: ccc_om_rnext,                                       \
+        ccc_flat_ordered_map *: ccc_fom_rnext,                                 \
         ccc_flat_double_ended_queue *: ccc_fdeq_rnext,                         \
         ccc_double_ended_priority_queue *: ccc_depq_rnext,                     \
         ccc_doubly_linked_list *: ccc_dll_rnext,                               \
@@ -423,6 +432,7 @@
         ccc_flat_realtime_ordered_map *: ccc_frm_rnext,                        \
         ccc_buffer const *: ccc_buf_rnext,                                     \
         ccc_ordered_map const *: ccc_om_rnext,                                 \
+        ccc_flat_ordered_map const *: ccc_fom_rnext,                           \
         ccc_flat_double_ended_queue const *: ccc_fdeq_rnext,                   \
         ccc_double_ended_priority_queue const *: ccc_depq_rnext,               \
         ccc_doubly_linked_list const *: ccc_dll_rnext,                         \
@@ -435,6 +445,7 @@
         ccc_buffer *: ccc_buf_end,                                             \
         ccc_flat_hash_map *: ccc_fhm_end,                                      \
         ccc_ordered_map *: ccc_om_end,                                         \
+        ccc_flat_ordered_map *: ccc_fom_end,                                   \
         ccc_flat_double_ended_queue *: ccc_fdeq_end,                           \
         ccc_double_ended_priority_queue *: ccc_depq_end,                       \
         ccc_singly_linked_list *: ccc_sll_end,                                 \
@@ -444,6 +455,7 @@
         ccc_buffer const *: ccc_buf_end,                                       \
         ccc_flat_hash_map const *: ccc_fhm_end,                                \
         ccc_ordered_map const *: ccc_om_end,                                   \
+        ccc_flat_ordered_map const *: ccc_fom_end,                             \
         ccc_flat_double_ended_queue const *: ccc_fdeq_end,                     \
         ccc_double_ended_priority_queue const *: ccc_depq_end,                 \
         ccc_singly_linked_list const *: ccc_sll_end,                           \
@@ -455,6 +467,7 @@
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_rend,                                            \
         ccc_ordered_map *: ccc_om_rend,                                        \
+        ccc_flat_ordered_map *: ccc_fom_rend,                                  \
         ccc_flat_double_ended_queue *: ccc_fdeq_rend,                          \
         ccc_double_ended_priority_queue *: ccc_depq_rend,                      \
         ccc_doubly_linked_list *: ccc_dll_rend,                                \
@@ -462,6 +475,7 @@
         ccc_flat_realtime_ordered_map *: ccc_frm_rend,                         \
         ccc_buffer const *: ccc_buf_rend,                                      \
         ccc_ordered_map const *: ccc_om_rend,                                  \
+        ccc_flat_ordered_map const *: ccc_fom_rend,                            \
         ccc_flat_double_ended_queue const *: ccc_fdeq_rend,                    \
         ccc_double_ended_priority_queue const *: ccc_depq_rend,                \
         ccc_doubly_linked_list const *: ccc_dll_rend,                          \
@@ -523,6 +537,7 @@
         ccc_buffer *: ccc_buf_size,                                            \
         ccc_flat_hash_map *: ccc_fhm_size,                                     \
         ccc_ordered_map *: ccc_om_size,                                        \
+        ccc_flat_ordered_map *: ccc_fom_size,                                  \
         ccc_flat_priority_queue *: ccc_fpq_size,                               \
         ccc_flat_double_ended_queue *: ccc_fdeq_size,                          \
         ccc_double_ended_priority_queue *: ccc_depq_size,                      \
@@ -534,6 +549,7 @@
         ccc_buffer const *: ccc_buf_size,                                      \
         ccc_flat_hash_map const *: ccc_fhm_size,                               \
         ccc_ordered_map const *: ccc_om_size,                                  \
+        ccc_flat_ordered_map const *: ccc_fom_size,                            \
         ccc_flat_priority_queue const *: ccc_fpq_size,                         \
         ccc_flat_double_ended_queue const *: ccc_fdeq_size,                    \
         ccc_double_ended_priority_queue const *: ccc_depq_size,                \
@@ -548,6 +564,7 @@
         ccc_buffer *: ccc_buf_empty,                                           \
         ccc_flat_hash_map *: ccc_fhm_empty,                                    \
         ccc_ordered_map *: ccc_om_empty,                                       \
+        ccc_flat_ordered_map *: ccc_fom_empty,                                 \
         ccc_flat_priority_queue *: ccc_fpq_empty,                              \
         ccc_flat_double_ended_queue *: ccc_fdeq_empty,                         \
         ccc_double_ended_priority_queue *: ccc_depq_empty,                     \
@@ -559,6 +576,7 @@
         ccc_buffer const *: ccc_buf_empty,                                     \
         ccc_flat_hash_map const *: ccc_fhm_empty,                              \
         ccc_ordered_map const *: ccc_om_empty,                                 \
+        ccc_flat_ordered_map const *: ccc_fom_empty,                           \
         ccc_flat_priority_queue const *: ccc_fpq_empty,                        \
         ccc_flat_double_ended_queue const *: ccc_fdeq_empty,                   \
         ccc_double_ended_priority_queue const *: ccc_depq_empty,               \
@@ -572,6 +590,7 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_validate,                                 \
         ccc_ordered_map *: ccc_om_validate,                                    \
+        ccc_flat_ordered_map *: ccc_fom_validate,                              \
         ccc_flat_priority_queue *: ccc_fpq_validate,                           \
         ccc_flat_double_ended_queue *: ccc_fdeq_validate,                      \
         ccc_double_ended_priority_queue *: ccc_depq_validate,                  \
@@ -582,6 +601,7 @@
         ccc_flat_realtime_ordered_map *: ccc_frm_validate,                     \
         ccc_flat_hash_map const *: ccc_fhm_validate,                           \
         ccc_ordered_map const *: ccc_om_validate,                              \
+        ccc_flat_ordered_map const *: ccc_fom_validate,                        \
         ccc_flat_priority_queue const *: ccc_fpq_validate,                     \
         ccc_flat_double_ended_queue const *: ccc_fdeq_validate,                \
         ccc_double_ended_priority_queue const *: ccc_depq_validate,            \

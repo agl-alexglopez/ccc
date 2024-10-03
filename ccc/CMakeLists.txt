@@ -68,6 +68,14 @@ target_link_libraries(ordered_map
     impl_ordered_map
 )
 
+add_library(flat_ordered_map flat_ordered_map.h ${CMAKE_SOURCE_DIR}/src/flat_ordered_map.c)
+target_link_libraries(flat_ordered_map
+  PUBLIC
+    types
+  PRIVATE
+    impl_flat_ordered_map
+)
+
 add_library(realtime_ordered_map realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/realtime_ordered_map.c)
 target_link_libraries(realtime_ordered_map
   PUBLIC
