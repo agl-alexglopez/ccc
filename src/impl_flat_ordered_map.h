@@ -24,7 +24,7 @@ struct ccc_fom_
 
 struct ccc_fom_entry_
 {
-    struct ccc_fom_ *frm_;
+    struct ccc_fom_ *fom_;
     ccc_threeway_cmp last_cmp_;
     /* The types.h entry is not quite suitable for this container so change. */
     size_t i_;
