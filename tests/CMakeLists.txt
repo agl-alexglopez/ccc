@@ -171,7 +171,7 @@ endmacro()
 
 add_fmap_test(test_fmap_construct)
 add_fmap_test(test_fmap_insert)
-# add_fmap_test(test_fmap_erase)
+add_fmap_test(test_fmap_erase)
 # add_fmap_test(test_fmap_iter)
 
 #############  Realtime Map  ##########################

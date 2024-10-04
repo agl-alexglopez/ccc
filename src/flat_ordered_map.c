@@ -566,9 +566,7 @@ erase(struct ccc_fom_ *const t, void const *const key)
         return NULL;
     }
     ret = remove_from_tree(t, ret);
-    struct ccc_fom_elem_ *const r = at(t, ret);
     swap_and_pop(t, ret);
-    r->branch_[L] = r->branch_[R] = r->parent_ = 0;
     return base_at(t, ccc_buf_size(&t->buf_));
 }
 
@@ -582,7 +580,7 @@ swap_and_pop(struct ccc_fom_ *const t, size_t const vacant_i)
     {
         return;
     }
-    struct ccc_fom_elem_ const *const x = at(t, x_i);
+    struct ccc_fom_elem_ *const x = at(t, x_i);
     assert(vacant_i);
     assert(x_i);
     assert(x);
@@ -599,6 +597,8 @@ swap_and_pop(struct ccc_fom_ *const t, size_t const vacant_i)
     *parent_ref(t, x->branch_[L]) = vacant_i;
     /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
     ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
+    /* Clear out the back elements fields just as precaution. */
+    x->branch_[L] = x->branch_[R] = x->parent_ = 0;
 }
 
 static inline size_t
