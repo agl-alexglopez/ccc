@@ -1,6 +1,7 @@
 #include "flat_ordered_map.h"
 #include "impl_flat_ordered_map.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +35,8 @@ static enum fom_branch_ const reverse_inorder_traversal = L;
 static enum fom_branch_ const min = L;
 static enum fom_branch_ const max = R;
 
-static size_t const single_tree_node = 2;
+/* Buffer allocates before insert. "Empty" has nil 0th slot and one more. */
+static size_t const empty_tree = 2;
 
 /*==============================  Prototypes   ==============================*/
 
@@ -45,6 +47,8 @@ static struct ccc_fom_elem_ *at(struct ccc_fom_ const *, size_t);
 static struct ccc_fom_elem_ *elem_in_slot(struct ccc_fom_ const *t,
                                           void const *slot);
 /* Returning the user struct type with stored offsets. */
+static struct ccc_fom_entry_ entry(struct ccc_fom_ *fom, void const *key);
+static void *erase(struct ccc_fom_ *t, void const *key);
 static void *maybe_alloc_insert(struct ccc_fom_ *fom,
                                 struct ccc_fom_elem_ *elem);
 static void *find(struct ccc_fom_ *, void const *key);
@@ -62,6 +66,7 @@ static void *key_at(struct ccc_fom_ const *t, size_t i);
 static ccc_threeway_cmp cmp_elems(struct ccc_fom_ const *fom, void const *key,
                                   size_t node, ccc_key_cmp_fn *fn);
 /* Returning read only indices for tree nodes. */
+static size_t remove_from_tree(struct ccc_fom_ *t, size_t ret);
 static size_t min_max_from(struct ccc_fom_ const *t, size_t start,
                            enum fom_branch_ dir);
 static size_t next(struct ccc_fom_ const *t, size_t n,
@@ -79,6 +84,7 @@ static size_t *parent_ref(struct ccc_fom_ const *t, size_t node);
 static bool validate(struct ccc_fom_ const *fom);
 
 /* Returning void as miscellaneous helpers. */
+static inline void swap_and_pop(struct ccc_fom_ *t, size_t vacant_i);
 static void init_node(struct ccc_fom_elem_ *e);
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 static void tree_print(struct ccc_fom_ const *t, size_t root,
@@ -87,6 +93,76 @@ static void link_trees(struct ccc_fom_ *t, size_t parent, enum fom_branch_ dir,
                        size_t subtree);
 
 /*==============================  Interface    ==============================*/
+
+bool
+ccc_fom_contains(ccc_flat_ordered_map *const fom, void const *const key)
+{
+    fom->root_ = splay(fom, fom->root_, key, fom->cmp_);
+    return cmp_elems(fom, key, fom->root_, fom->cmp_) == CCC_EQL;
+}
+
+void *
+ccc_fom_get_key_val(ccc_flat_ordered_map *const fom, void const *const key)
+{
+    return find(fom, key);
+}
+
+ccc_f_om_entry
+ccc_fom_entry(ccc_flat_ordered_map *const fom, void const *const key)
+{
+    return (ccc_f_om_entry){entry(fom, key)};
+}
+
+void *
+ccc_fom_insert_entry(ccc_f_om_entry const *const e, ccc_f_om_elem *const elem)
+{
+    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    {
+        *elem = *at(e->impl_.fom_, e->impl_.i_);
+        void *const ret = base_at(e->impl_.fom_, e->impl_.i_);
+        memcpy(ret, struct_base(e->impl_.fom_, elem),
+               ccc_buf_size(&e->impl_.fom_->buf_));
+        return ret;
+    }
+    return maybe_alloc_insert(e->impl_.fom_, elem);
+}
+
+ccc_f_om_entry *
+ccc_fom_and_modify(ccc_f_om_entry *const e, ccc_update_fn *const fn)
+{
+    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        fn(&(ccc_update){
+            .container = base_at(e->impl_.fom_, e->impl_.i_),
+            .aux = NULL,
+        });
+    }
+    return e;
+}
+
+ccc_f_om_entry *
+ccc_fom_and_modify_aux(ccc_f_om_entry *const e, ccc_update_fn *const fn,
+                       void *const aux)
+{
+    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        fn(&(ccc_update){
+            .container = base_at(e->impl_.fom_, e->impl_.i_),
+            .aux = aux,
+        });
+    }
+    return e;
+}
+
+void *
+ccc_fom_or_insert(ccc_f_om_entry const *const e, ccc_f_om_elem *const elem)
+{
+    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        return NULL;
+    }
+    return maybe_alloc_insert(e->impl_.fom_, elem);
+}
 
 ccc_entry
 ccc_fom_insert(ccc_flat_ordered_map *const t, ccc_f_om_elem *const out_handle,
@@ -108,6 +184,89 @@ ccc_fom_insert(ccc_flat_ordered_map *const t, ccc_f_om_elem *const out_handle,
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fom_try_insert(ccc_flat_ordered_map *const fom,
+                   ccc_f_om_elem *const key_val_handle)
+{
+    void *const found = find(fom, key_from_node(fom, key_val_handle));
+    if (found)
+    {
+        assert(fom->root_);
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *const inserted = maybe_alloc_insert(fom, key_val_handle);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fom_insert_or_assign(ccc_flat_ordered_map *const fom,
+                         ccc_f_om_elem *const key_val_handle)
+{
+    void *const found = find(fom, key_from_node(fom, key_val_handle));
+    if (found)
+    {
+        *key_val_handle = *elem_in_slot(fom, found);
+        assert(fom->root_);
+        memcpy(found, struct_base(fom, key_val_handle),
+               ccc_buf_elem_size(&fom->buf_));
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    void *const inserted = maybe_alloc_insert(fom, key_val_handle);
+    if (!inserted)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fom_remove(ccc_flat_ordered_map *const fom, ccc_f_om_elem *const out_handle)
+{
+    void *const n = erase(fom, key_from_node(fom, out_handle));
+    if (!n)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    }
+    return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
+}
+
+ccc_entry
+ccc_fom_remove_entry(ccc_f_om_entry *const e)
+{
+    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    {
+        void *const erased
+            = erase(e->impl_.fom_, key_at(e->impl_.fom_, e->impl_.i_));
+        assert(erased);
+        return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+}
+
+void *
+ccc_fom_unwrap(ccc_f_om_entry const *const e)
+{
+    return e->impl_.stats_ == CCC_ENTRY_OCCUPIED
+               ? base_at(e->impl_.fom_, e->impl_.i_)
+               : NULL;
+}
+
+bool
+ccc_fom_insert_error(ccc_f_om_entry const *const e)
+{
+    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
+}
+
+bool
+ccc_fom_occupied(ccc_f_om_entry const *const e)
+{
+    return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
 }
 
 bool
@@ -189,6 +348,47 @@ ccc_fom_rend(ccc_flat_ordered_map const *const fom)
     return base_at(fom, 0);
 }
 
+void
+ccc_fom_clear(ccc_flat_ordered_map *const frm, ccc_destructor_fn *const fn)
+{
+    if (!frm)
+    {
+        return;
+    }
+    if (!fn)
+    {
+        ccc_buf_size_set(&frm->buf_, 1);
+        frm->root_ = 0;
+        return;
+    }
+    while (!ccc_fom_empty(frm))
+    {
+        void *const deleted = erase(frm, key_at(frm, frm->root_));
+        fn(deleted);
+    }
+}
+
+ccc_result
+ccc_fom_clear_and_free(ccc_flat_ordered_map *const frm,
+                       ccc_destructor_fn *const fn)
+{
+    if (!frm)
+    {
+        return CCC_INPUT_ERR;
+    }
+    if (!fn)
+    {
+        frm->root_ = 0;
+        return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
+    }
+    while (!ccc_fom_empty(frm))
+    {
+        void *const deleted = erase(frm, key_at(frm, frm->root_));
+        fn(deleted);
+    }
+    return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
+}
+
 bool
 ccc_fom_validate(ccc_flat_ordered_map const *const fom)
 {
@@ -202,6 +402,25 @@ ccc_fom_print(ccc_flat_ordered_map const *const fom, ccc_print_fn *const fn)
 }
 
 /*===========================   Static Helpers    ===========================*/
+
+static inline struct ccc_fom_entry_
+entry(struct ccc_fom_ *const fom, void const *const key)
+{
+    void *const found = find(fom, key);
+    if (found)
+    {
+        return (struct ccc_fom_entry_){
+            .fom_ = fom,
+            .i_ = ccc_buf_index_of(&fom->buf_, found),
+            .stats_ = CCC_ENTRY_OCCUPIED,
+        };
+    }
+    return (struct ccc_fom_entry_){
+        .fom_ = fom,
+        .i_ = ccc_buf_index_of(&fom->buf_, found),
+        .stats_ = CCC_ENTRY_VACANT,
+    };
+}
 
 static void *
 maybe_alloc_insert(struct ccc_fom_ *const fom, struct ccc_fom_elem_ *const elem)
@@ -222,7 +441,7 @@ insert(struct ccc_fom_ *const t, size_t const n)
 {
     struct ccc_fom_elem_ *const node = at(t, n);
     init_node(node);
-    if (ccc_buf_size(&t->buf_) == single_tree_node)
+    if (ccc_buf_size(&t->buf_) == empty_tree)
     {
         t->root_ = n;
         return struct_base(t, node);
@@ -235,6 +454,72 @@ insert(struct ccc_fom_ *const t, size_t const n)
         return NULL;
     }
     return connect_new_root(t, n, root_cmp);
+}
+
+static inline void *
+erase(struct ccc_fom_ *const t, void const *const key)
+{
+    if (ccc_fom_empty(t))
+    {
+        return NULL;
+    }
+    size_t ret = splay(t, t->root_, key, t->cmp_);
+    ccc_threeway_cmp const found = cmp_elems(t, key, ret, t->cmp_);
+    if (found != CCC_EQL)
+    {
+        return NULL;
+    }
+    ret = remove_from_tree(t, ret);
+    struct ccc_fom_elem_ *const r = at(t, ret);
+    swap_and_pop(t, ret);
+    r->branch_[L] = r->branch_[R] = r->parent_ = 0;
+    return base_at(t, ccc_buf_size(&t->buf_));
+}
+
+/** Swaps in the back buffer element into vacated slot*/
+static inline void
+swap_and_pop(struct ccc_fom_ *const t, size_t const vacant_i)
+{
+    ccc_buf_size_minus(&t->buf_, 1);
+    size_t const x_i = ccc_buf_size(&t->buf_);
+    if (vacant_i == x_i)
+    {
+        return;
+    }
+    struct ccc_fom_elem_ const *const x = at(t, x_i);
+    assert(vacant_i);
+    assert(x_i);
+    assert(x);
+    if (x_i == t->root_)
+    {
+        t->root_ = vacant_i;
+    }
+    else
+    {
+        struct ccc_fom_elem_ *const p = at(t, x->parent_);
+        p->branch_[p->branch_[R] == x_i] = vacant_i;
+    }
+    *parent_ref(t, x->branch_[R]) = vacant_i;
+    *parent_ref(t, x->branch_[L]) = vacant_i;
+    /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
+    ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
+}
+
+static inline size_t
+remove_from_tree(struct ccc_fom_ *const t, size_t const ret)
+{
+    if (!branch_i(t, ret, L))
+    {
+        t->root_ = branch_i(t, ret, R);
+        link_trees(t, 0, 0, t->root_);
+    }
+    else
+    {
+        t->root_ = splay(t, branch_i(t, ret, L), key_from_node(t, at(t, ret)),
+                         t->cmp_);
+        link_trees(t, t->root_, R, branch_i(t, ret, R));
+    }
+    return ret;
 }
 
 static inline void *
@@ -375,13 +660,9 @@ alloc_back(struct ccc_fom_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementor is always at least 1. */
-    if (ccc_buf_empty(&t->buf_))
+    if (ccc_buf_empty(&t->buf_) && !ccc_buf_alloc_back(&t->buf_))
     {
-        void *const sentinel = ccc_buf_alloc_back(&t->buf_);
-        if (!sentinel)
-        {
-            return NULL;
-        }
+        return NULL;
     }
     return ccc_buf_alloc_back(&t->buf_);
 }
