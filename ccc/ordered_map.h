@@ -31,7 +31,7 @@ typedef union
 #define ccc_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data...)        \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
-        ccc_impl_om_and_modify_wITH(ordered_map_entry_ptr, mod_fn, aux_data)   \
+        ccc_impl_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data)      \
     }
 
 #define ccc_om_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)           \

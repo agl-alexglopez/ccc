@@ -20,6 +20,31 @@ typedef union
     ccc_impl_fom_init(mem_ptr, capacity, struct_name, map_elem_field,          \
                       key_elem_field, alloc_fn, key_cmp, aux)
 
+#define ccc_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn, aux_data...)  \
+    &(ccc_f_om_entry)                                                          \
+    {                                                                          \
+        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \
+                                  aux_data)                                    \
+    }
+
+#define ccc_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value...)     \
+    ccc_impl_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value)
+
+#define ccc_fom_insert_entry_w(flat_ordered_map_entry_ptr, lazy_key_value...)  \
+    ccc_impl_fom_insert_entry_w(flat_ordered_map_entry_ptr, lazy_key_value)
+
+#define ccc_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value...)         \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value)       \
+    }
+
+#define ccc_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value...)   \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value) \
+    }
+
 bool ccc_fom_contains(ccc_flat_ordered_map *, void const *key);
 void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
 
@@ -113,6 +138,11 @@ void ccc_fom_print(ccc_flat_ordered_map const *fom, ccc_print_fn *fn);
 typedef ccc_flat_ordered_map flat_ordered_map;
 typedef ccc_f_om_elem f_om_elem;
 typedef ccc_f_om_entry f_om_entry;
+#    define fom_and_modify_w(args...) ccc_fom_and_modify_w(args)
+#    define fom_or_insert_w(args...) ccc_fom_or_insert_w(args)
+#    define fom_insert_entry_w(args...) ccc_fom_insert_entry_w(args)
+#    define fom_try_insert_w(args...) ccc_fom_try_insert_w(args)
+#    define fom_insert_or_assign_w(args...) ccc_fom_insert_or_assign_w(args)
 #    define fom_init(args...) ccc_fom_init(args)
 #    define fom_contains(args...) ccc_fom_contains(args)
 #    define fom_get_key_val(args...) ccc_fom_get_key_val(args)
