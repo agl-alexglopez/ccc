@@ -58,6 +58,9 @@ static void *struct_base(struct ccc_fom_ const *, struct ccc_fom_elem_ const *);
 static void *insert(struct ccc_fom_ *t, size_t n);
 static void *base_at(struct ccc_fom_ const *, size_t);
 static void *alloc_back(struct ccc_fom_ *t);
+static struct ccc_range_ equal_range(struct ccc_fom_ *t, void const *begin_key,
+                                     void const *end_key,
+                                     enum fom_branch_ traversal);
 /* Returning the user key with stored offsets. */
 static void *key_from_node(struct ccc_fom_ const *t,
                            struct ccc_fom_elem_ const *);
@@ -84,7 +87,7 @@ static size_t *parent_ref(struct ccc_fom_ const *t, size_t node);
 static bool validate(struct ccc_fom_ const *fom);
 
 /* Returning void as miscellaneous helpers. */
-static inline void swap_and_pop(struct ccc_fom_ *t, size_t vacant_i);
+static void swap_and_pop(struct ccc_fom_ *t, size_t vacant_i);
 static void init_node(struct ccc_fom_elem_ *e);
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 static void tree_print(struct ccc_fom_ const *t, size_t root,
@@ -348,6 +351,22 @@ ccc_fom_rend(ccc_flat_ordered_map const *const fom)
     return base_at(fom, 0);
 }
 
+ccc_range
+ccc_fom_equal_range(ccc_flat_ordered_map *const fom,
+                    void const *const begin_key, void const *const end_key)
+{
+    return (ccc_range){equal_range(fom, begin_key, end_key, inorder_traversal)};
+}
+
+ccc_rrange
+ccc_fom_equal_rrange(ccc_flat_ordered_map *const fom,
+                     void const *const rbegin_key, void const *const end_key)
+
+{
+    return (ccc_rrange){
+        equal_range(fom, rbegin_key, end_key, reverse_inorder_traversal)};
+}
+
 void
 ccc_fom_clear(ccc_flat_ordered_map *const frm, ccc_destructor_fn *const fn)
 {
@@ -389,6 +408,12 @@ ccc_fom_clear_and_free(ccc_flat_ordered_map *const frm,
     return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
 }
 
+void *
+ccc_fom_root(ccc_flat_ordered_map const *const fom)
+{
+    return ccc_fom_empty(fom) ? NULL : base_at(fom, fom->root_);
+}
+
 bool
 ccc_fom_validate(ccc_flat_ordered_map const *const fom)
 {
@@ -402,6 +427,36 @@ ccc_fom_print(ccc_flat_ordered_map const *const fom, ccc_print_fn *const fn)
 }
 
 /*===========================   Static Helpers    ===========================*/
+
+static inline struct ccc_range_
+equal_range(struct ccc_fom_ *const t, void const *const begin_key,
+            void const *const end_key, enum fom_branch_ const traversal)
+{
+    if (ccc_fom_empty(t))
+    {
+        return (struct ccc_range_){};
+    }
+    /* As with most BST code the cases are perfectly symmetrical. If we
+       are seeking an increasing or decreasing range we need to make sure
+       we follow the [inclusive, exclusive) range rule. This means double
+       checking we don't need to progress to the next greatest or next
+       lesser element depending on the direction we are traversing. */
+    ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
+    size_t b = splay(t, t->root_, begin_key, t->cmp_);
+    if (cmp_elems(t, begin_key, b, t->cmp_) == les_or_grt[traversal])
+    {
+        b = next(t, b, traversal);
+    }
+    size_t e = splay(t, t->root_, end_key, t->cmp_);
+    if (cmp_elems(t, end_key, e, t->cmp_) != les_or_grt[!traversal])
+    {
+        e = next(t, e, traversal);
+    }
+    return (struct ccc_range_){
+        .begin_ = base_at(t, b),
+        .end_ = base_at(t, e),
+    };
+}
 
 static inline struct ccc_fom_entry_
 entry(struct ccc_fom_ *const fom, void const *const key)
@@ -955,7 +1010,7 @@ print_inner_tree(size_t const root, size_t const parent_size,
     else
     {
         print_inner_tree(branch_i(t, root, R), subtree_size, root, str,
-                         left_edge_color, LEAF, R, t, fn_print);
+                         left_edge_color, BRANCH, R, t, fn_print);
         print_inner_tree(branch_i(t, root, L), subtree_size, root, str,
                          left_edge_color, LEAF, L, t, fn_print);
     }
@@ -991,10 +1046,10 @@ tree_print(struct ccc_fom_ const *const t, size_t const root,
     }
     else
     {
+        print_inner_tree(branch_i(t, root, R), subtree_size, root, "",
+                         left_edge_color, BRANCH, R, t, fn_print);
         print_inner_tree(branch_i(t, root, L), subtree_size, root, "",
                          left_edge_color, LEAF, L, t, fn_print);
-        print_inner_tree(branch_i(t, root, R), subtree_size, root, "",
-                         left_edge_color, LEAF, R, t, fn_print);
     }
 }
 
