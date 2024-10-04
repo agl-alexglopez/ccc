@@ -94,12 +94,18 @@ void *ccc_fom_end(ccc_flat_ordered_map const *);
 void *ccc_fom_rend(ccc_flat_ordered_map const *);
 void *ccc_fom_next(ccc_flat_ordered_map const *, ccc_f_om_elem const *);
 void *ccc_fom_rnext(ccc_flat_ordered_map const *, ccc_f_om_elem const *);
+ccc_range ccc_fom_equal_range(ccc_flat_ordered_map *fom, void const *begin_key,
+                              void const *end_key);
+ccc_rrange ccc_fom_equal_rrange(ccc_flat_ordered_map *fom,
+                                void const *rbegin_key, void const *end_key);
+void *ccc_fom_root(ccc_flat_ordered_map const *);
 
 /*===========================    Getters    =================================*/
 
 size_t ccc_fom_size(ccc_flat_ordered_map const *);
 bool ccc_fom_empty(ccc_flat_ordered_map const *);
 bool ccc_fom_validate(ccc_flat_ordered_map const *);
+void ccc_fom_print(ccc_flat_ordered_map const *fom, ccc_print_fn *fn);
 
 /*===========================    Namespace  =================================*/
 
@@ -107,19 +113,40 @@ bool ccc_fom_validate(ccc_flat_ordered_map const *);
 typedef ccc_flat_ordered_map flat_ordered_map;
 typedef ccc_f_om_elem f_om_elem;
 typedef ccc_f_om_entry f_om_entry;
-
 #    define fom_init(args...) ccc_fom_init(args)
+#    define fom_contains(args...) ccc_fom_contains(args)
+#    define fom_get_key_val(args...) ccc_fom_get_key_val(args)
+#    define fom_insert_vr(args...) ccc_fom_insert_vr(args)
+#    define fom_try_insert_vr(args...) ccc_fom_try_insert_vr(args)
+#    define fom_remove_vr(args...) ccc_fom_remove_vr(args)
+#    define fom_remove_entry_vr(args...) ccc_fom_remove_entry_vr(args)
 #    define fom_insert(args...) ccc_fom_insert(args)
-
+#    define fom_try_insert(args...) ccc_fom_try_insert(args)
+#    define fom_insert_or_assign(args...) ccc_fom_insert_or_assign(args)
+#    define fom_remove(args...) ccc_fom_remove(args)
+#    define fom_remove_entry(args...) ccc_fom_remove_entry(args)
+#    define fom_entry_vr(args...) ccc_fom_entry_vr(args)
+#    define fom_entry(args...) ccc_fom_entry(args)
+#    define fom_and_modify(args...) ccc_fom_and_modify(args)
+#    define fom_and_modify_aux(args...) ccc_fom_and_modify_aux(args)
+#    define fom_or_insert(args...) ccc_fom_or_insert(args)
+#    define fom_insert_entry(args...) ccc_fom_insert_entry(args)
+#    define fom_unwrap(args...) ccc_fom_unwrap(args)
+#    define fom_insert_error(args...) ccc_fom_insert_error(args)
+#    define fom_occupied(args...) ccc_fom_occupied(args)
+#    define fom_clear(args...) ccc_fom_clear(args)
+#    define fom_clear_and_free(args...) ccc_fom_clear_and_free(args)
 #    define fom_begin(args...) ccc_fom_begin(args)
-#    define fom_next(args...) ccc_fom_next(args)
 #    define fom_rbegin(args...) ccc_fom_rbegin(args)
-#    define fom_rnext(args...) ccc_fom_rnext(args)
 #    define fom_end(args...) ccc_fom_end(args)
 #    define fom_rend(args...) ccc_fom_rend(args)
+#    define fom_next(args...) ccc_fom_next(args)
+#    define fom_rnext(args...) ccc_fom_rnext(args)
+#    define fom_root(args...) ccc_fom_root(args)
 #    define fom_size(args...) ccc_fom_size(args)
 #    define fom_empty(args...) ccc_fom_empty(args)
 #    define fom_validate(args...) ccc_fom_validate(args)
+#    define fom_print(args...) ccc_fom_print(args)
 #endif /* FLAT_ORDERED_MAP_USING_NAMESPACE_CCC */
 
 #endif /* CCC_FLAT_ORDERED_MAP_H */
