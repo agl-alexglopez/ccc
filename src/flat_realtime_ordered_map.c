@@ -871,8 +871,6 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
         maintain_rank_rules(t, two_child, p_of_xy, x);
         assert(!is_leaf(t, p_of_xy) || !parity(t, p_of_xy));
     }
-    struct ccc_frm_elem_ *const r = at(t, remove);
-    r->branch_[L] = r->branch_[R] = r->parent_ = r->parity_ = 0;
     swap_and_pop(t, remove);
     return base_at(t, ccc_buf_size(&t->buf_));
 }
@@ -887,7 +885,7 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     {
         return;
     }
-    struct ccc_frm_elem_ const *const x = at(t, x_i);
+    struct ccc_frm_elem_ *const x = at(t, x_i);
     assert(vacant_i);
     assert(x_i);
     assert(x);
@@ -905,6 +903,8 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
     ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     at(t, 0)->parity_ = 1;
+    /* Clear back elements fields as precaution. */
+    x->branch_[L] = x->branch_[R] = x->parent_ = x->parity_ = 0;
 }
 
 static inline void
