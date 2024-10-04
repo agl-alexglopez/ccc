@@ -140,7 +140,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
         {                                                                      \
             frm_try_ins_ent_ret_ = (struct ccc_entry_){                        \
                 .e_ = ccc_impl_frm_alloc_back(frm_try_ins_ent_.frm_),          \
-                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL)}; \
+                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL    \
+                           | CCC_ENTRY_VACANT)};                               \
             if (frm_try_ins_ent_ret_.e_)                                       \
             {                                                                  \
                 *((typeof(lazy_value) *)frm_try_ins_ent_ret_.e_) = lazy_value; \
@@ -152,6 +153,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
                     frm_try_ins_ent_.last_cmp_,                                \
                     ccc_buf_index_of(&frm_try_ins_ent_.frm_->buf_,             \
                                      frm_try_ins_ent_ret_.e_));                \
+                frm_try_ins_ent_ret_.stats_ = CCC_ENTRY_VACANT;                \
             }                                                                  \
         }                                                                      \
         else if (frm_try_ins_ent_.stats_ == CCC_ENTRY_OCCUPIED)                \
@@ -174,7 +176,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
         {                                                                      \
             frm_ins_or_assign_ent_ret_ = (struct ccc_entry_){                  \
                 .e_ = ccc_impl_frm_alloc_back(frm_ins_or_assign_ent_.frm_),    \
-                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL)}; \
+                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL    \
+                           | CCC_ENTRY_VACANT)};                               \
             if (frm_ins_or_assign_ent_ret_.e_)                                 \
             {                                                                  \
                 *((typeof(lazy_value) *)frm_ins_or_assign_ent_ret_.e_)         \
@@ -188,6 +191,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
                     frm_ins_or_assign_ent_.last_cmp_,                          \
                     ccc_buf_index_of(&frm_ins_or_assign_ent_.frm_->buf_,       \
                                      frm_ins_or_assign_ent_ret_.e_));          \
+                frm_ins_or_assign_ent_ret_.stats_ = CCC_ENTRY_VACANT;          \
             }                                                                  \
         }                                                                      \
         else if (frm_ins_or_assign_ent_.stats_ == CCC_ENTRY_OCCUPIED)          \

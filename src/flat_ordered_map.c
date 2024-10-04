@@ -426,6 +426,47 @@ ccc_fom_print(ccc_flat_ordered_map const *const fom, ccc_print_fn *const fn)
     tree_print(fom, fom->root_, fn);
 }
 
+/*===========================   Private Interface ===========================*/
+
+void *
+ccc_impl_fom_insert(struct ccc_fom_ *const fom, size_t const elem_i)
+{
+    return insert(fom, elem_i);
+}
+
+struct ccc_fom_entry_
+ccc_impl_fom_entry(struct ccc_fom_ *const fom, void const *const key)
+{
+    return entry(fom, key);
+}
+
+void *
+ccc_impl_fom_key_from_node(struct ccc_fom_ const *const fom,
+                           struct ccc_fom_elem_ const *const elem)
+{
+    return key_from_node(fom, elem);
+}
+
+void *
+ccc_impl_fom_key_in_slot(struct ccc_fom_ const *const fom,
+                         void const *const slot)
+{
+    return (char *)slot + fom->key_offset_;
+}
+
+struct ccc_fom_elem_ *
+ccc_impl_fom_elem_in_slot(struct ccc_fom_ const *const fom,
+                          void const *const slot)
+{
+    return elem_in_slot(fom, slot);
+}
+
+void *
+ccc_impl_fom_alloc_back(struct ccc_fom_ *const fom)
+{
+    return alloc_back(fom);
+}
+
 /*===========================   Static Helpers    ===========================*/
 
 static inline struct ccc_range_
@@ -472,7 +513,7 @@ entry(struct ccc_fom_ *const fom, void const *const key)
     }
     return (struct ccc_fom_entry_){
         .fom_ = fom,
-        .i_ = ccc_buf_index_of(&fom->buf_, found),
+        .i_ = 0,
         .stats_ = CCC_ENTRY_VACANT,
     };
 }
