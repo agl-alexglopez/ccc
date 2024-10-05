@@ -19,6 +19,7 @@ struct ccc_fpq_
 };
 
 size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
+void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 
 /*=======================    Convenience Macros    ======================== */
 
@@ -28,6 +29,16 @@ size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
         .buf_ = ccc_buf_init(mem_ptr, type_name, capacity, alloc_fn),          \
         .cmp_ = (cmp_fn), .order_ = (cmp_order), .aux_ = (aux_data),           \
     }
+
+#define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, type_name,          \
+                                  cmp_order, alloc_fn, cmp_fn, aux_data)       \
+    ({                                                                         \
+        struct ccc_fpq_ fpq_heapify_res_                                       \
+            = ccc_impl_fpq_init(mem_ptr, capacity, type_name, cmp_order,       \
+                                alloc_fn, cmp_fn, aux_data);                   \
+        ccc_impl_fpq_in_place_heapify(&fpq_heapify_res_, (size));              \
+        fpq_heapify_res_;                                                      \
+    })
 
 /* This macro "returns" a value thanks to clang and gcc statement expressions.
    See documentation in the flat pqueue header for usage. The ugly details

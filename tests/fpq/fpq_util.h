@@ -13,6 +13,7 @@ struct val
 
 ccc_threeway_cmp val_cmp(ccc_cmp const *);
 void val_print(void const *);
+void int_print(void const *);
 void val_update(ccc_update const *);
 size_t rand_range(size_t min, size_t max);
 enum test_result inorder_fill(int[], size_t, ccc_flat_priority_queue *);

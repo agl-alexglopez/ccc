@@ -162,7 +162,7 @@ ccc_fom_or_insert(ccc_f_om_entry const *const e, ccc_f_om_elem *const elem)
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        return NULL;
+        return base_at(e->impl_.fom_, e->impl_.i_);
     }
     return maybe_alloc_insert(e->impl_.fom_, elem);
 }
