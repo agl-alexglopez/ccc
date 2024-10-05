@@ -25,6 +25,12 @@ val_print(void const *e)
 }
 
 void
+int_print(void const *e)
+{
+    printf("%d", *(int *)e);
+}
+
+void
 val_update(ccc_update const *const u)
 {
     struct val *const old = u->container;

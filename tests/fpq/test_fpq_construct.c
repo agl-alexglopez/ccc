@@ -8,6 +8,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <time.h>
 
 static ccc_threeway_cmp
 int_cmp(ccc_cmp const *const cmp)
@@ -70,9 +72,64 @@ BEGIN_STATIC_TEST(pq_test_raw_type)
     END_TEST();
 }
 
+BEGIN_STATIC_TEST(pq_test_heapify_init)
+{
+    srand(time(NULL)); /* NOLINT */
+    int heap[100] = {};
+    size_t const size = 99;
+    for (size_t i = 0; i < size; ++i)
+    {
+        heap[i] = rand_range(-99, size); /* NOLINT */
+    }
+    ccc_flat_priority_queue pq
+        = ccc_fpq_heapify_init(&heap, (sizeof(heap) / sizeof(int)), size, int,
+                               CCC_LES, NULL, int_cmp, NULL);
+    ccc_fpq_print(&pq, 0, int_print);
+    printf("\n");
+    int prev = *((int *)ccc_fpq_front(&pq));
+    ccc_fpq_pop(&pq);
+    while (!ccc_fpq_empty(&pq))
+    {
+        int cur = *((int *)ccc_fpq_front(&pq));
+        ccc_fpq_pop(&pq);
+        CHECK(cur >= prev, true);
+        prev = cur;
+    }
+    END_TEST();
+}
+
+BEGIN_STATIC_TEST(pq_test_heapify_copy)
+{
+    srand(time(NULL)); /* NOLINT */
+    int heap[100] = {};
+    ccc_flat_priority_queue pq = ccc_fpq_init(
+        &heap, (sizeof(heap) / sizeof(int)), int, CCC_LES, NULL, int_cmp, NULL);
+    int input[99] = {};
+    for (size_t i = 0; i < sizeof(input) / sizeof(int); ++i)
+    {
+        input[i] = rand_range(-99, 99); /* NOLINT */
+    }
+    CHECK(ccc_fpq_heapify(&pq, input, sizeof(input) / sizeof(int), sizeof(int)),
+          CCC_OK);
+    ccc_fpq_print(&pq, 0, int_print);
+    printf("\n");
+    CHECK(ccc_fpq_size(&pq), sizeof(input) / sizeof(int));
+    int prev = *((int *)ccc_fpq_front(&pq));
+    ccc_fpq_pop(&pq);
+    while (!ccc_fpq_empty(&pq))
+    {
+        int cur = *((int *)ccc_fpq_front(&pq));
+        ccc_fpq_pop(&pq);
+        CHECK(cur >= prev, true);
+        prev = cur;
+    }
+    END_TEST();
+}
+
 int
 main()
 {
     return RUN_TESTS(pq_test_empty(), pq_test_macro(), pq_test_push(),
-                     pq_test_raw_type());
+                     pq_test_raw_type(), pq_test_heapify_init(),
+                     pq_test_heapify_copy());
 }

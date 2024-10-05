@@ -21,6 +21,16 @@ typedef struct ccc_fpq_ ccc_flat_priority_queue;
     ccc_impl_fpq_init(mem_ptr, capacity, type_name, cmp_order, alloc_fn,       \
                       cmp_fn, aux_data)
 
+/** @brief Initializes a heap with the provided memory of size and capacity
+provided in O(n) time. Elements are sorted by their values as provided. Size
+must be less than or equal to (capacity - 1). Use on the right hand side of
+of the assignment for the current heap, same as normal initialization. However,
+this initializer must be used at runtime, not compile time. */
+#define ccc_fpq_heapify_init(mem_ptr, capacity, size, type_name, cmp_order,    \
+                             alloc_fn, cmp_fn, aux_data)                       \
+    ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, type_name, cmp_order,   \
+                              alloc_fn, cmp_fn, aux_data)
+
 /* Given an initialized flat priority queue, a struct type, and its
    initializer, attempts to write an r-value of one's struct type into the
    backing buffer directly, returning a pointer to the element in storage.
@@ -52,6 +62,12 @@ typedef struct ccc_fpq_ ccc_flat_priority_queue;
 #define ccc_fpq_emplace(fpq, val_initializer...)                               \
     ccc_impl_fpq_emplace(fpq, val_initializer)
 
+/** @brief Builds a heap in O(n) time from the input data. If elements were
+previously occupying the heap, they are overwritten and only elements in the
+input array are considered part of the heap. */
+ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *, void *input_array,
+                           size_t input_n, size_t input_elem_size);
+
 ccc_result ccc_fpq_realloc(ccc_flat_priority_queue *, size_t new_capacity,
                            ccc_alloc_fn *);
 void *ccc_fpq_push(ccc_flat_priority_queue *, void const *);
@@ -65,6 +81,8 @@ bool ccc_fpq_decrease(ccc_flat_priority_queue *, void *, ccc_update_fn *,
                       void *);
 
 void ccc_fpq_clear(ccc_flat_priority_queue *, ccc_destructor_fn *);
+ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *,
+                                  ccc_destructor_fn *);
 bool ccc_fpq_empty(ccc_flat_priority_queue const *);
 size_t ccc_fpq_size(ccc_flat_priority_queue const *);
 bool ccc_fpq_validate(ccc_flat_priority_queue const *);
