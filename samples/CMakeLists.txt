@@ -31,6 +31,17 @@ target_link_libraries(graph PRIVATE
   traits
 )
 
+add_executable(words words.c)
+target_link_libraries(words PRIVATE
+  cli
+  str_view::str_view
+  realtime_ordered_map
+  flat_realtime_ordered_map
+  ordered_map
+  flat_ordered_map
+  traits
+)
+
 add_custom_target(samples)
 # Function to add dependencies on all targets from the subdirectory
 # Get the list of all targets
