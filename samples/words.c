@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 
@@ -10,12 +9,29 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 enum action_type
 {
     COUNT,
     FIND,
+};
+
+struct pool_string
+{
+    size_t next_string_offset;
+    char *string;
+};
+
+struct string_pool
+{
+    char *pool;
+};
+
+struct word
+{
 };
 
 struct action_pack
@@ -75,6 +91,10 @@ static void print_top_n(FILE *file, int n);
 static void print_top_n_rev(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
+
+ccc_flat_realtime_ordered_map create_frequency_map(void);
+void destroy_frequency_map(ccc_flat_realtime_ordered_map *);
+
 FILE *open_file(str_view file);
 
 /*=======================     Main         ==================================*/

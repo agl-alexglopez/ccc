@@ -39,6 +39,7 @@ target_link_libraries(words PRIVATE
   flat_realtime_ordered_map
   ordered_map
   flat_ordered_map
+  flat_priority_queue
   traits
 )
 
