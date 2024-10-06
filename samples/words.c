@@ -167,6 +167,12 @@ main(int argc, char *argv[])
             exe.freq_fn = print_top_n;
             exe.n = all_frequencies;
         }
+        else if (sv_starts_with(sv_arg, SV("-rc")))
+        {
+            exe.type = COUNT;
+            exe.freq_fn = print_last_n;
+            exe.n = all_frequencies;
+        }
         else if (sv_starts_with(sv_arg, SV("-top=")))
         {
             exe.type = COUNT;
