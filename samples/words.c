@@ -57,7 +57,8 @@ struct frequency
 
 struct word
 {
-    struct frequency freq;
+    str_ofs arena_pos;
+    int freq;
     /* Map element for logging frequencies by string key, freq value. */
     f_om_elem map_elem;
 };
@@ -251,7 +252,7 @@ print_found(FILE *const f, str_view w)
     {
         return;
     }
-    printf("%s %d\n", str_arena_at(&a, word->freq.arena_pos), word->freq.freq);
+    printf("%s %d\n", str_arena_at(&a, word->arena_pos), word->freq);
 }
 
 static void
@@ -312,9 +313,10 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
     assert(freqs);
     size_t i = 0;
     for (struct word *w = begin(map); w != end(map) && i < cap;
-         w = next(map, &w->map_elem))
+         w = next(map, &w->map_elem), ++i)
     {
-        freqs[i++] = w->freq;
+        freqs[i].arena_pos = w->arena_pos;
+        freqs[i].freq = w->freq;
     }
     return (struct frequency_alloc){.arr = freqs, .cap = cap};
 }
@@ -341,8 +343,8 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     size_t len = 0;
     ssize_t read = 0;
     ccc_flat_ordered_map fom
-        = ccc_fom_init((struct word *)NULL, 0, map_elem, freq.arena_pos,
-                       realloc, cmp_string_keys, a);
+        = ccc_fom_init((struct word *)NULL, 0, map_elem, arena_pos, realloc,
+                       cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .sz = read - 1};
@@ -353,10 +355,9 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
             assert(cleaned.stat != WC_ARENA_ERR);
             if (cleaned.stat == WC_CLEAN)
             {
-                fom_or_insert_w(
-                    entry_vr(&fom, &cleaned.str),
-                    (struct word){.freq = {.arena_pos = cleaned.str}})
-                    ->freq.freq++;
+                fom_or_insert_w(entry_vr(&fom, &cleaned.str),
+                                (struct word){.arena_pos = cleaned.str})
+                    ->freq++;
             }
         }
     }
@@ -428,6 +429,9 @@ str_arena_alloc(struct str_arena *const a, size_t const bytes)
     return (ssize_t)ret;
 }
 
+/* Push a character back to the last string allocation. This is possible
+   and useful when a string may be needed depending on other factors
+   before it is finally recorded or allocated. */
 static bool
 str_arena_push_back(struct str_arena *const a, str_ofs const str,
                     size_t const str_len, char const c)
@@ -466,7 +470,8 @@ str_arena_maybe_resize(struct str_arena *const a, size_t const new_request)
 
 /* Returns the last given out position to the arena. The only fine grained
    freeing made possible and requires the user knows the most recently
-   allocated position. */
+   allocated position or all strings between end and last_pos are
+   invalidated. */
 static void
 str_arena_free_to_pos(struct str_arena *const a, str_ofs const last_pos)
 {
@@ -511,8 +516,7 @@ cmp_string_keys(ccc_key_cmp const c)
     struct word const *const w = c.user_type;
     struct str_arena const *const a = c.aux;
     str_ofs const id = *((str_ofs *)c.key);
-    int const res
-        = strcmp(str_arena_at(a, id), str_arena_at(a, w->freq.arena_pos));
+    int const res = strcmp(str_arena_at(a, id), str_arena_at(a, w->arena_pos));
     if (res > 0)
     {
         return CCC_GRT;
@@ -554,7 +558,7 @@ print_word(ccc_user_type const u)
 {
     struct word const *const w = u.user_type;
     struct str_arena const *const a = u.aux;
-    printf("{%s, %d}", str_arena_at(a, w->freq.arena_pos), w->freq.freq);
+    printf("{%s, %d}", str_arena_at(a, w->arena_pos), w->freq);
 }
 
 /*=======================   CLI Helpers    ==================================*/
