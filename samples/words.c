@@ -62,6 +62,12 @@ struct word
     f_om_elem map_elem;
 };
 
+struct frequency_alloc
+{
+    struct frequency *arr;
+    size_t cap;
+};
+
 struct action_pack
 {
     str_view file;
@@ -121,7 +127,7 @@ static str_view const directions
 static void print_found(FILE *file, str_view w);
 static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
-static struct frequency *copy_frequencies(ccc_flat_ordered_map const *map);
+static struct frequency_alloc copy_frequencies(ccc_flat_ordered_map const *map);
 static void print_n(ccc_flat_priority_queue *, struct str_arena const *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
@@ -256,13 +262,14 @@ print_top_n(FILE *const f, int n)
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
     /* O(n) copy */
-    struct frequency *const freqs = copy_frequencies(&map);
+    struct frequency_alloc freqs = copy_frequencies(&map);
+    assert(freqs.cap);
     /* O(n) sort kind of. Pops will be O(nlgn). But we don't have stdlib qsort
        space overhead to emulate why someone in an embedded or OS
        environment might choose this approach for sorting. Granted any O(1)
        space approach to sorting may beat the slower pop operation. */
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
-        freqs, size(&map) + 1, size(&map), CCC_GRT, realloc, cmp_freqs, &a);
+        freqs.arr, freqs.cap, size(&map), CCC_GRT, realloc, cmp_freqs, &a);
     assert(size(&fpq) == size(&map));
     if (!n)
     {
@@ -281,9 +288,10 @@ print_last_n(FILE *const f, int n)
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
-    struct frequency *const freqs = copy_frequencies(&map);
+    struct frequency_alloc freqs = copy_frequencies(&map);
+    assert(freqs.cap);
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
-        freqs, size(&map) + 1, size(&map), CCC_LES, realloc, cmp_freqs, &a);
+        freqs.arr, freqs.cap, size(&map), CCC_LES, realloc, cmp_freqs, &a);
     assert(size(&fpq) == size(&map));
     if (!n)
     {
@@ -295,7 +303,7 @@ print_last_n(FILE *const f, int n)
     ccc_fom_clear_and_free(&map, NULL);
 }
 
-static struct frequency *
+static struct frequency_alloc
 copy_frequencies(ccc_flat_ordered_map const *const map)
 {
     assert(!empty(map));
@@ -308,7 +316,7 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
     {
         freqs[i++] = w->freq;
     }
-    return freqs;
+    return (struct frequency_alloc){.arr = freqs, .cap = cap};
 }
 
 static void
