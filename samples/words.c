@@ -80,7 +80,7 @@ struct action_pack
 
 /*=======================     Constants    ==================================*/
 
-#define STARTING_ARENA_SIZE 4096
+static size_t arena_start_cap = 4096;
 static int const all_frequencies = 0;
 static str_view const space = SV(" ");
 
@@ -230,7 +230,7 @@ main(int argc, char *argv[])
 static void
 print_found(FILE *const f, str_view w)
 {
-    struct str_arena a = str_arena_create(STARTING_ARENA_SIZE);
+    struct str_arena a = str_arena_create(arena_start_cap);
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
@@ -251,7 +251,7 @@ print_found(FILE *const f, str_view w)
 static void
 print_top_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(STARTING_ARENA_SIZE);
+    struct str_arena a = str_arena_create(arena_start_cap);
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
@@ -277,7 +277,7 @@ print_top_n(FILE *const f, int n)
 static void
 print_last_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(STARTING_ARENA_SIZE);
+    struct str_arena a = str_arena_create(arena_start_cap);
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
@@ -403,7 +403,7 @@ str_arena_create(size_t const cap)
     {
         return (struct str_arena){};
     }
-    a.cap = STARTING_ARENA_SIZE;
+    a.cap = arena_start_cap;
     a.next_free_pos = 0;
     return a;
 }
