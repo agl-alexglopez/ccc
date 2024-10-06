@@ -392,9 +392,8 @@ clean_word(struct str_arena *const a, str_view word)
     {
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
-    str_view const complete_word = sv(str_arena_at(a, str));
-    if (!isalpha(*sv_begin(complete_word))
-        || !isalpha(*sv_rbegin(complete_word)))
+    char const *const w = str_arena_at(a, str);
+    if (!isalpha(*w) || !isalpha(*(w + (str_len - 1))))
     {
         str_arena_free_to_pos(a, str);
         return (struct clean_word){.stat = WC_NOT_WORD};
