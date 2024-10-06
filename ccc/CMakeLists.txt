@@ -125,6 +125,8 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/impl_priority_queue.h
         ${PROJECT_SOURCE_DIR}/src/impl_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/impl_flat_ordered_map.h
+        ${PROJECT_SOURCE_DIR}/src/flat_ordered_map.c
         ${PROJECT_SOURCE_DIR}/src/impl_double_ended_priority_queue.h
         ${PROJECT_SOURCE_DIR}/src/double_ended_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/priority_queue.c
@@ -148,6 +150,7 @@ target_sources(${PROJECT_NAME}
               flat_double_ended_queue.h
               flat_priority_queue.h
               ordered_map.h
+              flat_ordered_map.h
               realtime_ordered_map.h
               flat_realtime_ordered_map.h
               double_ended_priority_queue.h

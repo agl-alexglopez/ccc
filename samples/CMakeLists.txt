@@ -6,6 +6,7 @@ project("ccc samples"
 )
 
 find_package(str_view)
+find_package(ccc HINTS "../intall")
 include_directories("../ccc")
 include_directories("../util")
 
@@ -14,9 +15,7 @@ target_link_libraries(maze PRIVATE
   cli
   random
   str_view::str_view
-  ordered_map
-  double_ended_priority_queue
-  traits
+  ccc
 )
 
 add_executable(graph graph.c)
@@ -24,24 +23,14 @@ target_link_libraries(graph PRIVATE
   cli
   random
   str_view::str_view
-  flat_hash_map
-  flat_double_ended_queue
-  priority_queue
-  flat_priority_queue
-  traits
+  ccc
 )
 
 add_executable(words words.c)
 target_link_libraries(words PRIVATE
   cli
   str_view::str_view
-  realtime_ordered_map
-  flat_realtime_ordered_map
-  ordered_map
-  flat_ordered_map
-  flat_priority_queue
-  types
-  traits
+  ccc
 )
 
 add_custom_target(samples)
