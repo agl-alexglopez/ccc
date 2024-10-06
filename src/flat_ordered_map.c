@@ -135,8 +135,8 @@ ccc_fom_and_modify(ccc_f_om_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){
-            .container = base_at(e->impl_.fom_, e->impl_.i_),
+        fn((ccc_user_type_mut){
+            .user_type = base_at(e->impl_.fom_, e->impl_.i_),
             .aux = NULL,
         });
     }
@@ -149,8 +149,8 @@ ccc_fom_and_modify_aux(ccc_f_om_entry *const e, ccc_update_fn *const fn,
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){
-            .container = base_at(e->impl_.fom_, e->impl_.i_),
+        fn((ccc_user_type_mut){
+            .user_type = base_at(e->impl_.fom_, e->impl_.i_),
             .aux = aux,
         });
     }
@@ -383,7 +383,7 @@ ccc_fom_clear(ccc_flat_ordered_map *const frm, ccc_destructor_fn *const fn)
     while (!ccc_fom_empty(frm))
     {
         void *const deleted = erase(frm, key_at(frm, frm->root_));
-        fn(deleted);
+        fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
     }
 }
 
@@ -403,7 +403,7 @@ ccc_fom_clear_and_free(ccc_flat_ordered_map *const frm,
     while (!ccc_fom_empty(frm))
     {
         void *const deleted = erase(frm, key_at(frm, frm->root_));
-        fn(deleted);
+        fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
     }
     return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
 }
@@ -747,8 +747,8 @@ static inline ccc_threeway_cmp
 cmp_elems(struct ccc_fom_ const *const fom, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
-    return fn(&(ccc_key_cmp){
-        .container = base_at(fom, node), .key = key, .aux = fom->aux_});
+    return fn((ccc_key_cmp){
+        .user_type = base_at(fom, node), .key = key, .aux = fom->aux_});
 }
 
 static inline void *
@@ -981,12 +981,13 @@ static void
 print_node(struct ccc_fom_ const *const t, size_t const parent,
            size_t const root, ccc_print_fn *const fn_print)
 {
-    fn_print(base_at(t, root));
+    fn_print((ccc_user_type){.user_type = base_at(t, root), .aux = t->aux_});
     struct parent_status stat = child_tracks_parent(t, parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);
-        fn_print(base_at(t, stat.parent));
+        fn_print((ccc_user_type){.user_type = base_at(t, stat.parent),
+                                 .aux = t->aux_});
         printf("%s", COLOR_NIL);
     }
     printf("\n");

@@ -92,7 +92,8 @@ ccc_pq_clear(ccc_priority_queue *const ppq, ccc_destructor_fn *fn)
 {
     while (!ccc_pq_empty(ppq))
     {
-        fn(ccc_pq_front(ppq));
+        fn((ccc_user_type_mut){.user_type = ccc_pq_front(ppq),
+                               .aux = ppq->aux_});
         ccc_pq_pop(ppq);
     }
 }
@@ -123,7 +124,7 @@ ccc_pq_update(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
     {
         return false;
     }
-    fn(&(ccc_update){struct_base(ppq, e), aux});
+    fn((ccc_user_type_mut){struct_base(ppq, e), aux});
     if (e->parent_ && cmp(ppq, e, e->parent_) == ppq->order_)
     {
         cut_child(e);
@@ -148,13 +149,13 @@ ccc_pq_increase(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
     }
     if (ppq->order_ == CCC_GRT)
     {
-        fn(&(ccc_update){struct_base(ppq, e), aux});
+        fn((ccc_user_type_mut){struct_base(ppq, e), aux});
         cut_child(e);
     }
     else
     {
         ppq->root_ = delete (ppq, e);
-        fn(&(ccc_update){struct_base(ppq, e), aux});
+        fn((ccc_user_type_mut){struct_base(ppq, e), aux});
         init_node(e);
     }
     ppq->root_ = merge(ppq, ppq->root_, e);
@@ -173,13 +174,13 @@ ccc_pq_decrease(ccc_priority_queue *const ppq, ccc_pq_elem *const e,
     }
     if (ppq->order_ == CCC_LES)
     {
-        fn(&(ccc_update){struct_base(ppq, e), aux});
+        fn((ccc_user_type_mut){struct_base(ppq, e), aux});
         cut_child(e);
     }
     else
     {
         ppq->root_ = delete (ppq, e);
-        fn(&(ccc_update){struct_base(ppq, e), aux});
+        fn((ccc_user_type_mut){struct_base(ppq, e), aux});
         init_node(e);
     }
     ppq->root_ = merge(ppq, ppq->root_, e);
@@ -216,8 +217,9 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_pq_ const *const ppq, struct ccc_pq_elem_ const *const a,
     struct ccc_pq_elem_ const *const b)
 {
-    return ppq->cmp_(
-        &(ccc_cmp){struct_base(ppq, a), struct_base(ppq, b), ppq->aux_});
+    return ppq->cmp_((ccc_cmp){.user_type_a = struct_base(ppq, a),
+                               .user_type_b = struct_base(ppq, b),
+                               .aux = ppq->aux_});
 }
 
 static inline void *

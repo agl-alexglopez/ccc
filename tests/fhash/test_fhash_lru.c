@@ -77,17 +77,17 @@ lru_head(struct lru_cache *const lru)
 }
 
 static bool
-lru_lookup_cmp(ccc_key_cmp const *const cmp)
+lru_lookup_cmp(ccc_key_cmp const cmp)
 {
-    struct lru_lookup const *const lookup = cmp->container;
-    return lookup->key == *((int *)cmp->key);
+    struct lru_lookup const *const lookup = cmp.user_type;
+    return lookup->key == *((int *)cmp.key);
 }
 
 static ccc_threeway_cmp
-cmp_by_key(ccc_cmp const *const cmp)
+cmp_by_key(ccc_cmp const cmp)
 {
-    struct key_val const *const kv_a = cmp->container_a;
-    struct key_val const *const kv_b = cmp->container_b;
+    struct key_val const *const kv_a = cmp.user_type_a;
+    struct key_val const *const kv_b = cmp.user_type_b;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 

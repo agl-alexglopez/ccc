@@ -14,8 +14,8 @@ struct val
     ccc_frtm_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_key_cmp const *);
-void map_printer_fn(void const *);
+ccc_threeway_cmp val_cmp(ccc_key_cmp);
+void map_printer_fn(ccc_user_type);
 
 enum test_result insert_shuffled(ccc_flat_realtime_ordered_map *m, size_t size,
                                  int larger_prime);

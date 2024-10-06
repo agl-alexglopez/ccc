@@ -200,7 +200,7 @@ ccc_sll_clear_and_free(ccc_singly_linked_list *const sll,
         void *mem = struct_base(sll, pop_front(sll));
         if (fn)
         {
-            fn(mem);
+            fn((ccc_user_type_mut){.user_type = mem, .aux = sll->aux_});
         }
         if (sll->alloc_)
         {

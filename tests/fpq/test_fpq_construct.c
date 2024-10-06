@@ -12,10 +12,10 @@
 #include <time.h>
 
 static ccc_threeway_cmp
-int_cmp(ccc_cmp const *const cmp)
+int_cmp(ccc_cmp const cmp)
 {
-    int a = *((int const *const)cmp->container_a);
-    int b = *((int const *const)cmp->container_b);
+    int a = *((int const *const)cmp.user_type_a);
+    int b = *((int const *const)cmp.user_type_b);
     return (a > b) - (a < b);
 }
 

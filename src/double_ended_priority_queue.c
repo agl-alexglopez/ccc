@@ -124,8 +124,8 @@ static struct ccc_node_ *get_parent(struct ccc_tree_ const *,
 
 /* Comparison function returns */
 
-static ccc_threeway_cmp force_find_grt(ccc_key_cmp const *);
-static ccc_threeway_cmp force_find_les(ccc_key_cmp const *);
+static ccc_threeway_cmp force_find_grt(ccc_key_cmp);
+static ccc_threeway_cmp force_find_les(ccc_key_cmp);
 /* The key comes first. It is the "left hand side" of the comparison. */
 static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
                             struct ccc_node_ const *, ccc_key_cmp_fn *);
@@ -141,7 +141,8 @@ ccc_depq_clear(ccc_double_ended_priority_queue *pq,
         void *popped = pop_min(&pq->impl_);
         if (destructor)
         {
-            destructor(popped);
+            destructor((ccc_user_type_mut){.user_type = popped,
+                                           .aux = pq->impl_.aux_});
         }
         if (pq->impl_.alloc_)
         {
@@ -298,7 +299,7 @@ ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
     {
         return false;
     }
-    fn(&(ccc_update){e, aux});
+    fn((ccc_user_type_mut){e, aux});
     multimap_insert(&pq->impl_, &elem->impl_);
     return true;
 }
@@ -930,8 +931,8 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_tree_ const *const t, void const *const key,
     struct ccc_node_ const *const node, ccc_key_cmp_fn *const fn)
 {
-    return fn(&(ccc_key_cmp){
-        .container = struct_base(t, node),
+    return fn((ccc_key_cmp){
+        .user_type = struct_base(t, node),
         .key = key,
         .aux = t->aux_,
     });
@@ -944,13 +945,13 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
    return one or the other and we will end up at the max or min
    NOLINTBEGIN(*swappable-parameters) */
 static ccc_threeway_cmp
-force_find_grt([[maybe_unused]] ccc_key_cmp const *const cmp)
+force_find_grt([[maybe_unused]] ccc_key_cmp const cmp)
 {
     return CCC_GRT;
 }
 
 static ccc_threeway_cmp
-force_find_les([[maybe_unused]] ccc_key_cmp const *const cmp)
+force_find_les([[maybe_unused]] ccc_key_cmp const cmp)
 {
     return CCC_LES;
 }
@@ -1145,26 +1146,31 @@ print_node(struct ccc_tree_ const *const t,
            struct ccc_node_ const *const parent,
            struct ccc_node_ const *const root, ccc_print_fn *const fn_print)
 {
-    fn_print(struct_base(t, root));
+    fn_print(
+        (ccc_user_type){.user_type = struct_base(t, root), .aux = t->aux_});
     struct parent_status_ stat = child_tracks_parent(t, parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);
-        fn_print(struct_base(t, stat.parent));
+        fn_print((ccc_user_type){.user_type = struct_base(t, stat.parent),
+                                 .aux = t->aux_});
         printf("%s", COLOR_NIL);
     }
     printf(COLOR_CYN);
-    /* If a node is a duplicate, we will give it a special mark among nodes. */
+    /* If a node is a duplicate, we will give it a special mark among nodes.
+     */
     if (has_dups(&t->end_, root))
     {
         int duplicates = 1;
         if (root->dup_head_ != &t->end_)
         {
-            fn_print(struct_base(t, root->dup_head_));
+            fn_print((ccc_user_type){
+                .user_type = struct_base(t, root->dup_head_), .aux = t->aux_});
             for (struct ccc_node_ *i = root->dup_head_->link_[N];
                  i != root->dup_head_; i = i->link_[N], ++duplicates)
             {
-                fn_print(struct_base(t, i));
+                fn_print((ccc_user_type){.user_type = struct_base(t, i),
+                                         .aux = t->aux_});
             }
         }
         printf("(+%d)", duplicates);

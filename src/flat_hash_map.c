@@ -141,7 +141,7 @@ ccc_impl_fhm_and_modify(struct ccc_fhm_entry_ *const e, ccc_update_fn *const fn)
 {
     if (e->entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){e->entry_.e_, NULL});
+        fn((ccc_user_type_mut){e->entry_.e_, NULL});
     }
     return e;
 }
@@ -152,7 +152,7 @@ ccc_fhm_and_modify_aux(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){e->impl_.entry_.e_, aux});
+        fn((ccc_user_type_mut){e->impl_.entry_.e_, aux});
     }
     return e;
 }
@@ -343,7 +343,7 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
         }
         if (hash == e->hash_
             && h->eq_fn_(
-                &(ccc_key_cmp){.container = slot, .key = key, .aux = h->aux_}))
+                (ccc_key_cmp){.user_type = slot, .key = key, .aux = h->aux_}))
         {
             return (struct ccc_entry_){.e_ = slot,
                                        .stats_ = CCC_ENTRY_OCCUPIED};
@@ -476,7 +476,7 @@ ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn)
     {
         if (ccc_impl_fhm_in_slot(h, i)->hash_ != CCC_FHM_EMPTY)
         {
-            fn(i);
+            fn((ccc_user_type){.user_type = (void *)i, .aux = h->aux_});
         }
     }
 }
@@ -507,7 +507,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     {
         if (ccc_impl_fhm_in_slot(h, slot)->hash_ != CCC_FHM_EMPTY)
         {
-            fn(slot);
+            fn((ccc_user_type_mut){.user_type = slot, .aux = h->aux_});
         }
     }
 }
@@ -526,7 +526,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     {
         if (ccc_impl_fhm_in_slot(h, slot)->hash_ != CCC_FHM_EMPTY)
         {
-            fn(slot);
+            fn((ccc_user_type_mut){.user_type = slot, .aux = h->aux_});
         }
     }
     return ccc_buf_free(&h->buf_, h->buf_.alloc_);

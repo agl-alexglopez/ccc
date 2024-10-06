@@ -141,8 +141,9 @@ static char *str_arena_at(struct str_arena const *, str_ofs);
 
 /* Container Functions */
 static ccc_flat_ordered_map create_frequency_map(struct str_arena *, FILE *);
-static ccc_threeway_cmp cmp_string_keys(ccc_key_cmp const *);
-static ccc_threeway_cmp cmp_freqs(ccc_cmp const *);
+static ccc_threeway_cmp cmp_string_keys(ccc_key_cmp);
+static ccc_threeway_cmp cmp_freqs(ccc_cmp);
+static void print_word(ccc_user_type);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -248,6 +249,8 @@ print_top_n(FILE *const f, int n)
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
+    ccc_fom_print(&map, print_word);
+    printf("\n");
     /* O(n) copy */
     struct frequency *const freqs = copy_frequencies(&map);
     /* O(n) sort */
@@ -490,11 +493,11 @@ str_arena_at(struct str_arena const *const a, str_ofs const i)
 /*=======================   Container Helpers    ============================*/
 
 static ccc_threeway_cmp
-cmp_string_keys(ccc_key_cmp const *const c)
+cmp_string_keys(ccc_key_cmp const c)
 {
-    struct word const *const w = c->container;
-    struct str_arena const *const a = c->aux;
-    str_ofs const id = *((str_ofs *)c->key);
+    struct word const *const w = c.user_type;
+    struct str_arena const *const a = c.aux;
+    str_ofs const id = *((str_ofs *)c.key);
     int const res
         = strcmp(str_arena_at(a, id), str_arena_at(a, w->freq.arena_pos));
     if (res > 0)
@@ -510,11 +513,11 @@ cmp_string_keys(ccc_key_cmp const *const c)
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
 static ccc_threeway_cmp
-cmp_freqs(ccc_cmp const *const c)
+cmp_freqs(ccc_cmp const c)
 {
-    struct frequency const *const a = c->container_a;
-    struct frequency const *const b = c->container_b;
-    struct str_arena const *const arena = c->aux;
+    struct frequency const *const a = c.user_type_a;
+    struct frequency const *const b = c.user_type_b;
+    struct str_arena const *const arena = c.aux;
     ccc_threeway_cmp cmp = (a->freq > b->freq) - (a->freq < b->freq);
     if (cmp != CCC_EQL)
     {
@@ -531,6 +534,14 @@ cmp_freqs(ccc_cmp const *const c)
         return CCC_GRT;
     }
     return CCC_EQL;
+}
+
+static void
+print_word(ccc_user_type const u)
+{
+    struct word const *const w = u.user_type;
+    struct str_arena const *const a = u.aux;
+    printf("{%s, %d}", str_arena_at(a, w->freq.arena_pos), w->freq.freq);
 }
 
 /*=======================   CLI Helpers    ==================================*/

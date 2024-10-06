@@ -41,37 +41,43 @@ typedef enum
 
 typedef struct
 {
-    void const *const container_a;
-    void const *const container_b;
+    void const *const user_type_a;
+    void const *const user_type_b;
     void *aux;
 } ccc_cmp;
 
 typedef struct
 {
-    void const *const container;
+    void const *const user_type;
     void const *const key;
     void *aux;
 } ccc_key_cmp;
 
 typedef struct
 {
-    void *container;
+    void const *const user_type;
     void *aux;
-} ccc_update;
+} ccc_user_type;
+
+typedef struct
+{
+    void *user_type;
+    void *aux;
+} ccc_user_type_mut;
 
 typedef void *ccc_alloc_fn(void *, size_t);
 
-typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp const *);
+typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
 
-typedef void ccc_print_fn(void const *container);
+typedef void ccc_print_fn(ccc_user_type);
 
-typedef void ccc_update_fn(ccc_update const *);
+typedef void ccc_update_fn(ccc_user_type_mut);
 
-typedef void ccc_destructor_fn(void *container);
+typedef void ccc_destructor_fn(ccc_user_type_mut);
 
-typedef bool ccc_key_eq_fn(ccc_key_cmp const *);
+typedef bool ccc_key_eq_fn(ccc_key_cmp);
 
-typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp const *);
+typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
 typedef uint64_t ccc_hash_fn(void const *to_hash);
 
@@ -92,7 +98,7 @@ typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
 typedef ccc_cmp cmp;
 typedef ccc_key_cmp key_cmp;
-typedef ccc_update update;
+typedef ccc_user_type user_type;
 typedef ccc_alloc_fn alloc_fn;
 typedef ccc_cmp_fn cmp_fn;
 typedef ccc_print_fn print_fn;

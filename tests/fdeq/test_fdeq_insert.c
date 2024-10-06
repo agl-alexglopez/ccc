@@ -10,7 +10,7 @@
 
 BEGIN_STATIC_TEST(fdeq_test_insert_three)
 {
-    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     CHECK(size(&q), 3);
     END_TEST();
@@ -18,7 +18,7 @@ BEGIN_STATIC_TEST(fdeq_test_insert_three)
 
 BEGIN_STATIC_TEST(fdeq_test_insert_overwrite_three)
 {
-    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     CHECK(size(&q), 3);
     (void)fdeq_push_back_range(&q, 3, (int[3]){3, 4, 5});
@@ -65,7 +65,7 @@ BEGIN_STATIC_TEST(fdeq_test_insert_overwrite_three)
 
 BEGIN_STATIC_TEST(fdeq_test_push_back_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     CHECK(check_order(&q, 3, (int[3]){0, 1, 2}), PASS);
     (void)fdeq_push_back_range(&q, 2, (int[2]){3, 4});
@@ -85,7 +85,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_back_ranges)
 
 BEGIN_STATIC_TEST(fdeq_test_push_front_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     CHECK(check_order(&q, 3, (int[3]){0, 1, 2}), PASS);
     (void)fdeq_push_front_range(&q, 2, (int[2]){3, 4});
@@ -105,7 +105,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_front_ranges)
 
 BEGIN_STATIC_TEST(fdeq_test_insert_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     CHECK(check_order(&q, 3, (int[3]){0, 1, 2}), PASS);
     (void)fdeq_insert_range(&q, fdeq_at(&q, 1), 2, (int[2]){3, 4});

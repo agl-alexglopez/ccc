@@ -10,17 +10,17 @@
 #include <stddef.h>
 
 static void
-mod(ccc_update const *const u)
+mod(ccc_user_type_mut const u)
 {
-    struct val *v = u->container;
+    struct val *v = u.user_type;
     v->val += 5;
 }
 
 static void
-modw(ccc_update const *const u)
+modw(ccc_user_type_mut const u)
 {
-    struct val *v = u->container;
-    v->val = *((int *)u->aux);
+    struct val *v = u.user_type;
+    v->val = *((int *)u.aux);
 }
 
 static int

@@ -9,17 +9,17 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_key_cmp const *const cmp)
+val_cmp(ccc_key_cmp const cmp)
 {
-    struct val const *const c = cmp->container;
-    int const key = *((int *)cmp->key);
+    struct val const *const c = cmp.user_type;
+    int const key = *((int *)cmp.key);
     return (key > c->id) - (key < c->id);
 }
 
 void
-map_printer_fn(void const *const container)
+map_printer_fn(ccc_user_type const container)
 {
-    struct val const *const v = container;
+    struct val const *const v = container.user_type;
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 

@@ -11,9 +11,9 @@ struct val
     ccc_depq_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_key_cmp const *);
-void val_update(ccc_update const *);
-void depq_printer_fn(void const *);
+ccc_threeway_cmp val_cmp(ccc_key_cmp);
+void val_update(ccc_user_type_mut);
+void depq_printer_fn(ccc_user_type);
 
 enum test_result insert_shuffled(ccc_double_ended_priority_queue *,
                                  struct val[], size_t, int);
