@@ -270,7 +270,8 @@ print_top_n(FILE *const f, int n)
     /* O(n) sort kind of. Pops will be O(nlgn). But we don't have stdlib qsort
        space overhead to emulate why someone in an embedded or OS
        environment might choose this approach for sorting. Granted any O(1)
-       space approach to sorting may beat the slower pop operation. */
+       space approach to sorting may beat the slower pop operation but strict
+       O(lgN) runtime for heap pop is pretty good. */
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_GRT, realloc, cmp_freqs, &a);
     assert(size(&fpq) == size(&map));
