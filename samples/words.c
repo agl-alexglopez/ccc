@@ -139,7 +139,9 @@ static struct clean_word clean_word(struct str_arena *, str_view word);
 static struct str_arena str_arena_create(size_t);
 static ssize_t str_arena_alloc(struct str_arena *, size_t bytes);
 static ccc_result str_arena_maybe_resize(struct str_arena *,
-                                         size_t new_request);
+                                         size_t byte_request);
+static ccc_result str_arena_maybe_resize_pos(struct str_arena *,
+                                             size_t furthest_pos);
 static void str_arena_free_to_pos(struct str_arena *, str_ofs last_pos);
 static bool str_arena_push_back(struct str_arena *, str_ofs str, size_t len,
                                 char);
@@ -390,10 +392,9 @@ clean_word(struct str_arena *const a, str_view word)
     {
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
-    [[maybe_unused]] bool const pushed_char
-        = str_arena_push_back(a, str, str_len, '\0');
-    assert(pushed_char);
-    if (sv_strcmp(SV("--"), str_arena_at(a, str)) == SV_EQL)
+    str_view const complete_word = sv(str_arena_at(a, str));
+    if (!isalpha(*sv_begin(complete_word))
+        || !isalpha(*sv_rbegin(complete_word)))
     {
         str_arena_free_to_pos(a, str);
         return (struct clean_word){.stat = WC_NOT_WORD};
@@ -430,32 +431,58 @@ str_arena_alloc(struct str_arena *const a, size_t const bytes)
 }
 
 /* Push a character back to the last string allocation. This is possible
-   and useful when a string may be needed depending on other factors
-   before it is finally recorded or allocated. */
+   and useful when a string may be edited depending on other factors
+   before it is finally recorded for later use. One would overwrite other
+   strings if this is not the last element. However all strings will remain
+   null terminated. A null terminator is added after the new character.
+   Assumes str_len + 1 bytes for str have been allocated already starting
+   at str. */
 static bool
 str_arena_push_back(struct str_arena *const a, str_ofs const str,
                     size_t const str_len, char const c)
 {
-    if (str_arena_maybe_resize(a, str + str_len + 1) != CCC_OK
-        || *str_arena_at(a, str + (str_ofs)str_len + 1) != '\0')
+    if (str_arena_maybe_resize_pos(a, str + str_len + 1) != CCC_OK)
     {
         return false;
     }
     *(str_arena_at(a, str) + str_len) = c;
-    ++a->next_free_pos;
+    *(str_arena_at(a, str) + str_len + 1) = '\0';
+    a->next_free_pos += 2;
     return true;
 }
 
 static ccc_result
-str_arena_maybe_resize(struct str_arena *const a, size_t const new_request)
+str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
 {
     if (!a)
     {
         return CCC_INPUT_ERR;
     }
-    if (a->next_free_pos + new_request >= a->cap)
+    if (a->next_free_pos + byte_request >= a->cap)
     {
-        size_t const new_cap = (a->next_free_pos + new_request) * 2;
+        size_t const new_cap = (a->next_free_pos + byte_request) * 2;
+        void *moved_arena = realloc(a->arena, new_cap);
+        if (!moved_arena)
+        {
+            return CCC_MEM_ERR;
+        }
+        memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
+        a->arena = moved_arena;
+        a->cap = new_cap;
+    }
+    return CCC_OK;
+}
+
+static ccc_result
+str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
+{
+    if (!a)
+    {
+        return CCC_INPUT_ERR;
+    }
+    if (furthest_pos >= a->cap)
+    {
+        size_t const new_cap = (furthest_pos) * 2;
         void *moved_arena = realloc(a->arena, new_cap);
         if (!moved_arena)
         {
@@ -479,6 +506,7 @@ str_arena_free_to_pos(struct str_arena *const a, str_ofs const last_pos)
     {
         return;
     }
+    memset(a->arena + last_pos, '\0', a->next_free_pos - last_pos);
     a->next_free_pos = last_pos;
 }
 
