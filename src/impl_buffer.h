@@ -15,9 +15,9 @@ struct ccc_buf_
     ccc_alloc_fn *alloc_;
 };
 
-#define ccc_impl_buf_init(mem, type, capacity, alloc_fn)                       \
+#define ccc_impl_buf_init(mem, capacity, alloc_fn)                             \
     {                                                                          \
-        .mem_ = (mem), .elem_sz_ = sizeof(type), .sz_ = 0,                     \
+        .mem_ = (mem), .elem_sz_ = sizeof(*(mem)), .sz_ = 0,                   \
         .capacity_ = (capacity), .alloc_ = (alloc_fn),                         \
     }
 

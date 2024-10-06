@@ -15,10 +15,10 @@ typedef union
     struct ccc_fom_entry_ impl_;
 } ccc_f_om_entry;
 
-#define ccc_fom_init(mem_ptr, capacity, struct_name, map_elem_field,           \
-                     key_elem_field, alloc_fn, key_cmp, aux)                   \
-    ccc_impl_fom_init(mem_ptr, capacity, struct_name, map_elem_field,          \
-                      key_elem_field, alloc_fn, key_cmp, aux)
+#define ccc_fom_init(mem_ptr, capacity, map_elem_field, key_elem_field,        \
+                     alloc_fn, key_cmp, aux)                                   \
+    ccc_impl_fom_init(mem_ptr, capacity, map_elem_field, key_elem_field,       \
+                      alloc_fn, key_cmp, aux)
 
 #define ccc_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn, aux_data...)  \
     &(ccc_f_om_entry)                                                          \

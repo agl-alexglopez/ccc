@@ -16,20 +16,18 @@
    access the fields directly or modify them. */
 typedef struct ccc_fpq_ ccc_flat_priority_queue;
 
-#define ccc_fpq_init(mem_ptr, capacity, type_name, cmp_order, alloc_fn,        \
-                     cmp_fn, aux_data)                                         \
-    ccc_impl_fpq_init(mem_ptr, capacity, type_name, cmp_order, alloc_fn,       \
-                      cmp_fn, aux_data)
+#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
+    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
 
 /** @brief Initializes a heap with the provided memory of size and capacity
 provided in O(n) time. Elements are sorted by their values as provided. Size
 must be less than or equal to (capacity - 1). Use on the right hand side of
 of the assignment for the current heap, same as normal initialization. However,
 this initializer must be used at runtime, not compile time. */
-#define ccc_fpq_heapify_init(mem_ptr, capacity, size, type_name, cmp_order,    \
-                             alloc_fn, cmp_fn, aux_data)                       \
-    ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, type_name, cmp_order,   \
-                              alloc_fn, cmp_fn, aux_data)
+#define ccc_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,     \
+                             cmp_fn, aux_data)                                 \
+    ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,    \
+                              cmp_fn, aux_data)
 
 /* Given an initialized flat priority queue, a struct type, and its
    initializer, attempts to write an r-value of one's struct type into the

@@ -17,8 +17,7 @@
 BEGIN_STATIC_TEST(frtomap_test_insert_erase_shuffled)
 {
     struct val vals[51];
-    ccc_flat_ordered_map s
-        = fom_init(vals, 51, struct val, elem, id, NULL, val_cmp, NULL);
+    ccc_flat_ordered_map s = fom_init(vals, 51, elem, id, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -43,8 +42,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_erase_shuffled)
 BEGIN_STATIC_TEST(frtomap_test_prime_shuffle)
 {
     struct val vals[51];
-    ccc_flat_ordered_map s
-        = fom_init(vals, 51, struct val, elem, id, NULL, val_cmp, NULL);
+    ccc_flat_ordered_map s = fom_init(vals, 51, elem, id, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -78,7 +76,7 @@ BEGIN_STATIC_TEST(frtomap_test_weak_srand)
 {
     struct val vals[1001];
     ccc_flat_ordered_map s
-        = fom_init(vals, 10001, struct val, elem, id, NULL, val_cmp, NULL);
+        = fom_init(vals, 10001, elem, id, NULL, val_cmp, NULL);
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;

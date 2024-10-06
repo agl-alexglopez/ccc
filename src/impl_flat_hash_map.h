@@ -36,16 +36,16 @@ struct ccc_fhm_entry_
     struct ccc_entry_ entry_;
 };
 
-#define ccc_impl_fhm_init(flat_hash_map_ptr, memory_ptr, capacity,             \
-                          struct_name, key_field, fhash_elem_field, alloc_fn,  \
-                          hash_fn, key_eq_fn, aux)                             \
+#define ccc_impl_fhm_init(flat_hash_map_ptr, memory_ptr, capacity, key_field,  \
+                          fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux) \
     ({                                                                         \
-        (flat_hash_map_ptr)->buf_ = (ccc_buffer)ccc_buf_init(                  \
-            (memory_ptr), struct_name, (capacity), (alloc_fn));                \
+        __auto_type fhm_mem_ptr_ = (memory_ptr);                               \
+        (flat_hash_map_ptr)->buf_                                              \
+            = (ccc_buffer)ccc_buf_init(fhm_mem_ptr_, capacity, alloc_fn);      \
         ccc_result res_ = ccc_impl_fhm_init_buf(                               \
-            (flat_hash_map_ptr), offsetof(struct_name, key_field),             \
-            offsetof(struct_name, fhash_elem_field), (hash_fn), (key_eq_fn),   \
-            (aux));                                                            \
+            (flat_hash_map_ptr), offsetof(typeof(*(fhm_mem_ptr_)), key_field), \
+            offsetof(typeof(*(fhm_mem_ptr_)), fhash_elem_field), (hash_fn),    \
+            (key_eq_fn), (aux));                                               \
         res_;                                                                  \
     })
 

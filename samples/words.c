@@ -249,14 +249,14 @@ print_top_n(FILE *const f, int n)
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
-    ccc_fom_print(&map, print_word);
-    printf("\n");
     /* O(n) copy */
     struct frequency *const freqs = copy_frequencies(&map);
-    /* O(n) sort */
+    /* O(n) sort kind of. Pops will be O(nlgn). But we don't have stdlib qsort
+       space overhead to emulate why someone in an embedded or OS
+       environment might choose this approach for sorting. Granted any O(1)
+       space approach to sorting may beat the slower pop operation. */
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
-        freqs, size(&map) + 1, size(&map), struct frequency, CCC_GRT, realloc,
-        cmp_freqs, &a);
+        freqs, size(&map) + 1, size(&map), CCC_GRT, realloc, cmp_freqs, &a);
     assert(size(&fpq) == size(&map));
     if (!n)
     {
@@ -277,8 +277,7 @@ print_last_n(FILE *const f, int n)
     assert(!empty(&map));
     struct frequency *const freqs = copy_frequencies(&map);
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
-        freqs, size(&map) + 1, size(&map), struct frequency, CCC_LES, realloc,
-        cmp_freqs, &a);
+        freqs, size(&map) + 1, size(&map), CCC_LES, realloc, cmp_freqs, &a);
     assert(size(&fpq) == size(&map));
     if (!n)
     {
@@ -328,8 +327,8 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     size_t len = 0;
     ssize_t read = 0;
     ccc_flat_ordered_map fom
-        = ccc_fom_init(NULL, 0, struct word, map_elem, freq.arena_pos, realloc,
-                       cmp_string_keys, a);
+        = ccc_fom_init((struct word *)NULL, 0, map_elem, freq.arena_pos,
+                       realloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .sz = read - 1};
@@ -536,7 +535,7 @@ cmp_freqs(ccc_cmp const c)
     return CCC_EQL;
 }
 
-static void
+[[maybe_unused]] static void
 print_word(ccc_user_type const u)
 {
     struct word const *const w = u.user_type;

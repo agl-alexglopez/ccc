@@ -33,9 +33,9 @@ resizing is allowed.
 @param [in] aux auxilliary data that is needed for key comparison.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
-#define ccc_fhm_init(fhash_ptr, memory_ptr, capacity, struct_name, key_field,  \
+#define ccc_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,               \
                      fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)      \
-    ccc_impl_fhm_init(fhash_ptr, memory_ptr, capacity, struct_name, key_field, \
+    ccc_impl_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,              \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
 #define ccc_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux...)          \

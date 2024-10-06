@@ -11,8 +11,8 @@
 
 BEGIN_STATIC_TEST(frtomap_test_empty)
 {
-    flat_realtime_ordered_map s = frm_init((struct val[3]){}, 3, struct val,
-                                           elem, id, NULL, val_cmp, NULL);
+    flat_realtime_ordered_map s
+        = frm_init((struct val[3]){}, 3, elem, id, NULL, val_cmp, NULL);
     CHECK(empty(&s), true);
     END_TEST();
 }

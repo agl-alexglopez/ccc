@@ -23,18 +23,19 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 
 /*=======================    Convenience Macros    ======================== */
 
-#define ccc_impl_fpq_init(mem_ptr, capacity, type_name, cmp_order, alloc_fn,   \
-                          cmp_fn, aux_data)                                    \
+#define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \
+                          aux_data)                                            \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, type_name, capacity, alloc_fn),          \
-        .cmp_ = (cmp_fn), .order_ = (cmp_order), .aux_ = (aux_data),           \
+        .buf_ = ccc_buf_init(mem_ptr, capacity, alloc_fn), .cmp_ = (cmp_fn),   \
+        .order_ = (cmp_order), .aux_ = (aux_data),                             \
     }
 
-#define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, type_name,          \
-                                  cmp_order, alloc_fn, cmp_fn, aux_data)       \
+#define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order,          \
+                                  alloc_fn, cmp_fn, aux_data)                  \
     ({                                                                         \
+        __auto_type fpq_heapify_mem_ = (mem_ptr);                              \
         struct ccc_fpq_ fpq_heapify_res_                                       \
-            = ccc_impl_fpq_init(mem_ptr, capacity, type_name, cmp_order,       \
+            = ccc_impl_fpq_init(fpq_heapify_mem_, capacity, cmp_order,         \
                                 alloc_fn, cmp_fn, aux_data);                   \
         ccc_impl_fpq_in_place_heapify(&fpq_heapify_res_, (size));              \
         fpq_heapify_res_;                                                      \
