@@ -16,10 +16,10 @@ typedef union
     struct ccc_frm_entry_ impl_;
 } ccc_frtm_entry;
 
-#define ccc_frm_init(memory_ptr, capacity, struct_name, node_elem_field,       \
-                     key_elem_field, alloc_fn, key_cmp_fn, aux_data)           \
-    ccc_impl_frm_init(memory_ptr, capacity, struct_name, node_elem_field,      \
-                      key_elem_field, alloc_fn, key_cmp_fn, aux_data)
+#define ccc_frm_init(memory_ptr, capacity, node_elem_field, key_elem_field,    \
+                     alloc_fn, key_cmp_fn, aux_data)                           \
+    ccc_impl_frm_init(memory_ptr, capacity, node_elem_field, key_elem_field,   \
+                      alloc_fn, key_cmp_fn, aux_data)
 
 #define ccc_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn,      \
                              aux_data...)                                      \

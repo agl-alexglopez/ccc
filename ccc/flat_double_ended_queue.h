@@ -6,9 +6,9 @@
 
 typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 
-#define ccc_fdeq_init(mem_ptr, capacity, type_name, alloc_fn, aux_data)        \
+#define ccc_fdeq_init(mem_ptr, capacity, alloc_fn, aux_data)                   \
     (ccc_flat_double_ended_queue)                                              \
-        ccc_impl_fdeq_init(mem_ptr, capacity, type_name, alloc_fn, aux_data)
+        ccc_impl_fdeq_init(mem_ptr, capacity, alloc_fn, aux_data)
 
 #define ccc_fdeq_emplace(fq_ptr, value...) ccc_impl_fdeq_emplace(fq_ptr, value)
 

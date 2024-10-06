@@ -15,8 +15,8 @@ BEGIN_STATIC_TEST(fhash_test_insert)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent
@@ -32,8 +32,8 @@ BEGIN_STATIC_TEST(fhash_test_insert_macros)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val const *ins = ccc_fhm_or_insert_w(
         entry_vr(&fh, &(int){2}), (struct val){.id = 2, .val = 0});
@@ -79,8 +79,8 @@ BEGIN_STATIC_TEST(fhash_test_insert_overwrite)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e, &(struct val){});
@@ -115,8 +115,8 @@ BEGIN_STATIC_TEST(fhash_test_insert_then_bad_ideas)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val q = {.id = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e, &(struct val){});
@@ -149,7 +149,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_functional)
     struct val vals[200];
     size_t const size = sizeof(vals) / sizeof(vals[0]);
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -208,7 +208,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_via_entry)
     size_t const size = 200;
     struct val vals[200];
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -255,7 +255,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_via_entry_macros)
     size_t const size = 200;
     struct val vals[200];
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -297,7 +297,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_macros)
     int const size = 200;
     struct val vals[200];
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, id, e, NULL,
                                     fhash_int_last_digit, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     /* Test entry or insert with for all even values. Default should be
@@ -352,8 +352,8 @@ BEGIN_STATIC_TEST(fhash_test_two_sum)
     struct val vals[20];
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_to_u64, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
@@ -383,9 +383,8 @@ BEGIN_STATIC_TEST(fhash_test_resize)
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals == NULL, false);
     ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, prime_start, struct val, id, e, realloc,
-                   fhash_int_to_u64, fhash_id_eq, NULL);
+    ccc_result const res = fhm_init(&fh, vals, prime_start, id, e, realloc,
+                                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -419,9 +418,8 @@ BEGIN_STATIC_TEST(fhash_test_resize_macros)
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals == NULL, false);
     ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, prime_start, struct val, id, e, realloc,
-                   fhash_int_to_u64, fhash_id_eq, NULL);
+    ccc_result const res = fhm_init(&fh, vals, prime_start, id, e, realloc,
+                                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -459,7 +457,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_macros)
 BEGIN_STATIC_TEST(fhash_test_resize_from_null)
 {
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, NULL, 0, struct val, id, e, realloc,
+    ccc_result const res = fhm_init(&fh, (struct val *)NULL, 0, id, e, realloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
@@ -492,7 +490,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_from_null_macros)
     size_t const prime_start = 0;
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, NULL, prime_start, struct val, id, e, realloc,
+        = fhm_init(&fh, (struct val *)NULL, prime_start, id, e, realloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
@@ -533,7 +531,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_limit)
     int const size = 101;
     struct val vals[101];
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, struct val, id, e, NULL,
+    ccc_result const res = fhm_init(&fh, vals, size, id, e, NULL,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const larger_prime = (int)fhm_next_prime(size);

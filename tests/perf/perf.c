@@ -117,8 +117,8 @@ test_push(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_priority_queue fpq = ccc_fpq_init(
-            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq
+            = ccc_fpq_init(val_array, n + 1, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -165,8 +165,8 @@ test_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_priority_queue fpq = ccc_fpq_init(
-            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq
+            = ccc_fpq_init(val_array, n + 1, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
@@ -217,8 +217,8 @@ test_push_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_priority_queue fpq = ccc_fpq_init(
-            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq
+            = ccc_fpq_init(val_array, n + 1, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -269,8 +269,8 @@ test_push_intermittent_pop(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_priority_queue fpq = ccc_fpq_init(
-            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq
+            = ccc_fpq_init(val_array, n + 1, CCC_LES, NULL, val_cmp, NULL);
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -333,8 +333,8 @@ test_pop_intermittent_push(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_priority_queue fpq = ccc_fpq_init(
-            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq
+            = ccc_fpq_init(val_array, n + 1, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
@@ -394,8 +394,8 @@ test_update(void)
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        ccc_flat_priority_queue fpq = ccc_fpq_init(
-            val_array, n + 1, struct val, CCC_LES, NULL, val_cmp, NULL);
+        ccc_flat_priority_queue fpq
+            = ccc_fpq_init(val_array, n + 1, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);

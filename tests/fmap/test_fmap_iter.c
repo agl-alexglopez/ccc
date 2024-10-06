@@ -138,8 +138,8 @@ BEGIN_STATIC_TEST(iterator_check, flat_ordered_map *s)
 
 BEGIN_STATIC_TEST(rtom_test_forward_iter)
 {
-    flat_ordered_map s = fom_init((struct val[34]){}, 34, struct val, elem, id,
-                                  NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[34]){}, 34, elem, id, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -169,8 +169,8 @@ BEGIN_STATIC_TEST(rtom_test_forward_iter)
 
 BEGIN_STATIC_TEST(rtom_test_iterate_removal)
 {
-    flat_ordered_map s = fom_init((struct val[1001]){}, 1001, struct val, elem,
-                                  id, NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[1001]){}, 1001, elem, id, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -200,8 +200,8 @@ BEGIN_STATIC_TEST(rtom_test_iterate_removal)
 
 BEGIN_STATIC_TEST(rtom_test_iterate_remove_reinsert)
 {
-    flat_ordered_map s = fom_init((struct val[1001]){}, 1001, struct val, elem,
-                                  id, NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[1001]){}, 1001, elem, id, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -239,8 +239,8 @@ BEGIN_STATIC_TEST(rtom_test_iterate_remove_reinsert)
 
 BEGIN_STATIC_TEST(rtom_test_valid_range)
 {
-    flat_ordered_map s = fom_init((struct val[26]){}, 26, struct val, elem, id,
-                                  NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -266,8 +266,8 @@ BEGIN_STATIC_TEST(rtom_test_valid_range)
 
 BEGIN_STATIC_TEST(rtom_test_valid_range_equals)
 {
-    flat_ordered_map s = fom_init((struct val[26]){}, 26, struct val, elem, id,
-                                  NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -291,8 +291,8 @@ BEGIN_STATIC_TEST(rtom_test_valid_range_equals)
 
 BEGIN_STATIC_TEST(rtom_test_invalid_range)
 {
-    flat_ordered_map s = fom_init((struct val[26]){}, 26, struct val, elem, id,
-                                  NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -317,8 +317,8 @@ BEGIN_STATIC_TEST(rtom_test_invalid_range)
 
 BEGIN_STATIC_TEST(rtom_test_empty_range)
 {
-    flat_ordered_map s = fom_init((struct val[26]){}, 26, struct val, elem, id,
-                                  NULL, val_cmp, NULL);
+    flat_ordered_map s
+        = fom_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     int const step = 5;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */

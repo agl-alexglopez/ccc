@@ -42,8 +42,8 @@ BEGIN_STATIC_TEST(fhash_test_empty)
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(empty(&fh), true);
     END_TEST();
@@ -54,8 +54,8 @@ BEGIN_STATIC_TEST(fhash_test_entry_functional)
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
@@ -80,8 +80,8 @@ BEGIN_STATIC_TEST(fhash_test_entry_macros)
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     CHECK(get_key_val(&fh, &(int){137}) == NULL, true);
@@ -108,8 +108,8 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_functional)
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
@@ -150,8 +150,8 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
-                   NULL, fhash_int_zero, fhash_id_eq, NULL);
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+                   fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(fhm_empty(&fh), true);
 
