@@ -1,5 +1,8 @@
 #include "flat_ordered_map.h"
+#include "buffer.h"
 #include "impl_flat_ordered_map.h"
+#include "impl_types.h"
+#include "types.h"
 
 #include <assert.h>
 #include <stdio.h>

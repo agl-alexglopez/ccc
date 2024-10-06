@@ -358,9 +358,11 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
             assert(cleaned.stat != WC_ARENA_ERR);
             if (cleaned.stat == WC_CLEAN)
             {
-                fom_or_insert_w(entry_vr(&fom, &cleaned.str),
-                                (struct word){.arena_pos = cleaned.str})
-                    ->freq++;
+                struct word *const w = or_insert(
+                    entry_vr(&fom, &cleaned.str),
+                    &(struct word){.arena_pos = cleaned.str}.map_elem);
+                assert(w);
+                ++w->freq;
             }
         }
     }

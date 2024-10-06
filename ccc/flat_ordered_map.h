@@ -2,6 +2,7 @@
 #define CCC_FLAT_ORDERED_MAP_H
 
 #include "impl_flat_ordered_map.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
