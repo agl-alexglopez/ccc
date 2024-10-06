@@ -1,15 +1,6 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "cli.h"
-#include "flat_double_ended_queue.h"
-#include "flat_hash_map.h"
-#include "priority_queue.h"
-#include "random.h"
-#include "str_view/str_view.h"
-#include "traits.h"
-#include "types.h"
-
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -19,6 +10,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "ccc/flat_double_ended_queue.h"
+#include "ccc/flat_hash_map.h"
+#include "ccc/priority_queue.h"
+#include "ccc/traits.h"
+#include "ccc/types.h"
+#include "cli.h"
+#include "random.h"
+#include "str_view/str_view.h"
 
 enum
 {

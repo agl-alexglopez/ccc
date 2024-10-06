@@ -8,14 +8,6 @@
    opportunity. */
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "cli.h"
-#include "double_ended_priority_queue.h"
-#include "ordered_map.h"
-#include "random.h"
-#include "str_view/str_view.h"
-#include "traits.h"
-#include "types.h"
-
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -24,6 +16,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "ccc/double_ended_priority_queue.h"
+#include "ccc/ordered_map.h"
+#include "ccc/traits.h"
+#include "ccc/types.h"
+#include "cli.h"
+#include "random.h"
+#include "str_view/str_view.h"
 
 /*=======================   Maze Helper Types   =============================*/
 
