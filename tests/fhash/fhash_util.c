@@ -6,29 +6,28 @@
 #include <stdio.h>
 
 uint64_t
-fhash_int_zero(void const *const n)
+fhash_int_zero([[maybe_unused]] void const *const n)
 {
-    (void)n;
     return 0;
 }
 
 uint64_t
-fhash_int_last_digit(void const *n)
+fhash_int_last_digit(void const *const n)
 {
     return *((int *)n) % 10;
 }
 
 bool
-fhash_id_eq(ccc_key_cmp const *const cmp)
+fhash_id_eq(ccc_key_cmp const cmp)
 {
-    struct val const *const va = cmp->container;
-    return va->id == *((int *)cmp->key);
+    struct val const *const va = cmp.user_type;
+    return va->id == *((int *)cmp.key);
 }
 
 void
-fhash_print_val(void const *const val)
+fhash_print_val(ccc_user_type const val)
 {
-    struct val const *const v = val;
+    struct val const *const v = val.user_type;
     printf("{id:%d,val:%d},", v->id, v->val);
 }
 
@@ -44,9 +43,9 @@ fhash_int_to_u64(void const *const id)
 }
 
 void
-fhash_modplus(ccc_update const *const mod)
+fhash_modplus(ccc_user_type_mut const mod)
 {
-    ((struct val *)mod->container)->val++;
+    ((struct val *)mod.user_type)->val++;
 }
 
 struct val
@@ -56,8 +55,8 @@ fhash_create(int const id, int const val)
 }
 
 void
-fhash_swap_val(ccc_update const *const u)
+fhash_swap_val(ccc_user_type_mut const u)
 {
-    struct val *v = u->container;
-    v->val = *((int *)u->aux);
+    struct val *v = u.user_type;
+    v->val = *((int *)u.aux);
 }

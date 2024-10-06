@@ -246,17 +246,16 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void *valid_malloc(size_t);
 static void help(void);
 
-static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp const *);
+static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 
-static bool eq_parent_cells(ccc_key_cmp const *);
+static bool eq_parent_cells(ccc_key_cmp);
 static uint64_t hash_parent_cells(void const *point_struct);
-static bool eq_prev_vertices(ccc_key_cmp const *);
+static bool eq_prev_vertices(ccc_key_cmp);
 static uint64_t hash_vertex_addr(void const *pointer_to_vertex);
 static uint64_t hash_64_bits(uint64_t);
 
-static void pq_update_dist(ccc_update const *);
-static void map_pq_prev_vertex_dist_point_destructor(void *);
-static void map_parent_point_destructor(void *);
+static void pq_update_dist(ccc_user_type_mut);
+static void map_pq_prev_vertex_dist_point_destructor(ccc_user_type_mut);
 static unsigned count_digits(uintmax_t n);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -431,7 +430,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                    hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_double_ended_queue bfs
-        = ccc_fdeq_init(NULL, 0, struct point, realloc);
+        = ccc_fdeq_init(NULL, 0, struct point, realloc, NULL);
     [[maybe_unused]] ccc_entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
     assert(!insert_error(e));
@@ -491,7 +490,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         (void)add_edge(dst, &edge);
         add_edge_cost_label(graph, dst, &edge);
     }
-    fhm_clear_and_free(&parent_map, map_parent_point_destructor);
+    fhm_clear_and_free(&parent_map, NULL);
     ccc_fdeq_clear_and_free(&bfs, NULL);
     return success;
 }
@@ -1050,10 +1049,10 @@ build_path_outline(struct graph *graph)
 /*====================    Data Structure Helpers    =========================*/
 
 static bool
-eq_parent_cells(ccc_key_cmp const *const c)
+eq_parent_cells(ccc_key_cmp const c)
 {
-    struct parent_cell const *const pc = c->container;
-    struct point const *const p = c->key;
+    struct parent_cell const *const pc = c.user_type;
+    struct point const *const p = c.key;
     return pc->key.r == p->r && pc->key.c == p->c;
 }
 
@@ -1065,19 +1064,19 @@ hash_parent_cells(void const *const point_struct)
 }
 
 static ccc_threeway_cmp
-cmp_pq_dist_points(ccc_cmp const *const cmp)
+cmp_pq_dist_points(ccc_cmp const cmp)
 {
-    struct dist_point const *const a = cmp->container_a;
-    struct dist_point const *const b = cmp->container_b;
+    struct dist_point const *const a = cmp.user_type_a;
+    struct dist_point const *const b = cmp.user_type_b;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static bool
-eq_prev_vertices(ccc_key_cmp const *const cmp)
+eq_prev_vertices(ccc_key_cmp const cmp)
 {
-    struct prev_vertex const *const a = cmp->container;
+    struct prev_vertex const *const a = cmp.user_type;
     struct vertex const *const *const v
-        = (struct vertex const *const *const)cmp->key;
+        = (struct vertex const *const *const)cmp.key;
     return a->v == *v;
 }
 
@@ -1097,22 +1096,16 @@ hash_64_bits(uint64_t x)
 }
 
 static void
-pq_update_dist(ccc_update const *const u)
+pq_update_dist(ccc_user_type_mut const u)
 {
-    ((struct dist_point *)u->container)->dist = *((int *)u->aux);
+    ((struct dist_point *)u.user_type)->dist = *((int *)u.aux);
 }
 
 static void
-map_pq_prev_vertex_dist_point_destructor(void *const e)
+map_pq_prev_vertex_dist_point_destructor(ccc_user_type_mut const e)
 {
-    struct prev_vertex *pv = e;
+    struct prev_vertex *pv = e.user_type;
     free(pv->dist_point);
-}
-
-static void
-map_parent_point_destructor(void *const e)
-{
-    (void)e;
 }
 
 /*===========================    Misc    ====================================*/

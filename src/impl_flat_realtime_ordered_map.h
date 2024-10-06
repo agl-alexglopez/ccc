@@ -66,8 +66,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
         if (frm_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                          \
         {                                                                      \
             __auto_type frm_aux_data_ = aux_data;                              \
-            (mod_fn)(&(ccc_update){.container = (void *const)e.entry,          \
-                                   .aux = &frm_aux_data_});                    \
+            (mod_fn)((ccc_user_type_mut){.user_type = (void *const)e.entry,    \
+                                         .aux = &frm_aux_data_});              \
         }                                                                      \
         frm_mod_ent_;                                                          \
     })

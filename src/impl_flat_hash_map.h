@@ -116,7 +116,8 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)             \
         {                                                                      \
             __auto_type fhm_aux_ = aux;                                        \
-            (mod_fn)(&(ccc_update){fhm_mod_with_ent_.entry_.e_, &fhm_aux_});   \
+            (mod_fn)(                                                          \
+                (ccc_user_type_mut){fhm_mod_with_ent_.entry_.e_, &fhm_aux_});  \
         }                                                                      \
         fhm_mod_with_ent_;                                                     \
     })

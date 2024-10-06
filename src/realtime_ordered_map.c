@@ -325,7 +325,7 @@ ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){.container = e->impl_.entry_.e_, NULL});
+        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, NULL});
     }
     return e;
 }
@@ -335,7 +335,7 @@ ccc_rom_and_modify_aux(ccc_rtom_entry *e, ccc_update_fn *fn, void *aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){.container = e->impl_.entry_.e_, aux});
+        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, aux});
     }
     return e;
 }
@@ -480,7 +480,8 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
         {
-            destructor(deleted);
+            destructor(
+                (ccc_user_type_mut){.user_type = deleted, .aux = rom->aux_});
         }
     }
 }
@@ -498,7 +499,8 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
         {
-            destructor(deleted);
+            destructor(
+                (ccc_user_type_mut){.user_type = deleted, .aux = rom->aux_});
         }
         (void)rom->alloc_(deleted, 0);
     }
@@ -699,9 +701,9 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_rtom_ const *const rom, void const *const key,
     struct ccc_rtom_elem_ const *const node, ccc_key_cmp_fn *const fn)
 {
-    return fn(&(ccc_key_cmp){
+    return fn((ccc_key_cmp){
         .key = key,
-        .container = struct_base(rom, node),
+        .user_type = struct_base(rom, node),
         .aux = rom->aux_,
     });
 }
@@ -1271,7 +1273,8 @@ print_node(struct ccc_rtom_ const *const rom,
            ccc_print_fn *const fn_print)
 {
     printf("%s%u%s:", COLOR_CYN, root->parity_, COLOR_NIL);
-    fn_print(struct_base(rom, root));
+    fn_print(
+        (ccc_user_type){.user_type = struct_base(rom, root), .aux = rom->aux_});
     printf("\n");
 }
 

@@ -9,18 +9,18 @@
 #include <stddef.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_cmp const *const cmp)
+val_cmp(ccc_cmp const cmp)
 {
-    struct val const *const lhs = cmp->container_a;
-    struct val const *const rhs = cmp->container_b;
+    struct val const *const lhs = cmp.user_type_a;
+    struct val const *const rhs = cmp.user_type_b;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 void
-val_update(ccc_update const *const u)
+val_update(ccc_user_type_mut const u)
 {
-    struct val *const old = u->container;
-    old->val = *(int *)u->aux;
+    struct val *const old = u.user_type;
+    old->val = *(int *)u.aux;
 }
 
 BEGIN_TEST(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],

@@ -479,7 +479,8 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fq,
     size_t const back = back_free_slot(fq);
     for (size_t i = fq->front_; i != back; i = increment(fq, i))
     {
-        destructor(ccc_buf_at(&fq->buf_, i));
+        destructor((ccc_user_type_mut){.user_type = ccc_buf_at(&fq->buf_, i),
+                                       .aux = fq->aux_});
     }
 }
 
@@ -500,7 +501,8 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
     size_t const back = back_free_slot(fq);
     for (size_t i = fq->front_; i != back; i = increment(fq, i))
     {
-        destructor(ccc_buf_at(&fq->buf_, i));
+        destructor((ccc_user_type_mut){.user_type = ccc_buf_at(&fq->buf_, i),
+                                       .aux = fq->aux_});
     }
     (void)ccc_buf_realloc(&fq->buf_, 0, fq->buf_.alloc_);
 }

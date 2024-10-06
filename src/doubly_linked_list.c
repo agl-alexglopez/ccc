@@ -8,9 +8,8 @@
 #include <string.h>
 
 static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
-static inline size_t erase_range([[maybe_unused]] struct ccc_dll_ const *l,
-                                 struct ccc_dll_elem_ *begin,
-                                 struct ccc_dll_elem_ *end);
+static size_t erase_range(struct ccc_dll_ const *l, struct ccc_dll_elem_ *begin,
+                          struct ccc_dll_elem_ *end);
 static size_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
                   struct ccc_dll_elem_ const *end);
 static struct ccc_dll_elem_ *pop_front(struct ccc_dll_ *);
@@ -322,7 +321,7 @@ ccc_dll_clear_and_free(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
         void *node = struct_base(l, pop_front(l));
         if (fn)
         {
-            fn(node);
+            fn((ccc_user_type_mut){.user_type = node, .aux = l->aux_});
         }
         if (l->alloc_)
         {

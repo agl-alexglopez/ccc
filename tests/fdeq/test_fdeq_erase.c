@@ -29,7 +29,7 @@ BEGIN_STATIC_TEST(pop_back_n, flat_double_ended_queue *const q, size_t n)
 
 BEGIN_STATIC_TEST(fdeq_test_push_pop_back_three)
 {
-    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     while (!empty(&q))
     {
@@ -42,7 +42,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_back_three)
 
 BEGIN_STATIC_TEST(fdeq_test_push_pop_front_three)
 {
-    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[3]){}, 3, int, NULL, NULL);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     while (!empty(&q))
     {
@@ -55,7 +55,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_three)
 
 BEGIN_STATIC_TEST(fdeq_test_push_pop_front_back)
 {
-    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[6]){}, 6, int, NULL, NULL);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     while (!empty(&q))
     {
@@ -75,7 +75,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_back)
 
 BEGIN_STATIC_TEST(fdeq_test_push_pop_front_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[10]){}, 10, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[10]){}, 10, int, NULL, NULL);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_back_n(&q, 4), PASS);
     ccc_result res = fdeq_push_front_range(&q, 4, (int[4]){6, 7, 8, 9});
@@ -96,7 +96,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_ranges)
 
 BEGIN_STATIC_TEST(fdeq_test_push_pop_back_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[10]){}, 10, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[10]){}, 10, int, NULL, NULL);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_front_n(&q, 4), PASS);
     ccc_result res = fdeq_push_back_range(&q, 4, (int[4]){6, 7, 8, 9});
@@ -117,7 +117,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_back_ranges)
 
 BEGIN_STATIC_TEST(fdeq_test_push_pop_middle_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[10]){}, 10, int, NULL);
+    flat_double_ended_queue q = fdeq_init((int[10]){}, 10, int, NULL, NULL);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_front_n(&q, 3), PASS);
     int *ins = fdeq_insert_range(&q, fdeq_at(&q, 1), 4, (int[4]){6, 7, 8, 9});

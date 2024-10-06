@@ -58,8 +58,8 @@ void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
         if (fom_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                          \
         {                                                                      \
             __auto_type fom_aux_data_ = aux_data;                              \
-            (mod_fn)(&(ccc_update){.container = (void *const)e.entry,          \
-                                   .aux = &fom_aux_data_});                    \
+            (mod_fn)((ccc_user_type_mut){.user_type = e.entry,                 \
+                                         .aux = &fom_aux_data_});              \
         }                                                                      \
         fom_mod_ent_;                                                          \
     })

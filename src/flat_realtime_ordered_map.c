@@ -221,8 +221,8 @@ ccc_frm_and_modify(ccc_frtm_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){.container = base_at(e->impl_.frm_, e->impl_.i_),
-                         NULL});
+        fn((ccc_user_type_mut){.user_type = base_at(e->impl_.frm_, e->impl_.i_),
+                               NULL});
     }
     return e;
 }
@@ -233,8 +233,8 @@ ccc_frm_and_modify_aux(ccc_frtm_entry *const e, ccc_update_fn *const fn,
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){.container = base_at(e->impl_.frm_, e->impl_.i_),
-                         aux});
+        fn((ccc_user_type_mut){.user_type = base_at(e->impl_.frm_, e->impl_.i_),
+                               aux});
     }
     return e;
 }
@@ -433,7 +433,7 @@ ccc_frm_clear(ccc_flat_realtime_ordered_map *const frm,
     while (!ccc_frm_empty(frm))
     {
         void *const deleted = remove_fixup(frm, frm->root_);
-        fn(deleted);
+        fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
     }
 }
 
@@ -453,7 +453,7 @@ ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *const frm,
     while (!ccc_frm_empty(frm))
     {
         void *const deleted = remove_fixup(frm, frm->root_);
-        fn(deleted);
+        fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
     }
     return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
 }
@@ -670,8 +670,8 @@ static inline ccc_threeway_cmp
 cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
-    return fn(&(ccc_key_cmp){
-        .container = base_at(frm, node), .key = key, .aux = frm->aux_});
+    return fn((ccc_key_cmp){
+        .user_type = base_at(frm, node), .key = key, .aux = frm->aux_});
 }
 
 static inline void *
@@ -1340,7 +1340,7 @@ print_node(struct ccc_frm_ const *const t, size_t const root,
            ccc_print_fn *const fn_print)
 {
     printf("%s%u%s:", COLOR_CYN, at(t, root)->parity_, COLOR_NIL);
-    fn_print(base_at(t, root));
+    fn_print((ccc_user_type){.user_type = base_at(t, root), .aux = t->aux_});
     printf("\n");
 }
 

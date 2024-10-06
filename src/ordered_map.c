@@ -95,7 +95,8 @@ ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
                     ccc_impl_om_key_from_node(&set->impl_, set->impl_.root_));
         if (destructor)
         {
-            destructor(popped);
+            destructor((ccc_user_type_mut){.user_type = popped,
+                                           .aux = set->impl_.aux_});
         }
     }
 }
@@ -112,7 +113,8 @@ ccc_om_clear_and_free(ccc_ordered_map *const set,
                     ccc_impl_om_key_from_node(&set->impl_, set->impl_.root_));
         if (destructor)
         {
-            destructor(popped);
+            destructor((ccc_user_type_mut){.user_type = popped,
+                                           .aux = set->impl_.aux_});
         }
         if (set->impl_.alloc_)
         {
@@ -197,8 +199,8 @@ ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){
-            .container = e->impl_.entry_.e_,
+        fn((ccc_user_type_mut){
+            .user_type = e->impl_.entry_.e_,
             .aux = NULL,
         });
     }
@@ -211,8 +213,8 @@ ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *const fn,
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn(&(ccc_update){
-            .container = e->impl_.entry_.e_,
+        fn((ccc_user_type_mut){
+            .user_type = e->impl_.entry_.e_,
             .aux = aux,
         });
     }
@@ -751,8 +753,8 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_tree_ const *const t, void const *const key,
     struct ccc_node_ const *const node, ccc_key_cmp_fn *const fn)
 {
-    return fn(&(ccc_key_cmp){
-        .container = struct_base(t, node),
+    return fn((ccc_key_cmp){
+        .user_type = struct_base(t, node),
         .key = key,
         .aux = t->aux_,
     });
@@ -938,12 +940,14 @@ print_node(struct ccc_tree_ const *const t,
            struct ccc_node_ const *const parent,
            struct ccc_node_ const *const root, ccc_print_fn *const fn_print)
 {
-    fn_print(struct_base(t, root));
+    fn_print(
+        (ccc_user_type){.user_type = struct_base(t, root), .aux = t->aux_});
     struct parent_status stat = child_tracks_parent(parent, root);
     if (!stat.correct)
     {
         printf("%s", COLOR_RED);
-        fn_print(struct_base(t, stat.parent));
+        fn_print((ccc_user_type){.user_type = struct_base(t, stat.parent),
+                                 .aux = t->aux_});
         printf("%s", COLOR_NIL);
     }
     printf("\n");

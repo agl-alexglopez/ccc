@@ -9,28 +9,23 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_key_cmp const *const cmp)
+val_cmp(ccc_key_cmp const cmp)
 {
-    struct val const *const c = cmp->container;
-    int const key = *((int *)cmp->key);
+    struct val const *const c = cmp.user_type;
+    int const key = *((int *)cmp.key);
     return (key > c->val) - (key < c->val);
 }
 
 void
-map_printer_fn(void const *const container)
+map_printer_fn(ccc_user_type const container)
 {
-    struct val const *const v = container;
+    struct val const *const v = container.user_type;
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
 BEGIN_TEST(insert_shuffled, ccc_ordered_map *m, struct val vals[],
            size_t const size, int const larger_prime)
 {
-    /* Math magic ahead so that we iterate over every index
-       eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
-       easier to debug if something goes wrong. Think
-       of the prime number as a random seed, kind of. */
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
