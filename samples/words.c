@@ -396,6 +396,7 @@ clean_word(struct str_arena *const a, str_view word)
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
     char const *const w = str_arena_at(a, str);
+    assert(w);
     if (!isalpha(*w) || !isalpha(*(w + (str_len - 1))))
     {
         str_arena_free_to_pos(a, str, str_len);
@@ -449,8 +450,10 @@ str_arena_push_back(struct str_arena *const a, str_ofs const str,
     {
         return false;
     }
-    *(str_arena_at(a, str) + str_len) = c;
-    *(str_arena_at(a, str) + str_len + 1) = '\0';
+    char *const pos = str_arena_at(a, str);
+    assert(pos);
+    *(pos + str_len) = c;
+    *(pos + str_len + 1) = '\0';
     a->next_free_pos += 2;
     return true;
 }
@@ -552,7 +555,10 @@ cmp_string_keys(ccc_key_cmp const c)
     struct word const *const w = c.user_type;
     struct str_arena const *const a = c.aux;
     str_ofs const id = *((str_ofs *)c.key);
-    int const res = strcmp(str_arena_at(a, id), str_arena_at(a, w->ofs));
+    char const *const key_word = str_arena_at(a, id);
+    char const *const struct_word = str_arena_at(a, w->ofs);
+    assert(key_word && struct_word);
+    int const res = strcmp(key_word, struct_word);
     if (res > 0)
     {
         return CCC_GRT;
@@ -576,8 +582,10 @@ cmp_freqs(ccc_cmp const c)
     {
         return cmp;
     }
-    int const res
-        = strcmp(str_arena_at(arena, a->ofs), str_arena_at(arena, b->ofs));
+    char const *const a_word = str_arena_at(arena, a->ofs);
+    char const *const b_word = str_arena_at(arena, b->ofs);
+    assert(a_word && b_word);
+    int const res = strcmp(a_word, b_word);
     if (res > 0)
     {
         return CCC_LES;
@@ -594,7 +602,8 @@ print_word(ccc_user_type const u)
 {
     struct word const *const w = u.user_type;
     struct str_arena const *const a = u.aux;
-    printf("{%s, %d}", str_arena_at(a, w->ofs), w->freq);
+    char const *const struct_word = str_arena_at(a, w->ofs);
+    printf("{%s, %d}", struct_word, w->freq);
 }
 
 /*=======================   CLI Helpers    ==================================*/
