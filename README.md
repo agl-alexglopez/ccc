@@ -8,5 +8,5 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 
 ## About
 
-Currently all Containers provided by this library can be viewed in the [`ccc/`](/ccc/) folder. More details on usage and design of the library is coming soon.
+These containers are functional, but still a work in progress. A release version is not yet ready. All ontainers provided by this library can be viewed in the [`ccc/`](/ccc/) folder. More details on usage and design of the library is coming soon.
 
