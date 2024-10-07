@@ -941,8 +941,7 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
    without any input from the user. Our seach evaluates a threeway
    comparison to decide which branch to take in the tree or if we
    found the desired element. Simply force the function to always
-   return one or the other and we will end up at the max or min
-   NOLINTBEGIN(*swappable-parameters) */
+   return one or the other and we will end up at the max or min */
 static ccc_threeway_cmp
 force_find_grt([[maybe_unused]] ccc_key_cmp const cmp)
 {
@@ -955,7 +954,7 @@ force_find_les([[maybe_unused]] ccc_key_cmp const cmp)
     return CCC_LES;
 }
 
-/* NOLINTEND(*swappable-parameters) NOLINTBEGIN(*misc-no-recursion) */
+/* NOLINTBEGIN(*misc-no-recursion) */
 
 /* ======================        Debugging           ====================== */
 
