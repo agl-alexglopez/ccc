@@ -12,7 +12,7 @@ typedef struct ccc_buf_ ccc_buffer;
 #define ccc_buf_init(mem_ptr, capacity, alloc_fn)                              \
     ccc_impl_buf_init(mem_ptr, capacity, alloc_fn)
 
-ccc_result ccc_buf_realloc(ccc_buffer *, size_t new_capacity, ccc_alloc_fn *);
+ccc_result ccc_buf_alloc(ccc_buffer *, size_t capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);
 size_t ccc_buf_size(ccc_buffer const *);
 
@@ -39,8 +39,6 @@ ccc_result ccc_buf_swap(ccc_buffer *, char tmp[], size_t i, size_t j);
 ccc_result ccc_buf_write(ccc_buffer *, size_t i, void const *data);
 ccc_result ccc_buf_erase(ccc_buffer *, size_t i);
 
-ccc_result ccc_buf_free(ccc_buffer *, ccc_alloc_fn *);
-
 void *ccc_buf_begin(ccc_buffer const *);
 void *ccc_buf_next(ccc_buffer const *, void const *);
 void *ccc_buf_end(ccc_buffer const *);
@@ -54,7 +52,7 @@ void *ccc_buf_capacity_end(ccc_buffer const *);
 #ifndef BUFFER_USING_NAMESPACE_CCC
 typedef ccc_buffer buffer;
 #    define buf_init(args...) ccc_buf_init(args)
-#    define buf_realloc(args...) ccc_buf_realloc(args)
+#    define buf_alloc(args...) ccc_buf_alloc(args)
 #    define buf_base(args...) ccc_buf_base(args)
 #    define buf_size(args...) ccc_buf_size(args)
 #    define buf_size_plus(args...) ccc_buf_size_plus(args)
@@ -76,7 +74,6 @@ typedef ccc_buffer buffer;
 #    define buf_swap(args...) ccc_buf_swap(args)
 #    define buf_write(args...) ccc_buf_write(args)
 #    define buf_erase(args...) ccc_buf_erase(args)
-#    define buf_free(args...) ccc_buf_free(args)
 #    define buf_begin(args...) ccc_buf_begin(args)
 #    define buf_next(args...) ccc_buf_next(args)
 #    define buf_end(args...) ccc_buf_end(args)

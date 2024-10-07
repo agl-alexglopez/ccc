@@ -62,6 +62,7 @@ bool ccc_dll_empty(ccc_doubly_linked_list const *);
 void ccc_dll_clear_and_free(ccc_doubly_linked_list *, ccc_destructor_fn *);
 
 bool ccc_dll_validate(ccc_doubly_linked_list const *);
+void ccc_dll_print(ccc_doubly_linked_list const *, ccc_print_fn *);
 
 #ifdef DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef ccc_dll_elem dll_elem;
@@ -93,6 +94,7 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_empty(args...) ccc_dll_empty(args)
 #    define dll_clear_and_free(args...) ccc_dll_clear_and_free(args)
 #    define dll_validate(args...) ccc_dll_validate(args)
+#    define dll_print(args...) ccc_dll_print(args)
 #endif /* DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC */
 
 #endif /* CCC_LIST_H */

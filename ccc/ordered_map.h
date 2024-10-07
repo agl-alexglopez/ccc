@@ -161,8 +161,7 @@ bool ccc_om_empty(ccc_ordered_map const *);
 
 size_t ccc_om_size(ccc_ordered_map const *);
 
-void ccc_om_print(ccc_ordered_map const *, ccc_o_map_elem const *,
-                  ccc_print_fn *);
+void ccc_om_print(ccc_ordered_map const *, ccc_print_fn *);
 
 bool ccc_om_validate(ccc_ordered_map const *);
 

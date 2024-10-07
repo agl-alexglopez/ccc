@@ -250,8 +250,7 @@ BEGIN_STATIC_TEST(depq_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_depq_print(&pq, &((struct val *)ccc_depq_root(&pq))->elem,
-                   depq_printer_fn);
+    ccc_depq_print(&pq, depq_printer_fn);
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;

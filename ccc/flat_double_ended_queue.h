@@ -47,6 +47,7 @@ void *ccc_fdeq_end(ccc_flat_double_ended_queue const *fq);
 void *ccc_fdeq_rend(ccc_flat_double_ended_queue const *fq);
 
 bool ccc_fdeq_validate(ccc_flat_double_ended_queue const *fq);
+void ccc_fdeq_print(ccc_flat_double_ended_queue const *fq, ccc_print_fn *);
 
 #ifdef FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_double_ended_queue flat_double_ended_queue;
@@ -72,6 +73,8 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_rnext(args...) ccc_fdeq_rnext(args)
 #    define fdeq_end(args...) ccc_fdeq_end(args)
 #    define fdeq_rend(args...) ccc_fdeq_rend(args)
+#    define fdeq_validate(args...) ccc_fdeq_validate(args)
+#    define fdeq_print(args...) ccc_fdeq_print(args)
 #endif /* FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC */
 
 #endif /* CCC_FLAT_DOUBLE_ENDED_QUEUE_H */

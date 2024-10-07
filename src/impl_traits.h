@@ -640,4 +640,30 @@
         ccc_flat_realtime_ordered_map const *: ccc_frm_validate,               \
         ccc_realtime_ordered_map const *: ccc_rom_validate)((container_ptr))
 
+#define ccc_impl_print(container_ptr, printer_fn)                              \
+    _Generic((container_ptr),                                                  \
+        ccc_flat_hash_map *: ccc_fhm_print,                                    \
+        ccc_ordered_map *: ccc_om_print,                                       \
+        ccc_flat_ordered_map *: ccc_fom_print,                                 \
+        ccc_flat_priority_queue *: ccc_fpq_print,                              \
+        ccc_flat_double_ended_queue *: ccc_fdeq_print,                         \
+        ccc_double_ended_priority_queue *: ccc_depq_print,                     \
+        ccc_priority_queue *: ccc_pq_print,                                    \
+        ccc_singly_linked_list *: ccc_sll_print,                               \
+        ccc_doubly_linked_list *: ccc_dll_print,                               \
+        ccc_realtime_ordered_map *: ccc_rom_print,                             \
+        ccc_flat_realtime_ordered_map *: ccc_frm_print,                        \
+        ccc_flat_hash_map const *: ccc_fhm_print,                              \
+        ccc_ordered_map const *: ccc_om_print,                                 \
+        ccc_flat_ordered_map const *: ccc_fom_print,                           \
+        ccc_flat_priority_queue const *: ccc_fpq_print,                        \
+        ccc_flat_double_ended_queue const *: ccc_fdeq_print,                   \
+        ccc_double_ended_priority_queue const *: ccc_depq_print,               \
+        ccc_priority_queue const *: ccc_pq_print,                              \
+        ccc_singly_linked_list const *: ccc_sll_print,                         \
+        ccc_doubly_linked_list const *: ccc_dll_print,                         \
+        ccc_flat_realtime_ordered_map const *: ccc_frm_print,                  \
+        ccc_realtime_ordered_map const *: ccc_rom_print)((container_ptr),      \
+                                                         (printer_fn))
+
 #endif /* CCC_IMPL_TRAITS_H */

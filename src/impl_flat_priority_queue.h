@@ -53,7 +53,7 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
         if (ccc_buf_size(&fpq_->buf_) == ccc_buf_capacity(&fpq_->buf_))        \
         {                                                                      \
             fpq_res_ = NULL;                                                   \
-            ccc_result const extra_space_ = ccc_buf_realloc(                   \
+            ccc_result const extra_space_ = ccc_buf_alloc(                     \
                 &fpq_->buf_, ccc_buf_capacity(&fpq_->buf_) * 2,                \
                 fpq_->buf_.alloc_);                                            \
             if (extra_space_ == CCC_OK)                                        \

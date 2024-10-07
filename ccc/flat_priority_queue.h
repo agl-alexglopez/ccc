@@ -1,7 +1,6 @@
 #ifndef CCC_FLAT_PRIORITY_QUEUE_H
 #define CCC_FLAT_PRIORITY_QUEUE_H
 
-/* Privately linked implementation. */
 #include "impl_flat_priority_queue.h"
 #include "types.h"
 

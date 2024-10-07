@@ -401,14 +401,14 @@ ccc_fom_clear_and_free(ccc_flat_ordered_map *const frm,
     if (!fn)
     {
         frm->root_ = 0;
-        return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
+        return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
     }
     while (!ccc_fom_empty(frm))
     {
         void *const deleted = erase(frm, key_at(frm, frm->root_));
         fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
     }
-    return ccc_buf_realloc(&frm->buf_, 0, frm->buf_.alloc_);
+    return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
 }
 
 void *

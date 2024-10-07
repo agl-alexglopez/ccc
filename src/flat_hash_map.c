@@ -463,7 +463,7 @@ ccc_impl_fhm_maybe_resize(struct ccc_fhm_ *h)
                                 ccc_buf_index_of(&new_hash.buf_, new_ent.e_));
         }
     }
-    (void)ccc_buf_realloc(&h->buf_, 0, h->buf_.alloc_);
+    (void)ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
     *h = new_hash;
     return CCC_OK;
 }
@@ -518,7 +518,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     if (!fn)
     {
         h->buf_.sz_ = 0;
-        return ccc_buf_free(&h->buf_, h->buf_.alloc_);
+        return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
     }
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
@@ -529,7 +529,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn((ccc_user_type_mut){.user_type = slot, .aux = h->aux_});
         }
     }
-    return ccc_buf_free(&h->buf_, h->buf_.alloc_);
+    return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
 }
 
 size_t

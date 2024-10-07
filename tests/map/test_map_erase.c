@@ -38,7 +38,7 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_om_print(&s, &((struct val *)ccc_om_root(&s))->elem, map_printer_fn);
+    ccc_om_print(&s, map_printer_fn);
     CHECK(ccc_om_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {

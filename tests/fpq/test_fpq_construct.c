@@ -84,8 +84,6 @@ BEGIN_STATIC_TEST(pq_test_heapify_init)
     }
     ccc_flat_priority_queue pq = ccc_fpq_heapify_init(
         heap, (sizeof(heap) / sizeof(int)), size, CCC_LES, NULL, int_cmp, NULL);
-    ccc_fpq_print(&pq, 0, int_print);
-    printf("\n");
     int prev = *((int *)ccc_fpq_front(&pq));
     ccc_fpq_pop(&pq);
     while (!ccc_fpq_empty(&pq))
@@ -111,8 +109,6 @@ BEGIN_STATIC_TEST(pq_test_heapify_copy)
     }
     CHECK(ccc_fpq_heapify(&pq, input, sizeof(input) / sizeof(int), sizeof(int)),
           CCC_OK);
-    ccc_fpq_print(&pq, 0, int_print);
-    printf("\n");
     CHECK(ccc_fpq_size(&pq), sizeof(input) / sizeof(int));
     int prev = *((int *)ccc_fpq_front(&pq));
     ccc_fpq_pop(&pq);

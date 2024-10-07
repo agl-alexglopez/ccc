@@ -11,20 +11,19 @@ static size_t const start_capacity = 8;
 static void *at(ccc_buffer const *, size_t);
 
 ccc_result
-ccc_buf_realloc(ccc_buffer *buf, size_t const new_capacity,
-                ccc_alloc_fn *const fn)
+ccc_buf_alloc(ccc_buffer *buf, size_t const capacity, ccc_alloc_fn *const fn)
 {
     if (!fn)
     {
         return CCC_NO_REALLOC;
     }
-    void *const new_mem = fn(buf->mem_, buf->elem_sz_ * new_capacity);
-    if (new_capacity && !new_mem)
+    void *const new_mem = fn(buf->mem_, buf->elem_sz_ * capacity);
+    if (capacity && !new_mem)
     {
         return CCC_MEM_ERR;
     }
     buf->mem_ = new_mem;
-    buf->capacity_ = new_capacity;
+    buf->capacity_ = capacity;
     return CCC_OK;
 }
 
@@ -55,8 +54,8 @@ ccc_buf_alloc_back(ccc_buffer *buf)
 {
     if (buf->sz_ == buf->capacity_
         && (CCC_OK != buf->capacity_
-                ? ccc_buf_realloc(buf, buf->capacity_ * 2, buf->alloc_)
-                : ccc_buf_realloc(buf, start_capacity, buf->alloc_)))
+                ? ccc_buf_alloc(buf, buf->capacity_ * 2, buf->alloc_)
+                : ccc_buf_alloc(buf, start_capacity, buf->alloc_)))
     {
         return NULL;
     }
@@ -135,19 +134,6 @@ ccc_buf_erase(ccc_buffer *buf, size_t const i)
     (void)memcpy(at(buf, i), at(buf, i + 1),
                  buf->elem_sz_ * (buf->sz_ - (i + 1)));
     --buf->sz_;
-    return CCC_OK;
-}
-
-ccc_result
-ccc_buf_free(ccc_buffer *buf, ccc_alloc_fn *fn)
-{
-    if (!buf->capacity_ || !fn)
-    {
-        return CCC_MEM_ERR;
-    }
-    buf->capacity_ = 0;
-    buf->sz_ = 0;
-    fn(buf->mem_, 0);
     return CCC_OK;
 }
 

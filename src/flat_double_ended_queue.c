@@ -463,6 +463,17 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
 }
 
 void
+ccc_fdeq_print(ccc_flat_double_ended_queue const *const fq,
+               ccc_print_fn *const fn)
+{
+    for (void const *iter = ccc_fdeq_begin(fq); iter != ccc_fdeq_end(fq);
+         iter = ccc_fdeq_next(fq, iter))
+    {
+        fn((ccc_user_type){.user_type = iter, .aux = fq->aux_});
+    }
+}
+
+void
 ccc_fdeq_clear(ccc_flat_double_ended_queue *const fq,
                ccc_destructor_fn *destructor)
 {
@@ -495,7 +506,7 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
     if (!destructor)
     {
         fq->buf_.sz_ = fq->front_ = 0;
-        ccc_buf_realloc(&fq->buf_, 0, fq->buf_.alloc_);
+        ccc_buf_alloc(&fq->buf_, 0, fq->buf_.alloc_);
         return;
     }
     size_t const back = back_free_slot(fq);
@@ -504,7 +515,7 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
         destructor((ccc_user_type_mut){.user_type = ccc_buf_at(&fq->buf_, i),
                                        .aux = fq->aux_});
     }
-    (void)ccc_buf_realloc(&fq->buf_, 0, fq->buf_.alloc_);
+    (void)ccc_buf_alloc(&fq->buf_, 0, fq->buf_.alloc_);
 }
 
 static inline ccc_result
@@ -539,7 +550,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
                      ccc_buf_base(&q->buf_),
                      elem_sz * (ccc_buf_size(&q->buf_) - first_chunk));
     }
-    (void)ccc_buf_realloc(&q->buf_, 0, q->buf_.alloc_);
+    (void)ccc_buf_alloc(&q->buf_, 0, q->buf_.alloc_);
     q->buf_.mem_ = new_mem;
     q->front_ = 0;
     q->buf_.capacity_ = new_cap;

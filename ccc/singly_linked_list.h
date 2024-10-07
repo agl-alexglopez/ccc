@@ -44,6 +44,7 @@ size_t ccc_sll_size(ccc_singly_linked_list const *sll);
 bool ccc_sll_empty(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);
+void ccc_sll_print(ccc_singly_linked_list const *sll, ccc_print_fn *fn);
 void ccc_sll_clear_and_free(ccc_singly_linked_list *sll, ccc_destructor_fn *fn);
 
 #ifdef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
@@ -62,6 +63,7 @@ typedef ccc_singly_linked_list singly_linked_list;
 #    define sll_size(args...) ccc_sll_size(args)
 #    define sll_empty(args...) ccc_sll_empty(args)
 #    define sll_validate(args...) ccc_sll_validate(args)
+#    define sll_print(args...) ccc_sll_print(args)
 #endif /* SINGLY_LINKED_LIST_USING_NAMESPACE_CCC */
 
 #endif /* CCC_FORWARD_LIST_H */

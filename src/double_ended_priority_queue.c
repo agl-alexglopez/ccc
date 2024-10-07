@@ -75,9 +75,8 @@ static void link_trees(struct ccc_tree_ *, struct ccc_node_ *, enum tree_link_,
                        struct ccc_node_ *);
 static void add_duplicate(struct ccc_tree_ *, struct ccc_node_ *,
                           struct ccc_node_ *, struct ccc_node_ *);
-static void ccc_tree_print(struct ccc_tree_ const *t,
-                           struct ccc_node_ const *root,
-                           ccc_print_fn *fn_print);
+static void tree_print(struct ccc_tree_ const *t, struct ccc_node_ const *root,
+                       ccc_print_fn *fn_print);
 
 /* Boolean returns */
 
@@ -363,9 +362,9 @@ ccc_depq_size(ccc_double_ended_priority_queue const *const pq)
 
 void
 ccc_depq_print(ccc_double_ended_priority_queue const *const pq,
-               ccc_depq_elem const *const start, ccc_print_fn *const fn)
+               ccc_print_fn *const fn)
 {
-    ccc_tree_print(&pq->impl_, &start->impl_, fn);
+    tree_print(&pq->impl_, pq->impl_.root_, fn);
 }
 
 bool
@@ -1249,8 +1248,8 @@ print_inner_tree(struct ccc_node_ const *const root, size_t const parent_size,
    is an error in parent tracking. The child does not track the parent
    correctly if this occurs and this will cause subtle delayed bugs. */
 static void
-ccc_tree_print(struct ccc_tree_ const *const t,
-               struct ccc_node_ const *const root, ccc_print_fn *const fn_print)
+tree_print(struct ccc_tree_ const *const t, struct ccc_node_ const *const root,
+           ccc_print_fn *const fn_print)
 {
     if (root == &t->end_)
     {

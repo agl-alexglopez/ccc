@@ -349,6 +349,16 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     return size == l->sz_;
 }
 
+void
+ccc_dll_print(ccc_doubly_linked_list const *const l, ccc_print_fn *const fn)
+{
+    for (void const *base = ccc_dll_begin(l); base != ccc_dll_end(l);
+         base = ccc_dll_next(l, ccc_dll_elem_in(l, base)))
+    {
+        fn((ccc_user_type){.user_type = base, .aux = l->aux_});
+    }
+}
+
 struct ccc_dll_elem_ *
 ccc_dll_elem_in(struct ccc_dll_ const *const l, void const *const user_struct)
 {

@@ -1,16 +1,3 @@
-/* Author: Alexander G. Lopez
- --------------------------
- This is the Double Ended Priority Queue interface implemented via Splay
- Tree. In this case we modify a Splay Tree to allow for
- a Double Ended Priority Queue (aka a sorted Multi-Set). See the
- normal set interface as well. While a Red-Black Tree
- would be the more optimal data structure to support
- a DEPQ the underlying implementation of a Splay Tree
- offers some interesting tradeoffs for systems programmers.
- They are working sets that keep frequently (Least
- Recently Used) elements close to the root even if their
- runtime is amortized O(lgN). With the right use cases we
- can frequently benefit from O(1) operations. */
 #ifndef CCC_DOUBLE_ENDED_PRIORITY_QUEUE_H
 #define CCC_DOUBLE_ENDED_PRIORITY_QUEUE_H
 
@@ -97,8 +84,7 @@ ccc_rrange ccc_depq_equal_rrange(ccc_double_ended_priority_queue *,
 
 void *ccc_depq_root(ccc_double_ended_priority_queue const *);
 
-void ccc_depq_print(ccc_double_ended_priority_queue const *,
-                    ccc_depq_elem const *, ccc_print_fn *);
+void ccc_depq_print(ccc_double_ended_priority_queue const *, ccc_print_fn *);
 
 bool ccc_depq_validate(ccc_double_ended_priority_queue const *);
 

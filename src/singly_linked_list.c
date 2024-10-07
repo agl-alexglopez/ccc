@@ -228,6 +228,16 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     return size == sll->sz_;
 }
 
+void
+ccc_sll_print(ccc_singly_linked_list const *const l, ccc_print_fn *const fn)
+{
+    for (void const *base = ccc_sll_begin(l); base != ccc_sll_end(l);
+         base = ccc_sll_next(l, ccc_sll_elem_in(l, base)))
+    {
+        fn((ccc_user_type){.user_type = base, .aux = l->aux_});
+    }
+}
+
 size_t
 ccc_sll_size(ccc_singly_linked_list const *const sll)
 {

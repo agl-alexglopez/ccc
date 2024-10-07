@@ -47,7 +47,7 @@ ccc_result
 ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
                 ccc_alloc_fn *const fn)
 {
-    return ccc_buf_realloc(&fpq->buf_, new_capacity, fn);
+    return ccc_buf_alloc(&fpq->buf_, new_capacity, fn);
 }
 
 void
@@ -76,7 +76,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const input_array,
     if (input_n + 1 > ccc_buf_capacity(&fpq->buf_))
     {
         ccc_result const resize_res
-            = ccc_buf_realloc(&fpq->buf_, input_n + 1, fpq->buf_.alloc_);
+            = ccc_buf_alloc(&fpq->buf_, input_n + 1, fpq->buf_.alloc_);
         if (resize_res != CCC_OK)
         {
             return resize_res;
@@ -100,7 +100,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
     if (ccc_buf_size(&fpq->buf_) == ccc_buf_capacity(&fpq->buf_))
     {
         new = NULL;
-        ccc_result const extra_space = ccc_buf_realloc(
+        ccc_result const extra_space = ccc_buf_alloc(
             &fpq->buf_, ccc_buf_capacity(&fpq->buf_) * 2, fpq->buf_.alloc_);
         if (extra_space == CCC_OK)
         {
@@ -289,7 +289,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
             fn((ccc_user_type_mut){.user_type = at(fpq, i), .aux = fpq->aux_});
         }
     }
-    return ccc_buf_realloc(&fpq->buf_, 0, fpq->buf_.alloc_);
+    return ccc_buf_alloc(&fpq->buf_, 0, fpq->buf_.alloc_);
 }
 
 bool
