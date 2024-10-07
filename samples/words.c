@@ -28,7 +28,7 @@ enum action_type
 
 enum word_clean_status
 {
-    WC_CLEAN,
+    WC_CLEAN_WORD,
     WC_NOT_WORD,
     WC_ARENA_ERR,
 };
@@ -50,17 +50,17 @@ struct str_arena
 struct frequency
 {
     /* If arena resizes, string is not lost. This is an offset. */
-    str_ofs arena_pos;
+    str_ofs ofs;
     /* How many times the word is encountered. Key for priority queue. */
     int freq;
 };
 
 struct word
 {
-    str_ofs arena_pos;
+    str_ofs ofs;
     int freq;
     /* Map element for logging frequencies by string key, freq value. */
-    f_om_elem map_elem;
+    f_om_elem e;
 };
 
 struct frequency_alloc
@@ -142,7 +142,8 @@ static ccc_result str_arena_maybe_resize(struct str_arena *,
                                          size_t byte_request);
 static ccc_result str_arena_maybe_resize_pos(struct str_arena *,
                                              size_t furthest_pos);
-static void str_arena_free_to_pos(struct str_arena *, str_ofs last_pos);
+static void str_arena_free_to_pos(struct str_arena *, str_ofs last_str,
+                                  size_t str_len);
 static bool str_arena_push_back(struct str_arena *, str_ofs str, size_t len,
                                 char);
 static void str_arena_free(struct str_arena *);
@@ -243,18 +244,18 @@ print_found(FILE *const f, str_view w)
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     assert(!empty(&map));
-    struct clean_word w_clean = clean_word(&a, w);
-    assert(w_clean.stat != WC_ARENA_ERR);
-    if (w_clean.stat != WC_CLEAN)
+    struct clean_word wc = clean_word(&a, w);
+    assert(wc.stat != WC_ARENA_ERR);
+    if (wc.stat != WC_CLEAN_WORD)
     {
         return;
     }
-    struct word const *const word = get_key_val(&map, &w_clean.str);
+    struct word const *const word = get_key_val(&map, &wc.str);
     if (!word)
     {
         return;
     }
-    printf("%s %d\n", str_arena_at(&a, word->arena_pos), word->freq);
+    printf("%s %d\n", str_arena_at(&a, word->ofs), word->freq);
 }
 
 static void
@@ -316,9 +317,9 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
     assert(freqs);
     size_t i = 0;
     for (struct word *w = begin(map); w != end(map) && i < cap;
-         w = next(map, &w->map_elem), ++i)
+         w = next(map, &w->e), ++i)
     {
-        freqs[i].arena_pos = w->arena_pos;
+        freqs[i].ofs = w->ofs;
         freqs[i].freq = w->freq;
     }
     return (struct frequency_alloc){.arr = freqs, .cap = cap};
@@ -331,8 +332,7 @@ print_n(ccc_flat_priority_queue *const fpq, struct str_arena const *const a,
     for (int w = 0; w < n && !empty(fpq); ++w)
     {
         struct frequency *const word = front(fpq);
-        printf("%d. %s %d\n", w + 1, str_arena_at(a, word->arena_pos),
-               word->freq);
+        printf("%d. %s %d\n", w + 1, str_arena_at(a, word->ofs), word->freq);
         pop(fpq);
     }
 }
@@ -345,22 +345,20 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     char *lineptr = NULL;
     size_t len = 0;
     ssize_t read = 0;
-    ccc_flat_ordered_map fom
-        = ccc_fom_init((struct word *)NULL, 0, map_elem, arena_pos, realloc,
-                       cmp_string_keys, a);
+    ccc_flat_ordered_map fom = ccc_fom_init((struct word *)NULL, 0, e, ofs,
+                                            realloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .sz = read - 1};
-        for (str_view tok = sv_begin_tok(line, space); !sv_end_tok(line, tok);
-             tok = sv_next_tok(line, tok, space))
+        for (str_view word = sv_begin_tok(line, space); !sv_end_tok(line, word);
+             word = sv_next_tok(line, word, space))
         {
-            struct clean_word const cleaned = clean_word(a, tok);
-            assert(cleaned.stat != WC_ARENA_ERR);
-            if (cleaned.stat == WC_CLEAN)
+            struct clean_word const cw = clean_word(a, word);
+            assert(cw.stat != WC_ARENA_ERR);
+            if (cw.stat == WC_CLEAN_WORD)
             {
                 struct word *const w = or_insert(
-                    entry_vr(&fom, &cleaned.str),
-                    &(struct word){.arena_pos = cleaned.str}.map_elem);
+                    entry_vr(&fom, &cw.str), &(struct word){.ofs = cw.str}.e);
                 assert(w);
                 ++w->freq;
             }
@@ -383,13 +381,15 @@ clean_word(struct str_arena *const a, str_view word)
     size_t str_len = 0;
     for (char const *c = sv_begin(word); c != sv_end(word); c = sv_next(c))
     {
-        if (isalpha(*c) || *c == '-')
+        if (!isalpha(*c) && *c != '-')
         {
-            [[maybe_unused]] bool const pushed_char
-                = str_arena_push_back(a, str, str_len, (char)tolower(*c));
-            assert(pushed_char);
-            ++str_len;
+            str_arena_free_to_pos(a, str, str_len);
+            return (struct clean_word){.stat = WC_NOT_WORD};
         }
+        [[maybe_unused]] bool const pushed_char
+            = str_arena_push_back(a, str, str_len, (char)tolower(*c));
+        assert(pushed_char);
+        ++str_len;
     }
     if (!str_len)
     {
@@ -398,10 +398,10 @@ clean_word(struct str_arena *const a, str_view word)
     char const *const w = str_arena_at(a, str);
     if (!isalpha(*w) || !isalpha(*(w + (str_len - 1))))
     {
-        str_arena_free_to_pos(a, str);
+        str_arena_free_to_pos(a, str, str_len);
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
-    return (struct clean_word){.str = str, .stat = WC_CLEAN};
+    return (struct clean_word){.str = str, .stat = WC_CLEAN_WORD};
 }
 
 /*=======================   Str Arena Allocator   ===========================*/
@@ -420,6 +420,8 @@ str_arena_create(size_t const cap)
     return a;
 }
 
+/* Allocates exactly bytes bytes from the arena. Do not forget the null
+   terminator in requests if a string is requested. */
 static ssize_t
 str_arena_alloc(struct str_arena *const a, size_t const bytes)
 {
@@ -463,7 +465,7 @@ str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
     if (a->next_free_pos + byte_request >= a->cap)
     {
         size_t const new_cap = (a->next_free_pos + byte_request) * 2;
-        void *moved_arena = realloc(a->arena, new_cap);
+        void *const moved_arena = realloc(a->arena, new_cap);
         if (!moved_arena)
         {
             return CCC_MEM_ERR;
@@ -485,7 +487,7 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
     if (furthest_pos >= a->cap)
     {
         size_t const new_cap = (furthest_pos) * 2;
-        void *moved_arena = realloc(a->arena, new_cap);
+        void *const moved_arena = realloc(a->arena, new_cap);
         if (!moved_arena)
         {
             return CCC_MEM_ERR;
@@ -502,14 +504,18 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
    allocated position or all strings between end and last_pos are
    invalidated. */
 static void
-str_arena_free_to_pos(struct str_arena *const a, str_ofs const last_pos)
+str_arena_free_to_pos(struct str_arena *const a, str_ofs const last_str,
+                      size_t const str_len)
 {
     if (!a || !a->arena || !a->cap || !a->next_free_pos)
     {
         return;
     }
-    memset(a->arena + last_pos, '\0', a->next_free_pos - last_pos);
-    a->next_free_pos = last_pos;
+    if (str_len)
+    {
+        memset(a->arena + last_str, '\0', str_len);
+    }
+    a->next_free_pos = last_str;
 }
 
 static void
@@ -546,7 +552,7 @@ cmp_string_keys(ccc_key_cmp const c)
     struct word const *const w = c.user_type;
     struct str_arena const *const a = c.aux;
     str_ofs const id = *((str_ofs *)c.key);
-    int const res = strcmp(str_arena_at(a, id), str_arena_at(a, w->arena_pos));
+    int const res = strcmp(str_arena_at(a, id), str_arena_at(a, w->ofs));
     if (res > 0)
     {
         return CCC_GRT;
@@ -570,8 +576,8 @@ cmp_freqs(ccc_cmp const c)
     {
         return cmp;
     }
-    int const res = strcmp(str_arena_at(arena, a->arena_pos),
-                           str_arena_at(arena, b->arena_pos));
+    int const res
+        = strcmp(str_arena_at(arena, a->ofs), str_arena_at(arena, b->ofs));
     if (res > 0)
     {
         return CCC_LES;
@@ -588,7 +594,7 @@ print_word(ccc_user_type const u)
 {
     struct word const *const w = u.user_type;
     struct str_arena const *const a = u.aux;
-    printf("{%s, %d}", str_arena_at(a, w->arena_pos), w->freq);
+    printf("{%s, %d}", str_arena_at(a, w->ofs), w->freq);
 }
 
 /*=======================   CLI Helpers    ==================================*/
