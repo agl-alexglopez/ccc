@@ -11,17 +11,20 @@
 BEGIN_STATIC_TEST(sll_test_insert_three)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
-    CHECK(push_front(&sll, &(struct val){}.e) != NULL, true);
+    struct val v0 = (struct val){};
+    CHECK(push_front(&sll, &v0.e) != NULL, true);
     struct val *v = front(&sll);
     CHECK(validate(&sll), true);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
-    CHECK(push_front(&sll, &(struct val){.val = 1}.e) != NULL, true);
+    struct val v1 = (struct val){.val = 1};
+    CHECK(push_front(&sll, &v1.e) != NULL, true);
     CHECK(validate(&sll), true);
     v = front(&sll);
     CHECK(v == NULL, false);
     CHECK(v->val, 1);
-    CHECK(push_front(&sll, &(struct val){.val = 2}.e) != NULL, true);
+    struct val v2 = (struct val){.val = 2};
+    CHECK(push_front(&sll, &v2.e) != NULL, true);
     CHECK(validate(&sll), true);
     v = front(&sll);
     CHECK(v == NULL, false);

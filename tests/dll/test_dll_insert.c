@@ -11,11 +11,14 @@
 BEGIN_STATIC_TEST(dll_test_push_three_front)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    CHECK(push_front(&dll, &(struct val){}.e) != NULL, true);
+    struct val v0 = {};
+    CHECK(push_front(&dll, &v0.e) != NULL, true);
     CHECK(validate(&dll), true);
-    CHECK(push_front(&dll, &(struct val){.id = 1, .val = 1}.e) != NULL, true);
+    struct val v1 = {.id = 1, .val = 1};
+    CHECK(push_front(&dll, &v1.e) != NULL, true);
     CHECK(validate(&dll), true);
-    CHECK(push_front(&dll, &(struct val){.id = 2, .val = 2}.e) != NULL, true);
+    struct val v2 = {.id = 2, .val = 2};
+    CHECK(push_front(&dll, &v2.e) != NULL, true);
     CHECK(validate(&dll), true);
     CHECK(size(&dll), 3);
     struct val *v = dll_front(&dll);
@@ -30,11 +33,14 @@ BEGIN_STATIC_TEST(dll_test_push_three_front)
 BEGIN_STATIC_TEST(dll_test_push_three_back)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    CHECK(push_back(&dll, &(struct val){}.e) != NULL, true);
+    struct val v0 = {};
+    CHECK(push_back(&dll, &v0.e) != NULL, true);
     CHECK(validate(&dll), true);
-    CHECK(push_back(&dll, &(struct val){.id = 1, .val = 1}.e) != NULL, true);
+    struct val v1 = {.id = 1, .val = 1};
+    CHECK(push_back(&dll, &v1.e) != NULL, true);
     CHECK(validate(&dll), true);
-    CHECK(push_back(&dll, &(struct val){.id = 2, .val = 2}.e) != NULL, true);
+    struct val v2 = {.id = 2, .val = 2};
+    CHECK(push_back(&dll, &v2.e) != NULL, true);
     CHECK(validate(&dll), true);
     CHECK(size(&dll), 3);
     struct val *v = dll_front(&dll);
