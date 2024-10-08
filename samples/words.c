@@ -329,10 +329,18 @@ static void
 print_n(ccc_flat_priority_queue *const fpq, struct str_arena const *const a,
         int const n)
 {
+    if (n <= 0)
+    {
+        return;
+    }
     for (int w = 0; w < n && !empty(fpq); ++w)
     {
         struct frequency *const word = front(fpq);
-        printf("%d. %s %d\n", w + 1, str_arena_at(a, word->ofs), word->freq);
+        char const *const arena_str = str_arena_at(a, word->ofs);
+        if (arena_str)
+        {
+            printf("%d. %s %d\n", w + 1, arena_str, word->freq);
+        }
         pop(fpq);
     }
 }

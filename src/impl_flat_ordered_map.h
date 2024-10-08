@@ -35,7 +35,7 @@ struct ccc_fom_entry_
 #define ccc_impl_fom_init(mem_ptr, capacity, node_elem_field, key_elem_field,  \
                           alloc_fn, key_cmp_fn, aux_data)                      \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, capacity, alloc_fn), .root_ = 0,         \
+        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, capacity), .root_ = 0,         \
         .key_offset_ = offsetof(typeof(*(mem_ptr)), key_elem_field),           \
         .node_elem_offset_ = offsetof(typeof(*(mem_ptr)), node_elem_field),    \
         .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                              \

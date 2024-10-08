@@ -430,7 +430,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                    realloc, hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_double_ended_queue bfs
-        = ccc_fdeq_init((struct point *)NULL, 0, realloc, NULL);
+        = ccc_fdeq_init((struct point *)NULL, realloc, NULL, 0);
     [[maybe_unused]] ccc_entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
     assert(!insert_error(e));

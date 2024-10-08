@@ -26,7 +26,7 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 #define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \
                           aux_data)                                            \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, capacity, alloc_fn), .cmp_ = (cmp_fn),   \
+        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, capacity), .cmp_ = (cmp_fn),   \
         .order_ = (cmp_order), .aux_ = (aux_data),                             \
     }
 

@@ -16,10 +16,11 @@ struct ccc_fdeq_
 void *ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *);
 void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
 
-#define ccc_impl_fdeq_init(mem_ptr, capacity, alloc_fn, aux_data)              \
+#define ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity,              \
+                           optional_size...)                                   \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, capacity, alloc_fn), .front_ = 0,        \
-        .aux_ = (aux_data),                                                    \
+        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size),      \
+        .front_ = 0, .aux_ = (aux_data),                                       \
     }
 
 #define ccc_impl_fdeq_emplace_back(fq_ptr, value...)                           \

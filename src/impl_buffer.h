@@ -15,15 +15,21 @@ struct ccc_buf_
     ccc_alloc_fn *alloc_;
 };
 
-#define ccc_impl_buf_init(mem, capacity, alloc_fn)                             \
+#define IMPL_BUF_NON_IMPL_BUF_DEFAULT_SIZE(...) __VA_ARGS__
+#define IMPL_BUF_DEFAULT_SIZE(...) 0
+#define IMPL_BUF_OPTIONAL_SIZE(...)                                            \
+    __VA_OPT__(IMPL_BUF_NON_)##IMPL_BUF_DEFAULT_SIZE(__VA_ARGS__)
+
+#define ccc_impl_buf_init(mem, alloc_fn, capacity, ...)                        \
     {                                                                          \
-        .mem_ = (mem), .elem_sz_ = sizeof(*(mem)), .sz_ = 0,                   \
-        .capacity_ = (capacity), .alloc_ = (alloc_fn),                         \
+        .mem_ = (mem), .elem_sz_ = sizeof(*(mem)),                             \
+        .sz_ = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__), .capacity_ = (capacity),   \
+        .alloc_ = (alloc_fn),                                                  \
     }
 
 #define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \
     ({                                                                         \
-        typeof(type_initializer) *buf_res_;                                    \
+        typeof(type_initializer) *buf_res_ = NULL;                             \
         __auto_type i_ = (index);                                              \
         __auto_type emplace_buff_ptr_ = (ccc_buf_ptr);                         \
         assert(sizeof(typeof(*buf_res_))                                       \
@@ -38,7 +44,7 @@ struct ccc_buf_
 
 #define ccc_impl_buf_emplace_back(ccc_buf_ptr, type_initializer...)            \
     ({                                                                         \
-        typeof(type_initializer) *buf_res_;                                    \
+        typeof(type_initializer) *buf_res_ = NULL;                             \
         __auto_type emplace_back_buf_ptr_ = (ccc_buf_ptr);                     \
         assert(sizeof(typeof(*buf_res_))                                       \
                == ccc_buf_elem_size(emplace_back_buf_ptr_));                   \

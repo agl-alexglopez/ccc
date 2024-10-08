@@ -9,8 +9,8 @@
 
 typedef struct ccc_buf_ ccc_buffer;
 
-#define ccc_buf_init(mem_ptr, capacity, alloc_fn)                              \
-    ccc_impl_buf_init(mem_ptr, capacity, alloc_fn)
+#define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
+    ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
 
 ccc_result ccc_buf_alloc(ccc_buffer *, size_t capacity, ccc_alloc_fn *);
 void *ccc_buf_base(ccc_buffer const *);
