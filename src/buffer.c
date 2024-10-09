@@ -241,7 +241,7 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
 }
 
 size_t
-ccc_buf_index_of(ccc_buffer const *const buf, void const *const slot)
+ccc_buf_i(ccc_buffer const *const buf, void const *const slot)
 {
     assert(slot >= buf->mem_);
     assert((char *)slot

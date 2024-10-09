@@ -510,7 +510,7 @@ entry(struct ccc_fom_ *const fom, void const *const key)
     {
         return (struct ccc_fom_entry_){
             .fom_ = fom,
-            .i_ = ccc_buf_index_of(&fom->buf_, found),
+            .i_ = ccc_buf_i(&fom->buf_, found),
             .stats_ = CCC_ENTRY_OCCUPIED,
         };
     }
@@ -807,7 +807,7 @@ parent_i(struct ccc_fom_ const *const t, size_t const child)
 static inline size_t
 index_of(struct ccc_fom_ const *const t, struct ccc_fom_elem_ const *const elem)
 {
-    return ccc_buf_index_of(&t->buf_, struct_base(t, elem));
+    return ccc_buf_i(&t->buf_, struct_base(t, elem));
 }
 
 static inline size_t *

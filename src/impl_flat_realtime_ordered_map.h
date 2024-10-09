@@ -151,8 +151,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
                 (void)ccc_impl_frm_insert(                                     \
                     frm_try_ins_ent_.frm_, frm_try_ins_ent_.i_,                \
                     frm_try_ins_ent_.last_cmp_,                                \
-                    ccc_buf_index_of(&frm_try_ins_ent_.frm_->buf_,             \
-                                     frm_try_ins_ent_ret_.e_));                \
+                    ccc_buf_i(&frm_try_ins_ent_.frm_->buf_,                    \
+                              frm_try_ins_ent_ret_.e_));                       \
                 frm_try_ins_ent_ret_.stats_ = CCC_ENTRY_VACANT;                \
             }                                                                  \
         }                                                                      \
@@ -189,8 +189,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
                 (void)ccc_impl_frm_insert(                                     \
                     frm_ins_or_assign_ent_.frm_, frm_ins_or_assign_ent_.i_,    \
                     frm_ins_or_assign_ent_.last_cmp_,                          \
-                    ccc_buf_index_of(&frm_ins_or_assign_ent_.frm_->buf_,       \
-                                     frm_ins_or_assign_ent_ret_.e_));          \
+                    ccc_buf_i(&frm_ins_or_assign_ent_.frm_->buf_,              \
+                              frm_ins_or_assign_ent_ret_.e_));                 \
                 frm_ins_or_assign_ent_ret_.stats_ = CCC_ENTRY_VACANT;          \
             }                                                                  \
         }                                                                      \

@@ -430,7 +430,7 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
         return true;
     }
     void *iter = ccc_fdeq_begin(fq);
-    if (ccc_buf_index_of(&fq->buf_, iter) != fq->front_)
+    if (ccc_buf_i(&fq->buf_, iter) != fq->front_)
     {
         return false;
     }
@@ -448,7 +448,7 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
     }
     size = 0;
     iter = ccc_fdeq_rbegin(fq);
-    if (ccc_buf_index_of(&fq->buf_, iter) != last_elem_index(fq))
+    if (ccc_buf_i(&fq->buf_, iter) != last_elem_index(fq))
     {
         return false;
     }

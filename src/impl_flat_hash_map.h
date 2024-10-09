@@ -76,8 +76,8 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
    which it must have to make it to this point. */
 #define ccc_impl_fhm_swaps(swap_entry, lazy_key_value...)                      \
     ({                                                                         \
-        size_t fhm_i_ = ccc_buf_index_of(&((swap_entry)->h_->buf_),            \
-                                         (swap_entry)->entry_.e_);             \
+        size_t fhm_i_                                                          \
+            = ccc_buf_i(&((swap_entry)->h_->buf_), (swap_entry)->entry_.e_);   \
         if (*ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_) == CCC_FHM_EMPTY)  \
         {                                                                      \
             *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),  \

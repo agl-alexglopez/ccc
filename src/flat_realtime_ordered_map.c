@@ -732,7 +732,7 @@ parent_i(struct ccc_frm_ const *const t, size_t const child)
 static inline size_t
 index_of(struct ccc_frm_ const *const t, struct ccc_frm_elem_ const *const elem)
 {
-    return ccc_buf_index_of(&t->buf_, struct_base(t, elem));
+    return ccc_buf_i(&t->buf_, struct_base(t, elem));
 }
 
 static inline uint8_t

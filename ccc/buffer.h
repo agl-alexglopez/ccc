@@ -22,7 +22,7 @@ void ccc_buf_size_set(ccc_buffer *, size_t n);
 
 size_t ccc_buf_capacity(ccc_buffer const *);
 size_t ccc_buf_elem_size(ccc_buffer const *);
-size_t ccc_buf_index_of(ccc_buffer const *, void const *slot);
+size_t ccc_buf_i(ccc_buffer const *, void const *slot);
 bool ccc_buf_full(ccc_buffer const *);
 bool ccc_buf_empty(ccc_buffer const *);
 void *ccc_buf_at(ccc_buffer const *, size_t);
@@ -60,7 +60,7 @@ typedef ccc_buffer buffer;
 #    define buf_size_set(args...) ccc_buf_size_set(args)
 #    define buf_capacity(args...) ccc_buf_capacity(args)
 #    define buf_elem_size(args...) ccc_buf_elem_size(args)
-#    define buf_index_of(args...) ccc_buf_index_of(args)
+#    define buf_i(args...) ccc_buf_i(args)
 #    define buf_full(args...) ccc_buf_full(args)
 #    define buf_empty(args...) ccc_buf_empty(args)
 #    define buf_at(args...) ccc_buf_at(args)

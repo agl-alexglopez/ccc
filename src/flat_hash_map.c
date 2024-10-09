@@ -28,7 +28,7 @@ static struct ccc_fhm_entry_ container_entry(struct ccc_fhm_ *h,
 static struct ccc_fhm_entry_ *and_modify(struct ccc_fhm_entry_ *e,
                                          ccc_update_fn *fn);
 static bool valid_distance_from_home(struct ccc_fhm_ const *, void const *slot);
-static size_t to_index(size_t capacity, uint64_t hash);
+static size_t to_i(size_t capacity, uint64_t hash);
 static size_t increment(size_t capacity, size_t i);
 static size_t decrement(size_t capacity, size_t i);
 static size_t distance(size_t capacity, size_t i, size_t j);
@@ -86,7 +86,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
         return NULL;
     }
     insert(e->impl_.h_, user_struct, e->impl_.hash_,
-           ccc_buf_index_of(&e->impl_.h_->buf_, e->impl_.entry_.e_));
+           ccc_buf_i(&e->impl_.h_->buf_, e->impl_.entry_.e_));
     return e->impl_.entry_.e_;
 }
 
@@ -151,8 +151,7 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle,
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert(h, user_return, ent.hash_,
-           ccc_buf_index_of(&h->buf_, ent.entry_.e_));
+    insert(h, user_return, ent.hash_, ccc_buf_i(&h->buf_, ent.entry_.e_));
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
 
@@ -170,7 +169,7 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h,
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert(h, user_base, ent.hash_, ccc_buf_index_of(&h->buf_, ent.entry_.e_));
+    insert(h, user_base, ent.hash_, ccc_buf_i(&h->buf_, ent.entry_.e_));
     return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_VACANT}};
 }
 
@@ -188,7 +187,7 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fh_map_elem *key_val_handle)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert(h, user_base, ent.hash_, ccc_buf_index_of(&h->buf_, ent.entry_.e_));
+    insert(h, user_base, ent.hash_, ccc_buf_i(&h->buf_, ent.entry_.e_));
     return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_VACANT}};
 }
 
@@ -221,7 +220,7 @@ ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
     void *user_struct = struct_base(e->impl_.h_, elem);
     elem->hash_ = e->impl_.hash_;
     insert(e->impl_.h_, user_struct, elem->hash_,
-           ccc_buf_index_of(&e->impl_.h_->buf_, e->impl_.entry_.e_));
+           ccc_buf_i(&e->impl_.h_->buf_, e->impl_.entry_.e_));
     return e->impl_.entry_.e_;
 }
 
@@ -491,13 +490,13 @@ find(struct ccc_fhm_ const *const h, void const *const key, uint64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     assert(cap);
-    size_t cur_i = to_index(cap, hash);
+    size_t cur_i = to_i(cap, hash);
     for (size_t dist = 0; dist < cap; ++dist, cur_i = increment(cap, cur_i))
     {
         void *slot = ccc_buf_at(&h->buf_, cur_i);
         struct ccc_fhm_elem_ *const e = elem_in_slot(h, slot);
         if (e->hash_ == CCC_FHM_EMPTY
-            || dist > distance(cap, cur_i, to_index(cap, e->hash_)))
+            || dist > distance(cap, cur_i, to_i(cap, e->hash_)))
         {
             return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
         }
@@ -529,7 +528,7 @@ insert(struct ccc_fhm_ *const h, void const *const e, uint64_t const hash,
        insertion from old table. So should this function invariantly assign
        starting hash to this slot copy for insertion? I think yes so far. */
     elem_in_slot(h, floater)->hash_ = hash;
-    size_t dist = distance(cap, cur_i, to_index(cap, hash));
+    size_t dist = distance(cap, cur_i, to_i(cap, hash));
     for (;; cur_i = increment(cap, cur_i), ++dist)
     {
         void *const slot = ccc_buf_at(&h->buf_, cur_i);
@@ -543,7 +542,7 @@ insert(struct ccc_fhm_ *const h, void const *const e, uint64_t const hash,
             return;
         }
         size_t const slot_dist
-            = distance(cap, cur_i, to_index(cap, slot_hash->hash_));
+            = distance(cap, cur_i, to_i(cap, slot_hash->hash_));
         if (dist > slot_dist)
         {
             void *tmp = ccc_buf_at(&h->buf_, 1);
@@ -558,7 +557,7 @@ erase(struct ccc_fhm_ *const h, void *const e)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
-    size_t stopped_at = ccc_buf_index_of(&h->buf_, e);
+    size_t stopped_at = ccc_buf_i(&h->buf_, e);
     *hash_at(h, stopped_at) = CCC_FHM_EMPTY;
     size_t next = increment(cap, stopped_at);
     void *tmp = ccc_buf_at(&h->buf_, 0);
@@ -568,7 +567,7 @@ erase(struct ccc_fhm_ *const h, void *const e)
         void *next_slot = ccc_buf_at(&h->buf_, next);
         struct ccc_fhm_elem_ *next_elem = elem_in_slot(h, next_slot);
         if (next_elem->hash_ == CCC_FHM_EMPTY
-            || !distance(cap, next, to_index(cap, next_elem->hash_)))
+            || !distance(cap, next, to_i(cap, next_elem->hash_)))
         {
             break;
         }
@@ -639,7 +638,7 @@ maybe_resize(struct ccc_fhm_ *const h)
             struct ccc_entry_ const new_ent
                 = find(&new_hash, key_in_slot(h, slot), e->hash_);
             insert(&new_hash, slot, e->hash_,
-                   ccc_buf_index_of(&new_hash.buf_, new_ent.e_));
+                   ccc_buf_i(&new_hash.buf_, new_ent.e_));
         }
     }
     if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_OK)
@@ -699,7 +698,7 @@ decrement(size_t const capacity, size_t i)
 }
 
 static size_t
-to_index(size_t const capacity, uint64_t hash)
+to_i(size_t const capacity, uint64_t hash)
 {
     hash = hash % capacity;
     return hash <= last_swap_slot ? last_swap_slot + 1 : hash;
@@ -753,11 +752,11 @@ valid_distance_from_home(struct ccc_fhm_ const *h, void const *slot)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     uint64_t const hash = ccc_impl_fhm_in_slot(h, slot)->hash_;
-    size_t const home = to_index(cap, hash);
+    size_t const home = to_i(cap, hash);
     size_t const end = decrement(cap, home);
-    for (size_t i = ccc_buf_index_of(&h->buf_, slot),
+    for (size_t i = ccc_buf_i(&h->buf_, slot),
                 distance_to_home
-                = ccc_impl_fhm_distance(cap, i, to_index(cap, hash));
+                = ccc_impl_fhm_distance(cap, i, to_i(cap, hash));
          i != end; --distance_to_home, i = decrement(cap, i))
     {
         uint64_t const cur_hash = *ccc_impl_fhm_hash_at(h, i);
@@ -773,7 +772,7 @@ valid_distance_from_home(struct ccc_fhm_ const *h, void const *slot)
            taking from the close and giving to the far. If this happens
            we have made our algorithm greedy not altruistic. */
         if (distance_to_home
-            > ccc_impl_fhm_distance(cap, i, to_index(cap, cur_hash)))
+            > ccc_impl_fhm_distance(cap, i, to_i(cap, cur_hash)))
         {
             return false;
         }

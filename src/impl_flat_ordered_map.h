@@ -137,8 +137,8 @@ void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
                     = fom_key_;                                                \
                 (void)ccc_impl_fom_insert(                                     \
                     fom_try_ins_ent_.fom_,                                     \
-                    ccc_buf_index_of(&fom_try_ins_ent_.fom_->buf_,             \
-                                     fom_try_ins_ent_ret_.e_));                \
+                    ccc_buf_i(&fom_try_ins_ent_.fom_->buf_,                    \
+                              fom_try_ins_ent_ret_.e_));                       \
                 fom_try_ins_ent_ret_.stats_ = CCC_ENTRY_VACANT;                \
             }                                                                  \
         }                                                                      \
@@ -174,8 +174,8 @@ void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
                     = fom_key_;                                                \
                 (void)ccc_impl_fom_insert(                                     \
                     fom_ins_or_assign_ent_.fom_,                               \
-                    ccc_buf_index_of(&fom_ins_or_assign_ent_.fom_->buf_,       \
-                                     fom_ins_or_assign_ent_ret_.e_));          \
+                    ccc_buf_i(&fom_ins_or_assign_ent_.fom_->buf_,              \
+                              fom_ins_or_assign_ent_ret_.e_));                 \
                 fom_ins_or_assign_ent_ret_.stats_ = CCC_ENTRY_VACANT;          \
             }                                                                  \
         }                                                                      \
