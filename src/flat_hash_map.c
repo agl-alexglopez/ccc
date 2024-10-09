@@ -429,10 +429,6 @@ ccc_impl_fhm_find(struct ccc_fhm_ const *const h, void const *const key,
     return find(h, key, hash);
 }
 
-/* Assumes that element to be inserted does not already exist in the table.
-   Assumes that the table has room for another insertion. It is undefined to
-   use this if the element has not been membership tested yet or the table
-   is full. */
 void
 ccc_impl_fhm_insert(struct ccc_fhm_ *const h, void const *const e,
                     uint64_t const hash, size_t cur_i)
@@ -518,9 +514,8 @@ find(struct ccc_fhm_ const *const h, void const *const key, uint64_t const hash)
 }
 
 /* Assumes that element to be inserted does not already exist in the table.
-   Assumes that the table has room for another insertion. It is undefined to
-   use this if the element has not been membership tested yet or the table
-   is full. */
+   Assumes that the table has room for another insertion. Unexpected results
+   may occur if these assumptions are not accomodated. */
 static inline void
 insert(struct ccc_fhm_ *const h, void const *const e, uint64_t const hash,
        size_t cur_i)
