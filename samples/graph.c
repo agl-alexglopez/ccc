@@ -436,7 +436,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     assert(!insert_error(e));
     push_back(&bfs, &src->pos);
     bool success = false;
-    struct point cur = {0};
+    struct point cur = {};
     while (!is_empty(&bfs) && !success)
     {
         cur = *((struct point *)front(&bfs));
@@ -449,9 +449,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                [[maybe_unused]] ccc_entry const inserted
+                [[maybe_unused]] ccc_entry const in
                     = insert_or_assign(&parent_map, &push.elem);
-                assert(unwrap(&inserted) != NULL);
+                assert(unwrap(&in) != NULL);
                 cur = next;
                 success = true;
                 break;
@@ -459,9 +459,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (!is_path(next_cell)
                 && !occupied(try_insert_vr(&parent_map, &push.elem)))
             {
-                [[maybe_unused]] struct point const *const pushed
+                [[maybe_unused]] struct point const *const n
                     = push_back(&bfs, &next);
-                assert(pushed);
+                assert(n);
             }
         }
     }
