@@ -315,7 +315,7 @@ bool ccc_buf_is_full(ccc_buffer const *buf);
 /** Define this preprocessor directive to drop the ccc prefix from all buffer
 related types and methods. By default the prefix is required but may be
 dropped with this directive if one is sure no namespace collisions occur. */
-#ifndef BUFFER_USING_NAMESPACE_CCC
+#ifdef BUFFER_USING_NAMESPACE_CCC
 typedef ccc_buffer buffer;
 #    define buf_init(args...) ccc_buf_init(args)
 #    define buf_alloc(args...) ccc_buf_alloc(args)
