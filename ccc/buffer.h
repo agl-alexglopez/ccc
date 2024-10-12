@@ -230,8 +230,27 @@ Note that end is determined by the capcity of the buffer and will not change
 until a resize has occured, if permitted. */
 void *ccc_buf_capacity_end(ccc_buffer const *buf);
 
+/** @brief obtain the address of the last element in the buffer in preperation
+for iteration according to size.
+@param [in] buf the pointer to the buffer.
+@return the address of the last element buffer. This will be equivalent to the
+buffer rend iterator if the buffer size is 0. NULL is returned if a NULL
+argument is provided or the buffer has not yet been allocated. */
 void *ccc_buf_rbegin(ccc_buffer const *buf);
+
+/** @brief advance the iter to the next slot in the buffer according to size and
+in reverse order.
+@param [in] buf the pointer to the buffer.
+@parem [in] iter the pointer to the current slot of the buffer.
+@return the next iterator position according to size and in reverse order. NULL
+is returned if bad input is provided or the buffer has not been allocated. */
 void *ccc_buf_rnext(ccc_buffer const *buf, void const *iter);
+
+/** @brief return the rend position of the buffer.
+@param [in] buf the pointer to the buffer.
+@return the address of the rend position. It is undefined to access this
+position for any reason. NULL is returned if NULL is provided or buffer has
+not yet been allocated. */
 void *ccc_buf_rend(ccc_buffer const *buf);
 
 /*=====================   State Management    ===============================*/
@@ -268,7 +287,7 @@ ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 /** @brief return the current capacity of the buffer.
 @param [in] the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
-value is always the same regardless of the current size. */
+value remains the same until a resize occurs. */
 size_t ccc_buf_capacity(ccc_buffer const *buf);
 
 /** @brief the size of the type being stored contiguously in the buffer.
