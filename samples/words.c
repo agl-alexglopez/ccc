@@ -282,8 +282,8 @@ print_top_n(FILE *const f, int n)
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    ccc_fpq_clear_and_free(&fpq, NULL);
-    ccc_fom_clear_and_free(&map, NULL);
+    (void)ccc_fpq_clear_and_free(&fpq, NULL);
+    (void)ccc_fom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -304,8 +304,8 @@ print_last_n(FILE *const f, int n)
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    ccc_fpq_clear_and_free(&fpq, NULL);
-    ccc_fom_clear_and_free(&map, NULL);
+    (void)ccc_fpq_clear_and_free(&fpq, NULL);
+    (void)ccc_fom_clear_and_free(&map, NULL);
 }
 
 static struct frequency_alloc
@@ -341,7 +341,7 @@ print_n(ccc_flat_priority_queue *const fpq, struct str_arena const *const a,
         {
             printf("%d. %s %d\n", w + 1, arena_str, word->freq);
         }
-        pop(fpq);
+        (void)pop(fpq);
     }
 }
 

@@ -285,7 +285,7 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            push(&cells, &new_cell->elem);
+            (void)push(&cells, &new_cell->elem);
         }
         else
         {
@@ -298,15 +298,15 @@ animate_maze(struct maze *maze)
        determined the course of the maze building. It has no hidden allocations
        either so no more work is needed if we know it's empty and the data
        structure metadata is on the stack. */
-    ccc_om_clear(&cell_costs, set_destructor);
+    (void)ccc_om_clear(&cell_costs, set_destructor);
 }
 
 static struct point
 pick_rand_point(struct maze const *const maze)
 {
     return (struct point){
-        .r = 2 * rand_range(1, (maze->rows - 2) / 2) + 1,
-        .c = 2 * rand_range(1, (maze->cols - 2) / 2) + 1,
+        .r = (2 * rand_range(1, (maze->rows - 2) / 2)) + 1,
+        .c = (2 * rand_range(1, (maze->cols - 2) / 2)) + 1,
     };
 }
 
@@ -466,13 +466,13 @@ print_square(struct maze const *m, struct point p)
 static uint16_t *
 maze_at_mut(struct maze const *const maze, struct point p)
 {
-    return &maze->maze[p.r * maze->cols + p.c];
+    return &maze->maze[(p.r * maze->cols) + p.c];
 }
 
 static uint16_t
 maze_at(struct maze const *const maze, struct point p)
 {
-    return maze->maze[p.r * maze->cols + p.c];
+    return maze->maze[(p.r * maze->cols) + p.c];
 }
 
 static bool

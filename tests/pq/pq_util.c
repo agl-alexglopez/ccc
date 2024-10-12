@@ -35,38 +35,38 @@ BEGIN_TEST(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        push(ppq, &vals[shuffled_index].elem);
-        CHECK(ccc_pq_size(ppq), i + 1);
+        (void)push(ppq, &vals[shuffled_index].elem);
+        CHECK(size(ppq), i + 1);
         CHECK(validate(ppq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_pq_size(ppq), size);
+    CHECK(size(ppq), size);
     END_TEST();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
 {
-    CHECK(ccc_pq_size(ppq), size);
+    CHECK(size(ppq), size);
     size_t i = 0;
     ccc_priority_queue copy
         = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), NULL, val_cmp, NULL);
-    while (!ccc_pq_is_empty(ppq))
+    while (!is_empty(ppq))
     {
         struct val *const front = front(ppq);
-        pop(ppq);
+        (void)pop(ppq);
         CHECK(validate(ppq), true);
         CHECK(validate(&copy), true);
         vals[i++] = front->val;
-        push(&copy, &front->elem);
+        (void)push(&copy, &front->elem);
     }
     i = 0;
-    while (!ccc_pq_is_empty(&copy))
+    while (!is_empty(&copy))
     {
         struct val *v = front(&copy);
         CHECK(v->val, vals[i++]);
-        pop(&copy);
-        push(ppq, &v->elem);
+        (void)pop(&copy);
+        (void)push(ppq, &v->elem);
         CHECK(validate(ppq), true);
         CHECK(validate(&copy), true);
     }

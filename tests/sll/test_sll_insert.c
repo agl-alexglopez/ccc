@@ -5,6 +5,7 @@
 #include "sll_util.h"
 #include "test.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stddef.h>
 
@@ -41,13 +42,13 @@ BEGIN_STATIC_TEST(sll_push_and_splice)
     enum test_result const t = create_list(&sll, 4, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 4, (int[4]){3, 2, 1, 0}), PASS);
-    splice(&sll, sll_begin_elem(&sll), &sll, &vals[0].e);
+    CHECK(splice(&sll, sll_begin_elem(&sll), &sll, &vals[0].e), CCC_OK);
     CHECK(validate(&sll), true);
     CHECK(check_order(&sll, 4, (int[4]){3, 0, 2, 1}), PASS);
-    splice(&sll, &vals[0].e, &sll, &vals[3].e);
+    CHECK(splice(&sll, &vals[0].e, &sll, &vals[3].e), CCC_OK);
     CHECK(validate(&sll), true);
     CHECK(check_order(&sll, 4, (int[4]){0, 3, 2, 1}), PASS);
-    splice(&sll, &vals[1].e, &sll, &vals[0].e);
+    CHECK(splice(&sll, &vals[1].e, &sll, &vals[0].e), CCC_OK);
     CHECK(validate(&sll), true);
     CHECK(check_order(&sll, 4, (int[4]){3, 2, 1, 0}), PASS);
     END_TEST();
@@ -61,17 +62,21 @@ BEGIN_STATIC_TEST(sll_push_and_splice_range)
     enum test_result const t = create_list(&sll, 5, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    splice_range(&sll, sll_begin_sentinel(&sll), &sll, &vals[2].e, &vals[0].e);
+    CHECK(splice_range(&sll, sll_begin_sentinel(&sll), &sll, &vals[2].e,
+                       &vals[0].e),
+          CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){2, 1, 0, 4, 3}), PASS);
-    splice_range(&sll, &vals[3].e, &sll, &vals[2].e, &vals[0].e);
+    CHECK(splice_range(&sll, &vals[3].e, &sll, &vals[2].e, &vals[0].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    splice_range(&sll, sll_begin_sentinel(&sll), &sll, &vals[3].e, &vals[1].e);
+    CHECK(splice_range(&sll, sll_begin_sentinel(&sll), &sll, &vals[3].e,
+                       &vals[1].e),
+          CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){3, 2, 1, 4, 0}), PASS);
-    splice_range(&sll, &vals[0].e, &sll, &vals[2].e, &vals[4].e);
+    CHECK(splice_range(&sll, &vals[0].e, &sll, &vals[2].e, &vals[4].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){3, 0, 2, 1, 4}), PASS);
-    splice_range(&sll, &vals[1].e, &sll, &vals[0].e, &vals[2].e);
+    CHECK(splice_range(&sll, &vals[1].e, &sll, &vals[0].e, &vals[2].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){3, 1, 0, 2, 4}), PASS);
-    splice_range(&sll, &vals[3].e, &sll, &vals[0].e, &vals[2].e);
+    CHECK(splice_range(&sll, &vals[3].e, &sll, &vals[0].e, &vals[2].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){3, 0, 2, 1, 4}), PASS);
     END_TEST();
 }
@@ -84,13 +89,13 @@ BEGIN_STATIC_TEST(sll_push_and_splice_range_no_ops)
     enum test_result const t = create_list(&sll, 5, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    splice(&sll, &vals[2].e, &sll, &vals[2].e);
+    CHECK(splice(&sll, &vals[2].e, &sll, &vals[2].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    splice(&sll, &vals[3].e, &sll, &vals[2].e);
+    CHECK(splice(&sll, &vals[3].e, &sll, &vals[2].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    splice_range(&sll, &vals[3].e, &sll, &vals[2].e, &vals[0].e);
+    CHECK(splice_range(&sll, &vals[3].e, &sll, &vals[2].e, &vals[0].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    splice_range(&sll, &vals[3].e, &sll, &vals[3].e, &vals[0].e);
+    CHECK(splice_range(&sll, &vals[3].e, &sll, &vals[3].e, &vals[0].e), CCC_OK);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
     END_TEST();
 }

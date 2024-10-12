@@ -30,7 +30,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        pop(&fpq);
+        (void)pop(&fpq);
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)0);
@@ -80,7 +80,7 @@ BEGIN_STATIC_TEST(fpq_test_pop_max)
     {
         struct val const *const front = front(&fpq);
         CHECK(front->val, sorted_check[i]);
-        pop(&fpq);
+        (void)pop(&fpq);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
     END_TEST();
@@ -103,7 +103,7 @@ BEGIN_STATIC_TEST(fpq_test_pop_min)
     {
         struct val const *const front = front(&fpq);
         CHECK(front->val, sorted_check[i]);
-        pop(&fpq);
+        (void)pop(&fpq);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
     END_TEST();

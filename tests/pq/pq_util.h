@@ -1,6 +1,8 @@
 #ifndef CCC_PQ_UTIL_H
 #define CCC_PQ_UTIL_H
 
+#include <stddef.h>
+
 #include "priority_queue.h"
 #include "test.h"
 #include "types.h"

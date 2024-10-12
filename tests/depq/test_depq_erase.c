@@ -20,7 +20,7 @@ BEGIN_STATIC_TEST(depq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        push(&pq, &three_vals[i].elem);
+        CHECK(push(&pq, &three_vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         size_t const size = i + 1;
         CHECK(size(&pq), size);
@@ -141,7 +141,7 @@ BEGIN_STATIC_TEST(depq_test_max_round_robin)
             vals[i].val = 99;
         }
         vals[i].id = i;
-        push(&depq, &vals[i].elem);
+        CHECK(push(&depq, &vals[i].elem), CCC_OK);
         CHECK(validate(&depq), true);
     }
     /* Now let's make sure we pop round robin. */
@@ -178,7 +178,7 @@ BEGIN_STATIC_TEST(depq_test_min_round_robin)
             vals[i].val = 1;
         }
         vals[i].id = i;
-        push(&depq, &vals[i].elem);
+        CHECK(push(&depq, &vals[i].elem), CCC_OK);
         CHECK(validate(&depq), true);
     }
     /* Now let's make sure we pop round robin. */
@@ -208,7 +208,7 @@ BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         size_t const s = i + 1;
         CHECK(size(&pq), s);
@@ -245,7 +245,7 @@ BEGIN_STATIC_TEST(depq_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -277,7 +277,7 @@ BEGIN_STATIC_TEST(depq_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
     }
     for (int i = 0; i < num_nodes; ++i)

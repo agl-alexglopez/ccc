@@ -57,9 +57,9 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
     {
         return;
     }
-    ccc_buf_size_set(&fpq->buf_, n);
+    (void)ccc_buf_size_set(&fpq->buf_, n);
     void *const tmp = ccc_buf_at(&fpq->buf_, n);
-    for (size_t i = n / 2 + 1; i--;)
+    for (size_t i = (n / 2) + 1; i--;)
     {
         bubble_down(fpq, tmp, i);
     }
@@ -82,11 +82,11 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const input_array,
             return resize_res;
         }
     }
-    ccc_buf_size_set(&fpq->buf_, input_n);
+    (void)ccc_buf_size_set(&fpq->buf_, input_n);
     (void)memcpy(ccc_buf_begin(&fpq->buf_), input_array,
                  input_n * input_elem_size);
     void *const tmp = ccc_buf_at(&fpq->buf_, input_n);
-    for (size_t i = input_n / 2 + 1; i--;)
+    for (size_t i = (input_n / 2) + 1; i--;)
     {
         bubble_down(fpq, tmp, i);
     }
@@ -138,12 +138,12 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
     }
     if (ccc_buf_size(&fpq->buf_) == 1)
     {
-        ccc_buf_pop_back(&fpq->buf_);
+        (void)ccc_buf_pop_back(&fpq->buf_);
         return CCC_OK;
     }
     void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, 0, ccc_buf_size(&fpq->buf_) - 1);
-    ccc_buf_pop_back(&fpq->buf_);
+    (void)ccc_buf_pop_back(&fpq->buf_);
     bubble_down(fpq, tmp, 0);
     return CCC_OK;
 }
@@ -158,7 +158,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     if (ccc_buf_size(&fpq->buf_) == 1)
     {
         void *const ret = at(fpq, 0);
-        ccc_buf_pop_back(&fpq->buf_);
+        (void)ccc_buf_pop_back(&fpq->buf_);
         return ret;
     }
     /* Important to remember this key now to avoid confusion later once the
@@ -167,13 +167,13 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     if (swap_location == ccc_buf_size(&fpq->buf_) - 1)
     {
         void *const ret = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
-        ccc_buf_pop_back(&fpq->buf_);
+        (void)ccc_buf_pop_back(&fpq->buf_);
         return ret;
     }
     void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, swap_location, ccc_buf_size(&fpq->buf_) - 1);
     void *const erased = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
-    ccc_buf_pop_back(&fpq->buf_);
+    (void)ccc_buf_pop_back(&fpq->buf_);
     ccc_threeway_cmp const erased_cmp
         = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->aux_});
     if (erased_cmp == fpq->order_)
@@ -364,8 +364,8 @@ static inline void
 bubble_down(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
 {
     size_t const sz = ccc_buf_size(&fpq->buf_);
-    for (size_t next = i, left = i * 2 + 1, right = left + 1; left < sz;
-         i = next, left = i * 2 + 1, right = left + 1)
+    for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < sz;
+         i = next, left = (i * 2) + 1, right = left + 1)
     {
         /* Avoid one comparison call if there is no right child. */
         next = right < sz && wins(fpq, at(fpq, right), at(fpq, left)) ? right
@@ -425,7 +425,7 @@ print_node(struct ccc_fpq_ const *const fpq, size_t i, ccc_print_fn *const fn)
     printf(COLOR_CYN);
     if (i)
     {
-        at(fpq, index_of(fpq, at(fpq, (i - 1) / 2)) * 2 + 1) == at(fpq, i)
+        at(fpq, (index_of(fpq, at(fpq, (i - 1) / 2)) * 2) + 1) == at(fpq, i)
             ? printf("L%zu:", i)
             : printf("R%zu:", i);
     }

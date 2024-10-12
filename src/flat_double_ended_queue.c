@@ -368,7 +368,7 @@ alloc_front(struct ccc_fdeq_ *const fq)
     new_slot = ccc_buf_at(&fq->buf_, fq->front_);
     if (!full)
     {
-        ccc_buf_size_plus(&fq->buf_, 1);
+        (void)ccc_buf_size_plus(&fq->buf_, 1);
     }
     return new_slot;
 }
@@ -391,7 +391,7 @@ alloc_back(struct ccc_fdeq_ *const fq)
     }
     else
     {
-        ccc_buf_size_plus(&fq->buf_, 1);
+        (void)ccc_buf_size_plus(&fq->buf_, 1);
     }
     return new_slot;
 }

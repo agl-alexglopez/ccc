@@ -379,7 +379,7 @@ ccc_fom_clear(ccc_flat_ordered_map *const frm, ccc_destructor_fn *const fn)
     }
     if (!fn)
     {
-        ccc_buf_size_set(&frm->buf_, 1);
+        (void)ccc_buf_size_set(&frm->buf_, 1);
         frm->root_ = 0;
         return;
     }
@@ -536,7 +536,7 @@ maybe_alloc_insert(struct ccc_fom_ *const fom, struct ccc_fom_elem_ *const elem)
         return NULL;
     }
     size_t const node = ccc_buf_size(&fom->buf_) - 1;
-    ccc_buf_write(&fom->buf_, node, struct_base(fom, elem));
+    (void)ccc_buf_write(&fom->buf_, node, struct_base(fom, elem));
     return insert(fom, node);
 }
 
@@ -582,7 +582,7 @@ erase(struct ccc_fom_ *const t, void const *const key)
 static inline void
 swap_and_pop(struct ccc_fom_ *const t, size_t const vacant_i)
 {
-    ccc_buf_size_minus(&t->buf_, 1);
+    (void)ccc_buf_size_minus(&t->buf_, 1);
     size_t const x_i = ccc_buf_size(&t->buf_);
     if (vacant_i == x_i)
     {
@@ -604,7 +604,7 @@ swap_and_pop(struct ccc_fom_ *const t, size_t const vacant_i)
     *parent_ref(t, x->branch_[R]) = vacant_i;
     *parent_ref(t, x->branch_[L]) = vacant_i;
     /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
-    ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
+    (void)ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     /* Clear out the back elements fields just as precaution. */
     x->branch_[L] = x->branch_[R] = x->parent_ = 0;
 }

@@ -18,7 +18,7 @@ BEGIN_STATIC_TEST(sll_test_push_pop_three)
     size_t const end = size(&sll);
     for (size_t i = 0; i < end; ++i)
     {
-        pop_front(&sll);
+        (void)pop_front(&sll);
         CHECK(validate(&sll), true);
     }
     CHECK(is_empty(&sll), true);
@@ -79,14 +79,16 @@ BEGIN_STATIC_TEST(sll_test_splice_two_lists)
     CHECK(t, PASS);
     CHECK(check_order(&to_lose, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
     CHECK(check_order(&to_gain, 2, (int[2]){1, 0}), PASS);
-    splice(&to_gain, sll_begin_elem(&to_gain), &to_lose,
-           sll_begin_elem(&to_lose));
+    CHECK(splice(&to_gain, sll_begin_elem(&to_gain), &to_lose,
+                 sll_begin_elem(&to_lose)),
+          CCC_OK);
     CHECK(size(&to_gain), 3);
     CHECK(size(&to_lose), 4);
     CHECK(check_order(&to_lose, 4, (int[4]){3, 2, 1, 0}), PASS);
     CHECK(check_order(&to_gain, 3, (int[3]){1, 4, 0}), PASS);
-    splice_range(&to_gain, sll_begin_elem(&to_gain), &to_lose,
-                 sll_begin_elem(&to_lose), &to_lose_vals[0].e);
+    CHECK(splice_range(&to_gain, sll_begin_elem(&to_gain), &to_lose,
+                       sll_begin_elem(&to_lose), &to_lose_vals[0].e),
+          CCC_OK);
     CHECK(size(&to_gain), 7);
     CHECK(is_empty(&to_lose), true);
     CHECK(check_order(&to_gain, 7, (int[7]){1, 3, 2, 1, 0, 4, 0}), PASS);

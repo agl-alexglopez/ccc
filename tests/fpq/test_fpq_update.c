@@ -30,9 +30,9 @@ BEGIN_STATIC_TEST(fpq_test_insert_iterate_pop)
         CHECK(validate(&fpq), true);
     }
     size_t pop_count = 0;
-    while (!ccc_fpq_is_empty(&fpq))
+    while (!is_empty(&fpq))
     {
-        pop(&fpq);
+        (void)pop(&fpq);
         ++pop_count;
         CHECK(validate(&fpq), true);
     }
@@ -66,7 +66,7 @@ BEGIN_STATIC_TEST(fpq_test_priority_removal)
         struct val *cur = &vals[seen];
         if (cur->val > limit)
         {
-            (void)ccc_fpq_erase(&fpq, cur);
+            (void)erase(&fpq, cur);
             CHECK(validate(&fpq), true);
             --remaining;
         }
@@ -101,11 +101,11 @@ BEGIN_STATIC_TEST(fpq_test_priority_update)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(ccc_fpq_update(&fpq, cur, val_update, &backoff), true);
+            CHECK(update(&fpq, cur, val_update, &backoff), true);
             CHECK(validate(&fpq), true);
         }
     }
-    CHECK(ccc_fpq_size(&fpq), num_nodes);
+    CHECK(size(&fpq), num_nodes);
     END_TEST();
 }
 

@@ -351,7 +351,7 @@ BEGIN_STATIC_TEST(rtom_test_empty_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.

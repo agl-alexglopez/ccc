@@ -546,7 +546,7 @@ insert(struct ccc_fhm_ *const h, void const *const e, uint64_t const hash,
         if (slot_hash->hash_ == CCC_FHM_EMPTY)
         {
             memcpy(slot, floater, elem_sz);
-            ccc_buf_size_plus(&h->buf_, 1);
+            (void)ccc_buf_size_plus(&h->buf_, 1);
             *hash_at(h, 0) = CCC_FHM_EMPTY;
             *hash_at(h, 1) = CCC_FHM_EMPTY;
             return;
@@ -584,7 +584,7 @@ erase(struct ccc_fhm_ *const h, void *const e)
         swap(tmp, next_slot, ccc_buf_at(&h->buf_, stopped_at), elem_sz);
     }
     *hash_at(h, 0) = CCC_FHM_EMPTY;
-    ccc_buf_size_minus(&h->buf_, 1);
+    (void)ccc_buf_size_minus(&h->buf_, 1);
 }
 
 static inline struct ccc_fhm_entry_

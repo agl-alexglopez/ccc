@@ -75,7 +75,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_shuffle)
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
 
-    frm_print(&s, map_printer_fn);
+    (void)frm_print(&s, map_printer_fn);
     printf("\n");
 
     int sorted_check[50];

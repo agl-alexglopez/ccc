@@ -85,7 +85,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 = lazy_key_value;                                              \
             *ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_)                    \
                 = (swap_entry)->hash_;                                         \
-            ccc_buf_size_plus(&(swap_entry)->h_->buf_, 1);                     \
+            (void)ccc_buf_size_plus(&(swap_entry)->h_->buf_, 1);               \
         }                                                                      \
         else                                                                   \
         {                                                                      \

@@ -16,7 +16,7 @@ BEGIN_STATIC_TEST(pq_test_insert_one)
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
-    push(&pq, &single.elem);
+    CHECK(push(&pq, &single.elem), CCC_OK);
     CHECK(ccc_pq_is_empty(&pq), false);
     END_TEST();
 }
@@ -29,7 +29,7 @@ BEGIN_STATIC_TEST(pq_test_insert_three)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        push(&pq, &three_vals[i].elem);
+        CHECK(push(&pq, &three_vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
@@ -49,8 +49,8 @@ BEGIN_STATIC_TEST(pq_test_struct_getter)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        push(&pq, &vals[i].elem);
-        push(&pq_tester_clone, &tester_clone[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(push(&pq_tester_clone, &tester_clone[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
@@ -70,7 +70,7 @@ BEGIN_STATIC_TEST(pq_test_insert_three_dups)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        push(&pq, &three_vals[i].elem);
+        CHECK(push(&pq, &three_vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
@@ -102,7 +102,7 @@ BEGIN_STATIC_TEST(pq_test_read_max_min)
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
         CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }

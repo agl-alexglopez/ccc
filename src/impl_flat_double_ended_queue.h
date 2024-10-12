@@ -2,7 +2,6 @@
 #define CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H
 
 #include "buffer.h"
-#include "types.h"
 
 #include <stddef.h>
 

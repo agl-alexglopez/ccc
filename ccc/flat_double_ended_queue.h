@@ -1,6 +1,8 @@
 #ifndef CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 #define CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 
+#include <stddef.h>
+
 #include "impl_flat_double_ended_queue.h"
 #include "types.h"
 

@@ -106,14 +106,14 @@ test_push(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            push(&depq, &val_array[i].depq_elem);
+            (void)push(&depq, &val_array[i].depq_elem);
         }
         clock_t end = clock();
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            push(&pq, &val_array[i].pq_elem);
+            (void)push(&pq, &val_array[i].pq_elem);
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -145,7 +145,7 @@ test_pop(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            push(&depq, &val_array[i].depq_elem);
+            (void)push(&depq, &val_array[i].depq_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -156,12 +156,12 @@ test_pop(void)
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
-            push(&pq, &val_array[i].pq_elem);
+            (void)push(&pq, &val_array[i].pq_elem);
         }
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            pop(&pq);
+            (void)pop(&pq);
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -174,7 +174,7 @@ test_pop(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            pop(&fpq);
+            (void)pop(&fpq);
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -198,7 +198,7 @@ test_push_pop(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            push(&depq, &val_array[i].depq_elem);
+            (void)push(&depq, &val_array[i].depq_elem);
         }
         for (size_t i = 0; i < n; ++i)
         {
@@ -209,11 +209,11 @@ test_push_pop(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            push(&pq, &val_array[i].pq_elem);
+            (void)push(&pq, &val_array[i].pq_elem);
         }
         for (size_t i = 0; i < n; ++i)
         {
-            pop(&pq);
+            (void)pop(&pq);
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -226,7 +226,7 @@ test_push_pop(void)
         }
         for (size_t i = 0; i < n; ++i)
         {
-            pop(&fpq);
+            (void)pop(&fpq);
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -250,7 +250,7 @@ test_push_intermittent_pop(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            push(&depq, &val_array[i].depq_elem);
+            (void)push(&depq, &val_array[i].depq_elem);
             if (i % 10 == 0)
             {
                 ccc_depq_pop_min(&depq);
@@ -261,10 +261,10 @@ test_push_intermittent_pop(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            push(&pq, &val_array[i].pq_elem);
+            (void)push(&pq, &val_array[i].pq_elem);
             if (i % 10 == 0)
             {
-                pop(&pq);
+                (void)pop(&pq);
             }
         }
         end = clock();
@@ -277,7 +277,7 @@ test_push_intermittent_pop(void)
             (void)push(&fpq, &val_array[i]);
             if (i % 10 == 0)
             {
-                pop(&fpq);
+                (void)pop(&fpq);
             }
         }
         end = clock();
@@ -301,7 +301,7 @@ test_pop_intermittent_push(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            push(&depq, &val_array[i].depq_elem);
+            (void)push(&depq, &val_array[i].depq_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -311,24 +311,24 @@ test_pop_intermittent_push(void)
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
-                push(&depq, &v->depq_elem);
+                (void)push(&depq, &v->depq_elem);
             }
         }
         clock_t end = clock();
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
-            push(&pq, &val_array[i].pq_elem);
+            (void)push(&pq, &val_array[i].pq_elem);
         }
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
             struct val *v = front(&pq);
-            pop(&pq);
+            (void)pop(&pq);
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
-                push(&pq, &v->pq_elem);
+                (void)push(&pq, &v->pq_elem);
             }
         }
         end = clock();
@@ -342,7 +342,7 @@ test_pop_intermittent_push(void)
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            pop(&fpq);
+            (void)pop(&fpq);
             if (i % 10 == 0)
             {
                 (void)ccc_fpq_emplace(
@@ -370,7 +370,7 @@ test_update(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            push(&depq, &val_array[i].depq_elem);
+            (void)push(&depq, &val_array[i].depq_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -383,14 +383,15 @@ test_update(void)
         double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
-            push(&pq, &val_array[i].pq_elem);
+            (void)push(&pq, &val_array[i].pq_elem);
         }
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
             int new_val
                 = rand_range(0, val_array[i].val - (val_array[i].val != 0));
-            ccc_pq_decrease(&pq, &val_array[i].pq_elem, val_update, &new_val);
+            (void)ccc_pq_decrease(&pq, &val_array[i].pq_elem, val_update,
+                                  &new_val);
         }
         end = clock();
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;

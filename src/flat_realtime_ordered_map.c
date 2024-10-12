@@ -204,7 +204,8 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
     if (CCC_EQL == q.last_cmp_)
     {
         void *const found = base_at(frm, q.found_);
-        ccc_buf_write(&frm->buf_, q.found_, struct_base(frm, key_val_handle));
+        (void)ccc_buf_write(&frm->buf_, q.found_,
+                            struct_base(frm, key_val_handle));
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     void *inserted
@@ -538,7 +539,7 @@ maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
         return NULL;
     }
     size_t const node = ccc_buf_size(&frm->buf_) - 1;
-    ccc_buf_write(&frm->buf_, node, struct_base(frm, elem));
+    (void)ccc_buf_write(&frm->buf_, node, struct_base(frm, elem));
     return insert(frm, parent, last_cmp, node);
 }
 
@@ -884,7 +885,7 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
 static inline void
 swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
 {
-    ccc_buf_size_minus(&t->buf_, 1);
+    (void)ccc_buf_size_minus(&t->buf_, 1);
     size_t const x_i = ccc_buf_size(&t->buf_);
     if (vacant_i == x_i)
     {
@@ -906,7 +907,7 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     *parent_ref(t, x->branch_[R]) = vacant_i;
     *parent_ref(t, x->branch_[L]) = vacant_i;
     /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
-    ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
+    (void)ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     at(t, 0)->parity_ = 1;
     /* Clear back elements fields as precaution. */
     x->branch_[L] = x->branch_[R] = x->parent_ = x->parity_ = 0;

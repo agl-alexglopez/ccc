@@ -26,13 +26,13 @@ BEGIN_STATIC_TEST(pq_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
     }
     size_t pop_count = 0;
     while (!ccc_pq_is_empty(&pq))
     {
-        pop(&pq);
+        CHECK(pop(&pq), CCC_OK);
         ++pop_count;
         CHECK(validate(&pq), true);
     }
@@ -54,7 +54,7 @@ BEGIN_STATIC_TEST(pq_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -63,7 +63,7 @@ BEGIN_STATIC_TEST(pq_test_priority_removal)
         struct val *i = &vals[val];
         if (i->val > limit)
         {
-            ccc_pq_erase(&pq, &i->elem);
+            (void)ccc_pq_erase(&pq, &i->elem);
             CHECK(validate(&pq), true);
         }
     }
@@ -84,7 +84,7 @@ BEGIN_STATIC_TEST(pq_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -116,7 +116,7 @@ BEGIN_STATIC_TEST(pq_test_priority_increase)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -154,7 +154,7 @@ BEGIN_STATIC_TEST(pq_test_priority_decrease)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        push(&pq, &vals[i].elem);
+        CHECK(push(&pq, &vals[i].elem), CCC_OK);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;

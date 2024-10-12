@@ -6,6 +6,7 @@
 #include "traits.h"
 #include "types.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 ccc_threeway_cmp
@@ -42,7 +43,7 @@ BEGIN_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        push(pq, &vals[shuffled_index].elem);
+        CHECK(push(pq, &vals[shuffled_index].elem), CCC_OK);
         CHECK(validate(pq), true);
         CHECK(size(pq), i + 1);
         shuffled_index = (shuffled_index + larger_prime) % size;

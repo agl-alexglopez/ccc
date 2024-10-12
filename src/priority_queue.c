@@ -106,7 +106,7 @@ ccc_pq_clear(ccc_priority_queue *const ppq, ccc_destructor_fn *fn)
             fn((ccc_user_type_mut){.user_type = ccc_pq_front(ppq),
                                    .aux = ppq->aux_});
         }
-        ccc_pq_pop(ppq);
+        (void)ccc_pq_pop(ppq);
     }
     return CCC_OK;
 }

@@ -61,7 +61,6 @@ BEGIN_STATIC_TEST(rtomap_test_insert_macros)
     CHECK(v != NULL, true);
     CHECK(v->id, 2);
     CHECK(size(&s), 4);
-    rom_clear_and_free(&s, NULL);
     END_TEST(rom_clear_and_free(&s, NULL););
 }
 
@@ -75,7 +74,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_shuffle)
     struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
 
-    rom_print(&s, map_printer_fn);
+    (void)print(&s, map_printer_fn);
     printf("\n");
 
     int sorted_check[50];

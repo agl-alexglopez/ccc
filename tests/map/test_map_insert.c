@@ -62,7 +62,7 @@ BEGIN_STATIC_TEST(map_test_insert_three)
     CHECK(ins->id, 99);
     CHECK(ins->val, 3);
     CHECK(size(&s), 3);
-    ccc_om_clear_and_free(&s, NULL);
+    (void)ccc_om_clear_and_free(&s, NULL);
     END_TEST();
 }
 

@@ -1,6 +1,8 @@
 #ifndef CCC_DOUBLY_LINKED_LIST_H
 #define CCC_DOUBLY_LINKED_LIST_H
 
+#include <stddef.h>
+
 #include "impl_doubly_linked_list.h"
 #include "types.h"
 

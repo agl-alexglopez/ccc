@@ -1,6 +1,8 @@
 #ifndef DLL_UTIL_H
 #define DLL_UTIL_H
 
+#include <stddef.h>
+
 #include "doubly_linked_list.h"
 #include "test.h"
 #include "types.h"

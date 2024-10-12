@@ -100,8 +100,9 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
     {
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
-                   &found->kv_in_list->list_elem);
+        CHECK(dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                         &found->kv_in_list->list_elem),
+              CCC_OK);
         return PASS;
     }
     struct lru_lookup *const new
@@ -115,7 +116,7 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
         CHECK(to_drop == NULL, false);
         ccc_entry const e = remove_entry(entry_vr(&lru->fh, &to_drop->key));
         CHECK(occupied(&e), true);
-        pop_back(&lru->l);
+        (void)pop_back(&lru->l);
     }
     END_TEST();
 }
@@ -128,8 +129,8 @@ lru_get(struct lru_cache *const lru, int const key)
     {
         return -1;
     }
-    dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
-               &found->kv_in_list->list_elem);
+    (void)dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                     &found->kv_in_list->list_elem);
     return found->kv_in_list->val;
 }
 
@@ -185,8 +186,8 @@ BEGIN_STATIC_TEST(run_lru_cache)
         }
     }
     END_TEST({
-        ccc_fhm_clear_and_free(&lru.fh, NULL);
-        dll_clear_and_free(&lru.l, NULL);
+        (void)ccc_fhm_clear_and_free(&lru.fh, NULL);
+        (void)dll_clear_and_free(&lru.l, NULL);
     });
 }
 

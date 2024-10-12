@@ -1,6 +1,8 @@
 #ifndef CCC_FMAP_UTIL_H
 #define CCC_FMAP_UTIL_H
 
+#include <stddef.h>
+
 #include "flat_ordered_map.h"
 #include "test.h"
 #include "types.h"

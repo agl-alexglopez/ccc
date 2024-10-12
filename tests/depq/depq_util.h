@@ -1,6 +1,8 @@
 #ifndef CCC_DEPQ_UTIL_H
 #define CCC_DEPQ_UTIL_H
 
+#include <stddef.h>
+
 #include "double_ended_priority_queue.h"
 #include "types.h"
 

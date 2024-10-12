@@ -11,7 +11,7 @@
 
 BEGIN_STATIC_TEST(pop_front_n, flat_double_ended_queue *const q, size_t n)
 {
-    for (; n-- && !is_empty(q); pop_front(q))
+    for (; n-- && !is_empty(q); (void)pop_front(q))
     {
         CHECK(validate(q), true);
     }
@@ -20,7 +20,7 @@ BEGIN_STATIC_TEST(pop_front_n, flat_double_ended_queue *const q, size_t n)
 
 BEGIN_STATIC_TEST(pop_back_n, flat_double_ended_queue *const q, size_t n)
 {
-    for (; n-- && !is_empty(q); pop_back(q))
+    for (; n-- && !is_empty(q); (void)pop_back(q))
     {
         CHECK(validate(q), true);
     }
@@ -33,7 +33,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_back_three)
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     while (!is_empty(&q))
     {
-        pop_back(&q);
+        (void)pop_back(&q);
         CHECK(validate(&q), true);
     }
     CHECK(is_empty(&q), true);
@@ -46,7 +46,7 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_three)
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     while (!is_empty(&q))
     {
-        pop_front(&q);
+        (void)pop_front(&q);
         CHECK(validate(&q), true);
     }
     CHECK(is_empty(&q), true);
@@ -61,11 +61,11 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_back)
     {
         if (size(&q) % 2)
         {
-            pop_front(&q);
+            (void)pop_front(&q);
         }
         else
         {
-            pop_back(&q);
+            (void)pop_back(&q);
         }
         CHECK(validate(&q), true);
     }

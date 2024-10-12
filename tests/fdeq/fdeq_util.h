@@ -1,6 +1,8 @@
 #ifndef FDEQ_UTIL_H
 #define FDEQ_UTIL_H
 
+#include <stddef.h>
+
 #include "flat_double_ended_queue.h"
 #include "test.h"
 

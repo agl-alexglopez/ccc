@@ -1,6 +1,8 @@
 #ifndef CCC_FPQ_UTIL_H
 #define CCC_FPQ_UTIL_H
 
+#include <stddef.h>
+
 #include "flat_priority_queue.h"
 #include "test.h"
 #include "types.h"

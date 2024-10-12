@@ -7,6 +7,7 @@
 #include "traits.h"
 #include "types.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 ccc_threeway_cmp

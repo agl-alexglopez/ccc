@@ -123,7 +123,8 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
     }
     if (to_splice_begin == to_splice_end)
     {
-        ccc_sll_splice(pos_sll, pos_before, to_splice_sll, to_splice_begin);
+        (void)ccc_sll_splice(pos_sll, pos_before, to_splice_sll,
+                             to_splice_begin);
         return CCC_OK;
     }
     struct ccc_sll_elem_ *found = before(to_splice_sll, to_splice_begin);

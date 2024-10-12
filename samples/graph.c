@@ -434,13 +434,13 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     [[maybe_unused]] ccc_entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
     assert(!insert_error(e));
-    push_back(&bfs, &src->pos);
+    (void)push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {};
     while (!is_empty(&bfs) && !success)
     {
         cur = *((struct point *)front(&bfs));
-        pop_front(&bfs);
+        (void)pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next
@@ -490,8 +490,8 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         (void)add_edge(dst, &edge);
         add_edge_cost_label(graph, dst, &edge);
     }
-    fhm_clear_and_free(&parent_map, NULL);
-    ccc_fdeq_clear_and_free(&bfs, NULL);
+    (void)fhm_clear_and_free(&parent_map, NULL);
+    (void)ccc_fdeq_clear_and_free(&bfs, NULL);
     return success;
 }
 
@@ -611,6 +611,11 @@ random_vertex_placement(struct graph const *const graph)
 {
     int const row_end = graph->rows - 2;
     int const col_end = graph->cols - 2;
+    if (row_end < row_col_min || col_end < row_col_min)
+    {
+        quit("rows and cols are below minimum quitting now.\n", 1);
+        exit(1);
+    }
     /* No vertices should be close to the edge of the map. */
     int const row_start = rand_range(vertex_placement_padding,
                                      graph->rows - vertex_placement_padding);
@@ -711,7 +716,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         /* PQ entries are popped but the map will free the memory at
            the end because it always holds a reference to its pq_elem. */
         cur = front(&dist_q);
-        pop(&dist_q);
+        (void)pop(&dist_q);
         if (cur->v == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
@@ -757,7 +762,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
        prev map is the last allocation with access to the priority queue
        elements that have been popped but not freed. It will free its
        own map and its references to priority queue elements. */
-    fhm_clear_and_free(&prev_map, map_pq_prev_vertex_dist_point_destructor);
+    (void)fhm_clear_and_free(&prev_map,
+                             map_pq_prev_vertex_dist_point_destructor);
     clear_and_flush_graph(graph);
     return success;
 }
@@ -784,7 +790,8 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
                      1, free(p););
             return;
         }
-        push(dist_q, &p->pq_elem);
+        [[maybe_unused]] ccc_result const res = push(dist_q, &p->pq_elem);
+        assert(res == CCC_OK);
     }
 }
 
@@ -856,13 +863,13 @@ vertex_degree(struct vertex const *const v)
 static inline Cell *
 grid_at_mut(struct graph const *const graph, struct point p)
 {
-    return &graph->grid[p.r * graph->cols + p.c];
+    return &graph->grid[(p.r * graph->cols) + p.c];
 }
 
 static inline Cell
 grid_at(struct graph const *const graph, struct point p)
 {
-    return graph->grid[p.r * graph->cols + p.c];
+    return graph->grid[(p.r * graph->cols) + p.c];
 }
 
 static inline uint16_t
