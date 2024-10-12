@@ -192,7 +192,7 @@ void *ccc_fhm_insert_entry(ccc_fh_map_entry const *e, ccc_fh_map_elem *elem);
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return an immutable view into the table entry if one is present, or NULL. */
-void const *ccc_fhm_unwrap(ccc_fh_map_entry const *e);
+void *ccc_fhm_unwrap(ccc_fh_map_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
@@ -245,7 +245,7 @@ void *ccc_fhm_end(ccc_flat_hash_map const *h);
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. */
-bool ccc_fhm_empty(ccc_flat_hash_map const *h);
+bool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
 
 /** @brief Returns the size of the table.
 @param [in] h the hash table.
@@ -259,7 +259,7 @@ maintenance is required on the elements in the table before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(capacity). */
-void ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
+ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer.
 @param [in] h the table to be cleared.
@@ -291,7 +291,7 @@ size_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
 @param [in] the printer function for the type stored by the user.
 
 This function will only print the occupied slots in the table. O(capacity) */
-void ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn);
+ccc_result ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn);
 
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
@@ -335,7 +335,7 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_begin(args...) ccc_fhm_begin(args)
 #    define fhm_next(args...) ccc_fhm_next(args)
 #    define fhm_end(args...) ccc_fhm_end(args)
-#    define fhm_empty(args...) ccc_fhm_empty(args)
+#    define fhm_is_empty(args...) ccc_fhm_is_empty(args)
 #    define fhm_size(args...) ccc_fhm_size(args)
 #    define fhm_clear(args...) ccc_fhm_clear(args)
 #    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)

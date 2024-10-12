@@ -139,7 +139,7 @@
 
 #define ccc_size(container_entry_ptr) ccc_impl_size(container_entry_ptr)
 
-#define ccc_empty(container_entry_ptr) ccc_impl_empty(container_entry_ptr)
+#define ccc_is_empty(container_entry_ptr) ccc_impl_is_empty(container_entry_ptr)
 
 #define ccc_validate(container_entry_ptr) ccc_impl_validate(container_entry_ptr)
 
@@ -200,7 +200,7 @@
 #    define splice_range(args...) ccc_splice_range(args)
 
 #    define size(args...) ccc_size(args)
-#    define empty(args...) ccc_empty(args)
+#    define is_empty(args...) ccc_is_empty(args)
 #    define validate(args...) ccc_validate(args)
 #    define print(args...) ccc_print(args)
 

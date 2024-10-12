@@ -19,7 +19,7 @@ BEGIN_STATIC_TEST(map_test_insert_one)
     struct val single;
     single.val = 0;
     CHECK(insert_entry(entry_vr(&s, &single.val), &single.elem) != NULL, true);
-    CHECK(empty(&s), false);
+    CHECK(is_empty(&s), false);
     CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true);
     END_TEST();
 }

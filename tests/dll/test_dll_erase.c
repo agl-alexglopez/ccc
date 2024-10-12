@@ -29,7 +29,7 @@ BEGIN_STATIC_TEST(dll_test_push_pop_front)
     CHECK(v == NULL, false);
     CHECK(v->val, 2);
     pop_front(&dll);
-    CHECK(empty(&dll), true);
+    CHECK(is_empty(&dll), true);
     END_TEST();
 }
 
@@ -54,7 +54,7 @@ BEGIN_STATIC_TEST(dll_test_push_pop_back)
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
     pop_back(&dll);
-    CHECK(empty(&dll), true);
+    CHECK(is_empty(&dll), true);
     END_TEST();
 }
 
@@ -75,7 +75,7 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle)
     CHECK(check_order(&dll, 1, (int[1]){0}), PASS);
     dll_erase(&dll, &vals[0].e);
     CHECK(validate(&dll), true);
-    CHECK(empty(&dll), true);
+    CHECK(is_empty(&dll), true);
     END_TEST();
 }
 

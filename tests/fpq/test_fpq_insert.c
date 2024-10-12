@@ -19,7 +19,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_one)
                        NULL, val_cmp, NULL);
     single[0].val = 0;
     push(&fpq, &single[0]);
-    CHECK(ccc_fpq_empty(&fpq), false);
+    CHECK(ccc_fpq_is_empty(&fpq), false);
     END_TEST();
 }
 
@@ -98,7 +98,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
 
     /* Test the printing function at least once. */
-    ccc_fpq_print(&fpq, 0, val_print);
+    CHECK(ccc_fpq_print(&fpq, val_print), CCC_OK);
 
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);

@@ -164,17 +164,19 @@ void *ccc_frm_rend(ccc_flat_realtime_ordered_map const *frm);
 
 /*======================       Cleanup     ==================================*/
 
-void ccc_frm_clear(ccc_flat_realtime_ordered_map *frm, ccc_destructor_fn *fn);
+ccc_result ccc_frm_clear(ccc_flat_realtime_ordered_map *frm,
+                         ccc_destructor_fn *fn);
 ccc_result ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *frm,
                                   ccc_destructor_fn *fn);
 
 /*======================       Getters     ==================================*/
 
-bool ccc_frm_empty(ccc_flat_realtime_ordered_map const *frm);
+bool ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *frm);
 size_t ccc_frm_size(ccc_flat_realtime_ordered_map const *frm);
 bool ccc_frm_validate(ccc_flat_realtime_ordered_map const *frm);
 void *ccc_frm_root(ccc_flat_realtime_ordered_map const *frm);
-void ccc_frm_print(ccc_flat_realtime_ordered_map const *frm, ccc_print_fn *fn);
+ccc_result ccc_frm_print(ccc_flat_realtime_ordered_map const *frm,
+                         ccc_print_fn *fn);
 
 /*======================      Namespace    ==================================*/
 
@@ -199,7 +201,7 @@ typedef ccc_frtm_entry frtm_entry;
 #    define frm_rend(args...) ccc_frm_rend(args)
 #    define frm_root(args...) ccc_frm_root(args)
 #    define frm_root(args...) ccc_frm_root(args)
-#    define frm_empty(args...) ccc_frm_empty(args)
+#    define frm_is_empty(args...) ccc_frm_is_empty(args)
 #    define frm_size(args...) ccc_frm_size(args)
 #    define frm_clear(args...) ccc_frm_clear(args)
 #    define frm_clear_and_free(args...) ccc_frm_clear_and_free(args)

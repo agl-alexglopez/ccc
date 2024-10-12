@@ -35,12 +35,12 @@ ccc_pq_front(ccc_priority_queue const *const ppq)
     return ppq->root_ ? struct_base(ppq, ppq->root_) : NULL;
 }
 
-void
+ccc_result
 ccc_pq_push(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
     if (!e || !ppq)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     init_node(e);
     if (ppq->alloc_)
@@ -48,20 +48,21 @@ ccc_pq_push(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
         void *node = ppq->alloc_(NULL, ppq->elem_sz_);
         if (!node)
         {
-            return;
+            return CCC_MEM_ERR;
         }
         (void)memcpy(node, struct_base(ppq, e), ppq->elem_sz_);
     }
     ppq->root_ = merge(ppq, ppq->root_, e);
     ++ppq->sz_;
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_pq_pop(ccc_priority_queue *const ppq)
 {
-    if (!ppq->root_)
+    if (!ppq || !ppq->root_)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     struct ccc_pq_elem_ *const popped = ppq->root_;
     ppq->root_ = delete_min(ppq, ppq->root_);
@@ -69,39 +70,49 @@ ccc_pq_pop(ccc_priority_queue *const ppq)
     clear_node(popped);
     if (ppq->alloc_)
     {
-        ppq->alloc_(struct_base(ppq, popped), 0);
+        (void)ppq->alloc_(struct_base(ppq, popped), 0);
     }
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_pq_erase(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
-    if (!ppq->root_ || !e->next_sibling_ || !e->prev_sibling_)
+    if (!ppq || !e || !ppq->root_ || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     ppq->root_ = delete (ppq, e);
     ppq->sz_--;
     clear_node(e);
     if (ppq->alloc_)
     {
-        ppq->alloc_(struct_base(ppq, e), 0);
+        (void)ppq->alloc_(struct_base(ppq, e), 0);
     }
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_pq_clear(ccc_priority_queue *const ppq, ccc_destructor_fn *fn)
 {
-    while (!ccc_pq_empty(ppq))
+    if (!ppq)
     {
-        fn((ccc_user_type_mut){.user_type = ccc_pq_front(ppq),
-                               .aux = ppq->aux_});
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_pq_is_empty(ppq))
+    {
+        if (fn)
+        {
+            fn((ccc_user_type_mut){.user_type = ccc_pq_front(ppq),
+                                   .aux = ppq->aux_});
+        }
         ccc_pq_pop(ppq);
     }
+    return CCC_OK;
 }
 
 bool
-ccc_pq_empty(ccc_priority_queue const *const ppq)
+ccc_pq_is_empty(ccc_priority_queue const *const ppq)
 {
     return !ppq->sz_;
 }
@@ -207,10 +218,15 @@ ccc_pq_validate(ccc_priority_queue const *const ppq)
     return true;
 }
 
-void
+ccc_result
 ccc_pq_print(ccc_priority_queue const *const pq, ccc_print_fn *const fn)
 {
+    if (!pq || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     print_pq(pq, pq->root_, fn);
+    return CCC_OK;
 }
 
 ccc_threeway_cmp

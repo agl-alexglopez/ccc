@@ -338,7 +338,7 @@ ccc_frm_occupied(ccc_frtm_entry const *const e)
 }
 
 bool
-ccc_frm_empty(ccc_flat_realtime_ordered_map const *const frm)
+ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *const frm)
 {
     return !ccc_frm_size(frm);
 }
@@ -353,7 +353,7 @@ ccc_frm_size(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_begin(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_empty(&frm->buf_))
+    if (ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -364,7 +364,7 @@ ccc_frm_begin(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_empty(&frm->buf_))
+    if (ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -376,7 +376,7 @@ void *
 ccc_frm_next(ccc_flat_realtime_ordered_map const *const frm,
              ccc_frtm_elem const *const e)
 {
-    if (ccc_buf_empty(&frm->buf_))
+    if (ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -388,7 +388,7 @@ void *
 ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
               ccc_frtm_elem const *const e)
 {
-    if (ccc_buf_empty(&frm->buf_))
+    if (ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -399,7 +399,7 @@ ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
 void *
 ccc_frm_end(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_empty(&frm->buf_))
+    if (ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -409,32 +409,32 @@ ccc_frm_end(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_rend(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_empty(&frm->buf_))
+    if (ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
     return base_at(frm, 0);
 }
 
-void
+ccc_result
 ccc_frm_clear(ccc_flat_realtime_ordered_map *const frm,
               ccc_destructor_fn *const fn)
 {
     if (!frm)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     if (!fn)
     {
-        ccc_buf_size_set(&frm->buf_, 1);
         frm->root_ = 0;
-        return;
+        return ccc_buf_size_set(&frm->buf_, 1);
     }
-    while (!ccc_frm_empty(frm))
+    while (!ccc_frm_is_empty(frm))
     {
         void *const deleted = remove_fixup(frm, frm->root_);
         fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
     }
+    return CCC_OK;
 }
 
 ccc_result
@@ -450,7 +450,7 @@ ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *const frm,
         frm->root_ = 0;
         return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
     }
-    while (!ccc_frm_empty(frm))
+    while (!ccc_frm_is_empty(frm))
     {
         void *const deleted = remove_fixup(frm, frm->root_);
         fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
@@ -470,11 +470,16 @@ ccc_frm_root(ccc_flat_realtime_ordered_map const *const frm)
     return frm->root_ ? base_at(frm, frm->root_) : NULL;
 }
 
-void
+ccc_result
 ccc_frm_print(ccc_flat_realtime_ordered_map const *const frm,
               ccc_print_fn *const fn)
 {
+    if (!frm || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     tree_print(frm, frm->root_, fn);
+    return CCC_OK;
 }
 
 /*========================  Private Interface  ==============================*/
@@ -632,7 +637,7 @@ static struct ccc_range_
 equal_range(struct ccc_frm_ const *const t, void const *const begin_key,
             void const *const end_key, enum frm_branch_ const traversal)
 {
-    if (ccc_frm_empty(t))
+    if (ccc_frm_is_empty(t))
     {
         return (struct ccc_range_){};
     }
@@ -679,7 +684,7 @@ alloc_back(struct ccc_frm_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementor is always at least 1. */
-    if (ccc_buf_empty(&t->buf_))
+    if (ccc_buf_is_empty(&t->buf_))
     {
         void *const sentinel = ccc_buf_alloc_back(&t->buf_);
         if (!sentinel)

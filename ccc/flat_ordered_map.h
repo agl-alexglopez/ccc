@@ -129,9 +129,9 @@ void *ccc_fom_root(ccc_flat_ordered_map const *);
 /*===========================    Getters    =================================*/
 
 size_t ccc_fom_size(ccc_flat_ordered_map const *);
-bool ccc_fom_empty(ccc_flat_ordered_map const *);
+bool ccc_fom_is_empty(ccc_flat_ordered_map const *);
 bool ccc_fom_validate(ccc_flat_ordered_map const *);
-void ccc_fom_print(ccc_flat_ordered_map const *fom, ccc_print_fn *fn);
+ccc_result ccc_fom_print(ccc_flat_ordered_map const *fom, ccc_print_fn *fn);
 
 /*===========================    Namespace  =================================*/
 
@@ -175,7 +175,7 @@ typedef ccc_f_om_entry f_om_entry;
 #    define fom_rnext(args...) ccc_fom_rnext(args)
 #    define fom_root(args...) ccc_fom_root(args)
 #    define fom_size(args...) ccc_fom_size(args)
-#    define fom_empty(args...) ccc_fom_empty(args)
+#    define fom_is_empty(args...) ccc_fom_is_empty(args)
 #    define fom_validate(args...) ccc_fom_validate(args)
 #    define fom_print(args...) ccc_fom_print(args)
 #endif /* FLAT_ORDERED_MAP_USING_NAMESPACE_CCC */

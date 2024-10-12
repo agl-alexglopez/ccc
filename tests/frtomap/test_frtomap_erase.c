@@ -36,7 +36,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_erase_shuffled)
         CHECK(v->id, i);
         CHECK(validate(&s), true);
     }
-    CHECK(frm_empty(&s), true);
+    CHECK(is_empty(&s), true);
     END_TEST();
 }
 
@@ -99,7 +99,7 @@ BEGIN_STATIC_TEST(frtomap_test_weak_srand)
         CHECK(v == NULL, false);
         CHECK(validate(&s), true);
     }
-    CHECK(frm_empty(&s), true);
+    CHECK(is_empty(&s), true);
     END_TEST();
 }
 

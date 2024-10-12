@@ -69,7 +69,7 @@ ccc_result ccc_fpq_realloc(ccc_flat_priority_queue *, size_t new_capacity,
                            ccc_alloc_fn *);
 void *ccc_fpq_push(ccc_flat_priority_queue *, void const *);
 void *ccc_fpq_front(ccc_flat_priority_queue const *);
-void ccc_fpq_pop(ccc_flat_priority_queue *);
+ccc_result ccc_fpq_pop(ccc_flat_priority_queue *);
 void *ccc_fpq_erase(ccc_flat_priority_queue *, void *);
 bool ccc_fpq_update(ccc_flat_priority_queue *, void *, ccc_update_fn *, void *);
 bool ccc_fpq_increase(ccc_flat_priority_queue *, void *, ccc_update_fn *,
@@ -77,15 +77,15 @@ bool ccc_fpq_increase(ccc_flat_priority_queue *, void *, ccc_update_fn *,
 bool ccc_fpq_decrease(ccc_flat_priority_queue *, void *, ccc_update_fn *,
                       void *);
 
-void ccc_fpq_clear(ccc_flat_priority_queue *, ccc_destructor_fn *);
+ccc_result ccc_fpq_clear(ccc_flat_priority_queue *, ccc_destructor_fn *);
 ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *,
                                   ccc_destructor_fn *);
-bool ccc_fpq_empty(ccc_flat_priority_queue const *);
+bool ccc_fpq_is_empty(ccc_flat_priority_queue const *);
 size_t ccc_fpq_size(ccc_flat_priority_queue const *);
 bool ccc_fpq_validate(ccc_flat_priority_queue const *);
 ccc_threeway_cmp ccc_fpq_order(ccc_flat_priority_queue const *);
 
-void ccc_fpq_print(ccc_flat_priority_queue const *, size_t, ccc_print_fn *);
+ccc_result ccc_fpq_print(ccc_flat_priority_queue const *, ccc_print_fn *);
 
 #ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_priority_queue flat_priority_queue;
@@ -100,7 +100,7 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_increase(args...) ccc_fpq_increase(args)
 #    define fpq_decrease(args...) ccc_fpq_decrease(args)
 #    define fpq_clear(args...) ccc_fpq_clear(args)
-#    define fpq_empty(args...) ccc_fpq_empty(args)
+#    define fpq_is_empty(args...) ccc_fpq_is_empty(args)
 #    define fpq_size(args...) ccc_fpq_size(args)
 #    define fpq_validate(args...) ccc_fpq_validate(args)
 #    define fpq_order(args...) ccc_fpq_order(args)

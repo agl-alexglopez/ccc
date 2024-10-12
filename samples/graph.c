@@ -437,7 +437,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {0};
-    while (!empty(&bfs) && !success)
+    while (!is_empty(&bfs) && !success)
     {
         cur = *((struct point *)front(&bfs));
         pop_front(&bfs);
@@ -706,7 +706,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;
-    while (!empty(&dist_q))
+    while (!is_empty(&dist_q))
     {
         /* PQ entries are popped but the map will free the memory at
            the end because it always holds a reference to its pq_elem. */

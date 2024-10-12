@@ -83,7 +83,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const input_array,
         }
     }
     ccc_buf_size_set(&fpq->buf_, input_n);
-    (void)memcpy(ccc_buf_base(&fpq->buf_), input_array,
+    (void)memcpy(ccc_buf_begin(&fpq->buf_), input_array,
                  input_n * input_elem_size);
     void *const tmp = ccc_buf_at(&fpq->buf_, input_n);
     for (size_t i = input_n / 2 + 1; i--;)
@@ -119,7 +119,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
     size_t i = buf_sz - 1;
     if (buf_sz > 1)
     {
-        void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
+        void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
         i = bubble_up(fpq, tmp, i);
     }
     else
@@ -129,28 +129,29 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
     return ccc_buf_at(&fpq->buf_, i);
 }
 
-void
+ccc_result
 ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 {
-    if (ccc_buf_empty(&fpq->buf_))
+    if (!fpq || ccc_buf_is_empty(&fpq->buf_))
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     if (ccc_buf_size(&fpq->buf_) == 1)
     {
         ccc_buf_pop_back(&fpq->buf_);
-        return;
+        return CCC_OK;
     }
-    void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
+    void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, 0, ccc_buf_size(&fpq->buf_) - 1);
     ccc_buf_pop_back(&fpq->buf_);
     bubble_down(fpq, tmp, 0);
+    return CCC_OK;
 }
 
 void *
 ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 {
-    if (ccc_buf_empty(&fpq->buf_))
+    if (ccc_buf_is_empty(&fpq->buf_))
     {
         return NULL;
     }
@@ -191,7 +192,7 @@ bool
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
                ccc_update_fn *fn, void *aux)
 {
-    if (ccc_buf_empty(&fpq->buf_))
+    if (ccc_buf_is_empty(&fpq->buf_))
     {
         return false;
     }
@@ -238,7 +239,7 @@ ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
 void *
 ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {
-    if (ccc_buf_empty(&fpq->buf_))
+    if (ccc_buf_is_empty(&fpq->buf_))
     {
         return NULL;
     }
@@ -246,9 +247,9 @@ ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 }
 
 bool
-ccc_fpq_empty(ccc_flat_priority_queue const *const fpq)
+ccc_fpq_is_empty(ccc_flat_priority_queue const *const fpq)
 {
-    return ccc_buf_empty(&fpq->buf_);
+    return ccc_buf_is_empty(&fpq->buf_);
 }
 
 size_t
@@ -263,9 +264,13 @@ ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
     return fpq->order_;
 }
 
-void
+ccc_result
 ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
 {
+    if (!fpq)
+    {
+        return CCC_INPUT_ERR;
+    }
     if (fn)
     {
         size_t const sz = ccc_buf_size(&fpq->buf_);
@@ -274,7 +279,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
             fn((ccc_user_type_mut){.user_type = at(fpq, i), .aux = fpq->aux_});
         }
     }
-    ccc_buf_pop_back_n(&fpq->buf_, ccc_buf_size(&fpq->buf_));
+    return ccc_buf_pop_back_n(&fpq->buf_, ccc_buf_size(&fpq->buf_));
 }
 
 ccc_result
@@ -320,11 +325,15 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     return true;
 }
 
-void
-ccc_fpq_print(ccc_flat_priority_queue const *const fpq, size_t const i,
-              ccc_print_fn *const fn)
+ccc_result
+ccc_fpq_print(ccc_flat_priority_queue const *const fpq, ccc_print_fn *const fn)
 {
-    print_heap(fpq, i, fn);
+    if (!fpq || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
+    print_heap(fpq, 0, fn);
+    return CCC_OK;
 }
 
 /*===========================   Implementation   ========================== */
@@ -394,8 +403,8 @@ at(struct ccc_fpq_ const *const fpq, size_t const i)
 static inline size_t
 index_of(struct ccc_fpq_ const *const fpq, void const *const slot)
 {
-    assert(slot >= ccc_buf_base(&fpq->buf_));
-    size_t const i = (((char *)slot) - ((char *)ccc_buf_base(&fpq->buf_)))
+    assert(slot >= ccc_buf_begin(&fpq->buf_));
+    size_t const i = (((char *)slot) - ((char *)ccc_buf_begin(&fpq->buf_)))
                      / ccc_buf_elem_size(&fpq->buf_);
     assert(i < ccc_buf_size(&fpq->buf_));
     return i;

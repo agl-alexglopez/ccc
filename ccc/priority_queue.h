@@ -42,17 +42,17 @@ typedef struct ccc_pq_ ccc_priority_queue;
 void *ccc_pq_front(ccc_priority_queue const *);
 
 /* Adds an element to the priority queue in correct total order. O(1). */
-void ccc_pq_push(ccc_priority_queue *, ccc_pq_elem *);
+ccc_result ccc_pq_push(ccc_priority_queue *, ccc_pq_elem *);
 
 /* Pops the front element from the priority queue. O(lgN). */
-void ccc_pq_pop(ccc_priority_queue *);
+ccc_result ccc_pq_pop(ccc_priority_queue *);
 
 /* Erase the specified element from the priority queue. This need not be
    the front element. O(lgN). */
-void ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *);
+ccc_result ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *);
 
 /* Returns true if the priority queue is empty false if not. */
-bool ccc_pq_empty(ccc_priority_queue const *);
+bool ccc_pq_is_empty(ccc_priority_queue const *);
 
 /* Returns the size of the priority queue. */
 size_t ccc_pq_size(ccc_priority_queue const *);
@@ -83,13 +83,13 @@ ccc_threeway_cmp ccc_pq_order(ccc_priority_queue const *);
 /* Calls the user provided destructor on each element in the priority queue.
    It is safe to free the struct if it has been heap allocated as elements
    are popped from the priority queue before the function is called. O(NlgN). */
-void ccc_pq_clear(ccc_priority_queue *, ccc_destructor_fn *);
+ccc_result ccc_pq_clear(ccc_priority_queue *, ccc_destructor_fn *);
 
 /* Internal validation function for the state of the heap. This should be of
    little interest to the user. */
 bool ccc_pq_validate(ccc_priority_queue const *);
 
-void ccc_pq_print(ccc_priority_queue const *, ccc_print_fn *);
+ccc_result ccc_pq_print(ccc_priority_queue const *, ccc_print_fn *);
 
 #ifndef PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_pq_elem pq_elem;
@@ -99,7 +99,7 @@ typedef ccc_priority_queue priority_queue;
 #    define pq_push(args...) ccc_pq_push(args)
 #    define pq_pop(args...) ccc_pq_pop(args)
 #    define pq_erase(args...) ccc_pq_erase(args)
-#    define pq_empty(args...) ccc_pq_empty(args)
+#    define pq_is_empty(args...) ccc_pq_is_empty(args)
 #    define pq_size(args...) ccc_pq_size(args)
 #    define pq_update(args...) ccc_pq_update(args)
 #    define pq_increase(args...) ccc_pq_increase(args)

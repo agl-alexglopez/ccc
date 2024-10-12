@@ -46,7 +46,7 @@ static uint64_t filter(struct ccc_fhm_ const *h, void const *key);
 /*=========================   Interface    ==================================*/
 
 bool
-ccc_fhm_empty(ccc_flat_hash_map const *const h)
+ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 {
     return !ccc_buf_size(&h->buf_);
 }
@@ -224,10 +224,10 @@ ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
     return e->impl_.entry_.e_;
 }
 
-void const *
+void *
 ccc_fhm_unwrap(ccc_fh_map_entry const *const e)
 {
-    if (!(e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED))
+    if (!e || !(e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
@@ -237,19 +237,19 @@ ccc_fhm_unwrap(ccc_fh_map_entry const *const e)
 bool
 ccc_fhm_occupied(ccc_fh_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
+    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
 bool
 ccc_fhm_insert_error(ccc_fh_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
+    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
-    if (ccc_buf_empty(&h->buf_))
+    if (ccc_buf_is_empty(&h->buf_))
     {
         return NULL;
     }
@@ -292,9 +292,13 @@ entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
     return res;
 }
 
-void
+ccc_result
 ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn)
 {
+    if (!h || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     for (void const *i = ccc_buf_begin(&h->buf_);
          i != ccc_buf_capacity_end(&h->buf_); i = ccc_buf_next(&h->buf_, i))
     {
@@ -303,6 +307,7 @@ ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn)
             fn((ccc_user_type){.user_type = (void *)i, .aux = h->aux_});
         }
     }
+    return CCC_OK;
 }
 
 size_t
@@ -317,13 +322,17 @@ ccc_fhm_next_prime(size_t n)
     return n;
 }
 
-void
+ccc_result
 ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
+    if (!h)
+    {
+        return CCC_INPUT_ERR;
+    }
     if (!fn)
     {
         h->buf_.sz_ = 0;
-        return;
+        return CCC_OK;
     }
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
@@ -334,6 +343,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn((ccc_user_type_mut){.user_type = slot, .aux = h->aux_});
         }
     }
+    return CCC_OK;
 }
 
 ccc_result
@@ -468,7 +478,7 @@ ccc_impl_fhm_increment(size_t const capacity, size_t i)
 void *
 ccc_impl_fhm_base(struct ccc_fhm_ const *const h)
 {
-    return ccc_buf_base(&h->buf_);
+    return ccc_buf_begin(&h->buf_);
 }
 
 inline uint64_t *
@@ -625,7 +635,7 @@ maybe_resize(struct ccc_fhm_ *const h)
     }
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
-    memset(ccc_buf_base(&new_hash.buf_), CCC_FHM_EMPTY,
+    memset(ccc_buf_begin(&new_hash.buf_), CCC_FHM_EMPTY,
            ccc_buf_capacity(&new_hash.buf_)
                * ccc_buf_elem_size(&new_hash.buf_));
     for (void *slot = ccc_buf_begin(&h->buf_);

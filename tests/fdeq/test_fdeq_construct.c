@@ -12,7 +12,7 @@ BEGIN_STATIC_TEST(fdeq_test_construct)
     int vals[2];
     flat_double_ended_queue q
         = ccc_fdeq_init(vals, NULL, NULL, sizeof(vals) / sizeof(int));
-    CHECK(empty(&q), true);
+    CHECK(is_empty(&q), true);
     END_TEST();
 }
 

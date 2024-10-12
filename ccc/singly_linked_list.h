@@ -21,13 +21,16 @@ typedef struct ccc_sll_ ccc_singly_linked_list;
 void *ccc_sll_push_front(ccc_singly_linked_list *sll,
                          ccc_sll_elem *struct_handle);
 void *ccc_sll_front(ccc_singly_linked_list const *sll);
-void ccc_sll_pop_front(ccc_singly_linked_list *sll);
-void ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos_before,
-                    ccc_singly_linked_list *splice_sll, ccc_sll_elem *splice);
-void ccc_sll_splice_range(ccc_singly_linked_list *pos_sll,
+ccc_result ccc_sll_pop_front(ccc_singly_linked_list *sll);
+ccc_result ccc_sll_splice(ccc_singly_linked_list *pos_sll,
                           ccc_sll_elem *pos_before,
                           ccc_singly_linked_list *splice_sll,
-                          ccc_sll_elem *splice_begin, ccc_sll_elem *splice_end);
+                          ccc_sll_elem *splice);
+ccc_result ccc_sll_splice_range(ccc_singly_linked_list *pos_sll,
+                                ccc_sll_elem *pos_before,
+                                ccc_singly_linked_list *splice_sll,
+                                ccc_sll_elem *splice_begin,
+                                ccc_sll_elem *splice_end);
 
 void *ccc_sll_erase(ccc_singly_linked_list *erase_sll, ccc_sll_elem *erase);
 void *ccc_sll_erase_range(ccc_singly_linked_list *erase_sll,
@@ -41,11 +44,12 @@ void *ccc_sll_next(ccc_singly_linked_list const *sll,
 ccc_sll_elem *ccc_sll_begin_elem(ccc_singly_linked_list const *sll);
 ccc_sll_elem *ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 size_t ccc_sll_size(ccc_singly_linked_list const *sll);
-bool ccc_sll_empty(ccc_singly_linked_list const *sll);
+bool ccc_sll_is_empty(ccc_singly_linked_list const *sll);
 
 bool ccc_sll_validate(ccc_singly_linked_list const *sll);
-void ccc_sll_print(ccc_singly_linked_list const *sll, ccc_print_fn *fn);
-void ccc_sll_clear_and_free(ccc_singly_linked_list *sll, ccc_destructor_fn *fn);
+ccc_result ccc_sll_print(ccc_singly_linked_list const *sll, ccc_print_fn *fn);
+ccc_result ccc_sll_clear_and_free(ccc_singly_linked_list *sll,
+                                  ccc_destructor_fn *fn);
 
 #ifdef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef ccc_sll_elem sll_elem;
@@ -61,7 +65,7 @@ typedef ccc_singly_linked_list singly_linked_list;
 #    define sll_begin_elem(args...) ccc_sll_begin_elem(args)
 #    define sll_begin_sentinel(args...) ccc_sll_begin_sentinel(args)
 #    define sll_size(args...) ccc_sll_size(args)
-#    define sll_empty(args...) ccc_sll_empty(args)
+#    define sll_is_empty(args...) ccc_sll_is_empty(args)
 #    define sll_validate(args...) ccc_sll_validate(args)
 #    define sll_print(args...) ccc_sll_print(args)
 #endif /* SINGLY_LINKED_LIST_USING_NAMESPACE_CCC */

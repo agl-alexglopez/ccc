@@ -51,7 +51,7 @@ push_back_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
         elems += ((n - cap) * elem_sz);
         fq->front_ = 0;
         (void)memcpy(ccc_buf_at(&fq->buf_, 0), elems, elem_sz * cap);
-        ccc_buf_size_set(&fq->buf_, cap);
+        (void)ccc_buf_size_set(&fq->buf_, cap);
         return CCC_OK;
     }
     size_t const new_size = ccc_buf_size(&fq->buf_) + n;
@@ -70,7 +70,7 @@ push_back_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
     {
         fq->front_ = (fq->front_ + (new_size - cap)) % cap;
     }
-    ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
+    (void)ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
     return CCC_OK;
 }
 
@@ -91,7 +91,7 @@ push_front_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
         elems += ((n - cap) * elem_sz);
         fq->front_ = 0;
         (void)memcpy(ccc_buf_at(&fq->buf_, 0), elems, elem_sz * cap);
-        ccc_buf_size_set(&fq->buf_, cap);
+        (void)ccc_buf_size_set(&fq->buf_, cap);
         return CCC_OK;
     }
     size_t const space_ahead = front_free_slot(fq->front_, cap) + 1;
@@ -105,7 +105,7 @@ push_front_range(struct ccc_fdeq_ *const fq, size_t const n, char const *elems)
         (void)memcpy(ccc_buf_at(&fq->buf_, cap - remainder), elems,
                      remainder * elem_sz);
     }
-    ccc_buf_size_set(&fq->buf_, MIN(cap, ccc_buf_size(&fq->buf_) + n));
+    (void)ccc_buf_size_set(&fq->buf_, MIN(cap, ccc_buf_size(&fq->buf_) + n));
     fq->front_ = remainder ? cap - remainder : i;
     return CCC_OK;
 }
@@ -128,7 +128,7 @@ push_range(struct ccc_fdeq_ *const fq, char const *const pos, size_t n,
         fq->front_ = 0;
         void *ret = ccc_buf_at(&fq->buf_, 0);
         (void)memcpy(ret, elems, elem_sz * cap);
-        ccc_buf_size_set(&fq->buf_, cap);
+        (void)ccc_buf_size_set(&fq->buf_, cap);
         return ret;
     }
     size_t const pos_i = index_of(fq, pos);
@@ -175,7 +175,7 @@ push_range(struct ccc_fdeq_ *const fq, char const *const pos, size_t n,
             fq->front_ = (fq->front_ + excess) % cap;
         }
     }
-    ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
+    (void)ccc_buf_size_set(&fq->buf_, MIN(cap, new_size));
     return ccc_buf_at(&fq->buf_, pos_i);
 }
 
@@ -258,31 +258,27 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void *pos, size_t n,
     return push_range(fq, pos, n, elems);
 }
 
-void
+ccc_result
 ccc_fdeq_pop_front(ccc_flat_double_ended_queue *const fq)
 {
-    if (ccc_buf_empty(&fq->buf_))
+    if (ccc_buf_is_empty(&fq->buf_))
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     fq->front_ = increment(fq, fq->front_);
-    ccc_buf_size_minus(&fq->buf_, 1);
+    return ccc_buf_size_minus(&fq->buf_, 1);
 }
 
-void
+ccc_result
 ccc_fdeq_pop_back(ccc_flat_double_ended_queue *const fq)
 {
-    if (ccc_buf_empty(&fq->buf_))
-    {
-        return;
-    }
-    ccc_buf_size_minus(&fq->buf_, 1);
+    return ccc_buf_size_minus(&fq->buf_, 1);
 }
 
 void *
 ccc_fdeq_front(ccc_flat_double_ended_queue const *const fq)
 {
-    if (ccc_buf_empty(&fq->buf_))
+    if (ccc_buf_is_empty(&fq->buf_))
     {
         return NULL;
     }
@@ -292,7 +288,7 @@ ccc_fdeq_front(ccc_flat_double_ended_queue const *const fq)
 void *
 ccc_fdeq_back(ccc_flat_double_ended_queue const *const fq)
 {
-    if (ccc_buf_empty(&fq->buf_))
+    if (ccc_buf_is_empty(&fq->buf_))
     {
         return NULL;
     }
@@ -300,7 +296,7 @@ ccc_fdeq_back(ccc_flat_double_ended_queue const *const fq)
 }
 
 bool
-ccc_fdeq_empty(ccc_flat_double_ended_queue const *const fq)
+ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *const fq)
 {
     return !fq || !ccc_buf_size(&fq->buf_);
 }
@@ -367,7 +363,7 @@ ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *fq)
 void *
 ccc_fdeq_begin(ccc_flat_double_ended_queue const *fq)
 {
-    if (ccc_fdeq_empty(fq))
+    if (ccc_fdeq_is_empty(fq))
     {
         return NULL;
     }
@@ -425,12 +421,12 @@ ccc_fdeq_rend([[maybe_unused]] ccc_flat_double_ended_queue const *const fq)
 bool
 ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
 {
-    if (ccc_fdeq_empty(fq))
+    if (ccc_fdeq_is_empty(fq))
     {
         return true;
     }
     void *iter = ccc_fdeq_begin(fq);
-    if (ccc_buf_i(&fq->buf_, iter) != fq->front_)
+    if (ccc_buf_i(&fq->buf_, iter) != (ptrdiff_t)fq->front_)
     {
         return false;
     }
@@ -448,7 +444,7 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
     }
     size = 0;
     iter = ccc_fdeq_rbegin(fq);
-    if (ccc_buf_i(&fq->buf_, iter) != last_elem_index(fq))
+    if (ccc_buf_i(&fq->buf_, iter) != (ptrdiff_t)last_elem_index(fq))
     {
         return false;
     }
@@ -462,30 +458,34 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
     return size == ccc_fdeq_size(fq);
 }
 
-void
+ccc_result
 ccc_fdeq_print(ccc_flat_double_ended_queue const *const fq,
                ccc_print_fn *const fn)
 {
+    if (!fq || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     for (void const *iter = ccc_fdeq_begin(fq); iter != ccc_fdeq_end(fq);
          iter = ccc_fdeq_next(fq, iter))
     {
         fn((ccc_user_type){.user_type = iter, .aux = fq->aux_});
     }
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_fdeq_clear(ccc_flat_double_ended_queue *const fq,
                ccc_destructor_fn *destructor)
 {
     if (!fq)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     if (!destructor)
     {
         fq->front_ = 0;
-        ccc_buf_size_set(&fq->buf_, 0);
-        return;
+        return ccc_buf_size_set(&fq->buf_, 0);
     }
     size_t const back = back_free_slot(fq);
     for (size_t i = fq->front_; i != back; i = increment(fq, i))
@@ -493,21 +493,21 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fq,
         destructor((ccc_user_type_mut){.user_type = ccc_buf_at(&fq->buf_, i),
                                        .aux = fq->aux_});
     }
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
                         ccc_destructor_fn *destructor)
 {
     if (!fq)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     if (!destructor)
     {
         fq->buf_.sz_ = fq->front_ = 0;
-        ccc_buf_alloc(&fq->buf_, 0, fq->buf_.alloc_);
-        return;
+        return ccc_buf_alloc(&fq->buf_, 0, fq->buf_.alloc_);
     }
     size_t const back = back_free_slot(fq);
     for (size_t i = fq->front_; i != back; i = increment(fq, i))
@@ -515,7 +515,7 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fq,
         destructor((ccc_user_type_mut){.user_type = ccc_buf_at(&fq->buf_, i),
                                        .aux = fq->aux_});
     }
-    (void)ccc_buf_alloc(&fq->buf_, 0, fq->buf_.alloc_);
+    return ccc_buf_alloc(&fq->buf_, 0, fq->buf_.alloc_);
 }
 
 static inline ccc_result
@@ -547,7 +547,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     if (first_chunk < ccc_buf_size(&q->buf_))
     {
         (void)memcpy((char *)new_mem + (elem_sz * first_chunk),
-                     ccc_buf_base(&q->buf_),
+                     ccc_buf_begin(&q->buf_),
                      elem_sz * (ccc_buf_size(&q->buf_) - first_chunk));
     }
     (void)ccc_buf_alloc(&q->buf_, 0, q->buf_.alloc_);
@@ -576,9 +576,9 @@ rdistance(struct ccc_fdeq_ const *const fq, size_t const iter,
 static inline size_t
 index_of(struct ccc_fdeq_ const *const fq, void const *const pos)
 {
-    assert(pos >= ccc_buf_base(&fq->buf_));
+    assert(pos >= ccc_buf_begin(&fq->buf_));
     assert(pos < ccc_buf_capacity_end(&fq->buf_));
-    return ((char *)pos - (char *)ccc_buf_base(&fq->buf_))
+    return ((char *)pos - (char *)ccc_buf_begin(&fq->buf_))
            / ccc_buf_elem_size(&fq->buf_);
 }
 

@@ -53,7 +53,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_erase_shuffled)
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     /* Now let's delete everything with no errors. */
-    while (!ccc_fpq_empty(&fpq))
+    while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
         (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
@@ -82,7 +82,7 @@ BEGIN_STATIC_TEST(fpq_test_pop_max)
         CHECK(front->val, sorted_check[i]);
         pop(&fpq);
     }
-    CHECK(ccc_fpq_empty(&fpq), true);
+    CHECK(ccc_fpq_is_empty(&fpq), true);
     END_TEST();
 }
 
@@ -105,7 +105,7 @@ BEGIN_STATIC_TEST(fpq_test_pop_min)
         CHECK(front->val, sorted_check[i]);
         pop(&fpq);
     }
-    CHECK(ccc_fpq_empty(&fpq), true);
+    CHECK(ccc_fpq_is_empty(&fpq), true);
     END_TEST();
 }
 
@@ -134,7 +134,7 @@ BEGIN_STATIC_TEST(fpq_test_delete_prime_shuffle_duplicates)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     size_t cur_size = size;
-    while (!ccc_fpq_empty(&fpq))
+    while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
         (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
@@ -167,7 +167,7 @@ BEGIN_STATIC_TEST(fpq_test_prime_shuffle)
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;
-    while (!ccc_fpq_empty(&fpq))
+    while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
         CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true);
@@ -194,13 +194,13 @@ BEGIN_STATIC_TEST(fpq_test_weak_srand)
         CHECK(push(&fpq, &vals[i]) != NULL, true);
         CHECK(validate(&fpq), true);
     }
-    while (!ccc_fpq_empty(&fpq))
+    while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
         CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) != NULL, true);
         CHECK(validate(&fpq), true);
     }
-    CHECK(ccc_fpq_empty(&fpq), true);
+    CHECK(ccc_fpq_is_empty(&fpq), true);
     END_TEST();
 }
 

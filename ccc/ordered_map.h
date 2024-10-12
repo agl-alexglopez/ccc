@@ -153,15 +153,16 @@ void *ccc_om_rnext(ccc_ordered_map const *, ccc_o_map_elem const *);
 
 void *ccc_om_root(ccc_ordered_map const *);
 
-void ccc_om_clear(ccc_ordered_map *, ccc_destructor_fn *destructor);
+ccc_result ccc_om_clear(ccc_ordered_map *, ccc_destructor_fn *destructor);
 
-void ccc_om_clear_and_free(ccc_ordered_map *, ccc_destructor_fn *destructor);
+ccc_result ccc_om_clear_and_free(ccc_ordered_map *,
+                                 ccc_destructor_fn *destructor);
 
-bool ccc_om_empty(ccc_ordered_map const *);
+bool ccc_om_is_empty(ccc_ordered_map const *);
 
 size_t ccc_om_size(ccc_ordered_map const *);
 
-void ccc_om_print(ccc_ordered_map const *, ccc_print_fn *);
+ccc_result ccc_om_print(ccc_ordered_map const *, ccc_print_fn *);
 
 bool ccc_om_validate(ccc_ordered_map const *);
 
@@ -199,7 +200,7 @@ typedef ccc_o_map_entry o_map_entry;
 #    define om_end(args...) ccc_om_end(args)
 #    define om_rend(args...) ccc_om_rend(args)
 #    define om_size(args...) ccc_om_size(args)
-#    define om_empty(args...) ccc_om_empty(args)
+#    define om_is_empty(args...) ccc_om_is_empty(args)
 #    define om_clear(args...) ccc_om_clear(args)
 #    define om_clear_and_free(args...) ccc_om_clear_and_free(args)
 #    define om_print(args...) ccc_om_print(args)

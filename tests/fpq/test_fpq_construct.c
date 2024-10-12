@@ -26,7 +26,7 @@ BEGIN_STATIC_TEST(pq_test_empty)
     ccc_flat_priority_queue pq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(struct val)), CCC_LES, NULL,
                        val_cmp, NULL);
-    CHECK(ccc_fpq_empty(&pq), true);
+    CHECK(ccc_fpq_is_empty(&pq), true);
     END_TEST();
 }
 
@@ -38,7 +38,7 @@ BEGIN_STATIC_TEST(pq_test_macro)
                        val_cmp, NULL);
     struct val *res = ccc_fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res != NULL, true);
-    CHECK(ccc_fpq_empty(&pq), false);
+    CHECK(ccc_fpq_is_empty(&pq), false);
     struct val *res2 = ccc_fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res2 == NULL, true);
     END_TEST();
@@ -52,7 +52,7 @@ BEGIN_STATIC_TEST(pq_test_push)
                        val_cmp, NULL);
     struct val *res = push(&pq, &vals[0]);
     CHECK(res != NULL, true);
-    CHECK(ccc_fpq_empty(&pq), false);
+    CHECK(ccc_fpq_is_empty(&pq), false);
     END_TEST();
 }
 
@@ -64,7 +64,7 @@ BEGIN_STATIC_TEST(pq_test_raw_type)
     int val = 1;
     int *res = push(&pq, &val);
     CHECK(res != NULL, true);
-    CHECK(ccc_fpq_empty(&pq), false);
+    CHECK(ccc_fpq_is_empty(&pq), false);
     res = ccc_fpq_emplace(&pq, -1);
     CHECK(res != NULL, true);
     CHECK(ccc_fpq_size(&pq), 2);
@@ -86,7 +86,7 @@ BEGIN_STATIC_TEST(pq_test_heapify_init)
         heap, (sizeof(heap) / sizeof(int)), size, CCC_LES, NULL, int_cmp, NULL);
     int prev = *((int *)ccc_fpq_front(&pq));
     ccc_fpq_pop(&pq);
-    while (!ccc_fpq_empty(&pq))
+    while (!ccc_fpq_is_empty(&pq))
     {
         int cur = *((int *)ccc_fpq_front(&pq));
         ccc_fpq_pop(&pq);
@@ -112,7 +112,7 @@ BEGIN_STATIC_TEST(pq_test_heapify_copy)
     CHECK(ccc_fpq_size(&pq), sizeof(input) / sizeof(int));
     int prev = *((int *)ccc_fpq_front(&pq));
     ccc_fpq_pop(&pq);
-    while (!ccc_fpq_empty(&pq))
+    while (!ccc_fpq_is_empty(&pq))
     {
         int cur = *((int *)ccc_fpq_front(&pq));
         ccc_fpq_pop(&pq);

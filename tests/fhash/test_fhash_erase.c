@@ -64,7 +64,7 @@ BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
     CHECK(size(&h), to_insert);
     size_t cur_size = size(&h);
     int i = 0;
-    while (!empty(&h) && cur_size)
+    while (!is_empty(&h) && cur_size)
     {
         CHECK(contains(&h, &i), true);
         if (i % 2)

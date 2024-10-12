@@ -17,7 +17,7 @@ BEGIN_STATIC_TEST(depq_test_insert_one)
     struct val single;
     single.val = 0;
     push(&pq, &single.elem);
-    CHECK(empty(&pq), false);
+    CHECK(is_empty(&pq), false);
     CHECK(((struct val *)ccc_depq_root(&pq))->val == single.val, true);
     END_TEST();
 }

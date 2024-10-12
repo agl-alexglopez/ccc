@@ -22,18 +22,18 @@ void *ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fq, void *pos,
                             size_t n, void const *elems);
 void *ccc_fdeq_at(ccc_flat_double_ended_queue const *fq, size_t i);
 
-void ccc_fdeq_pop_front(ccc_flat_double_ended_queue *fq);
-void ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fq);
+ccc_result ccc_fdeq_pop_front(ccc_flat_double_ended_queue *fq);
+ccc_result ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fq);
 
 void *ccc_fdeq_front(ccc_flat_double_ended_queue const *fq);
 void *ccc_fdeq_back(ccc_flat_double_ended_queue const *fq);
 
-bool ccc_fdeq_empty(ccc_flat_double_ended_queue const *fq);
+bool ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fq);
 size_t ccc_fdeq_size(ccc_flat_double_ended_queue const *fq);
-void ccc_fdeq_clear(ccc_flat_double_ended_queue *fq,
-                    ccc_destructor_fn *destructor);
-void ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fq,
-                             ccc_destructor_fn *destructor);
+ccc_result ccc_fdeq_clear(ccc_flat_double_ended_queue *fq,
+                          ccc_destructor_fn *destructor);
+ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fq,
+                                   ccc_destructor_fn *destructor);
 
 void *ccc_fdeq_begin(ccc_flat_double_ended_queue const *fq);
 void *ccc_fdeq_rbegin(ccc_flat_double_ended_queue const *fq);
@@ -47,7 +47,8 @@ void *ccc_fdeq_end(ccc_flat_double_ended_queue const *fq);
 void *ccc_fdeq_rend(ccc_flat_double_ended_queue const *fq);
 
 bool ccc_fdeq_validate(ccc_flat_double_ended_queue const *fq);
-void ccc_fdeq_print(ccc_flat_double_ended_queue const *fq, ccc_print_fn *);
+ccc_result ccc_fdeq_print(ccc_flat_double_ended_queue const *fq,
+                          ccc_print_fn *);
 
 #ifdef FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_double_ended_queue flat_double_ended_queue;
@@ -62,7 +63,7 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_pop_back(args...) ccc_fdeq_pop_back(args)
 #    define fdeq_front(args...) ccc_fdeq_front(args)
 #    define fdeq_back(args...) ccc_fdeq_back(args)
-#    define fdeq_empty(args...) ccc_fdeq_empty(args)
+#    define fdeq_is_empty(args...) ccc_fdeq_is_empty(args)
 #    define fdeq_size(args...) ccc_fdeq_size(args)
 #    define fdeq_clear(args...) ccc_fdeq_clear(args)
 #    define fdeq_clear_and_free(args...) ccc_fdeq_clear_and_free(args)

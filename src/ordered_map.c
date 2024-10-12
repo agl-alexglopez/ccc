@@ -39,6 +39,11 @@ typedef enum
 static om_branch_ const inorder_traversal = R;
 static om_branch_ const reverse_inorder_traversal = L;
 
+/* Container entry return value. */
+
+static struct ccc_tree_entry_ container_entry(struct ccc_tree_ *t,
+                                              void const *key);
+
 /* No return value. */
 
 static void init_node(struct ccc_tree_ *, struct ccc_node_ *);
@@ -64,6 +69,8 @@ static void *connect_new_root(struct ccc_tree_ *, struct ccc_node_ *,
                               ccc_threeway_cmp);
 static void *max(struct ccc_tree_ const *);
 static void *min(struct ccc_tree_ const *);
+static void *key_in_slot(struct ccc_tree_ const *t, void const *slot);
+static void *key_from_node(struct ccc_tree_ const *, ccc_node_ const *);
 static struct ccc_range_ equal_range(struct ccc_tree_ *, void const *,
                                      void const *, om_branch_);
 
@@ -76,6 +83,8 @@ static struct ccc_node_ const *next(struct ccc_tree_ const *,
                                     struct ccc_node_ const *, om_branch_);
 static struct ccc_node_ *splay(struct ccc_tree_ *, struct ccc_node_ *,
                                void const *key, ccc_key_cmp_fn *);
+static struct ccc_node_ *elem_in_slot(struct ccc_tree_ const *t,
+                                      void const *slot);
 
 /* The key comes first. It is the "left hand side" of the comparison. */
 static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
@@ -83,33 +92,39 @@ static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
 
 /* ======================        Map Interface      ====================== */
 
-void
+ccc_result
 ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
 {
-
-    while (!ccc_om_empty(set))
+    if (!set)
     {
-        void *popped
-            = erase(&set->impl_,
-                    ccc_impl_om_key_from_node(&set->impl_, set->impl_.root_));
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_om_is_empty(set))
+    {
+        void *const popped
+            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
         if (destructor)
         {
             destructor((ccc_user_type_mut){.user_type = popped,
                                            .aux = set->impl_.aux_});
         }
     }
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_om_clear_and_free(ccc_ordered_map *const set,
                       ccc_destructor_fn *const destructor)
 {
 
-    while (!ccc_om_empty(set))
+    if (!set)
     {
-        void *popped
-            = erase(&set->impl_,
-                    ccc_impl_om_key_from_node(&set->impl_, set->impl_.root_));
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_om_is_empty(set))
+    {
+        void *const popped
+            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
         if (destructor)
         {
             destructor((ccc_user_type_mut){.user_type = popped,
@@ -117,13 +132,14 @@ ccc_om_clear_and_free(ccc_ordered_map *const set,
         }
         if (set->impl_.alloc_)
         {
-            set->impl_.alloc_(popped, 0);
+            (void)set->impl_.alloc_(popped, 0);
         }
     }
+    return CCC_OK;
 }
 
 bool
-ccc_om_empty(ccc_ordered_map const *const s)
+ccc_om_is_empty(ccc_ordered_map const *const s)
 {
     return empty(&s->impl_);
 }
@@ -140,33 +156,10 @@ ccc_om_contains(ccc_ordered_map *const s, void const *const key)
     return contains(&s->impl_, key);
 }
 
-struct ccc_tree_entry_
-ccc_impl_om_entry(struct ccc_tree_ *const t, void const *key)
-{
-    void *found = find(t, key);
-    if (found)
-    {
-        return (struct ccc_tree_entry_){
-            .t_ = t,
-            .entry_ = {
-                .e_ = found,
-                .stats_ = CCC_ENTRY_OCCUPIED,
-            },
-        };
-    }
-    return (struct ccc_tree_entry_){
-        .t_ = t,
-        .entry_ = {
-            .e_ = found,
-            .stats_ = CCC_ENTRY_VACANT,
-        },
-    };
-}
-
 ccc_o_map_entry
 ccc_om_entry(ccc_ordered_map *const s, void const *const key)
 {
-    return (ccc_o_map_entry){ccc_impl_om_entry(&s->impl_, key)};
+    return (ccc_o_map_entry){container_entry(&s->impl_, key)};
 }
 
 void *
@@ -174,8 +167,7 @@ ccc_om_insert_entry(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        elem->impl_
-            = *ccc_impl_om_elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
+        elem->impl_ = *elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
         memcpy(e->impl_.entry_.e_, struct_base(e->impl_.t_, &elem->impl_),
                e->impl_.t_->elem_sz_);
         return e->impl_.entry_.e_;
@@ -224,8 +216,7 @@ ccc_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
               void *const tmp)
 {
-    void *found = find(
-        &s->impl_, ccc_impl_om_key_from_node(&s->impl_, &out_handle->impl_));
+    void *found = find(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
     if (found)
     {
         assert(s->impl_.root_ != &s->impl_.end_);
@@ -248,8 +239,7 @@ ccc_om_try_insert(ccc_ordered_map *const s,
                   ccc_o_map_elem *const key_val_handle)
 {
     void *found
-        = find(&s->impl_,
-               ccc_impl_om_key_from_node(&s->impl_, &key_val_handle->impl_));
+        = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
     if (found)
     {
         assert(s->impl_.root_ != &s->impl_.end_);
@@ -269,11 +259,10 @@ ccc_om_insert_or_assign(ccc_ordered_map *const s,
                         ccc_o_map_elem *const key_val_handle)
 {
     void *found
-        = find(&s->impl_,
-               ccc_impl_om_key_from_node(&s->impl_, &key_val_handle->impl_));
+        = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
     if (found)
     {
-        key_val_handle->impl_ = *ccc_impl_om_elem_in_slot(&s->impl_, found);
+        key_val_handle->impl_ = *elem_in_slot(&s->impl_, found);
         assert(s->impl_.root_ != &s->impl_.end_);
         memcpy(found, struct_base(&s->impl_, &key_val_handle->impl_),
                s->impl_.elem_sz_);
@@ -290,8 +279,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const s,
 ccc_entry
 ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
-    void *n = erase(&s->impl_,
-                    ccc_impl_om_key_from_node(&s->impl_, &out_handle->impl_));
+    void *n = erase(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
     if (!n)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
@@ -312,8 +300,7 @@ ccc_om_remove_entry(ccc_o_map_entry *const e)
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *erased
-            = erase(e->impl_.t_,
-                    ccc_impl_om_key_in_slot(e->impl_.t_, e->impl_.entry_.e_));
+            = erase(e->impl_.t_, key_in_slot(e->impl_.t_, e->impl_.entry_.e_));
         assert(erased);
         if (e->impl_.t_->alloc_)
         {
@@ -334,6 +321,10 @@ ccc_om_get_key_val(ccc_ordered_map *const s, void const *const key)
 void *
 ccc_om_unwrap(ccc_o_map_entry const *const e)
 {
+    if (!e)
+    {
+        return NULL;
+    }
     return e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED ? e->impl_.entry_.e_
                                                         : NULL;
 }
@@ -341,13 +332,13 @@ ccc_om_unwrap(ccc_o_map_entry const *const e)
 bool
 ccc_om_insert_error(ccc_o_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
+    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 bool
 ccc_om_occupied(ccc_o_map_entry const *const e)
 {
-    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
+    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
 void *
@@ -417,19 +408,34 @@ ccc_om_root(ccc_ordered_map const *const s)
     return struct_base(&s->impl_, n);
 }
 
-void
+ccc_result
 ccc_om_print(ccc_ordered_map const *const s, ccc_print_fn *const fn)
 {
+    if (!s || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     tree_print(&s->impl_, s->impl_.root_, fn);
+    return CCC_OK;
 }
 
 bool
 ccc_om_validate(ccc_ordered_map const *const s)
 {
+    if (!s)
+    {
+        return false;
+    }
     return ccc_tree_validate(&s->impl_);
 }
 
 /*==========================  Private Interface  ============================*/
+
+struct ccc_tree_entry_
+ccc_impl_om_entry(struct ccc_tree_ *const t, void const *const key)
+{
+    return container_entry(t, key);
+}
 
 void *
 ccc_impl_om_insert(struct ccc_tree_ *const t, struct ccc_node_ *n)
@@ -440,24 +446,66 @@ ccc_impl_om_insert(struct ccc_tree_ *const t, struct ccc_node_ *n)
 void *
 ccc_impl_om_key_in_slot(struct ccc_tree_ const *const t, void const *const slot)
 {
-    return (char *)slot + t->key_offset_;
+    return key_in_slot(t, slot);
 }
 
 void *
 ccc_impl_om_key_from_node(struct ccc_tree_ const *const t,
                           struct ccc_node_ const *const n)
 {
-    return (char *)struct_base(t, n) + t->key_offset_;
+    return key_from_node(t, n);
 }
 
 struct ccc_node_ *
 ccc_impl_om_elem_in_slot(struct ccc_tree_ const *const t, void const *slot)
 {
 
-    return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
+    return elem_in_slot(t, slot);
 }
 
 /*======================  Static Splay Tree Helpers  ========================*/
+
+static inline struct ccc_tree_entry_
+container_entry(struct ccc_tree_ *const t, void const *const key)
+{
+    void *const found = find(t, key);
+    if (found)
+    {
+        return (struct ccc_tree_entry_){
+            .t_ = t,
+            .entry_ = {
+                .e_ = found,
+                .stats_ = CCC_ENTRY_OCCUPIED,
+            },
+        };
+    }
+    return (struct ccc_tree_entry_){
+        .t_ = t,
+        .entry_ = {
+            .e_ = found,
+            .stats_ = CCC_ENTRY_VACANT,
+        },
+    };
+}
+
+static inline void *
+key_from_node(struct ccc_tree_ const *const t, ccc_node_ const *const n)
+{
+    return (char *)struct_base(t, n) + t->key_offset_;
+}
+
+static inline void *
+key_in_slot(struct ccc_tree_ const *const t, void const *const slot)
+{
+    return (char *)slot + t->key_offset_;
+}
+
+static inline struct ccc_node_ *
+elem_in_slot(struct ccc_tree_ const *const t, void const *const slot)
+{
+
+    return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
+}
 
 static inline void
 init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)

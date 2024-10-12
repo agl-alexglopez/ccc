@@ -55,18 +55,19 @@ ccc_sll_begin_sentinel(ccc_singly_linked_list const *const sll)
     return (ccc_sll_elem *)&sll->sentinel_;
 }
 
-void
+ccc_result
 ccc_sll_pop_front(ccc_singly_linked_list *const sll)
 {
-    if (!sll->sz_)
+    if (!sll || !sll->sz_)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     struct ccc_sll_elem_ *remove = pop_front(sll);
     if (sll->alloc_)
     {
         (void)sll->alloc_(struct_base(sll, remove), 0);
     }
+    return CCC_OK;
 }
 
 void
@@ -78,16 +79,19 @@ ccc_impl_sll_push_front(struct ccc_sll_ *const sll,
     ++sll->sz_;
 }
 
-void
+ccc_result
 ccc_sll_splice(ccc_singly_linked_list *const pos_sll,
                ccc_sll_elem *const pos_before,
                ccc_singly_linked_list *const to_splice_sll,
                ccc_sll_elem *const to_splice)
 {
-    if (!pos_sll || !pos_before || !to_splice || !to_splice_sll
-        || to_splice == pos_before || pos_before->n_ == to_splice)
+    if (!pos_sll || !pos_before || !to_splice || !to_splice_sll)
     {
-        return;
+        return CCC_INPUT_ERR;
+    }
+    if (to_splice == pos_before || pos_before->n_ == to_splice)
+    {
+        return CCC_OK;
     }
     before(to_splice_sll, to_splice)->n_ = to_splice->n_;
     to_splice->n_ = pos_before->n_;
@@ -97,9 +101,10 @@ ccc_sll_splice(ccc_singly_linked_list *const pos_sll,
         --to_splice_sll->sz_;
         ++pos_sll->sz_;
     }
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
                      ccc_sll_elem *const pos_before,
                      ccc_singly_linked_list *const to_splice_sll,
@@ -107,15 +112,19 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
                      ccc_sll_elem *const to_splice_end)
 {
     if (!pos_sll || !pos_before || !to_splice_begin || !to_splice_end
-        || !to_splice_sll || to_splice_begin == pos_before
-        || to_splice_end == pos_before || pos_before->n_ == to_splice_begin)
+        || !to_splice_sll)
     {
-        return;
+        return CCC_INPUT_ERR;
+    }
+    if (to_splice_begin == pos_before || to_splice_end == pos_before
+        || pos_before->n_ == to_splice_begin)
+    {
+        return CCC_OK;
     }
     if (to_splice_begin == to_splice_end)
     {
         ccc_sll_splice(pos_sll, pos_before, to_splice_sll, to_splice_begin);
-        return;
+        return CCC_OK;
     }
     struct ccc_sll_elem_ *found = before(to_splice_sll, to_splice_begin);
     found->n_ = to_splice_end->n_;
@@ -128,6 +137,7 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
         to_splice_sll->sz_ -= sz;
         pos_sll->sz_ += sz;
     }
+    return CCC_OK;
 }
 
 void *
@@ -191,13 +201,17 @@ ccc_sll_next(ccc_singly_linked_list const *const sll,
     return struct_base(sll, iter_handle->n_);
 }
 
-void
+ccc_result
 ccc_sll_clear_and_free(ccc_singly_linked_list *const sll,
                        ccc_destructor_fn *const fn)
 {
-    while (!ccc_sll_empty(sll))
+    if (!sll)
     {
-        void *mem = struct_base(sll, pop_front(sll));
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_sll_is_empty(sll))
+    {
+        void *const mem = struct_base(sll, pop_front(sll));
         if (fn)
         {
             fn((ccc_user_type_mut){.user_type = mem, .aux = sll->aux_});
@@ -207,6 +221,7 @@ ccc_sll_clear_and_free(ccc_singly_linked_list *const sll,
             (void)sll->alloc_(mem, 0);
         }
     }
+    return CCC_OK;
 }
 
 bool
@@ -228,14 +243,19 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     return size == sll->sz_;
 }
 
-void
+ccc_result
 ccc_sll_print(ccc_singly_linked_list const *const l, ccc_print_fn *const fn)
 {
+    if (!l || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     for (void const *base = ccc_sll_begin(l); base != ccc_sll_end(l);
          base = ccc_sll_next(l, ccc_sll_elem_in(l, base)))
     {
         fn((ccc_user_type){.user_type = base, .aux = l->aux_});
     }
+    return CCC_OK;
 }
 
 size_t
@@ -245,7 +265,7 @@ ccc_sll_size(ccc_singly_linked_list const *const sll)
 }
 
 bool
-ccc_sll_empty(ccc_singly_linked_list const *const sll)
+ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 {
     return !sll->sz_;
 }

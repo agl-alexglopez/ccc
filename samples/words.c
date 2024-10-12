@@ -243,7 +243,7 @@ print_found(FILE *const f, str_view w)
     struct str_arena a = str_arena_create(arena_start_cap);
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
-    assert(!empty(&map));
+    assert(!is_empty(&map));
     struct clean_word wc = clean_word(&a, w);
     assert(wc.stat != WC_ARENA_ERR);
     if (wc.stat != WC_CLEAN_WORD)
@@ -264,7 +264,7 @@ print_top_n(FILE *const f, int n)
     struct str_arena a = str_arena_create(arena_start_cap);
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
-    assert(!empty(&map));
+    assert(!is_empty(&map));
     /* O(n) copy */
     struct frequency_alloc freqs = copy_frequencies(&map);
     assert(freqs.cap);
@@ -292,7 +292,7 @@ print_last_n(FILE *const f, int n)
     struct str_arena a = str_arena_create(arena_start_cap);
     assert(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
-    assert(!empty(&map));
+    assert(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
     assert(freqs.cap);
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
@@ -311,7 +311,7 @@ print_last_n(FILE *const f, int n)
 static struct frequency_alloc
 copy_frequencies(ccc_flat_ordered_map const *const map)
 {
-    assert(!empty(map));
+    assert(!is_empty(map));
     size_t const cap = sizeof(struct frequency) * (size(map) + 1);
     struct frequency *const freqs = malloc(cap);
     assert(freqs);
@@ -333,7 +333,7 @@ print_n(ccc_flat_priority_queue *const fpq, struct str_arena const *const a,
     {
         return;
     }
-    for (int w = 0; w < n && !empty(fpq); ++w)
+    for (int w = 0; w < n && !is_empty(fpq); ++w)
     {
         struct frequency *const word = front(fpq);
         char const *const arena_str = str_arena_at(a, word->ofs);

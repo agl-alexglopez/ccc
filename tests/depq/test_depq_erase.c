@@ -88,7 +88,7 @@ BEGIN_STATIC_TEST(depq_test_pop_max)
         CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val);
         ccc_depq_pop_max(&pq);
     }
-    CHECK(empty(&pq), true);
+    CHECK(is_empty(&pq), true);
     END_TEST();
 }
 
@@ -116,7 +116,7 @@ BEGIN_STATIC_TEST(depq_test_pop_min)
         CHECK(((struct val *)ccc_depq_min(&pq))->val, vals[i].val);
         ccc_depq_pop_min(&pq);
     }
-    CHECK(empty(&pq), true);
+    CHECK(is_empty(&pq), true);
     END_TEST();
 }
 
@@ -146,7 +146,7 @@ BEGIN_STATIC_TEST(depq_test_max_round_robin)
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
-    while (!empty(&depq))
+    while (!is_empty(&depq))
     {
         struct val const *front = ccc_depq_max(&depq);
         CHECK(front->id, order[i].id);
@@ -183,7 +183,7 @@ BEGIN_STATIC_TEST(depq_test_min_round_robin)
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
-    while (!empty(&depq))
+    while (!is_empty(&depq))
     {
         struct val const *front = ccc_depq_min(&depq);
         CHECK(front->id, order[i].id);
@@ -285,7 +285,7 @@ BEGIN_STATIC_TEST(depq_test_weak_srand)
         CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
-    CHECK(empty(&pq), true);
+    CHECK(is_empty(&pq), true);
     END_TEST();
 }
 

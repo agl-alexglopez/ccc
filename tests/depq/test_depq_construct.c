@@ -12,7 +12,7 @@ BEGIN_STATIC_TEST(depq_test_empty)
 {
     ccc_double_ended_priority_queue pq
         = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
-    CHECK(empty(&pq), true);
+    CHECK(is_empty(&pq), true);
     END_TEST();
 }
 

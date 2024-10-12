@@ -135,7 +135,7 @@ void
 ccc_depq_clear(ccc_double_ended_priority_queue *pq,
                ccc_destructor_fn *destructor)
 {
-    while (!ccc_depq_empty(pq))
+    while (!ccc_depq_is_empty(pq))
     {
         void *popped = pop_min(&pq->impl_);
         if (destructor)
@@ -151,7 +151,7 @@ ccc_depq_clear(ccc_double_ended_priority_queue *pq,
 }
 
 bool
-ccc_depq_empty(ccc_double_ended_priority_queue const *const pq)
+ccc_depq_is_empty(ccc_double_ended_priority_queue const *const pq)
 {
     return empty(&pq->impl_);
 }

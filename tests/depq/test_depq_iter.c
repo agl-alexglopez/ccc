@@ -240,7 +240,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
     }
     CHECK(iterator_check(&pq), PASS);
     size_t pop_count = 0;
-    while (!empty(&pq))
+    while (!is_empty(&pq))
     {
         ccc_depq_pop_max(&pq);
         ++pop_count;

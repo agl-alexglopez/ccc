@@ -82,7 +82,7 @@ BEGIN_STATIC_TEST(fhash_test_empty)
     ccc_result const res
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
-    CHECK(empty(&fh), true);
+    CHECK(is_empty(&fh), true);
     END_TEST();
 }
 

@@ -444,7 +444,7 @@ ccc_rom_size(ccc_realtime_ordered_map const *const rom)
 }
 
 bool
-ccc_rom_empty(ccc_realtime_ordered_map const *const rom)
+ccc_rom_is_empty(ccc_realtime_ordered_map const *const rom)
 {
     return !rom->sz_;
 }
@@ -465,17 +465,26 @@ ccc_rom_validate(ccc_realtime_ordered_map const *rom)
     return validate(rom);
 }
 
-void
+ccc_result
 ccc_rom_print(ccc_realtime_ordered_map const *const rom, ccc_print_fn *const fn)
 {
+    if (!rom || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     ccc_tree_print(rom, rom->root_, fn);
+    return CCC_OK;
 }
 
-void
+ccc_result
 ccc_rom_clear(ccc_realtime_ordered_map *const rom,
               ccc_destructor_fn *const destructor)
 {
-    while (!ccc_rom_empty(rom))
+    if (!rom)
+    {
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_rom_is_empty(rom))
     {
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
@@ -484,6 +493,7 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
                 (ccc_user_type_mut){.user_type = deleted, .aux = rom->aux_});
         }
     }
+    return CCC_OK;
 }
 
 ccc_result
@@ -494,7 +504,7 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
     {
         return CCC_NO_REALLOC;
     }
-    while (!ccc_rom_empty(rom))
+    while (!ccc_rom_is_empty(rom))
     {
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)

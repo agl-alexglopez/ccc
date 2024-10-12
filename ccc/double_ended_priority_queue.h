@@ -31,7 +31,7 @@ typedef union
 void ccc_depq_clear(ccc_double_ended_priority_queue *,
                     ccc_destructor_fn *destructor);
 
-bool ccc_depq_empty(ccc_double_ended_priority_queue const *);
+bool ccc_depq_is_empty(ccc_double_ended_priority_queue const *);
 
 size_t ccc_depq_size(ccc_double_ended_priority_queue const *);
 
@@ -93,7 +93,7 @@ typedef ccc_depq_elem depq_elem;
 typedef ccc_double_ended_priority_queue double_ended_priority_queue;
 #    define depq_init(args...) ccc_depq_init(args)
 #    define depq_clear(args...) ccc_depq_clear(args)
-#    define depq_empty(args...) ccc_depq_empty(args)
+#    define depq_is_empty(args...) ccc_depq_is_empty(args)
 #    define depq_size(args...) ccc_depq_size(args)
 #    define depq_push(args...) ccc_depq_push(args)
 #    define depq_pop_max(args...) ccc_depq_pop_max(args)

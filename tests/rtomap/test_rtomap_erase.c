@@ -36,7 +36,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_erase_shuffled)
         CHECK(v->val, vals[i].val);
         CHECK(validate(&s), true);
     }
-    CHECK(rom_empty(&s), true);
+    CHECK(is_empty(&s), true);
     END_TEST();
 }
 
@@ -98,7 +98,7 @@ BEGIN_STATIC_TEST(rtomap_test_weak_srand)
         (void)remove(&s, &vals[i].elem);
         CHECK(validate(&s), true);
     }
-    CHECK(rom_empty(&s), true);
+    CHECK(is_empty(&s), true);
     END_TEST();
 }
 

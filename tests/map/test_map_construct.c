@@ -12,7 +12,7 @@ BEGIN_STATIC_TEST(map_test_empty)
 {
     ccc_ordered_map s
         = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(empty(&s), true);
+    CHECK(is_empty(&s), true);
     END_TEST();
 }
 

@@ -21,7 +21,7 @@ BEGIN_STATIC_TEST(sll_test_push_pop_three)
         pop_front(&sll);
         CHECK(validate(&sll), true);
     }
-    CHECK(empty(&sll), true);
+    CHECK(is_empty(&sll), true);
     END_TEST();
 }
 
@@ -60,7 +60,7 @@ BEGIN_STATIC_TEST(sll_test_push_erase_range)
     CHECK(check_order(&sll, 2, (int[2]){4, 0}), PASS);
     after_erase = erase_range(&sll, sll_begin_elem(&sll), &vals[0].e);
     CHECK(after_erase, end(&sll));
-    CHECK(empty(&sll), true);
+    CHECK(is_empty(&sll), true);
     END_TEST();
 }
 
@@ -88,7 +88,7 @@ BEGIN_STATIC_TEST(sll_test_splice_two_lists)
     splice_range(&to_gain, sll_begin_elem(&to_gain), &to_lose,
                  sll_begin_elem(&to_lose), &to_lose_vals[0].e);
     CHECK(size(&to_gain), 7);
-    CHECK(empty(&to_lose), true);
+    CHECK(is_empty(&to_lose), true);
     CHECK(check_order(&to_gain, 7, (int[7]){1, 3, 2, 1, 0, 4, 0}), PASS);
     END_TEST();
 }

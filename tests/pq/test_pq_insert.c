@@ -17,7 +17,7 @@ BEGIN_STATIC_TEST(pq_test_insert_one)
     struct val single;
     single.val = 0;
     push(&pq, &single.elem);
-    CHECK(ccc_pq_empty(&pq), false);
+    CHECK(ccc_pq_is_empty(&pq), false);
     END_TEST();
 }
 

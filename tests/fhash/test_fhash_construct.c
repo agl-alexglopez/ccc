@@ -45,7 +45,7 @@ BEGIN_STATIC_TEST(fhash_test_empty)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
                    fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    CHECK(empty(&fh), true);
+    CHECK(is_empty(&fh), true);
     END_TEST();
 }
 
@@ -57,7 +57,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_functional)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
                    fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    CHECK(fhm_empty(&fh), true);
+    CHECK(is_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
     ccc_fh_map_entry ent = entry(&fh, &def.id);
     CHECK(unwrap(&ent) == NULL, true);
@@ -83,7 +83,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_macros)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
                    fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    CHECK(fhm_empty(&fh), true);
+    CHECK(is_empty(&fh), true);
     CHECK(get_key_val(&fh, &(int){137}) == NULL, true);
     int const key = 137;
     int mut = 99;
@@ -111,7 +111,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_functional)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
                    fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    CHECK(fhm_empty(&fh), true);
+    CHECK(is_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
@@ -153,7 +153,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
                    fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
-    CHECK(fhm_empty(&fh), true);
+    CHECK(is_empty(&fh), true);
 
     /* Returning a vacant entry is possible when modification is attemtped. */
     ccc_fh_map_entry *ent = and_modify(entry_vr(&fh, &(int){137}), mod);

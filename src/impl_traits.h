@@ -588,32 +588,32 @@
         ccc_flat_realtime_ordered_map const *: ccc_frm_size,                   \
         ccc_realtime_ordered_map const *: ccc_rom_size)((container_ptr))
 
-#define ccc_impl_empty(container_ptr)                                          \
+#define ccc_impl_is_empty(container_ptr)                                       \
     _Generic((container_ptr),                                                  \
-        ccc_buffer *: ccc_buf_empty,                                           \
-        ccc_flat_hash_map *: ccc_fhm_empty,                                    \
-        ccc_ordered_map *: ccc_om_empty,                                       \
-        ccc_flat_ordered_map *: ccc_fom_empty,                                 \
-        ccc_flat_priority_queue *: ccc_fpq_empty,                              \
-        ccc_flat_double_ended_queue *: ccc_fdeq_empty,                         \
-        ccc_double_ended_priority_queue *: ccc_depq_empty,                     \
-        ccc_priority_queue *: ccc_pq_empty,                                    \
-        ccc_singly_linked_list *: ccc_sll_empty,                               \
-        ccc_doubly_linked_list *: ccc_dll_empty,                               \
-        ccc_realtime_ordered_map *: ccc_rom_empty,                             \
-        ccc_flat_realtime_ordered_map *: ccc_frm_empty,                        \
-        ccc_buffer const *: ccc_buf_empty,                                     \
-        ccc_flat_hash_map const *: ccc_fhm_empty,                              \
-        ccc_ordered_map const *: ccc_om_empty,                                 \
-        ccc_flat_ordered_map const *: ccc_fom_empty,                           \
-        ccc_flat_priority_queue const *: ccc_fpq_empty,                        \
-        ccc_flat_double_ended_queue const *: ccc_fdeq_empty,                   \
-        ccc_double_ended_priority_queue const *: ccc_depq_empty,               \
-        ccc_priority_queue const *: ccc_pq_empty,                              \
-        ccc_singly_linked_list const *: ccc_sll_empty,                         \
-        ccc_doubly_linked_list const *: ccc_dll_empty,                         \
-        ccc_flat_realtime_ordered_map const *: ccc_frm_empty,                  \
-        ccc_realtime_ordered_map const *: ccc_rom_empty)((container_ptr))
+        ccc_buffer *: ccc_buf_is_empty,                                        \
+        ccc_flat_hash_map *: ccc_fhm_is_empty,                                 \
+        ccc_ordered_map *: ccc_om_is_empty,                                    \
+        ccc_flat_ordered_map *: ccc_fom_is_empty,                              \
+        ccc_flat_priority_queue *: ccc_fpq_is_empty,                           \
+        ccc_flat_double_ended_queue *: ccc_fdeq_is_empty,                      \
+        ccc_double_ended_priority_queue *: ccc_depq_is_empty,                  \
+        ccc_priority_queue *: ccc_pq_is_empty,                                 \
+        ccc_singly_linked_list *: ccc_sll_is_empty,                            \
+        ccc_doubly_linked_list *: ccc_dll_is_empty,                            \
+        ccc_realtime_ordered_map *: ccc_rom_is_empty,                          \
+        ccc_flat_realtime_ordered_map *: ccc_frm_is_empty,                     \
+        ccc_buffer const *: ccc_buf_is_empty,                                  \
+        ccc_flat_hash_map const *: ccc_fhm_is_empty,                           \
+        ccc_ordered_map const *: ccc_om_is_empty,                              \
+        ccc_flat_ordered_map const *: ccc_fom_is_empty,                        \
+        ccc_flat_priority_queue const *: ccc_fpq_is_empty,                     \
+        ccc_flat_double_ended_queue const *: ccc_fdeq_is_empty,                \
+        ccc_double_ended_priority_queue const *: ccc_depq_is_empty,            \
+        ccc_priority_queue const *: ccc_pq_is_empty,                           \
+        ccc_singly_linked_list const *: ccc_sll_is_empty,                      \
+        ccc_doubly_linked_list const *: ccc_dll_is_empty,                      \
+        ccc_flat_realtime_ordered_map const *: ccc_frm_is_empty,               \
+        ccc_realtime_ordered_map const *: ccc_rom_is_empty)((container_ptr))
 
 #define ccc_impl_validate(container_ptr)                                       \
     _Generic((container_ptr),                                                  \

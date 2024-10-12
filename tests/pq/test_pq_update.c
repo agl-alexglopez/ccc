@@ -30,7 +30,7 @@ BEGIN_STATIC_TEST(pq_test_insert_iterate_pop)
         CHECK(validate(&pq), true);
     }
     size_t pop_count = 0;
-    while (!ccc_pq_empty(&pq))
+    while (!ccc_pq_is_empty(&pq))
     {
         pop(&pq);
         ++pop_count;

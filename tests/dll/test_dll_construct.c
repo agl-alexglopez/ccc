@@ -12,9 +12,9 @@ BEGIN_STATIC_TEST(dll_test_construct)
 {
     struct val val = {};
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
-    CHECK(empty(&dll), true);
+    CHECK(is_empty(&dll), true);
     CHECK(dll_push_front(&dll, &val.e) != NULL, true);
-    CHECK(empty(&dll), false);
+    CHECK(is_empty(&dll), false);
     CHECK(size(&dll), 1);
     END_TEST();
 }

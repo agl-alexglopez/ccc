@@ -19,7 +19,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_one)
         = frm_init((struct val[2]){}, 2, elem, id, NULL, val_cmp, NULL);
     CHECK(occupied(insert_vr(&s, &(struct val){}.elem, &(struct val){}.elem)),
           false);
-    CHECK(frm_empty(&s), false);
+    CHECK(is_empty(&s), false);
     struct val *v = frm_root(&s);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);

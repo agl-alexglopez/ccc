@@ -25,8 +25,8 @@ void *ccc_dll_insert(ccc_doubly_linked_list *l, ccc_dll_elem *pos,
                      ccc_dll_elem *struct_handle);
 void *ccc_dll_front(ccc_doubly_linked_list const *l);
 void *ccc_dll_back(ccc_doubly_linked_list const *l);
-void ccc_dll_pop_front(ccc_doubly_linked_list *l);
-void ccc_dll_pop_back(ccc_doubly_linked_list *l);
+ccc_result ccc_dll_pop_front(ccc_doubly_linked_list *l);
+ccc_result ccc_dll_pop_back(ccc_doubly_linked_list *l);
 void *ccc_dll_erase(ccc_doubly_linked_list *l,
                     ccc_dll_elem *struct_handle_in_list);
 void *ccc_dll_erase_range(ccc_doubly_linked_list *l,
@@ -37,12 +37,14 @@ void *ccc_dll_erase_range(ccc_doubly_linked_list *l,
 @param [in] pos_sll the list to which pos belongs.
 @param [in] pos the position before which to_cut will be moved.
 @param [in] to_cut_sll the list to which to_cut belongs. */
-void ccc_dll_splice(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
-                    ccc_doubly_linked_list *to_cut_sll, ccc_dll_elem *to_cut);
-
-void ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
+ccc_result ccc_dll_splice(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
                           ccc_doubly_linked_list *to_cut_sll,
-                          ccc_dll_elem *begin, ccc_dll_elem *end);
+                          ccc_dll_elem *to_cut);
+
+ccc_result ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll,
+                                ccc_dll_elem *pos,
+                                ccc_doubly_linked_list *to_cut_sll,
+                                ccc_dll_elem *begin, ccc_dll_elem *end);
 void *ccc_dll_begin(ccc_doubly_linked_list const *);
 void *ccc_dll_next(ccc_doubly_linked_list const *, ccc_dll_elem const *);
 
@@ -57,12 +59,13 @@ ccc_dll_elem *ccc_dll_end_elem(ccc_doubly_linked_list const *);
 ccc_dll_elem *ccc_dll_end_sentinel(ccc_doubly_linked_list const *);
 
 size_t ccc_dll_size(ccc_doubly_linked_list const *);
-bool ccc_dll_empty(ccc_doubly_linked_list const *);
+bool ccc_dll_is_empty(ccc_doubly_linked_list const *);
 
-void ccc_dll_clear_and_free(ccc_doubly_linked_list *, ccc_destructor_fn *);
+ccc_result ccc_dll_clear_and_free(ccc_doubly_linked_list *,
+                                  ccc_destructor_fn *);
 
 bool ccc_dll_validate(ccc_doubly_linked_list const *);
-void ccc_dll_print(ccc_doubly_linked_list const *, ccc_print_fn *);
+ccc_result ccc_dll_print(ccc_doubly_linked_list const *, ccc_print_fn *);
 
 #ifdef DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef ccc_dll_elem dll_elem;
@@ -91,7 +94,7 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_end_elem(args...) ccc_dll_end_elem(args)
 #    define dll_end_sentinel(args...) ccc_dll_end_sentinel(args)
 #    define dll_size(args...) ccc_dll_size(args)
-#    define dll_empty(args...) ccc_dll_empty(args)
+#    define dll_is_empty(args...) ccc_dll_is_empty(args)
 #    define dll_clear_and_free(args...) ccc_dll_clear_and_free(args)
 #    define dll_validate(args...) ccc_dll_validate(args)
 #    define dll_print(args...) ccc_dll_print(args)

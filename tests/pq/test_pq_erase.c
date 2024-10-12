@@ -77,7 +77,7 @@ BEGIN_STATIC_TEST(pq_test_pop_max)
         CHECK(front->val, vals[i].val);
         pop(&ppq);
     }
-    CHECK(ccc_pq_empty(&ppq), true);
+    CHECK(ccc_pq_is_empty(&ppq), true);
     END_TEST();
 }
 
@@ -100,7 +100,7 @@ BEGIN_STATIC_TEST(pq_test_pop_min)
         CHECK(front->val, vals[i].val);
         pop(&ppq);
     }
-    CHECK(ccc_pq_empty(&ppq), true);
+    CHECK(ccc_pq_is_empty(&ppq), true);
     END_TEST();
 }
 
@@ -193,7 +193,7 @@ BEGIN_STATIC_TEST(pq_test_weak_srand)
         ccc_pq_erase(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
     }
-    CHECK(ccc_pq_empty(&ppq), true);
+    CHECK(ccc_pq_is_empty(&ppq), true);
     END_TEST();
 }
 

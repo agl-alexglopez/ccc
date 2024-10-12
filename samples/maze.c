@@ -233,7 +233,7 @@ animate_maze(struct maze *maze)
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
-    while (!empty(&cells))
+    while (!is_empty(&cells))
     {
         struct priority_cell const *const cur = ccc_depq_max(&cells);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
