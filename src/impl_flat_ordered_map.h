@@ -50,6 +50,8 @@ struct ccc_fom_elem_ *ccc_impl_fom_elem_in_slot(struct ccc_fom_ const *fom,
                                                 void const *slot);
 void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /*==================     Core Macro Implementations     =====================*/
 
 #define ccc_impl_fom_and_modify_w(flat_ordered_map_entry, mod_fn, aux_data...) \
@@ -199,5 +201,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
         }                                                                      \
         fom_ins_or_assign_ent_ret_;                                            \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_FLAT_ORDERED_MAP_H */

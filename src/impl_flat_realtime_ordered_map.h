@@ -45,6 +45,8 @@ void *ccc_impl_frm_insert(struct ccc_frm_ *frm, size_t parent_i,
                           ccc_threeway_cmp last_cmp, size_t elem_i);
 void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /*=========================      Initialization     =========================*/
 
 #define ccc_impl_frm_init(memory_ptr, capacity, node_elem_field,               \
@@ -214,5 +216,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
         }                                                                      \
         frm_ins_or_assign_ent_ret_;                                            \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* IMPL_FLAT_REALTIME_ORDERED_MAP_H */

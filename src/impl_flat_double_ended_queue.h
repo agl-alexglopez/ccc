@@ -22,6 +22,8 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
         .front_ = 0, .aux_ = (aux_data),                                       \
     }
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 #define ccc_impl_fdeq_emplace_back(fq_ptr, value...)                           \
     ({                                                                         \
         void *const fdeq_emplace_ret_ = ccc_impl_fdeq_alloc_back((fq_ptr));    \
@@ -41,5 +43,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
         }                                                                      \
         fdeq_emplace_ret_;                                                     \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H */

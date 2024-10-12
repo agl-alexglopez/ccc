@@ -27,6 +27,8 @@ struct ccc_buf_
         .alloc_ = (alloc_fn),                                                  \
     }
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 #define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \
     ({                                                                         \
         typeof(type_initializer) *buf_res_ = NULL;                             \
@@ -55,5 +57,7 @@ struct ccc_buf_
         }                                                                      \
         buf_res_;                                                              \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_BUF_H */

@@ -21,6 +21,8 @@ void *ccc_impl_om_key_from_node(struct ccc_tree_ const *t, ccc_node_ const *n);
 struct ccc_tree_entry_ ccc_impl_om_entry(struct ccc_tree_ *t, void const *key);
 void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 #define ccc_impl_om_new(ordered_map_entry)                                     \
@@ -172,5 +174,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         }                                                                      \
         om_ins_or_assign_ent_ret_;                                             \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_ORDERED_MAP_H */

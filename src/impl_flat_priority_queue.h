@@ -21,6 +21,8 @@ struct ccc_fpq_
 size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
 void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /*=======================    Convenience Macros    ======================== */
 
 #define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \
@@ -80,5 +82,7 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
         }                                                                      \
         fpq_res_;                                                              \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_FLAT_PRIORITY_QUEUE_H */

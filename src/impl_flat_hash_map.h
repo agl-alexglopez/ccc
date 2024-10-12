@@ -70,6 +70,8 @@ uint64_t ccc_impl_fhm_filter(struct ccc_fhm_ const *, void const *key);
 void *ccc_impl_fhm_base(struct ccc_fhm_ const *h);
 size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 /* Internal helper assumes that swap_entry has already been evaluated once
@@ -232,5 +234,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         }                                                                      \
         fhm_ins_or_assign_res_;                                                \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_FLAT_HASH_MAP_H */

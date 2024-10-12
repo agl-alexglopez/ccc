@@ -38,6 +38,8 @@ struct ccc_dll_elem_ *ccc_dll_elem_in(struct ccc_dll_ const *,
         .alloc_ = (alloc_fn), .cmp_ = (cmp_fn), .aux_ = (aux_data),            \
     }
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 #define ccc_impl_dll_emplace_back(dll_ptr, struct_initializer...)              \
     ({                                                                         \
         typeof(struct_initializer) *dll_res_;                                  \
@@ -80,5 +82,7 @@ struct ccc_dll_elem_ *ccc_dll_elem_in(struct ccc_dll_ const *,
         }                                                                      \
         dll_res_;                                                              \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_DOUBLY_LINKED_LIST_H */

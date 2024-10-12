@@ -58,6 +58,8 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
                           ccc_threeway_cmp last_cmp,
                           struct ccc_rtom_elem_ *out_handle);
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 #define ccc_impl_rom_new(realtime_ordered_map_entry)                           \
@@ -225,5 +227,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
         }                                                                      \
         rom_ins_or_assign_ent_ret_;                                            \
     })
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_REALTIME_realtime_ORDERED_MAP_H */
