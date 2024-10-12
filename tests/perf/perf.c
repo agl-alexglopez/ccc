@@ -443,16 +443,16 @@ valid_malloc(size_t bytes)
 static ccc_threeway_cmp
 val_key_cmp(ccc_key_cmp const cmp)
 {
-    struct val const *const x = cmp.user_type;
-    int const key = *((int *)cmp.key);
+    struct val const *const x = cmp.user_type_rhs;
+    int const key = *((int *)cmp.key_lhs);
     return (key > x->val) - (key < x->val);
 }
 
 static ccc_threeway_cmp
 val_cmp(ccc_cmp const cmp)
 {
-    struct val const *const a = cmp.user_type_a;
-    struct val const *const b = cmp.user_type_b;
+    struct val const *const a = cmp.user_type_lhs;
+    struct val const *const b = cmp.user_type_rhs;
     return (a->val > b->val) - (a->val < b->val);
 }
 

@@ -560,9 +560,9 @@ str_arena_at(struct str_arena const *const a, str_ofs const i)
 static ccc_threeway_cmp
 cmp_string_keys(ccc_key_cmp const c)
 {
-    struct word const *const w = c.user_type;
+    struct word const *const w = c.user_type_rhs;
     struct str_arena const *const a = c.aux;
-    str_ofs const id = *((str_ofs *)c.key);
+    str_ofs const id = *((str_ofs *)c.key_lhs);
     char const *const key_word = str_arena_at(a, id);
     char const *const struct_word = str_arena_at(a, w->ofs);
     assert(key_word && struct_word);
@@ -582,8 +582,8 @@ cmp_string_keys(ccc_key_cmp const c)
 static ccc_threeway_cmp
 cmp_freqs(ccc_cmp const c)
 {
-    struct frequency const *const a = c.user_type_a;
-    struct frequency const *const b = c.user_type_b;
+    struct frequency const *const a = c.user_type_lhs;
+    struct frequency const *const b = c.user_type_rhs;
     struct str_arena const *const arena = c.aux;
     ccc_threeway_cmp cmp = (a->freq > b->freq) - (a->freq < b->freq);
     if (cmp != CCC_EQL)

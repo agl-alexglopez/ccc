@@ -677,7 +677,7 @@ cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){
-        .user_type = base_at(frm, node), .key = key, .aux = frm->aux_});
+        .key_lhs = key, .user_type_rhs = base_at(frm, node), .aux = frm->aux_});
 }
 
 static inline void *

@@ -13,9 +13,9 @@ struct val
     ccc_fh_map_elem e;
 };
 
-uint64_t fhash_int_zero(void const *);
-uint64_t fhash_int_last_digit(void const *);
-uint64_t fhash_int_to_u64(void const *);
+uint64_t fhash_int_zero(ccc_user_key);
+uint64_t fhash_int_last_digit(ccc_user_key);
+uint64_t fhash_int_to_u64(ccc_user_key);
 bool fhash_id_eq(ccc_key_cmp);
 void fhash_print_val(ccc_user_type val);
 

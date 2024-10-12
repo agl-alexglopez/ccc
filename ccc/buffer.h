@@ -9,7 +9,7 @@
 
 /** A buffer is a contiguous block of storage for elements of the same type.
 The usage is similar to a C++ vector, with more flexible functions
-provided to accomodate a variety of higher level use cases. While useful
+provided to support higher level containers and abstractions. While useful
 on its own--a stack could be implemented with the provided functions--a buffer
 is often used as the lower level abstraction for the flat data structures
 in this library that provide more specialized operations. */
@@ -42,7 +42,7 @@ with the provided allocation function. */
 /*=====================   Allocation Managment   ============================*/
 
 /** @brief allocates the buffer to the specified size according to the user
-define allocation function.
+defined allocation function.
 @param [in] buf a pointer to the buffer.
 @param [in] capacity the newly desired capacity.
 @param [in] fn the allocation function defined by the user.

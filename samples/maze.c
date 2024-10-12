@@ -487,16 +487,16 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 static ccc_threeway_cmp
 cmp_priority_cells(ccc_key_cmp const cmp)
 {
-    struct priority_cell const *const a = cmp.user_type;
-    int const key = *((int *)cmp.key);
+    struct priority_cell const *const a = cmp.user_type_rhs;
+    int const key = *((int *)cmp.key_lhs);
     return (key > a->priority) - (key < a->priority);
 }
 
 static ccc_threeway_cmp
 cmp_points(ccc_key_cmp const cmp)
 {
-    struct point_cost const *const a = cmp.user_type;
-    struct point const *const key = cmp.key;
+    struct point_cost const *const a = cmp.user_type_rhs;
+    struct point const *const key = cmp.key_lhs;
     if (a->p.r == key->r && a->p.c == key->c)
     {
         return CCC_EQL;

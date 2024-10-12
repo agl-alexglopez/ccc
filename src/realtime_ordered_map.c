@@ -712,8 +712,8 @@ cmp(struct ccc_rtom_ const *const rom, void const *const key,
     struct ccc_rtom_elem_ const *const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){
-        .key = key,
-        .user_type = struct_base(rom, node),
+        .key_lhs = key,
+        .user_type_rhs = struct_base(rom, node),
         .aux = rom->aux_,
     });
 }

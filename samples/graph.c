@@ -249,9 +249,9 @@ static void help(void);
 static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 
 static bool eq_parent_cells(ccc_key_cmp);
-static uint64_t hash_parent_cells(void const *point_struct);
+static uint64_t hash_parent_cells(ccc_user_key point_struct);
 static bool eq_prev_vertices(ccc_key_cmp);
-static uint64_t hash_vertex_addr(void const *pointer_to_vertex);
+static uint64_t hash_vertex_addr(ccc_user_key pointer_to_vertex);
 static uint64_t hash_64_bits(uint64_t);
 
 static void pq_update_dist(ccc_user_type_mut);
@@ -1058,39 +1058,40 @@ build_path_outline(struct graph *graph)
 static bool
 eq_parent_cells(ccc_key_cmp const c)
 {
-    struct parent_cell const *const pc = c.user_type;
-    struct point const *const p = c.key;
+    struct parent_cell const *const pc = c.user_type_rhs;
+    struct point const *const p = c.key_lhs;
     return pc->key.r == p->r && pc->key.c == p->c;
 }
 
 static uint64_t
-hash_parent_cells(void const *const point_struct)
+hash_parent_cells(ccc_user_key const point_struct)
 {
-    struct point const *const p = point_struct;
+    struct point const *const p = point_struct.user_key;
     return hash_64_bits((p->r << 31) | p->c);
 }
 
 static ccc_threeway_cmp
 cmp_pq_dist_points(ccc_cmp const cmp)
 {
-    struct dist_point const *const a = cmp.user_type_a;
-    struct dist_point const *const b = cmp.user_type_b;
+    struct dist_point const *const a = cmp.user_type_lhs;
+    struct dist_point const *const b = cmp.user_type_rhs;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static bool
 eq_prev_vertices(ccc_key_cmp const cmp)
 {
-    struct prev_vertex const *const a = cmp.user_type;
+    struct prev_vertex const *const a = cmp.user_type_rhs;
     struct vertex const *const *const v
-        = (struct vertex const *const *const)cmp.key;
+        = (struct vertex const *const *const)cmp.key_lhs;
     return a->v == *v;
 }
 
 static uint64_t
-hash_vertex_addr(void const *pointer_to_vertex)
+hash_vertex_addr(ccc_user_key const pointer_to_vertex)
 {
-    return hash_64_bits((uintptr_t) * ((struct vertex **)pointer_to_vertex));
+    return hash_64_bits((uintptr_t)
+                        * ((struct vertex **)pointer_to_vertex.user_key));
 }
 
 static uint64_t

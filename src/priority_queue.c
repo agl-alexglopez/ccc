@@ -241,8 +241,8 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_pq_ const *const ppq, struct ccc_pq_elem_ const *const a,
     struct ccc_pq_elem_ const *const b)
 {
-    return ppq->cmp_((ccc_cmp){.user_type_a = struct_base(ppq, a),
-                               .user_type_b = struct_base(ppq, b),
+    return ppq->cmp_((ccc_cmp){.user_type_lhs = struct_base(ppq, a),
+                               .user_type_rhs = struct_base(ppq, b),
                                .aux = ppq->aux_});
 }
 

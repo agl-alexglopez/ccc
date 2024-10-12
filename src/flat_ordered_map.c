@@ -756,7 +756,7 @@ cmp_elems(struct ccc_fom_ const *const fom, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){
-        .user_type = base_at(fom, node), .key = key, .aux = fom->aux_});
+        .key_lhs = key, .user_type_rhs = base_at(fom, node), .aux = fom->aux_});
 }
 
 static inline void *

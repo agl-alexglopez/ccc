@@ -800,8 +800,8 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
     struct ccc_node_ const *const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){
-        .user_type = struct_base(t, node),
-        .key = key,
+        .key_lhs = key,
+        .user_type_rhs = struct_base(t, node),
         .aux = t->aux_,
     });
 }

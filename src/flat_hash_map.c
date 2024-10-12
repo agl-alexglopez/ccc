@@ -511,8 +511,8 @@ find(struct ccc_fhm_ const *const h, void const *const key, uint64_t const hash)
             return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
         }
         if (hash == e->hash_
-            && h->eq_fn_(
-                (ccc_key_cmp){.user_type = slot, .key = key, .aux = h->aux_}))
+            && h->eq_fn_((ccc_key_cmp){
+                .key_lhs = key, .user_type_rhs = slot, .aux = h->aux_}))
         {
             return (struct ccc_entry_){.e_ = slot,
                                        .stats_ = CCC_ENTRY_OCCUPIED};
@@ -671,7 +671,8 @@ hash_at(struct ccc_fhm_ const *const h, size_t const i)
 static inline uint64_t
 filter(struct ccc_fhm_ const *const h, void const *const key)
 {
-    uint64_t const hash = h->hash_fn_(key);
+    uint64_t const hash
+        = h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_});
     return hash == CCC_FHM_EMPTY ? hash + 1 : hash;
 }
 
