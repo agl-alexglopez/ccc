@@ -19,6 +19,10 @@ static char const *const result_msgs[CCC_RESULTS_SIZE] = {
 char const *
 ccc_result_msg(ccc_result const res)
 {
+    if (res >= CCC_RESULTS_SIZE)
+    {
+        return "";
+    }
     return result_msgs[res];
 }
 
