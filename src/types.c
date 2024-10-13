@@ -21,7 +21,7 @@ ccc_result_msg(ccc_result const res)
 {
     if (res >= CCC_RESULTS_SIZE)
     {
-        return "";
+        return "error: invalid result provided no message exists";
     }
     return result_msgs[res];
 }
