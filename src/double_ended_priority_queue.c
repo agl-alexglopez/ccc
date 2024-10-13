@@ -96,12 +96,16 @@ static void *max(struct ccc_tree_ const *);
 static void *pop_max(struct ccc_tree_ *);
 static void *pop_min(struct ccc_tree_ *);
 static void *min(struct ccc_tree_ const *);
+static void *key_in_slot(struct ccc_tree_ const *t, void const *slot);
+static void *key_from_node(struct ccc_tree_ const *t,
+                           struct ccc_node_ const *n);
+static struct ccc_node_ *elem_in_slot(struct ccc_tree_ const *t,
+                                      void const *slot);
 static struct ccc_range_ equal_range(struct ccc_tree_ *, void const *,
                                      void const *, enum tree_link_);
 
 /* Internal operations that take and return nodes for the tree. */
 
-static struct ccc_node_ *root(struct ccc_tree_ const *);
 static struct ccc_node_ *pop_dup_node(struct ccc_tree_ *, struct ccc_node_ *,
                                       struct ccc_node_ *);
 static struct ccc_node_ *pop_front_dup(struct ccc_tree_ *, struct ccc_node_ *,
@@ -154,17 +158,6 @@ bool
 ccc_depq_is_empty(ccc_double_ended_priority_queue const *const pq)
 {
     return empty(&pq->impl_);
-}
-
-void *
-ccc_depq_root(ccc_double_ended_priority_queue const *const pq)
-{
-    struct ccc_node_ const *const n = root(&pq->impl_);
-    if (!n)
-    {
-        return NULL;
-    }
-    return struct_base(&pq->impl_, n);
 }
 
 void *
@@ -379,21 +372,20 @@ void *
 ccc_impl_tree_key_in_slot(struct ccc_tree_ const *const t,
                           void const *const slot)
 {
-    return (char *)slot + t->key_offset_;
+    return key_in_slot(t, slot);
 }
 
 void *
 ccc_impl_tree_key_from_node(struct ccc_tree_ const *const t,
                             struct ccc_node_ const *const n)
 {
-    return (char *)struct_base(t, n) + t->key_offset_;
+    return key_from_node(t, n);
 }
 
 struct ccc_node_ *
 ccc_impl_tree_elem_in_slot(struct ccc_tree_ const *t, void const *slot)
 {
-
-    return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
+    return elem_in_slot(t, slot);
 }
 
 /*======================  Static Splay Tree Helpers  ========================*/
@@ -410,12 +402,6 @@ static bool
 empty(struct ccc_tree_ const *const t)
 {
     return !t->size_;
-}
-
-static struct ccc_node_ *
-root(struct ccc_tree_ const *const t)
-{
-    return t->root_;
 }
 
 static void *
@@ -600,7 +586,7 @@ multimap_insert(struct ccc_tree_ *t, struct ccc_node_ *out_handle)
         return;
     }
     t->size_++;
-    void const *const key = ccc_impl_tree_key_from_node(t, out_handle);
+    void const *const key = key_from_node(t, out_handle);
     t->root_ = splay(t, t->root_, key, t->cmp_);
 
     ccc_threeway_cmp const root_cmp = cmp(t, key, t->root_, t->cmp_);
@@ -674,7 +660,7 @@ multimap_erase_max_or_min(struct ccc_tree_ *t, ccc_key_cmp_fn *force_max_or_min)
     struct ccc_node_ *ret = splay(t, t->root_, NULL, force_max_or_min);
     if (has_dups(&t->end_, ret))
     {
-        ret = pop_front_dup(t, ret, ccc_impl_tree_key_from_node(t, ret));
+        ret = pop_front_dup(t, ret, key_from_node(t, ret));
     }
     else
     {
@@ -711,7 +697,7 @@ multimap_erase_node(struct ccc_tree_ *t, struct ccc_node_ *node)
         node->link_[N]->link_[P] = node->link_[P];
         return struct_base(t, node);
     }
-    void const *const key = ccc_impl_tree_key_from_node(t, node);
+    void const *const key = key_from_node(t, node);
     struct ccc_node_ *ret = splay(t, t->root_, key, t->cmp_);
     if (cmp(t, key, ret, t->cmp_) != CCC_EQL)
     {
@@ -736,8 +722,7 @@ pop_dup_node(struct ccc_tree_ *const t, struct ccc_node_ *const dup,
 {
     if (dup == splayed)
     {
-        return pop_front_dup(t, splayed,
-                             ccc_impl_tree_key_from_node(t, splayed));
+        return pop_front_dup(t, splayed, key_from_node(t, splayed));
     }
     /* This is the head of the list of duplicates and no dups left. */
     if (dup->link_[N] == dup)
@@ -802,8 +787,7 @@ remove_from_tree(struct ccc_tree_ *t, struct ccc_node_ *ret)
     }
     else
     {
-        t->root_ = splay(t, ret->branch_[L],
-                         ccc_impl_tree_key_from_node(t, ret), t->cmp_);
+        t->root_ = splay(t, ret->branch_[L], key_from_node(t, ret), t->cmp_);
         link_trees(t, t->root_, R, ret->branch_[R]);
     }
     return ret;
@@ -935,6 +919,24 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
         .user_type_rhs = struct_base(t, node),
         .aux = t->aux_,
     });
+}
+
+static inline void *
+key_in_slot(struct ccc_tree_ const *const t, void const *const slot)
+{
+    return (char *)slot + t->key_offset_;
+}
+
+static inline void *
+key_from_node(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
+{
+    return (char *)struct_base(t, n) + t->key_offset_;
+}
+
+static inline struct ccc_node_ *
+elem_in_slot(struct ccc_tree_ const *t, void const *slot)
+{
+    return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
 }
 
 /* We can trick our splay tree into giving us the max via splaying

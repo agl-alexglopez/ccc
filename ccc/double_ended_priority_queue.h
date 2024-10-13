@@ -18,11 +18,6 @@ typedef union
     struct ccc_tree_ impl_;
 } ccc_double_ended_priority_queue;
 
-/* Initialize the depq on the left hand side with this right hand side
-   initializer. Pass the left hand side depq by name to this macro along
-   with the comparison function and any necessary auxilliary data. This may
-   be used at compile time or runtime. It is undefined to use the depq if
-   this has not been called. */
 #define ccc_depq_init(struct_name, depq_elem_field, key_field, depq_name,      \
                       alloc_fn, key_cmp_fn, aux)                               \
     ccc_impl_depq_init(struct_name, depq_elem_field, key_field, depq_name,     \
@@ -82,8 +77,6 @@ ccc_range ccc_depq_equal_range(ccc_double_ended_priority_queue *,
 ccc_rrange ccc_depq_equal_rrange(ccc_double_ended_priority_queue *,
                                  void const *rbegin_key, void const *end_key);
 
-void *ccc_depq_root(ccc_double_ended_priority_queue const *);
-
 void ccc_depq_print(ccc_double_ended_priority_queue const *, ccc_print_fn *);
 
 bool ccc_depq_validate(ccc_double_ended_priority_queue const *);
@@ -115,7 +108,6 @@ typedef ccc_double_ended_priority_queue double_ended_priority_queue;
 #    define depq_rend(args...) ccc_depq_rend(args)
 #    define depq_equal_range(args...) ccc_depq_equal_range(args)
 #    define depq_equal_rrange(args...) ccc_depq_equal_rrange(args)
-#    define depq_root(args...) ccc_depq_root(args)
 #    define depq_print(args...) ccc_depq_print(args)
 #    define depq_validate(args...) ccc_depq_validate(args)
 #endif /* DOUBLE_ENDED_PRIORITY_QUEUE_USING_NAMESPACE_CCC */

@@ -22,7 +22,7 @@ policy, capacity, and optional starting size.
 @param [in] capacity the capacity of memory at mem_ptr.
 @param [in] optional_size optional starting size of the buffer <= capacity.
 @return the initialized buffer. Directly assign to buffer on the right hand
-side of the equality operator (e.g. ccc_buffer mine = ccc_buf_init(...);).
+side of the equality operator (e.g. ccc_buffer b = ccc_buf_init(...);).
 
 Initialization of a buffer can occur at compile time or run time depending
 on the arguments. The memory pointer should be of the same type one intends to
