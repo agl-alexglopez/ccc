@@ -619,7 +619,7 @@ maybe_resize(struct ccc_fhm_ *const h)
     }
     if (!h->buf_.alloc_)
     {
-        return CCC_NO_REALLOC;
+        return CCC_NO_ALLOC;
     }
     struct ccc_fhm_ new_hash = *h;
     new_hash.buf_.sz_ = 0;

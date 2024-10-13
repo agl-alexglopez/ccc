@@ -227,13 +227,13 @@ ccc_fdeq_rnext(ccc_flat_double_ended_queue const *const fq,
 }
 
 void *
-ccc_fdeq_end([[maybe_unused]] ccc_flat_double_ended_queue const *const fq)
+ccc_fdeq_end(ccc_flat_double_ended_queue const *const)
 {
     return NULL;
 }
 
 void *
-ccc_fdeq_rend([[maybe_unused]] ccc_flat_double_ended_queue const *const fq)
+ccc_fdeq_rend(ccc_flat_double_ended_queue const *const)
 {
     return NULL;
 }
@@ -551,7 +551,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     }
     if (!q->buf_.alloc_)
     {
-        return CCC_NO_REALLOC;
+        return CCC_NO_ALLOC;
     }
     size_t const elem_sz = ccc_buf_elem_size(&q->buf_);
     size_t const new_cap

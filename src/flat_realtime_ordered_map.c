@@ -1226,13 +1226,11 @@ demote(struct ccc_frm_ const *const t, size_t const x)
 }
 
 static inline void
-double_promote([[maybe_unused]] struct ccc_frm_ const *const t,
-               [[maybe_unused]] size_t const x)
+double_promote(struct ccc_frm_ const *const, size_t const)
 {}
 
 static inline void
-double_demote([[maybe_unused]] struct ccc_frm_ const *const t,
-              [[maybe_unused]] size_t const x)
+double_demote(struct ccc_frm_ const *const, size_t const)
 {}
 
 static inline bool

@@ -402,13 +402,13 @@ ccc_rom_rbegin(ccc_realtime_ordered_map const *const rom)
 }
 
 void *
-ccc_rom_end([[maybe_unused]] ccc_realtime_ordered_map const *const rom)
+ccc_rom_end(ccc_realtime_ordered_map const *const)
 {
     return NULL;
 }
 
 void *
-ccc_rom_rend([[maybe_unused]] ccc_realtime_ordered_map const *const rom)
+ccc_rom_rend(ccc_realtime_ordered_map const *const)
 {
     return NULL;
 }
@@ -502,7 +502,7 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
 {
     if (!rom->alloc_)
     {
-        return CCC_NO_REALLOC;
+        return CCC_NO_ALLOC;
     }
     while (!ccc_rom_is_empty(rom))
     {
@@ -1139,13 +1139,11 @@ demote(struct ccc_rtom_ const *const rom, struct ccc_rtom_elem_ *const x)
 }
 
 static inline void
-double_promote([[maybe_unused]] struct ccc_rtom_ const *const rom,
-               [[maybe_unused]] struct ccc_rtom_elem_ *const x)
+double_promote(struct ccc_rtom_ const *const, struct ccc_rtom_elem_ *const)
 {}
 
 static inline void
-double_demote([[maybe_unused]] struct ccc_rtom_ const *const rom,
-              [[maybe_unused]] struct ccc_rtom_elem_ *const x)
+double_demote(struct ccc_rtom_ const *const, struct ccc_rtom_elem_ *const)
 {}
 
 static inline bool

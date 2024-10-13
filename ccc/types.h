@@ -45,13 +45,13 @@ typedef enum
     /** The operation has occured without error. */
     CCC_OK = 0,
     /** Memory is needed but the container lacks allocation permission. */
-    CCC_NO_REALLOC,
+    CCC_NO_ALLOC,
     /** The container has allocation permission, but allocation failed. */
     CCC_MEM_ERR,
     /** Bad arguments have been provided to an operation. */
     CCC_INPUT_ERR,
-    /** The operation has had no effect, nothing executes. */
-    CCC_NOP,
+    /** Internal helper, never returned to user. Always last result. */
+    CCC_RESULTS_SIZE,
 } ccc_result;
 
 /** A C style threeway comparison value (e.g. ((a > b) - (a < b))). CCC_LES if
@@ -287,6 +287,16 @@ Note the reverse end of a range may be equivalent to the reverse beginning or
 NULL. Functions that obtain ranges treat the reverse end as an exclusive bound
 and therefore it is undefined to access this element. */
 void *ccc_rend_rrange(ccc_rrange const *r);
+
+/** @brief Obtain a string message with a description of the error returned
+from a container operation, possible causes, and possible fixes to such error.
+@param [in] res the result obtained from a container operation.
+@return a string message of the result. A CCC_OK result is an empty string,
+the falsey null terminator. All other results have a string message.
+
+These messages can be used for logging or to help with debugging by providing
+more information for why such a result might be obtained from a container. */
+char const *ccc_result_msg(ccc_result res);
 
 /** Define this directive at the top of a translation unit if shorter names are
 desired. By default the ccc prefix is used to avoid namespace clashes. */

@@ -8,7 +8,11 @@
 
 static size_t const start_capacity = 8;
 
+/*==========================   Prototypes    ================================*/
+
 static void *at(ccc_buffer const *, size_t);
+
+/*==========================    Interface    ================================*/
 
 ccc_result
 ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
@@ -20,7 +24,7 @@ ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
     }
     if (!fn)
     {
-        return CCC_NO_REALLOC;
+        return CCC_NO_ALLOC;
     }
     void *const new_mem = fn(buf->mem_, buf->elem_sz_ * capacity);
     if (capacity && !new_mem)
@@ -251,13 +255,13 @@ ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
 }
 
 void *
-ccc_buf_end([[maybe_unused]] ccc_buffer const *const buf)
+ccc_buf_end(ccc_buffer const *const buf)
 {
     return buf ? (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_) : NULL;
 }
 
 void *
-ccc_buf_rend([[maybe_unused]] ccc_buffer const *const buf)
+ccc_buf_rend(ccc_buffer const *const buf)
 {
     return buf ? (char *)buf->mem_ - buf->elem_sz_ : NULL;
 }
