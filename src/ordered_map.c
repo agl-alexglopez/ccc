@@ -168,8 +168,8 @@ ccc_om_insert_entry(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         elem->impl_ = *elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
-        memcpy(e->impl_.entry_.e_, struct_base(e->impl_.t_, &elem->impl_),
-               e->impl_.t_->elem_sz_);
+        (void)memcpy(e->impl_.entry_.e_, struct_base(e->impl_.t_, &elem->impl_),
+                     e->impl_.t_->elem_sz_);
         return e->impl_.entry_.e_;
     }
     return alloc_insert(e->impl_.t_, &elem->impl_);
@@ -221,8 +221,8 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
     {
         assert(s->impl_.root_ != &s->impl_.end_);
         out_handle->impl_ = *s->impl_.root_;
-        void *user_struct = struct_base(&s->impl_, &out_handle->impl_);
-        void *ret = struct_base(&s->impl_, s->impl_.root_);
+        void *const user_struct = struct_base(&s->impl_, &out_handle->impl_);
+        void *const ret = struct_base(&s->impl_, s->impl_.root_);
         swap(tmp, user_struct, ret, s->impl_.elem_sz_);
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -279,7 +279,8 @@ ccc_om_insert_or_assign(ccc_ordered_map *const s,
 ccc_entry
 ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 {
-    void *n = erase(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
+    void *const n
+        = erase(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
     if (!n)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
@@ -305,7 +306,8 @@ ccc_om_remove_entry(ccc_o_map_entry *const e)
         if (e->impl_.t_->alloc_)
         {
             e->impl_.t_->alloc_(erased, 0);
-            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
+            return (ccc_entry){
+                {.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED_CONTAINS_NULL}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
     }

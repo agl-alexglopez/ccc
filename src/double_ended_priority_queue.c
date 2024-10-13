@@ -136,8 +136,8 @@ static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
 /* =================  Double Ended Priority Queue Interface  ============== */
 
 void
-ccc_depq_clear(ccc_double_ended_priority_queue *pq,
-               ccc_destructor_fn *destructor)
+ccc_depq_clear(ccc_double_ended_priority_queue *const pq,
+               ccc_destructor_fn *const destructor)
 {
     while (!ccc_depq_is_empty(pq))
     {
@@ -229,19 +229,19 @@ ccc_depq_rnext(ccc_double_ended_priority_queue const *const pq,
 }
 
 void *
-ccc_depq_end([[maybe_unused]] ccc_double_ended_priority_queue const *const pq)
+ccc_depq_end(ccc_double_ended_priority_queue const *const)
 {
     return NULL;
 }
 
 void *
-ccc_depq_rend([[maybe_unused]] ccc_double_ended_priority_queue const *const pq)
+ccc_depq_rend(ccc_double_ended_priority_queue const *const)
 {
     return NULL;
 }
 
 ccc_range
-ccc_depq_equal_range(ccc_double_ended_priority_queue *pq,
+ccc_depq_equal_range(ccc_double_ended_priority_queue *const pq,
                      void const *const begin_key, void const *const end_key)
 {
     return (ccc_range){
@@ -249,7 +249,7 @@ ccc_depq_equal_range(ccc_double_ended_priority_queue *pq,
 }
 
 ccc_rrange
-ccc_depq_equal_rrange(ccc_double_ended_priority_queue *pq,
+ccc_depq_equal_rrange(ccc_double_ended_priority_queue *const pq,
                       void const *const rbegin_key, void const *const rend_key)
 {
     return (ccc_rrange){
@@ -257,7 +257,7 @@ ccc_depq_equal_rrange(ccc_double_ended_priority_queue *pq,
 }
 
 ccc_result
-ccc_depq_push(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
+ccc_depq_push(ccc_double_ended_priority_queue *const pq, ccc_depq_elem *const e)
 {
     if (pq->impl_.alloc_)
     {
@@ -273,14 +273,16 @@ ccc_depq_push(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
 }
 
 void *
-ccc_depq_erase(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const e)
+ccc_depq_erase(ccc_double_ended_priority_queue *const pq,
+               ccc_depq_elem *const e)
 {
     return multimap_erase_node(&pq->impl_, &e->impl_);
 }
 
 bool
-ccc_depq_update(ccc_double_ended_priority_queue *pq, ccc_depq_elem *const elem,
-                ccc_update_fn *fn, void *aux)
+ccc_depq_update(ccc_double_ended_priority_queue *const pq,
+                ccc_depq_elem *const elem, ccc_update_fn *const fn,
+                void *const aux)
 {
     if (NULL == elem->impl_.branch_[L] || NULL == elem->impl_.branch_[R])
     {
@@ -320,9 +322,9 @@ ccc_depq_contains(ccc_double_ended_priority_queue *const pq,
 }
 
 void
-ccc_depq_pop_max(ccc_double_ended_priority_queue *pq)
+ccc_depq_pop_max(ccc_double_ended_priority_queue *const pq)
 {
-    void *n = pop_max(&pq->impl_);
+    void *const n = pop_max(&pq->impl_);
     if (!n)
     {
         return;
@@ -334,9 +336,9 @@ ccc_depq_pop_max(ccc_double_ended_priority_queue *pq)
 }
 
 void
-ccc_depq_pop_min(ccc_double_ended_priority_queue *pq)
+ccc_depq_pop_min(ccc_double_ended_priority_queue *const pq)
 {
-    struct ccc_node_ *n = pop_min(&pq->impl_);
+    struct ccc_node_ *const n = pop_min(&pq->impl_);
     if (!n)
     {
         return;
@@ -361,7 +363,7 @@ ccc_depq_print(ccc_double_ended_priority_queue const *const pq,
 }
 
 bool
-ccc_depq_validate(ccc_double_ended_priority_queue const *pq)
+ccc_depq_validate(ccc_double_ended_priority_queue const *const pq)
 {
     return ccc_tree_validate(&pq->impl_);
 }
@@ -383,7 +385,8 @@ ccc_impl_tree_key_from_node(struct ccc_tree_ const *const t,
 }
 
 struct ccc_node_ *
-ccc_impl_tree_elem_in_slot(struct ccc_tree_ const *t, void const *slot)
+ccc_impl_tree_elem_in_slot(struct ccc_tree_ const *const t,
+                           void const *const slot)
 {
     return elem_in_slot(t, slot);
 }
@@ -391,7 +394,7 @@ ccc_impl_tree_elem_in_slot(struct ccc_tree_ const *t, void const *slot)
 /*======================  Static Splay Tree Helpers  ========================*/
 
 static void
-init_node(struct ccc_tree_ *t, struct ccc_node_ *n)
+init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)
 {
     n->branch_[L] = &t->end_;
     n->branch_[R] = &t->end_;
@@ -418,7 +421,7 @@ max(struct ccc_tree_ const *const t)
 }
 
 static void *
-min(struct ccc_tree_ const *t)
+min(struct ccc_tree_ const *const t)
 {
     if (!t->size_)
     {
@@ -431,31 +434,31 @@ min(struct ccc_tree_ const *t)
 }
 
 static void *
-pop_max(struct ccc_tree_ *t)
+pop_max(struct ccc_tree_ *const t)
 {
     return multimap_erase_max_or_min(t, force_find_grt);
 }
 
 static void *
-pop_min(struct ccc_tree_ *t)
+pop_min(struct ccc_tree_ *const t)
 {
     return multimap_erase_max_or_min(t, force_find_les);
 }
 
 static inline bool
-is_dup_head_next(struct ccc_node_ const *i)
+is_dup_head_next(struct ccc_node_ const *const i)
 {
     return i->link_[R]->parent_ != NULL;
 }
 
 static inline bool
-is_dup_head(struct ccc_node_ const *const end, struct ccc_node_ const *i)
+is_dup_head(struct ccc_node_ const *const end, struct ccc_node_ const *const i)
 {
     return i != end && i->link_[P] != end && i->link_[P]->link_[N] == i;
 }
 
 static struct ccc_node_ const *
-multimap_next(struct ccc_tree_ const *const t, struct ccc_node_ const *i,
+multimap_next(struct ccc_tree_ const *const t, struct ccc_node_ const *const i,
               enum tree_link_ const traversal)
 {
     /* An arbitrary node in a doubly linked list of duplicates. */
@@ -539,8 +542,8 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
 }
 
 static struct ccc_range_
-equal_range(struct ccc_tree_ *t, void const *begin_key, void const *end_key,
-            enum tree_link_ const traversal)
+equal_range(struct ccc_tree_ *const t, void const *const begin_key,
+            void const *const end_key, enum tree_link_ const traversal)
 {
     if (!t->size_)
     {
@@ -569,14 +572,14 @@ equal_range(struct ccc_tree_ *t, void const *begin_key, void const *end_key,
 }
 
 static bool
-contains(struct ccc_tree_ *t, void const *key)
+contains(struct ccc_tree_ *const t, void const *const key)
 {
     t->root_ = splay(t, t->root_, key, t->cmp_);
     return cmp(t, key, t->root_, t->cmp_) == CCC_EQL;
 }
 
 static void
-multimap_insert(struct ccc_tree_ *t, struct ccc_node_ *out_handle)
+multimap_insert(struct ccc_tree_ *const t, struct ccc_node_ *const out_handle)
 {
     init_node(t, out_handle);
     if (empty(t))
@@ -599,8 +602,8 @@ multimap_insert(struct ccc_tree_ *t, struct ccc_node_ *out_handle)
 }
 
 static void *
-connect_new_root(struct ccc_tree_ *t, struct ccc_node_ *new_root,
-                 ccc_threeway_cmp cmp_result)
+connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *const new_root,
+                 ccc_threeway_cmp const cmp_result)
 {
     enum tree_link_ const link = CCC_GRT == cmp_result;
     link_trees(t, new_root, link, t->root_->branch_[link]);
@@ -613,8 +616,8 @@ connect_new_root(struct ccc_tree_ *t, struct ccc_node_ *new_root,
 }
 
 static void
-add_duplicate(struct ccc_tree_ *t, struct ccc_node_ *tree_node,
-              struct ccc_node_ *add, struct ccc_node_ *parent)
+add_duplicate(struct ccc_tree_ *const t, struct ccc_node_ *const tree_node,
+              struct ccc_node_ *const add, struct ccc_node_ *const parent)
 {
     /* This is a circular doubly linked list with O(1) append to back
        to maintain round robin fairness for any use of this queue.
@@ -646,7 +649,8 @@ add_duplicate(struct ccc_tree_ *t, struct ccc_node_ *tree_node,
    This function expects to be passed the t->impl_il as the node and a
    comparison function that forces either the max or min to be searched. */
 static void *
-multimap_erase_max_or_min(struct ccc_tree_ *t, ccc_key_cmp_fn *force_max_or_min)
+multimap_erase_max_or_min(struct ccc_tree_ *const t,
+                          ccc_key_cmp_fn *const force_max_or_min)
 {
     if (!t || !force_max_or_min)
     {
@@ -676,7 +680,7 @@ multimap_erase_max_or_min(struct ccc_tree_ *t, ccc_key_cmp_fn *force_max_or_min)
    the same size is splayed to the root and we are a duplicate in the
    list. */
 static void *
-multimap_erase_node(struct ccc_tree_ *t, struct ccc_node_ *node)
+multimap_erase_node(struct ccc_tree_ *const t, struct ccc_node_ *const node)
 {
     /* This is what we set removed nodes to so this is a mistaken query */
     if (NULL == node->branch_[R] || NULL == node->branch_[L])
@@ -745,7 +749,7 @@ pop_front_dup(struct ccc_tree_ *const t, struct ccc_node_ *const old,
               void const *const old_key)
 {
     struct ccc_node_ *parent = old->dup_head_->parent_;
-    struct ccc_node_ *tree_replacement = old->dup_head_;
+    struct ccc_node_ *const tree_replacement = old->dup_head_;
     if (old == t->root_)
     {
         t->root_ = tree_replacement;
@@ -778,7 +782,7 @@ pop_front_dup(struct ccc_tree_ *const t, struct ccc_node_ *const old,
 }
 
 static inline struct ccc_node_ *
-remove_from_tree(struct ccc_tree_ *t, struct ccc_node_ *ret)
+remove_from_tree(struct ccc_tree_ *const t, struct ccc_node_ *const ret)
 {
     if (ret->branch_[L] == &t->end_)
     {
@@ -794,8 +798,8 @@ remove_from_tree(struct ccc_tree_ *t, struct ccc_node_ *ret)
 }
 
 static struct ccc_node_ *
-splay(struct ccc_tree_ *t, struct ccc_node_ *root, void const *const key,
-      ccc_key_cmp_fn *cmp_fn)
+splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
+      ccc_key_cmp_fn *const cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -847,8 +851,8 @@ splay(struct ccc_tree_ *t, struct ccc_node_ *root, void const *const key,
    and updating the subtree parent field to point back to parent. This last
    step is critical and easy to miss or mess up. */
 static inline void
-link_trees(struct ccc_tree_ *t, struct ccc_node_ *parent, enum tree_link_ dir,
-           struct ccc_node_ *subtree)
+link_trees(struct ccc_tree_ *const t, struct ccc_node_ *const parent,
+           enum tree_link_ const dir, struct ccc_node_ *const subtree)
 {
     parent->branch_[dir] = subtree;
     if (has_dups(&t->end_, subtree))
@@ -934,7 +938,7 @@ key_from_node(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
 }
 
 static inline struct ccc_node_ *
-elem_in_slot(struct ccc_tree_ const *t, void const *slot)
+elem_in_slot(struct ccc_tree_ const *const t, void const *const slot)
 {
     return (struct ccc_node_ *)((char *)slot + t->node_elem_offset_);
 }
@@ -945,13 +949,13 @@ elem_in_slot(struct ccc_tree_ const *t, void const *slot)
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min */
 static ccc_threeway_cmp
-force_find_grt([[maybe_unused]] ccc_key_cmp const cmp)
+force_find_grt(ccc_key_cmp const)
 {
     return CCC_GRT;
 }
 
 static ccc_threeway_cmp
-force_find_les([[maybe_unused]] ccc_key_cmp const cmp)
+force_find_les(ccc_key_cmp const)
 {
     return CCC_LES;
 }
@@ -1011,7 +1015,7 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_ const *t, struct tree_range_ const r,
+are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)

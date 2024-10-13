@@ -113,7 +113,8 @@ ccc_fhm_remove_entry(ccc_fh_map_entry const *const e)
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
     erase(e->impl_.h_, e->impl_.entry_.e_);
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){
+        {.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED_CONTAINS_NULL}};
 }
 
 ccc_fh_map_entry *
@@ -274,22 +275,9 @@ ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fh_map_elem const *iter)
 }
 
 void *
-ccc_fhm_end([[maybe_unused]] ccc_flat_hash_map const *const h)
+ccc_fhm_end(ccc_flat_hash_map const *const)
 {
     return NULL;
-}
-
-static struct ccc_entry_
-entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
-{
-    char upcoming_insertion_error = 0;
-    if (maybe_resize(h) != CCC_OK)
-    {
-        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
-    }
-    struct ccc_entry_ res = find(h, key, hash);
-    res.stats_ |= upcoming_insertion_error;
-    return res;
 }
 
 ccc_result
@@ -494,6 +482,19 @@ ccc_impl_fhm_filter(struct ccc_fhm_ const *const h, void const *const key)
 }
 
 /*=======================     Static Helpers    =============================*/
+
+static inline struct ccc_entry_
+entry(struct ccc_fhm_ *const h, void const *key, uint64_t const hash)
+{
+    char upcoming_insertion_error = 0;
+    if (maybe_resize(h) != CCC_OK)
+    {
+        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
+    }
+    struct ccc_entry_ res = find(h, key, hash);
+    res.stats_ |= upcoming_insertion_error;
+    return res;
+}
 
 static inline struct ccc_entry_
 find(struct ccc_fhm_ const *const h, void const *const key, uint64_t const hash)

@@ -297,7 +297,7 @@ ccc_frm_remove(ccc_flat_realtime_ordered_map *const frm,
     void const *const removed = remove_fixup(frm, q.found_);
     assert(removed);
     void *const user_struct = struct_base(frm, out_handle);
-    memcpy(user_struct, removed, ccc_buf_elem_size(&frm->buf_));
+    (void)memcpy(user_struct, removed, ccc_buf_elem_size(&frm->buf_));
     return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
