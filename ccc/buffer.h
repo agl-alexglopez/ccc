@@ -281,7 +281,8 @@ ccc_result ccc_buf_size_minus(ccc_buffer *buf, size_t n);
 @return the result of setting the size. CCC_OK if no errors occur or an error
 indicating bad input has been provided.
 
-If n is larger than the capacity of the buffer an error is returned. */
+If n is larger than the capacity of the buffer the size is set equal to the
+capacity and an error is returned. */
 ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 
 /** @brief return the current capacity of the buffer.
