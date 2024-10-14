@@ -28,6 +28,8 @@ typedef union
     ccc_impl_om_init(struct_name, set_elem_field, key_elem_field, set_name,    \
                      alloc_fn, key_cmp, aux)
 
+/*=======================    Lazy Construction   ============================*/
+
 #define ccc_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data...)        \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
@@ -51,6 +53,8 @@ typedef union
     {                                                                          \
         ccc_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value)       \
     }
+
+/*=========================   Membership    =================================*/
 
 bool ccc_om_contains(ccc_ordered_map *, void const *key);
 
