@@ -1,6 +1,8 @@
 #include "types.h"
 #include "impl_types.h"
 
+#include <stddef.h>
+
 static char const *const result_msgs[CCC_RESULTS_SIZE] = {
     [CCC_OK] = "",
     [CCC_NO_ALLOC]

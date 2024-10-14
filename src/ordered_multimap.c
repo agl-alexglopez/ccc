@@ -1,20 +1,3 @@
-/** Author: Alexander G. Lopez
-------------------------------
-The double ended priority queue is completely seperate from the ordered map
-implementation, even though they both implement an almost identical splay tree,
-for a few reasons. One, making a splay tree a double ended priority queue
-that exhibits round robin fairness is significantly more complicated than a
-simple map. Two, the standard map should not pay any performance cost for the
-burden of implementation that arises to implement such a priority queue. For
-example, the duplicate tracking introduces a significantly higher number
-of memory accesses per operation harming the cache performance. The normal
-ordered map should operate without this constraint.
-
-While the structure of this code at first appears the same as the ordered
-map implementation, if one explores the details of splaying, insertion, and
-removal, they will see there are significant differences. I thought these
-differences warranted slight code duplication for the benefit of better
-maintainability and performance. */
 #include "ordered_multimap.h"
 #include "impl_ordered_multimap.h"
 #include "impl_tree.h"
@@ -133,7 +116,7 @@ static ccc_threeway_cmp force_find_les(ccc_key_cmp);
 static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
                             struct ccc_node_ const *, ccc_key_cmp_fn *);
 
-/* =================  Double Ended Priority Queue Interface  ============== */
+/* ===========================    Interface     ============================ */
 
 void
 ccc_omm_clear(ccc_ordered_multimap *const pq,

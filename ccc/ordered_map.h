@@ -158,6 +158,8 @@ ccc_result ccc_om_clear(ccc_ordered_map *, ccc_destructor_fn *destructor);
 ccc_result ccc_om_clear_and_free(ccc_ordered_map *,
                                  ccc_destructor_fn *destructor);
 
+/*===========================     Getters   =================================*/
+
 bool ccc_om_is_empty(ccc_ordered_map const *);
 
 size_t ccc_om_size(ccc_ordered_map const *);
