@@ -1,7 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "depq_util.h"
-#include "double_ended_priority_queue.h"
+#include "omm_util.h"
+#include "ordered_multimap.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -12,10 +12,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(depq_test_insert_remove_four_dups)
+BEGIN_STATIC_TEST(omm_test_insert_remove_four_dups)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -29,24 +29,24 @@ BEGIN_STATIC_TEST(depq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        ccc_depq_pop_max(&pq);
+        ccc_omm_pop_max(&pq);
         CHECK(validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_insert_erase_shuffled)
+BEGIN_STATIC_TEST(omm_test_insert_erase_shuffled)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
-    struct val const *max = ccc_depq_max(&pq);
+    struct val const *max = ccc_omm_max(&pq);
     CHECK(max->val, (int)size - 1);
-    struct val const *min = ccc_depq_min(&pq);
+    struct val const *min = ccc_omm_min(&pq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), size);
@@ -57,24 +57,24 @@ BEGIN_STATIC_TEST(depq_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_depq_erase(&pq, &vals[i].elem);
+        (void)ccc_omm_erase(&pq, &vals[i].elem);
         CHECK(validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_pop_max)
+BEGIN_STATIC_TEST(omm_test_pop_max)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
-    struct val const *max = ccc_depq_max(&pq);
+    struct val const *max = ccc_omm_max(&pq);
     CHECK(max->val, (int)size - 1);
-    struct val const *min = ccc_depq_min(&pq);
+    struct val const *min = ccc_omm_min(&pq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), size);
@@ -85,24 +85,24 @@ BEGIN_STATIC_TEST(depq_test_pop_max)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
-        CHECK(((struct val *)ccc_depq_max(&pq))->val, vals[i].val);
-        ccc_depq_pop_max(&pq);
+        CHECK(((struct val *)ccc_omm_max(&pq))->val, vals[i].val);
+        ccc_omm_pop_max(&pq);
     }
     CHECK(is_empty(&pq), true);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_pop_min)
+BEGIN_STATIC_TEST(omm_test_pop_min)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
-    struct val const *max = ccc_depq_max(&pq);
+    struct val const *max = ccc_omm_max(&pq);
     CHECK(max->val, (int)size - 1);
-    struct val const *min = ccc_depq_min(&pq);
+    struct val const *min = ccc_omm_min(&pq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), size);
@@ -113,17 +113,17 @@ BEGIN_STATIC_TEST(depq_test_pop_min)
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(((struct val *)ccc_depq_min(&pq))->val, vals[i].val);
-        ccc_depq_pop_min(&pq);
+        CHECK(((struct val *)ccc_omm_min(&pq))->val, vals[i].val);
+        ccc_omm_pop_min(&pq);
     }
     CHECK(is_empty(&pq), true);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_max_round_robin)
+BEGIN_STATIC_TEST(omm_test_max_round_robin)
 {
-    ccc_double_ended_priority_queue depq
-        = ccc_depq_init(struct val, elem, val, depq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(struct val, elem, val, omm, NULL, val_cmp, NULL);
     int const size = 6;
     struct val vals[6];
     struct val const order[6] = {
@@ -141,26 +141,26 @@ BEGIN_STATIC_TEST(depq_test_max_round_robin)
             vals[i].val = 99;
         }
         vals[i].id = i;
-        CHECK(push(&depq, &vals[i].elem), CCC_OK);
-        CHECK(validate(&depq), true);
+        CHECK(push(&omm, &vals[i].elem), CCC_OK);
+        CHECK(validate(&omm), true);
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
-    while (!is_empty(&depq))
+    while (!is_empty(&omm))
     {
-        struct val const *front = ccc_depq_max(&depq);
+        struct val const *front = ccc_omm_max(&omm);
         CHECK(front->id, order[i].id);
         CHECK(front->val, order[i].val);
-        ccc_depq_pop_max(&depq);
+        ccc_omm_pop_max(&omm);
         ++i;
     }
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_min_round_robin)
+BEGIN_STATIC_TEST(omm_test_min_round_robin)
 {
-    ccc_double_ended_priority_queue depq
-        = ccc_depq_init(struct val, elem, val, depq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(struct val, elem, val, omm, NULL, val_cmp, NULL);
     int const size = 6;
     struct val vals[6];
     struct val const order[6] = {
@@ -178,26 +178,26 @@ BEGIN_STATIC_TEST(depq_test_min_round_robin)
             vals[i].val = 1;
         }
         vals[i].id = i;
-        CHECK(push(&depq, &vals[i].elem), CCC_OK);
-        CHECK(validate(&depq), true);
+        CHECK(push(&omm, &vals[i].elem), CCC_OK);
+        CHECK(validate(&omm), true);
     }
     /* Now let's make sure we pop round robin. */
     size_t i = 0;
-    while (!is_empty(&depq))
+    while (!is_empty(&omm))
     {
-        struct val const *front = ccc_depq_min(&depq);
+        struct val const *front = ccc_omm_min(&omm);
         CHECK(front->id, order[i].id);
         CHECK(front->val, order[i].val);
-        ccc_depq_pop_min(&depq);
+        ccc_omm_pop_min(&omm);
         ++i;
     }
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
+BEGIN_STATIC_TEST(omm_test_delete_prime_shuffle_duplicates)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -220,7 +220,7 @@ BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_depq_erase(&pq, &vals[shuffled_index].elem);
+        (void)ccc_omm_erase(&pq, &vals[shuffled_index].elem);
         CHECK(validate(&pq), true);
         --cur_size;
         CHECK(size(&pq), cur_size);
@@ -230,10 +230,10 @@ BEGIN_STATIC_TEST(depq_test_delete_prime_shuffle_duplicates)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_prime_shuffle)
+BEGIN_STATIC_TEST(omm_test_prime_shuffle)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -250,13 +250,13 @@ BEGIN_STATIC_TEST(depq_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_depq_print(&pq, depq_printer_fn);
+    ccc_omm_print(&pq, omm_printer_fn);
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
+        CHECK(ccc_omm_erase(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
         --cur_size;
         CHECK(size(&pq), cur_size);
@@ -264,10 +264,10 @@ BEGIN_STATIC_TEST(depq_test_prime_shuffle)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_weak_srand)
+BEGIN_STATIC_TEST(omm_test_weak_srand)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -282,7 +282,7 @@ BEGIN_STATIC_TEST(depq_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_depq_erase(&pq, &vals[i].elem) != NULL, true);
+        CHECK(ccc_omm_erase(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
     CHECK(is_empty(&pq), true);
@@ -292,10 +292,9 @@ BEGIN_STATIC_TEST(depq_test_weak_srand)
 int
 main()
 {
-    return RUN_TESTS(depq_test_insert_remove_four_dups(),
-                     depq_test_insert_erase_shuffled(), depq_test_pop_max(),
-                     depq_test_pop_min(), depq_test_max_round_robin(),
-                     depq_test_min_round_robin(),
-                     depq_test_delete_prime_shuffle_duplicates(),
-                     depq_test_prime_shuffle(), depq_test_weak_srand());
+    return RUN_TESTS(
+        omm_test_insert_remove_four_dups(), omm_test_insert_erase_shuffled(),
+        omm_test_pop_max(), omm_test_pop_min(), omm_test_max_round_robin(),
+        omm_test_min_round_robin(), omm_test_delete_prime_shuffle_duplicates(),
+        omm_test_prime_shuffle(), omm_test_weak_srand());
 }

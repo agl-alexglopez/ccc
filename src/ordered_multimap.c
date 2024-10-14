@@ -15,8 +15,8 @@ map implementation, if one explores the details of splaying, insertion, and
 removal, they will see there are significant differences. I thought these
 differences warranted slight code duplication for the benefit of better
 maintainability and performance. */
-#include "double_ended_priority_queue.h"
-#include "impl_double_ended_priority_queue.h"
+#include "ordered_multimap.h"
+#include "impl_ordered_multimap.h"
 #include "impl_tree.h"
 #include "impl_types.h"
 #include "types.h"
@@ -136,10 +136,10 @@ static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
 /* =================  Double Ended Priority Queue Interface  ============== */
 
 void
-ccc_depq_clear(ccc_double_ended_priority_queue *const pq,
-               ccc_destructor_fn *const destructor)
+ccc_omm_clear(ccc_ordered_multimap *const pq,
+              ccc_destructor_fn *const destructor)
 {
-    while (!ccc_depq_is_empty(pq))
+    while (!ccc_omm_is_empty(pq))
     {
         void *popped = pop_min(&pq->impl_);
         if (destructor)
@@ -155,13 +155,13 @@ ccc_depq_clear(ccc_double_ended_priority_queue *const pq,
 }
 
 bool
-ccc_depq_is_empty(ccc_double_ended_priority_queue const *const pq)
+ccc_omm_is_empty(ccc_ordered_multimap const *const pq)
 {
     return empty(&pq->impl_);
 }
 
 void *
-ccc_depq_max(ccc_double_ended_priority_queue *const pq)
+ccc_omm_max(ccc_ordered_multimap *const pq)
 {
     struct ccc_node_ const *const n
         = splay(&pq->impl_, pq->impl_.root_, NULL, force_find_grt);
@@ -173,14 +173,13 @@ ccc_depq_max(ccc_double_ended_priority_queue *const pq)
 }
 
 bool
-ccc_depq_is_max(ccc_double_ended_priority_queue *const pq,
-                ccc_depq_elem const *const e)
+ccc_omm_is_max(ccc_ordered_multimap *const pq, ccc_omm_elem const *const e)
 {
-    return !ccc_depq_rnext(pq, e);
+    return !ccc_omm_rnext(pq, e);
 }
 
 void *
-ccc_depq_min(ccc_double_ended_priority_queue *const pq)
+ccc_omm_min(ccc_ordered_multimap *const pq)
 {
     struct ccc_node_ const *const n
         = splay(&pq->impl_, pq->impl_.root_, NULL, force_find_les);
@@ -192,27 +191,25 @@ ccc_depq_min(ccc_double_ended_priority_queue *const pq)
 }
 
 bool
-ccc_depq_is_min(ccc_double_ended_priority_queue *const pq,
-                ccc_depq_elem const *const e)
+ccc_omm_is_min(ccc_ordered_multimap *const pq, ccc_omm_elem const *const e)
 {
-    return !ccc_depq_next(pq, e);
+    return !ccc_omm_next(pq, e);
 }
 
 void *
-ccc_depq_begin(ccc_double_ended_priority_queue const *const pq)
+ccc_omm_begin(ccc_ordered_multimap const *const pq)
 {
     return max(&pq->impl_);
 }
 
 void *
-ccc_depq_rbegin(ccc_double_ended_priority_queue const *const pq)
+ccc_omm_rbegin(ccc_ordered_multimap const *const pq)
 {
     return min(&pq->impl_);
 }
 
 void *
-ccc_depq_next(ccc_double_ended_priority_queue const *const pq,
-              ccc_depq_elem const *e)
+ccc_omm_next(ccc_ordered_multimap const *const pq, ccc_omm_elem const *e)
 {
     struct ccc_node_ const *const n
         = multimap_next(&pq->impl_, &e->impl_, reverse_inorder_traversal);
@@ -220,8 +217,7 @@ ccc_depq_next(ccc_double_ended_priority_queue const *const pq,
 }
 
 void *
-ccc_depq_rnext(ccc_double_ended_priority_queue const *const pq,
-               ccc_depq_elem const *e)
+ccc_omm_rnext(ccc_ordered_multimap const *const pq, ccc_omm_elem const *e)
 {
     struct ccc_node_ const *const n
         = multimap_next(&pq->impl_, &e->impl_, inorder_traversal);
@@ -229,35 +225,35 @@ ccc_depq_rnext(ccc_double_ended_priority_queue const *const pq,
 }
 
 void *
-ccc_depq_end(ccc_double_ended_priority_queue const *const)
+ccc_omm_end(ccc_ordered_multimap const *const)
 {
     return NULL;
 }
 
 void *
-ccc_depq_rend(ccc_double_ended_priority_queue const *const)
+ccc_omm_rend(ccc_ordered_multimap const *const)
 {
     return NULL;
 }
 
 ccc_range
-ccc_depq_equal_range(ccc_double_ended_priority_queue *const pq,
-                     void const *const begin_key, void const *const end_key)
+ccc_omm_equal_range(ccc_ordered_multimap *const pq, void const *const begin_key,
+                    void const *const end_key)
 {
     return (ccc_range){
         equal_range(&pq->impl_, begin_key, end_key, reverse_inorder_traversal)};
 }
 
 ccc_rrange
-ccc_depq_equal_rrange(ccc_double_ended_priority_queue *const pq,
-                      void const *const rbegin_key, void const *const rend_key)
+ccc_omm_equal_rrange(ccc_ordered_multimap *const pq,
+                     void const *const rbegin_key, void const *const rend_key)
 {
     return (ccc_rrange){
         equal_range(&pq->impl_, rbegin_key, rend_key, inorder_traversal)};
 }
 
 ccc_result
-ccc_depq_push(ccc_double_ended_priority_queue *const pq, ccc_depq_elem *const e)
+ccc_omm_push(ccc_ordered_multimap *const pq, ccc_omm_elem *const e)
 {
     if (pq->impl_.alloc_)
     {
@@ -273,16 +269,14 @@ ccc_depq_push(ccc_double_ended_priority_queue *const pq, ccc_depq_elem *const e)
 }
 
 void *
-ccc_depq_erase(ccc_double_ended_priority_queue *const pq,
-               ccc_depq_elem *const e)
+ccc_omm_erase(ccc_ordered_multimap *const pq, ccc_omm_elem *const e)
 {
     return multimap_erase_node(&pq->impl_, &e->impl_);
 }
 
 bool
-ccc_depq_update(ccc_double_ended_priority_queue *const pq,
-                ccc_depq_elem *const elem, ccc_update_fn *const fn,
-                void *const aux)
+ccc_omm_update(ccc_ordered_multimap *const pq, ccc_omm_elem *const elem,
+               ccc_update_fn *const fn, void *const aux)
 {
     if (NULL == elem->impl_.branch_[L] || NULL == elem->impl_.branch_[R])
     {
@@ -299,30 +293,27 @@ ccc_depq_update(ccc_double_ended_priority_queue *const pq,
 }
 
 bool
-ccc_depq_increase(ccc_double_ended_priority_queue *const pq,
-                  ccc_depq_elem *const elem, ccc_update_fn *const fn,
-                  void *const aux)
+ccc_omm_increase(ccc_ordered_multimap *const pq, ccc_omm_elem *const elem,
+                 ccc_update_fn *const fn, void *const aux)
 {
-    return ccc_depq_update(pq, elem, fn, aux);
+    return ccc_omm_update(pq, elem, fn, aux);
 }
 
 bool
-ccc_depq_decrease(ccc_double_ended_priority_queue *const pq,
-                  ccc_depq_elem *const elem, ccc_update_fn *const fn,
-                  void *const aux)
+ccc_omm_decrease(ccc_ordered_multimap *const pq, ccc_omm_elem *const elem,
+                 ccc_update_fn *const fn, void *const aux)
 {
-    return ccc_depq_update(pq, elem, fn, aux);
+    return ccc_omm_update(pq, elem, fn, aux);
 }
 
 bool
-ccc_depq_contains(ccc_double_ended_priority_queue *const pq,
-                  void const *const key)
+ccc_omm_contains(ccc_ordered_multimap *const pq, void const *const key)
 {
     return contains(&pq->impl_, key);
 }
 
 void
-ccc_depq_pop_max(ccc_double_ended_priority_queue *const pq)
+ccc_omm_pop_max(ccc_ordered_multimap *const pq)
 {
     void *const n = pop_max(&pq->impl_);
     if (!n)
@@ -336,7 +327,7 @@ ccc_depq_pop_max(ccc_double_ended_priority_queue *const pq)
 }
 
 void
-ccc_depq_pop_min(ccc_double_ended_priority_queue *const pq)
+ccc_omm_pop_min(ccc_ordered_multimap *const pq)
 {
     struct ccc_node_ *const n = pop_min(&pq->impl_);
     if (!n)
@@ -350,20 +341,19 @@ ccc_depq_pop_min(ccc_double_ended_priority_queue *const pq)
 }
 
 size_t
-ccc_depq_size(ccc_double_ended_priority_queue const *const pq)
+ccc_omm_size(ccc_ordered_multimap const *const pq)
 {
     return pq->impl_.size_;
 }
 
 void
-ccc_depq_print(ccc_double_ended_priority_queue const *const pq,
-               ccc_print_fn *const fn)
+ccc_omm_print(ccc_ordered_multimap const *const pq, ccc_print_fn *const fn)
 {
     tree_print(&pq->impl_, pq->impl_.root_, fn);
 }
 
 bool
-ccc_depq_validate(ccc_double_ended_priority_queue const *const pq)
+ccc_omm_validate(ccc_ordered_multimap const *const pq)
 {
     return ccc_tree_validate(&pq->impl_);
 }

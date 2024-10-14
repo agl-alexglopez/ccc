@@ -17,8 +17,8 @@
 #include <string.h>
 #include <time.h>
 
-#include "ccc/double_ended_priority_queue.h"
 #include "ccc/ordered_map.h"
+#include "ccc/ordered_multimap.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
@@ -59,7 +59,7 @@ struct priority_cell
 {
     struct point cell;
     int priority;
-    ccc_depq_elem elem;
+    ccc_omm_elem elem;
 };
 
 struct point_cost
@@ -210,9 +210,9 @@ animate_maze(struct maze *maze)
        A ccc_ordered_map could be replaced by a 2D vector copy of the maze with
        costs mapped but the purpose of this program is to test both the set and
        priority queue data structures. Also a 2D vector wastes space. */
-    ccc_double_ended_priority_queue cells
-        = ccc_depq_init(struct priority_cell, elem, priority, cells, NULL,
-                        cmp_priority_cells, NULL);
+    ccc_ordered_multimap cells
+        = ccc_omm_init(struct priority_cell, elem, priority, cells, NULL,
+                       cmp_priority_cells, NULL);
     ccc_ordered_map cell_costs = ccc_om_init(
         struct point_cost, elem, p, cell_costs, NULL, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
@@ -235,7 +235,7 @@ animate_maze(struct maze *maze)
     clear_and_flush_maze(maze);
     while (!is_empty(&cells))
     {
-        struct priority_cell const *const cur = ccc_depq_max(&cells);
+        struct priority_cell const *const cur = ccc_omm_max(&cells);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
@@ -289,8 +289,8 @@ animate_maze(struct maze *maze)
         }
         else
         {
-            struct priority_cell *pc = ccc_depq_max(&cells);
-            ccc_depq_pop_max(&cells);
+            struct priority_cell *pc = ccc_omm_max(&cells);
+            ccc_omm_pop_max(&cells);
             free(pc);
         }
     }

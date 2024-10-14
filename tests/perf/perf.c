@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "cli.h"
-#include "double_ended_priority_queue.h"
 #include "flat_priority_queue.h"
+#include "ordered_multimap.h"
 #include "priority_queue.h"
 #include "random.h"
 #include "str_view/str_view.h"
@@ -17,7 +17,7 @@
 struct val
 {
     int val;
-    ccc_depq_elem depq_elem;
+    ccc_omm_elem omm_elem;
     ccc_pq_elem pq_elem;
 };
 
@@ -95,21 +95,21 @@ main(int argc, char **argv)
 static void
 test_push(void)
 {
-    printf("push N elements, pq, vs depq, vs fpq \n");
+    printf("push N elements, pq, vs omm, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_double_ended_priority_queue depq = ccc_depq_init(
-            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
+        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+                                                NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)push(&depq, &val_array[i].depq_elem);
+            (void)push(&omm, &val_array[i].omm_elem);
         }
         clock_t end = clock();
-        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -126,7 +126,7 @@ test_push(void)
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
+        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, omm_time, fpq_time,
                pq_time);
         free(val_array);
     }
@@ -135,25 +135,25 @@ test_push(void)
 static void
 test_pop(void)
 {
-    printf("pop N elements, pq, vs depq, vs fpq \n");
+    printf("pop N elements, pq, vs omm, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_double_ended_priority_queue depq = ccc_depq_init(
-            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
+        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+                                                NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            (void)push(&depq, &val_array[i].depq_elem);
+            (void)push(&omm, &val_array[i].omm_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            ccc_depq_pop_min(&depq);
+            ccc_omm_pop_min(&omm);
         }
         clock_t end = clock();
-        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
@@ -178,7 +178,7 @@ test_pop(void)
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
+        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, omm_time, fpq_time,
                pq_time);
         free(val_array);
     }
@@ -187,25 +187,25 @@ test_pop(void)
 static void
 test_push_pop(void)
 {
-    printf("push N elements then pop N elements, pq, vs depq, vs fpq \n");
+    printf("push N elements then pop N elements, pq, vs omm, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_double_ended_priority_queue depq = ccc_depq_init(
-            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
+        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+                                                NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)push(&depq, &val_array[i].depq_elem);
+            (void)push(&omm, &val_array[i].omm_elem);
         }
         for (size_t i = 0; i < n; ++i)
         {
-            ccc_depq_pop_min(&depq);
+            ccc_omm_pop_min(&omm);
         }
         clock_t end = clock();
-        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -230,7 +230,7 @@ test_push_pop(void)
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
+        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, omm_time, fpq_time,
                pq_time);
         free(val_array);
     }
@@ -239,25 +239,25 @@ test_push_pop(void)
 static void
 test_push_intermittent_pop(void)
 {
-    printf("push N elements pop every 10, pq, vs depq, vs fpq \n");
+    printf("push N elements pop every 10, pq, vs omm, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_double_ended_priority_queue depq = ccc_depq_init(
-            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
+        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+                                                NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)push(&depq, &val_array[i].depq_elem);
+            (void)push(&omm, &val_array[i].omm_elem);
             if (i % 10 == 0)
             {
-                ccc_depq_pop_min(&depq);
+                ccc_omm_pop_min(&omm);
             }
         }
         clock_t end = clock();
-        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -282,7 +282,7 @@ test_push_intermittent_pop(void)
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
+        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, omm_time, fpq_time,
                pq_time);
         free(val_array);
     }
@@ -291,31 +291,31 @@ test_push_intermittent_pop(void)
 static void
 test_pop_intermittent_push(void)
 {
-    printf("pop N elements push every 10, pq, vs depq, vs fpq \n");
+    printf("pop N elements push every 10, pq, vs omm, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_double_ended_priority_queue depq = ccc_depq_init(
-            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
+        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+                                                NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            (void)push(&depq, &val_array[i].depq_elem);
+            (void)push(&omm, &val_array[i].omm_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            struct val *v = ccc_depq_min(&depq);
-            ccc_depq_pop_min(&depq);
+            struct val *v = ccc_omm_min(&omm);
+            ccc_omm_pop_min(&omm);
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
-                (void)push(&depq, &v->depq_elem);
+                (void)push(&omm, &v->omm_elem);
             }
         }
         clock_t end = clock();
-        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
@@ -351,7 +351,7 @@ test_pop_intermittent_push(void)
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
+        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, omm_time, fpq_time,
                pq_time);
         free(val_array);
     }
@@ -360,27 +360,27 @@ test_pop_intermittent_push(void)
 static void
 test_update(void)
 {
-    printf("push N elements update N elements, pq, vs depq, vs fpq \n");
+    printf("push N elements update N elements, pq, vs omm, vs fpq \n");
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_double_ended_priority_queue depq = ccc_depq_init(
-            struct val, depq_elem, val, depq, NULL, val_key_cmp, NULL);
+        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+                                                NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            (void)push(&depq, &val_array[i].depq_elem);
+            (void)push(&omm, &val_array[i].omm_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
             int new_val = rand_range(0, max_rand_range);
-            (void)ccc_depq_update(&depq, &val_array[i].depq_elem, val_update,
-                                  &new_val);
+            (void)ccc_omm_update(&omm, &val_array[i].omm_elem, val_update,
+                                 &new_val);
         }
         clock_t end = clock();
-        double const depq_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         for (size_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
@@ -409,7 +409,7 @@ test_update(void)
         }
         end = clock();
         double const fpq_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, depq_time, fpq_time,
+        printf("N=%zu: DEPQ=%f, FPQ=%f, PQ=%f\n", n, omm_time, fpq_time,
                pq_time);
         free(val_array);
     }

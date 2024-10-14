@@ -1,7 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "depq_util.h"
-#include "double_ended_priority_queue.h"
+#include "omm_util.h"
+#include "ordered_multimap.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -25,14 +25,14 @@ val_update(ccc_user_type_mut const u)
 }
 
 void
-depq_printer_fn(ccc_user_type const e)
+omm_printer_fn(ccc_user_type const e)
 {
     struct val const *const v = e.user_type;
     printf("{id:%d,val:%d}", v->id, v->val);
 }
 
-BEGIN_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
-           struct val vals[], size_t const size, int const larger_prime)
+BEGIN_TEST(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
+           size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -54,7 +54,7 @@ BEGIN_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_double_ended_priority_queue *pq)
+inorder_fill(int vals[], size_t size, ccc_ordered_multimap *pq)
 {
     if (size(pq) != size)
     {
