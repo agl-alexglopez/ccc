@@ -23,11 +23,15 @@ typedef union
     ccc_impl_omm_init(struct_name, omm_elem_field, key_field, omm_name,        \
                       alloc_fn, key_cmp_fn, aux)
 
-void ccc_omm_clear(ccc_ordered_multimap *, ccc_destructor_fn *destructor);
+/*=========================    Membership   =================================*/
 
-bool ccc_omm_is_empty(ccc_ordered_multimap const *);
+bool ccc_omm_contains(ccc_ordered_multimap *, void const *key);
 
-size_t ccc_omm_size(ccc_ordered_multimap const *);
+/*=========================    Entry API    =================================*/
+
+/* TODO */
+
+/*===================    Priority Queue Helpers    ==========================*/
 
 ccc_result ccc_omm_push(ccc_ordered_multimap *, ccc_omm_elem *);
 
@@ -54,7 +58,29 @@ bool ccc_omm_increase(ccc_ordered_multimap *, ccc_omm_elem *, ccc_update_fn *,
 bool ccc_omm_decrease(ccc_ordered_multimap *, ccc_omm_elem *, ccc_update_fn *,
                       void *);
 
-bool ccc_omm_contains(ccc_ordered_multimap *, void const *key);
+/*===========================   Iterators   =================================*/
+
+#define ccc_omm_equal_range_vr(ordered_multimap_ptr,                           \
+                               begin_and_end_key_ptrs...)                      \
+    &(ccc_range)                                                               \
+    {                                                                          \
+        ccc_omm_equal_range(ordered_multimap_ptr, begin_and_end_key_ptrs)      \
+            .impl_                                                             \
+    }
+
+#define ccc_omm_equal_rrange_vr(ordered_multimap_ptr,                          \
+                                rbegin_and_rend_key_ptrs...)                   \
+    &(ccc_rrange)                                                              \
+    {                                                                          \
+        ccc_omm_equal_rrange(ordered_multimap_ptr, rbegin_and_rend_key_ptrs)   \
+            .impl_                                                             \
+    }
+
+ccc_range ccc_omm_equal_range(ccc_ordered_multimap *, void const *begin_key,
+                              void const *end_key);
+
+ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *, void const *rbegin_key,
+                                void const *end_key);
 
 void *ccc_omm_begin(ccc_ordered_multimap const *);
 
@@ -68,11 +94,13 @@ void *ccc_omm_end(ccc_ordered_multimap const *);
 
 void *ccc_omm_rend(ccc_ordered_multimap const *);
 
-ccc_range ccc_omm_equal_range(ccc_ordered_multimap *, void const *begin_key,
-                              void const *end_key);
+void ccc_omm_clear(ccc_ordered_multimap *, ccc_destructor_fn *destructor);
 
-ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *, void const *rbegin_key,
-                                void const *end_key);
+/*===========================     Getters   =================================*/
+
+bool ccc_omm_is_empty(ccc_ordered_multimap const *);
+
+size_t ccc_omm_size(ccc_ordered_multimap const *);
 
 void ccc_omm_print(ccc_ordered_multimap const *, ccc_print_fn *);
 
