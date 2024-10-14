@@ -25,37 +25,45 @@ typedef union
 
 /*=========================    Membership   =================================*/
 
-bool ccc_omm_contains(ccc_ordered_multimap *, void const *key);
+bool ccc_omm_contains(ccc_ordered_multimap *mm, void const *key);
+void *ccc_omm_get_key_val(ccc_ordered_multimap *mm, void const *key);
 
 /*=========================    Entry API    =================================*/
 
-/* TODO */
+/** @brief Returns an entry pointing to the newly inserted element and a status
+indicating if the inserted element is a duplicate key.
+@param [in] mm a pointer to the multimap.
+@param [in] e a handle to the new key value to be inserted.
+@return an entry that can be unwrapped to view the inserted element. The status
+will be Occupied if this element is a duplicate added to a duplicate list or
+Vacant if this is the first key value to be inserted into the multimap. */
+ccc_entry ccc_omm_insert(ccc_ordered_multimap *mm, ccc_omm_elem *e);
 
 /*===================    Priority Queue Helpers    ==========================*/
 
-ccc_result ccc_omm_push(ccc_ordered_multimap *, ccc_omm_elem *);
+ccc_result ccc_omm_push(ccc_ordered_multimap *mm, ccc_omm_elem *);
 
-void ccc_omm_pop_max(ccc_ordered_multimap *);
+void ccc_omm_pop_max(ccc_ordered_multimap *mm);
 
-void ccc_omm_pop_min(ccc_ordered_multimap *);
+void ccc_omm_pop_min(ccc_ordered_multimap *mm);
 
-void *ccc_omm_max(ccc_ordered_multimap *);
+void *ccc_omm_max(ccc_ordered_multimap *mm);
 
-void *ccc_omm_min(ccc_ordered_multimap *);
+void *ccc_omm_min(ccc_ordered_multimap *mm);
 
-bool ccc_omm_is_max(ccc_ordered_multimap *, ccc_omm_elem const *);
+bool ccc_omm_is_max(ccc_ordered_multimap *mm, ccc_omm_elem const *);
 
-bool ccc_omm_is_min(ccc_ordered_multimap *, ccc_omm_elem const *);
+bool ccc_omm_is_min(ccc_ordered_multimap *mm, ccc_omm_elem const *);
 
-void *ccc_omm_erase(ccc_ordered_multimap *, ccc_omm_elem *);
+void *ccc_omm_erase(ccc_ordered_multimap *mm, ccc_omm_elem *);
 
-bool ccc_omm_update(ccc_ordered_multimap *, ccc_omm_elem *, ccc_update_fn *,
+bool ccc_omm_update(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
                     void *);
 
-bool ccc_omm_increase(ccc_ordered_multimap *, ccc_omm_elem *, ccc_update_fn *,
+bool ccc_omm_increase(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
                       void *);
 
-bool ccc_omm_decrease(ccc_ordered_multimap *, ccc_omm_elem *, ccc_update_fn *,
+bool ccc_omm_decrease(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
                       void *);
 
 /*===========================   Iterators   =================================*/
@@ -76,35 +84,35 @@ bool ccc_omm_decrease(ccc_ordered_multimap *, ccc_omm_elem *, ccc_update_fn *,
             .impl_                                                             \
     }
 
-ccc_range ccc_omm_equal_range(ccc_ordered_multimap *, void const *begin_key,
+ccc_range ccc_omm_equal_range(ccc_ordered_multimap *mm, void const *begin_key,
                               void const *end_key);
 
-ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *, void const *rbegin_key,
-                                void const *end_key);
+ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *mm,
+                                void const *rbegin_key, void const *end_key);
 
-void *ccc_omm_begin(ccc_ordered_multimap const *);
+void *ccc_omm_begin(ccc_ordered_multimap const *mm);
 
-void *ccc_omm_rbegin(ccc_ordered_multimap const *);
+void *ccc_omm_rbegin(ccc_ordered_multimap const *mm);
 
-void *ccc_omm_next(ccc_ordered_multimap const *, ccc_omm_elem const *);
+void *ccc_omm_next(ccc_ordered_multimap const *mm, ccc_omm_elem const *);
 
-void *ccc_omm_rnext(ccc_ordered_multimap const *, ccc_omm_elem const *);
+void *ccc_omm_rnext(ccc_ordered_multimap const *mm, ccc_omm_elem const *);
 
-void *ccc_omm_end(ccc_ordered_multimap const *);
+void *ccc_omm_end(ccc_ordered_multimap const *mm);
 
-void *ccc_omm_rend(ccc_ordered_multimap const *);
+void *ccc_omm_rend(ccc_ordered_multimap const *mm);
 
-void ccc_omm_clear(ccc_ordered_multimap *, ccc_destructor_fn *destructor);
+void ccc_omm_clear(ccc_ordered_multimap *mm, ccc_destructor_fn *destructor);
 
 /*===========================     Getters   =================================*/
 
-bool ccc_omm_is_empty(ccc_ordered_multimap const *);
+bool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
-size_t ccc_omm_size(ccc_ordered_multimap const *);
+size_t ccc_omm_size(ccc_ordered_multimap const *mm);
 
-void ccc_omm_print(ccc_ordered_multimap const *, ccc_print_fn *);
+void ccc_omm_print(ccc_ordered_multimap const *mm, ccc_print_fn *);
 
-bool ccc_omm_validate(ccc_ordered_multimap const *);
+bool ccc_omm_validate(ccc_ordered_multimap const *mm);
 
 #ifdef ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 typedef ccc_omm_elem omm_elem;

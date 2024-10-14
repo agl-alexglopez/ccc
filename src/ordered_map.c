@@ -92,52 +92,6 @@ static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
 
 /* ======================        Map Interface      ====================== */
 
-ccc_result
-ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
-{
-    if (!set)
-    {
-        return CCC_INPUT_ERR;
-    }
-    while (!ccc_om_is_empty(set))
-    {
-        void *const popped
-            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
-        if (destructor)
-        {
-            destructor((ccc_user_type_mut){.user_type = popped,
-                                           .aux = set->impl_.aux_});
-        }
-    }
-    return CCC_OK;
-}
-
-ccc_result
-ccc_om_clear_and_free(ccc_ordered_map *const set,
-                      ccc_destructor_fn *const destructor)
-{
-
-    if (!set)
-    {
-        return CCC_INPUT_ERR;
-    }
-    while (!ccc_om_is_empty(set))
-    {
-        void *const popped
-            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
-        if (destructor)
-        {
-            destructor((ccc_user_type_mut){.user_type = popped,
-                                           .aux = set->impl_.aux_});
-        }
-        if (set->impl_.alloc_)
-        {
-            (void)set->impl_.alloc_(popped, 0);
-        }
-    }
-    return CCC_OK;
-}
-
 bool
 ccc_om_is_empty(ccc_ordered_map const *const s)
 {
@@ -216,7 +170,8 @@ ccc_entry
 ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
               void *const tmp)
 {
-    void *found = find(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
+    void *const found
+        = find(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
     if (found)
     {
         assert(s->impl_.root_ != &s->impl_.end_);
@@ -226,7 +181,7 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
         swap(tmp, user_struct, ret, s->impl_.elem_sz_);
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted = alloc_insert(&s->impl_, &out_handle->impl_);
+    void *const inserted = alloc_insert(&s->impl_, &out_handle->impl_);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
@@ -238,7 +193,7 @@ ccc_entry
 ccc_om_try_insert(ccc_ordered_map *const s,
                   ccc_o_map_elem *const key_val_handle)
 {
-    void *found
+    void *const found
         = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
     if (found)
     {
@@ -246,7 +201,7 @@ ccc_om_try_insert(ccc_ordered_map *const s,
         return (ccc_entry){{.e_ = struct_base(&s->impl_, s->impl_.root_),
                             .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted = alloc_insert(&s->impl_, &key_val_handle->impl_);
+    void *const inserted = alloc_insert(&s->impl_, &key_val_handle->impl_);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
@@ -258,7 +213,7 @@ ccc_entry
 ccc_om_insert_or_assign(ccc_ordered_map *const s,
                         ccc_o_map_elem *const key_val_handle)
 {
-    void *found
+    void *const found
         = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
     if (found)
     {
@@ -268,7 +223,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const s,
                s->impl_.elem_sz_);
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted = alloc_insert(&s->impl_, &key_val_handle->impl_);
+    void *const inserted = alloc_insert(&s->impl_, &key_val_handle->impl_);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
@@ -287,7 +242,7 @@ ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
     }
     if (s->impl_.alloc_)
     {
-        void *user_struct = struct_base(&s->impl_, &out_handle->impl_);
+        void *const user_struct = struct_base(&s->impl_, &out_handle->impl_);
         memcpy(user_struct, n, s->impl_.elem_sz_);
         s->impl_.alloc_(n, 0);
         return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -300,7 +255,7 @@ ccc_om_remove_entry(ccc_o_map_entry *const e)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        void *erased
+        void *const erased
             = erase(e->impl_.t_, key_in_slot(e->impl_.t_, e->impl_.entry_.e_));
         assert(erased);
         if (e->impl_.t_->alloc_)
@@ -356,13 +311,13 @@ ccc_om_rbegin(ccc_ordered_map const *const s)
 }
 
 void *
-ccc_om_end([[maybe_unused]] ccc_ordered_map const *const s)
+ccc_om_end(ccc_ordered_map const *const)
 {
     return NULL;
 }
 
 void *
-ccc_om_rend([[maybe_unused]] ccc_ordered_map const *const s)
+ccc_om_rend(ccc_ordered_map const *const)
 {
     return NULL;
 }
@@ -408,6 +363,52 @@ ccc_om_root(ccc_ordered_map const *const s)
         return NULL;
     }
     return struct_base(&s->impl_, n);
+}
+
+ccc_result
+ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
+{
+    if (!set)
+    {
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_om_is_empty(set))
+    {
+        void *const popped
+            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
+        if (destructor)
+        {
+            destructor((ccc_user_type_mut){.user_type = popped,
+                                           .aux = set->impl_.aux_});
+        }
+    }
+    return CCC_OK;
+}
+
+ccc_result
+ccc_om_clear_and_free(ccc_ordered_map *const set,
+                      ccc_destructor_fn *const destructor)
+{
+
+    if (!set)
+    {
+        return CCC_INPUT_ERR;
+    }
+    while (!ccc_om_is_empty(set))
+    {
+        void *const popped
+            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
+        if (destructor)
+        {
+            destructor((ccc_user_type_mut){.user_type = popped,
+                                           .aux = set->impl_.aux_});
+        }
+        if (set->impl_.alloc_)
+        {
+            (void)set->impl_.alloc_(popped, 0);
+        }
+    }
+    return CCC_OK;
 }
 
 ccc_result
@@ -642,7 +643,7 @@ alloc_insert(struct ccc_tree_ *const t, struct ccc_node_ *out_handle)
     ccc_threeway_cmp root_cmp = CCC_CMP_ERR;
     if (!empty(t))
     {
-        void const *const key = ccc_impl_om_key_from_node(t, out_handle);
+        void const *const key = key_from_node(t, out_handle);
         t->root_ = splay(t, t->root_, key, t->cmp_);
         root_cmp = cmp(t, key, t->root_, t->cmp_);
         if (CCC_EQL == root_cmp)
@@ -652,13 +653,13 @@ alloc_insert(struct ccc_tree_ *const t, struct ccc_node_ *out_handle)
     }
     if (t->alloc_)
     {
-        void *node = t->alloc_(NULL, t->elem_sz_);
+        void *const node = t->alloc_(NULL, t->elem_sz_);
         if (!node)
         {
             return NULL;
         }
-        memcpy(node, struct_base(t, out_handle), t->elem_sz_);
-        out_handle = ccc_impl_om_elem_in_slot(t, node);
+        (void)memcpy(node, struct_base(t, out_handle), t->elem_sz_);
+        out_handle = elem_in_slot(t, node);
     }
     if (empty(t))
     {
@@ -681,7 +682,7 @@ insert(struct ccc_tree_ *const t, struct ccc_node_ *const n)
         t->size_++;
         return struct_base(t, n);
     }
-    void const *const key = ccc_impl_om_key_from_node(t, n);
+    void const *const key = key_from_node(t, n);
     t->root_ = splay(t, t->root_, key, t->cmp_);
     ccc_threeway_cmp const root_cmp = cmp(t, key, t->root_, t->cmp_);
     if (CCC_EQL == root_cmp)
@@ -735,8 +736,7 @@ remove_from_tree(struct ccc_tree_ *const t, struct ccc_node_ *const ret)
     }
     else
     {
-        t->root_ = splay(t, ret->branch_[L], ccc_impl_om_key_from_node(t, ret),
-                         t->cmp_);
+        t->root_ = splay(t, ret->branch_[L], key_from_node(t, ret), t->cmp_);
         link_trees(t->root_, R, ret->branch_[R]);
     }
     return ret;
@@ -815,9 +815,9 @@ swap(char tmp[], void *const a, void *const b, size_t elem_sz)
     {
         return;
     }
-    memcpy(tmp, a, elem_sz);
-    memcpy(a, b, elem_sz);
-    memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, elem_sz);
+    (void)memcpy(a, b, elem_sz);
+    (void)memcpy(b, tmp, elem_sz);
 }
 
 static inline void
