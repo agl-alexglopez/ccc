@@ -21,22 +21,22 @@ target_link_libraries(run_tests PRIVATE str_view::str_view test)
 # the test executable in the tests folder either in debug or release
 # depending on the build type. The run_tests program then runs all binaries.
 
-#############  Priority Queue  ##########################
-add_library(depq_util depq/depq_util.h depq/depq_util.c)
-target_link_libraries(depq_util
+#############  Ordered Multimap ##########################
+add_library(omm_util omm/omm_util.h omm/omm_util.c)
+target_link_libraries(omm_util
   PRIVATE
-    double_ended_priority_queue
+    ordered_multimap
     test
     traits
 )
 
-macro(add_depq_test TEST_NAME)
-  add_executable(${TEST_NAME} depq/${TEST_NAME}.c)
+macro(add_omm_test TEST_NAME)
+  add_executable(${TEST_NAME} omm/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       traits
-      double_ended_priority_queue 
-      depq_util
+      ordered_multimap 
+      omm_util
       test
   )
   set_target_properties(${TEST_NAME} 
@@ -47,10 +47,10 @@ macro(add_depq_test TEST_NAME)
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
-add_depq_test(test_depq_construct)
-add_depq_test(test_depq_insert)
-add_depq_test(test_depq_erase)
-add_depq_test(test_depq_iter)
+add_omm_test(test_omm_construct)
+add_omm_test(test_omm_insert)
+add_omm_test(test_omm_erase)
+add_omm_test(test_omm_iter)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
@@ -349,7 +349,7 @@ add_executable(perf perf/perf.c)
 target_link_libraries(perf 
   PRIVATE 
     buffer
-    double_ended_priority_queue 
+    ordered_multimap 
     flat_priority_queue
     priority_queue
     random

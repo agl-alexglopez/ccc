@@ -1,7 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "depq_util.h"
-#include "double_ended_priority_queue.h"
+#include "omm_util.h"
+#include "ordered_multimap.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -10,10 +10,10 @@
 #include <stddef.h>
 #include <stdio.h>
 
-BEGIN_STATIC_TEST(depq_test_insert_one)
+BEGIN_STATIC_TEST(omm_test_insert_one)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val single;
     single.val = 0;
     CHECK(push(&pq, &single.elem), CCC_OK);
@@ -21,10 +21,10 @@ BEGIN_STATIC_TEST(depq_test_insert_one)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_insert_three)
+BEGIN_STATIC_TEST(omm_test_insert_three)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -37,11 +37,11 @@ BEGIN_STATIC_TEST(depq_test_insert_three)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_struct_getter)
+BEGIN_STATIC_TEST(omm_test_struct_getter)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
-    ccc_double_ended_priority_queue pq_tester_clone = ccc_depq_init(
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq_tester_clone = ccc_omm_init(
         struct val, elem, val, pq_tester_clone, NULL, val_cmp, NULL);
     struct val vals[10];
     struct val tester_clone[10];
@@ -62,10 +62,10 @@ BEGIN_STATIC_TEST(depq_test_struct_getter)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_insert_three_dups)
+BEGIN_STATIC_TEST(omm_test_insert_three_dups)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -78,18 +78,18 @@ BEGIN_STATIC_TEST(depq_test_insert_three_dups)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_insert_shuffle)
+BEGIN_STATIC_TEST(omm_test_insert_shuffle)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
-    struct val const *max = ccc_depq_max(&pq);
+    struct val const *max = ccc_omm_max(&pq);
     CHECK(max->val, (int)size - 1);
-    struct val const *min = ccc_depq_min(&pq);
+    struct val const *min = ccc_omm_min(&pq);
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), size);
@@ -100,10 +100,10 @@ BEGIN_STATIC_TEST(depq_test_insert_shuffle)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_read_max_min)
+BEGIN_STATIC_TEST(omm_test_read_max_min)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
@@ -113,9 +113,9 @@ BEGIN_STATIC_TEST(depq_test_read_max_min)
         CHECK(size(&pq), (size_t)i + 1);
     }
     CHECK(size(&pq), (size_t)10);
-    struct val const *max = ccc_depq_max(&pq);
+    struct val const *max = ccc_omm_max(&pq);
     CHECK(max->val, 9);
-    struct val const *min = ccc_depq_min(&pq);
+    struct val const *min = ccc_omm_min(&pq);
     CHECK(min->val, 0);
     END_TEST();
 }
@@ -123,7 +123,7 @@ BEGIN_STATIC_TEST(depq_test_read_max_min)
 int
 main()
 {
-    return RUN_TESTS(depq_test_insert_one(), depq_test_insert_three(),
-                     depq_test_struct_getter(), depq_test_insert_three_dups(),
-                     depq_test_insert_shuffle(), depq_test_read_max_min());
+    return RUN_TESTS(omm_test_insert_one(), omm_test_insert_three(),
+                     omm_test_struct_getter(), omm_test_insert_three_dups(),
+                     omm_test_insert_shuffle(), omm_test_read_max_min());
 }

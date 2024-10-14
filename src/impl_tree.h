@@ -31,7 +31,7 @@
    default and I have found trimming the tree with these "fat" tree nodes
    holding duplicates can net a nice performance boost in the pop operation for
    the priority queue. The normal map does not pay for the complexity of this
-   cycle detection because its implementation is seperate from the depq. */
+   cycle detection because its implementation is seperate from the omm. */
 typedef struct ccc_node_
 {
     union

@@ -88,17 +88,17 @@ BEGIN_STATIC_TEST(fhash_test_empty)
 
 Example with multiple parameters:
 
-enum test_result insert_shuffled(ccc_double_ended_priority_queue *,
+enum test_result insert_shuffled(ccc_ordered_multimap *,
                                  struct val[], size_t, int);
 
-BEGIN_STATIC_TEST(insert_shuffled, ccc_double_ended_priority_queue *pq,
+BEGIN_STATIC_TEST(insert_shuffled, ccc_ordered_multimap *pq,
                   struct val vals[], size_t const size, int const larger_prime)
 {
     for (int i = 0 shuffled_index = larger_prime % size; i < size; ++i)
     {
         vals[shuffled_index].val = shuffled_index;
         push(pq, &vals[shuffled_index].elem);
-        CHECK(ccc_depq_validate(pq), true);
+        CHECK(ccc_omm_validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     END_TEST();

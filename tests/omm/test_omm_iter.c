@@ -1,9 +1,9 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#define DOUBLE_ENDED_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 
-#include "depq_util.h"
-#include "double_ended_priority_queue.h"
+#include "omm_util.h"
+#include "ordered_multimap.h"
 #include "test.h"
 #include "traits.h"
 #include "types.h"
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(check_range, double_ended_priority_queue const *const rom,
+BEGIN_STATIC_TEST(check_range, ordered_multimap const *const rom,
                   range const *const r, size_t const n,
                   int const expect_range[])
 {
@@ -72,7 +72,7 @@ BEGIN_STATIC_TEST(check_range, double_ended_priority_queue const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(check_rrange, double_ended_priority_queue const *const rom,
+BEGIN_STATIC_TEST(check_rrange, ordered_multimap const *const rom,
                   rrange const *const r, size_t const n,
                   int const expect_rrange[])
 {
@@ -132,32 +132,32 @@ BEGIN_STATIC_TEST(check_rrange, double_ended_priority_queue const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(iterator_check, ccc_double_ended_priority_queue *pq)
+BEGIN_STATIC_TEST(iterator_check, ccc_ordered_multimap *pq)
 {
     size_t const size = size(pq);
     size_t iter_count = 0;
     for (struct val *e = begin(pq); e; e = next(pq, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_depq_is_min(pq, &e->elem), true);
-        CHECK(iter_count == size || !ccc_depq_is_min(pq, &e->elem), true);
+        CHECK(iter_count != size || ccc_omm_is_min(pq, &e->elem), true);
+        CHECK(iter_count == size || !ccc_omm_is_min(pq, &e->elem), true);
     }
     CHECK(iter_count, size);
     iter_count = 0;
-    for (struct val *e = ccc_depq_rbegin(pq); e; e = rnext(pq, &e->elem))
+    for (struct val *e = ccc_omm_rbegin(pq); e; e = rnext(pq, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_depq_is_max(pq, &e->elem), true);
-        CHECK(iter_count == size || !ccc_depq_is_max(pq, &e->elem), true);
+        CHECK(iter_count != size || ccc_omm_is_max(pq, &e->elem), true);
+        CHECK(iter_count == size || !ccc_omm_is_max(pq, &e->elem), true);
     }
     CHECK(iter_count, size);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_forward_iter_unique_vals)
+BEGIN_STATIC_TEST(omm_test_forward_iter_unique_vals)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&pq); e; e = next(&pq, &e->elem), ++j)
@@ -185,10 +185,10 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_unique_vals)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_forward_iter_all_vals)
+BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *i = begin(&pq); i; i = next(&pq, &i->elem), ++j)
@@ -221,10 +221,10 @@ BEGIN_STATIC_TEST(depq_test_forward_iter_all_vals)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
+BEGIN_STATIC_TEST(omm_test_insert_iterate_pop)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -242,7 +242,7 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
     size_t pop_count = 0;
     while (!is_empty(&pq))
     {
-        ccc_depq_pop_max(&pq);
+        ccc_omm_pop_max(&pq);
         ++pop_count;
         CHECK(validate(&pq), true);
         if (pop_count % 200)
@@ -254,10 +254,10 @@ BEGIN_STATIC_TEST(depq_test_insert_iterate_pop)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_priority_removal)
+BEGIN_STATIC_TEST(omm_test_priority_removal)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -277,7 +277,7 @@ BEGIN_STATIC_TEST(depq_test_priority_removal)
     {
         if (i->val > limit)
         {
-            i = ccc_depq_erase(&pq, &i->elem);
+            i = ccc_omm_erase(&pq, &i->elem);
             CHECK(validate(&pq), true);
         }
         else
@@ -288,10 +288,10 @@ BEGIN_STATIC_TEST(depq_test_priority_removal)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_priority_update)
+BEGIN_STATIC_TEST(omm_test_priority_update)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -325,10 +325,10 @@ BEGIN_STATIC_TEST(depq_test_priority_update)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_priority_valid_range)
+BEGIN_STATIC_TEST(omm_test_priority_valid_range)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -355,10 +355,10 @@ BEGIN_STATIC_TEST(depq_test_priority_valid_range)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_priority_valid_range_equals)
+BEGIN_STATIC_TEST(omm_test_priority_valid_range_equals)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -385,10 +385,10 @@ BEGIN_STATIC_TEST(depq_test_priority_valid_range_equals)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_priority_invalid_range)
+BEGIN_STATIC_TEST(omm_test_priority_invalid_range)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -415,10 +415,10 @@ BEGIN_STATIC_TEST(depq_test_priority_invalid_range)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(depq_test_priority_empty_range)
+BEGIN_STATIC_TEST(omm_test_priority_empty_range)
 {
-    ccc_double_ended_priority_queue pq
-        = ccc_depq_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap pq
+        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -446,9 +446,9 @@ int
 main()
 {
     return RUN_TESTS(
-        depq_test_forward_iter_unique_vals(), depq_test_forward_iter_all_vals(),
-        depq_test_insert_iterate_pop(), depq_test_priority_update(),
-        depq_test_priority_removal(), depq_test_priority_valid_range(),
-        depq_test_priority_valid_range_equals(),
-        depq_test_priority_invalid_range(), depq_test_priority_empty_range());
+        omm_test_forward_iter_unique_vals(), omm_test_forward_iter_all_vals(),
+        omm_test_insert_iterate_pop(), omm_test_priority_update(),
+        omm_test_priority_removal(), omm_test_priority_valid_range(),
+        omm_test_priority_valid_range_equals(),
+        omm_test_priority_invalid_range(), omm_test_priority_empty_range());
 }
