@@ -51,11 +51,10 @@ void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
 
 /*===========================   Entry API   =================================*/
 
-#define ccc_fom_insert_vr(flat_ordered_map_ptr, out_handle_ptr, tmp_ptr)       \
+#define ccc_fom_insert_vr(flat_ordered_map_ptr, out_handle_ptr)                \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fom_insert((flat_ordered_map_ptr), (out_handle_ptr), (tmp_ptr))    \
-            .impl_                                                             \
+        ccc_fom_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_         \
     }
 
 #define ccc_fom_try_insert_vr(flat_ordered_map_ptr, out_handle_ptr)            \
@@ -76,8 +75,7 @@ void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
         ccc_fom_remove_entry((flat_ordered_map_entry_ptr)).impl_               \
     }
 
-ccc_entry ccc_fom_insert(ccc_flat_ordered_map *, ccc_f_om_elem *out_handle,
-                         void *tmp);
+ccc_entry ccc_fom_insert(ccc_flat_ordered_map *, ccc_f_om_elem *out_handle);
 ccc_entry ccc_fom_try_insert(ccc_flat_ordered_map *,
                              ccc_f_om_elem *key_val_handle);
 ccc_entry ccc_fom_insert_or_assign(ccc_flat_ordered_map *,

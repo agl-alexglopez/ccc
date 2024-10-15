@@ -70,12 +70,10 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
         ccc_frm_entry((flat_realtime_ordered_map_ptr), (key_ptr)).impl_        \
     }
 
-#define ccc_frm_insert_vr(flat_realtime_ordered_map_ptr, out_handle_ptr,       \
-                          tmp_ptr)                                             \
+#define ccc_frm_insert_vr(flat_realtime_ordered_map_ptr, out_handle_ptr)       \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_frm_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr),      \
-                       (tmp_ptr))                                              \
+        ccc_frm_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))      \
             .impl_                                                             \
     }
 
@@ -100,7 +98,7 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
     }
 
 ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
-                         ccc_frtm_elem *out_handle, void *tmp);
+                         ccc_frtm_elem *out_handle);
 
 ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
                              ccc_frtm_elem *key_val_handle);

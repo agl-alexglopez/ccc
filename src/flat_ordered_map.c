@@ -171,16 +171,16 @@ ccc_fom_or_insert(ccc_f_om_entry const *const e, ccc_f_om_elem *const elem)
 }
 
 ccc_entry
-ccc_fom_insert(ccc_flat_ordered_map *const t, ccc_f_om_elem *const out_handle,
-               void *const tmp)
+ccc_fom_insert(ccc_flat_ordered_map *const t, ccc_f_om_elem *const out_handle)
 {
     void *found = find(t, key_from_node(t, out_handle));
     if (found)
     {
         assert(t->root_);
         *out_handle = *at(t, t->root_);
-        void *user_struct = struct_base(t, out_handle);
-        void *ret = base_at(t, t->root_);
+        void *const user_struct = struct_base(t, out_handle);
+        void *const ret = base_at(t, t->root_);
+        void *const tmp = ccc_buf_at(&t->buf_, 0);
         swap(tmp, user_struct, ret, ccc_buf_elem_size(&t->buf_));
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }

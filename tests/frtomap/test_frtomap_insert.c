@@ -17,8 +17,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_one)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[2]){}, 2, elem, id, NULL, val_cmp, NULL);
-    CHECK(occupied(insert_vr(&s, &(struct val){}.elem, &(struct val){}.elem)),
-          false);
+    CHECK(occupied(insert_vr(&s, &(struct val){}.elem)), false);
     CHECK(is_empty(&s), false);
     struct val *v = frm_root(&s);
     CHECK(v == NULL, false);
@@ -95,9 +94,8 @@ BEGIN_STATIC_TEST(frtomap_test_insert_weak_srand)
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
-        /* NOLINTNEXTLINE rand use is ok. */
-        ccc_entry const e = insert(
-            &s, &(struct val){.id = rand(), .val = i}.elem, &(struct val){});
+        ccc_entry const e
+            = insert(&s, &(struct val){.id = rand() /*NOLINT*/, .val = i}.elem);
         CHECK(insert_error(&e), false);
         CHECK(validate(&s), true);
     }

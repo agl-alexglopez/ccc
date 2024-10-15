@@ -85,8 +85,7 @@ BEGIN_STATIC_TEST(frtomap_test_weak_srand)
     {
         /* NOLINTNEXTLINE */
         int const rand_i = rand();
-        (void)insert(&s, &(struct val){.id = rand_i, .val = i}.elem,
-                     &(struct val){});
+        (void)insert(&s, &(struct val){.id = rand_i, .val = i}.elem);
         id_keys[i] = rand_i;
         CHECK(validate(&s), true);
     }

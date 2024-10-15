@@ -135,8 +135,7 @@ ccc_fhm_and_modify_aux(ccc_fh_map_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle,
-               void *const tmp)
+ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
 {
     void *const user_return = struct_base(h, out_handle);
     void *const key = key_in_slot(h, user_return);
@@ -145,6 +144,7 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle,
     if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         out_handle->hash_ = ent.hash_;
+        void *const tmp = ccc_buf_at(&h->buf_, 0);
         swap(tmp, ent.entry_.e_, user_return, user_struct_size);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -575,8 +575,8 @@ erase(struct ccc_fhm_ *const h, void *const e)
     for (;;
          stopped_at = increment(cap, stopped_at), next = increment(cap, next))
     {
-        void *next_slot = ccc_buf_at(&h->buf_, next);
-        struct ccc_fhm_elem_ *next_elem = elem_in_slot(h, next_slot);
+        void *const next_slot = ccc_buf_at(&h->buf_, next);
+        struct ccc_fhm_elem_ *const next_elem = elem_in_slot(h, next_slot);
         if (next_elem->hash_ == CCC_FHM_EMPTY
             || !distance(cap, next, to_i(cap, next_elem->hash_)))
         {

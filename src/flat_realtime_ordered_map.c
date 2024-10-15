@@ -157,18 +157,20 @@ ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *const frm,
 
 ccc_entry
 ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
-               ccc_frtm_elem *const out_handle, void *const tmp)
+               ccc_frtm_elem *const out_handle)
 {
     struct frm_query_ q = find(frm, key_from_node(frm, out_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         void *const slot = ccc_buf_at(&frm->buf_, q.found_);
         *out_handle = *elem_in_slot(frm, slot);
-        void *user_struct = struct_base(frm, out_handle);
+        void *const user_struct = struct_base(frm, out_handle);
+        void *const tmp = ccc_buf_at(&frm->buf_, 0);
         swap(tmp, user_struct, slot, ccc_buf_elem_size(&frm->buf_));
+        elem_in_slot(frm, tmp)->parity_ = 1;
         return (ccc_entry){{.e_ = slot, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted
+    void *const inserted
         = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, out_handle);
     if (!inserted)
     {
