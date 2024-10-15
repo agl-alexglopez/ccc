@@ -30,8 +30,7 @@ BEGIN_TEST(insert_shuffled, ccc_flat_ordered_map *m, size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         (void)insert(
-            m, &(struct val){.id = (int)shuffled_index, .val = (int)i}.elem,
-            &(struct val){}.elem);
+            m, &(struct val){.id = (int)shuffled_index, .val = (int)i}.elem);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }

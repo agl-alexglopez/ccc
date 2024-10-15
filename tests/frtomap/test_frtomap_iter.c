@@ -151,8 +151,7 @@ BEGIN_STATIC_TEST(rtom_test_forward_iter)
     for (int i = 0; i < num_nodes; ++i)
     {
         (void)insert(&s,
-                     &(struct val){.id = (int)shuffled_index, .val = i}.elem,
-                     &(struct val){});
+                     &(struct val){.id = (int)shuffled_index, .val = i}.elem);
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -180,8 +179,7 @@ BEGIN_STATIC_TEST(rtom_test_iterate_removal)
         /* Force duplicates. NOLINTNEXTLINE */
         (void)insert(
             &s,
-            &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem,
-            &(struct val){});
+            &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -211,8 +209,7 @@ BEGIN_STATIC_TEST(rtom_test_iterate_remove_reinsert)
         /* Force duplicates. NOLINTNEXTLINE */
         (void)insert(
             &s,
-            &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem,
-            &(struct val){});
+            &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);

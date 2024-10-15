@@ -20,7 +20,7 @@ BEGIN_STATIC_TEST(fhash_test_erase)
     CHECK(res, CCC_OK);
     struct val query = {.id = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = insert(&fh, &query.e, &(struct val){});
+    ccc_entry ent = insert(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
