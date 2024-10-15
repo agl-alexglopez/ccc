@@ -324,7 +324,7 @@ ccc_dll_is_empty(ccc_doubly_linked_list const *const l)
 }
 
 ccc_result
-ccc_dll_clear_and_free(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
+ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
 {
     if (!l)
     {

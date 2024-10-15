@@ -9,16 +9,56 @@
 typedef struct ccc_dll_elem_ ccc_dll_elem;
 typedef struct ccc_dll_ ccc_doubly_linked_list;
 
+/** @brief Initialize a doubly linked list with its l-value name, type
+containing the dll elems, the field of the dll elem, allocation function,
+compare function and any auxilliary data needed for comparison, printing, or
+destructors.
+@param [in] list_name the name of the list being initialized.
+@param [in] struct_name the type containing the intrusive dll element.
+@param [in] list_elem_field name of the dll element in the containing type.
+@param [in] alloc_fn the optional allocation function or NULL.
+@param [in] cmp_fn the ccc_cmp_fn used to compare list elements.
+@param [in] aux_data any auxilliary data that will be needed for comparison,
+printing, or destruction of elements.
+@return the initialized list. Assign to the list directly on the right hand
+side of an equality operator. Initialization can occur at runtime or compile
+time (e.g. ccc_doubly_linked l = ccc_dll_init(...);). */
 #define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
                      cmp_fn, aux_data)                                         \
     ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
                       cmp_fn, aux_data)
 
-#define ccc_dll_emplace_back(list_ptr, struct_initializer...)                  \
-    ccc_impl_dll_emplace_back(list_ptr, struct_initializer)
+/** @brief  writes contents of type initializer directly to allocated memory at
+the back of the list.
+@param [in] list_ptr the address of the doubly linked list.
+@param [in] type_initializer the r-value initializer of the type to be inserted
+in the list. This should match the type containing dll elements as a struct
+member for this list.
+@return a reference to the inserted element or NULL if allocation is not
+allowed or fails.
 
-#define ccc_dll_emplace_front(list_ptr, struct_initializer...)                 \
-    ccc_impl_dll_emplace_front(list_ptr, struct_initializer)
+Note that it does not make sense to use this method if the list has been
+initialized without an allocation function. If the user does not allow
+allocation, the contents of new elements to be inserted has been determined by
+the user prior to any inserts into the list. */
+#define ccc_dll_emplace_back(list_ptr, type_initializer...)                    \
+    ccc_impl_dll_emplace_back(list_ptr, type_initializer)
+
+/** @brief  writes contents of type initializer directly to allocated memory at
+the front of the list.
+@param [in] list_ptr the address of the doubly linked list.
+@param [in] type_initializer the r-value initializer of the type to be inserted
+in the list. This should match the type containing dll elements as a struct
+member for this list.
+@return a reference to the inserted element or NULL if allocation is not
+allowed or fails.
+
+Note that it does not make sense to use this method if the list has been
+initialized without an allocation function. If the user does not allow
+allocation, the contents of new elements to be inserted has been determined by
+the user prior to any inserts into the list. */
+#define ccc_dll_emplace_front(list_ptr, type_initializer...)                   \
+    ccc_impl_dll_emplace_front(list_ptr, type_initializer)
 
 void *ccc_dll_push_front(ccc_doubly_linked_list *l,
                          ccc_dll_elem *struct_handle);
@@ -63,8 +103,7 @@ ccc_dll_elem *ccc_dll_end_sentinel(ccc_doubly_linked_list const *);
 size_t ccc_dll_size(ccc_doubly_linked_list const *);
 bool ccc_dll_is_empty(ccc_doubly_linked_list const *);
 
-ccc_result ccc_dll_clear_and_free(ccc_doubly_linked_list *,
-                                  ccc_destructor_fn *);
+ccc_result ccc_dll_clear(ccc_doubly_linked_list *, ccc_destructor_fn *);
 
 bool ccc_dll_validate(ccc_doubly_linked_list const *);
 ccc_result ccc_dll_print(ccc_doubly_linked_list const *, ccc_print_fn *);
@@ -97,7 +136,7 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_end_sentinel(args...) ccc_dll_end_sentinel(args)
 #    define dll_size(args...) ccc_dll_size(args)
 #    define dll_is_empty(args...) ccc_dll_is_empty(args)
-#    define dll_clear_and_free(args...) ccc_dll_clear_and_free(args)
+#    define dll_clear(args...) ccc_dll_clear(args)
 #    define dll_validate(args...) ccc_dll_validate(args)
 #    define dll_print(args...) ccc_dll_print(args)
 #endif /* DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC */

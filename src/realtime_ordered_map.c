@@ -481,26 +481,6 @@ ccc_result
 ccc_rom_clear(ccc_realtime_ordered_map *const rom,
               ccc_destructor_fn *const destructor)
 {
-    if (!rom)
-    {
-        return CCC_INPUT_ERR;
-    }
-    while (!ccc_rom_is_empty(rom))
-    {
-        void *const deleted = remove_fixup(rom, rom->root_);
-        if (destructor)
-        {
-            destructor(
-                (ccc_user_type_mut){.user_type = deleted, .aux = rom->aux_});
-        }
-    }
-    return CCC_OK;
-}
-
-ccc_result
-ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
-                       ccc_destructor_fn *const destructor)
-{
     if (!rom->alloc_)
     {
         return CCC_NO_ALLOC;
@@ -513,7 +493,10 @@ ccc_rom_clear_and_free(ccc_realtime_ordered_map *const rom,
             destructor(
                 (ccc_user_type_mut){.user_type = deleted, .aux = rom->aux_});
         }
-        (void)rom->alloc_(deleted, 0);
+        if (rom->alloc_)
+        {
+            (void)rom->alloc_(deleted, 0);
+        }
     }
     return CCC_OK;
 }

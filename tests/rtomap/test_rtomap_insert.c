@@ -61,7 +61,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_macros)
     CHECK(v != NULL, true);
     CHECK(v->id, 2);
     CHECK(size(&s), 4);
-    END_TEST(rom_clear_and_free(&s, NULL););
+    END_TEST(rom_clear(&s, NULL););
 }
 
 BEGIN_STATIC_TEST(rtomap_test_insert_shuffle)
