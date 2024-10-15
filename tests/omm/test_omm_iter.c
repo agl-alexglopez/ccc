@@ -171,7 +171,7 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_unique_vals)
     {
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -198,7 +198,7 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
     struct val vals[33];
     vals[0].val = 0; // NOLINT
     vals[0].id = 0;
-    CHECK(push(&pq, &vals[0].elem), CCC_OK);
+    CHECK(unwrap(insert_vr(&pq, &vals[0].elem)) != NULL, true);
     /* This will test iterating through every possible length list. */
     for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
     {
@@ -207,7 +207,7 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
         {
             vals[index].val = val; // NOLINT
             vals[index].id = index;
-            CHECK(push(&pq, &vals[index].elem), CCC_OK);
+            CHECK(unwrap(insert_vr(&pq, &vals[index].elem)) != NULL, true);
             CHECK(validate(&pq), true);
         }
     }
@@ -235,14 +235,14 @@ BEGIN_STATIC_TEST(omm_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
     size_t pop_count = 0;
     while (!is_empty(&pq))
     {
-        ccc_omm_pop_max(&pq);
+        CHECK(ccc_omm_pop_max(&pq), CCC_OK);
         ++pop_count;
         CHECK(validate(&pq), true);
         if (pop_count % 200)
@@ -268,7 +268,7 @@ BEGIN_STATIC_TEST(omm_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
@@ -302,7 +302,7 @@ BEGIN_STATIC_TEST(omm_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     CHECK(iterator_check(&pq), PASS);
@@ -337,7 +337,7 @@ BEGIN_STATIC_TEST(omm_test_priority_valid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -367,7 +367,7 @@ BEGIN_STATIC_TEST(omm_test_priority_valid_range_equals)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -397,7 +397,7 @@ BEGIN_STATIC_TEST(omm_test_priority_invalid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -427,7 +427,7 @@ BEGIN_STATIC_TEST(omm_test_priority_empty_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.

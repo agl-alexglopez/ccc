@@ -98,8 +98,6 @@ ccc_entry ccc_om_insert_or_assign(ccc_ordered_map *,
 
 ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
-ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
-
 /* Standard Entry API. */
 
 #define ccc_om_entry_vr(ordered_map_ptr, key_ptr)                              \
@@ -118,6 +116,8 @@ ccc_o_map_entry *ccc_om_and_modify_aux(ccc_o_map_entry *e, ccc_update_fn *fn,
 void *ccc_om_or_insert(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
 
 void *ccc_om_insert_entry(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
+
+ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
 
 void *ccc_om_unwrap(ccc_o_map_entry const *e);
 bool ccc_om_insert_error(ccc_o_map_entry const *e);

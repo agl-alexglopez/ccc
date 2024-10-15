@@ -20,7 +20,7 @@ BEGIN_STATIC_TEST(omm_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&pq, &three_vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
         size_t const size = i + 1;
         CHECK(size(&pq), size);
@@ -29,7 +29,7 @@ BEGIN_STATIC_TEST(omm_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        ccc_omm_pop_max(&pq);
+        CHECK(ccc_omm_pop_max(&pq), CCC_OK);
         CHECK(validate(&pq), true);
     }
     CHECK(size(&pq), (size_t)0);
@@ -86,7 +86,7 @@ BEGIN_STATIC_TEST(omm_test_pop_max)
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
         CHECK(((struct val *)ccc_omm_max(&pq))->val, vals[i].val);
-        ccc_omm_pop_max(&pq);
+        CHECK(ccc_omm_pop_max(&pq), CCC_OK);
     }
     CHECK(is_empty(&pq), true);
     END_TEST();
@@ -114,7 +114,7 @@ BEGIN_STATIC_TEST(omm_test_pop_min)
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(((struct val *)ccc_omm_min(&pq))->val, vals[i].val);
-        ccc_omm_pop_min(&pq);
+        CHECK(ccc_omm_pop_min(&pq), CCC_OK);
     }
     CHECK(is_empty(&pq), true);
     END_TEST();
@@ -141,7 +141,7 @@ BEGIN_STATIC_TEST(omm_test_max_round_robin)
             vals[i].val = 99;
         }
         vals[i].id = i;
-        CHECK(push(&omm, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* Now let's make sure we pop round robin. */
@@ -151,7 +151,7 @@ BEGIN_STATIC_TEST(omm_test_max_round_robin)
         struct val const *front = ccc_omm_max(&omm);
         CHECK(front->id, order[i].id);
         CHECK(front->val, order[i].val);
-        ccc_omm_pop_max(&omm);
+        CHECK(ccc_omm_pop_max(&omm), CCC_OK);
         ++i;
     }
     END_TEST();
@@ -178,7 +178,7 @@ BEGIN_STATIC_TEST(omm_test_min_round_robin)
             vals[i].val = 1;
         }
         vals[i].id = i;
-        CHECK(push(&omm, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* Now let's make sure we pop round robin. */
@@ -188,7 +188,7 @@ BEGIN_STATIC_TEST(omm_test_min_round_robin)
         struct val const *front = ccc_omm_min(&omm);
         CHECK(front->id, order[i].id);
         CHECK(front->val, order[i].val);
-        ccc_omm_pop_min(&omm);
+        CHECK(ccc_omm_pop_min(&omm), CCC_OK);
         ++i;
     }
     END_TEST();
@@ -208,7 +208,7 @@ BEGIN_STATIC_TEST(omm_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
         size_t const s = i + 1;
         CHECK(size(&pq), s);
@@ -245,12 +245,12 @@ BEGIN_STATIC_TEST(omm_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    ccc_omm_print(&pq, omm_printer_fn);
+    (void)ccc_omm_print(&pq, omm_printer_fn);
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;
@@ -277,7 +277,7 @@ BEGIN_STATIC_TEST(omm_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
         CHECK(validate(&pq), true);
     }
     for (int i = 0; i < num_nodes; ++i)

@@ -134,7 +134,7 @@ ccc_om_or_insert(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        return NULL;
+        return e->impl_.entry_.e_;
     }
     return alloc_insert(e->impl_.t_, &elem->impl_);
 }
@@ -144,10 +144,7 @@ ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){
-            .user_type = e->impl_.entry_.e_,
-            .aux = NULL,
-        });
+        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = NULL});
     }
     return e;
 }
@@ -158,10 +155,7 @@ ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *const fn,
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){
-            .user_type = e->impl_.entry_.e_,
-            .aux = aux,
-        });
+        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = aux});
     }
     return e;
 }
@@ -475,20 +469,10 @@ container_entry(struct ccc_tree_ *const t, void const *const key)
     if (found)
     {
         return (struct ccc_tree_entry_){
-            .t_ = t,
-            .entry_ = {
-                .e_ = found,
-                .stats_ = CCC_ENTRY_OCCUPIED,
-            },
-        };
+            .t_ = t, .entry_ = {.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (struct ccc_tree_entry_){
-        .t_ = t,
-        .entry_ = {
-            .e_ = found,
-            .stats_ = CCC_ENTRY_VACANT,
-        },
-    };
+        .t_ = t, .entry_ = {.e_ = found, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 static inline void *
