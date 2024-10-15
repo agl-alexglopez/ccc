@@ -159,9 +159,6 @@ void *ccc_om_root(ccc_ordered_map const *);
 
 ccc_result ccc_om_clear(ccc_ordered_map *, ccc_destructor_fn *destructor);
 
-ccc_result ccc_om_clear_and_free(ccc_ordered_map *,
-                                 ccc_destructor_fn *destructor);
-
 /*===========================     Getters   =================================*/
 
 bool ccc_om_is_empty(ccc_ordered_map const *);
@@ -208,7 +205,6 @@ typedef ccc_o_map_entry o_map_entry;
 #    define om_size(args...) ccc_om_size(args)
 #    define om_is_empty(args...) ccc_om_is_empty(args)
 #    define om_clear(args...) ccc_om_clear(args)
-#    define om_clear_and_free(args...) ccc_om_clear_and_free(args)
 #    define om_print(args...) ccc_om_print(args)
 #    define om_validate(args...) ccc_om_validate(args)
 #    define om_root(args...) ccc_om_root(args)

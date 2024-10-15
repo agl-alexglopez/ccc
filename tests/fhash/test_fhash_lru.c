@@ -187,7 +187,7 @@ BEGIN_STATIC_TEST(run_lru_cache)
     }
     END_TEST({
         (void)ccc_fhm_clear_and_free(&lru.fh, NULL);
-        (void)dll_clear_and_free(&lru.l, NULL);
+        (void)dll_clear(&lru.l, NULL);
     });
 }
 

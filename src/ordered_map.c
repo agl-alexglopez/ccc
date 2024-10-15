@@ -375,28 +375,6 @@ ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
             destructor((ccc_user_type_mut){.user_type = popped,
                                            .aux = set->impl_.aux_});
         }
-    }
-    return CCC_OK;
-}
-
-ccc_result
-ccc_om_clear_and_free(ccc_ordered_map *const set,
-                      ccc_destructor_fn *const destructor)
-{
-
-    if (!set)
-    {
-        return CCC_INPUT_ERR;
-    }
-    while (!ccc_om_is_empty(set))
-    {
-        void *const popped
-            = erase(&set->impl_, key_from_node(&set->impl_, set->impl_.root_));
-        if (destructor)
-        {
-            destructor((ccc_user_type_mut){.user_type = popped,
-                                           .aux = set->impl_.aux_});
-        }
         if (set->impl_.alloc_)
         {
             (void)set->impl_.alloc_(popped, 0);
