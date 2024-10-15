@@ -228,7 +228,7 @@ animate_maze(struct maze *maze)
         .cell = odd_point->p,
         .priority = odd_point->cost,
     };
-    (void)push(&cells, &start->elem);
+    (void)insert(&cells, &start->elem);
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
@@ -285,12 +285,12 @@ animate_maze(struct maze *maze)
                 .cell = min_neighbor,
                 .priority = min_weight,
             };
-            (void)push(&cells, &new_cell->elem);
+            (void)insert(&cells, &new_cell->elem);
         }
         else
         {
             struct priority_cell *pc = ccc_omm_max(&cells);
-            ccc_omm_pop_max(&cells);
+            (void)ccc_omm_pop_max(&cells);
             free(pc);
         }
     }
