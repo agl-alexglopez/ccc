@@ -101,6 +101,9 @@ ccc_entry_status_msg(ccc_entry const *const e)
     case CCC_ENTRY_DELETE_ERROR:
         return "entry encountered an error while trying to delete";
         break;
+    case CCC_ENTRY_INPUT_ERROR:
+        return "entry could not be produced due to bad input to function";
+        break;
     case CCC_ENTRY_OCCUPIED_CONTAINS_NULL:
         return "entry was occupied but cannot be shown because memory has been "
                "freed or is inaccessible";

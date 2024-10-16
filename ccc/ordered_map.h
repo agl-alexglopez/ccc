@@ -64,25 +64,25 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
 
 /* Retain access to old values in the map. See types.h for ccc_entry. */
 
-#define ccc_om_insert_vr(ordered_map_ptr, out_handle_ptr, tmp_ptr)             \
+#define ccc_om_insert_r(ordered_map_ptr, out_handle_ptr, tmp_ptr)              \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_insert((ordered_map_ptr), (out_handle_ptr), (tmp_ptr)).impl_    \
     }
 
-#define ccc_om_try_insert_vr(ordered_map_ptr, out_handle_ptr)                  \
+#define ccc_om_try_insert_r(ordered_map_ptr, out_handle_ptr)                   \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_try_insert((ordered_map_ptr), (out_handle_ptr)).impl_           \
     }
 
-#define ccc_om_remove_vr(ordered_map_ptr, out_handle_ptr)                      \
+#define ccc_om_remove_r(ordered_map_ptr, out_handle_ptr)                       \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl_               \
     }
 
-#define ccc_om_remove_entry_vr(ordered_map_entry_ptr)                          \
+#define ccc_om_remove_entry_r(ordered_map_entry_ptr)                           \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
@@ -100,7 +100,7 @@ ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
 
 /* Standard Entry API. */
 
-#define ccc_om_entry_vr(ordered_map_ptr, key_ptr)                              \
+#define ccc_om_entry_r(ordered_map_ptr, key_ptr)                               \
     &(ccc_o_map_entry)                                                         \
     {                                                                          \
         ccc_om_entry((ordered_map_ptr), (key_ptr)).impl_                       \
@@ -125,13 +125,13 @@ bool ccc_om_occupied(ccc_o_map_entry const *e);
 
 /*===========================   Iterators   =================================*/
 
-#define ccc_om_equal_range_vr(ordered_map_ptr, begin_and_end_key_ptrs...)      \
+#define ccc_om_equal_range_r(ordered_map_ptr, begin_and_end_key_ptrs...)       \
     &(ccc_range)                                                               \
     {                                                                          \
         ccc_om_equal_range(ordered_map_ptr, begin_and_end_key_ptrs).impl_      \
     }
 
-#define ccc_om_equal_rrange_vr(ordered_map_ptr, rbegin_and_rend_key_ptrs...)   \
+#define ccc_om_equal_rrange_r(ordered_map_ptr, rbegin_and_rend_key_ptrs...)    \
     &(ccc_rrange)                                                              \
     {                                                                          \
         ccc_om_equal_rrange(ordered_map_ptr, rbegin_and_rend_key_ptrs).impl_   \
@@ -179,12 +179,12 @@ typedef ccc_o_map_entry o_map_entry;
 #    define om_insert_entry_w(args...) ccc_om_insert_entry_w(args)
 #    define om_try_insert_w(args...) ccc_om_try_insert_w(args)
 #    define om_insert_or_assign_w(args...) ccc_om_insert_or_assign_w(args)
-#    define om_insert_vr(args...) ccc_om_insert_vr(args)
-#    define om_remove_vr(args...) ccc_om_remove_vr(args)
-#    define om_remove_entry_vr(args...) ccc_om_remove_entry_vr(args)
-#    define om_entry_vr(args...) ccc_om_entry_vr(args)
-#    define om_and_modify_vr(args...) ccc_om_and_modify_vr(args)
-#    define om_and_modify_aux_vr(args...) ccc_om_and_modify_aux_vr(args)
+#    define om_insert_r(args...) ccc_om_insert_r(args)
+#    define om_remove_r(args...) ccc_om_remove_r(args)
+#    define om_remove_entry_r(args...) ccc_om_remove_entry_r(args)
+#    define om_entry_r(args...) ccc_om_entry_r(args)
+#    define om_and_modify_r(args...) ccc_om_and_modify_r(args)
+#    define om_and_modify_aux_r(args...) ccc_om_and_modify_aux_r(args)
 #    define om_contains(args...) ccc_om_contains(args)
 #    define om_get_key_val(args...) ccc_om_get_key_val(args)
 #    define om_get_mut(args...) ccc_om_get_mut(args)

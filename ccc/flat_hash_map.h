@@ -80,25 +80,25 @@ void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
 /* Preserve old values from stored in the map. See types.h for more. */
 
-#define ccc_fhm_remove_vr(flat_hash_map_ptr, out_handle_ptr)                   \
+#define ccc_fhm_remove_r(flat_hash_map_ptr, out_handle_ptr)                    \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-#define ccc_fhm_insert_vr(flat_hash_map_ptr, out_handle_ptr)                   \
+#define ccc_fhm_insert_r(flat_hash_map_ptr, out_handle_ptr)                    \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-#define ccc_fhm_try_insert_vr(flat_hash_map_ptr, out_handle_ptr)               \
+#define ccc_fhm_try_insert_r(flat_hash_map_ptr, out_handle_ptr)                \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_try_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_        \
     }
 
-#define ccc_fhm_remove_entry_vr(flat_hash_map_entry_ptr)                       \
+#define ccc_fhm_remove_entry_r(flat_hash_map_entry_ptr)                        \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
@@ -123,7 +123,7 @@ ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
 
 /* Standard Entry API */
 
-#define ccc_fhm_entry_vr(flat_hash_map_ptr, key_ptr)                           \
+#define ccc_fhm_entry_r(flat_hash_map_ptr, key_ptr)                            \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl_                    \
@@ -312,17 +312,17 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_contains(args...) ccc_fhm_contains(args)
 #    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
 #    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
-#    define fhm_insert_vr(args...) ccc_fhm_insert_vr(args)
-#    define fhm_remove_vr(args...) ccc_fhm_remove_vr(args)
-#    define fhm_remove_entry_vr(args...) ccc_fhm_remove_entry_vr(args)
+#    define fhm_insert_r(args...) ccc_fhm_insert_r(args)
+#    define fhm_remove_r(args...) ccc_fhm_remove_r(args)
+#    define fhm_remove_entry_r(args...) ccc_fhm_remove_entry_r(args)
 #    define fhm_remove(args...) ccc_fhm_remove(args)
 #    define fhm_insert(args...) ccc_fhm_insert(args)
 #    define fhm_remove_entry(args...) ccc_fhm_remove_entry(args)
-#    define fhm_entry_vr(args...) ccc_fhm_entry_vr(args)
+#    define fhm_entry_r(args...) ccc_fhm_entry_r(args)
 #    define fhm_entry(args...) ccc_fhm_entry(args)
-#    define fhm_and_modify_vr(args...) ccc_fhm_and_modify_vr(args)
+#    define fhm_and_modify_r(args...) ccc_fhm_and_modify_r(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
-#    define fhm_and_modify_aux_vr(args...) ccc_fhm_and_modify_aux_vr(args)
+#    define fhm_and_modify_aux_r(args...) ccc_fhm_and_modify_aux_r(args)
 #    define fhm_and_modify_aux(args...) ccc_fhm_and_modify_aux(args)
 #    define fhm_entry(args...) ccc_fhm_entry(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)

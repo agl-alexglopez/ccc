@@ -11,7 +11,7 @@
 BEGIN_STATIC_TEST(omm_test_empty)
 {
     ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+        = ccc_omm_init(pq, struct val, elem, val, NULL, val_cmp, NULL);
     CHECK(is_empty(&pq), true);
     END_TEST();
 }

@@ -30,7 +30,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = unwrap(remove_vr(&s, &vals[i].elem));
+        struct val *v = unwrap(remove_r(&s, &vals[i].elem));
         CHECK(v != NULL, true);
         CHECK(v->val, vals[i].val);
         CHECK(validate(&s), true);
@@ -56,7 +56,7 @@ BEGIN_STATIC_TEST(rtomap_test_prime_shuffle)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (unwrap(insert_vr(&s, &vals[i].elem, &(struct val){}.elem)))
+        if (unwrap(insert_r(&s, &vals[i].elem, &(struct val){}.elem)))
         {
             repeats[i] = true;
         }
@@ -67,8 +67,7 @@ BEGIN_STATIC_TEST(rtomap_test_prime_shuffle)
     CHECK(rom_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(occupied(remove_entry_vr(entry_vr(&s, &vals[i].val)))
-                  || repeats[i],
+        CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].val))) || repeats[i],
               true);
         CHECK(validate(&s), true);
     }

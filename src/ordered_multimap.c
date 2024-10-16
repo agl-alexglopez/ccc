@@ -157,19 +157,20 @@ ccc_omm_entry(ccc_ordered_multimap *const mm, void const *const key)
 }
 
 void *
-ccc_omm_insert_entry(ccc_o_mm_entry const *const e, ccc_omm_elem *const elem)
+ccc_omm_insert_entry(ccc_o_mm_entry const *const e,
+                     ccc_omm_elem *const key_val_handle)
 {
-    if (!e || !elem)
+    if (!e || !key_val_handle)
     {
         return NULL;
     }
-    return multimap_insert(e->impl_.t_, &elem->impl_).e_;
+    return multimap_insert(e->impl_.t_, &key_val_handle->impl_).e_;
 }
 
 void *
-ccc_omm_or_insert(ccc_o_mm_entry const *e, ccc_omm_elem *elem)
+ccc_omm_or_insert(ccc_o_mm_entry const *e, ccc_omm_elem *key_val_handle)
 {
-    if (!e || !elem)
+    if (!e || !key_val_handle)
     {
         return NULL;
     }
@@ -177,12 +178,16 @@ ccc_omm_or_insert(ccc_o_mm_entry const *e, ccc_omm_elem *elem)
     {
         return e->impl_.entry_.e_;
     }
-    return multimap_insert(e->impl_.t_, &elem->impl_).e_;
+    return multimap_insert(e->impl_.t_, &key_val_handle->impl_).e_;
 }
 
 ccc_o_mm_entry *
 ccc_omm_and_modify(ccc_o_mm_entry *const e, ccc_update_fn *const fn)
 {
+    if (!e || !fn)
+    {
+        return NULL;
+    }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = NULL});
@@ -194,6 +199,10 @@ ccc_o_mm_entry *
 ccc_omm_and_modify_aux(ccc_o_mm_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
+    if (!e || !fn)
+    {
+        return NULL;
+    }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = aux});
@@ -202,9 +211,14 @@ ccc_omm_and_modify_aux(ccc_o_mm_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_omm_insert(ccc_ordered_multimap *const mm, ccc_omm_elem *const e)
+ccc_omm_insert(ccc_ordered_multimap *const mm,
+               ccc_omm_elem *const key_val_handle)
 {
-    struct ccc_node_ *n = &e->impl_;
+    if (!mm || !key_val_handle)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
+    struct ccc_node_ *n = &key_val_handle->impl_;
     if (mm->impl_.alloc_)
     {
         void *const mem = mm->impl_.alloc_(NULL, mm->impl_.elem_sz_);
@@ -213,7 +227,7 @@ ccc_omm_insert(ccc_ordered_multimap *const mm, ccc_omm_elem *const e)
             return (ccc_entry){
                 {.e_ = NULL, .stats_ = CCC_ENTRY_NULL_INSERT_ERROR}};
         }
-        (void)memcpy(mem, struct_base(&mm->impl_, &e->impl_),
+        (void)memcpy(mem, struct_base(&mm->impl_, &key_val_handle->impl_),
                      mm->impl_.elem_sz_);
         n = elem_in_slot(&mm->impl_, mem);
     }
@@ -224,6 +238,10 @@ ccc_entry
 ccc_omm_try_insert(ccc_ordered_multimap *const mm,
                    ccc_omm_elem *const key_val_handle)
 {
+    if (!mm || !key_val_handle)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     void const *const key = key_from_node(&mm->impl_, &key_val_handle->impl_);
     void *const found = find(&mm->impl_, key);
     if (found)
@@ -237,6 +255,10 @@ ccc_entry
 ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
                          ccc_omm_elem *const key_val_handle)
 {
+    if (!mm || !key_val_handle)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     void *const found
         = find(&mm->impl_, key_from_node(&mm->impl_, &key_val_handle->impl_));
     if (found)
@@ -254,6 +276,10 @@ ccc_entry
 ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_omm_elem *const out_handle)
 {
 
+    if (!mm || !out_handle)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     void *const n = multimap_erase(
         &mm->impl_, key_from_node(&mm->impl_, &out_handle->impl_));
     if (!n)
@@ -273,6 +299,10 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_omm_elem *const out_handle)
 ccc_entry
 ccc_omm_remove_entry(ccc_o_mm_entry *const e)
 {
+    if (!e)
+    {
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *const erased = multimap_erase(

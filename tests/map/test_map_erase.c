@@ -15,7 +15,7 @@
 BEGIN_STATIC_TEST(map_test_prime_shuffle)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -29,7 +29,7 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = (int)shuffled_index;
-        if (occupied(insert_vr(&s, &vals[i].elem, &(struct val){}.elem)))
+        if (occupied(insert_r(&s, &vals[i].elem, &(struct val){}.elem)))
         {
             repeats[i] = true;
         }
@@ -41,8 +41,7 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
     CHECK(ccc_om_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(occupied(remove_entry_vr(entry_vr(&s, &vals[i].val)))
-                  || repeats[i],
+        CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].val))) || repeats[i],
               true);
         CHECK(validate(&s), true);
     }
@@ -52,7 +51,7 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
 BEGIN_STATIC_TEST(map_test_insert_erase_shuffled)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -66,7 +65,7 @@ BEGIN_STATIC_TEST(map_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = unwrap(remove_vr(&s, &vals[i].elem));
+        struct val *v = unwrap(remove_r(&s, &vals[i].elem));
         CHECK(v != NULL, true);
         CHECK(v->val, vals[i].val);
         CHECK(validate(&s), true);
@@ -78,12 +77,12 @@ BEGIN_STATIC_TEST(map_test_insert_erase_shuffled)
 BEGIN_STATIC_TEST(map_test_weak_srand)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
-    /* Seed the test with any integer for reproducible randome test sequence
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+    /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    int const num_nodes = 1000;
     struct val vals[1000];
+    int const num_nodes = 1000;
     for (int i = 0; i < num_nodes; ++i)
     {
         vals[i].val = rand(); // NOLINT

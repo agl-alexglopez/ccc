@@ -61,13 +61,13 @@ BEGIN_STATIC_TEST(fhash_test_entry_functional)
     struct val def = {.id = 137, .val = 0};
     ccc_fh_map_entry ent = entry(&fh, &def.id);
     CHECK(unwrap(&ent) == NULL, true);
-    struct val *v = or_insert(entry_vr(&fh, &def.id), &def.e);
+    struct val *v = or_insert(entry_r(&fh, &def.id), &def.e);
     CHECK(v != NULL, true);
     v->val += 1;
     struct val const *const inserted = get_key_val(&fh, &def.id);
     CHECK((inserted != NULL), true);
     CHECK(inserted->val, 1);
-    v = or_insert(entry_vr(&fh, &def.id), &def.e);
+    v = or_insert(entry_r(&fh, &def.id), &def.e);
     CHECK(v != NULL, true);
     v->val += 1;
     CHECK(inserted->val, 2);
@@ -89,12 +89,12 @@ BEGIN_STATIC_TEST(fhash_test_entry_macros)
     int mut = 99;
     /* The function with a side effect should execute. */
     struct val *inserted = fhm_or_insert_w(
-        entry_vr(&fh, &key), (struct val){.id = key, .val = def(&mut)});
+        entry_r(&fh, &key), (struct val){.id = key, .val = def(&mut)});
     CHECK(inserted != NULL, true);
     CHECK(mut, 100);
     CHECK(inserted->val, 0);
     /* The function with a side effect should NOT execute. */
-    struct val *v = fhm_or_insert_w(entry_vr(&fh, &key),
+    struct val *v = fhm_or_insert_w(entry_r(&fh, &key),
                                     (struct val){.id = key, .val = def(&mut)});
     CHECK(v != NULL, true);
     v->val++;
@@ -115,12 +115,12 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_functional)
     struct val def = {.id = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fh_map_entry *ent = and_modify(entry_vr(&fh, &def.id), mod);
+    ccc_fh_map_entry *ent = and_modify(entry_r(&fh, &def.id), mod);
     CHECK(occupied(ent), false);
     CHECK((unwrap(ent) == NULL), true);
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v = or_insert(entry_vr(&fh, &def.id), &def.e);
+    struct val *v = or_insert(entry_r(&fh, &def.id), &def.e);
     CHECK(v != NULL, true);
     v->val++;
     struct val const *const inserted = get_key_val(&fh, &def.id);
@@ -130,7 +130,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_functional)
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2 = or_insert(and_modify(entry_vr(&fh, &def.id), mod), &def.e);
+    struct val *v2 = or_insert(and_modify(entry_r(&fh, &def.id), mod), &def.e);
     CHECK((v2 != NULL), true);
     CHECK(inserted->id, 137);
     CHECK(v2->val, 6);
@@ -138,7 +138,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_functional)
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
     struct val *v3 = or_insert(
-        and_modify_aux(entry_vr(&fh, &def.id), modw, &def.id), &def.e);
+        and_modify_aux(entry_r(&fh, &def.id), modw, &def.id), &def.e);
     CHECK((v3 != NULL), true);
     CHECK(inserted->id, 137);
     CHECK(v3->val, 137);
@@ -156,7 +156,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
     CHECK(is_empty(&fh), true);
 
     /* Returning a vacant entry is possible when modification is attemtped. */
-    ccc_fh_map_entry *ent = and_modify(entry_vr(&fh, &(int){137}), mod);
+    ccc_fh_map_entry *ent = and_modify(entry_r(&fh, &(int){137}), mod);
     CHECK(occupied(ent), false);
     CHECK((unwrap(ent) == NULL), true);
 
@@ -164,7 +164,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
 
     /* Inserting default value before an in place modification is possible. */
     struct val *v = fhm_or_insert_w(
-        fhm_and_modify_w(entry_vr(&fh, &(int){137}), modw, gen(&mut)),
+        fhm_and_modify_w(entry_r(&fh, &(int){137}), modw, gen(&mut)),
         (struct val){.id = 137, .val = def(&mut)});
     CHECK((v != NULL), true);
     CHECK(v->id, 137);
@@ -173,9 +173,8 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
 
     /* Modifying an existing value or inserting default is possible when no
        auxilliary input is needed. */
-    struct val *v2
-        = fhm_or_insert_w(and_modify(entry_vr(&fh, &(int){137}), mod),
-                          (struct val){.id = 137, .val = def(&mut)});
+    struct val *v2 = fhm_or_insert_w(and_modify(entry_r(&fh, &(int){137}), mod),
+                                     (struct val){.id = 137, .val = def(&mut)});
     CHECK((v2 != NULL), true);
     CHECK(v2->id, 137);
     CHECK(v2->val, 5);
@@ -187,7 +186,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_and_modify_macros)
        but the function def does not execute and therefore does not modify
        mut. */
     struct val *v3 = fhm_or_insert_w(
-        fhm_and_modify_w(entry_vr(&fh, &(int){137}), modw, gen(&mut)),
+        fhm_and_modify_w(entry_r(&fh, &(int){137}), modw, gen(&mut)),
         (struct val){.id = 137, .val = def(&mut)});
     CHECK((v3 != NULL), true);
     CHECK(v3->id, 137);

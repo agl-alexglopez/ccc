@@ -8,8 +8,8 @@
 #define ccc_insert(container_ptr, insert_args...)                              \
     ccc_impl_insert(container_ptr, insert_args)
 
-#define ccc_insert_vr(container_ptr, key_val_container_handle_ptr...)          \
-    ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr)
+#define ccc_insert_r(container_ptr, key_val_container_handle_ptr...)           \
+    ccc_impl_insert_r(container_ptr, key_val_container_handle_ptr)
 
 #define ccc_try_insert(container_ptr, try_insert_args...)                      \
     ccc_impl_try_insert(container_ptr, try_insert_args)
@@ -17,26 +17,26 @@
 #define ccc_insert_or_assign(container_ptr, insert_or_assign_args...)          \
     ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args)
 
-#define ccc_try_insert_vr(container_ptr, key_val_container_handle_ptr...)      \
-    ccc_impl_try_insert_vr(container_ptr, key_val_container_handle_ptr)
+#define ccc_try_insert_r(container_ptr, key_val_container_handle_ptr...)       \
+    ccc_impl_try_insert_r(container_ptr, key_val_container_handle_ptr)
 
 #define ccc_remove(container_ptr, key_val_container_handle_ptr...)             \
     ccc_impl_remove(container_ptr, key_val_container_handle_ptr)
 
-#define ccc_remove_vr(container_ptr, key_val_container_handle_ptr...)          \
-    ccc_impl_remove_vr(container_ptr, key_val_container_handle_ptr)
+#define ccc_remove_r(container_ptr, key_val_container_handle_ptr...)           \
+    ccc_impl_remove_r(container_ptr, key_val_container_handle_ptr)
 
 #define ccc_remove_entry(container_entry_ptr)                                  \
     ccc_impl_remove_entry(container_entry_ptr)
 
-#define ccc_remove_entry_vr(container_entry_ptr)                               \
-    ccc_impl_remove_entry_vr(container_entry_ptr)
+#define ccc_remove_entry_r(container_entry_ptr)                                \
+    ccc_impl_remove_entry_r(container_entry_ptr)
 
 #define ccc_entry(container_ptr, key_ptr...)                                   \
     ccc_impl_entry(container_ptr, key_ptr)
 
-#define ccc_entry_vr(container_ptr, key_ptr...)                                \
-    ccc_impl_entry_vr(container_ptr, key_ptr)
+#define ccc_entry_r(container_ptr, key_ptr...)                                 \
+    ccc_impl_entry_r(container_ptr, key_ptr)
 
 #define ccc_and_modify(entry_ptr, mod_fn) ccc_impl_and_modify(entry_ptr, mod_fn)
 
@@ -120,14 +120,14 @@
 #define ccc_equal_range(container_ptr, begin_and_end_args...)                  \
     ccc_impl_equal_range(container_ptr, begin_and_end_args)
 
-#define ccc_equal_range_vr(container_ptr, begin_and_end_args...)               \
-    ccc_impl_equal_range_vr(container_ptr, begin_and_end_args)
+#define ccc_equal_range_r(container_ptr, begin_and_end_args...)                \
+    ccc_impl_equal_range_r(container_ptr, begin_and_end_args)
 
 #define ccc_equal_rrange(container_ptr, rbegin_and_rend_args...)               \
     ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_args)
 
-#define ccc_equal_rrange_vr(container_ptr, rbegin_and_rend_args...)            \
-    ccc_impl_equal_rrange_vr(container_ptr, rbegin_and_rend_args)
+#define ccc_equal_rrange_r(container_ptr, rbegin_and_rend_args...)             \
+    ccc_impl_equal_rrange_r(container_ptr, rbegin_and_rend_args)
 
 #define ccc_splice(container_ptr, splice_args...)                              \
     ccc_impl_splice(container_ptr, splice_args)
@@ -151,14 +151,14 @@
 #    define insert(args...) ccc_insert(args)
 #    define try_insert(args...) ccc_try_insert(args)
 #    define insert_or_assign(args...) ccc_insert_or_assign(args)
-#    define try_insert_vr(args...) ccc_try_insert_vr(args)
-#    define insert_vr(args...) ccc_insert_vr(args)
+#    define try_insert_r(args...) ccc_try_insert_r(args)
+#    define insert_r(args...) ccc_insert_r(args)
 #    define remove(args...) ccc_remove(args)
-#    define remove_vr(args...) ccc_remove_vr(args)
+#    define remove_r(args...) ccc_remove_r(args)
 #    define remove_entry(args...) ccc_remove_entry(args)
-#    define remove_entry_vr(args...) ccc_remove_entry_vr(args)
+#    define remove_entry_r(args...) ccc_remove_entry_r(args)
 #    define entry(args...) ccc_entry(args)
-#    define entry_vr(args...) ccc_entry_vr(args)
+#    define entry_r(args...) ccc_entry_r(args)
 #    define or_insert(args...) ccc_or_insert(args)
 #    define insert_entry(args...) ccc_insert_entry(args)
 #    define and_modify(args...) ccc_and_modify(args)
@@ -194,8 +194,8 @@
 
 #    define equal_range(args...) ccc_equal_range(args)
 #    define equal_rrange(args...) ccc_equal_rrange(args)
-#    define equal_range_vr(args...) ccc_equal_range_vr(args)
-#    define equal_rrange_vr(args...) ccc_equal_rrange_vr(args)
+#    define equal_range_r(args...) ccc_equal_range_r(args)
+#    define equal_rrange_r(args...) ccc_equal_rrange_r(args)
 #    define splice(args...) ccc_splice(args)
 #    define splice_range(args...) ccc_splice_range(args)
 

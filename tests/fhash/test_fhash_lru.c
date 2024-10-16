@@ -94,7 +94,7 @@ cmp_by_key(ccc_cmp const cmp)
 BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
                   int const val)
 {
-    ccc_fh_map_entry *const ent = entry_vr(&lru->fh, &key);
+    ccc_fh_map_entry *const ent = entry_r(&lru->fh, &key);
     struct lru_lookup const *const found = unwrap(ent);
     if (found)
     {
@@ -114,7 +114,7 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
     {
         struct key_val const *const to_drop = back(&lru->l);
         CHECK(to_drop == NULL, false);
-        ccc_entry const e = remove_entry(entry_vr(&lru->fh, &to_drop->key));
+        ccc_entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
         CHECK(occupied(&e), true);
         (void)pop_back(&lru->l);
     }

@@ -35,10 +35,10 @@ BEGIN_STATIC_TEST(fhash_test_erase)
     ent = remove(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), 0);
-    ccc_fhm_insert_entry_w(entry_vr(&fh, &(int){137}),
+    ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
                            (struct val){.id = 137, .val = 99});
     CHECK(size(&fh), 1);
-    CHECK(occupied(remove_entry_vr(entry_vr(&fh, &(int){137}))), true);
+    CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
     CHECK(size(&fh), 0);
     END_TEST();
 }
@@ -70,13 +70,13 @@ BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
         if (i % 2)
         {
             struct val const *const old_val
-                = unwrap(remove_vr(&h, &(struct val){.id = i}.e));
+                = unwrap(remove_r(&h, &(struct val){.id = i}.e));
             CHECK(old_val != NULL, true);
             CHECK(old_val->id, i);
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_vr(&h, &i));
+            ccc_entry removed = remove_entry(entry_r(&h, &i));
             CHECK(occupied(&removed), true);
         }
         --cur_size;

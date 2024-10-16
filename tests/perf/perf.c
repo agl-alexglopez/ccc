@@ -99,7 +99,7 @@ test_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+        ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, omm_elem, val,
                                                 NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
@@ -139,7 +139,7 @@ test_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+        ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, omm_elem, val,
                                                 NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
@@ -191,7 +191,7 @@ test_push_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+        ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, omm_elem, val,
                                                 NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
@@ -243,7 +243,7 @@ test_push_intermittent_pop(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+        ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, omm_elem, val,
                                                 NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
@@ -295,7 +295,7 @@ test_pop_intermittent_push(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+        ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, omm_elem, val,
                                                 NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
@@ -364,7 +364,7 @@ test_update(void)
     for (size_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
-        ccc_ordered_multimap omm = ccc_omm_init(struct val, omm_elem, val, omm,
+        ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, omm_elem, val,
                                                 NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
