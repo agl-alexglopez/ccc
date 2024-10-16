@@ -56,7 +56,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             = ccc_impl_om_new((&om_insert_entry));                             \
         om_insert_entry_ret = (struct ccc_entry_){                             \
             .e_ = om_new_ins_base_,                                            \
-            .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL),      \
+            .stats_ = CCC_ENTRY_INSERT_ERROR,                                  \
         };                                                                     \
         if (om_new_ins_base_)                                                  \
         {                                                                      \

@@ -53,7 +53,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             = ccc_impl_omm_new((&omm_insert_entry));                           \
         omm_insert_entry_ret = (struct ccc_entry_){                            \
             .e_ = omm_new_ins_base_,                                           \
-            .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL),      \
+            .stats_ = CCC_ENTRY_INSERT_ERROR,                                  \
         };                                                                     \
         if (omm_new_ins_base_)                                                 \
         {                                                                      \

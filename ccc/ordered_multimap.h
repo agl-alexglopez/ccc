@@ -287,13 +287,35 @@ user type containing key_val_handle has been allocated with appropriate lifetime
 by the user, for the user's intended use case. */
 void *ccc_omm_or_insert(ccc_o_mm_entry const *e, ccc_omm_elem *key_val_handle);
 
+/** @brief Invariantly writes the specified key value directly to the existing
+or newly allocated entry.
+@param [in] e a pointer to the multimap entry.
+@param [in] key_val_handle a pointer to the intrusive element in the user type.
+@return a pointer to the user type written to the existing map entry or newly
+inserted. NULL is returned if allocation is permitted but the allocator
+encounters an error.
+
+Note that if allocation has been prohibited the address of the key_val_handle
+is used directly. This means the container assumes the memory provided for the
+user type containing key_val_handle has been allocated with appropriate lifetime
+by the user, for the user's intended use case. */
 void *ccc_omm_insert_entry(ccc_o_mm_entry const *e,
                            ccc_omm_elem *key_val_handle);
 
+/** @brief Removes the entry if it is Occupied.
+@param [in] e a pointer to the multimap entry.
+@return an entry indicating the status of the removal. If the entry was Vacant,
+a Vacant entry with NULL is returned. If the entry is Occupied and allocation
+is permitted, the stored user type is freed, the entry points to NULL, and the
+status indicates the entry was Occupied but contains NULL. If allocation is
+prohibited the entry is removed from the map and returned to be unwrapped and
+freed by the user. */
 ccc_entry ccc_omm_remove_entry(ccc_o_mm_entry *e);
 
+/** @brief */
 void *ccc_omm_unwrap(ccc_o_mm_entry const *e);
 bool ccc_omm_insert_error(ccc_o_mm_entry const *e);
+bool ccc_omm_input_error(ccc_o_mm_entry const *e);
 bool ccc_omm_occupied(ccc_o_mm_entry const *e);
 
 /*===================    Priority Queue Helpers    ==========================*/

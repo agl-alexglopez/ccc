@@ -129,8 +129,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
         {                                                                      \
             fom_try_ins_ent_ret_ = (struct ccc_entry_){                        \
                 .e_ = ccc_impl_fom_alloc_back(fom_try_ins_ent_.fom_),          \
-                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL    \
-                           | CCC_ENTRY_VACANT)};                               \
+                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_VACANT)};        \
             if (fom_try_ins_ent_ret_.e_)                                       \
             {                                                                  \
                 *((typeof(lazy_value) *)fom_try_ins_ent_ret_.e_) = lazy_value; \
@@ -164,8 +163,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fom_ *fom);
         {                                                                      \
             fom_ins_or_assign_ent_ret_ = (struct ccc_entry_){                  \
                 .e_ = ccc_impl_fom_alloc_back(fom_ins_or_assign_ent_.fom_),    \
-                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL    \
-                           | CCC_ENTRY_VACANT)};                               \
+                .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_VACANT)};        \
             if (fom_ins_or_assign_ent_ret_.e_)                                 \
             {                                                                  \
                 *((typeof(lazy_value) *)fom_ins_or_assign_ent_ret_.e_)         \
