@@ -255,8 +255,7 @@ ccc_om_remove_entry(ccc_o_map_entry *const e)
         if (e->impl_.t_->alloc_)
         {
             e->impl_.t_->alloc_(erased, 0);
-            return (ccc_entry){
-                {.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED_CONTAINS_NULL}};
+            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
     }

@@ -292,8 +292,7 @@ ccc_rom_remove_entry(ccc_rtom_entry const *const e)
         if (e->impl_.rom_->alloc_)
         {
             e->impl_.rom_->alloc_(erased, 0);
-            return (ccc_entry){
-                {.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED_CONTAINS_NULL}};
+            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
     }

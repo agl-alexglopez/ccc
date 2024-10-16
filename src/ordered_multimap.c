@@ -224,8 +224,7 @@ ccc_omm_insert(ccc_ordered_multimap *const mm,
         void *const mem = mm->impl_.alloc_(NULL, mm->impl_.elem_sz_);
         if (!mem)
         {
-            return (ccc_entry){
-                {.e_ = NULL, .stats_ = CCC_ENTRY_NULL_INSERT_ERROR}};
+            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
         }
         (void)memcpy(mem, struct_base(&mm->impl_, &key_val_handle->impl_),
                      mm->impl_.elem_sz_);
@@ -311,8 +310,7 @@ ccc_omm_remove_entry(ccc_o_mm_entry *const e)
         if (e->impl_.t_->alloc_)
         {
             e->impl_.t_->alloc_(erased, 0);
-            return (ccc_entry){
-                {.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED_CONTAINS_NULL}};
+            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -513,18 +511,19 @@ ccc_omm_print(ccc_ordered_multimap const *const mm, ccc_print_fn *const fn)
 void *
 ccc_omm_unwrap(ccc_o_mm_entry const *e)
 {
-    if (!e)
-    {
-        return NULL;
-    }
-    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED ? e->impl_.entry_.e_
-                                                       : NULL;
+    return ccc_entry_unwrap(&(ccc_entry){e->impl_.entry_});
 }
 
 bool
 ccc_omm_insert_error(ccc_o_mm_entry const *e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+}
+
+bool
+ccc_omm_input_error(ccc_o_mm_entry const *e)
+{
+    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INPUT_ERROR : false;
 }
 
 bool

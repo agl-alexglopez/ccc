@@ -81,7 +81,7 @@ ccc_fhm_insert_entry(ccc_fh_map_entry const *const e,
                ccc_buf_elem_size(&e->impl_.h_->buf_));
         return e->impl_.entry_.e_;
     }
-    if (e->impl_.entry_.stats_ & ~CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
@@ -113,8 +113,7 @@ ccc_fhm_remove_entry(ccc_fh_map_entry const *const e)
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
     }
     erase(e->impl_.h_, e->impl_.entry_.e_);
-    return (ccc_entry){
-        {.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED_CONTAINS_NULL}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
 ccc_fh_map_entry *
@@ -148,7 +147,7 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *const out_handle)
         swap(tmp, ent.entry_.e_, user_return, user_struct_size);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & (CCC_ENTRY_CONTAINS_NULL | CCC_ENTRY_INSERT_ERROR))
+    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -166,7 +165,7 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h,
     {
         return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & (CCC_ENTRY_CONTAINS_NULL | CCC_ENTRY_INSERT_ERROR))
+    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -184,7 +183,7 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fh_map_elem *key_val_handle)
         memcpy(ent.entry_.e_, user_base, ccc_buf_elem_size(&h->buf_));
         return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & (CCC_ENTRY_CONTAINS_NULL | CCC_ENTRY_INSERT_ERROR))
+    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -198,13 +197,13 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fh_map_elem *const out_handle)
     void *const ret = struct_base(h, out_handle);
     void *const key = key_in_slot(h, ret);
     struct ccc_entry_ const ent = find(h, key, filter(h, key));
-    if (ent.stats_ == CCC_ENTRY_VACANT || !ret || !ent.e_)
+    if (ent.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+        memcpy(ret, ent.e_, ccc_buf_elem_size(&h->buf_));
+        erase(h, ent.e_);
+        return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    memcpy(ret, ent.e_, ccc_buf_elem_size(&h->buf_));
-    erase(h, ent.e_);
-    return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 void *
@@ -214,7 +213,7 @@ ccc_fhm_or_insert(ccc_fh_map_entry const *const e, ccc_fh_map_elem *const elem)
     {
         return e->impl_.entry_.e_;
     }
-    if (e->impl_.entry_.stats_ & ~CCC_ENTRY_VACANT)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
@@ -509,7 +508,8 @@ find(struct ccc_fhm_ const *const h, void const *const key, uint64_t const hash)
         if (e->hash_ == CCC_FHM_EMPTY
             || dist > distance(cap, cur_i, to_i(cap, e->hash_)))
         {
-            return (struct ccc_entry_){.e_ = slot, .stats_ = CCC_ENTRY_VACANT};
+            return (struct ccc_entry_){
+                .e_ = slot, .stats_ = CCC_ENTRY_VACANT | CCC_ENTRY_NO_UNWRAP};
         }
         if (hash == e->hash_
             && h->eq_fn_((ccc_key_cmp){
@@ -519,8 +519,7 @@ find(struct ccc_fhm_ const *const h, void const *const key, uint64_t const hash)
                                        .stats_ = CCC_ENTRY_OCCUPIED};
         }
     }
-    return (struct ccc_entry_){
-        .e_ = NULL, .stats_ = CCC_ENTRY_VACANT | CCC_ENTRY_CONTAINS_NULL};
+    return (struct ccc_entry_){.e_ = NULL, .stats_ = CCC_ENTRY_VACANT};
 }
 
 /* Assumes that element to be inserted does not already exist in the table.

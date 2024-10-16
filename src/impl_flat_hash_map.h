@@ -135,7 +135,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         {                                                                      \
             res_ = fhm_or_ins_entry_->entry_.e_;                               \
         }                                                                      \
-        else if (fhm_or_ins_entry_->entry_.stats_ & ~CCC_ENTRY_VACANT)         \
+        else if (fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR)    \
         {                                                                      \
             res_ = NULL;                                                       \
         }                                                                      \
@@ -163,7 +163,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 = fhm_ins_ent_->hash_;                                         \
             fhm_res_ = fhm_ins_ent_->entry_.e_;                                \
         }                                                                      \
-        else if (fhm_ins_ent_->entry_.stats_ & ~CCC_ENTRY_OCCUPIED)            \
+        else if (fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR)         \
         {                                                                      \
             fhm_res_ = NULL;                                                   \
         }                                                                      \
@@ -182,7 +182,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);       \
         struct ccc_entry_ fhm_try_insert_res_ = {};                            \
         if ((fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)              \
-            || (fhm_try_ins_ent_.entry_.stats_ & ~CCC_ENTRY_VACANT))           \
+            || (fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR))      \
         {                                                                      \
             fhm_try_insert_res_ = fhm_try_ins_ent_.entry_;                     \
         }                                                                      \
@@ -218,9 +218,11 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 ->hash_                                                        \
                 = fhm_ins_or_assign_ent_.hash_;                                \
         }                                                                      \
-        else if (fhm_ins_or_assign_ent_.entry_.stats_ & ~CCC_ENTRY_VACANT)     \
+        else if (fhm_ins_or_assign_ent_.entry_.stats_                          \
+                 & CCC_ENTRY_INSERT_ERROR)                                     \
         {                                                                      \
-            fhm_ins_or_assign_res_ = fhm_ins_or_assign_ent_.entry_;            \
+            fhm_ins_or_assign_res_.e_ = NULL;                                  \
+            fhm_ins_or_assign_res_.stats_ = CCC_ENTRY_INSERT_ERROR;            \
         }                                                                      \
         else                                                                   \
         {                                                                      \

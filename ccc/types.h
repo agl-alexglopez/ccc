@@ -235,6 +235,13 @@ have occured but the container did not have permission to allocate new memory
 or allocation failed. */
 bool ccc_entry_insert_error(ccc_entry const *e);
 
+/** @brief Determine if an input error has occured for a function that generates
+an entry.
+@param [in] e the pointer to the entry obtained from a container function.
+@return true if an input error occured usually meaning an invalid argument such
+as a NULL pointer was provided to a function. */
+bool ccc_entry_input_error(ccc_entry const *e);
+
 /** @brief Unwraps the provided entry providing a reference to the user type
 obtained from the operation that provides the entry.
 @param [in] e the pointer to the entry obtained from an operation.

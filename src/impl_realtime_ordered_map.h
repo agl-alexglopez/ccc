@@ -99,7 +99,7 @@ void *ccc_impl_rom_insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
             = ccc_impl_rom_new((&rom_insert_entry));                           \
         rom_insert_entry_ret = (struct ccc_entry_){                            \
             .e_ = rom_new_ins_base_,                                           \
-            .stats_ = (CCC_ENTRY_INSERT_ERROR | CCC_ENTRY_CONTAINS_NULL),      \
+            .stats_ = CCC_ENTRY_INSERT_ERROR,                                  \
         };                                                                     \
         if (rom_new_ins_base_)                                                 \
         {                                                                      \
