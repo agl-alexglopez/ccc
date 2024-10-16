@@ -64,34 +64,34 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
 
 /*======================      Entry API    ==================================*/
 
-#define ccc_frm_entry_vr(flat_realtime_ordered_map_ptr, key_ptr)               \
+#define ccc_frm_entry_r(flat_realtime_ordered_map_ptr, key_ptr)                \
     &(ccc_frtm_entry)                                                          \
     {                                                                          \
         ccc_frm_entry((flat_realtime_ordered_map_ptr), (key_ptr)).impl_        \
     }
 
-#define ccc_frm_insert_vr(flat_realtime_ordered_map_ptr, out_handle_ptr)       \
+#define ccc_frm_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)        \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_frm_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))      \
             .impl_                                                             \
     }
 
-#define ccc_frm_try_insert_vr(flat_realtime_ordered_map_ptr, out_handle_ptr)   \
+#define ccc_frm_try_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)    \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_frm_try_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))  \
             .impl_                                                             \
     }
 
-#define ccc_frm_remove_vr(flat_realtime_ordered_map_ptr, out_handle_ptr)       \
+#define ccc_frm_remove_r(flat_realtime_ordered_map_ptr, out_handle_ptr)        \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_frm_remove((flat_realtime_ordered_map_ptr), (out_handle_ptr))      \
             .impl_                                                             \
     }
 
-#define ccc_frm_remove_entry_vr(flat_realtime_ordered_map_entry_ptr)           \
+#define ccc_frm_remove_entry_r(flat_realtime_ordered_map_entry_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_frm_remove_entry((flat_realtime_ordered_map_entry_ptr)).impl_      \
@@ -127,8 +127,8 @@ bool ccc_frm_occupied(ccc_frtm_entry const *e);
 
 /*======================      Iteration    ==================================*/
 
-#define ccc_frm_equal_range_vr(flat_realtime_ordered_map_ptr,                  \
-                               begin_and_end_key_ptrs...)                      \
+#define ccc_frm_equal_range_r(flat_realtime_ordered_map_ptr,                   \
+                              begin_and_end_key_ptrs...)                       \
     &(ccc_range)                                                               \
     {                                                                          \
         ccc_frm_equal_range((flat_realtime_ordered_map_ptr),                   \
@@ -136,8 +136,8 @@ bool ccc_frm_occupied(ccc_frtm_entry const *e);
             .impl_                                                             \
     }
 
-#define ccc_frm_equal_rrange_vr(flat_realtime_ordered_map_ptr,                 \
-                                rbegin_and_rend_key_ptrs...)                   \
+#define ccc_frm_equal_rrange_r(flat_realtime_ordered_map_ptr,                  \
+                               rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
     {                                                                          \
         ccc_frm_equal_rrange((flat_realtime_ordered_map_ptr),                  \

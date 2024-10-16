@@ -17,7 +17,7 @@ BEGIN_STATIC_TEST(fmap_test_insert_one)
 {
     flat_ordered_map s
         = fom_init((struct val[2]){}, 2, elem, id, NULL, val_cmp, NULL);
-    CHECK(occupied(insert_vr(&s, &(struct val){}.elem)), false);
+    CHECK(occupied(insert_r(&s, &(struct val){}.elem)), false);
     CHECK(is_empty(&s), false);
     struct val *v = fom_root(&s);
     CHECK(v == NULL, false);
@@ -31,14 +31,14 @@ BEGIN_STATIC_TEST(fmap_test_insert_macros)
        when provided with a realloc function starting from NULL. */
     flat_ordered_map s
         = fom_init((struct val *)NULL, 0, elem, id, realloc, val_cmp, NULL);
-    struct val *v = fom_or_insert_w(entry_vr(&s, &(int){0}), (struct val){});
+    struct val *v = fom_or_insert_w(entry_r(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
-    v = fom_insert_entry_w(entry_vr(&s, &(int){0}),
+    v = fom_insert_entry_w(entry_r(&s, &(int){0}),
                            (struct val){.id = 0, .val = 99});
     CHECK(validate(&s), true);
     CHECK(v == NULL, false);
     CHECK(v->val, 99);
-    v = fom_insert_entry_w(entry_vr(&s, &(int){9}),
+    v = fom_insert_entry_w(entry_r(&s, &(int){9}),
                            (struct val){.id = 9, .val = 100});
     CHECK(v != NULL, true);
     CHECK(v->val, 100);

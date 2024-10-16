@@ -457,7 +457,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 break;
             }
             if (!is_path(next_cell)
-                && !occupied(try_insert_vr(&parent_map, &push.elem)))
+                && !occupied(try_insert_r(&parent_map, &push.elem)))
             {
                 [[maybe_unused]] struct point const *const n
                     = push_back(&bfs, &next);

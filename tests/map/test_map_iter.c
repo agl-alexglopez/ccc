@@ -155,7 +155,7 @@ BEGIN_STATIC_TEST(iterator_check, ccc_ordered_map *s)
 BEGIN_STATIC_TEST(map_test_forward_iter)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -187,7 +187,7 @@ BEGIN_STATIC_TEST(map_test_forward_iter)
 BEGIN_STATIC_TEST(map_test_iterate_removal)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -218,7 +218,7 @@ BEGIN_STATIC_TEST(map_test_iterate_removal)
 BEGIN_STATIC_TEST(map_test_iterate_remove_reinsert)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -243,7 +243,7 @@ BEGIN_STATIC_TEST(map_test_iterate_remove_reinsert)
         {
             (void)remove(&s, &i->elem);
             i->val = new_unique_entry_val;
-            CHECK(insert_entry(entry_vr(&s, &i->val), &i->elem) != NULL, true);
+            CHECK(insert_entry(entry_r(&s, &i->val), &i->elem) != NULL, true);
             CHECK(validate(&s), true);
             ++new_unique_entry_val;
         }
@@ -255,7 +255,7 @@ BEGIN_STATIC_TEST(map_test_iterate_remove_reinsert)
 BEGIN_STATIC_TEST(map_test_valid_range)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -270,13 +270,13 @@ BEGIN_STATIC_TEST(map_test_valid_range)
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    CHECK(check_range(&s, equal_range_vr(&s, &(int){6}, &(int){44}), 8,
+    CHECK(check_range(&s, equal_range_r(&s, &(int){6}, &(int){44}), 8,
                       (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
           PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    CHECK(check_rrange(&s, equal_rrange_vr(&s, &(int){119}, &(int){84}), 8,
+    CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){119}, &(int){84}), 8,
                        (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
     END_TEST();
@@ -285,7 +285,7 @@ BEGIN_STATIC_TEST(map_test_valid_range)
 BEGIN_STATIC_TEST(map_test_valid_range_equals)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -297,10 +297,10 @@ BEGIN_STATIC_TEST(map_test_valid_range_equals)
         (void)insert(&s, &vals[i].elem, &(struct val){});
         CHECK(validate(&s), true);
     }
-    CHECK(check_range(&s, equal_range_vr(&s, &(int){10}, &(int){40}), 8,
+    CHECK(check_range(&s, equal_range_r(&s, &(int){10}, &(int){40}), 8,
                       (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
           PASS);
-    CHECK(check_rrange(&s, equal_rrange_vr(&s, &(int){115}, &(int){85}), 8,
+    CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){115}, &(int){85}), 8,
                        (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
     END_TEST();
@@ -309,7 +309,7 @@ BEGIN_STATIC_TEST(map_test_valid_range_equals)
 BEGIN_STATIC_TEST(map_test_invalid_range)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -323,13 +323,13 @@ BEGIN_STATIC_TEST(map_test_invalid_range)
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    CHECK(check_range(&s, equal_range_vr(&s, &(int){95}, &(int){999}), 6,
+    CHECK(check_range(&s, equal_range_r(&s, &(int){95}, &(int){999}), 6,
                       (int[6]){95, 100, 105, 110, 115, 120}),
           PASS);
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    CHECK(check_rrange(&s, equal_rrange_vr(&s, &(int){36}, &(int){-999}), 8,
+    CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){36}, &(int){-999}), 8,
                        (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           PASS);
     END_TEST();
@@ -338,7 +338,7 @@ BEGIN_STATIC_TEST(map_test_invalid_range)
 BEGIN_STATIC_TEST(map_test_empty_range)
 {
     ccc_ordered_map s
-        = ccc_om_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */

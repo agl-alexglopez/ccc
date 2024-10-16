@@ -35,15 +35,15 @@ BEGIN_STATIC_TEST(fhash_test_insert_macros)
                    fhash_int_zero, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     struct val const *ins = ccc_fhm_or_insert_w(
-        entry_vr(&fh, &(int){2}), (struct val){.id = 2, .val = 0});
+        entry_r(&fh, &(int){2}), (struct val){.id = 2, .val = 0});
     CHECK(ins != NULL, true);
     CHECK(validate(&fh), true);
     CHECK(size(&fh), 1);
-    ins = fhm_insert_entry_w(entry_vr(&fh, &(int){2}),
+    ins = fhm_insert_entry_w(entry_r(&fh, &(int){2}),
                              (struct val){.id = 2, .val = 0});
     CHECK(validate(&fh), true);
     CHECK(ins != NULL, true);
-    ins = fhm_insert_entry_w(entry_vr(&fh, &(int){9}),
+    ins = fhm_insert_entry_w(entry_r(&fh, &(int){9}),
                              (struct val){.id = 9, .val = 1});
     CHECK(validate(&fh), true);
     CHECK(ins != NULL, true);
@@ -86,7 +86,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_overwrite)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
 
-    struct val const *v = unwrap(entry_vr(&fh, &q.id));
+    struct val const *v = unwrap(entry_r(&fh, &q.id));
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
 
@@ -103,7 +103,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_overwrite)
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
     CHECK(q.val, 99);
-    v = unwrap(entry_vr(&fh, &q.id));
+    v = unwrap(entry_r(&fh, &q.id));
     CHECK(v != NULL, true);
     CHECK(v->val, 100);
     END_TEST();
@@ -121,7 +121,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_then_bad_ideas)
     ccc_entry ent = insert(&fh, &q.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    struct val const *v = unwrap(entry_vr(&fh, &q.id));
+    struct val const *v = unwrap(entry_r(&fh, &q.id));
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
 
@@ -159,7 +159,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_functional)
     {
         def.id = (int)i;
         def.val = (int)i;
-        struct val const *const d = or_insert(entry_vr(&fh, &def.id), &def.e);
+        struct val const *const d = or_insert(entry_r(&fh, &def.id), &def.e);
         CHECK((d != NULL), true);
         CHECK(d->id, i);
         CHECK(d->val, i);
@@ -171,7 +171,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_functional)
         def.id = (int)i;
         def.val = (int)i;
         struct val const *const d = or_insert(
-            and_modify(entry_vr(&fh, &def.id), fhash_modplus), &def.e);
+            and_modify(entry_r(&fh, &def.id), fhash_modplus), &def.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->id, i);
@@ -192,7 +192,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_functional)
     {
         def.id = (int)i;
         def.val = (int)i;
-        struct val *const in = or_insert(entry_vr(&fh, &def.id), &def.e);
+        struct val *const in = or_insert(entry_r(&fh, &def.id), &def.e);
         in->val++;
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true);
@@ -218,8 +218,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_via_entry)
     {
         def.id = (int)i;
         def.val = (int)i;
-        struct val const *const d
-            = insert_entry(entry_vr(&fh, &def.id), &def.e);
+        struct val const *const d = insert_entry(entry_r(&fh, &def.id), &def.e);
         CHECK((d != NULL), true);
         CHECK(d->id, i);
         CHECK(d->val, i);
@@ -230,8 +229,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_via_entry)
     {
         def.id = (int)i;
         def.val = (int)i + 1;
-        struct val const *const d
-            = insert_entry(entry_vr(&fh, &def.id), &def.e);
+        struct val const *const d = insert_entry(entry_r(&fh, &def.id), &def.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->val, i + 1);
@@ -263,7 +261,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_via_entry_macros)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
-            = insert_entry(entry_vr(&fh, &i), &(struct val){i, i, {}}.e);
+            = insert_entry(entry_r(&fh, &i), &(struct val){i, i, {}}.e);
         CHECK((d != NULL), true);
         CHECK(d->id, i);
         CHECK(d->val, i);
@@ -273,7 +271,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_via_entry_macros)
     for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
-            = insert_entry(entry_vr(&fh, &i), &(struct val){i, i + 1, {}}.e);
+            = insert_entry(entry_r(&fh, &i), &(struct val){i, i + 1, {}}.e);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->val, i + 1);
@@ -307,7 +305,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_macros)
         /* The macros support functions that will only execute if the or
            insert branch executes. */
         struct val const *const d
-            = fhm_or_insert_w(entry_vr(&fh, &i), fhash_create(i, i));
+            = fhm_or_insert_w(entry_r(&fh, &i), fhash_create(i, i));
         CHECK((d != NULL), true);
         CHECK(d->id, i);
         CHECK(d->val, i);
@@ -317,7 +315,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_macros)
     for (int i = 0; i < size / 2; ++i)
     {
         struct val const *const d = fhm_or_insert_w(
-            and_modify(entry_vr(&fh, &i), fhash_modplus), fhash_create(i, i));
+            and_modify(entry_r(&fh, &i), fhash_modplus), fhash_create(i, i));
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->id, i);
@@ -336,7 +334,7 @@ BEGIN_STATIC_TEST(fhash_test_entry_api_macros)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val *v = fhm_or_insert_w(entry_vr(&fh, &i), (struct val){});
+        struct val *v = fhm_or_insert_w(entry_r(&fh, &i), (struct val){});
         CHECK(v != NULL, true);
         v->val++;
         /* All values in the array should be odd now */
@@ -391,7 +389,7 @@ BEGIN_STATIC_TEST(fhash_test_resize)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(entry_r(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true);
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
@@ -403,7 +401,7 @@ BEGIN_STATIC_TEST(fhash_test_resize)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
+            = insert_entry(entry_r(&fh, &swap_slot.id), &swap_slot.e);
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
@@ -425,7 +423,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
+        struct val *v = insert_entry(entry_r(&fh, &shuffled_index),
                                      &(struct val){shuffled_index, i, {}}.e);
         CHECK(v != NULL, true);
         CHECK(v->id, shuffled_index);
@@ -436,13 +434,13 @@ BEGIN_STATIC_TEST(fhash_test_resize_macros)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = fhm_or_insert_w(fhm_and_modify_w(entry_vr(&fh, &shuffled_index),
+            = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &shuffled_index),
                                                fhash_swap_val, shuffled_index),
                               (struct val){});
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
         struct val *v
-            = fhm_or_insert_w(entry_vr(&fh, &shuffled_index), (struct val){});
+            = fhm_or_insert_w(entry_r(&fh, &shuffled_index), (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
         v = get_key_val(&fh, &shuffled_index);
@@ -465,7 +463,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_from_null)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.id = shuffled_index, .val = i};
-        struct val *v = insert_entry(entry_vr(&fh, &elem.id), &elem.e);
+        struct val *v = insert_entry(entry_r(&fh, &elem.id), &elem.e);
         CHECK(v != NULL, true);
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
@@ -476,7 +474,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_from_null)
     {
         struct val swap_slot = {shuffled_index, shuffled_index, {}};
         struct val const *const in_table
-            = insert_entry(entry_vr(&fh, &swap_slot.id), &swap_slot.e);
+            = insert_entry(entry_r(&fh, &swap_slot.id), &swap_slot.e);
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
@@ -497,7 +495,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
+        struct val *v = insert_entry(entry_r(&fh, &shuffled_index),
                                      &(struct val){shuffled_index, i, {}}.e);
         CHECK(v != NULL, true);
         CHECK(v->id, shuffled_index);
@@ -508,13 +506,13 @@ BEGIN_STATIC_TEST(fhash_test_resize_from_null_macros)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val const *const in_table
-            = fhm_or_insert_w(fhm_and_modify_w(entry_vr(&fh, &shuffled_index),
+            = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &shuffled_index),
                                                fhash_swap_val, shuffled_index),
                               (struct val){});
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
         struct val *v
-            = fhm_or_insert_w(entry_vr(&fh, &shuffled_index), (struct val){});
+            = fhm_or_insert_w(entry_r(&fh, &shuffled_index), (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
         v = get_key_val(&fh, &shuffled_index);
@@ -539,7 +537,7 @@ BEGIN_STATIC_TEST(fhash_test_insert_limit)
     for (int i = 0; i < size;
          ++i, shuffled_index = (shuffled_index + larger_prime) % size)
     {
-        struct val *v = insert_entry(entry_vr(&fh, &shuffled_index),
+        struct val *v = insert_entry(entry_r(&fh, &shuffled_index),
                                      &(struct val){shuffled_index, i, {}}.e);
         if (!v)
         {
@@ -558,12 +556,12 @@ BEGIN_STATIC_TEST(fhash_test_insert_limit)
     CHECK(size(&fh), final_size);
 
     v = (struct val){.id = last_index, .val = -2};
-    struct val *in_table = insert_entry(entry_vr(&fh, &v.id), &v.e);
+    struct val *in_table = insert_entry(entry_r(&fh, &v.id), &v.e);
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -2);
     CHECK(size(&fh), final_size);
 
-    in_table = insert_entry(entry_vr(&fh, &last_index),
+    in_table = insert_entry(entry_r(&fh, &last_index),
                             &(struct val){.id = last_index, .val = -3}.e);
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -3);
@@ -571,11 +569,11 @@ BEGIN_STATIC_TEST(fhash_test_insert_limit)
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct val){.id = shuffled_index, .val = -4};
-    in_table = insert_entry(entry_vr(&fh, &v.id), &v.e);
+    in_table = insert_entry(entry_r(&fh, &v.id), &v.e);
     CHECK(in_table == NULL, true);
     CHECK(size(&fh), final_size);
 
-    in_table = insert_entry(entry_vr(&fh, &shuffled_index),
+    in_table = insert_entry(entry_r(&fh, &shuffled_index),
                             &(struct val){.id = shuffled_index, .val = -4}.e);
     CHECK(in_table == NULL, true);
     CHECK(size(&fh), final_size);

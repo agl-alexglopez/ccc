@@ -51,25 +51,25 @@ void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
 
 /*===========================   Entry API   =================================*/
 
-#define ccc_fom_insert_vr(flat_ordered_map_ptr, out_handle_ptr)                \
+#define ccc_fom_insert_r(flat_ordered_map_ptr, out_handle_ptr)                 \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fom_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_         \
     }
 
-#define ccc_fom_try_insert_vr(flat_ordered_map_ptr, out_handle_ptr)            \
+#define ccc_fom_try_insert_r(flat_ordered_map_ptr, out_handle_ptr)             \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fom_try_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
-#define ccc_fom_remove_vr(flat_ordered_map_ptr, out_handle_ptr)                \
+#define ccc_fom_remove_r(flat_ordered_map_ptr, out_handle_ptr)                 \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fom_remove((flat_ordered_map_ptr), (out_handle_ptr)).impl_         \
     }
 
-#define ccc_fom_remove_entry_vr(flat_ordered_map_entry_ptr)                    \
+#define ccc_fom_remove_entry_r(flat_ordered_map_entry_ptr)                     \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fom_remove_entry((flat_ordered_map_entry_ptr)).impl_               \
@@ -85,7 +85,7 @@ ccc_entry ccc_fom_remove_entry(ccc_f_om_entry *e);
 
 /* Standard Entry API. */
 
-#define ccc_fom_entry_vr(flat_ordered_map_ptr, key_ptr)                        \
+#define ccc_fom_entry_r(flat_ordered_map_ptr, key_ptr)                         \
     &(ccc_f_om_entry)                                                          \
     {                                                                          \
         ccc_fom_entry((flat_ordered_map_ptr), (key_ptr)).impl_                 \
@@ -145,16 +145,16 @@ typedef ccc_f_om_entry f_om_entry;
 #    define fom_init(args...) ccc_fom_init(args)
 #    define fom_contains(args...) ccc_fom_contains(args)
 #    define fom_get_key_val(args...) ccc_fom_get_key_val(args)
-#    define fom_insert_vr(args...) ccc_fom_insert_vr(args)
-#    define fom_try_insert_vr(args...) ccc_fom_try_insert_vr(args)
-#    define fom_remove_vr(args...) ccc_fom_remove_vr(args)
-#    define fom_remove_entry_vr(args...) ccc_fom_remove_entry_vr(args)
+#    define fom_insert_r(args...) ccc_fom_insert_r(args)
+#    define fom_try_insert_r(args...) ccc_fom_try_insert_r(args)
+#    define fom_remove_r(args...) ccc_fom_remove_r(args)
+#    define fom_remove_entry_r(args...) ccc_fom_remove_entry_r(args)
 #    define fom_insert(args...) ccc_fom_insert(args)
 #    define fom_try_insert(args...) ccc_fom_try_insert(args)
 #    define fom_insert_or_assign(args...) ccc_fom_insert_or_assign(args)
 #    define fom_remove(args...) ccc_fom_remove(args)
 #    define fom_remove_entry(args...) ccc_fom_remove_entry(args)
-#    define fom_entry_vr(args...) ccc_fom_entry_vr(args)
+#    define fom_entry_r(args...) ccc_fom_entry_r(args)
 #    define fom_entry(args...) ccc_fom_entry(args)
 #    define fom_and_modify(args...) ccc_fom_and_modify(args)
 #    define fom_and_modify_aux(args...) ccc_fom_and_modify_aux(args)

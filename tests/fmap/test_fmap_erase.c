@@ -30,7 +30,7 @@ BEGIN_STATIC_TEST(frtomap_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = unwrap(remove_vr(&s, &(struct val){.id = i}.elem));
+        struct val *v = unwrap(remove_r(&s, &(struct val){.id = i}.elem));
         CHECK(v != NULL, true);
         CHECK(v->id, i);
         CHECK(validate(&s), true);
@@ -53,9 +53,9 @@ BEGIN_STATIC_TEST(frtomap_test_prime_shuffle)
     memset(repeats, false, sizeof(bool) * size);
     for (size_t i = 0; i < size; ++i)
     {
-        if (occupied(try_insert_vr(&s, &(struct val){.id = (int)shuffled_index,
-                                                     .val = (int)shuffled_index}
-                                            .elem)))
+        if (occupied(try_insert_r(&s, &(struct val){.id = (int)shuffled_index,
+                                                    .val = (int)shuffled_index}
+                                           .elem)))
         {
             repeats[i] = true;
         }
@@ -65,7 +65,7 @@ BEGIN_STATIC_TEST(frtomap_test_prime_shuffle)
     CHECK(fom_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_entry const *const e = remove_entry_vr(entry_vr(&s, &i));
+        ccc_entry const *const e = remove_entry_r(entry_r(&s, &i));
         CHECK(occupied(e) || repeats[i], true);
         CHECK(validate(&s), true);
     }
@@ -92,7 +92,7 @@ BEGIN_STATIC_TEST(frtomap_test_weak_srand)
     for (int i = 0; i < num_nodes; ++i)
     {
         struct val *v
-            = unwrap(remove_vr(&s, &(struct val){.id = id_keys[i]}.elem));
+            = unwrap(remove_r(&s, &(struct val){.id = id_keys[i]}.elem));
         CHECK(v == NULL, false);
         CHECK(validate(&s), true);
     }

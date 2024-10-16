@@ -211,10 +211,10 @@ animate_maze(struct maze *maze)
        costs mapped but the purpose of this program is to test both the set and
        priority queue data structures. Also a 2D vector wastes space. */
     ccc_ordered_multimap cells
-        = ccc_omm_init(struct priority_cell, elem, priority, cells, NULL,
+        = ccc_omm_init(cells, struct priority_cell, elem, priority, NULL,
                        cmp_priority_cells, NULL);
-    ccc_ordered_map cell_costs = ccc_om_init(
-        struct point_cost, elem, p, cell_costs, NULL, cmp_points, NULL);
+    ccc_ordered_map cell_costs = ccc_om_init(cell_costs, struct point_cost,
+                                             elem, p, NULL, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
     *odd_point = (struct point_cost){
         .p = pick_rand_point(maze),
@@ -262,7 +262,7 @@ animate_maze(struct maze *maze)
                 };
                 cur_weight = new_cost->cost;
                 [[maybe_unused]] bool const inserted = insert_entry(
-                    entry_vr(&cell_costs, &new_cost->p), &new_cost->elem);
+                    entry_r(&cell_costs, &new_cost->p), &new_cost->elem);
                 assert(inserted);
             }
             else

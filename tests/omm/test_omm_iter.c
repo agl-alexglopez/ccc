@@ -132,23 +132,23 @@ BEGIN_STATIC_TEST(check_rrange, ordered_multimap const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(iterator_check, ccc_ordered_multimap *pq)
+BEGIN_STATIC_TEST(iterator_check, ccc_ordered_multimap *const omm)
 {
-    size_t const size = size(pq);
+    size_t const size = size(omm);
     size_t iter_count = 0;
-    for (struct val *e = begin(pq); e; e = next(pq, &e->elem))
+    for (struct val *e = begin(omm); e; e = next(omm, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_omm_is_min(pq, &e->elem), true);
-        CHECK(iter_count == size || !ccc_omm_is_min(pq, &e->elem), true);
+        CHECK(iter_count != size || ccc_omm_is_min(omm, &e->elem), true);
+        CHECK(iter_count == size || !ccc_omm_is_min(omm, &e->elem), true);
     }
     CHECK(iter_count, size);
     iter_count = 0;
-    for (struct val *e = ccc_omm_rbegin(pq); e; e = rnext(pq, &e->elem))
+    for (struct val *e = ccc_omm_rbegin(omm); e; e = rnext(omm, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_omm_is_max(pq, &e->elem), true);
-        CHECK(iter_count == size || !ccc_omm_is_max(pq, &e->elem), true);
+        CHECK(iter_count != size || ccc_omm_is_max(omm, &e->elem), true);
+        CHECK(iter_count == size || !ccc_omm_is_max(omm, &e->elem), true);
     }
     CHECK(iter_count, size);
     END_TEST();
@@ -156,11 +156,11 @@ BEGIN_STATIC_TEST(iterator_check, ccc_ordered_multimap *pq)
 
 BEGIN_STATIC_TEST(omm_test_forward_iter_unique_vals)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct val *e = begin(&pq); e; e = next(&pq, &e->elem), ++j)
+    for (struct val *e = begin(&omm); e; e = next(&omm, &e->elem), ++j)
     {}
     CHECK(j, 0);
     int const num_nodes = 33;
@@ -171,14 +171,15 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_unique_vals)
     {
         vals[i].val = shuffled_index; // NOLINT
         vals[i].id = i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[33];
-    CHECK(inorder_fill(val_keys_inorder, num_nodes, &pq), size(&pq));
+    CHECK(inorder_fill(val_keys_inorder, num_nodes, &omm), size(&omm));
     j = num_nodes - 1;
-    for (struct val *e = begin(&pq); e && j >= 0; e = next(&pq, &e->elem), --j)
+    for (struct val *e = begin(&omm); e && j >= 0;
+         e = next(&omm, &e->elem), --j)
     {
         CHECK(e->val, val_keys_inorder[j]);
     }
@@ -187,18 +188,18 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_unique_vals)
 
 BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct val *i = begin(&pq); i; i = next(&pq, &i->elem), ++j)
+    for (struct val *i = begin(&omm); i; i = next(&omm, &i->elem), ++j)
     {}
     CHECK(j, 0);
     int const num_nodes = 33;
     struct val vals[33];
     vals[0].val = 0; // NOLINT
     vals[0].id = 0;
-    CHECK(unwrap(insert_vr(&pq, &vals[0].elem)) != NULL, true);
+    CHECK(unwrap(insert_r(&omm, &vals[0].elem)) != NULL, true);
     /* This will test iterating through every possible length list. */
     for (int i = 1, val = 1; i < num_nodes; i += i, ++val)
     {
@@ -207,14 +208,15 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
         {
             vals[index].val = val; // NOLINT
             vals[index].id = index;
-            CHECK(unwrap(insert_vr(&pq, &vals[index].elem)) != NULL, true);
-            CHECK(validate(&pq), true);
+            CHECK(unwrap(insert_r(&omm, &vals[index].elem)) != NULL, true);
+            CHECK(validate(&omm), true);
         }
     }
     int val_keys_inorder[33];
-    (void)inorder_fill(val_keys_inorder, num_nodes, &pq);
+    (void)inorder_fill(val_keys_inorder, num_nodes, &omm);
     j = num_nodes - 1;
-    for (struct val *i = begin(&pq); i && j >= 0; i = next(&pq, &i->elem), --j)
+    for (struct val *i = begin(&omm); i && j >= 0;
+         i = next(&omm, &i->elem), --j)
     {
         CHECK(i->val, val_keys_inorder[j]);
     }
@@ -223,8 +225,8 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
 
 BEGIN_STATIC_TEST(omm_test_insert_iterate_pop)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -235,19 +237,19 @@ BEGIN_STATIC_TEST(omm_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
-    CHECK(iterator_check(&pq), PASS);
+    CHECK(iterator_check(&omm), PASS);
     size_t pop_count = 0;
-    while (!is_empty(&pq))
+    while (!is_empty(&omm))
     {
-        CHECK(ccc_omm_pop_max(&pq), CCC_OK);
+        CHECK(ccc_omm_pop_max(&omm), CCC_OK);
         ++pop_count;
-        CHECK(validate(&pq), true);
+        CHECK(validate(&omm), true);
         if (pop_count % 200)
         {
-            CHECK(iterator_check(&pq), PASS);
+            CHECK(iterator_check(&omm), PASS);
         }
     }
     CHECK(pop_count, num_nodes);
@@ -256,8 +258,8 @@ BEGIN_STATIC_TEST(omm_test_insert_iterate_pop)
 
 BEGIN_STATIC_TEST(omm_test_priority_removal)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -268,21 +270,21 @@ BEGIN_STATIC_TEST(omm_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
-    CHECK(iterator_check(&pq), PASS);
+    CHECK(iterator_check(&omm), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&pq); i;)
+    for (struct val *i = begin(&omm); i;)
     {
         if (i->val > limit)
         {
-            i = ccc_omm_erase(&pq, &i->elem);
-            CHECK(validate(&pq), true);
+            i = ccc_omm_erase(&omm, &i->elem);
+            CHECK(validate(&omm), true);
         }
         else
         {
-            i = next(&pq, &i->elem);
+            i = next(&omm, &i->elem);
         }
     }
     END_TEST();
@@ -290,8 +292,8 @@ BEGIN_STATIC_TEST(omm_test_priority_removal)
 
 BEGIN_STATIC_TEST(omm_test_priority_update)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -302,33 +304,33 @@ BEGIN_STATIC_TEST(omm_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
-    CHECK(iterator_check(&pq), PASS);
+    CHECK(iterator_check(&omm), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&pq); i;)
+    for (struct val *i = begin(&omm); i;)
     {
         if (i->val > limit)
         {
-            struct val *next = next(&pq, &i->elem);
-            CHECK(update(&pq, &i->elem, val_update, &(int){i->val / 2}), true);
-            CHECK(validate(&pq), true);
+            struct val *next = next(&omm, &i->elem);
+            CHECK(update(&omm, &i->elem, val_update, &(int){i->val / 2}), true);
+            CHECK(validate(&omm), true);
             i = next;
         }
         else
         {
-            i = next(&pq, &i->elem);
+            i = next(&omm, &i->elem);
         }
     }
-    CHECK(size(&pq), num_nodes);
+    CHECK(size(&omm), num_nodes);
     END_TEST();
 }
 
 BEGIN_STATIC_TEST(omm_test_priority_valid_range)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -337,19 +339,19 @@ BEGIN_STATIC_TEST(omm_test_priority_valid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    CHECK(check_rrange(&pq, equal_rrange_vr(&pq, &(int){6}, &(int){44}), 8,
+    CHECK(check_rrange(&omm, equal_rrange_r(&omm, &(int){6}, &(int){44}), 8,
                        (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
           PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    CHECK(check_range(&pq, equal_range_vr(&pq, &(int){119}, &(int){84}), 8,
+    CHECK(check_range(&omm, equal_range_r(&omm, &(int){119}, &(int){84}), 8,
                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
     END_TEST();
@@ -357,8 +359,8 @@ BEGIN_STATIC_TEST(omm_test_priority_valid_range)
 
 BEGIN_STATIC_TEST(omm_test_priority_valid_range_equals)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -367,19 +369,19 @@ BEGIN_STATIC_TEST(omm_test_priority_valid_range_equals)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    CHECK(check_rrange(&pq, equal_rrange_vr(&pq, &(int){10}, &(int){40}), 8,
+    CHECK(check_rrange(&omm, equal_rrange_r(&omm, &(int){10}, &(int){40}), 8,
                        (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
           PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    CHECK(check_range(&pq, equal_range_vr(&pq, &(int){115}, &(int){85}), 8,
+    CHECK(check_range(&omm, equal_range_r(&omm, &(int){115}, &(int){85}), 8,
                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
     END_TEST();
@@ -387,8 +389,8 @@ BEGIN_STATIC_TEST(omm_test_priority_valid_range_equals)
 
 BEGIN_STATIC_TEST(omm_test_priority_invalid_range)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -397,19 +399,19 @@ BEGIN_STATIC_TEST(omm_test_priority_invalid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    CHECK(check_rrange(&pq, equal_rrange_vr(&pq, &(int){95}, &(int){999}), 6,
+    CHECK(check_rrange(&omm, equal_rrange_r(&omm, &(int){95}, &(int){999}), 6,
                        (int[6]){95, 100, 105, 110, 115, 120}),
           PASS);
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    CHECK(check_range(&pq, equal_range_vr(&pq, &(int){36}, &(int){-999}), 8,
+    CHECK(check_range(&omm, equal_range_r(&omm, &(int){36}, &(int){-999}), 8,
                       (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           PASS);
     END_TEST();
@@ -417,8 +419,8 @@ BEGIN_STATIC_TEST(omm_test_priority_invalid_range)
 
 BEGIN_STATIC_TEST(omm_test_priority_empty_range)
 {
-    ccc_ordered_multimap pq
-        = ccc_omm_init(struct val, elem, val, pq, NULL, val_cmp, NULL);
+    ccc_ordered_multimap omm
+        = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -427,16 +429,16 @@ BEGIN_STATIC_TEST(omm_test_priority_empty_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        CHECK(unwrap(insert_vr(&pq, &vals[i].elem)) != NULL, true);
-        CHECK(validate(&pq), true);
+        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(validate(&omm), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    ccc_rrange const rev_range = equal_rrange(&pq, &(int){-50}, &(int){-25});
+    ccc_rrange const rev_range = equal_rrange(&omm, &(int){-50}, &(int){-25});
     CHECK(((struct val *)rbegin_rrange(&rev_range))->val, vals[0].val);
     CHECK(((struct val *)rend_rrange(&rev_range))->val, vals[0].val);
-    ccc_range const eq_range = equal_range(&pq, &(int){150}, &(int){999});
+    ccc_range const eq_range = equal_range(&omm, &(int){150}, &(int){999});
     CHECK(((struct val *)begin_range(&eq_range))->val, vals[num_nodes - 1].val);
     CHECK(((struct val *)end_range(&eq_range))->val, vals[num_nodes - 1].val);
     END_TEST();

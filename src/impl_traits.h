@@ -29,7 +29,7 @@
         ccc_realtime_ordered_map *: ccc_rom_insert)((container_ptr),           \
                                                     insert_args)
 
-#define ccc_impl_insert_vr(container_ptr, key_val_container_handle_ptr...)     \
+#define ccc_impl_insert_r(container_ptr, key_val_container_handle_ptr...)      \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_insert(container_ptr, key_val_container_handle_ptr).impl_     \
@@ -45,7 +45,7 @@
         ccc_realtime_ordered_map *: ccc_rom_try_insert)((container_ptr),       \
                                                         try_insert_args)
 
-#define ccc_impl_try_insert_vr(container_ptr, try_insert_args...)              \
+#define ccc_impl_try_insert_r(container_ptr, try_insert_args...)               \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_try_insert(container_ptr, try_insert_args).impl_              \
@@ -61,7 +61,7 @@
         ccc_realtime_ordered_map *: ccc_rom_insert_or_assign)(                 \
         (container_ptr), insert_or_assign_args)
 
-#define ccc_impl_insert_or_assign_vr(container_ptr, insert_or_assign_args...)  \
+#define ccc_impl_insert_or_assign_r(container_ptr, insert_or_assign_args...)   \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args).impl_  \
@@ -77,7 +77,7 @@
         ccc_realtime_ordered_map                                               \
             *: ccc_rom_remove)((container_ptr), key_val_container_handle_ptr)
 
-#define ccc_impl_remove_vr(container_ptr, key_val_container_handle_ptr...)     \
+#define ccc_impl_remove_r(container_ptr, key_val_container_handle_ptr...)      \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_remove(container_ptr, key_val_container_handle_ptr).impl_     \
@@ -97,7 +97,7 @@
         ccc_f_om_entry const *: ccc_fom_remove_entry,                          \
         ccc_rtom_entry const *: ccc_rom_remove_entry)((container_entry_ptr))
 
-#define ccc_impl_remove_entry_vr(container_entry_ptr)                          \
+#define ccc_impl_remove_entry_r(container_entry_ptr)                           \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_remove_entry(container_entry_ptr).impl_                       \
@@ -116,7 +116,7 @@
         ccc_realtime_ordered_map const *: ccc_rom_entry)((container_ptr),      \
                                                          key_ptr)
 
-#define ccc_impl_entry_vr(container_ptr, key_ptr...)                           \
+#define ccc_impl_entry_r(container_ptr, key_ptr...)                            \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map                                                      \
             *: &(ccc_fh_map_entry){ccc_fhm_entry(                              \
@@ -544,7 +544,7 @@
         ccc_realtime_ordered_map const *: ccc_rom_equal_range)(                \
         (container_ptr), begin_and_end_key_ptr)
 
-#define ccc_impl_equal_range_vr(container_ptr, begin_and_end_key_ptr...)       \
+#define ccc_impl_equal_range_r(container_ptr, begin_and_end_key_ptr...)        \
     &(ccc_range)                                                               \
     {                                                                          \
         ccc_impl_equal_range(container_ptr, begin_and_end_key_ptr).impl_       \
@@ -561,7 +561,7 @@
         ccc_realtime_ordered_map const *: ccc_rom_equal_rrange)(               \
         (container_ptr), rbegin_and_rend_key_ptr)
 
-#define ccc_impl_equal_rrange_vr(container_ptr, rbegin_and_rend_key_ptr...)    \
+#define ccc_impl_equal_rrange_r(container_ptr, rbegin_and_rend_key_ptr...)     \
     &(ccc_rrange)                                                              \
     {                                                                          \
         ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr).impl_    \

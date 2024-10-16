@@ -6,9 +6,9 @@
 struct ccc_node_;
 struct ccc_tree_;
 
-#define ccc_impl_omm_init(struct_name, node_elem_field, key_elem_field,        \
-                          tree_name, alloc_fn, key_cmp_fn, aux_data)           \
-    ccc_tree_init(struct_name, node_elem_field, key_elem_field, tree_name,     \
+#define ccc_impl_omm_init(tree_name, struct_name, node_elem_field,             \
+                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \
+    ccc_tree_init(tree_name, struct_name, node_elem_field, key_elem_field,     \
                   alloc_fn, key_cmp_fn, aux_data)
 
 void *ccc_impl_omm_key_in_slot(struct ccc_tree_ const *t, void const *slot);

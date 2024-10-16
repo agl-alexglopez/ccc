@@ -366,7 +366,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
             if (cw.stat == WC_CLEAN_WORD)
             {
                 struct word *const w = or_insert(
-                    entry_vr(&fom, &cw.str), &(struct word){.ofs = cw.str}.e);
+                    entry_r(&fom, &cw.str), &(struct word){.ofs = cw.str}.e);
                 assert(w);
                 ++w->freq;
             }

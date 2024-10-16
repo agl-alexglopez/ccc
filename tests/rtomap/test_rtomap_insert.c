@@ -17,7 +17,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_one)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(occupied(insert_vr(&s, &(struct val){}.elem, &(struct val){}.elem)),
+    CHECK(occupied(insert_r(&s, &(struct val){}.elem, &(struct val){}.elem)),
           false);
     CHECK(is_empty(&s), false);
     struct val *v = rom_root(&s);
@@ -30,14 +30,14 @@ BEGIN_STATIC_TEST(rtomap_test_insert_macros)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, realloc, val_cmp, NULL);
-    struct val *v = rom_or_insert_w(entry_vr(&s, &(int){0}), (struct val){});
+    struct val *v = rom_or_insert_w(entry_r(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
-    v = rom_insert_entry_w(entry_vr(&s, &(int){0}),
+    v = rom_insert_entry_w(entry_r(&s, &(int){0}),
                            (struct val){.val = 0, .id = 99});
     CHECK(validate(&s), true);
     CHECK(v == NULL, false);
     CHECK(v->id, 99);
-    v = rom_insert_entry_w(entry_vr(&s, &(int){9}),
+    v = rom_insert_entry_w(entry_r(&s, &(int){9}),
                            (struct val){.val = 9, .id = 100});
     CHECK(v != NULL, true);
     CHECK(v->id, 100);
