@@ -32,9 +32,11 @@ ccc_result ccc_sll_splice_range(ccc_singly_linked_list *pos_sll,
                                 ccc_sll_elem *splice_begin,
                                 ccc_sll_elem *splice_end);
 
-void *ccc_sll_erase(ccc_singly_linked_list *erase_sll, ccc_sll_elem *erase);
-void *ccc_sll_erase_range(ccc_singly_linked_list *erase_sll,
-                          ccc_sll_elem *erase_begin, ccc_sll_elem *erase_end);
+void *ccc_sll_extract(ccc_singly_linked_list *extract_sll,
+                      ccc_sll_elem *extract);
+void *ccc_sll_extract_range(ccc_singly_linked_list *extract_sll,
+                            ccc_sll_elem *extract_begin,
+                            ccc_sll_elem *extract_end);
 
 void *ccc_sll_begin(ccc_singly_linked_list const *sll);
 void *ccc_sll_end(ccc_singly_linked_list const *sll);
@@ -60,8 +62,8 @@ typedef ccc_singly_linked_list singly_linked_list;
 #    define sll_pop_front(args...) ccc_sll_pop_front(args)
 #    define sll_splice(args...) ccc_sll_splice(args)
 #    define sll_splice_range(args...) ccc_sll_splice_range(args)
-#    define sll_erase(args...) ccc_sll_erase(args)
-#    define sll_erase_range(args...) ccc_sll_erase_range(args)
+#    define sll_extract(args...) ccc_sll_extract(args)
+#    define sll_extract_range(args...) ccc_sll_extract_range(args)
 #    define sll_begin(args...) ccc_sll_begin(args)
 #    define sll_end(args...) ccc_sll_end(args)
 #    define sll_next(args...) ccc_sll_next(args)

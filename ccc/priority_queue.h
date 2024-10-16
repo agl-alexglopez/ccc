@@ -49,7 +49,7 @@ ccc_result ccc_pq_pop(ccc_priority_queue *);
 
 /* Erase the specified element from the priority queue. This need not be
    the front element. O(lgN). */
-ccc_result ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *);
+ccc_result ccc_pq_extract(ccc_priority_queue *, ccc_pq_elem *);
 
 /* Returns true if the priority queue is empty false if not. */
 bool ccc_pq_is_empty(ccc_priority_queue const *);
@@ -98,7 +98,7 @@ typedef ccc_priority_queue priority_queue;
 #    define pq_front(args...) ccc_pq_front(args)
 #    define pq_push(args...) ccc_pq_push(args)
 #    define pq_pop(args...) ccc_pq_pop(args)
-#    define pq_erase(args...) ccc_pq_erase(args)
+#    define pq_extract(args...) ccc_pq_extract(args)
 #    define pq_is_empty(args...) ccc_pq_is_empty(args)
 #    define pq_size(args...) ccc_pq_size(args)
 #    define pq_update(args...) ccc_pq_update(args)

@@ -63,7 +63,7 @@ BEGIN_STATIC_TEST(pq_test_priority_removal)
         struct val *i = &vals[val];
         if (i->val > limit)
         {
-            (void)ccc_pq_erase(&pq, &i->elem);
+            (void)ccc_pq_extract(&pq, &i->elem);
             CHECK(validate(&pq), true);
         }
     }

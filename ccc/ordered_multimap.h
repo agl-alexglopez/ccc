@@ -232,7 +232,7 @@ search. No manual management of a compound literal reference is necessary.
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] key_ptr a ponter to the key to be searched.
 @return a compound literal reference to a container specific entry associated
-with the enclosing scope.
+with the enclosing scope. This reference is always non-NULL.
 
 Note this is useful for nested calls where an entry pointer is requested by
 further operations in the Entry API, avoiding uneccessary intermediate values
@@ -312,39 +312,153 @@ prohibited the entry is removed from the map and returned to be unwrapped and
 freed by the user. */
 ccc_entry ccc_omm_remove_entry(ccc_o_mm_entry *e);
 
-/** @brief */
-void *ccc_omm_unwrap(ccc_o_mm_entry const *e);
-bool ccc_omm_insert_error(ccc_o_mm_entry const *e);
-bool ccc_omm_input_error(ccc_o_mm_entry const *e);
+/** @brief Indicates if an entry is Occupied or Vacant.
+@param [in] e a pointer to the multimap entry.
+@return true if the entry is Occupied, false if it is Vacant. */
 bool ccc_omm_occupied(ccc_o_mm_entry const *e);
+
+/** @brief Unwraps the provided entry. An Occupied entry will point to the user
+type stored in the map, a Vacant entry will be NULL.
+@param [in] e a pointer to the multimap entry.
+@return a pointer to the user type if Occupied, otherwise NULL. */
+void *ccc_omm_unwrap(ccc_o_mm_entry const *e);
+
+/** @brief Indicates if an insertion error occurs.
+@param [in] e a pointer to the multimap entry.
+@return true if an insertion error occured preventing completing of an Entry
+API series of operations.
+
+Note that this will most commonly occur if the container is permitted to
+allocate but the allocation has failed. */
+bool ccc_omm_insert_error(ccc_o_mm_entry const *e);
+
+/** @brief Indicates if a function used to generate the provided entry
+encountered bad arguments that prevented the operation of the function.
+@param [in] e a pointer to the multimap entry.
+@return true if bad function arguments were provided, otherwise false.
+
+Note bad arguments usually mean NULL pointers were passed to functions expecting
+non-NULL arguments. */
+bool ccc_omm_input_error(ccc_o_mm_entry const *e);
 
 /*===================    Priority Queue Helpers    ==========================*/
 
+/** @brief Pops the oldest maximum key value user type from the map. Elements
+are stored in ascending order, smallest as defined by the comparison function is
+min and largest is max.
+@param [in] mm the pointer to the multimap.
+@return the status of the pop operation. If NULL pointer is provided or the
+map is empty a bad input result is returned otherwise ok.
+
+Note that continual pop max operations emptying a full queue with few to no
+intervening search or insert operations is a good use case for this container
+due to its self optimization. */
 ccc_result ccc_omm_pop_max(ccc_ordered_multimap *mm);
 
+/** @brief Pops the oldest minimum element from the map. Elements are stored
+in ascending order, smallest as defined by the comparison function is min and
+largest is max.
+@param [in] mm the pointer to the multimap.
+@return the status of the pop operation. If NULL pointer is provided or the
+map is empty a bad input result is returned otherwise ok.
+
+Note that continual pop min operations emptying a full queue with few to no
+intervening search or insert operations is a good use case for this container
+due to its self optimization. */
 ccc_result ccc_omm_pop_min(ccc_ordered_multimap *mm);
 
+/** @brief Returns a reference to the oldest maximum key value user type from
+the map. Elements are stored in ascending order, smallest as defined by the
+comparison function is min and largest is max.
+@param [in] mm the pointer to the multimap.
+@return the oldest maximum key value user type in the map.
+
+Note that because the map is self optimizing, a search for the maximum element
+followed by a pop of the maximum element results in one amortized O(lgN) search
+followed by one O(1) pop. If there are duplicate max keys stored in the map, all
+subsequent max search and pop operations are O(1) until duplicates are exhausted
+and if no intervening search, insert, or erase operations occur for non-max
+keys. */
 void *ccc_omm_max(ccc_ordered_multimap *mm);
 
+/** @brief Returns a reference to the oldest minimum key value user type from
+the map. Elements are stored in ascending order, smallest as defined by the
+comparison function is min and largest is max.
+@param [in] mm the pointer to the multimap.
+@return the oldest minimum key value user type in the map.
+
+Note that because the map is self optimizing, a search for the minimum element
+followed by a pop of the minimum element results in one amortized O(lgN) search
+followed by one O(1) pop. If there are duplicate min keys stored in the map, all
+subsequent min search and pop operations are O(1) until duplicates are exhausted
+and if no intervening search, insert, or erase operations occur for non-min
+keys. */
 void *ccc_omm_min(ccc_ordered_multimap *mm);
 
-bool ccc_omm_is_max(ccc_ordered_multimap *mm, ccc_omm_elem const *);
+/** @brief Extracts a user type known to be stored in the map with
+key_val_handle as an element currently in use by the map.
+@param [in] mm the pointer to the multimap.
+@param [in] key_val_handle a pointer to the intrusive element embedded in a
+user type that the user knows is currently in the map.
+@return a reference to the extracted element. NULL is returned if it is possible
+to prove the key_val_handle is not tracked by the map or the map is empty.
 
-bool ccc_omm_is_min(ccc_ordered_multimap *mm, ccc_omm_elem const *);
+Note that the element that is extracted is not freed, even if allocation
+permission is given to the container. It is the user's responsibility to free
+the element that has been extracted. */
+void *ccc_omm_extract(ccc_ordered_multimap *mm, ccc_omm_elem *key_val_handle);
 
-void *ccc_omm_erase(ccc_ordered_multimap *mm, ccc_omm_elem *);
+/** @brief Updates an element key that is currently tracked directly as a
+member of the map.
+@param [in] mm the pointer to the multimap.
+@param [in] key_val_handle a pointer to the intrusive element embedded in a
+user type that the user knows is currently in the map.
+@param [in] fn the function used to update an element key in the map.
+@param [in] aux any auxiliary data needed for the update. Usually a new value
+but NULL is possible if aux is not needed.
+@return true if the key update was successful, false if bad arguments are
+provided, it is possible to prove the key_val_handle is not tracked by the map,
+or the map is empty. */
+bool ccc_omm_update(ccc_ordered_multimap *mm, ccc_omm_elem *key_val_handle,
+                    ccc_update_fn *fn, void *aux);
 
-bool ccc_omm_update(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
-                    void *);
+/** @brief Increases an element key that is currently tracked directly as a
+member of the map.
+@param [in] mm the pointer to the multimap.
+@param [in] key_val_handle a pointer to the intrusive element embedded in a
+user type that the user knows is currently in the map.
+@param [in] fn the function used to increase an element key in the map.
+@param [in] aux any auxiliary data needed for the key increase. Usually a new
+value but NULL is possible if aux is not needed.
+@return true if the key increase was successful, false if bad arguments are
+provided, it is possible to prove the key_val_handle is not tracked by the map,
+or the map is empty. */
+bool ccc_omm_increase(ccc_ordered_multimap *mm, ccc_omm_elem *key_val_handle,
+                      ccc_update_fn *fn, void *aux);
 
-bool ccc_omm_increase(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
-                      void *);
-
-bool ccc_omm_decrease(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
-                      void *);
+/** @brief Decreases an element key that is currently tracked directly as a
+member of the map.
+@param [in] mm the pointer to the multimap.
+@param [in] key_val_handle a pointer to the intrusive element embedded in a
+user type that the user knows is currently in the map.
+@param [in] fn the function used to decrease an element key in the map.
+@param [in] aux any auxiliary data needed for the key decrease. Usually a new
+value but NULL is possible if aux is not needed.
+@return true if the key decrease was successful, false if bad arguments are
+provided, it is possible to prove the key_val_handle is not tracked by the map,
+or the map is empty. */
+bool ccc_omm_decrease(ccc_ordered_multimap *mm, ccc_omm_elem *key_val_handle,
+                      ccc_update_fn *fn, void *aux);
 
 /*===========================   Iterators   =================================*/
 
+/** @brief Returns a compound literal reference to the desired range.
+@param [in] ordered_multimap_ptr a pointer to the multimap.
+@param [in] begin_key_ptr a pointer to the key that marks the start of the
+range.
+@param [in] end_key_ptr a pointer to the key that marks the end of the range.
+@return a compound literal reference to the produced range associated with the
+enclosing scope. This reference is always non-NULL. */
 #define ccc_omm_equal_range_r(ordered_multimap_ptr, begin_and_end_key_ptrs...) \
     &(ccc_range)                                                               \
     {                                                                          \
@@ -352,6 +466,13 @@ bool ccc_omm_decrease(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
             .impl_                                                             \
     }
 
+/** @brief Returns a compound literal reference to the desired rrange.
+@param [in] ordered_multimap_ptr a pointer to the multimap.
+@param [in] begin_key_ptr a pointer to the key that marks the start of the
+rrange.
+@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
+@return a compound literal reference to the produced rrange associated with the
+enclosing scope. This reference is always non-NULL. */
 #define ccc_omm_equal_rrange_r(ordered_multimap_ptr,                           \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
@@ -360,36 +481,152 @@ bool ccc_omm_decrease(ccc_ordered_multimap *mm, ccc_omm_elem *, ccc_update_fn *,
             .impl_                                                             \
     }
 
+/** @brief Return an iterable range of values from [begin_key, end_key).
+@param [in] mm a pointer to the multimap.
+@param [in] begin_key a pointer to the key intended as the start of the range.
+@param [in] end_key a pointer to the key intended as the end of the range.
+@return a range containing the first element NOT LESS than the begin_key and
+the first element GREATER than end_key.
+
+Note that due to the variety of values that can be returned in the range, using
+the provided range iteration functions from types.h is recommended for example:
+
+for (struct val *i = range_begin(&range);
+     i != end_range(&range);
+     i = next(&omm, &i->elem))
+{}
+
+This avoids any possible errors in handling an end range element that is in the
+map versus the end map sentinel. */
 ccc_range ccc_omm_equal_range(ccc_ordered_multimap *mm, void const *begin_key,
                               void const *end_key);
 
-ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *mm,
-                                void const *rbegin_key, void const *end_key);
+/** @brief Return an iterable rrange of values from [begin_key, end_key).
+@param [in] mm a pointer to the multimap.
+@param [in] begin_key a pointer to the key intended as the start of the rrange.
+@param [in] end_key a pointer to the key intended as the end of the rrange.
+@return a rrange containing the first element NOT GREATER than the begin_key and
+the first element LESS than rend_key.
 
+Note that due to the variety of values that can be returned in the rrange, using
+the provided rrange iteration functions from types.h is recommended for example:
+
+for (struct val *i = rrange_begin(&rrange);
+     i != rend_rrange(&rrange);
+     i = rnext(&omm, &i->elem))
+{}
+
+This avoids any possible errors in handling an rend rrange element that is in
+the map versus the end map sentinel. */
+ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *mm,
+                                void const *rbegin_key, void const *rend_key);
+
+/** @brief Return the start of an inorder traversal of the multimap.
+@param [in] mm a pointer to the multimap.
+@return the oldest minimum element of the map.
+
+Note that duplicate keys will be traversed starting at the oldest element in
+round robin order and ending at the newest before progressing to the next
+key of stored in the multimap. */
 void *ccc_omm_begin(ccc_ordered_multimap const *mm);
 
+/** @brief Return the start of a reverse inorder traversal of the multimap.
+@param [in] mm a pointer to the multimap.
+@return the oldest maximum element of the map.
+
+Note that duplicate keys will be traversed starting at the oldest element in
+round robin order and ending at the newest before progressing to the next
+key of stored in the multimap. */
 void *ccc_omm_rbegin(ccc_ordered_multimap const *mm);
 
-void *ccc_omm_next(ccc_ordered_multimap const *mm, ccc_omm_elem const *);
+/** @brief Return the next element in an inorder traversal of the multimap.
+@param [in] mm a pointer to the multimap.
+@param [in] iter_handle a pointer to the intrusive multimap element of the
+current iterator.
+@return the next user type stored in the map in an inorder traversal.
 
-void *ccc_omm_rnext(ccc_ordered_multimap const *mm, ccc_omm_elem const *);
+Note that duplicate keys will be traversed starting at the oldest element in
+round robin order and ending at the newest before progressing to the next
+key of stored in the multimap. */
+void *ccc_omm_next(ccc_ordered_multimap const *mm,
+                   ccc_omm_elem const *iter_handle);
 
+/** @brief Return the rnext element in a reverse inorder traversal of the
+multimap.
+@param [in] mm a pointer to the multimap.
+@param [in] iter_handle a pointer to the intrusive multimap element of the
+current iterator.
+@return the rnext user type stored in the map in a reverse inorder traversal.
+
+Note that duplicate keys will be traversed starting at the oldest element in
+round robin order and ending at the newest before progressing to the rnext
+key of stored in the multimap. */
+void *ccc_omm_rnext(ccc_ordered_multimap const *mm,
+                    ccc_omm_elem const *iter_handle);
+
+/** @brief Return the end of an inorder traversal of the multimap.
+@param [in] mm a pointer to the multimap.
+@return the newest maximum element of the map.
+
+Note that duplicate keys will be traversed starting at the oldest element in
+round robin order and ending at the newest before progressing to the next
+key of stored in the multimap. */
 void *ccc_omm_end(ccc_ordered_multimap const *mm);
 
+/** @brief Return the rend of a reverse inorder traversal of the multimap.
+@param [in] mm a pointer to the multimap.
+@return the newest minimum element of the map.
+
+Note that duplicate keys will be traversed starting at the oldest element in
+round robin order and ending at the newest before progressing to the next
+key of stored in the multimap. */
 void *ccc_omm_rend(ccc_ordered_multimap const *mm);
 
-void ccc_omm_clear(ccc_ordered_multimap *mm, ccc_destructor_fn *destructor);
+/** @brief Pops every element from the map calling destructor if destructor is
+non-NULL.
+@param [in] mm a pointer to the multimap.
+@param [in] destructor a destructor function if required. NULL if unneeded.
+@return an input error if mm points to NULL otherwise ok.
+
+Note that if the multimap has been given permission to allocate, the destructor
+will be called on each element before it uses the provided allocator to free
+the element. Therefore, the destructor should not free the element or a double
+free will occur.
+
+If the container has not been given allocation permission, then the destructor
+may free elements or not depending on how and when the user wishes to free
+elements of the map according to their own memory management schemes. */
+ccc_result ccc_omm_clear(ccc_ordered_multimap *mm,
+                         ccc_destructor_fn *destructor);
 
 /*===========================     Getters   =================================*/
 
+/** @brief Returns true if the multimap is empty.
+@param [in] mm a pointer to the multimap.
+@return true if empty, false if mm is NULL or mm is empty. */
 bool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
+/** @brief Returns true if the multimap is empty.
+@param [in] mm a pointer to the multimap.
+@return the size of the container or 0 if empty or mm is NULL. */
 size_t ccc_omm_size(ccc_ordered_multimap const *mm);
 
-ccc_result ccc_omm_print(ccc_ordered_multimap const *mm, ccc_print_fn *);
+/** @brief Returns true if the multimap is empty.
+@param [in] mm a pointer to the multimap.
+@param [in] fn a printer function for each element stored in the map.
 
+Note that this printer function will use the provided allocator. So, if
+allocation is not permitted this function will return a no alloc error. This
+function also uses stdout. */
+ccc_result ccc_omm_print(ccc_ordered_multimap const *mm, ccc_print_fn *fn);
+
+/** @brief Returns true if the multimap is empty.
+@param [in] mm a pointer to the multimap.
+@return true if invariants of the data structure are preserved, else false. */
 bool ccc_omm_validate(ccc_ordered_multimap const *mm);
 
+/** Use this preprocessor directive if shorter names are desired use the ccc
+namespace to drop the ccc prefix from all types and methods. */
 #ifdef ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 typedef ccc_omm_elem omm_elem;
 typedef ccc_ordered_multimap ordered_multimap;
@@ -423,7 +660,7 @@ typedef ccc_o_mm_entry o_mm_entry;
 #    define omm_min(args...) ccc_omm_min(args)
 #    define omm_is_max(args...) ccc_omm_is_max(args)
 #    define omm_is_min(args...) ccc_omm_is_min(args)
-#    define omm_erase(args...) ccc_omm_erase(args)
+#    define omm_extract(args...) ccc_omm_extract(args)
 #    define omm_update(args...) ccc_omm_update(args)
 #    define omm_increase(args...) ccc_omm_increase(args)
 #    define omm_decrease(args...) ccc_omm_decrease(args)

@@ -3,6 +3,8 @@
 
 #include "impl_tree.h"
 
+#include <stddef.h>
+
 struct ccc_node_;
 struct ccc_tree_;
 

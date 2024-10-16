@@ -36,7 +36,7 @@ BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(pq_test_insert_erase_shuffled)
+BEGIN_STATIC_TEST(pq_test_insert_extract_shuffled)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -51,7 +51,7 @@ BEGIN_STATIC_TEST(pq_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[i].elem);
+        (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
@@ -130,7 +130,7 @@ BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[shuffled_index].elem);
+        (void)ccc_pq_extract(&ppq, &vals[shuffled_index].elem);
         CHECK(validate(&ppq), true);
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);
@@ -164,7 +164,7 @@ BEGIN_STATIC_TEST(pq_test_prime_shuffle)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[i].elem);
+        (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);
@@ -190,7 +190,7 @@ BEGIN_STATIC_TEST(pq_test_weak_srand)
     }
     for (int i = 0; i < num_heap_elems; ++i)
     {
-        (void)ccc_pq_erase(&ppq, &vals[i].elem);
+        (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_is_empty(&ppq), true);
@@ -201,7 +201,7 @@ int
 main()
 {
     return RUN_TESTS(pq_test_insert_remove_four_dups(),
-                     pq_test_insert_erase_shuffled(), pq_test_pop_max(),
+                     pq_test_insert_extract_shuffled(), pq_test_pop_max(),
                      pq_test_pop_min(),
                      pq_test_delete_prime_shuffle_duplicates(),
                      pq_test_prime_shuffle(), pq_test_weak_srand());

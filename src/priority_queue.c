@@ -76,7 +76,7 @@ ccc_pq_pop(ccc_priority_queue *const ppq)
 }
 
 ccc_result
-ccc_pq_erase(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
+ccc_pq_extract(ccc_priority_queue *const ppq, ccc_pq_elem *const e)
 {
     if (!ppq || !e || !ppq->root_ || !e->next_sibling_ || !e->prev_sibling_)
     {

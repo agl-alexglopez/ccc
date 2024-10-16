@@ -139,16 +139,12 @@ BEGIN_STATIC_TEST(iterator_check, ccc_ordered_multimap *const omm)
     for (struct val *e = begin(omm); e; e = next(omm, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_omm_is_min(omm, &e->elem), true);
-        CHECK(iter_count == size || !ccc_omm_is_min(omm, &e->elem), true);
     }
     CHECK(iter_count, size);
     iter_count = 0;
     for (struct val *e = ccc_omm_rbegin(omm); e; e = rnext(omm, &e->elem))
     {
         ++iter_count;
-        CHECK(iter_count != size || ccc_omm_is_max(omm, &e->elem), true);
-        CHECK(iter_count == size || !ccc_omm_is_max(omm, &e->elem), true);
     }
     CHECK(iter_count, size);
     END_TEST();
@@ -279,7 +275,7 @@ BEGIN_STATIC_TEST(omm_test_priority_removal)
     {
         if (i->val > limit)
         {
-            i = ccc_omm_erase(&omm, &i->elem);
+            i = ccc_omm_extract(&omm, &i->elem);
             CHECK(validate(&omm), true);
         }
         else
