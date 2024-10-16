@@ -320,6 +320,10 @@ ccc_omm_remove_entry(ccc_o_mm_entry *const e)
 void *
 ccc_omm_max(ccc_ordered_multimap *const mm)
 {
+    if (!mm)
+    {
+        return NULL;
+    }
     struct ccc_node_ const *const n
         = splay(&mm->impl_, mm->impl_.root_, NULL, force_find_grt);
     if (!n)
@@ -329,15 +333,13 @@ ccc_omm_max(ccc_ordered_multimap *const mm)
     return struct_base(&mm->impl_, n);
 }
 
-bool
-ccc_omm_is_max(ccc_ordered_multimap *const mm, ccc_omm_elem const *const e)
-{
-    return !ccc_omm_rnext(mm, e);
-}
-
 void *
 ccc_omm_min(ccc_ordered_multimap *const mm)
 {
+    if (!mm)
+    {
+        return NULL;
+    }
     struct ccc_node_ const *const n
         = splay(&mm->impl_, mm->impl_.root_, NULL, force_find_les);
     if (!n)
@@ -347,37 +349,49 @@ ccc_omm_min(ccc_ordered_multimap *const mm)
     return struct_base(&mm->impl_, n);
 }
 
-bool
-ccc_omm_is_min(ccc_ordered_multimap *const mm, ccc_omm_elem const *const e)
-{
-    return !ccc_omm_next(mm, e);
-}
-
 void *
 ccc_omm_begin(ccc_ordered_multimap const *const mm)
 {
+    if (!mm)
+    {
+        return NULL;
+    }
     return max(&mm->impl_);
 }
 
 void *
 ccc_omm_rbegin(ccc_ordered_multimap const *const mm)
 {
+    if (!mm)
+    {
+        return NULL;
+    }
     return min(&mm->impl_);
 }
 
 void *
-ccc_omm_next(ccc_ordered_multimap const *const mm, ccc_omm_elem const *const e)
+ccc_omm_next(ccc_ordered_multimap const *const mm,
+             ccc_omm_elem const *const iter_handle)
 {
-    struct ccc_node_ const *const n
-        = multimap_next(&mm->impl_, &e->impl_, reverse_inorder_traversal);
+    if (!mm || !iter_handle)
+    {
+        return NULL;
+    }
+    struct ccc_node_ const *const n = multimap_next(
+        &mm->impl_, &iter_handle->impl_, reverse_inorder_traversal);
     return n == &mm->impl_.end_ ? NULL : struct_base(&mm->impl_, n);
 }
 
 void *
-ccc_omm_rnext(ccc_ordered_multimap const *const mm, ccc_omm_elem const *const e)
+ccc_omm_rnext(ccc_ordered_multimap const *const mm,
+              ccc_omm_elem const *const iter_handle)
 {
+    if (!mm || !iter_handle)
+    {
+        return NULL;
+    }
     struct ccc_node_ const *const n
-        = multimap_next(&mm->impl_, &e->impl_, inorder_traversal);
+        = multimap_next(&mm->impl_, &iter_handle->impl_, inorder_traversal);
     return n == &mm->impl_.end_ ? NULL : struct_base(&mm->impl_, n);
 }
 
@@ -397,6 +411,10 @@ ccc_range
 ccc_omm_equal_range(ccc_ordered_multimap *const mm, void const *const begin_key,
                     void const *const end_key)
 {
+    if (!mm || !begin_key || !end_key)
+    {
+        return (ccc_range){};
+    }
     return (ccc_range){
         equal_range(&mm->impl_, begin_key, end_key, reverse_inorder_traversal)};
 }
@@ -405,51 +423,68 @@ ccc_rrange
 ccc_omm_equal_rrange(ccc_ordered_multimap *const mm,
                      void const *const rbegin_key, void const *const rend_key)
 {
+    if (!mm || !rbegin_key || !rend_key)
+    {
+        return (ccc_rrange){};
+    }
     return (ccc_rrange){
         equal_range(&mm->impl_, rbegin_key, rend_key, inorder_traversal)};
 }
 
 void *
-ccc_omm_erase(ccc_ordered_multimap *const mm, ccc_omm_elem *const e)
+ccc_omm_extract(ccc_ordered_multimap *const mm,
+                ccc_omm_elem *const key_val_handle)
 {
-    return multimap_erase_node(&mm->impl_, &e->impl_);
+    if (!mm || !key_val_handle)
+    {
+        return NULL;
+    }
+    return multimap_erase_node(&mm->impl_, &key_val_handle->impl_);
 }
 
 bool
-ccc_omm_update(ccc_ordered_multimap *const mm, ccc_omm_elem *const elem,
-               ccc_update_fn *const fn, void *const aux)
+ccc_omm_update(ccc_ordered_multimap *const mm,
+               ccc_omm_elem *const key_val_handle, ccc_update_fn *const fn,
+               void *const aux)
 {
-    if (NULL == elem->impl_.branch_[L] || NULL == elem->impl_.branch_[R])
+    if (!mm || !key_val_handle || !fn || !key_val_handle->impl_.branch_[L]
+        || !key_val_handle->impl_.branch_[R])
     {
         return false;
     }
-    void *const e = multimap_erase_node(&mm->impl_, &elem->impl_);
+    void *const e = multimap_erase_node(&mm->impl_, &key_val_handle->impl_);
     if (!e)
     {
         return false;
     }
     fn((ccc_user_type_mut){e, aux});
-    (void)multimap_insert(&mm->impl_, &elem->impl_);
+    (void)multimap_insert(&mm->impl_, &key_val_handle->impl_);
     return true;
 }
 
 bool
-ccc_omm_increase(ccc_ordered_multimap *const mm, ccc_omm_elem *const elem,
-                 ccc_update_fn *const fn, void *const aux)
+ccc_omm_increase(ccc_ordered_multimap *const mm,
+                 ccc_omm_elem *const key_val_handle, ccc_update_fn *const fn,
+                 void *const aux)
 {
-    return ccc_omm_update(mm, elem, fn, aux);
+    return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
 
 bool
-ccc_omm_decrease(ccc_ordered_multimap *const mm, ccc_omm_elem *const elem,
-                 ccc_update_fn *const fn, void *const aux)
+ccc_omm_decrease(ccc_ordered_multimap *const mm,
+                 ccc_omm_elem *const key_val_handle, ccc_update_fn *const fn,
+                 void *const aux)
 {
-    return ccc_omm_update(mm, elem, fn, aux);
+    return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
 
 bool
 ccc_omm_contains(ccc_ordered_multimap *const mm, void const *const key)
 {
+    if (!mm || !key)
+    {
+        return false;
+    }
     return contains(&mm->impl_, key);
 }
 
@@ -494,7 +529,7 @@ ccc_omm_pop_min(ccc_ordered_multimap *const mm)
 size_t
 ccc_omm_size(ccc_ordered_multimap const *const mm)
 {
-    return mm->impl_.size_;
+    return mm ? mm->impl_.size_ : 0;
 }
 
 ccc_result
@@ -535,13 +570,21 @@ ccc_omm_occupied(ccc_o_mm_entry const *e)
 bool
 ccc_omm_validate(ccc_ordered_multimap const *const mm)
 {
+    if (!mm)
+    {
+        return false;
+    }
     return ccc_tree_validate(&mm->impl_);
 }
 
-void
+ccc_result
 ccc_omm_clear(ccc_ordered_multimap *const mm,
               ccc_destructor_fn *const destructor)
 {
+    if (!mm)
+    {
+        return CCC_INPUT_ERR;
+    }
     while (!ccc_omm_is_empty(mm))
     {
         void *const popped = pop_min(&mm->impl_);
@@ -552,9 +595,10 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
         }
         if (mm->impl_.alloc_)
         {
-            mm->impl_.alloc_(popped, 0);
+            (void)mm->impl_.alloc_(popped, 0);
         }
     }
+    return CCC_OK;
 }
 
 /*==========================  Private Interface  ============================*/
@@ -1473,7 +1517,6 @@ print_inner_tree(struct ccc_node_ const *const root, size_t const parent_size,
                    node_type == LEAF ? "     " : " │   ");
     if (string_length > 0)
     {
-        /* NOLINTNEXTLINE */
         str = malloc(string_length + 1);
         /* NOLINTNEXTLINE */
         (void)snprintf(str, string_length, "%s%s%s", prefix, prefix_color,

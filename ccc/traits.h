@@ -95,11 +95,11 @@
 #define ccc_decrease(container_ptr, decrease_args...)                          \
     ccc_impl_decrease(container_ptr, decrease_args)
 
-#define ccc_erase(container_ptr, container_handle_ptr...)                      \
-    ccc_impl_erase(container_ptr, container_handle_ptr)
+#define ccc_extract(container_ptr, container_handle_ptr...)                    \
+    ccc_impl_extract(container_ptr, container_handle_ptr)
 
-#define ccc_erase_range(container_ptr, container_handle_begin_end_ptrs...)     \
-    ccc_impl_erase_range(container_ptr, container_handle_begin_end_ptrs)
+#define ccc_extract_range(container_ptr, container_handle_begin_end_ptrs...)   \
+    ccc_impl_extract_range(container_ptr, container_handle_begin_end_ptrs)
 
 /*===================       Iterators API      ==============================*/
 
@@ -178,8 +178,8 @@
 #    define update(args...) ccc_update(args)
 #    define increase(args...) ccc_increase(args)
 #    define decrease(args...) ccc_decrease(args)
-#    define erase(args...) ccc_erase(args)
-#    define erase_range(args...) ccc_erase_range(args)
+#    define extract(args...) ccc_extract(args)
+#    define extract_range(args...) ccc_extract_range(args)
 
 #    define get_key_val(args...) ccc_get_key_val(args)
 #    define get_mut(args...) ccc_get_key_val_mut(args)

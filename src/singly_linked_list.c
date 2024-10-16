@@ -12,8 +12,8 @@ static struct ccc_sll_elem_ *before(struct ccc_sll_ const *,
                                     struct ccc_sll_elem_ const *to_find);
 static size_t len(struct ccc_sll_ const *, struct ccc_sll_elem_ const *begin,
                   struct ccc_sll_elem_ const *end);
-static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
-                          struct ccc_sll_elem_ *end);
+static size_t extract_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
+                            struct ccc_sll_elem_ *end);
 static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 
 void *
@@ -142,37 +142,41 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
 }
 
 void *
-ccc_sll_erase(ccc_singly_linked_list *const erase_sll,
-              ccc_sll_elem *const erase)
+ccc_sll_extract(ccc_singly_linked_list *const extract_sll,
+                ccc_sll_elem *const extract)
 {
-    if (!erase_sll || !erase || !erase_sll->sz_
-        || erase == &erase_sll->sentinel_)
+    if (!extract_sll || !extract || !extract_sll->sz_
+        || extract == &extract_sll->sentinel_)
     {
         return NULL;
     }
-    struct ccc_sll_elem_ const *const ret = erase->n_;
-    before(erase_sll, erase)->n_ = erase->n_;
-    erase->n_ = NULL;
-    --erase_sll->sz_;
-    return ret == &erase_sll->sentinel_ ? NULL : struct_base(erase_sll, ret);
+    struct ccc_sll_elem_ const *const ret = extract->n_;
+    before(extract_sll, extract)->n_ = extract->n_;
+    extract->n_ = NULL;
+    --extract_sll->sz_;
+    return ret == &extract_sll->sentinel_ ? NULL
+                                          : struct_base(extract_sll, ret);
 }
 
 void *
-ccc_sll_erase_range(ccc_singly_linked_list *const erase_sll,
-                    ccc_sll_elem *const erase_begin, ccc_sll_elem *erase_end)
+ccc_sll_extract_range(ccc_singly_linked_list *const extract_sll,
+                      ccc_sll_elem *const extract_begin,
+                      ccc_sll_elem *extract_end)
 {
-    if (!erase_sll || !erase_begin || !erase_end || !erase_sll->sz_
-        || erase_begin == &erase_sll->sentinel_
-        || erase_end == &erase_sll->sentinel_)
+    if (!extract_sll || !extract_begin || !extract_end || !extract_sll->sz_
+        || extract_begin == &extract_sll->sentinel_
+        || extract_end == &extract_sll->sentinel_)
     {
         return NULL;
     }
-    struct ccc_sll_elem_ const *const ret = erase_end->n_;
-    before(erase_sll, erase_begin)->n_ = erase_end->n_;
-    size_t const deleted = erase_range(erase_sll, erase_begin, erase_end);
-    assert(deleted <= erase_sll->sz_);
-    erase_sll->sz_ -= deleted;
-    return ret == &erase_sll->sentinel_ ? NULL : struct_base(erase_sll, ret);
+    struct ccc_sll_elem_ const *const ret = extract_end->n_;
+    before(extract_sll, extract_begin)->n_ = extract_end->n_;
+    size_t const deleted
+        = extract_range(extract_sll, extract_begin, extract_end);
+    assert(deleted <= extract_sll->sz_);
+    extract_sll->sz_ -= deleted;
+    return ret == &extract_sll->sentinel_ ? NULL
+                                          : struct_base(extract_sll, ret);
 }
 
 inline void *
@@ -298,8 +302,8 @@ before(struct ccc_sll_ const *const sll,
 }
 
 static inline size_t
-erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
-            struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
+extract_range([[maybe_unused]] struct ccc_sll_ *const sll,
+              struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
 {
     size_t sz = 1;
     for (struct ccc_sll_elem_ *next = NULL; begin != end; begin = next, ++sz)

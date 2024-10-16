@@ -388,19 +388,20 @@
         ccc_flat_priority_queue *: ccc_fpq_decrease,                           \
         ccc_priority_queue *: ccc_pq_decrease)((container_ptr), decrease_args)
 
-#define ccc_impl_erase(container_ptr, container_handle_ptr...)                 \
+#define ccc_impl_extract(container_ptr, container_handle_ptr...)               \
     _Generic((container_ptr),                                                  \
-        ccc_ordered_multimap *: ccc_omm_erase,                                 \
-        ccc_doubly_linked_list *: ccc_dll_erase,                               \
-        ccc_singly_linked_list *: ccc_sll_erase,                               \
-        ccc_flat_priority_queue *: ccc_fpq_erase,                              \
-        ccc_priority_queue *: ccc_pq_erase)((container_ptr),                   \
-                                            container_handle_ptr)
+        ccc_ordered_multimap *: ccc_omm_extract,                               \
+        ccc_doubly_linked_list *: ccc_dll_extract,                             \
+        ccc_singly_linked_list *: ccc_sll_extract,                             \
+        ccc_flat_priority_queue *: ccc_fpq_extract,                            \
+        ccc_priority_queue *: ccc_pq_extract)((container_ptr),                 \
+                                              container_handle_ptr)
 
-#define ccc_impl_erase_range(container_ptr, container_handle_begin_end_ptr...) \
+#define ccc_impl_extract_range(container_ptr,                                  \
+                               container_handle_begin_end_ptr...)              \
     _Generic((container_ptr),                                                  \
-        ccc_doubly_linked_list *: ccc_dll_erase_range,                         \
-        ccc_singly_linked_list *: ccc_sll_erase_range)(                        \
+        ccc_doubly_linked_list *: ccc_dll_extract_range,                       \
+        ccc_singly_linked_list *: ccc_sll_extract_range)(                      \
         (container_ptr), container_handle_begin_end_ptr)
 
 /*===================       Iterators API ==============================*/

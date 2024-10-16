@@ -25,26 +25,26 @@ BEGIN_STATIC_TEST(sll_test_push_pop_three)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(sll_test_push_erase_middle)
+BEGIN_STATIC_TEST(sll_test_push_extract_middle)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum test_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 3, (int[3]){2, 1, 0}), PASS);
-    struct val *after_erase = erase(&sll, &vals[1].e);
+    struct val *after_extract = extract(&sll, &vals[1].e);
     CHECK(validate(&sll), true);
-    CHECK(after_erase == NULL, false);
-    CHECK(after_erase->val, 0);
+    CHECK(after_extract == NULL, false);
+    CHECK(after_extract->val, 0);
     CHECK(check_order(&sll, 2, (int[2]){2, 0}), PASS);
-    after_erase = erase(&sll, &vals[0].e);
-    CHECK(after_erase, end(&sll));
+    after_extract = extract(&sll, &vals[0].e);
+    CHECK(after_extract, end(&sll));
     CHECK(check_order(&sll, 1, (int[1]){2}), PASS);
     CHECK(size(&sll), 1);
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(sll_test_push_erase_range)
+BEGIN_STATIC_TEST(sll_test_push_extract_range)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[5]
@@ -52,14 +52,14 @@ BEGIN_STATIC_TEST(sll_test_push_erase_range)
     enum test_result const t = create_list(&sll, 5, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
-    struct val *after_erase = erase_range(&sll, &vals[3].e, &vals[1].e);
+    struct val *after_extract = extract_range(&sll, &vals[3].e, &vals[1].e);
     CHECK(size(&sll), 2);
     CHECK(validate(&sll), true);
-    CHECK(after_erase == NULL, false);
-    CHECK(after_erase->val, 0);
+    CHECK(after_extract == NULL, false);
+    CHECK(after_extract->val, 0);
     CHECK(check_order(&sll, 2, (int[2]){4, 0}), PASS);
-    after_erase = erase_range(&sll, sll_begin_elem(&sll), &vals[0].e);
-    CHECK(after_erase, end(&sll));
+    after_extract = extract_range(&sll, sll_begin_elem(&sll), &vals[0].e);
+    CHECK(after_extract, end(&sll));
     CHECK(is_empty(&sll), true);
     END_TEST();
 }
@@ -98,6 +98,7 @@ BEGIN_STATIC_TEST(sll_test_splice_two_lists)
 int
 main()
 {
-    return RUN_TESTS(sll_test_push_pop_three(), sll_test_push_erase_middle(),
-                     sll_test_push_erase_range(), sll_test_splice_two_lists());
+    return RUN_TESTS(sll_test_push_pop_three(), sll_test_push_extract_middle(),
+                     sll_test_push_extract_range(),
+                     sll_test_splice_two_lists());
 }

@@ -57,7 +57,7 @@ BEGIN_STATIC_TEST(omm_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        (void)ccc_omm_erase(&omm, &vals[i].elem);
+        (void)ccc_omm_extract(&omm, &vals[i].elem);
         CHECK(validate(&omm), true);
     }
     CHECK(size(&omm), (size_t)0);
@@ -220,7 +220,7 @@ BEGIN_STATIC_TEST(omm_test_delete_prime_shuffle_duplicates)
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        (void)ccc_omm_erase(&omm, &vals[shuffled_index].elem);
+        (void)ccc_omm_extract(&omm, &vals[shuffled_index].elem);
         CHECK(validate(&omm), true);
         --cur_size;
         CHECK(size(&omm), cur_size);
@@ -249,14 +249,16 @@ BEGIN_STATIC_TEST(omm_test_prime_shuffle)
         CHECK(validate(&omm), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    /* One test can use our printer function as test output */
+    /* One test can use our printer function as test output. This is very
+       sketchy messing with the allocation function mid test but its fine
+       just to test the printer. */
     (void)ccc_omm_print(&omm, omm_printer_fn);
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
-        CHECK(ccc_omm_erase(&omm, &vals[i].elem) != NULL, true);
+        CHECK(ccc_omm_extract(&omm, &vals[i].elem) != NULL, true);
         CHECK(validate(&omm), true);
         --cur_size;
         CHECK(size(&omm), cur_size);
@@ -282,7 +284,7 @@ BEGIN_STATIC_TEST(omm_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(ccc_omm_erase(&omm, &vals[i].elem) != NULL, true);
+        CHECK(ccc_omm_extract(&omm, &vals[i].elem) != NULL, true);
         CHECK(validate(&omm), true);
     }
     CHECK(is_empty(&omm), true);

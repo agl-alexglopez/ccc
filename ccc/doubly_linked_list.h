@@ -69,11 +69,11 @@ void *ccc_dll_front(ccc_doubly_linked_list const *l);
 void *ccc_dll_back(ccc_doubly_linked_list const *l);
 ccc_result ccc_dll_pop_front(ccc_doubly_linked_list *l);
 ccc_result ccc_dll_pop_back(ccc_doubly_linked_list *l);
-void *ccc_dll_erase(ccc_doubly_linked_list *l,
-                    ccc_dll_elem *struct_handle_in_list);
-void *ccc_dll_erase_range(ccc_doubly_linked_list *l,
-                          ccc_dll_elem *struct_handle_in_list_begin,
-                          ccc_dll_elem *struct_handle_in_list_end);
+void *ccc_dll_extract(ccc_doubly_linked_list *l,
+                      ccc_dll_elem *struct_handle_in_list);
+void *ccc_dll_extract_range(ccc_doubly_linked_list *l,
+                            ccc_dll_elem *struct_handle_in_list_begin,
+                            ccc_dll_elem *struct_handle_in_list_end);
 
 /** @brief Repositions to_cut before pos. Only list pointers are modified.
 @param [in] pos_sll the list to which pos belongs.
@@ -120,8 +120,8 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_back(args...) ccc_dll_back(args)
 #    define dll_pop_front(args...) ccc_dll_pop_front(args)
 #    define dll_pop_back(args...) ccc_dll_pop_back(args)
-#    define dll_erase(args...) ccc_dll_erase(args)
-#    define dll_erase_range(args...) ccc_dll_erase_range(args)
+#    define dll_extract(args...) ccc_dll_extract(args)
+#    define dll_extract_range(args...) ccc_dll_extract_range(args)
 #    define dll_splice(args...) ccc_dll_splice(args)
 #    define dll_splice_range(args...) ccc_dll_splice_range(args)
 #    define dll_begin(args...) ccc_dll_begin(args)

@@ -149,7 +149,7 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 }
 
 void *
-ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
+ccc_fpq_extract(ccc_flat_priority_queue *const fpq, void *const e)
 {
     if (ccc_buf_is_empty(&fpq->buf_))
     {
@@ -172,20 +172,20 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     }
     void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, swap_location, ccc_buf_size(&fpq->buf_) - 1);
-    void *const erased = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
+    void *const extracted = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
-    ccc_threeway_cmp const erased_cmp
-        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->aux_});
-    if (erased_cmp == fpq->order_)
+    ccc_threeway_cmp const extracted_cmp
+        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), extracted, fpq->aux_});
+    if (extracted_cmp == fpq->order_)
     {
         (void)bubble_up(fpq, tmp, swap_location);
     }
-    else if (erased_cmp != CCC_EQL)
+    else if (extracted_cmp != CCC_EQL)
     {
         bubble_down(fpq, tmp, swap_location);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
-    return erased;
+    return extracted;
 }
 
 bool
