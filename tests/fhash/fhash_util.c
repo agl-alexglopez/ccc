@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 
 uint64_t
 fhash_int_zero([[maybe_unused]] ccc_user_key const n)
@@ -22,13 +21,6 @@ fhash_id_eq(ccc_key_cmp const cmp)
 {
     struct val const *const va = cmp.user_type_rhs;
     return va->id == *((int *)cmp.key_lhs);
-}
-
-void
-fhash_print_val(ccc_user_type const val)
-{
-    struct val const *const v = val.user_type;
-    printf("{id:%d,val:%d},", v->id, v->val);
 }
 
 uint64_t

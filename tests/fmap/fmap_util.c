@@ -16,13 +16,6 @@ val_cmp(ccc_key_cmp const cmp)
     return (key > c->id) - (key < c->id);
 }
 
-void
-map_printer_fn(ccc_user_type const container)
-{
-    struct val const *const v = container.user_type;
-    printf("{id:%d,val:%d}", v->id, v->val);
-}
-
 BEGIN_TEST(insert_shuffled, ccc_flat_ordered_map *m, size_t const size,
            int const larger_prime)
 {

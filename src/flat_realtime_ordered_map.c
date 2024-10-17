@@ -7,31 +7,12 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-#define COLOR_BLK "\033[34;1m"
-#define COLOR_BLU_BOLD "\033[38;5;12m"
-#define COLOR_RED_BOLD "\033[38;5;9m"
-#define COLOR_RED "\033[31;1m"
-#define COLOR_CYN "\033[36;1m"
-#define COLOR_GRN "\033[32;1m"
-#define COLOR_NIL "\033[0m"
-#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-#define PRINTER_INDENT 13
-#define LR 2
 
 enum frm_branch_
 {
     L = 0,
     R,
-};
-
-enum frm_print_branch_
-{
-    BRANCH = 0, /* ├── */
-    LEAF,       /* └── */
 };
 
 struct frm_query_
@@ -135,8 +116,6 @@ static void double_rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
                           size_t y, enum frm_branch_ dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
-static void tree_print(struct ccc_frm_ const *t, size_t root,
-                       ccc_print_fn *fn_print);
 
 /*==============================  Interface    ==============================*/
 
@@ -471,18 +450,6 @@ void *
 ccc_frm_root(ccc_flat_realtime_ordered_map const *const frm)
 {
     return frm->root_ ? base_at(frm, frm->root_) : NULL;
-}
-
-ccc_result
-ccc_frm_print(ccc_flat_realtime_ordered_map const *const frm,
-              ccc_print_fn *const fn)
-{
-    if (!frm || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    tree_print(frm, frm->root_, fn);
-    return CCC_OK;
 }
 
 /*========================  Private Interface  ==============================*/
@@ -1339,86 +1306,6 @@ validate(struct ccc_frm_ const *const frm)
         return false;
     }
     return true;
-}
-
-static void
-print_node(struct ccc_frm_ const *const t, size_t const root,
-           ccc_print_fn *const fn_print)
-{
-    printf("%s%u%s:", COLOR_CYN, at(t, root)->parity_, COLOR_NIL);
-    fn_print((ccc_user_type){.user_type = base_at(t, root), .aux = t->aux_});
-    printf("\n");
-}
-
-static void
-print_inner_tree(size_t const root, char const *const prefix,
-                 enum frm_print_branch_ const node_type,
-                 enum frm_branch_ const dir, struct ccc_frm_ const *const t,
-                 ccc_print_fn *const fn_print)
-{
-    if (!root)
-    {
-        return;
-    }
-    printf("%s", prefix);
-    printf("%s%s", node_type == LEAF ? " └──" : " ├──", COLOR_NIL);
-    printf(COLOR_CYN);
-    dir == L ? printf("L" COLOR_NIL) : printf("R" COLOR_NIL);
-    print_node(t, root, fn_print);
-
-    char *str = NULL;
-    /* NOLINTNEXTLINE */
-    int const string_length = snprintf(NULL, 0, "%s%s", prefix,
-                                       node_type == LEAF ? "     " : " │   ");
-    if (string_length > 0)
-    {
-        /* NOLINTNEXTLINE */
-        str = malloc(string_length + 1);
-        assert(str);
-        /* NOLINTNEXTLINE */
-        (void)snprintf(str, string_length, "%s%s", prefix,
-                       node_type == LEAF ? "     " : " │   ");
-    }
-
-    if (!branch_i(t, root, R))
-    {
-        print_inner_tree(branch_i(t, root, L), str, LEAF, L, t, fn_print);
-    }
-    else if (!branch_i(t, root, L))
-    {
-        print_inner_tree(branch_i(t, root, R), str, LEAF, R, t, fn_print);
-    }
-    else
-    {
-        print_inner_tree(branch_i(t, root, R), str, BRANCH, R, t, fn_print);
-        print_inner_tree(branch_i(t, root, L), str, LEAF, L, t, fn_print);
-    }
-    free(str);
-}
-
-static void
-tree_print(struct ccc_frm_ const *const t, size_t const root,
-           ccc_print_fn *const fn_print)
-{
-    if (!root)
-    {
-        return;
-    }
-    print_node(t, root, fn_print);
-
-    if (!branch_i(t, root, R))
-    {
-        print_inner_tree(branch_i(t, root, L), "", LEAF, L, t, fn_print);
-    }
-    else if (!branch_i(t, root, L))
-    {
-        print_inner_tree(branch_i(t, root, R), "", LEAF, R, t, fn_print);
-    }
-    else
-    {
-        print_inner_tree(branch_i(t, root, R), "", BRANCH, R, t, fn_print);
-        print_inner_tree(branch_i(t, root, L), "", LEAF, L, t, fn_print);
-    }
 }
 
 /* NOLINTEND(*misc-no-recursion) */

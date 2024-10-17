@@ -5,8 +5,6 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 /* Printing enum for printing tree structures if heap available. */
@@ -16,21 +14,6 @@ enum ccc_print_link
     LEAF = 1    /* └── */
 };
 
-enum fpq_direction
-{
-    L = 0,
-    R,
-};
-
-#define COLOR_BLK "\033[34;1m"
-#define COLOR_BLU_BOLD "\033[38;5;12m"
-#define COLOR_RED_BOLD "\033[38;5;9m"
-#define COLOR_RED "\033[31;1m"
-#define COLOR_CYN "\033[36;1m"
-#define COLOR_GRN "\033[32;1m"
-#define COLOR_NIL "\033[0m"
-#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-
 static void *at(struct ccc_fpq_ const *, size_t);
 static size_t index_of(struct ccc_fpq_ const *, void const *);
 static bool wins(struct ccc_fpq_ const *, void const *winner,
@@ -38,10 +21,6 @@ static bool wins(struct ccc_fpq_ const *, void const *winner,
 static void swap(struct ccc_fpq_ *, char tmp[], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
 static void bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
-static void print_node(struct ccc_fpq_ const *, size_t, ccc_print_fn *);
-static void print_inner_heap(struct ccc_fpq_ const *, size_t, char const *,
-                             enum ccc_print_link, ccc_print_fn *);
-static void print_heap(struct ccc_fpq_ const *, size_t, ccc_print_fn *);
 
 ccc_result
 ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
@@ -325,17 +304,6 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     return true;
 }
 
-ccc_result
-ccc_fpq_print(ccc_flat_priority_queue const *const fpq, ccc_print_fn *const fn)
-{
-    if (!fpq || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    print_heap(fpq, 0, fn);
-    return CCC_OK;
-}
-
 /*===========================   Implementation   ========================== */
 
 size_t
@@ -416,90 +384,3 @@ wins(struct ccc_fpq_ const *const fpq, void const *const winner,
 {
     return fpq->cmp_((ccc_cmp){winner, loser, fpq->aux_}) == fpq->order_;
 }
-
-/* NOLINTBEGIN(*misc-no-recursion) */
-
-static void
-print_node(struct ccc_fpq_ const *const fpq, size_t i, ccc_print_fn *const fn)
-{
-    printf(COLOR_CYN);
-    if (i)
-    {
-        at(fpq, (index_of(fpq, at(fpq, (i - 1) / 2)) * 2) + 1) == at(fpq, i)
-            ? printf("L%zu:", i)
-            : printf("R%zu:", i);
-    }
-    else
-    {
-        printf("%zu:", i);
-    }
-    printf(COLOR_NIL);
-    fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->aux_});
-    printf("\n");
-}
-
-static void
-print_inner_heap(struct ccc_fpq_ const *const fpq, size_t i, char const *prefix,
-                 enum ccc_print_link const node_type, ccc_print_fn *const fn)
-{
-    size_t const sz = ccc_buf_size(&fpq->buf_);
-    if (i >= sz)
-    {
-        return;
-    }
-    printf("%s", prefix);
-    printf("%s", node_type == LEAF ? " └──" : " ├──");
-    print_node(fpq, i, fn);
-
-    char *str = NULL;
-    int string_length
-        = snprintf(NULL, 0, "%s%s", prefix,
-                   node_type == LEAF ? "     " : " │   "); // NOLINT
-    if (string_length > 0)
-    {
-        str = malloc(string_length + 1);
-        (void)snprintf(str, string_length, "%s%s", prefix,
-                       node_type == LEAF ? "     " : " │   "); // NOLINT
-    }
-    if (str != NULL)
-    {
-        if ((i * 2) + 2 >= sz)
-        {
-            print_inner_heap(fpq, (i * 2) + 1, str, LEAF, fn);
-        }
-        else
-        {
-            print_inner_heap(fpq, (i * 2) + 2, str, BRANCH, fn);
-            print_inner_heap(fpq, (i * 2) + 1, str, LEAF, fn);
-        }
-    }
-    else
-    {
-        printf(COLOR_ERR "memory exceeded. Cannot display tree." COLOR_NIL);
-    }
-    free(str);
-}
-
-static void
-print_heap(struct ccc_fpq_ const *const fpq, size_t i, ccc_print_fn *const fn)
-{
-    size_t const sz = ccc_buf_size(&fpq->buf_);
-    if (i >= sz)
-    {
-        return;
-    }
-    printf(" ");
-    print_node(fpq, i, fn);
-
-    if ((i * 2) + 2 >= sz)
-    {
-        print_inner_heap(fpq, (i * 2) + 1, "", LEAF, fn);
-    }
-    else
-    {
-        print_inner_heap(fpq, (i * 2) + 2, "", BRANCH, fn);
-        print_inner_heap(fpq, (i * 2) + 1, "", LEAF, fn);
-    }
-}
-
-/* NOLINTEND(*misc-no-recursion) */

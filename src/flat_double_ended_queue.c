@@ -279,22 +279,6 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fq)
 }
 
 ccc_result
-ccc_fdeq_print(ccc_flat_double_ended_queue const *const fq,
-               ccc_print_fn *const fn)
-{
-    if (!fq || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    for (void const *iter = ccc_fdeq_begin(fq); iter != ccc_fdeq_end(fq);
-         iter = ccc_fdeq_next(fq, iter))
-    {
-        fn((ccc_user_type){.user_type = iter, .aux = fq->aux_});
-    }
-    return CCC_OK;
-}
-
-ccc_result
 ccc_fdeq_clear(ccc_flat_double_ended_queue *const fq,
                ccc_destructor_fn *destructor)
 {

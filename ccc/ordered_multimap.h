@@ -613,15 +613,6 @@ size_t ccc_omm_size(ccc_ordered_multimap const *mm);
 
 /** @brief Returns true if the multimap is empty.
 @param [in] mm a pointer to the multimap.
-@param [in] fn a printer function for each element stored in the map.
-
-Note that this printer function will use the provided allocator. So, if
-allocation is not permitted this function will return a no alloc error. This
-function also uses stdout. */
-ccc_result ccc_omm_print(ccc_ordered_multimap const *mm, ccc_print_fn *fn);
-
-/** @brief Returns true if the multimap is empty.
-@param [in] mm a pointer to the multimap.
 @return true if invariants of the data structure are preserved, else false. */
 bool ccc_omm_validate(ccc_ordered_multimap const *mm);
 
@@ -673,7 +664,6 @@ typedef ccc_o_mm_entry o_mm_entry;
 #    define omm_rend(args...) ccc_omm_rend(args)
 #    define omm_equal_range(args...) ccc_omm_equal_range(args)
 #    define omm_equal_rrange(args...) ccc_omm_equal_rrange(args)
-#    define omm_print(args...) ccc_omm_print(args)
 #    define omm_validate(args...) ccc_omm_validate(args)
 #endif /* ORDERED_MULTIMAP_USING_NAMESPACE_CCC */
 

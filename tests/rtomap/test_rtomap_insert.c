@@ -74,9 +74,6 @@ BEGIN_STATIC_TEST(rtomap_test_insert_shuffle)
     struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
 
-    (void)print(&s, map_printer_fn);
-    printf("\n");
-
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)

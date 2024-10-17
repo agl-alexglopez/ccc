@@ -1,9 +1,7 @@
 #ifndef CCC_TEST
 #define CCC_TEST
 
-/* NOLINTBEGIN */
-#include <stdio.h>
-/* NOLINTEND */
+#include <stdio.h> /* NOLINT */
 
 #define RED "\033[38;5;9m"
 #define GREEN "\033[38;5;10m"
@@ -45,17 +43,15 @@ typedef enum test_result (*test_fn)(void);
             void *: "%p",                                                      \
             void const *: "%p",                                                \
             default: "%p");                                                    \
-        (void)fprintf(stderr, CYAN "--\nfailure in %s, line %d\n" NONE,        \
-                      __func__, __LINE__);                                     \
-        (void)fprintf(stderr,                                                  \
-                      GREEN "CHECK: "                                          \
-                            "result( %s ) == expected( %s )" NONE "\n",        \
-                      result_string, expected_string);                         \
-        (void)fprintf(stderr, RED "ERROR: result( ");                          \
+        (void)fprintf(stderr, "%s\n--\nfailure in %s, line %d%s\n", CYAN,      \
+                      __func__, __LINE__, NONE);                               \
+        (void)fprintf(stderr, "%sCHECK: result( %s ) == expected( %s )%s\n",   \
+                      GREEN, result_string, expected_string, NONE);            \
+        (void)fprintf(stderr, "%sERROR: result( ", RED);                       \
         (void)fprintf(stderr, format_string_, result_);                        \
         (void)fprintf(stderr, " ) != expected( ");                             \
         (void)fprintf(stderr, format_string_, expected_);                      \
-        (void)fprintf(stderr, " )" CYAN "\n" NONE);                            \
+        (void)fprintf(stderr, " )\n%s", NONE);                                 \
     } while (0)
 
 #define NON_DEFAULT_PARAMS(...) __VA_ARGS__

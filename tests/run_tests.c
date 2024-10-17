@@ -69,29 +69,28 @@ run(str_view const tests_dir)
         {
             return 1;
         }
-        printf("%s(%s%s\n", CYAN, sv_begin(entry), NONE);
+        printf("%s(%s%s", CYAN, sv_begin(entry), NONE);
         (void)fflush(stdout);
         enum test_result const res
             = run_test_process((struct path_bin){sv(absolute_path), entry});
         switch (res)
         {
         case ERROR:
-            (void)fprintf(stderr, "%s%s%s %s%s\n", RED, err_msg, CYAN,
+            (void)fprintf(stderr, "\n%s%s%s %s%s\n", RED, err_msg, CYAN,
                           sv_begin(entry), NONE);
             break;
         case PASS:
-            (void)fprintf(stdout, "%s%s%s)%s\n", GREEN, pass_msg, CYAN, NONE);
+            (void)fprintf(stdout, " %s%s%s)%s\n", GREEN, pass_msg, CYAN, NONE);
             break;
         case FAIL:
-            (void)fprintf(stdout, "%s%s%s)%s\n", RED, fail_msg, CYAN, NONE);
+            (void)fprintf(stdout, "\n%s%s%s)%s\n", RED, fail_msg, CYAN, NONE);
             break;
         }
         passed += 1 - res;
         ++tests;
     }
-    passed == tests
-        ? printf("%sPASSED %zu/%zu \\(*.*)/%s\n\n", GREEN, passed, tests, NONE)
-        : printf("%sPASSED %zu/%zu T_T%s\n\n", RED, passed, tests, NONE);
+    passed == tests ? printf("%sPASSED %zu/%zu%s\n", GREEN, passed, tests, NONE)
+                    : printf("%sPASSED %zu/%zu%s\n", RED, passed, tests, NONE);
     return 0;
 }
 

@@ -279,24 +279,6 @@ ccc_fhm_end(ccc_flat_hash_map const *const)
     return NULL;
 }
 
-ccc_result
-ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn)
-{
-    if (!h || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    for (void const *i = ccc_buf_begin(&h->buf_);
-         i != ccc_buf_capacity_end(&h->buf_); i = ccc_buf_next(&h->buf_, i))
-    {
-        if (elem_in_slot(h, i)->hash_ != CCC_FHM_EMPTY)
-        {
-            fn((ccc_user_type){.user_type = (void *)i, .aux = h->aux_});
-        }
-    }
-    return CCC_OK;
-}
-
 size_t
 ccc_fhm_next_prime(size_t n)
 {

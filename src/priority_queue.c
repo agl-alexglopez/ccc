@@ -24,8 +24,6 @@ static void *struct_base(struct ccc_pq_ const *, struct ccc_pq_elem_ const *e);
 static ccc_threeway_cmp cmp(struct ccc_pq_ const *,
                             struct ccc_pq_elem_ const *a,
                             struct ccc_pq_elem_ const *b);
-static void print_pq(struct ccc_pq_ const *ppq, struct ccc_pq_elem_ const *root,
-                     ccc_print_fn *fn);
 
 /*=========================  Interface Functions   ==========================*/
 
@@ -216,17 +214,6 @@ ccc_pq_validate(ccc_priority_queue const *const ppq)
         return false;
     }
     return true;
-}
-
-ccc_result
-ccc_pq_print(ccc_priority_queue const *const pq, ccc_print_fn *const fn)
-{
-    if (!pq || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    print_pq(pq, pq->root_, fn);
-    return CCC_OK;
 }
 
 ccc_threeway_cmp
@@ -426,23 +413,6 @@ has_valid_links(struct ccc_pq_ const *const ppq,
         }
     } while ((cur = cur->next_sibling_) != child);
     return true;
-}
-
-static void
-print_pq(struct ccc_pq_ const *const ppq, struct ccc_pq_elem_ const *const root,
-         ccc_print_fn *const fn)
-{
-    if (!root)
-    {
-        return;
-    }
-    struct ccc_pq_elem_ const *cur = root;
-    do
-    {
-        fn((ccc_user_type){.user_type = struct_base(ppq, cur),
-                           .aux = ppq->aux_});
-        print_pq(ppq, cur->left_child_, fn);
-    } while ((cur = cur->next_sibling_) != root);
 }
 
 /* NOLINTEND(*misc-no-recursion) */

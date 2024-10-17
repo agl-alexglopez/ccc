@@ -18,19 +18,6 @@ val_cmp(ccc_cmp const cmp)
 }
 
 void
-val_print(ccc_user_type const e)
-{
-    struct val const *const v = e.user_type;
-    printf("{%d,%d}", v->id, v->val);
-}
-
-void
-int_print(ccc_user_type const e)
-{
-    printf("%d", *(int *)e.user_type);
-}
-
-void
 val_update(ccc_user_type_mut const u)
 {
     struct val *const old = u.user_type;

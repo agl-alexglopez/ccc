@@ -173,8 +173,6 @@ bool ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *frm);
 size_t ccc_frm_size(ccc_flat_realtime_ordered_map const *frm);
 bool ccc_frm_validate(ccc_flat_realtime_ordered_map const *frm);
 void *ccc_frm_root(ccc_flat_realtime_ordered_map const *frm);
-ccc_result ccc_frm_print(ccc_flat_realtime_ordered_map const *frm,
-                         ccc_print_fn *fn);
 
 /*======================      Namespace    ==================================*/
 
@@ -204,7 +202,6 @@ typedef ccc_frtm_entry frtm_entry;
 #    define frm_clear(args...) ccc_frm_clear(args)
 #    define frm_clear_and_free(args...) ccc_frm_clear_and_free(args)
 #    define frm_validate(args...) ccc_frm_validate(args)
-#    define frm_print(args...) ccc_frm_print(args)
 #endif /* FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC */
 
 #endif /* FLAT_REALTIME_ORDERED_MAP_H */

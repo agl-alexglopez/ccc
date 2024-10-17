@@ -98,17 +98,6 @@ typedef struct
     void *aux;
 } ccc_key_cmp;
 
-/** A read only reference to a user type within the container. This is to help
-users define callback functions that act on each node in a container. For
-example, a printer function will use this type. */
-typedef struct
-{
-    /** The user type being stored in the container. */
-    void const *const user_type;
-    /** A reference to aux data provided to the container on initialization. */
-    void *aux;
-} ccc_user_type;
-
 /** A reference to a user type within the container. This is to help users
 define callback functions that act on each node in a container. For example, a
 destruct function will use this type. */
@@ -173,13 +162,6 @@ comparison return value is expected and the two containers being compared
 are guaranteed to be non-null and pointing to the base of the user type stored
 in the container. Aux may be NULL if no aux is provided on initialization. */
 typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
-
-/** A callback function for printing an individual element in the container.
-A read-only reference to the container type and any aux data provided on
-initialization is available. The container pointer points to the base of the
-user type and is not NULL. Aux may be NULL if no aux is provided on
-initialization. */
-typedef void ccc_print_fn(ccc_user_type);
 
 /** A callback function for modifying an individual element in the container.
 A reference to the container type and any aux data provided on initialization
@@ -315,11 +297,10 @@ typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
 typedef ccc_cmp cmp;
 typedef ccc_key_cmp key_cmp;
-typedef ccc_user_type user_type;
+typedef ccc_user_type_mut user_type_mut;
 typedef ccc_user_key user_key;
 typedef ccc_alloc_fn alloc_fn;
 typedef ccc_cmp_fn cmp_fn;
-typedef ccc_print_fn print_fn;
 typedef ccc_update_fn update_fn;
 typedef ccc_destructor_fn destructor_fn;
 typedef ccc_key_eq_fn key_eq_fn;

@@ -85,8 +85,6 @@ size_t ccc_fpq_size(ccc_flat_priority_queue const *);
 bool ccc_fpq_validate(ccc_flat_priority_queue const *);
 ccc_threeway_cmp ccc_fpq_order(ccc_flat_priority_queue const *);
 
-ccc_result ccc_fpq_print(ccc_flat_priority_queue const *, ccc_print_fn *);
-
 #ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_init(args...) ccc_fpq_init(args)
@@ -104,7 +102,6 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_size(args...) ccc_fpq_size(args)
 #    define fpq_validate(args...) ccc_fpq_validate(args)
 #    define fpq_order(args...) ccc_fpq_order(args)
-#    define fpq_print(args...) ccc_fpq_print(args)
 #endif /* FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC */
 
 #endif /* CCC_FLAT_PRIORITY_QUEUE_H */
