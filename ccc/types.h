@@ -121,41 +121,42 @@ typedef struct
 } ccc_user_key;
 
 /** An allocation function is at the core of this library and all containers.
-An allocation function implements the following API, where void * is pointer
-to memory and size_t is number of bytes to allocate.
+An allocation function implements the following API, where ptr is pointer
+to memory and size is number of bytes to allocate.
 - If NULL is provided with a size of 0, NULL is returned.
-- If NULL is provided with a non-zero size new memory is allocated/returned.
-- If void * is non-NULL it has been previously allocated by the alloc fn.
-- If void * is non-NULL with non-zero size void * is resized to at least size
-  bytes. The pointer returned is NULL if resizing fails. Upon success the
-  pointer returned may not be equal to the pointer provided.
-- If void * is non-NULL and size is 0 memory is freed and NULL is returned.
+- If NULL is provided with a non-zero size, new memory is allocated/returned.
+- If ptr is non-NULL it has been previously allocated by the alloc function.
+- If ptr is non-NULL with non-zero size, ptr is resized to at least size
+  size. The pointer returned is NULL if resizing fails. Upon success, the
+  pointer returned might not be equal to the pointer provided.
+- If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.
 A function that implements such behavior on many platforms is realloc. If one
-is not sure that realloc implements all such behaviors, wrap it in a helper
-function. For example, one solution might be implemented as follows:
+is not sure that realloc implements all such behaviors, especially the final
+requirement for freeing memory, wrap it in a helper function. For example, one
+solution using the standard library allocator might be implemented as follows:
 
 void *
-alloc_fn(void *const mem, size_t const bytes)
+alloc(void *const mem, size_t const size)
 {
-    if (!mem && !bytes)
+    if (!ptr && !size)
     {
         return NULL;
     }
     if (!mem)
     {
-        return malloc(bytes);
+        return malloc(size);
     }
-    if (!bytes)
+    if (!size)
     {
         free(mem);
         return NULL;
     }
-    return realloc(mem, bytes);
+    return realloc(mem, size);
 }
 
 However, the above example is only useful if the standard library allocator
 is used. Any allocator that implements the required behavior is sufficient. */
-typedef void *ccc_alloc_fn(void *, size_t);
+typedef void *ccc_alloc_fn(void *ptr, size_t size);
 
 /** A callback function for comparing two elements in a container. A threeway
 comparison return value is expected and the two containers being compared

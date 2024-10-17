@@ -108,26 +108,26 @@ Note that as long as the index is valid within the capacity of the buffer a
 valid pointer is returned, which may result in a slot of old or uninitialized
 data. It is up to the user to ensure the index provided is within the current
 size of the buffer. */
-void *ccc_buf_at(ccc_buffer const *buf, size_t i);
+[[nodiscard]] void *ccc_buf_at(ccc_buffer const *buf, size_t i);
 
 /** @brief return the index of an element known to be in the buffer.
 @param [in] buf the pointer to the buffer.
 @param [in] slot the pointer to the element stored in the buffer.
 @return the index if the slot provided is within the capacity range of the
 buffer, otherwise -1. */
-ptrdiff_t ccc_buf_i(ccc_buffer const *buf, void const *slot);
+[[nodiscard]] ptrdiff_t ccc_buf_i(ccc_buffer const *buf, void const *slot);
 
 /** @brief return the final element in the buffer according the current size.
 @param [in] buf the pointer to the buffer.
 @return the pointer the final element in the buffer according to the current
 size or NULL if the buffer does not exist or is empty. */
-void *ccc_buf_back(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_back(ccc_buffer const *buf);
 
 /** @brief return the first element in the buffer at index 0.
 @param [in] buf the pointer to the buffer.
 @return the pointer to the front element or NULL if the buffer does not exist
 or is empty. */
-void *ccc_buf_front(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_front(ccc_buffer const *buf);
 
 /** @brief copy data at index src to dst according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -203,13 +203,13 @@ ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
 @return the base address of the buffer. This will be equivalent to the buffer
 end iterator if the buffer size is 0. NULL is returned if a NULL argument is
 provided or the buffer has not yet been allocated. */
-void *ccc_buf_begin(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_begin(ccc_buffer const *buf);
 
 /** @brief advance the iter to the next slot in the buffer according to size.
 @param [in] buf the pointer to the buffer.
 @parem [in] iter the pointer to the current slot of the buffer.
 @return the next iterator position according to size. */
-void *ccc_buf_next(ccc_buffer const *buf, void const *iter);
+[[nodiscard]] void *ccc_buf_next(ccc_buffer const *buf, void const *iter);
 
 /** @brief return the end position of the buffer according to size.
 @param [in] buf the pointer to the buffer.
@@ -218,7 +218,7 @@ position for any reason. NULL is returned if NULL is provided or buffer has
 not yet been allocated.
 
 Note that end is determined by the size of the buffer dynamically. */
-void *ccc_buf_end(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_end(ccc_buffer const *buf);
 
 /** @brief return the end position of the buffer according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -228,7 +228,7 @@ buffer has not yet been allocated.
 
 Note that end is determined by the capcity of the buffer and will not change
 until a resize has occured, if permitted. */
-void *ccc_buf_capacity_end(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_capacity_end(ccc_buffer const *buf);
 
 /** @brief obtain the address of the last element in the buffer in preperation
 for iteration according to size.
@@ -236,7 +236,7 @@ for iteration according to size.
 @return the address of the last element buffer. This will be equivalent to the
 buffer rend iterator if the buffer size is 0. NULL is returned if a NULL
 argument is provided or the buffer has not yet been allocated. */
-void *ccc_buf_rbegin(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_rbegin(ccc_buffer const *buf);
 
 /** @brief advance the iter to the next slot in the buffer according to size and
 in reverse order.
@@ -244,14 +244,14 @@ in reverse order.
 @parem [in] iter the pointer to the current slot of the buffer.
 @return the next iterator position according to size and in reverse order. NULL
 is returned if bad input is provided or the buffer has not been allocated. */
-void *ccc_buf_rnext(ccc_buffer const *buf, void const *iter);
+[[nodiscard]] void *ccc_buf_rnext(ccc_buffer const *buf, void const *iter);
 
 /** @brief return the rend position of the buffer.
 @param [in] buf the pointer to the buffer.
 @return the address of the rend position. It is undefined to access this
 position for any reason. NULL is returned if NULL is provided or buffer has
 not yet been allocated. */
-void *ccc_buf_rend(ccc_buffer const *buf);
+[[nodiscard]] void *ccc_buf_rend(ccc_buffer const *buf);
 
 /*=====================   State Management    ===============================*/
 
@@ -289,29 +289,29 @@ ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 @param [in] the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
 value remains the same until a resize occurs. */
-size_t ccc_buf_capacity(ccc_buffer const *buf);
+[[nodiscard]] size_t ccc_buf_capacity(ccc_buffer const *buf);
 
 /** @brief the size of the type being stored contiguously in the buffer.
 @param [in] buf the pointer to the buffer.
 @return the size of the type being stored in the buffer. */
-size_t ccc_buf_elem_size(ccc_buffer const *buf);
+[[nodiscard]] size_t ccc_buf_elem_size(ccc_buffer const *buf);
 
 /** @brief obtain the size of the buffer.
 @param [in] buf the pointer to the buffer.
 @return the quantity of elements stored in the buffer.
 
 Note that size must be less than or equal to capacity. */
-size_t ccc_buf_size(ccc_buffer const *buf);
+[[nodiscard]] size_t ccc_buf_size(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer is 0.
 @aram [in] buf the pointer to the buffer.
 @return true if the size is 0 false if not. */
-bool ccc_buf_is_empty(ccc_buffer const *buf);
+[[nodiscard]] bool ccc_buf_is_empty(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer equals capacity.
 @param [in] buf the pointer to the buffer.
 @return true if the size equals the capacity. */
-bool ccc_buf_is_full(ccc_buffer const *buf);
+[[nodiscard]] bool ccc_buf_is_full(ccc_buffer const *buf);
 
 /** Define this preprocessor directive to drop the ccc prefix from all buffer
 related types and methods. By default the prefix is required but may be
