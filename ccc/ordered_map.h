@@ -165,8 +165,6 @@ bool ccc_om_is_empty(ccc_ordered_map const *);
 
 size_t ccc_om_size(ccc_ordered_map const *);
 
-ccc_result ccc_om_print(ccc_ordered_map const *, ccc_print_fn *);
-
 bool ccc_om_validate(ccc_ordered_map const *);
 
 #ifdef ORDERED_MAP_USING_NAMESPACE_CCC
@@ -205,7 +203,6 @@ typedef ccc_o_map_entry o_map_entry;
 #    define om_size(args...) ccc_om_size(args)
 #    define om_is_empty(args...) ccc_om_is_empty(args)
 #    define om_clear(args...) ccc_om_clear(args)
-#    define om_print(args...) ccc_om_print(args)
 #    define om_validate(args...) ccc_om_validate(args)
 #    define om_root(args...) ccc_om_root(args)
 #endif

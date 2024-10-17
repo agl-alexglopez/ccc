@@ -165,8 +165,6 @@ ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
 
 /*=================     Utilities and Validation    =========================*/
 
-ccc_result ccc_rom_print(ccc_realtime_ordered_map const *rom, ccc_print_fn *fn);
-
 bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 
 void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
@@ -207,7 +205,6 @@ typedef ccc_rtom_entry rtom_entry;
 #    define rom_size(args...) ccc_rom_size(args)
 #    define rom_is_empty(args...) ccc_rom_is_empty(args)
 #    define rom_clear(args...) ccc_rom_clear(args)
-#    define rom_print(args...) ccc_rom_print(args)
 #    define rom_validate(args...) ccc_rom_validate(args)
 #    define rom_root(args...) ccc_rom_root(args)
 #endif

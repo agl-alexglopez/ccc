@@ -143,9 +143,6 @@
 
 #define ccc_validate(container_entry_ptr) ccc_impl_validate(container_entry_ptr)
 
-#define ccc_print(container_entry_ptr, printer_fn)                             \
-    ccc_impl_print(container_entry_ptr, printer_fn)
-
 #ifdef TRAITS_USING_NAMESPACE_CCC
 
 #    define insert(args...) ccc_insert(args)
@@ -202,7 +199,6 @@
 #    define size(args...) ccc_size(args)
 #    define is_empty(args...) ccc_is_empty(args)
 #    define validate(args...) ccc_validate(args)
-#    define print(args...) ccc_print(args)
 
 #endif /* CCC_USING_NAMESPACE_CCC */
 

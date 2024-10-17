@@ -36,8 +36,6 @@ BEGIN_STATIC_TEST(map_test_prime_shuffle)
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    /* One test can use our printer function as test output */
-    (void)print(&s, map_printer_fn);
     CHECK(ccc_om_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {

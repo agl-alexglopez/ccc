@@ -97,9 +97,6 @@ BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
         vals, (sizeof(vals) / sizeof(vals[0])), CCC_LES, NULL, val_cmp, NULL);
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
 
-    /* Test the printing function at least once. */
-    CHECK(ccc_fpq_print(&fpq, val_print), CCC_OK);
-
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);
     int sorted_check[50];

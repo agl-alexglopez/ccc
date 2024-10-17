@@ -15,7 +15,6 @@ struct val
 };
 
 ccc_threeway_cmp val_cmp(ccc_key_cmp);
-void map_printer_fn(ccc_user_type);
 
 enum test_result insert_shuffled(ccc_ordered_map *m, struct val vals[],
                                  size_t size, int larger_prime);

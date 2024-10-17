@@ -249,10 +249,6 @@ BEGIN_STATIC_TEST(omm_test_prime_shuffle)
         CHECK(validate(&omm), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    /* One test can use our printer function as test output. This is very
-       sketchy messing with the allocation function mid test but its fine
-       just to test the printer. */
-    (void)ccc_omm_print(&omm, omm_printer_fn);
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
     size_t cur_size = size;

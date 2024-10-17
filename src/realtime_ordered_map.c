@@ -33,31 +33,12 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-#define COLOR_BLK "\033[34;1m"
-#define COLOR_BLU_BOLD "\033[38;5;12m"
-#define COLOR_RED_BOLD "\033[38;5;9m"
-#define COLOR_RED "\033[31;1m"
-#define COLOR_CYN "\033[36;1m"
-#define COLOR_GRN "\033[32;1m"
-#define COLOR_NIL "\033[0m"
-#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-#define PRINTER_INDENT 13
-#define LR 2
 
 enum rtom_link_
 {
     L = 0,
     R,
-};
-
-enum rtom_print_link_
-{
-    BRANCH = 0, /* ├── */
-    LEAF,       /* └── */
 };
 
 struct rtom_query_
@@ -152,10 +133,6 @@ static void double_rotate(struct ccc_rtom_ *rom,
                           struct ccc_rtom_elem_ *x_p_of_y,
                           struct ccc_rtom_elem_ *y, enum rtom_link_ dir);
 static bool validate(struct ccc_rtom_ const *rom);
-static void ccc_tree_print(struct ccc_rtom_ const *rom,
-                           struct ccc_rtom_elem_ const *root,
-                           ccc_print_fn *fn_print);
-
 static struct ccc_rtom_elem_ *
 next(struct ccc_rtom_ const *, struct ccc_rtom_elem_ const *, enum rtom_link_);
 static struct ccc_rtom_elem_ *min_max_from(struct ccc_rtom_ const *,
@@ -463,17 +440,6 @@ bool
 ccc_rom_validate(ccc_realtime_ordered_map const *rom)
 {
     return validate(rom);
-}
-
-ccc_result
-ccc_rom_print(ccc_realtime_ordered_map const *const rom, ccc_print_fn *const fn)
-{
-    if (!rom || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    ccc_tree_print(rom, rom->root_, fn);
-    return CCC_OK;
 }
 
 ccc_result
@@ -1256,90 +1222,6 @@ validate(struct ccc_rtom_ const *const rom)
         return false;
     }
     return true;
-}
-
-static void
-print_node(struct ccc_rtom_ const *const rom,
-           struct ccc_rtom_elem_ const *const root,
-           ccc_print_fn *const fn_print)
-{
-    printf("%s%u%s:", COLOR_CYN, root->parity_, COLOR_NIL);
-    fn_print(
-        (ccc_user_type){.user_type = struct_base(rom, root), .aux = rom->aux_});
-    printf("\n");
-}
-
-static void
-print_inner_tree(struct ccc_rtom_elem_ const *const root,
-                 char const *const prefix,
-                 enum rtom_print_link_ const node_type,
-                 enum rtom_link_ const dir, struct ccc_rtom_ const *const rom,
-                 ccc_print_fn *const fn_print)
-{
-    if (root == &rom->end_)
-    {
-        return;
-    }
-    printf("%s", prefix);
-    printf("%s%s", node_type == LEAF ? " └──" : " ├──", COLOR_NIL);
-    printf(COLOR_CYN);
-    dir == L ? printf("L" COLOR_NIL) : printf("R" COLOR_NIL);
-    print_node(rom, root, fn_print);
-
-    char *str = NULL;
-    /* NOLINTNEXTLINE */
-    int const string_length = snprintf(NULL, 0, "%s%s", prefix,
-                                       node_type == LEAF ? "     " : " │   ");
-    if (string_length > 0)
-    {
-        /* NOLINTNEXTLINE */
-        str = malloc(string_length + 1);
-        assert(str);
-        /* NOLINTNEXTLINE */
-        (void)snprintf(str, string_length, "%s%s", prefix,
-                       node_type == LEAF ? "     " : " │   ");
-    }
-
-    if (root->branch_[R] == &rom->end_)
-    {
-        print_inner_tree(root->branch_[L], str, LEAF, L, rom, fn_print);
-    }
-    else if (root->branch_[L] == &rom->end_)
-    {
-        print_inner_tree(root->branch_[R], str, LEAF, R, rom, fn_print);
-    }
-    else
-    {
-        print_inner_tree(root->branch_[R], str, BRANCH, R, rom, fn_print);
-        print_inner_tree(root->branch_[L], str, LEAF, L, rom, fn_print);
-    }
-    free(str);
-}
-
-static void
-ccc_tree_print(struct ccc_rtom_ const *const rom,
-               struct ccc_rtom_elem_ const *const root,
-               ccc_print_fn *const fn_print)
-{
-    if (root == &rom->end_)
-    {
-        return;
-    }
-    print_node(rom, root, fn_print);
-
-    if (root->branch_[R] == &rom->end_)
-    {
-        print_inner_tree(root->branch_[L], "", LEAF, L, rom, fn_print);
-    }
-    else if (root->branch_[L] == &rom->end_)
-    {
-        print_inner_tree(root->branch_[R], "", LEAF, R, rom, fn_print);
-    }
-    else
-    {
-        print_inner_tree(root->branch_[R], "", BRANCH, R, rom, fn_print);
-        print_inner_tree(root->branch_[L], "", LEAF, L, rom, fn_print);
-    }
 }
 
 /* NOLINTEND(*misc-no-recursion) */

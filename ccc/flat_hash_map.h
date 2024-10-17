@@ -287,13 +287,6 @@ size_t ccc_fhm_next_prime(size_t n);
 @return the capacity. */
 size_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
-/** @brief Print all elements in the table as defined by the provided printer.
-@param [in] h the hash table
-@param [in] the printer function for the type stored by the user.
-
-This function will only print the occupied slots in the table. O(capacity) */
-ccc_result ccc_fhm_print(ccc_flat_hash_map const *h, ccc_print_fn *fn);
-
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
@@ -342,7 +335,6 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)
 #    define fhm_next_prime(args...) ccc_fhm_next_prime(args)
 #    define fhm_capacity(args...) ccc_fhm_capacity(args)
-#    define fhm_print(args...) ccc_fhm_print(args)
 #    define fhm_validate(args...) ccc_fhm_validate(args)
 #endif
 

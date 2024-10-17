@@ -89,8 +89,6 @@ ccc_result ccc_pq_clear(ccc_priority_queue *, ccc_destructor_fn *);
    little interest to the user. */
 bool ccc_pq_validate(ccc_priority_queue const *);
 
-ccc_result ccc_pq_print(ccc_priority_queue const *, ccc_print_fn *);
-
 #ifndef PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_pq_elem pq_elem;
 typedef ccc_priority_queue priority_queue;
@@ -107,7 +105,6 @@ typedef ccc_priority_queue priority_queue;
 #    define pq_order(args...) ccc_pq_order(args)
 #    define pq_clear(args...) ccc_pq_clear(args)
 #    define pq_validate(args...) ccc_pq_validate(args)
-#    define pq_print(args...) ccc_pq_print(args)
 #endif /* PRIORITY_QUEUE_USING_NAMESPACE_CCC */
 
 #endif /* CCC_PRIORITY_QUEUE_H */

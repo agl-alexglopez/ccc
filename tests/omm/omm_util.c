@@ -24,13 +24,6 @@ val_update(ccc_user_type_mut const u)
     old->val = *(int *)u.aux;
 }
 
-void
-omm_printer_fn(ccc_user_type const e)
-{
-    struct val const *const v = e.user_type;
-    printf("{id:%d,val:%d}", v->id, v->val);
-}
-
 BEGIN_TEST(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
            size_t const size, int const larger_prime)
 {

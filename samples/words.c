@@ -153,7 +153,6 @@ static char *str_arena_at(struct str_arena const *, str_ofs);
 static ccc_flat_ordered_map create_frequency_map(struct str_arena *, FILE *);
 static ccc_threeway_cmp cmp_string_keys(ccc_key_cmp);
 static ccc_threeway_cmp cmp_freqs(ccc_cmp);
-static void print_word(ccc_user_type);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -603,15 +602,6 @@ cmp_freqs(ccc_cmp const c)
         return CCC_GRT;
     }
     return CCC_EQL;
-}
-
-[[maybe_unused]] static void
-print_word(ccc_user_type const u)
-{
-    struct word const *const w = u.user_type;
-    struct str_arena const *const a = u.aux;
-    char const *const struct_word = str_arena_at(a, w->ofs);
-    printf("{%s, %d}", struct_word, w->freq);
 }
 
 /*=======================   CLI Helpers    ==================================*/

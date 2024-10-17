@@ -5,19 +5,8 @@
 #include "types.h"
 
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#define COLOR_BLK "\033[34;1m"
-#define COLOR_BLU_BOLD "\033[38;5;12m"
-#define COLOR_RED_BOLD "\033[38;5;9m"
-#define COLOR_RED "\033[31;1m"
-#define COLOR_CYN "\033[36;1m"
-#define COLOR_GRN "\033[32;1m"
-#define COLOR_NIL "\033[0m"
-#define COLOR_ERR COLOR_RED "Error: " COLOR_NIL
-#define PRINTER_INDENT 13
 #define LR 2
 
 /* Instead of thinking about left and right consider only links
@@ -28,13 +17,6 @@ typedef enum
     L = 0,
     R,
 } om_branch_;
-
-/* Printing enum for printing tree structures if heap available. */
-typedef enum
-{
-    BRANCH = 0, /* ├── */
-    LEAF = 1    /* └── */
-} om_print_branch_;
 
 static om_branch_ const inorder_traversal = R;
 static om_branch_ const reverse_inorder_traversal = L;
@@ -49,8 +31,6 @@ static struct ccc_tree_entry_ container_entry(struct ccc_tree_ *t,
 static void init_node(struct ccc_tree_ *, struct ccc_node_ *);
 static void swap(char tmp[], void *, void *, size_t);
 static void link_trees(struct ccc_node_ *, om_branch_, struct ccc_node_ *);
-static void tree_print(struct ccc_tree_ const *t, struct ccc_node_ const *root,
-                       ccc_print_fn *fn_print);
 
 /* Boolean returns */
 
@@ -379,17 +359,6 @@ ccc_om_clear(ccc_ordered_map *const set, ccc_destructor_fn *const destructor)
             (void)set->impl_.alloc_(popped, 0);
         }
     }
-    return CCC_OK;
-}
-
-ccc_result
-ccc_om_print(ccc_ordered_map const *const s, ccc_print_fn *const fn)
-{
-    if (!s || !fn)
-    {
-        return CCC_INPUT_ERR;
-    }
-    tree_print(&s->impl_, s->impl_.root_, fn);
     return CCC_OK;
 }
 
@@ -919,148 +888,6 @@ ccc_tree_validate(struct ccc_tree_ const *const t)
         return false;
     }
     return true;
-}
-
-static size_t
-get_subtree_size(struct ccc_node_ const *const root, void const *const nil)
-{
-    if (root == nil)
-    {
-        return 0;
-    }
-    return 1 + get_subtree_size(root->branch_[L], nil)
-           + get_subtree_size(root->branch_[R], nil);
-}
-
-static char const *
-get_edge_color(struct ccc_node_ const *const root, size_t const parent_size,
-               struct ccc_node_ const *const nil)
-{
-    if (root == nil)
-    {
-        return "";
-    }
-    return get_subtree_size(root, nil) <= parent_size / 2 ? COLOR_BLU_BOLD
-                                                          : COLOR_RED_BOLD;
-}
-
-static void
-print_node(struct ccc_tree_ const *const t,
-           struct ccc_node_ const *const parent,
-           struct ccc_node_ const *const root, ccc_print_fn *const fn_print)
-{
-    fn_print(
-        (ccc_user_type){.user_type = struct_base(t, root), .aux = t->aux_});
-    struct parent_status stat = child_tracks_parent(parent, root);
-    if (!stat.correct)
-    {
-        printf("%s", COLOR_RED);
-        fn_print((ccc_user_type){.user_type = struct_base(t, stat.parent),
-                                 .aux = t->aux_});
-        printf("%s", COLOR_NIL);
-    }
-    printf("\n");
-}
-
-/* I know this function is rough but it's tricky to focus on edge color rather
-   than node color. Don't care about pretty code here, need thorough debug.
-   I want to convert to iterative stack when I get the chance. */
-static void
-print_inner_tree(struct ccc_node_ const *const root, size_t const parent_size,
-                 struct ccc_node_ const *const parent, char const *const prefix,
-                 char const *const prefix_color,
-                 om_print_branch_ const node_type, om_branch_ const dir,
-                 struct ccc_tree_ const *const t, ccc_print_fn *const fn_print)
-{
-    if (root == &t->end_)
-    {
-        return;
-    }
-    size_t subtree_size = get_subtree_size(root, &t->end_);
-    printf("%s", prefix);
-    printf("%s%s%s",
-           subtree_size <= parent_size / 2 ? COLOR_BLU_BOLD : COLOR_RED_BOLD,
-           node_type == LEAF ? " └──" : " ├──", COLOR_NIL);
-    printf(COLOR_CYN);
-    printf("(%zu)", subtree_size);
-    dir == L ? printf("L:" COLOR_NIL) : printf("R:" COLOR_NIL);
-
-    print_node(t, parent, root, fn_print);
-
-    char *str = NULL;
-    int const string_length
-        = snprintf(NULL, 0, "%s%s%s", prefix, prefix_color, /* NOLINT */
-                   node_type == LEAF ? "     " : " │   ");
-    if (string_length > 0)
-    {
-        /* NOLINTNEXTLINE */
-        str = malloc(string_length + 1);
-        /* NOLINTNEXTLINE */
-        (void)snprintf(str, string_length, "%s%s%s", prefix, prefix_color,
-                       node_type == LEAF ? "     " : " │   ");
-    }
-    if (str == NULL)
-    {
-        printf(COLOR_ERR "memory exceeded. Cannot display tree." COLOR_NIL);
-        return;
-    }
-
-    char const *left_edge_color
-        = get_edge_color(root->branch_[L], subtree_size, &t->end_);
-    if (root->branch_[R] == &t->end_)
-    {
-        print_inner_tree(root->branch_[L], subtree_size, root, str,
-                         left_edge_color, LEAF, L, t, fn_print);
-    }
-    else if (root->branch_[L] == &t->end_)
-    {
-        print_inner_tree(root->branch_[R], subtree_size, root, str,
-                         left_edge_color, LEAF, R, t, fn_print);
-    }
-    else
-    {
-        print_inner_tree(root->branch_[R], subtree_size, root, str,
-                         left_edge_color, BRANCH, R, t, fn_print);
-        print_inner_tree(root->branch_[L], subtree_size, root, str,
-                         left_edge_color, LEAF, L, t, fn_print);
-    }
-    free(str);
-}
-
-/* Should be pretty straightforward output. Red node means there
-   is an error in parent tracking. The child does not track the parent
-   correctly if this occurs and this will cause subtle delayed bugs. */
-static void
-tree_print(struct ccc_tree_ const *const t, struct ccc_node_ const *const root,
-           ccc_print_fn *const fn_print)
-{
-    if (root == &t->end_)
-    {
-        return;
-    }
-    size_t subtree_size = get_subtree_size(root, &t->end_);
-    printf("\n%s(%zu)%s", COLOR_CYN, subtree_size, COLOR_NIL);
-    print_node(t, &t->end_, root, fn_print);
-
-    char const *left_edge_color
-        = get_edge_color(root->branch_[L], subtree_size, &t->end_);
-    if (root->branch_[R] == &t->end_)
-    {
-        print_inner_tree(root->branch_[L], subtree_size, root, "",
-                         left_edge_color, LEAF, L, t, fn_print);
-    }
-    else if (root->branch_[L] == &t->end_)
-    {
-        print_inner_tree(root->branch_[R], subtree_size, root, "",
-                         left_edge_color, LEAF, R, t, fn_print);
-    }
-    else
-    {
-        print_inner_tree(root->branch_[R], subtree_size, root, "",
-                         left_edge_color, BRANCH, R, t, fn_print);
-        print_inner_tree(root->branch_[L], subtree_size, root, "",
-                         left_edge_color, LEAF, L, t, fn_print);
-    }
 }
 
 /* NOLINTEND(*misc-no-recursion) */
