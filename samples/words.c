@@ -572,18 +572,18 @@ cmp_string_keys(ccc_key_cmp const c)
 static ccc_threeway_cmp
 cmp_freqs(ccc_cmp const c)
 {
-    struct frequency const *const a = c.user_type_lhs;
-    struct frequency const *const b = c.user_type_rhs;
-    ccc_threeway_cmp cmp = (a->freq > b->freq) - (a->freq < b->freq);
+    struct frequency const *const lhs = c.user_type_lhs;
+    struct frequency const *const rhs = c.user_type_rhs;
+    ccc_threeway_cmp cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
     if (cmp != CCC_EQL)
     {
         return cmp;
     }
     struct str_arena const *const arena = c.aux;
-    char const *const a_word = str_arena_at(arena, a->ofs);
-    char const *const b_word = str_arena_at(arena, b->ofs);
-    PROG_ASSERT(a_word && b_word);
-    int const res = strcmp(a_word, b_word);
+    char const *const lhs_word = str_arena_at(arena, lhs->ofs);
+    char const *const rhs_word = str_arena_at(arena, rhs->ofs);
+    PROG_ASSERT(lhs_word && rhs_word);
+    int const res = strcmp(lhs_word, rhs_word);
     /* Looks like we have chosen wrong order to return but not so: greater
        lexicographic order is sorted first in a min priority queue or CCC_LES
        in this case. */

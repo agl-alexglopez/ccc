@@ -38,7 +38,7 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
     }
     (void)ccc_buf_size_set(&fpq->buf_, n);
     void *const tmp = ccc_buf_at(&fpq->buf_, n);
-    for (size_t i = (n / 2) + 1; i--;)
+    for (size_t i = (n / 2) + 1; --i;)
     {
         bubble_down(fpq, tmp, i);
     }
@@ -65,7 +65,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const input_array,
     (void)memcpy(ccc_buf_begin(&fpq->buf_), input_array,
                  input_n * input_elem_size);
     void *const tmp = ccc_buf_at(&fpq->buf_, input_n);
-    for (size_t i = (input_n / 2) + 1; i--;)
+    for (size_t i = (input_n / 2) + 1; --i;)
     {
         bubble_down(fpq, tmp, i);
     }
