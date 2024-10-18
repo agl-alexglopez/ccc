@@ -240,11 +240,11 @@ static void
 print_found(FILE *const f, str_view w)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    assert(a.arena);
+    PROG_ASSERT(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
-    assert(!is_empty(&map));
+    PROG_ASSERT(!is_empty(&map));
     struct clean_word wc = clean_word(&a, w);
-    assert(wc.stat != WC_ARENA_ERR);
+    PROG_ASSERT(wc.stat != WC_ARENA_ERR);
     if (wc.stat != WC_CLEAN_WORD)
     {
         return;
@@ -261,12 +261,12 @@ static void
 print_top_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    assert(a.arena);
+    PROG_ASSERT(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
-    assert(!is_empty(&map));
+    PROG_ASSERT(!is_empty(&map));
     /* O(n) copy */
     struct frequency_alloc freqs = copy_frequencies(&map);
-    assert(freqs.cap);
+    PROG_ASSERT(freqs.cap);
     /* O(n) sort kind of. Pops will be O(nlgn). But we don't have stdlib qsort
        space overhead to emulate why someone in an embedded or OS
        environment might choose this approach for sorting. Granted any O(1)
@@ -274,7 +274,7 @@ print_top_n(FILE *const f, int n)
        O(lgN) runtime for heap pop is pretty good. */
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_GRT, realloc, cmp_freqs, &a);
-    assert(size(&fpq) == size(&map));
+    PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
     {
         n = size(&fpq);
@@ -289,14 +289,14 @@ static void
 print_last_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    assert(a.arena);
+    PROG_ASSERT(a.arena);
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
-    assert(!is_empty(&map));
+    PROG_ASSERT(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
-    assert(freqs.cap);
+    PROG_ASSERT(freqs.cap);
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_LES, realloc, cmp_freqs, &a);
-    assert(size(&fpq) == size(&map));
+    PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
     {
         n = size(&fpq);
@@ -310,7 +310,7 @@ print_last_n(FILE *const f, int n)
 static struct frequency_alloc
 copy_frequencies(ccc_flat_ordered_map const *const map)
 {
-    assert(!is_empty(map));
+    PROG_ASSERT(!is_empty(map));
     size_t const cap = sizeof(struct frequency) * (size(map) + 1);
     struct frequency *const freqs = malloc(cap);
     assert(freqs);
