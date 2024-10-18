@@ -452,15 +452,19 @@ static bool
 str_arena_push_back(struct str_arena *const a, str_ofs const str,
                     size_t const str_len, char const c)
 {
-    if (str_arena_maybe_resize_pos(a, str + str_len + 1) != CCC_OK)
+    size_t const new_pos = str + str_len + 1;
+    if (str_arena_maybe_resize_pos(a, new_pos) != CCC_OK)
     {
         return false;
     }
-    char *const pos = str_arena_at(a, str);
-    PROG_ASSERT(pos);
-    *(pos + str_len) = c;
-    *(pos + str_len + 1) = '\0';
-    a->next_free_pos += 2;
+    char *const string = str_arena_at(a, str);
+    PROG_ASSERT(string);
+    *(string + str_len) = c;
+    *(string + str_len + 1) = '\0';
+    if (new_pos >= a->next_free_pos)
+    {
+        a->next_free_pos += ((new_pos + 1) - a->next_free_pos);
+    }
     return true;
 }
 
