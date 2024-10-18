@@ -584,6 +584,9 @@ cmp_freqs(ccc_cmp const c)
     char const *const b_word = str_arena_at(arena, b->ofs);
     PROG_ASSERT(a_word && b_word);
     int const res = strcmp(a_word, b_word);
+    /* Looks like we have chosen wrong order to return but not so: greater
+       lexicographic order is sorted first in a min priority queue or CCC_LES
+       in this case. */
     if (res > 0)
     {
         return CCC_LES;
