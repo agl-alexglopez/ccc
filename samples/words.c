@@ -314,7 +314,7 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
     struct frequency *const freqs = malloc(cap);
     PROG_ASSERT(freqs);
     size_t i = 0;
-    for (struct word *w = begin(map); w != end(map) && i < cap;
+    for (struct word const *w = begin(map); w != end(map) && i < cap;
          w = next(map, &w->e), ++i)
     {
         freqs[i].ofs = w->ofs;
