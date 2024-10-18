@@ -552,8 +552,8 @@ cmp_string_keys(ccc_key_cmp const c)
 {
     struct word const *const w = c.user_type_rhs;
     struct str_arena const *const a = c.aux;
-    str_ofs const id = *((str_ofs *)c.key_lhs);
-    char const *const key_word = str_arena_at(a, id);
+    str_ofs const *const id = c.key_lhs;
+    char const *const key_word = str_arena_at(a, *id);
     char const *const struct_word = str_arena_at(a, w->ofs);
     PROG_ASSERT(key_word && struct_word);
     int const res = strcmp(key_word, struct_word);
@@ -574,12 +574,12 @@ cmp_freqs(ccc_cmp const c)
 {
     struct frequency const *const a = c.user_type_lhs;
     struct frequency const *const b = c.user_type_rhs;
-    struct str_arena const *const arena = c.aux;
     ccc_threeway_cmp cmp = (a->freq > b->freq) - (a->freq < b->freq);
     if (cmp != CCC_EQL)
     {
         return cmp;
     }
+    struct str_arena const *const arena = c.aux;
     char const *const a_word = str_arena_at(arena, a->ofs);
     char const *const b_word = str_arena_at(arena, b->ofs);
     PROG_ASSERT(a_word && b_word);
