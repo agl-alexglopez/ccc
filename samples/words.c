@@ -18,7 +18,7 @@
 #include "cli.h"
 #include "str_view/str_view.h"
 
-typedef ssize_t str_ofs;
+typedef ptrdiff_t str_ofs;
 
 enum action_type
 {
@@ -137,7 +137,7 @@ static struct clean_word clean_word(struct str_arena *, str_view word);
 
 /* String Arena Functions */
 static struct str_arena str_arena_create(size_t);
-static ssize_t str_arena_alloc(struct str_arena *, size_t bytes);
+static ptrdiff_t str_arena_alloc(struct str_arena *, size_t bytes);
 static ccc_result str_arena_maybe_resize(struct str_arena *,
                                          size_t byte_request);
 static ccc_result str_arena_maybe_resize_pos(struct str_arena *,
@@ -351,7 +351,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
 {
     char *lineptr = NULL;
     size_t len = 0;
-    ssize_t read = 0;
+    ptrdiff_t read = 0;
     ccc_flat_ordered_map fom = ccc_fom_init((struct word *)NULL, 0, e, ofs,
                                             realloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
@@ -430,7 +430,7 @@ str_arena_create(size_t const cap)
 
 /* Allocates exactly bytes bytes from the arena. Do not forget the null
    terminator in requests if a string is requested. */
-static ssize_t
+static ptrdiff_t
 str_arena_alloc(struct str_arena *const a, size_t const bytes)
 {
     if (str_arena_maybe_resize(a, bytes) != CCC_OK)
@@ -439,7 +439,7 @@ str_arena_alloc(struct str_arena *const a, size_t const bytes)
     }
     size_t const ret = a->next_free_pos;
     a->next_free_pos += bytes;
-    return (ssize_t)ret;
+    return (ptrdiff_t)ret;
 }
 
 /* Push a character back to the last string allocation. This is possible
