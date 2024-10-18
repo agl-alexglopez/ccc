@@ -313,7 +313,7 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
     PROG_ASSERT(!is_empty(map));
     size_t const cap = sizeof(struct frequency) * (size(map) + 1);
     struct frequency *const freqs = malloc(cap);
-    assert(freqs);
+    PROG_ASSERT(freqs);
     size_t i = 0;
     for (struct word *w = begin(map); w != end(map) && i < cap;
          w = next(map, &w->e), ++i)
@@ -361,12 +361,12 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
              word = sv_next_tok(line, word, space))
         {
             struct clean_word const cw = clean_word(a, word);
-            assert(cw.stat != WC_ARENA_ERR);
+            PROG_ASSERT(cw.stat != WC_ARENA_ERR);
             if (cw.stat == WC_CLEAN_WORD)
             {
                 struct word *const w = or_insert(
                     entry_r(&fom, &cw.str), &(struct word){.ofs = cw.str}.e);
-                assert(w);
+                PROG_ASSERT(w);
                 ++w->freq;
             }
         }
@@ -395,7 +395,7 @@ clean_word(struct str_arena *const a, str_view word)
         }
         [[maybe_unused]] bool const pushed_char
             = str_arena_push_back(a, str, str_len, (char)tolower(*c));
-        assert(pushed_char);
+        PROG_ASSERT(pushed_char);
         ++str_len;
     }
     if (!str_len)
@@ -403,7 +403,7 @@ clean_word(struct str_arena *const a, str_view word)
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
     char const *const w = str_arena_at(a, str);
-    assert(w);
+    PROG_ASSERT(w);
     if (!isalpha(*w) || !isalpha(*(w + (str_len - 1))))
     {
         str_arena_free_to_pos(a, str, str_len);
@@ -458,7 +458,7 @@ str_arena_push_back(struct str_arena *const a, str_ofs const str,
         return false;
     }
     char *const pos = str_arena_at(a, str);
-    assert(pos);
+    PROG_ASSERT(pos);
     *(pos + str_len) = c;
     *(pos + str_len + 1) = '\0';
     a->next_free_pos += 2;
@@ -564,7 +564,7 @@ cmp_string_keys(ccc_key_cmp const c)
     str_ofs const id = *((str_ofs *)c.key_lhs);
     char const *const key_word = str_arena_at(a, id);
     char const *const struct_word = str_arena_at(a, w->ofs);
-    assert(key_word && struct_word);
+    PROG_ASSERT(key_word && struct_word);
     int const res = strcmp(key_word, struct_word);
     if (res > 0)
     {
@@ -591,7 +591,7 @@ cmp_freqs(ccc_cmp const c)
     }
     char const *const a_word = str_arena_at(arena, a->ofs);
     char const *const b_word = str_arena_at(arena, b->ofs);
-    assert(a_word && b_word);
+    PROG_ASSERT(a_word && b_word);
     int const res = strcmp(a_word, b_word);
     if (res > 0)
     {
