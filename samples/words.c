@@ -1,7 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
 
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
