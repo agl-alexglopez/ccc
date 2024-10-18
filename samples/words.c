@@ -475,19 +475,7 @@ str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
     {
         return CCC_INPUT_ERR;
     }
-    if (a->next_free_pos + byte_request >= a->cap)
-    {
-        size_t const new_cap = (a->next_free_pos + byte_request) * 2;
-        void *const moved_arena = realloc(a->arena, new_cap);
-        if (!moved_arena)
-        {
-            return CCC_MEM_ERR;
-        }
-        memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
-        a->arena = moved_arena;
-        a->cap = new_cap;
-    }
-    return CCC_OK;
+    return str_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
 }
 
 static ccc_result
