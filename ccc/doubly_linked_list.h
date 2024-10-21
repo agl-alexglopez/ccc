@@ -60,20 +60,19 @@ the user prior to any inserts into the list. */
 #define ccc_dll_emplace_front(list_ptr, type_initializer...)                   \
     ccc_impl_dll_emplace_front(list_ptr, type_initializer)
 
-void *ccc_dll_push_front(ccc_doubly_linked_list *l,
-                         ccc_dll_elem *struct_handle);
-void *ccc_dll_push_back(ccc_doubly_linked_list *l, ccc_dll_elem *struct_handle);
-void *ccc_dll_insert(ccc_doubly_linked_list *l, ccc_dll_elem *pos,
-                     ccc_dll_elem *struct_handle);
+/** @brief Push user type wrapping elem*/
+void *ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
+void *ccc_dll_push_back(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
+void *ccc_dll_insert(ccc_doubly_linked_list *l, ccc_dll_elem *pos_elem,
+                     ccc_dll_elem *elem);
 void *ccc_dll_front(ccc_doubly_linked_list const *l);
 void *ccc_dll_back(ccc_doubly_linked_list const *l);
 ccc_result ccc_dll_pop_front(ccc_doubly_linked_list *l);
 ccc_result ccc_dll_pop_back(ccc_doubly_linked_list *l);
-void *ccc_dll_extract(ccc_doubly_linked_list *l,
-                      ccc_dll_elem *struct_handle_in_list);
+void *ccc_dll_extract(ccc_doubly_linked_list *l, ccc_dll_elem *elem_in_list);
 void *ccc_dll_extract_range(ccc_doubly_linked_list *l,
-                            ccc_dll_elem *struct_handle_in_list_begin,
-                            ccc_dll_elem *struct_handle_in_list_end);
+                            ccc_dll_elem *elem_in_list_begin,
+                            ccc_dll_elem *elem_in_list_end);
 
 /** @brief Repositions to_cut before pos. Only list pointers are modified.
 @param [in] pos_sll the list to which pos belongs.

@@ -350,8 +350,7 @@ bubble_down(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
 static inline void
 swap(struct ccc_fpq_ *const fpq, char tmp[], size_t const i, size_t const j)
 {
-    ccc_result const res = ccc_buf_swap(&fpq->buf_, tmp, i, j);
-    (void)res;
+    [[maybe_unused]] ccc_result const res = ccc_buf_swap(&fpq->buf_, tmp, i, j);
     assert(res == CCC_OK);
 }
 
