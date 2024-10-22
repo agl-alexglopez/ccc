@@ -6,8 +6,14 @@
 #include "impl_doubly_linked_list.h"
 #include "types.h"
 
-typedef struct ccc_dll_elem_ ccc_dll_elem;
+/** A doubly linked list is a container offering bidirectional, insert,
+removal, and iteration. Pushing to the before the front, at the back, or
+between elements of the list is O(1). */
 typedef struct ccc_dll_ ccc_doubly_linked_list;
+
+/** A doubly linked list element is an intrusive element embedded in the user
+type. It can be used in an allocating or non allocating container. */
+typedef struct ccc_dll_elem_ ccc_dll_elem;
 
 /** @brief Initialize a doubly linked list with its l-value name, type
 containing the dll elems, the field of the dll elem, allocation function,
@@ -60,52 +66,186 @@ the user prior to any inserts into the list. */
 #define ccc_dll_emplace_front(list_ptr, type_initializer...)                   \
     ccc_impl_dll_emplace_front(list_ptr, type_initializer)
 
-/** @brief Push user type wrapping elem*/
+/** @brief Push user type wrapping elem to the front of the list.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem a pointer to the list element.
+@return a pointer to the element inserted or NULL if bad input is provided
+or allocation fails. */
 void *ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
+
+/** @brief Push user type wrapping elem to the back of the list.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem a pointer to the list element.
+@return a pointer to the element inserted or NULL if bad input is provided
+or allocation fails. */
 void *ccc_dll_push_back(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
+
+/** @brief Insert user type wrapping elem before pos_elem.
+@param [in] l a pointer to the doubly linked list.
+@param [in] pos_elem a pointer to the list element before which elem inserts.
+@param [in] elem a pointer to the list element.
+@return a pointer to the element inserted or NULL if bad input is provided
+or allocation fails. */
 void *ccc_dll_insert(ccc_doubly_linked_list *l, ccc_dll_elem *pos_elem,
                      ccc_dll_elem *elem);
+
+/** @brief Returns the user type at the front of the list.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type at the front of the list. NULL if empty. */
 void *ccc_dll_front(ccc_doubly_linked_list const *l);
+
+/** @brief Returns the user type at the back of the list.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type at the back of the list. NULL if empty. */
 void *ccc_dll_back(ccc_doubly_linked_list const *l);
+
+/** @brief Pop the user type at the front of the list.
+@param [in] l a pointer to the doubly linked list.
+@return an ok result if the pop was successful or an error if bad input is
+provided or the list is empty.*/
 ccc_result ccc_dll_pop_front(ccc_doubly_linked_list *l);
+
+/** @brief Pop the user type at the back of the list.
+@param [in] l a pointer to the doubly linked list.
+@return an ok result if the pop was successful or an error if bad input is
+provided or the list is empty.*/
 ccc_result ccc_dll_pop_back(ccc_doubly_linked_list *l);
-void *ccc_dll_extract(ccc_doubly_linked_list *l, ccc_dll_elem *elem_in_list);
-void *ccc_dll_extract_range(ccc_doubly_linked_list *l,
-                            ccc_dll_elem *elem_in_list_begin,
-                            ccc_dll_elem *elem_in_list_end);
+
+/** @brief Returns the element following an extracted element from the list
+without deallocating regardless of allocation permission provided to the
+container.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem the handle of an element known to be in the list.
+@return a reference to the element in the list following elem or NULL if the
+element is the last. NULL is returned if bad input is provided or the elem is
+not in the list. */
+void *ccc_dll_extract(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
+
+/** @brief Returns the element following an extracted range of elements from the
+list without deallocating regardless of allocation permission provided to the
+container.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem_begin the handle of an element known to be in the list at the
+start of the range.
+@param [in] elem_end the handle of an element known to be in the list at the
+end of the range following elem_begin.
+@return a reference to the element in the list following elem_end or NULL if the
+element is the last. NULL is returned if bad input is provided or the elem is
+not in the list. */
+void *ccc_dll_extract_range(ccc_doubly_linked_list *l, ccc_dll_elem *elem_begin,
+                            ccc_dll_elem *elem_end);
 
 /** @brief Repositions to_cut before pos. Only list pointers are modified.
 @param [in] pos_sll the list to which pos belongs.
 @param [in] pos the position before which to_cut will be moved.
-@param [in] to_cut_sll the list to which to_cut belongs. */
+@param [in] to_cut_sll the list to which to_cut belongs.
+@return ok if the splice is successful or an error if bad input is provided. */
 ccc_result ccc_dll_splice(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
                           ccc_doubly_linked_list *to_cut_sll,
                           ccc_dll_elem *to_cut);
 
+/** @brief Repositions begin to end before pos. Only list pointers are modified.
+@param [in] pos_sll the list to which pos belongs.
+@param [in] pos the position before which to_cut will be moved.
+@param [in] to_cut_sll the list to which the range belongs.
+@param [in] begin the start of the list to splice.
+@param [in] end the end of the list to splice.
+@return ok if the splice is successful or an error if bad input is provided. */
 ccc_result ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll,
                                 ccc_dll_elem *pos,
                                 ccc_doubly_linked_list *to_cut_sll,
                                 ccc_dll_elem *begin, ccc_dll_elem *end);
-void *ccc_dll_begin(ccc_doubly_linked_list const *);
-void *ccc_dll_next(ccc_doubly_linked_list const *, ccc_dll_elem const *);
 
-void *ccc_dll_rbegin(ccc_doubly_linked_list const *);
-void *ccc_dll_rnext(ccc_doubly_linked_list const *, ccc_dll_elem const *);
+/** @brief Return the user type at the start of the list or NULL if empty.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type or NULL if empty or bad input. */
+void *ccc_dll_begin(ccc_doubly_linked_list const *l);
 
-void *ccc_dll_end(ccc_doubly_linked_list const *);
-void *ccc_dll_rend(ccc_doubly_linked_list const *);
+/** @brief Return the user type following the element known to be in the list.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem a handle to the list element known to be in the list.
+@return a pointer to the element following elem or NULL if no elements follow
+or bad input is provided. */
+void *ccc_dll_next(ccc_doubly_linked_list const *l, ccc_dll_elem const *elem);
 
-ccc_dll_elem *ccc_dll_begin_elem(ccc_doubly_linked_list const *);
-ccc_dll_elem *ccc_dll_end_elem(ccc_doubly_linked_list const *);
-ccc_dll_elem *ccc_dll_end_sentinel(ccc_doubly_linked_list const *);
+/** @brief Return the user type at the end of the list or NULL if empty.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type or NULL if empty or bad input. */
+void *ccc_dll_rbegin(ccc_doubly_linked_list const *l);
 
-size_t ccc_dll_size(ccc_doubly_linked_list const *);
-bool ccc_dll_is_empty(ccc_doubly_linked_list const *);
+/** @brief Return the user type following the element known to be in the list
+moving from back to front.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem a handle to the list element known to be in the list.
+@return a pointer to the element following elem from back to front or NULL if no
+elements follow or bad input is provided. */
+void *ccc_dll_rnext(ccc_doubly_linked_list const *l, ccc_dll_elem const *elem);
 
-ccc_result ccc_dll_clear(ccc_doubly_linked_list *, ccc_destructor_fn *);
+/** @brief Return the end sentinel with no accessible fields.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the end sentinel with no accessible fields. */
+void *ccc_dll_end(ccc_doubly_linked_list const *l);
 
-bool ccc_dll_validate(ccc_doubly_linked_list const *);
+/** @brief Return the start sentinel with no accessible fields.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the start sentinel with no accessible fields. */
+void *ccc_dll_rend(ccc_doubly_linked_list const *l);
 
+/** @brief Return a handle to the list element at the front of the list which
+may be the sentinel.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the list element at the beginning of the list which may be
+the sentinel but will not be NULL unless a NULL pointer is provided as l. */
+ccc_dll_elem *ccc_dll_begin_elem(ccc_doubly_linked_list const *l);
+
+/** @brief Return a handle to the list element at the back of the list which
+may be the sentinel.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the list element at the end of the list which may be
+the sentinel but will not be NULL unless a NULL pointer is provided as l. */
+ccc_dll_elem *ccc_dll_end_elem(ccc_doubly_linked_list const *l);
+
+/** @brief Return a handle to the sentinel at the back of the list.
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the sentinel at the end of the list which will not be NULL
+unless a NULL pointer is provided as l. */
+ccc_dll_elem *ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
+
+/** @brief Return the size of the list.
+@param [in] l a pointer to the doubly linked list.
+@return the size of the list or 0 if empty or l is NULL. */
+size_t ccc_dll_size(ccc_doubly_linked_list const *l);
+
+/** @brief Return if the size of the list is equal to 0.
+@param [in] l a pointer to the doubly linked list.
+@return true if the size is 0 or l is NULL, else false. */
+bool ccc_dll_is_empty(ccc_doubly_linked_list const *l);
+
+/** @brief Clear the contents of the list freeing elements, if given allocation
+permission.
+@param [in] l a pointer to the doubly linked list.
+@param [in] fn a destructor function to run on each element.
+@return ok if the clearing was a success or an input error if l or fn is NULL.
+
+Note that if the list is initialized with allocation permission it will free
+elements for the user and the destructor function should only perform auxiliary
+cleanup, otherwise a double free will occur.
+
+If the list has not been given allocation permission the user should free
+the list elements with the destructor if they wish to do so. The implementation
+ensures the function is called after the element is removed. Otherwise, the user
+must manage their elements at their discretion after the list is emptied in
+this function. */
+ccc_result ccc_dll_clear(ccc_doubly_linked_list *l, ccc_destructor_fn *fn);
+
+/** @brief Validates internal state of the list.
+@param [in] l a pointer to the doubly linked list.
+@return true if invariants hold, false if not. */
+bool ccc_dll_validate(ccc_doubly_linked_list const *l);
+
+/** Define this preprocessor directive before including this header if shorter
+names are desired for the doubly linked list container. Ensure no namespace
+clashes exist prior to name shortening. */
 #ifdef DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef ccc_dll_elem dll_elem;
 typedef ccc_doubly_linked_list doubly_linked_list;

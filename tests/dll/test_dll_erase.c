@@ -75,7 +75,6 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle)
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 1, (int[1]){0}), PASS);
     (void)extract(&dll, &vals[0].e);
-    ;
     CHECK(validate(&dll), true);
     CHECK(is_empty(&dll), true);
     END_TEST();

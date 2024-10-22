@@ -16,6 +16,7 @@ static size_t extract_range(struct ccc_dll_ const *l,
 static size_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
                   struct ccc_dll_elem_ const *end);
 static struct ccc_dll_elem_ *pop_front(struct ccc_dll_ *);
+static void push_front(struct ccc_dll_ *l, struct ccc_dll_elem_ *e);
 static struct ccc_dll_elem_ *elem_in(ccc_doubly_linked_list const *,
                                      void const *struct_base);
 static void push_back(ccc_doubly_linked_list *, struct ccc_dll_elem_ *);
@@ -36,10 +37,10 @@ ccc_dll_push_front(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
         {
             return NULL;
         }
-        memcpy(node, struct_base(l, elem), l->elem_sz_);
+        (void)memcpy(node, struct_base(l, elem), l->elem_sz_);
         elem = elem_in(l, node);
     }
-    ccc_impl_dll_push_front(l, elem);
+    push_front(l, elem);
     return struct_base(l, l->sentinel_.n_);
 }
 
@@ -57,10 +58,10 @@ ccc_dll_push_back(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
         {
             return NULL;
         }
-        memcpy(node, struct_base(l, elem), l->elem_sz_);
+        (void)memcpy(node, struct_base(l, elem), l->elem_sz_);
         elem = elem_in(l, node);
     }
-    ccc_impl_dll_push_back(l, elem);
+    push_back(l, elem);
     return struct_base(l, l->sentinel_.p_);
 }
 
@@ -118,23 +119,23 @@ ccc_dll_pop_back(ccc_doubly_linked_list *const l)
     return CCC_OK;
 }
 
-void
-ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
-{
-    e->p_ = &l->sentinel_;
-    e->n_ = l->sentinel_.n_;
-    l->sentinel_.n_->p_ = e;
-    l->sentinel_.n_ = e;
-    ++l->sz_;
-}
-
 void *
 ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
-               ccc_dll_elem *const elem)
+               ccc_dll_elem *elem)
 {
-    if (!pos->n_ || !pos->p_)
+    if (!l || !pos->n_ || !pos->p_)
     {
         return NULL;
+    }
+    if (l->alloc_)
+    {
+        void *const node = l->alloc_(NULL, l->elem_sz_);
+        if (!node)
+        {
+            return NULL;
+        }
+        (void)memcpy(node, struct_base(l, elem), l->elem_sz_);
+        elem = elem_in(l, node);
     }
     elem->n_ = pos;
     elem->p_ = pos->p_;
@@ -148,26 +149,27 @@ ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
 ccc_dll_elem *
 ccc_dll_begin_elem(ccc_doubly_linked_list const *const l)
 {
-    return l->sentinel_.n_;
+    return l ? l->sentinel_.n_ : NULL;
 }
 
 ccc_dll_elem *
 ccc_dll_end_elem(ccc_doubly_linked_list const *const l)
 {
-    return l->sentinel_.p_;
+    return l ? l->sentinel_.p_ : NULL;
 }
 
 ccc_dll_elem *
 ccc_dll_end_sentinel(ccc_doubly_linked_list const *const l)
 {
-    return (ccc_dll_elem *)&l->sentinel_;
+    return l ? (struct ccc_dll_elem_ *)&l->sentinel_ : NULL;
 }
 
 void *
 ccc_dll_extract(ccc_doubly_linked_list *const l,
                 ccc_dll_elem *const elem_in_list)
 {
-    if (!elem_in_list->n_ || !elem_in_list->p_ || !l->sz_)
+    if (!l || !elem_in_list || !elem_in_list->n_ || !elem_in_list->p_
+        || !l->sz_)
     {
         return NULL;
     }
@@ -181,25 +183,23 @@ ccc_dll_extract(ccc_doubly_linked_list *const l,
 
 void *
 ccc_dll_extract_range(ccc_doubly_linked_list *const l,
-                      ccc_dll_elem *const elem_in_list_begin,
-                      ccc_dll_elem *elem_in_list_end)
+                      ccc_dll_elem *const elem_begin, ccc_dll_elem *elem_end)
 {
-    if (!elem_in_list_begin->n_ || !elem_in_list_begin->p_
-        || !elem_in_list_end->n_ || !elem_in_list_end->p_ || !l->sz_)
+    if (!l || !elem_begin || !elem_end || !elem_begin->n_ || !elem_begin->p_
+        || !elem_end->n_ || !elem_end->p_ || !l->sz_)
     {
         return NULL;
     }
-    if (elem_in_list_begin == elem_in_list_end)
+    if (elem_begin == elem_end)
     {
-        return ccc_dll_extract(l, elem_in_list_begin);
+        return ccc_dll_extract(l, elem_begin);
     }
-    struct ccc_dll_elem_ const *const ret = elem_in_list_end;
-    elem_in_list_end = elem_in_list_end->p_;
-    elem_in_list_end->n_->p_ = elem_in_list_begin->p_;
-    elem_in_list_begin->p_->n_ = elem_in_list_end->n_;
+    struct ccc_dll_elem_ const *const ret = elem_end;
+    elem_end = elem_end->p_;
+    elem_end->n_->p_ = elem_begin->p_;
+    elem_begin->p_->n_ = elem_end->n_;
 
-    size_t const deleted
-        = extract_range(l, elem_in_list_begin, elem_in_list_end);
+    size_t const deleted = extract_range(l, elem_begin, elem_end);
 
     assert(deleted <= l->sz_);
     l->sz_ -= deleted;
@@ -287,13 +287,13 @@ ccc_dll_rbegin(ccc_doubly_linked_list const *const l)
 }
 
 void *
-ccc_dll_end([[maybe_unused]] ccc_doubly_linked_list const *const l)
+ccc_dll_end(ccc_doubly_linked_list const *const)
 {
     return NULL;
 }
 
 void *
-ccc_dll_rend([[maybe_unused]] ccc_doubly_linked_list const *const l)
+ccc_dll_rend(ccc_doubly_linked_list const *const)
 {
     return NULL;
 }
@@ -301,7 +301,7 @@ ccc_dll_rend([[maybe_unused]] ccc_doubly_linked_list const *const l)
 void *
 ccc_dll_next(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
 {
-    if (!e || e->n_ == &l->sentinel_)
+    if (!l || !e || e->n_ == &l->sentinel_)
     {
         return NULL;
     }
@@ -311,7 +311,7 @@ ccc_dll_next(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
 void *
 ccc_dll_rnext(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
 {
-    if (!e || e->p_ == &l->sentinel_)
+    if (!l || !e || e->p_ == &l->sentinel_)
     {
         return NULL;
     }
@@ -321,13 +321,13 @@ ccc_dll_rnext(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
 size_t
 ccc_dll_size(ccc_doubly_linked_list const *const l)
 {
-    return l->sz_;
+    return l ? l->sz_ : 0;
 }
 
 bool
 ccc_dll_is_empty(ccc_doubly_linked_list const *const l)
 {
-    return !l->sz_;
+    return l ? !l->sz_ : true;
 }
 
 ccc_result
@@ -339,7 +339,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
     }
     while (!ccc_dll_is_empty(l))
     {
-        void *node = struct_base(l, pop_front(l));
+        void *const node = struct_base(l, pop_front(l));
         if (fn)
         {
             fn((ccc_user_type_mut){.user_type = node, .aux = l->aux_});
@@ -355,8 +355,12 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
 bool
 ccc_dll_validate(ccc_doubly_linked_list const *const l)
 {
+    if (!l)
+    {
+        return false;
+    }
     size_t size = 0;
-    for (struct ccc_dll_elem_ *e = l->sentinel_.n_; e != &l->sentinel_;
+    for (struct ccc_dll_elem_ const *e = l->sentinel_.n_; e != &l->sentinel_;
          e = e->n_, ++size)
     {
         if (size >= l->sz_)
@@ -383,7 +387,27 @@ ccc_impl_dll_push_back(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
     push_back(l, e);
 }
 
+void
+ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
+{
+    if (!l || !e)
+    {
+        return;
+    }
+    push_front(l, e);
+}
+
 /*=======================       Static Helpers    ===========================*/
+
+static inline void
+push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
+{
+    e->p_ = &l->sentinel_;
+    e->n_ = l->sentinel_.n_;
+    l->sentinel_.n_->p_ = e;
+    l->sentinel_.n_ = e;
+    ++l->sz_;
+}
 
 static inline void
 push_back(ccc_doubly_linked_list *const l, struct ccc_dll_elem_ *const e)
@@ -396,7 +420,7 @@ push_back(ccc_doubly_linked_list *const l, struct ccc_dll_elem_ *const e)
 }
 
 static inline struct ccc_dll_elem_ *
-pop_front(struct ccc_dll_ *dll)
+pop_front(struct ccc_dll_ *const dll)
 {
     struct ccc_dll_elem_ *ret = dll->sentinel_.n_;
     dll->sentinel_.n_->p_ = &dll->sentinel_;
@@ -417,16 +441,16 @@ static inline size_t
 extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
               struct ccc_dll_elem_ *begin, struct ccc_dll_elem_ *const end)
 {
+    begin->p_ = NULL;
     size_t sz = 1;
     for (; begin != end; ++sz)
     {
         assert(sz <= l->sz_);
         struct ccc_dll_elem_ *const next = begin->n_;
-        begin->n_ = begin->p_ = NULL;
         begin = next;
     }
     assert(end != &l->sentinel_);
-    end->n_ = end->p_ = NULL;
+    end->n_ = NULL;
     return sz;
 }
 
