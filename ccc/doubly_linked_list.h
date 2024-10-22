@@ -131,7 +131,10 @@ start of the range.
 end of the range following elem_begin.
 @return a reference to the element in the list following elem_end or NULL if the
 element is the last. NULL is returned if bad input is provided or the elem is
-not in the list. */
+not in the list.
+
+Note that the user may iterate through the extracted range in the same way one
+iterates through a normal list using the iterator function. */
 void *ccc_dll_extract_range(ccc_doubly_linked_list *l, ccc_dll_elem *elem_begin,
                             ccc_dll_elem *elem_end);
 
