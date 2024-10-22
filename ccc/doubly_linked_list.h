@@ -121,6 +121,32 @@ element is the last. NULL is returned if bad input is provided or the elem is
 not in the list. */
 void *ccc_dll_extract(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
 
+/** @brief Returns the element following an erased element from the list.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem the handle of an element known to be in the list.
+@return a reference to the element in the list following elem or NULL if the
+element is the last. NULL is returned if bad input is provided or the elem is
+not in the list. */
+void *ccc_dll_erase(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
+
+/** @brief Returns the element following an extracted range of elements from the
+list.
+@param [in] l a pointer to the doubly linked list.
+@param [in] elem_begin the handle of an element known to be in the list at the
+start of the range.
+@param [in] elem_end the handle of an element known to be in the list at the
+end of the range following elem_begin.
+@return a reference to the element in the list following elem_end or NULL if the
+element is the last. NULL is returned if bad input is provided or the elem is
+not in the list.
+
+Note that if the user does not permit the container to allocate they may iterate
+through the extracted range in the same way one iterates through a normal list
+using the iterator function. If allocation is allowed, all elements from
+elem_begin to elem_end will be erased and references invalidated. */
+void *ccc_dll_erase_range(ccc_doubly_linked_list *l, ccc_dll_elem *elem_begin,
+                          ccc_dll_elem *elem_end);
+
 /** @brief Returns the element following an extracted range of elements from the
 list without deallocating regardless of allocation permission provided to the
 container.

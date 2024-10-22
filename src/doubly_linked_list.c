@@ -13,6 +13,8 @@ static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
 static size_t extract_range(struct ccc_dll_ const *l,
                             struct ccc_dll_elem_ *begin,
                             struct ccc_dll_elem_ *end);
+static size_t erase_range(struct ccc_dll_ const *l, struct ccc_dll_elem_ *begin,
+                          struct ccc_dll_elem_ *end);
 static size_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
                   struct ccc_dll_elem_ const *end);
 static struct ccc_dll_elem_ *pop_front(struct ccc_dll_ *);
@@ -144,6 +146,49 @@ ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
     pos->p_ = elem;
     ++l->sz_;
     return struct_base(l, elem);
+}
+
+void *
+ccc_dll_erase(ccc_doubly_linked_list *const l, ccc_dll_elem *const elem)
+{
+    if (!l || !elem || !l->sz_)
+    {
+        return NULL;
+    }
+    elem->n_->p_ = elem->p_;
+    elem->p_->n_ = elem->n_;
+    void *const ret = elem->n_ == &l->sentinel_ ? NULL : struct_base(l, elem);
+    if (l->alloc_)
+    {
+        (void)l->alloc_(struct_base(l, elem), 0);
+    }
+    --l->sz_;
+    return ret;
+}
+
+void *
+ccc_dll_erase_range(ccc_doubly_linked_list *const l,
+                    ccc_dll_elem *const elem_begin, ccc_dll_elem *elem_end)
+{
+    if (!l || !elem_begin || !elem_end || !elem_begin->n_ || !elem_begin->p_
+        || !elem_end->n_ || !elem_end->p_ || !l->sz_)
+    {
+        return NULL;
+    }
+    if (elem_begin == elem_end)
+    {
+        return ccc_dll_erase(l, elem_begin);
+    }
+    struct ccc_dll_elem_ const *const ret = elem_end;
+    elem_end = elem_end->p_;
+    elem_end->n_->p_ = elem_begin->p_;
+    elem_begin->p_->n_ = elem_end->n_;
+
+    size_t const deleted = erase_range(l, elem_begin, elem_end);
+
+    assert(deleted <= l->sz_);
+    l->sz_ -= deleted;
+    return ret == &l->sentinel_ ? NULL : struct_base(l, ret);
 }
 
 ccc_dll_elem *
@@ -451,6 +496,38 @@ extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
     }
     assert(end != &l->sentinel_);
     end->n_ = NULL;
+    return sz;
+}
+
+static inline size_t
+erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
+            struct ccc_dll_elem_ *const end)
+{
+    begin->p_ = NULL;
+    size_t sz = 1;
+    if (l->alloc_)
+    {
+        for (; begin != end; ++sz)
+        {
+            assert(sz <= l->sz_);
+            struct ccc_dll_elem_ *const next = begin->n_;
+            (void)l->alloc_(begin, 0);
+            begin = next;
+        }
+        (void)l->alloc_(end, 0);
+    }
+    else
+    {
+        begin->p_ = NULL;
+        for (; begin != end; ++sz)
+        {
+            assert(sz <= l->sz_);
+            struct ccc_dll_elem_ *const next = begin->n_;
+            begin = next;
+        }
+        assert(end != &l->sentinel_);
+        end->n_ = NULL;
+    }
     return sz;
 }
 
