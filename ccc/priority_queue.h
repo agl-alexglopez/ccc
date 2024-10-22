@@ -7,23 +7,15 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/* The embedded struct type for operation of the priority queue. The priority
-   queue does not use the heap so it is the users responsibility to decide
-   where elements are allocated in memory. For example:
-       struct val
-       {
-           int val;
-           ccc_pq_elem elem;
-       };
-   Do not access the fields of the struct directly. */
-typedef struct ccc_pq_elem_ ccc_pq_elem;
-
-/* The structure used to manage the data in a priority queue. Stack allocation
-   is recommended for easy cleanup and speed. However, this structure may be
-   placed anywhere that is convenient for the user. Consider the fields
-   private. This structure can be initialized upon declaration witht the
-   provided initialization macro. */
+/** The structure used to manage the data in a priority queue. This priority
+queue offers pointer stability and an O(1) push and amortized O(1) (technically
+amortized o(lgN) by increasing the cost of the next pop, but the operation
+iteself is O(1)) or O(lgN) increase or decrease key operation, depending on the
+initialization of the queue. The cost of a pop operation is O(lgN). */
 typedef struct ccc_pq_ ccc_priority_queue;
+
+/** The embedded struct type for operation of the priority queue. */
+typedef struct ccc_pq_elem_ ccc_pq_elem;
 
 /* Given the desired total order of the priority queue, the comparison function,
    and any auxilliarry data needed for comparison, initialize an empty priority
@@ -47,9 +39,16 @@ ccc_result ccc_pq_push(ccc_priority_queue *, ccc_pq_elem *);
 /* Pops the front element from the priority queue. O(lgN). */
 ccc_result ccc_pq_pop(ccc_priority_queue *);
 
-/* Erase the specified element from the priority queue. This need not be
-   the front element. O(lgN). */
-ccc_result ccc_pq_extract(ccc_priority_queue *, ccc_pq_elem *);
+/* Extract the specified element from the priority queue without freeing memory.
+   This need not be the front element. O(lgN). */
+void *ccc_pq_extract(ccc_priority_queue *, ccc_pq_elem *e);
+
+/* Erase the specified element from the priority queue, freeing the user type
+   wrapping the element if the container has permission to allocate; this
+   invalidates the reference to elem. If the container does not have allocation
+   permission it is the user's responsibility to manage the memory wrapping
+   element. This need not be the front element. O(lgN). */
+ccc_result ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *e);
 
 /* Returns true if the priority queue is empty false if not. */
 bool ccc_pq_is_empty(ccc_priority_queue const *);
