@@ -38,34 +38,33 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
     }
     (void)ccc_buf_size_set(&fpq->buf_, n);
     void *const tmp = ccc_buf_at(&fpq->buf_, n);
-    for (size_t i = (n / 2) + 1; --i;)
+    for (size_t i = (n / 2) + 1; i--;)
     {
         bubble_down(fpq, tmp, i);
     }
 }
 
 ccc_result
-ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const input_array,
-                size_t const input_n, size_t const input_elem_size)
+ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
+                size_t const n, size_t const input_elem_size)
 {
     if (input_elem_size != ccc_buf_elem_size(&fpq->buf_))
     {
         return CCC_INPUT_ERR;
     }
-    if (input_n + 1 > ccc_buf_capacity(&fpq->buf_))
+    if (n + 1 > ccc_buf_capacity(&fpq->buf_))
     {
         ccc_result const resize_res
-            = ccc_buf_alloc(&fpq->buf_, input_n + 1, fpq->buf_.alloc_);
+            = ccc_buf_alloc(&fpq->buf_, n + 1, fpq->buf_.alloc_);
         if (resize_res != CCC_OK)
         {
             return resize_res;
         }
     }
-    (void)ccc_buf_size_set(&fpq->buf_, input_n);
-    (void)memcpy(ccc_buf_begin(&fpq->buf_), input_array,
-                 input_n * input_elem_size);
-    void *const tmp = ccc_buf_at(&fpq->buf_, input_n);
-    for (size_t i = (input_n / 2) + 1; --i;)
+    (void)ccc_buf_size_set(&fpq->buf_, n);
+    (void)memcpy(ccc_buf_begin(&fpq->buf_), array, n * input_elem_size);
+    void *const tmp = ccc_buf_at(&fpq->buf_, n);
+    for (size_t i = (n / 2) + 1; i--;)
     {
         bubble_down(fpq, tmp, i);
     }
