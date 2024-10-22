@@ -136,12 +136,10 @@ main(int argc, char **argv)
        perfect. It only helps build the maze.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
     srand(time(NULL));
-    struct maze maze = {
-        .rows = default_rows,
-        .cols = default_cols,
-        .speed = default_speed,
-        .maze = NULL,
-    };
+    struct maze maze = {.rows = default_rows,
+                        .cols = default_cols,
+                        .speed = default_speed,
+                        .maze = NULL};
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
@@ -216,18 +214,14 @@ animate_maze(struct maze *maze)
     ccc_ordered_map cell_costs = ccc_om_init(cell_costs, struct point_cost,
                                              elem, p, NULL, cmp_points, NULL);
     struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
-    *odd_point = (struct point_cost){
-        .p = pick_rand_point(maze),
-        .cost = rand_range(0, 100),
-    };
+    *odd_point = (struct point_cost){.p = pick_rand_point(maze),
+                                     .cost = rand_range(0, 100)};
     [[maybe_unused]] ccc_entry const ent
         = try_insert(&cell_costs, &odd_point->elem);
     assert(!occupied(&ent));
     struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
-    *start = (struct priority_cell){
-        .cell = odd_point->p,
-        .priority = odd_point->cost,
-    };
+    *start = (struct priority_cell){.cell = odd_point->p,
+                                    .priority = odd_point->cost};
     (void)insert(&cells, &start->elem);
 
     int const animation_speed = speeds[maze->speed];
@@ -241,10 +235,8 @@ animate_maze(struct maze *maze)
         int min_weight = INT_MAX;
         for (size_t i = 0; i < build_dirs_size; ++i)
         {
-            struct point const next = {
-                .r = cur->cell.r + build_dirs[i].r,
-                .c = cur->cell.c + build_dirs[i].c,
-            };
+            struct point const next = {.r = cur->cell.r + build_dirs[i].r,
+                                       .c = cur->cell.c + build_dirs[i].c};
             if (!can_build_new_square(maze, next))
             {
                 continue;
@@ -256,10 +248,8 @@ animate_maze(struct maze *maze)
             {
                 struct point_cost *new_cost
                     = valid_malloc(sizeof(struct point_cost));
-                *new_cost = (struct point_cost){
-                    .p = next,
-                    .cost = rand_range(0, 100),
-                };
+                *new_cost = (struct point_cost){.p = next,
+                                                .cost = rand_range(0, 100)};
                 cur_weight = new_cost->cost;
                 [[maybe_unused]] bool const inserted = insert_entry(
                     entry_r(&cell_costs, &new_cost->p), &new_cost->elem);
@@ -281,10 +271,8 @@ animate_maze(struct maze *maze)
                                   animation_speed);
             struct priority_cell *new_cell
                 = valid_malloc(sizeof(struct priority_cell));
-            *new_cell = (struct priority_cell){
-                .cell = min_neighbor,
-                .priority = min_weight,
-            };
+            *new_cell = (struct priority_cell){.cell = min_neighbor,
+                                               .priority = min_weight};
             (void)insert(&cells, &new_cell->elem);
         }
         else

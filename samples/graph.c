@@ -267,13 +267,11 @@ main(int argc, char **argv)
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
     srand(time(NULL));
-    struct graph graph = {
-        .rows = default_rows,
-        .cols = default_cols,
-        .vertices = default_vertices,
-        .grid = NULL,
-        .graph = network,
-    };
+    struct graph graph = {.rows = default_rows,
+                          .cols = default_cols,
+                          .vertices = default_vertices,
+                          .grid = NULL,
+                          .graph = network};
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
@@ -469,10 +467,8 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     {
         struct parent_cell const *cell = get_key_val(&parent_map, &cur);
         assert(cell);
-        struct edge edge = {
-            .n = {.name = dst->name, .cost = 0},
-            .pos = dst->pos,
-        };
+        struct edge edge
+            = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
         while (cell->parent.r > 0)
         {
             cell = get_key_val(&parent_map, &cell->parent);
@@ -519,16 +515,13 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
                                  .start = cur,
                                  .cost = e->n.cost,
                                  .spaces_needed = spaces_needed_for_cost,
-                                 .orientation = direction,
-                             });
+                                 .orientation = direction});
             return;
         }
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
-            struct point next = {
-                .r = cur.r + dirs[i].r,
-                .c = cur.c + dirs[i].c,
-            };
+            struct point next
+                = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
             Cell const next_cell = grid_at(g, next);
             if ((next_cell & vertex_bit)
                 && get_cell_vertex_title(next_cell) == e->n.name)
