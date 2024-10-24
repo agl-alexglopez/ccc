@@ -294,6 +294,8 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_pop_back(args...) ccc_dll_pop_back(args)
 #    define dll_extract(args...) ccc_dll_extract(args)
 #    define dll_extract_range(args...) ccc_dll_extract_range(args)
+#    define dll_erase(args...) ccc_dll_erase(args)
+#    define dll_erase_range(args...) ccc_dll_erase_range(args)
 #    define dll_splice(args...) ccc_dll_splice(args)
 #    define dll_splice_range(args...) ccc_dll_splice_range(args)
 #    define dll_begin(args...) ccc_dll_begin(args)

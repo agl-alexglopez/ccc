@@ -6,6 +6,18 @@
 #include "impl_flat_double_ended_queue.h"
 #include "types.h"
 
+/** A Flat Double Ended Queue (FDEQ) is a contiguous buffer supporting amortized
+O(1) or strict O(1) push and pop from the front and back depending on
+initialization options.
+
+If the container is initialized with allocation permission it will resize when
+needed but support constant time push and pop to the front and back when
+resizing is not required, resulting in amortized O(1) operations.
+
+If the FDEQ is initialized without allocation permission its behavior is
+equivalent to a Ring Buffer. This means that push front, push back, pop front,
+and pop back are O(1) operations. However, if any push exceeds capacity an
+element where the push should occur is overwritten. */
 typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 
 #define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
