@@ -883,7 +883,8 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     (void)ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     at(t, 0)->parity_ = 1;
     /* Clear back elements fields as precaution. */
-    x->branch_[L] = x->branch_[R] = x->parent_ = x->parity_ = 0;
+    x->parity_ = 0;
+    x->branch_[L] = x->branch_[R] = x->parent_ = 0;
 }
 
 static inline void
