@@ -32,8 +32,6 @@ struct ccc_sll_
     }
 
 void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
-struct ccc_sll_elem_ *ccc_sll_elem_in(struct ccc_sll_ const *,
-                                      void const *user_struct);
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
