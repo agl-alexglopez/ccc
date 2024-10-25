@@ -110,7 +110,7 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 }
 
 ccc_result
-ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *fn)
+ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
 {
     if (!pq)
     {
@@ -171,7 +171,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
    Much more efficient. */
 bool
 ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
-                ccc_update_fn *fn, void *aux)
+                ccc_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
@@ -196,7 +196,7 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
    Much more efficient. */
 bool
 ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
-                ccc_update_fn *fn, void *aux)
+                ccc_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
@@ -253,7 +253,7 @@ cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
 }
 
 static inline void *
-struct_base(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *e)
+struct_base(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const e)
 {
     return ((char *)&(e->left_child_)) - pq->pq_elem_offset_;
 }
@@ -265,20 +265,20 @@ elem_in(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const e)
 }
 
 static inline void
-init_node(struct ccc_pq_elem_ *e)
+init_node(struct ccc_pq_elem_ *const e)
 {
     e->left_child_ = e->parent_ = NULL;
     e->next_sibling_ = e->prev_sibling_ = e;
 }
 
 static inline void
-clear_node(struct ccc_pq_elem_ *e)
+clear_node(struct ccc_pq_elem_ *const e)
 {
     e->left_child_ = e->next_sibling_ = e->prev_sibling_ = e->parent_ = NULL;
 }
 
 static inline void
-cut_child(struct ccc_pq_elem_ *child)
+cut_child(struct ccc_pq_elem_ *const child)
 {
     child->next_sibling_->prev_sibling_ = child->prev_sibling_;
     child->prev_sibling_->next_sibling_ = child->next_sibling_;
@@ -297,7 +297,7 @@ cut_child(struct ccc_pq_elem_ *child)
 }
 
 static inline struct ccc_pq_elem_ *
-delete_node(struct ccc_pq_ *pq, struct ccc_pq_elem_ *root)
+delete_node(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const root)
 {
     if (pq->root_ == root)
     {
@@ -308,7 +308,7 @@ delete_node(struct ccc_pq_ *pq, struct ccc_pq_elem_ *root)
 }
 
 static inline struct ccc_pq_elem_ *
-delete_min(struct ccc_pq_ *pq, struct ccc_pq_elem_ *root)
+delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
 {
     if (!root->left_child_)
     {
@@ -319,8 +319,8 @@ delete_min(struct ccc_pq_ *pq, struct ccc_pq_elem_ *root)
     struct ccc_pq_elem_ *cur = root->left_child_->next_sibling_->next_sibling_;
     while (cur != eldest && cur->next_sibling_ != eldest)
     {
-        struct ccc_pq_elem_ *next = cur->next_sibling_;
-        struct ccc_pq_elem_ *next_cur = cur->next_sibling_->next_sibling_;
+        struct ccc_pq_elem_ *const next = cur->next_sibling_;
+        struct ccc_pq_elem_ *const next_cur = cur->next_sibling_->next_sibling_;
         next->next_sibling_ = next->prev_sibling_ = NULL;
         cur->next_sibling_ = cur->prev_sibling_ = NULL;
         accumulator = merge(pq, accumulator, merge(pq, cur, next));
@@ -386,14 +386,11 @@ traversal_size(struct ccc_pq_elem_ const *const root)
         return 0;
     }
     size_t sz = 0;
-    bool sibling_ring_lapped = false;
     struct ccc_pq_elem_ const *cur = root;
-    while (!sibling_ring_lapped)
+    do
     {
         sz += 1 + traversal_size(cur->left_child_);
-        cur = cur->next_sibling_;
-        sibling_ring_lapped = cur == root;
-    }
+    } while ((cur = cur->next_sibling_) != root);
     return sz;
 }
 

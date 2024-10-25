@@ -17,78 +17,149 @@ typedef struct ccc_pq_ ccc_priority_queue;
 /** The embedded struct type for operation of the priority queue. */
 typedef struct ccc_pq_elem_ ccc_pq_elem;
 
-/* Given the desired total order of the priority queue, the comparison function,
-   and any auxilliarry data needed for comparison, initialize an empty priority
-   queue on the right hand side of it's declaration. This can be used at
-   compile time or runtime. For example:
-     ccc_priority_queue my_pq = ccc_pq_init(CCC_PQ_LES, my_cmp_fn, NULL);
-   Such initialization must always occur or use of the priority queue is
-   undefined. */
+/** @brief Initialize a priority queue at runtime or compile time.
+@param [in] struct_name the name of the user type wrapping pq elems.
+@param [in] pq_elem_field the name of the field for the pq elem.
+@param [in] pq_order CCC_LES for a min pq or CCC_GRT for a max pq.
+@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] cmp_fn the function used to compare two user types.
+@param [in] aux_data auxiliary data needed for comparison or destruction.
+@return the initialized pq on the right side of an equality operator
+(e.g. ccc_priority_queue pq = ccc_pq_init(...);) */
 #define ccc_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,    \
                     aux_data)                                                  \
     ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
                      aux_data)
 
-/* Obtain a reference to the front of the priority queue. This will be a min
-   or max depending on the initialization of the priority queue. O(1). */
-void *ccc_pq_front(ccc_priority_queue const *);
+/** @brief Obtain a reference to the front of the priority queue. O(1).
+@param [in] pq a pointer to the priority queue.
+@return a reference to the front element in the pq. */
+[[nodiscard]] void *ccc_pq_front(ccc_priority_queue const *pq);
 
-/* Adds an element to the priority queue in correct total order. O(1). */
-ccc_result ccc_pq_push(ccc_priority_queue *, ccc_pq_elem *);
+/** @brief Adds an element to the priority queue in correct total order. O(1).
+@param [in] pq a pointer to the priority queue.
+@param [in] elem a pointer to the intrusive element in the user type.
+@return ok if the push succeeded. If NULL arguments are provided an input error
+is returned. If allocation is permitted but allocation fails a memory error
+is returned.
 
-/* Pops the front element from the priority queue. O(lgN). */
-ccc_result ccc_pq_pop(ccc_priority_queue *);
+Note that if allocation is permitted the user type is copied into a newly
+allocated node.
 
-/* Extract the specified element from the priority queue without freeing memory.
-   This need not be the front element. O(lgN). */
-void *ccc_pq_extract(ccc_priority_queue *, ccc_pq_elem *e);
+If allocation is not permitted this function assumes the memory wrapping elem
+has been allocated with the appropriate lifetime for the user's needs. */
+ccc_result ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
-/* Erase the specified element from the priority queue, freeing the user type
-   wrapping the element if the container has permission to allocate; this
-   invalidates the reference to elem. If the container does not have allocation
-   permission it is the user's responsibility to manage the memory wrapping
-   element. This need not be the front element. O(lgN). */
-ccc_result ccc_pq_erase(ccc_priority_queue *, ccc_pq_elem *e);
+/** @brief Pops the front element from the priority queue. Amortized O(lgN).
+@param [in] pq a pointer to the priority queue.
+@return ok if pop was successful or an input error if pq is NULL or empty. */
+ccc_result ccc_pq_pop(ccc_priority_queue *pq);
 
-/* Returns true if the priority queue is empty false if not. */
-bool ccc_pq_is_empty(ccc_priority_queue const *);
+/** Extract the element known to be in the pq without freeing memory. Amortized
+O(lgN).
+@param [in] pq a pointer to the priority queue.
+@param [in] elem a pointer to the intrusive element in the user type.
+@return a pointer to the extracted user type.
 
-/* Returns the size of the priority queue. */
-size_t ccc_pq_size(ccc_priority_queue const *);
+Note that the user must ensure that elem is in the priority queue. */
+[[nodiscard]] void *ccc_pq_extract(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
-/* Update the value of a priority queue element if the new value is not
-   known to be less than or greater than the old value. This operation
-   may incur uneccessary overhead if the user can deduce if an increase
-   or decrease is occuring. See the increase and decrease operations. O(1)
-   best case, O(lgN) worst case. */
-bool ccc_pq_update(ccc_priority_queue *, ccc_pq_elem *, ccc_update_fn *,
-                   void *);
+/** @brief Erase elem from the pq. Amortized O(lgN).
+@param [in] pq a pointer to the priority queue.
+@param [in] elem a pointer to the intrusive element in the user type.
+@return ok if erase was successful or an input error if pq or elem is NULL or
+pq is empty.
 
-/* Optimal update technique if the priority queue has been initialized as
-   a max queue and the new value is known to be greater than the old value.
-   If this is a max heap O(1), otherwise O(lgN). */
-bool ccc_pq_increase(ccc_priority_queue *, ccc_pq_elem *, ccc_update_fn *,
-                     void *);
+Note that the user must ensure that elem is in the priority queue. */
+ccc_result ccc_pq_erase(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
-/* Optimal update technique if the priority queue has been initialized as
-   a min queue and the new value is known to be less than the old value.
-   If this is a min heap O(1), otherwise O(lgN). */
-bool ccc_pq_decrease(ccc_priority_queue *, ccc_pq_elem *, ccc_update_fn *,
-                     void *);
+/** @brief Returns true if the priority queue is empty false if not. O(1).
+@param [in] pq a pointer to the priority queue.
+@return true if the size is 0 or pq is NULL, false if not empty.  */
+[[nodiscard]] bool ccc_pq_is_empty(ccc_priority_queue const *pq);
 
-/* Return the order used to initialize the heap. */
-ccc_threeway_cmp ccc_pq_order(ccc_priority_queue const *);
+/** @brief Returns the size of the priority queue.
+@param [in] pq a pointer to the priority queue.
+@return the size of the pq or 0 if pq is NULL or pq is empty. */
+[[nodiscard]] size_t ccc_pq_size(ccc_priority_queue const *pq);
 
-/* Calls the user provided destructor on each element in the priority queue.
-   It is safe to free the struct if it has been heap allocated as elements
-   are popped from the priority queue before the function is called. O(NlgN). */
-ccc_result ccc_pq_clear(ccc_priority_queue *, ccc_destructor_fn *);
+/** @brief Update the value in the user type wrapping elem.
+@param [in] pq a pointer to the priority queue.
+@param [in] elem a pointer to the intrusive element in the user type.
+@param [in] fn the update function to act on the type wrapping elem.
+@param [in] aux any auxiliary data needed for the update function.
+@return true if the update occured false if parameters were invalid or the
+function can deduce elem is not in the pq.
+@warning the user must ensure elem is in the pq.
 
-/* Internal validation function for the state of the heap. This should be of
-   little interest to the user. */
-bool ccc_pq_validate(ccc_priority_queue const *);
+Note that this operation may incur uneccessary overhead if the user can't
+deduce if an increase or decrease is occuring. See the increase and decrease
+operations. O(1) best case, O(lgN) worst case. */
+bool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem, ccc_update_fn *fn,
+                   void *aux);
 
-#ifndef PRIORITY_QUEUE_USING_NAMESPACE_CCC
+/** @brief Increases the value of the type wrapping elem. O(1) or O(lgN)
+@param [in] pq a pointer to the priority queue.
+@param [in] elem a pointer to the intrusive element in the user type.
+@param [in] fn the update function to act on the type wrapping elem.
+@param [in] aux any auxiliary data needed for the update function.
+@return true if the increase occured false if parameters were invalid or the
+function can deduce elem is not in the pq.
+
+Note that this is optimal update technique if the priority queue has been
+initialized as a max queue and the new value is known to be greater than the old
+value. If this is a max heap O(1), otherwise O(lgN).
+
+While the best case operation is O(1) the impact of restructuring on future pops
+from the pq creates an amortized o(lgN) runtime for this function. */
+bool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
+                     ccc_update_fn *fn, void *aux);
+
+/** @brief Decreases the value of the type wrapping elem. O(1) or O(lgN)
+@param [in] pq a pointer to the priority queue.
+@param [in] elem a pointer to the intrusive element in the user type.
+@param [in] fn the update function to act on the type wrapping elem.
+@param [in] aux any auxiliary data needed for the update function.
+@return true if the decrease occured false if parameters were invalid or the
+function can deduce elem is not in the pq.
+
+Note that this is optimal update technique if the priority queue has been
+initialized as a min queue and the new value is known to be less than the old
+value. If this is a min heap O(1), otherwise O(lgN).
+
+While the best case operation is O(1) the impact of restructuring on future pops
+from the pq creates an amortized o(lgN) runtime for this function. */
+bool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
+                     ccc_update_fn *fn, void *aux);
+
+/** @brief Return the order used to initialize the heap.
+@param [in] pq a pointer to the priority queue.
+@return LES or GRT ordering. Any other ordering is invalid. */
+[[nodiscard]] ccc_threeway_cmp ccc_pq_order(ccc_priority_queue const *pq);
+
+/** @brief Removes all elements from the pq, freeing if needed.
+@param [in] pq a pointer to the priority queue.
+@param [in] fn the destructor function or NULL if not needed.
+@return ok if the clear was successful or an input error for NULL args.
+
+Note that if allocation is allowed the container will free the user type
+wrapping each element in the pq. Therefore, the user should not free in the
+destructor function. Only perform auxiliary cleanup operations if needed.
+
+If allocation is not allowed, the user may free their stored types in the
+destructor function if they wish to do so. The container simply removes all
+the elements from the pq, calling fn on each user type if provided, and sets the
+size to zero. */
+ccc_result ccc_pq_clear(ccc_priority_queue *pq, ccc_destructor_fn *fn);
+
+/** @brief Verifies the internal invariants of the pq hold.
+@param [in] pq a pointer to the priority queue.
+@return true if the pq is valid false if pq is NULL or invalid. */
+[[nodiscard]] bool ccc_pq_validate(ccc_priority_queue const *pq);
+
+/** Define this preprocessor directive if shortened names are desired for the
+priority queue container. Check for collisions before name shortening. */
+#ifdef PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_pq_elem pq_elem;
 typedef ccc_priority_queue priority_queue;
 #    define pq_init(args...) ccc_pq_init(args)

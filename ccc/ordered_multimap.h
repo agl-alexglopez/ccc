@@ -82,7 +82,7 @@ other struct members. */
     }
 
 /** @brief Insert an initial key value into the multimap if none is present,
-otherwise return the oldest user type stored at the specified key.
+otherwise return the oldest user type stored at the specified key. O(1).
 @param [in] ordered_multimap_entry_ptr the address of the multimap entry.
 @param [in] lazy_key_value the compound literal of the user struct stored in
 the map.
@@ -98,7 +98,7 @@ permitted to allocate memory. */
     ccc_impl_omm_or_insert_w(ordered_multimap_entry_ptr, lazy_key_value)
 
 /** @brief Invariantly writes the specified compound literal directly to the
-existing or newly allocated entry.
+existing or newly allocated entry. O(1).
 @param [in] ordered_multimap_entry_ptr the address of the multimap entry.
 @param [in] lazy_key_value the compound literal that is constructed directly
 at the existing or newly allocated memory in the container.
@@ -114,6 +114,7 @@ permitted to allocate memory. */
     ccc_impl_omm_insert_entry_w(ordered_multimap_entry_ptr, lazy_key_value)
 
 /** @brief Inserts a new key-value into the multimap only if none exists.
+Amortized O(lgN).
 @param [in] ordered_multimap_ptr a pointer to the multimap
 @param [in] key the direct key r-value to be searched.
 @param [in] lazy_value the compound literal for the type to be directly written
@@ -132,7 +133,8 @@ searched key match. */
     }
 
 /** @brief Invariantly inserts the key value pair into the multimap either as
-the first entry or overwriting the oldest existing entry at key.
+the first entry or overwriting the oldest existing entry at key. Amortized
+O(lgN).
 @param [in] ordered_multimap_ptr a pointer to the multimap
 @param [in] key the direct key r-value to be searched.
 @param [in] lazy_value the compound literal for the type to be directly written
@@ -153,13 +155,13 @@ and searched key match. */
 
 /*=========================    Membership   =================================*/
 
-/** @brief Returns the membership of key in the multimap.
+/** @brief Returns the membership of key in the multimap. Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
 @return true if the multimap contains at least one entry at key, else false. */
 [[nodiscard]] bool ccc_omm_contains(ccc_ordered_multimap *mm, void const *key);
 
-/** @brief Returns a reference to the user type stored at key.
+/** @brief Returns a reference to the user type stored at key. Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
 @return a reference to the oldest existing user type at key, NULL if absent. */
@@ -169,7 +171,8 @@ and searched key match. */
 /*=========================    Entry API    =================================*/
 
 /** @brief Returns an entry pointing to the newly inserted element and a status
-indicating if the map has already been Occupied at the given key.
+indicating if the map has already been Occupied at the given key. Amortized
+O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] e a handle to the new key value to be inserted.
 @return an entry that can be unwrapped to view the inserted element. The status
@@ -185,6 +188,7 @@ by the user, for the user's intended use case. */
                                        ccc_omm_elem *key_val_handle);
 
 /** @brief Inserts a new key-value into the multimap only if none exists.
+Amortized O(lgN).
 @param [in] mm a pointer to the multimap
 @param [in] key_val_handle a pointer to the intrusive element in the user type.
 @return an entry of the user type in the map. The status is Occupied if this
@@ -199,7 +203,8 @@ by the user, for the user's intended use case. */
                                            ccc_omm_elem *key_val_handle);
 
 /** @brief Invariantly inserts the key value pair into the multimap either as
-the first entry or overwriting the oldest existing entry at key.
+the first entry or overwriting the oldest existing entry at key. Amortized
+O(lgN).
 @param [in] mm a pointer to the multimap
 @param [in] key_val_handle a pointer to the intrusive element in the user type.
 @return an entry of the user type in the map. The status is Occupied if this
@@ -214,7 +219,7 @@ by the user, for the user's intended use case. */
                                                  ccc_omm_elem *key_val_handle);
 
 /** @brief Removes the entry specified at key of the type containing out_handle
-preserving the old value if possible.
+preserving the old value if possible. Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] out_handle the pointer to the intrusive element in the user type.
 @return an entry indicating if one of the elements stored at key has been
@@ -231,6 +236,7 @@ struct directly and the user must unwrap and free their type themselves. */
 
 /** @brief Return a compound literal reference to the entry generated from a
 search. No manual management of a compound literal reference is necessary.
+Amortized O(lgN).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] key_ptr a ponter to the key to be searched.
 @return a compound literal reference to a container specific entry associated
@@ -246,6 +252,7 @@ and references (e.g. struct val *v = or_insert(entry_r(...), ...)); */
     }
 
 /** @brief Return a container specific entry for the given search for key.
+Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
 @return a container specific entry for status, unwrapping, or further Entry API
@@ -278,7 +285,7 @@ function are NULL, NULL is returned. */
 ccc_omm_and_modify_aux(ccc_o_mm_entry *e, ccc_update_fn *fn, void *aux);
 
 /** @brief Insert an initial key value into the multimap if none is present,
-otherwise return the oldest user type stored at the specified key.
+otherwise return the oldest user type stored at the specified key. O(1).
 @param [in] e a pointer to the multimap entry.
 @param [in] key_val_handle a pointer to the intrusive element in the user type.
 @return a pointer to the user type stored in the map either existing or newly
@@ -293,7 +300,7 @@ by the user, for the user's intended use case. */
                                       ccc_omm_elem *key_val_handle);
 
 /** @brief Invariantly writes the specified key value directly to the existing
-or newly allocated entry.
+or newly allocated entry. O(1).
 @param [in] e a pointer to the multimap entry.
 @param [in] key_val_handle a pointer to the intrusive element in the user type.
 @return a pointer to the user type written to the existing map entry or newly
@@ -307,7 +314,7 @@ by the user, for the user's intended use case. */
 [[nodiscard]] void *ccc_omm_insert_entry(ccc_o_mm_entry const *e,
                                          ccc_omm_elem *key_val_handle);
 
-/** @brief Removes the entry if it is Occupied.
+/** @brief Removes the entry if it is Occupied. O(1).
 @param [in] e a pointer to the multimap entry.
 @return an entry indicating the status of the removal. If the entry was Vacant,
 a Vacant entry with NULL is returned. If the entry is Occupied and allocation
@@ -350,7 +357,7 @@ non-NULL arguments. */
 
 /** @brief Pops the oldest maximum key value user type from the map. Elements
 are stored in ascending order, smallest as defined by the comparison function is
-min and largest is max.
+min and largest is max. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @return the status of the pop operation. If NULL pointer is provided or the
 map is empty a bad input result is returned otherwise ok.
@@ -362,7 +369,7 @@ ccc_result ccc_omm_pop_max(ccc_ordered_multimap *mm);
 
 /** @brief Pops the oldest minimum element from the map. Elements are stored
 in ascending order, smallest as defined by the comparison function is min and
-largest is max.
+largest is max. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @return the status of the pop operation. If NULL pointer is provided or the
 map is empty a bad input result is returned otherwise ok.
@@ -374,7 +381,7 @@ ccc_result ccc_omm_pop_min(ccc_ordered_multimap *mm);
 
 /** @brief Returns a reference to the oldest maximum key value user type from
 the map. Elements are stored in ascending order, smallest as defined by the
-comparison function is min and largest is max.
+comparison function is min and largest is max. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @return the oldest maximum key value user type in the map.
 
@@ -388,7 +395,7 @@ keys. */
 
 /** @brief Returns a reference to the oldest minimum key value user type from
 the map. Elements are stored in ascending order, smallest as defined by the
-comparison function is min and largest is max.
+comparison function is min and largest is max. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @return the oldest minimum key value user type in the map.
 
@@ -401,7 +408,7 @@ keys. */
 [[nodiscard]] void *ccc_omm_min(ccc_ordered_multimap *mm);
 
 /** @brief Extracts a user type known to be stored in the map with
-key_val_handle as an element currently in use by the map.
+key_val_handle as an element currently in use by the map. O(1).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -415,7 +422,7 @@ the element that has been extracted. */
                                     ccc_omm_elem *key_val_handle);
 
 /** @brief Updates an element key that is currently tracked directly as a
-member of the map.
+member of the map. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -430,7 +437,7 @@ or the map is empty. */
                                   ccc_update_fn *fn, void *aux);
 
 /** @brief Increases an element key that is currently tracked directly as a
-member of the map.
+member of the map. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -445,7 +452,7 @@ or the map is empty. */
                                     ccc_update_fn *fn, void *aux);
 
 /** @brief Decreases an element key that is currently tracked directly as a
-member of the map.
+member of the map. Amortized O(lgN).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -461,7 +468,8 @@ or the map is empty. */
 
 /*===========================   Iterators   =================================*/
 
-/** @brief Returns a compound literal reference to the desired range.
+/** @brief Returns a compound literal reference to the desired range. Amortized
+O(lgN).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] begin_key_ptr a pointer to the key that marks the start of the
 range.
@@ -475,7 +483,8 @@ enclosing scope. This reference is always non-NULL. */
             .impl_                                                             \
     }
 
-/** @brief Returns a compound literal reference to the desired rrange.
+/** @brief Returns a compound literal reference to the desired rrange. Amortized
+O(lgN).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] begin_key_ptr a pointer to the key that marks the start of the
 rrange.
@@ -491,6 +500,7 @@ enclosing scope. This reference is always non-NULL. */
     }
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
+Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] begin_key a pointer to the key intended as the start of the range.
 @param [in] end_key a pointer to the key intended as the end of the range.
@@ -512,6 +522,7 @@ map versus the end map sentinel. */
                                             void const *end_key);
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
+Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @param [in] begin_key a pointer to the key intended as the start of the rrange.
 @param [in] end_key a pointer to the key intended as the end of the rrange.
@@ -532,7 +543,8 @@ the map versus the end map sentinel. */
                                               void const *rbegin_key,
                                               void const *rend_key);
 
-/** @brief Return the start of an inorder traversal of the multimap.
+/** @brief Return the start of an inorder traversal of the multimap. Amortized
+O(lgN).
 @param [in] mm a pointer to the multimap.
 @return the oldest minimum element of the map.
 
@@ -542,6 +554,7 @@ key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_begin(ccc_ordered_multimap const *mm);
 
 /** @brief Return the start of a reverse inorder traversal of the multimap.
+Amortized O(lgN).
 @param [in] mm a pointer to the multimap.
 @return the oldest maximum element of the map.
 
@@ -551,6 +564,7 @@ key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_rbegin(ccc_ordered_multimap const *mm);
 
 /** @brief Return the next element in an inorder traversal of the multimap.
+O(1).
 @param [in] mm a pointer to the multimap.
 @param [in] iter_handle a pointer to the intrusive multimap element of the
 current iterator.
@@ -563,7 +577,7 @@ key of stored in the multimap. */
                                  ccc_omm_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the
-multimap.
+multimap. O(1).
 @param [in] mm a pointer to the multimap.
 @param [in] iter_handle a pointer to the intrusive multimap element of the
 current iterator.
@@ -575,7 +589,7 @@ key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_rnext(ccc_ordered_multimap const *mm,
                                   ccc_omm_elem const *iter_handle);
 
-/** @brief Return the end of an inorder traversal of the multimap.
+/** @brief Return the end of an inorder traversal of the multimap. O(1).
 @param [in] mm a pointer to the multimap.
 @return the newest maximum element of the map.
 
@@ -584,7 +598,7 @@ round robin order and ending at the newest before progressing to the next
 key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_end(ccc_ordered_multimap const *mm);
 
-/** @brief Return the rend of a reverse inorder traversal of the multimap.
+/** @brief Return the rend of a reverse inorder traversal of the multimap. O(1).
 @param [in] mm a pointer to the multimap.
 @return the newest minimum element of the map.
 
@@ -594,7 +608,7 @@ key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_rend(ccc_ordered_multimap const *mm);
 
 /** @brief Pops every element from the map calling destructor if destructor is
-non-NULL.
+non-NULL. O(N).
 @param [in] mm a pointer to the multimap.
 @param [in] destructor a destructor function if required. NULL if unneeded.
 @return an input error if mm points to NULL otherwise ok.
@@ -612,12 +626,12 @@ ccc_result ccc_omm_clear(ccc_ordered_multimap *mm,
 
 /*===========================     Getters   =================================*/
 
-/** @brief Returns true if the multimap is empty.
+/** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
 @return true if empty, false if mm is NULL or mm is empty. */
 [[nodiscard]] bool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
-/** @brief Returns true if the multimap is empty.
+/** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
 @return the size of the container or 0 if empty or mm is NULL. */
 [[nodiscard]] size_t ccc_omm_size(ccc_ordered_multimap const *mm);
