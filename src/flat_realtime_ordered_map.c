@@ -1062,7 +1062,6 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
     struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
     struct ccc_frm_elem_ *const x_ref = at(t, x_p_of_y);
     struct ccc_frm_elem_ *const y_ref = at(t, y);
-    // struct ccc_frm_elem_ *const y = at(t, y);
     size_t const p_of_p_of_x = z_ref->parent_;
     y_ref->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
