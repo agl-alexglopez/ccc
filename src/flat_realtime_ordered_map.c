@@ -673,7 +673,8 @@ static inline void
 init_node(struct ccc_frm_elem_ *const e)
 {
     assert(e != NULL);
-    e->branch_[L] = e->branch_[R] = e->parent_ = e->parity_ = 0;
+    e->parity_ = 0;
+    e->branch_[L] = e->branch_[R] = e->parent_ = 0;
 }
 
 static inline void
@@ -683,9 +684,9 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
     {
         return;
     }
-    memcpy(tmp, a, elem_sz);
-    memcpy(a, b, elem_sz);
-    memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, elem_sz);
+    (void)memcpy(a, b, elem_sz);
+    (void)memcpy(b, tmp, elem_sz);
 }
 
 static inline struct ccc_frm_elem_ *

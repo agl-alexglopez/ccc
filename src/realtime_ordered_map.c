@@ -638,9 +638,7 @@ init_node(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const e)
 {
     assert(e != NULL);
     assert(rom != NULL);
-    e->branch_[L] = &rom->end_;
-    e->branch_[R] = &rom->end_;
-    e->parent_ = &rom->end_;
+    e->branch_[L] = e->branch_[R] = e->parent_ = &rom->end_;
     e->parity_ = 0;
 }
 
@@ -651,9 +649,9 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
     {
         return;
     }
-    memcpy(tmp, a, elem_sz);
-    memcpy(a, b, elem_sz);
-    memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, elem_sz);
+    (void)memcpy(a, b, elem_sz);
+    (void)memcpy(b, tmp, elem_sz);
 }
 
 static inline ccc_threeway_cmp
