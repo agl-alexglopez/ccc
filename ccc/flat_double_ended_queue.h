@@ -128,7 +128,7 @@ Notice that the start of the range, {0,0,3,...}, is overwritten. */
 /** @brief Return a reference to the element at index position i.
 @param [in] fdeq a pointer to the fdeq.
 @param [in] i the 0 based index in the fdeq.
-@return a reference to the element at i if i <= capacity.
+@return a reference to the element at i if i < capacity.
 
 Note that the front of the fdeq is considered index 0, so the user need not
 worry about where the front is for indexing purposes. */
