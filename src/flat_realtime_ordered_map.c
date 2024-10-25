@@ -411,11 +411,13 @@ ccc_frm_clear(ccc_flat_realtime_ordered_map *const frm,
         frm->root_ = 0;
         return ccc_buf_size_set(&frm->buf_, 1);
     }
-    while (!ccc_frm_is_empty(frm))
+    for (void *e = ccc_buf_at(&frm->buf_, 1); e != ccc_buf_end(&frm->buf_);
+         e = ccc_buf_next(&frm->buf_, e))
     {
-        void *const deleted = remove_fixup(frm, frm->root_);
-        fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
+        fn((ccc_user_type_mut){.user_type = e, .aux = frm->aux_});
     }
+    (void)ccc_buf_size_set(&frm->buf_, 1);
+    frm->root_ = 0;
     return CCC_OK;
 }
 
@@ -432,11 +434,12 @@ ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *const frm,
         frm->root_ = 0;
         return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
     }
-    while (!ccc_frm_is_empty(frm))
+    for (void *e = ccc_buf_at(&frm->buf_, 1); e != ccc_buf_end(&frm->buf_);
+         e = ccc_buf_next(&frm->buf_, e))
     {
-        void *const deleted = remove_fixup(frm, frm->root_);
-        fn((ccc_user_type_mut){.user_type = deleted, .aux = frm->aux_});
+        fn((ccc_user_type_mut){.user_type = e, .aux = frm->aux_});
     }
+    frm->root_ = 0;
     return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
 }
 
