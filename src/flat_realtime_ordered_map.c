@@ -76,9 +76,9 @@ static size_t parent_i(struct ccc_frm_ const *t, size_t child);
 static size_t index_of(struct ccc_frm_ const *t,
                        struct ccc_frm_elem_ const *elem);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_ref(struct ccc_frm_ const *t, size_t node,
-                          enum frm_branch_ branch);
-static size_t *parent_ref(struct ccc_frm_ const *t, size_t node);
+static size_t *branch_r(struct ccc_frm_ const *t, size_t node,
+                        enum frm_branch_ branch);
+static size_t *parent_r(struct ccc_frm_ const *t, size_t node);
 /* Returning WAVL tree status. */
 static bool is_0_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
 static bool is_1_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
@@ -600,10 +600,10 @@ next(struct ccc_frm_ const *const t, size_t n, enum frm_branch_ const traversal)
        write to the sentinel on every call to next. I want multiple threads to
        iterate freely without undefined data race writes to memory locations.
        So more expensive loop.*/
-    for (; parent_i(t, n) && branch_i(t, parent_i(t, n), !traversal) != n;
-         n = parent_i(t, n))
+    size_t p = parent_i(t, n);
+    for (; p && branch_i(t, p, !traversal) != n; n = p, p = parent_i(t, p))
     {}
-    return parent_i(t, n);
+    return p;
 }
 
 static struct ccc_range_
@@ -721,14 +721,14 @@ parity(struct ccc_frm_ const *t, size_t const node)
 }
 
 static inline size_t *
-branch_ref(struct ccc_frm_ const *t, size_t const node,
-           enum frm_branch_ const branch)
+branch_r(struct ccc_frm_ const *t, size_t const node,
+         enum frm_branch_ const branch)
 {
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->branch_[branch];
 }
 
 static inline size_t *
-parent_ref(struct ccc_frm_ const *t, size_t node)
+parent_r(struct ccc_frm_ const *t, size_t node)
 {
 
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
@@ -818,26 +818,26 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
         y = remove;
         p_of_xy = parent_i(t, y);
         x = branch_i(t, y, !branch_i(t, y, L));
-        *parent_ref(t, x) = parent_i(t, y);
+        *parent_r(t, x) = parent_i(t, y);
         if (!p_of_xy)
         {
             t->root_ = x;
         }
         two_child = is_2_child(t, p_of_xy, y);
-        *branch_ref(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
+        *branch_r(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
     }
     else
     {
         y = min_max_from(t, branch_i(t, remove, R), min);
         p_of_xy = parent_i(t, y);
         x = branch_i(t, y, !branch_i(t, y, L));
-        *parent_ref(t, x) = parent_i(t, y);
+        *parent_r(t, x) = parent_i(t, y);
 
         /* Save if check and improve readability by assuming this is true. */
         assert(p_of_xy);
 
         two_child = is_2_child(t, p_of_xy, y);
-        *branch_ref(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
+        *branch_r(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
         transplant(t, remove, y);
         if (remove == p_of_xy)
         {
@@ -877,8 +877,8 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
         struct ccc_frm_elem_ *const p = at(t, x->parent_);
         p->branch_[p->branch_[R] == x_i] = vacant_i;
     }
-    *parent_ref(t, x->branch_[R]) = vacant_i;
-    *parent_ref(t, x->branch_[L]) = vacant_i;
+    *parent_r(t, x->branch_[R]) = vacant_i;
+    *parent_r(t, x->branch_[L]) = vacant_i;
     /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
     (void)ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
     at(t, 0)->parity_ = 1;
@@ -893,7 +893,7 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
 {
     assert(remove);
     assert(replacement);
-    *parent_ref(t, replacement) = parent_i(t, remove);
+    *parent_r(t, replacement) = parent_i(t, remove);
     if (!parent_i(t, remove))
     {
         t->root_ = replacement;
@@ -901,15 +901,15 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
     else
     {
         size_t const p = parent_i(t, remove);
-        *branch_ref(t, p, branch_i(t, p, R) == remove) = replacement;
+        *branch_r(t, p, branch_i(t, p, R) == remove) = replacement;
     }
-    struct ccc_frm_elem_ *const remove_ref = at(t, remove);
-    struct ccc_frm_elem_ *const replace_ref = at(t, replacement);
-    *parent_ref(t, remove_ref->branch_[R]) = replacement;
-    *parent_ref(t, remove_ref->branch_[L]) = replacement;
-    replace_ref->branch_[R] = remove_ref->branch_[R];
-    replace_ref->branch_[L] = remove_ref->branch_[L];
-    replace_ref->parity_ = remove_ref->parity_;
+    struct ccc_frm_elem_ *const remove_r = at(t, remove);
+    struct ccc_frm_elem_ *const replace_r = at(t, replacement);
+    *parent_r(t, remove_r->branch_[R]) = replacement;
+    *parent_r(t, remove_r->branch_[L]) = replacement;
+    replace_r->branch_[R] = remove_r->branch_[R];
+    replace_r->branch_[L] = remove_r->branch_[L];
+    replace_r->parity_ = remove_r->parity_;
 }
 
 static inline void
@@ -1024,10 +1024,10 @@ rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
        size_t const y, enum frm_branch_ const dir)
 {
     assert(z_p_of_x);
-    struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
-    struct ccc_frm_elem_ *const x_ref = at(t, x_p_of_y);
+    struct ccc_frm_elem_ *const z_r = at(t, z_p_of_x);
+    struct ccc_frm_elem_ *const x_r = at(t, x_p_of_y);
     size_t const p_of_p_of_x = parent_i(t, z_p_of_x);
-    x_ref->parent_ = p_of_p_of_x;
+    x_r->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
     {
         t->root_ = x_p_of_y;
@@ -1037,10 +1037,10 @@ rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
         struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
         g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
     }
-    x_ref->branch_[dir] = z_p_of_x;
-    z_ref->parent_ = x_p_of_y;
-    z_ref->branch_[!dir] = y;
-    *parent_ref(t, y) = z_p_of_x;
+    x_r->branch_[dir] = z_p_of_x;
+    z_r->parent_ = x_p_of_y;
+    z_r->branch_[!dir] = y;
+    *parent_r(t, y) = z_p_of_x;
 }
 
 /** A double rotation shouldn't actually be two calls to rotate because that
@@ -1059,11 +1059,11 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
               size_t const x_p_of_y, size_t const y, enum frm_branch_ const dir)
 {
     assert(z_p_of_x && x_p_of_y && y);
-    struct ccc_frm_elem_ *const z_ref = at(t, z_p_of_x);
-    struct ccc_frm_elem_ *const x_ref = at(t, x_p_of_y);
-    struct ccc_frm_elem_ *const y_ref = at(t, y);
-    size_t const p_of_p_of_x = z_ref->parent_;
-    y_ref->parent_ = p_of_p_of_x;
+    struct ccc_frm_elem_ *const z_r = at(t, z_p_of_x);
+    struct ccc_frm_elem_ *const x_r = at(t, x_p_of_y);
+    struct ccc_frm_elem_ *const y_r = at(t, y);
+    size_t const p_of_p_of_x = z_r->parent_;
+    y_r->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
     {
         t->root_ = y;
@@ -1073,15 +1073,15 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
         struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
         g->branch_[g->branch_[R] == z_p_of_x] = y;
     }
-    x_ref->branch_[!dir] = y_ref->branch_[dir];
-    *parent_ref(t, y_ref->branch_[dir]) = x_p_of_y;
-    y_ref->branch_[dir] = x_p_of_y;
-    x_ref->parent_ = y;
+    x_r->branch_[!dir] = y_r->branch_[dir];
+    *parent_r(t, y_r->branch_[dir]) = x_p_of_y;
+    y_r->branch_[dir] = x_p_of_y;
+    x_r->parent_ = y;
 
-    z_ref->branch_[dir] = y_ref->branch_[!dir];
-    *parent_ref(t, y_ref->branch_[!dir]) = z_p_of_x;
-    y_ref->branch_[!dir] = z_p_of_x;
-    z_ref->parent_ = y;
+    z_r->branch_[dir] = y_r->branch_[!dir];
+    *parent_r(t, y_r->branch_[!dir]) = z_p_of_x;
+    y_r->branch_[!dir] = z_p_of_x;
+    z_r->parent_ = y;
 }
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
@@ -1215,9 +1215,10 @@ is_leaf(struct ccc_frm_ const *const t, size_t const x)
 static inline size_t
 sibling_of(struct ccc_frm_ const *const t, size_t const x)
 {
-    assert(parent_i(t, x));
+    size_t const p = parent_i(t, x);
+    assert(p);
     /* We want the sibling so we need the truthy value to be opposite of x. */
-    return at(t, parent_i(t, x))->branch_[branch_i(t, parent_i(t, x), L) == x];
+    return at(t, p)->branch_[branch_i(t, p, L) == x];
 }
 
 /*===========================   Validation   ===============================*/
