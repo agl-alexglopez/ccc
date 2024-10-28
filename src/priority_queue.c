@@ -284,14 +284,8 @@ cut_child(struct ccc_pq_elem_ *const child)
     child->prev_sibling_->next_sibling_ = child->next_sibling_;
     if (child->parent_ && child == child->parent_->left_child_)
     {
-        if (child->next_sibling_ == child)
-        {
-            child->parent_->left_child_ = NULL;
-        }
-        else
-        {
-            child->parent_->left_child_ = child->next_sibling_;
-        }
+        child->parent_->left_child_
+            = child->next_sibling_ == child ? NULL : child->next_sibling_;
     }
     child->parent_ = NULL;
 }
