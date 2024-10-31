@@ -555,7 +555,7 @@ entry(struct ccc_frm_ const *const frm, void const *const key)
         .frm_ = (struct ccc_frm_ *)frm,
         .last_cmp_ = q.last_cmp_,
         .i_ = q.parent_,
-        .stats_ = CCC_ENTRY_VACANT,
+        .stats_ = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
     };
 }
 

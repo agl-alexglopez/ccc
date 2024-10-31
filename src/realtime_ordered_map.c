@@ -140,6 +140,16 @@ static struct ccc_rtom_elem_ *min_max_from(struct ccc_rtom_ const *,
                                            enum rtom_link_);
 static struct ccc_range_ equal_range(struct ccc_rtom_ const *, void const *,
                                      void const *, enum rtom_link_);
+static struct ccc_rtom_entry_ entry(struct ccc_rtom_ const *rom,
+                                    void const *key);
+static void *insert(struct ccc_rtom_ *rom, struct ccc_rtom_elem_ *parent,
+                    ccc_threeway_cmp last_cmp,
+                    struct ccc_rtom_elem_ *out_handle);
+static void *key_from_node(struct ccc_rtom_ const *rom,
+                           struct ccc_rtom_elem_ const *elem);
+static void *key_in_slot(struct ccc_rtom_ const *rom, void const *slot);
+static struct ccc_rtom_elem_ *elem_in_slot(struct ccc_rtom_ const *rom,
+                                           void const *slot);
 
 /*==============================  Interface    ==============================*/
 
@@ -162,8 +172,7 @@ ccc_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle, void *const tmp)
 {
-    struct rtom_query_ q
-        = find(rom, ccc_impl_rom_key_from_node(rom, out_handle));
+    struct rtom_query_ q = find(rom, key_from_node(rom, out_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         *out_handle = *(ccc_rtom_elem *)q.found_;
@@ -185,8 +194,7 @@ ccc_entry
 ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
                    ccc_rtom_elem *const key_val_handle)
 {
-    struct rtom_query_ q
-        = find(rom, ccc_impl_rom_key_from_node(rom, key_val_handle));
+    struct rtom_query_ q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         return (ccc_entry){
@@ -205,8 +213,7 @@ ccc_entry
 ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
                          ccc_rtom_elem *const key_val_handle)
 {
-    struct rtom_query_ q
-        = find(rom, ccc_impl_rom_key_from_node(rom, key_val_handle));
+    struct rtom_query_ q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         void *const found = struct_base(rom, q.found_);
@@ -225,7 +232,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
 ccc_rtom_entry
 ccc_rom_entry(ccc_realtime_ordered_map const *const rom, void const *const key)
 {
-    return (ccc_rtom_entry){ccc_impl_rom_entry(rom, key)};
+    return (ccc_rtom_entry){entry(rom, key)};
 }
 
 void *
@@ -235,10 +242,9 @@ ccc_rom_or_insert(ccc_rtom_entry const *const e, ccc_rtom_elem *const elem)
     {
         return e->impl_.entry_.e_;
     }
-    return maybe_alloc_insert(
-        e->impl_.rom_,
-        ccc_impl_rom_elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_),
-        e->impl_.last_cmp_, elem);
+    return maybe_alloc_insert(e->impl_.rom_,
+                              elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_),
+                              e->impl_.last_cmp_, elem);
 }
 
 void *
@@ -246,15 +252,14 @@ ccc_rom_insert_entry(ccc_rtom_entry const *const e, ccc_rtom_elem *const elem)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        *elem = *ccc_impl_rom_elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_);
+        *elem = *elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_);
         memcpy(e->impl_.entry_.e_, struct_base(e->impl_.rom_, elem),
                e->impl_.rom_->elem_sz_);
         return e->impl_.entry_.e_;
     }
-    return maybe_alloc_insert(
-        e->impl_.rom_,
-        ccc_impl_rom_elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_),
-        e->impl_.last_cmp_, elem);
+    return maybe_alloc_insert(e->impl_.rom_,
+                              elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_),
+                              e->impl_.last_cmp_, elem);
 }
 
 ccc_entry
@@ -263,8 +268,7 @@ ccc_rom_remove_entry(ccc_rtom_entry const *const e)
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *const erased = remove_fixup(
-            e->impl_.rom_,
-            ccc_impl_rom_elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_));
+            e->impl_.rom_, elem_in_slot(e->impl_.rom_, e->impl_.entry_.e_));
         assert(erased);
         if (e->impl_.rom_->alloc_)
         {
@@ -280,8 +284,7 @@ ccc_entry
 ccc_rom_remove(ccc_realtime_ordered_map *const rom,
                ccc_rtom_elem *const out_handle)
 {
-    struct rtom_query_ const q
-        = find(rom, ccc_impl_rom_key_from_node(rom, out_handle));
+    struct rtom_query_ const q = find(rom, key_from_node(rom, out_handle));
     if (q.last_cmp_ != CCC_EQL)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
@@ -471,6 +474,44 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
 struct ccc_rtom_entry_
 ccc_impl_rom_entry(struct ccc_rtom_ const *const rom, void const *const key)
 {
+    return entry(rom, key);
+}
+
+void *
+ccc_impl_rom_insert(struct ccc_rtom_ *const rom,
+                    struct ccc_rtom_elem_ *const parent,
+                    ccc_threeway_cmp const last_cmp,
+                    struct ccc_rtom_elem_ *const out_handle)
+{
+    return insert(rom, parent, last_cmp, out_handle);
+}
+
+void *
+ccc_impl_rom_key_from_node(struct ccc_rtom_ const *const rom,
+                           struct ccc_rtom_elem_ const *const elem)
+{
+    return key_from_node(rom, elem);
+}
+
+void *
+ccc_impl_rom_key_in_slot(struct ccc_rtom_ const *const rom,
+                         void const *const slot)
+{
+    return key_in_slot(rom, slot);
+}
+
+struct ccc_rtom_elem_ *
+ccc_impl_rom_elem_in_slot(struct ccc_rtom_ const *const rom,
+                          void const *const slot)
+{
+    return elem_in_slot(rom, slot);
+}
+
+/*=========================    Static Helpers    ============================*/
+
+static inline struct ccc_rtom_entry_
+entry(struct ccc_rtom_ const *const rom, void const *const key)
+{
     struct rtom_query_ q = find(rom, key);
     if (CCC_EQL == q.last_cmp_)
     {
@@ -488,16 +529,14 @@ ccc_impl_rom_entry(struct ccc_rtom_ const *const rom, void const *const key)
         .last_cmp_ = q.last_cmp_,
         .entry_ = {
             .e_ = struct_base(rom, q.parent_),
-            .stats_ = CCC_ENTRY_VACANT,
+            .stats_ = CCC_ENTRY_VACANT | CCC_ENTRY_NO_UNWRAP,
         },
     };
 }
 
-void *
-ccc_impl_rom_insert(struct ccc_rtom_ *const rom,
-                    struct ccc_rtom_elem_ *const parent,
-                    ccc_threeway_cmp const last_cmp,
-                    struct ccc_rtom_elem_ *const out_handle)
+static inline void *
+insert(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const parent,
+       ccc_threeway_cmp const last_cmp, struct ccc_rtom_elem_ *const out_handle)
 {
     init_node(rom, out_handle);
     if (!rom->sz_)
@@ -519,29 +558,6 @@ ccc_impl_rom_insert(struct ccc_rtom_ *const rom,
     return struct_base(rom, out_handle);
 }
 
-void *
-ccc_impl_rom_key_from_node(struct ccc_rtom_ const *const rom,
-                           struct ccc_rtom_elem_ const *const elem)
-{
-    return (char *)struct_base(rom, elem) + rom->key_offset_;
-}
-
-void *
-ccc_impl_rom_key_in_slot(struct ccc_rtom_ const *const rom,
-                         void const *const slot)
-{
-    return (char *)slot + rom->key_offset_;
-}
-
-struct ccc_rtom_elem_ *
-ccc_impl_rom_elem_in_slot(struct ccc_rtom_ const *const rom,
-                          void const *const slot)
-{
-    return (struct ccc_rtom_elem_ *)((char *)slot + rom->node_elem_offset_);
-}
-
-/*=========================    Static Helpers    ============================*/
-
 static void *
 maybe_alloc_insert(struct ccc_rtom_ *const rom,
                    struct ccc_rtom_elem_ *const parent,
@@ -555,9 +571,9 @@ maybe_alloc_insert(struct ccc_rtom_ *const rom,
             return NULL;
         }
         memcpy(new, struct_base(rom, out_handle), rom->elem_sz_);
-        out_handle = ccc_impl_rom_elem_in_slot(rom, new);
+        out_handle = elem_in_slot(rom, new);
     }
-    return ccc_impl_rom_insert(rom, parent, last_cmp, out_handle);
+    return insert(rom, parent, last_cmp, out_handle);
 }
 
 static inline struct rtom_query_
@@ -670,6 +686,25 @@ struct_base(struct ccc_rtom_ const *const rom,
             struct ccc_rtom_elem_ const *const e)
 {
     return ((char *)e->branch_) - rom->node_elem_offset_;
+}
+
+static inline void *
+key_from_node(struct ccc_rtom_ const *const rom,
+              struct ccc_rtom_elem_ const *const elem)
+{
+    return (char *)struct_base(rom, elem) + rom->key_offset_;
+}
+
+static inline void *
+key_in_slot(struct ccc_rtom_ const *const rom, void const *const slot)
+{
+    return (char *)slot + rom->key_offset_;
+}
+
+static inline struct ccc_rtom_elem_ *
+elem_in_slot(struct ccc_rtom_ const *const rom, void const *const slot)
+{
+    return (struct ccc_rtom_elem_ *)((char *)slot + rom->node_elem_offset_);
 }
 
 /*=======================   WAVL Tree Maintenance   =========================*/
@@ -1150,14 +1185,12 @@ are_subtrees_valid(struct ccc_rtom_ const *t, struct tree_range const r,
         return true;
     }
     if (r.low != nil
-        && cmp(t, ccc_impl_rom_key_from_node(t, r.low), r.root, t->cmp_)
-               != CCC_LES)
+        && cmp(t, key_from_node(t, r.low), r.root, t->cmp_) != CCC_LES)
     {
         return false;
     }
     if (r.high != nil
-        && cmp(t, ccc_impl_rom_key_from_node(t, r.high), r.root, t->cmp_)
-               != CCC_GRT)
+        && cmp(t, key_from_node(t, r.high), r.root, t->cmp_) != CCC_GRT)
     {
         return false;
     }
