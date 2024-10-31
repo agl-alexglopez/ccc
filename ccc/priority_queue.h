@@ -132,7 +132,7 @@ from the pq creates an amortized o(lgN) runtime for this function. */
 bool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
                      ccc_update_fn *fn, void *aux);
 
-/** @brief Return the order used to initialize the heap.
+/** @brief Return the order used to initialize the pq.
 @param [in] pq a pointer to the priority queue.
 @return LES or GRT ordering. Any other ordering is invalid. */
 [[nodiscard]] ccc_threeway_cmp ccc_pq_order(ccc_priority_queue const *pq);

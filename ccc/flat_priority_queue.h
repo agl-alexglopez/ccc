@@ -7,84 +7,187 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/* It does not make sense for a flat pqueue to be associated with any other
-   buffer, comparison function, ordering, or auxiliarry data once it has been
-   initialized. The ccc_fpq_init macro allows for initialization at compile
-   time for static/global data, or runtime for dynamic data so initialization
-   via construction of const fields is always possible. There is no reason to
-   access the fields directly or modify them. */
+/** A flat priority queue (fpq) offers direct storage and sorting of user data
+by heap order. A flat heap does not offer pointer stability and may need to
+resize depending on initialization options. However, push and pop without
+resizing offer O(lgN) performance. */
 typedef struct ccc_fpq_ ccc_flat_priority_queue;
 
+/** @brief Initialize a fpq as a min or max heap.
+@param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
+@param [in] capacity the capacity of contiguous elements at mem_ptr.
+@param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
+@param [in] alloc_fn the allocation function or NULL if no allocation.
+@param [in] aux_data any auxiliary data needed for destruction of elements.
+@return the initilialized priority queue on the right hand side of an equality
+operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
+
+Note that to avoid temporary or unpredictable allocation the fpq requires one
+slot for swapping. Therefore if the user wants a fixed size fpq of size N,
+N + 1 capacity is required. */
 #define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
     ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
 
-/** @brief Initializes a heap with the provided memory of size and capacity
-provided in O(n) time. Elements are sorted by their values as provided. Size
-must be less than or equal to (capacity - 1). Use on the right hand side of
-of the assignment for the current heap, same as normal initialization. However,
-this initializer must be used at runtime, not compile time. */
+/** @brief Order an existing array of elements as a min or max heap. O(N).
+@param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
+@param [in] capacity the capacity of contiguous elements at mem_ptr.
+@param [in] size the size <= capacity.
+@param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
+@param [in] alloc_fn the allocation function or NULL if no allocation.
+@param [in] aux_data any auxiliary data needed for destruction of elements.
+@return the initilialized priority queue on the right hand side of an equality
+operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
+
+Note that to avoid temporary or unpredictable allocation the fpq requires one
+slot for swapping. Therefore if the user wants a fixed size fpq of size N,
+N + 1 capacity is required. */
 #define ccc_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,     \
                              cmp_fn, aux_data)                                 \
     ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,    \
                               cmp_fn, aux_data)
 
-/* Given an initialized flat priority queue, a struct type, and its
-   initializer, attempts to write an r-value of one's struct type into the
-   backing buffer directly, returning a pointer to the element in storage.
-   If a memory permission error occurs NULL is returned. Use as follows:
-
-   struct val
-   {
-       int v;
-       int id;
-   };
-
-   Various forms of designated initializers:
-
-   struct val const *res = ccc_fpq_emplace(&fpq, (struct val){.v = 10});
-   struct val const *res
-       = ccc_fpq_emplace(&fpq, (struct val){.v = rand_value(), .id = 0});
-   struct val const *res
-       = ccc_fpq_emplace(&fpq, (struct val){.v = 10, .id = 0});
-
-   Older C notation requires all fields be specified on some compilers:
-
-   struct val const *res = ccc_fpq_emplace(&fpq, (struct val){10, 0});
-
-   This macro avoids an additional copy if the struct values are constructed
-   by hand or from input of other functions, requiring no intermediate storage.
-   If generating any values within the struct occurs via expensive function
-   calls or calls with side effects, note that such functions do not execute
-   if allocation fails due to a full buffer and no reallocation policy. */
+/** @brief Write a type directly to a priority queue slot. O(lgN).
+@param [in] fpq a pointer to the priority queue.
+@param [in] val_initializer the compound literal or direct scalar type.
+@return a reference to the inserted element or NULL if allocation failed. */
 #define ccc_fpq_emplace(fpq, val_initializer...)                               \
     ccc_impl_fpq_emplace(fpq, val_initializer)
 
-/** @brief Builds a heap in O(n) time from the input data. If elements were
-previously occupying the heap, they are overwritten and only elements in the
-input array are considered part of the heap. */
-ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *, void *input_array,
+/** @brief Copy input array into the fpq, organizing into heap. O(N).
+@param [in] fpq a pointer to the priority queue.
+@param [in] input_array an array of elements of the same size as the type used
+to initialize fpq.
+@param [in] input_n the number of contiguous elements at input_array.
+@param [in] input_elem_size size of each element in input_array matching element
+size of fpq.
+@return ok if sorting was successful or an input error if bad input is
+provided. A permission error will occur if no allocation is allowed and the
+input array is larger than the fixed fpq capacity. A memory error will
+occur if reallocation is required to fit all elements but reallocation fails.
+
+Note that this version of heapify copies elements from the input array. If an
+in place heapify is required use the initializer version of this method. */
+ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
                            size_t input_n, size_t input_elem_size);
 
-ccc_result ccc_fpq_realloc(ccc_flat_priority_queue *, size_t new_capacity,
-                           ccc_alloc_fn *);
-void *ccc_fpq_push(ccc_flat_priority_queue *, void const *);
-void *ccc_fpq_front(ccc_flat_priority_queue const *);
-ccc_result ccc_fpq_pop(ccc_flat_priority_queue *);
-void *ccc_fpq_extract(ccc_flat_priority_queue *, void *);
-bool ccc_fpq_update(ccc_flat_priority_queue *, void *, ccc_update_fn *, void *);
-bool ccc_fpq_increase(ccc_flat_priority_queue *, void *, ccc_update_fn *,
-                      void *);
-bool ccc_fpq_decrease(ccc_flat_priority_queue *, void *, ccc_update_fn *,
-                      void *);
+/** @brief Many allocate memory for the fpq.
+@param [in] fpq a pointer to the priority queue.
+@param [in] new_capacity the desirect capacity for the fpq.
+@param [in] fn the allocation function. May be the same as used on init.
+@return ok if allocation was successful or a memory error on failure. */
+ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, size_t new_capacity,
+                         ccc_alloc_fn *fn);
 
-ccc_result ccc_fpq_clear(ccc_flat_priority_queue *, ccc_destructor_fn *);
-ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *,
-                                  ccc_destructor_fn *);
-bool ccc_fpq_is_empty(ccc_flat_priority_queue const *);
-size_t ccc_fpq_size(ccc_flat_priority_queue const *);
-bool ccc_fpq_validate(ccc_flat_priority_queue const *);
-ccc_threeway_cmp ccc_fpq_order(ccc_flat_priority_queue const *);
+/** @brief Pushes element pointed to at e into fpq. O(lgN).
+@param [in] fpq a pointer to the priority queue.
+@param [in] e a pointer to the user element of same type as in fpq.
+@return a pointer to the inserted element or NULl if NULL args are provided or
+push required more memory and failed. Failure can occur if the fpq is full and
+allocation is not allowed or a resize failed when allocation is allowed. */
+[[nodiscard]] void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e);
 
+/** @brief Return a pointer to the front (min or max) element in the fpq. O(1).
+@param [in] fpq a pointer to the priority queue.
+@return A pointer to the front element or NULL if empty or fpq is NULL. */
+[[nodiscard]] void *ccc_fpq_front(ccc_flat_priority_queue const *fpq);
+
+/** @brief Pop the front element (min or max) element in the fpq. O(lgN).
+@param [in] fpq a pointer to the priority queue.
+@return ok if the pop succeeds or an input error if fpq is NULL or empty. */
+ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq);
+
+/** @brief Erase element e that is a handle to the stored fpq element.
+@param [in] fpq a pointer to the priority queue.
+@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@return ok if the erase is successful or an input error if NULL args are
+provided or the fpq is empty.
+@warning the user must ensure e is in the fpq.
+
+Note that the reference to e is invalidated after this call. */
+ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *e);
+
+/** @brief Update e that is a handle to the stored fpq element. O(lgN).
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] fn the update function to act on e.
+@param [in] aux any auxiliary data needed for the update function.
+@return true on success, false if parameters are invalid or fpq is empty.
+@warning the user must ensure e is in the fpq. */
+bool ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
+                    void *aux);
+
+/** @brief Increase e that is a handle to the stored fpq element. O(lgN).
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] fn the update function to act on e.
+@param [in] aux any auxiliary data needed for the update function.
+@return true on success, false if parameters are invalid or fpq is empty.
+@warning the user must ensure e is in the fpq. */
+bool ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
+                      void *aux);
+
+/** @brief Decrease e that is a handle to the stored fpq element. O(lgN).
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] fn the update function to act on e.
+@param [in] aux any auxiliary data needed for the update function.
+@return true on success, false if parameters are invalid or fpq is empty.
+@warning the user must ensure e is in the fpq. */
+bool ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
+                      void *aux);
+
+/** @brief Clears the fpq calling fn on every element if provided. O(1)-O(N).
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] fn the destructor function or NULL if not needed.
+@return ok if input is valid and clear succeeds, otherwise input error.
+
+Note that because the priority queue is flat there is no need to free elements
+stored in the fpq. However, the destructor is free to manage cleanup in other
+parts of user code as needed upon destruction of each element.
+
+If the destructor is NULL, the function is O(1) and no attempt is made to
+free capacity of the fpq. */
+ccc_result ccc_fpq_clear(ccc_flat_priority_queue *fpq, ccc_destructor_fn *fn);
+
+/** @brief Clears the fpq calling fn on every element if provided and frees the
+underlying buffer. O(1)-O(N).
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] fn the destructor function or NULL if not needed.
+@return ok if input is valid and clear succeeds, otherwise input error. If the
+buffer attempts to free but is not allowed a no alloc error is returned.
+
+Note that because the priority queue is flat there is no need to free elements
+stored in the fpq. However, the destructor is free to manage cleanup in other
+parts of user code as needed upon destruction of each element.
+
+If the destructor is NULL, the function is O(1) and only relies on the runtime
+of the provided allocation function free operation. */
+ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *fpq,
+                                  ccc_destructor_fn *fn);
+
+/** @brief Returns true if the fpq is empty false if not. O(1).
+@param [in] fpq a pointer to the flat priority queue.
+@return true if the size is 0 or fpq is NULL, false if not empty.  */
+[[nodiscard]] bool ccc_fpq_is_empty(ccc_flat_priority_queue const *fpq);
+
+/** @brief Returns the size of the fpq.
+@param [in] fpq a pointer to the flat priority queue.
+@return the size of the fpq or 0 if fpq is NULL or fpq is empty. */
+[[nodiscard]] size_t ccc_fpq_size(ccc_flat_priority_queue const *fpq);
+
+/** @brief Verifies the internal invariants of the fpq hold.
+@param [in] fpq a pointer to the flat priority queue.
+@return true if the fpq is valid false if fpq is NULL or invalid. */
+[[nodiscard]] bool ccc_fpq_validate(ccc_flat_priority_queue const *fpq);
+
+/** @brief Return the order used to initialize the fpq.
+@param [in] fpq a pointer to the flat priority queue.
+@return LES or GRT ordering. Any other ordering is invalid. */
+[[nodiscard]] ccc_threeway_cmp
+ccc_fpq_order(ccc_flat_priority_queue const *fpq);
+
+/** Define this preprocessor directive if shortened names are desired for the
+flat priority queue container. Check for collisions before name shortening. */
 #ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_init(args...) ccc_fpq_init(args)

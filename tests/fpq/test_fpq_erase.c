@@ -37,7 +37,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_remove_four_dups)
     END_TEST();
 }
 
-BEGIN_STATIC_TEST(fpq_test_insert_extract_shuffled)
+BEGIN_STATIC_TEST(fpq_test_insert_erase_shuffled)
 {
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -56,7 +56,7 @@ BEGIN_STATIC_TEST(fpq_test_insert_extract_shuffled)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        (void)ccc_fpq_extract(&fpq, &vals[rand_index]);
+        (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)0);
@@ -137,7 +137,7 @@ BEGIN_STATIC_TEST(fpq_test_delete_prime_shuffle_duplicates)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        (void)ccc_fpq_extract(&fpq, &vals[rand_index]);
+        (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
         CHECK(validate(&fpq), true);
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size);
@@ -170,7 +170,7 @@ BEGIN_STATIC_TEST(fpq_test_prime_shuffle)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_extract(&fpq, &vals[rand_index]) != NULL, true);
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_OK, true);
         CHECK(validate(&fpq), true);
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size);
@@ -197,7 +197,7 @@ BEGIN_STATIC_TEST(fpq_test_weak_srand)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_extract(&fpq, &vals[rand_index]) != NULL, true);
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_OK, true);
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
@@ -208,7 +208,7 @@ int
 main()
 {
     return RUN_TESTS(fpq_test_insert_remove_four_dups(),
-                     fpq_test_insert_extract_shuffled(), fpq_test_pop_max(),
+                     fpq_test_insert_erase_shuffled(), fpq_test_pop_max(),
                      fpq_test_pop_min(),
                      fpq_test_delete_prime_shuffle_duplicates(),
                      fpq_test_prime_shuffle(), fpq_test_weak_srand());

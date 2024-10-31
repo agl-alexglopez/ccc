@@ -66,7 +66,7 @@ BEGIN_STATIC_TEST(fpq_test_priority_removal)
         struct val *cur = &vals[seen];
         if (cur->val > limit)
         {
-            (void)extract(&fpq, cur);
+            (void)erase(&fpq, cur);
             CHECK(validate(&fpq), true);
             --remaining;
         }

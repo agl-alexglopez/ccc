@@ -7,13 +7,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-/* Printing enum for printing tree structures if heap available. */
-enum ccc_print_link
-{
-    BRANCH = 0, /* ├── */
-    LEAF = 1    /* └── */
-};
-
 static void *at(struct ccc_fpq_ const *, size_t);
 static size_t index_of(struct ccc_fpq_ const *, void const *);
 static bool wins(struct ccc_fpq_ const *, void const *winner,
@@ -23,16 +16,20 @@ static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
 static void bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
 
 ccc_result
-ccc_fpq_realloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
-                ccc_alloc_fn *const fn)
+ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
+              ccc_alloc_fn *const fn)
 {
+    if (!fpq || !fn)
+    {
+        return CCC_INPUT_ERR;
+    }
     return ccc_buf_alloc(&fpq->buf_, new_capacity, fn);
 }
 
 void
 ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
 {
-    if (ccc_buf_capacity(&fpq->buf_) < n + 1)
+    if (!fpq || ccc_buf_capacity(&fpq->buf_) < n + 1)
     {
         return;
     }
@@ -48,7 +45,7 @@ ccc_result
 ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
                 size_t const n, size_t const input_elem_size)
 {
-    if (input_elem_size != ccc_buf_elem_size(&fpq->buf_))
+    if (!fpq || !array || input_elem_size != ccc_buf_elem_size(&fpq->buf_))
     {
         return CCC_INPUT_ERR;
     }
@@ -72,8 +69,12 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
 }
 
 void *
-ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
+ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
 {
+    if (!fpq || !e)
+    {
+        return NULL;
+    }
     void *new = ccc_buf_alloc_back(&fpq->buf_);
     if (ccc_buf_size(&fpq->buf_) == ccc_buf_capacity(&fpq->buf_))
     {
@@ -89,9 +90,9 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const val)
     {
         return NULL;
     }
-    if (new != val)
+    if (new != e)
     {
-        memcpy(new, val, ccc_buf_elem_size(&fpq->buf_));
+        memcpy(new, e, ccc_buf_elem_size(&fpq->buf_));
     }
     size_t const buf_sz = ccc_buf_size(&fpq->buf_);
     size_t i = buf_sz - 1;
@@ -126,51 +127,49 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
     return CCC_OK;
 }
 
-void *
-ccc_fpq_extract(ccc_flat_priority_queue *const fpq, void *const e)
+ccc_result
+ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 {
-    if (ccc_buf_is_empty(&fpq->buf_))
+    if (!fpq || !e || ccc_buf_is_empty(&fpq->buf_))
     {
-        return NULL;
+        return CCC_INPUT_ERR;
     }
     if (ccc_buf_size(&fpq->buf_) == 1)
     {
-        void *const ret = at(fpq, 0);
         (void)ccc_buf_pop_back(&fpq->buf_);
-        return ret;
+        return CCC_OK;
     }
     /* Important to remember this key now to avoid confusion later once the
        elements are swapped and we lose access to original handle index. */
     size_t const swap_location = index_of(fpq, e);
     if (swap_location == ccc_buf_size(&fpq->buf_) - 1)
     {
-        void *const ret = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
         (void)ccc_buf_pop_back(&fpq->buf_);
-        return ret;
+        return CCC_OK;
     }
-    void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
+    void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, swap_location, ccc_buf_size(&fpq->buf_) - 1);
-    void *const extracted = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
+    void *const erased = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
-    ccc_threeway_cmp const extracted_cmp
-        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), extracted, fpq->aux_});
-    if (extracted_cmp == fpq->order_)
+    ccc_threeway_cmp const erased_cmp
+        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->aux_});
+    if (erased_cmp == fpq->order_)
     {
         (void)bubble_up(fpq, tmp, swap_location);
     }
-    else if (extracted_cmp != CCC_EQL)
+    else if (erased_cmp != CCC_EQL)
     {
         bubble_down(fpq, tmp, swap_location);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
-    return extracted;
+    return CCC_OK;
 }
 
 bool
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
                ccc_update_fn *fn, void *aux)
 {
-    if (ccc_buf_is_empty(&fpq->buf_))
+    if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf_))
     {
         return false;
     }
@@ -217,7 +216,7 @@ ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
 void *
 ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {
-    if (ccc_buf_is_empty(&fpq->buf_))
+    if (!fpq || ccc_buf_is_empty(&fpq->buf_))
     {
         return NULL;
     }
@@ -227,19 +226,19 @@ ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 bool
 ccc_fpq_is_empty(ccc_flat_priority_queue const *const fpq)
 {
-    return ccc_buf_is_empty(&fpq->buf_);
+    return fpq ? ccc_buf_is_empty(&fpq->buf_) : true;
 }
 
 size_t
 ccc_fpq_size(ccc_flat_priority_queue const *const fpq)
 {
-    return ccc_buf_size(&fpq->buf_);
+    return fpq ? ccc_buf_size(&fpq->buf_) : 0;
 }
 
 ccc_threeway_cmp
 ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 {
-    return fpq->order_;
+    return fpq ? fpq->order_ : CCC_CMP_ERR;
 }
 
 ccc_result
@@ -257,13 +256,17 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
             fn((ccc_user_type_mut){.user_type = at(fpq, i), .aux = fpq->aux_});
         }
     }
-    return ccc_buf_pop_back_n(&fpq->buf_, ccc_buf_size(&fpq->buf_));
+    return ccc_buf_size_set(&fpq->buf_, 0);
 }
 
 ccc_result
 ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
                        ccc_destructor_fn *const fn)
 {
+    if (!fpq)
+    {
+        return CCC_INPUT_ERR;
+    }
     if (fn)
     {
         size_t const sz = ccc_buf_size(&fpq->buf_);
@@ -278,6 +281,10 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
 bool
 ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
 {
+    if (!fpq)
+    {
+        return false;
+    }
     size_t const sz = ccc_buf_size(&fpq->buf_);
     if (sz <= 1)
     {
