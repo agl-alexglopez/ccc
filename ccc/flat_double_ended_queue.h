@@ -25,7 +25,9 @@ typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 @param [in] alloc_fn the allocator function, if allocation is allowed.
 @param [in] aux_data any auxiliary data needed for element destruction.
 @param [in] capacity the number of contiguous elements at mem_ptr
-@param [in] optional_size an optional initial size between 1 and capacity.*/
+@param [in] optional_size an optional initial size between 1 and capacity.
+@return the fdeq on the right hand side of an equality operator at runtime or
+compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
 #define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
     (ccc_flat_double_ended_queue) ccc_impl_fdeq_init(                          \
         mem_ptr, alloc_fn, aux_data, capacity, optional_size)
