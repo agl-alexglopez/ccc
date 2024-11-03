@@ -7,8 +7,8 @@
 #include "types.h"
 
 /** A doubly linked list is a container offering bidirectional, insert,
-removal, and iteration. Pushing to the before the front, at the back, or
-between elements of the list is O(1). */
+removal, and iteration. Pushing to the the front, at the back, or between
+elements of the list is O(1). */
 typedef struct ccc_dll_ ccc_doubly_linked_list;
 
 /** A doubly linked list element is an intrusive element embedded in the user
