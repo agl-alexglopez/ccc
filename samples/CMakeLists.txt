@@ -6,7 +6,7 @@ project("ccc samples"
 )
 
 find_package(str_view)
-find_package(ccc HINTS "../intall")
+find_package(ccc HINTS "../install")
 include_directories("../util")
 
 add_executable(maze maze.c)
