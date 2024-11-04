@@ -136,13 +136,13 @@ BEGIN_STATIC_TEST(iterator_check, ordered_multimap *const omm)
 {
     size_t const size = size(omm);
     size_t iter_count = 0;
-    for (struct val *e = begin(omm); e; e = next(omm, &e->elem))
+    for (struct val *e = begin(omm); e != end(omm); e = next(omm, &e->elem))
     {
         ++iter_count;
     }
     CHECK(iter_count, size);
     iter_count = 0;
-    for (struct val *e = omm_rbegin(omm); e; e = rnext(omm, &e->elem))
+    for (struct val *e = rbegin(omm); e != rend(omm); e = rnext(omm, &e->elem))
     {
         ++iter_count;
     }
@@ -156,7 +156,8 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_unique_vals)
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct val *e = begin(&omm); e; e = next(&omm, &e->elem), ++j)
+    for (struct val *e = begin(&omm); e != end(&omm);
+         e = next(&omm, &e->elem), ++j)
     {}
     CHECK(j, 0);
     int const num_nodes = 33;
@@ -188,7 +189,8 @@ BEGIN_STATIC_TEST(omm_test_forward_iter_all_vals)
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct val *i = begin(&omm); i; i = next(&omm, &i->elem), ++j)
+    for (struct val *i = begin(&omm); i != end(&omm);
+         i = next(&omm, &i->elem), ++j)
     {}
     CHECK(j, 0);
     int const num_nodes = 33;
@@ -271,7 +273,7 @@ BEGIN_STATIC_TEST(omm_test_priority_removal)
     }
     CHECK(iterator_check(&omm), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&omm); i;)
+    for (struct val *i = begin(&omm); i != end(&omm);)
     {
         if (i->val > limit)
         {
@@ -305,7 +307,7 @@ BEGIN_STATIC_TEST(omm_test_priority_update)
     }
     CHECK(iterator_check(&omm), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&omm); i;)
+    for (struct val *i = begin(&omm); i != end(&omm);)
     {
         if (i->val > limit)
         {
