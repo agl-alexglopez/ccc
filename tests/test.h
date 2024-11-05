@@ -152,6 +152,43 @@ though the braces are not required. */
         }                                                                      \
     } while (0)
 
+/** @brief execute a check within the context of a test that sets an error.
+@param [in] test_result the result value of some action.
+@param [in] test_expected the expection of what the result is equal to.
+@param [in] ... any additional function call that should execute on failure
+that cannot be performed by the end test macro.
+
+test_result and test_expected should be comparable with ==/!=. If a test
+passes nothing happens. If a test fails output shows the failure and sets the
+test status to an error rather than a failure. This should be used when a check
+failure is the result of some operation not directly tied to the behavior being
+tested. For example a failed system call would be a good reason to use this
+check. Upon failure any cleanup function specified by the end test macro will
+execute to prevent memory leaks. See the end test macro for more. If the test
+end macro will not have access to some memory or operation in the scope of the
+current check one may provide an additional function call they wish to have
+executed on failure. This should only be used in special cases where such a
+function is unusable by the end test macro due to scoping. Even then, consider
+tracking allocations in an array of some sort to be cleaned up upon failure or
+success in the end test macro. Function calls should be a semicolon seperated
+list of calls with their appropriate args. If more complex code needs to be
+written in the cleanup case a code block can be surrounded by
+{...any code goes here...} braces for the formatting assistance braces provide,
+though the braces are not required. */
+#define CHECK_ERROR(test_result, test_expected, ...)                           \
+    do                                                                         \
+    {                                                                          \
+        const __auto_type result_ = (test_result);                             \
+        typeof(result_) const expected_ = (test_expected);                     \
+        if (result_ != expected_)                                              \
+        {                                                                      \
+            TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
+            macro_test_res_ = ERROR;                                           \
+            __VA_OPT__((void)({__VA_ARGS__});)                                 \
+            goto use_at_least_one_check_and_finish_with_END_macro_call_;       \
+        }                                                                      \
+    } while (0)
+
 /** Returns the current test status. If the end pass and end fail macros to
 finish a test do not provide the necessary flow control for various test
 scenarios, then check this status in the end test macro and act accordingly.
@@ -245,6 +282,31 @@ grained control over nested scope is required upon a failure.*/
 use_at_least_one_check_and_finish_with_END_macro_call_:                        \
     __VA_OPT__((void)({                                                        \
                    if (macro_test_res_ == FAIL)                                \
+                   {                                                           \
+                       __VA_ARGS__                                             \
+                   }                                                           \
+               });)                                                            \
+    return macro_test_res_;                                                    \
+    }
+
+/** @brief End every test started with the end error macro.
+@param [in] ... optional code block with arbitrary cleanup code to be executed
+only upon the first test failure.
+@return the test result from the currently executing test. FAIL upon the first
+check failure or PASS if all checks have passed.
+
+One may enter two braces and any code within them END_ERROR({..code here...}).
+This will help with formatting for more complicated cleanup procedures. This
+end test macro is best to use when some code should only execute upon the first
+test error. Keep in mind that any function calls need to have access to
+variables from earlier in the test if used. Standard scoping rules apply. This
+check operates at function scope so does not have access to nested conditionals,
+loops, or blocks from earlier in the test. See the check macro if more fine
+grained control over nested scope is required upon a failure.*/
+#define END_ERROR(...)                                                         \
+use_at_least_one_check_and_finish_with_END_macro_call_:                        \
+    __VA_OPT__((void)({                                                        \
+                   if (macro_test_res_ == ERROR)                               \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \

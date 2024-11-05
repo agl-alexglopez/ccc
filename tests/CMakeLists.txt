@@ -38,6 +38,7 @@ macro(add_omm_test TEST_NAME)
       ordered_multimap 
       omm_util
       test
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -69,6 +70,7 @@ macro(add_fpq_test TEST_NAME)
       fpq_util
       flat_priority_queue 
       test
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -100,6 +102,7 @@ macro(add_pq_test TEST_NAME)
       pq_util
       priority_queue 
       test
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -131,6 +134,7 @@ macro(add_map_test TEST_NAME)
       map_util
       ordered_map
       test
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -161,6 +165,7 @@ macro(add_fmap_test TEST_NAME)
       fmap_util
       flat_ordered_map
       test
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -191,6 +196,7 @@ macro(add_rtomap_test TEST_NAME)
       ordered_map
       test
       traits
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -221,6 +227,7 @@ macro(add_frtomap_test TEST_NAME)
       ordered_map
       test
       traits
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -250,6 +257,7 @@ macro(add_fhash_test TEST_NAME)
       test
       fhash_util
       traits
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -278,6 +286,7 @@ macro(add_dll_test TEST_NAME)
       test
       dll_util
       traits
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -305,6 +314,7 @@ macro(add_sll_test TEST_NAME)
       test
       sll_util
       traits
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -332,6 +342,7 @@ macro(add_fdeq_test TEST_NAME)
       test
       fdeq_util
       traits
+      alloc
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -356,6 +367,7 @@ target_link_libraries(perf
     str_view::str_view
     cli
     traits
+    alloc
 )
 
 # Create a custom target that will depend on all targets in the subdirectory

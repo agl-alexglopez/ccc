@@ -4,6 +4,7 @@ The leetcode lru problem in C. */
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "doubly_linked_list.h"
 #include "fhash/fhash_util.h"
 #include "flat_hash_map.h"
@@ -138,11 +139,11 @@ BEGIN_STATIC_TEST(run_lru_cache)
 {
     struct lru_cache lru = {
         .cap = 3,
-        .l
-        = dll_init(lru.l, struct key_val, list_elem, realloc, cmp_by_key, NULL),
+        .l = dll_init(lru.l, struct key_val, list_elem, std_alloc, cmp_by_key,
+                      NULL),
     };
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
-    fhm_init(&lru.fh, (struct lru_lookup *)NULL, 0, key, hash_elem, realloc,
+    fhm_init(&lru.fh, (struct lru_lookup *)NULL, 0, key, hash_elem, std_alloc,
              fhash_int_to_u64, lru_lookup_cmp, NULL);
     struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .putter = lru_put},

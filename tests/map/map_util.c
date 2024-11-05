@@ -23,7 +23,7 @@ BEGIN_TEST(insert_shuffled, ccc_ordered_map *m, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
-        (void)insert(m, &vals[shuffled_index].elem, &(struct val){});
+        (void)insert(m, &vals[shuffled_index].elem, &(struct val){}.elem);
         CHECK(size(m), i + 1);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;

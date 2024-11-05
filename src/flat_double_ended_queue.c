@@ -494,7 +494,9 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
     size_t const back = back_free_slot(fdeq);
     size_t const to_move = back > pos_i ? back - pos_i : cap - pos_i + back;
     size_t const move_i = (pos_i + n) % cap;
-    size_t const move_chunk = move_i + to_move > cap ? cap - move_i : to_move;
+    size_t move_chunk = move_i + to_move > cap ? cap - move_i : to_move;
+    move_chunk = back < pos_i ? MIN(cap - pos_i, move_chunk)
+                              : MIN(back - pos_i, move_chunk);
     size_t const move_remain = to_move - move_chunk;
     (void)memmove(ccc_buf_at(&fdeq->buf_, move_i),
                   ccc_buf_at(&fdeq->buf_, pos_i), move_chunk * elem_sz);

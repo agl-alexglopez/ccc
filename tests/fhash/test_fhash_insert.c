@@ -1,6 +1,7 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "fhash_util.h"
 #include "flat_hash_map.h"
 #include "test.h"
@@ -380,7 +381,7 @@ BEGIN_STATIC_TEST(fhash_test_resize)
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals == NULL, false);
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, prime_start, id, e, realloc,
+    ccc_result const res = fhm_init(&fh, vals, prime_start, id, e, std_alloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
@@ -415,7 +416,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_macros)
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals == NULL, false);
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, prime_start, id, e, realloc,
+    ccc_result const res = fhm_init(&fh, vals, prime_start, id, e, std_alloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
@@ -454,8 +455,9 @@ BEGIN_STATIC_TEST(fhash_test_resize_macros)
 BEGIN_STATIC_TEST(fhash_test_resize_from_null)
 {
     ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, (struct val *)NULL, 0, id, e, realloc,
-                                    fhash_int_to_u64, fhash_id_eq, NULL);
+    ccc_result const res
+        = fhm_init(&fh, (struct val *)NULL, 0, id, e, std_alloc,
+                   fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -487,7 +489,7 @@ BEGIN_STATIC_TEST(fhash_test_resize_from_null_macros)
     size_t const prime_start = 0;
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, (struct val *)NULL, prime_start, id, e, realloc,
+        = fhm_init(&fh, (struct val *)NULL, prime_start, id, e, std_alloc,
                    fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 1000;

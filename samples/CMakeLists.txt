@@ -15,6 +15,7 @@ target_link_libraries(maze PRIVATE
   random
   str_view::str_view
   ccc
+  alloc
 )
 
 add_executable(graph graph.c)
@@ -23,6 +24,7 @@ target_link_libraries(graph PRIVATE
   random
   str_view::str_view
   ccc
+  alloc
 )
 
 add_executable(words words.c)
@@ -30,6 +32,7 @@ target_link_libraries(words PRIVATE
   cli
   str_view::str_view
   ccc
+  alloc
 )
 
 add_custom_target(samples)

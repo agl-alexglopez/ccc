@@ -27,7 +27,7 @@ BEGIN_TEST(check_order, flat_double_ended_queue const *const q, size_t const n,
 {
     size_t i = 0;
     int *v = begin(q);
-    for (; v != end(q); v = next(q, v), ++i)
+    for (; v != end(q) && i < n; v = next(q, v), ++i)
     {
         CHECK(v == NULL, false);
         CHECK(*v, order[i]);

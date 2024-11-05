@@ -169,7 +169,7 @@ BEGIN_STATIC_TEST(map_test_forward_iter)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -198,7 +198,7 @@ BEGIN_STATIC_TEST(map_test_iterate_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -229,7 +229,7 @@ BEGIN_STATIC_TEST(map_test_iterate_remove_reinsert)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -264,7 +264,7 @@ BEGIN_STATIC_TEST(map_test_valid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -294,7 +294,7 @@ BEGIN_STATIC_TEST(map_test_valid_range_equals)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(check_range(&s, equal_range_r(&s, &(int){10}, &(int){40}), 8,
@@ -317,7 +317,7 @@ BEGIN_STATIC_TEST(map_test_invalid_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -346,7 +346,7 @@ BEGIN_STATIC_TEST(map_test_empty_range)
     {
         vals[i].val = val; // NOLINT
         vals[i].id = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){});
+        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.

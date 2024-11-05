@@ -141,21 +141,27 @@ ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle,
-              void *const tmp)
+ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const key_val_handle,
+              ccc_o_map_elem *const tmp)
 {
     void *const found
-        = find(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
+        = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
     if (found)
     {
         assert(s->impl_.root_ != &s->impl_.end_);
-        out_handle->impl_ = *s->impl_.root_;
-        void *const user_struct = struct_base(&s->impl_, &out_handle->impl_);
-        void *const ret = struct_base(&s->impl_, s->impl_.root_);
-        swap(tmp, user_struct, ret, s->impl_.elem_sz_);
-        return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
+        key_val_handle->impl_ = *s->impl_.root_;
+        void *const user_struct
+            = struct_base(&s->impl_, &key_val_handle->impl_);
+        void *const in_tree = struct_base(&s->impl_, s->impl_.root_);
+        void *const old_val = struct_base(&s->impl_, &tmp->impl_);
+        swap(old_val, in_tree, user_struct, s->impl_.elem_sz_);
+        key_val_handle->impl_.branch_[L] = key_val_handle->impl_.branch_[R]
+            = key_val_handle->impl_.parent_ = NULL;
+        tmp->impl_.branch_[L] = tmp->impl_.branch_[R] = tmp->impl_.parent_
+            = NULL;
+        return (ccc_entry){{.e_ = old_val, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *const inserted = alloc_insert(&s->impl_, &out_handle->impl_);
+    void *const inserted = alloc_insert(&s->impl_, &key_val_handle->impl_);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};

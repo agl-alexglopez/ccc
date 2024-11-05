@@ -105,8 +105,8 @@ BEGIN_STATIC_TEST(fdeq_test_push_front_ranges)
 
 BEGIN_STATIC_TEST(fdeq_test_insert_ranges)
 {
-    flat_double_ended_queue q = fdeq_init((int[6]){}, NULL, NULL, 6);
-    CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
+    flat_double_ended_queue q
+        = fdeq_init(((int[6]){0, 1, 2}), NULL, NULL, 6, 3);
     CHECK(check_order(&q, 3, (int[3]){0, 1, 2}), PASS);
     (void)fdeq_insert_range(&q, fdeq_at(&q, 1), 2, (int[2]){3, 4});
     CHECK(check_order(&q, 5, (int[5]){0, 3, 4, 1, 2}), PASS);

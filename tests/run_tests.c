@@ -1,5 +1,6 @@
 #include "str_view/str_view.h"
 #include "test.h"
+#include <string.h>
 
 #ifdef __linux__
 #    include <linux/limits.h>
@@ -30,8 +31,8 @@ char const *const pass_msg = "⬤";
 char const *const fail_msg = "X";
 char const *const err_msg = "Test process failed abnormally:";
 
-static int run(str_view);
-enum test_result run_test_process(struct path_bin);
+static enum test_result run(str_view);
+static enum test_result run_test_process(struct path_bin);
 static DIR *open_test_dir(str_view);
 static bool fill_path(char *, str_view, str_view);
 
@@ -43,17 +44,13 @@ main(int argc, char **argv)
         return 0;
     }
     str_view arg_view = sv(argv[1]);
-    return run(arg_view);
+    RUN_TESTS(run(arg_view));
 }
 
-static int
-run(str_view const tests_dir)
+BEGIN_STATIC_TEST(run, str_view const tests_dir)
 {
     DIR *dir_ptr = open_test_dir(tests_dir);
-    if (!dir_ptr)
-    {
-        return 1;
-    }
+    CHECK(dir_ptr != NULL, true);
     char absolute_path[FILESYS_MAX_PATH];
     size_t tests = 0;
     size_t passed = 0;
@@ -65,10 +62,7 @@ run(str_view const tests_dir)
         {
             continue;
         }
-        if (!fill_path(absolute_path, tests_dir, entry))
-        {
-            return 1;
-        }
+        CHECK(fill_path(absolute_path, tests_dir, entry), true);
         printf("%s(%s%s", CYAN, sv_begin(entry), NONE);
         (void)fflush(stdout);
         enum test_result const res
@@ -76,8 +70,8 @@ run(str_view const tests_dir)
         switch (res)
         {
         case ERROR:
-            (void)fprintf(stderr, "\n%s%s%s %s%s\n", RED, err_msg, CYAN,
-                          sv_begin(entry), NONE);
+            (void)fprintf(stderr, "\n%s%s%s %s %s%s%s)%s\n", RED, err_msg, CYAN,
+                          sv_begin(entry), RED, fail_msg, CYAN, NONE);
             break;
         case PASS:
             (void)fprintf(stdout, " %s%s%s)%s\n", GREEN, pass_msg, CYAN, NONE);
@@ -86,41 +80,51 @@ run(str_view const tests_dir)
             (void)fprintf(stdout, "\n%s%s%s)%s\n", RED, fail_msg, CYAN, NONE);
             break;
         }
-        passed += 1 - res;
+        if (res == PASS)
+        {
+            ++passed;
+        }
         ++tests;
     }
     passed == tests ? printf("%sPASSED %zu/%zu%s\n", GREEN, passed, tests, NONE)
                     : printf("%sPASSED %zu/%zu%s\n", RED, passed, tests, NONE);
-    return 0;
+    END_TEST(closedir(dir_ptr););
 }
 
-enum test_result
-run_test_process(struct path_bin pb)
+BEGIN_STATIC_TEST(run_test_process, struct path_bin pb)
 {
-    if (sv_empty(pb.path))
-    {
-        (void)fprintf(stderr, "No test provided.\n");
-        return ERROR;
-    }
+    CHECK_ERROR(sv_empty(pb.path), false,
+                { (void)fprintf(stderr, "No test provided.\n"); });
     pid_t const test_proc = fork();
     if (test_proc == 0)
     {
-        execl(sv_begin(pb.path), sv_begin(pb.bin), NULL);
-        (void)fprintf(stderr, "Child test process could not start.\n");
-        exit(1);
+        CHECK_ERROR(
+            execl(sv_begin(pb.path), sv_begin(pb.bin), NULL) >= 0, true, {
+                (void)fprintf(stderr, "Child test process could not start.\n");
+            });
     }
     int status = 0;
-    if (waitpid(test_proc, &status, 0) < 0)
-    {
+    CHECK_ERROR(waitpid(test_proc, &status, 0) >= 0, true, {
         (void)fprintf(stderr, "Error running test: %s\n", sv_begin(pb.bin));
-        return ERROR;
-    }
-    if (WIFSIGNALED(status)
-        || (WIFEXITED(status) && WEXITSTATUS(status) == FAIL))
-    {
-        return FAIL;
-    }
-    return PASS;
+    });
+    CHECK_ERROR(WIFSIGNALED(status), false, {
+        int const sig = WTERMSIG(status);
+        char const *const msg = strsignal(sig);
+        if (msg)
+        {
+            (void)fprintf(stderr, "%sProcess terminated with signal %d: %s%s\n",
+                          RED, sig, msg, NONE);
+        }
+        else
+        {
+            (void)fprintf(
+                stderr,
+                "%sProcess terminated with signal %d: unknown signal code%s\n",
+                RED, sig, NONE);
+        }
+    });
+    CHECK(WIFEXITED(status), true);
+    END_TEST();
 }
 
 static DIR *

@@ -1,6 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define ORDERED_MAP_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "map_util.h"
 #include "ordered_map.h"
 #include "test.h"
@@ -27,19 +28,20 @@ BEGIN_STATIC_TEST(map_test_insert_one)
 BEGIN_STATIC_TEST(map_test_insert_three)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, val, realloc, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, std_alloc, val_cmp, NULL);
     struct val swap_slot = {.val = 1, .id = 99};
     CHECK(occupied(insert_r(&s, &swap_slot.elem, &(struct val){}.elem)), false);
     CHECK(validate(&s), true);
     CHECK(size(&s), (size_t)1);
     swap_slot = (struct val){.val = 1, .id = 137};
-    struct val const *ins
-        = unwrap(insert_r(&s, &swap_slot.elem, &(struct val){}.elem));
+    ccc_entry *const e = insert_r(&s, &swap_slot.elem, &(struct val){}.elem);
+    struct val const *ins = unwrap(e);
+    CHECK(occupied(e), true);
     CHECK(validate(&s), true);
     CHECK(size(&s), (size_t)1);
     CHECK(ins != NULL, true);
     CHECK(ins->val, 1);
-    CHECK(ins->id, 137);
+    CHECK(ins->id, 99);
     CHECK(swap_slot.val, 1);
     CHECK(swap_slot.id, 99);
     ins = ccc_om_or_insert_w(entry_r(&s, &(int){2}),
@@ -67,7 +69,7 @@ BEGIN_STATIC_TEST(map_test_insert_three)
 BEGIN_STATIC_TEST(map_test_insert_macros)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, val, realloc, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, val, std_alloc, val_cmp, NULL);
     struct val const *ins = ccc_om_or_insert_w(entry_r(&s, &(int){2}),
                                                (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true);

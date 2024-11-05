@@ -1,6 +1,7 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "fhash_util.h"
 #include "flat_hash_map.h"
 #include "test.h"
@@ -46,7 +47,7 @@ BEGIN_STATIC_TEST(fhash_test_erase)
 BEGIN_STATIC_TEST(fhash_test_shuffle_insert_erase)
 {
     ccc_flat_hash_map h;
-    ccc_result const res = fhm_init(&h, (struct val *)NULL, 0, id, e, realloc,
+    ccc_result const res = fhm_init(&h, (struct val *)NULL, 0, id, e, std_alloc,
                                     fhash_int_to_u64, fhash_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 100;

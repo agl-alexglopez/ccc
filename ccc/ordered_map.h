@@ -88,8 +88,8 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
         ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
     }
 
-ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *out_handle,
-                        void *tmp);
+ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *key_val_handle,
+                        ccc_o_map_elem *tmp);
 
 ccc_entry ccc_om_try_insert(ccc_ordered_map *, ccc_o_map_elem *key_val_handle);
 

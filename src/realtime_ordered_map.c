@@ -170,19 +170,23 @@ ccc_rom_get_key_val(ccc_realtime_ordered_map const *const rom,
 
 ccc_entry
 ccc_rom_insert(ccc_realtime_ordered_map *const rom,
-               ccc_rtom_elem *const out_handle, void *const tmp)
+               ccc_rtom_elem *const key_val_handle, ccc_rtom_elem *const tmp)
 {
-    struct rtom_query_ q = find(rom, key_from_node(rom, out_handle));
+    struct rtom_query_ q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
-        *out_handle = *(ccc_rtom_elem *)q.found_;
-        void *user_struct = struct_base(rom, out_handle);
-        void *ret = struct_base(rom, q.found_);
-        swap(tmp, user_struct, ret, rom->elem_sz_);
-        return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
+        *key_val_handle = *q.found_;
+        void *const found = struct_base(rom, q.found_);
+        void *const user_struct = struct_base(rom, key_val_handle);
+        void *const old_val = struct_base(rom, tmp);
+        swap(old_val, found, user_struct, rom->elem_sz_);
+        key_val_handle->branch_[L] = key_val_handle->branch_[R]
+            = key_val_handle->parent_ = NULL;
+        tmp->branch_[L] = tmp->branch_[R] = tmp->parent_ = NULL;
+        return (ccc_entry){{.e_ = old_val, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     void *inserted
-        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, out_handle);
+        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};

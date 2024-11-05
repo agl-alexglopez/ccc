@@ -11,6 +11,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "alloc.h"
 #include "ccc/flat_double_ended_queue.h"
 #include "ccc/flat_hash_map.h"
 #include "ccc/priority_queue.h"
@@ -425,10 +426,10 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     ccc_flat_hash_map parent_map;
     [[maybe_unused]] ccc_result res
         = fhm_init(&parent_map, (struct parent_cell *)NULL, 0, key, elem,
-                   realloc, hash_parent_cells, eq_parent_cells, NULL);
+                   std_alloc, hash_parent_cells, eq_parent_cells, NULL);
     assert(res == CCC_OK);
     ccc_flat_double_ended_queue bfs
-        = ccc_fdeq_init((struct point *)NULL, realloc, NULL, 0);
+        = ccc_fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     [[maybe_unused]] ccc_entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
     assert(!insert_error(e));
@@ -698,7 +699,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                                             NULL, cmp_pq_dist_points, NULL);
     ccc_flat_hash_map prev_map;
     [[maybe_unused]] ccc_result res
-        = fhm_init(&prev_map, (struct prev_vertex *)NULL, 0, v, elem, realloc,
+        = fhm_init(&prev_map, (struct prev_vertex *)NULL, 0, v, elem, std_alloc,
                    hash_vertex_addr, eq_prev_vertices, NULL);
     assert(res == CCC_OK);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);

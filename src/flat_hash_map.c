@@ -383,8 +383,11 @@ ccc_impl_fhm_init_buf(struct ccc_fhm_ *const h, size_t key_offset,
     h->hash_fn_ = hash_fn;
     h->eq_fn_ = eq_fn;
     h->aux_ = aux;
-    memset(ccc_buf_begin(&h->buf_), CCC_FHM_EMPTY,
-           ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
+    if (ccc_buf_begin(&h->buf_))
+    {
+        memset(ccc_buf_begin(&h->buf_), CCC_FHM_EMPTY,
+               ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
+    }
     return CCC_OK;
 }
 

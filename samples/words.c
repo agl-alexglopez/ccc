@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "alloc.h"
 #include "ccc/flat_ordered_map.h"
 #include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
@@ -272,7 +273,7 @@ print_top_n(FILE *const f, int n)
        space approach to sorting may beat the slower pop operation but strict
        O(lgN) runtime for heap pop is pretty good. */
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
-        freqs.arr, freqs.cap, size(&map), CCC_GRT, realloc, cmp_freqs, &a);
+        freqs.arr, freqs.cap, size(&map), CCC_GRT, std_alloc, cmp_freqs, &a);
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
     {
@@ -294,7 +295,7 @@ print_last_n(FILE *const f, int n)
     struct frequency_alloc freqs = copy_frequencies(&map);
     PROG_ASSERT(freqs.cap);
     ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
-        freqs.arr, freqs.cap, size(&map), CCC_LES, realloc, cmp_freqs, &a);
+        freqs.arr, freqs.cap, size(&map), CCC_LES, std_alloc, cmp_freqs, &a);
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
     {
@@ -352,7 +353,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     size_t len = 0;
     ptrdiff_t read = 0;
     ccc_flat_ordered_map fom = ccc_fom_init((struct word *)NULL, 0, e, ofs,
-                                            realloc, cmp_string_keys, a);
+                                            std_alloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .sz = read - 1};
@@ -488,7 +489,7 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
     if (furthest_pos >= a->cap)
     {
         size_t const new_cap = (furthest_pos) * 2;
-        void *const moved_arena = realloc(a->arena, new_cap);
+        void *const moved_arena = std_alloc(a->arena, new_cap);
         if (!moved_arena)
         {
             return CCC_MEM_ERR;

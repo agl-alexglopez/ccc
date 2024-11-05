@@ -136,22 +136,22 @@ requirement for freeing memory, wrap it in a helper function. For example, one
 solution using the standard library allocator might be implemented as follows:
 
 void *
-alloc(void *const mem, size_t const size)
+std_alloc(void *const ptr, size_t const size)
 {
     if (!ptr && !size)
     {
         return NULL;
     }
-    if (!mem)
+    if (!ptr)
     {
         return malloc(size);
     }
     if (!size)
     {
-        free(mem);
+        free(ptr);
         return NULL;
     }
-    return realloc(mem, size);
+    return realloc(ptr, size);
 }
 
 However, the above example is only useful if the standard library allocator

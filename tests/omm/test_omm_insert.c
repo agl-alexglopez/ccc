@@ -1,6 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "omm_util.h"
 #include "ordered_multimap.h"
 #include "test.h"
@@ -42,7 +43,7 @@ BEGIN_STATIC_TEST(omm_test_insert_three)
 BEGIN_STATIC_TEST(omm_test_insert_macros)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, val, realloc, val_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, val, std_alloc, val_cmp, NULL);
     struct val const *ins = ccc_omm_or_insert_w(
         entry_r(&omm, &(int){2}), (struct val){.val = 2, .id = 0});
     CHECK(ins != NULL, true);

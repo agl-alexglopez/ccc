@@ -12,6 +12,8 @@ add_library(cli cli.h cli.c)
 target_link_libraries(cli PUBLIC
   str_view::str_view
 )
+add_library(alloc alloc.h alloc.c)
+
 add_custom_target(util)
 # Function to add dependencies on all targets from the subdirectory
 # Get the list of all targets

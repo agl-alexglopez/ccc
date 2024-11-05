@@ -1,6 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "flat_realtime_ordered_map.h"
 #include "frtomap_util.h"
 #include "test.h"
@@ -28,9 +29,9 @@ BEGIN_STATIC_TEST(frtomap_test_insert_one)
 BEGIN_STATIC_TEST(frtomap_test_insert_macros)
 {
     /* This is also a good test to see if the buffer can manage its own memory
-       when provided with a realloc function starting from NULL. */
+       when provided with a std_alloc function starting from NULL. */
     flat_realtime_ordered_map s
-        = frm_init((struct val *)NULL, 0, elem, id, realloc, val_cmp, NULL);
+        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, val_cmp, NULL);
     struct val *v = frm_or_insert_w(entry_r(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
     v = frm_insert_entry_w(entry_r(&s, &(int){0}),

@@ -90,7 +90,7 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
     }
 
 ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
-                         ccc_rtom_elem *out_handle, void *tmp);
+                         ccc_rtom_elem *key_val_handle, ccc_rtom_elem *tmp);
 
 ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
                              ccc_rtom_elem *key_val_handle);

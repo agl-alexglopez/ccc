@@ -1,6 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "realtime_ordered_map.h"
 #include "rtomap_util.h"
 #include "test.h"
@@ -15,10 +16,10 @@
 
 BEGIN_STATIC_TEST(rtomap_test_insert_one)
 {
+    struct val one = {};
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
-    CHECK(occupied(insert_r(&s, &(struct val){}.elem, &(struct val){}.elem)),
-          false);
+    CHECK(occupied(insert_r(&s, &one.elem, &one.elem)), false);
     CHECK(is_empty(&s), false);
     struct val *v = rom_root(&s);
     CHECK(v == NULL, false);
@@ -29,7 +30,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_one)
 BEGIN_STATIC_TEST(rtomap_test_insert_macros)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, realloc, val_cmp, NULL);
+        = rom_init(struct val, elem, val, s, std_alloc, val_cmp, NULL);
     struct val *v = rom_or_insert_w(entry_r(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
     v = rom_insert_entry_w(entry_r(&s, &(int){0}),
@@ -96,7 +97,7 @@ BEGIN_STATIC_TEST(rtomap_test_insert_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        ccc_entry const e = insert(&s, &vals[i].elem, &(struct val){});
+        ccc_entry const e = insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(insert_error(&e), false);
         CHECK(validate(&s), true);
     }
