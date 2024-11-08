@@ -1061,7 +1061,8 @@ static uint64_t
 hash_parent_cells(ccc_user_key const point_struct)
 {
     struct point const *const p = point_struct.user_key;
-    return hash_64_bits((p->r << 31) | p->c);
+    uint64_t const wr = p->r;
+    return hash_64_bits((wr << 31) | p->c);
 }
 
 static ccc_threeway_cmp

@@ -596,9 +596,10 @@ and_modify(struct ccc_fhm_entry_ *const e, ccc_update_fn *const fn)
 static ccc_result
 maybe_resize(struct ccc_fhm_ *const h)
 {
-    if ((double)(ccc_buf_size(&h->buf_) + num_swap_slots)
-            / (double)ccc_buf_capacity(&h->buf_)
-        <= load_factor)
+    if (ccc_buf_capacity(&h->buf_)
+        && (double)(ccc_buf_size(&h->buf_) + num_swap_slots)
+                   / (double)ccc_buf_capacity(&h->buf_)
+               <= load_factor)
     {
         return CCC_OK;
     }

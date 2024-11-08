@@ -93,7 +93,7 @@ static str_view const space = SV(" ");
 
 static str_view const directions
     = SV("\nPlease specify a command as follows:\n"
-         "./build/[[bin/] or [debug/bin]]/words [flag] -f=[path/to/file.txt]\n"
+         "./build/[bin/] or [debug/bin]/words [flag] -f=[path/to/file.txt]\n"
          "[flag]:\n"
          "-c\n"
          "\treports the words by count in descending order.\n"
@@ -108,11 +108,12 @@ static str_view const directions
 
 /*=======================   Prototypes     ==================================*/
 
-#define PROG_ASSERT(cond)                                                      \
+#define PROG_ASSERT(cond, ...)                                                 \
     do                                                                         \
     {                                                                          \
         if (!(cond))                                                           \
         {                                                                      \
+            __VA_OPT__((void)fprintf(stderr, __VA_ARGS__);)                    \
             sv_print(stderr, directions);                                      \
             exit(1);                                                           \
         }                                                                      \
@@ -187,7 +188,8 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_top_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            PROG_ASSERT(c.status != CONV_ER);
+            PROG_ASSERT(c.status != CONV_ER,
+                        "cannot convert -top= flag to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-last=")))
@@ -195,14 +197,15 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_last_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            PROG_ASSERT(c.status != CONV_ER);
+            PROG_ASSERT(c.status != CONV_ER,
+                        "cannot convert -last= flat to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-find=")))
         {
             str_view const raw_word = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            PROG_ASSERT(!sv_empty(raw_word));
+            PROG_ASSERT(!sv_empty(raw_word), "-find= flag has invalid entry");
             exe.type = FIND;
             exe.find_fn = print_found;
             exe.w = raw_word;
@@ -211,24 +214,31 @@ main(int argc, char *argv[])
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            PROG_ASSERT(!sv_empty(raw_file));
+            PROG_ASSERT(!sv_empty(raw_file), "file string is empty");
             exe.file = raw_file;
         }
         else
         {
-            QUIT_MSG(stderr, "unrecognized argument: %s", sv_begin(sv_arg));
+            QUIT_MSG(stderr, "unrecognized argument: %s\n", sv_begin(sv_arg));
         }
     }
     FILE *f = open_file(exe.file);
-    PROG_ASSERT(f != NULL);
-    switch (exe.type)
+    if (!f)
     {
-    case COUNT:
+        (void)fprintf(stderr, "error opening: %s\n", exe.file.s);
+    }
+    if (exe.type == COUNT && exe.n)
+    {
         exe.freq_fn(f, exe.n);
-        break;
-    case FIND:
+    }
+    else if (exe.type == FIND && exe.w.s)
+    {
         exe.find_fn(f, exe.w);
-        break;
+    }
+    else
+    {
+        (void)fprintf(stderr,
+                      "no word counts requested or empty word searched\n");
     }
     (void)fclose(f);
     return 0;
@@ -244,17 +254,16 @@ print_found(FILE *const f, str_view w)
     ccc_flat_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     struct clean_word wc = clean_word(&a, w);
-    PROG_ASSERT(wc.stat != WC_ARENA_ERR);
-    if (wc.stat != WC_CLEAN_WORD)
+    if (wc.stat == WC_CLEAN_WORD)
     {
-        return;
+        struct word const *const word = get_key_val(&map, &wc.str);
+        if (word)
+        {
+            printf("%s %d\n", str_arena_at(&a, word->ofs), word->freq);
+        }
     }
-    struct word const *const word = get_key_val(&map, &wc.str);
-    if (!word)
-    {
-        return;
-    }
-    printf("%s %d\n", str_arena_at(&a, word->ofs), word->freq);
+    str_arena_free(&a);
+    (void)ccc_fom_clear_and_free(&map, NULL);
 }
 
 static void

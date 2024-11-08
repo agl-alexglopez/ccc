@@ -1,4 +1,4 @@
-.PHONY: ccc default build rel deb crel cdeb clean tests samples all-deb all-rel call-deb call-rel dtest rtest util tidy format fanalyze
+.PHONY: ccc default build rel deb crel cdeb dsan rsan clean tests samples all-deb all-rel all-dsan all-rsan all-cdeb all-crel dtest rtest util tidy format fanalyze
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
@@ -39,6 +39,14 @@ cdeb:
 	cmake --preset=cdeb
 	$(MAKE) build
 
+rsan:
+	cmake --preset=rsan
+	$(MAKE) build
+
+dsan:
+	cmake --preset=dsan
+	$(MAKE) build
+
 format:
 	cmake --build $(BUILD_DIR) --target format
 
@@ -64,18 +72,22 @@ all-rel:
 	$(MAKE) tests
 	$(MAKE) samples
 
-fanalyze:
-	cmake --preset=fanalyze
-	$(MAKE) build
+all-dsan:
+	$(MAKE) dsan
 	$(MAKE) tests
 	$(MAKE) samples
 
-call-deb:
+all-rsan:
+	$(MAKE) rsan
+	$(MAKE) tests
+	$(MAKE) samples
+
+all-cdeb:
 	$(MAKE) cdeb
 	$(MAKE) tests
 	$(MAKE) samples
 
-call-rel:
+all-crel:
 	$(MAKE) crel
 	$(MAKE) tests
 	$(MAKE) samples

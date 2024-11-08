@@ -7,8 +7,10 @@
 int
 rand_range(int const min, int const max)
 {
+    unsigned mn = min;
+    unsigned mx = max;
     /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
-    return min + (rand() / (RAND_MAX / (max - min + 1) + 1));
+    return (int)(mn + (rand() / (RAND_MAX / (mx - mn + 1) + 1)));
 }
 
 void

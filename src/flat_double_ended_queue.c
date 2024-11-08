@@ -563,15 +563,18 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     {
         return CCC_MEM_ERR;
     }
-    size_t const first_chunk
-        = MIN(ccc_buf_size(&q->buf_), ccc_buf_capacity(&q->buf_) - q->front_);
-    (void)memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_),
-                 elem_sz * first_chunk);
-    if (first_chunk < ccc_buf_size(&q->buf_))
+    if (ccc_buf_size(&q->buf_))
     {
-        (void)memcpy((char *)new_mem + (elem_sz * first_chunk),
-                     ccc_buf_begin(&q->buf_),
-                     elem_sz * (ccc_buf_size(&q->buf_) - first_chunk));
+        size_t const first_chunk = MIN(ccc_buf_size(&q->buf_),
+                                       ccc_buf_capacity(&q->buf_) - q->front_);
+        (void)memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_),
+                     elem_sz * first_chunk);
+        if (first_chunk < ccc_buf_size(&q->buf_))
+        {
+            (void)memcpy((char *)new_mem + (elem_sz * first_chunk),
+                         ccc_buf_begin(&q->buf_),
+                         elem_sz * (ccc_buf_size(&q->buf_) - first_chunk));
+        }
     }
     (void)ccc_buf_alloc(&q->buf_, 0, q->buf_.alloc_);
     q->buf_.mem_ = new_mem;

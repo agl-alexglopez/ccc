@@ -59,6 +59,26 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
             }
+        },
+        {
+            "name": "gcc-dsan",
+            "inherits": "default-deb",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -fanalyzer -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow"
+            }
+        },
+        {
+            "name": "gcc-rsan",
+            "inherits": "default-rel",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow"
+            }
         }
     ]
 }
