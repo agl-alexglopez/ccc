@@ -98,8 +98,6 @@ static bool validate(struct ccc_frm_ const *frm);
 /* Returning void and maintaining the WAVL tree. */
 static void init_node(struct ccc_frm_elem_ *e);
 static void insert_fixup(struct ccc_frm_ *t, size_t z_p_of_xy, size_t x);
-static void maintain_rank_rules(struct ccc_frm_ *t, bool two_child,
-                                size_t p_of_xy, size_t x);
 static void rebalance_3_child(struct ccc_frm_ *t, size_t p_of_xy, size_t x);
 static void rebalance_via_rotation(struct ccc_frm_ *t, size_t z, size_t x,
                                    size_t y);
@@ -847,44 +845,26 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
 
     if (p_of_xy)
     {
-        maintain_rank_rules(t, two_child, p_of_xy, x);
+        if (two_child)
+        {
+            assert(p_of_xy);
+            rebalance_3_child(t, p_of_xy, x);
+        }
+        else if (!x && branch_i(t, p_of_xy, L) == branch_i(t, p_of_xy, R))
+        {
+            assert(p_of_xy);
+            bool const demote_makes_3_child
+                = is_2_child(t, parent_i(t, p_of_xy), p_of_xy);
+            demote(t, p_of_xy);
+            if (demote_makes_3_child)
+            {
+                rebalance_3_child(t, parent_i(t, p_of_xy), p_of_xy);
+            }
+        }
         assert(!is_leaf(t, p_of_xy) || !parity(t, p_of_xy));
     }
     swap_and_pop(t, remove);
     return base_at(t, ccc_buf_size(&t->buf_));
-}
-
-/** Swaps in the back buffer element into vacated slot*/
-static inline void
-swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
-{
-    (void)ccc_buf_size_minus(&t->buf_, 1);
-    size_t const x_i = ccc_buf_size(&t->buf_);
-    if (vacant_i == x_i)
-    {
-        return;
-    }
-    struct ccc_frm_elem_ *const x = at(t, x_i);
-    assert(vacant_i);
-    assert(x_i);
-    assert(x);
-    if (x_i == t->root_)
-    {
-        t->root_ = vacant_i;
-    }
-    else
-    {
-        struct ccc_frm_elem_ *const p = at(t, x->parent_);
-        p->branch_[p->branch_[R] == x_i] = vacant_i;
-    }
-    *parent_r(t, x->branch_[R]) = vacant_i;
-    *parent_r(t, x->branch_[L]) = vacant_i;
-    /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
-    (void)ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
-    at(t, 0)->parity_ = 1;
-    /* Clear back elements fields as precaution. */
-    x->parity_ = 0;
-    x->branch_[L] = x->branch_[R] = x->parent_ = 0;
 }
 
 static inline void
@@ -910,29 +890,6 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
     replace_r->branch_[R] = remove_r->branch_[R];
     replace_r->branch_[L] = remove_r->branch_[L];
     replace_r->parity_ = remove_r->parity_;
-}
-
-static inline void
-maintain_rank_rules(struct ccc_frm_ *const t, bool const two_child,
-                    size_t const p_of_xy, size_t const x)
-{
-    if (two_child)
-    {
-        assert(p_of_xy);
-        rebalance_3_child(t, p_of_xy, x);
-    }
-    else if (!x && branch_i(t, p_of_xy, L) == branch_i(t, p_of_xy, R))
-    {
-        assert(p_of_xy);
-        bool const demote_makes_3_child
-            = is_2_child(t, parent_i(t, p_of_xy), p_of_xy);
-        demote(t, p_of_xy);
-        if (demote_makes_3_child)
-        {
-            rebalance_3_child(t, parent_i(t, p_of_xy), p_of_xy);
-        }
-    }
-    assert(!is_leaf(t, p_of_xy) || !parity(t, p_of_xy));
 }
 
 static inline void
@@ -1008,6 +965,39 @@ rebalance_via_rotation(struct ccc_frm_ *const t, size_t const z, size_t const x,
             promote(t, y);
         }
     }
+}
+
+/** Swaps in the back buffer element into vacated slot*/
+static inline void
+swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
+{
+    (void)ccc_buf_size_minus(&t->buf_, 1);
+    size_t const x_i = ccc_buf_size(&t->buf_);
+    if (vacant_i == x_i)
+    {
+        return;
+    }
+    struct ccc_frm_elem_ *const x = at(t, x_i);
+    assert(vacant_i);
+    assert(x_i);
+    assert(x);
+    if (x_i == t->root_)
+    {
+        t->root_ = vacant_i;
+    }
+    else
+    {
+        struct ccc_frm_elem_ *const p = at(t, x->parent_);
+        p->branch_[p->branch_[R] == x_i] = vacant_i;
+    }
+    *parent_r(t, x->branch_[R]) = vacant_i;
+    *parent_r(t, x->branch_[L]) = vacant_i;
+    /* Code may not allocate (i.e Variable Length Array) so 0 slot is tmp. */
+    (void)ccc_buf_swap(&t->buf_, base_at(t, 0), vacant_i, x_i);
+    at(t, 0)->parity_ = 1;
+    /* Clear back elements fields as precaution. */
+    x->parity_ = 0;
+    x->branch_[L] = x->branch_[R] = x->parent_ = 0;
 }
 
 /** A single rotation is symmetric. Here is the right case. Lowercase are nodes
@@ -1086,7 +1076,7 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
          p
-       0/
+      0╭─╯
        x */
 [[maybe_unused]] static inline bool
 is_0_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
@@ -1096,7 +1086,7 @@ is_0_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 
 /* Returns true for rank difference 1 between the parent and node.
          p
-       1/
+      1╭─╯
        x */
 static inline bool
 is_1_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
@@ -1106,7 +1096,7 @@ is_1_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 
 /* Returns true for rank difference 2 between the parent and node.
          p
-       2/
+      2╭─╯
        x */
 static inline bool
 is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
@@ -1116,7 +1106,7 @@ is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 
 /* Returns true for rank difference 3 between the parent and node.
          p
-       3/
+      3╭─╯
        x */
 [[maybe_unused]] static inline bool
 is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
@@ -1127,7 +1117,7 @@ is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
 /* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
    child may be the sentinel node which has a parity of 1 and rank -1.
          p
-       0/ \1
+      0╭─┴─╮1
        x   y */
 static inline bool
 is_01_parent(struct ccc_frm_ const *const t, size_t const x,
@@ -1141,7 +1131,7 @@ is_01_parent(struct ccc_frm_ const *const t, size_t const x,
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
    node which has a parity of 1 and rank -1.
          p
-       1/ \1
+      1╭─┴─╮1
        x   y */
 static inline bool
 is_11_parent(struct ccc_frm_ const *const t, size_t const x,
@@ -1155,7 +1145,7 @@ is_11_parent(struct ccc_frm_ const *const t, size_t const x,
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
    child may be the sentinel node which has a parity of 1 and rank -1.
          p
-       2/ \0
+      0╭─┴─╮2
        x   y */
 static inline bool
 is_02_parent(struct ccc_frm_ const *const t, size_t const x,
@@ -1172,7 +1162,7 @@ is_02_parent(struct ccc_frm_ const *const t, size_t const x,
    for a WAVL tree. Either child may be the sentinel node which has a parity of
    1 and rank -1.
          p
-       2/ \2
+      2╭─┴─╮2
        x   y */
 static inline bool
 is_22_parent(struct ccc_frm_ const *const t, size_t const x,

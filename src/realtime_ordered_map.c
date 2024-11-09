@@ -74,9 +74,6 @@ static void *maybe_alloc_insert(struct ccc_rtom_ *,
 static void *remove_fixup(struct ccc_rtom_ *, struct ccc_rtom_elem_ *);
 static void insert_fixup(struct ccc_rtom_ *, struct ccc_rtom_elem_ *z_p_of_x,
                          struct ccc_rtom_elem_ *x);
-static void maintain_rank_rules(struct ccc_rtom_ *rom, bool two_child,
-                                struct ccc_rtom_elem_ *p_of_xy,
-                                struct ccc_rtom_elem_ *x);
 static void transplant(struct ccc_rtom_ *, struct ccc_rtom_elem_ *remove,
                        struct ccc_rtom_elem_ *replacement);
 static void rebalance_3_child(struct ccc_rtom_ *rom,
@@ -792,37 +789,28 @@ remove_fixup(struct ccc_rtom_ *const rom, struct ccc_rtom_elem_ *const remove)
 
     if (p_of_xy != &rom->end_)
     {
-        maintain_rank_rules(rom, two_child, p_of_xy, x);
+        if (two_child)
+        {
+            assert(p_of_xy != &rom->end_);
+            rebalance_3_child(rom, p_of_xy, x);
+        }
+        else if (x == &rom->end_ && p_of_xy->branch_[L] == p_of_xy->branch_[R])
+        {
+            assert(p_of_xy != &rom->end_);
+            bool const demote_makes_3_child
+                = is_2_child(rom, p_of_xy->parent_, p_of_xy);
+            demote(rom, p_of_xy);
+            if (demote_makes_3_child)
+            {
+                rebalance_3_child(rom, p_of_xy->parent_, p_of_xy);
+            }
+        }
         assert(!is_leaf(rom, p_of_xy) || !p_of_xy->parity_);
     }
     remove->branch_[L] = remove->branch_[R] = remove->parent_ = NULL;
     remove->parity_ = 0;
     --rom->sz_;
     return struct_base(rom, remove);
-}
-
-static inline void
-maintain_rank_rules(struct ccc_rtom_ *const rom, bool two_child,
-                    struct ccc_rtom_elem_ *const p_of_xy,
-                    struct ccc_rtom_elem_ *const x)
-{
-    if (two_child)
-    {
-        assert(p_of_xy != &rom->end_);
-        rebalance_3_child(rom, p_of_xy, x);
-    }
-    else if (x == &rom->end_ && p_of_xy->branch_[L] == p_of_xy->branch_[R])
-    {
-        assert(p_of_xy != &rom->end_);
-        bool const demote_makes_3_child
-            = is_2_child(rom, p_of_xy->parent_, p_of_xy);
-        demote(rom, p_of_xy);
-        if (demote_makes_3_child)
-        {
-            rebalance_3_child(rom, p_of_xy->parent_, p_of_xy);
-        }
-    }
-    assert(!is_leaf(rom, p_of_xy) || !p_of_xy->parity_);
 }
 
 static inline void
@@ -1000,8 +988,8 @@ double_rotate(struct ccc_rtom_ *const rom,
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
          p
-       0/
-       x*/
+      1╭─╯
+       x */
 [[maybe_unused]] static inline bool
 is_0_child(struct ccc_rtom_ const *const rom,
            struct ccc_rtom_elem_ const *p_of_x, struct ccc_rtom_elem_ const *x)
@@ -1022,8 +1010,8 @@ is_1_child(struct ccc_rtom_ const *const rom,
 
 /* Returns true for rank difference 2 between the parent and node.
          p
-       2/
-       x*/
+      2╭─╯
+       x */
 static inline bool
 is_2_child(struct ccc_rtom_ const *const rom,
            struct ccc_rtom_elem_ const *const p_of_x,
@@ -1034,8 +1022,8 @@ is_2_child(struct ccc_rtom_ const *const rom,
 
 /* Returns true for rank difference 3 between the parent and node.
          p
-       3/
-       x*/
+      3╭─╯
+       x */
 [[maybe_unused]] static inline bool
 is_3_child(struct ccc_rtom_ const *const rom,
            struct ccc_rtom_elem_ const *const p_of_x,
@@ -1047,8 +1035,8 @@ is_3_child(struct ccc_rtom_ const *const rom,
 /* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
    child may be the sentinel node which has a parity of 1 and rank -1.
          p
-       0/ \1
-       x   y*/
+      0╭─┴─╮1
+       x   y */
 static inline bool
 is_01_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
              struct ccc_rtom_elem_ const *const x,
@@ -1063,8 +1051,8 @@ is_01_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
    node which has a parity of 1 and rank -1.
          p
-       1/ \1
-       x   y*/
+      1╭─┴─╮1
+       x   y */
 static inline bool
 is_11_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
              struct ccc_rtom_elem_ const *const x,
@@ -1079,8 +1067,8 @@ is_11_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
    child may be the sentinel node which has a parity of 1 and rank -1.
          p
-       2/ \0
-       x   y*/
+      0╭─┴─╮2
+       x   y */
 static inline bool
 is_02_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
              struct ccc_rtom_elem_ const *const x,
@@ -1097,8 +1085,8 @@ is_02_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
    for a WAVL tree. Either child may be the sentinel node which has a parity of
    1 and rank -1.
          p
-       2/ \2
-       x   y*/
+      2╭─┴─╮2
+       x   y */
 static inline bool
 is_22_parent([[maybe_unused]] struct ccc_rtom_ const *const rom,
              struct ccc_rtom_elem_ const *const x,
