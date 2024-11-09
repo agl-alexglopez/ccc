@@ -146,49 +146,149 @@ void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
 /* Preserve old values from stored in the map. See types.h for more. */
 
+/** @brief Removes the key value in the map storing the old value, if present,
+in the struct containing out_handle_ptr provided by the user.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return a compound literal reference to the removed entry. If Occupied it may
+be unwrapped to obtain the old key value pair. If Vacant the key value pair
+was not stored in the map. If bad input is provided an input error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
 #define ccc_fhm_remove_r(flat_hash_map_ptr, out_handle_ptr)                    \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
+/** @brief Invariantly inserts the key value wrapping out_handle_ptr.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return a compound literal reference to the entry. If Vacant, no prior element
+with key existed and the type wrapping out_handle_ptr remains unchanged. If
+Occupied the old value is written to the type wrapping out_handle_ptr and may
+be unwrapped to view. If more space is needed but allocation fails or has been
+forbidden, an insert error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
 #define ccc_fhm_insert_r(flat_hash_map_ptr, out_handle_ptr)                    \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-#define ccc_fhm_try_insert_r(flat_hash_map_ptr, out_handle_ptr)                \
+/** @brief Attempts to insert the key value wrapping out_handle_ptr.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return a compound literal reference to the entry. If Occupied, the entry
+contains a reference to the key value user type in the table and may be
+unwrapped. If Vacant the entry contains a reference to the newly inserted
+entry in the table. If more space is needed but allocation fails or has been
+forbidden, an insert error is set.
+@warning because this function returns a reference to a user type in the table
+any subsequent insertions or deletions invalidate this reference. */
+#define ccc_fhm_try_insert_r(flat_hash_map_ptr, key_val_handle)                \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_try_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_        \
+        ccc_fhm_try_insert((flat_hash_map_ptr), (key_val_handle)).impl_        \
     }
 
+/** @brief Invariantly inserts or overwrites a user struct into the table.
+@param [in] h a pointer to the flat hash map.
+@param [in] key_val_handle the handle to the wrapping user struct key value.
+@return a compound literal reference to the entry. If Occupied an entry was
+overwritten by the new key value. If Vacant no prior table entry existed.
+
+Note that this function can be used when the old user type is not needed but
+the information regarding its presence is helpful. */
+#define ccc_fhm_insert_or_assign_r(flat_hash_map_ptr, key_val_handle)          \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_insert_or_assign((flat_hash_map_ptr), (key_val_handle)).impl_  \
+    }
+
+/** @brief Remove the entry from the table if Occupied.
+@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
+@return an entry containing NULL. If Occupied an entry in the table existed and
+was removed. If Vacant, no prior entry existed to be removed. */
 #define ccc_fhm_remove_entry_r(flat_hash_map_entry_ptr)                        \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
     }
 
-/** TODO */
+/** @brief Removes the key value in the map storing the old value, if present,
+in the struct containing out_handle_ptr provided by the user.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return the removed entry. If Occupied it may be unwrapped to obtain the old key
+value pair. If Vacant the key value pair was not stored in the map. If bad input
+is provided an input error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
 ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
-/** TODO */
+/** @brief Invariantly inserts the key value wrapping out_handle_ptr.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return an entry. If Vacant, no prior element with key existed and the type
+wrapping out_handle_ptr remains unchanged. If Occupied the old value is written
+to the type wrapping out_handle_ptr and may be unwrapped to view. If more space
+is needed but allocation fails or has been forbidden, an insert error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
 ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
 
-/** TODO */
+/** @brief Attempts to insert the key value wrapping out_handle_ptr.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return an entry. If Occupied, the entry contains a reference to the key value
+user type in the table and may be unwrapped. If Vacant the entry contains a
+reference to the newly inserted entry in the table. If more space is needed but
+allocation fails or has been forbidden, an insert error is set.
+@warning because this function returns a reference to a user type in the table
+any subsequent insertions or deletions invalidate this reference. */
 ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
                              ccc_fh_map_elem *key_val_handle);
 
-/** TODO */
+/** @brief Invariantly inserts or overwrites a user struct into the table.
+@param [in] h a pointer to the flat hash map.
+@param [in] key_val_handle the handle to the wrapping user struct key value.
+@return an entry. If Occupied an entry was overwritten by the new key value. If
+Vacant no prior table entry existed.
+
+Note that this function can be used when the old user type is not needed but
+the information regarding its presence is helpful. */
 ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h,
                                    ccc_fh_map_elem *key_val_handle);
 
-/** TODO */
+/** @brief Remove the entry from the table if Occupied.
+@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
+@return an entry containing NULL. If Occupied an entry in the table existed and
+was removed. If Vacant, no prior entry existed to be removed. */
 ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
 
 /* Standard Entry API */
 
+/** @brief Obtains an entry for the provided key in the table for future use.
+@param [in] h the hash table to be searched.
+@param [in] key the key used to search the table matching the stored key type.
+@return a compound literal reference to a specialized hash entry for use with
+other functions in the Entry API.
+@warning the contents of an entry should not be examined or modified. Use the
+provided functions, only.
+
+An entry is a search result that provides either an Occupied or Vacant entry
+in the table. An occupied entry signifies that the search was successful. A
+Vacant entry means the search was not successful but we now have a handle to
+where in the table such an element should be inserted.
+
+An entry is most often passed in a functional style to subsequent calls in the
+Entry API.*/
 #define ccc_fhm_entry_r(flat_hash_map_ptr, key_ptr)                            \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
@@ -358,6 +458,8 @@ size_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
 @return true if all invariants hold, false if corruption occurs. */
 bool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
+/** Define this preprocessor directive if shorter names are helpful. Ensure
+ no namespace clashes occure before shortening. */
 #ifdef FLAT_HASH_MAP_USING_NAMESPACE_CCC
 typedef ccc_fh_map_elem fh_map_elem;
 typedef ccc_flat_hash_map flat_hash_map;
@@ -366,30 +468,27 @@ typedef ccc_fh_map_entry fh_map_entry;
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
 #    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
 #    define fhm_insert_entry_w(args...) ccc_fhm_insert_entry_w(args)
-#    define fhm_insert_or_assign_w(args...) ccc_fhm_insert_or_assign_w(args)
 #    define fhm_try_insert_w(args...) ccc_fhm_try_insert_w(args)
+#    define fhm_insert_or_assign_w(args...) ccc_fhm_insert_or_assign_w(args)
 #    define fhm_contains(args...) ccc_fhm_contains(args)
 #    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
-#    define fhm_get_mut(args...) ccc_fhm_get_mut(args)
-#    define fhm_insert_r(args...) ccc_fhm_insert_r(args)
 #    define fhm_remove_r(args...) ccc_fhm_remove_r(args)
+#    define fhm_insert_r(args...) ccc_fhm_insert_r(args)
+#    define fhm_try_insert_r(args...) ccc_fhm_try_insert_r(args)
+#    define fhm_insert_or_assign_r(args...) ccc_fhm_insert_or_assign_r(args)
 #    define fhm_remove_entry_r(args...) ccc_fhm_remove_entry_r(args)
 #    define fhm_remove(args...) ccc_fhm_remove(args)
 #    define fhm_insert(args...) ccc_fhm_insert(args)
+#    define fhm_try_insert(args...) ccc_fhm_try_insert(args)
+#    define fhm_insert_or_assign(args...) ccc_fhm_insert_or_assign(args)
 #    define fhm_remove_entry(args...) ccc_fhm_remove_entry(args)
 #    define fhm_entry_r(args...) ccc_fhm_entry_r(args)
-#    define fhm_entry(args...) ccc_fhm_entry(args)
-#    define fhm_and_modify_r(args...) ccc_fhm_and_modify_r(args)
-#    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
-#    define fhm_and_modify_aux_r(args...) ccc_fhm_and_modify_aux_r(args)
-#    define fhm_and_modify_aux(args...) ccc_fhm_and_modify_aux(args)
 #    define fhm_entry(args...) ccc_fhm_entry(args)
 #    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
 #    define fhm_and_modify_aux(args...) ccc_fhm_and_modify_aux(args)
 #    define fhm_or_insert(args...) ccc_fhm_or_insert(args)
 #    define fhm_insert_entry(args...) ccc_fhm_insert_entry(args)
 #    define fhm_unwrap(args...) ccc_fhm_unwrap(args)
-#    define fhm_unwrap_mut(args...) ccc_fhm_unwrap_mut(args)
 #    define fhm_occupied(args...) ccc_fhm_occupied(args)
 #    define fhm_insert_error(args...) ccc_fhm_insert_error(args)
 #    define fhm_begin(args...) ccc_fhm_begin(args)
