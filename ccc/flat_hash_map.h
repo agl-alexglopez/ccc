@@ -6,10 +6,27 @@
 #include "impl_flat_hash_map.h"
 #include "types.h"
 
-typedef struct ccc_fhm_elem_ ccc_fh_map_elem;
+/** A flat hash map stores key-value structures defined by the user in
+a contiguous buffer. Elements are then retrievable by key in amortized
+O(1). Elements in the table may be copied and moved so no pointer
+stability is available in this implementation. If pointer stability
+is needed, store and hash pointers to those elements in this table.
 
+A flat hash map requires the user to provide a struct with known key
+and flat hash element fields as well as a hash function and key
+comparator function. The hash function should be well tailored to
+the key being stored in the table to prevent collisions. Currently,
+the flat hash map does not offer any default hash functions or hash
+strengthening algorithms so good hash functions should be used. */
 typedef struct ccc_fhm_ ccc_flat_hash_map;
 
+/** A flat hash element is an intrusive element that should be inserted into the
+struct used to store the key and value for the user. */
+typedef struct ccc_fhm_elem_ ccc_fh_map_elem;
+
+/** A flat hash map entry is the container specific entry used to implement the
+ Entry API. The Entry API offers efficient search and subsequent insertion,
+ deletion, or value update based on the needs of the user. */
 typedef union
 {
     struct ccc_fhm_entry_ impl_;
@@ -32,7 +49,7 @@ handle.
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
-@param [in] aux auxilliary data that is needed for key comparison.
+@param [in] aux auxilliary data that is needed for hashing or comparison.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
 #define ccc_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,               \
@@ -40,24 +57,73 @@ initialization is successful or a failure. */
     ccc_impl_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,              \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
+/** @brief modify the value stored in the map entry with a modification
+function and lazily constructed auxiliary data.
+@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] mod_fn the function used to modify the entry value.
+@param [in] aux lazily constructed auxiliary data for mod_fn.
+@return a compound literal reference to the modified entry if it was occupied
+or a vacant entry if it was vacant.
+
+Note that if aux is a function call to generate a value it will only be called
+if the entry is occupied and thus able to be modified. */
 #define ccc_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux...)          \
     &(ccc_fh_map_entry)                                                        \
     {                                                                          \
         ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux)        \
     }
 
+/** @brief lazily insert the desired key value into the entry if it is Vacant.
+@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] lazy_key_value the compound literal to construct in place if the
+entry is Vacant.
+@return a reference to the unwrapped user type in the entry, either the
+unmodified reference if the entry was Occupied or the newly inserted element
+if the entry was Vacant. NULL is returned if resizing is required but fails or
+is not allowed.
+
+Note that if the compound literal uses any function calls to generate values
+or other data, such functions will not be called if the entry is Occupied. */
 #define ccc_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)        \
     ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)
 
+/** @brief write the contents of the compound literal lazy_key_value to a slot.
+@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] lazy_key_value the compound literal to write to a new slot.
+@return a reference to the newly inserted or overwritten user type. NULL is
+returned if resizing is required but fails or is not allowed. */
 #define ccc_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value...)     \
     ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)
 
+/** @brief lazily insert lazy_value into the map at key if key is absent.
+@param [in] flat_hash_map_ptr a pointer to the flat hash map.
+@param [in] key the direct key r-value.
+@param [in] lazy_value the compound literal specifying the value.
+@return a compound literal reference to the entry of the existing or newly
+inserted value. Occupied indicates the key existed, Vacant indicates the key
+was absent. Unwrapping in any case provides the current value unless an error
+occurs that prevents insertion. An insertion error will flag such a case.
+
+Note that for brevity and convenience the user need not write the key to the
+lazy value compound literal as well. This function ensures the key in the
+compound literal matches the searched key. */
 #define ccc_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)            \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value)          \
     }
 
+/** @brief Inserts a new key value pair or overwrites the existing entry.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] lazy_value the compound literal to insert or use for overwrite.
+@return a compound literal reference to the entry of the existing or newly
+inserted value. Occupied indicates the key existed, Vacant indicates the key
+was absent. Unwrapping in any case provides the current value unless an error
+occurs that prevents insertion. An insertion error will flag such a case.
+
+Note that for brevity and convenience the user need not write the key to the
+lazy value compound literal as well. This function ensures the key in the
+compound literal matches the searched key. */
 #define ccc_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...)      \
     &(ccc_entry)                                                               \
     {                                                                          \
@@ -72,7 +138,7 @@ bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
 
 /** @brief Returns a reference into the table at entry key.
 @param [in] h the flat hash map to search.
-@param [in]*key the key to search matching stored key type.
+@param [in] key the key to search matching stored key type.
 @return a view of the table entry if it is present, else NULL. */
 void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
