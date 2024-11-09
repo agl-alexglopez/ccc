@@ -134,13 +134,13 @@ compound literal matches the searched key. */
 @param [in] h the flat hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
+[[nodiscard]] bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
 
 /** @brief Returns a reference into the table at entry key.
 @param [in] h the flat hash map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the table entry if it is present, else NULL. */
-void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
+[[nodiscard]] void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
 /*========================    Entry API    ==================================*/
 
@@ -229,7 +229,8 @@ is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
+                                       ccc_fh_map_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping out_handle_ptr.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
@@ -241,7 +242,8 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fh_map_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h,
+                                       ccc_fh_map_elem *out_handle);
 
 /** @brief Attempts to insert the key value wrapping out_handle_ptr.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
@@ -252,8 +254,8 @@ reference to the newly inserted entry in the table. If more space is needed but
 allocation fails or has been forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
-ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
-                             ccc_fh_map_elem *key_val_handle);
+[[nodiscard]] ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
+                                           ccc_fh_map_elem *key_val_handle);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
 @param [in] h a pointer to the flat hash map.
@@ -263,14 +265,14 @@ Vacant no prior table entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h,
-                                   ccc_fh_map_elem *key_val_handle);
+[[nodiscard]] ccc_entry
+ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fh_map_elem *key_val_handle);
 
 /** @brief Remove the entry from the table if Occupied.
 @param [in] flat_hash_map_entry_ptr a pointer to the table entry.
 @return an entry containing NULL. If Occupied an entry in the table existed and
 was removed. If Vacant, no prior entry existed to be removed. */
-ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
+[[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fh_map_entry const *e);
 
 /* Standard Entry API */
 
@@ -309,7 +311,8 @@ where in the table such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry API.*/
-ccc_fh_map_entry ccc_fhm_entry(ccc_flat_hash_map *h, void const *key);
+[[nodiscard]] ccc_fh_map_entry ccc_fhm_entry(ccc_flat_hash_map *h,
+                                             void const *key);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -319,7 +322,8 @@ ccc_fh_map_entry ccc_fhm_entry(ccc_flat_hash_map *h, void const *key);
 This function is intended to make the function chaining in the Entry API more
 succinct if the entry will be modified in place based on its own value without
 the need of the auxilliary argument a ccc_update_fn can provide. */
-ccc_fh_map_entry *ccc_fhm_and_modify(ccc_fh_map_entry *e, ccc_update_fn *fn);
+[[nodiscard]] ccc_fh_map_entry *ccc_fhm_and_modify(ccc_fh_map_entry *e,
+                                                   ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -329,8 +333,8 @@ ccc_fh_map_entry *ccc_fhm_and_modify(ccc_fh_map_entry *e, ccc_update_fn *fn);
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-ccc_fh_map_entry *ccc_fhm_and_modify_aux(ccc_fh_map_entry *e, ccc_update_fn *fn,
-                                         void *aux);
+[[nodiscard]] ccc_fh_map_entry *
+ccc_fhm_and_modify_aux(ccc_fh_map_entry *e, ccc_update_fn *fn, void *aux);
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
@@ -341,7 +345,8 @@ Because this functions takes an entry and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
 to resize because no reallocation function is provided. */
-void *ccc_fhm_or_insert(ccc_fh_map_entry const *e, ccc_fh_map_elem *elem);
+[[nodiscard]] void *ccc_fhm_or_insert(ccc_fh_map_entry const *e,
+                                      ccc_fh_map_elem *elem);
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
@@ -354,17 +359,18 @@ This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
-void *ccc_fhm_insert_entry(ccc_fh_map_entry const *e, ccc_fh_map_elem *elem);
+[[nodiscard]] void *ccc_fhm_insert_entry(ccc_fh_map_entry const *e,
+                                         ccc_fh_map_elem *elem);
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return an immutable view into the table entry if one is present, or NULL. */
-void *ccc_fhm_unwrap(ccc_fh_map_entry const *e);
+[[nodiscard]] void *ccc_fhm_unwrap(ccc_fh_map_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if the entry is occupied, false if not. */
-bool ccc_fhm_occupied(ccc_fh_map_entry const *e);
+[[nodiscard]] bool ccc_fhm_occupied(ccc_fh_map_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
@@ -373,7 +379,7 @@ bool ccc_fhm_occupied(ccc_fh_map_entry const *e);
 Table resizing occurs upon calls to entry functions/macros or when trying
 to insert a new element directly. This is to provide stable entries from the
 time they are obtained to the time they are used in functions they are passed
-to (i.e. the idiomatic OR_INSERT(ENTRY(...)...)).
+to (i.e. the idiomatic or_insert(entry(...)...)).
 
 However, if a Vacant entry is returned and then a subsequent insertion function
 is used, it will not work if resizing has failed and the return of those
@@ -381,7 +387,7 @@ functions will indicate such a failure. One can also confirm an insertion error
 will occur from an entry with this function. For example, leaving this function
 in an assert for debug builds can be a helpful sanity check if the heap should
 correctly resize by default and errors are not usually expected. */
-bool ccc_fhm_insert_error(ccc_fh_map_entry const *e);
+[[nodiscard]] bool ccc_fhm_insert_error(ccc_fh_map_entry const *e);
 
 /*==============================   Iteration    =============================*/
 
@@ -393,7 +399,7 @@ resizing occurs which would lead to undefined behavior. O(capacity).
 
 Iteration starts from index 0 by capacity of the table so iteration order is
 not obvious to the user, nor should any specific order be relied on. */
-void *ccc_fhm_begin(ccc_flat_hash_map const *h);
+[[nodiscard]] void *ccc_fhm_begin(ccc_flat_hash_map const *h);
 
 /** @brief Advances the iterator to the next occupied table slot.
 @param [in] h the table being iterated upon.
@@ -401,23 +407,24 @@ void *ccc_fhm_begin(ccc_flat_hash_map const *h);
 @return a pointer that can be cast directly to the user type that is stored.
 @warning erasing or inserting during iteration may invalidate iterators if
 resizing occurs which would lead to undefined behavior. O(capacity). */
-void *ccc_fhm_next(ccc_flat_hash_map const *h, ccc_fh_map_elem const *iter);
+[[nodiscard]] void *ccc_fhm_next(ccc_flat_hash_map const *h,
+                                 ccc_fh_map_elem const *iter);
 
 /** @brief Check the current iterator against the end for loop termination.
 @param [in] h the table being iterated upon.
 @return the end address of the hash table.
 @warning It is undefined behavior to access or modify the end address. */
-void *ccc_fhm_end(ccc_flat_hash_map const *h);
+[[nodiscard]] void *ccc_fhm_end(ccc_flat_hash_map const *h);
 
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. */
-bool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
+[[nodiscard]] bool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
 
 /** @brief Returns the size of the table.
 @param [in] h the hash table.
 @return the size_t size. */
-size_t ccc_fhm_size(ccc_flat_hash_map const *h);
+[[nodiscard]] size_t ccc_fhm_size(ccc_flat_hash_map const *h);
 
 /** @brief Frees all slots in the table for use without affecting capacity.
 @param [in] h the table to be cleared.
@@ -446,17 +453,17 @@ It is possible to use this hash table without an allocator by providing the
 buffer to be used for the underlying storage and preventing reallocation.
 If such a backing store is used it would be best to ensure it is a prime number
 size to mitigate hash collisions. */
-size_t ccc_fhm_next_prime(size_t n);
+[[nodiscard]] size_t ccc_fhm_next_prime(size_t n);
 
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
 @return the capacity. */
-size_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
+[[nodiscard]] size_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
-bool ccc_fhm_validate(ccc_flat_hash_map const *h);
+[[nodiscard]] bool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occure before shortening. */
