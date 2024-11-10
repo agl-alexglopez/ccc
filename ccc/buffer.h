@@ -34,8 +34,8 @@ This initializer determines memory control for the lifetime of the buffer. If
 the buffer points to memory of a predetermined and fixed capacity do not
 provide an allocation function. If a dynamic buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
-desired on memory that has already been allocated, ensure allocation has occured
-with the provided allocation function. */
+desired on memory that has already been allocated, ensure allocation has
+occurred with the provided allocation function. */
 #define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
     ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
 
@@ -198,7 +198,7 @@ ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
 
 /*=====================       Iteration       ===============================*/
 
-/** @brief obtain the base address of the buffer in preperation for iteration.
+/** @brief obtain the base address of the buffer in preparation for iteration.
 @param [in] buf the pointer to the buffer.
 @return the base address of the buffer. This will be equivalent to the buffer
 end iterator if the buffer size is 0. NULL is returned if a NULL argument is
@@ -230,7 +230,7 @@ Note that end is determined by the capcity of the buffer and will not change
 until a resize has occured, if permitted. */
 [[nodiscard]] void *ccc_buf_capacity_end(ccc_buffer const *buf);
 
-/** @brief obtain the address of the last element in the buffer in preperation
+/** @brief obtain the address of the last element in the buffer in preparation
 for iteration according to size.
 @param [in] buf the pointer to the buffer.
 @return the address of the last element buffer. This will be equivalent to the
