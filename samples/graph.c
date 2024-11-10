@@ -40,14 +40,14 @@ struct parent_cell
 {
     struct point key;
     struct point parent;
-    ccc_fh_map_elem elem;
+    ccc_fhmap_elem elem;
 };
 
 struct prev_vertex
 {
     struct vertex *v;
     struct vertex *prev;
-    ccc_fh_map_elem elem;
+    ccc_fhmap_elem elem;
     /* A pointer to the corresponding pq_entry for this element. */
     struct dist_point *dist_point;
 };

@@ -7,14 +7,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct ccc_frm_elem_
+struct ccc_fromap_elem_
 {
     size_t branch_[2];
     size_t parent_;
     uint8_t parity_;
 };
 
-struct ccc_frm_
+struct ccc_fromap_
 {
     ccc_buffer buf_;
     size_t root_;
@@ -24,9 +24,9 @@ struct ccc_frm_
     void *aux_;
 };
 
-struct ccc_frm_entry_
+struct ccc_fromap_entry_
 {
-    struct ccc_frm_ *frm_;
+    struct ccc_fromap_ *frm_;
     ccc_threeway_cmp last_cmp_;
     /* The types.h entry is not quite suitable for this container so change. */
     size_t i_;
@@ -34,16 +34,16 @@ struct ccc_frm_entry_
     typeof((ccc_entry){}.impl_.stats_) stats_;
 };
 
-void *ccc_impl_frm_key_from_node(struct ccc_frm_ const *frm,
-                                 struct ccc_frm_elem_ const *elem);
-void *ccc_impl_frm_key_in_slot(struct ccc_frm_ const *frm, void const *slot);
-struct ccc_frm_elem_ *ccc_impl_frm_elem_in_slot(struct ccc_frm_ const *frm,
-                                                void const *slot);
-struct ccc_frm_entry_ ccc_impl_frm_entry(struct ccc_frm_ const *frm,
-                                         void const *key);
-void *ccc_impl_frm_insert(struct ccc_frm_ *frm, size_t parent_i,
+void *ccc_impl_frm_key_from_node(struct ccc_fromap_ const *frm,
+                                 struct ccc_fromap_elem_ const *elem);
+void *ccc_impl_frm_key_in_slot(struct ccc_fromap_ const *frm, void const *slot);
+struct ccc_fromap_elem_ *
+ccc_impl_frm_elem_in_slot(struct ccc_fromap_ const *frm, void const *slot);
+struct ccc_fromap_entry_ ccc_impl_frm_entry(struct ccc_fromap_ const *frm,
+                                            void const *key);
+void *ccc_impl_frm_insert(struct ccc_fromap_ *frm, size_t parent_i,
                           ccc_threeway_cmp last_cmp, size_t elem_i);
-void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
+void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
@@ -63,7 +63,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
 #define ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry, mod_fn,     \
                                   aux_data...)                                 \
     ({                                                                         \
-        struct ccc_frm_entry_ frm_mod_ent_                                     \
+        struct ccc_fromap_entry_ frm_mod_ent_                                  \
             = (flat_realtime_ordered_map_entry);                               \
         if (frm_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                          \
         {                                                                      \
@@ -77,7 +77,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
 #define ccc_impl_frm_or_insert_w(flat_realtime_ordered_map_entry,              \
                                  lazy_key_value...)                            \
     ({                                                                         \
-        struct ccc_frm_entry_ *frm_or_ins_ent_                                 \
+        struct ccc_fromap_entry_ *frm_or_ins_ent_                              \
             = &(flat_realtime_ordered_map_entry)->impl_;                       \
         typeof(lazy_key_value) *frm_or_ins_ret_ = NULL;                        \
         if (frm_or_ins_ent_->stats_ == CCC_ENTRY_OCCUPIED)                     \
@@ -103,7 +103,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
 #define ccc_impl_frm_insert_entry_w(flat_realtime_ordered_map_entry,           \
                                     lazy_key_value...)                         \
     ({                                                                         \
-        struct ccc_frm_entry_ *frm_ins_ent_                                    \
+        struct ccc_fromap_entry_ *frm_ins_ent_                                 \
             = &(flat_realtime_ordered_map_entry)->impl_;                       \
         typeof(lazy_key_value) *frm_ins_ent_ret_ = NULL;                       \
         if (!(frm_ins_ent_->stats_ & CCC_ENTRY_OCCUPIED))                      \
@@ -122,8 +122,9 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
         {                                                                      \
             frm_ins_ent_ret_                                                   \
                 = ccc_buf_at(&frm_ins_ent_->frm_->buf_, frm_ins_ent_->i_);     \
-            struct ccc_frm_elem_ ins_ent_saved_ = *ccc_impl_frm_elem_in_slot(  \
-                frm_ins_ent_->frm_, frm_ins_ent_ret_);                         \
+            struct ccc_fromap_elem_ ins_ent_saved_                             \
+                = *ccc_impl_frm_elem_in_slot(frm_ins_ent_->frm_,               \
+                                             frm_ins_ent_ret_);                \
             *frm_ins_ent_ret_ = lazy_key_value;                                \
             *ccc_impl_frm_elem_in_slot(frm_ins_ent_->frm_, frm_ins_ent_ret_)   \
                 = ins_ent_saved_;                                              \
@@ -135,7 +136,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
                                   lazy_value...)                               \
     ({                                                                         \
         __auto_type frm_key_ = (key);                                          \
-        struct ccc_frm_entry_ frm_try_ins_ent_                                 \
+        struct ccc_fromap_entry_ frm_try_ins_ent_                              \
             = ccc_impl_frm_entry((flat_realtime_ordered_map_ptr), &frm_key_);  \
         struct ccc_entry_ frm_try_ins_ent_ret_ = {};                           \
         if (!(frm_try_ins_ent_.stats_ & CCC_ENTRY_OCCUPIED))                   \
@@ -170,7 +171,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
                                         lazy_value...)                         \
     ({                                                                         \
         __auto_type frm_key_ = (key);                                          \
-        struct ccc_frm_entry_ frm_ins_or_assign_ent_                           \
+        struct ccc_fromap_entry_ frm_ins_or_assign_ent_                        \
             = ccc_impl_frm_entry((flat_realtime_ordered_map_ptr), &frm_key_);  \
         struct ccc_entry_ frm_ins_or_assign_ent_ret_ = {};                     \
         if (!(frm_ins_or_assign_ent_.stats_ & CCC_ENTRY_OCCUPIED))             \
@@ -199,8 +200,9 @@ void *ccc_impl_frm_alloc_back(struct ccc_frm_ *frm);
             void *frm_ins_or_assign_slot_                                      \
                 = ccc_buf_at(&frm_ins_or_assign_ent_.frm_->buf_,               \
                              frm_ins_or_assign_ent_.i_);                       \
-            struct ccc_frm_elem_ ins_ent_saved_ = *ccc_impl_frm_elem_in_slot(  \
-                frm_ins_or_assign_ent_.frm_, frm_ins_or_assign_slot_);         \
+            struct ccc_fromap_elem_ ins_ent_saved_                             \
+                = *ccc_impl_frm_elem_in_slot(frm_ins_or_assign_ent_.frm_,      \
+                                             frm_ins_or_assign_slot_);         \
             *((typeof(lazy_value) *)frm_ins_or_assign_slot_) = lazy_value;     \
             *ccc_impl_frm_elem_in_slot(frm_ins_or_assign_ent_.frm_,            \
                                        frm_ins_or_assign_slot_)                \

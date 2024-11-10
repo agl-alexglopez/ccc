@@ -14,8 +14,8 @@ struct ccc_tree_;
                   alloc_fn, key_cmp_fn, aux_data)
 
 void *ccc_impl_om_key_in_slot(struct ccc_tree_ const *t, void const *slot);
-ccc_node_ *ccc_impl_om_elem_in_slot(struct ccc_tree_ const *t,
-                                    void const *slot);
+ccc_node_ *ccc_impl_omap_elem_in_slot(struct ccc_tree_ const *t,
+                                      void const *slot);
 void *ccc_impl_om_key_from_node(struct ccc_tree_ const *t, ccc_node_ const *n);
 
 struct ccc_tree_entry_ ccc_impl_om_entry(struct ccc_tree_ *t, void const *key);
@@ -45,7 +45,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             *new_mem = lazy_key_value;                                         \
             new_mem = ccc_impl_om_insert(                                      \
                 (ordered_map_entry)->t_,                                       \
-                ccc_impl_om_elem_in_slot((ordered_map_entry)->t_, new_mem));   \
+                ccc_impl_omap_elem_in_slot((ordered_map_entry)->t_, new_mem)); \
         }                                                                      \
     })
 
@@ -66,8 +66,8 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 = key;                                                         \
             (void)ccc_impl_om_insert(                                          \
                 om_insert_entry.t_,                                            \
-                ccc_impl_om_elem_in_slot(om_insert_entry.t_,                   \
-                                         om_new_ins_base_));                   \
+                ccc_impl_omap_elem_in_slot(om_insert_entry.t_,                 \
+                                           om_new_ins_base_));                 \
         }                                                                      \
     })
 
@@ -115,11 +115,12 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         }                                                                      \
         else if (om_ins_ent_->entry_.stats_ == CCC_ENTRY_OCCUPIED)             \
         {                                                                      \
-            struct ccc_node_ ins_ent_saved_ = *ccc_impl_om_elem_in_slot(       \
+            struct ccc_node_ ins_ent_saved_ = *ccc_impl_omap_elem_in_slot(     \
                 om_ins_ent_->t_, om_ins_ent_->entry_.e_);                      \
             *((typeof(lazy_key_value) *)om_ins_ent_->entry_.e_)                \
                 = lazy_key_value;                                              \
-            *ccc_impl_om_elem_in_slot(om_ins_ent_->t_, om_ins_ent_->entry_.e_) \
+            *ccc_impl_omap_elem_in_slot(om_ins_ent_->t_,                       \
+                                        om_ins_ent_->entry_.e_)                \
                 = ins_ent_saved_;                                              \
             om_ins_ent_ret_ = om_ins_ent_->entry_.e_;                          \
         }                                                                      \
@@ -160,12 +161,12 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         }                                                                      \
         else if (om_ins_or_assign_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)    \
         {                                                                      \
-            struct ccc_node_ ins_ent_saved_ = *ccc_impl_om_elem_in_slot(       \
+            struct ccc_node_ ins_ent_saved_ = *ccc_impl_omap_elem_in_slot(     \
                 om_ins_or_assign_ent_.t_, om_ins_or_assign_ent_.entry_.e_);    \
             *((typeof(lazy_value) *)om_ins_or_assign_ent_.entry_.e_)           \
                 = lazy_value;                                                  \
-            *ccc_impl_om_elem_in_slot(om_ins_or_assign_ent_.t_,                \
-                                      om_ins_or_assign_ent_.entry_.e_)         \
+            *ccc_impl_omap_elem_in_slot(om_ins_or_assign_ent_.t_,              \
+                                        om_ins_or_assign_ent_.entry_.e_)       \
                 = ins_ent_saved_;                                              \
             om_ins_or_assign_ent_ret_ = om_ins_or_assign_ent_.entry_;          \
             *((typeof(om_key_) *)ccc_impl_om_key_in_slot(                      \

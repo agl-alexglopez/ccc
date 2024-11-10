@@ -124,21 +124,21 @@ ccc_omm_is_empty(ccc_ordered_multimap const *const mm)
     return empty(&mm->impl_);
 }
 
-ccc_o_mm_entry
+ccc_ommap_entry
 ccc_omm_entry(ccc_ordered_multimap *const mm, void const *const key)
 {
     if (!mm || !key)
     {
-        return (ccc_o_mm_entry){
+        return (ccc_ommap_entry){
             {.t_ = NULL,
              .entry_ = {.e_ = NULL, .stats_ = CCC_ENTRY_SEARCH_ERROR}}};
     }
-    return (ccc_o_mm_entry){container_entry(&mm->impl_, key)};
+    return (ccc_ommap_entry){container_entry(&mm->impl_, key)};
 }
 
 void *
-ccc_omm_insert_entry(ccc_o_mm_entry const *const e,
-                     ccc_omm_elem *const key_val_handle)
+ccc_omm_insert_entry(ccc_ommap_entry const *const e,
+                     ccc_ommap_elem *const key_val_handle)
 {
     if (!e || !key_val_handle)
     {
@@ -148,7 +148,7 @@ ccc_omm_insert_entry(ccc_o_mm_entry const *const e,
 }
 
 void *
-ccc_omm_or_insert(ccc_o_mm_entry const *e, ccc_omm_elem *key_val_handle)
+ccc_omm_or_insert(ccc_ommap_entry const *e, ccc_ommap_elem *key_val_handle)
 {
     if (!e || !key_val_handle)
     {
@@ -161,8 +161,8 @@ ccc_omm_or_insert(ccc_o_mm_entry const *e, ccc_omm_elem *key_val_handle)
     return multimap_insert(e->impl_.t_, &key_val_handle->impl_).e_;
 }
 
-ccc_o_mm_entry *
-ccc_omm_and_modify(ccc_o_mm_entry *const e, ccc_update_fn *const fn)
+ccc_ommap_entry *
+ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_update_fn *const fn)
 {
     if (!e || !fn)
     {
@@ -175,8 +175,8 @@ ccc_omm_and_modify(ccc_o_mm_entry *const e, ccc_update_fn *const fn)
     return e;
 }
 
-ccc_o_mm_entry *
-ccc_omm_and_modify_aux(ccc_o_mm_entry *const e, ccc_update_fn *const fn,
+ccc_ommap_entry *
+ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
     if (!e || !fn)
@@ -192,7 +192,7 @@ ccc_omm_and_modify_aux(ccc_o_mm_entry *const e, ccc_update_fn *const fn,
 
 ccc_entry
 ccc_omm_insert(ccc_ordered_multimap *const mm,
-               ccc_omm_elem *const key_val_handle)
+               ccc_ommap_elem *const key_val_handle)
 {
     if (!mm || !key_val_handle)
     {
@@ -215,7 +215,7 @@ ccc_omm_insert(ccc_ordered_multimap *const mm,
 
 ccc_entry
 ccc_omm_try_insert(ccc_ordered_multimap *const mm,
-                   ccc_omm_elem *const key_val_handle)
+                   ccc_ommap_elem *const key_val_handle)
 {
     if (!mm || !key_val_handle)
     {
@@ -232,7 +232,7 @@ ccc_omm_try_insert(ccc_ordered_multimap *const mm,
 
 ccc_entry
 ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
-                         ccc_omm_elem *const key_val_handle)
+                         ccc_ommap_elem *const key_val_handle)
 {
     if (!mm || !key_val_handle)
     {
@@ -252,7 +252,7 @@ ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
 }
 
 ccc_entry
-ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_omm_elem *const out_handle)
+ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
 {
 
     if (!mm || !out_handle)
@@ -276,7 +276,7 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_omm_elem *const out_handle)
 }
 
 ccc_entry
-ccc_omm_remove_entry(ccc_o_mm_entry *const e)
+ccc_omm_remove_entry(ccc_ommap_entry *const e)
 {
     if (!e)
     {
@@ -351,7 +351,7 @@ ccc_omm_rbegin(ccc_ordered_multimap const *const mm)
 
 void *
 ccc_omm_next(ccc_ordered_multimap const *const mm,
-             ccc_omm_elem const *const iter_handle)
+             ccc_ommap_elem const *const iter_handle)
 {
     if (!mm || !iter_handle)
     {
@@ -364,7 +364,7 @@ ccc_omm_next(ccc_ordered_multimap const *const mm,
 
 void *
 ccc_omm_rnext(ccc_ordered_multimap const *const mm,
-              ccc_omm_elem const *const iter_handle)
+              ccc_ommap_elem const *const iter_handle)
 {
     if (!mm || !iter_handle)
     {
@@ -413,7 +413,7 @@ ccc_omm_equal_rrange(ccc_ordered_multimap *const mm,
 
 void *
 ccc_omm_extract(ccc_ordered_multimap *const mm,
-                ccc_omm_elem *const key_val_handle)
+                ccc_ommap_elem *const key_val_handle)
 {
     if (!mm || !key_val_handle)
     {
@@ -424,7 +424,7 @@ ccc_omm_extract(ccc_ordered_multimap *const mm,
 
 bool
 ccc_omm_update(ccc_ordered_multimap *const mm,
-               ccc_omm_elem *const key_val_handle, ccc_update_fn *const fn,
+               ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
                void *const aux)
 {
     if (!mm || !key_val_handle || !fn || !key_val_handle->impl_.branch_[L]
@@ -444,7 +444,7 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
 
 bool
 ccc_omm_increase(ccc_ordered_multimap *const mm,
-                 ccc_omm_elem *const key_val_handle, ccc_update_fn *const fn,
+                 ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
                  void *const aux)
 {
     return ccc_omm_update(mm, key_val_handle, fn, aux);
@@ -452,7 +452,7 @@ ccc_omm_increase(ccc_ordered_multimap *const mm,
 
 bool
 ccc_omm_decrease(ccc_ordered_multimap *const mm,
-                 ccc_omm_elem *const key_val_handle, ccc_update_fn *const fn,
+                 ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
                  void *const aux)
 {
     return ccc_omm_update(mm, key_val_handle, fn, aux);
@@ -513,25 +513,25 @@ ccc_omm_size(ccc_ordered_multimap const *const mm)
 }
 
 void *
-ccc_omm_unwrap(ccc_o_mm_entry const *e)
+ccc_omm_unwrap(ccc_ommap_entry const *e)
 {
     return ccc_entry_unwrap(&(ccc_entry){e->impl_.entry_});
 }
 
 bool
-ccc_omm_insert_error(ccc_o_mm_entry const *e)
+ccc_omm_insert_error(ccc_ommap_entry const *e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 bool
-ccc_omm_input_error(ccc_o_mm_entry const *e)
+ccc_omm_input_error(ccc_ommap_entry const *e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INPUT_ERROR : false;
 }
 
 bool
-ccc_omm_occupied(ccc_o_mm_entry const *e)
+ccc_omm_occupied(ccc_ommap_entry const *e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
@@ -599,8 +599,8 @@ ccc_impl_omm_key_from_node(struct ccc_tree_ const *const t,
 }
 
 struct ccc_node_ *
-ccc_impl_omm_elem_in_slot(struct ccc_tree_ const *const t,
-                          void const *const slot)
+ccc_impl_ommap_elem_in_slot(struct ccc_tree_ const *const t,
+                            void const *const slot)
 {
     return elem_in_slot(t, slot);
 }

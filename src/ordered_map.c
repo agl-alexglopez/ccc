@@ -90,14 +90,14 @@ ccc_om_contains(ccc_ordered_map *const s, void const *const key)
     return contains(&s->impl_, key);
 }
 
-ccc_o_map_entry
+ccc_omap_entry
 ccc_om_entry(ccc_ordered_map *const s, void const *const key)
 {
-    return (ccc_o_map_entry){container_entry(&s->impl_, key)};
+    return (ccc_omap_entry){container_entry(&s->impl_, key)};
 }
 
 void *
-ccc_om_insert_entry(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
+ccc_om_insert_entry(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
@@ -110,7 +110,7 @@ ccc_om_insert_entry(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
 }
 
 void *
-ccc_om_or_insert(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
+ccc_om_or_insert(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
@@ -119,8 +119,8 @@ ccc_om_or_insert(ccc_o_map_entry const *const e, ccc_o_map_elem *const elem)
     return alloc_insert(e->impl_.t_, &elem->impl_);
 }
 
-ccc_o_map_entry *
-ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
+ccc_omap_entry *
+ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
@@ -129,8 +129,8 @@ ccc_om_and_modify(ccc_o_map_entry *const e, ccc_update_fn *const fn)
     return e;
 }
 
-ccc_o_map_entry *
-ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *const fn,
+ccc_omap_entry *
+ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
                       void *const aux)
 {
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
@@ -141,8 +141,8 @@ ccc_om_and_modify_aux(ccc_o_map_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const key_val_handle,
-              ccc_o_map_elem *const tmp)
+ccc_om_insert(ccc_ordered_map *const s, ccc_omap_elem *const key_val_handle,
+              ccc_omap_elem *const tmp)
 {
     void *const found
         = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
@@ -170,8 +170,7 @@ ccc_om_insert(ccc_ordered_map *const s, ccc_o_map_elem *const key_val_handle,
 }
 
 ccc_entry
-ccc_om_try_insert(ccc_ordered_map *const s,
-                  ccc_o_map_elem *const key_val_handle)
+ccc_om_try_insert(ccc_ordered_map *const s, ccc_omap_elem *const key_val_handle)
 {
     void *const found
         = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
@@ -191,7 +190,7 @@ ccc_om_try_insert(ccc_ordered_map *const s,
 
 ccc_entry
 ccc_om_insert_or_assign(ccc_ordered_map *const s,
-                        ccc_o_map_elem *const key_val_handle)
+                        ccc_omap_elem *const key_val_handle)
 {
     void *const found
         = find(&s->impl_, key_from_node(&s->impl_, &key_val_handle->impl_));
@@ -212,7 +211,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const s,
 }
 
 ccc_entry
-ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
+ccc_om_remove(ccc_ordered_map *const s, ccc_omap_elem *const out_handle)
 {
     void *const n
         = erase(&s->impl_, key_from_node(&s->impl_, &out_handle->impl_));
@@ -231,7 +230,7 @@ ccc_om_remove(ccc_ordered_map *const s, ccc_o_map_elem *const out_handle)
 }
 
 ccc_entry
-ccc_om_remove_entry(ccc_o_map_entry *const e)
+ccc_om_remove_entry(ccc_omap_entry *const e)
 {
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
@@ -255,7 +254,7 @@ ccc_om_get_key_val(ccc_ordered_map *const s, void const *const key)
 }
 
 void *
-ccc_om_unwrap(ccc_o_map_entry const *const e)
+ccc_om_unwrap(ccc_omap_entry const *const e)
 {
     if (!e)
     {
@@ -266,13 +265,13 @@ ccc_om_unwrap(ccc_o_map_entry const *const e)
 }
 
 bool
-ccc_om_insert_error(ccc_o_map_entry const *const e)
+ccc_om_insert_error(ccc_omap_entry const *const e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 bool
-ccc_om_occupied(ccc_o_map_entry const *const e)
+ccc_om_occupied(ccc_omap_entry const *const e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
@@ -302,14 +301,14 @@ ccc_om_rend(ccc_ordered_map const *const)
 }
 
 void *
-ccc_om_next(ccc_ordered_map const *const s, ccc_o_map_elem const *const e)
+ccc_om_next(ccc_ordered_map const *const s, ccc_omap_elem const *const e)
 {
     struct ccc_node_ const *n = next(&s->impl_, &e->impl_, inorder_traversal);
     return n == &s->impl_.end_ ? NULL : struct_base(&s->impl_, n);
 }
 
 void *
-ccc_om_rnext(ccc_ordered_map const *const s, ccc_o_map_elem const *const e)
+ccc_om_rnext(ccc_ordered_map const *const s, ccc_omap_elem const *const e)
 {
     struct ccc_node_ const *n
         = next(&s->impl_, &e->impl_, reverse_inorder_traversal);
@@ -406,7 +405,7 @@ ccc_impl_om_key_from_node(struct ccc_tree_ const *const t,
 }
 
 struct ccc_node_ *
-ccc_impl_om_elem_in_slot(struct ccc_tree_ const *const t, void const *slot)
+ccc_impl_omap_elem_in_slot(struct ccc_tree_ const *const t, void const *slot)
 {
 
     return elem_in_slot(t, slot);

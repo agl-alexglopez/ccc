@@ -36,82 +36,85 @@ static size_t const single_tree_node = 2;
 /*==============================  Prototypes   ==============================*/
 
 /* Returning the user struct type with stored offsets. */
-static void *insert(struct ccc_frm_ *frm, size_t parent_i,
+static void *insert(struct ccc_fromap_ *frm, size_t parent_i,
                     ccc_threeway_cmp last_cmp, size_t elem_i);
-static void *struct_base(struct ccc_frm_ const *, struct ccc_frm_elem_ const *);
-static void *maybe_alloc_insert(struct ccc_frm_ *frm, size_t parent,
+static void *struct_base(struct ccc_fromap_ const *,
+                         struct ccc_fromap_elem_ const *);
+static void *maybe_alloc_insert(struct ccc_fromap_ *frm, size_t parent,
                                 ccc_threeway_cmp last_cmp,
-                                struct ccc_frm_elem_ *elem);
-static void *remove_fixup(struct ccc_frm_ *t, size_t remove);
-static void *base_at(struct ccc_frm_ const *, size_t);
-static void *alloc_back(struct ccc_frm_ *t);
+                                struct ccc_fromap_elem_ *elem);
+static void *remove_fixup(struct ccc_fromap_ *t, size_t remove);
+static void *base_at(struct ccc_fromap_ const *, size_t);
+static void *alloc_back(struct ccc_fromap_ *t);
 /* Returning the user key with stored offsets. */
-static void *key_from_node(struct ccc_frm_ const *t,
-                           struct ccc_frm_elem_ const *);
-static void *key_at(struct ccc_frm_ const *t, size_t i);
+static void *key_from_node(struct ccc_fromap_ const *t,
+                           struct ccc_fromap_elem_ const *);
+static void *key_at(struct ccc_fromap_ const *t, size_t i);
 /* Returning the internal elem type with stored offsets. */
-static struct ccc_frm_elem_ *at(struct ccc_frm_ const *, size_t);
-static struct ccc_frm_elem_ *elem_in_slot(struct ccc_frm_ const *t,
-                                          void const *slot);
+static struct ccc_fromap_elem_ *at(struct ccc_fromap_ const *, size_t);
+static struct ccc_fromap_elem_ *elem_in_slot(struct ccc_fromap_ const *t,
+                                             void const *slot);
 /* Returning the internal query helper to aid in entry handling. */
-static struct frm_query_ find(struct ccc_frm_ const *frm, void const *key);
+static struct frm_query_ find(struct ccc_fromap_ const *frm, void const *key);
 /* Returning the entry core to the Entry API. */
-static inline struct ccc_frm_entry_ entry(struct ccc_frm_ const *frm,
-                                          void const *key);
+static inline struct ccc_fromap_entry_ entry(struct ccc_fromap_ const *frm,
+                                             void const *key);
 /* Returning a generic range that can be use for range or rrange. */
-static struct ccc_range_ equal_range(struct ccc_frm_ const *, void const *,
+static struct ccc_range_ equal_range(struct ccc_fromap_ const *, void const *,
                                      void const *, enum frm_branch_);
 /* Returning threeway comparison with user callback. */
-static ccc_threeway_cmp cmp_elems(struct ccc_frm_ const *frm, void const *key,
-                                  size_t node, ccc_key_cmp_fn *fn);
+static ccc_threeway_cmp cmp_elems(struct ccc_fromap_ const *frm,
+                                  void const *key, size_t node,
+                                  ccc_key_cmp_fn *fn);
 /* Returning read only indices for tree nodes. */
-static size_t sibling_of(struct ccc_frm_ const *t, size_t x);
-static size_t next(struct ccc_frm_ const *t, size_t n,
+static size_t sibling_of(struct ccc_fromap_ const *t, size_t x);
+static size_t next(struct ccc_fromap_ const *t, size_t n,
                    enum frm_branch_ traversal);
-static size_t min_max_from(struct ccc_frm_ const *t, size_t start,
+static size_t min_max_from(struct ccc_fromap_ const *t, size_t start,
                            enum frm_branch_ dir);
-static size_t branch_i(struct ccc_frm_ const *t, size_t parent,
+static size_t branch_i(struct ccc_fromap_ const *t, size_t parent,
                        enum frm_branch_ dir);
-static size_t parent_i(struct ccc_frm_ const *t, size_t child);
-static size_t index_of(struct ccc_frm_ const *t,
-                       struct ccc_frm_elem_ const *elem);
+static size_t parent_i(struct ccc_fromap_ const *t, size_t child);
+static size_t index_of(struct ccc_fromap_ const *t,
+                       struct ccc_fromap_elem_ const *elem);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_r(struct ccc_frm_ const *t, size_t node,
+static size_t *branch_r(struct ccc_fromap_ const *t, size_t node,
                         enum frm_branch_ branch);
-static size_t *parent_r(struct ccc_frm_ const *t, size_t node);
+static size_t *parent_r(struct ccc_fromap_ const *t, size_t node);
 /* Returning WAVL tree status. */
-static bool is_0_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
-static bool is_1_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
-static bool is_2_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
-static bool is_3_child(struct ccc_frm_ const *, size_t p_of_x, size_t x);
-static bool is_01_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
+static bool is_0_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
+static bool is_1_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
+static bool is_2_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
+static bool is_3_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
+static bool is_01_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
                          size_t y);
-static bool is_11_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
+static bool is_11_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
                          size_t y);
-static bool is_02_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
+static bool is_02_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
                          size_t y);
-static bool is_22_parent(struct ccc_frm_ const *, size_t x, size_t p_of_xy,
+static bool is_22_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
                          size_t y);
-static bool is_leaf(struct ccc_frm_ const *t, size_t x);
-static uint8_t parity(struct ccc_frm_ const *t, size_t node);
-static bool validate(struct ccc_frm_ const *frm);
+static bool is_leaf(struct ccc_fromap_ const *t, size_t x);
+static uint8_t parity(struct ccc_fromap_ const *t, size_t node);
+static bool validate(struct ccc_fromap_ const *frm);
 /* Returning void and maintaining the WAVL tree. */
-static void init_node(struct ccc_frm_elem_ *e);
-static void insert_fixup(struct ccc_frm_ *t, size_t z_p_of_xy, size_t x);
-static void rebalance_3_child(struct ccc_frm_ *t, size_t p_of_xy, size_t x);
-static void rebalance_via_rotation(struct ccc_frm_ *t, size_t z, size_t x,
+static void init_node(struct ccc_fromap_elem_ *e);
+static void insert_fixup(struct ccc_fromap_ *t, size_t z_p_of_xy, size_t x);
+static void rebalance_3_child(struct ccc_fromap_ *t, size_t p_of_xy, size_t x);
+static void rebalance_via_rotation(struct ccc_fromap_ *t, size_t z, size_t x,
                                    size_t y);
-static void transplant(struct ccc_frm_ *t, size_t remove, size_t replacement);
-static void swap_and_pop(struct ccc_frm_ *t, size_t vacant_i);
-static void promote(struct ccc_frm_ const *t, size_t x);
-static void demote(struct ccc_frm_ const *t, size_t x);
-static void double_promote(struct ccc_frm_ const *t, size_t x);
-static void double_demote(struct ccc_frm_ const *t, size_t x);
+static void transplant(struct ccc_fromap_ *t, size_t remove,
+                       size_t replacement);
+static void swap_and_pop(struct ccc_fromap_ *t, size_t vacant_i);
+static void promote(struct ccc_fromap_ const *t, size_t x);
+static void demote(struct ccc_fromap_ const *t, size_t x);
+static void double_promote(struct ccc_fromap_ const *t, size_t x);
+static void double_demote(struct ccc_fromap_ const *t, size_t x);
 
-static void rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
+static void rotate(struct ccc_fromap_ *t, size_t z_p_of_x, size_t x_p_of_y,
                    size_t y, enum frm_branch_ dir);
-static void double_rotate(struct ccc_frm_ *t, size_t z_p_of_x, size_t x_p_of_y,
-                          size_t y, enum frm_branch_ dir);
+static void double_rotate(struct ccc_fromap_ *t, size_t z_p_of_x,
+                          size_t x_p_of_y, size_t y, enum frm_branch_ dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 
@@ -134,7 +137,7 @@ ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *const frm,
 
 ccc_entry
 ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
-               ccc_frtm_elem *const out_handle)
+               ccc_fromap_elem *const out_handle)
 {
     struct frm_query_ q = find(frm, key_from_node(frm, out_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -158,7 +161,7 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
 
 ccc_entry
 ccc_frm_try_insert(ccc_flat_realtime_ordered_map *const frm,
-                   ccc_frtm_elem *const key_val_handle)
+                   ccc_fromap_elem *const key_val_handle)
 {
     struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -177,7 +180,7 @@ ccc_frm_try_insert(ccc_flat_realtime_ordered_map *const frm,
 
 ccc_entry
 ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
-                         ccc_frtm_elem *const key_val_handle)
+                         ccc_fromap_elem *const key_val_handle)
 {
     struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -196,8 +199,8 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
     return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
-ccc_frtm_entry *
-ccc_frm_and_modify(ccc_frtm_entry *const e, ccc_update_fn *const fn)
+ccc_fromap_entry *
+ccc_frm_and_modify(ccc_fromap_entry *const e, ccc_update_fn *const fn)
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
@@ -207,8 +210,8 @@ ccc_frm_and_modify(ccc_frtm_entry *const e, ccc_update_fn *const fn)
     return e;
 }
 
-ccc_frtm_entry *
-ccc_frm_and_modify_aux(ccc_frtm_entry *const e, ccc_update_fn *const fn,
+ccc_fromap_entry *
+ccc_frm_and_modify_aux(ccc_fromap_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
@@ -220,7 +223,7 @@ ccc_frm_and_modify_aux(ccc_frtm_entry *const e, ccc_update_fn *const fn,
 }
 
 void *
-ccc_frm_or_insert(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
+ccc_frm_or_insert(ccc_fromap_entry const *const e, ccc_fromap_elem *const elem)
 {
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
@@ -231,7 +234,8 @@ ccc_frm_or_insert(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
 }
 
 void *
-ccc_frm_insert_entry(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
+ccc_frm_insert_entry(ccc_fromap_entry const *const e,
+                     ccc_fromap_elem *const elem)
 {
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
@@ -245,15 +249,15 @@ ccc_frm_insert_entry(ccc_frtm_entry const *const e, ccc_frtm_elem *const elem)
                               elem);
 }
 
-ccc_frtm_entry
+ccc_fromap_entry
 ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
               void const *const key)
 {
-    return (ccc_frtm_entry){entry(frm, key)};
+    return (ccc_fromap_entry){entry(frm, key)};
 }
 
 ccc_entry
-ccc_frm_remove_entry(ccc_frtm_entry const *const e)
+ccc_frm_remove_entry(ccc_fromap_entry const *const e)
 {
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
@@ -266,7 +270,7 @@ ccc_frm_remove_entry(ccc_frtm_entry const *const e)
 
 ccc_entry
 ccc_frm_remove(ccc_flat_realtime_ordered_map *const frm,
-               ccc_frtm_elem *const out_handle)
+               ccc_fromap_elem *const out_handle)
 {
     struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
     if (q.last_cmp_ != CCC_EQL)
@@ -296,7 +300,7 @@ ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *const frm,
 }
 
 void *
-ccc_frm_unwrap(ccc_frtm_entry const *const e)
+ccc_frm_unwrap(ccc_fromap_entry const *const e)
 {
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
@@ -306,13 +310,13 @@ ccc_frm_unwrap(ccc_frtm_entry const *const e)
 }
 
 bool
-ccc_frm_insert_error(ccc_frtm_entry const *const e)
+ccc_frm_insert_error(ccc_fromap_entry const *const e)
 {
     return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 bool
-ccc_frm_occupied(ccc_frtm_entry const *const e)
+ccc_frm_occupied(ccc_fromap_entry const *const e)
 {
     return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
 }
@@ -354,7 +358,7 @@ ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *const frm)
 
 void *
 ccc_frm_next(ccc_flat_realtime_ordered_map const *const frm,
-             ccc_frtm_elem const *const e)
+             ccc_fromap_elem const *const e)
 {
     if (ccc_buf_is_empty(&frm->buf_))
     {
@@ -366,7 +370,7 @@ ccc_frm_next(ccc_flat_realtime_ordered_map const *const frm,
 
 void *
 ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
-              ccc_frtm_elem const *const e)
+              ccc_fromap_elem const *const e)
 {
     if (ccc_buf_is_empty(&frm->buf_))
     {
@@ -456,41 +460,41 @@ ccc_frm_root(ccc_flat_realtime_ordered_map const *const frm)
 /*========================  Private Interface  ==============================*/
 
 void *
-ccc_impl_frm_insert(struct ccc_frm_ *const frm, size_t const parent_i,
+ccc_impl_frm_insert(struct ccc_fromap_ *const frm, size_t const parent_i,
                     ccc_threeway_cmp const last_cmp, size_t const elem_i)
 {
     return insert(frm, parent_i, last_cmp, elem_i);
 }
 
-struct ccc_frm_entry_
-ccc_impl_frm_entry(struct ccc_frm_ const *const frm, void const *const key)
+struct ccc_fromap_entry_
+ccc_impl_frm_entry(struct ccc_fromap_ const *const frm, void const *const key)
 {
     return entry(frm, key);
 }
 
 void *
-ccc_impl_frm_key_from_node(struct ccc_frm_ const *const frm,
-                           struct ccc_frm_elem_ const *const elem)
+ccc_impl_frm_key_from_node(struct ccc_fromap_ const *const frm,
+                           struct ccc_fromap_elem_ const *const elem)
 {
     return key_from_node(frm, elem);
 }
 
 void *
-ccc_impl_frm_key_in_slot(struct ccc_frm_ const *const frm,
+ccc_impl_frm_key_in_slot(struct ccc_fromap_ const *const frm,
                          void const *const slot)
 {
     return (char *)slot + frm->key_offset_;
 }
 
-struct ccc_frm_elem_ *
-ccc_impl_frm_elem_in_slot(struct ccc_frm_ const *const frm,
+struct ccc_fromap_elem_ *
+ccc_impl_frm_elem_in_slot(struct ccc_fromap_ const *const frm,
                           void const *const slot)
 {
     return elem_in_slot(frm, slot);
 }
 
 void *
-ccc_impl_frm_alloc_back(struct ccc_frm_ *const frm)
+ccc_impl_frm_alloc_back(struct ccc_fromap_ *const frm)
 {
     return alloc_back(frm);
 }
@@ -498,9 +502,9 @@ ccc_impl_frm_alloc_back(struct ccc_frm_ *const frm)
 /*==========================  Static Helpers   ==============================*/
 
 static void *
-maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
+maybe_alloc_insert(struct ccc_fromap_ *const frm, size_t const parent,
                    ccc_threeway_cmp const last_cmp,
-                   struct ccc_frm_elem_ *const elem)
+                   struct ccc_fromap_elem_ *const elem)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementor is always at least 1. */
@@ -514,10 +518,10 @@ maybe_alloc_insert(struct ccc_frm_ *const frm, size_t const parent,
 }
 
 static inline void *
-insert(struct ccc_frm_ *const frm, size_t const parent_i,
+insert(struct ccc_fromap_ *const frm, size_t const parent_i,
        ccc_threeway_cmp const last_cmp, size_t const elem_i)
 {
-    struct ccc_frm_elem_ *elem = at(frm, elem_i);
+    struct ccc_fromap_elem_ *elem = at(frm, elem_i);
     init_node(elem);
     if (ccc_buf_size(&frm->buf_) == single_tree_node)
     {
@@ -525,7 +529,7 @@ insert(struct ccc_frm_ *const frm, size_t const parent_i,
         return struct_base(frm, elem);
     }
     assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
-    struct ccc_frm_elem_ *parent = at(frm, parent_i);
+    struct ccc_fromap_elem_ *parent = at(frm, parent_i);
     bool const rank_rule_break = !parent->branch_[L] && !parent->branch_[R];
     parent->branch_[CCC_GRT == last_cmp] = elem_i;
     elem->parent_ = parent_i;
@@ -536,21 +540,21 @@ insert(struct ccc_frm_ *const frm, size_t const parent_i,
     return struct_base(frm, elem);
 }
 
-static inline struct ccc_frm_entry_
-entry(struct ccc_frm_ const *const frm, void const *const key)
+static inline struct ccc_fromap_entry_
+entry(struct ccc_fromap_ const *const frm, void const *const key)
 {
     struct frm_query_ q = find(frm, key);
     if (CCC_EQL == q.last_cmp_)
     {
-        return (struct ccc_frm_entry_){
-            .frm_ = (struct ccc_frm_ *)frm,
+        return (struct ccc_fromap_entry_){
+            .frm_ = (struct ccc_fromap_ *)frm,
             .last_cmp_ = q.last_cmp_,
             .i_ = q.found_,
             .stats_ = CCC_ENTRY_OCCUPIED,
         };
     }
-    return (struct ccc_frm_entry_){
-        .frm_ = (struct ccc_frm_ *)frm,
+    return (struct ccc_fromap_entry_){
+        .frm_ = (struct ccc_fromap_ *)frm,
         .last_cmp_ = q.last_cmp_,
         .i_ = q.parent_,
         .stats_ = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
@@ -558,7 +562,7 @@ entry(struct ccc_frm_ const *const frm, void const *const key)
 }
 
 static inline struct frm_query_
-find(struct ccc_frm_ const *const frm, void const *const key)
+find(struct ccc_fromap_ const *const frm, void const *const key)
 {
     size_t parent = 0;
     ccc_threeway_cmp link = CCC_CMP_ERR;
@@ -575,7 +579,8 @@ find(struct ccc_frm_ const *const frm, void const *const key)
 }
 
 static inline size_t
-next(struct ccc_frm_ const *const t, size_t n, enum frm_branch_ const traversal)
+next(struct ccc_fromap_ const *const t, size_t n,
+     enum frm_branch_ const traversal)
 {
     if (!n)
     {
@@ -605,7 +610,7 @@ next(struct ccc_frm_ const *const t, size_t n, enum frm_branch_ const traversal)
 }
 
 static struct ccc_range_
-equal_range(struct ccc_frm_ const *const t, void const *const begin_key,
+equal_range(struct ccc_fromap_ const *const t, void const *const begin_key,
             void const *const end_key, enum frm_branch_ const traversal)
 {
     if (ccc_frm_is_empty(t))
@@ -630,7 +635,7 @@ equal_range(struct ccc_frm_ const *const t, void const *const begin_key,
 }
 
 static inline size_t
-min_max_from(struct ccc_frm_ const *const t, size_t start,
+min_max_from(struct ccc_fromap_ const *const t, size_t start,
              enum frm_branch_ const dir)
 {
     if (!start)
@@ -643,7 +648,7 @@ min_max_from(struct ccc_frm_ const *const t, size_t start,
 }
 
 static inline ccc_threeway_cmp
-cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
+cmp_elems(struct ccc_fromap_ const *const frm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){
@@ -651,7 +656,7 @@ cmp_elems(struct ccc_frm_ const *const frm, void const *const key,
 }
 
 static inline void *
-alloc_back(struct ccc_frm_ *const t)
+alloc_back(struct ccc_fromap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementor is always at least 1. */
@@ -668,7 +673,7 @@ alloc_back(struct ccc_frm_ *const t)
 }
 
 static inline void
-init_node(struct ccc_frm_elem_ *const e)
+init_node(struct ccc_fromap_elem_ *const e)
 {
     assert(e != NULL);
     e->parity_ = 0;
@@ -687,80 +692,81 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
     (void)memcpy(b, tmp, elem_sz);
 }
 
-static inline struct ccc_frm_elem_ *
-at(struct ccc_frm_ const *const t, size_t const i)
+static inline struct ccc_fromap_elem_ *
+at(struct ccc_fromap_ const *const t, size_t const i)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, i));
 }
 
 static inline size_t
-branch_i(struct ccc_frm_ const *const t, size_t const parent,
+branch_i(struct ccc_fromap_ const *const t, size_t const parent,
          enum frm_branch_ const dir)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, parent))->branch_[dir];
 }
 
 static inline size_t
-parent_i(struct ccc_frm_ const *const t, size_t const child)
+parent_i(struct ccc_fromap_ const *const t, size_t const child)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, child))->parent_;
 }
 
 static inline size_t
-index_of(struct ccc_frm_ const *const t, struct ccc_frm_elem_ const *const elem)
+index_of(struct ccc_fromap_ const *const t,
+         struct ccc_fromap_elem_ const *const elem)
 {
     return ccc_buf_i(&t->buf_, struct_base(t, elem));
 }
 
 static inline uint8_t
-parity(struct ccc_frm_ const *t, size_t const node)
+parity(struct ccc_fromap_ const *t, size_t const node)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parity_;
 }
 
 static inline size_t *
-branch_r(struct ccc_frm_ const *t, size_t const node,
+branch_r(struct ccc_fromap_ const *t, size_t const node,
          enum frm_branch_ const branch)
 {
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->branch_[branch];
 }
 
 static inline size_t *
-parent_r(struct ccc_frm_ const *t, size_t node)
+parent_r(struct ccc_fromap_ const *t, size_t node)
 {
 
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
 }
 
 static inline void *
-base_at(struct ccc_frm_ const *const frm, size_t const i)
+base_at(struct ccc_fromap_ const *const frm, size_t const i)
 {
     return ccc_buf_at(&frm->buf_, i);
 }
 
 static inline void *
-struct_base(struct ccc_frm_ const *const frm,
-            struct ccc_frm_elem_ const *const e)
+struct_base(struct ccc_fromap_ const *const frm,
+            struct ccc_fromap_elem_ const *const e)
 {
     return ((char *)e->branch_) - frm->node_elem_offset_;
 }
 
-static struct ccc_frm_elem_ *
-elem_in_slot(struct ccc_frm_ const *const t, void const *const slot)
+static struct ccc_fromap_elem_ *
+elem_in_slot(struct ccc_fromap_ const *const t, void const *const slot)
 {
 
-    return (struct ccc_frm_elem_ *)((char *)slot + t->node_elem_offset_);
+    return (struct ccc_fromap_elem_ *)((char *)slot + t->node_elem_offset_);
 }
 
 static inline void *
-key_from_node(struct ccc_frm_ const *const t,
-              struct ccc_frm_elem_ const *const elem)
+key_from_node(struct ccc_fromap_ const *const t,
+              struct ccc_fromap_elem_ const *const elem)
 {
     return (char *)struct_base(t, elem) + t->key_offset_;
 }
 
 static inline void *
-key_at(struct ccc_frm_ const *const t, size_t const i)
+key_at(struct ccc_fromap_ const *const t, size_t const i)
 {
     return (char *)ccc_buf_at(&t->buf_, i) + t->key_offset_;
 }
@@ -768,7 +774,7 @@ key_at(struct ccc_frm_ const *const t, size_t const i)
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
+insert_fixup(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
 {
     do
     {
@@ -805,7 +811,7 @@ insert_fixup(struct ccc_frm_ *const t, size_t z_p_of_xy, size_t x)
 }
 
 static void *
-remove_fixup(struct ccc_frm_ *const t, size_t const remove)
+remove_fixup(struct ccc_fromap_ *const t, size_t const remove)
 {
     size_t y = 0;
     size_t x = 0;
@@ -868,7 +874,7 @@ remove_fixup(struct ccc_frm_ *const t, size_t const remove)
 }
 
 static inline void
-transplant(struct ccc_frm_ *const t, size_t const remove,
+transplant(struct ccc_fromap_ *const t, size_t const remove,
            size_t const replacement)
 {
     assert(remove);
@@ -883,8 +889,8 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
         size_t const p = parent_i(t, remove);
         *branch_r(t, p, branch_i(t, p, R) == remove) = replacement;
     }
-    struct ccc_frm_elem_ *const remove_r = at(t, remove);
-    struct ccc_frm_elem_ *const replace_r = at(t, replacement);
+    struct ccc_fromap_elem_ *const remove_r = at(t, remove);
+    struct ccc_fromap_elem_ *const replace_r = at(t, replacement);
     *parent_r(t, remove_r->branch_[R]) = replacement;
     *parent_r(t, remove_r->branch_[L]) = replacement;
     replace_r->branch_[R] = remove_r->branch_[R];
@@ -893,7 +899,7 @@ transplant(struct ccc_frm_ *const t, size_t const remove,
 }
 
 static inline void
-rebalance_3_child(struct ccc_frm_ *const t, size_t p_of_xy, size_t x)
+rebalance_3_child(struct ccc_fromap_ *const t, size_t p_of_xy, size_t x)
 {
     assert(p_of_xy);
     bool made_3_child = false;
@@ -923,8 +929,8 @@ rebalance_3_child(struct ccc_frm_ *const t, size_t p_of_xy, size_t x)
 }
 
 static inline void
-rebalance_via_rotation(struct ccc_frm_ *const t, size_t const z, size_t const x,
-                       size_t const y)
+rebalance_via_rotation(struct ccc_fromap_ *const t, size_t const z,
+                       size_t const x, size_t const y)
 {
     enum frm_branch_ const z_to_x_dir = branch_i(t, z, R) == x;
     size_t const w = branch_i(t, y, !z_to_x_dir);
@@ -969,7 +975,7 @@ rebalance_via_rotation(struct ccc_frm_ *const t, size_t const z, size_t const x,
 
 /** Swaps in the back buffer element into vacated slot*/
 static inline void
-swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
+swap_and_pop(struct ccc_fromap_ *const t, size_t const vacant_i)
 {
     (void)ccc_buf_size_minus(&t->buf_, 1);
     size_t const x_i = ccc_buf_size(&t->buf_);
@@ -977,7 +983,7 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     {
         return;
     }
-    struct ccc_frm_elem_ *const x = at(t, x_i);
+    struct ccc_fromap_elem_ *const x = at(t, x_i);
     assert(vacant_i);
     assert(x_i);
     assert(x);
@@ -987,7 +993,7 @@ swap_and_pop(struct ccc_frm_ *const t, size_t const vacant_i)
     }
     else
     {
-        struct ccc_frm_elem_ *const p = at(t, x->parent_);
+        struct ccc_fromap_elem_ *const p = at(t, x->parent_);
         p->branch_[p->branch_[R] == x_i] = vacant_i;
     }
     *parent_r(t, x->branch_[R]) = vacant_i;
@@ -1010,12 +1016,12 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B */
 static inline void
-rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
-       size_t const y, enum frm_branch_ const dir)
+rotate(struct ccc_fromap_ *const t, size_t const z_p_of_x,
+       size_t const x_p_of_y, size_t const y, enum frm_branch_ const dir)
 {
     assert(z_p_of_x);
-    struct ccc_frm_elem_ *const z_r = at(t, z_p_of_x);
-    struct ccc_frm_elem_ *const x_r = at(t, x_p_of_y);
+    struct ccc_fromap_elem_ *const z_r = at(t, z_p_of_x);
+    struct ccc_fromap_elem_ *const x_r = at(t, x_p_of_y);
     size_t const p_of_p_of_x = parent_i(t, z_p_of_x);
     x_r->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
@@ -1024,7 +1030,7 @@ rotate(struct ccc_frm_ *const t, size_t const z_p_of_x, size_t const x_p_of_y,
     }
     else
     {
-        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+        struct ccc_fromap_elem_ *const g = at(t, p_of_p_of_x);
         g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
     }
     x_r->branch_[dir] = z_p_of_x;
@@ -1045,13 +1051,13 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      ╭─┴─╮
      B   C */
 static inline void
-double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
+double_rotate(struct ccc_fromap_ *const t, size_t const z_p_of_x,
               size_t const x_p_of_y, size_t const y, enum frm_branch_ const dir)
 {
     assert(z_p_of_x && x_p_of_y && y);
-    struct ccc_frm_elem_ *const z_r = at(t, z_p_of_x);
-    struct ccc_frm_elem_ *const x_r = at(t, x_p_of_y);
-    struct ccc_frm_elem_ *const y_r = at(t, y);
+    struct ccc_fromap_elem_ *const z_r = at(t, z_p_of_x);
+    struct ccc_fromap_elem_ *const x_r = at(t, x_p_of_y);
+    struct ccc_fromap_elem_ *const y_r = at(t, y);
     size_t const p_of_p_of_x = z_r->parent_;
     y_r->parent_ = p_of_p_of_x;
     if (!p_of_p_of_x)
@@ -1060,7 +1066,7 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
     }
     else
     {
-        struct ccc_frm_elem_ *const g = at(t, p_of_p_of_x);
+        struct ccc_fromap_elem_ *const g = at(t, p_of_p_of_x);
         g->branch_[g->branch_[R] == z_p_of_x] = y;
     }
     x_r->branch_[!dir] = y_r->branch_[dir];
@@ -1079,7 +1085,8 @@ double_rotate(struct ccc_frm_ *const t, size_t const z_p_of_x,
       0╭─╯
        x */
 [[maybe_unused]] static inline bool
-is_0_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
+is_0_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
+           size_t const x)
 {
     return p_of_x && parity(t, p_of_x) == parity(t, x);
 }
@@ -1089,7 +1096,8 @@ is_0_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
       1╭─╯
        x */
 static inline bool
-is_1_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
+is_1_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
+           size_t const x)
 {
     return p_of_x && parity(t, p_of_x) != parity(t, x);
 }
@@ -1099,7 +1107,8 @@ is_1_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
       2╭─╯
        x */
 static inline bool
-is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
+is_2_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
+           size_t const x)
 {
     return p_of_x && parity(t, p_of_x) == parity(t, x);
 }
@@ -1109,7 +1118,8 @@ is_2_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
       3╭─╯
        x */
 [[maybe_unused]] static inline bool
-is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
+is_3_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
+           size_t const x)
 {
     return p_of_x && parity(t, p_of_x) != parity(t, x);
 }
@@ -1120,7 +1130,7 @@ is_3_child(struct ccc_frm_ const *const t, size_t const p_of_x, size_t const x)
       0╭─┴─╮1
        x   y */
 static inline bool
-is_01_parent(struct ccc_frm_ const *const t, size_t const x,
+is_01_parent(struct ccc_fromap_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
@@ -1134,7 +1144,7 @@ is_01_parent(struct ccc_frm_ const *const t, size_t const x,
       1╭─┴─╮1
        x   y */
 static inline bool
-is_11_parent(struct ccc_frm_ const *const t, size_t const x,
+is_11_parent(struct ccc_fromap_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
@@ -1148,7 +1158,7 @@ is_11_parent(struct ccc_frm_ const *const t, size_t const x,
       0╭─┴─╮2
        x   y */
 static inline bool
-is_02_parent(struct ccc_frm_ const *const t, size_t const x,
+is_02_parent(struct ccc_fromap_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
@@ -1165,7 +1175,7 @@ is_02_parent(struct ccc_frm_ const *const t, size_t const x,
       2╭─┴─╮2
        x   y */
 static inline bool
-is_22_parent(struct ccc_frm_ const *const t, size_t const x,
+is_22_parent(struct ccc_fromap_ const *const t, size_t const x,
              size_t const p_of_xy, size_t const y)
 {
     assert(p_of_xy);
@@ -1174,7 +1184,7 @@ is_22_parent(struct ccc_frm_ const *const t, size_t const x,
 }
 
 static inline void
-promote(struct ccc_frm_ const *const t, size_t const x)
+promote(struct ccc_fromap_ const *const t, size_t const x)
 {
     if (x)
     {
@@ -1183,27 +1193,27 @@ promote(struct ccc_frm_ const *const t, size_t const x)
 }
 
 static inline void
-demote(struct ccc_frm_ const *const t, size_t const x)
+demote(struct ccc_fromap_ const *const t, size_t const x)
 {
     promote(t, x);
 }
 
 static inline void
-double_promote(struct ccc_frm_ const *const, size_t const)
+double_promote(struct ccc_fromap_ const *const, size_t const)
 {}
 
 static inline void
-double_demote(struct ccc_frm_ const *const, size_t const)
+double_demote(struct ccc_fromap_ const *const, size_t const)
 {}
 
 static inline bool
-is_leaf(struct ccc_frm_ const *const t, size_t const x)
+is_leaf(struct ccc_fromap_ const *const t, size_t const x)
 {
     return !branch_i(t, x, L) && !branch_i(t, x, R);
 }
 
 static inline size_t
-sibling_of(struct ccc_frm_ const *const t, size_t const x)
+sibling_of(struct ccc_fromap_ const *const t, size_t const x)
 {
     size_t const p = parent_i(t, x);
     assert(p);
@@ -1229,7 +1239,7 @@ struct parent_status
 };
 
 static size_t
-recursive_size(struct ccc_frm_ const *const t, size_t const r)
+recursive_size(struct ccc_fromap_ const *const t, size_t const r)
 {
     if (!r)
     {
@@ -1240,7 +1250,7 @@ recursive_size(struct ccc_frm_ const *const t, size_t const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_frm_ const *t, struct tree_range const r)
+are_subtrees_valid(struct ccc_fromap_ const *t, struct tree_range const r)
 {
     if (!r.root)
     {
@@ -1265,7 +1275,7 @@ are_subtrees_valid(struct ccc_frm_ const *t, struct tree_range const r)
 }
 
 static bool
-is_storing_parent(struct ccc_frm_ const *const t, size_t const p,
+is_storing_parent(struct ccc_fromap_ const *const t, size_t const p,
                   size_t const root)
 {
     if (!root)
@@ -1281,7 +1291,7 @@ is_storing_parent(struct ccc_frm_ const *const t, size_t const p,
 }
 
 static bool
-validate(struct ccc_frm_ const *const frm)
+validate(struct ccc_fromap_ const *const frm)
 {
     if (!at(frm, 0)->parity_)
     {

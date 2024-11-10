@@ -8,20 +8,35 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+/** A ordered map is a self-optimizing data structure offering amortized
+O(lg N) search, insert, and erase and pointer stability. Because the data
+structure is self-optimizing it is not suitable in a realtime environment where
+strict runtime bounds are needed. Also, searching the map is not a const
+thread-safe operation as indicated by the function signatures. The map is
+optimized upon every new search. However, in many cases the self-optimizing
+structure of the map can be beneficial when considering non-uniform access
+cases. In the best case, repeated searches of the same value yield an O(1)
+access and many other frequently searched values will remain close to the root
+of the map. */
 typedef union
 {
     struct ccc_tree_ impl_;
 } ccc_ordered_map;
 
+/** A map element is the intrusive element of the user defined struct being
+stored in the map for key value access. */
 typedef union
 {
     ccc_node_ impl_;
-} ccc_o_map_elem;
+} ccc_omap_elem;
 
+/** A container specific entry used to implement the Entry API. The Entry API
+ offers efficient search and subsequent insertion, deletion, or value update
+ based on the needs of the user. */
 typedef union
 {
     struct ccc_tree_entry_ impl_;
-} ccc_o_map_entry;
+} ccc_omap_entry;
 
 #define ccc_om_init(struct_name, set_elem_field, key_elem_field, set_name,     \
                     alloc_fn, key_cmp, aux)                                    \
@@ -31,7 +46,7 @@ typedef union
 /*=======================    Lazy Construction   ============================*/
 
 #define ccc_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data...)        \
-    &(ccc_o_map_entry)                                                         \
+    &(ccc_omap_entry)                                                          \
     {                                                                          \
         ccc_impl_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data)      \
     }
@@ -88,40 +103,40 @@ void *ccc_om_get_key_val(ccc_ordered_map *s, void const *key);
         ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
     }
 
-ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_o_map_elem *key_val_handle,
-                        ccc_o_map_elem *tmp);
+ccc_entry ccc_om_insert(ccc_ordered_map *, ccc_omap_elem *key_val_handle,
+                        ccc_omap_elem *tmp);
 
-ccc_entry ccc_om_try_insert(ccc_ordered_map *, ccc_o_map_elem *key_val_handle);
+ccc_entry ccc_om_try_insert(ccc_ordered_map *, ccc_omap_elem *key_val_handle);
 
 ccc_entry ccc_om_insert_or_assign(ccc_ordered_map *,
-                                  ccc_o_map_elem *key_val_handle);
+                                  ccc_omap_elem *key_val_handle);
 
-ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_o_map_elem *out_handle);
+ccc_entry ccc_om_remove(ccc_ordered_map *, ccc_omap_elem *out_handle);
 
 /* Standard Entry API. */
 
 #define ccc_om_entry_r(ordered_map_ptr, key_ptr)                               \
-    &(ccc_o_map_entry)                                                         \
+    &(ccc_omap_entry)                                                          \
     {                                                                          \
         ccc_om_entry((ordered_map_ptr), (key_ptr)).impl_                       \
     }
 
-ccc_o_map_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
+ccc_omap_entry ccc_om_entry(ccc_ordered_map *s, void const *key);
 
-ccc_o_map_entry *ccc_om_and_modify(ccc_o_map_entry *e, ccc_update_fn *fn);
+ccc_omap_entry *ccc_om_and_modify(ccc_omap_entry *e, ccc_update_fn *fn);
 
-ccc_o_map_entry *ccc_om_and_modify_aux(ccc_o_map_entry *e, ccc_update_fn *fn,
-                                       void *aux);
+ccc_omap_entry *ccc_om_and_modify_aux(ccc_omap_entry *e, ccc_update_fn *fn,
+                                      void *aux);
 
-void *ccc_om_or_insert(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
+void *ccc_om_or_insert(ccc_omap_entry const *e, ccc_omap_elem *elem);
 
-void *ccc_om_insert_entry(ccc_o_map_entry const *e, ccc_o_map_elem *elem);
+void *ccc_om_insert_entry(ccc_omap_entry const *e, ccc_omap_elem *elem);
 
-ccc_entry ccc_om_remove_entry(ccc_o_map_entry *e);
+ccc_entry ccc_om_remove_entry(ccc_omap_entry *e);
 
-void *ccc_om_unwrap(ccc_o_map_entry const *e);
-bool ccc_om_insert_error(ccc_o_map_entry const *e);
-bool ccc_om_occupied(ccc_o_map_entry const *e);
+void *ccc_om_unwrap(ccc_omap_entry const *e);
+bool ccc_om_insert_error(ccc_omap_entry const *e);
+bool ccc_om_occupied(ccc_omap_entry const *e);
 
 /*===========================   Iterators   =================================*/
 
@@ -151,9 +166,9 @@ void *ccc_om_end(ccc_ordered_map const *);
 
 void *ccc_om_rend(ccc_ordered_map const *);
 
-void *ccc_om_next(ccc_ordered_map const *, ccc_o_map_elem const *);
+void *ccc_om_next(ccc_ordered_map const *, ccc_omap_elem const *);
 
-void *ccc_om_rnext(ccc_ordered_map const *, ccc_o_map_elem const *);
+void *ccc_om_rnext(ccc_ordered_map const *, ccc_omap_elem const *);
 
 void *ccc_om_root(ccc_ordered_map const *);
 
@@ -168,9 +183,9 @@ size_t ccc_om_size(ccc_ordered_map const *);
 bool ccc_om_validate(ccc_ordered_map const *);
 
 #ifdef ORDERED_MAP_USING_NAMESPACE_CCC
-typedef ccc_o_map_elem o_map_elem;
+typedef ccc_omap_elem omap_elem;
 typedef ccc_ordered_map ordered_map;
-typedef ccc_o_map_entry o_map_entry;
+typedef ccc_omap_entry omap_entry;
 #    define om_init(args...) ccc_om_init(args)
 #    define om_and_modify_w(args...) ccc_om_and_modify_w(args)
 #    define om_or_insert_w(args...) ccc_om_or_insert_w(args)

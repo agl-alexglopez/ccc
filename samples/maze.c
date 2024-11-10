@@ -59,14 +59,14 @@ struct priority_cell
 {
     struct point cell;
     int priority;
-    ccc_omm_elem elem;
+    ccc_ommap_elem elem;
 };
 
 struct point_cost
 {
     struct point p;
     int cost;
-    ccc_o_map_elem elem;
+    ccc_omap_elem elem;
 };
 
 /*======================   Maze Constants   =================================*/

@@ -60,7 +60,7 @@ struct word
     str_ofs ofs;
     int freq;
     /* Map element for logging frequencies by string key, freq value. */
-    f_om_elem e;
+    fomap_elem e;
 };
 
 struct frequency_alloc

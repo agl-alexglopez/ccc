@@ -6,14 +6,14 @@
 #include "impl_realtime_ordered_map.h"
 #include "types.h"
 
-typedef struct ccc_rtom_elem_ ccc_rtom_elem;
+typedef struct ccc_romap_elem_ ccc_romap_elem;
 
-typedef struct ccc_rtom_ ccc_realtime_ordered_map;
+typedef struct ccc_romap_ ccc_realtime_ordered_map;
 
 typedef union
 {
-    struct ccc_rtom_entry_ impl_;
-} ccc_rtom_entry;
+    struct ccc_romap_entry_ impl_;
+} ccc_romap_entry;
 
 #define ccc_rom_init(struct_name, node_elem_field, key_elem_field, map_name,   \
                      alloc_fn, key_cmp_fn, aux_data)                           \
@@ -22,7 +22,7 @@ typedef union
 
 #define ccc_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,           \
                              aux_data...)                                      \
-    &(ccc_rtom_entry)                                                          \
+    &(ccc_romap_entry)                                                         \
     {                                                                          \
         ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,      \
                                   aux_data)                                    \
@@ -58,7 +58,7 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
 /*======================      Entry API    ==================================*/
 
 #define ccc_rom_entry_r(realtime_ordered_map_ptr, key_ptr)                     \
-    &(ccc_rtom_entry)                                                          \
+    &(ccc_romap_entry)                                                         \
     {                                                                          \
         ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
     }
@@ -90,34 +90,34 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
     }
 
 ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
-                         ccc_rtom_elem *key_val_handle, ccc_rtom_elem *tmp);
+                         ccc_romap_elem *key_val_handle, ccc_romap_elem *tmp);
 
 ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
-                             ccc_rtom_elem *key_val_handle);
+                             ccc_romap_elem *key_val_handle);
 
 ccc_entry ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
-                                   ccc_rtom_elem *key_val_handle);
+                                   ccc_romap_elem *key_val_handle);
 
 ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
-                         ccc_rtom_elem *out_handle);
+                         ccc_romap_elem *out_handle);
 
-ccc_entry ccc_rom_remove_entry(ccc_rtom_entry const *e);
+ccc_entry ccc_rom_remove_entry(ccc_romap_entry const *e);
 
-ccc_rtom_entry *ccc_rom_and_modify(ccc_rtom_entry *e, ccc_update_fn *fn);
+ccc_romap_entry *ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn);
 
-ccc_rtom_entry *ccc_rom_and_modify_aux(ccc_rtom_entry *e, ccc_update_fn *fn,
-                                       void *aux);
+ccc_romap_entry *ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_update_fn *fn,
+                                        void *aux);
 
-ccc_rtom_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
-                             void const *key);
+ccc_romap_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
+                              void const *key);
 
-void *ccc_rom_or_insert(ccc_rtom_entry const *e, ccc_rtom_elem *elem);
+void *ccc_rom_or_insert(ccc_romap_entry const *e, ccc_romap_elem *elem);
 
-void *ccc_rom_insert_entry(ccc_rtom_entry const *e, ccc_rtom_elem *elem);
+void *ccc_rom_insert_entry(ccc_romap_entry const *e, ccc_romap_elem *elem);
 
-void *ccc_rom_unwrap(ccc_rtom_entry const *e);
-bool ccc_rom_insert_error(ccc_rtom_entry const *e);
-bool ccc_rom_occupied(ccc_rtom_entry const *e);
+void *ccc_rom_unwrap(ccc_romap_entry const *e);
+bool ccc_rom_insert_error(ccc_romap_entry const *e);
+bool ccc_rom_occupied(ccc_romap_entry const *e);
 
 /*======================      Iteration    ==================================*/
 
@@ -145,10 +145,11 @@ ccc_rrange ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,
                                 void const *rbegin_key, void const *rend_key);
 
 void *ccc_rom_begin(ccc_realtime_ordered_map const *rom);
-void *ccc_rom_next(ccc_realtime_ordered_map const *rom, ccc_rtom_elem const *);
+void *ccc_rom_next(ccc_realtime_ordered_map const *rom, ccc_romap_elem const *);
 
 void *ccc_rom_rbegin(ccc_realtime_ordered_map const *rom);
-void *ccc_rom_rnext(ccc_realtime_ordered_map const *rom, ccc_rtom_elem const *);
+void *ccc_rom_rnext(ccc_realtime_ordered_map const *rom,
+                    ccc_romap_elem const *);
 
 void *ccc_rom_end(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_rend(ccc_realtime_ordered_map const *rom);
@@ -170,9 +171,9 @@ bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
 
 #ifdef REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-typedef ccc_rtom_elem rtom_elem;
+typedef ccc_romap_elem romap_elem;
 typedef ccc_realtime_ordered_map realtime_ordered_map;
-typedef ccc_rtom_entry rtom_entry;
+typedef ccc_romap_entry romap_entry;
 #    define rom_init(args...) ccc_rom_init(args)
 #    define rom_and_modify_w(args...) ccc_rom_and_modify_w(args)
 #    define rom_or_insert_w(args...) ccc_rom_or_insert_w(args)

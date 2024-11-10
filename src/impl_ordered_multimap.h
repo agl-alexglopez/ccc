@@ -14,8 +14,8 @@ struct ccc_tree_;
                   alloc_fn, key_cmp_fn, aux_data)
 
 void *ccc_impl_omm_key_in_slot(struct ccc_tree_ const *t, void const *slot);
-ccc_node_ *ccc_impl_omm_elem_in_slot(struct ccc_tree_ const *t,
-                                     void const *slot);
+ccc_node_ *ccc_impl_ommap_elem_in_slot(struct ccc_tree_ const *t,
+                                       void const *slot);
 void *ccc_impl_omm_key_from_node(struct ccc_tree_ const *t, ccc_node_ const *n);
 struct ccc_tree_entry_ ccc_impl_omm_entry(struct ccc_tree_ *t, void const *key);
 void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
@@ -44,7 +44,8 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             *new_mem = lazy_key_value;                                         \
             new_mem = ccc_impl_omm_multimap_insert(                            \
                 (ordered_map_entry)->t_,                                       \
-                ccc_impl_omm_elem_in_slot((ordered_map_entry)->t_, new_mem));  \
+                ccc_impl_ommap_elem_in_slot((ordered_map_entry)->t_,           \
+                                            new_mem));                         \
         }                                                                      \
     })
 
@@ -65,8 +66,8 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 = key;                                                         \
             (void)ccc_impl_omm_multimap_insert(                                \
                 omm_insert_entry.t_,                                           \
-                ccc_impl_omm_elem_in_slot(omm_insert_entry.t_,                 \
-                                          omm_new_ins_base_));                 \
+                ccc_impl_ommap_elem_in_slot(omm_insert_entry.t_,               \
+                                            omm_new_ins_base_));               \
         }                                                                      \
     })
 
@@ -146,12 +147,12 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
         }                                                                      \
         else if (omm_ins_or_assign_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)   \
         {                                                                      \
-            struct ccc_node_ ins_ent_saved_ = *ccc_impl_omm_elem_in_slot(      \
+            struct ccc_node_ ins_ent_saved_ = *ccc_impl_ommap_elem_in_slot(    \
                 omm_ins_or_assign_ent_.t_, omm_ins_or_assign_ent_.entry_.e_);  \
             *((typeof(lazy_value) *)omm_ins_or_assign_ent_.entry_.e_)          \
                 = lazy_value;                                                  \
-            *ccc_impl_omm_elem_in_slot(omm_ins_or_assign_ent_.t_,              \
-                                       omm_ins_or_assign_ent_.entry_.e_)       \
+            *ccc_impl_ommap_elem_in_slot(omm_ins_or_assign_ent_.t_,            \
+                                         omm_ins_or_assign_ent_.entry_.e_)     \
                 = ins_ent_saved_;                                              \
             omm_ins_or_assign_ent_ret_ = omm_ins_or_assign_ent_.entry_;        \
             *((typeof(omm_key_) *)ccc_impl_omm_key_in_slot(                    \

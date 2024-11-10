@@ -22,21 +22,21 @@ target_link_libraries(run_tests PRIVATE str_view::str_view test)
 # depending on the build type. The run_tests program then runs all binaries.
 
 #############  Ordered Multimap ##########################
-add_library(omm_util omm/omm_util.h omm/omm_util.c)
-target_link_libraries(omm_util
+add_library(ommap_util ommap/ommap_util.h ommap/ommap_util.c)
+target_link_libraries(ommap_util
   PRIVATE
     ordered_multimap
     test
     traits
 )
 
-macro(add_omm_test TEST_NAME)
-  add_executable(${TEST_NAME} omm/${TEST_NAME}.c)
+macro(add_ommap_test TEST_NAME)
+  add_executable(${TEST_NAME} ommap/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       traits
       ordered_multimap 
-      omm_util
+      ommap_util
       test
       alloc
   )
@@ -48,10 +48,10 @@ macro(add_omm_test TEST_NAME)
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
-add_omm_test(test_omm_construct)
-add_omm_test(test_omm_insert)
-add_omm_test(test_omm_erase)
-add_omm_test(test_omm_iter)
+add_ommap_test(test_ommap_construct)
+add_ommap_test(test_ommap_insert)
+add_ommap_test(test_ommap_erase)
+add_ommap_test(test_ommap_iter)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
@@ -118,20 +118,20 @@ add_pq_test(test_pq_erase)
 add_pq_test(test_pq_update)
 
 #############  Map  ##########################
-add_library(map_util map/map_util.h map/map_util.c)
-target_link_libraries(map_util
+add_library(omap_util omap/omap_util.h omap/omap_util.c)
+target_link_libraries(omap_util
   PRIVATE
     traits
     ordered_map
     test
 )
 
-macro(add_map_test TEST_NAME)
-  add_executable(${TEST_NAME} map/${TEST_NAME}.c)
+macro(add_omap_test TEST_NAME)
+  add_executable(${TEST_NAME} omap/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       traits
-      map_util
+      omap_util
       ordered_map
       test
       alloc
@@ -143,26 +143,26 @@ macro(add_map_test TEST_NAME)
   )
 endmacro()
 
-add_map_test(test_map_construct)
-add_map_test(test_map_insert)
-add_map_test(test_map_erase)
-add_map_test(test_map_iter)
+add_omap_test(test_omap_construct)
+add_omap_test(test_omap_insert)
+add_omap_test(test_omap_erase)
+add_omap_test(test_omap_iter)
 
 #############  Flat Map  ##########################
-add_library(fmap_util fmap/fmap_util.h fmap/fmap_util.c)
-target_link_libraries(fmap_util
+add_library(fomap_util fomap/fomap_util.h fomap/fomap_util.c)
+target_link_libraries(fomap_util
   PRIVATE
     traits
     flat_ordered_map
     test
 )
 
-macro(add_fmap_test TEST_NAME)
-  add_executable(${TEST_NAME} fmap/${TEST_NAME}.c)
+macro(add_fomap_test TEST_NAME)
+  add_executable(${TEST_NAME} fomap/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       traits
-      fmap_util
+      fomap_util
       flat_ordered_map
       test
       alloc
@@ -174,25 +174,25 @@ macro(add_fmap_test TEST_NAME)
   )
 endmacro()
 
-add_fmap_test(test_fmap_construct)
-add_fmap_test(test_fmap_insert)
-add_fmap_test(test_fmap_erase)
-add_fmap_test(test_fmap_iter)
+add_fomap_test(test_fomap_construct)
+add_fomap_test(test_fomap_insert)
+add_fomap_test(test_fomap_erase)
+add_fomap_test(test_fomap_iter)
 
 #############  Realtime Map  ##########################
-add_library(rtomap_util rtomap/rtomap_util.h rtomap/rtomap_util.c)
-target_link_libraries(rtomap_util
+add_library(romap_util romap/romap_util.h romap/romap_util.c)
+target_link_libraries(romap_util
   PRIVATE
     traits
     realtime_ordered_map
     test
 )
 
-macro(add_rtomap_test TEST_NAME)
-  add_executable(${TEST_NAME} rtomap/${TEST_NAME}.c)
+macro(add_romap_test TEST_NAME)
+  add_executable(${TEST_NAME} romap/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      rtomap_util
+      romap_util
       ordered_map
       test
       traits
@@ -205,25 +205,25 @@ macro(add_rtomap_test TEST_NAME)
   )
 endmacro()
 
-add_rtomap_test(test_rtomap_construct)
-add_rtomap_test(test_rtomap_insert)
-add_rtomap_test(test_rtomap_erase)
-add_rtomap_test(test_rtomap_iter)
+add_romap_test(test_romap_construct)
+add_romap_test(test_romap_insert)
+add_romap_test(test_romap_erase)
+add_romap_test(test_romap_iter)
 
 #############  Flat Realtime Map  ##########################
-add_library(frtomap_util frtomap/frtomap_util.h frtomap/frtomap_util.c)
-target_link_libraries(frtomap_util
+add_library(fromap_util fromap/fromap_util.h fromap/fromap_util.c)
+target_link_libraries(fromap_util
   PRIVATE
     traits
     flat_realtime_ordered_map
     test
 )
 
-macro(add_frtomap_test TEST_NAME)
-  add_executable(${TEST_NAME} frtomap/${TEST_NAME}.c)
+macro(add_fromap_test TEST_NAME)
+  add_executable(${TEST_NAME} fromap/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      frtomap_util
+      fromap_util
       ordered_map
       test
       traits
@@ -236,26 +236,26 @@ macro(add_frtomap_test TEST_NAME)
   )
 endmacro()
 
-add_frtomap_test(test_frtomap_construct)
-add_frtomap_test(test_frtomap_insert)
-add_frtomap_test(test_frtomap_erase)
-add_frtomap_test(test_frtomap_iter)
+add_fromap_test(test_fromap_construct)
+add_fromap_test(test_fromap_insert)
+add_fromap_test(test_fromap_erase)
+add_fromap_test(test_fromap_iter)
 
 #############  Flat Hash Map ##########################
 
-add_library(fhash_util fhash/fhash_util.h fhash/fhash_util.c)
-target_link_libraries(fhash_util
+add_library(fhmap_util fhmap/fhmap_util.h fhmap/fhmap_util.c)
+target_link_libraries(fhmap_util
   flat_hash_map
 )
 
-macro(add_fhash_test TEST_NAME)
-  add_executable(${TEST_NAME} fhash/${TEST_NAME}.c)
+macro(add_fhmap_test TEST_NAME)
+  add_executable(${TEST_NAME} fhmap/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       flat_hash_map
       doubly_linked_list
       test
-      fhash_util
+      fhmap_util
       traits
       alloc
   )
@@ -266,10 +266,10 @@ macro(add_fhash_test TEST_NAME)
   )
 endmacro()
 
-add_fhash_test(test_fhash_construct)
-add_fhash_test(test_fhash_insert)
-add_fhash_test(test_fhash_erase)
-add_fhash_test(test_fhash_lru)
+add_fhmap_test(test_fhmap_construct)
+add_fhmap_test(test_fhmap_insert)
+add_fhmap_test(test_fhmap_erase)
+add_fhmap_test(test_fhmap_lru)
 
 #############  Doubly Linked List ##########################
 
