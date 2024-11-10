@@ -27,9 +27,9 @@ typedef union
     struct ccc_range_ impl_;
 } ccc_rrange;
 
-/** A entry is the basis for more complex container specific Entry API's for
+/** A entry is the basis for more complex container specific Entry API for
 all search-by-key containers. An entry is returned from various operations
-to provide both a reference to data and any auxilliary status that is
+to provide both a reference to data and any auxiliary status that is
 important for the user. An entry can be Occupied or Vacant. See individual
 headers for containers that return this type for its meaning in context. */
 typedef union
@@ -42,7 +42,7 @@ provides status messages according to the result type returned from a operation
 that uses this type. */
 typedef enum
 {
-    /** The operation has occured without error. */
+    /** The operation has occurred without error. */
     CCC_OK = 0,
     /** Memory is needed but the container lacks allocation permission. */
     CCC_NO_ALLOC,
@@ -54,7 +54,7 @@ typedef enum
     CCC_RESULTS_SIZE,
 } ccc_result;
 
-/** A C style threeway comparison value (e.g. ((a > b) - (a < b))). CCC_LES if
+/** A C style three way comparison value (e.g. ((a > b) - (a < b))). CCC_LES if
 left hand side is less than right hand side, CCC_EQL if they are equal, and
 CCC_GRT if left hand side is greater than right hand side. */
 typedef enum
@@ -65,28 +65,28 @@ typedef enum
     CCC_EQL,
     /** The left hand side is greater than the right hand side. */
     CCC_GRT,
-    /** Comparison is not possible or other error has occured. */
+    /** Comparison is not possible or other error has occurred. */
     CCC_CMP_ERR,
 } ccc_threeway_cmp;
 
 /** An element comparison helper. This type helps the user define the
 comparison callback function, if the container takes a standard element
-comparison function, and helps avoid swappable argument errors. Use type
-lhs is considered the left hand side and user type rhs is the right hand side
-when considering threeway comparison return values. Aux data is a reference
-to any auxilliary data provided upon container initialization. */
+comparison function, and helps avoid swappable argument errors. User type
+LHS is considered the left hand side and user type RHS is the right hand side
+when considering three-way comparison return values. Aux data is a reference
+to any auxiliary data provided upon container initialization. */
 typedef struct
 {
-    /** The left hand side for a threeway comparison operation. */
+    /** The left hand side for a three-way comparison operation. */
     void const *const user_type_lhs;
-    /** The right hand side for a threeway comparison operation. */
+    /** The right hand side for a three-way comparison operation. */
     void const *const user_type_rhs;
     /** A reference to aux data provided to container on initialization. */
     void *aux;
 } ccc_cmp;
 
 /** A key comparison helper to avoid argument swapping. The key is considered
-the left hand side of the operation if threeway comparison is needed. Left
+the left hand side of the operation if three-way comparison is needed. Left
 and right do not matter if simply equality is needed. */
 typedef struct
 {
@@ -110,7 +110,7 @@ typedef struct
 } ccc_user_type_mut;
 
 /** A read only reference to a key type matching the key field type used
-for hash containers. A reference to any auxilliary data is also provided.
+for hash containers. A reference to any auxiliary data is also provided.
 This the struct one can use to hash their values with their hash function. */
 typedef struct
 {
@@ -158,7 +158,7 @@ However, the above example is only useful if the standard library allocator
 is used. Any allocator that implements the required behavior is sufficient. */
 typedef void *ccc_alloc_fn(void *ptr, size_t size);
 
-/** A callback function for comparing two elements in a container. A threeway
+/** A callback function for comparing two elements in a container. A three-way
 comparison return value is expected and the two containers being compared
 are guaranteed to be non-null and pointing to the base of the user type stored
 in the container. Aux may be NULL if no aux is provided on initialization. */
@@ -168,7 +168,7 @@ typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
 A reference to the container type and any aux data provided on initialization
 is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
-function is used when a container api exposes functions to modify the key
+function is used when a container API exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
 typedef void ccc_update_fn(ccc_user_type_mut);
 
@@ -178,7 +178,7 @@ is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. A destructor
 function is used to act on each element of the container when it is being
 emptied and destroyed. The function will be called on each type after it
-removed fromt the container and before it is freed by the container, if
+removed from the container and before it is freed by the container, if
 allocation permission is provided to the container. Therefore, if the user
 has given permission to the container to allocate memory they can assume the
 container will free each element with the provided allocation function; this
@@ -210,18 +210,18 @@ typedef uint64_t ccc_hash_fn(ccc_user_key to_hash);
 @return true if Occupied false if Vacant. */
 bool ccc_entry_occupied(ccc_entry const *e);
 
-/** @brief Determine if an insertion error has occured when a function that
+/** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
 @param [in] e the pointer to the entry obtained from a container insert.
-@return true if an insertion error occured usually meaning a insertion should
-have occured but the container did not have permission to allocate new memory
+@return true if an insertion error occurred usually meaning a insertion should
+have occurred but the container did not have permission to allocate new memory
 or allocation failed. */
 bool ccc_entry_insert_error(ccc_entry const *e);
 
-/** @brief Determine if an input error has occured for a function that generates
-an entry.
+/** @brief Determine if an input error has occurred for a function that
+generates an entry.
 @param [in] e the pointer to the entry obtained from a container function.
-@return true if an input error occured usually meaning an invalid argument such
+@return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. */
 bool ccc_entry_input_error(ccc_entry const *e);
 

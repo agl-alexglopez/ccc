@@ -1,12 +1,12 @@
 /* Author: Alexander G. Lopez
    --------------------------
    This file contains my implementation of a realtime ordered map. The added
-   realtime prefix is to indicate that this map meets specific runtime bounds
+   realtime prefix is to indicate that this map meets specific run time bounds
    that can be relied upon consistently. This is may not be the case if a map
    is implemented with some self-optimizing data structure like a Splay Tree.
 
-   This map, however, promises O(lgN) search, insert, and remove as a true
-   upper bound, inclusive. This is acheived through a Weak AVL (WAVL) tree
+   This map, however, promises O(lg N) search, insert, and remove as a true
+   upper bound, inclusive. This is achieved through a Weak AVL (WAVL) tree
    that is derived from the following two sources.
 
    [1] Bernhard Haeupler, Siddhartha Sen, and Robert E. Tarjan, 2014.
@@ -17,7 +17,7 @@
    [2] Phil Vachon (pvachon) https://github.com/pvachon/wavl_tree
    This implementation is heavily influential throughout. However there have
    been some major adjustments and simplifications. Namely, the allocation has
-   been adjusted to accomodate this library's ability to be an allocating or
+   been adjusted to accommodate this library's ability to be an allocating or
    non-allocating container. All left-right symmetric cases have been united
    into one and I chose to tackle rotations and deletions slightly differently,
    shortening the code significantly. Finally, a few other changes and
