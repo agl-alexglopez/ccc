@@ -83,7 +83,7 @@ ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
     void *const mem = ccc_buf_alloc_back(buf);
     if (mem)
     {
-        memcpy(mem, data, buf->elem_sz_);
+        (void)memcpy(mem, data, buf->elem_sz_);
     }
     return mem;
 }
@@ -118,6 +118,10 @@ ccc_buf_copy(ccc_buffer *const buf, size_t const dst, size_t const src)
 ccc_result
 ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
 {
+    if (!buf || !buf->mem_)
+    {
+        return CCC_INPUT_ERR;
+    }
     void *const pos = ccc_buf_at(buf, i);
     if (!pos || data == pos)
     {
@@ -153,7 +157,7 @@ ccc_buf_erase(ccc_buffer *const buf, size_t const i)
 void *
 ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
 {
-    if (!buf || i > buf->sz_)
+    if (!buf || !buf->mem_ || i > buf->sz_)
     {
         return NULL;
     }
@@ -222,13 +226,17 @@ ccc_buf_begin(ccc_buffer const *const buf)
 void *
 ccc_buf_rbegin(ccc_buffer const *const buf)
 {
-    return buf ? (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_) : NULL;
+    if (!buf || !buf->mem_)
+    {
+        return NULL;
+    }
+    return (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_);
 }
 
 void *
 ccc_buf_next(ccc_buffer const *const buf, void const *const iter)
 {
-    if (!buf)
+    if (!buf || !buf->mem_)
     {
         return NULL;
     }
@@ -242,7 +250,7 @@ ccc_buf_next(ccc_buffer const *const buf, void const *const iter)
 void *
 ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
 {
-    if (!buf)
+    if (!buf || !buf->mem_)
     {
         return NULL;
     }
@@ -256,13 +264,21 @@ ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
 void *
 ccc_buf_end(ccc_buffer const *const buf)
 {
-    return buf ? (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_) : NULL;
+    if (!buf || !buf->mem_)
+    {
+        return NULL;
+    }
+    return (char *)buf->mem_ + (buf->sz_ * buf->elem_sz_);
 }
 
 void *
 ccc_buf_rend(ccc_buffer const *const buf)
 {
-    return buf ? (char *)buf->mem_ - buf->elem_sz_ : NULL;
+    if (!buf || !buf->mem_)
+    {
+        return NULL;
+    }
+    return (char *)buf->mem_ - buf->elem_sz_;
 }
 
 void *
@@ -278,7 +294,7 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
 ptrdiff_t
 ccc_buf_i(ccc_buffer const *const buf, void const *const slot)
 {
-    if (!buf || !slot || slot < buf->mem_
+    if (!buf || !buf->mem_ || !slot || slot < buf->mem_
         || (char *)slot
                >= ((char *)buf->mem_ + (buf->capacity_ * buf->elem_sz_)))
     {
