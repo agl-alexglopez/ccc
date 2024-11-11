@@ -16,7 +16,7 @@
 CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -42,7 +42,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -78,7 +78,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

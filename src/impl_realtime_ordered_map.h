@@ -34,8 +34,8 @@ struct ccc_romap_entry_
     struct ccc_entry_ entry_;
 };
 
-#define ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field,        \
-                          map_name, alloc_fn, key_cmp_fn, aux_data)            \
+#define ccc_impl_rom_init(map_name, struct_name, node_elem_field,              \
+                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \
     {                                                                          \
         .root_ = &(map_name).end_,                                             \
         .end_ = {.parity_ = 1,                                                 \

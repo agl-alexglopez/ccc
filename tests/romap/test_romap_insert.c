@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_one)
 {
     struct val one = {};
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     CHECK(occupied(insert_r(&s, &one.elem, &one.elem)), false);
     CHECK(is_empty(&s), false);
     CHECK_END_FN();
@@ -27,7 +27,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_one)
 CHECK_BEGIN_STATIC_FN(romap_test_insert_macros)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, std_alloc, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, std_alloc, val_cmp, NULL);
     struct val *v = rom_or_insert_w(entry_r(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
     v = rom_insert_entry_w(entry_r(&s, &(int){0}),
@@ -65,7 +65,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_macros)
 CHECK_BEGIN_STATIC_FN(romap_test_insert_shuffle)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -84,7 +84,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_shuffle)
 CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
 {
     ccc_realtime_ordered_map s
-        = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

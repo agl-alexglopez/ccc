@@ -6,18 +6,27 @@
 #include "impl_realtime_ordered_map.h"
 #include "types.h"
 
-typedef struct ccc_romap_elem_ ccc_romap_elem;
-
+/** A realtime ordered map offers amortized O(lg N) search, insert, and erase
+and pointer stability. This map offers a strict runtime bound of O(lg N) which
+is helpful in realtime environments. Also, searching is a thread-safe read-only
+operation. Balancing modifications only occur upon insert or remove. */
 typedef struct ccc_romap_ ccc_realtime_ordered_map;
 
+/** A map element is the intrusive element of the user defined struct being
+stored in the map for key value access. */
+typedef struct ccc_romap_elem_ ccc_romap_elem;
+
+/** A container specific entry used to implement the Entry API. The Entry API
+ offers efficient search and subsequent insertion, deletion, or value update
+ based on the needs of the user. */
 typedef union
 {
     struct ccc_romap_entry_ impl_;
 } ccc_romap_entry;
 
-#define ccc_rom_init(struct_name, node_elem_field, key_elem_field, map_name,   \
+#define ccc_rom_init(map_name, struct_name, node_elem_field, key_elem_field,   \
                      alloc_fn, key_cmp_fn, aux_data)                           \
-    ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field, map_name,  \
+    ccc_impl_rom_init(map_name, struct_name, node_elem_field, key_elem_field,  \
                       alloc_fn, key_cmp_fn, aux_data)
 
 /*=================    Membership and Retrieval    ==========================*/
