@@ -21,9 +21,6 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_one)
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
     CHECK(occupied(insert_r(&s, &one.elem, &one.elem)), false);
     CHECK(is_empty(&s), false);
-    struct val *v = rom_root(&s);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 0);
     CHECK_END_FN();
 }
 

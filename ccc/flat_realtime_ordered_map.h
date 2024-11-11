@@ -21,23 +21,35 @@ typedef union
     ccc_impl_frm_init(memory_ptr, capacity, node_elem_field, key_elem_field,   \
                       alloc_fn, key_cmp_fn, aux_data)
 
-#define ccc_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn,      \
-                             aux_data...)                                      \
-    &(ccc_fromap_entry)                                                        \
+/*=================      Membership and Retrieval    ========================*/
+
+bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
+                      void const *key);
+
+void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
+                          void const *key);
+
+/*======================      Entry API    ==================================*/
+
+ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
+                         ccc_fromap_elem *out_handle);
+
+#define ccc_frm_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)        \
+    &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn, \
-                                  aux_data)                                    \
+        ccc_frm_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))      \
+            .impl_                                                             \
     }
 
-#define ccc_frm_or_insert_w(flat_realtime_ordered_map_entry_ptr,               \
-                            lazy_key_value...)                                 \
-    ccc_impl_frm_or_insert_w(flat_realtime_ordered_map_entry_ptr,              \
-                             lazy_key_value)
+ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
+                             ccc_fromap_elem *key_val_handle);
 
-#define ccc_frm_insert_entry_w(flat_realtime_ordered_map_entry_ptr,            \
-                               lazy_key_value...)                              \
-    ccc_impl_frm_insert_entry_w(flat_realtime_ordered_map_entry_ptr,           \
-                                lazy_key_value)
+#define ccc_frm_try_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)    \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_frm_try_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))  \
+            .impl_                                                             \
+    }
 
 #define ccc_frm_try_insert_w(flat_realtime_ordered_map_ptr, key,               \
                              lazy_value...)                                    \
@@ -47,6 +59,9 @@ typedef union
                                   lazy_value)                                  \
     }
 
+ccc_entry ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *frm,
+                                   ccc_fromap_elem *key_val_handle);
+
 #define ccc_frm_insert_or_assign_w(flat_realtime_ordered_map_ptr, key,         \
                                    lazy_value...)                              \
     &(ccc_entry)                                                               \
@@ -55,14 +70,8 @@ typedef union
                                         lazy_value)                            \
     }
 
-/*=================      Membership and Retrieval    ========================*/
-
-bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
-                      void const *key);
-void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
-                          void const *key);
-
-/*======================      Entry API    ==================================*/
+ccc_fromap_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
+                               void const *key);
 
 #define ccc_frm_entry_r(flat_realtime_ordered_map_ptr, key_ptr)                \
     &(ccc_fromap_entry)                                                        \
@@ -70,19 +79,8 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
         ccc_frm_entry((flat_realtime_ordered_map_ptr), (key_ptr)).impl_        \
     }
 
-#define ccc_frm_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)        \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_frm_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))      \
-            .impl_                                                             \
-    }
-
-#define ccc_frm_try_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)    \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_frm_try_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))  \
-            .impl_                                                             \
-    }
+ccc_entry ccc_frm_remove(ccc_flat_realtime_ordered_map *frm,
+                         ccc_fromap_elem *out_handle);
 
 #define ccc_frm_remove_r(flat_realtime_ordered_map_ptr, out_handle_ptr)        \
     &(ccc_entry)                                                               \
@@ -91,41 +89,51 @@ void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
             .impl_                                                             \
     }
 
+ccc_entry ccc_frm_remove_entry(ccc_fromap_entry const *e);
+
 #define ccc_frm_remove_entry_r(flat_realtime_ordered_map_entry_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_frm_remove_entry((flat_realtime_ordered_map_entry_ptr)).impl_      \
     }
 
-ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
-                         ccc_fromap_elem *out_handle);
-
-ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
-                             ccc_fromap_elem *key_val_handle);
-
-ccc_entry ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *frm,
-                                   ccc_fromap_elem *key_val_handle);
-
-ccc_fromap_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
-                               void const *key);
-
-ccc_entry ccc_frm_remove(ccc_flat_realtime_ordered_map *frm,
-                         ccc_fromap_elem *out_handle);
-
-ccc_entry ccc_frm_remove_entry(ccc_fromap_entry const *e);
-
 ccc_fromap_entry *ccc_frm_and_modify(ccc_fromap_entry *e, ccc_update_fn *fn);
 
 ccc_fromap_entry *ccc_frm_and_modify_aux(ccc_fromap_entry *e, ccc_update_fn *fn,
                                          void *aux);
+
+#define ccc_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn,      \
+                             aux_data...)                                      \
+    &(ccc_fromap_entry)                                                        \
+    {                                                                          \
+        ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn, \
+                                  aux_data)                                    \
+    }
+
 void *ccc_frm_or_insert(ccc_fromap_entry const *e, ccc_fromap_elem *elem);
+
+#define ccc_frm_or_insert_w(flat_realtime_ordered_map_entry_ptr,               \
+                            lazy_key_value...)                                 \
+    ccc_impl_frm_or_insert_w(flat_realtime_ordered_map_entry_ptr,              \
+                             lazy_key_value)
+
 void *ccc_frm_insert_entry(ccc_fromap_entry const *e, ccc_fromap_elem *elem);
 
+#define ccc_frm_insert_entry_w(flat_realtime_ordered_map_entry_ptr,            \
+                               lazy_key_value...)                              \
+    ccc_impl_frm_insert_entry_w(flat_realtime_ordered_map_entry_ptr,           \
+                                lazy_key_value)
+
 void *ccc_frm_unwrap(ccc_fromap_entry const *e);
+
 bool ccc_frm_insert_error(ccc_fromap_entry const *e);
+
 bool ccc_frm_occupied(ccc_fromap_entry const *e);
 
 /*======================      Iteration    ==================================*/
+
+ccc_range ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
+                              void const *begin_key, void const *end_key);
 
 #define ccc_frm_equal_range_r(flat_realtime_ordered_map_ptr,                   \
                               begin_and_end_key_ptrs...)                       \
@@ -136,6 +144,9 @@ bool ccc_frm_occupied(ccc_fromap_entry const *e);
             .impl_                                                             \
     }
 
+ccc_rrange ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
+                                void const *rbegin_key, void const *rend_key);
+
 #define ccc_frm_equal_rrange_r(flat_realtime_ordered_map_ptr,                  \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
@@ -145,34 +156,35 @@ bool ccc_frm_occupied(ccc_fromap_entry const *e);
             .impl_                                                             \
     }
 
-ccc_range ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
-                              void const *begin_key, void const *end_key);
-ccc_rrange ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
-                                void const *rbegin_key, void const *rend_key);
-
 void *ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm);
+
 void *ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *frm);
 
 void *ccc_frm_next(ccc_flat_realtime_ordered_map const *frm,
                    ccc_fromap_elem const *);
+
 void *ccc_frm_rnext(ccc_flat_realtime_ordered_map const *frm,
                     ccc_fromap_elem const *);
+
 void *ccc_frm_end(ccc_flat_realtime_ordered_map const *frm);
+
 void *ccc_frm_rend(ccc_flat_realtime_ordered_map const *frm);
 
 /*======================       Cleanup     ==================================*/
 
 ccc_result ccc_frm_clear(ccc_flat_realtime_ordered_map *frm,
                          ccc_destructor_fn *fn);
+
 ccc_result ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *frm,
                                   ccc_destructor_fn *fn);
 
 /*======================       Getters     ==================================*/
 
 bool ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *frm);
+
 size_t ccc_frm_size(ccc_flat_realtime_ordered_map const *frm);
+
 bool ccc_frm_validate(ccc_flat_realtime_ordered_map const *frm);
-void *ccc_frm_root(ccc_flat_realtime_ordered_map const *frm);
 
 /*======================      Namespace    ==================================*/
 
@@ -195,7 +207,6 @@ typedef ccc_fromap_entry fromap_entry;
 #    define frm_rnext(args...) ccc_frm_rnext(args)
 #    define frm_end(args...) ccc_frm_end(args)
 #    define frm_rend(args...) ccc_frm_rend(args)
-#    define frm_root(args...) ccc_frm_root(args)
 #    define frm_root(args...) ccc_frm_root(args)
 #    define frm_is_empty(args...) ccc_frm_is_empty(args)
 #    define frm_size(args...) ccc_frm_size(args)

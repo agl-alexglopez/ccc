@@ -81,7 +81,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         if (om_ent_ptr_)                                                       \
         {                                                                      \
             om_mod_ent_ = om_ent_ptr_->impl_;                                  \
-            ccc_update_fn *and_mod_fn_ = (mod_fn);                             \
+            ccc_update_fn *const and_mod_fn_ = (mod_fn);                       \
             if (and_mod_fn_ && om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED) \
             {                                                                  \
                 __auto_type om_aux_data_ = aux_data;                           \

@@ -123,6 +123,10 @@ bool
 ccc_frm_contains(ccc_flat_realtime_ordered_map const *const frm,
                  void const *const key)
 {
+    if (!frm || !key)
+    {
+        return false;
+    }
     return CCC_EQL == find(frm, key).last_cmp_;
 }
 
@@ -130,6 +134,10 @@ void *
 ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *const frm,
                     void const *const key)
 {
+    if (!frm || !key)
+    {
+        return NULL;
+    }
     struct frm_query_ q = find(frm, key);
     return (CCC_EQL == q.last_cmp_) ? base_at(frm, q.found_) : NULL;
 }
@@ -138,6 +146,10 @@ ccc_entry
 ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
                ccc_fromap_elem *const out_handle)
 {
+    if (!frm || !out_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     struct frm_query_ q = find(frm, key_from_node(frm, out_handle));
     if (CCC_EQL == q.last_cmp_)
     {
@@ -162,6 +174,10 @@ ccc_entry
 ccc_frm_try_insert(ccc_flat_realtime_ordered_map *const frm,
                    ccc_fromap_elem *const key_val_handle)
 {
+    if (!frm || !key_val_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
@@ -181,6 +197,10 @@ ccc_entry
 ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
                          ccc_fromap_elem *const key_val_handle)
 {
+    if (!frm || !key_val_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
@@ -201,7 +221,7 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
 ccc_fromap_entry *
 ccc_frm_and_modify(ccc_fromap_entry *const e, ccc_update_fn *const fn)
 {
-    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type_mut){.user_type = base_at(e->impl_.frm_, e->impl_.i_),
                                NULL});
@@ -213,7 +233,7 @@ ccc_fromap_entry *
 ccc_frm_and_modify_aux(ccc_fromap_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type_mut){.user_type = base_at(e->impl_.frm_, e->impl_.i_),
                                aux});
@@ -224,6 +244,10 @@ ccc_frm_and_modify_aux(ccc_fromap_entry *const e, ccc_update_fn *const fn,
 void *
 ccc_frm_or_insert(ccc_fromap_entry const *const e, ccc_fromap_elem *const elem)
 {
+    if (!e || !elem)
+    {
+        return NULL;
+    }
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         return base_at(e->impl_.frm_, e->impl_.i_);
@@ -236,6 +260,10 @@ void *
 ccc_frm_insert_entry(ccc_fromap_entry const *const e,
                      ccc_fromap_elem *const elem)
 {
+    if (!e || !elem)
+    {
+        return NULL;
+    }
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *const ret = base_at(e->impl_.frm_, e->impl_.i_);
@@ -252,12 +280,20 @@ ccc_fromap_entry
 ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
               void const *const key)
 {
+    if (!frm || !key)
+    {
+        return (ccc_fromap_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     return (ccc_fromap_entry){entry(frm, key)};
 }
 
 ccc_entry
 ccc_frm_remove_entry(ccc_fromap_entry const *const e)
 {
+    if (!e)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *const erased = remove_fixup(e->impl_.frm_, e->impl_.i_);
@@ -271,6 +307,10 @@ ccc_entry
 ccc_frm_remove(ccc_flat_realtime_ordered_map *const frm,
                ccc_fromap_elem *const out_handle)
 {
+    if (!frm || !out_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
     if (q.last_cmp_ != CCC_EQL)
     {
@@ -287,6 +327,10 @@ ccc_range
 ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *const frm,
                     void const *const begin_key, void const *const end_key)
 {
+    if (!frm || !begin_key || !end_key)
+    {
+        return (ccc_range){};
+    }
     return (ccc_range){equal_range(frm, begin_key, end_key, inorder_traversal)};
 }
 
@@ -294,6 +338,10 @@ ccc_rrange
 ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *const frm,
                      void const *const rbegin_key, void const *const rend_key)
 {
+    if (!frm || !rbegin_key || !rend_key)
+    {
+        return (ccc_rrange){};
+    }
     return (ccc_rrange){
         equal_range(frm, rbegin_key, rend_key, reverse_inorder_traversal)};
 }
@@ -301,7 +349,7 @@ ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *const frm,
 void *
 ccc_frm_unwrap(ccc_fromap_entry const *const e)
 {
-    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         return ccc_buf_at(&e->impl_.frm_->buf_, e->impl_.i_);
     }
@@ -311,13 +359,13 @@ ccc_frm_unwrap(ccc_fromap_entry const *const e)
 bool
 ccc_frm_insert_error(ccc_fromap_entry const *const e)
 {
-    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
+    return e ? e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 bool
 ccc_frm_occupied(ccc_fromap_entry const *const e)
 {
-    return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
+    return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
 bool
@@ -329,6 +377,10 @@ ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *const frm)
 size_t
 ccc_frm_size(ccc_flat_realtime_ordered_map const *const frm)
 {
+    if (!frm)
+    {
+        return 0;
+    }
     size_t const sz = ccc_buf_size(&frm->buf_);
     return !sz ? sz : sz - 1;
 }
@@ -336,7 +388,7 @@ ccc_frm_size(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_begin(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_is_empty(&frm->buf_))
+    if (!frm || ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -347,7 +399,7 @@ ccc_frm_begin(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_is_empty(&frm->buf_))
+    if (!frm || ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -359,7 +411,7 @@ void *
 ccc_frm_next(ccc_flat_realtime_ordered_map const *const frm,
              ccc_fromap_elem const *const e)
 {
-    if (ccc_buf_is_empty(&frm->buf_))
+    if (!frm || !e || ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -371,7 +423,7 @@ void *
 ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
               ccc_fromap_elem const *const e)
 {
-    if (ccc_buf_is_empty(&frm->buf_))
+    if (!frm || !e || ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -382,7 +434,7 @@ ccc_frm_rnext(ccc_flat_realtime_ordered_map const *const frm,
 void *
 ccc_frm_end(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_is_empty(&frm->buf_))
+    if (!frm || ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -392,7 +444,7 @@ ccc_frm_end(ccc_flat_realtime_ordered_map const *const frm)
 void *
 ccc_frm_rend(ccc_flat_realtime_ordered_map const *const frm)
 {
-    if (ccc_buf_is_empty(&frm->buf_))
+    if (!frm || ccc_buf_is_empty(&frm->buf_))
     {
         return NULL;
     }
@@ -447,13 +499,7 @@ ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *const frm,
 bool
 ccc_frm_validate(ccc_flat_realtime_ordered_map const *const frm)
 {
-    return validate(frm);
-}
-
-void *
-ccc_frm_root(ccc_flat_realtime_ordered_map const *const frm)
-{
-    return frm->root_ ? base_at(frm, frm->root_) : NULL;
+    return frm ? validate(frm) : false;
 }
 
 /*========================  Private Interface  ==============================*/

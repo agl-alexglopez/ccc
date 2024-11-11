@@ -168,8 +168,6 @@ ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
 
 bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 
-void *ccc_rom_root(ccc_realtime_ordered_map const *rom);
-
 #ifdef REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 typedef ccc_romap_elem romap_elem;
 typedef ccc_realtime_ordered_map realtime_ordered_map;
@@ -207,7 +205,6 @@ typedef ccc_romap_entry romap_entry;
 #    define rom_is_empty(args...) ccc_rom_is_empty(args)
 #    define rom_clear(args...) ccc_rom_clear(args)
 #    define rom_validate(args...) ccc_rom_validate(args)
-#    define rom_root(args...) ccc_rom_root(args)
 #endif
 
 #endif /* CCC_REALTIME_ORDERED_MAP_H */
