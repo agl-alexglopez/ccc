@@ -21,35 +21,15 @@ typedef union
     ccc_impl_fom_init(mem_ptr, capacity, map_elem_field, key_elem_field,       \
                       alloc_fn, key_cmp, aux)
 
-#define ccc_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn, aux_data...)  \
-    &(ccc_fomap_entry)                                                         \
-    {                                                                          \
-        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \
-                                  aux_data)                                    \
-    }
-
-#define ccc_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value...)     \
-    ccc_impl_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value)
-
-#define ccc_fom_insert_entry_w(flat_ordered_map_entry_ptr, lazy_key_value...)  \
-    ccc_impl_fom_insert_entry_w(flat_ordered_map_entry_ptr, lazy_key_value)
-
-#define ccc_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value...)         \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value)       \
-    }
-
-#define ccc_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value...)   \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value) \
-    }
+/*==========================    Membership   ================================*/
 
 bool ccc_fom_contains(ccc_flat_ordered_map *, void const *key);
+
 void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
 
 /*===========================   Entry API   =================================*/
+
+ccc_entry ccc_fom_insert(ccc_flat_ordered_map *, ccc_fomap_elem *out_handle);
 
 #define ccc_fom_insert_r(flat_ordered_map_ptr, out_handle_ptr)                 \
     &(ccc_entry)                                                               \
@@ -57,11 +37,31 @@ void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
         ccc_fom_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_         \
     }
 
+ccc_entry ccc_fom_try_insert(ccc_flat_ordered_map *,
+                             ccc_fomap_elem *key_val_handle);
+
 #define ccc_fom_try_insert_r(flat_ordered_map_ptr, out_handle_ptr)             \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fom_try_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
+
+#define ccc_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value...)         \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value)       \
+    }
+
+ccc_entry ccc_fom_insert_or_assign(ccc_flat_ordered_map *,
+                                   ccc_fomap_elem *key_val_handle);
+
+#define ccc_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value...)   \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value) \
+    }
+
+ccc_entry ccc_fom_remove(ccc_flat_ordered_map *, ccc_fomap_elem *out_handle);
 
 #define ccc_fom_remove_r(flat_ordered_map_ptr, out_handle_ptr)                 \
     &(ccc_entry)                                                               \
@@ -69,21 +69,15 @@ void *ccc_fom_get_key_val(ccc_flat_ordered_map *, void const *key);
         ccc_fom_remove((flat_ordered_map_ptr), (out_handle_ptr)).impl_         \
     }
 
+ccc_entry ccc_fom_remove_entry(ccc_fomap_entry *e);
+
 #define ccc_fom_remove_entry_r(flat_ordered_map_entry_ptr)                     \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fom_remove_entry((flat_ordered_map_entry_ptr)).impl_               \
     }
 
-ccc_entry ccc_fom_insert(ccc_flat_ordered_map *, ccc_fomap_elem *out_handle);
-ccc_entry ccc_fom_try_insert(ccc_flat_ordered_map *,
-                             ccc_fomap_elem *key_val_handle);
-ccc_entry ccc_fom_insert_or_assign(ccc_flat_ordered_map *,
-                                   ccc_fomap_elem *key_val_handle);
-ccc_entry ccc_fom_remove(ccc_flat_ordered_map *, ccc_fomap_elem *out_handle);
-ccc_entry ccc_fom_remove_entry(ccc_fomap_entry *e);
-
-/* Standard Entry API. */
+ccc_fomap_entry ccc_fom_entry(ccc_flat_ordered_map *fom, void const *key);
 
 #define ccc_fom_entry_r(flat_ordered_map_ptr, key_ptr)                         \
     &(ccc_fomap_entry)                                                         \
@@ -91,19 +85,32 @@ ccc_entry ccc_fom_remove_entry(ccc_fomap_entry *e);
         ccc_fom_entry((flat_ordered_map_ptr), (key_ptr)).impl_                 \
     }
 
-ccc_fomap_entry ccc_fom_entry(ccc_flat_ordered_map *fom, void const *key);
-
 ccc_fomap_entry *ccc_fom_and_modify(ccc_fomap_entry *e, ccc_update_fn *fn);
 
 ccc_fomap_entry *ccc_fom_and_modify_aux(ccc_fomap_entry *e, ccc_update_fn *fn,
                                         void *aux);
 
+#define ccc_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn, aux_data...)  \
+    &(ccc_fomap_entry)                                                         \
+    {                                                                          \
+        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \
+                                  aux_data)                                    \
+    }
+
 void *ccc_fom_or_insert(ccc_fomap_entry const *e, ccc_fomap_elem *elem);
+
+#define ccc_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value...)     \
+    ccc_impl_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value)
 
 void *ccc_fom_insert_entry(ccc_fomap_entry const *e, ccc_fomap_elem *elem);
 
+#define ccc_fom_insert_entry_w(flat_ordered_map_entry_ptr, lazy_key_value...)  \
+    ccc_impl_fom_insert_entry_w(flat_ordered_map_entry_ptr, lazy_key_value)
+
 void *ccc_fom_unwrap(ccc_fomap_entry const *e);
+
 bool ccc_fom_insert_error(ccc_fomap_entry const *e);
+
 bool ccc_fom_occupied(ccc_fomap_entry const *e);
 
 void ccc_fom_clear(ccc_flat_ordered_map *frm, ccc_destructor_fn *fn);
@@ -112,22 +119,47 @@ ccc_result ccc_fom_clear_and_free(ccc_flat_ordered_map *frm,
 
 /*===========================   Iterators   =================================*/
 
-void *ccc_fom_begin(ccc_flat_ordered_map const *);
-void *ccc_fom_rbegin(ccc_flat_ordered_map const *);
-void *ccc_fom_end(ccc_flat_ordered_map const *);
-void *ccc_fom_rend(ccc_flat_ordered_map const *);
-void *ccc_fom_next(ccc_flat_ordered_map const *, ccc_fomap_elem const *);
-void *ccc_fom_rnext(ccc_flat_ordered_map const *, ccc_fomap_elem const *);
 ccc_range ccc_fom_equal_range(ccc_flat_ordered_map *fom, void const *begin_key,
                               void const *end_key);
+
+#define ccc_fom_equal_range_r(flat_ordered_map_ptr, begin_and_end_key_ptrs...) \
+    &(ccc_range)                                                               \
+    {                                                                          \
+        ccc_fom_equal_range(flat_ordered_map_ptr, begin_and_end_key_ptrs)      \
+            .impl_                                                             \
+    }
+
 ccc_rrange ccc_fom_equal_rrange(ccc_flat_ordered_map *fom,
                                 void const *rbegin_key, void const *end_key);
+
+#define ccc_fom_equal_rrange_r(flat_ordered_map_ptr,                           \
+                               rbegin_and_rend_key_ptrs...)                    \
+    &(ccc_rrange)                                                              \
+    {                                                                          \
+        ccc_fom_equal_rrange(flat_ordered_map_ptr, rbegin_and_rend_key_ptrs)   \
+            .impl_                                                             \
+    }
+
+void *ccc_fom_begin(ccc_flat_ordered_map const *);
+
+void *ccc_fom_rbegin(ccc_flat_ordered_map const *);
+
+void *ccc_fom_end(ccc_flat_ordered_map const *);
+
+void *ccc_fom_rend(ccc_flat_ordered_map const *);
+
+void *ccc_fom_next(ccc_flat_ordered_map const *, ccc_fomap_elem const *);
+
+void *ccc_fom_rnext(ccc_flat_ordered_map const *, ccc_fomap_elem const *);
+
 void *ccc_fom_root(ccc_flat_ordered_map const *);
 
 /*===========================    Getters    =================================*/
 
 size_t ccc_fom_size(ccc_flat_ordered_map const *);
+
 bool ccc_fom_is_empty(ccc_flat_ordered_map const *);
+
 bool ccc_fom_validate(ccc_flat_ordered_map const *);
 
 /*===========================    Namespace  =================================*/

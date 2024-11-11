@@ -49,7 +49,7 @@ handle.
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
-@param [in] aux auxilliary data that is needed for hashing or comparison.
+@param [in] aux auxiliary data that is needed for hashing or comparison.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
 #define ccc_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,               \
