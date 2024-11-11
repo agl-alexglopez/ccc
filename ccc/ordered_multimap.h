@@ -17,7 +17,7 @@ multimap is equivalent to a double ended priority queue with round robin
 fairness among duplicate key elements. There are helper functions to make this
 use case simpler. The multimap is a self-optimizing data structure and
 therefore does not offer read-only searching. The runtime for all search,
-insert, and remove operations is amortized O(lgN) and may not meet the
+insert, and remove operations is amortized O(lg N) and may not meet the
 requirements of realtime systems. */
 typedef union
 {
@@ -59,62 +59,58 @@ hand side of the variable at compile or run time
     ccc_impl_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field, \
                       alloc_fn, key_cmp_fn, aux)
 
-/*=======================    Lazy Construction   ============================*/
+/*=========================    Membership   =================================*/
 
-/** @brief Modify the ordered multimap entry with a modification function
-requiring auxiliary data. If auxiliary data is passed as a function call, it
-will only execute if the entry is occupied.
-@param [in] ordered_multimap_entry_ptr the address of the multimap entry.
-@param [in] mod_fn the ccc_update_fn used to update a stored value.
-@param [in] aux_data the rvalue that this operation will construct and pass to
-the modification function if the entry is occupied.
-@return a pointer to a new entry. This is a compound literal reference, not a
-pointer that requires any manual memory management.
+/** @brief Returns the membership of key in the multimap. Amortized O(lg N).
+@param [in] mm a pointer to the multimap.
+@param [in] key a pointer to the key to be searched.
+@return true if the multimap contains at least one entry at key, else false. */
+[[nodiscard]] bool ccc_omm_contains(ccc_ordered_multimap *mm, void const *key);
 
-Note that keys should not be modified by the modify operation, only values or
-other struct members. */
-#define ccc_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,               \
-                             lazy_aux_data...)                                 \
-    &(ccc_ommap_entry)                                                         \
-    {                                                                          \
-        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,          \
-                                  lazy_aux_data)                               \
-    }
+/** @brief Returns a reference to the user type stored at key. Amortized O(lg
+N).
+@param [in] mm a pointer to the multimap.
+@param [in] key a pointer to the key to be searched.
+@return a reference to the oldest existing user type at key, NULL if absent. */
+[[nodiscard]] void *ccc_omm_get_key_val(ccc_ordered_multimap *mm,
+                                        void const *key);
 
-/** @brief Insert an initial key value into the multimap if none is present,
-otherwise return the oldest user type stored at the specified key. O(1).
-@param [in] ordered_multimap_entry_ptr the address of the multimap entry.
-@param [in] lazy_key_value the compound literal of the user struct stored in
-the map.
-@return a pointer to the user type stored in the map either existing or newly
-inserted. If NULL is returned, an allocator error has occured or allocation
-was disallowed on initialization to prevent inserting a new element.
-@warning the key in the lazy_key_value compound literal must match the key
-used for the initial entry generation.
+/*=========================    Entry API    =================================*/
 
-Note that it only makes sense to use this method when the container is
-permitted to allocate memory. */
-#define ccc_omm_or_insert_w(ordered_multimap_entry_ptr, lazy_key_value...)     \
-    ccc_impl_omm_or_insert_w(ordered_multimap_entry_ptr, lazy_key_value)
+/** @brief Returns an entry pointing to the newly inserted element and a status
+indicating if the map has already been Occupied at the given key. Amortized
+O(lg N).
+@param [in] mm a pointer to the multimap.
+@param [in] e a handle to the new key value to be inserted.
+@return an entry that can be unwrapped to view the inserted element. The status
+will be Occupied if this element is a duplicate added to a duplicate list or
+Vacant if this key is the first of its value inserted into the multimap. If the
+element cannot be added due to an allocator error, an insert error is set.
 
-/** @brief Invariantly writes the specified compound literal directly to the
-existing or newly allocated entry. O(1).
-@param [in] ordered_multimap_entry_ptr the address of the multimap entry.
-@param [in] lazy_key_value the compound literal that is constructed directly
-at the existing or newly allocated memory in the container.
-@return a pointer to the user type written to the existing map entry or newly
-inserted. If NULL is returned, an allocator error has occured or allocation
-was disallowed on initialization to prevent inserting a new element
-@warning the key in the lazy_key_value compound literal must match the key
-used for the initial entry generation.
-
-Note that it only makes sense to use this method when the container is
-permitted to allocate memory. */
-#define ccc_omm_insert_entry_w(ordered_multimap_entry_ptr, lazy_key_value...)  \
-    ccc_impl_omm_insert_entry_w(ordered_multimap_entry_ptr, lazy_key_value)
+Note that if allocation has been prohibited the address of the key_val_handle
+is used directly. This means the container assumes the memory provided for the
+user type containing key_val_handle has been allocated with appropriate lifetime
+by the user, for the user's intended use case. */
+[[nodiscard]] ccc_entry ccc_omm_insert(ccc_ordered_multimap *mm,
+                                       ccc_ommap_elem *key_val_handle);
 
 /** @brief Inserts a new key-value into the multimap only if none exists.
-Amortized O(lgN).
+Amortized O(lg N).
+@param [in] mm a pointer to the multimap
+@param [in] key_val_handle a pointer to the intrusive element in the user type.
+@return an entry of the user type in the map. The status is Occupied if this
+entry shows the oldest existing entry at key, or Vacant if no prior entry
+existed and this is the first insertion at key.
+
+Note that if allocation has been prohibited the address of the key_val_handle
+is used directly. This means the container assumes the memory provided for the
+user type containing key_val_handle has been allocated with appropriate lifetime
+by the user, for the user's intended use case. */
+[[nodiscard]] ccc_entry ccc_omm_try_insert(ccc_ordered_multimap *mm,
+                                           ccc_ommap_elem *key_val_handle);
+
+/** @brief Inserts a new key-value into the multimap only if none exists.
+Amortized O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap
 @param [in] key the direct key r-value to be searched.
 @param [in] lazy_value the compound literal for the type to be directly written
@@ -134,7 +130,24 @@ searched key match. */
 
 /** @brief Invariantly inserts the key value pair into the multimap either as
 the first entry or overwriting the oldest existing entry at key. Amortized
-O(lgN).
+O(lg N).
+@param [in] mm a pointer to the multimap
+@param [in] key_val_handle a pointer to the intrusive element in the user type.
+@return an entry of the user type in the map. The status is Occupied if this
+entry shows the oldest existing entry at key with the newly written value, or
+Vacant if no prior entry existed and this is the first insertion at key.
+
+Note that if allocation has been prohibited the address of the key_val_handle
+is used directly. This means the container assumes the memory provided for the
+user type containing key_val_handle has been allocated with appropriate lifetime
+by the user, for the user's intended use case. */
+[[nodiscard]] ccc_entry
+ccc_omm_insert_or_assign(ccc_ordered_multimap *mm,
+                         ccc_ommap_elem *key_val_handle);
+
+/** @brief Invariantly inserts the key value pair into the multimap either as
+the first entry or overwriting the oldest existing entry at key. Amortized
+O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap
 @param [in] key the direct key r-value to be searched.
 @param [in] lazy_value the compound literal for the type to be directly written
@@ -153,74 +166,8 @@ and searched key match. */
         ccc_impl_omm_insert_or_assign_w(ordered_multimap_ptr, key, lazy_value) \
     }
 
-/*=========================    Membership   =================================*/
-
-/** @brief Returns the membership of key in the multimap. Amortized O(lgN).
-@param [in] mm a pointer to the multimap.
-@param [in] key a pointer to the key to be searched.
-@return true if the multimap contains at least one entry at key, else false. */
-[[nodiscard]] bool ccc_omm_contains(ccc_ordered_multimap *mm, void const *key);
-
-/** @brief Returns a reference to the user type stored at key. Amortized O(lgN).
-@param [in] mm a pointer to the multimap.
-@param [in] key a pointer to the key to be searched.
-@return a reference to the oldest existing user type at key, NULL if absent. */
-[[nodiscard]] void *ccc_omm_get_key_val(ccc_ordered_multimap *mm,
-                                        void const *key);
-
-/*=========================    Entry API    =================================*/
-
-/** @brief Returns an entry pointing to the newly inserted element and a status
-indicating if the map has already been Occupied at the given key. Amortized
-O(lgN).
-@param [in] mm a pointer to the multimap.
-@param [in] e a handle to the new key value to be inserted.
-@return an entry that can be unwrapped to view the inserted element. The status
-will be Occupied if this element is a duplicate added to a duplicate list or
-Vacant if this key is the first of its value inserted into the multimap. If the
-element cannot be added due to an allocator error, an insert error is set.
-
-Note that if allocation has been prohibited the address of the key_val_handle
-is used directly. This means the container assumes the memory provided for the
-user type containing key_val_handle has been allocated with appropriate lifetime
-by the user, for the user's intended use case. */
-[[nodiscard]] ccc_entry ccc_omm_insert(ccc_ordered_multimap *mm,
-                                       ccc_ommap_elem *key_val_handle);
-
-/** @brief Inserts a new key-value into the multimap only if none exists.
-Amortized O(lgN).
-@param [in] mm a pointer to the multimap
-@param [in] key_val_handle a pointer to the intrusive element in the user type.
-@return an entry of the user type in the map. The status is Occupied if this
-entry shows the oldest existing entry at key, or Vacant if no prior entry
-existed and this is the first insertion at key.
-
-Note that if allocation has been prohibited the address of the key_val_handle
-is used directly. This means the container assumes the memory provided for the
-user type containing key_val_handle has been allocated with appropriate lifetime
-by the user, for the user's intended use case. */
-[[nodiscard]] ccc_entry ccc_omm_try_insert(ccc_ordered_multimap *mm,
-                                           ccc_ommap_elem *key_val_handle);
-
-/** @brief Invariantly inserts the key value pair into the multimap either as
-the first entry or overwriting the oldest existing entry at key. Amortized
-O(lgN).
-@param [in] mm a pointer to the multimap
-@param [in] key_val_handle a pointer to the intrusive element in the user type.
-@return an entry of the user type in the map. The status is Occupied if this
-entry shows the oldest existing entry at key with the newly written value, or
-Vacant if no prior entry existed and this is the first insertion at key.
-
-Note that if allocation has been prohibited the address of the key_val_handle
-is used directly. This means the container assumes the memory provided for the
-user type containing key_val_handle has been allocated with appropriate lifetime
-by the user, for the user's intended use case. */
-[[nodiscard]] ccc_entry
-ccc_omm_insert_or_assign(ccc_ordered_multimap *mm,
-                         ccc_ommap_elem *key_val_handle);
-
 /** @brief Removes the entry specified at key of the type containing out_handle
-preserving the old value if possible. Amortized O(lgN).
+preserving the old value if possible. Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
 @param [in] out_handle the pointer to the intrusive element in the user type.
 @return an entry indicating if one of the elements stored at key has been
@@ -233,11 +180,19 @@ struct directly and the user must unwrap and free their type themselves. */
 [[nodiscard]] ccc_entry ccc_omm_remove(ccc_ordered_multimap *mm,
                                        ccc_ommap_elem *out_handle);
 
-/* Standard Entry API. */
+/** @brief Return a container specific entry for the given search for key.
+Amortized O(lg N).
+@param [in] mm a pointer to the multimap.
+@param [in] key a pointer to the key to be searched.
+@return a container specific entry for status, unwrapping, or further Entry API
+operations. Occupied indicates at least one user type with key exists and can
+be unwrapped to view. Vacant indicates no user type at key exists. */
+[[nodiscard]] ccc_ommap_entry ccc_omm_entry(ccc_ordered_multimap *mm,
+                                            void const *key);
 
 /** @brief Return a compound literal reference to the entry generated from a
 search. No manual management of a compound literal reference is necessary.
-Amortized O(lgN).
+Amortized O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] key_ptr a ponter to the key to be searched.
 @return a compound literal reference to a container specific entry associated
@@ -251,16 +206,6 @@ and references (e.g. struct val *v = or_insert(entry_r(...), ...)); */
     {                                                                          \
         ccc_omm_entry((ordered_multimap_ptr), (key_ptr)).impl_                 \
     }
-
-/** @brief Return a container specific entry for the given search for key.
-Amortized O(lgN).
-@param [in] mm a pointer to the multimap.
-@param [in] key a pointer to the key to be searched.
-@return a container specific entry for status, unwrapping, or further Entry API
-operations. Occupied indicates at least one user type with key exists and can
-be unwrapped to view. Vacant indicates no user type at key exists. */
-[[nodiscard]] ccc_ommap_entry ccc_omm_entry(ccc_ordered_multimap *mm,
-                                            void const *key);
 
 /** @brief Return a reference to the provided entry modified with fn if
 Occupied.
@@ -285,6 +230,26 @@ function are NULL, NULL is returned. */
 [[nodiscard]] ccc_ommap_entry *
 ccc_omm_and_modify_aux(ccc_ommap_entry *e, ccc_update_fn *fn, void *aux);
 
+/** @brief Modify the ordered multimap entry with a modification function
+requiring auxiliary data. If auxiliary data is passed as a function call, it
+will only execute if the entry is occupied.
+@param [in] ordered_multimap_entry_ptr the address of the multimap entry.
+@param [in] mod_fn the ccc_update_fn used to update a stored value.
+@param [in] aux_data the rvalue that this operation will construct and pass to
+the modification function if the entry is occupied.
+@return a pointer to a new entry. This is a compound literal reference, not a
+pointer that requires any manual memory management.
+
+Note that keys should not be modified by the modify operation, only values or
+other struct members. */
+#define ccc_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,               \
+                             lazy_aux_data...)                                 \
+    &(ccc_ommap_entry)                                                         \
+    {                                                                          \
+        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,          \
+                                  lazy_aux_data)                               \
+    }
+
 /** @brief Insert an initial key value into the multimap if none is present,
 otherwise return the oldest user type stored at the specified key. O(1).
 @param [in] e a pointer to the multimap entry.
@@ -300,6 +265,22 @@ by the user, for the user's intended use case. */
 [[nodiscard]] void *ccc_omm_or_insert(ccc_ommap_entry const *e,
                                       ccc_ommap_elem *key_val_handle);
 
+/** @brief Insert an initial key value into the multimap if none is present,
+otherwise return the oldest user type stored at the specified key. O(1).
+@param [in] ordered_multimap_entry_ptr the address of the multimap entry.
+@param [in] lazy_key_value the compound literal of the user struct stored in
+the map.
+@return a pointer to the user type stored in the map either existing or newly
+inserted. If NULL is returned, an allocator error has occured or allocation
+was disallowed on initialization to prevent inserting a new element.
+@warning the key in the lazy_key_value compound literal must match the key
+used for the initial entry generation.
+
+Note that it only makes sense to use this method when the container is
+permitted to allocate memory. */
+#define ccc_omm_or_insert_w(ordered_multimap_entry_ptr, lazy_key_value...)     \
+    ccc_impl_omm_or_insert_w(ordered_multimap_entry_ptr, lazy_key_value)
+
 /** @brief Invariantly writes the specified key value directly to the existing
 or newly allocated entry. O(1).
 @param [in] e a pointer to the multimap entry.
@@ -314,6 +295,22 @@ user type containing key_val_handle has been allocated with appropriate lifetime
 by the user, for the user's intended use case. */
 [[nodiscard]] void *ccc_omm_insert_entry(ccc_ommap_entry const *e,
                                          ccc_ommap_elem *key_val_handle);
+
+/** @brief Invariantly writes the specified compound literal directly to the
+existing or newly allocated entry. O(1).
+@param [in] ordered_multimap_entry_ptr the address of the multimap entry.
+@param [in] lazy_key_value the compound literal that is constructed directly
+at the existing or newly allocated memory in the container.
+@return a pointer to the user type written to the existing map entry or newly
+inserted. If NULL is returned, an allocator error has occured or allocation
+was disallowed on initialization to prevent inserting a new element
+@warning the key in the lazy_key_value compound literal must match the key
+used for the initial entry generation.
+
+Note that it only makes sense to use this method when the container is
+permitted to allocate memory. */
+#define ccc_omm_insert_entry_w(ordered_multimap_entry_ptr, lazy_key_value...)  \
+    ccc_impl_omm_insert_entry_w(ordered_multimap_entry_ptr, lazy_key_value)
 
 /** @brief Removes the entry if it is Occupied. O(1).
 @param [in] e a pointer to the multimap entry.
@@ -358,7 +355,7 @@ non-NULL arguments. */
 
 /** @brief Pops the oldest maximum key value user type from the map. Elements
 are stored in ascending order, smallest as defined by the comparison function is
-min and largest is max. Amortized O(lgN).
+min and largest is max. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @return the status of the pop operation. If NULL pointer is provided or the
 map is empty a bad input result is returned otherwise ok.
@@ -370,7 +367,7 @@ ccc_result ccc_omm_pop_max(ccc_ordered_multimap *mm);
 
 /** @brief Pops the oldest minimum element from the map. Elements are stored
 in ascending order, smallest as defined by the comparison function is min and
-largest is max. Amortized O(lgN).
+largest is max. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @return the status of the pop operation. If NULL pointer is provided or the
 map is empty a bad input result is returned otherwise ok.
@@ -382,12 +379,12 @@ ccc_result ccc_omm_pop_min(ccc_ordered_multimap *mm);
 
 /** @brief Returns a reference to the oldest maximum key value user type from
 the map. Elements are stored in ascending order, smallest as defined by the
-comparison function is min and largest is max. Amortized O(lgN).
+comparison function is min and largest is max. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @return the oldest maximum key value user type in the map.
 
 Note that because the map is self optimizing, a search for the maximum element
-followed by a pop of the maximum element results in one amortized O(lgN) search
+followed by a pop of the maximum element results in one amortized O(lg N) search
 followed by one O(1) pop. If there are duplicate max keys stored in the map, all
 subsequent max search and pop operations are O(1) until duplicates are exhausted
 and if no intervening search, insert, or erase operations occur for non-max
@@ -396,12 +393,12 @@ keys. */
 
 /** @brief Returns a reference to the oldest minimum key value user type from
 the map. Elements are stored in ascending order, smallest as defined by the
-comparison function is min and largest is max. Amortized O(lgN).
+comparison function is min and largest is max. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @return the oldest minimum key value user type in the map.
 
 Note that because the map is self optimizing, a search for the minimum element
-followed by a pop of the minimum element results in one amortized O(lgN) search
+followed by a pop of the minimum element results in one amortized O(lg N) search
 followed by one O(1) pop. If there are duplicate min keys stored in the map, all
 subsequent min search and pop operations are O(1) until duplicates are exhausted
 and if no intervening search, insert, or erase operations occur for non-min
@@ -423,7 +420,7 @@ the element that has been extracted. */
                                     ccc_ommap_elem *key_val_handle);
 
 /** @brief Updates an element key that is currently tracked directly as a
-member of the map. Amortized O(lgN).
+member of the map. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -438,7 +435,7 @@ or the map is empty. */
                                   ccc_update_fn *fn, void *aux);
 
 /** @brief Increases an element key that is currently tracked directly as a
-member of the map. Amortized O(lgN).
+member of the map. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -453,7 +450,7 @@ or the map is empty. */
                                     ccc_update_fn *fn, void *aux);
 
 /** @brief Decreases an element key that is currently tracked directly as a
-member of the map. Amortized O(lgN).
+member of the map. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
@@ -470,7 +467,7 @@ or the map is empty. */
 /*===========================   Iterators   =================================*/
 
 /** @brief Returns a compound literal reference to the desired range. Amortized
-O(lgN).
+O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] begin_key_ptr a pointer to the key that marks the start of the
 range.
@@ -485,7 +482,7 @@ enclosing scope. This reference is always non-NULL. */
     }
 
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
-O(lgN).
+O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] begin_key_ptr a pointer to the key that marks the start of the
 rrange.
@@ -501,7 +498,7 @@ enclosing scope. This reference is always non-NULL. */
     }
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
-Amortized O(lgN).
+Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
 @param [in] begin_key a pointer to the key intended as the start of the range.
 @param [in] end_key a pointer to the key intended as the end of the range.
@@ -523,7 +520,7 @@ map versus the end map sentinel. */
                                             void const *end_key);
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
-Amortized O(lgN).
+Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
 @param [in] begin_key a pointer to the key intended as the start of the rrange.
 @param [in] end_key a pointer to the key intended as the end of the rrange.
@@ -545,7 +542,7 @@ the map versus the end map sentinel. */
                                               void const *rend_key);
 
 /** @brief Return the start of an inorder traversal of the multimap. Amortized
-O(lgN).
+O(lg N).
 @param [in] mm a pointer to the multimap.
 @return the oldest minimum element of the map.
 
@@ -555,7 +552,7 @@ key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_begin(ccc_ordered_multimap const *mm);
 
 /** @brief Return the start of a reverse inorder traversal of the multimap.
-Amortized O(lgN).
+Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
 @return the oldest maximum element of the map.
 

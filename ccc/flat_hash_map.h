@@ -57,78 +57,7 @@ initialization is successful or a failure. */
     ccc_impl_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,              \
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
 
-/** @brief modify the value stored in the map entry with a modification
-function and lazily constructed auxiliary data.
-@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
-@param [in] mod_fn the function used to modify the entry value.
-@param [in] aux lazily constructed auxiliary data for mod_fn.
-@return a compound literal reference to the modified entry if it was occupied
-or a vacant entry if it was vacant.
-
-Note that if aux is a function call to generate a value it will only be called
-if the entry is occupied and thus able to be modified. */
-#define ccc_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux...)          \
-    &(ccc_fhmap_entry)                                                         \
-    {                                                                          \
-        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux)        \
-    }
-
-/** @brief lazily insert the desired key value into the entry if it is Vacant.
-@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
-@param [in] lazy_key_value the compound literal to construct in place if the
-entry is Vacant.
-@return a reference to the unwrapped user type in the entry, either the
-unmodified reference if the entry was Occupied or the newly inserted element
-if the entry was Vacant. NULL is returned if resizing is required but fails or
-is not allowed.
-
-Note that if the compound literal uses any function calls to generate values
-or other data, such functions will not be called if the entry is Occupied. */
-#define ccc_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)        \
-    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)
-
-/** @brief write the contents of the compound literal lazy_key_value to a slot.
-@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
-@param [in] lazy_key_value the compound literal to write to a new slot.
-@return a reference to the newly inserted or overwritten user type. NULL is
-returned if resizing is required but fails or is not allowed. */
-#define ccc_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value...)     \
-    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)
-
-/** @brief lazily insert lazy_value into the map at key if key is absent.
-@param [in] flat_hash_map_ptr a pointer to the flat hash map.
-@param [in] key the direct key r-value.
-@param [in] lazy_value the compound literal specifying the value.
-@return a compound literal reference to the entry of the existing or newly
-inserted value. Occupied indicates the key existed, Vacant indicates the key
-was absent. Unwrapping in any case provides the current value unless an error
-occurs that prevents insertion. An insertion error will flag such a case.
-
-Note that for brevity and convenience the user need not write the key to the
-lazy value compound literal as well. This function ensures the key in the
-compound literal matches the searched key. */
-#define ccc_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)            \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value)          \
-    }
-
-/** @brief Inserts a new key value pair or overwrites the existing entry.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] lazy_value the compound literal to insert or use for overwrite.
-@return a compound literal reference to the entry of the existing or newly
-inserted value. Occupied indicates the key existed, Vacant indicates the key
-was absent. Unwrapping in any case provides the current value unless an error
-occurs that prevents insertion. An insertion error will flag such a case.
-
-Note that for brevity and convenience the user need not write the key to the
-lazy value compound literal as well. This function ensures the key in the
-compound literal matches the searched key. */
-#define ccc_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...)      \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value)    \
-    }
+/*========================   Membership   ===================================*/
 
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
@@ -147,6 +76,19 @@ compound literal matches the searched key. */
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle_ptr provided by the user.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return the removed entry. If Occupied it may be unwrapped to obtain the old key
+value pair. If Vacant the key value pair was not stored in the map. If bad input
+is provided an input error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
+[[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
+                                       ccc_fhmap_elem *out_handle);
+
+/** @brief Removes the key value in the map storing the old value, if present,
+in the struct containing out_handle_ptr provided by the user.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
 @param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
 @return a compound literal reference to the removed entry. If Occupied it may
 be unwrapped to obtain the old key value pair. If Vacant the key value pair
@@ -159,6 +101,19 @@ and wraps it in an entry to provide information about the old value. */
     {                                                                          \
         ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
+
+/** @brief Invariantly inserts the key value wrapping out_handle_ptr.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return an entry. If Vacant, no prior element with key existed and the type
+wrapping out_handle_ptr remains unchanged. If Occupied the old value is written
+to the type wrapping out_handle_ptr and may be unwrapped to view. If more space
+is needed but allocation fails or has been forbidden, an insert error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
+[[nodiscard]] ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h,
+                                       ccc_fhmap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping out_handle_ptr.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
@@ -180,6 +135,18 @@ and wraps it in an entry to provide information about the old value. */
 /** @brief Attempts to insert the key value wrapping out_handle_ptr.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
 @param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return an entry. If Occupied, the entry contains a reference to the key value
+user type in the table and may be unwrapped. If Vacant the entry contains a
+reference to the newly inserted entry in the table. If more space is needed but
+allocation fails or has been forbidden, an insert error is set.
+@warning because this function returns a reference to a user type in the table
+any subsequent insertions or deletions invalidate this reference. */
+[[nodiscard]] ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
+                                           ccc_fhmap_elem *key_val_handle);
+
+/** @brief Attempts to insert the key value wrapping out_handle_ptr.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
 @return a compound literal reference to the entry. If Occupied, the entry
 contains a reference to the key value user type in the table and may be
 unwrapped. If Vacant the entry contains a reference to the newly inserted
@@ -192,6 +159,35 @@ any subsequent insertions or deletions invalidate this reference. */
     {                                                                          \
         ccc_fhm_try_insert((flat_hash_map_ptr), (key_val_handle)).impl_        \
     }
+
+/** @brief lazily insert lazy_value into the map at key if key is absent.
+@param [in] flat_hash_map_ptr a pointer to the flat hash map.
+@param [in] key the direct key r-value.
+@param [in] lazy_value the compound literal specifying the value.
+@return a compound literal reference to the entry of the existing or newly
+inserted value. Occupied indicates the key existed, Vacant indicates the key
+was absent. Unwrapping in any case provides the current value unless an error
+occurs that prevents insertion. An insertion error will flag such a case.
+
+Note that for brevity and convenience the user need not write the key to the
+lazy value compound literal as well. This function ensures the key in the
+compound literal matches the searched key. */
+#define ccc_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)            \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value)          \
+    }
+
+/** @brief Invariantly inserts or overwrites a user struct into the table.
+@param [in] h a pointer to the flat hash map.
+@param [in] key_val_handle the handle to the wrapping user struct key value.
+@return an entry. If Occupied an entry was overwritten by the new key value. If
+Vacant no prior table entry existed.
+
+Note that this function can be used when the old user type is not needed but
+the information regarding its presence is helpful. */
+[[nodiscard]] ccc_entry
+ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
 @param [in] h a pointer to the flat hash map.
@@ -207,6 +203,29 @@ the information regarding its presence is helpful. */
         ccc_fhm_insert_or_assign((flat_hash_map_ptr), (key_val_handle)).impl_  \
     }
 
+/** @brief Inserts a new key value pair or overwrites the existing entry.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] lazy_value the compound literal to insert or use for overwrite.
+@return a compound literal reference to the entry of the existing or newly
+inserted value. Occupied indicates the key existed, Vacant indicates the key
+was absent. Unwrapping in any case provides the current value unless an error
+occurs that prevents insertion. An insertion error will flag such a case.
+
+Note that for brevity and convenience the user need not write the key to the
+lazy value compound literal as well. This function ensures the key in the
+compound literal matches the searched key. */
+#define ccc_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...)      \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value)    \
+    }
+
+/** @brief Remove the entry from the table if Occupied.
+@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
+@return an entry containing NULL. If Occupied an entry in the table existed and
+was removed. If Vacant, no prior entry existed to be removed. */
+[[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
+
 /** @brief Remove the entry from the table if Occupied.
 @param [in] flat_hash_map_entry_ptr a pointer to the table entry.
 @return an entry containing NULL. If Occupied an entry in the table existed and
@@ -217,62 +236,22 @@ was removed. If Vacant, no prior entry existed to be removed. */
         ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
     }
 
-/** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle_ptr provided by the user.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
-@return the removed entry. If Occupied it may be unwrapped to obtain the old key
-value pair. If Vacant the key value pair was not stored in the map. If bad input
-is provided an input error is set.
+/** @brief Obtains an entry for the provided key in the table for future use.
+@param [in] h the hash table to be searched.
+@param [in] key the key used to search the table matching the stored key type.
+@return a specialized hash entry for use with other functions in the Entry API.
+@warning the contents of an entry should not be examined or modified. Use the
+provided functions, only.
 
-Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
-                                       ccc_fhmap_elem *out_handle);
+An entry is a search result that provides either an Occupied or Vacant entry
+in the table. An occupied entry signifies that the search was successful. A
+Vacant entry means the search was not successful but we now have a handle to
+where in the table such an element should be inserted.
 
-/** @brief Invariantly inserts the key value wrapping out_handle_ptr.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
-@return an entry. If Vacant, no prior element with key existed and the type
-wrapping out_handle_ptr remains unchanged. If Occupied the old value is written
-to the type wrapping out_handle_ptr and may be unwrapped to view. If more space
-is needed but allocation fails or has been forbidden, an insert error is set.
-
-Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h,
-                                       ccc_fhmap_elem *out_handle);
-
-/** @brief Attempts to insert the key value wrapping out_handle_ptr.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
-@return an entry. If Occupied, the entry contains a reference to the key value
-user type in the table and may be unwrapped. If Vacant the entry contains a
-reference to the newly inserted entry in the table. If more space is needed but
-allocation fails or has been forbidden, an insert error is set.
-@warning because this function returns a reference to a user type in the table
-any subsequent insertions or deletions invalidate this reference. */
-[[nodiscard]] ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
-                                           ccc_fhmap_elem *key_val_handle);
-
-/** @brief Invariantly inserts or overwrites a user struct into the table.
-@param [in] h a pointer to the flat hash map.
-@param [in] key_val_handle the handle to the wrapping user struct key value.
-@return an entry. If Occupied an entry was overwritten by the new key value. If
-Vacant no prior table entry existed.
-
-Note that this function can be used when the old user type is not needed but
-the information regarding its presence is helpful. */
-[[nodiscard]] ccc_entry
-ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle);
-
-/** @brief Remove the entry from the table if Occupied.
-@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
-@return an entry containing NULL. If Occupied an entry in the table existed and
-was removed. If Vacant, no prior entry existed to be removed. */
-[[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
-
-/* Standard Entry API */
+An entry is rarely useful on its own. It should be passed in a functional style
+to subsequent calls in the Entry API.*/
+[[nodiscard]] ccc_fhmap_entry ccc_fhm_entry(ccc_flat_hash_map *h,
+                                            void const *key);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
@@ -294,23 +273,6 @@ Entry API.*/
     {                                                                          \
         ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl_                    \
     }
-
-/** @brief Obtains an entry for the provided key in the table for future use.
-@param [in] h the hash table to be searched.
-@param [in] key the key used to search the table matching the stored key type.
-@return a specialized hash entry for use with other functions in the Entry API.
-@warning the contents of an entry should not be examined or modified. Use the
-provided functions, only.
-
-An entry is a search result that provides either an Occupied or Vacant entry
-in the table. An occupied entry signifies that the search was successful. A
-Vacant entry means the search was not successful but we now have a handle to
-where in the table such an element should be inserted.
-
-An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry API.*/
-[[nodiscard]] ccc_fhmap_entry ccc_fhm_entry(ccc_flat_hash_map *h,
-                                            void const *key);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -334,6 +296,22 @@ ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_update_fn *fn, void *aux);
 
+/** @brief modify the value stored in the map entry with a modification
+function and lazily constructed auxiliary data.
+@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] mod_fn the function used to modify the entry value.
+@param [in] aux lazily constructed auxiliary data for mod_fn.
+@return a compound literal reference to the modified entry if it was occupied
+or a vacant entry if it was vacant.
+
+Note that if aux is a function call to generate a value it will only be called
+if the entry is occupied and thus able to be modified. */
+#define ccc_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux...)          \
+    &(ccc_fhmap_entry)                                                         \
+    {                                                                          \
+        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux)        \
+    }
+
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
 @param [in] elem the handle to the struct to be inserted to a Vacant entry.
@@ -345,6 +323,20 @@ due to a resizing memory error. This can happen if the table is not allowed
 to resize because no reallocation function is provided. */
 [[nodiscard]] void *ccc_fhm_or_insert(ccc_fhmap_entry const *e,
                                       ccc_fhmap_elem *elem);
+
+/** @brief lazily insert the desired key value into the entry if it is Vacant.
+@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] lazy_key_value the compound literal to construct in place if the
+entry is Vacant.
+@return a reference to the unwrapped user type in the entry, either the
+unmodified reference if the entry was Occupied or the newly inserted element
+if the entry was Vacant. NULL is returned if resizing is required but fails or
+is not allowed.
+
+Note that if the compound literal uses any function calls to generate values
+or other data, such functions will not be called if the entry is Occupied. */
+#define ccc_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)        \
+    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
@@ -359,6 +351,14 @@ If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
 [[nodiscard]] void *ccc_fhm_insert_entry(ccc_fhmap_entry const *e,
                                          ccc_fhmap_elem *elem);
+
+/** @brief write the contents of the compound literal lazy_key_value to a slot.
+@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] lazy_key_value the compound literal to write to a new slot.
+@return a reference to the newly inserted or overwritten user type. NULL is
+returned if resizing is required but fails or is not allowed. */
+#define ccc_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value...)     \
+    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
