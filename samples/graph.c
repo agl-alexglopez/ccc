@@ -330,6 +330,7 @@ main(int argc, char **argv)
     find_shortest_paths(&graph);
     set_cursor_position(graph.rows + 1, graph.cols + 1);
     printf("\n");
+    free(graph.grid);
 }
 
 /*========================   Graph Building    ==============================*/
@@ -688,8 +689,9 @@ find_shortest_paths(struct graph *const graph)
             }
             break;
         }
+        /* Allocating and freeing in a loop is bad but getline is nice. */
+        free(lineptr);
     }
-    free(lineptr);
 }
 
 static bool
