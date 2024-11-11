@@ -20,35 +20,6 @@ typedef union
     ccc_impl_rom_init(struct_name, node_elem_field, key_elem_field, map_name,  \
                       alloc_fn, key_cmp_fn, aux_data)
 
-#define ccc_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,           \
-                             aux_data...)                                      \
-    &(ccc_romap_entry)                                                         \
-    {                                                                          \
-        ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,      \
-                                  aux_data)                                    \
-    }
-
-#define ccc_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value...) \
-    ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value)
-
-#define ccc_rom_insert_entry_w(realtime_ordered_map_entry_ptr,                 \
-                               lazy_key_value...)                              \
-    ccc_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr, lazy_key_value)
-
-#define ccc_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value...)     \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value)   \
-    }
-
-#define ccc_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,              \
-                                   lazy_value...)                              \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
-                                        lazy_value)                            \
-    }
-
 /*=================    Membership and Retrieval    ==========================*/
 
 bool ccc_rom_contains(ccc_realtime_ordered_map const *rom, void const *key);
@@ -56,12 +27,6 @@ bool ccc_rom_contains(ccc_realtime_ordered_map const *rom, void const *key);
 void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
 
 /*======================      Entry API    ==================================*/
-
-#define ccc_rom_entry_r(realtime_ordered_map_ptr, key_ptr)                     \
-    &(ccc_romap_entry)                                                         \
-    {                                                                          \
-        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
-    }
 
 #define ccc_rom_insert_r(realtime_ordered_map_ptr, out_handle_ptr, tmp_ptr)    \
     &(ccc_entry)                                                               \
@@ -71,11 +36,37 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
             .impl_                                                             \
     }
 
+ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
+                         ccc_romap_elem *key_val_handle, ccc_romap_elem *tmp);
+
+ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
+                             ccc_romap_elem *key_val_handle);
+
 #define ccc_rom_try_insert_r(realtime_ordered_map_ptr, out_handle_ptr)         \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_try_insert((realtime_ordered_map_ptr), (out_handle_ptr)).impl_ \
     }
+
+#define ccc_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value...)     \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value)   \
+    }
+
+ccc_entry ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
+                                   ccc_romap_elem *key_val_handle);
+
+#define ccc_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,              \
+                                   lazy_value...)                              \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
+                                        lazy_value)                            \
+    }
+
+ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
+                         ccc_romap_elem *out_handle);
 
 #define ccc_rom_remove_r(realtime_ordered_map_ptr, out_handle_ptr)             \
     &(ccc_entry)                                                               \
@@ -83,43 +74,57 @@ void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom, void const *key);
         ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
+ccc_entry ccc_rom_remove_entry(ccc_romap_entry const *e);
+
 #define ccc_rom_remove_entry_r(realtime_ordered_map_entry_ptr)                 \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl_           \
     }
 
-ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
-                         ccc_romap_elem *key_val_handle, ccc_romap_elem *tmp);
-
-ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
-                             ccc_romap_elem *key_val_handle);
-
-ccc_entry ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
-                                   ccc_romap_elem *key_val_handle);
-
-ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
-                         ccc_romap_elem *out_handle);
-
-ccc_entry ccc_rom_remove_entry(ccc_romap_entry const *e);
-
 ccc_romap_entry *ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn);
 
 ccc_romap_entry *ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_update_fn *fn,
                                         void *aux);
 
+#define ccc_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,           \
+                             aux_data...)                                      \
+    &(ccc_romap_entry)                                                         \
+    {                                                                          \
+        ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,      \
+                                  aux_data)                                    \
+    }
+
 ccc_romap_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
                               void const *key);
 
+#define ccc_rom_entry_r(realtime_ordered_map_ptr, key_ptr)                     \
+    &(ccc_romap_entry)                                                         \
+    {                                                                          \
+        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
+    }
+
 void *ccc_rom_or_insert(ccc_romap_entry const *e, ccc_romap_elem *elem);
+
+#define ccc_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value...) \
+    ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value)
 
 void *ccc_rom_insert_entry(ccc_romap_entry const *e, ccc_romap_elem *elem);
 
+#define ccc_rom_insert_entry_w(realtime_ordered_map_entry_ptr,                 \
+                               lazy_key_value...)                              \
+    ccc_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr, lazy_key_value)
+
 void *ccc_rom_unwrap(ccc_romap_entry const *e);
+
 bool ccc_rom_insert_error(ccc_romap_entry const *e);
+
 bool ccc_rom_occupied(ccc_romap_entry const *e);
 
 /*======================      Iteration    ==================================*/
+
+ccc_range ccc_rom_equal_range(ccc_realtime_ordered_map const *rom,
+                              void const *begin_key, void const *end_key);
 
 #define ccc_rom_equal_range_r(realtime_ordered_map_ptr,                        \
                               begin_and_end_key_ptrs...)                       \
@@ -130,6 +135,9 @@ bool ccc_rom_occupied(ccc_romap_entry const *e);
             .impl_                                                             \
     }
 
+ccc_rrange ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,
+                                void const *rbegin_key, void const *rend_key);
+
 #define ccc_rom_equal_rrange_r(realtime_ordered_map_ptr,                       \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
@@ -139,32 +147,27 @@ bool ccc_rom_occupied(ccc_romap_entry const *e);
             .impl_                                                             \
     }
 
-ccc_range ccc_rom_equal_range(ccc_realtime_ordered_map const *rom,
-                              void const *begin_key, void const *end_key);
-ccc_rrange ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,
-                                void const *rbegin_key, void const *rend_key);
-
 void *ccc_rom_begin(ccc_realtime_ordered_map const *rom);
+
 void *ccc_rom_next(ccc_realtime_ordered_map const *rom, ccc_romap_elem const *);
 
 void *ccc_rom_rbegin(ccc_realtime_ordered_map const *rom);
+
 void *ccc_rom_rnext(ccc_realtime_ordered_map const *rom,
                     ccc_romap_elem const *);
 
 void *ccc_rom_end(ccc_realtime_ordered_map const *rom);
+
 void *ccc_rom_rend(ccc_realtime_ordered_map const *rom);
-
-/*======================       Getters     ==================================*/
-
-size_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
-bool ccc_rom_is_empty(ccc_realtime_ordered_map const *rom);
-
-/*=================           Cleanup               =========================*/
 
 ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
                          ccc_destructor_fn *destructor);
 
-/*=================     Utilities and Validation    =========================*/
+/*======================       Getters     ==================================*/
+
+size_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
+
+bool ccc_rom_is_empty(ccc_realtime_ordered_map const *rom);
 
 bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 
