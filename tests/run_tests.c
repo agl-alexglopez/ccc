@@ -1,5 +1,6 @@
+#include "checkers.h"
 #include "str_view/str_view.h"
-#include "test.h"
+
 #include <string.h>
 
 #ifdef __linux__
@@ -31,8 +32,8 @@ char const *const pass_msg = "⬤";
 char const *const fail_msg = "X";
 char const *const err_msg = "Test process failed abnormally:";
 
-static enum test_result run(str_view);
-static enum test_result run_test_process(struct path_bin);
+static enum check_result run(str_view);
+static enum check_result run_test_process(struct path_bin);
 static DIR *open_test_dir(str_view);
 static bool fill_path(char *, str_view, str_view);
 
@@ -44,10 +45,10 @@ main(int argc, char **argv)
         return 0;
     }
     str_view arg_view = sv(argv[1]);
-    RUN_TESTS(run(arg_view));
+    CHECK_RUN(run(arg_view));
 }
 
-BEGIN_STATIC_TEST(run, str_view const tests_dir)
+CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
 {
     DIR *dir_ptr = open_test_dir(tests_dir);
     CHECK(dir_ptr != NULL, true);
@@ -65,7 +66,7 @@ BEGIN_STATIC_TEST(run, str_view const tests_dir)
         CHECK(fill_path(absolute_path, tests_dir, entry), true);
         printf("%s(%s%s", CYAN, sv_begin(entry), NONE);
         (void)fflush(stdout);
-        enum test_result const res
+        enum check_result const res
             = run_test_process((struct path_bin){sv(absolute_path), entry});
         switch (res)
         {
@@ -88,10 +89,10 @@ BEGIN_STATIC_TEST(run, str_view const tests_dir)
     }
     passed == tests ? printf("%sPASSED %zu/%zu%s\n", GREEN, passed, tests, NONE)
                     : printf("%sPASSED %zu/%zu%s\n", RED, passed, tests, NONE);
-    END_TEST(closedir(dir_ptr););
+    CHECK_END_FN(closedir(dir_ptr););
 }
 
-BEGIN_STATIC_TEST(run_test_process, struct path_bin pb)
+CHECK_BEGIN_STATIC_FN(run_test_process, struct path_bin pb)
 {
     CHECK_ERROR(sv_empty(pb.path), false,
                 { (void)fprintf(stderr, "No test provided.\n"); });
@@ -124,7 +125,7 @@ BEGIN_STATIC_TEST(run_test_process, struct path_bin pb)
         }
     });
     CHECK(WIFEXITED(status), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 static DIR *

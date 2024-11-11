@@ -1,5 +1,5 @@
-#ifndef CCC_TEST
-#define CCC_TEST
+#ifndef CHECKERS
+#define CHECKERS
 
 #include <stdio.h> /* NOLINT */
 
@@ -8,16 +8,16 @@
 #define CYAN "\033[38;5;14m"
 #define NONE "\033[0m"
 
-enum test_result
+enum check_result
 {
     ERROR = -1,
     PASS,
     FAIL,
 };
 
-typedef enum test_result (*test_fn)(void);
+typedef enum check_result (*test_fn)(void);
 
-#define TEST_PRINT_FAIL(result, result_string, expected, expected_string)      \
+#define CHECK_FAIL_PRINT(result, result_string, expected, expected_string)     \
     do                                                                         \
     {                                                                          \
         char const *const format_string_ = _Generic((result_),                 \
@@ -62,7 +62,7 @@ typedef enum test_result (*test_fn)(void);
 additional parameters that one may wish to define for a test function.
 @param [in] test_name the name of the static function.
 @param [in] ... any additional parameters required for the function.
-@return see the end test macro. This will return a enum test_result that is
+@return see the end test macro. This will return a enum check_result that is
 PASS or FAIL to be handled as the user sees fit.
 
 It is possible to return early from a test before the end test macro, but it
@@ -71,7 +71,7 @@ a test fails.
 
 Example with no additional parameters:
 
-BEGIN_STATIC_TEST(fhash_test_empty)
+CHECK_BEGIN_STATIC_FN(fhash_test_empty)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -79,16 +79,17 @@ BEGIN_STATIC_TEST(fhash_test_empty)
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(is_empty(&fh), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 Example with multiple parameters:
 
-enum test_result insert_shuffled(ccc_ordered_multimap *,
+enum check_result insert_shuffled(ccc_ordered_multimap *,
                                  struct val[], size_t, int);
 
-BEGIN_STATIC_TEST(insert_shuffled, ccc_ordered_multimap *pq,
-                  struct val vals[], size_t const size, int const larger_prime)
+CHECK_BEGIN_STATIC_FN(insert_shuffled, ccc_ordered_multimap *pq,
+                      struct val vals[], size_t const size,
+                      int const larger_prime)
 {
     for (int i = 0 shuffled_index = larger_prime % size; i < size; ++i)
     {
@@ -97,26 +98,26 @@ BEGIN_STATIC_TEST(insert_shuffled, ccc_ordered_multimap *pq,
         CHECK(ccc_omm_validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    END_TEST();
+    CHECK_END_FN();
 }*/
-#define BEGIN_STATIC_TEST(test_name, ...)                                      \
-    static enum test_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))           \
+#define CHECK_BEGIN_STATIC_FN(test_name, ...)                                  \
+    static enum check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))          \
     {                                                                          \
-        enum test_result macro_test_res_ = PASS;
+        enum check_result check_macro_res_ = PASS;
 
 /** @brief Define a test function that has a name and optionally
 additional parameters that one may wish to define a test function.
 @param [in] test_name the name of the function.
 @param [in] ... any additional parameters required for the function.
-@return see the end test macro. This will return a enum test_result.
+@return see the end test macro. This will return a enum check_result.
 
 It is possible to return early from a test before the end test macro, but it
 is discouraged, especially if any memory allocations need to be cleaned up if
 a test fails. See begin static test for examples. */
-#define BEGIN_TEST(test_name, ...)                                             \
-    enum test_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))                  \
+#define CHECK_BEGIN_FN(test_name, ...)                                         \
+    enum check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))                 \
     {                                                                          \
-        enum test_result macro_test_res_ = PASS;
+        enum check_result check_macro_res_ = PASS;
 
 /** @brief execute a check within the context of a test.
 @param [in] test_result the result value of some action.
@@ -145,10 +146,11 @@ though the braces are not required. */
         typeof(result_) const expected_ = (test_expected);                     \
         if (result_ != expected_)                                              \
         {                                                                      \
-            TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
-            macro_test_res_ = FAIL;                                            \
+            CHECK_FAIL_PRINT(result_, #test_result, expected_,                 \
+                             #test_expected);                                  \
+            check_macro_res_ = FAIL;                                           \
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
-            goto use_at_least_one_check_and_finish_with_END_macro_call_;       \
+            goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
         }                                                                      \
     } while (0)
 
@@ -182,10 +184,11 @@ though the braces are not required. */
         typeof(result_) const expected_ = (test_expected);                     \
         if (result_ != expected_)                                              \
         {                                                                      \
-            TEST_PRINT_FAIL(result_, #test_result, expected_, #test_expected); \
-            macro_test_res_ = ERROR;                                           \
+            CHECK_FAIL_PRINT(result_, #test_result, expected_,                 \
+                             #test_expected);                                  \
+            check_macro_res_ = ERROR;                                          \
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
-            goto use_at_least_one_check_and_finish_with_END_macro_call_;       \
+            goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
         }                                                                      \
     } while (0)
 
@@ -194,11 +197,11 @@ finish a test do not provide the necessary flow control for various test
 scenarios, then check this status in the end test macro and act accordingly.
 
 Example:
-BEGIN_TEST(my_test)
+CHECK_BEGIN_FN(my_test)
 {
     ...test code ommited...
-    END_TEST({
-        switch(TEST_STATUS)
+    CHECK_END_FN({
+        switch(CHECK_STATUS)
         {
             case PASS:
                 ...action...
@@ -215,7 +218,7 @@ BEGIN_TEST(my_test)
 
 This is not recommended as complex tests should be simplified such that one
 of the end test macros is sufficient. */
-#define TEST_STATUS macro_test_res_
+#define CHECK_STATUS check_macro_res_
 
 /** @brief End every test started with the end test macro.
 @param [in] ... optional code block with arbitrary cleanup code to be executed
@@ -223,20 +226,20 @@ to clean up any allocated memory upon test completion.
 @return the test result from the currently executing test. FAIL upon the first
 check failure or PASS if all checks have passed.
 
-One may enter two braces and any code within them END_TEST({..code here...}).
-This will help with formatting for more complicated cleanup procedures. This
-end test macro is best to use when some code must execute every time a test
-finishes whether it fails early or runs to completion. The code written will
-execute whether all tests pass, or the first failure quits the test early.
-Keep in mind that any function calls need to have access to variables from
-earlier in the test if used. Standard scoping rules apply. This check operates
-at function scope so does not have access to nested conditionals, loops, or
-blocks from earlier in the test. See the check macro if more fine
+One may enter two braces and any code within them CHECK_END_FN({..code
+here...}). This will help with formatting for more complicated cleanup
+procedures. This end test macro is best to use when some code must execute every
+time a test finishes whether it fails early or runs to completion. The code
+written will execute whether all tests pass, or the first failure quits the test
+early. Keep in mind that any function calls need to have access to variables
+from earlier in the test if used. Standard scoping rules apply. This check
+operates at function scope so does not have access to nested conditionals,
+loops, or blocks from earlier in the test. See the check macro if more fine
 grained control over nested scope is required upon a failure.*/
-#define END_TEST(...)                                                          \
-use_at_least_one_check_and_finish_with_END_macro_call_:                        \
+#define CHECK_END_FN(...)                                                      \
+use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({__VA_ARGS__});)                                         \
-    return macro_test_res_;                                                    \
+    return check_macro_res_;                                                   \
     }
 
 /** @brief End every test started with the end pass macro.
@@ -245,23 +248,24 @@ all tests passing.
 @return the test result from the currently executing test. FAIL upon the first
 check failure or PASS if all checks have passed.
 
-One may enter two braces and any code within them END_PASS({..code here...}).
-This will help with formatting for more complicated cleanup procedures. This
-end test macro is best to use when some code should only execute upon all
-checks passing. Keep in mind that any function calls need to have access to
-variables from earlier in the test if used. Standard scoping rules apply. This
-check operates at function scope so does not have access to nested conditionals,
-loops, or blocks from earlier in the test. See the check macro if more fine
-grained control over nested scope is required upon a failure. */
-#define END_PASS(...)                                                          \
-use_at_least_one_check_and_finish_with_END_macro_call_:                        \
+One may enter two braces and any code within them CHECK_END_FN_PASS({..code
+here...}). This will help with formatting for more complicated cleanup
+procedures. This end test macro is best to use when some code should only
+execute upon all checks passing. Keep in mind that any function calls need to
+have access to variables from earlier in the test if used. Standard scoping
+rules apply. This check operates at function scope so does not have access to
+nested conditionals, loops, or blocks from earlier in the test. See the check
+macro if more fine grained control over nested scope is required upon a failure.
+*/
+#define CHECK_END_FN_PASS(...)                                                 \
+use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({                                                        \
-                   if (macro_test_res_ == PASS)                                \
+                   if (check_macro_res_ == PASS)                               \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \
                });)                                                            \
-    return macro_test_res_;                                                    \
+    return check_macro_res_;                                                   \
     }
 
 /** @brief End every test started with the end fail macros.
@@ -270,23 +274,24 @@ only upon the first test failure.
 @return the test result from the currently executing test. FAIL upon the first
 check failure or PASS if all checks have passed.
 
-One may enter two braces and any code within them END_FAIL({..code here...}).
-This will help with formatting for more complicated cleanup procedures. This
-end test macro is best to use when some code should only execute upon the first
-test failure. Keep in mind that any function calls need to have access to
-variables from earlier in the test if used. Standard scoping rules apply. This
-check operates at function scope so does not have access to nested conditionals,
-loops, or blocks from earlier in the test. See the check macro if more fine
-grained control over nested scope is required upon a failure.*/
-#define END_FAIL(...)                                                          \
-use_at_least_one_check_and_finish_with_END_macro_call_:                        \
+One may enter two braces and any code within them CHECK_END_FN_FAIL({..code
+here...}). This will help with formatting for more complicated cleanup
+procedures. This end test macro is best to use when some code should only
+execute upon the first test failure. Keep in mind that any function calls need
+to have access to variables from earlier in the test if used. Standard scoping
+rules apply. This check operates at function scope so does not have access to
+nested conditionals, loops, or blocks from earlier in the test. See the check
+macro if more fine grained control over nested scope is required upon a
+failure.*/
+#define CHECK_END_FN_FAIL(...)                                                 \
+use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({                                                        \
-                   if (macro_test_res_ == FAIL)                                \
+                   if (check_macro_res_ == FAIL)                               \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \
                });)                                                            \
-    return macro_test_res_;                                                    \
+    return check_macro_res_;                                                   \
     }
 
 /** @brief End every test started with the end error macro.
@@ -295,23 +300,24 @@ only upon the first test failure.
 @return the test result from the currently executing test. FAIL upon the first
 check failure or PASS if all checks have passed.
 
-One may enter two braces and any code within them END_ERROR({..code here...}).
-This will help with formatting for more complicated cleanup procedures. This
-end test macro is best to use when some code should only execute upon the first
-test error. Keep in mind that any function calls need to have access to
-variables from earlier in the test if used. Standard scoping rules apply. This
-check operates at function scope so does not have access to nested conditionals,
-loops, or blocks from earlier in the test. See the check macro if more fine
-grained control over nested scope is required upon a failure.*/
-#define END_ERROR(...)                                                         \
-use_at_least_one_check_and_finish_with_END_macro_call_:                        \
+One may enter two braces and any code within them CHECK_END_FN_ERROR({..code
+here...}). This will help with formatting for more complicated cleanup
+procedures. This end test macro is best to use when some code should only
+execute upon the first test error. Keep in mind that any function calls need to
+have access to variables from earlier in the test if used. Standard scoping
+rules apply. This check operates at function scope so does not have access to
+nested conditionals, loops, or blocks from earlier in the test. See the check
+macro if more fine grained control over nested scope is required upon a
+failure.*/
+#define CHECK_END_FN_ERROR(...)                                                \
+use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({                                                        \
-                   if (macro_test_res_ == ERROR)                               \
+                   if (check_macro_res_ == ERROR)                              \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \
                });)                                                            \
-    return macro_test_res_;                                                    \
+    return check_macro_res_;                                                   \
     }
 
 /** @brief Runs a list of test functions and returns the result.
@@ -323,19 +329,19 @@ Return this macro from the main function of the test program. All tests
 will run but the testing result for the entire program will be set to FAIL
 upon the first failure. All functions must share the same signature, returning
 a test_result and taking no arguments. */
-#define RUN_TESTS(test_fn_list...)                                             \
+#define CHECK_RUN(test_fn_list...)                                             \
     ({                                                                         \
-        enum test_result const all_results_[] = {test_fn_list};                \
-        enum test_result all_tests_res_ = PASS;                                \
-        for (unsigned i = 0;                                                   \
-             i < sizeof(all_results_) / sizeof(enum test_result); ++i)         \
+        enum check_result const check_all_checks_[] = {test_fn_list};          \
+        enum check_result check_all_checks_res_ = PASS;                        \
+        for (unsigned long long i = 0;                                         \
+             i < sizeof(check_all_checks_) / sizeof(enum check_result); ++i)   \
         {                                                                      \
-            if (all_results_[i] == FAIL)                                       \
+            if (check_all_checks_[i] == FAIL)                                  \
             {                                                                  \
-                all_tests_res_ = FAIL;                                         \
+                check_all_checks_res_ = FAIL;                                  \
             }                                                                  \
         }                                                                      \
-        all_tests_res_;                                                        \
+        check_all_checks_res_;                                                 \
     })
 
-#endif /* CCC_TEST */
+#endif /* CHECKERS */

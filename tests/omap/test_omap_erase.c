@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"
-#include "test.h"
 #include "traits.h"
 
 #include <stdbool.h>
@@ -12,7 +12,7 @@
 #include <string.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(omap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -43,10 +43,10 @@ BEGIN_STATIC_TEST(omap_test_prime_shuffle)
               true);
         CHECK(validate(&s), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -69,10 +69,10 @@ BEGIN_STATIC_TEST(omap_test_insert_erase_shuffled)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(omap_test_weak_srand)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -95,12 +95,12 @@ BEGIN_STATIC_TEST(omap_test_weak_srand)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(omap_test_insert_erase_shuffled(),
+    return CHECK_RUN(omap_test_insert_erase_shuffled(),
                      omap_test_prime_shuffle(), omap_test_weak_srand());
 }

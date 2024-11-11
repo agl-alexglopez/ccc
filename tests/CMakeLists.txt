@@ -7,12 +7,12 @@ project("ccc tests"
 
 find_package(str_view)
 
-add_library(test INTERFACE test.h)
+add_library(checkers INTERFACE checkers.h)
 include_directories("../ccc")
 include_directories("../util")
 
 add_executable(run_tests run_tests.c)
-target_link_libraries(run_tests PRIVATE str_view::str_view test)
+target_link_libraries(run_tests PRIVATE checkers str_view::str_view)
 
 ###########   Add Test Files Below This Point   ###########
 
@@ -26,7 +26,7 @@ add_library(ommap_util ommap/ommap_util.h ommap/ommap_util.c)
 target_link_libraries(ommap_util
   PRIVATE
     ordered_multimap
-    test
+    checkers
     traits
 )
 
@@ -37,7 +37,7 @@ macro(add_ommap_test TEST_NAME)
       traits
       ordered_multimap 
       ommap_util
-      test
+      checkers
       alloc
   )
   set_target_properties(${TEST_NAME} 
@@ -59,7 +59,7 @@ target_link_libraries(fpq_util
   PRIVATE
     traits
     flat_priority_queue
-    test
+    checkers
 )
 
 macro(add_fpq_test TEST_NAME)
@@ -69,7 +69,7 @@ macro(add_fpq_test TEST_NAME)
       traits
       fpq_util
       flat_priority_queue 
-      test
+      checkers
       alloc
   )
   set_target_properties(${TEST_NAME} 
@@ -91,7 +91,7 @@ target_link_libraries(pq_util
   PRIVATE
     traits
     priority_queue
-    test
+    checkers
 )
 
 macro(add_pq_test TEST_NAME)
@@ -101,7 +101,7 @@ macro(add_pq_test TEST_NAME)
       traits
       pq_util
       priority_queue 
-      test
+      checkers
       alloc
   )
   set_target_properties(${TEST_NAME} 
@@ -123,7 +123,7 @@ target_link_libraries(omap_util
   PRIVATE
     traits
     ordered_map
-    test
+    checkers
 )
 
 macro(add_omap_test TEST_NAME)
@@ -133,7 +133,7 @@ macro(add_omap_test TEST_NAME)
       traits
       omap_util
       ordered_map
-      test
+      checkers 
       alloc
   )
   set_target_properties(${TEST_NAME} 
@@ -154,7 +154,7 @@ target_link_libraries(fomap_util
   PRIVATE
     traits
     flat_ordered_map
-    test
+    checkers
 )
 
 macro(add_fomap_test TEST_NAME)
@@ -164,7 +164,7 @@ macro(add_fomap_test TEST_NAME)
       traits
       fomap_util
       flat_ordered_map
-      test
+      checkers
       alloc
   )
   set_target_properties(${TEST_NAME} 
@@ -185,7 +185,7 @@ target_link_libraries(romap_util
   PRIVATE
     traits
     realtime_ordered_map
-    test
+    checkers
 )
 
 macro(add_romap_test TEST_NAME)
@@ -194,7 +194,7 @@ macro(add_romap_test TEST_NAME)
     PRIVATE
       romap_util
       ordered_map
-      test
+      checkers
       traits
       alloc
   )
@@ -216,7 +216,7 @@ target_link_libraries(fromap_util
   PRIVATE
     traits
     flat_realtime_ordered_map
-    test
+    checkers
 )
 
 macro(add_fromap_test TEST_NAME)
@@ -225,7 +225,7 @@ macro(add_fromap_test TEST_NAME)
     PRIVATE
       fromap_util
       ordered_map
-      test
+      checkers
       traits
       alloc
   )
@@ -254,7 +254,7 @@ macro(add_fhmap_test TEST_NAME)
     PRIVATE
       flat_hash_map
       doubly_linked_list
-      test
+      checkers
       fhmap_util
       traits
       alloc
@@ -283,7 +283,7 @@ macro(add_dll_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       doubly_linked_list
-      test
+      checkers
       dll_util
       traits
       alloc
@@ -311,7 +311,7 @@ macro(add_sll_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       singly_linked_list
-      test
+      checkers 
       sll_util
       traits
       alloc
@@ -339,7 +339,7 @@ macro(add_fdeq_test TEST_NAME)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       flat_double_ended_queue
-      test
+      checkers 
       fdeq_util
       traits
       alloc

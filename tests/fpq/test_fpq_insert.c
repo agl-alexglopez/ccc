@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-BEGIN_STATIC_TEST(fpq_test_insert_one)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_one)
 {
     struct val single[2] = {};
     ccc_flat_priority_queue fpq
@@ -20,10 +20,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_one)
     single[0].val = 0;
     (void)push(&fpq, &single[0]);
     CHECK(ccc_fpq_is_empty(&fpq), false);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_insert_three)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_three)
 {
     size_t size = 3;
     struct val three_vals[4] = {};
@@ -38,10 +38,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_three)
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_struct_getter)
+CHECK_BEGIN_STATIC_FN(fpq_test_struct_getter)
 {
     size_t const size = 10;
     struct val vals[10 + 1];
@@ -67,10 +67,10 @@ BEGIN_STATIC_TEST(fpq_test_struct_getter)
         CHECK(get->val, vals[i].val);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)10);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_insert_three_dups)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_three_dups)
 {
     struct val three_vals[3 + 1];
     ccc_flat_priority_queue fpq
@@ -84,10 +84,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_three_dups)
         CHECK(ccc_fpq_size(&fpq), (size_t)i + 1);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
 {
     /* Math magic ahead... */
     size_t const size = 50;
@@ -107,10 +107,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_shuffle)
         CHECK(prev <= sorted_check[i], true);
         prev = sorted_check[i];
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_read_max_min)
+CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)
 {
     size_t const size = 10;
     struct val vals[10 + 1];
@@ -126,13 +126,13 @@ BEGIN_STATIC_TEST(fpq_test_read_max_min)
     CHECK(ccc_fpq_size(&fpq), (size_t)10);
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fpq_test_insert_one(), fpq_test_insert_three(),
+    return CHECK_RUN(fpq_test_insert_one(), fpq_test_insert_three(),
                      fpq_test_struct_getter(), fpq_test_insert_three_dups(),
                      fpq_test_insert_shuffle(), fpq_test_read_max_min());
 }

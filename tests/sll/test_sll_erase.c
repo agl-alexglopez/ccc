@@ -1,19 +1,19 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "singly_linked_list.h"
 #include "sll_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
 
-BEGIN_STATIC_TEST(sll_test_push_pop_three)
+CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
-    enum test_result const t = create_list(&sll, 3, vals);
+    enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
     size_t const end = size(&sll);
     for (size_t i = 0; i < end; ++i)
@@ -22,14 +22,14 @@ BEGIN_STATIC_TEST(sll_test_push_pop_three)
         CHECK(validate(&sll), true);
     }
     CHECK(is_empty(&sll), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(sll_test_push_extract_middle)
+CHECK_BEGIN_STATIC_FN(sll_test_push_extract_middle)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
-    enum test_result const t = create_list(&sll, 3, vals);
+    enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 3, (int[3]){2, 1, 0}), PASS);
     struct val *after_extract = extract(&sll, &vals[1].e);
@@ -41,15 +41,15 @@ BEGIN_STATIC_TEST(sll_test_push_extract_middle)
     CHECK(after_extract, end(&sll));
     CHECK(check_order(&sll, 1, (int[1]){2}), PASS);
     CHECK(size(&sll), 1);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(sll_test_push_extract_range)
+CHECK_BEGIN_STATIC_FN(sll_test_push_extract_range)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum test_result const t = create_list(&sll, 5, vals);
+    enum check_result const t = create_list(&sll, 5, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
     struct val *after_extract = extract_range(&sll, &vals[3].e, &vals[1].e);
@@ -61,16 +61,16 @@ BEGIN_STATIC_TEST(sll_test_push_extract_range)
     after_extract = extract_range(&sll, sll_begin_elem(&sll), &vals[0].e);
     CHECK(after_extract, end(&sll));
     CHECK(is_empty(&sll), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(sll_test_splice_two_lists)
+CHECK_BEGIN_STATIC_FN(sll_test_splice_two_lists)
 {
     singly_linked_list to_lose
         = sll_init(to_lose, struct val, e, NULL, val_cmp, NULL);
     struct val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum test_result t = create_list(&to_lose, 5, to_lose_vals);
+    enum check_result t = create_list(&to_lose, 5, to_lose_vals);
     CHECK(t, PASS);
     singly_linked_list to_gain
         = sll_init(to_gain, struct val, e, NULL, val_cmp, NULL);
@@ -92,13 +92,13 @@ BEGIN_STATIC_TEST(sll_test_splice_two_lists)
     CHECK(size(&to_gain), 7);
     CHECK(is_empty(&to_lose), true);
     CHECK(check_order(&to_gain, 7, (int[7]){1, 3, 2, 1, 0, 4, 0}), PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(sll_test_push_pop_three(), sll_test_push_extract_middle(),
+    return CHECK_RUN(sll_test_push_pop_three(), sll_test_push_extract_middle(),
                      sll_test_push_extract_range(),
                      sll_test_splice_two_lists());
 }

@@ -1,33 +1,33 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "fdeq_util.h"
 #include "flat_double_ended_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
 
-BEGIN_STATIC_TEST(pop_front_n, flat_double_ended_queue *const q, size_t n)
+CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q, size_t n)
 {
     for (; n-- && !is_empty(q); (void)pop_front(q))
     {
         CHECK(validate(q), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pop_back_n, flat_double_ended_queue *const q, size_t n)
+CHECK_BEGIN_STATIC_FN(pop_back_n, flat_double_ended_queue *const q, size_t n)
 {
     for (; n-- && !is_empty(q); (void)pop_back(q))
     {
         CHECK(validate(q), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_pop_back_three)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_back_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
@@ -37,10 +37,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_back_three)
         CHECK(validate(&q), true);
     }
     CHECK(is_empty(&q), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_pop_front_three)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
@@ -50,10 +50,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_three)
         CHECK(validate(&q), true);
     }
     CHECK(is_empty(&q), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_pop_front_back)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_back)
 {
     flat_double_ended_queue q = fdeq_init((int[6]){}, NULL, NULL, 6);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
@@ -70,10 +70,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_back)
         CHECK(validate(&q), true);
     }
     CHECK(is_empty(&q), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_pop_front_ranges)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_ranges)
 {
     flat_double_ended_queue q = fdeq_init((int[10]){}, NULL, NULL, 10);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
@@ -91,10 +91,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_front_ranges)
     CHECK(
         check_order(&q, 10, (int[10]){16, 17, 18, 19, 10, 11, 12, 13, 14, 15}),
         PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_pop_back_ranges)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_back_ranges)
 {
     flat_double_ended_queue q = fdeq_init((int[10]){}, NULL, NULL, 10);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
@@ -112,10 +112,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_back_ranges)
     CHECK(
         check_order(&q, 10, (int[10]){10, 11, 12, 13, 14, 15, 16, 17, 18, 19}),
         PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_pop_middle_ranges)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_middle_ranges)
 {
     flat_double_ended_queue q = fdeq_init((int[10]){}, NULL, NULL, 10);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
@@ -134,13 +134,13 @@ BEGIN_STATIC_TEST(fdeq_test_push_pop_middle_ranges)
     CHECK(*ins, 13);
     CHECK(check_order(&q, 10, (int[10]){8, 9, 10, 11, 12, 13, 14, 15, 4, 5}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(
+    return CHECK_RUN(
         fdeq_test_push_pop_back_three(), fdeq_test_push_pop_front_three(),
         fdeq_test_push_pop_front_back(), fdeq_test_push_pop_front_ranges(),
         fdeq_test_push_pop_back_ranges(), fdeq_test_push_pop_middle_ranges());

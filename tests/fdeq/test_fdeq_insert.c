@@ -1,22 +1,22 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "fdeq_util.h"
 #include "flat_double_ended_queue.h"
-#include "test.h"
 #include "traits.h"
 
 #include <stddef.h>
 
-BEGIN_STATIC_TEST(fdeq_test_insert_three)
+CHECK_BEGIN_STATIC_FN(fdeq_test_insert_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     CHECK(size(&q), 3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_insert_overwrite_three)
+CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
@@ -60,10 +60,10 @@ BEGIN_STATIC_TEST(fdeq_test_insert_overwrite_three)
     CHECK(v == NULL, false);
     CHECK(*v, 8);
     CHECK(size(&q), 3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_back_ranges)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_back_ranges)
 {
     flat_double_ended_queue q = fdeq_init((int[6]){}, NULL, NULL, 6);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
@@ -80,10 +80,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_back_ranges)
     CHECK(check_order(&q, 6, (int[6]){18, 19, 20, 21, 22, 23}), PASS);
     (void)fdeq_push_back_range(&q, 7, (int[7]){24, 25, 26, 27, 28, 29, 30});
     CHECK(check_order(&q, 6, (int[6]){25, 26, 27, 28, 29, 30}), PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_push_front_ranges)
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_front_ranges)
 {
     flat_double_ended_queue q = fdeq_init((int[6]){}, NULL, NULL, 6);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
@@ -100,10 +100,10 @@ BEGIN_STATIC_TEST(fdeq_test_push_front_ranges)
     CHECK(check_order(&q, 6, (int[6]){18, 19, 20, 21, 22, 23}), PASS);
     (void)fdeq_push_front_range(&q, 7, (int[7]){24, 25, 26, 27, 28, 29, 30});
     CHECK(check_order(&q, 6, (int[6]){25, 26, 27, 28, 29, 30}), PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fdeq_test_insert_ranges)
+CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges)
 {
     flat_double_ended_queue q
         = fdeq_init(((int[6]){0, 1, 2}), NULL, NULL, 6, 3);
@@ -123,13 +123,13 @@ BEGIN_STATIC_TEST(fdeq_test_insert_ranges)
     (void)fdeq_insert_range(&q, fdeq_at(&q, 3), 7,
                             (int[7]){23, 24, 25, 26, 27, 28, 29});
     CHECK(check_order(&q, 6, (int[6]){24, 25, 26, 27, 28, 29}), PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fdeq_test_insert_three(),
+    return CHECK_RUN(fdeq_test_insert_three(),
                      fdeq_test_insert_overwrite_three(),
                      fdeq_test_push_back_ranges(),
                      fdeq_test_push_front_ranges(), fdeq_test_insert_ranges());

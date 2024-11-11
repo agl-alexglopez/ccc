@@ -2,9 +2,9 @@
 #define TYPES_USING_NAMESPACE_CCC
 #define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "ommap_util.h"
 #include "ordered_multimap.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(check_range, ordered_multimap const *const rom,
-                  range const *const r, size_t const n,
-                  int const expect_range[])
+CHECK_BEGIN_STATIC_FN(check_range, ordered_multimap const *const rom,
+                      range const *const r, size_t const n,
+                      int const expect_range[])
 {
     if (begin_range(r))
     {
@@ -39,7 +39,7 @@ BEGIN_STATIC_TEST(check_range, ordered_multimap const *const rom,
     {
         CHECK(((struct val *)iter)->val, expect_range[n - 1]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
@@ -53,7 +53,7 @@ BEGIN_STATIC_TEST(check_range, ordered_multimap const *const rom,
         {
             if (!iter)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (expect_range[j] == iter->val)
             {
@@ -72,9 +72,9 @@ BEGIN_STATIC_TEST(check_range, ordered_multimap const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(check_rrange, ordered_multimap const *const rom,
-                  rrange const *const r, size_t const n,
-                  int const expect_rrange[])
+CHECK_BEGIN_STATIC_FN(check_rrange, ordered_multimap const *const rom,
+                      rrange const *const r, size_t const n,
+                      int const expect_rrange[])
 {
     if (rbegin_rrange(r))
     {
@@ -97,7 +97,7 @@ BEGIN_STATIC_TEST(check_rrange, ordered_multimap const *const rom,
     {
         CHECK(((struct val *)iter)->val, expect_rrange[n - 1]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         size_t j = 0;
         for (; j < n; ++j)
@@ -112,7 +112,7 @@ BEGIN_STATIC_TEST(check_rrange, ordered_multimap const *const rom,
         {
             if (!iter)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (expect_rrange[j] == iter->val)
             {
@@ -132,7 +132,7 @@ BEGIN_STATIC_TEST(check_rrange, ordered_multimap const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(iterator_check, ordered_multimap *const omm)
+CHECK_BEGIN_STATIC_FN(iterator_check, ordered_multimap *const omm)
 {
     size_t const size = size(omm);
     size_t iter_count = 0;
@@ -147,10 +147,10 @@ BEGIN_STATIC_TEST(iterator_check, ordered_multimap *const omm)
         ++iter_count;
     }
     CHECK(iter_count, size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_forward_iter_unique_vals)
+CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_unique_vals)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -180,10 +180,10 @@ BEGIN_STATIC_TEST(ommap_test_forward_iter_unique_vals)
     {
         CHECK(e->val, val_keys_inorder[j]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_forward_iter_all_vals)
+CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_all_vals)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -218,10 +218,10 @@ BEGIN_STATIC_TEST(ommap_test_forward_iter_all_vals)
     {
         CHECK(i->val, val_keys_inorder[j]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_insert_iterate_pop)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -251,10 +251,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_iterate_pop)
         }
     }
     CHECK(pop_count, num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_priority_removal)
+CHECK_BEGIN_STATIC_FN(ommap_test_priority_removal)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -285,10 +285,10 @@ BEGIN_STATIC_TEST(ommap_test_priority_removal)
             i = next(&omm, &i->elem);
         }
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_priority_update)
+CHECK_BEGIN_STATIC_FN(ommap_test_priority_update)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -322,10 +322,10 @@ BEGIN_STATIC_TEST(ommap_test_priority_update)
         }
     }
     CHECK(size(&omm), num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_priority_valid_range)
+CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -352,10 +352,10 @@ BEGIN_STATIC_TEST(ommap_test_priority_valid_range)
     CHECK(check_range(&omm, equal_range_r(&omm, &(int){119}, &(int){84}), 8,
                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_priority_valid_range_equals)
+CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range_equals)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -382,10 +382,10 @@ BEGIN_STATIC_TEST(ommap_test_priority_valid_range_equals)
     CHECK(check_range(&omm, equal_range_r(&omm, &(int){115}, &(int){85}), 8,
                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_priority_invalid_range)
+CHECK_BEGIN_STATIC_FN(ommap_test_priority_invalid_range)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -412,10 +412,10 @@ BEGIN_STATIC_TEST(ommap_test_priority_invalid_range)
     CHECK(check_range(&omm, equal_range_r(&omm, &(int){36}, &(int){-999}), 8,
                       (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_priority_empty_range)
+CHECK_BEGIN_STATIC_FN(ommap_test_priority_empty_range)
 {
     ordered_multimap omm
         = omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -439,13 +439,13 @@ BEGIN_STATIC_TEST(ommap_test_priority_empty_range)
     range const eq_range = equal_range(&omm, &(int){150}, &(int){999});
     CHECK(((struct val *)begin_range(&eq_range))->val, vals[num_nodes - 1].val);
     CHECK(((struct val *)end_range(&eq_range))->val, vals[num_nodes - 1].val);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(
+    return CHECK_RUN(
         ommap_test_forward_iter_unique_vals(),
         ommap_test_forward_iter_all_vals(), ommap_test_insert_iterate_pop(),
         ommap_test_priority_update(), ommap_test_priority_removal(),

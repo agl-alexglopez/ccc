@@ -2,16 +2,16 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "fhmap_util.h"
 #include "flat_hash_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
 #include <stdlib.h>
 
-BEGIN_STATIC_TEST(fhmap_test_erase)
+CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -41,10 +41,10 @@ BEGIN_STATIC_TEST(fhmap_test_erase)
     CHECK(size(&fh), 1);
     CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
     CHECK(size(&fh), 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_shuffle_insert_erase)
+CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
     ccc_flat_hash_map h;
     ccc_result const res = fhm_init(&h, (struct val *)NULL, 0, id, e, std_alloc,
@@ -86,11 +86,11 @@ BEGIN_STATIC_TEST(fhmap_test_shuffle_insert_erase)
         CHECK(validate(&h), true);
     }
     CHECK(size(&h), 0);
-    END_TEST(fhm_clear_and_free(&h, NULL););
+    CHECK_END_FN(fhm_clear_and_free(&h, NULL););
 }
 
 int
 main()
 {
-    return RUN_TESTS(fhmap_test_erase(), fhmap_test_shuffle_insert_erase());
+    return CHECK_RUN(fhmap_test_erase(), fhmap_test_shuffle_insert_erase());
 }

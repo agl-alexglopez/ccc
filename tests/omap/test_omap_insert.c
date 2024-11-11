@@ -2,9 +2,9 @@
 #define ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-BEGIN_STATIC_TEST(omap_test_insert_one)
+CHECK_BEGIN_STATIC_FN(omap_test_insert_one)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -22,10 +22,10 @@ BEGIN_STATIC_TEST(omap_test_insert_one)
     CHECK(insert_entry(entry_r(&s, &single.val), &single.elem) != NULL, true);
     CHECK(is_empty(&s), false);
     CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_insert_three)
+CHECK_BEGIN_STATIC_FN(omap_test_insert_three)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, std_alloc, val_cmp, NULL);
@@ -63,10 +63,10 @@ BEGIN_STATIC_TEST(omap_test_insert_three)
     CHECK(ins->id, 99);
     CHECK(ins->val, 3);
     CHECK(size(&s), 3);
-    END_TEST((void)ccc_om_clear(&s, NULL););
+    CHECK_END_FN((void)ccc_om_clear(&s, NULL););
 }
 
-BEGIN_STATIC_TEST(omap_test_insert_macros)
+CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, std_alloc, val_cmp, NULL);
@@ -108,10 +108,10 @@ BEGIN_STATIC_TEST(omap_test_insert_macros)
     CHECK(validate(&s), true);
     CHECK(ins->id, 100);
     CHECK(size(&s), 4);
-    END_TEST((void)ccc_om_clear(&s, NULL););
+    CHECK_END_FN((void)ccc_om_clear(&s, NULL););
 }
 
-BEGIN_STATIC_TEST(omap_test_struct_getter)
+CHECK_BEGIN_STATIC_FN(omap_test_struct_getter)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -137,10 +137,10 @@ BEGIN_STATIC_TEST(omap_test_struct_getter)
         CHECK(get->val, vals[i].val);
     }
     CHECK(size(&s), (size_t)10);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_insert_shuffle)
+CHECK_BEGIN_STATIC_FN(omap_test_insert_shuffle)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -155,13 +155,13 @@ BEGIN_STATIC_TEST(omap_test_insert_shuffle)
     {
         CHECK(vals[i].val, sorted_check[i]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(omap_test_insert_one(), omap_test_insert_three(),
+    return CHECK_RUN(omap_test_insert_one(), omap_test_insert_three(),
                      omap_test_insert_macros(), omap_test_struct_getter(),
                      omap_test_insert_shuffle());
 }

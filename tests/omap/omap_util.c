@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "omap_util.h"
+#include "checkers.h"
 #include "ordered_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -16,8 +16,8 @@ val_cmp(ccc_key_cmp const cmp)
     return (key > c->val) - (key < c->val);
 }
 
-BEGIN_TEST(insert_shuffled, ccc_ordered_map *m, struct val vals[],
-           size_t const size, int const larger_prime)
+CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_map *m, struct val vals[],
+               size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
@@ -29,7 +29,7 @@ BEGIN_TEST(insert_shuffled, ccc_ordered_map *m, struct val vals[],
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(m), size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

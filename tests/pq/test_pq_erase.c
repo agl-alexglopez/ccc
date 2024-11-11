@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "pq_util.h"
 #include "priority_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -33,10 +33,10 @@ BEGIN_STATIC_TEST(pq_test_insert_remove_four_dups)
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_insert_extract_shuffled)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_extract_shuffled)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -55,10 +55,10 @@ BEGIN_STATIC_TEST(pq_test_insert_extract_shuffled)
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_pop_max)
+CHECK_BEGIN_STATIC_FN(pq_test_pop_max)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -78,10 +78,10 @@ BEGIN_STATIC_TEST(pq_test_pop_max)
         CHECK(pop(&ppq), CCC_OK);
     }
     CHECK(ccc_pq_is_empty(&ppq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_pop_min)
+CHECK_BEGIN_STATIC_FN(pq_test_pop_min)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -101,10 +101,10 @@ BEGIN_STATIC_TEST(pq_test_pop_min)
         CHECK(pop(&ppq), CCC_OK);
     }
     CHECK(ccc_pq_is_empty(&ppq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
+CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -137,10 +137,10 @@ BEGIN_STATIC_TEST(pq_test_delete_prime_shuffle_duplicates)
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -169,10 +169,10 @@ BEGIN_STATIC_TEST(pq_test_prime_shuffle)
         --cur_size;
         CHECK(ccc_pq_size(&ppq), cur_size);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(pq_test_weak_srand)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -194,13 +194,13 @@ BEGIN_STATIC_TEST(pq_test_weak_srand)
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_is_empty(&ppq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(pq_test_insert_remove_four_dups(),
+    return CHECK_RUN(pq_test_insert_remove_four_dups(),
                      pq_test_insert_extract_shuffled(), pq_test_pop_max(),
                      pq_test_pop_min(),
                      pq_test_delete_prime_shuffle_duplicates(),

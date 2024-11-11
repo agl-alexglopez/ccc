@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "pq_util.h"
 #include "priority_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-BEGIN_STATIC_TEST(pq_test_insert_one)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_one)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -18,10 +18,10 @@ BEGIN_STATIC_TEST(pq_test_insert_one)
     single.val = 0;
     CHECK(push(&pq, &single.elem), CCC_OK);
     CHECK(ccc_pq_is_empty(&pq), false);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_insert_three)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_three)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -34,10 +34,10 @@ BEGIN_STATIC_TEST(pq_test_insert_three)
         CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
     CHECK(ccc_pq_size(&pq), (size_t)3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_struct_getter)
+CHECK_BEGIN_STATIC_FN(pq_test_struct_getter)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -59,10 +59,10 @@ BEGIN_STATIC_TEST(pq_test_struct_getter)
         CHECK(get->val, vals[i].val);
     }
     CHECK(ccc_pq_size(&pq), (size_t)10);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_insert_three_dups)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_three_dups)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -75,10 +75,10 @@ BEGIN_STATIC_TEST(pq_test_insert_three_dups)
         CHECK(ccc_pq_size(&pq), (size_t)i + 1);
     }
     CHECK(ccc_pq_size(&pq), (size_t)3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_insert_shuffle)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_shuffle)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -91,10 +91,10 @@ BEGIN_STATIC_TEST(pq_test_insert_shuffle)
     CHECK(min->val, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &pq), PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_read_max_min)
+CHECK_BEGIN_STATIC_FN(pq_test_read_max_min)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -109,13 +109,13 @@ BEGIN_STATIC_TEST(pq_test_read_max_min)
     CHECK(ccc_pq_size(&pq), (size_t)10);
     struct val const *min = front(&pq);
     CHECK(min->val, 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(pq_test_insert_one(), pq_test_insert_three(),
+    return CHECK_RUN(pq_test_insert_one(), pq_test_insert_three(),
                      pq_test_struct_getter(), pq_test_insert_three_dups(),
                      pq_test_insert_shuffle(), pq_test_read_max_min());
 }

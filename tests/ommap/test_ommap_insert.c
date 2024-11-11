@@ -2,9 +2,9 @@
 #define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "ommap_util.h"
 #include "ordered_multimap.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-BEGIN_STATIC_TEST(ommap_test_insert_one)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_one)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -21,10 +21,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_one)
     single.val = 0;
     CHECK(unwrap(insert_r(&omm, &single.elem)) != NULL, true);
     CHECK(is_empty(&omm), false);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_insert_three)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_three)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -37,10 +37,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_three)
         CHECK(size(&omm), (size_t)i + 1);
     }
     CHECK(size(&omm), (size_t)3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_insert_macros)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_macros)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, std_alloc, val_cmp, NULL);
@@ -82,10 +82,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_macros)
     CHECK(validate(&omm), true);
     CHECK(ins->id, 100);
     CHECK(size(&omm), 5);
-    END_TEST(omm_clear(&omm, NULL););
+    CHECK_END_FN(omm_clear(&omm, NULL););
 }
 
-BEGIN_STATIC_TEST(ommap_test_struct_getter)
+CHECK_BEGIN_STATIC_FN(ommap_test_struct_getter)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -109,10 +109,10 @@ BEGIN_STATIC_TEST(ommap_test_struct_getter)
         CHECK(get->val, vals[i].val);
     }
     CHECK(size(&omm), (size_t)10);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_insert_three_dups)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_three_dups)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -125,10 +125,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_three_dups)
         CHECK(size(&omm), (size_t)i + 1);
     }
     CHECK(size(&omm), (size_t)3);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_insert_shuffle)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -147,10 +147,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_shuffle)
     {
         CHECK(vals[i].val, sorted_check[i]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_read_max_min)
+CHECK_BEGIN_STATIC_FN(ommap_test_read_max_min)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -167,13 +167,13 @@ BEGIN_STATIC_TEST(ommap_test_read_max_min)
     CHECK(max->val, 9);
     struct val const *min = ccc_omm_min(&omm);
     CHECK(min->val, 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(ommap_test_insert_one(), ommap_test_insert_three(),
+    return CHECK_RUN(ommap_test_insert_one(), ommap_test_insert_three(),
                      ommap_test_insert_macros(), ommap_test_struct_getter(),
                      ommap_test_insert_three_dups(),
                      ommap_test_insert_shuffle(), ommap_test_read_max_min());

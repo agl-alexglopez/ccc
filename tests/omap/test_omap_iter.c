@@ -2,9 +2,9 @@
 #define TYPES_USING_NAMESPACE_CCC
 #define ORDERED_MAP_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(check_range, ordered_map const *const rom,
-                  range const *const r, size_t const n,
-                  int const expect_range[])
+CHECK_BEGIN_STATIC_FN(check_range, ordered_map const *const rom,
+                      range const *const r, size_t const n,
+                      int const expect_range[])
 {
     if (begin_range(r))
     {
@@ -39,7 +39,7 @@ BEGIN_STATIC_TEST(check_range, ordered_map const *const rom,
     {
         CHECK(((struct val *)iter)->val, expect_range[n - 1]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
@@ -53,7 +53,7 @@ BEGIN_STATIC_TEST(check_range, ordered_map const *const rom,
         {
             if (!iter)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (expect_range[j] == iter->val)
             {
@@ -72,9 +72,9 @@ BEGIN_STATIC_TEST(check_range, ordered_map const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(check_rrange, ordered_map const *const rom,
-                  rrange const *const r, size_t const n,
-                  int const expect_rrange[])
+CHECK_BEGIN_STATIC_FN(check_rrange, ordered_map const *const rom,
+                      rrange const *const r, size_t const n,
+                      int const expect_rrange[])
 {
     if (rbegin_rrange(r))
     {
@@ -97,7 +97,7 @@ BEGIN_STATIC_TEST(check_rrange, ordered_map const *const rom,
     {
         CHECK(((struct val *)iter)->val, expect_rrange[n - 1]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         size_t j = 0;
         for (; j < n; ++j)
@@ -112,7 +112,7 @@ BEGIN_STATIC_TEST(check_rrange, ordered_map const *const rom,
         {
             if (!iter)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (expect_rrange[j] == iter->val)
             {
@@ -132,7 +132,7 @@ BEGIN_STATIC_TEST(check_rrange, ordered_map const *const rom,
     });
 }
 
-BEGIN_STATIC_TEST(iterator_check, ccc_ordered_map *s)
+CHECK_BEGIN_STATIC_FN(iterator_check, ccc_ordered_map *s)
 {
     size_t const size = size(s);
     size_t iter_count = 0;
@@ -149,10 +149,10 @@ BEGIN_STATIC_TEST(iterator_check, ccc_ordered_map *s)
         CHECK(iter_count <= size, true);
     }
     CHECK(iter_count, size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_forward_iter)
+CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -181,10 +181,10 @@ BEGIN_STATIC_TEST(omap_test_forward_iter)
     {
         CHECK(e->val, val_keys_inorder[j]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_iterate_removal)
+CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -212,10 +212,10 @@ BEGIN_STATIC_TEST(omap_test_iterate_removal)
             CHECK(validate(&s), true);
         }
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_iterate_remove_reinsert)
+CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -249,10 +249,10 @@ BEGIN_STATIC_TEST(omap_test_iterate_remove_reinsert)
         }
     }
     CHECK(size(&s), old_size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_valid_range)
+CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -279,10 +279,10 @@ BEGIN_STATIC_TEST(omap_test_valid_range)
     CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){119}, &(int){84}), 8,
                        (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_valid_range_equals)
+CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -303,10 +303,10 @@ BEGIN_STATIC_TEST(omap_test_valid_range_equals)
     CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){115}, &(int){85}), 8,
                        (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_invalid_range)
+CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -332,10 +332,10 @@ BEGIN_STATIC_TEST(omap_test_invalid_range)
     CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){36}, &(int){-999}), 8,
                        (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(omap_test_empty_range)
+CHECK_BEGIN_STATIC_FN(omap_test_empty_range)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
@@ -360,13 +360,13 @@ BEGIN_STATIC_TEST(omap_test_empty_range)
           vals[num_nodes - 1].val);
     CHECK(((struct val *)rend_rrange(&rev_range))->val,
           vals[num_nodes - 1].val);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(omap_test_forward_iter(), omap_test_iterate_removal(),
+    return CHECK_RUN(omap_test_forward_iter(), omap_test_iterate_removal(),
                      omap_test_valid_range(), omap_test_invalid_range(),
                      omap_test_valid_range_equals(), omap_test_empty_range(),
                      omap_test_iterate_remove_reinsert());

@@ -2,9 +2,9 @@
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "flat_realtime_ordered_map.h"
 #include "fromap_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(check_range, flat_realtime_ordered_map const *const frm,
-                  range const *const r, size_t const n,
-                  int const expect_range[])
+CHECK_BEGIN_STATIC_FN(check_range, flat_realtime_ordered_map const *const frm,
+                      range const *const r, size_t const n,
+                      int const expect_range[])
 {
     size_t index = 0;
     struct val *iter = begin_range(r);
@@ -31,7 +31,7 @@ BEGIN_STATIC_TEST(check_range, flat_realtime_ordered_map const *const frm,
     {
         CHECK(((struct val *)iter)->id, expect_range[n - 1]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
@@ -45,7 +45,7 @@ BEGIN_STATIC_TEST(check_range, flat_realtime_ordered_map const *const frm,
         {
             if (iter == end(frm) || !iter)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (expect_range[j] == iter->id)
             {
@@ -64,9 +64,9 @@ BEGIN_STATIC_TEST(check_range, flat_realtime_ordered_map const *const frm,
     });
 }
 
-BEGIN_STATIC_TEST(check_rrange, flat_realtime_ordered_map const *const frm,
-                  rrange const *const r, size_t const n,
-                  int const expect_rrange[])
+CHECK_BEGIN_STATIC_FN(check_rrange, flat_realtime_ordered_map const *const frm,
+                      rrange const *const r, size_t const n,
+                      int const expect_rrange[])
 {
     struct val *iter = rbegin_rrange(r);
     size_t index = 0;
@@ -81,7 +81,7 @@ BEGIN_STATIC_TEST(check_rrange, flat_realtime_ordered_map const *const frm,
     {
         CHECK(((struct val *)iter)->id, expect_rrange[n - 1]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         size_t j = 0;
         for (; j < n; ++j)
@@ -96,7 +96,7 @@ BEGIN_STATIC_TEST(check_rrange, flat_realtime_ordered_map const *const frm,
         {
             if (iter == rend(frm) || !iter)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (expect_rrange[j] == iter->id)
             {
@@ -116,7 +116,7 @@ BEGIN_STATIC_TEST(check_rrange, flat_realtime_ordered_map const *const frm,
     });
 }
 
-BEGIN_STATIC_TEST(iterator_check, flat_realtime_ordered_map *s)
+CHECK_BEGIN_STATIC_FN(iterator_check, flat_realtime_ordered_map *s)
 {
     size_t const size = size(s);
     size_t iter_count = 0;
@@ -133,10 +133,10 @@ BEGIN_STATIC_TEST(iterator_check, flat_realtime_ordered_map *s)
         CHECK(iter_count <= size, true);
     }
     CHECK(iter_count, size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_forward_iter)
+CHECK_BEGIN_STATIC_FN(fromap_test_forward_iter)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[34]){}, 34, elem, id, NULL, val_cmp, NULL);
@@ -163,10 +163,10 @@ BEGIN_STATIC_TEST(fromap_test_forward_iter)
     {
         CHECK(e->id, keys_inorder[j]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_iterate_removal)
+CHECK_BEGIN_STATIC_FN(fromap_test_iterate_removal)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[1001]){}, 1001, elem, id, NULL, val_cmp, NULL);
@@ -193,10 +193,10 @@ BEGIN_STATIC_TEST(fromap_test_iterate_removal)
             CHECK(validate(&s), true);
         }
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_iterate_remove_reinsert)
+CHECK_BEGIN_STATIC_FN(fromap_test_iterate_remove_reinsert)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[1001]){}, 1001, elem, id, NULL, val_cmp, NULL);
@@ -231,10 +231,10 @@ BEGIN_STATIC_TEST(fromap_test_iterate_remove_reinsert)
         }
     }
     CHECK(size(&s), old_size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_valid_range)
+CHECK_BEGIN_STATIC_FN(fromap_test_valid_range)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
@@ -258,10 +258,10 @@ BEGIN_STATIC_TEST(fromap_test_valid_range)
     CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){119}, &(int){84}), 8,
                        (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_valid_range_equals)
+CHECK_BEGIN_STATIC_FN(fromap_test_valid_range_equals)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
@@ -283,10 +283,10 @@ BEGIN_STATIC_TEST(fromap_test_valid_range_equals)
     CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){115}, &(int){85}), 8,
                        (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_invalid_range)
+CHECK_BEGIN_STATIC_FN(fromap_test_invalid_range)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
@@ -309,10 +309,10 @@ BEGIN_STATIC_TEST(fromap_test_invalid_range)
     CHECK(check_rrange(&s, equal_rrange_r(&s, &(int){36}, &(int){-999}), 8,
                        (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_empty_range)
+CHECK_BEGIN_STATIC_FN(fromap_test_empty_range)
 {
     flat_realtime_ordered_map s
         = frm_init((struct val[26]){}, 26, elem, id, NULL, val_cmp, NULL);
@@ -337,13 +337,13 @@ BEGIN_STATIC_TEST(fromap_test_empty_range)
           (num_nodes * step) - step);
     CHECK(((struct val *)rend_rrange(&rev_range))->id,
           (num_nodes * step) - step);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fromap_test_forward_iter(), fromap_test_iterate_removal(),
+    return CHECK_RUN(fromap_test_forward_iter(), fromap_test_iterate_removal(),
                      fromap_test_valid_range(),
                      fromap_test_valid_range_equals(),
                      fromap_test_invalid_range(), fromap_test_empty_range(),

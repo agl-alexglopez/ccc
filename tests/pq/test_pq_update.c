@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "pq_util.h"
 #include "priority_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(pq_test_insert_iterate_pop)
+CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -37,10 +37,10 @@ BEGIN_STATIC_TEST(pq_test_insert_iterate_pop)
         CHECK(validate(&pq), true);
     }
     CHECK(pop_count, num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_priority_removal)
+CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -67,10 +67,10 @@ BEGIN_STATIC_TEST(pq_test_priority_removal)
             CHECK(validate(&pq), true);
         }
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_priority_update)
+CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -99,10 +99,10 @@ BEGIN_STATIC_TEST(pq_test_priority_update)
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_priority_increase)
+CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
@@ -137,10 +137,10 @@ BEGIN_STATIC_TEST(pq_test_priority_increase)
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_priority_decrease)
+CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
 {
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_GRT, NULL, val_cmp, NULL);
@@ -175,13 +175,13 @@ BEGIN_STATIC_TEST(pq_test_priority_decrease)
         }
     }
     CHECK(ccc_pq_size(&pq), num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(pq_test_insert_iterate_pop(), pq_test_priority_update(),
+    return CHECK_RUN(pq_test_insert_iterate_pop(), pq_test_priority_update(),
                      pq_test_priority_removal(), pq_test_priority_increase(),
                      pq_test_priority_decrease());
 }

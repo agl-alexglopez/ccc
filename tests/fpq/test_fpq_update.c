@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(fpq_test_insert_iterate_pop)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_iterate_pop)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -37,10 +37,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_iterate_pop)
         CHECK(validate(&fpq), true);
     }
     CHECK(pop_count, num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_priority_removal)
+CHECK_BEGIN_STATIC_FN(fpq_test_priority_removal)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -71,10 +71,10 @@ BEGIN_STATIC_TEST(fpq_test_priority_removal)
             --remaining;
         }
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_priority_update)
+CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -106,12 +106,12 @@ BEGIN_STATIC_TEST(fpq_test_priority_update)
         }
     }
     CHECK(size(&fpq), num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fpq_test_insert_iterate_pop(), fpq_test_priority_update(),
+    return CHECK_RUN(fpq_test_insert_iterate_pop(), fpq_test_priority_update(),
                      fpq_test_priority_removal());
 }

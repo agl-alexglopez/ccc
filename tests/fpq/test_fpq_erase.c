@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(fpq_test_insert_remove_four_dups)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_remove_four_dups)
 {
     struct val three_vals[4 + 1];
     ccc_flat_priority_queue fpq
@@ -34,10 +34,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_remove_four_dups)
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_erase_shuffled)
 {
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -60,10 +60,10 @@ BEGIN_STATIC_TEST(fpq_test_insert_erase_shuffled)
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_size(&fpq), (size_t)0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_pop_max)
+CHECK_BEGIN_STATIC_FN(fpq_test_pop_max)
 {
     size_t const size = 50;
     int const prime = 53;
@@ -83,10 +83,10 @@ BEGIN_STATIC_TEST(fpq_test_pop_max)
         (void)pop(&fpq);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_pop_min)
+CHECK_BEGIN_STATIC_FN(fpq_test_pop_min)
 {
     size_t const size = 50;
     int const prime = 53;
@@ -106,10 +106,10 @@ BEGIN_STATIC_TEST(fpq_test_pop_min)
         (void)pop(&fpq);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_delete_prime_shuffle_duplicates)
+CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
 {
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -142,10 +142,10 @@ BEGIN_STATIC_TEST(fpq_test_delete_prime_shuffle_duplicates)
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
 {
     int const size = 50;
     int const prime = 53;
@@ -175,10 +175,10 @@ BEGIN_STATIC_TEST(fpq_test_prime_shuffle)
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fpq_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(fpq_test_weak_srand)
 {
     /* Seed the test with any integer for reproducible randome test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -201,13 +201,13 @@ BEGIN_STATIC_TEST(fpq_test_weak_srand)
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fpq_test_insert_remove_four_dups(),
+    return CHECK_RUN(fpq_test_insert_remove_four_dups(),
                      fpq_test_insert_erase_shuffled(), fpq_test_pop_max(),
                      fpq_test_pop_min(),
                      fpq_test_delete_prime_shuffle_duplicates(),

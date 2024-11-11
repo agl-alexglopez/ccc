@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "pq_util.h"
+#include "checkers.h"
 #include "priority_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -23,8 +23,8 @@ val_update(ccc_user_type_mut const u)
     old->val = *(int *)u.aux;
 }
 
-BEGIN_TEST(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
-           size_t const size, int const larger_prime)
+CHECK_BEGIN_FN(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
+               size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -41,11 +41,11 @@ BEGIN_TEST(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(ppq), size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
+CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
 {
     CHECK(size(ppq), size);
     size_t i = 0;
@@ -70,5 +70,5 @@ BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
         CHECK(validate(ppq), true);
         CHECK(validate(&copy), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }

@@ -1,23 +1,23 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"
-#include "test.h"
 #include "traits.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
-BEGIN_STATIC_TEST(omap_test_empty)
+CHECK_BEGIN_STATIC_FN(omap_test_empty)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(omap_test_empty());
+    return CHECK_RUN(omap_test_empty());
 }

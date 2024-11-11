@@ -5,10 +5,10 @@ The leetcode lru problem in C. */
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "doubly_linked_list.h"
 #include "fhmap/fhmap_util.h"
 #include "flat_hash_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -53,7 +53,7 @@ struct lru_request
     int val;
     union
     {
-        enum test_result (*putter)(struct lru_cache *, int, int);
+        enum check_result (*putter)(struct lru_cache *, int, int);
         int (*getter)(struct lru_cache *, int);
         struct key_val *(*header)(struct lru_cache *);
     };
@@ -92,8 +92,8 @@ cmp_by_key(ccc_cmp const cmp)
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 
-BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
-                  int const val)
+CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
+                      int const val)
 {
     ccc_fhmap_entry *const ent = entry_r(&lru->fh, &key);
     struct lru_lookup const *const found = unwrap(ent);
@@ -119,7 +119,7 @@ BEGIN_STATIC_TEST(lru_put, struct lru_cache *const lru, int const key,
         CHECK(occupied(&e), true);
         (void)pop_back(&lru->l);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
 static int
@@ -135,7 +135,7 @@ lru_get(struct lru_cache *const lru, int const key)
     return found->kv_in_list->val;
 }
 
-BEGIN_STATIC_TEST(run_lru_cache)
+CHECK_BEGIN_STATIC_FN(run_lru_cache)
 {
     struct lru_cache lru = {
         .cap = 3,
@@ -186,7 +186,7 @@ BEGIN_STATIC_TEST(run_lru_cache)
             break;
         }
     }
-    END_TEST({
+    CHECK_END_FN({
         (void)ccc_fhm_clear_and_free(&lru.fh, NULL);
         (void)dll_clear(&lru.l, NULL);
     });
@@ -195,5 +195,5 @@ BEGIN_STATIC_TEST(run_lru_cache)
 int
 main()
 {
-    return RUN_TESTS(run_lru_cache());
+    return CHECK_RUN(run_lru_cache());
 }

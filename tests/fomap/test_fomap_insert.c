@@ -2,9 +2,9 @@
 #define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "flat_ordered_map.h"
 #include "fomap_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(fomap_test_insert_one)
+CHECK_BEGIN_STATIC_FN(fomap_test_insert_one)
 {
     flat_ordered_map s
         = fom_init((struct val[2]){}, 2, elem, id, NULL, val_cmp, NULL);
@@ -23,10 +23,10 @@ BEGIN_STATIC_TEST(fomap_test_insert_one)
     struct val *v = fom_root(&s);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fomap_test_insert_macros)
+CHECK_BEGIN_STATIC_FN(fomap_test_insert_macros)
 {
     /* This is also a good test to see if the buffer can manage its own memory
        when provided with a std_alloc function starting from NULL. */
@@ -63,10 +63,10 @@ BEGIN_STATIC_TEST(fomap_test_insert_macros)
     CHECK(v != NULL, true);
     CHECK(v->val, 2);
     CHECK(size(&s), 4);
-    END_TEST(fom_clear_and_free(&s, NULL););
+    CHECK_END_FN(fom_clear_and_free(&s, NULL););
 }
 
-BEGIN_STATIC_TEST(fomap_test_insert_shuffle)
+CHECK_BEGIN_STATIC_FN(fomap_test_insert_shuffle)
 {
     size_t const size = 50;
     ccc_flat_ordered_map s
@@ -80,10 +80,10 @@ BEGIN_STATIC_TEST(fomap_test_insert_shuffle)
     {
         CHECK(sorted_check[i - 1] <= sorted_check[i], true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fomap_test_insert_weak_srand)
+CHECK_BEGIN_STATIC_FN(fomap_test_insert_weak_srand)
 {
     int const num_nodes = 1000;
     ccc_flat_ordered_map s
@@ -97,13 +97,13 @@ BEGIN_STATIC_TEST(fomap_test_insert_weak_srand)
         CHECK(validate(&s), true);
     }
     CHECK(size(&s), (size_t)num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fomap_test_insert_one(), fomap_test_insert_macros(),
+    return CHECK_RUN(fomap_test_insert_one(), fomap_test_insert_macros(),
                      fomap_test_insert_shuffle(),
                      fomap_test_insert_weak_srand());
 }

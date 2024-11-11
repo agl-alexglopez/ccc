@@ -1,9 +1,9 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "fhmap_util.h"
 #include "flat_hash_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -37,7 +37,7 @@ gen(int *to_affect)
     return 42;
 }
 
-BEGIN_STATIC_TEST(fhmap_test_empty)
+CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -46,10 +46,10 @@ BEGIN_STATIC_TEST(fhmap_test_empty)
                    fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(res, CCC_OK);
     CHECK(is_empty(&fh), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_entry_functional)
+CHECK_BEGIN_STATIC_FN(fhmap_test_entry_functional)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -72,10 +72,10 @@ BEGIN_STATIC_TEST(fhmap_test_entry_functional)
     v->val += 1;
     CHECK(inserted->val, 2);
     return PASS;
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_entry_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_entry_macros)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -100,10 +100,10 @@ BEGIN_STATIC_TEST(fhmap_test_entry_macros)
     v->val++;
     CHECK(mut, 100);
     CHECK(inserted->val, 1);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_entry_and_modify_functional)
+CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -142,10 +142,10 @@ BEGIN_STATIC_TEST(fhmap_test_entry_and_modify_functional)
     CHECK((v3 != NULL), true);
     CHECK(inserted->id, 137);
     CHECK(v3->val, 137);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_entry_and_modify_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
 {
     struct val vals[5] = {};
     ccc_flat_hash_map fh;
@@ -192,13 +192,13 @@ BEGIN_STATIC_TEST(fhmap_test_entry_and_modify_macros)
     CHECK(v3->id, 137);
     CHECK(v3->val, 42);
     CHECK(mut, 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fhmap_test_empty(), fhmap_test_entry_macros(),
+    return CHECK_RUN(fhmap_test_empty(), fhmap_test_entry_macros(),
                      fhmap_test_entry_functional(),
                      fhmap_test_entry_and_modify_functional(),
                      fhmap_test_entry_and_modify_macros());

@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
+#include "checkers.h"
 #include "flat_ordered_map.h"
-#include "test.h"
 #include "types.h"
 
 struct val
@@ -16,8 +16,8 @@ struct val
 
 ccc_threeway_cmp val_cmp(ccc_key_cmp);
 
-enum test_result insert_shuffled(ccc_flat_ordered_map *m, size_t size,
-                                 int larger_prime);
+enum check_result insert_shuffled(ccc_flat_ordered_map *m, size_t size,
+                                  int larger_prime);
 size_t inorder_fill(int vals[], size_t size, ccc_flat_ordered_map const *m);
 
 #endif /* CCC_FOMAP_UTIL_H */

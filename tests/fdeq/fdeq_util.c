@@ -2,16 +2,16 @@
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
 #include "fdeq_util.h"
+#include "checkers.h"
 #include "flat_double_ended_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
 #include <stdio.h>
 
-BEGIN_TEST(create_queue, flat_double_ended_queue *const q, size_t const n,
-           int const vals[])
+CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
+               int const vals[])
 {
     if (n)
     {
@@ -19,11 +19,11 @@ BEGIN_TEST(create_queue, flat_double_ended_queue *const q, size_t const n,
         CHECK(res, CCC_OK);
         CHECK(validate(q), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_TEST(check_order, flat_double_ended_queue const *const q, size_t const n,
-           int const order[])
+CHECK_BEGIN_FN(check_order, flat_double_ended_queue const *const q,
+               size_t const n, int const order[])
 {
     size_t i = 0;
     int *v = begin(q);
@@ -39,7 +39,7 @@ BEGIN_TEST(check_order, flat_double_ended_queue const *const q, size_t const n,
         CHECK(v == NULL, false);
         CHECK(*v, order[i]);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
@@ -52,7 +52,7 @@ BEGIN_TEST(check_order, flat_double_ended_queue const *const q, size_t const n,
         {
             if (!v)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (order[j] == *v)
             {

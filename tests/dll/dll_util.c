@@ -2,8 +2,8 @@
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 
 #include "dll_util.h"
+#include "checkers.h"
 #include "doubly_linked_list.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -18,8 +18,8 @@ val_cmp(ccc_cmp const c)
     return (a->val > b->val) - (a->val < b->val);
 }
 
-BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
-           int const order[])
+CHECK_BEGIN_FN(check_order, doubly_linked_list const *const dll, size_t const n,
+               int const order[])
 {
     if (!n)
     {
@@ -38,7 +38,7 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
         CHECK(v == NULL, false);
         CHECK(order[i], v->val);
     }
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
@@ -51,7 +51,7 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
         {
             if (!v)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (order[j] == v->val)
             {
@@ -70,8 +70,8 @@ BEGIN_TEST(check_order, doubly_linked_list const *const dll, size_t const n,
     });
 }
 
-BEGIN_TEST(create_list, ccc_doubly_linked_list *const dll,
-           enum push_end const dir, size_t const n, struct val vals[])
+CHECK_BEGIN_FN(create_list, ccc_doubly_linked_list *const dll,
+               enum push_end const dir, size_t const n, struct val vals[])
 {
     for (size_t i = 0; i < n; ++i)
     {
@@ -85,5 +85,5 @@ BEGIN_TEST(create_list, ccc_doubly_linked_list *const dll,
         }
     }
     CHECK(validate(dll), true);
-    END_TEST();
+    CHECK_END_FN();
 }

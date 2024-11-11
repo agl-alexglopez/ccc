@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "fomap_util.h"
+#include "checkers.h"
 #include "flat_ordered_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -16,8 +16,8 @@ val_cmp(ccc_key_cmp const cmp)
     return (key > c->id) - (key < c->id);
 }
 
-BEGIN_TEST(insert_shuffled, ccc_flat_ordered_map *m, size_t const size,
-           int const larger_prime)
+CHECK_BEGIN_FN(insert_shuffled, ccc_flat_ordered_map *m, size_t const size,
+               int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
@@ -28,7 +28,7 @@ BEGIN_TEST(insert_shuffled, ccc_flat_ordered_map *m, size_t const size,
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(m), size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

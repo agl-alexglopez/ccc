@@ -2,8 +2,8 @@
 #define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 
 #include "sll_util.h"
+#include "checkers.h"
 #include "singly_linked_list.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -18,8 +18,8 @@ val_cmp(ccc_cmp const c)
     return (a->val > b->val) - (a->val < b->val);
 }
 
-BEGIN_TEST(check_order, singly_linked_list const *const sll, size_t const n,
-           int const order[])
+CHECK_BEGIN_FN(check_order, singly_linked_list const *const sll, size_t const n,
+               int const order[])
 {
     size_t i = 0;
     struct val const *v = begin(sll);
@@ -29,7 +29,7 @@ BEGIN_TEST(check_order, singly_linked_list const *const sll, size_t const n,
         CHECK(v->val, order[i]);
     }
     CHECK(i, n);
-    END_FAIL({
+    CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
@@ -42,7 +42,7 @@ BEGIN_TEST(check_order, singly_linked_list const *const sll, size_t const n,
         {
             if (!v)
             {
-                return TEST_STATUS;
+                return CHECK_STATUS;
             }
             if (order[j] == v->val)
             {
@@ -61,13 +61,13 @@ BEGIN_TEST(check_order, singly_linked_list const *const sll, size_t const n,
     });
 }
 
-BEGIN_TEST(create_list, ccc_singly_linked_list *const sll, size_t const n,
-           struct val vals[])
+CHECK_BEGIN_FN(create_list, ccc_singly_linked_list *const sll, size_t const n,
+               struct val vals[])
 {
     for (size_t i = 0; i < n; ++i)
     {
         CHECK(push_front(sll, &vals[i].e) == NULL, false);
     }
     CHECK(validate(sll), true);
-    END_TEST();
+    CHECK_END_FN();
 }

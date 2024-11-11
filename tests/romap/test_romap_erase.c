@@ -1,9 +1,9 @@
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "realtime_ordered_map.h"
 #include "romap_util.h"
-#include "test.h"
 #include "traits.h"
 
 #include <stdbool.h>
@@ -13,7 +13,7 @@
 #include <string.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(romap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -36,10 +36,10 @@ BEGIN_STATIC_TEST(romap_test_insert_erase_shuffled)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(romap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -72,10 +72,10 @@ BEGIN_STATIC_TEST(romap_test_prime_shuffle)
               true);
         CHECK(validate(&s), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(romap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -98,12 +98,12 @@ BEGIN_STATIC_TEST(romap_test_weak_srand)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(romap_test_insert_erase_shuffled(),
+    return CHECK_RUN(romap_test_insert_erase_shuffled(),
                      romap_test_prime_shuffle(), romap_test_weak_srand());
 }

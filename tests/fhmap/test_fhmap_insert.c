@@ -2,16 +2,16 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "fhmap_util.h"
 #include "flat_hash_map.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
 #include <stdlib.h>
 
-BEGIN_STATIC_TEST(fhmap_test_insert)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -24,10 +24,10 @@ BEGIN_STATIC_TEST(fhmap_test_insert)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_insert_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -71,10 +71,10 @@ BEGIN_STATIC_TEST(fhmap_test_insert_macros)
     CHECK(validate(&fh), true);
     CHECK(ins->val, 100);
     CHECK(size(&fh), 4);
-    END_TEST(ccc_fhm_clear_and_free(&fh, NULL););
+    CHECK_END_FN(ccc_fhm_clear_and_free(&fh, NULL););
 }
 
-BEGIN_STATIC_TEST(fhmap_test_insert_overwrite)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -107,10 +107,10 @@ BEGIN_STATIC_TEST(fhmap_test_insert_overwrite)
     v = unwrap(entry_r(&fh, &q.id));
     CHECK(v != NULL, true);
     CHECK(v->val, 100);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_insert_then_bad_ideas)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
 {
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
@@ -140,10 +140,10 @@ BEGIN_STATIC_TEST(fhmap_test_insert_then_bad_ideas)
     CHECK(v != NULL, true);
     CHECK(v->val, 100);
     CHECK(q.val, 90);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_entry_api_functional)
+CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     struct val vals[200];
@@ -199,10 +199,10 @@ BEGIN_STATIC_TEST(fhmap_test_entry_api_functional)
         CHECK((in->val % 2 == 0), true);
     }
     CHECK(size(&fh), (size / 2));
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_insert_via_entry)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
@@ -244,10 +244,10 @@ BEGIN_STATIC_TEST(fhmap_test_insert_via_entry)
         }
     }
     CHECK(size(&fh), (size / 2));
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_insert_via_entry_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
@@ -286,10 +286,10 @@ BEGIN_STATIC_TEST(fhmap_test_insert_via_entry_macros)
         }
     }
     CHECK(size(&fh), (size / 2));
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_entry_api_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
@@ -342,10 +342,10 @@ BEGIN_STATIC_TEST(fhmap_test_entry_api_macros)
         CHECK(v->val % 2 == 0, true);
     }
     CHECK(size(&fh), (size / 2));
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_two_sum)
+CHECK_BEGIN_STATIC_FN(fhmap_test_two_sum)
 {
     struct val vals[20];
     ccc_flat_hash_map fh;
@@ -372,10 +372,10 @@ BEGIN_STATIC_TEST(fhmap_test_two_sum)
     }
     CHECK(solution_indices[0], 8);
     CHECK(solution_indices[1], 2);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_resize)
+CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
 {
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
@@ -407,10 +407,10 @@ BEGIN_STATIC_TEST(fhmap_test_resize)
         CHECK(in_table->val, shuffled_index);
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_resize_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
 {
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
@@ -449,10 +449,10 @@ BEGIN_STATIC_TEST(fhmap_test_resize_macros)
         CHECK(v->val, i);
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_resize_from_null)
+CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
 {
     ccc_flat_hash_map fh;
     ccc_result const res
@@ -481,10 +481,10 @@ BEGIN_STATIC_TEST(fhmap_test_resize_from_null)
         CHECK(in_table->val, shuffled_index);
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_resize_from_null_macros)
+CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
 {
     size_t const prime_start = 0;
     ccc_flat_hash_map fh;
@@ -522,10 +522,10 @@ BEGIN_STATIC_TEST(fhmap_test_resize_from_null_macros)
         CHECK(v->val, i);
     }
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fhmap_test_insert_limit)
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
 {
     int const size = 101;
     struct val vals[101];
@@ -584,13 +584,13 @@ BEGIN_STATIC_TEST(fhmap_test_insert_limit)
     CHECK(unwrap(&ent) == NULL, true);
     CHECK(insert_error(&ent), true);
     CHECK(size(&fh), final_size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(
+    return CHECK_RUN(
         fhmap_test_insert(), fhmap_test_insert_macros(),
         fhmap_test_insert_overwrite(), fhmap_test_insert_then_bad_ideas(),
         fhmap_test_insert_via_entry(), fhmap_test_insert_via_entry_macros(),

@@ -1,9 +1,9 @@
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "flat_realtime_ordered_map.h"
 #include "fromap_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(fromap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(fromap_test_insert_erase_shuffled)
 {
     struct val vals[51];
     ccc_flat_realtime_ordered_map s
@@ -37,10 +37,10 @@ BEGIN_STATIC_TEST(fromap_test_insert_erase_shuffled)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(fromap_test_prime_shuffle)
 {
     struct val vals[51];
     ccc_flat_realtime_ordered_map s
@@ -71,10 +71,10 @@ BEGIN_STATIC_TEST(fromap_test_prime_shuffle)
         CHECK(occupied(e) || repeats[i], true);
         CHECK(validate(&s), true);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(fromap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(fromap_test_weak_srand)
 {
     struct val vals[1001];
     ccc_flat_realtime_ordered_map s
@@ -99,12 +99,12 @@ BEGIN_STATIC_TEST(fromap_test_weak_srand)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(fromap_test_insert_erase_shuffled(),
+    return CHECK_RUN(fromap_test_insert_erase_shuffled(),
                      fromap_test_prime_shuffle(), fromap_test_weak_srand());
 }

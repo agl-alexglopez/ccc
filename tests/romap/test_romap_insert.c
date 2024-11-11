@@ -2,9 +2,9 @@
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include "alloc.h"
+#include "checkers.h"
 #include "realtime_ordered_map.h"
 #include "romap_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(romap_test_insert_one)
+CHECK_BEGIN_STATIC_FN(romap_test_insert_one)
 {
     struct val one = {};
     ccc_realtime_ordered_map s
@@ -24,10 +24,10 @@ BEGIN_STATIC_TEST(romap_test_insert_one)
     struct val *v = rom_root(&s);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(romap_test_insert_macros)
+CHECK_BEGIN_STATIC_FN(romap_test_insert_macros)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, std_alloc, val_cmp, NULL);
@@ -62,10 +62,10 @@ BEGIN_STATIC_TEST(romap_test_insert_macros)
     CHECK(v != NULL, true);
     CHECK(v->id, 2);
     CHECK(size(&s), 4);
-    END_TEST(rom_clear(&s, NULL););
+    CHECK_END_FN(rom_clear(&s, NULL););
 }
 
-BEGIN_STATIC_TEST(romap_test_insert_shuffle)
+CHECK_BEGIN_STATIC_FN(romap_test_insert_shuffle)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -81,10 +81,10 @@ BEGIN_STATIC_TEST(romap_test_insert_shuffle)
     {
         CHECK(vals[i].val, sorted_check[i]);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(romap_test_insert_weak_srand)
+CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
 {
     ccc_realtime_ordered_map s
         = rom_init(struct val, elem, val, s, NULL, val_cmp, NULL);
@@ -102,13 +102,13 @@ BEGIN_STATIC_TEST(romap_test_insert_weak_srand)
         CHECK(validate(&s), true);
     }
     CHECK(size(&s), (size_t)num_nodes);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(romap_test_insert_one(), romap_test_insert_macros(),
+    return CHECK_RUN(romap_test_insert_one(), romap_test_insert_macros(),
                      romap_test_insert_shuffle(),
                      romap_test_insert_weak_srand());
 }

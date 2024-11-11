@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -20,17 +20,17 @@ int_cmp(ccc_cmp const cmp)
     return (a > b) - (a < b);
 }
 
-BEGIN_STATIC_TEST(pq_test_empty)
+CHECK_BEGIN_STATIC_FN(pq_test_empty)
 {
     struct val vals[2] = {};
     ccc_flat_priority_queue pq
         = ccc_fpq_init(vals, (sizeof(vals) / sizeof(struct val)), CCC_LES, NULL,
                        val_cmp, NULL);
     CHECK(ccc_fpq_is_empty(&pq), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_macro)
+CHECK_BEGIN_STATIC_FN(pq_test_macro)
 {
     struct val vals[2] = {};
     ccc_flat_priority_queue pq
@@ -41,10 +41,10 @@ BEGIN_STATIC_TEST(pq_test_macro)
     CHECK(ccc_fpq_is_empty(&pq), false);
     struct val *res2 = ccc_fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res2 == NULL, true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_push)
+CHECK_BEGIN_STATIC_FN(pq_test_push)
 {
     struct val vals[3] = {};
     ccc_flat_priority_queue pq
@@ -53,10 +53,10 @@ BEGIN_STATIC_TEST(pq_test_push)
     struct val *res = push(&pq, &vals[0]);
     CHECK(res != NULL, true);
     CHECK(ccc_fpq_is_empty(&pq), false);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_raw_type)
+CHECK_BEGIN_STATIC_FN(pq_test_raw_type)
 {
     int vals[4] = {};
     ccc_flat_priority_queue pq = ccc_fpq_init(
@@ -70,10 +70,10 @@ BEGIN_STATIC_TEST(pq_test_raw_type)
     CHECK(ccc_fpq_size(&pq), 2);
     int *popped = front(&pq);
     CHECK(*popped, -1);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_heapify_init)
+CHECK_BEGIN_STATIC_FN(pq_test_heapify_init)
 {
     srand(time(NULL)); /* NOLINT */
     int heap[100] = {};
@@ -93,10 +93,10 @@ BEGIN_STATIC_TEST(pq_test_heapify_init)
         CHECK(cur >= prev, true);
         prev = cur;
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(pq_test_heapify_copy)
+CHECK_BEGIN_STATIC_FN(pq_test_heapify_copy)
 {
     srand(time(NULL)); /* NOLINT */
     int heap[100] = {};
@@ -119,13 +119,13 @@ BEGIN_STATIC_TEST(pq_test_heapify_copy)
         CHECK(cur >= prev, true);
         prev = cur;
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(pq_test_empty(), pq_test_macro(), pq_test_push(),
+    return CHECK_RUN(pq_test_empty(), pq_test_macro(), pq_test_push(),
                      pq_test_raw_type(), pq_test_heapify_init(),
                      pq_test_heapify_copy());
 }

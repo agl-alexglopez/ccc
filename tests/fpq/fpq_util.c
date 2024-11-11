@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "fpq_util.h"
+#include "checkers.h"
 #include "flat_priority_queue.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -31,8 +31,8 @@ rand_range(size_t const min, size_t const max)
     return min + (rand() / (RAND_MAX / (max - min + 1) + 1));
 }
 
-BEGIN_TEST(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
-           size_t const size, int const larger_prime)
+CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
+               size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -49,11 +49,12 @@ BEGIN_TEST(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(ccc_fpq_size(pq), size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_flat_priority_queue *fpq)
+CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
+               ccc_flat_priority_queue *fpq)
 {
     if (ccc_fpq_size(fpq) != size)
     {
@@ -87,5 +88,5 @@ BEGIN_TEST(inorder_fill, int vals[], size_t size, ccc_flat_priority_queue *fpq)
         CHECK(vals[i++], v->val);
         (void)pop(&fpq_copy);
     };
-    END_TEST(free(copy_buf););
+    CHECK_END_FN(free(copy_buf););
 }

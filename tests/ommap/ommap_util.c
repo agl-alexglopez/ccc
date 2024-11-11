@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "ommap_util.h"
+#include "checkers.h"
 #include "ordered_multimap.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -24,8 +24,8 @@ val_update(ccc_user_type_mut const u)
     old->val = *(int *)u.aux;
 }
 
-BEGIN_TEST(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
-           size_t const size, int const larger_prime)
+CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
+               size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -42,7 +42,7 @@ BEGIN_TEST(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
     CHECK(size(pq), size);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

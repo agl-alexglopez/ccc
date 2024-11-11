@@ -1,8 +1,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "ommap_util.h"
 #include "ordered_multimap.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-BEGIN_STATIC_TEST(ommap_test_insert_remove_four_dups)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_remove_four_dups)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -33,10 +33,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_remove_four_dups)
         CHECK(validate(&omm), true);
     }
     CHECK(size(&omm), (size_t)0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(ommap_test_insert_erase_shuffled)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -61,10 +61,10 @@ BEGIN_STATIC_TEST(ommap_test_insert_erase_shuffled)
         CHECK(validate(&omm), true);
     }
     CHECK(size(&omm), (size_t)0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_pop_max)
+CHECK_BEGIN_STATIC_FN(ommap_test_pop_max)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -89,10 +89,10 @@ BEGIN_STATIC_TEST(ommap_test_pop_max)
         CHECK(ccc_omm_pop_max(&omm), CCC_OK);
     }
     CHECK(is_empty(&omm), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_pop_min)
+CHECK_BEGIN_STATIC_FN(ommap_test_pop_min)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -117,10 +117,10 @@ BEGIN_STATIC_TEST(ommap_test_pop_min)
         CHECK(ccc_omm_pop_min(&omm), CCC_OK);
     }
     CHECK(is_empty(&omm), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_max_round_robin)
+CHECK_BEGIN_STATIC_FN(ommap_test_max_round_robin)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -154,10 +154,10 @@ BEGIN_STATIC_TEST(ommap_test_max_round_robin)
         CHECK(ccc_omm_pop_max(&omm), CCC_OK);
         ++i;
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_min_round_robin)
+CHECK_BEGIN_STATIC_FN(ommap_test_min_round_robin)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -191,10 +191,10 @@ BEGIN_STATIC_TEST(ommap_test_min_round_robin)
         CHECK(ccc_omm_pop_min(&omm), CCC_OK);
         ++i;
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_delete_prime_shuffle_duplicates)
+CHECK_BEGIN_STATIC_FN(ommap_test_delete_prime_shuffle_duplicates)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -227,10 +227,10 @@ BEGIN_STATIC_TEST(ommap_test_delete_prime_shuffle_duplicates)
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(ommap_test_prime_shuffle)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -259,10 +259,10 @@ BEGIN_STATIC_TEST(ommap_test_prime_shuffle)
         --cur_size;
         CHECK(size(&omm), cur_size);
     }
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(ommap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(ommap_test_weak_srand)
 {
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, val, NULL, val_cmp, NULL);
@@ -284,13 +284,13 @@ BEGIN_STATIC_TEST(ommap_test_weak_srand)
         CHECK(validate(&omm), true);
     }
     CHECK(is_empty(&omm), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(ommap_test_insert_remove_four_dups(),
+    return CHECK_RUN(ommap_test_insert_remove_four_dups(),
                      ommap_test_insert_erase_shuffled(), ommap_test_pop_max(),
                      ommap_test_pop_min(), ommap_test_max_round_robin(),
                      ommap_test_min_round_robin(),

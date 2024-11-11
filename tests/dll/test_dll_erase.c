@@ -1,19 +1,19 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 
+#include "checkers.h"
 #include "dll_util.h"
 #include "doubly_linked_list.h"
-#include "test.h"
 #include "traits.h"
 #include "types.h"
 
 #include <stddef.h>
 
-BEGIN_STATIC_TEST(dll_test_push_pop_front)
+CHECK_BEGIN_STATIC_FN(dll_test_push_pop_front)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
+    enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
     CHECK(t, PASS);
     CHECK(size(&dll), 3);
     struct val *v = dll_front(&dll);
@@ -31,14 +31,14 @@ BEGIN_STATIC_TEST(dll_test_push_pop_front)
     CHECK(v->val, 2);
     CHECK(pop_front(&dll), CCC_OK);
     CHECK(is_empty(&dll), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(dll_test_push_pop_back)
+CHECK_BEGIN_STATIC_FN(dll_test_push_pop_back)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
+    enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
     CHECK(t, PASS);
     CHECK(size(&dll), 3);
     struct val *v = dll_back(&dll);
@@ -56,14 +56,14 @@ BEGIN_STATIC_TEST(dll_test_push_pop_back)
     CHECK(v->val, 0);
     CHECK(pop_back(&dll), CCC_OK);
     CHECK(is_empty(&dll), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(dll_test_push_pop_middle)
+CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
+    enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     CHECK(extract(&dll, &vals[2].e) != NULL, true);
     CHECK(validate(&dll), true);
@@ -77,15 +77,15 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle)
     (void)extract(&dll, &vals[0].e);
     CHECK(validate(&dll), true);
     CHECK(is_empty(&dll), true);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(dll_test_push_pop_middle_range)
+CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle_range)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum test_result const t = create_list(&dll, UTIL_PUSH_BACK, 5, vals);
+    enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 5, vals);
     CHECK(t, PASS);
     (void)dll_extract_range(&dll, &vals[1].e, &vals[4].e);
     CHECK(validate(&dll), true);
@@ -94,16 +94,17 @@ BEGIN_STATIC_TEST(dll_test_push_pop_middle_range)
     (void)dll_extract_range(&dll, &vals[0].e, dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
     CHECK(size(&dll), 0);
-    END_TEST();
+    CHECK_END_FN();
 }
 
-BEGIN_STATIC_TEST(dll_test_splice_two_lists)
+CHECK_BEGIN_STATIC_FN(dll_test_splice_two_lists)
 {
     doubly_linked_list to_lose
         = dll_init(to_lose, struct val, e, NULL, val_cmp, NULL);
     struct val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum test_result t = create_list(&to_lose, UTIL_PUSH_BACK, 5, to_lose_vals);
+    enum check_result t
+        = create_list(&to_lose, UTIL_PUSH_BACK, 5, to_lose_vals);
     CHECK(t, PASS);
     doubly_linked_list to_gain
         = dll_init(to_gain, struct val, e, NULL, val_cmp, NULL);
@@ -129,13 +130,13 @@ BEGIN_STATIC_TEST(dll_test_splice_two_lists)
     CHECK(size(&to_gain), 7);
     CHECK(size(&to_lose), 0);
     CHECK(check_order(&to_gain, 7, (int[7]){0, 1, 1, 2, 3, 4, 0}), PASS);
-    END_TEST();
+    CHECK_END_FN();
 }
 
 int
 main()
 {
-    return RUN_TESTS(dll_test_push_pop_front(), dll_test_push_pop_back(),
+    return CHECK_RUN(dll_test_push_pop_front(), dll_test_push_pop_back(),
                      dll_test_push_pop_middle(),
                      dll_test_push_pop_middle_range(),
                      dll_test_splice_two_lists());
