@@ -20,9 +20,6 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_one)
         = fom_init((struct val[2]){}, 2, elem, id, NULL, val_cmp, NULL);
     CHECK(occupied(insert_r(&s, &(struct val){}.elem)), false);
     CHECK(is_empty(&s), false);
-    struct val *v = fom_root(&s);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 0);
     CHECK_END_FN();
 }
 

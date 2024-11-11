@@ -85,6 +85,10 @@ static void link_trees(struct ccc_fomap_ *t, size_t parent,
 bool
 ccc_fom_contains(ccc_flat_ordered_map *const fom, void const *const key)
 {
+    if (!fom || !key)
+    {
+        return false;
+    }
     fom->root_ = splay(fom, fom->root_, key, fom->cmp_);
     return cmp_elems(fom, key, fom->root_, fom->cmp_) == CCC_EQL;
 }
@@ -92,18 +96,30 @@ ccc_fom_contains(ccc_flat_ordered_map *const fom, void const *const key)
 void *
 ccc_fom_get_key_val(ccc_flat_ordered_map *const fom, void const *const key)
 {
+    if (!fom || !key)
+    {
+        return NULL;
+    }
     return find(fom, key);
 }
 
 ccc_fomap_entry
 ccc_fom_entry(ccc_flat_ordered_map *const fom, void const *const key)
 {
+    if (!fom || !key)
+    {
+        return (ccc_fomap_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     return (ccc_fomap_entry){entry(fom, key)};
 }
 
 void *
 ccc_fom_insert_entry(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
 {
+    if (!e || !elem)
+    {
+        return NULL;
+    }
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         *elem = *at(e->impl_.fom_, e->impl_.i_);
@@ -118,7 +134,11 @@ ccc_fom_insert_entry(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
 ccc_fomap_entry *
 ccc_fom_and_modify(ccc_fomap_entry *const e, ccc_update_fn *const fn)
 {
-    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (!e)
+    {
+        return NULL;
+    }
+    if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type_mut){
             .user_type = base_at(e->impl_.fom_, e->impl_.i_),
@@ -132,7 +152,11 @@ ccc_fomap_entry *
 ccc_fom_and_modify_aux(ccc_fomap_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (!e)
+    {
+        return NULL;
+    }
+    if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type_mut){
             .user_type = base_at(e->impl_.fom_, e->impl_.i_),
@@ -145,6 +169,10 @@ ccc_fom_and_modify_aux(ccc_fomap_entry *const e, ccc_update_fn *const fn,
 void *
 ccc_fom_or_insert(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
 {
+    if (!e || !elem)
+    {
+        return NULL;
+    }
     if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         return base_at(e->impl_.fom_, e->impl_.i_);
@@ -153,20 +181,25 @@ ccc_fom_or_insert(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
 }
 
 ccc_entry
-ccc_fom_insert(ccc_flat_ordered_map *const t, ccc_fomap_elem *const out_handle)
+ccc_fom_insert(ccc_flat_ordered_map *const fom,
+               ccc_fomap_elem *const out_handle)
 {
-    void *found = find(t, key_from_node(t, out_handle));
+    if (!fom || !out_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
+    void *found = find(fom, key_from_node(fom, out_handle));
     if (found)
     {
-        assert(t->root_);
-        *out_handle = *at(t, t->root_);
-        void *const user_struct = struct_base(t, out_handle);
-        void *const ret = base_at(t, t->root_);
-        void *const tmp = ccc_buf_at(&t->buf_, 0);
-        swap(tmp, user_struct, ret, ccc_buf_elem_size(&t->buf_));
+        assert(fom->root_);
+        *out_handle = *at(fom, fom->root_);
+        void *const user_struct = struct_base(fom, out_handle);
+        void *const ret = base_at(fom, fom->root_);
+        void *const tmp = ccc_buf_at(&fom->buf_, 0);
+        swap(tmp, user_struct, ret, ccc_buf_elem_size(&fom->buf_));
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted = maybe_alloc_insert(t, out_handle);
+    void *inserted = maybe_alloc_insert(fom, out_handle);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
@@ -178,6 +211,10 @@ ccc_entry
 ccc_fom_try_insert(ccc_flat_ordered_map *const fom,
                    ccc_fomap_elem *const key_val_handle)
 {
+    if (!fom || !key_val_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     void *const found = find(fom, key_from_node(fom, key_val_handle));
     if (found)
     {
@@ -196,6 +233,10 @@ ccc_entry
 ccc_fom_insert_or_assign(ccc_flat_ordered_map *const fom,
                          ccc_fomap_elem *const key_val_handle)
 {
+    if (!fom || !key_val_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     void *const found = find(fom, key_from_node(fom, key_val_handle));
     if (found)
     {
@@ -217,6 +258,10 @@ ccc_entry
 ccc_fom_remove(ccc_flat_ordered_map *const fom,
                ccc_fomap_elem *const out_handle)
 {
+    if (!fom || !out_handle)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     void *const n = erase(fom, key_from_node(fom, out_handle));
     if (!n)
     {
@@ -228,6 +273,10 @@ ccc_fom_remove(ccc_flat_ordered_map *const fom,
 ccc_entry
 ccc_fom_remove_entry(ccc_fomap_entry *const e)
 {
+    if (!e)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+    }
     if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         void *const erased
@@ -241,6 +290,10 @@ ccc_fom_remove_entry(ccc_fomap_entry *const e)
 void *
 ccc_fom_unwrap(ccc_fomap_entry const *const e)
 {
+    if (!e)
+    {
+        return NULL;
+    }
     return e->impl_.stats_ == CCC_ENTRY_OCCUPIED
                ? base_at(e->impl_.fom_, e->impl_.i_)
                : NULL;
@@ -249,13 +302,13 @@ ccc_fom_unwrap(ccc_fomap_entry const *const e)
 bool
 ccc_fom_insert_error(ccc_fomap_entry const *const e)
 {
-    return e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR;
+    return e ? e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 bool
 ccc_fom_occupied(ccc_fomap_entry const *const e)
 {
-    return e->impl_.stats_ & CCC_ENTRY_OCCUPIED;
+    return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
 bool
@@ -267,6 +320,10 @@ ccc_fom_is_empty(ccc_flat_ordered_map const *const fom)
 size_t
 ccc_fom_size(ccc_flat_ordered_map const *const fom)
 {
+    if (!fom)
+    {
+        return 0;
+    }
     size_t const sz = ccc_buf_size(&fom->buf_);
     return !sz ? sz : sz - 1;
 }
@@ -274,7 +331,7 @@ ccc_fom_size(ccc_flat_ordered_map const *const fom)
 void *
 ccc_fom_begin(ccc_flat_ordered_map const *const fom)
 {
-    if (ccc_buf_is_empty(&fom->buf_))
+    if (!fom || ccc_buf_is_empty(&fom->buf_))
     {
         return NULL;
     }
@@ -285,7 +342,7 @@ ccc_fom_begin(ccc_flat_ordered_map const *const fom)
 void *
 ccc_fom_rbegin(ccc_flat_ordered_map const *const fom)
 {
-    if (ccc_buf_is_empty(&fom->buf_))
+    if (!fom || ccc_buf_is_empty(&fom->buf_))
     {
         return NULL;
     }
@@ -297,7 +354,7 @@ void *
 ccc_fom_next(ccc_flat_ordered_map const *const fom,
              ccc_fomap_elem const *const e)
 {
-    if (ccc_buf_is_empty(&fom->buf_))
+    if (!fom || ccc_buf_is_empty(&fom->buf_))
     {
         return NULL;
     }
@@ -309,7 +366,7 @@ void *
 ccc_fom_rnext(ccc_flat_ordered_map const *const fom,
               ccc_fomap_elem const *const e)
 {
-    if (ccc_buf_is_empty(&fom->buf_))
+    if (!fom || !e || ccc_buf_is_empty(&fom->buf_))
     {
         return NULL;
     }
@@ -320,7 +377,7 @@ ccc_fom_rnext(ccc_flat_ordered_map const *const fom,
 void *
 ccc_fom_end(ccc_flat_ordered_map const *const fom)
 {
-    if (ccc_buf_is_empty(&fom->buf_))
+    if (!fom || ccc_buf_is_empty(&fom->buf_))
     {
         return NULL;
     }
@@ -330,7 +387,7 @@ ccc_fom_end(ccc_flat_ordered_map const *const fom)
 void *
 ccc_fom_rend(ccc_flat_ordered_map const *const fom)
 {
-    if (ccc_buf_is_empty(&fom->buf_))
+    if (!fom || ccc_buf_is_empty(&fom->buf_))
     {
         return NULL;
     }
@@ -341,6 +398,10 @@ ccc_range
 ccc_fom_equal_range(ccc_flat_ordered_map *const fom,
                     void const *const begin_key, void const *const end_key)
 {
+    if (!fom || !begin_key || !end_key)
+    {
+        return (ccc_range){};
+    }
     return (ccc_range){equal_range(fom, begin_key, end_key, inorder_traversal)};
 }
 
@@ -349,64 +410,62 @@ ccc_fom_equal_rrange(ccc_flat_ordered_map *const fom,
                      void const *const rbegin_key, void const *const end_key)
 
 {
+    if (!fom || !rbegin_key || !end_key)
+    {
+        return (ccc_rrange){};
+    }
     return (ccc_rrange){
         equal_range(fom, rbegin_key, end_key, reverse_inorder_traversal)};
 }
 
 void
-ccc_fom_clear(ccc_flat_ordered_map *const frm, ccc_destructor_fn *const fn)
+ccc_fom_clear(ccc_flat_ordered_map *const fom, ccc_destructor_fn *const fn)
 {
-    if (!frm)
+    if (!fom)
     {
         return;
     }
     if (!fn)
     {
-        (void)ccc_buf_size_set(&frm->buf_, 1);
-        frm->root_ = 0;
+        (void)ccc_buf_size_set(&fom->buf_, 1);
+        fom->root_ = 0;
         return;
     }
-    for (void *e = ccc_buf_at(&frm->buf_, 1); e != ccc_buf_end(&frm->buf_);
-         e = ccc_buf_next(&frm->buf_, e))
+    for (void *e = ccc_buf_at(&fom->buf_, 1); e != ccc_buf_end(&fom->buf_);
+         e = ccc_buf_next(&fom->buf_, e))
     {
-        fn((ccc_user_type_mut){.user_type = e, .aux = frm->aux_});
+        fn((ccc_user_type_mut){.user_type = e, .aux = fom->aux_});
     }
-    (void)ccc_buf_size_set(&frm->buf_, 1);
-    frm->root_ = 0;
+    (void)ccc_buf_size_set(&fom->buf_, 1);
+    fom->root_ = 0;
 }
 
 ccc_result
-ccc_fom_clear_and_free(ccc_flat_ordered_map *const frm,
+ccc_fom_clear_and_free(ccc_flat_ordered_map *const fom,
                        ccc_destructor_fn *const fn)
 {
-    if (!frm)
+    if (!fom)
     {
         return CCC_INPUT_ERR;
     }
     if (!fn)
     {
-        frm->root_ = 0;
-        return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
+        fom->root_ = 0;
+        return ccc_buf_alloc(&fom->buf_, 0, fom->buf_.alloc_);
     }
-    for (void *e = ccc_buf_at(&frm->buf_, 1); e != ccc_buf_end(&frm->buf_);
-         e = ccc_buf_next(&frm->buf_, e))
+    for (void *e = ccc_buf_at(&fom->buf_, 1); e != ccc_buf_end(&fom->buf_);
+         e = ccc_buf_next(&fom->buf_, e))
     {
-        fn((ccc_user_type_mut){.user_type = e, .aux = frm->aux_});
+        fn((ccc_user_type_mut){.user_type = e, .aux = fom->aux_});
     }
-    frm->root_ = 0;
-    return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
-}
-
-void *
-ccc_fom_root(ccc_flat_ordered_map const *const fom)
-{
-    return ccc_fom_is_empty(fom) ? NULL : base_at(fom, fom->root_);
+    fom->root_ = 0;
+    return ccc_buf_alloc(&fom->buf_, 0, fom->buf_.alloc_);
 }
 
 bool
 ccc_fom_validate(ccc_flat_ordered_map const *const fom)
 {
-    return validate(fom);
+    return fom ? validate(fom) : false;
 }
 
 /*===========================   Private Interface ===========================*/
@@ -506,7 +565,7 @@ maybe_alloc_insert(struct ccc_fomap_ *const fom,
                    struct ccc_fomap_elem_ *const elem)
 {
     /* The end sentinel node will always be at 0. This also means once
-       initialized the internal size for implementor is always at least 1. */
+       initialized the internal size for implementer is always at least 1. */
     if (!alloc_back(fom))
     {
         return NULL;
@@ -740,7 +799,7 @@ static inline void *
 alloc_back(struct ccc_fomap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
-       initialized the internal size for implementor is always at least 1. */
+       initialized the internal size for implementer is always at least 1. */
     if (ccc_buf_is_empty(&t->buf_) && !ccc_buf_alloc_back(&t->buf_))
     {
         return NULL;
@@ -762,9 +821,9 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
     {
         return;
     }
-    memcpy(tmp, a, elem_sz);
-    memcpy(a, b, elem_sz);
-    memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, elem_sz);
+    (void)memcpy(a, b, elem_sz);
+    (void)memcpy(b, tmp, elem_sz);
 }
 
 static inline struct ccc_fomap_elem_ *
@@ -803,7 +862,6 @@ branch_ref(struct ccc_fomap_ const *t, size_t const node,
 static inline size_t *
 parent_ref(struct ccc_fomap_ const *t, size_t node)
 {
-
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
 }
 
@@ -823,7 +881,6 @@ struct_base(struct ccc_fomap_ const *const fom,
 static struct ccc_fomap_elem_ *
 elem_in_slot(struct ccc_fomap_ const *const t, void const *const slot)
 {
-
     return (struct ccc_fomap_elem_ *)((char *)slot + t->node_elem_offset_);
 }
 
@@ -849,12 +906,6 @@ struct tree_range
     size_t low;
     size_t root;
     size_t high;
-};
-
-struct parent_status
-{
-    bool correct;
-    size_t parent;
 };
 
 static size_t

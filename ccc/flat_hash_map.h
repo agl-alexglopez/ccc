@@ -36,16 +36,16 @@ typedef union
 at runtime.
 @param [in] fhash_ptr the pointer to the flat_hash object.
 @param [in] memory_ptr the pointer to the backing buffer array. May be NULL
-if the user provides a reallocation function. The buffer will be interpreted
+if the user provides a allocation function. The buffer will be interpreted
 in units of type size that the user intends to store.
 @param [in] capacity the starting capacity of the provided buffer or 0 if no
-buffer is provided and a reallocation function is given.
+buffer is provided and a allocation function is given.
 @param [in] struct_name the name of the struct type the user stores in the
 hash table.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] fhash_elem_field the name of the field holding the fhash_elem
 handle.
-@param [in] alloc_fn the reallocation function for resizing or NULL if no
+@param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
@@ -320,7 +320,7 @@ if the entry is occupied and thus able to be modified. */
 Because this functions takes an entry and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
-to resize because no reallocation function is provided. */
+to resize because no allocation function is provided. */
 [[nodiscard]] void *ccc_fhm_or_insert(ccc_fhmap_entry const *e,
                                       ccc_fhmap_elem *elem);
 
@@ -342,7 +342,7 @@ or other data, such functions will not be called if the entry is Occupied. */
 @param [in] e the entry returned from a call obtaining an entry.
 @param [in] elem a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon a memory error in which
-the load factor would be exceeded when no reallocation policy is defined or
+the load factor would be exceeded when no allocation policy is defined or
 resizing failed to find more memory.
 
 This method can be used when the old value in the table does not need to
@@ -438,7 +438,7 @@ ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
 @param [in] fn the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the table before their slots are
 forfeit.
-@return the result of free operation. If no realloc function is provided it is
+@return the result of free operation. If no alloc function is provided it is
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
 ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *, ccc_destructor_fn *);
@@ -448,7 +448,7 @@ ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *, ccc_destructor_fn *);
 @return the next larger prime number.
 
 It is possible to use this hash table without an allocator by providing the
-buffer to be used for the underlying storage and preventing reallocation.
+buffer to be used for the underlying storage and preventing allocation.
 If such a backing store is used it would be best to ensure it is a prime number
 size to mitigate hash collisions. */
 [[nodiscard]] size_t ccc_fhm_next_prime(size_t n);

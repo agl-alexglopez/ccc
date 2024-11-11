@@ -73,18 +73,19 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 
 /*=====================     Core Macro Implementations     ==================*/
 
-#define ccc_impl_om_and_modify_w(ordered_map_entry, mod_fn, aux_data...)       \
+#define ccc_impl_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data...)   \
     ({                                                                         \
-        __auto_type om_ent_ptr_ = (ordered_map_entry);                         \
+        __auto_type om_ent_ptr_ = (ordered_map_entry_ptr);                     \
         struct ccc_tree_entry_ om_mod_ent_                                     \
             = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
         if (om_ent_ptr_)                                                       \
         {                                                                      \
             om_mod_ent_ = om_ent_ptr_->impl_;                                  \
-            if (om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                \
+            ccc_update_fn *and_mod_fn_ = (mod_fn);                             \
+            if (and_mod_fn_ && om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED) \
             {                                                                  \
                 __auto_type om_aux_data_ = aux_data;                           \
-                (mod_fn)((ccc_user_type_mut){                                  \
+                and_mod_fn_((ccc_user_type_mut){                               \
                     .user_type = (void *const)om_mod_ent_.entry_.e_,           \
                     .aux = &om_aux_data_});                                    \
             }                                                                  \
@@ -92,9 +93,9 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         om_mod_ent_;                                                           \
     })
 
-#define ccc_impl_om_or_insert_w(ordered_map_entry, lazy_key_value...)          \
+#define ccc_impl_om_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)      \
     ({                                                                         \
-        __auto_type or_ins_entry_ptr_ = (ordered_map_entry);                   \
+        __auto_type or_ins_entry_ptr_ = (ordered_map_entry_ptr);               \
         typeof(lazy_key_value) *or_ins_ret_ = NULL;                            \
         if (or_ins_entry_ptr_)                                                 \
         {                                                                      \
@@ -114,9 +115,9 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         or_ins_ret_;                                                           \
     })
 
-#define ccc_impl_om_insert_entry_w(ordered_map_entry, lazy_key_value...)       \
+#define ccc_impl_om_insert_entry_w(ordered_map_entry_ptr, lazy_key_value...)   \
     ({                                                                         \
-        __auto_type ins_entry_ptr_ = (ordered_map_entry);                      \
+        __auto_type ins_entry_ptr_ = (ordered_map_entry_ptr);                  \
         typeof(lazy_key_value) *om_ins_ent_ret_ = NULL;                        \
         if (ins_entry_ptr_)                                                    \
         {                                                                      \

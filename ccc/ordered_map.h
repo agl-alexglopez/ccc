@@ -15,7 +15,7 @@ where strict runtime bounds are needed. Also, searching the map is not a const
 thread-safe operation as indicated by the function signatures. The map is
 optimized upon every new search. However, in many cases the self-optimizing
 structure of the map can be beneficial when considering non-uniform access
-cases. In the best case, repeated searches of the same value yield an O(1)
+patterns. In the best case, repeated searches of the same value yield an O(1)
 access and many other frequently searched values will remain close to the root
 of the map. */
 typedef union
@@ -111,7 +111,7 @@ in an entry to provide information about the old value. */
 @return an entry. If Occupied, the entry contains a reference to the key value
 user type in the map and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the map. If more space is needed but
-allocation fails or has been forbidden, an insert error is set. */
+allocation fails, an insert error is set. */
 [[nodiscard]] ccc_entry ccc_om_try_insert(ccc_ordered_map *om,
                                           ccc_omap_elem *key_val_handle);
 
@@ -457,21 +457,13 @@ enclosing scope. This reference is always non-NULL. */
 /** @brief Return the start of an inorder traversal of the map. Amortized
 O(lg N).
 @param [in] om a pointer to the map.
-@return the oldest minimum element of the map.
-
-Note that duplicate keys will be traversed starting at the oldest element in
-round robin order and ending at the newest before progressing to the next
-key of stored in the map. */
+@return the oldest minimum element of the map. */
 [[nodiscard]] void *ccc_om_begin(ccc_ordered_map const *om);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param [in] om a pointer to the map.
-@return the oldest maximum element of the map.
-
-Note that duplicate keys will be traversed starting at the oldest element in
-round robin order and ending at the newest before progressing to the next
-key of stored in the map. */
+@return the oldest maximum element of the map. */
 [[nodiscard]] void *ccc_om_rbegin(ccc_ordered_map const *om);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
