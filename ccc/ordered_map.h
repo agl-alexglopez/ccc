@@ -10,8 +10,8 @@
 
 /** A ordered map is a self-optimizing data structure offering amortized
 O(lg N) search, insert, and erase and pointer stability. Because the data
-structure is self-optimizing it is not suimap in a realtime environment where
-strict runtime bounds are needed. Also, searching the map is not a const
+structure is self-optimizing it is not suitable map in a realtime environment
+where strict runtime bounds are needed. Also, searching the map is not a const
 thread-safe operation as indicated by the function signatures. The map is
 optimized upon every new search. However, in many cases the self-optimizing
 structure of the map can be beneficial when considering non-uniform access
