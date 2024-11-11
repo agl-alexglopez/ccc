@@ -38,9 +38,10 @@ typedef union
     struct ccc_tree_entry_ impl_;
 } ccc_omap_entry;
 
-#define ccc_om_init(struct_name, set_elem_field, key_elem_field, set_name,     \
+/** @brief Initializes the ordered map at runtime or compile time. */
+#define ccc_om_init(set_name, struct_name, set_elem_field, key_elem_field,     \
                     alloc_fn, key_cmp, aux)                                    \
-    ccc_impl_om_init(struct_name, set_elem_field, key_elem_field, set_name,    \
+    ccc_impl_om_init(set_name, struct_name, set_elem_field, key_elem_field,    \
                      alloc_fn, key_cmp, aux)
 
 /*=======================    Lazy Construction   ============================*/

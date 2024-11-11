@@ -144,8 +144,6 @@ compound literal matches the searched key. */
 
 /*========================    Entry API    ==================================*/
 
-/* Preserve old values from stored in the map. See types.h for more. */
-
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle_ptr provided by the user.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
