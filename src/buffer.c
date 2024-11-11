@@ -1,7 +1,6 @@
 #include "buffer.h"
 #include "types.h"
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -269,7 +268,11 @@ ccc_buf_rend(ccc_buffer const *const buf)
 void *
 ccc_buf_capacity_end(ccc_buffer const *const buf)
 {
-    return buf ? (char *)buf->mem_ + (buf->elem_sz_ * buf->capacity_) : NULL;
+    if (!buf || !buf->mem_)
+    {
+        return NULL;
+    }
+    return (char *)buf->mem_ + (buf->elem_sz_ * buf->capacity_);
 }
 
 ptrdiff_t

@@ -100,9 +100,8 @@ static bool validate(struct ccc_fromap_ const *frm);
 /* Returning void and maintaining the WAVL tree. */
 static void init_node(struct ccc_fromap_elem_ *e);
 static void insert_fixup(struct ccc_fromap_ *t, size_t z_p_of_xy, size_t x);
-static void rebalance_3_child(struct ccc_fromap_ *t, size_t p_of_xy, size_t x);
-static void rebalance_via_rotation(struct ccc_fromap_ *t, size_t z, size_t x,
-                                   size_t y);
+static void rebalance_3_child(struct ccc_fromap_ *t, size_t z_p_of_xy,
+                              size_t x);
 static void transplant(struct ccc_fromap_ *t, size_t remove,
                        size_t replacement);
 static void swap_and_pop(struct ccc_fromap_ *t, size_t vacant_i);
@@ -899,78 +898,73 @@ transplant(struct ccc_fromap_ *const t, size_t const remove,
 }
 
 static inline void
-rebalance_3_child(struct ccc_fromap_ *const t, size_t p_of_xy, size_t x)
+rebalance_3_child(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
 {
-    assert(p_of_xy);
+    assert(z_p_of_xy);
     bool made_3_child = false;
     do
     {
-        size_t const p_of_p_of_x = parent_i(t, p_of_xy);
-        size_t const y = branch_i(t, p_of_xy, branch_i(t, p_of_xy, L) == x);
-        made_3_child = is_2_child(t, p_of_p_of_x, p_of_xy);
-        if (is_2_child(t, p_of_xy, y))
+        size_t const p_of_p_of_x = parent_i(t, z_p_of_xy);
+        size_t const y = branch_i(t, z_p_of_xy, branch_i(t, z_p_of_xy, L) == x);
+        made_3_child = is_2_child(t, p_of_p_of_x, z_p_of_xy);
+        if (is_2_child(t, z_p_of_xy, y))
         {
-            demote(t, p_of_xy);
+            demote(t, z_p_of_xy);
         }
         else if (is_22_parent(t, branch_i(t, y, L), y, branch_i(t, y, R)))
         {
-            demote(t, p_of_xy);
+            demote(t, z_p_of_xy);
             demote(t, y);
         }
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
-            assert(is_3_child(t, p_of_xy, x));
-            rebalance_via_rotation(t, p_of_xy, x, y);
+            assert(is_3_child(t, z_p_of_xy, x));
+            enum frm_branch_ const z_to_x_dir = branch_i(t, z_p_of_xy, R) == x;
+            size_t const w = branch_i(t, y, !z_to_x_dir);
+            if (is_1_child(t, y, w))
+            {
+                rotate(t, z_p_of_xy, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
+                promote(t, y);
+                demote(t, z_p_of_xy);
+                if (is_leaf(t, z_p_of_xy))
+                {
+                    demote(t, z_p_of_xy);
+                }
+            }
+            else /* w is a 2-child and v will be a 1-child. */
+            {
+                size_t const v = branch_i(t, y, z_to_x_dir);
+                assert(is_2_child(t, y, w));
+                assert(is_1_child(t, y, v));
+                double_rotate(t, z_p_of_xy, y, v, !z_to_x_dir);
+                double_promote(t, v);
+                demote(t, y);
+                double_demote(t, z_p_of_xy);
+                /* Optional "Rebalancing with Promotion," defined as follows:
+                       if node z is a non-leaf 1,1 node, we promote it;
+                   otherwise, if y is a non-leaf 1,1 node, we promote it. (See
+                   Figure 4.) (Haeupler et. al. 2014, 17). This reduces
+                   constants in some of theorems mentioned in the paper but may
+                   not be worth doing. Rotations stay at 2 worst case. Should
+                   revisit after more performance testing. */
+                if (!is_leaf(t, z_p_of_xy)
+                    && is_11_parent(t, branch_i(t, z_p_of_xy, L), z_p_of_xy,
+                                    branch_i(t, z_p_of_xy, R)))
+                {
+                    promote(t, z_p_of_xy);
+                }
+                else if (!is_leaf(t, y)
+                         && is_11_parent(t, branch_i(t, y, L), y,
+                                         branch_i(t, y, R)))
+                {
+                    promote(t, y);
+                }
+            }
             return;
         }
-        x = p_of_xy;
-        p_of_xy = p_of_p_of_x;
-    } while (p_of_xy && made_3_child);
-}
-
-static inline void
-rebalance_via_rotation(struct ccc_fromap_ *const t, size_t const z,
-                       size_t const x, size_t const y)
-{
-    enum frm_branch_ const z_to_x_dir = branch_i(t, z, R) == x;
-    size_t const w = branch_i(t, y, !z_to_x_dir);
-    if (is_1_child(t, y, w))
-    {
-        rotate(t, z, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
-        promote(t, y);
-        demote(t, z);
-        if (is_leaf(t, z))
-        {
-            demote(t, z);
-        }
-    }
-    else /* w is a 2-child and v will be a 1-child. */
-    {
-        size_t const v = branch_i(t, y, z_to_x_dir);
-        assert(is_2_child(t, y, w));
-        assert(is_1_child(t, y, v));
-        double_rotate(t, z, y, v, !z_to_x_dir);
-        double_promote(t, v);
-        demote(t, y);
-        double_demote(t, z);
-        /* Optional "Rebalancing with Promotion," defined as follows:
-               if node z is a non-leaf 1,1 node, we promote it; otherwise, if y
-               is a non-leaf 1,1 node, we promote it. (See Figure 4.)
-               (Haeupler et. al. 2014, 17).
-           This reduces constants in some of theorems mentioned in the paper
-           but may not be worth doing. Rotations stay at 2 worst case. Should
-           revisit after more performance testing. */
-        if (!is_leaf(t, z)
-            && is_11_parent(t, branch_i(t, z, L), z, branch_i(t, z, R)))
-        {
-            promote(t, z);
-        }
-        else if (!is_leaf(t, y)
-                 && is_11_parent(t, branch_i(t, y, L), y, branch_i(t, y, R)))
-        {
-            promote(t, y);
-        }
-    }
+        x = z_p_of_xy;
+        z_p_of_xy = p_of_p_of_x;
+    } while (z_p_of_xy && made_3_child);
 }
 
 /** Swaps in the back buffer element into vacated slot*/

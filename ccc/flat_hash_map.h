@@ -74,9 +74,9 @@ initialization is successful or a failure. */
 /*========================    Entry API    ==================================*/
 
 /** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle_ptr provided by the user.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+in the struct containing out_handle provided by the user.
+@param [in] flat_hash_map the pointer to the flat hash map.
+@param [out] out_handle the handle to the user type wrapping fhash elem.
 @return the removed entry. If Occupied it may be unwrapped to obtain the old key
 value pair. If Vacant the key value pair was not stored in the map. If bad input
 is provided an input error is set.
@@ -102,12 +102,12 @@ and wraps it in an entry to provide information about the old value. */
         ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-/** @brief Invariantly inserts the key value wrapping out_handle_ptr.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+/** @brief Invariantly inserts the key value wrapping out_handle.
+@param [in] h the pointer to the flat hash map.
+@param [out] out_handle the handle to the user type wrapping fhash elem.
 @return an entry. If Vacant, no prior element with key existed and the type
-wrapping out_handle_ptr remains unchanged. If Occupied the old value is written
-to the type wrapping out_handle_ptr and may be unwrapped to view. If more space
+wrapping out_handle remains unchanged. If Occupied the old value is written
+to the type wrapping out_handle and may be unwrapped to view. If more space
 is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
@@ -132,9 +132,9 @@ and wraps it in an entry to provide information about the old value. */
         ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
-/** @brief Attempts to insert the key value wrapping out_handle_ptr.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+/** @brief Attempts to insert the key value wrapping key_val_handle
+@param [in] h the pointer to the flat hash map.
+@param [in] key_val_handle the handle to the user type wrapping fhash elem.
 @return an entry. If Occupied, the entry contains a reference to the key value
 user type in the table and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the table. If more space is needed but
@@ -221,7 +221,7 @@ compound literal matches the searched key. */
     }
 
 /** @brief Remove the entry from the table if Occupied.
-@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
+@param [in] e a pointer to the table entry.
 @return an entry containing NULL. If Occupied an entry in the table existed and
 was removed. If Vacant, no prior entry existed to be removed. */
 [[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
@@ -276,19 +276,19 @@ Entry API.*/
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
-@param [in] fn an update function in which the auxilliary argument is unused.
+@param [in] fn an update function in which the auxiliary argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function is intended to make the function chaining in the Entry API more
 succinct if the entry will be modified in place based on its own value without
-the need of the auxilliary argument a ccc_update_fn can provide. */
+the need of the auxiliary argument a ccc_update_fn can provide. */
 [[nodiscard]] ccc_fhmap_entry *ccc_fhm_and_modify(ccc_fhmap_entry *e,
                                                   ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
-@param [in] fn an update function that requires auxilliary data.
-@param [in] aux auxilliary data required for the update.
+@param [in] fn an update function that requires auxiliary data.
+@param [in] aux auxiliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
@@ -362,7 +362,7 @@ returned if resizing is required but fails or is not allowed. */
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
-@return an immutable view into the table entry if one is present, or NULL. */
+@return an view into the table entry if one is present, or NULL. */
 [[nodiscard]] void *ccc_fhm_unwrap(ccc_fhmap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.

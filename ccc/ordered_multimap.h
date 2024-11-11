@@ -466,37 +466,6 @@ or the map is empty. */
 
 /*===========================   Iterators   =================================*/
 
-/** @brief Returns a compound literal reference to the desired range. Amortized
-O(lg N).
-@param [in] ordered_multimap_ptr a pointer to the multimap.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-range.
-@param [in] end_key_ptr a pointer to the key that marks the end of the range.
-@return a compound literal reference to the produced range associated with the
-enclosing scope. This reference is always non-NULL. */
-#define ccc_omm_equal_range_r(ordered_multimap_ptr, begin_and_end_key_ptrs...) \
-    &(ccc_range)                                                               \
-    {                                                                          \
-        ccc_omm_equal_range(ordered_multimap_ptr, begin_and_end_key_ptrs)      \
-            .impl_                                                             \
-    }
-
-/** @brief Returns a compound literal reference to the desired rrange. Amortized
-O(lg N).
-@param [in] ordered_multimap_ptr a pointer to the multimap.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-rrange.
-@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
-@return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
-#define ccc_omm_equal_rrange_r(ordered_multimap_ptr,                           \
-                               rbegin_and_rend_key_ptrs...)                    \
-    &(ccc_rrange)                                                              \
-    {                                                                          \
-        ccc_omm_equal_rrange(ordered_multimap_ptr, rbegin_and_rend_key_ptrs)   \
-            .impl_                                                             \
-    }
-
 /** @brief Return an iterable range of values from [begin_key, end_key).
 Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
@@ -519,6 +488,21 @@ map versus the end map sentinel. */
                                             void const *begin_key,
                                             void const *end_key);
 
+/** @brief Returns a compound literal reference to the desired range. Amortized
+O(lg N).
+@param [in] ordered_multimap_ptr a pointer to the multimap.
+@param [in] begin_key_ptr a pointer to the key that marks the start of the
+range.
+@param [in] end_key_ptr a pointer to the key that marks the end of the range.
+@return a compound literal reference to the produced range associated with the
+enclosing scope. This reference is always non-NULL. */
+#define ccc_omm_equal_range_r(ordered_multimap_ptr, begin_and_end_key_ptrs...) \
+    &(ccc_range)                                                               \
+    {                                                                          \
+        ccc_omm_equal_range(ordered_multimap_ptr, begin_and_end_key_ptrs)      \
+            .impl_                                                             \
+    }
+
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
 Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
@@ -540,6 +524,22 @@ the map versus the end map sentinel. */
 [[nodiscard]] ccc_rrange ccc_omm_equal_rrange(ccc_ordered_multimap *mm,
                                               void const *rbegin_key,
                                               void const *rend_key);
+
+/** @brief Returns a compound literal reference to the desired rrange. Amortized
+O(lg N).
+@param [in] ordered_multimap_ptr a pointer to the multimap.
+@param [in] begin_key_ptr a pointer to the key that marks the start of the
+rrange.
+@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
+@return a compound literal reference to the produced rrange associated with the
+enclosing scope. This reference is always non-NULL. */
+#define ccc_omm_equal_rrange_r(ordered_multimap_ptr,                           \
+                               rbegin_and_rend_key_ptrs...)                    \
+    &(ccc_rrange)                                                              \
+    {                                                                          \
+        ccc_omm_equal_rrange(ordered_multimap_ptr, rbegin_and_rend_key_ptrs)   \
+            .impl_                                                             \
+    }
 
 /** @brief Return the start of an inorder traversal of the multimap. Amortized
 O(lg N).

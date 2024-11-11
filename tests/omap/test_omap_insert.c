@@ -21,7 +21,6 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_one)
     single.val = 0;
     CHECK(insert_entry(entry_r(&s, &single.val), &single.elem) != NULL, true);
     CHECK(is_empty(&s), false);
-    CHECK(((struct val *)ccc_om_root(&s))->val == single.val, true);
     CHECK_END_FN();
 }
 

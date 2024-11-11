@@ -76,13 +76,8 @@ static void insert_fixup(struct ccc_romap_ *, struct ccc_romap_elem_ *z_p_of_x,
                          struct ccc_romap_elem_ *x);
 static void transplant(struct ccc_romap_ *, struct ccc_romap_elem_ *remove,
                        struct ccc_romap_elem_ *replacement);
-static void rebalance_3_child(struct ccc_romap_ *rom,
-                              struct ccc_romap_elem_ *p_of_x,
+static void rebalance_3_child(struct ccc_romap_ *rom, struct ccc_romap_elem_ *z,
                               struct ccc_romap_elem_ *x);
-static void rebalance_via_rotation(struct ccc_romap_ *rom,
-                                   struct ccc_romap_elem_ *z_p_of_xy,
-                                   struct ccc_romap_elem_ *x,
-                                   struct ccc_romap_elem_ *y);
 static bool is_0_child(struct ccc_romap_ const *,
                        struct ccc_romap_elem_ const *p_of_x,
                        struct ccc_romap_elem_ const *x);
@@ -817,81 +812,74 @@ remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
 }
 
 static inline void
-rebalance_3_child(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *p_of_xy,
-                  struct ccc_romap_elem_ *x)
+rebalance_3_child(struct ccc_romap_ *const rom,
+                  struct ccc_romap_elem_ *z_p_of_xy, struct ccc_romap_elem_ *x)
 {
-    assert(p_of_xy != &rom->end_);
+    assert(z_p_of_xy != &rom->end_);
     bool made_3_child = false;
     do
     {
-        struct ccc_romap_elem_ *const p_of_p_of_x = p_of_xy->parent_;
-        struct ccc_romap_elem_ *y = p_of_xy->branch_[p_of_xy->branch_[L] == x];
-        made_3_child = is_2_child(rom, p_of_p_of_x, p_of_xy);
-        if (is_2_child(rom, p_of_xy, y))
+        struct ccc_romap_elem_ *const p_of_p_of_xy = z_p_of_xy->parent_;
+        struct ccc_romap_elem_ *y
+            = z_p_of_xy->branch_[z_p_of_xy->branch_[L] == x];
+        made_3_child = is_2_child(rom, p_of_p_of_xy, z_p_of_xy);
+        if (is_2_child(rom, z_p_of_xy, y))
         {
-            demote(rom, p_of_xy);
+            demote(rom, z_p_of_xy);
         }
         else if (is_22_parent(rom, y->branch_[L], y, y->branch_[R]))
         {
-            demote(rom, p_of_xy);
+            demote(rom, z_p_of_xy);
             demote(rom, y);
         }
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
-            assert(is_3_child(rom, p_of_xy, x));
-            rebalance_via_rotation(rom, p_of_xy, x, y);
+            assert(is_3_child(rom, z_p_of_xy, x));
+            enum romap_link_ const z_to_x_dir = z_p_of_xy->branch_[R] == x;
+            struct ccc_romap_elem_ *const w = y->branch_[!z_to_x_dir];
+            if (is_1_child(rom, y, w))
+            {
+                rotate(rom, z_p_of_xy, y, y->branch_[z_to_x_dir], z_to_x_dir);
+                promote(rom, y);
+                demote(rom, z_p_of_xy);
+                if (is_leaf(rom, z_p_of_xy))
+                {
+                    demote(rom, z_p_of_xy);
+                }
+            }
+            else /* w is a 2-child and v will be a 1-child. */
+            {
+                struct ccc_romap_elem_ *const v = y->branch_[z_to_x_dir];
+                assert(is_2_child(rom, y, w));
+                assert(is_1_child(rom, y, v));
+                double_rotate(rom, z_p_of_xy, y, v, !z_to_x_dir);
+                double_promote(rom, v);
+                demote(rom, y);
+                double_demote(rom, z_p_of_xy);
+                /* Optional "Rebalancing with Promotion," defined as follows:
+                       if node z is a non-leaf 1,1 node, we promote it;
+                   otherwise, if y is a non-leaf 1,1 node, we promote it. (See
+                   Figure 4.) (Haeupler et. al. 2014, 17). This reduces
+                   constants in some of theorems mentioned in the paper but may
+                   not be worth doing. Rotations stay at 2 worst case. Should
+                   revisit after more performance testing. */
+                if (!is_leaf(rom, z_p_of_xy)
+                    && is_11_parent(rom, z_p_of_xy->branch_[L], z_p_of_xy,
+                                    z_p_of_xy->branch_[R]))
+                {
+                    promote(rom, z_p_of_xy);
+                }
+                else if (!is_leaf(rom, y)
+                         && is_11_parent(rom, y->branch_[L], y, y->branch_[R]))
+                {
+                    promote(rom, y);
+                }
+            }
             return;
         }
-        x = p_of_xy;
-        p_of_xy = p_of_p_of_x;
-    } while (p_of_xy != &rom->end_ && made_3_child);
-}
-
-static inline void
-rebalance_via_rotation(struct ccc_romap_ *const rom,
-                       struct ccc_romap_elem_ *const z,
-                       struct ccc_romap_elem_ *const x,
-                       struct ccc_romap_elem_ *const y)
-{
-    enum romap_link_ const z_to_x_dir = z->branch_[R] == x;
-    struct ccc_romap_elem_ *const w = y->branch_[!z_to_x_dir];
-    if (is_1_child(rom, y, w))
-    {
-        rotate(rom, z, y, y->branch_[z_to_x_dir], z_to_x_dir);
-        promote(rom, y);
-        demote(rom, z);
-        if (is_leaf(rom, z))
-        {
-            demote(rom, z);
-        }
-    }
-    else /* w is a 2-child and v will be a 1-child. */
-    {
-        struct ccc_romap_elem_ *const v = y->branch_[z_to_x_dir];
-        assert(is_2_child(rom, y, w));
-        assert(is_1_child(rom, y, v));
-        double_rotate(rom, z, y, v, !z_to_x_dir);
-        double_promote(rom, v);
-        demote(rom, y);
-        double_demote(rom, z);
-        /* Optional "Rebalancing with Promotion," defined as follows:
-               if node z is a non-leaf 1,1 node, we promote it; otherwise, if y
-               is a non-leaf 1,1 node, we promote it. (See Figure 4.)
-               (Haeupler et. al. 2014, 17).
-           This reduces constants in some of theorems mentioned in the paper
-           but may not be worth doing. Rotations stay at 2 worst case. Should
-           revisit after more performance testing. */
-        if (!is_leaf(rom, z)
-            && is_11_parent(rom, z->branch_[L], z, z->branch_[R]))
-        {
-            promote(rom, z);
-        }
-        else if (!is_leaf(rom, y)
-                 && is_11_parent(rom, y->branch_[L], y, y->branch_[R]))
-        {
-            promote(rom, y);
-        }
-    }
+        x = z_p_of_xy;
+        z_p_of_xy = p_of_p_of_xy;
+    } while (z_p_of_xy != &rom->end_ && made_3_child);
 }
 
 static inline void
