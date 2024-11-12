@@ -397,10 +397,12 @@ the first element GREATER than end_key.
 Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
+```c
 for (struct val *i = range_begin(&range);
      i != end_range(&range);
      i = next(&fom, &i->elem))
 {}
+```
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
@@ -433,10 +435,12 @@ the first element LESS than rend_key.
 Note that due to the variety of values that can be returned in the rrange, using
 the provided rrange iteration functions from types.h is recommended for example:
 
+```c
 for (struct val *i = rrange_begin(&rrange);
      i != rend_rrange(&rrange);
      i = rnext(&fom, &i->elem))
 {}
+```
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
