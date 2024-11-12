@@ -26,7 +26,11 @@ typedef union
 
 /** The intrusive element that must occupy a field in the struct the user
 intends to track in the set. The ordered multimap element can occupy a single
-field anywhere in the user struct. */
+field anywhere in the user struct. Note that if allocation is not
+permitted, insertions functions accepting this type as an argument assume it
+to exist in pre-allocated memory that will exist with the appropriate lifetime
+and scope for the user's needs; the container does not allocate or free in this
+case. */
 typedef union
 {
     struct ccc_node_ impl_;

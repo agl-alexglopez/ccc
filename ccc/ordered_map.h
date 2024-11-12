@@ -24,7 +24,11 @@ typedef union
 } ccc_ordered_map;
 
 /** A map element is the intrusive element of the user defined struct being
-stored in the map for key value access. */
+stored in the map for key value access. Note that if allocation is not
+permitted, insertions functions accepting this type as an argument assume it
+to exist in pre-allocated memory that will exist with the appropriate lifetime
+and scope for the user's needs; the container does not allocate or free in this
+case. */
 typedef union
 {
     ccc_node_ impl_;

@@ -28,7 +28,11 @@ sentinel node in the buffer. */
 typedef struct ccc_fomap_ ccc_flat_ordered_map;
 
 /** A map element is the intrusive element of the user defined struct being
-stored in the map for key value access. */
+stored in the map for key value access. Note that if allocation is not
+permitted, insertions functions accepting this type as an argument assume it
+to exist in pre-allocated memory that will exist with the appropriate lifetime
+and scope for the user's needs; the container does not allocate or free in this
+case. */
 typedef struct ccc_fomap_elem_ ccc_fomap_elem;
 
 /** A container specific entry used to implement the Entry API. The Entry API
@@ -393,7 +397,7 @@ the provided range iteration functions from types.h is recommended for example:
 
 for (struct val *i = range_begin(&range);
      i != end_range(&range);
-     i = next(&omm, &i->elem))
+     i = next(&fom, &i->elem))
 {}
 
 This avoids any possible errors in handling an end range element that is in the
@@ -429,7 +433,7 @@ the provided rrange iteration functions from types.h is recommended for example:
 
 for (struct val *i = rrange_begin(&rrange);
      i != rend_rrange(&rrange);
-     i = rnext(&omm, &i->elem))
+     i = rnext(&fom, &i->elem))
 {}
 
 This avoids any possible errors in handling an rend rrange element that is in
