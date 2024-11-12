@@ -60,8 +60,10 @@ occurred with the provided allocation function. */
 #define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
     ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
 
-/*=====================   Allocation Management  ============================*/
-
+/** @name Allocation Management Functions
+These functions assume contiguity of elements in the buffer and increase or
+decrease size accordingly. */
+/**@{*/
 /** @brief allocates the buffer to the specified size according to the user
 defined allocation function.
 @param [in] buf a pointer to the buffer.
@@ -149,9 +151,13 @@ Note that this function assumes elements must be maintained contiguously
 according to size meaning a bulk copy of elements sliding down to fill the
 space left by i will occur. */
 ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
+/**@}*/
 
-/*=====================   Slot Management    ================================*/
-
+/** @name Slot Management Functions
+These functions interact with slots in the buffer directly and do not modify
+the size of the buffer. These are best used for custom container
+implementations operating at a higher level of abstraction. */
+/**@{*/
 /** @brief return the element at slot i in buf.
 @param [in] buf the pointer to the buffer.
 @param [in] i the index within capacity range of the buffer.
@@ -225,9 +231,11 @@ Note that i and j are only checked to be within capacity range of the buffer.
 It is the user's responsibility to check for i and j within bounds of size
 if such behavior is needed. */
 ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t i, size_t j);
+/**@}*/
 
-/*=====================       Iteration       ===============================*/
-
+/** @name Iteration Functions
+The following functions implement iterators over the buffer. */
+/**@{*/
 /** @brief obtain the base address of the buffer in preparation for iteration.
 @param [in] buf the pointer to the buffer.
 @return the base address of the buffer. This will be equivalent to the buffer
@@ -282,9 +290,11 @@ is returned if bad input is provided or the buffer has not been allocated. */
 position for any reason. NULL is returned if NULL is provided or buffer has
 not yet been allocated. */
 [[nodiscard]] void *ccc_buf_rend(ccc_buffer const *buf);
+/**@}*/
 
-/*=====================   State Management    ===============================*/
-
+/** @name State Management Functions
+These functions help manage or obtain state of the buffer. */
+/**@{*/
 /** @brief add n to the size of the buffer.
 @param [in] buf the pointer to the buffer.
 @param [in] n the quantity to add to the current buffer size.
@@ -342,6 +352,7 @@ Note that size must be less than or equal to capacity. */
 @param [in] buf the pointer to the buffer.
 @return true if the size equals the capacity. */
 [[nodiscard]] bool ccc_buf_is_full(ccc_buffer const *buf);
+/**@}*/
 
 /** Define this preprocessor directive to drop the ccc prefix from all buffer
 related types and methods. By default the prefix is required but may be
