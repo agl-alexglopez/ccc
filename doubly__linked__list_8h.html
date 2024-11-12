@@ -235,6 +235,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Doubly Linked List Interface. </p>
+<p>A doubly linked list offers efficient push, pop, extract, and erase operations for elements stored in the list. Notably, for single elements the list can offer O(1) push front/back, pop front/back, and removal of elements in arbitrary positions in the list. The cost of this efficiency is higher memory footprint. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a67936dadaece25c50d68e3dae247f686" name="a67936dadaece25c50d68e3dae247f686"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a67936dadaece25c50d68e3dae247f686">&#9670;&#160;</a></span>ccc_dll_emplace_back</h2>
@@ -413,7 +414,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A container offering bidirectional, insert, removal, and iteration. </p>
-<p>Pushing to the front, at the back, or between elements of the list is O(1). </p>
+<dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to use an uninitialized doubly linked list.</dd></dl>
+<p>A doubly linked list may be stored in the stack, heap, or data segment. Once Initialized it is passed by reference to all functions. A doubly linked list can be initialized at compile time or runtime. </p>
 
 </div>
 </div>
