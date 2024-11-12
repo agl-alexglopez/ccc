@@ -25,6 +25,16 @@
 var NAVTREE =
 [
   [ "C Container Collection (CCC)", "index.html", [
+    [ "Installation", "index.html#autotoc_md1", null ],
+    [ "Quick Start", "index.html#autotoc_md2", null ],
+    [ "Design", "index.html#autotoc_md3", null ],
+    [ "Building and Installation", "md_INSTALL.html", [
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md5", null ],
+      [ "Include the Library", "md_INSTALL.html#autotoc_md6", null ],
+      [ "Alternative Builds", "md_INSTALL.html#autotoc_md7", null ],
+      [ "Without Make", "md_INSTALL.html#autotoc_md8", null ],
+      [ "User Presets", "md_INSTALL.html#autotoc_md9", null ]
+    ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
       [ "Data Structure Index", "classes.html", null ],
@@ -51,7 +61,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "flat__realtime__ordered__map_8h.html#aee6facea4fd2cead46927b5391d0a156",
-"traits_8h.html#a7e4421e251272e1eb19a8b0c8e40d7c2"
+"traits_8h.html#a4fa9dedbf797c4b5017903e0703dda5c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
