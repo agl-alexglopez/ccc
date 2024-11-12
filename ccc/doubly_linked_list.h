@@ -1,5 +1,11 @@
 /** @file
-@brief The Doubly Linked List Interface */
+@brief The Doubly Linked List Interface
+
+A doubly linked list offers efficient push, pop, extract, and erase operations
+for elements stored in the list. Notably, for single elements the list can
+offer O(1) push front/back, pop front/back, and removal of elements in
+arbitrary positions in the list. The cost of this efficiency is higher memory
+footprint. */
 #ifndef CCC_DOUBLY_LINKED_LIST_H
 #define CCC_DOUBLY_LINKED_LIST_H
 
@@ -9,8 +15,11 @@
 #include "types.h"
 
 /** @brief A container offering bidirectional, insert, removal, and iteration.
+@warning it is undefined behavior to use an uninitialized doubly linked list.
 
-Pushing to the front, at the back, or between elements of the list is O(1). */
+A doubly linked list may be stored in the stack, heap, or data segment. Once
+Initialized it is passed by reference to all functions. A doubly linked list
+can be initialized at compile time or runtime. */
 typedef struct ccc_dll_ ccc_doubly_linked_list;
 
 /** @brief A doubly linked list intrusive element to embedded in a user type.

@@ -1,5 +1,25 @@
 /** @file
-@brief The Buffer Interface */
+@brief The Buffer Interface
+
+Buffer usage is similar to a C++ vector, with more flexible functions
+provided to support higher level containers and abstractions. While useful
+on its own--a stack could be implemented with the provided functions--a buffer
+is often used as the lower level abstraction for the flat data structures
+in this library that provide more specialized operations. A buffer does not
+require the user accommodate any intrusive elements.
+
+A buffer with allocation permission will resize when a new element is inserted
+in a contiguous fashion. Functions in the allocation management section assume
+elements are stored contiguously and adjust size accordingly.
+
+Functions in the slot management section offer data movement and writing
+operations that do not affect the size of the container. If writing a more
+complex higher level container that does not need size management these
+functions offer more custom control over the buffer.
+
+If allocation is not permitted, resizing will not occur and the insertion
+function will fail when capacity is reached, returning some value to indicate
+the failure. */
 #ifndef CCC_BUFFER_H
 #define CCC_BUFFER_H
 
@@ -10,12 +30,10 @@
 #include <stddef.h>
 
 /** @brief A contiguous block of storage for elements of the same type.
+@warning it is undefined behavior to use an uninitialized buffer.
 
-The usage is similar to a C++ vector, with more flexible functions
-provided to support higher level containers and abstractions. While useful
-on its own--a stack could be implemented with the provided functions--a buffer
-is often used as the lower level abstraction for the flat data structures
-in this library that provide more specialized operations. */
+A buffer may be initialized on the stack, heap, or data segment at compile time
+or runtime. */
 typedef struct ccc_buf_ ccc_buffer;
 
 /** @brief Initialize a contiguous buffer of user a specified type, allocation
@@ -42,7 +60,7 @@ occurred with the provided allocation function. */
 #define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
     ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
 
-/*=====================   Allocation Managment   ============================*/
+/*=====================   Allocation Management  ============================*/
 
 /** @brief allocates the buffer to the specified size according to the user
 defined allocation function.
@@ -65,6 +83,7 @@ buffer is initialized.
 @param [in] buf a pointer to the buffer.
 @return a pointer to the newly allocated memory or NULL if no buffer is
 provided or the buffer is unable to allocate more memory.
+@note this function modifies the size of the container.
 
 A buffer can be used as the backing for more complex data structures.
 Requesting new space from a buffer as an allocator can be helpful for these
@@ -77,6 +96,7 @@ according to size.
 @param [in] data the pointer to the data of element size.
 @return the pointer to the newly pushed element or NULL if no buffer exists or
 resizing has failed due to memory exhuastion or no allocation allowed.
+@note this function modifies the size of the container.
 
 The data is copied into the buffer at the final slot if there is remaining
 capacity. If size is equal to capacity resizing will be attempted but may
@@ -93,11 +113,42 @@ as elements stored in the buffer.
 @return the pointer to the inserted element or NULL if bad input is provided,
 the buffer is full and no resizing is allowed, or resizing fails when resizing
 is allowed.
+@note this function modifies the size of the container.
 
 Note that this function assumes elements must be maintained contiguously
 according to size of the buffer meaning a bulk move of elements sliding down
-to accomodate i will occur. */
+to accommodate i will occur. */
 [[nodiscard]] void *ccc_buf_insert(ccc_buffer *buf, size_t i, void const *data);
+
+/** @brief pop the back element from the buffer according to size.
+@param [in] buf the pointer to the buffer.
+@return the result of the attempted pop. CCC_OK upon success or an input error
+if bad input is provided.
+@note this function modifies the size of the container. */
+ccc_result ccc_buf_pop_back(ccc_buffer *buf);
+
+/** @brief pop n elements from the back of the buffer according to size.
+@param [in] buf the pointer to the buffer.
+@param [in] n the number of elements to pop.
+@return the result of the attempted pop. CCC_OK if the buffer exists and n
+is within the bounds of size. If the buffer does not exist an input error is
+returned. If n is greater than the size of the buffer size is set to zero
+and input error is returned.
+@note this function modifies the size of the container. */
+ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, size_t n);
+
+/** @brief erase element at slot i according to size of the buffer maintaining
+contiguous storage of elements between 0 and size.
+@param [in] buf the pointer to the buffer.
+@param [in] i the index of the element to be erased.
+@return the result, CCC_OK if the input is valid. If no buffer exists or i is
+out of range of size then an input error is returned.
+@note this function modifies the size of the container.
+
+Note that this function assumes elements must be maintained contiguously
+according to size meaning a bulk copy of elements sliding down to fill the
+space left by i will occur. */
+ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
 
 /*=====================   Slot Management    ================================*/
 
@@ -137,26 +188,12 @@ or is empty. */
 @param [in] dst the index of destination within bounds of capacity.
 @param [in] src the index of source within bounds of capacity.
 @return a pointer to the slot at dst or NULL if bad input is provided.
+@note this function does NOT modify the size of the container.
 
 Note that destination and source are only required to be valid within bounds
 of capacity of the buffer. It is up to the user to ensure destination and
 source are within the size bounds of the buffer. */
 void *ccc_buf_copy(ccc_buffer *buf, size_t dst, size_t src);
-
-/** @brief pop the back element from the buffer according to size.
-@param [in] buf the pointer to the buffer.
-@return the result of the attempted pop. CCC_OK upon success or an input error
-if bad input is provided. */
-ccc_result ccc_buf_pop_back(ccc_buffer *buf);
-
-/** @brief pop n elements from the back of the buffer according to size.
-@param [in] buf the pointer to the buffer.
-@param [in] n the number of elements to pop.
-@return the result of the attempted pop. CCC_OK if the buffer exists and n
-is within the bounds of size. If the buffer does not exist an input error is
-returned. If n is greater than the size of the buffer size is set to zero
-and input error is returned. */
-ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, size_t n);
 
 /** @brief write data to buffer at slot at index i according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -165,6 +202,7 @@ ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, size_t n);
 @return the result of the write, CCC_OK if success. If no buffer or data
 exists input error is returned. If i is outside of the range of capacity
 input error is returned.
+@note this function does NOT modify the size of the container.
 
 Note that data will be written to the slot at index i, according to the
 capacity of the buffer. It is up to the user to ensure i is within size
@@ -181,23 +219,12 @@ element stored in the buffer.
 @return the result of the swap, CCC_OK if no error occurs. If no buffer exists,
 no tmp exists, i is out of capacity range, or j is out of capacity range, an
 input error is returned.
+@note this function does NOT modify the size of the container.
 
 Note that i and j are only checked to be within capacity range of the buffer.
 It is the user's responsibility to check for i and j within bounds of size
 if such behavior is needed. */
 ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t i, size_t j);
-
-/** @brief erase element at slot i according to size of the buffer maintaining
-contiguous storage of elements between 0 and size.
-@param [in] buf the pointer to the buffer.
-@param [in] i the index of the element to be erased.
-@return the result, CCC_OK if the input is valid. If no buffer exists or i is
-out of range of size then an input error is returned.
-
-Note that this function assumes elements must be maintained contiguously
-according to size meaning a bulk copy of elements sliding down to fill the
-space left by i will occur. */
-ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
 
 /*=====================       Iteration       ===============================*/
 
