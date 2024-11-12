@@ -1,5 +1,6 @@
 /** @file
-@brief The Ordered Map Interface */
+@brief The Ordered Map Interface
+@nosubgrouping */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 
