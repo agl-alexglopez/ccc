@@ -8,7 +8,7 @@
 #include "impl_realtime_ordered_map.h"
 #include "types.h"
 
-/** @brief A container for amortized O(lg N) search, insert, and erase and
+/** @brief A container for amortized O(lg N) search, insert, erase, ranges and
 pointer stability.
 
 This map offers a strict runtime bound of O(lg N) which is helpful in realtime
