@@ -52,7 +52,9 @@ typedef union ccc_omap_entry_ ccc_omap_entry;
     ccc_impl_om_init(om_name, struct_name, om_elem_field, key_elem_field,      \
                      alloc_fn, key_cmp, aux)
 
-/*=========================   Membership    =================================*/
+/**@name Membership Functions
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Searches the map for the presence of key.
 @param [in] om the map to be searched.
@@ -66,7 +68,12 @@ typedef union ccc_omap_entry_ ccc_omap_entry;
 @return a view of the map entry if it is present, else NULL. */
 [[nodiscard]] void *ccc_om_get_key_val(ccc_ordered_map *om, void const *key);
 
-/*===========================   Entry API   =================================*/
+/**@}*/
+
+/** @name Entry API Functions
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] om the pointer to the ordered map.
@@ -379,7 +386,11 @@ free or use as needed. */
 due to an allocation failure when allocation success was expected. */
 [[nodiscard]] bool ccc_om_insert_error(ccc_omap_entry const *e);
 
-/*===========================   Iterators   =================================*/
+/**@}*/
+
+/** @name Iterator Functions
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
 Amortized O(lg N).
@@ -510,7 +521,11 @@ may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
 ccc_result ccc_om_clear(ccc_ordered_map *om, ccc_destructor_fn *destructor);
 
-/*===========================     Getters   =================================*/
+/**@}*/
+
+/** @name Getters
+Obtain the container state. */
+/**@{*/
 
 /** @brief Returns the size status of the map.
 @param [in] om the map.
@@ -526,6 +541,8 @@ ccc_result ccc_om_clear(ccc_ordered_map *om, ccc_destructor_fn *destructor);
 @param [in] om the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
 [[nodiscard]] bool ccc_om_validate(ccc_ordered_map const *om);
+
+/**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
