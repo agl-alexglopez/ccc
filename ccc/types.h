@@ -143,7 +143,7 @@ is not sure that realloc implements all such behaviors, especially the final
 requirement for freeing memory, wrap it in a helper function. For example, one
 solution using the standard library allocator might be implemented as follows:
 
-```c
+```
 void *
 std_alloc(void *const ptr, size_t const size)
 {
@@ -170,7 +170,7 @@ typedef void *ccc_alloc_fn(void *ptr, size_t size);
 
 /** @brief A callback function for comparing two elements in a container.
 A three-way comparison return value is expected and the two containers being
-compared are guaranteed to be non-null and pointing to the base of the user type
+compared are guaranteed to be non-NULL and pointing to the base of the user type
 stored in the container. Aux may be NULL if no aux is provided on
 initialization. */
 typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
@@ -293,7 +293,7 @@ void *ccc_rend_rrange(ccc_rrange const *r);
 from a container operation, possible causes, and possible fixes to such error.
 @param [in] res the result obtained from a container operation.
 @return a string message of the result. A CCC_OK result is an empty string,
-the falsey null terminator. All other results have a string message.
+the falsey NULL terminator. All other results have a string message.
 
 These messages can be used for logging or to help with debugging by providing
 more information for why such a result might be obtained from a container. */

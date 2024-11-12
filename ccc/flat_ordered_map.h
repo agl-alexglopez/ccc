@@ -397,7 +397,7 @@ the first element GREATER than end_key.
 Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
-```c
+```
 for (struct val *i = range_begin(&range);
      i != end_range(&range);
      i = next(&fom, &i->elem))
@@ -412,11 +412,9 @@ ccc_range ccc_fom_equal_range(ccc_flat_ordered_map *fom, void const *begin_key,
 /** @brief Returns a compound literal reference to the desired range. Amortized
 O(lg N).
 @param [in] flat_ordered_map_ptr a pointer to the map.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-range.
-@param [in] end_key_ptr a pointer to the key that marks the end of the range.
+@param [in] begin_and_key_ptrs pointers to the begin and end of the range.
 @return a compound literal reference to the produced range associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always be valid. */
 #define ccc_fom_equal_range_r(flat_ordered_map_ptr, begin_and_end_key_ptrs...) \
     &(ccc_range)                                                               \
     {                                                                          \
@@ -424,10 +422,10 @@ enclosing scope. This reference is always non-NULL. */
             .impl_                                                             \
     }
 
-/** @brief Return an iterable rrange of values from [begin_key, end_key).
+/** @brief Return an iterable rrange of values from [rbegin_key, end_key).
 Amortized O(lg N).
 @param [in] mm a pointer to the map.
-@param [in] begin_key a pointer to the key intended as the start of the rrange.
+@param [in] rbegin_key a pointer to the key intended as the start of the rrange.
 @param [in] end_key a pointer to the key intended as the end of the rrange.
 @return a rrange containing the first element NOT GREATER than the begin_key and
 the first element LESS than rend_key.
@@ -435,7 +433,7 @@ the first element LESS than rend_key.
 Note that due to the variety of values that can be returned in the rrange, using
 the provided rrange iteration functions from types.h is recommended for example:
 
-```c
+```
 for (struct val *i = rrange_begin(&rrange);
      i != rend_rrange(&rrange);
      i = rnext(&fom, &i->elem))
@@ -450,11 +448,9 @@ ccc_rrange ccc_fom_equal_rrange(ccc_flat_ordered_map *fom,
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
 O(lg N).
 @param [in] flat_ordered_map_ptr a pointer to the map.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-rrange.
-@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
+@param [in] rbegin_and_rkey_ptrs pointers to the rbegin and rend of the range.
 @return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always valid. */
 #define ccc_fom_equal_rrange_r(flat_ordered_map_ptr,                           \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
