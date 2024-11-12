@@ -1,3 +1,5 @@
+/** @file
+@brief The Buffer Interface */
 #ifndef CCC_BUFFER_H
 #define CCC_BUFFER_H
 

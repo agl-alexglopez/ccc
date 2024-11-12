@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/** \internal */
 struct ccc_fromap_elem_
 {
     size_t branch_[2];
@@ -14,6 +15,7 @@ struct ccc_fromap_elem_
     uint8_t parity_;
 };
 
+/** \internal */
 struct ccc_fromap_
 {
     ccc_buffer buf_;
@@ -24,6 +26,7 @@ struct ccc_fromap_
     void *aux_;
 };
 
+/** \internal */
 struct ccc_fromap_entry_
 {
     struct ccc_fromap_ *frm_;

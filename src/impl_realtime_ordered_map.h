@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/** \internal */
 typedef struct ccc_romap_elem_
 {
     struct ccc_romap_elem_ *branch_[2];
@@ -14,6 +15,7 @@ typedef struct ccc_romap_elem_
     uint8_t parity_;
 } ccc_romap_elem_;
 
+/** \internal */
 struct ccc_romap_
 {
     struct ccc_romap_elem_ *root_;
@@ -27,6 +29,7 @@ struct ccc_romap_
     void *aux_;
 };
 
+/** \internal */
 struct ccc_romap_entry_
 {
     struct ccc_romap_ *rom_;

@@ -6,12 +6,14 @@
 
 #include <stddef.h>
 
+/** \internal */
 struct ccc_fomap_elem_
 {
     size_t branch_[2];
     size_t parent_;
 };
 
+/** \internal */
 struct ccc_fomap_
 {
     ccc_buffer buf_;
@@ -22,6 +24,7 @@ struct ccc_fomap_
     void *aux_;
 };
 
+/** \internal */
 struct ccc_fomap_entry_
 {
     struct ccc_fomap_ *fom_;

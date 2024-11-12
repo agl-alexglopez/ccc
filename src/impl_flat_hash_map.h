@@ -14,11 +14,13 @@ enum : uint64_t
     CCC_FHM_EMPTY = 0,
 };
 
+/** \internal */
 struct ccc_fhmap_elem_
 {
     uint64_t hash_;
 };
 
+/** \internal */
 struct ccc_fhmap_
 {
     ccc_buffer buf_;
@@ -29,6 +31,7 @@ struct ccc_fhmap_
     size_t hash_elem_offset_;
 };
 
+/** \internal */
 struct ccc_fhmap_entry_
 {
     struct ccc_fhmap_ *h_;

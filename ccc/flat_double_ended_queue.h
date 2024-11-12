@@ -1,3 +1,5 @@
+/** @file
+@brief The Flat Double Ended Queue Interface */
 #ifndef CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 #define CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 

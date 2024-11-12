@@ -16,12 +16,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/* This node type will support more expressive implementations of a standard
-   map and double ended priority queue. The array of pointers is to support
-   unifying left and right symmetric cases. The union is only relevant to
-   the double ended priority queue code. Duplicate values are placed in
-   a circular doubly linked list. The head of this doubly linked list is
-   the oldest duplicate (aka round robin). The node still in the tree then
+/** \internal This node type will support more expressive implementations of a
+   standard map and double ended priority queue. The array of pointers is to
+   support unifying left and right symmetric cases. The union is only relevant
+   to the double ended priority queue code. Duplicate values are placed in a
+   circular doubly linked list. The head of this doubly linked list is the
+   oldest duplicate (aka round robin). The node still in the tree then
    sacrifices its parent field to track this head of all duplicates. The
    duplicate then uses its parent field to track the parent of the node
    in the tree. Duplicates can be detected by detecting a cycle in the tree
@@ -46,6 +46,7 @@ typedef struct ccc_node_
     };
 } ccc_node_;
 
+/** \internal */
 struct ccc_tree_
 {
     struct ccc_node_ *root_;
@@ -59,6 +60,7 @@ struct ccc_tree_
     size_t key_offset_;
 };
 
+/** \internal */
 struct ccc_tree_entry_
 {
     struct ccc_tree_ *t_;

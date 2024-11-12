@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stddef.h>
 
+/** \internal */
 struct ccc_fpq_
 {
     ccc_buffer buf_;

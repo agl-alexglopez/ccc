@@ -1,3 +1,5 @@
+/** @file
+@brief The Realtime Ordered Map Interface */
 #ifndef CCC_REALTIME_ORDERED_MAP_H
 #define CCC_REALTIME_ORDERED_MAP_H
 

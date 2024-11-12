@@ -1,5 +1,5 @@
-/** This file contains definitions and functions for types used across all
-containers in the C Container Collection Library. */
+/** @file
+@brief The C Container Collection Fundamental Types */
 #ifndef CCC_TYPES_H
 #define CCC_TYPES_H
 
@@ -9,7 +9,8 @@ containers in the C Container Collection Library. */
 #include <stddef.h>
 #include <stdint.h>
 
-/** A range provides a view all elements that fit the equals range criteria
+/** @brief The result of a range query on iterable containers.
+A range provides a view all elements that fit the equals range criteria
 of search-by-key containers. Use the provided range iteration functions in
 this header to iterate from beginning to end in forward order relative to
 the containers default ordering. */
@@ -18,7 +19,8 @@ typedef union
     struct ccc_range_ impl_;
 } ccc_range;
 
-/** A rrange provides a view all elements that fit the equals rrange criteria
+/** @brief The result of a rrange query on iterable containers.
+A rrange provides a view all elements that fit the equals rrange criteria
 of search-by-key containers. Use the provided range iteration functions in
 this header to iterate from beginning to end in reverse order relative to
 the containers default ordering. */
@@ -27,7 +29,8 @@ typedef union
     struct ccc_range_ impl_;
 } ccc_rrange;
 
-/** A entry is the basis for more complex container specific Entry API for
+/** @brief An Occupied or Vacant position in a searchable container.
+A entry is the basis for more complex container specific Entry API for
 all search-by-key containers. An entry is returned from various operations
 to provide both a reference to data and any auxiliary status that is
 important for the user. An entry can be Occupied or Vacant. See individual
@@ -37,7 +40,8 @@ typedef union
     struct ccc_entry_ impl_;
 } ccc_entry;
 
-/** A result indicates the status of the requested operation. Each container
+/** @brief A result of actions on containers.
+A result indicates the status of the requested operation. Each container
 provides status messages according to the result type returned from a operation
 that uses this type. */
 typedef enum
@@ -54,7 +58,8 @@ typedef enum
     CCC_RESULTS_SIZE,
 } ccc_result;
 
-/** A C style three way comparison value (e.g. ((a > b) - (a < b))). CCC_LES if
+/** @brief A three-way comparison for comparison functions.
+A C style three way comparison value (e.g. ((a > b) - (a < b))). CCC_LES if
 left hand side is less than right hand side, CCC_EQL if they are equal, and
 CCC_GRT if left hand side is greater than right hand side. */
 typedef enum
@@ -69,12 +74,13 @@ typedef enum
     CCC_CMP_ERR,
 } ccc_threeway_cmp;
 
-/** An element comparison helper. This type helps the user define the
-comparison callback function, if the container takes a standard element
-comparison function, and helps avoid swappable argument errors. User type
-LHS is considered the left hand side and user type RHS is the right hand side
-when considering three-way comparison return values. Aux data is a reference
-to any auxiliary data provided upon container initialization. */
+/** @brief An element comparison helper.
+This type helps the user define the comparison callback function, if the
+container takes a standard element comparison function, and helps avoid
+swappable argument errors. User type LHS is considered the left hand side and
+user type RHS is the right hand side when considering three-way comparison
+return values. Aux data is a reference to any auxiliary data provided upon
+container initialization. */
 typedef struct
 {
     /** The left hand side for a three-way comparison operation. */
@@ -85,9 +91,10 @@ typedef struct
     void *aux;
 } ccc_cmp;
 
-/** A key comparison helper to avoid argument swapping. The key is considered
-the left hand side of the operation if three-way comparison is needed. Left
-and right do not matter if simply equality is needed. */
+/** @brief A key comparison helper to avoid argument swapping.
+The key is considered the left hand side of the operation if three-way
+comparison is needed. Left and right do not matter if simply equality is needed.
+*/
 typedef struct
 {
     /** Key matching the key field of the provided type to the container. */
@@ -98,9 +105,9 @@ typedef struct
     void *aux;
 } ccc_key_cmp;
 
-/** A reference to a user type within the container. This is to help users
-define callback functions that act on each node in a container. For example, a
-destruct function will use this type. */
+/** @brief A reference to a user type within the container.
+This is to help users define callback functions that act on each node in a
+container. For example, a destruct function will use this type. */
 typedef struct
 {
     /** The user type being stored in the container. */
@@ -109,9 +116,10 @@ typedef struct
     void *aux;
 } ccc_user_type_mut;
 
-/** A read only reference to a key type matching the key field type used
-for hash containers. A reference to any auxiliary data is also provided.
-This the struct one can use to hash their values with their hash function. */
+/** @brief A read only reference to a key type matching the key field type used
+for hash containers.
+A reference to any auxiliary data is also provided. This the struct one can use
+to hash their values with their hash function. */
 typedef struct
 {
     /** A reference to the same type used for keys in the container. */
@@ -120,7 +128,7 @@ typedef struct
     void *aux;
 } ccc_user_key;
 
-/** An allocation function is at the core of this library and all containers.
+/** @brief An allocation function at the core of all containers.
 An allocation function implements the following API, where ptr is pointer
 to memory and size is number of bytes to allocate.
 - If NULL is provided with a size of 0, NULL is returned.
@@ -135,6 +143,7 @@ is not sure that realloc implements all such behaviors, especially the final
 requirement for freeing memory, wrap it in a helper function. For example, one
 solution using the standard library allocator might be implemented as follows:
 
+```c
 void *
 std_alloc(void *const ptr, size_t const size)
 {
@@ -153,18 +162,20 @@ std_alloc(void *const ptr, size_t const size)
     }
     return realloc(ptr, size);
 }
+```
 
 However, the above example is only useful if the standard library allocator
 is used. Any allocator that implements the required behavior is sufficient. */
 typedef void *ccc_alloc_fn(void *ptr, size_t size);
 
-/** A callback function for comparing two elements in a container. A three-way
-comparison return value is expected and the two containers being compared
-are guaranteed to be non-null and pointing to the base of the user type stored
-in the container. Aux may be NULL if no aux is provided on initialization. */
+/** @brief A callback function for comparing two elements in a container.
+A three-way comparison return value is expected and the two containers being
+compared are guaranteed to be non-null and pointing to the base of the user type
+stored in the container. Aux may be NULL if no aux is provided on
+initialization. */
 typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
 
-/** A callback function for modifying an individual element in the container.
+/** @brief A callback function for modifying an element in the container.
 A reference to the container type and any aux data provided on initialization
 is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
@@ -172,7 +183,7 @@ function is used when a container API exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
 typedef void ccc_update_fn(ccc_user_type_mut);
 
-/** A callback function for modifying an individual element in the container.
+/** @brief A callback function for destroying an element in the container.
 A reference to the container type and any aux data provided on initialization
 is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. A destructor
@@ -189,20 +200,20 @@ desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
 typedef void ccc_destructor_fn(ccc_user_type_mut);
 
-/** A callback function for determining equality between a key and the key
-field of a user type stored in the container. The function should return
-true if the key and key field in the user type are equivalent, else false. */
+/** @brief A callback function to determining equality between two stored keys.
+The function should return true if the key and key field in the user type are
+equivalent, else false. */
 typedef bool ccc_key_eq_fn(ccc_key_cmp);
 
-/** A callback function for comparing a key to the key field in a user type
-stored in the container. The key is considered the left hand side of the
-comparison. The function should return CCC_LES if the key is less than the
-key in key field of user type, CCC_EQL if equal, and CCC_GRT if greater. */
+/** @brief A callback function for three-way comparing two stored keys.
+The key is considered the left hand side of the comparison. The function should
+return CCC_LES if the key is less than the key in key field of user type,
+CCC_EQL if equal, and CCC_GRT if greater. */
 typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
-/** A callback function to hash the key type used in a container. A reference to
-any aux data provided on initialization is also available. Return the complete
-hash value as determined by the user hashing algorithm. */
+/** @brief A callback function to hash the key type used in a container.
+A reference to any aux data provided on initialization is also available.
+Return the complete hash value as determined by the user hashing algorithm. */
 typedef uint64_t ccc_hash_fn(ccc_user_key to_hash);
 
 /** @brief Determine if an entry is Occupied in the container.

@@ -1,3 +1,5 @@
+/** @file
+@brief The Doubly Linked List Interface */
 #ifndef CCC_DOUBLY_LINKED_LIST_H
 #define CCC_DOUBLY_LINKED_LIST_H
 

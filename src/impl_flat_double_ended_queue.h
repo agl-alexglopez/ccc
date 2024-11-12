@@ -5,6 +5,7 @@
 
 #include <stddef.h>
 
+/** \internal */
 struct ccc_fdeq_
 {
     ccc_buffer buf_;

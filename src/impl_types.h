@@ -14,12 +14,14 @@ enum ccc_entry_status_ : uint8_t
     CCC_ENTRY_NO_UNWRAP = 0x20,
 };
 
+/** \internal */
 struct ccc_entry_
 {
     void *e_;
     enum ccc_entry_status_ stats_;
 };
 
+/** \internal */
 struct ccc_range_
 {
     union

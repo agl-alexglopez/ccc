@@ -1,3 +1,5 @@
+/** @file
+@brief The Flat Realtime Ordered Map Interface */
 #ifndef FLAT_REALTIME_ORDERED_MAP_H
 #define FLAT_REALTIME_ORDERED_MAP_H
 

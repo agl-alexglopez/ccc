@@ -1,3 +1,5 @@
+/** @file
+@brief The Ordered Map Interface */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 

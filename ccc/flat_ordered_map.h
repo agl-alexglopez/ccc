@@ -1,3 +1,5 @@
+/** @file
+@brief The Flat Ordered Map Interface */
 #ifndef CCC_FLAT_ORDERED_MAP_H
 #define CCC_FLAT_ORDERED_MAP_H
 

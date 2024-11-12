@@ -1,3 +1,5 @@
+/** @file
+@brief The Ordered Multimap Interface */
 #ifndef CCC_ORDERED_MULTIMAP_H
 #define CCC_ORDERED_MULTIMAP_H
 

@@ -1,3 +1,5 @@
+/** @file
+@brief The Priority Queue Interface */
 #ifndef CCC_PRIORITY_QUEUE_H
 #define CCC_PRIORITY_QUEUE_H
 

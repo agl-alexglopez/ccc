@@ -1,3 +1,5 @@
+/** @file
+@brief The Flat Priority Queue Interface */
 #ifndef CCC_FLAT_PRIORITY_QUEUE_H
 #define CCC_FLAT_PRIORITY_QUEUE_H
 

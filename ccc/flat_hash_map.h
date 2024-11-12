@@ -1,3 +1,5 @@
+/** @file
+@brief The Flat Hash Map Interface */
 #ifndef CCC_FLAT_HASH_MAP_H
 #define CCC_FLAT_HASH_MAP_H
 

@@ -1,3 +1,5 @@
+/** @file
+@brief The Singly Linked List Interface */
 #ifndef CCC_SINGLY_LINKED_LIST_H
 #define CCC_SINGLY_LINKED_LIST_H
 

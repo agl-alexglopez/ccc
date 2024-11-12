@@ -1,3 +1,5 @@
+/** @file
+@brief The C Container Collection Traits Interface */
 #ifndef CCC_TRAITS_H
 #define CCC_TRAITS_H
 
