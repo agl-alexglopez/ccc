@@ -9,9 +9,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** A flat realtime ordered map offers O(lg N) search and erase, and amortized
-O(lg N) insert. This map is suitable for realtime applications if resizing can
-be limited or controlled.
+/** @brief A flat realtime ordered map offers O(lg N) search and erase, and
+amortized O(lg N) insert.
+
+This map is suitable for realtime applications if resizing can be limited or
+controlled.
 
 The flat variant of the ordered map promises contiguous storage and random
 access if needed. Also, all elements in the map track their relationships via
@@ -23,26 +25,27 @@ to store a fixed size N nodes in the map N + 1 capacity is needed for the
 sentinel node in the buffer. */
 typedef struct ccc_fromap_ ccc_flat_realtime_ordered_map;
 
-/** A map element is the intrusive element of the user defined struct being
-stored in the map for key value access. */
+/** @brief The intrusive element for the user defined struct being stored in the
+map
+
+Because the map is flat data is always copied from the user type to map. */
 typedef struct ccc_fromap_elem_ ccc_fromap_elem;
 
-/** A container specific entry used to implement the Entry API. The Entry API
- offers efficient search and subsequent insertion, deletion, or value update
- based on the needs of the user. */
-typedef union
-{
-    struct ccc_fromap_entry_ impl_;
-} ccc_fromap_entry;
+/** @brief A container specific entry used to implement the Entry API.
+
+The Entry API offers efficient search and subsequent insertion, deletion, or
+value update based on the needs of the user. */
+typedef union ccc_fromap_entry_ ccc_fromap_entry;
 
 /** @brief Initializes the map at runtime or compile time.
-@param [in] mem_ptr a pointer to the contiguous user types or ((T *)NULL).
+@param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
 @param [in] capacity the capacity at mem_ptr or 0 if ((T *)NULL).
 @param [in] frm_elem_field the name of the intrusive map elem field.
 @param [in] key_elem_field the name of the field in user type used as key.
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
-@param [in] key_cmp the key comparison function (see types.h).
-@param [in] aux a pointer to any auxiliary data for comparison or destruction.
+@param [in] key_cmp_fn the key comparison function (see types.h).
+@param [in] aux_data a pointer to any auxiliary data for comparison or
+destruction.
 @return the struct initialized ordered map for direct assignment
 (i.e. ccc_flat_realtime_ordered_map m = ccc_frm_init(...);). */
 #define ccc_frm_init(memory_ptr, capacity, frm_elem_field, key_elem_field,     \
@@ -82,8 +85,8 @@ ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
                          ccc_fromap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
-@param [in] frm the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
+@param [in] flat_realtime_ordered_map_ptr the pointer to the ordered map.
+@param [out] out_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to an entry. If Vacant, no prior element
 with key existed and the type wrapping out_handle remains unchanged. If Occupied
 the old value is written to the type wrapping out_handle and may be unwrapped to
@@ -110,16 +113,18 @@ ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
                              ccc_fromap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
-@param [in] frm the pointer to the map.
-@param [in] key_val_handle the handle to the user type wrapping map elem.
+@param [in] flat_realtime_ordered_map_ptr the pointer to the map.
+@param [in] key_val_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to an entry. If Occupied, the entry
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the entry contains a reference to the newly inserted entry in the map.
 If more space is needed but allocation fails an insert error is set. */
-#define ccc_frm_try_insert_r(flat_realtime_ordered_map_ptr, out_handle_ptr)    \
+#define ccc_frm_try_insert_r(flat_realtime_ordered_map_ptr,                    \
+                             key_val_handle_ptr)                               \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_frm_try_insert((flat_realtime_ordered_map_ptr), (out_handle_ptr))  \
+        ccc_frm_try_insert((flat_realtime_ordered_map_ptr),                    \
+                           (key_val_handle_ptr))                               \
             .impl_                                                             \
     }
 
@@ -189,8 +194,8 @@ ccc_entry ccc_frm_remove(ccc_flat_realtime_ordered_map *frm,
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
-@param [in] frm the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
+@param [in] flat_realtime_ordered_map_ptr the pointer to the ordered map.
+@param [out] out_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to the removed entry. If Occupied it may be
 unwrapped to obtain the old key value pair. If Vacant the key value pair was not
 stored in the map. If bad input is provided an input error is set.
@@ -222,8 +227,8 @@ ccc_fromap_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
                                void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
-@param [in] frm the map to be searched.
-@param [in] key the key used to search the map matching the stored key type.
+@param [in] flat_realtime_ordered_map_ptr the map to be searched.
+@param [in] key_ptr the key used to search the map matching the stored key type.
 @return a compound literal reference to a specialized entry for use with other
 functions in the Entry API.
 @warning the contents of an entry should not be examined or modified. Use the
@@ -340,7 +345,7 @@ insertions. */
 ccc_entry ccc_frm_remove_entry(ccc_fromap_entry const *e);
 
 /** @brief Remove the entry from the map if Occupied.
-@param [in] e a pointer to the map entry.
+@param [in] flat_realtime_ordered_map_entry_ptr a pointer to the map entry.
 @return a compound literal reference to an entry containing NULL or a reference
 to the old entry. If Occupied an entry in the map existed and was removed. If
 Vacant, no prior entry existed to be removed.
@@ -417,9 +422,8 @@ ccc_range ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
 
 /** @brief Returns a compound literal reference to the desired range. O(lg N).
 @param [in] flat_realtime_ordered_map_ptr a pointer to the map.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-range.
-@param [in] end_key_ptr a pointer to the key that marks the end of the range.
+@param [in] begin_and_end_key_ptrs two pointers, the first to the start of the
+range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
 #define ccc_frm_equal_range_r(flat_realtime_ordered_map_ptr,                   \
@@ -433,9 +437,9 @@ enclosing scope. This reference is always non-NULL. */
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
 O(lg N).
-@param [in] mm a pointer to the map.
-@param [in] begin_key a pointer to the key intended as the start of the rrange.
-@param [in] end_key a pointer to the key intended as the end of the rrange.
+@param [in] frm a pointer to the map.
+@param [in] rbegin_key a pointer to the key intended as the start of the rrange.
+@param [in] rend_key a pointer to the key intended as the end of the rrange.
 @return a rrange containing the first element NOT GREATER than the begin_key and
 the first element LESS than rend_key.
 
@@ -455,9 +459,8 @@ ccc_rrange ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
 /** @brief Returns a compound literal reference to the desired rrange.
 O(lg N).
 @param [in] flat_realtime_ordered_map_ptr a pointer to the map.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-rrange.
-@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
+@param [in] rbegin_and_rend_key_ptrs two pointers, the first to the start of the
+rrange the second to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
 enclosing scope. This reference is always non-NULL. */
 #define ccc_frm_equal_rrange_r(flat_realtime_ordered_map_ptr,                  \
@@ -485,7 +488,7 @@ void *ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *frm);
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
 void *ccc_frm_next(ccc_flat_realtime_ordered_map const *frm,
-                   ccc_fromap_elem const *);
+                   ccc_fromap_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -494,7 +497,7 @@ O(1).
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
 void *ccc_frm_rnext(ccc_flat_realtime_ordered_map const *frm,
-                    ccc_fromap_elem const *);
+                    ccc_fromap_elem const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] frm a pointer to the map.

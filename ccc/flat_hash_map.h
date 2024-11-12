@@ -8,11 +8,13 @@
 #include "impl_flat_hash_map.h"
 #include "types.h"
 
-/** A flat hash map stores key-value structures defined by the user in
-a contiguous buffer. Elements are then retrievable by key in amortized
-O(1). Elements in the table may be copied and moved so no pointer
-stability is available in this implementation. If pointer stability
-is needed, store and hash pointers to those elements in this table.
+/** @brief A container for storing key-value structures defined by the user in
+a contiguous buffer.
+
+Elements are then retrievable by key in amortized O(1). Elements in the table
+may be copied and moved so no pointer stability is available in this
+implementation. If pointer stability is needed, store and hash pointers to those
+elements in this table.
 
 A flat hash map requires the user to provide a struct with known key
 and flat hash element fields as well as a hash function and key
@@ -22,17 +24,17 @@ the flat hash map does not offer any default hash functions or hash
 strengthening algorithms so good hash functions should be used. */
 typedef struct ccc_fhmap_ ccc_flat_hash_map;
 
-/** A flat hash element is an intrusive element that should be inserted into the
-struct used to store the key and value for the user. */
+/** @brief An intrusive element for a user provided type.
+
+Because the hash map is flat, data is always copied from the provided type into
+the table. */
 typedef struct ccc_fhmap_elem_ ccc_fhmap_elem;
 
-/** A container specific entry used to implement the Entry API. The Entry API
- offers efficient search and subsequent insertion, deletion, or value update
- based on the needs of the user. */
-typedef union
-{
-    struct ccc_fhmap_entry_ impl_;
-} ccc_fhmap_entry;
+/** @brief A container specific entry used to implement the Entry API.
+
+The Entry API offers efficient search and subsequent insertion, deletion, or
+value update based on the needs of the user. */
+typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
 
 /** @brief the initialization helper macro for a hash table. Must be called
 at runtime.
@@ -42,8 +44,6 @@ if the user provides a allocation function. The buffer will be interpreted
 in units of type size that the user intends to store.
 @param [in] capacity the starting capacity of the provided buffer or 0 if no
 buffer is provided and a allocation function is given.
-@param [in] struct_name the name of the struct type the user stores in the
-hash table.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] fhash_elem_field the name of the field holding the fhash_elem
 handle.
@@ -51,13 +51,14 @@ handle.
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
-@param [in] aux auxiliary data that is needed for hashing or comparison.
+@param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @return this macro "returns" a value, a ccc_result to indicate if
 initialization is successful or a failure. */
 #define ccc_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,               \
-                     fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)      \
+                     fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux_data) \
     ccc_impl_fhm_init(fhash_ptr, memory_ptr, capacity, key_field,              \
-                      fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux)
+                      fhash_elem_field, alloc_fn, hash_fn, key_eq_fn,          \
+                      aux_data)
 
 /*========================   Membership   ===================================*/
 
@@ -77,7 +78,7 @@ initialization is successful or a failure. */
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
-@param [in] flat_hash_map the pointer to the flat hash map.
+@param [in] h the pointer to the flat hash map.
 @param [out] out_handle the handle to the user type wrapping fhash elem.
 @return the removed entry. If Occupied it may be unwrapped to obtain the old key
 value pair. If Vacant the key value pair was not stored in the map. If bad input
@@ -146,9 +147,9 @@ any subsequent insertions or deletions invalidate this reference. */
 [[nodiscard]] ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
                                            ccc_fhmap_elem *key_val_handle);
 
-/** @brief Attempts to insert the key value wrapping out_handle_ptr.
+/** @brief Attempts to insert the key value wrapping key_val_handle_ptr.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [in] out_handle_ptr the handle to the user type wrapping fhash elem.
+@param [in] key_val_handle_ptr the handle to the user type wrapping fhash elem.
 @return a compound literal reference to the entry. If Occupied, the entry
 contains a reference to the key value user type in the table and may be
 unwrapped. If Vacant the entry contains a reference to the newly inserted
@@ -156,10 +157,10 @@ entry in the table. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
-#define ccc_fhm_try_insert_r(flat_hash_map_ptr, key_val_handle)                \
+#define ccc_fhm_try_insert_r(flat_hash_map_ptr, key_val_handle_ptr)            \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_try_insert((flat_hash_map_ptr), (key_val_handle)).impl_        \
+        ccc_fhm_try_insert((flat_hash_map_ptr), (key_val_handle_ptr)).impl_    \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -192,14 +193,14 @@ the information regarding its presence is helpful. */
 ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
-@param [in] h a pointer to the flat hash map.
-@param [in] key_val_handle the handle to the wrapping user struct key value.
+@param [in] flat_hash_map_ptr a pointer to the flat hash map.
+@param [in] key_val_handle_ptr the handle to the wrapping user struct key value.
 @return a compound literal reference to the entry. If Occupied an entry was
 overwritten by the new key value. If Vacant no prior table entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-#define ccc_fhm_insert_or_assign_r(flat_hash_map_ptr, key_val_handle)          \
+#define ccc_fhm_insert_or_assign_r(flat_hash_map_ptr, key_val_handle_ptr)      \
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_insert_or_assign((flat_hash_map_ptr), (key_val_handle)).impl_  \
@@ -207,6 +208,7 @@ the information regarding its presence is helpful. */
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] key the key to be searched in the table.
 @param [in] lazy_value the compound literal to insert or use for overwrite.
 @return a compound literal reference to the entry of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
@@ -256,8 +258,9 @@ to subsequent calls in the Entry API.*/
                                             void const *key);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
-@param [in] h the hash table to be searched.
-@param [in] key the key used to search the table matching the stored key type.
+@param [in] flat_hash_map_ptr the hash table to be searched.
+@param [in] key_ptr the key used to search the table matching the stored key
+type.
 @return a compound literal reference to a specialized hash entry for use with
 other functions in the Entry API.
 @warning the contents of an entry should not be examined or modified. Use the

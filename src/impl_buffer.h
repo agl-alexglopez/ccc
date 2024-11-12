@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stddef.h>
 
-/** \internal */
+/** @private */
 struct ccc_buf_
 {
     void *mem_;

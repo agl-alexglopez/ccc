@@ -35,12 +35,14 @@
 #include <stdbool.h>
 #include <string.h>
 
+/** @private */
 enum romap_link_
 {
     L = 0,
     R,
 };
 
+/** @private */
 struct romap_query_
 {
     ccc_threeway_cmp last_cmp_;
@@ -131,9 +133,9 @@ static struct ccc_romap_elem_ *next(struct ccc_romap_ const *,
 static struct ccc_romap_elem_ *min_max_from(struct ccc_romap_ const *,
                                             struct ccc_romap_elem_ *start,
                                             enum romap_link_);
-static struct ccc_range_ equal_range(struct ccc_romap_ const *, void const *,
-                                     void const *, enum romap_link_);
-static struct ccc_romap_entry_ entry(struct ccc_romap_ const *rom,
+static struct ccc_range_u_ equal_range(struct ccc_romap_ const *, void const *,
+                                       void const *, enum romap_link_);
+static struct ccc_rtree_entry_ entry(struct ccc_romap_ const *rom,
                                      void const *key);
 static void *insert(struct ccc_romap_ *rom, struct ccc_romap_elem_ *parent,
                     ccc_threeway_cmp last_cmp,
@@ -517,7 +519,7 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
 
 /*=========================   Private Interface  ============================*/
 
-struct ccc_romap_entry_
+struct ccc_rtree_entry_
 ccc_impl_rom_entry(struct ccc_romap_ const *const rom, void const *const key)
 {
     return entry(rom, key);
@@ -568,13 +570,13 @@ min_max_from(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ *start,
     return start;
 }
 
-static inline struct ccc_romap_entry_
+static inline struct ccc_rtree_entry_
 entry(struct ccc_romap_ const *const rom, void const *const key)
 {
     struct romap_query_ q = find(rom, key);
     if (CCC_EQL == q.last_cmp_)
     {
-        return (struct ccc_romap_entry_){
+        return (struct ccc_rtree_entry_){
             .rom_ = (struct ccc_romap_ *)rom,
             .last_cmp_ = q.last_cmp_,
             .entry_ = {
@@ -583,7 +585,7 @@ entry(struct ccc_romap_ const *const rom, void const *const key)
             },
         };
     }
-    return (struct ccc_romap_entry_){
+    return (struct ccc_rtree_entry_){
         .rom_ = (struct ccc_romap_ *)rom,
         .last_cmp_ = q.last_cmp_,
         .entry_ = {
@@ -685,13 +687,13 @@ next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
     return n->parent_;
 }
 
-static struct ccc_range_
+static struct ccc_range_u_
 equal_range(struct ccc_romap_ const *const rom, void const *const begin_key,
             void const *const end_key, enum romap_link_ const traversal)
 {
     if (!rom->sz_)
     {
-        return (struct ccc_range_){};
+        return (struct ccc_range_u_){};
     }
     ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
     struct romap_query_ b = find(rom, begin_key);
@@ -704,7 +706,7 @@ equal_range(struct ccc_romap_ const *const rom, void const *const begin_key,
     {
         e.found_ = next(rom, e.found_, traversal);
     }
-    return (struct ccc_range_){
+    return (struct ccc_range_u_){
         .begin_ = b.found_ == &rom->end_ ? NULL : struct_base(rom, b.found_),
         .end_ = e.found_ == &rom->end_ ? NULL : struct_base(rom, e.found_),
     };
@@ -1195,17 +1197,12 @@ sibling_of([[maybe_unused]] struct ccc_romap_ const *const rom,
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-struct tree_range
+/** @private */
+struct tree_range_
 {
     struct ccc_romap_elem_ const *low;
     struct ccc_romap_elem_ const *root;
     struct ccc_romap_elem_ const *high;
-};
-
-struct parent_status
-{
-    bool correct;
-    struct ccc_romap_elem_ const *parent;
 };
 
 static size_t
@@ -1221,7 +1218,7 @@ recursive_size(struct ccc_romap_ const *const rom,
 }
 
 static bool
-are_subtrees_valid(struct ccc_romap_ const *t, struct tree_range const r,
+are_subtrees_valid(struct ccc_romap_ const *t, struct tree_range_ const r,
                    struct ccc_romap_elem_ const *const nil)
 {
     if (!r.root)
@@ -1243,14 +1240,14 @@ are_subtrees_valid(struct ccc_romap_ const *t, struct tree_range const r,
         return false;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range){
+                              (struct tree_range_){
                                   .low = r.low,
                                   .root = r.root->branch_[L],
                                   .high = r.root,
                               },
                               nil)
            && are_subtrees_valid(t,
-                                 (struct tree_range){
+                                 (struct tree_range_){
                                      .low = r.root,
                                      .root = r.root->branch_[R],
                                      .high = r.high,
@@ -1283,7 +1280,7 @@ validate(struct ccc_romap_ const *const rom)
         return false;
     }
     if (!are_subtrees_valid(rom,
-                            (struct tree_range){
+                            (struct tree_range_){
                                 .low = &rom->end_,
                                 .root = rom->root_,
                                 .high = &rom->end_,

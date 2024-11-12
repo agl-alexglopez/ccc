@@ -6,13 +6,13 @@
 #include <assert.h>
 #include <stddef.h>
 
-/** \internal */
+/** @private */
 typedef struct ccc_sll_elem_
 {
     struct ccc_sll_elem_ *n_;
 } ccc_sll_elem_;
 
-/** \internal */
+/** @private */
 struct ccc_sll_
 {
     struct ccc_sll_elem_ sentinel_;

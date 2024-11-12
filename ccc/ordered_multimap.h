@@ -4,14 +4,14 @@
 #define CCC_ORDERED_MULTIMAP_H
 
 #include "impl_ordered_multimap.h"
-#include "impl_tree.h"
 #include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
-/** An ordered multimap allows for membership testing by key field, but
-insertion allows for multiple keys of the same value to exist in the multimap.
+/** @brief A container for membership testing by key field, allowing duplicate
+keys.
+
 This multimap orders duplicate keys by a round robin scheme. This means the
 oldest key-value inserted into the multimap will be the one found on any
 queries or removed first when popped from the multimap. Therefore, this
@@ -21,32 +21,25 @@ use case simpler. The multimap is a self-optimizing data structure and
 therefore does not offer read-only searching. The runtime for all search,
 insert, and remove operations is amortized O(lg N) and may not meet the
 requirements of realtime systems. */
-typedef union
-{
-    struct ccc_tree_ impl_;
-} ccc_ordered_multimap;
+typedef union ccc_ordered_multimap_ ccc_ordered_multimap;
 
-/** The intrusive element that must occupy a field in the struct the user
-intends to track in the set. The ordered multimap element can occupy a single
-field anywhere in the user struct. Note that if allocation is not
-permitted, insertions functions accepting this type as an argument assume it
-to exist in pre-allocated memory that will exist with the appropriate lifetime
-and scope for the user's needs; the container does not allocate or free in this
-case. */
-typedef union
-{
-    struct ccc_node_ impl_;
-} ccc_ommap_elem;
+/** @brief The intrusive element for the user defined type stored in the
+multimap.
 
-/** The container specific type to support the Entry API. An Entry API offers
-efficient conditional searching, saving multiple searches. Entries are views
-of Vacant or Occupied multimap elements allowing further operations to be
-performed once they are obtained without a second search, insert, or remove
-query. */
-typedef union
-{
-    struct ccc_tree_entry_ impl_;
-} ccc_ommap_entry;
+The ordered multimap element can occupy a single field anywhere in the user
+struct. Note that if allocation is not permitted, insertions functions accepting
+this type as an argument assume it to exist in pre-allocated memory that will
+exist with the appropriate lifetime and scope for the user's needs; the
+container does not allocate or free in this case. */
+typedef union ccc_ommap_elem_ ccc_ommap_elem;
+
+/** @brief The container specific type to support the Entry API.
+
+An Entry API offers efficient conditional searching, saving multiple searches.
+Entries are views of Vacant or Occupied multimap elements allowing further
+operations to be performed once they are obtained without a second search,
+insert, or remove query. */
+typedef union ccc_ommap_entry_ ccc_ommap_entry;
 
 /** @brief Initialize a ordered multimap of the user specified type.
 @param [in] omm_name the name of the ordered multimap being initialized.
@@ -87,7 +80,7 @@ N).
 indicating if the map has already been Occupied at the given key. Amortized
 O(lg N).
 @param [in] mm a pointer to the multimap.
-@param [in] e a handle to the new key value to be inserted.
+@param [in] key_val_handle a handle to the new key value to be inserted.
 @return an entry that can be unwrapped to view the inserted element. The status
 will be Occupied if this element is a duplicate added to a duplicate list or
 Vacant if this key is the first of its value inserted into the multimap. If the
@@ -241,8 +234,8 @@ requiring auxiliary data. If auxiliary data is passed as a function call, it
 will only execute if the entry is occupied.
 @param [in] ordered_multimap_entry_ptr the address of the multimap entry.
 @param [in] mod_fn the ccc_update_fn used to update a stored value.
-@param [in] aux_data the rvalue that this operation will construct and pass to
-the modification function if the entry is occupied.
+@param [in] lazy_aux_data the rvalue that this operation will construct and pass
+to the modification function if the entry is occupied.
 @return a pointer to a new entry. This is a compound literal reference, not a
 pointer that requires any manual memory management.
 
@@ -497,9 +490,8 @@ map versus the end map sentinel. */
 /** @brief Returns a compound literal reference to the desired range. Amortized
 O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-range.
-@param [in] end_key_ptr a pointer to the key that marks the end of the range.
+@param [in] begin_and_end_key_ptrs two pointers, one to the beginning of the
+range and one to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
 #define ccc_omm_equal_range_r(ordered_multimap_ptr, begin_and_end_key_ptrs...) \
@@ -512,8 +504,8 @@ enclosing scope. This reference is always non-NULL. */
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
 Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
-@param [in] begin_key a pointer to the key intended as the start of the rrange.
-@param [in] end_key a pointer to the key intended as the end of the rrange.
+@param [in] rbegin_key a pointer to the key intended as the start of the rrange.
+@param [in] rend_key a pointer to the key intended as the end of the rrange.
 @return a rrange containing the first element NOT GREATER than the begin_key and
 the first element LESS than rend_key.
 
@@ -534,9 +526,8 @@ the map versus the end map sentinel. */
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
 O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-rrange.
-@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
+@param [in] rbegin_and_rend_key_ptrs two pointers, one to the beginning of the
+rrange and one to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
 enclosing scope. This reference is always non-NULL. */
 #define ccc_omm_equal_rrange_r(ordered_multimap_ptr,                           \

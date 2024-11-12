@@ -5,8 +5,23 @@
 
 #include <stddef.h>
 
-struct ccc_node_;
-struct ccc_tree_;
+/** @private */
+union ccc_ordered_map_
+{
+    struct ccc_tree_ impl_;
+};
+
+/** @private */
+union ccc_omap_elem_
+{
+    ccc_node_ impl_;
+};
+
+/** @private */
+union ccc_omap_entry_
+{
+    struct ccc_tree_entry_ impl_;
+};
 
 #define ccc_impl_om_init(tree_name, struct_name, node_elem_field,              \
                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)       \
@@ -54,7 +69,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
     ({                                                                         \
         typeof(lazy_value) *om_new_ins_base_                                   \
             = ccc_impl_om_new((&om_insert_entry));                             \
-        om_insert_entry_ret = (struct ccc_entry_){                             \
+        om_insert_entry_ret = (struct ccc_ent_){                               \
             .e_ = om_new_ins_base_,                                            \
             .stats_ = CCC_ENTRY_INSERT_ERROR,                                  \
         };                                                                     \
@@ -146,7 +161,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_om_try_insert_w(ordered_map_ptr, key, lazy_value...)          \
     ({                                                                         \
         __auto_type try_ins_map_ptr_ = (ordered_map_ptr);                      \
-        struct ccc_entry_ om_try_ins_ent_ret_                                  \
+        struct ccc_ent_ om_try_ins_ent_ret_                                    \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
         if (try_ins_map_ptr_)                                                  \
         {                                                                      \
@@ -171,7 +186,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)    \
     ({                                                                         \
         __auto_type ins_or_assign_map_ptr_ = (ordered_map_ptr);                \
-        struct ccc_entry_ om_ins_or_assign_ent_ret_                            \
+        struct ccc_ent_ om_ins_or_assign_ent_ret_                              \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
         if (ins_or_assign_map_ptr_)                                            \
         {                                                                      \

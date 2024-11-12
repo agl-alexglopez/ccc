@@ -9,12 +9,14 @@
 #include <stdint.h>
 #include <string.h>
 
+/** @private */
 enum frm_branch_
 {
     L = 0,
     R,
 };
 
+/** @private */
 struct frm_query_
 {
     ccc_threeway_cmp last_cmp_;
@@ -57,11 +59,11 @@ static struct ccc_fromap_elem_ *elem_in_slot(struct ccc_fromap_ const *t,
 /* Returning the internal query helper to aid in entry handling. */
 static struct frm_query_ find(struct ccc_fromap_ const *frm, void const *key);
 /* Returning the entry core to the Entry API. */
-static inline struct ccc_fromap_entry_ entry(struct ccc_fromap_ const *frm,
+static inline struct ccc_frtree_entry_ entry(struct ccc_fromap_ const *frm,
                                              void const *key);
 /* Returning a generic range that can be use for range or rrange. */
-static struct ccc_range_ equal_range(struct ccc_fromap_ const *, void const *,
-                                     void const *, enum frm_branch_);
+static struct ccc_range_u_ equal_range(struct ccc_fromap_ const *, void const *,
+                                       void const *, enum frm_branch_);
 /* Returning threeway comparison with user callback. */
 static ccc_threeway_cmp cmp_elems(struct ccc_fromap_ const *frm,
                                   void const *key, size_t node,
@@ -511,7 +513,7 @@ ccc_impl_frm_insert(struct ccc_fromap_ *const frm, size_t const parent_i,
     return insert(frm, parent_i, last_cmp, elem_i);
 }
 
-struct ccc_fromap_entry_
+struct ccc_frtree_entry_
 ccc_impl_frm_entry(struct ccc_fromap_ const *const frm, void const *const key)
 {
     return entry(frm, key);
@@ -552,7 +554,7 @@ maybe_alloc_insert(struct ccc_fromap_ *const frm, size_t const parent,
                    struct ccc_fromap_elem_ *const elem)
 {
     /* The end sentinel node will always be at 0. This also means once
-       initialized the internal size for implementor is always at least 1. */
+       initialized the internal size for implementer is always at least 1. */
     if (!alloc_back(frm))
     {
         return NULL;
@@ -585,20 +587,20 @@ insert(struct ccc_fromap_ *const frm, size_t const parent_i,
     return struct_base(frm, elem);
 }
 
-static inline struct ccc_fromap_entry_
+static inline struct ccc_frtree_entry_
 entry(struct ccc_fromap_ const *const frm, void const *const key)
 {
     struct frm_query_ q = find(frm, key);
     if (CCC_EQL == q.last_cmp_)
     {
-        return (struct ccc_fromap_entry_){
+        return (struct ccc_frtree_entry_){
             .frm_ = (struct ccc_fromap_ *)frm,
             .last_cmp_ = q.last_cmp_,
             .i_ = q.found_,
             .stats_ = CCC_ENTRY_OCCUPIED,
         };
     }
-    return (struct ccc_fromap_entry_){
+    return (struct ccc_frtree_entry_){
         .frm_ = (struct ccc_fromap_ *)frm,
         .last_cmp_ = q.last_cmp_,
         .i_ = q.parent_,
@@ -654,13 +656,13 @@ next(struct ccc_fromap_ const *const t, size_t n,
     return p;
 }
 
-static struct ccc_range_
+static struct ccc_range_u_
 equal_range(struct ccc_fromap_ const *const t, void const *const begin_key,
             void const *const end_key, enum frm_branch_ const traversal)
 {
     if (ccc_frm_is_empty(t))
     {
-        return (struct ccc_range_){};
+        return (struct ccc_range_u_){};
     }
     ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
     struct frm_query_ b = find(t, begin_key);
@@ -673,7 +675,7 @@ equal_range(struct ccc_fromap_ const *const t, void const *const begin_key,
     {
         e.found_ = next(t, e.found_, traversal);
     }
-    return (struct ccc_range_){
+    return (struct ccc_range_u_){
         .begin_ = base_at(t, b.found_),
         .end_ = base_at(t, e.found_),
     };
@@ -1265,17 +1267,12 @@ sibling_of(struct ccc_fromap_ const *const t, size_t const x)
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-struct tree_range
+/** @private */
+struct tree_range_
 {
     size_t low;
     size_t root;
     size_t high;
-};
-
-struct parent_status
-{
-    bool correct;
-    size_t parent;
 };
 
 static size_t
@@ -1290,7 +1287,7 @@ recursive_size(struct ccc_fromap_ const *const t, size_t const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_fromap_ const *t, struct tree_range const r)
+are_subtrees_valid(struct ccc_fromap_ const *t, struct tree_range_ const r)
 {
     if (!r.root)
     {
@@ -1305,13 +1302,13 @@ are_subtrees_valid(struct ccc_fromap_ const *t, struct tree_range const r)
         return false;
     }
     return are_subtrees_valid(
-               t, (struct tree_range){.low = r.low,
-                                      .root = branch_i(t, r.root, L),
-                                      .high = r.root})
+               t, (struct tree_range_){.low = r.low,
+                                       .root = branch_i(t, r.root, L),
+                                       .high = r.root})
            && are_subtrees_valid(
-               t, (struct tree_range){.low = r.root,
-                                      .root = branch_i(t, r.root, R),
-                                      .high = r.high});
+               t, (struct tree_range_){.low = r.root,
+                                       .root = branch_i(t, r.root, R),
+                                       .high = r.high});
 }
 
 static bool
@@ -1337,7 +1334,7 @@ validate(struct ccc_fromap_ const *const frm)
     {
         return false;
     }
-    if (!are_subtrees_valid(frm, (struct tree_range){.root = frm->root_}))
+    if (!are_subtrees_valid(frm, (struct tree_range_){.root = frm->root_}))
     {
         return false;
     }

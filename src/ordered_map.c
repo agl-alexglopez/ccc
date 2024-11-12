@@ -9,9 +9,9 @@
 
 #define LR 2
 
-/* Instead of thinking about left and right consider only links
-   in the abstract sense. Put them in an array and then flip
-   this enum and left and right code paths can be united into one */
+/** @private Instead of thinking about left and right consider only links
+    in the abstract sense. Put them in an array and then flip
+    this enum and left and right code paths can be united into one */
 typedef enum
 {
     L = 0,
@@ -51,8 +51,8 @@ static void *max(struct ccc_tree_ const *);
 static void *min(struct ccc_tree_ const *);
 static void *key_in_slot(struct ccc_tree_ const *t, void const *slot);
 static void *key_from_node(struct ccc_tree_ const *, ccc_node_ const *);
-static struct ccc_range_ equal_range(struct ccc_tree_ *, void const *,
-                                     void const *, om_branch_);
+static struct ccc_range_u_ equal_range(struct ccc_tree_ *, void const *,
+                                       void const *, om_branch_);
 
 /* Internal operations that take and return nodes for the tree. */
 
@@ -381,14 +381,14 @@ ccc_om_equal_range(ccc_ordered_map *const om, void const *const begin_key,
 
 ccc_rrange
 ccc_om_equal_rrange(ccc_ordered_map *const om, void const *const rbegin_key,
-                    void const *const end_key)
+                    void const *const rend_key)
 
 {
-    if (!om || !rbegin_key || !end_key)
+    if (!om || !rbegin_key || !rend_key)
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){equal_range(&om->impl_, rbegin_key, end_key,
+    return (ccc_rrange){equal_range(&om->impl_, rbegin_key, rend_key,
                                     reverse_inorder_traversal)};
 }
 
@@ -565,13 +565,13 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
     return p;
 }
 
-static inline struct ccc_range_
+static inline struct ccc_range_u_
 equal_range(struct ccc_tree_ *const t, void const *const begin_key,
             void const *const end_key, om_branch_ const traversal)
 {
     if (!t->size_)
     {
-        return (struct ccc_range_){};
+        return (struct ccc_range_u_){};
     }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -589,7 +589,7 @@ equal_range(struct ccc_tree_ *const t, void const *const begin_key,
     {
         e = next(t, e, traversal);
     }
-    return (struct ccc_range_){
+    return (struct ccc_range_u_){
         .begin_ = b == &t->end_ ? NULL : struct_base(t, b),
         .end_ = e == &t->end_ ? NULL : struct_base(t, e),
     };
@@ -810,23 +810,19 @@ link_trees(struct ccc_node_ *const parent, om_branch_ const dir,
 
 /* ======================        Debugging           ====================== */
 
-/* This section has recursion so it should probably not be used in
-   a custom operating system environment with constrained stack space.
-   Needless to mention the stdlib.h heap implementation that would need
-   to be replaced with the custom OS drop in. */
-
-/* Validate binary tree invariants with ranges. Use a recursive method that
-   does not rely upon the implementation of iterators or any other possibly
-   buggy implementation. A pure functional range check will provide the most
-   reliable check regardless of implementation changes throughout code base. */
-struct tree_range
+/** @private Validate binary tree invariants with ranges. Use a recursive method
+that does not rely upon the implementation of iterators or any other possibly
+buggy implementation. A pure functional range check will provide the most
+reliable check regardless of implementation changes throughout code base. */
+struct tree_range_
 {
     struct ccc_node_ const *low;
     struct ccc_node_ const *root;
     struct ccc_node_ const *high;
 };
 
-struct parent_status
+/** @private */
+struct parent_status_
 {
     bool correct;
     struct ccc_node_ const *parent;
@@ -844,7 +840,7 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range const r,
+are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)
@@ -868,27 +864,27 @@ are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range const r,
         return false;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range){.low = r.low,
-                                                  .root = r.root->branch_[L],
-                                                  .high = r.root},
+                              (struct tree_range_){.low = r.low,
+                                                   .root = r.root->branch_[L],
+                                                   .high = r.root},
                               nil)
-           && are_subtrees_valid(t,
-                                 (struct tree_range){.low = r.root,
-                                                     .root = r.root->branch_[R],
-                                                     .high = r.high},
-                                 nil);
+           && are_subtrees_valid(
+               t,
+               (struct tree_range_){
+                   .low = r.root, .root = r.root->branch_[R], .high = r.high},
+               nil);
 }
 
-static struct parent_status
+static struct parent_status_
 child_tracks_parent(struct ccc_node_ const *const parent,
                     struct ccc_node_ const *const root)
 {
     if (root->parent_ != parent)
     {
         struct ccc_node_ *p = root->parent_->parent_;
-        return (struct parent_status){false, p};
+        return (struct parent_status_){false, p};
     }
-    return (struct parent_status){true, parent};
+    return (struct parent_status_){true, parent};
 }
 
 static bool
@@ -918,7 +914,7 @@ static bool
 ccc_tree_validate(struct ccc_tree_ const *const t)
 {
     if (!are_subtrees_valid(t,
-                            (struct tree_range){
+                            (struct tree_range_){
                                 .low = &t->end_,
                                 .root = t->root_,
                                 .high = &t->end_,

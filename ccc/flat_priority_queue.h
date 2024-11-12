@@ -9,10 +9,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** A flat priority queue (fpq) offers direct storage and sorting of user data
-by heap order. A flat heap does not offer pointer stability and may need to
-resize depending on initialization options. However, push and pop without
-resizing offer O(lgN) performance. */
+/** @brief A container offering direct storage and sorting of user data by heap
+order.
+
+A flat heap does not offer pointer stability and may need to resize depending on
+initialization options. However, push and pop without resizing offer O(lgN)
+performance. */
 typedef struct ccc_fpq_ ccc_flat_priority_queue;
 
 /** @brief Initialize a fpq as a min or max heap.
@@ -20,6 +22,7 @@ typedef struct ccc_fpq_ ccc_flat_priority_queue;
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
+@param [in] cmp_fn the user defined comarison function for user types.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @return the initilialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
@@ -36,6 +39,7 @@ N + 1 capacity is required. */
 @param [in] size the size <= capacity.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
+@param [in] cmp_fn the user defined comarison function for user types.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @return the initilialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
@@ -62,7 +66,7 @@ to initialize fpq.
 @param [in] input_n the number of contiguous elements at input_array.
 @param [in] input_elem_size size of each element in input_array matching element
 size of fpq.
-@return ok if sorting was successful or an input error if bad input is
+@return OK if sorting was successful or an input error if bad input is
 provided. A permission error will occur if no allocation is allowed and the
 input array is larger than the fixed fpq capacity. A memory error will
 occur if reallocation is required to fit all elements but reallocation fails.
@@ -76,7 +80,7 @@ ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
 @param [in] fpq a pointer to the priority queue.
 @param [in] new_capacity the desirect capacity for the fpq.
 @param [in] fn the allocation function. May be the same as used on init.
-@return ok if allocation was successful or a memory error on failure. */
+@return OK if allocation was successful or a memory error on failure. */
 ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, size_t new_capacity,
                          ccc_alloc_fn *fn);
 
@@ -95,13 +99,13 @@ allocation is not allowed or a resize failed when allocation is allowed. */
 
 /** @brief Pop the front element (min or max) element in the fpq. O(lgN).
 @param [in] fpq a pointer to the priority queue.
-@return ok if the pop succeeds or an input error if fpq is NULL or empty. */
+@return OK if the pop succeeds or an input error if fpq is NULL or empty. */
 ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq);
 
 /** @brief Erase element e that is a handle to the stored fpq element.
 @param [in] fpq a pointer to the priority queue.
 @param [in] e a handle to the stored fpq element. Must be in the fpq.
-@return ok if the erase is successful or an input error if NULL args are
+@return OK if the erase is successful or an input error if NULL args are
 provided or the fpq is empty.
 @warning the user must ensure e is in the fpq.
 
@@ -141,7 +145,7 @@ bool ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
 /** @brief Clears the fpq calling fn on every element if provided. O(1)-O(N).
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] fn the destructor function or NULL if not needed.
-@return ok if input is valid and clear succeeds, otherwise input error.
+@return OK if input is valid and clear succeeds, otherwise input error.
 
 Note that because the priority queue is flat there is no need to free elements
 stored in the fpq. However, the destructor is free to manage cleanup in other
@@ -155,7 +159,7 @@ ccc_result ccc_fpq_clear(ccc_flat_priority_queue *fpq, ccc_destructor_fn *fn);
 underlying buffer. O(1)-O(N).
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] fn the destructor function or NULL if not needed.
-@return ok if input is valid and clear succeeds, otherwise input error. If the
+@return OK if input is valid and clear succeeds, otherwise input error. If the
 buffer attempts to free but is not allowed a no alloc error is returned.
 
 Note that because the priority queue is flat there is no need to free elements

@@ -8,13 +8,19 @@
 #include "impl_doubly_linked_list.h"
 #include "types.h"
 
-/** A doubly linked list is a container offering bidirectional, insert,
-removal, and iteration. Pushing to the the front, at the back, or between
-elements of the list is O(1). */
+/** @brief A container offering bidirectional, insert, removal, and iteration.
+
+Pushing to the front, at the back, or between elements of the list is O(1). */
 typedef struct ccc_dll_ ccc_doubly_linked_list;
 
-/** A doubly linked list element is an intrusive element embedded in the user
-type. It can be used in an allocating or non allocating container. */
+/** @brief A doubly linked list intrusive element to embedded in a user type.
+
+It can be used in an allocating or non allocating container. If allocation is
+prohibited the container assumes the element is wrapped in pre-allocated
+memory with the appropriate lifetime and scope for the user's needs; the
+container does not allocate or free in this case. If allocation is allowed
+the container will handle copying the data wrapping the element to allocations
+and deallocating when necessary. */
 typedef struct ccc_dll_elem_ ccc_dll_elem;
 
 /** @brief Initialize a doubly linked list with its l-value name, type
@@ -172,6 +178,7 @@ void *ccc_dll_extract_range(ccc_doubly_linked_list *l, ccc_dll_elem *elem_begin,
 @param [in] pos_sll the list to which pos belongs.
 @param [in] pos the position before which to_cut will be moved.
 @param [in] to_cut_sll the list to which to_cut belongs.
+@param [in] to_cut the element to cut.
 @return ok if the splice is successful or an error if bad input is provided. */
 ccc_result ccc_dll_splice(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
                           ccc_doubly_linked_list *to_cut_sll,

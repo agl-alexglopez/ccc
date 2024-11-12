@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+/** @private */
 enum ccc_entry_status_ : uint8_t
 {
     CCC_ENTRY_VACANT = 0,
@@ -14,15 +15,21 @@ enum ccc_entry_status_ : uint8_t
     CCC_ENTRY_NO_UNWRAP = 0x20,
 };
 
-/** \internal */
-struct ccc_entry_
+/** @private */
+struct ccc_ent_
 {
     void *e_;
     enum ccc_entry_status_ stats_;
 };
 
-/** \internal */
-struct ccc_range_
+/** @private */
+union ccc_entry_
+{
+    struct ccc_ent_ impl_;
+};
+
+/** @private */
+struct ccc_range_u_
 {
     union
     {
@@ -34,6 +41,18 @@ struct ccc_range_
         void *end_;
         void *rend_;
     };
+};
+
+/** @private */
+union ccc_range_
+{
+    struct ccc_range_u_ impl_;
+};
+
+/** @private */
+union ccc_rrange_
+{
+    struct ccc_range_u_ impl_;
 };
 
 #endif /* CCC_IMPL_TYPES_H */

@@ -9,14 +9,23 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** The structure used to manage the data in a priority queue. This priority
-queue offers pointer stability and an O(1) push and amortized O(1) (technically
-amortized o(lgN) by increasing the cost of the next pop, but the operation
-iteself is O(1)) or O(lgN) increase or decrease key operation, depending on the
-initialization of the queue. The cost of a pop operation is O(lgN). */
+/** @brief A container for pointer stability and an O(1) push and amortized o(lg
+N) increase/decrease key.
+
+The cost to execute the increase key in a max heap and decrease key in a min
+heap is O(1). However, due to the restructuring this causes that increases the
+cost of later pops, the more accurate runtime is o(lg N). The cost of a pop
+operation is O(lgN). */
 typedef struct ccc_pq_ ccc_priority_queue;
 
-/** The embedded struct type for operation of the priority queue. */
+/** @brief The embedded struct type for operation of the priority queue.
+
+It can be used in an allocating or non allocating container. If allocation is
+prohibited the container assumes the element is wrapped in pre-allocated
+memory with the appropriate lifetime and scope for the user's needs; the
+container does not allocate or free in this case. If allocation is allowed
+the container will handle copying the data wrapping the element to allocations
+and deallocating when necessary. */
 typedef struct ccc_pq_elem_ ccc_pq_elem;
 
 /** @brief Initialize a priority queue at runtime or compile time.

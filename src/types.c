@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+/** @private */
 static char const *const result_msgs[CCC_RESULTS_SIZE] = {
     [CCC_OK] = "",
     [CCC_NO_ALLOC]

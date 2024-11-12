@@ -10,7 +10,8 @@
 
 #define LR 2
 
-/* Instead of thinking about left and right consider only links
+/** @private
+   Instead of thinking about left and right consider only links
    in the abstract sense. Put them in an array and then flip
    this enum and left and right code paths can be united into one */
 enum tree_link_
@@ -19,7 +20,7 @@ enum tree_link_
     R = 1
 };
 
-/* Trees are just a different interpretation of the same links used
+/* @private Trees are just a different interpretation of the same links used
    for doubly linked lists. We take advantage of this for duplicates. */
 enum list_link_
 {
@@ -49,8 +50,7 @@ static bool ccc_tree_validate(struct ccc_tree_ const *t);
 
 /* Returning the user type that is stored in data structure. */
 
-static struct ccc_entry_ multimap_insert(struct ccc_tree_ *,
-                                         struct ccc_node_ *);
+static struct ccc_ent_ multimap_insert(struct ccc_tree_ *, struct ccc_node_ *);
 static void *multimap_erase(struct ccc_tree_ *t, void const *key);
 static void *find(struct ccc_tree_ *, void const *);
 static void *struct_base(struct ccc_tree_ const *, struct ccc_node_ const *);
@@ -67,8 +67,8 @@ static void *key_from_node(struct ccc_tree_ const *t,
                            struct ccc_node_ const *n);
 static struct ccc_node_ *elem_in_slot(struct ccc_tree_ const *t,
                                       void const *slot);
-static struct ccc_range_ equal_range(struct ccc_tree_ *, void const *,
-                                     void const *, enum tree_link_);
+static struct ccc_range_u_ equal_range(struct ccc_tree_ *, void const *,
+                                       void const *, enum tree_link_);
 
 /* Internal operations that take and return nodes for the tree. */
 
@@ -780,13 +780,13 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
     return p;
 }
 
-static struct ccc_range_
+static struct ccc_range_u_
 equal_range(struct ccc_tree_ *const t, void const *const begin_key,
             void const *const end_key, enum tree_link_ const traversal)
 {
     if (!t->size_)
     {
-        return (struct ccc_range_){};
+        return (struct ccc_range_u_){};
     }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -804,7 +804,7 @@ equal_range(struct ccc_tree_ *const t, void const *const begin_key,
     {
         e = next(t, e, traversal);
     }
-    return (struct ccc_range_){
+    return (struct ccc_range_u_){
         .begin_ = b == &t->end_ ? NULL : struct_base(t, b),
         .end_ = e == &t->end_ ? NULL : struct_base(t, e),
     };
@@ -817,7 +817,7 @@ contains(struct ccc_tree_ *const t, void const *const key)
     return cmp(t, key, t->root_, t->cmp_) == CCC_EQL;
 }
 
-static inline struct ccc_entry_
+static inline struct ccc_ent_
 multimap_insert(struct ccc_tree_ *const t, struct ccc_node_ *const out_handle)
 {
     init_node(t, out_handle);
@@ -825,8 +825,8 @@ multimap_insert(struct ccc_tree_ *const t, struct ccc_node_ *const out_handle)
     {
         t->root_ = out_handle;
         t->size_ = 1;
-        return (struct ccc_entry_){.e_ = struct_base(t, out_handle),
-                                   .stats_ = CCC_ENTRY_VACANT};
+        return (struct ccc_ent_){.e_ = struct_base(t, out_handle),
+                                 .stats_ = CCC_ENTRY_VACANT};
     }
     t->size_++;
     void const *const key = key_from_node(t, out_handle);
@@ -836,11 +836,11 @@ multimap_insert(struct ccc_tree_ *const t, struct ccc_node_ *const out_handle)
     if (CCC_EQL == root_cmp)
     {
         add_duplicate(t, t->root_, out_handle, &t->end_);
-        return (struct ccc_entry_){.e_ = struct_base(t, out_handle),
-                                   .stats_ = CCC_ENTRY_OCCUPIED};
+        return (struct ccc_ent_){.e_ = struct_base(t, out_handle),
+                                 .stats_ = CCC_ENTRY_OCCUPIED};
     }
-    return (struct ccc_entry_){.e_ = connect_new_root(t, out_handle, root_cmp),
-                               .stats_ = CCC_ENTRY_VACANT};
+    return (struct ccc_ent_){.e_ = connect_new_root(t, out_handle, root_cmp),
+                             .stats_ = CCC_ENTRY_VACANT};
 }
 
 static void *
@@ -1237,15 +1237,10 @@ force_find_les(ccc_key_cmp const)
 
 /* ======================        Debugging           ====================== */
 
-/* This section has recursion so it should probably not be used in
-   a custom operating system environment with constrained stack space.
-   Needless to mention the stdlib.h heap implementation that would need
-   to be replaced with the custom OS drop in. */
-
-/* Validate binary tree invariants with ranges. Use a recursive method that
-   does not rely upon the implementation of iterators or any other possibly
-   buggy implementation. A pure functional range check will provide the most
-   reliable check regardless of implementation changes throughout code base. */
+/** @private Validate binary tree invariants with ranges. Use a recursive method
+that does not rely upon the implementation of iterators or any other possibly
+buggy implementation. A pure functional range check will provide the most
+reliable check regardless of implementation changes throughout code base. */
 struct tree_range_
 {
     struct ccc_node_ const *low;
@@ -1253,6 +1248,7 @@ struct tree_range_
     struct ccc_node_ const *high;
 };
 
+/** @private */
 struct parent_status_
 {
     bool correct;

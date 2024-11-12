@@ -9,15 +9,17 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** A flat ordered map is a self-optimizing data structure offering amortized
-O(lg N) search, insert, and erase. Because the data structure is self-optimizing
-it is not suitable map in a realtime environment where strict runtime bounds are
-needed. Also, searching the map is not a const thread-safe operation as
-indicated by the function signatures. The map is optimized upon every new
-search. However, in many cases the self-optimizing structure of the map can be
-beneficial when considering non-uniform access patterns. In the best case,
-repeated searches of the same value yield an O(1) access and many other
-frequently searched values will remain close to the root of the map.
+/** @brief A self-optimizing data structure offering amortized O(lg N) search,
+insert, and erase.
+
+Because the data structure is self-optimizing it is not
+suitable map in a realtime environment where strict runtime bounds are needed.
+Also, searching the map is not a const thread-safe operation as indicated by the
+function signatures. The map is optimized upon every new search. However, in
+many cases the self-optimizing structure of the map can be beneficial when
+considering non-uniform access patterns. In the best case, repeated searches of
+the same value yield an O(1) access and many other frequently searched values
+will remain close to the root of the map.
 
 The flat variant of the ordered map promises contiguous storage and random
 access if needed. Also, all elements in the map track their relationships via
@@ -29,21 +31,20 @@ to store a fixed size N nodes in the map N + 1 capacity is needed for the
 sentinel node in the buffer. */
 typedef struct ccc_fomap_ ccc_flat_ordered_map;
 
-/** A map element is the intrusive element of the user defined struct being
-stored in the map for key value access. Note that if allocation is not
-permitted, insertions functions accepting this type as an argument assume it
-to exist in pre-allocated memory that will exist with the appropriate lifetime
-and scope for the user's needs; the container does not allocate or free in this
-case. */
+/** @brief The intrusive element for the user defined type being stored in the
+map.
+
+Note that if allocation is not permitted, insertions functions accepting
+this type as an argument assume it to exist in pre-allocated memory that will
+exist with the appropriate lifetime and scope for the user's needs; the
+container does not allocate or free in this case. */
 typedef struct ccc_fomap_elem_ ccc_fomap_elem;
 
-/** A container specific entry used to implement the Entry API. The Entry API
- offers efficient search and subsequent insertion, deletion, or value update
- based on the needs of the user. */
-typedef union
-{
-    struct ccc_fomap_entry_ impl_;
-} ccc_fomap_entry;
+/** @brief A container specific entry used to implement the Entry API.
+
+The Entry API offers efficient search and subsequent insertion, deletion, or
+value update based on the needs of the user. */
+typedef union ccc_fomap_entry_ ccc_fomap_entry;
 
 /** @brief Initializes the map at runtime or compile time.
 @param [in] mem_ptr a pointer to the contiguous user types or ((T *)NULL).
@@ -89,8 +90,8 @@ it in an entry to provide information about the old value. */
 ccc_entry ccc_fom_insert(ccc_flat_ordered_map *fom, ccc_fomap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
-@param [in] fom the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
+@param [in] flat_ordered_map_ptr the pointer to the ordered map.
+@param [out] out_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to an entry. If Vacant, no prior element
 with key existed and the type wrapping out_handle remains unchanged. If Occupied
 the old value is written to the type wrapping out_handle and may be unwrapped to
@@ -116,16 +117,16 @@ ccc_entry ccc_fom_try_insert(ccc_flat_ordered_map *fom,
                              ccc_fomap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
-@param [in] fom the pointer to the map.
-@param [in] key_val_handle the handle to the user type wrapping map elem.
+@param [in] flat_ordered_map_ptr the pointer to the map.
+@param [in] key_val_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to an entry. If Occupied, the entry
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the entry contains a reference to the newly inserted entry in the map.
 If more space is needed but allocation fails an insert error is set. */
-#define ccc_fom_try_insert_r(flat_ordered_map_ptr, out_handle_ptr)             \
+#define ccc_fom_try_insert_r(flat_ordered_map_ptr, key_val_handle_ptr)         \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fom_try_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_     \
+        ccc_fom_try_insert((flat_ordered_map_ptr), (key_val_handle_ptr)).impl_ \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -189,8 +190,8 @@ ccc_entry ccc_fom_remove(ccc_flat_ordered_map *fom, ccc_fomap_elem *out_handle);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
-@param [in] fom the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
+@param [in] flat_ordered_map_ptr the pointer to the ordered map.
+@param [out] out_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to the removed entry. If Occupied it may be
 unwrapped to obtain the old key value pair. If Vacant the key value pair was not
 stored in the map. If bad input is provided an input error is set.
@@ -220,8 +221,8 @@ to subsequent calls in the Entry API. */
 ccc_fomap_entry ccc_fom_entry(ccc_flat_ordered_map *fom, void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
-@param [in] fom the map to be searched.
-@param [in] key the key used to search the map matching the stored key type.
+@param [in] flat_ordered_map_ptr the map to be searched.
+@param [in] key_ptr the key used to search the map matching the stored key type.
 @return a compound literal reference to a specialized entry for use with other
 functions in the Entry API.
 @warning the contents of an entry should not be examined or modified. Use the
@@ -333,7 +334,7 @@ insertions. */
 ccc_entry ccc_fom_remove_entry(ccc_fomap_entry *e);
 
 /** @brief Remove the entry from the map if Occupied.
-@param [in] e a pointer to the map entry.
+@param [in] flat_ordered_map_entry_ptr a pointer to the map entry.
 @return a compound literal reference to an entry containing NULL or a reference
 to the old entry. If Occupied an entry in the map existed and was removed. If
 Vacant, no prior entry existed to be removed.
@@ -412,7 +413,7 @@ ccc_range ccc_fom_equal_range(ccc_flat_ordered_map *fom, void const *begin_key,
 /** @brief Returns a compound literal reference to the desired range. Amortized
 O(lg N).
 @param [in] flat_ordered_map_ptr a pointer to the map.
-@param [in] begin_and_key_ptrs pointers to the begin and end of the range.
+@param [in] begin_and_end_key_ptrs pointers to the begin and end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always be valid. */
 #define ccc_fom_equal_range_r(flat_ordered_map_ptr, begin_and_end_key_ptrs...) \
@@ -424,9 +425,9 @@ enclosing scope. This reference is always be valid. */
 
 /** @brief Return an iterable rrange of values from [rbegin_key, end_key).
 Amortized O(lg N).
-@param [in] mm a pointer to the map.
+@param [in] fom a pointer to the map.
 @param [in] rbegin_key a pointer to the key intended as the start of the rrange.
-@param [in] end_key a pointer to the key intended as the end of the rrange.
+@param [in] rend_key a pointer to the key intended as the end of the rrange.
 @return a rrange containing the first element NOT GREATER than the begin_key and
 the first element LESS than rend_key.
 
@@ -443,12 +444,13 @@ for (struct val *i = rrange_begin(&rrange);
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
 ccc_rrange ccc_fom_equal_rrange(ccc_flat_ordered_map *fom,
-                                void const *rbegin_key, void const *end_key);
+                                void const *rbegin_key, void const *rend_key);
 
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
 O(lg N).
 @param [in] flat_ordered_map_ptr a pointer to the map.
-@param [in] rbegin_and_rkey_ptrs pointers to the rbegin and rend of the range.
+@param [in] rbegin_and_rend_key_ptrs pointers to the rbegin and rend of the
+range.
 @return a compound literal reference to the produced rrange associated with the
 enclosing scope. This reference is always valid. */
 #define ccc_fom_equal_rrange_r(flat_ordered_map_ptr,                           \
@@ -476,7 +478,8 @@ void *ccc_fom_rbegin(ccc_flat_ordered_map const *fom);
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-void *ccc_fom_next(ccc_flat_ordered_map const *fom, ccc_fomap_elem const *);
+void *ccc_fom_next(ccc_flat_ordered_map const *fom,
+                   ccc_fomap_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -484,7 +487,8 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-void *ccc_fom_rnext(ccc_flat_ordered_map const *fom, ccc_fomap_elem const *);
+void *ccc_fom_rnext(ccc_flat_ordered_map const *fom,
+                    ccc_fomap_elem const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] fom a pointer to the map.

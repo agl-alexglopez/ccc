@@ -8,25 +8,29 @@
 
 #include <stddef.h>
 
-/** A singly linked list (sll) is a low overhead front tracking data structure
-with efficient push and pop operations. This makes it well suited for list or
-stack structures that only need access to the front or most recently added
-elements. When compared to a doubly linked list, the memory overhead per node is
-smaller but some operations will have O(N) runtime implications when compared to
-a similar operation in a doubly linked list. Review function documentation when
-unsure of the runtime of an sll operation. */
+/** @brief A low overhead front tracking container with efficient push and pop.
+
+A singly linked list is well suited for list or stack structures that only need
+access to the front or most recently added elements. When compared to a doubly
+linked list, the memory overhead per node is smaller but some operations will
+have O(N) runtime implications when compared to a similar operation in a doubly
+linked list. Review function documentation when unsure of the runtime of an sll
+operation. */
 typedef struct ccc_sll_ ccc_singly_linked_list;
 
-/** A node used to track elements in a singly linked list (sll). Include this
-intrusive element in the type intended for tracking in the list. The memory
-overhead of this node is smaller than that of a doubly linked list element and
-therefore will be slightly more cache friendly, especially if nodes are grouped
-together in a contiguous allocation, such as a pool allocator. */
+/** @brief A singly linked list intrusive element to embedded in a user type.
+
+It can be used in an allocating or non allocating container. If allocation is
+prohibited the container assumes the element is wrapped in pre-allocated
+memory with the appropriate lifetime and scope for the user's needs; the
+container does not allocate or free in this case. If allocation is allowed
+the container will handle copying the data wrapping the element to allocations
+and deallocating when necessary. */
 typedef struct ccc_sll_elem_ ccc_sll_elem;
 
 /** @brief Initialize a singly linked list at compile or runtime.
 @param [in] list_name the name the user has chosen for the list.
-@param [in] the user type wrapping the intrusive sll elem.
+@param [in] struct_name the user type wrapping the intrusive sll elem.
 @param [in] list_elem_field the name of the field in the user type storing the
 intrusive list elem.
 @param [in] alloc_fn an allocation function if allocation is allowed.
@@ -43,7 +47,7 @@ destruction.
 /** @brief Write a compound literal directly to allocated memory at the front.
 O(1).
 @param [in] list_ptr a pointer to the singly linked list.
-@param [in] struct_initializer... a compound literal containing the elements to
+@param [in] struct_initializer a compound literal containing the elements to
 be written to a newly allocated node.
 @return a reference to the element pushed to the front or NULL if allocation
 failed.
@@ -56,7 +60,7 @@ container to allocate memory. */
 
 /** @brief Push the type wrapping elem to the front of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
-@param [in] eleme a pointer to the intrusive handle in the user type.
+@param [in] elem a pointer to the intrusive handle in the user type.
 @return a pointer to the inserted element or NULL if allocation failed.
 
 Note that if allocation is not allowed the container assumes the memory wrapping

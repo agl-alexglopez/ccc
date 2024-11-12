@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 
-/** \internal */
+/** @private */
 struct ccc_fdeq_
 {
     ccc_buffer buf_;

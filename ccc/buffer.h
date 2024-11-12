@@ -9,7 +9,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** A buffer is a contiguous block of storage for elements of the same type.
+/** @brief A contiguous block of storage for elements of the same type.
+
 The usage is similar to a C++ vector, with more flexible functions
 provided to support higher level containers and abstractions. While useful
 on its own--a stack could be implemented with the provided functions--a buffer
@@ -101,7 +102,7 @@ to accomodate i will occur. */
 /*=====================   Slot Management    ================================*/
 
 /** @brief return the element at slot i in buf.
-@parm [in] buf the pointer to the buffer.
+@param [in] buf the pointer to the buffer.
 @param [in] i the index within capacity range of the buffer.
 @return a pointer to the element in the slot at position i or NULL if i is out
 of capacity range.
@@ -150,7 +151,7 @@ ccc_result ccc_buf_pop_back(ccc_buffer *buf);
 
 /** @brief pop n elements from the back of the buffer according to size.
 @param [in] buf the pointer to the buffer.
-@param [in] the number of elements to pop.
+@param [in] n the number of elements to pop.
 @return the result of the attempted pop. CCC_OK if the buffer exists and n
 is within the bounds of size. If the buffer does not exist an input error is
 returned. If n is greater than the size of the buffer size is set to zero
@@ -160,7 +161,7 @@ ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, size_t n);
 /** @brief write data to buffer at slot at index i according to capacity.
 @param [in] buf the pointer to the buffer.
 @param [in] i the index within bounds of capacity of the buffer.
-@param [in] the data that will be written to slot at i.
+@param [in] data the data that will be written to slot at i.
 @return the result of the write, CCC_OK if success. If no buffer or data
 exists input error is returned. If i is outside of the range of capacity
 input error is returned.
@@ -189,7 +190,7 @@ ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t i, size_t j);
 /** @brief erase element at slot i according to size of the buffer maintaining
 contiguous storage of elements between 0 and size.
 @param [in] buf the pointer to the buffer.
-@param [in] the index of the element to be erased.
+@param [in] i the index of the element to be erased.
 @return the result, CCC_OK if the input is valid. If no buffer exists or i is
 out of range of size then an input error is returned.
 
@@ -209,7 +210,7 @@ provided or the buffer has not yet been allocated. */
 
 /** @brief advance the iter to the next slot in the buffer according to size.
 @param [in] buf the pointer to the buffer.
-@parem [in] iter the pointer to the current slot of the buffer.
+@param [in] iter the pointer to the current slot of the buffer.
 @return the next iterator position according to size. */
 [[nodiscard]] void *ccc_buf_next(ccc_buffer const *buf, void const *iter);
 
@@ -243,7 +244,7 @@ argument is provided or the buffer has not yet been allocated. */
 /** @brief advance the iter to the next slot in the buffer according to size and
 in reverse order.
 @param [in] buf the pointer to the buffer.
-@parem [in] iter the pointer to the current slot of the buffer.
+@param [in] iter the pointer to the current slot of the buffer.
 @return the next iterator position according to size and in reverse order. NULL
 is returned if bad input is provided or the buffer has not been allocated. */
 [[nodiscard]] void *ccc_buf_rnext(ccc_buffer const *buf, void const *iter);
@@ -288,7 +289,7 @@ capacity and an error is returned. */
 ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 
 /** @brief return the current capacity of the buffer.
-@param [in] the pointer to the buffer.
+@param [in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
 value remains the same until a resize occurs. */
 [[nodiscard]] size_t ccc_buf_capacity(ccc_buffer const *buf);
@@ -306,7 +307,7 @@ Note that size must be less than or equal to capacity. */
 [[nodiscard]] size_t ccc_buf_size(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer is 0.
-@aram [in] buf the pointer to the buffer.
+@param [in] buf the pointer to the buffer.
 @return true if the size is 0 false if not. */
 [[nodiscard]] bool ccc_buf_is_empty(ccc_buffer const *buf);
 

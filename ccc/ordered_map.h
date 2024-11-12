@@ -4,45 +4,38 @@
 #define CCC_ORDERED_MAP_H
 
 #include "impl_ordered_map.h"
-#include "impl_tree.h"
 #include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
-/** A ordered map is a self-optimizing data structure offering amortized
-O(lg N) search, insert, and erase and pointer stability. Because the data
-structure is self-optimizing it is not suitable map in a realtime environment
-where strict runtime bounds are needed. Also, searching the map is not a const
-thread-safe operation as indicated by the function signatures. The map is
-optimized upon every new search. However, in many cases the self-optimizing
-structure of the map can be beneficial when considering non-uniform access
-patterns. In the best case, repeated searches of the same value yield an O(1)
-access and many other frequently searched values will remain close to the root
-of the map. */
-typedef union
-{
-    struct ccc_tree_ impl_;
-} ccc_ordered_map;
+/** @brief A self-optimizing data structure offering amortized O(lg N) search,
+insert, and erase and pointer stability.
 
-/** A map element is the intrusive element of the user defined struct being
-stored in the map for key value access. Note that if allocation is not
-permitted, insertions functions accepting this type as an argument assume it
-to exist in pre-allocated memory that will exist with the appropriate lifetime
-and scope for the user's needs; the container does not allocate or free in this
-case. */
-typedef union
-{
-    ccc_node_ impl_;
-} ccc_omap_elem;
+Because the data structure is self-optimizing it is not suitable map in a
+realtime environment where strict runtime bounds are needed. Also, searching the
+map is not a const thread-safe operation as indicated by the function
+signatures. The map is optimized upon every new search. However, in many cases
+the self-optimizing structure of the map can be beneficial when considering
+non-uniform access patterns. In the best case, repeated searches of the same
+value yield an O(1) access and many other frequently searched values will remain
+close to the root of the map. */
+typedef union ccc_ordered_map_ ccc_ordered_map;
 
-/** A container specific entry used to implement the Entry API. The Entry API
- offers efficient search and subsequent insertion, deletion, or value update
- based on the needs of the user. */
-typedef union
-{
-    struct ccc_tree_entry_ impl_;
-} ccc_omap_entry;
+/** @brief The intrusive element for the user defined struct being stored in the
+map.
+
+Note that if allocation is not permitted, insertions functions accepting this
+type as an argument assume it to exist in pre-allocated memory that will exist
+with the appropriate lifetime and scope for the user's needs; the container does
+not allocate or free in this case. */
+typedef union ccc_omap_elem_ ccc_omap_elem;
+
+/** @brief A container specific entry used to implement the Entry API.
+
+The Entry API offers efficient search and subsequent insertion, deletion, or
+value update based on the needs of the user. */
+typedef union ccc_omap_entry_ ccc_omap_entry;
 
 /** @brief Initializes the ordered map at runtime or compile time.
 @param [in] om_name the name of the ordered map being initialized.
@@ -122,17 +115,17 @@ allocation fails, an insert error is set. */
                                           ccc_omap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
-@param [in] om the pointer to the map.
-@param [in] key_val_handle the handle to the user type wrapping map elem.
+@param [in] ordered_map_ptr the pointer to the map.
+@param [in] key_val_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to an entry. If Occupied, the entry
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the entry contains a reference to the newly inserted entry in the map.
 If more space is needed but allocation fails or has been forbidden, an insert
 error is set. */
-#define ccc_om_try_insert_r(ordered_map_ptr, out_handle_ptr)                   \
+#define ccc_om_try_insert_r(ordered_map_ptr, key_val_handle_ptr)               \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_try_insert((ordered_map_ptr), (out_handle_ptr)).impl_           \
+        ccc_om_try_insert((ordered_map_ptr), (key_val_handle_ptr)).impl_       \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -202,8 +195,8 @@ stored memory as they see fit. */
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
-@param [in] om the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
+@param [in] ordered_map_ptr the pointer to the ordered map.
+@param [out] out_handle_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to the removed entry. If Occupied it may be
 unwrapped to obtain the old key value pair. If Vacant the key value pair was not
 stored in the map. If bad input is provided an input error is set.
@@ -238,8 +231,8 @@ to subsequent calls in the Entry API. */
 [[nodiscard]] ccc_omap_entry ccc_om_entry(ccc_ordered_map *om, void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
-@param [in] om the map to be searched.
-@param [in] key the key used to search the map matching the stored key type.
+@param [in] ordered_map_ptr the map to be searched.
+@param [in] key_ptr the key used to search the map matching the stored key type.
 @return a compound literal reference to a specialized entry for use with other
 functions in the Entry API.
 @warning the contents of an entry should not be examined or modified. Use the
@@ -355,7 +348,7 @@ free or use as needed. */
 [[nodiscard]] ccc_entry ccc_om_remove_entry(ccc_omap_entry *e);
 
 /** @brief Remove the entry from the map if Occupied.
-@param [in] e a pointer to the map entry.
+@param [in] ordered_map_entry_ptr a pointer to the map entry.
 @return a compound literal reference to an entry containing NULL or a reference
 to the old entry. If Occupied an entry in the map existed and was removed. If
 Vacant, no prior entry existed to be removed.
@@ -415,9 +408,8 @@ map versus the end map sentinel. */
 /** @brief Returns a compound literal reference to the desired range. Amortized
 O(lg N).
 @param [in] ordered_map_ptr a pointer to the map.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-range.
-@param [in] end_key_ptr a pointer to the key that marks the end of the range.
+@param [in] begin_and_end_key_ptrs two pointers, one to the start of the range
+and a second to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
 #define ccc_om_equal_range_r(ordered_map_ptr, begin_and_end_key_ptrs...)       \
@@ -428,9 +420,9 @@ enclosing scope. This reference is always non-NULL. */
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
 Amortized O(lg N).
-@param [in] mm a pointer to the map.
-@param [in] begin_key a pointer to the key intended as the start of the rrange.
-@param [in] end_key a pointer to the key intended as the end of the rrange.
+@param [in] om a pointer to the map.
+@param [in] rbegin_key a pointer to the key intended as the start of the rrange.
+@param [in] rend_key a pointer to the key intended as the end of the rrange.
 @return a rrange containing the first element NOT GREATER than the begin_key and
 the first element LESS than rend_key.
 
@@ -448,14 +440,13 @@ This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
 [[nodiscard]] ccc_rrange ccc_om_equal_rrange(ccc_ordered_map *om,
                                              void const *rbegin_key,
-                                             void const *end_key);
+                                             void const *rend_key);
 
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
 O(lg N).
 @param [in] ordered_map_ptr a pointer to the map.
-@param [in] begin_key_ptr a pointer to the key that marks the start of the
-rrange.
-@param [in] end_key_ptr a pointer to the key that marks the end of the rrange.
+@param [in] rbegin_and_rend_key_ptrs two pointers, one to the start of the
+rrange and a second to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
 enclosing scope. This reference is always non-NULL. */
 #define ccc_om_equal_rrange_r(ordered_map_ptr, rbegin_and_rend_key_ptrs...)    \

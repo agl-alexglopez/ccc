@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 
-/** \internal */
+/** @private */
 struct ccc_pq_elem_
 {
     struct ccc_pq_elem_ *left_child_;
@@ -14,7 +14,7 @@ struct ccc_pq_elem_
     struct ccc_pq_elem_ *parent_;
 };
 
-/** \internal */
+/** @private */
 struct ccc_pq_
 {
     struct ccc_pq_elem_ *root_;

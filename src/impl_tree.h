@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** \internal This node type will support more expressive implementations of a
+/** @private This node type will support more expressive implementations of a
    standard map and double ended priority queue. The array of pointers is to
    support unifying left and right symmetric cases. The union is only relevant
    to the double ended priority queue code. Duplicate values are placed in a
@@ -46,7 +46,7 @@ typedef struct ccc_node_
     };
 } ccc_node_;
 
-/** \internal */
+/** @private */
 struct ccc_tree_
 {
     struct ccc_node_ *root_;
@@ -60,11 +60,11 @@ struct ccc_tree_
     size_t key_offset_;
 };
 
-/** \internal */
+/** @private */
 struct ccc_tree_entry_
 {
     struct ccc_tree_ *t_;
-    struct ccc_entry_ entry_;
+    struct ccc_ent_ entry_;
 };
 
 #define ccc_tree_init(tree_name, struct_name, node_elem_field, key_elem_field, \

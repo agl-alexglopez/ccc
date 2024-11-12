@@ -5,8 +5,23 @@
 
 #include <stddef.h>
 
-struct ccc_node_;
-struct ccc_tree_;
+/** @private */
+union ccc_ordered_multimap_
+{
+    struct ccc_tree_ impl_;
+};
+
+/** @private */
+union ccc_ommap_elem_
+{
+    struct ccc_node_ impl_;
+};
+
+/** @private */
+union ccc_ommap_entry_
+{
+    struct ccc_tree_entry_ impl_;
+};
 
 #define ccc_impl_omm_init(tree_name, struct_name, node_elem_field,             \
                           key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \
@@ -54,7 +69,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
     ({                                                                         \
         typeof(lazy_value) *omm_new_ins_base_                                  \
             = ccc_impl_omm_new((&omm_insert_entry));                           \
-        omm_insert_entry_ret = (struct ccc_entry_){                            \
+        omm_insert_entry_ret = (struct ccc_ent_){                              \
             .e_ = omm_new_ins_base_,                                           \
             .stats_ = CCC_ENTRY_INSERT_ERROR,                                  \
         };                                                                     \
@@ -119,7 +134,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
         struct ccc_tree_ *omm_try_ins_map_ptr_ = &(ordered_map_ptr)->impl_;    \
         struct ccc_tree_entry_ omm_try_ins_ent_                                \
             = ccc_impl_omm_entry(omm_try_ins_map_ptr_, &omm_key_);             \
-        struct ccc_entry_ omm_try_ins_ent_ret_ = {};                           \
+        struct ccc_ent_ omm_try_ins_ent_ret_ = {};                             \
         if (!(omm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))            \
         {                                                                      \
             ccc_impl_omm_insert_and_copy_key(                                  \
@@ -138,7 +153,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
         struct ccc_tree_ *ordered_map_ptr_ = &(ordered_map_ptr)->impl_;        \
         struct ccc_tree_entry_ omm_ins_or_assign_ent_                          \
             = ccc_impl_omm_entry(ordered_map_ptr_, &omm_key_);                 \
-        struct ccc_entry_ omm_ins_or_assign_ent_ret_ = {};                     \
+        struct ccc_ent_ omm_ins_or_assign_ent_ret_ = {};                       \
         if (!(omm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))      \
         {                                                                      \
             ccc_impl_omm_insert_and_copy_key(omm_ins_or_assign_ent_,           \

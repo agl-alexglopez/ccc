@@ -7,8 +7,10 @@
 #include <assert.h>
 #include <string.h>
 
+/** @private */
 #define LR 2
 
+/** @private */
 enum fom_branch_
 {
     L = 0,
@@ -33,7 +35,7 @@ static struct ccc_fomap_elem_ *at(struct ccc_fomap_ const *, size_t);
 static struct ccc_fomap_elem_ *elem_in_slot(struct ccc_fomap_ const *t,
                                             void const *slot);
 /* Returning the user struct type with stored offsets. */
-static struct ccc_fomap_entry_ entry(struct ccc_fomap_ *fom, void const *key);
+static struct ccc_ftree_entry_ entry(struct ccc_fomap_ *fom, void const *key);
 static void *erase(struct ccc_fomap_ *t, void const *key);
 static void *maybe_alloc_insert(struct ccc_fomap_ *fom,
                                 struct ccc_fomap_elem_ *elem);
@@ -45,9 +47,10 @@ static void *struct_base(struct ccc_fomap_ const *,
 static void *insert(struct ccc_fomap_ *t, size_t n);
 static void *base_at(struct ccc_fomap_ const *, size_t);
 static void *alloc_back(struct ccc_fomap_ *t);
-static struct ccc_range_ equal_range(struct ccc_fomap_ *t,
-                                     void const *begin_key, void const *end_key,
-                                     enum fom_branch_ traversal);
+static struct ccc_range_u_ equal_range(struct ccc_fomap_ *t,
+                                       void const *begin_key,
+                                       void const *end_key,
+                                       enum fom_branch_ traversal);
 /* Returning the user key with stored offsets. */
 static void *key_from_node(struct ccc_fomap_ const *t,
                            struct ccc_fomap_elem_ const *);
@@ -407,15 +410,15 @@ ccc_fom_equal_range(ccc_flat_ordered_map *const fom,
 
 ccc_rrange
 ccc_fom_equal_rrange(ccc_flat_ordered_map *const fom,
-                     void const *const rbegin_key, void const *const end_key)
+                     void const *const rbegin_key, void const *const rend_key)
 
 {
-    if (!fom || !rbegin_key || !end_key)
+    if (!fom || !rbegin_key || !rend_key)
     {
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(fom, rbegin_key, end_key, reverse_inorder_traversal)};
+        equal_range(fom, rbegin_key, rend_key, reverse_inorder_traversal)};
 }
 
 void
@@ -476,7 +479,7 @@ ccc_impl_fom_insert(struct ccc_fomap_ *const fom, size_t const elem_i)
     return insert(fom, elem_i);
 }
 
-struct ccc_fomap_entry_
+struct ccc_ftree_entry_
 ccc_impl_fom_entry(struct ccc_fomap_ *const fom, void const *const key)
 {
     return entry(fom, key);
@@ -511,13 +514,13 @@ ccc_impl_fom_alloc_back(struct ccc_fomap_ *const fom)
 
 /*===========================   Static Helpers    ===========================*/
 
-static inline struct ccc_range_
+static inline struct ccc_range_u_
 equal_range(struct ccc_fomap_ *const t, void const *const begin_key,
             void const *const end_key, enum fom_branch_ const traversal)
 {
     if (ccc_fom_is_empty(t))
     {
-        return (struct ccc_range_){};
+        return (struct ccc_range_u_){};
     }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -535,25 +538,25 @@ equal_range(struct ccc_fomap_ *const t, void const *const begin_key,
     {
         e = next(t, e, traversal);
     }
-    return (struct ccc_range_){
+    return (struct ccc_range_u_){
         .begin_ = base_at(t, b),
         .end_ = base_at(t, e),
     };
 }
 
-static inline struct ccc_fomap_entry_
+static inline struct ccc_ftree_entry_
 entry(struct ccc_fomap_ *const fom, void const *const key)
 {
     void *const found = find(fom, key);
     if (found)
     {
-        return (struct ccc_fomap_entry_){
+        return (struct ccc_ftree_entry_){
             .fom_ = fom,
             .i_ = ccc_buf_i(&fom->buf_, found),
             .stats_ = CCC_ENTRY_OCCUPIED,
         };
     }
-    return (struct ccc_fomap_entry_){
+    return (struct ccc_ftree_entry_){
         .fom_ = fom,
         .i_ = 0,
         .stats_ = CCC_ENTRY_VACANT,
@@ -901,7 +904,8 @@ key_at(struct ccc_fomap_ const *const t, size_t const i)
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-struct tree_range
+/** @private */
+struct tree_range_
 {
     size_t low;
     size_t root;
@@ -920,7 +924,7 @@ recursive_size(struct ccc_fomap_ const *const t, size_t const r)
 }
 
 static bool
-are_subtrees_valid(struct ccc_fomap_ const *t, struct tree_range const r)
+are_subtrees_valid(struct ccc_fomap_ const *t, struct tree_range_ const r)
 {
     if (!r.root)
     {
@@ -935,13 +939,13 @@ are_subtrees_valid(struct ccc_fomap_ const *t, struct tree_range const r)
         return false;
     }
     return are_subtrees_valid(
-               t, (struct tree_range){.low = r.low,
-                                      .root = branch_i(t, r.root, L),
-                                      .high = r.root})
+               t, (struct tree_range_){.low = r.low,
+                                       .root = branch_i(t, r.root, L),
+                                       .high = r.root})
            && are_subtrees_valid(
-               t, (struct tree_range){.low = r.root,
-                                      .root = branch_i(t, r.root, R),
-                                      .high = r.high});
+               t, (struct tree_range_){.low = r.root,
+                                       .root = branch_i(t, r.root, R),
+                                       .high = r.high});
 }
 
 static bool
@@ -963,7 +967,7 @@ is_storing_parent(struct ccc_fomap_ const *const t, size_t const p,
 static bool
 validate(struct ccc_fomap_ const *const fom)
 {
-    if (!are_subtrees_valid(fom, (struct tree_range){.root = fom->root_}))
+    if (!are_subtrees_valid(fom, (struct tree_range_){.root = fom->root_}))
     {
         return false;
     }

@@ -8,9 +8,7 @@
 #include "impl_flat_double_ended_queue.h"
 #include "types.h"
 
-/** A Flat Double Ended Queue (FDEQ) is a contiguous buffer supporting amortized
-O(1) or strict O(1) push and pop from the front and back depending on
-initialization options.
+/** @brief A contiguous buffer for O(1) push and pop from front and back.
 
 If the container is initialized with allocation permission it will resize when
 needed but support constant time push and pop to the front and back when
@@ -38,7 +36,7 @@ compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
 allocation permission amortized O(1) if allocation permission is given and a
 resize is required.
 @param [in] fdeq_ptr a pointer to the fdeq.
-@param [in] value... for integral types, the direct value. For structs and
+@param [in] value for integral types, the direct value. For structs and
 unions use compound literal syntax.
 @return a reference to the inserted element. If allocation is permitted and a
 resizing is required to insert the element but fails, NULL is returned. */
@@ -49,7 +47,7 @@ resizing is required to insert the element but fails, NULL is returned. */
 allocation permission amortized O(1) if allocation permission is given and a
 resize is required.
 @param [in] fdeq_ptr a pointer to the fdeq.
-@param [in] value... for integral types, the direct value. For structs and
+@param [in] value for integral types, the direct value. For structs and
 unions use compound literal syntax.
 @return a reference to the inserted element. If allocation is permitted and a
 resizing is required to insert the element but fails, NULL is returned. */
@@ -68,7 +66,7 @@ required.
 /** @brief Push the range of user types to the back of the fdeq. O(N).
 @param [in] fdeq pointer to the fdeq.
 @param [in] n the number of user types in the elems range.
-@param [in] elem a pointer to the array of user types.
+@param [in] elems a pointer to the array of user types.
 @return ok if insertion was successful. If allocation is permitted and a resize
 is needed but fails an error is returned. If bad input is provided an input
 error is returned.
@@ -91,7 +89,7 @@ resize is required.
 /** @brief Push the range of user types to the front of the fdeq. O(N).
 @param [in] fdeq a pointer to the fdeq.
 @param [in] n the number of user types in the elems range.
-@param [in] elem a pointer to the array of user types.
+@param [in] elems a pointer to the array of user types.
 @return ok if insertion was successful. If allocation is permitted and a resize
 is needed but fails an error is returned. If bad input is provided an input
 error is returned.
@@ -106,7 +104,7 @@ ccc_result ccc_fdeq_push_front_range(ccc_flat_double_ended_queue *fdeq,
 @param [in] fdeq a pointer to the fdeq.
 @param [in] pos the position in the fdeq before which to push the range.
 @param [in] n the number of user types in the elems range.
-@param [in] elem a pointer to the array of user types.
+@param [in] elems a pointer to the array of user types.
 @return a pointer to the start of the inserted range or NULL if a resize was
 required and could not complete.
 
@@ -121,7 +119,6 @@ pos with value 6.
 
 ```
  front pos        front
-   │   │            │
 ┌─┬┴┬─┬┴┬─┐    ┌─┬─┬┴┬─┬─┐
 │ │1│2│6│ │ -> │5│6│2│3│4│
 └─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘
@@ -134,7 +131,6 @@ the range itself is too large for the capacity. For example, push a range
 
 ```
  front pos    front
-   │   │        │
 ┌─┬┴┬─┬┴┬─┐    ┌┴┬─┬─┬─┬─┐
 │ │1│2│6│ │ -> │3│4│4│5│5│
 └─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘
