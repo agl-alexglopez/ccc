@@ -1,4 +1,3 @@
-
 # Building and Installation
 
 Currently, this library utilizes some features that many compilers support such as gcc, clang, and AppleClang, but support is not ready for Windows.
