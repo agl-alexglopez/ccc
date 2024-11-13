@@ -134,7 +134,7 @@ typedef struct
 
 /** @brief An allocation function at the core of all containers.
 
-An allocation function implements the following Interface, where ptr is pointer
+An allocation function implements the following behavior, where ptr is pointer
 to memory and size is number of bytes to allocate.
 
 - If NULL is provided with a size of 0, NULL is returned.
