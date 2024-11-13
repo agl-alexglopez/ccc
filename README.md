@@ -31,7 +31,7 @@ struct key_val
 {
     int key;
     int val;
-    ccc_omap_elem map_elem;
+    container_elem elem;
 };
 ```
 
@@ -83,7 +83,7 @@ Another concern for the programmer related to allocation may be constructors and
 Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).
 
 ```c
-void *ccc_insert(ccc_container *c, ccc_container_elem *e);
+void *insert(container *c, container_elem *e);
 ```
 
 Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
@@ -93,13 +93,13 @@ For destructors, the argument is similar but the container does help with this a
 The clear function works for pointer stable containers and flat containers.
 
 ```c
-ccc_result clear(ccc_container *c, ccc_destructor_fn *fn);
+result clear(container *c, destructor_fn *fn);
 ```
 
 The clear and free function works for flat containers.
 
 ```c
-ccc_result clear_and_free(ccc_container *c, ccc_destructor_fn *fn);
+result clear_and_free(container *c, destructor_fn *fn);
 ```
 
 The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.
