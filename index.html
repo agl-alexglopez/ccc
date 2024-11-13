@@ -104,9 +104,9 @@ Quick Start</h1>
 Design</h1>
 <h2><a class="anchor" id="autotoc_md4"></a>
 Motivations</h2>
-<p>The hypothesis of this library is as follows:</p>
+<p>Here is the main argument of this library:</p>
 <blockquote class="doxtable">
-<p>&zwj;Containers in C should never limit the control and flexibility offered by the C language. </p>
+<p>&zwj;Containers in C should avoid limiting the control and flexibility offered by the C language. </p>
 </blockquote>
 <p>There are many excellent data structure libraries in C (see the related section). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have non-trivial side effect by calling dynamic memory interfaces.</p>
 <p>The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer data structures in the truest sense of the word; they structure the data they are given according to the container's invariants with no alternative side effects. The concerns for the container are now separate from those for the programmer. The container takes no part in the scope or lifetime of the programmer's provided memory, simply structuring it within the container as promised by the interface.</p>
