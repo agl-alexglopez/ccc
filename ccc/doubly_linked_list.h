@@ -277,7 +277,7 @@ elements follow or bad input is provided. */
 /**@}*/
 
 /** @name State Interface
-Remove elements from the doubly linked list. */
+Obtain state from the doubly linked list. */
 /**@{*/
 
 /** @brief Returns the user type at the front of the list. O(1).
