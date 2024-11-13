@@ -92,8 +92,7 @@ $(document).ready(function(){initNavTree('singly__linked__list_8h.html',''); ini
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">singly_linked_list.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -149,14 +148,12 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:adfeb9ade999c0c98572b636601a72bb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A singly linked list intrusive element to embedded in a user type.  <br /></td></tr>
 <tr class="separator:adfeb9ade999c0c98572b636601a72bb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Add or remove elements from the container. </p>
+</td></tr>
 <tr class="memitem:a20652f3d5f4e73dd77b3490c7534a54b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a20652f3d5f4e73dd77b3490c7534a54b">ccc_sll_push_front</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *elem)</td></tr>
 <tr class="memdesc:a20652f3d5f4e73dd77b3490c7534a54b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the type wrapping elem to the front of the list. O(1).  <br /></td></tr>
 <tr class="separator:a20652f3d5f4e73dd77b3490c7534a54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9925c8fe46e4b260e72377bb5bb7e4bc"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a9925c8fe46e4b260e72377bb5bb7e4bc">ccc_sll_front</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> const *sll)</td></tr>
-<tr class="memdesc:a9925c8fe46e4b260e72377bb5bb7e4bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the element at the front of the list. O(1).  <br /></td></tr>
-<tr class="separator:a9925c8fe46e4b260e72377bb5bb7e4bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2924476c4e07b64703ba579e9126ff7b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a2924476c4e07b64703ba579e9126ff7b">ccc_sll_pop_front</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll)</td></tr>
 <tr class="memdesc:a2924476c4e07b64703ba579e9126ff7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the front element from the list. O(1).  <br /></td></tr>
 <tr class="separator:a2924476c4e07b64703ba579e9126ff7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,6 +175,17 @@ Functions</h2></td></tr>
 <tr class="memitem:aebdb50adbf99f6a07b531a6d962a7f83"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#aebdb50adbf99f6a07b531a6d962a7f83">ccc_sll_extract_range</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *begin, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *end)</td></tr>
 <tr class="memdesc:aebdb50adbf99f6a07b531a6d962a7f83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts a range of elements from the list without freeing them. O(N).  <br /></td></tr>
 <tr class="separator:aebdb50adbf99f6a07b531a6d962a7f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
+</td></tr>
+<tr class="memitem:ab042e96aa623cc0bd618994414429961"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#ab042e96aa623cc0bd618994414429961">ccc_sll_clear</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:ab042e96aa623cc0bd618994414429961"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the list freeing memory if needed. O(N).  <br /></td></tr>
+<tr class="separator:ab042e96aa623cc0bd618994414429961"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Iterate through the doubly linked list. </p>
+</td></tr>
 <tr class="memitem:abe30c1573bc55030386e62844f8ae74e"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#abe30c1573bc55030386e62844f8ae74e">ccc_sll_begin</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> const *sll)</td></tr>
 <tr class="memdesc:abe30c1573bc55030386e62844f8ae74e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type at the front of the list. O(1).  <br /></td></tr>
 <tr class="separator:abe30c1573bc55030386e62844f8ae74e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,6 +195,13 @@ Functions</h2></td></tr>
 <tr class="memitem:ab4724b83877b5582774c6f5d138edf6a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#ab4724b83877b5582774c6f5d138edf6a">ccc_sll_next</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> const *sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> const *elem)</td></tr>
 <tr class="memdesc:ab4724b83877b5582774c6f5d138edf6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type following elem in the list. O(1).  <br /></td></tr>
 <tr class="separator:ab4724b83877b5582774c6f5d138edf6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain state from the doubly linked list. </p>
+</td></tr>
+<tr class="memitem:a9925c8fe46e4b260e72377bb5bb7e4bc"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a9925c8fe46e4b260e72377bb5bb7e4bc">ccc_sll_front</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> const *sll)</td></tr>
+<tr class="memdesc:a9925c8fe46e4b260e72377bb5bb7e4bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the element at the front of the list. O(1).  <br /></td></tr>
+<tr class="separator:a9925c8fe46e4b260e72377bb5bb7e4bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96a2fa2efc460be38875c7893b1416e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a96a2fa2efc460be38875c7893b1416e2">ccc_sll_begin_elem</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> const *sll)</td></tr>
 <tr class="memdesc:a96a2fa2efc460be38875c7893b1416e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the first intrusive handle in the list. O(1).  <br /></td></tr>
 <tr class="separator:a96a2fa2efc460be38875c7893b1416e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -202,12 +217,14 @@ Functions</h2></td></tr>
 <tr class="memitem:a4eb65ff8b957b2dd2c4ef6ef33e85b33"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a4eb65ff8b957b2dd2c4ef6ef33e85b33">ccc_sll_validate</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> const *sll)</td></tr>
 <tr class="memdesc:a4eb65ff8b957b2dd2c4ef6ef33e85b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the invariants of the list hold.  <br /></td></tr>
 <tr class="separator:a4eb65ff8b957b2dd2c4ef6ef33e85b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab042e96aa623cc0bd618994414429961"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#ab042e96aa623cc0bd618994414429961">ccc_sll_clear</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:ab042e96aa623cc0bd618994414429961"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the list freeing memory if needed. O(N).  <br /></td></tr>
-<tr class="separator:ab042e96aa623cc0bd618994414429961"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Singly Linked List Interface. </p>
+<p>A singly linked list is well suited for list or stack structures that only need access to the front or most recently added elements. When compared to a doubly linked list, the memory overhead per node is smaller but some operations will have O(N) runtime implications when compared to a similar operation in a doubly linked list. Review function documentation when unsure of the runtime of an sll operation.</p>
+<p>This container offers pointer stability. Also, if the container is not permitted to allocate all insertion code assumes that the user has allocated memory appropriately for the element to be inserted; it will not allocate or free in this case. If allocation is permitted upon initialization the container will manage the memory as expected on insert or erase operations as defined by the interface; memory is allocated for insertions and freed for removals.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a9002202a3809db1cf28ab47146f5cb3a" name="a9002202a3809db1cf28ab47146f5cb3a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9002202a3809db1cf28ab47146f5cb3a">&#9670;&#160;</a></span>ccc_sll_emplace_front</h2>
@@ -330,7 +347,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A low overhead front tracking container with efficient push and pop. </p>
-<p>A singly linked list is well suited for list or stack structures that only need access to the front or most recently added elements. When compared to a doubly linked list, the memory overhead per node is smaller but some operations will have O(N) runtime implications when compared to a similar operation in a doubly linked list. Review function documentation when unsure of the runtime of an sll operation. </p>
+<p>A singly linked list may be stored in the stack, heap, or data segment. Once Initialized it is passed by reference to all functions. A singly linked list can be initialized at compile time or runtime. </p>
 
 </div>
 </div>

@@ -92,8 +92,7 @@ $(document).ready(function(){initNavTree('flat__realtime__ordered__map_8h.html',
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_realtime_ordered_map.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -139,6 +138,22 @@ Macros</h2></td></tr>
 <tr class="memitem:ae2a7170efe0cde1bae865664d25019f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#ae2a7170efe0cde1bae865664d25019f3">ccc_frm_init</a>(memory_ptr,  capacity,  frm_elem_field,  key_elem_field,  alloc_fn,  key_cmp_fn,  aux_data)</td></tr>
 <tr class="memdesc:ae2a7170efe0cde1bae865664d25019f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the map at runtime or compile time.  <br /></td></tr>
 <tr class="separator:ae2a7170efe0cde1bae865664d25019f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a61529dc698f4413d5d4635f604cf02f2"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fromap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a></td></tr>
+<tr class="memdesc:a61529dc698f4413d5d4635f604cf02f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A flat realtime ordered map offers O(lg N) search and erase, and amortized O(lg N) insert.  <br /></td></tr>
+<tr class="separator:a61529dc698f4413d5d4635f604cf02f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5be3cecc9967a2b7aa46e95e5137499a"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fromap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a5be3cecc9967a2b7aa46e95e5137499a">ccc_fromap_elem</a></td></tr>
+<tr class="memdesc:a5be3cecc9967a2b7aa46e95e5137499a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined struct being stored in the map.  <br /></td></tr>
+<tr class="separator:a5be3cecc9967a2b7aa46e95e5137499a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36e567ad62e658d6158cabe06d9ec487"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fromap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></td></tr>
+<tr class="memdesc:a36e567ad62e658d6158cabe06d9ec487"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
+<tr class="separator:a36e567ad62e658d6158cabe06d9ec487"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
+</td></tr>
 <tr class="memitem:a850ce0eb74c9c8e955aeca49b03b5eea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a850ce0eb74c9c8e955aeca49b03b5eea">ccc_frm_insert_r</a>(flat_realtime_ordered_map_ptr,  out_handle_ptr)</td></tr>
 <tr class="memdesc:a850ce0eb74c9c8e955aeca49b03b5eea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping key_val_handle.  <br /></td></tr>
 <tr class="separator:a850ce0eb74c9c8e955aeca49b03b5eea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,33 +184,6 @@ Macros</h2></td></tr>
 <tr class="memitem:aa913899eea78092d58c6adeeccdadbf0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#aa913899eea78092d58c6adeeccdadbf0">ccc_frm_remove_entry_r</a>(flat_realtime_ordered_map_entry_ptr)</td></tr>
 <tr class="memdesc:aa913899eea78092d58c6adeeccdadbf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the map if Occupied.  <br /></td></tr>
 <tr class="separator:aa913899eea78092d58c6adeeccdadbf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc5ce17bf98d8f106c31d04a437115fd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#adc5ce17bf98d8f106c31d04a437115fd">ccc_frm_equal_range_r</a>(flat_realtime_ordered_map_ptr,  begin_and_end_key_ptrs...)</td></tr>
-<tr class="memdesc:adc5ce17bf98d8f106c31d04a437115fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a compound literal reference to the desired range. O(lg N).  <br /></td></tr>
-<tr class="separator:adc5ce17bf98d8f106c31d04a437115fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa767a183d722745d57d06e1f7a86b1a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#aa767a183d722745d57d06e1f7a86b1a2">ccc_frm_equal_rrange_r</a>(flat_realtime_ordered_map_ptr,  rbegin_and_rend_key_ptrs...)</td></tr>
-<tr class="memdesc:aa767a183d722745d57d06e1f7a86b1a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a compound literal reference to the desired rrange. O(lg N).  <br /></td></tr>
-<tr class="separator:aa767a183d722745d57d06e1f7a86b1a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a61529dc698f4413d5d4635f604cf02f2"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fromap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a></td></tr>
-<tr class="memdesc:a61529dc698f4413d5d4635f604cf02f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A flat realtime ordered map offers O(lg N) search and erase, and amortized O(lg N) insert.  <br /></td></tr>
-<tr class="separator:a61529dc698f4413d5d4635f604cf02f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5be3cecc9967a2b7aa46e95e5137499a"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fromap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a5be3cecc9967a2b7aa46e95e5137499a">ccc_fromap_elem</a></td></tr>
-<tr class="memdesc:a5be3cecc9967a2b7aa46e95e5137499a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined struct being stored in the map.  <br /></td></tr>
-<tr class="separator:a5be3cecc9967a2b7aa46e95e5137499a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36e567ad62e658d6158cabe06d9ec487"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fromap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></td></tr>
-<tr class="memdesc:a36e567ad62e658d6158cabe06d9ec487"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
-<tr class="separator:a36e567ad62e658d6158cabe06d9ec487"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a220d32bc2a1d5a262a0ef25751064b46"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a220d32bc2a1d5a262a0ef25751064b46">ccc_frm_contains</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm, void const *key)</td></tr>
-<tr class="memdesc:a220d32bc2a1d5a262a0ef25751064b46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the map for the presence of key.  <br /></td></tr>
-<tr class="separator:a220d32bc2a1d5a262a0ef25751064b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60885be73688b2e27b112d80f1e71263"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a60885be73688b2e27b112d80f1e71263">ccc_frm_get_key_val</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm, void const *key)</td></tr>
-<tr class="memdesc:a60885be73688b2e27b112d80f1e71263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the map at entry key.  <br /></td></tr>
-<tr class="separator:a60885be73688b2e27b112d80f1e71263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6aa1603f519df996f6215d456439c1c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a6aa1603f519df996f6215d456439c1c5">ccc_frm_insert</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> *frm, <a class="el" href="flat__realtime__ordered__map_8h.html#a5be3cecc9967a2b7aa46e95e5137499a">ccc_fromap_elem</a> *out_handle)</td></tr>
 <tr class="memdesc:a6aa1603f519df996f6215d456439c1c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping key_val_handle.  <br /></td></tr>
 <tr class="separator:a6aa1603f519df996f6215d456439c1c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -235,12 +223,16 @@ Functions</h2></td></tr>
 <tr class="memitem:adb60b3452f29647216f3bc11c5a65fa1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#adb60b3452f29647216f3bc11c5a65fa1">ccc_frm_insert_error</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a> const *e)</td></tr>
 <tr class="memdesc:adb60b3452f29647216f3bc11c5a65fa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the status of the entry should an insertion follow.  <br /></td></tr>
 <tr class="separator:adb60b3452f29647216f3bc11c5a65fa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70dad9055df763acef88da6988f539c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a70dad9055df763acef88da6988f539c5">ccc_frm_clear</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> *frm, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:a70dad9055df763acef88da6988f539c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map for use without affecting capacity.  <br /></td></tr>
-<tr class="separator:a70dad9055df763acef88da6988f539c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86f366e1170e53c3d0f69c3bc29ad2c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a86f366e1170e53c3d0f69c3bc29ad2c2">ccc_frm_clear_and_free</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> *frm, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:a86f366e1170e53c3d0f69c3bc29ad2c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map and frees the underlying buffer.  <br /></td></tr>
-<tr class="separator:a86f366e1170e53c3d0f69c3bc29ad2c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Iterator Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain and manage iterators over the container. </p>
+</td></tr>
+<tr class="memitem:adc5ce17bf98d8f106c31d04a437115fd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#adc5ce17bf98d8f106c31d04a437115fd">ccc_frm_equal_range_r</a>(flat_realtime_ordered_map_ptr,  begin_and_end_key_ptrs...)</td></tr>
+<tr class="memdesc:adc5ce17bf98d8f106c31d04a437115fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a compound literal reference to the desired range. O(lg N).  <br /></td></tr>
+<tr class="separator:adc5ce17bf98d8f106c31d04a437115fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa767a183d722745d57d06e1f7a86b1a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#aa767a183d722745d57d06e1f7a86b1a2">ccc_frm_equal_rrange_r</a>(flat_realtime_ordered_map_ptr,  rbegin_and_rend_key_ptrs...)</td></tr>
+<tr class="memdesc:aa767a183d722745d57d06e1f7a86b1a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a compound literal reference to the desired rrange. O(lg N).  <br /></td></tr>
+<tr class="separator:aa767a183d722745d57d06e1f7a86b1a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee6facea4fd2cead46927b5391d0a156"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#aee6facea4fd2cead46927b5391d0a156">ccc_frm_equal_range</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm, void const *begin_key, void const *end_key)</td></tr>
 <tr class="memdesc:aee6facea4fd2cead46927b5391d0a156"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an iterable range of values from [begin_key, end_key). O(lg N).  <br /></td></tr>
 <tr class="separator:aee6facea4fd2cead46927b5391d0a156"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,6 +257,30 @@ Functions</h2></td></tr>
 <tr class="memitem:a4eb48c80669b9cce61f9fca631805bac"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a4eb48c80669b9cce61f9fca631805bac">ccc_frm_rend</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm)</td></tr>
 <tr class="memdesc:a4eb48c80669b9cce61f9fca631805bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the rend of a reverse inorder traversal of the map. O(1).  <br /></td></tr>
 <tr class="separator:a4eb48c80669b9cce61f9fca631805bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
+</td></tr>
+<tr class="memitem:a220d32bc2a1d5a262a0ef25751064b46"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a220d32bc2a1d5a262a0ef25751064b46">ccc_frm_contains</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm, void const *key)</td></tr>
+<tr class="memdesc:a220d32bc2a1d5a262a0ef25751064b46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the map for the presence of key.  <br /></td></tr>
+<tr class="separator:a220d32bc2a1d5a262a0ef25751064b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60885be73688b2e27b112d80f1e71263"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a60885be73688b2e27b112d80f1e71263">ccc_frm_get_key_val</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm, void const *key)</td></tr>
+<tr class="memdesc:a60885be73688b2e27b112d80f1e71263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the map at entry key.  <br /></td></tr>
+<tr class="separator:a60885be73688b2e27b112d80f1e71263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
+</td></tr>
+<tr class="memitem:a70dad9055df763acef88da6988f539c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a70dad9055df763acef88da6988f539c5">ccc_frm_clear</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> *frm, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:a70dad9055df763acef88da6988f539c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map for use without affecting capacity.  <br /></td></tr>
+<tr class="separator:a70dad9055df763acef88da6988f539c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86f366e1170e53c3d0f69c3bc29ad2c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a86f366e1170e53c3d0f69c3bc29ad2c2">ccc_frm_clear_and_free</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> *frm, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:a86f366e1170e53c3d0f69c3bc29ad2c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map and frees the underlying buffer.  <br /></td></tr>
+<tr class="separator:a86f366e1170e53c3d0f69c3bc29ad2c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
+</td></tr>
 <tr class="memitem:a354d4ec48d979a7d8430e1d8ba9cae86"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a354d4ec48d979a7d8430e1d8ba9cae86">ccc_frm_is_empty</a> (<a class="el" href="flat__realtime__ordered__map_8h.html#a61529dc698f4413d5d4635f604cf02f2">ccc_flat_realtime_ordered_map</a> const *frm)</td></tr>
 <tr class="memdesc:a354d4ec48d979a7d8430e1d8ba9cae86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
 <tr class="separator:a354d4ec48d979a7d8430e1d8ba9cae86"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -277,6 +293,11 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Realtime Ordered Map Interface. </p>
+<p>A flat realtime ordered map offers storage and retrieval by key. This map is suitable for realtime applications if resizing can be limited or controlled.</p>
+<p>The flat variant of the ordered map promises contiguous storage and random access if needed. Also, all elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="aadbd502b35b349527990b26fbfcb9493" name="aadbd502b35b349527990b26fbfcb9493"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aadbd502b35b349527990b26fbfcb9493">&#9670;&#160;</a></span>ccc_frm_and_modify_w</h2>
@@ -314,7 +335,7 @@ Functions</h2></td></tr>
 <div class="line">        ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn, \</div>
 <div class="line">                                  aux_data)                                    \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__realtime__ordered__map_8h_html_a36e567ad62e658d6158cabe06d9ec487"><div class="ttname"><a href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></div><div class="ttdeci">union ccc_fromap_entry_ ccc_fromap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_realtime_ordered_map.h:38</div></div>
+<div class="ttc" id="aflat__realtime__ordered__map_8h_html_a36e567ad62e658d6158cabe06d9ec487"><div class="ttname"><a href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></div><div class="ttdeci">union ccc_fromap_entry_ ccc_fromap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_realtime_ordered_map.h:52</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -406,7 +427,7 @@ Functions</h2></td></tr>
 <div class="line">                            (begin_and_end_key_ptrs))                          \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:18</div></div>
+<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:23</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired range. O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -451,7 +472,7 @@ Functions</h2></td></tr>
 <div class="line">                             (rbegin_and_rend_key_ptrs))                       \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:26</div></div>
+<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired rrange. O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -616,7 +637,7 @@ Functions</h2></td></tr>
 <div class="line">        ccc_impl_frm_insert_or_assign_w(flat_realtime_ordered_map_ptr, key,    \</div>
 <div class="line">                                        lazy_value)                            \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:89</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:99</div></div>
 </div><!-- fragment -->
 <p>Inserts a new key value pair or overwrites the existing entry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -902,8 +923,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A flat realtime ordered map offers O(lg N) search and erase, and amortized O(lg N) insert. </p>
-<p>This map is suitable for realtime applications if resizing can be limited or controlled.</p>
-<p>The flat variant of the ordered map promises contiguous storage and random access if needed. Also, all elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer. </p>
+<dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to access an uninitialized container.</dd></dl>
+<p>A flat realtime ordered map can be initialized on the stack, heap, or data segment at runtime or compile time. </p>
 
 </div>
 </div>
@@ -937,6 +958,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A container specific entry used to implement the Entry Interface. </p>
+<dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to access an uninitialized container.</dd></dl>
 <p>The Entry Interface offers efficient search and subsequent insertion, deletion, or value update based on the needs of the user. </p>
 
 </div>

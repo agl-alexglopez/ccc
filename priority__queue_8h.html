@@ -92,8 +92,7 @@ $(document).ready(function(){initNavTree('priority__queue_8h.html',''); initResi
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">priority_queue.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -147,11 +146,9 @@ N) increase/decrease key.  <br /></td></tr>
 <tr class="memdesc:a5438f40477e5a79f1055adb17b055b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">The embedded struct type for operation of the priority queue.  <br /></td></tr>
 <tr class="separator:a5438f40477e5a79f1055adb17b055b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a5cfb0c9461d07915f3026f29fff5007d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5cfb0c9461d07915f3026f29fff5007d">ccc_pq_front</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:a5cfb0c9461d07915f3026f29fff5007d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the front of the priority queue. O(1).  <br /></td></tr>
-<tr class="separator:a5cfb0c9461d07915f3026f29fff5007d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Insert and remove elements from the priority queue. </p>
+</td></tr>
 <tr class="memitem:a57b0378d7b9a78cc68284447bbc2aea0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a57b0378d7b9a78cc68284447bbc2aea0">ccc_pq_push</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem)</td></tr>
 <tr class="memdesc:a57b0378d7b9a78cc68284447bbc2aea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the priority queue in correct total order. O(1).  <br /></td></tr>
 <tr class="separator:a57b0378d7b9a78cc68284447bbc2aea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,12 +160,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a58950b81644cdc83ff6e6dc2df186630"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a58950b81644cdc83ff6e6dc2df186630">ccc_pq_erase</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem)</td></tr>
 <tr class="memdesc:a58950b81644cdc83ff6e6dc2df186630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase elem from the pq. Amortized O(lgN).  <br /></td></tr>
 <tr class="separator:a58950b81644cdc83ff6e6dc2df186630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56f96b2f0327630ebf1ac7305d5889b5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a56f96b2f0327630ebf1ac7305d5889b5">ccc_pq_is_empty</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:a56f96b2f0327630ebf1ac7305d5889b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the priority queue is empty false if not. O(1).  <br /></td></tr>
-<tr class="separator:a56f96b2f0327630ebf1ac7305d5889b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa87411d342eff2335f15d54542fa4ad8"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aa87411d342eff2335f15d54542fa4ad8">ccc_pq_size</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:aa87411d342eff2335f15d54542fa4ad8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the priority queue.  <br /></td></tr>
-<tr class="separator:aa87411d342eff2335f15d54542fa4ad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a7d0fcc1464b01ed233f3c8e47ab1bf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a2a7d0fcc1464b01ed233f3c8e47ab1bf">ccc_pq_update</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a2a7d0fcc1464b01ed233f3c8e47ab1bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the value in the user type wrapping elem.  <br /></td></tr>
 <tr class="separator:a2a7d0fcc1464b01ed233f3c8e47ab1bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,18 +169,40 @@ Functions</h2></td></tr>
 <tr class="memitem:a4f71b0326f9c72019dd17021dc2fe0c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a4f71b0326f9c72019dd17021dc2fe0c6">ccc_pq_decrease</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a4f71b0326f9c72019dd17021dc2fe0c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the value of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
 <tr class="separator:a4f71b0326f9c72019dd17021dc2fe0c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ac93c8b051f2c6d02f706b7d71ce9bed5">ccc_pq_order</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the order used to initialize the pq.  <br /></td></tr>
-<tr class="separator:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
+</td></tr>
 <tr class="memitem:ac7e3da2adde1a7744411aed16c823809"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ac7e3da2adde1a7744411aed16c823809">ccc_pq_clear</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:ac7e3da2adde1a7744411aed16c823809"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the pq, freeing if needed.  <br /></td></tr>
 <tr class="separator:ac7e3da2adde1a7744411aed16c823809"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
+</td></tr>
+<tr class="memitem:a5cfb0c9461d07915f3026f29fff5007d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5cfb0c9461d07915f3026f29fff5007d">ccc_pq_front</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
+<tr class="memdesc:a5cfb0c9461d07915f3026f29fff5007d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the front of the priority queue. O(1).  <br /></td></tr>
+<tr class="separator:a5cfb0c9461d07915f3026f29fff5007d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56f96b2f0327630ebf1ac7305d5889b5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a56f96b2f0327630ebf1ac7305d5889b5">ccc_pq_is_empty</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
+<tr class="memdesc:a56f96b2f0327630ebf1ac7305d5889b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the priority queue is empty false if not. O(1).  <br /></td></tr>
+<tr class="separator:a56f96b2f0327630ebf1ac7305d5889b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa87411d342eff2335f15d54542fa4ad8"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aa87411d342eff2335f15d54542fa4ad8">ccc_pq_size</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
+<tr class="memdesc:aa87411d342eff2335f15d54542fa4ad8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the priority queue.  <br /></td></tr>
+<tr class="separator:aa87411d342eff2335f15d54542fa4ad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d48c9cd894bcfa150d4fb4d5afc1995"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a9d48c9cd894bcfa150d4fb4d5afc1995">ccc_pq_validate</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
 <tr class="memdesc:a9d48c9cd894bcfa150d4fb4d5afc1995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the internal invariants of the pq hold.  <br /></td></tr>
 <tr class="separator:a9d48c9cd894bcfa150d4fb4d5afc1995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ac93c8b051f2c6d02f706b7d71ce9bed5">ccc_pq_order</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> const *pq)</td></tr>
+<tr class="memdesc:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the order used to initialize the pq.  <br /></td></tr>
+<tr class="separator:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Priority Queue Interface. </p>
+<p>A priority queue offers simple, fast, pointer stable management of a prioriry queue. Push is O(1). The cost to execute the increase key in a max heap and decrease key in a min heap is O(1). However, due to the restructuring this causes that increases the cost of later pops, the more accurate runtime is o(lg
+N). The cost of a pop operation is O(lgN).</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="aa7e8b96d45a5f0ea4b9b6e128746111a" name="aa7e8b96d45a5f0ea4b9b6e128746111a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa7e8b96d45a5f0ea4b9b6e128746111a">&#9670;&#160;</a></span>ccc_pq_init</h2>
@@ -291,7 +304,8 @@ Functions</h2></td></tr>
 
 <p>A container for pointer stability and an O(1) push and amortized o(lg
 N) increase/decrease key. </p>
-<p>The cost to execute the increase key in a max heap and decrease key in a min heap is O(1). However, due to the restructuring this causes that increases the cost of later pops, the more accurate runtime is o(lg N). The cost of a pop operation is O(lgN). </p>
+<dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to access an uninitialized container.</dd></dl>
+<p>A priority queue can be initialized on the stack, heap, or data segment at runtime or compile time. </p>
 
 </div>
 </div>

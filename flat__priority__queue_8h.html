@@ -92,8 +92,7 @@ $(document).ready(function(){initNavTree('flat__priority__queue_8h.html',''); in
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_priority_queue.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -139,12 +138,6 @@ Macros</h2></td></tr>
 <tr class="memitem:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>(mem_ptr,  capacity,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</td></tr>
 <tr class="memdesc:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fpq as a min or max heap.  <br /></td></tr>
 <tr class="separator:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4ba72083dbab502b7392a44619f2f07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab4ba72083dbab502b7392a44619f2f07">ccc_fpq_heapify_init</a>(mem_ptr,  capacity,  size,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:ab4ba72083dbab502b7392a44619f2f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order an existing array of elements as a min or max heap. O(N).  <br /></td></tr>
-<tr class="separator:ab4ba72083dbab502b7392a44619f2f07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c8103699b633d1da090dd867b46d1ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a1c8103699b633d1da090dd867b46d1ec">ccc_fpq_emplace</a>(fpq,  val_initializer...)&#160;&#160;&#160;    ccc_impl_fpq_emplace(fpq, val_initializer)</td></tr>
-<tr class="memdesc:a1c8103699b633d1da090dd867b46d1ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a type directly to a priority queue slot. O(lgN).  <br /></td></tr>
-<tr class="separator:a1c8103699b633d1da090dd867b46d1ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -152,8 +145,15 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a8ed534b783c08382f5e3cd0456a1d72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container offering direct storage and sorting of user data by heap order.  <br /></td></tr>
 <tr class="separator:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Insert or remove elements from the flat priority queue. </p>
+</td></tr>
+<tr class="memitem:ab4ba72083dbab502b7392a44619f2f07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab4ba72083dbab502b7392a44619f2f07">ccc_fpq_heapify_init</a>(mem_ptr,  capacity,  size,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
+<tr class="memdesc:ab4ba72083dbab502b7392a44619f2f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order an existing array of elements as a min or max heap. O(N).  <br /></td></tr>
+<tr class="separator:ab4ba72083dbab502b7392a44619f2f07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c8103699b633d1da090dd867b46d1ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a1c8103699b633d1da090dd867b46d1ec">ccc_fpq_emplace</a>(fpq,  val_initializer...)&#160;&#160;&#160;    ccc_impl_fpq_emplace(fpq, val_initializer)</td></tr>
+<tr class="memdesc:a1c8103699b633d1da090dd867b46d1ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a type directly to a priority queue slot. O(lgN).  <br /></td></tr>
+<tr class="separator:a1c8103699b633d1da090dd867b46d1ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ef3dc2632fab0c00dce97c16957beba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ef3dc2632fab0c00dce97c16957beba">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_elem_size)</td></tr>
 <tr class="memdesc:a8ef3dc2632fab0c00dce97c16957beba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
 <tr class="separator:a8ef3dc2632fab0c00dce97c16957beba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,9 +163,6 @@ Functions</h2></td></tr>
 <tr class="memitem:af3629428e2a5117d810852fc70c283c8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void const *e)</td></tr>
 <tr class="memdesc:af3629428e2a5117d810852fc70c283c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pushes element pointed to at e into fpq. O(lgN).  <br /></td></tr>
 <tr class="separator:af3629428e2a5117d810852fc70c283c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51c6495321c6d46093b06ef01f0c6360"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51c6495321c6d46093b06ef01f0c6360">ccc_fpq_front</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
-<tr class="memdesc:a51c6495321c6d46093b06ef01f0c6360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the front (min or max) element in the fpq. O(1).  <br /></td></tr>
-<tr class="separator:a51c6495321c6d46093b06ef01f0c6360"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aaec4e075f10f8b6ee6bd99c50fb53d2d">ccc_fpq_pop</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq)</td></tr>
 <tr class="memdesc:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the front element (min or max) element in the fpq. O(lgN).  <br /></td></tr>
 <tr class="separator:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,12 +178,23 @@ Functions</h2></td></tr>
 <tr class="memitem:a260c7d003dc4db56264d3248912d5471"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a260c7d003dc4db56264d3248912d5471">ccc_fpq_decrease</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a260c7d003dc4db56264d3248912d5471"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
 <tr class="separator:a260c7d003dc4db56264d3248912d5471"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
+</td></tr>
 <tr class="memitem:a11a936861d17aa714b2ad105468c3a1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a11a936861d17aa714b2ad105468c3a1a">ccc_fpq_clear</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a11a936861d17aa714b2ad105468c3a1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided. O(1)-O(N).  <br /></td></tr>
 <tr class="separator:a11a936861d17aa714b2ad105468c3a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb7e8a483cf066fc8ff1b473a6802010"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#acb7e8a483cf066fc8ff1b473a6802010">ccc_fpq_clear_and_free</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:acb7e8a483cf066fc8ff1b473a6802010"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided and frees the underlying buffer. O(1)-O(N).  <br /></td></tr>
 <tr class="separator:acb7e8a483cf066fc8ff1b473a6802010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
+</td></tr>
+<tr class="memitem:a51c6495321c6d46093b06ef01f0c6360"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51c6495321c6d46093b06ef01f0c6360">ccc_fpq_front</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memdesc:a51c6495321c6d46093b06ef01f0c6360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the front (min or max) element in the fpq. O(1).  <br /></td></tr>
+<tr class="separator:a51c6495321c6d46093b06ef01f0c6360"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa63467559fa53bfbb088047b1d227870"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aa63467559fa53bfbb088047b1d227870">ccc_fpq_is_empty</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:aa63467559fa53bfbb088047b1d227870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the fpq is empty false if not. O(1).  <br /></td></tr>
 <tr class="separator:aa63467559fa53bfbb088047b1d227870"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -202,6 +210,10 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Priority Queue Interface. </p>
+<p>A flat priority queue is a contiguous container storing storing elements in heap order. This offers tightly packed data for efficient push, pop, min/max operations in O(lg N).</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a1c8103699b633d1da090dd867b46d1ec" name="a1c8103699b633d1da090dd867b46d1ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1c8103699b633d1da090dd867b46d1ec">&#9670;&#160;</a></span>ccc_fpq_emplace</h2>
@@ -398,7 +410,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A container offering direct storage and sorting of user data by heap order. </p>
-<p>A flat heap does not offer pointer stability and may need to resize depending on initialization options. However, push and pop without resizing offer O(lgN) performance. </p>
+<dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to access an uninitialized container.</dd></dl>
+<p>A flat priority queue can be initialized on the stack, heap, or data segment at runtime or compile time. </p>
 
 </div>
 </div>

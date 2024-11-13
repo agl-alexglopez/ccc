@@ -92,8 +92,7 @@ $(document).ready(function(){initNavTree('flat__hash__map_8h.html',''); initResi
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_hash_map.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -138,6 +137,22 @@ Macros</h2></td></tr>
 <tr class="memitem:abb03d4d7f479b9fe0bd1fed07ce3f8b6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#abb03d4d7f479b9fe0bd1fed07ce3f8b6">ccc_fhm_init</a>(fhash_ptr,  memory_ptr,  capacity,  key_field,  fhash_elem_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
 <tr class="memdesc:abb03d4d7f479b9fe0bd1fed07ce3f8b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">the initialization helper macro for a hash table. Must be called at runtime.  <br /></td></tr>
 <tr class="separator:abb03d4d7f479b9fe0bd1fed07ce3f8b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></td></tr>
+<tr class="memdesc:af8251d1f96c8a10e8ff2b20d7f117447"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for storing key-value structures defined by the user in a contiguous buffer.  <br /></td></tr>
+<tr class="separator:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada2d334ae54ac456f5ff1a37ac546994"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></td></tr>
+<tr class="memdesc:ada2d334ae54ac456f5ff1a37ac546994"><td class="mdescLeft">&#160;</td><td class="mdescRight">An intrusive element for a user provided type.  <br /></td></tr>
+<tr class="separator:ada2d334ae54ac456f5ff1a37ac546994"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefcfb8e4e21401e417bac1f3921606b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fhmap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></td></tr>
+<tr class="memdesc:aefcfb8e4e21401e417bac1f3921606b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
+<tr class="separator:aefcfb8e4e21401e417bac1f3921606b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
+</td></tr>
 <tr class="memitem:ab3e7d1da422626b8f3624fb50e461331"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ab3e7d1da422626b8f3624fb50e461331">ccc_fhm_remove_r</a>(flat_hash_map_ptr,  out_handle_ptr)</td></tr>
 <tr class="memdesc:ab3e7d1da422626b8f3624fb50e461331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle_ptr provided by the user.  <br /></td></tr>
 <tr class="separator:ab3e7d1da422626b8f3624fb50e461331"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -171,27 +186,6 @@ Macros</h2></td></tr>
 <tr class="memitem:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a726c7b51ef2288a25cc9fc8e6d75bd22">ccc_fhm_insert_entry_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="mdescLeft">&#160;</td><td class="mdescRight">write the contents of the compound literal lazy_key_value to a slot.  <br /></td></tr>
 <tr class="separator:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></td></tr>
-<tr class="memdesc:af8251d1f96c8a10e8ff2b20d7f117447"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for storing key-value structures defined by the user in a contiguous buffer.  <br /></td></tr>
-<tr class="separator:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada2d334ae54ac456f5ff1a37ac546994"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></td></tr>
-<tr class="memdesc:ada2d334ae54ac456f5ff1a37ac546994"><td class="mdescLeft">&#160;</td><td class="mdescRight">An intrusive element for a user provided type.  <br /></td></tr>
-<tr class="separator:ada2d334ae54ac456f5ff1a37ac546994"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefcfb8e4e21401e417bac1f3921606b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fhmap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></td></tr>
-<tr class="memdesc:aefcfb8e4e21401e417bac1f3921606b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
-<tr class="separator:aefcfb8e4e21401e417bac1f3921606b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a0e2bdf4f815cb592c007a536001b5386"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a0e2bdf4f815cb592c007a536001b5386">ccc_fhm_contains</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
-<tr class="memdesc:a0e2bdf4f815cb592c007a536001b5386"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the table for the presence of key.  <br /></td></tr>
-<tr class="separator:a0e2bdf4f815cb592c007a536001b5386"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaabf7c72514d440050daea0103552091"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aaabf7c72514d440050daea0103552091">ccc_fhm_get_key_val</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
-<tr class="memdesc:aaabf7c72514d440050daea0103552091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the table at entry key.  <br /></td></tr>
-<tr class="separator:aaabf7c72514d440050daea0103552091"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb4c561620549320c6fd340626e7bb1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#afb4c561620549320c6fd340626e7bb1a">ccc_fhm_remove</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *out_handle)</td></tr>
 <tr class="memdesc:afb4c561620549320c6fd340626e7bb1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user.  <br /></td></tr>
 <tr class="separator:afb4c561620549320c6fd340626e7bb1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -231,6 +225,30 @@ Functions</h2></td></tr>
 <tr class="memitem:abcb080315f7f8b5f7db0570a5e2ed69e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#abcb080315f7f8b5f7db0570a5e2ed69e">ccc_fhm_insert_error</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
 <tr class="memdesc:abcb080315f7f8b5f7db0570a5e2ed69e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the status of the entry should an insertion follow.  <br /></td></tr>
 <tr class="separator:abcb080315f7f8b5f7db0570a5e2ed69e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
+</td></tr>
+<tr class="memitem:a0e2bdf4f815cb592c007a536001b5386"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a0e2bdf4f815cb592c007a536001b5386">ccc_fhm_contains</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
+<tr class="memdesc:a0e2bdf4f815cb592c007a536001b5386"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the table for the presence of key.  <br /></td></tr>
+<tr class="separator:a0e2bdf4f815cb592c007a536001b5386"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaabf7c72514d440050daea0103552091"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aaabf7c72514d440050daea0103552091">ccc_fhm_get_key_val</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
+<tr class="memdesc:aaabf7c72514d440050daea0103552091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the table at entry key.  <br /></td></tr>
+<tr class="separator:aaabf7c72514d440050daea0103552091"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
+</td></tr>
+<tr class="memitem:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a9780e594ae08d8bf0b6b6764a40cfde5">ccc_fhm_clear</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table for use without affecting capacity.  <br /></td></tr>
+<tr class="separator:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafd0990700083047a2a04524e8336581"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aafd0990700083047a2a04524e8336581">ccc_fhm_clear_and_free</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *)</td></tr>
+<tr class="memdesc:aafd0990700083047a2a04524e8336581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table and frees the underlying buffer.  <br /></td></tr>
+<tr class="separator:aafd0990700083047a2a04524e8336581"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Iterator Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain and manage iterators over the container. </p>
+</td></tr>
 <tr class="memitem:a1d465160018013e982cc536fd61b81da"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a1d465160018013e982cc536fd61b81da">ccc_fhm_begin</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a1d465160018013e982cc536fd61b81da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains a pointer to the first element in the table.  <br /></td></tr>
 <tr class="separator:a1d465160018013e982cc536fd61b81da"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -240,18 +258,16 @@ Functions</h2></td></tr>
 <tr class="memitem:aded7d796d07299df27793836cb566b81"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aded7d796d07299df27793836cb566b81">ccc_fhm_end</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:aded7d796d07299df27793836cb566b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the current iterator against the end for loop termination.  <br /></td></tr>
 <tr class="separator:aded7d796d07299df27793836cb566b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
+</td></tr>
 <tr class="memitem:a781ca672c81fde036c57d30236eac5c9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a781ca672c81fde036c57d30236eac5c9">ccc_fhm_is_empty</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a781ca672c81fde036c57d30236eac5c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the table.  <br /></td></tr>
 <tr class="separator:a781ca672c81fde036c57d30236eac5c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d2127855aaeb0b44c1c59ae0ea7c0cd"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a3d2127855aaeb0b44c1c59ae0ea7c0cd">ccc_fhm_size</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a3d2127855aaeb0b44c1c59ae0ea7c0cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the table.  <br /></td></tr>
 <tr class="separator:a3d2127855aaeb0b44c1c59ae0ea7c0cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a9780e594ae08d8bf0b6b6764a40cfde5">ccc_fhm_clear</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table for use without affecting capacity.  <br /></td></tr>
-<tr class="separator:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafd0990700083047a2a04524e8336581"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aafd0990700083047a2a04524e8336581">ccc_fhm_clear_and_free</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *)</td></tr>
-<tr class="memdesc:aafd0990700083047a2a04524e8336581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table and frees the underlying buffer.  <br /></td></tr>
-<tr class="separator:aafd0990700083047a2a04524e8336581"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b421e53dd68f69656e8d7df2a21b446"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a0b421e53dd68f69656e8d7df2a21b446">ccc_fhm_next_prime</a> (size_t n)</td></tr>
 <tr class="memdesc:a0b421e53dd68f69656e8d7df2a21b446"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to find a prime number if needed.  <br /></td></tr>
 <tr class="separator:a0b421e53dd68f69656e8d7df2a21b446"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,6 +280,11 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Hash Map Interface. </p>
+<p>A Flat Hash Map stores elements by hash value and allows the user to retrieve them by key in amortized O(1). Elements in the table may be copied and moved so no pointer stability is available in this implementation. If pointer stability is needed, store and hash pointers to those elements in this table.</p>
+<p>A flat hash map requires the user to provide a struct with known key and flat hash element fields as well as a hash function and key comparator function. The hash function should be well tailored to the key being stored in the table to prevent collisions. Currently, the flat hash map does not offer any default hash functions or hash strengthening algorithms so good hash functions should be used.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a2959ac90ffbe517eade311f5d08b5201" name="a2959ac90ffbe517eade311f5d08b5201"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2959ac90ffbe517eade311f5d08b5201">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
@@ -300,7 +321,7 @@ Functions</h2></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux)        \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:37</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:49</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -518,7 +539,7 @@ Functions</h2></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_fhm_insert_or_assign((flat_hash_map_ptr), (key_val_handle)).impl_  \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:89</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:99</div></div>
 </div><!-- fragment -->
 <p>Invariantly inserts or overwrites a user struct into the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -880,8 +901,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A container for storing key-value structures defined by the user in a contiguous buffer. </p>
-<p>Elements are then retrievable by key in amortized O(1). Elements in the table may be copied and moved so no pointer stability is available in this implementation. If pointer stability is needed, store and hash pointers to those elements in this table.</p>
-<p>A flat hash map requires the user to provide a struct with known key and flat hash element fields as well as a hash function and key comparator function. The hash function should be well tailored to the key being stored in the table to prevent collisions. Currently, the flat hash map does not offer any default hash functions or hash strengthening algorithms so good hash functions should be used. </p>
+<p>A flat hash map can be initialized on the stack, heap, or data segment at runtime. </p>
 
 </div>
 </div>
