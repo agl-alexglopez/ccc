@@ -5,7 +5,14 @@ A doubly linked list offers efficient push, pop, extract, and erase operations
 for elements stored in the list. Notably, for single elements the list can
 offer O(1) push front/back, pop front/back, and removal of elements in
 arbitrary positions in the list. The cost of this efficiency is higher memory
-footprint. */
+footprint.
+
+This container offers pointer stability. Also, if the container is not
+permitted to allocate all insertion code assumes that the user has allocated
+memory appropriately for the element to be inserted; it will not allocate or
+free in this case. If allocation is permitted upon initialization the container
+will manage the memory as expected on insert or erase operations as defined
+by the interface; memory is allocated for insertions and freed for removals. */
 #ifndef CCC_DOUBLY_LINKED_LIST_H
 #define CCC_DOUBLY_LINKED_LIST_H
 
@@ -50,6 +57,10 @@ time (e.g. ccc_doubly_linked l = ccc_dll_init(...);). */
                      cmp_fn, aux_data)                                         \
     ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
                       cmp_fn, aux_data)
+
+/** @name Insert Interface
+Add elements to the doubly linked list. */
+/**@{*/
 
 /** @brief  writes contents of type initializer directly to allocated memory at
 the back of the list. O(1).
@@ -108,15 +119,11 @@ or allocation fails. */
 [[nodiscard]] void *ccc_dll_insert(ccc_doubly_linked_list *l,
                                    ccc_dll_elem *pos_elem, ccc_dll_elem *elem);
 
-/** @brief Returns the user type at the front of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type at the front of the list. NULL if empty. */
-[[nodiscard]] void *ccc_dll_front(ccc_doubly_linked_list const *l);
+/**@}*/
 
-/** @brief Returns the user type at the back of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type at the back of the list. NULL if empty. */
-[[nodiscard]] void *ccc_dll_back(ccc_doubly_linked_list const *l);
+/** @name Remove Interface
+Remove elements from the doubly linked list. */
+/**@{*/
 
 /** @brief Pop the user type at the front of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
@@ -206,10 +213,38 @@ ccc_result ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll,
                                 ccc_doubly_linked_list *to_cut_sll,
                                 ccc_dll_elem *begin, ccc_dll_elem *end);
 
+/** @brief Clear the contents of the list freeing elements, if given allocation
+permission. O(N).
+@param [in] l a pointer to the doubly linked list.
+@param [in] fn a destructor function to run on each element.
+@return ok if the clearing was a success or an input error if l or fn is NULL.
+
+Note that if the list is initialized with allocation permission it will free
+elements for the user and the destructor function should only perform auxiliary
+cleanup, otherwise a double free will occur.
+
+If the list has not been given allocation permission the user should free
+the list elements with the destructor if they wish to do so. The implementation
+ensures the function is called after the element is removed. Otherwise, the user
+must manage their elements at their discretion after the list is emptied in
+this function. */
+ccc_result ccc_dll_clear(ccc_doubly_linked_list *l, ccc_destructor_fn *fn);
+
+/**@}*/
+
+/** @name Iteration Interface
+Iterate through the doubly linked list. */
+/**@{*/
+
 /** @brief Return the user type at the start of the list or NULL if empty. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the user type or NULL if empty or bad input. */
 [[nodiscard]] void *ccc_dll_begin(ccc_doubly_linked_list const *l);
+
+/** @brief Return the user type at the end of the list or NULL if empty. O(1).
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type or NULL if empty or bad input. */
+[[nodiscard]] void *ccc_dll_rbegin(ccc_doubly_linked_list const *l);
 
 /** @brief Return the user type following the element known to be in the list.
 O(1).
@@ -219,11 +254,6 @@ O(1).
 or bad input is provided. */
 [[nodiscard]] void *ccc_dll_next(ccc_doubly_linked_list const *l,
                                  ccc_dll_elem const *elem);
-
-/** @brief Return the user type at the end of the list or NULL if empty. O(1).
-@param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type or NULL if empty or bad input. */
-[[nodiscard]] void *ccc_dll_rbegin(ccc_doubly_linked_list const *l);
 
 /** @brief Return the user type following the element known to be in the list
 moving from back to front. O(1).
@@ -243,6 +273,22 @@ elements follow or bad input is provided. */
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the start sentinel with no accessible fields. */
 [[nodiscard]] void *ccc_dll_rend(ccc_doubly_linked_list const *l);
+
+/**@}*/
+
+/** @name State Interface
+Remove elements from the doubly linked list. */
+/**@{*/
+
+/** @brief Returns the user type at the front of the list. O(1).
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type at the front of the list. NULL if empty. */
+[[nodiscard]] void *ccc_dll_front(ccc_doubly_linked_list const *l);
+
+/** @brief Returns the user type at the back of the list. O(1).
+@param [in] l a pointer to the doubly linked list.
+@return a pointer to the user type at the back of the list. NULL if empty. */
+[[nodiscard]] void *ccc_dll_back(ccc_doubly_linked_list const *l);
 
 /** @brief Return a handle to the list element at the front of the list which
 may be the sentinel. O(1).
@@ -275,27 +321,12 @@ ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
 @return true if the size is 0 or l is NULL, else false. */
 [[nodiscard]] bool ccc_dll_is_empty(ccc_doubly_linked_list const *l);
 
-/** @brief Clear the contents of the list freeing elements, if given allocation
-permission. O(N).
-@param [in] l a pointer to the doubly linked list.
-@param [in] fn a destructor function to run on each element.
-@return ok if the clearing was a success or an input error if l or fn is NULL.
-
-Note that if the list is initialized with allocation permission it will free
-elements for the user and the destructor function should only perform auxiliary
-cleanup, otherwise a double free will occur.
-
-If the list has not been given allocation permission the user should free
-the list elements with the destructor if they wish to do so. The implementation
-ensures the function is called after the element is removed. Otherwise, the user
-must manage their elements at their discretion after the list is emptied in
-this function. */
-ccc_result ccc_dll_clear(ccc_doubly_linked_list *l, ccc_destructor_fn *fn);
-
 /** @brief Validates internal state of the list.
 @param [in] l a pointer to the doubly linked list.
 @return true if invariants hold, false if not. */
 [[nodiscard]] bool ccc_dll_validate(ccc_doubly_linked_list const *l);
+
+/**@}*/
 
 /** Define this preprocessor directive before including this header if shorter
 names are desired for the doubly linked list container. Ensure no namespace

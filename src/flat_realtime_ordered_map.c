@@ -58,7 +58,7 @@ static struct ccc_fromap_elem_ *elem_in_slot(struct ccc_fromap_ const *t,
                                              void const *slot);
 /* Returning the internal query helper to aid in entry handling. */
 static struct frm_query_ find(struct ccc_fromap_ const *frm, void const *key);
-/* Returning the entry core to the Entry API. */
+/* Returning the entry core to the Entry Interface. */
 static inline struct ccc_frtree_entry_ entry(struct ccc_fromap_ const *frm,
                                              void const *key);
 /* Returning a generic range that can be use for range or rrange. */

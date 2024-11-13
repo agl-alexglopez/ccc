@@ -17,7 +17,8 @@
 #include "types.h"
 /* NOLINTEND */
 
-/*======================     Entry API  =====================================*/
+/*======================     Entry Interface
+ * =====================================*/
 
 #define ccc_impl_insert(container_ptr, insert_args...)                         \
     _Generic((container_ptr),                                                  \
@@ -282,7 +283,8 @@
         ccc_romap_entry *: ccc_rom_insert_error,                               \
         ccc_romap_entry const *: ccc_rom_insert_error)((container_entry_ptr))
 
-/*======================    Misc Search API  ================================*/
+/*======================    Misc Search Interface
+ * ================================*/
 
 #define ccc_impl_get_key_val(container_ptr, key_ptr...)                        \
     _Generic((container_ptr),                                                  \
@@ -309,7 +311,7 @@
         ccc_realtime_ordered_map const *: ccc_rom_contains,                    \
         ccc_ordered_multimap *: ccc_omm_contains)((container_ptr), key_ptr)
 
-/*================       Sequential Containers API =====================*/
+/*================       Sequential Containers Interface =====================*/
 
 #define ccc_impl_push(container_ptr, container_handle_ptr...)                  \
     _Generic((container_ptr),                                                  \
@@ -370,7 +372,7 @@
         ccc_doubly_linked_list const *: ccc_dll_back,                          \
         ccc_buffer const *: ccc_buf_back)((container_ptr))
 
-/*================       Priority Queue Update API =====================*/
+/*================       Priority Queue Update Interface =====================*/
 
 #define ccc_impl_update(container_ptr, update_args...)                         \
     _Generic((container_ptr),                                                  \
@@ -409,7 +411,7 @@
         ccc_singly_linked_list *: ccc_sll_extract_range)(                      \
         (container_ptr), container_handle_begin_end_ptr)
 
-/*===================       Iterators API ==============================*/
+/*===================       Iterators Interface ==============================*/
 
 #define ccc_impl_begin(container_ptr)                                          \
     _Generic((container_ptr),                                                  \
@@ -589,7 +591,8 @@
         ccc_doubly_linked_list const *: ccc_dll_splice_range)(                 \
         (container_ptr), splice_range_args)
 
-/*===================    Standard Getters API ==============================*/
+/*===================    Standard Getters Interface
+ * ==============================*/
 
 #define ccc_impl_size(container_ptr)                                           \
     _Generic((container_ptr),                                                  \

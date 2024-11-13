@@ -33,12 +33,12 @@ exist with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. */
 typedef union ccc_ommap_elem_ ccc_ommap_elem;
 
-/** @brief The container specific type to support the Entry API.
+/** @brief The container specific type to support the Entry Interface.
 
-An Entry API offers efficient conditional searching, saving multiple searches.
-Entries are views of Vacant or Occupied multimap elements allowing further
-operations to be performed once they are obtained without a second search,
-insert, or remove query. */
+An Entry Interface offers efficient conditional searching, saving multiple
+searches. Entries are views of Vacant or Occupied multimap elements allowing
+further operations to be performed once they are obtained without a second
+search, insert, or remove query. */
 typedef union ccc_ommap_entry_ ccc_ommap_entry;
 
 /** @brief Initialize a ordered multimap of the user specified type.
@@ -74,7 +74,8 @@ N).
 [[nodiscard]] void *ccc_omm_get_key_val(ccc_ordered_multimap *mm,
                                         void const *key);
 
-/*=========================    Entry API    =================================*/
+/*=========================    Entry Interface
+ * =================================*/
 
 /** @brief Returns an entry pointing to the newly inserted element and a status
 indicating if the map has already been Occupied at the given key. Amortized
@@ -183,9 +184,9 @@ struct directly and the user must unwrap and free their type themselves. */
 Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
-@return a container specific entry for status, unwrapping, or further Entry API
-operations. Occupied indicates at least one user type with key exists and can
-be unwrapped to view. Vacant indicates no user type at key exists. */
+@return a container specific entry for status, unwrapping, or further Entry
+Interface operations. Occupied indicates at least one user type with key exists
+and can be unwrapped to view. Vacant indicates no user type at key exists. */
 [[nodiscard]] ccc_ommap_entry ccc_omm_entry(ccc_ordered_multimap *mm,
                                             void const *key);
 
@@ -198,8 +199,8 @@ Amortized O(lg N).
 with the enclosing scope. This reference is always non-NULL.
 
 Note this is useful for nested calls where an entry pointer is requested by
-further operations in the Entry API, avoiding uneccessary intermediate values
-and references (e.g. struct val *v = or_insert(entry_r(...), ...)); */
+further operations in the Entry Interface, avoiding uneccessary intermediate
+values and references (e.g. struct val *v = or_insert(entry_r(...), ...)); */
 #define ccc_omm_entry_r(ordered_multimap_ptr, key_ptr)                         \
     &(ccc_ommap_entry)                                                         \
     {                                                                          \
@@ -335,7 +336,7 @@ type stored in the map, a Vacant entry will be NULL.
 /** @brief Indicates if an insertion error occurs.
 @param [in] e a pointer to the multimap entry.
 @return true if an insertion error occured preventing completing of an Entry
-API series of operations.
+Interface series of operations.
 
 Note that this will most commonly occur if the container is permitted to
 allocate but the allocation has failed. */

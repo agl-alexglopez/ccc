@@ -30,10 +30,10 @@ Because the hash map is flat, data is always copied from the provided type into
 the table. */
 typedef struct ccc_fhmap_elem_ ccc_fhmap_elem;
 
-/** @brief A container specific entry used to implement the Entry API.
+/** @brief A container specific entry used to implement the Entry Interface.
 
-The Entry API offers efficient search and subsequent insertion, deletion, or
-value update based on the needs of the user. */
+The Entry Interface offers efficient search and subsequent insertion, deletion,
+or value update based on the needs of the user. */
 typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
 
 /** @brief the initialization helper macro for a hash table. Must be called
@@ -74,7 +74,8 @@ initialization is successful or a failure. */
 @return a view of the table entry if it is present, else NULL. */
 [[nodiscard]] void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
-/*========================    Entry API    ==================================*/
+/*========================    Entry Interface
+ * ==================================*/
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
@@ -243,7 +244,8 @@ was removed. If Vacant, no prior entry existed to be removed. */
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
 @param [in] key the key used to search the table matching the stored key type.
-@return a specialized hash entry for use with other functions in the Entry API.
+@return a specialized hash entry for use with other functions in the Entry
+Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
 
@@ -253,7 +255,7 @@ Vacant entry means the search was not successful but we now have a handle to
 where in the table such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry API.*/
+to subsequent calls in the Entry Interface.*/
 [[nodiscard]] ccc_fhmap_entry ccc_fhm_entry(ccc_flat_hash_map *h,
                                             void const *key);
 
@@ -262,7 +264,7 @@ to subsequent calls in the Entry API.*/
 @param [in] key_ptr the key used to search the table matching the stored key
 type.
 @return a compound literal reference to a specialized hash entry for use with
-other functions in the Entry API.
+other functions in the Entry Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
 
@@ -272,7 +274,7 @@ Vacant entry means the search was not successful but we now have a handle to
 where in the table such an element should be inserted.
 
 An entry is most often passed in a functional style to subsequent calls in the
-Entry API.*/
+Entry Interface.*/
 #define ccc_fhm_entry_r(flat_hash_map_ptr, key_ptr)                            \
     &(ccc_fhmap_entry)                                                         \
     {                                                                          \
@@ -284,9 +286,9 @@ Entry API.*/
 @param [in] fn an update function in which the auxiliary argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function is intended to make the function chaining in the Entry API more
-succinct if the entry will be modified in place based on its own value without
-the need of the auxiliary argument a ccc_update_fn can provide. */
+This function is intended to make the function chaining in the Entry Interface
+more succinct if the entry will be modified in place based on its own value
+without the need of the auxiliary argument a ccc_update_fn can provide. */
 [[nodiscard]] ccc_fhmap_entry *ccc_fhm_and_modify(ccc_fhmap_entry *e,
                                                   ccc_update_fn *fn);
 

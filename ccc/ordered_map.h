@@ -31,10 +31,10 @@ with the appropriate lifetime and scope for the user's needs; the container does
 not allocate or free in this case. */
 typedef union ccc_omap_elem_ ccc_omap_elem;
 
-/** @brief A container specific entry used to implement the Entry API.
+/** @brief A container specific entry used to implement the Entry Interface.
 
-The Entry API offers efficient search and subsequent insertion, deletion, or
-value update based on the needs of the user. */
+The Entry Interface offers efficient search and subsequent insertion, deletion,
+or value update based on the needs of the user. */
 typedef union ccc_omap_entry_ ccc_omap_entry;
 
 /** @brief Initializes the ordered map at runtime or compile time.
@@ -70,7 +70,7 @@ Test membership or obtain references to stored user types directly. */
 
 /**@}*/
 
-/** @name Entry API Functions
+/** @name Entry Interface Functions
 Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
@@ -224,7 +224,7 @@ stored memory as they see fit. */
 /** @brief Obtains an entry for the provided key in the map for future use.
 @param [in] om the map to be searched.
 @param [in] key the key used to search the map matching the stored key type.
-@return a specialized entry for use with other functions in the Entry API.
+@return a specialized entry for use with other functions in the Entry Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
 
@@ -234,14 +234,14 @@ Vacant entry means the search was not successful but a handle is gained to
 where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry API. */
+to subsequent calls in the Entry Interface. */
 [[nodiscard]] ccc_omap_entry ccc_om_entry(ccc_ordered_map *om, void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
 @param [in] ordered_map_ptr the map to be searched.
 @param [in] key_ptr the key used to search the map matching the stored key type.
 @return a compound literal reference to a specialized entry for use with other
-functions in the Entry API.
+functions in the Entry Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
 
@@ -251,7 +251,7 @@ Vacant entry means the search was not successful but a handle is gained to
 where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry API. */
+to subsequent calls in the Entry Interface. */
 #define ccc_om_entry_r(ordered_map_ptr, key_ptr)                               \
     &(ccc_omap_entry)                                                          \
     {                                                                          \
@@ -263,9 +263,9 @@ to subsequent calls in the Entry API. */
 @param [in] fn an update function in which the auxiliary argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function is intended to make the function chaining in the Entry API more
-succinct if the entry will be modified in place based on its own value without
-the need of the auxiliary argument a ccc_update_fn can provide. */
+This function is intended to make the function chaining in the Entry Interface
+more succinct if the entry will be modified in place based on its own value
+without the need of the auxiliary argument a ccc_update_fn can provide. */
 [[nodiscard]] ccc_omap_entry *ccc_om_and_modify(ccc_omap_entry *e,
                                                 ccc_update_fn *fn);
 

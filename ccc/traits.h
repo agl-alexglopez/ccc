@@ -5,7 +5,8 @@
 
 #include "impl_traits.h"
 
-/*======================     Entry API  =====================================*/
+/*======================     Entry Interface
+ * =====================================*/
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
@@ -79,7 +80,7 @@ See container documentation for specific behavior. */
 #define ccc_remove_r(container_ptr, remove_args...)                            \
     ccc_impl_remove_r(container_ptr, remove_args)
 
-/** @brief Obtain a container specific entry for the Entry API.
+/** @brief Obtain a container specific entry for the Entry Interface.
 @param [in] container_ptr a pointer to the container.
 @param [in] key_ptr a pointer to the search key.
 @return a container specific entry depending on container specific context.
@@ -88,7 +89,7 @@ See container documentation for specific behavior. */
 #define ccc_entry(container_ptr, key_ptr...)                                   \
     ccc_impl_entry(container_ptr, key_ptr)
 
-/** @brief Obtain a container specific entry for the Entry API.
+/** @brief Obtain a container specific entry for the Entry Interface.
 @param [in] container_ptr a pointer to the container.
 @param [in] key_ptr a pointer to the search key.
 @return a container specific entry reference depending on container specific
@@ -169,7 +170,8 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_insert_error(entry_ptr) ccc_impl_insert_error(entry_ptr)
 
-/*======================    Misc Search API  ================================*/
+/*======================    Misc Search Interface
+ * ================================*/
 
 /** @brief Obtain a reference to the user type stored at the key.
 @param [in] container_ptr a pointer to the container.
@@ -189,7 +191,7 @@ See container documentation for specific behavior. */
 #define ccc_contains(container_ptr, key_ptr...)                                \
     ccc_impl_contains(container_ptr, key_ptr)
 
-/*================       Sequential Containers API      =====================*/
+/*================       Sequential Containers Interface =====================*/
 
 /** @brief Push an element into a container.
 @param [in] container_ptr a pointer to the container.
@@ -253,7 +255,7 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_back(container_ptr) ccc_impl_back(container_ptr)
 
-/*================       Priority Queue Update API      =====================*/
+/*================       Priority Queue Update Interface =====================*/
 
 /** @brief Update the value of an element known to be in a container.
 @param [in] container_ptr a pointer to the container.
@@ -303,7 +305,7 @@ See container documentation for specific behavior. */
 #define ccc_extract_range(container_ptr, extract_args...)                      \
     ccc_impl_extract_range(container_ptr, extract_args)
 
-/*===================       Iterators API      ==============================*/
+/*===================       Iterators Interface ==============================*/
 
 /** @brief Obtain a reference to the start of a container.
 @param [in] container_ptr a pointer to the container.
@@ -407,7 +409,8 @@ See container documentation for specific behavior. */
 #define ccc_splice_range(container_ptr, splice_args...)                        \
     ccc_impl_splice_range(container_ptr, splice_args)
 
-/*===================    Standard Getters API  ==============================*/
+/*===================    Standard Getters Interface
+ * ==============================*/
 
 /** @brief Return the size of the container.
 @param [in] container_ptr a pointer to the container.

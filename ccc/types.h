@@ -27,7 +27,7 @@ typedef union ccc_rrange_ ccc_rrange;
 
 /** @brief An Occupied or Vacant position in a searchable container.
 
-A entry is the basis for more complex container specific Entry API for
+A entry is the basis for more complex container specific Entry Interface for
 all search-by-key containers. An entry is returned from various operations
 to provide both a reference to data and any auxiliary status that is
 important for the user. An entry can be Occupied or Vacant. See individual
@@ -129,7 +129,7 @@ typedef struct
 
 /** @brief An allocation function at the core of all containers.
 
-An allocation function implements the following API, where ptr is pointer
+An allocation function implements the following Interface, where ptr is pointer
 to memory and size is number of bytes to allocate.
 
 - If NULL is provided with a size of 0, NULL is returned.
@@ -183,7 +183,7 @@ typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
 A reference to the container type and any aux data provided on initialization
 is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
-function is used when a container API exposes functions to modify the key
+function is used when a container Interface exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
 typedef void ccc_update_fn(ccc_user_type_mut);
 

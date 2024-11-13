@@ -31,10 +31,10 @@ map
 Because the map is flat data is always copied from the user type to map. */
 typedef struct ccc_fromap_elem_ ccc_fromap_elem;
 
-/** @brief A container specific entry used to implement the Entry API.
+/** @brief A container specific entry used to implement the Entry Interface.
 
-The Entry API offers efficient search and subsequent insertion, deletion, or
-value update based on the needs of the user. */
+The Entry Interface offers efficient search and subsequent insertion, deletion,
+or value update based on the needs of the user. */
 typedef union ccc_fromap_entry_ ccc_fromap_entry;
 
 /** @brief Initializes the map at runtime or compile time.
@@ -69,7 +69,8 @@ bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
 void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
                           void const *key);
 
-/*======================      Entry API    ==================================*/
+/*======================      Entry Interface
+ * ==================================*/
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] frm the pointer to the ordered map.
@@ -212,7 +213,7 @@ and wraps it in an entry to provide information about the old value. */
 /** @brief Obtains an entry for the provided key in the map for future use.
 @param [in] frm the map to be searched.
 @param [in] key the key used to search the map matching the stored key type.
-@return a specialized entry for use with other functions in the Entry API.
+@return a specialized entry for use with other functions in the Entry Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
 
@@ -222,7 +223,7 @@ Vacant entry means the search was not successful but a handle is gained to
 where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry API. */
+to subsequent calls in the Entry Interface. */
 ccc_fromap_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
                                void const *key);
 
@@ -230,7 +231,7 @@ ccc_fromap_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
 @param [in] flat_realtime_ordered_map_ptr the map to be searched.
 @param [in] key_ptr the key used to search the map matching the stored key type.
 @return a compound literal reference to a specialized entry for use with other
-functions in the Entry API.
+functions in the Entry Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
 
@@ -240,7 +241,7 @@ Vacant entry means the search was not successful but a handle is gained to
 where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry API. */
+to subsequent calls in the Entry Interface. */
 #define ccc_frm_entry_r(flat_realtime_ordered_map_ptr, key_ptr)                \
     &(ccc_fromap_entry)                                                        \
     {                                                                          \
@@ -252,9 +253,9 @@ to subsequent calls in the Entry API. */
 @param [in] fn an update function in which the auxiliary argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function is intended to make the function chaining in the Entry API more
-succinct if the entry will be modified in place based on its own value without
-the need of the auxiliary argument a ccc_update_fn can provide. */
+This function is intended to make the function chaining in the Entry Interface
+more succinct if the entry will be modified in place based on its own value
+without the need of the auxiliary argument a ccc_update_fn can provide. */
 ccc_fromap_entry *ccc_frm_and_modify(ccc_fromap_entry *e, ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.

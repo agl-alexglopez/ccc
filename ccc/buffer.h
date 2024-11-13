@@ -8,11 +8,11 @@ is often used as the lower level abstraction for the flat data structures
 in this library that provide more specialized operations. A buffer does not
 require the user accommodate any intrusive elements.
 
-A buffer with allocation permission will resize when a new element is inserted
-in a contiguous fashion. Functions in the allocation management section assume
+A buffer with allocation permission will re-size when a new element is inserted
+in a contiguous fashion. Interface in the allocation management section assume
 elements are stored contiguously and adjust size accordingly.
 
-Functions in the slot management section offer data movement and writing
+Interface in the slot management section offer data movement and writing
 operations that do not affect the size of the container. If writing a more
 complex higher level container that does not need size management these
 functions offer more custom control over the buffer.
@@ -60,7 +60,7 @@ occurred with the provided allocation function. */
 #define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
     ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
 
-/** @name Allocation Management Functions
+/** @name Allocation Management Interface
 These functions assume contiguity of elements in the buffer and increase or
 decrease size accordingly. */
 /**@{*/
@@ -155,7 +155,7 @@ ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
 
 /**@}*/
 
-/** @name Slot Management Functions
+/** @name Slot Management Interface
 These functions interact with slots in the buffer directly and do not modify
 the size of the buffer. These are best used for custom container
 implementations operating at a higher level of abstraction. */
@@ -237,7 +237,7 @@ ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t i, size_t j);
 
 /**@}*/
 
-/** @name Iteration Functions
+/** @name Iteration Interface
 The following functions implement iterators over the buffer. */
 /**@{*/
 
@@ -298,7 +298,7 @@ not yet been allocated. */
 
 /**@}*/
 
-/** @name State Management Functions
+/** @name State Interface
 These functions help manage or obtain state of the buffer. */
 /**@{*/
 
