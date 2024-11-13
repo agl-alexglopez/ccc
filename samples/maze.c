@@ -7,6 +7,9 @@
    structures are provided by the library offering a perfect sample program
    opportunity. */
 #define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include <assert.h>
 #include <limits.h>
@@ -17,13 +20,14 @@
 #include <string.h>
 #include <time.h>
 
+#include "ccc/flat_priority_queue.h"
 #include "ccc/ordered_map.h"
-#include "ccc/ordered_multimap.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
 #include "random.h"
 #include "str_view/str_view.h"
+#include "util/alloc.h"
 
 /*=======================   Maze Helper Types   =============================*/
 
@@ -59,14 +63,13 @@ struct priority_cell
 {
     struct point cell;
     int priority;
-    ccc_ommap_elem elem;
 };
 
 struct point_cost
 {
     struct point p;
     int cost;
-    ccc_omap_elem elem;
+    omap_elem elem;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -119,12 +122,10 @@ static void join_squares_animated(struct maze *, struct point, struct point,
                                   int);
 static void flush_cursor_maze_coordinate(struct maze const *, struct point);
 static bool can_build_new_square(struct maze const *, struct point);
-static void *valid_malloc(size_t);
 static void help(void);
 static struct point pick_rand_point(struct maze const *);
-static ccc_threeway_cmp cmp_priority_cells(ccc_key_cmp);
-static ccc_threeway_cmp cmp_points(ccc_key_cmp);
-static void set_destructor(ccc_user_type_mut);
+static threeway_cmp cmp_priority_cells(cmp);
+static threeway_cmp cmp_points(key_cmp);
 static struct int_conversion parse_digits(str_view);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -205,31 +206,28 @@ static void
 animate_maze(struct maze *maze)
 {
     /* Setting up the data structures needed should look similar to C++.
-       A ccc_ordered_map could be replaced by a 2D vector copy of the maze with
+       A ordered_map could be replaced by a 2D vector copy of the maze with
        costs mapped but the purpose of this program is to test both the set and
        priority queue data structures. Also a 2D vector wastes space. */
-    ccc_ordered_multimap cells
-        = ccc_omm_init(cells, struct priority_cell, elem, priority, NULL,
-                       cmp_priority_cells, NULL);
-    ccc_ordered_map cell_costs = ccc_om_init(cell_costs, struct point_cost,
-                                             elem, p, NULL, cmp_points, NULL);
-    struct point_cost *odd_point = valid_malloc(sizeof(struct point_cost));
-    *odd_point = (struct point_cost){.p = pick_rand_point(maze),
-                                     .cost = rand_range(0, 100)};
-    [[maybe_unused]] ccc_entry const ent
-        = try_insert(&cell_costs, &odd_point->elem);
+    flat_priority_queue cells
+        = fpq_init((struct priority_cell *)NULL, 0, CCC_LES, std_alloc,
+                   cmp_priority_cells, NULL);
+    ordered_map cell_costs = om_init(cell_costs, struct point_cost, elem, p,
+                                     std_alloc, cmp_points, NULL);
+    struct point_cost odd_point
+        = {.p = pick_rand_point(maze), .cost = rand_range(0, 100)};
+    [[maybe_unused]] entry const ent = try_insert(&cell_costs, &odd_point.elem);
     assert(!occupied(&ent));
-    struct priority_cell *start = valid_malloc(sizeof(struct priority_cell));
-    *start = (struct priority_cell){.cell = odd_point->p,
-                                    .priority = odd_point->cost};
-    (void)insert(&cells, &start->elem);
+    (void)fpq_emplace(&cells,
+                      (struct priority_cell){.cell = odd_point.p,
+                                             .priority = odd_point.cost});
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
     while (!is_empty(&cells))
     {
-        struct priority_cell const *const cur = ccc_omm_max(&cells);
+        struct priority_cell const *const cur = front(&cells);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
         struct point min_neighbor = {0};
         int min_weight = INT_MAX;
@@ -246,13 +244,11 @@ animate_maze(struct maze *maze)
                 = get_key_val(&cell_costs, &next);
             if (!found)
             {
-                struct point_cost *new_cost
-                    = valid_malloc(sizeof(struct point_cost));
-                *new_cost = (struct point_cost){.p = next,
-                                                .cost = rand_range(0, 100)};
-                cur_weight = new_cost->cost;
+                struct point_cost new_cost
+                    = {.p = next, .cost = rand_range(0, 100)};
+                cur_weight = new_cost.cost;
                 [[maybe_unused]] bool const inserted = insert_entry(
-                    entry_r(&cell_costs, &new_cost->p), &new_cost->elem);
+                    entry_r(&cell_costs, &new_cost.p), &new_cost.elem);
                 assert(inserted);
             }
             else
@@ -269,24 +265,20 @@ animate_maze(struct maze *maze)
         {
             join_squares_animated(maze, cur->cell, min_neighbor,
                                   animation_speed);
-            struct priority_cell *new_cell
-                = valid_malloc(sizeof(struct priority_cell));
-            *new_cell = (struct priority_cell){.cell = min_neighbor,
-                                               .priority = min_weight};
-            (void)insert(&cells, &new_cell->elem);
+            fpq_emplace(&cells, (struct priority_cell){.cell = min_neighbor,
+                                                       .priority = min_weight});
         }
         else
         {
-            struct priority_cell *pc = ccc_omm_max(&cells);
-            (void)ccc_omm_pop_max(&cells);
-            free(pc);
+            (void)pop(&cells);
         }
     }
     /* The priority queue does not need to be cleared because it's emptiness
        determined the course of the maze building. It has no hidden allocations
        either so no more work is needed if we know it's empty and the data
        structure metadata is on the stack. */
-    (void)ccc_om_clear(&cell_costs, set_destructor);
+    (void)om_clear(&cell_costs, NULL);
+    (void)fpq_clear_and_free(&cells, NULL);
 }
 
 static struct point
@@ -472,19 +464,19 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 
 /*===================   Data Structure Comparators   ========================*/
 
-static ccc_threeway_cmp
-cmp_priority_cells(ccc_key_cmp const cmp)
+static threeway_cmp
+cmp_priority_cells(cmp const cmp_cells)
 {
-    struct priority_cell const *const a = cmp.user_type_rhs;
-    int const key = *((int *)cmp.key_lhs);
-    return (key > a->priority) - (key < a->priority);
+    struct priority_cell const *const lhs = cmp_cells.user_type_rhs;
+    struct priority_cell const *const rhs = cmp_cells.user_type_rhs;
+    return (lhs->priority > rhs->priority) - (lhs->priority < rhs->priority);
 }
 
-static ccc_threeway_cmp
-cmp_points(ccc_key_cmp const cmp)
+static threeway_cmp
+cmp_points(key_cmp const cmp_points)
 {
-    struct point_cost const *const a = cmp.user_type_rhs;
-    struct point const *const key = cmp.key_lhs;
+    struct point_cost const *const a = cmp_points.user_type_rhs;
+    struct point const *const key = cmp_points.key_lhs;
     if (a->p.r == key->r && a->p.c == key->c)
     {
         return CCC_EQL;
@@ -494,12 +486,6 @@ cmp_points(ccc_key_cmp const cmp)
         return (key->c > a->p.c) - (key->c < a->p.c);
     }
     return (key->r > a->p.r) - (key->r < a->p.r);
-}
-
-static void
-set_destructor(ccc_user_type_mut const e)
-{
-    free(e.user_type);
 }
 
 /*===========================    Misc    ====================================*/
@@ -522,19 +508,6 @@ parse_digits(str_view arg)
     return convert_to_int(sv_begin(arg));
 }
 
-/* Promises valid memory or exits the program if the heap has an error. */
-static void *
-valid_malloc(size_t n)
-{
-    void *mem = malloc(n);
-    if (!mem)
-    {
-        (void)fprintf(stderr, "heap is exhausted, exiting program.\n");
-        exit(1);
-    }
-    return mem;
-}
-
 static void
 help(void)
 {
@@ -542,7 +515,7 @@ help(void)
         stdout,
         "Maze Builder:\nBuilds a Perfect Maze with Prim's "
         "Algorithm to demonstrate usage of the priority "
-        "queue and ccc_ordered_map provided by this library.\nUsage:\n-r=N The "
+        "queue and ordered_map provided by this library.\nUsage:\n-r=N The "
         "row flag lets you specify maze rows > 7.\n-c=N The col flag "
         "lets you specify maze cols > 7.\n-s=N The speed flag lets "
         "you specify the speed of the animation "

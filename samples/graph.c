@@ -437,7 +437,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     (void)push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {};
-    while (!is_empty(&bfs))
+    while (!is_empty(&bfs) && !success)
     {
         cur = *((struct point *)front(&bfs));
         (void)pop_front(&bfs);
@@ -656,7 +656,6 @@ is_dst(Cell const c, char const dst)
 static void
 find_shortest_paths(struct graph *const graph)
 {
-    char *lineptr = NULL;
     for (;;)
     {
         clear_paint(graph);
@@ -665,6 +664,7 @@ find_shortest_paths(struct graph *const graph)
         sv_print(stdout, prompt_msg);
         size_t len = 0;
         ssize_t read = 0;
+        char *lineptr = NULL;
         while ((read = getline(&lineptr, &len, stdin)) > 0)
         {
             struct path_request pr = parse_path_request(

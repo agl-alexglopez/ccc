@@ -238,6 +238,7 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_increase(args...) ccc_fpq_increase(args)
 #    define fpq_decrease(args...) ccc_fpq_decrease(args)
 #    define fpq_clear(args...) ccc_fpq_clear(args)
+#    define fpq_clear_and_free(args...) ccc_fpq_clear_and_free(args)
 #    define fpq_is_empty(args...) ccc_fpq_is_empty(args)
 #    define fpq_size(args...) ccc_fpq_size(args)
 #    define fpq_validate(args...) ccc_fpq_validate(args)

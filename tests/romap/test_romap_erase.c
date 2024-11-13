@@ -5,6 +5,7 @@
 #include "realtime_ordered_map.h"
 #include "romap_util.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

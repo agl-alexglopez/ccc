@@ -813,6 +813,7 @@ insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z_p_of_xy,
 static void *
 remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
 {
+    assert(remove->branch_[R] && remove->branch_[L]);
     struct ccc_romap_elem_ *y = NULL;
     struct ccc_romap_elem_ *x = NULL;
     struct ccc_romap_elem_ *p_of_xy = NULL;
