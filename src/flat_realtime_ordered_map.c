@@ -642,17 +642,18 @@ static inline struct frm_query_
 find(struct ccc_fromap_ const *const frm, void const *const key)
 {
     size_t parent = 0;
-    ccc_threeway_cmp link = CCC_CMP_ERR;
-    for (size_t seek = frm->root_; seek;
-         parent = seek, seek = branch_i(frm, seek, CCC_GRT == link))
+    struct frm_query_ q = {.last_cmp_ = CCC_CMP_ERR, .found_ = frm->root_};
+    for (; q.found_; parent = q.found_,
+                     q.found_ = branch_i(frm, q.found_, CCC_GRT == q.last_cmp_))
     {
-        link = cmp_elems(frm, key, seek, frm->cmp_);
-        if (CCC_EQL == link)
+        q.last_cmp_ = cmp_elems(frm, key, q.found_, frm->cmp_);
+        if (CCC_EQL == q.last_cmp_)
         {
-            return (struct frm_query_){.last_cmp_ = CCC_EQL, .found_ = seek};
+            return q;
         }
     }
-    return (struct frm_query_){.last_cmp_ = link, .parent_ = parent};
+    q.parent_ = parent;
+    return q;
 }
 
 static inline size_t

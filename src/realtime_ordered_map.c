@@ -643,17 +643,19 @@ static inline struct romap_query_
 find(struct ccc_romap_ const *const rom, void const *const key)
 {
     struct ccc_romap_elem_ *parent = (struct ccc_romap_elem_ *)&rom->end_;
-    ccc_threeway_cmp link = CCC_CMP_ERR;
-    for (struct ccc_romap_elem_ *seek = rom->root_; seek != &rom->end_;
-         parent = seek, seek = seek->branch_[CCC_GRT == link])
+    struct romap_query_ q = {.last_cmp_ = CCC_CMP_ERR, .found_ = rom->root_};
+    for (; q.found_ != &rom->end_;
+         parent = q.found_,
+         q.found_ = q.found_->branch_[CCC_GRT == q.last_cmp_])
     {
-        link = cmp(rom, key, seek, rom->cmp_);
-        if (CCC_EQL == link)
+        q.last_cmp_ = cmp(rom, key, q.found_, rom->cmp_);
+        if (CCC_EQL == q.last_cmp_)
         {
-            return (struct romap_query_){.last_cmp_ = CCC_EQL, .found_ = seek};
+            return q;
         }
     }
-    return (struct romap_query_){.last_cmp_ = link, .parent_ = parent};
+    q.parent_ = parent;
+    return q;
 }
 
 static struct ccc_romap_elem_ *
