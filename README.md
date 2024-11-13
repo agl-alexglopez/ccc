@@ -14,7 +14,7 @@ Read the documentation [HERE](https://agl-alexglopez.github.io/ccc). To get star
 
 ### Motivations
 
-The hypothesis of this library is as follows: 
+The hypothesis of this library is as follows:
 
 > Containers in C should never limit the control and flexibility offered by the C language.
 
@@ -26,7 +26,7 @@ The reason for this decision is simple: if people are using C today, in the face
 
 While not all containers require the user accommodate intrusive elements, when they do it looks like this.
 
-```
+```c
 struct key_val
 {
     int key;
@@ -55,7 +55,7 @@ This simplifies allocation and deallocation if the user chooses to hand these re
 
 A function that implements such behavior on many platforms is realloc. If one is not sure that realloc implements all such behaviors, especially the final requirement for freeing memory, wrap it in a helper function. For example, one solution using the standard library allocator might be implemented as follows:
 
-```
+```c
 void *
 std_alloc(void *const ptr, size_t const size)
 {
@@ -80,10 +80,10 @@ However, the above example is only useful if the standard library allocator is u
 
 Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped piece for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.
 
-Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this.
+Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).
 
-```
-insert(container_ptr, container_handle_ptr); 
+```c
+void *ccc_insert(ccc_container *c, ccc_container_elem *e);
 ```
 
 Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
@@ -92,14 +92,14 @@ For destructors, the argument is similar but the container does help with this a
 
 The clear function works for pointer stable containers and flat containers.
 
-```
-clear(container_ptr, destructor_fn_ptr);
+```c
+ccc_result clear(ccc_container *c, ccc_destructor_fn *fn);
 ```
 
 The clear and free function works for flat containers.
 
-```
-clear_and_free(container_ptr, destructor_fn_ptr);
+```c
+ccc_result clear_and_free(ccc_container *c, ccc_destructor_fn *fn);
 ```
 
 The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.
