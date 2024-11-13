@@ -180,10 +180,10 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a155e54fd97aa520dacfca655d2b7decf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a155e54fd97aa520dacfca655d2b7decf">ccc_omm_entry</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, void const *key)</td></tr>
 <tr class="memdesc:a155e54fd97aa520dacfca655d2b7decf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a container specific entry for the given search for key. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a155e54fd97aa520dacfca655d2b7decf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a2cb0585616dbb6b64e1fb3062daef6e5">ccc_omm_and_modify</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn)</td></tr>
+<tr class="memitem:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a2cb0585616dbb6b64e1fb3062daef6e5">ccc_omm_and_modify</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn)</td></tr>
 <tr class="memdesc:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the provided entry modified with fn if Occupied.  <br /></td></tr>
 <tr class="separator:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbd6c55fe7483ae6955fdeb1e174869f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#acbd6c55fe7483ae6955fdeb1e174869f">ccc_omm_and_modify_aux</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:acbd6c55fe7483ae6955fdeb1e174869f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#acbd6c55fe7483ae6955fdeb1e174869f">ccc_omm_and_modify_aux</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:acbd6c55fe7483ae6955fdeb1e174869f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the provided entry modified with fn and auxiliary data aux if Occupied.  <br /></td></tr>
 <tr class="separator:acbd6c55fe7483ae6955fdeb1e174869f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a492d3c9a89862156aa7ff3ef073972ab"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a492d3c9a89862156aa7ff3ef073972ab">ccc_omm_or_insert</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> const *e, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle)</td></tr>
@@ -271,20 +271,20 @@ N).  <br /></td></tr>
 <tr class="memitem:ab6cccc31a6c0503e8ac4340459adfbee"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab6cccc31a6c0503e8ac4340459adfbee">ccc_omm_extract</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle)</td></tr>
 <tr class="memdesc:ab6cccc31a6c0503e8ac4340459adfbee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts a user type known to be stored in the map with key_val_handle as an element currently in use by the map. O(1).  <br /></td></tr>
 <tr class="separator:ab6cccc31a6c0503e8ac4340459adfbee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f378b0bdedf3d1b9454016ed68f5be5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a1f378b0bdedf3d1b9454016ed68f5be5">ccc_omm_update</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:a1f378b0bdedf3d1b9454016ed68f5be5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a1f378b0bdedf3d1b9454016ed68f5be5">ccc_omm_update</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a1f378b0bdedf3d1b9454016ed68f5be5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates an element key that is currently tracked directly as a member of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a1f378b0bdedf3d1b9454016ed68f5be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d62a5ec7b584249a5bd9620bd47b5f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a9d62a5ec7b584249a5bd9620bd47b5f3">ccc_omm_increase</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:a9d62a5ec7b584249a5bd9620bd47b5f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a9d62a5ec7b584249a5bd9620bd47b5f3">ccc_omm_increase</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a9d62a5ec7b584249a5bd9620bd47b5f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases an element key that is currently tracked directly as a member of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a9d62a5ec7b584249a5bd9620bd47b5f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acabce7eb8fc409b1b67d13e3ca4fbb95"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#acabce7eb8fc409b1b67d13e3ca4fbb95">ccc_omm_decrease</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:acabce7eb8fc409b1b67d13e3ca4fbb95"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#acabce7eb8fc409b1b67d13e3ca4fbb95">ccc_omm_decrease</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:acabce7eb8fc409b1b67d13e3ca4fbb95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases an element key that is currently tracked directly as a member of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:acabce7eb8fc409b1b67d13e3ca4fbb95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container.. </p>
 </td></tr>
-<tr class="memitem:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae82b53c6b679358bb217f58dd46c5ee6">ccc_omm_clear</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae82b53c6b679358bb217f58dd46c5ee6">ccc_omm_clear</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:ae82b53c6b679358bb217f58dd46c5ee6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops every element from the map calling destructor if destructor is non-NULL. O(N).  <br /></td></tr>
 <tr class="separator:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -818,7 +818,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>&#160;</td>
         </tr>
         <tr>
@@ -856,7 +856,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -929,7 +929,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>&#160;</td>
         </tr>
         <tr>
@@ -1013,7 +1013,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -1305,7 +1305,7 @@ N). </p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -2027,7 +2027,7 @@ N). </p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>

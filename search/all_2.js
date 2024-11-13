@@ -43,7 +43,7 @@ var searchData=
   ['ccc_5fcmp_5ffn_40',['ccc_cmp_fn',['../types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231',1,'types.h']]],
   ['ccc_5fcontains_41',['ccc_contains',['../traits_8h.html#a9be78791f2812eee308106b818fa506f',1,'traits.h']]],
   ['ccc_5fdecrease_42',['ccc_decrease',['../traits_8h.html#aa4903300ff492bcc09cb717a7d212fc1',1,'traits.h']]],
-  ['ccc_5fdestructor_5ffn_43',['ccc_destructor_fn',['../types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c',1,'types.h']]],
+  ['ccc_5fdestructor_5ffn_43',['ccc_destructor_fn',['../types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5',1,'types.h']]],
   ['ccc_5fdll_5fback_44',['ccc_dll_back',['../doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac',1,'doubly_linked_list.c']]],
   ['ccc_5fdll_5fbegin_45',['ccc_dll_begin',['../doubly__linked__list_8h.html#a6659ba404965e290896edf2db6f85520',1,'doubly_linked_list.c']]],
   ['ccc_5fdll_5fbegin_5felem_46',['ccc_dll_begin_elem',['../doubly__linked__list_8h.html#a1cd9b16a6fe36296e4d95e2791b31a9e',1,'doubly_linked_list.c']]],
@@ -486,8 +486,8 @@ var searchData=
   ['ccc_5ftry_5finsert_5fr_483',['ccc_try_insert_r',['../traits_8h.html#a4a0df2c0362647236da2276149360e93',1,'traits.h']]],
   ['ccc_5funwrap_484',['ccc_unwrap',['../traits_8h.html#adad446a7857cbc4321f9d730bcccfdf9',1,'traits.h']]],
   ['ccc_5fupdate_485',['ccc_update',['../traits_8h.html#ae6de3ee031c3b30270bb461baba5cf76',1,'traits.h']]],
-  ['ccc_5fupdate_5ffn_486',['ccc_update_fn',['../types_8h.html#ad0670f03cf3cc94bc9666de800d8e5ad',1,'types.h']]],
+  ['ccc_5fupdate_5ffn_486',['ccc_update_fn',['../types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0',1,'types.h']]],
   ['ccc_5fuser_5fkey_487',['ccc_user_key',['../structccc__user__key.html',1,'']]],
-  ['ccc_5fuser_5ftype_5fmut_488',['ccc_user_type_mut',['../structccc__user__type__mut.html',1,'']]],
+  ['ccc_5fuser_5ftype_488',['ccc_user_type',['../structccc__user__type.html',1,'']]],
   ['ccc_5fvalidate_489',['ccc_validate',['../traits_8h.html#a0f910a1f06c9cfbef6da895928ef325e',1,'traits.h']]]
 ];
