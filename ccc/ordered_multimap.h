@@ -1,5 +1,34 @@
 /** @file
-@brief The Ordered Multimap Interface */
+@brief The Ordered Multimap Interface
+
+A multimap offers storage and retrieval by key. However, duplicate keys are
+allowed to be stored in the map.
+
+This multimap orders duplicate keys by a round robin scheme. This means the
+oldest key-value inserted into the multimap will be the one found on any
+queries or removed first when popped from the multimap. Therefore, this
+multimap is equivalent to a double ended priority queue with round robin
+fairness among duplicate key elements. There are helper functions to make this
+use case simpler. The multimap is a self-optimizing data structure and
+therefore does not offer read-only searching. The runtime for all search,
+insert, and remove operations is amortized O(lg N) and may not meet the
+requirements of realtime systems.
+
+This container offers pointer stability. Also, if the container is not
+permitted to allocate all insertion code assumes that the user has allocated
+memory appropriately for the element to be inserted; it will not allocate or
+free in this case. If allocation is permitted upon initialization the container
+will manage the memory as expected on insert or erase operations as defined
+by the interface; memory is allocated for insertions and freed for removals.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_ORDERED_MULTIMAP_H
 #define CCC_ORDERED_MULTIMAP_H
 
@@ -11,16 +40,10 @@
 
 /** @brief A container for membership testing by key field, allowing duplicate
 keys.
+@warning it is undefined behavior to use an uninitialized container.
 
-This multimap orders duplicate keys by a round robin scheme. This means the
-oldest key-value inserted into the multimap will be the one found on any
-queries or removed first when popped from the multimap. Therefore, this
-multimap is equivalent to a double ended priority queue with round robin
-fairness among duplicate key elements. There are helper functions to make this
-use case simpler. The multimap is a self-optimizing data structure and
-therefore does not offer read-only searching. The runtime for all search,
-insert, and remove operations is amortized O(lg N) and may not meet the
-requirements of realtime systems. */
+A ordered multimap may be stored on the stack, heap, or data segment. It can
+be initialized at compile time or runtime.*/
 typedef union ccc_ordered_multimap_ ccc_ordered_multimap;
 
 /** @brief The intrusive element for the user defined type stored in the
@@ -58,7 +81,9 @@ hand side of the variable at compile or run time
     ccc_impl_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field, \
                       alloc_fn, key_cmp_fn, aux)
 
-/*=========================    Membership   =================================*/
+/**@name Membership Interface
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Returns the membership of key in the multimap. Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
@@ -74,8 +99,12 @@ N).
 [[nodiscard]] void *ccc_omm_get_key_val(ccc_ordered_multimap *mm,
                                         void const *key);
 
-/*=========================    Entry Interface
- * =================================*/
+/**@}*/
+
+/** @name Entry Interface
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Returns an entry pointing to the newly inserted element and a status
 indicating if the map has already been Occupied at the given key. Amortized
@@ -351,7 +380,11 @@ Note bad arguments usually mean NULL pointers were passed to functions expecting
 non-NULL arguments. */
 [[nodiscard]] bool ccc_omm_input_error(ccc_ommap_entry const *e);
 
-/*===================    Priority Queue Helpers    ==========================*/
+/**@}*/
+
+/**@name Push and Pop Interface
+An interface to enhance the priority queue capabilities of a multimap. */
+/**@{*/
 
 /** @brief Pops the oldest maximum key value user type from the map. Elements
 are stored in ascending order, smallest as defined by the comparison function is
@@ -464,7 +497,34 @@ or the map is empty. */
                                     ccc_ommap_elem *key_val_handle,
                                     ccc_update_fn *fn, void *aux);
 
-/*===========================   Iterators   =================================*/
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container.. */
+/**@{*/
+
+/** @brief Pops every element from the map calling destructor if destructor is
+non-NULL. O(N).
+@param [in] mm a pointer to the multimap.
+@param [in] destructor a destructor function if required. NULL if unneeded.
+@return an input error if mm points to NULL otherwise ok.
+
+Note that if the multimap has been given permission to allocate, the destructor
+will be called on each element before it uses the provided allocator to free
+the element. Therefore, the destructor should not free the element or a double
+free will occur.
+
+If the container has not been given allocation permission, then the destructor
+may free elements or not depending on how and when the user wishes to free
+elements of the map according to their own memory management schemes. */
+ccc_result ccc_omm_clear(ccc_ordered_multimap *mm,
+                         ccc_destructor_fn *destructor);
+
+/**@}*/
+
+/** @name Iterator Interface
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
 Amortized O(lg N).
@@ -603,24 +663,11 @@ round robin order and ending at the newest before progressing to the next
 key of stored in the multimap. */
 [[nodiscard]] void *ccc_omm_rend(ccc_ordered_multimap const *mm);
 
-/** @brief Pops every element from the map calling destructor if destructor is
-non-NULL. O(N).
-@param [in] mm a pointer to the multimap.
-@param [in] destructor a destructor function if required. NULL if unneeded.
-@return an input error if mm points to NULL otherwise ok.
+/**@}*/
 
-Note that if the multimap has been given permission to allocate, the destructor
-will be called on each element before it uses the provided allocator to free
-the element. Therefore, the destructor should not free the element or a double
-free will occur.
-
-If the container has not been given allocation permission, then the destructor
-may free elements or not depending on how and when the user wishes to free
-elements of the map according to their own memory management schemes. */
-ccc_result ccc_omm_clear(ccc_ordered_multimap *mm,
-                         ccc_destructor_fn *destructor);
-
-/*===========================     Getters   =================================*/
+/** @name State Interface
+Obtain the container state. */
+/**@{*/
 
 /** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
@@ -636,6 +683,8 @@ ccc_result ccc_omm_clear(ccc_ordered_multimap *mm,
 @param [in] mm a pointer to the multimap.
 @return true if invariants of the data structure are preserved, else false. */
 [[nodiscard]] bool ccc_omm_validate(ccc_ordered_multimap const *mm);
+
+/**@}*/
 
 /** Use this preprocessor directive if shorter names are desired use the ccc
 namespace to drop the ccc prefix from all types and methods. */

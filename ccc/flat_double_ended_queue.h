@@ -1,5 +1,28 @@
 /** @file
-@brief The Flat Double Ended Queue Interface */
+@brief The Flat Double Ended Queue Interface
+
+An FDEQ offers contiguous storage and random access, push, and pop in constant
+time. The contiguous nature of the buffer makes it well-suited to dynamic or
+fixed size contexts where a double ended queue is needed.
+
+If the container is initialized with allocation permission it will resize when
+needed but support constant time push and pop to the front and back when
+resizing is not required, resulting in amortized O(1) operations.
+
+If the FDEQ is initialized without allocation permission its behavior is
+equivalent to a Ring Buffer. This is somewhat unique in that it does not fail
+to insert elements when size is equal to capacity. This means that push front,
+push back, pop front, and pop back are O(1) operations. However, if any push
+exceeds capacity an element where the push should occur is overwritten.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 #define CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 
@@ -9,15 +32,11 @@
 #include "types.h"
 
 /** @brief A contiguous buffer for O(1) push and pop from front and back.
+@warning it is undefined behavior to use an uninitialized flat double ended
+queue.
 
-If the container is initialized with allocation permission it will resize when
-needed but support constant time push and pop to the front and back when
-resizing is not required, resulting in amortized O(1) operations.
-
-If the FDEQ is initialized without allocation permission its behavior is
-equivalent to a Ring Buffer. This means that push front, push back, pop front,
-and pop back are O(1) operations. However, if any push exceeds capacity an
-element where the push should occur is overwritten. */
+A flat double ended queue can be initialized on the stack, heap, or data
+segment at compile time or runtime. */
 typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 
 /** @brief Initialize the fdeq with memory and allocation permission.
@@ -31,6 +50,10 @@ compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
 #define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
     (ccc_flat_double_ended_queue) ccc_impl_fdeq_init(                          \
         mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+
+/** @name Insert and Remove Interface
+Add or remove elements from the FDEQ. */
+/**@{*/
 
 /** @brief Write an element directly to the back slot of the fdeq. O(1) if no
 allocation permission amortized O(1) if allocation permission is given and a
@@ -141,16 +164,6 @@ Notice that the start of the range, {0,0,3,...}, is overwritten. */
                                           void *pos, size_t n,
                                           void const *elems);
 
-/** @brief Return a reference to the element at index position i. O(1).
-@param [in] fdeq a pointer to the fdeq.
-@param [in] i the 0 based index in the fdeq.
-@return a reference to the element at i if i < capacity.
-
-Note that the front of the fdeq is considered index 0, so the user need not
-worry about where the front is for indexing purposes. */
-[[nodiscard]] void *ccc_fdeq_at(ccc_flat_double_ended_queue const *fdeq,
-                                size_t i);
-
 /** @brief Pop an element from the front of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
 @return ok if the pop was successful. If fdeq is NULL or the fdeq is empty an
@@ -163,27 +176,11 @@ ccc_result ccc_fdeq_pop_front(ccc_flat_double_ended_queue *fdeq);
 input error is returned. */
 ccc_result ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fdeq);
 
-/** @brief Return a reference to the front of the fdeq. O(1).
-@param [in] fdeq a pointer to the fdeq.
-@return a reference to the front element or NULL if fdeq is NULL or the fdeq is
-empty. */
-[[nodiscard]] void *ccc_fdeq_front(ccc_flat_double_ended_queue const *fdeq);
+/**@}*/
 
-/** @brief Return a reference to the back of the fdeq. O(1).
-@param [in] fdeq a pointer to the fdeq.
-@return a reference to the back element or NULL if fdeq is NULL or the fdeq is
-empty. */
-[[nodiscard]] void *ccc_fdeq_back(ccc_flat_double_ended_queue const *fdeq);
-
-/** @brief Return true if the size of the fdeq is 0. O(1).
-@param [in] fdeq a pointer to the fdeq.
-@return true if the size is 0 or fdeq is NULL or false. */
-[[nodiscard]] bool ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
-
-/** @brief Return the size of the fdeq. O(1).
-@param [in] fdeq a pointer to the fdeq.
-@return the size of the fdeq or 0 if fdeq is NULL. */
-[[nodiscard]] size_t ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
+/** @name Deallocation Interface
+Destroy the container. */
+/**@{*/
 
 /** @brief Set size of fdeq to 0 and call destructor on each element if needed.
 O(1) if no destructor is provided, else O(N).
@@ -207,6 +204,12 @@ fdeq. After all elements are processed the buffer is freed and capacity is 0.
 If destructor is NULL the buffer is freed directly and capacity is 0. */
 ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fdeq,
                                    ccc_destructor_fn *destructor);
+
+/**@}*/
+
+/** @name State Interface
+Interact with the state of the FDEQ. */
+/**@{*/
 
 /** @brief Return a pointer to the front element of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
@@ -242,10 +245,50 @@ ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fdeq,
 @return a pointer to the start sentinel element that may not be accessed. */
 [[nodiscard]] void *ccc_fdeq_rend(ccc_flat_double_ended_queue const *fdeq);
 
+/**@}*/
+
+/** @name State Interface
+Interact with the state of the FDEQ. */
+/**@{*/
+
+/** @brief Return a reference to the element at index position i. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@param [in] i the 0 based index in the fdeq.
+@return a reference to the element at i if i < capacity.
+
+Note that the front of the fdeq is considered index 0, so the user need not
+worry about where the front is for indexing purposes. */
+[[nodiscard]] void *ccc_fdeq_at(ccc_flat_double_ended_queue const *fdeq,
+                                size_t i);
+
+/** @brief Return a reference to the front of the fdeq. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@return a reference to the front element or NULL if fdeq is NULL or the fdeq is
+empty. */
+[[nodiscard]] void *ccc_fdeq_front(ccc_flat_double_ended_queue const *fdeq);
+
+/** @brief Return a reference to the back of the fdeq. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@return a reference to the back element or NULL if fdeq is NULL or the fdeq is
+empty. */
+[[nodiscard]] void *ccc_fdeq_back(ccc_flat_double_ended_queue const *fdeq);
+
+/** @brief Return true if the size of the fdeq is 0. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@return true if the size is 0 or fdeq is NULL or false. */
+[[nodiscard]] bool ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
+
+/** @brief Return the size of the fdeq. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@return the size of the fdeq or 0 if fdeq is NULL. */
+[[nodiscard]] size_t ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
+
 /** @brief Return true if the internal invariants of the fdeq.
 @param [in] fdeq a pointer to the fdeq.
 @return true if the internal invariants of the fdeq are held, else false. */
 [[nodiscard]] bool ccc_fdeq_validate(ccc_flat_double_ended_queue const *fdeq);
+
+/**@}*/
 
 /** Define this preprocessor directive if you wish to use shorter names for the
 fdeq container. Ensure no namespace collisions occur before name shortening. */

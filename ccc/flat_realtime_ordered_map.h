@@ -1,7 +1,28 @@
 /** @file
-@brief The Flat Realtime Ordered Map Interface */
-#ifndef FLAT_REALTIME_ORDERED_MAP_H
-#define FLAT_REALTIME_ORDERED_MAP_H
+@brief The Flat Realtime Ordered Map Interface
+
+A flat realtime ordered map offers storage and retrieval by key. This map is
+suitable for realtime applications if resizing can be limited or controlled.
+
+The flat variant of the ordered map promises contiguous storage and random
+access if needed. Also, all elements in the map track their relationships via
+indices in the buffer. Therefore, this data structure can be relocated, copied,
+serialized, or written to disk and all internal data structure references will
+remain valid. Insertion may invoke an O(N) operation if resizing occurs.
+Finally, if allocation is prohibited upon initialization and the user intends
+to store a fixed size N nodes in the map N + 1 capacity is needed for the
+sentinel node in the buffer.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
+#ifndef CCC_FLAT_REALTIME_ORDERED_MAP_H
+#define CCC_FLAT_REALTIME_ORDERED_MAP_H
 
 #include "impl_flat_realtime_ordered_map.h"
 #include "types.h"
@@ -11,18 +32,10 @@
 
 /** @brief A flat realtime ordered map offers O(lg N) search and erase, and
 amortized O(lg N) insert.
+@warning it is undefined behavior to access an uninitialized container.
 
-This map is suitable for realtime applications if resizing can be limited or
-controlled.
-
-The flat variant of the ordered map promises contiguous storage and random
-access if needed. Also, all elements in the map track their relationships via
-indices in the buffer. Therefore, this data structure can be relocated, copied,
-serialized, or written to disk and all internal data structure references will
-remain valid. Insertion may invoke an O(N) operation if resizing occurs.
-Finally, if allocation is prohibited upon initialization and the user intends
-to store a fixed size N nodes in the map N + 1 capacity is needed for the
-sentinel node in the buffer. */
+A flat realtime ordered map can be initialized on the stack, heap, or data
+segment at runtime or compile time.*/
 typedef struct ccc_fromap_ ccc_flat_realtime_ordered_map;
 
 /** @brief The intrusive element for the user defined struct being stored in the
@@ -32,6 +45,7 @@ Because the map is flat data is always copied from the user type to map. */
 typedef struct ccc_fromap_elem_ ccc_fromap_elem;
 
 /** @brief A container specific entry used to implement the Entry Interface.
+@warning it is undefined behavior to access an uninitialized container.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
@@ -53,7 +67,9 @@ destruction.
     ccc_impl_frm_init(memory_ptr, capacity, frm_elem_field, key_elem_field,    \
                       alloc_fn, key_cmp_fn, aux_data)
 
-/*=================      Membership and Retrieval    ========================*/
+/**@name Membership Interface
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Searches the map for the presence of key.
 @param [in] frm the map to be searched.
@@ -69,8 +85,12 @@ bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
 void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
                           void const *key);
 
-/*======================      Entry Interface
- * ==================================*/
+/**@}*/
+
+/** @name Entry Interface
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] frm the pointer to the ordered map.
@@ -375,6 +395,12 @@ bool ccc_frm_occupied(ccc_fromap_entry const *e);
 due to an allocation failure when allocation success was expected. */
 bool ccc_frm_insert_error(ccc_fromap_entry const *e);
 
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
+
 /** @brief Frees all slots in the map for use without affecting capacity.
 @param [in] frm the map to be cleared.
 @param [in] fn the destructor for each element. NULL can be passed if no
@@ -398,7 +424,11 @@ If NULL is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *frm,
                                   ccc_destructor_fn *fn);
 
-/*======================      Iteration    ==================================*/
+/**@}*/
+
+/** @name Iterator Interface
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
 O(lg N).
@@ -510,7 +540,11 @@ void *ccc_frm_end(ccc_flat_realtime_ordered_map const *frm);
 @return the newest minimum element of the map. */
 void *ccc_frm_rend(ccc_flat_realtime_ordered_map const *frm);
 
-/*======================       Getters     ==================================*/
+/**@}*/
+
+/** @name State Interface
+Obtain the container state. */
+/**@{*/
 
 /** @brief Returns the size status of the map.
 @param [in] frm the map.
@@ -527,7 +561,7 @@ size_t ccc_frm_size(ccc_flat_realtime_ordered_map const *frm);
 @return true if all invariants hold, false if corruption occurs. */
 bool ccc_frm_validate(ccc_flat_realtime_ordered_map const *frm);
 
-/*======================      Namespace    ==================================*/
+/**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
@@ -558,4 +592,4 @@ typedef ccc_fromap_entry fromap_entry;
 #    define frm_validate(args...) ccc_frm_validate(args)
 #endif /* FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC */
 
-#endif /* FLAT_REALTIME_ORDERED_MAP_H */
+#endif /* CCC_FLAT_REALTIME_ORDERED_MAP_H */

@@ -1,5 +1,19 @@
 /** @file
-@brief The Realtime Ordered Map Interface */
+@brief The Realtime Ordered Map Interface
+
+A realtime ordered map offers storage and retrieval by key. This map offers
+pointer stability and a strict runtime bound of O(lg N) which is helpful in
+realtime environments. Also, searching is a thread-safe read-only operation.
+Balancing modifications only occur upon insert or remove.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_REALTIME_ORDERED_MAP_H
 #define CCC_REALTIME_ORDERED_MAP_H
 
@@ -10,10 +24,10 @@
 
 /** @brief A container for amortized O(lg N) search, insert, erase, ranges and
 pointer stability.
+@warning it is undefined behavior to access an uninitialized container.
 
-This map offers a strict runtime bound of O(lg N) which is helpful in realtime
-environments. Also, searching is a thread-safe read-only operation. Balancing
-modifications only occur upon insert or remove. */
+A realtime ordered map can be initialized on the stack, heap, or data segment at
+runtime or compile time.*/
 typedef struct ccc_romap_ ccc_realtime_ordered_map;
 
 /** @brief The intrusive element of the user defined struct being stored in the
@@ -49,7 +63,9 @@ destruction.
     ccc_impl_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,   \
                       alloc_fn, key_cmp_fn, aux_data)
 
-/*=================    Membership and Retrieval    ==========================*/
+/**@name Membership Interface
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Searches the map for the presence of key.
 @param [in] rom the map to be searched.
@@ -65,8 +81,12 @@ destruction.
 [[nodiscard]] void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom,
                                         void const *key);
 
-/*======================      Entry Interface
- * ==================================*/
+/**@}*/
+
+/** @name Entry Interface
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] rom the pointer to the ordered map.
@@ -389,7 +409,34 @@ free or use as needed. */
 due to an allocation failure when allocation success was expected. */
 [[nodiscard]] bool ccc_rom_occupied(ccc_romap_entry const *e);
 
-/*======================      Iteration    ==================================*/
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
+
+/** @brief Pops every element from the map calling destructor if destructor is
+non-NULL. O(N).
+@param [in] rom a pointer to the map.
+@param [in] destructor a destructor function if required. NULL if unneeded.
+@return an input error if rom points to NULL otherwise OK.
+
+Note that if the map has been given permission to allocate, the destructor will
+be called on each element before it uses the provided allocator to free the
+element. Therefore, the destructor should not free the element or a double free
+will occur.
+
+If the container has not been given allocation permission, then the destructor
+may free elements or not depending on how and when the user wishes to free
+elements of the map according to their own memory management schemes. */
+ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
+                         ccc_destructor_fn *destructor);
+
+/**@}*/
+
+/** @name Iterator Interface
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
 Amortized O(lg N).
@@ -506,24 +553,11 @@ current iterator.
 @return the newest minimum element of the map. */
 [[nodiscard]] void *ccc_rom_rend(ccc_realtime_ordered_map const *rom);
 
-/** @brief Pops every element from the map calling destructor if destructor is
-non-NULL. O(N).
-@param [in] rom a pointer to the map.
-@param [in] destructor a destructor function if required. NULL if unneeded.
-@return an input error if rom points to NULL otherwise OK.
+/**@}*/
 
-Note that if the map has been given permission to allocate, the destructor will
-be called on each element before it uses the provided allocator to free the
-element. Therefore, the destructor should not free the element or a double free
-will occur.
-
-If the container has not been given allocation permission, then the destructor
-may free elements or not depending on how and when the user wishes to free
-elements of the map according to their own memory management schemes. */
-ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
-                         ccc_destructor_fn *destructor);
-
-/*======================       Getters     ==================================*/
+/** @name State Interface
+Obtain the container state. */
+/**@{*/
 
 /** @brief Returns the size of the map
 @param [in] rom the map.
@@ -539,6 +573,8 @@ ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
 @param [in] rom the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
 [[nodiscard]] bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
+
+/**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */

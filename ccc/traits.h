@@ -1,12 +1,22 @@
 /** @file
-@brief The C Container Collection Traits Interface */
+@brief The C Container Collection Traits Interface
+
+Many functionalities across containers are similar. These can be described as
+traits that each container implements (see Rust Traits for a more pure example
+of the topic). Only a selections of shared traits across containers are
+represented here because some containers implement unique functionality that
+cannot be shared with other containers. These can simplify code greatly at a
+slightly higher compilation time cost. There is no runtime cost to using
+traits. */
 #ifndef CCC_TRAITS_H
 #define CCC_TRAITS_H
 
 #include "impl_traits.h"
 
-/*======================     Entry Interface
- * =====================================*/
+/** @name Entry Interface
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
@@ -170,8 +180,11 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_insert_error(entry_ptr) ccc_impl_insert_error(entry_ptr)
 
-/*======================    Misc Search Interface
- * ================================*/
+/**@}*/
+
+/**@name Membership Interface
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Obtain a reference to the user type stored at the key.
 @param [in] container_ptr a pointer to the container.
@@ -191,7 +204,11 @@ See container documentation for specific behavior. */
 #define ccc_contains(container_ptr, key_ptr...)                                \
     ccc_impl_contains(container_ptr, key_ptr)
 
-/*================       Sequential Containers Interface =====================*/
+/**@}*/
+
+/**@name Push Pop Front Back Interface
+Push, pop, and view elements in sorted or unsorted containers. */
+/**@{*/
 
 /** @brief Push an element into a container.
 @param [in] container_ptr a pointer to the container.
@@ -255,7 +272,31 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_back(container_ptr) ccc_impl_back(container_ptr)
 
-/*================       Priority Queue Update Interface =====================*/
+/** @brief Splice an element from one position to another in the same or a
+different container.
+@param [in] container_ptr a pointer to the container.
+@param splice_args are container specific.
+@return the result of the splice.
+
+See container documentation for specific behavior. */
+#define ccc_splice(container_ptr, splice_args...)                              \
+    ccc_impl_splice(container_ptr, splice_args)
+
+/** @brief Splice a range of elements from one position to another in the same
+or a different container.
+@param [in] container_ptr a pointer to the container.
+@param splice_args are container specific.
+@return the result of the splice.
+
+See container documentation for specific behavior. */
+#define ccc_splice_range(container_ptr, splice_args...)                        \
+    ccc_impl_splice_range(container_ptr, splice_args)
+
+/**@}*/
+
+/**@name Priority Queue Interface
+Interface to support generic priority queue operations. */
+/**@{*/
 
 /** @brief Update the value of an element known to be in a container.
 @param [in] container_ptr a pointer to the container.
@@ -305,7 +346,11 @@ See container documentation for specific behavior. */
 #define ccc_extract_range(container_ptr, extract_args...)                      \
     ccc_impl_extract_range(container_ptr, extract_args)
 
-/*===================       Iterators Interface ==============================*/
+/**@}*/
+
+/** @name Iterator Interface
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Obtain a reference to the start of a container.
 @param [in] container_ptr a pointer to the container.
@@ -389,28 +434,11 @@ See container documentation for specific behavior. */
 #define ccc_equal_rrange_r(container_ptr, rrange_args...)                      \
     ccc_impl_equal_rrange_r(container_ptr, rrange_args)
 
-/** @brief Splice an element from one position to another in the same or a
-different container.
-@param [in] container_ptr a pointer to the container.
-@param splice_args are container specific.
-@return the result of the splice.
+/**@}*/
 
-See container documentation for specific behavior. */
-#define ccc_splice(container_ptr, splice_args...)                              \
-    ccc_impl_splice(container_ptr, splice_args)
-
-/** @brief Splice a range of elements from one position to another in the same
-or a different container.
-@param [in] container_ptr a pointer to the container.
-@param splice_args are container specific.
-@return the result of the splice.
-
-See container documentation for specific behavior. */
-#define ccc_splice_range(container_ptr, splice_args...)                        \
-    ccc_impl_splice_range(container_ptr, splice_args)
-
-/*===================    Standard Getters Interface
- * ==============================*/
+/** @name State Interface
+Obtain the container state. */
+/**@{*/
 
 /** @brief Return the size of the container.
 @param [in] container_ptr a pointer to the container.
@@ -433,9 +461,10 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_validate(container_ptr) ccc_impl_validate(container_ptr)
 
+/**@}*/
+
 /** Define this preprocessor directive to shorten trait names. */
 #ifdef TRAITS_USING_NAMESPACE_CCC
-
 #    define insert(args...) ccc_insert(args)
 #    define try_insert(args...) ccc_try_insert(args)
 #    define insert_or_assign(args...) ccc_insert_or_assign(args)
@@ -491,7 +520,6 @@ See container documentation for specific behavior. */
 #    define size(args...) ccc_size(args)
 #    define is_empty(args...) ccc_is_empty(args)
 #    define validate(args...) ccc_validate(args)
-
 #endif /* CCC_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TRAITS_H */

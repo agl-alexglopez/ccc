@@ -1,20 +1,10 @@
 /** @file
-@brief The Flat Ordered Map Interface */
-#ifndef CCC_FLAT_ORDERED_MAP_H
-#define CCC_FLAT_ORDERED_MAP_H
+@brief The Flat Ordered Map Interface
 
-#include "impl_flat_ordered_map.h"
-#include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-
-/** @brief A self-optimizing data structure offering amortized O(lg N) search,
-insert, and erase.
-
-Because the data structure is self-optimizing it is not
-suitable map in a realtime environment where strict runtime bounds are needed.
-Also, searching the map is not a const thread-safe operation as indicated by the
+A flat ordered map is a contiguously stored map offering storage and retrieval
+by key. Because the data structure is self-optimizing it is not a suitable map
+in a realtime environment where strict runtime bounds are needed. Also,
+searching the map is not a const thread-safe operation as indicated by the
 function signatures. The map is optimized upon every new search. However, in
 many cases the self-optimizing structure of the map can be beneficial when
 considering non-uniform access patterns. In the best case, repeated searches of
@@ -28,7 +18,31 @@ serialized, or written to disk and all internal data structure references will
 remain valid. Insertion may invoke an O(N) operation if resizing occurs.
 Finally, if allocation is prohibited upon initialization and the user intends
 to store a fixed size N nodes in the map N + 1 capacity is needed for the
-sentinel node in the buffer. */
+sentinel node in the buffer.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
+#ifndef CCC_FLAT_ORDERED_MAP_H
+#define CCC_FLAT_ORDERED_MAP_H
+
+#include "impl_flat_ordered_map.h"
+#include "types.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+
+/** @brief A self-optimizing data structure offering amortized O(lg N) search,
+insert, and erase.
+@warning it is undefined behavior to access an uninitialized container.
+
+A flat ordered map can be initialized on the stack, heap, or data segment at
+runtime or compile time.*/
 typedef struct ccc_fomap_ ccc_flat_ordered_map;
 
 /** @brief The intrusive element for the user defined type being stored in the
@@ -61,7 +75,9 @@ typedef union ccc_fomap_entry_ ccc_fomap_entry;
     ccc_impl_fom_init(mem_ptr, capacity, om_elem_field, key_elem_field,        \
                       alloc_fn, key_cmp, aux)
 
-/*==========================    Membership   ================================*/
+/**@name Membership Interface
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Searches the map for the presence of key.
 @param [in] fom the map to be searched.
@@ -75,8 +91,12 @@ bool ccc_fom_contains(ccc_flat_ordered_map *fom, void const *key);
 @return a view of the map entry if it is present, else NULL. */
 void *ccc_fom_get_key_val(ccc_flat_ordered_map *fom, void const *key);
 
-/*===========================   Entry Interface
- * =================================*/
+/**@}*/
+
+/** @name Entry Interface
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] fom the pointer to the ordered map.
@@ -364,29 +384,9 @@ bool ccc_fom_occupied(ccc_fomap_entry const *e);
 due to an allocation failure when allocation success was expected. */
 bool ccc_fom_insert_error(ccc_fomap_entry const *e);
 
-/** @brief Frees all slots in the map for use without affecting capacity.
-@param [in] fom the map to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the map before their slots are
-forfeit.
-
-If NULL is passed as the destructor function time is O(1), else O(size). */
-void ccc_fom_clear(ccc_flat_ordered_map *fom, ccc_destructor_fn *fn);
-
-/** @brief Frees all slots in the map and frees the underlying buffer.
-@param [in] fom the map to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the map before their slots are
-forfeit.
-@return the result of free operation. If no alloc function is provided it is
-an error to attempt to free the buffer and a memory error is returned.
-Otherwise, an OK result is returned.
-
-If NULL is passed as the destructor function time is O(1), else O(size). */
-ccc_result ccc_fom_clear_and_free(ccc_flat_ordered_map *fom,
-                                  ccc_destructor_fn *fn);
-
-/*===========================   Iterators   =================================*/
+/** @name Iterator Interface
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
 Amortized O(lg N).
@@ -501,7 +501,39 @@ void *ccc_fom_end(ccc_flat_ordered_map const *fom);
 @return the newest minimum element of the map. */
 void *ccc_fom_rend(ccc_flat_ordered_map const *fom);
 
-/*===========================    Getters    =================================*/
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
+
+/** @brief Frees all slots in the map for use without affecting capacity.
+@param [in] fom the map to be cleared.
+@param [in] fn the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the map before their slots are
+forfeit.
+
+If NULL is passed as the destructor function time is O(1), else O(size). */
+void ccc_fom_clear(ccc_flat_ordered_map *fom, ccc_destructor_fn *fn);
+
+/** @brief Frees all slots in the map and frees the underlying buffer.
+@param [in] fom the map to be cleared.
+@param [in] fn the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the map before their slots are
+forfeit.
+@return the result of free operation. If no alloc function is provided it is
+an error to attempt to free the buffer and a memory error is returned.
+Otherwise, an OK result is returned.
+
+If NULL is passed as the destructor function time is O(1), else O(size). */
+ccc_result ccc_fom_clear_and_free(ccc_flat_ordered_map *fom,
+                                  ccc_destructor_fn *fn);
+
+/**@}*/
+
+/** @name State Interface
+Obtain the container state. */
+/**@{*/
 
 /** @brief Returns the size of the map
 @param [in] fom the map.
@@ -518,7 +550,7 @@ bool ccc_fom_is_empty(ccc_flat_ordered_map const *fom);
 @return true if all invariants hold, false if corruption occurs. */
 bool ccc_fom_validate(ccc_flat_ordered_map const *fom);
 
-/*===========================    Namespace  =================================*/
+/**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */

@@ -19,7 +19,15 @@ functions offer more custom control over the buffer.
 
 If allocation is not permitted, resizing will not occur and the insertion
 function will fail when capacity is reached, returning some value to indicate
-the failure. */
+the failure.
+
+If shorter names are desired, define the following preprocessor directive.
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+```
+
+Then, the `ccc_` prefix can be dropped from all types and functions. */
 #ifndef CCC_BUFFER_H
 #define CCC_BUFFER_H
 
@@ -60,7 +68,7 @@ occurred with the provided allocation function. */
 #define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
     ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
 
-/** @name Allocation Management Interface
+/** @name Insert and Remove Interface
 These functions assume contiguity of elements in the buffer and increase or
 decrease size accordingly. */
 /**@{*/

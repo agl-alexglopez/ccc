@@ -1,5 +1,28 @@
 /** @file
-@brief The Singly Linked List Interface */
+@brief The Singly Linked List Interface
+
+A singly linked list is well suited for list or stack structures that only need
+access to the front or most recently added elements. When compared to a doubly
+linked list, the memory overhead per node is smaller but some operations will
+have O(N) runtime implications when compared to a similar operation in a doubly
+linked list. Review function documentation when unsure of the runtime of an sll
+operation.
+
+This container offers pointer stability. Also, if the container is not
+permitted to allocate all insertion code assumes that the user has allocated
+memory appropriately for the element to be inserted; it will not allocate or
+free in this case. If allocation is permitted upon initialization the container
+will manage the memory as expected on insert or erase operations as defined
+by the interface; memory is allocated for insertions and freed for removals.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_SINGLY_LINKED_LIST_H
 #define CCC_SINGLY_LINKED_LIST_H
 
@@ -10,12 +33,9 @@
 
 /** @brief A low overhead front tracking container with efficient push and pop.
 
-A singly linked list is well suited for list or stack structures that only need
-access to the front or most recently added elements. When compared to a doubly
-linked list, the memory overhead per node is smaller but some operations will
-have O(N) runtime implications when compared to a similar operation in a doubly
-linked list. Review function documentation when unsure of the runtime of an sll
-operation. */
+A singly linked list may be stored in the stack, heap, or data segment. Once
+Initialized it is passed by reference to all functions. A singly linked list
+can be initialized at compile time or runtime. */
 typedef struct ccc_sll_ ccc_singly_linked_list;
 
 /** @brief A singly linked list intrusive element to embedded in a user type.
@@ -58,6 +78,10 @@ container to allocate memory. */
 #define ccc_sll_emplace_front(list_ptr, struct_initializer...)                 \
     ccc_impl_sll_emplace_front(list_ptr, struct_initializer)
 
+/** @name Insert and Remove Interface
+Add or remove elements from the container. */
+/**@{*/
+
 /** @brief Push the type wrapping elem to the front of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @param [in] elem a pointer to the intrusive handle in the user type.
@@ -69,11 +93,6 @@ elem has been allocated appropriately and with the correct lifetime by the user.
 If allocation is allowed the provided element is copied to a new allocation. */
 [[nodiscard]] void *ccc_sll_push_front(ccc_singly_linked_list *sll,
                                        ccc_sll_elem *elem);
-
-/** @brief Return a pointer to the element at the front of the list. O(1).
-@param [in] sll a pointer to the singly linked list.
-@return a reference to the front element or NULL if empty or sll is NULL. */
-[[nodiscard]] void *ccc_sll_front(ccc_singly_linked_list const *sll);
 
 /** @brief Pop the front element from the list. O(1).
 @param [in] sll a pointer to the singly linked list.
@@ -161,6 +180,33 @@ as they no longer belong to any list. */
 void *ccc_sll_extract_range(ccc_singly_linked_list *sll, ccc_sll_elem *begin,
                             ccc_sll_elem *end);
 
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
+
+/** @brief Clears the list freeing memory if needed. O(N).
+@param [in] sll a pointer to the singly linked list.
+@param [in] fn a destructor function or NULL if not needed.
+@return ok if the clear succeeded or an input error if sll or fn are NULL.
+
+Note that if allocation is allowed, the container will free the user types
+wrapping each intrusive element in the list after calling fn. Therefore, fn
+should not free memory if the container has been given allocation permission.
+It should only perform other necessary cleanup or state management.
+
+If allocation is not allowed fn may free memory or not as the user sees fit.
+The user is responsible for managing the memory that wraps each intrusive
+handle as the elements are simply removed from the list. */
+ccc_result ccc_sll_clear(ccc_singly_linked_list *sll, ccc_destructor_fn *fn);
+
+/**@}*/
+
+/** @name Iteration Interface
+Iterate through the doubly linked list. */
+/**@{*/
+
 /** @brief Return the user type at the front of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return a pointer to the user type at the start of the list or the end sentinel.
@@ -181,6 +227,17 @@ access the sentinel. NULL is returned if sll is NULL.  */
 is returned if sll or elem are NULL. */
 [[nodiscard]] void *ccc_sll_next(ccc_singly_linked_list const *sll,
                                  ccc_sll_elem const *elem);
+
+/**@}*/
+
+/** @name State Interface
+Obtain state from the doubly linked list. */
+/**@{*/
+
+/** @brief Return a pointer to the element at the front of the list. O(1).
+@param [in] sll a pointer to the singly linked list.
+@return a reference to the front element or NULL if empty or sll is NULL. */
+[[nodiscard]] void *ccc_sll_front(ccc_singly_linked_list const *sll);
 
 /** @brief Return a pointer to the first intrusive handle in the list. O(1).
 @param [in] sll a pointer to the singly linked list.
@@ -211,20 +268,7 @@ ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 @return true if the list is valid, else false. */
 [[nodiscard]] bool ccc_sll_validate(ccc_singly_linked_list const *sll);
 
-/** @brief Clears the list freeing memory if needed. O(N).
-@param [in] sll a pointer to the singly linked list.
-@param [in] fn a destructor function or NULL if not needed.
-@return ok if the clear succeeded or an input error if sll or fn are NULL.
-
-Note that if allocation is allowed, the container will free the user types
-wrapping each intrusive element in the list after calling fn. Therefore, fn
-should not free memory if the container has been given allocation permission.
-It should only perform other necessary cleanup or state management.
-
-If allocation is not allowed fn may free memory or not as the user sees fit.
-The user is responsible for managing the memory that wraps each intrusive
-handle as the elements are simply removed from the list. */
-ccc_result ccc_sll_clear(ccc_singly_linked_list *sll, ccc_destructor_fn *fn);
+/**@}*/
 
 /** Define this preprocessor macro if shorter names are desired for the singly
 linked list container. Check for namespace clashes before name shortening. */

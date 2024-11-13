@@ -1,5 +1,20 @@
 /** @file
-@brief The Priority Queue Interface */
+@brief The Priority Queue Interface
+
+A priority queue offers simple, fast, pointer stable management of a prioriry
+queue. Push is O(1). The cost to execute the increase key in a max heap and
+decrease key in a min heap is O(1). However, due to the restructuring this
+causes that increases the cost of later pops, the more accurate runtime is o(lg
+N). The cost of a pop operation is O(lgN).
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_PRIORITY_QUEUE_H
 #define CCC_PRIORITY_QUEUE_H
 
@@ -11,11 +26,10 @@
 
 /** @brief A container for pointer stability and an O(1) push and amortized o(lg
 N) increase/decrease key.
+@warning it is undefined behavior to access an uninitialized container.
 
-The cost to execute the increase key in a max heap and decrease key in a min
-heap is O(1). However, due to the restructuring this causes that increases the
-cost of later pops, the more accurate runtime is o(lg N). The cost of a pop
-operation is O(lgN). */
+A priority queue can be initialized on the stack, heap, or data segment at
+runtime or compile time.*/
 typedef struct ccc_pq_ ccc_priority_queue;
 
 /** @brief The embedded struct type for operation of the priority queue.
@@ -42,10 +56,9 @@ typedef struct ccc_pq_elem_ ccc_pq_elem;
     ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
                      aux_data)
 
-/** @brief Obtain a reference to the front of the priority queue. O(1).
-@param [in] pq a pointer to the priority queue.
-@return a reference to the front element in the pq. */
-[[nodiscard]] void *ccc_pq_front(ccc_priority_queue const *pq);
+/** @name Insert and Remove Interface
+Insert and remove elements from the priority queue. */
+/**@{*/
 
 /** @brief Adds an element to the priority queue in correct total order. O(1).
 @param [in] pq a pointer to the priority queue.
@@ -83,16 +96,6 @@ pq is empty.
 
 Note that the user must ensure that elem is in the priority queue. */
 ccc_result ccc_pq_erase(ccc_priority_queue *pq, ccc_pq_elem *elem);
-
-/** @brief Returns true if the priority queue is empty false if not. O(1).
-@param [in] pq a pointer to the priority queue.
-@return true if the size is 0 or pq is NULL, false if not empty.  */
-[[nodiscard]] bool ccc_pq_is_empty(ccc_priority_queue const *pq);
-
-/** @brief Returns the size of the priority queue.
-@param [in] pq a pointer to the priority queue.
-@return the size of the pq or 0 if pq is NULL or pq is empty. */
-[[nodiscard]] size_t ccc_pq_size(ccc_priority_queue const *pq);
 
 /** @brief Update the value in the user type wrapping elem.
 @param [in] pq a pointer to the priority queue.
@@ -143,10 +146,11 @@ from the pq creates an amortized o(lgN) runtime for this function. */
 bool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
                      ccc_update_fn *fn, void *aux);
 
-/** @brief Return the order used to initialize the pq.
-@param [in] pq a pointer to the priority queue.
-@return LES or GRT ordering. Any other ordering is invalid. */
-[[nodiscard]] ccc_threeway_cmp ccc_pq_order(ccc_priority_queue const *pq);
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
 
 /** @brief Removes all elements from the pq, freeing if needed.
 @param [in] pq a pointer to the priority queue.
@@ -163,10 +167,38 @@ the elements from the pq, calling fn on each user type if provided, and sets the
 size to zero. */
 ccc_result ccc_pq_clear(ccc_priority_queue *pq, ccc_destructor_fn *fn);
 
+/**@}*/
+
+/** @name State Interface
+Obtain state from the container. */
+/**@{*/
+
+/** @brief Obtain a reference to the front of the priority queue. O(1).
+@param [in] pq a pointer to the priority queue.
+@return a reference to the front element in the pq. */
+[[nodiscard]] void *ccc_pq_front(ccc_priority_queue const *pq);
+
+/** @brief Returns true if the priority queue is empty false if not. O(1).
+@param [in] pq a pointer to the priority queue.
+@return true if the size is 0 or pq is NULL, false if not empty.  */
+[[nodiscard]] bool ccc_pq_is_empty(ccc_priority_queue const *pq);
+
+/** @brief Returns the size of the priority queue.
+@param [in] pq a pointer to the priority queue.
+@return the size of the pq or 0 if pq is NULL or pq is empty. */
+[[nodiscard]] size_t ccc_pq_size(ccc_priority_queue const *pq);
+
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.
 @return true if the pq is valid false if pq is NULL or invalid. */
 [[nodiscard]] bool ccc_pq_validate(ccc_priority_queue const *pq);
+
+/** @brief Return the order used to initialize the pq.
+@param [in] pq a pointer to the priority queue.
+@return LES or GRT ordering. Any other ordering is invalid. */
+[[nodiscard]] ccc_threeway_cmp ccc_pq_order(ccc_priority_queue const *pq);
+
+/**@}*/
 
 /** Define this preprocessor directive if shortened names are desired for the
 priority queue container. Check for collisions before name shortening. */

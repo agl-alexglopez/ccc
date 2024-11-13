@@ -1,5 +1,10 @@
 /** @file
-@brief The C Container Collection Fundamental Types */
+@brief The C Container Collection Fundamental Types
+
+All containers make use of the fundamental types defined here. The purpose of
+these types is to aid the user in writing correct callback functions, allow
+clear error handling, and present a consistent interface to users across
+containers. */
 #ifndef CCC_TYPES_H
 #define CCC_TYPES_H
 

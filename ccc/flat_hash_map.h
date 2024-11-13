@@ -1,5 +1,26 @@
 /** @file
-@brief The Flat Hash Map Interface */
+@brief The Flat Hash Map Interface
+
+A Flat Hash Map stores elements by hash value and allows the user to retrieve
+them by key in amortized O(1). Elements in the table may be copied and moved so
+no pointer stability is available in this implementation. If pointer stability
+is needed, store and hash pointers to those elements in this table.
+
+A flat hash map requires the user to provide a struct with known key and flat
+hash element fields as well as a hash function and key comparator function. The
+hash function should be well tailored to the key being stored in the table to
+prevent collisions. Currently, the flat hash map does not offer any default hash
+functions or hash strengthening algorithms so good hash functions should be
+used.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_HASH_MAP_H
 #define CCC_FLAT_HASH_MAP_H
 
@@ -11,17 +32,8 @@
 /** @brief A container for storing key-value structures defined by the user in
 a contiguous buffer.
 
-Elements are then retrievable by key in amortized O(1). Elements in the table
-may be copied and moved so no pointer stability is available in this
-implementation. If pointer stability is needed, store and hash pointers to those
-elements in this table.
-
-A flat hash map requires the user to provide a struct with known key
-and flat hash element fields as well as a hash function and key
-comparator function. The hash function should be well tailored to
-the key being stored in the table to prevent collisions. Currently,
-the flat hash map does not offer any default hash functions or hash
-strengthening algorithms so good hash functions should be used. */
+A flat hash map can be initialized on the stack, heap, or data segment at
+runtime. */
 typedef struct ccc_fhmap_ ccc_flat_hash_map;
 
 /** @brief An intrusive element for a user provided type.
@@ -60,7 +72,9 @@ initialization is successful or a failure. */
                       fhash_elem_field, alloc_fn, hash_fn, key_eq_fn,          \
                       aux_data)
 
-/*========================   Membership   ===================================*/
+/**@name Membership Interface
+Test membership or obtain references to stored user types directly. */
+/**@{*/
 
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
@@ -74,8 +88,12 @@ initialization is successful or a failure. */
 @return a view of the table entry if it is present, else NULL. */
 [[nodiscard]] void *ccc_fhm_get_key_val(ccc_flat_hash_map *h, void const *key);
 
-/*========================    Entry Interface
- * ==================================*/
+/**@}*/
+
+/** @name Entry Interface
+Obtain and operate on container entries for efficient queries when non-trivial
+control flow is needed. */
+/**@{*/
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
@@ -394,7 +412,36 @@ in an assert for debug builds can be a helpful sanity check if the heap should
 correctly resize by default and errors are not usually expected. */
 [[nodiscard]] bool ccc_fhm_insert_error(ccc_fhmap_entry const *e);
 
-/*==============================   Iteration    =============================*/
+/**@}*/
+
+/** @name Deallocation Interface
+Destroy the container. */
+/**@{*/
+
+/** @brief Frees all slots in the table for use without affecting capacity.
+@param [in] h the table to be cleared.
+@param [in] fn the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the table before their slots are
+forfeit.
+
+If NULL is passed as the destructor function time is O(1), else O(capacity). */
+ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
+
+/** @brief Frees all slots in the table and frees the underlying buffer.
+@param [in] h the table to be cleared.
+@param [in] fn the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the table before their slots are
+forfeit.
+@return the result of free operation. If no alloc function is provided it is
+an error to attempt to free the buffer and a memory error is returned.
+Otherwise, an OK result is returned. */
+ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *, ccc_destructor_fn *);
+
+/**@}*/
+
+/** @name Iterator Interface
+Obtain and manage iterators over the container. */
+/**@{*/
 
 /** @brief Obtains a pointer to the first element in the table.
 @param [in] h the table to iterate through.
@@ -421,6 +468,12 @@ resizing occurs which would lead to undefined behavior. O(capacity). */
 @warning It is undefined behavior to access or modify the end address. */
 [[nodiscard]] void *ccc_fhm_end(ccc_flat_hash_map const *h);
 
+/**@}*/
+
+/** @name State Interface
+Obtain the container state. */
+/**@{*/
+
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. */
@@ -430,25 +483,6 @@ resizing occurs which would lead to undefined behavior. O(capacity). */
 @param [in] h the hash table.
 @return the size_t size. */
 [[nodiscard]] size_t ccc_fhm_size(ccc_flat_hash_map const *h);
-
-/** @brief Frees all slots in the table for use without affecting capacity.
-@param [in] h the table to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the table before their slots are
-forfeit.
-
-If NULL is passed as the destructor function time is O(1), else O(capacity). */
-ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
-
-/** @brief Frees all slots in the table and frees the underlying buffer.
-@param [in] h the table to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the table before their slots are
-forfeit.
-@return the result of free operation. If no alloc function is provided it is
-an error to attempt to free the buffer and a memory error is returned.
-Otherwise, an OK result is returned. */
-ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *, ccc_destructor_fn *);
 
 /** @brief Helper to find a prime number if needed.
 @param [in] n the input that may or may not be prime.
@@ -469,6 +503,8 @@ size to mitigate hash collisions. */
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
 [[nodiscard]] bool ccc_fhm_validate(ccc_flat_hash_map const *h);
+
+/**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */

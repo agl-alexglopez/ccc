@@ -1,5 +1,23 @@
 /** @file
-@brief The Ordered Map Interface */
+@brief The Ordered Map Interface
+
+An ordered map offers storage and retrieval elements by key. Because the data
+structure is self-optimizing it is not suitable map in a realtime environment
+where strict runtime bounds are needed. Also, searching the map is not a const
+thread-safe operation as indicated by the function signatures. The map is
+optimized upon every new search. However, in many cases the self-optimizing
+structure of the map can be beneficial when considering non-uniform access
+patterns. In the best case, repeated searches of the same value yield an O(1)
+access and many other frequently searched values will remain close to the root
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define ORDERED_MAP_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 
@@ -11,15 +29,10 @@
 
 /** @brief A self-optimizing data structure offering amortized O(lg N) search,
 insert, and erase and pointer stability.
+@warning it is undefined behavior to access an uninitialized container.
 
-Because the data structure is self-optimizing it is not suitable map in a
-realtime environment where strict runtime bounds are needed. Also, searching the
-map is not a const thread-safe operation as indicated by the function
-signatures. The map is optimized upon every new search. However, in many cases
-the self-optimizing structure of the map can be beneficial when considering
-non-uniform access patterns. In the best case, repeated searches of the same
-value yield an O(1) access and many other frequently searched values will remain
-close to the root of the map. */
+An ordered map can be initialized on the stack, heap, or data segment at
+runtime or compile time.*/
 typedef union ccc_ordered_map_ ccc_ordered_map;
 
 /** @brief The intrusive element for the user defined struct being stored in the
@@ -52,7 +65,7 @@ typedef union ccc_omap_entry_ ccc_omap_entry;
     ccc_impl_om_init(om_name, struct_name, om_elem_field, key_elem_field,      \
                      alloc_fn, key_cmp, aux)
 
-/**@name Membership Functions
+/**@name Membership Interface
 Test membership or obtain references to stored user types directly. */
 /**@{*/
 
@@ -70,7 +83,7 @@ Test membership or obtain references to stored user types directly. */
 
 /**@}*/
 
-/** @name Entry Interface Functions
+/** @name Entry Interface
 Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
@@ -388,7 +401,7 @@ due to an allocation failure when allocation success was expected. */
 
 /**@}*/
 
-/** @name Iterator Functions
+/** @name Iterator Interface
 Obtain and manage iterators over the container. */
 /**@{*/
 
@@ -505,6 +518,12 @@ current iterator.
 @return the newest minimum element of the map. */
 [[nodiscard]] void *ccc_om_rend(ccc_ordered_map const *om);
 
+/**@}*/
+
+/** @name Deallocation Interface
+Destroy the container. */
+/**@{*/
+
 /** @brief Pops every element from the map calling destructor if destructor is
 non-NULL. O(N).
 @param [in] om a pointer to the map.
@@ -523,7 +542,7 @@ ccc_result ccc_om_clear(ccc_ordered_map *om, ccc_destructor_fn *destructor);
 
 /**@}*/
 
-/** @name Getter Functions
+/** @name State Interface
 Obtain the container state. */
 /**@{*/
 

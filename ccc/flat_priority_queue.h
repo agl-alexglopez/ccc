@@ -1,5 +1,18 @@
 /** @file
-@brief The Flat Priority Queue Interface */
+@brief The Flat Priority Queue Interface
+
+A flat priority queue is a contiguous container storing storing elements in
+heap order. This offers tightly packed data for efficient push, pop, min/max
+operations in O(lg N).
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_PRIORITY_QUEUE_H
 #define CCC_FLAT_PRIORITY_QUEUE_H
 
@@ -11,10 +24,10 @@
 
 /** @brief A container offering direct storage and sorting of user data by heap
 order.
+@warning it is undefined behavior to access an uninitialized container.
 
-A flat heap does not offer pointer stability and may need to resize depending on
-initialization options. However, push and pop without resizing offer O(lgN)
-performance. */
+A flat priority queue can be initialized on the stack, heap, or data segment at
+runtime or compile time.*/
 typedef struct ccc_fpq_ ccc_flat_priority_queue;
 
 /** @brief Initialize a fpq as a min or max heap.
@@ -32,6 +45,10 @@ slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
 #define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
     ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
+
+/** @name Insert and Remove Interface
+Insert or remove elements from the flat priority queue. */
+/**@{*/
 
 /** @brief Order an existing array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
@@ -92,11 +109,6 @@ push required more memory and failed. Failure can occur if the fpq is full and
 allocation is not allowed or a resize failed when allocation is allowed. */
 [[nodiscard]] void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e);
 
-/** @brief Return a pointer to the front (min or max) element in the fpq. O(1).
-@param [in] fpq a pointer to the priority queue.
-@return A pointer to the front element or NULL if empty or fpq is NULL. */
-[[nodiscard]] void *ccc_fpq_front(ccc_flat_priority_queue const *fpq);
-
 /** @brief Pop the front element (min or max) element in the fpq. O(lgN).
 @param [in] fpq a pointer to the priority queue.
 @return OK if the pop succeeds or an input error if fpq is NULL or empty. */
@@ -142,6 +154,12 @@ bool ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
 bool ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
                       void *aux);
 
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
+
 /** @brief Clears the fpq calling fn on every element if provided. O(1)-O(N).
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] fn the destructor function or NULL if not needed.
@@ -171,6 +189,17 @@ of the provided allocation function free operation. */
 ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *fpq,
                                   ccc_destructor_fn *fn);
 
+/**@}*/
+
+/** @name State Interface
+Obtain state from the container. */
+/**@{*/
+
+/** @brief Return a pointer to the front (min or max) element in the fpq. O(1).
+@param [in] fpq a pointer to the priority queue.
+@return A pointer to the front element or NULL if empty or fpq is NULL. */
+[[nodiscard]] void *ccc_fpq_front(ccc_flat_priority_queue const *fpq);
+
 /** @brief Returns true if the fpq is empty false if not. O(1).
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the size is 0 or fpq is NULL, false if not empty.  */
@@ -191,6 +220,8 @@ ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *fpq,
 @return LES or GRT ordering. Any other ordering is invalid. */
 [[nodiscard]] ccc_threeway_cmp
 ccc_fpq_order(ccc_flat_priority_queue const *fpq);
+
+/**@}*/
 
 /** Define this preprocessor directive if shortened names are desired for the
 flat priority queue container. Check for collisions before name shortening. */

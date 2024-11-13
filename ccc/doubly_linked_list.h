@@ -12,7 +12,16 @@ permitted to allocate all insertion code assumes that the user has allocated
 memory appropriately for the element to be inserted; it will not allocate or
 free in this case. If allocation is permitted upon initialization the container
 will manage the memory as expected on insert or erase operations as defined
-by the interface; memory is allocated for insertions and freed for removals. */
+by the interface; memory is allocated for insertions and freed for removals.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_DOUBLY_LINKED_LIST_H
 #define CCC_DOUBLY_LINKED_LIST_H
 
@@ -22,7 +31,7 @@ by the interface; memory is allocated for insertions and freed for removals. */
 #include "types.h"
 
 /** @brief A container offering bidirectional, insert, removal, and iteration.
-@warning it is undefined behavior to use an uninitialized doubly linked list.
+@warning it is undefined behavior to use an uninitialized container.
 
 A doubly linked list may be stored in the stack, heap, or data segment. Once
 Initialized it is passed by reference to all functions. A doubly linked list
@@ -58,8 +67,8 @@ time (e.g. ccc_doubly_linked l = ccc_dll_init(...);). */
     ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
                       cmp_fn, aux_data)
 
-/** @name Insert Interface
-Add elements to the doubly linked list. */
+/** @name Insert and Remove Interface
+Add or remove elements from the doubly linked list. */
 /**@{*/
 
 /** @brief  writes contents of type initializer directly to allocated memory at
@@ -118,12 +127,6 @@ or allocation fails. */
 or allocation fails. */
 [[nodiscard]] void *ccc_dll_insert(ccc_doubly_linked_list *l,
                                    ccc_dll_elem *pos_elem, ccc_dll_elem *elem);
-
-/**@}*/
-
-/** @name Remove Interface
-Remove elements from the doubly linked list. */
-/**@{*/
 
 /** @brief Pop the user type at the front of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
@@ -212,6 +215,12 @@ ccc_result ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll,
                                 ccc_dll_elem *pos,
                                 ccc_doubly_linked_list *to_cut_sll,
                                 ccc_dll_elem *begin, ccc_dll_elem *end);
+
+/**@}*/
+
+/** @name Deallocation Interface
+Deallocate the container. */
+/**@{*/
 
 /** @brief Clear the contents of the list freeing elements, if given allocation
 permission. O(N).
