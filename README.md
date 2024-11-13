@@ -14,9 +14,9 @@ Read the documentation [HERE](https://agl-alexglopez.github.io/ccc). To get star
 
 ### Motivations
 
-The hypothesis of this library is as follows:
+Here is the main argument of this library:
 
-> Containers in C should never limit the control and flexibility offered by the C language.
+> Containers in C should avoid limiting the control and flexibility offered by the C language.
 
 There are many excellent data structure libraries in C (see the [related](#related) section). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have non-trivial side effect by calling dynamic memory interfaces.
 
