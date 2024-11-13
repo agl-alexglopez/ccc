@@ -25,19 +25,19 @@
 var NAVTREE =
 [
   [ "C Container Collection (CCC)", "index.html", [
-    [ "Installation", "index.html#autotoc_md1", null ],
-    [ "Quick Start", "index.html#autotoc_md2", null ],
-    [ "Design", "index.html#autotoc_md3", [
-      [ "Motivations", "index.html#autotoc_md4", null ],
-      [ "Allocation", "index.html#autotoc_md5", null ]
+    [ "Installation", "index.html#autotoc_md3", null ],
+    [ "Quick Start", "index.html#autotoc_md4", null ],
+    [ "Design", "index.html#autotoc_md5", [
+      [ "Motivations", "index.html#autotoc_md6", null ],
+      [ "Allocation", "index.html#autotoc_md7", null ]
     ] ],
-    [ "Related", "index.html#autotoc_md6", null ],
+    [ "Related", "index.html#autotoc_md8", null ],
     [ "Building and Installation", "md_INSTALL.html", [
-      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md8", null ],
-      [ "Include the Library", "md_INSTALL.html#autotoc_md9", null ],
-      [ "Alternative Builds", "md_INSTALL.html#autotoc_md10", null ],
-      [ "Without Make", "md_INSTALL.html#autotoc_md11", null ],
-      [ "User Presets", "md_INSTALL.html#autotoc_md12", null ]
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md10", null ],
+      [ "Include the Library", "md_INSTALL.html#autotoc_md11", null ],
+      [ "Alternative Builds", "md_INSTALL.html#autotoc_md12", null ],
+      [ "Without Make", "md_INSTALL.html#autotoc_md13", null ],
+      [ "User Presets", "md_INSTALL.html#autotoc_md14", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],

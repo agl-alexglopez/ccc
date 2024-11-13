@@ -94,15 +94,15 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a> The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. This means it is possible to write a program in which a container never allocates or frees a single byte of your memory. For the motivations of why such a library is helpful in C read on.</p>
-<h1><a class="anchor" id="autotoc_md1"></a>
+<h1><a class="anchor" id="autotoc_md3"></a>
 Installation</h1>
 <p>Currently, this library supports a manual installation via CMake. See the <a class="el" href="md_INSTALL.html">INSTALL.md</a> file for more details.</p>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Quick Start</h1>
 <p>Read the documentation <a href="https://agl-alexglopez.github.io/ccc">HERE</a>. To get started, read the <a href="https://agl-alexglopez.github.io/ccc/files.html">header</a> for the container you want to use. Also check out <a href="https://agl-alexglopez.github.io/ccc/files.html">types.h</a> to acquaint yourself with the <code>ccc_alloc_fn</code> abstraction and decide if you need allocating or non-allocating containers in your project.</p>
-<h1><a class="anchor" id="autotoc_md3"></a>
+<h1><a class="anchor" id="autotoc_md5"></a>
 Design</h1>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Motivations</h2>
 <p>Here is the main argument of this library:</p>
 <blockquote class="doxtable">
@@ -119,7 +119,7 @@ Motivations</h2>
 <div class="line">    container_elem elem;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The handle to the container element is then passed by reference to all functions that require it.</p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Allocation</h2>
 <p>If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.</p>
 <div class="fragment"><div class="line">typedef void *ccc_alloc_fn(void *ptr, size_t size);</div>
@@ -162,7 +162,7 @@ Allocation</h2>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 Related</h1>
 <p>Here are some excellent data structure libraries I have found for C. Many of them are simple, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
