@@ -502,7 +502,7 @@ or the map is empty. */
 /**@}*/
 
 /** @name Deallocation Interface
-Deallocate the container.. */
+Deallocate the container. */
 /**@{*/
 
 /** @brief Pops every element from the map calling destructor if destructor is
