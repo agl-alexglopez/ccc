@@ -1020,11 +1020,11 @@ rebalance_3_child(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
                 double_demote(t, z_p_of_xy);
                 /* Optional "Rebalancing with Promotion," defined as follows:
                        if node z is a non-leaf 1,1 node, we promote it;
-                   otherwise, if y is a non-leaf 1,1 node, we promote it. (See
-                   Figure 4.) (Haeupler et. al. 2014, 17). This reduces
-                   constants in some of theorems mentioned in the paper but may
-                   not be worth doing. Rotations stay at 2 worst case. Should
-                   revisit after more performance testing. */
+                       otherwise, if y is a non-leaf 1,1 node, we promote it.
+                       (See Figure 4.) (Haeupler et. al. 2014, 17).
+                   This reduces constants in some of theorems mentioned in the
+                   paper but may not be worth doing. Rotations stay at 2 worst
+                   case. Should revisit after more performance testing. */
                 if (!is_leaf(t, z_p_of_xy)
                     && is_11_parent(t, branch_i(t, z_p_of_xy, L), z_p_of_xy,
                                     branch_i(t, z_p_of_xy, R)))
