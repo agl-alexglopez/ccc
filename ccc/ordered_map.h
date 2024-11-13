@@ -1,6 +1,5 @@
 /** @file
-@brief The Ordered Map Interface
-@nosubgrouping */
+@brief The Ordered Map Interface */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 
@@ -524,7 +523,7 @@ ccc_result ccc_om_clear(ccc_ordered_map *om, ccc_destructor_fn *destructor);
 
 /**@}*/
 
-/** @name Getters
+/** @name Getter Functions
 Obtain the container state. */
 /**@{*/
 
