@@ -151,18 +151,24 @@ Allocation</h2>
 <div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient.</p>
+<h3><a class="anchor" id="autotoc_md8"></a>
+Constructors</h3>
 <p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped piece for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
+<h3><a class="anchor" id="autotoc_md9"></a>
+Destructors</h3>
 <p>For destructors, the argument is similar but the container does help with this at times. If an action other than freeing the memory of a user type is needed upon removal, there are multiple options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. The one exception is the following interfaces.</p>
 <p>The clear function works for pointer stable containers and flat containers.</p>
 <div class="fragment"><div class="line">result clear(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
+<h3><a class="anchor" id="autotoc_md10"></a>
+Samples</h3>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
-<h1><a class="anchor" id="autotoc_md8"></a>
+<h1><a class="anchor" id="autotoc_md11"></a>
 Related</h1>
 <p>Here are some excellent data structure libraries I have found for C. Many of them are simple, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
