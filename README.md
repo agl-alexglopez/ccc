@@ -108,7 +108,7 @@ result clear_and_free(container *c, destructor_fn *fn);
 
 The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.
 
-#### Samples
+## Samples
 
 For examples of what code that uses these ideas looks like, read and use the sample programs in the `samples/`. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.
 
