@@ -1,10 +1,7 @@
 <map id="ccc/ordered_map.h" name="ccc/ordered_map.h">
-<area shape="rect" id="node1" title="The Ordered Map Interface." alt="" coords="103,5,248,31"/>
-<area shape="rect" id="node2" href="$impl__ordered__map_8h_source.html" title=" " alt="" coords="40,79,196,104"/>
-<area shape="rect" id="node6" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="189,225,260,251"/>
-<area shape="rect" id="node7" title=" " alt="" coords="286,299,369,324"/>
-<area shape="rect" id="node8" title=" " alt="" coords="6,299,81,324"/>
-<area shape="rect" id="node3" href="$impl__tree_8h_source.html" title=" " alt="" coords="101,152,197,177"/>
-<area shape="rect" id="node4" href="$impl__types_8h_source.html" title=" " alt="" coords="105,299,211,324"/>
-<area shape="rect" id="node5" title=" " alt="" coords="168,372,239,397"/>
+<area shape="rect" id="node1" title="The Ordered Map Interface." alt="" coords="68,5,213,31"/>
+<area shape="rect" id="node2" href="$impl__ordered__map_8h_source.html" title=" " alt="" coords="5,79,161,104"/>
+<area shape="rect" id="node5" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="137,225,208,251"/>
+<area shape="rect" id="node3" href="$impl__tree_8h_source.html" title=" " alt="" coords="51,152,147,177"/>
+<area shape="rect" id="node4" href="$impl__types_8h_source.html" title=" " alt="" coords="82,299,189,324"/>
 </map>

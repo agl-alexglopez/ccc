@@ -99,21 +99,17 @@ $(document).ready(function(){initNavTree('realtime__ordered__map_8h.html',''); i
 
 <p>The Realtime Ordered Map Interface.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;stddef.h&gt;</code><br />
-<code>#include &quot;impl_realtime_ordered_map.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;impl_realtime_ordered_map.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="types_8h_source.html">types.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for realtime_ordered_map.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="realtime__ordered__map_8h__incl.png" border="0" usemap="#accc_2realtime__ordered__map_8h" alt=""/></div>
 <map name="accc_2realtime__ordered__map_8h" id="accc_2realtime__ordered__map_8h">
-<area shape="rect" title="The Realtime Ordered Map Interface." alt="" coords="57,5,215,45"/>
-<area shape="rect" title=" " alt="" coords="5,255,80,280"/>
-<area shape="rect" href="impl__realtime__ordered__map_8h_source.html" title=" " alt="" coords="173,93,344,133"/>
-<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="161,181,231,207"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="261,255,368,280"/>
-<area shape="rect" title=" " alt="" coords="279,328,350,353"/>
-<area shape="rect" title=" " alt="" coords="104,255,187,280"/>
+<area shape="rect" title="The Realtime Ordered Map Interface." alt="" coords="73,5,231,45"/>
+<area shape="rect" href="impl__realtime__ordered__map_8h_source.html" title=" " alt="" coords="5,93,176,133"/>
+<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="129,181,199,207"/>
+<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="73,255,180,280"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -327,7 +323,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,      \</div>
 <div class="line">                                  aux_data)                                    \</div>
 <div class="line">    }</div>
-<div class="ttc" id="arealtime__ordered__map_8h_html_aa12b57bbf811c5ceaddb04be774bf662"><div class="ttname"><a href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a></div><div class="ttdeci">union ccc_romap_entry_ ccc_romap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:48</div></div>
+<div class="ttc" id="arealtime__ordered__map_8h_html_aa12b57bbf811c5ceaddb04be774bf662"><div class="ttname"><a href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a></div><div class="ttdeci">union ccc_romap_entry_ ccc_romap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:50</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -419,7 +415,7 @@ Typedefs</h2></td></tr>
 <div class="line">                            (begin_and_end_key_ptrs))                          \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:23</div></div>
+<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:25</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired range. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -464,7 +460,7 @@ Typedefs</h2></td></tr>
 <div class="line">                             (rbegin_and_rend_key_ptrs))                       \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
+<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired rrange. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>

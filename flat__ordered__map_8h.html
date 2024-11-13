@@ -101,23 +101,17 @@ $(document).ready(function(){initNavTree('flat__ordered__map_8h.html',''); initR
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;impl_flat_ordered_map.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="types_8h_source.html">types.h</a>&quot;</code><br />
-<code>#include &lt;stdbool.h&gt;</code><br />
-<code>#include &lt;stddef.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for flat_ordered_map.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="flat__ordered__map_8h__incl.png" border="0" usemap="#accc_2flat__ordered__map_8h" alt=""/></div>
 <map name="accc_2flat__ordered__map_8h" id="accc_2flat__ordered__map_8h">
-<area shape="rect" title="The Flat Ordered Map Interface." alt="" coords="56,5,229,31"/>
-<area shape="rect" href="impl__flat__ordered__map_8h_source.html" title=" " alt="" coords="116,79,300,104"/>
-<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="138,299,209,324"/>
-<area shape="rect" title=" " alt="" coords="13,372,96,397"/>
-<area shape="rect" title=" " alt="" coords="359,372,433,397"/>
-<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="195,152,266,177"/>
-<area shape="rect" href="impl__buffer_8h_source.html" title=" " alt="" coords="245,225,352,251"/>
-<area shape="rect" title=" " alt="" coords="233,299,308,324"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="120,372,227,397"/>
-<area shape="rect" title=" " alt="" coords="183,445,254,471"/>
+<area shape="rect" title="The Flat Ordered Map Interface." alt="" coords="101,5,275,31"/>
+<area shape="rect" href="impl__flat__ordered__map_8h_source.html" title=" " alt="" coords="32,79,216,104"/>
+<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="139,299,210,324"/>
+<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="89,152,159,177"/>
+<area shape="rect" href="impl__buffer_8h_source.html" title=" " alt="" coords="5,225,112,251"/>
+<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="121,372,228,397"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -335,7 +329,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \</div>
 <div class="line">                                  aux_data)                                    \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__ordered__map_8h_html_a0f6c79e32b5b75645a8d93af21291565"><div class="ttname"><a href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></div><div class="ttdeci">union ccc_fomap_entry_ ccc_fomap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_ordered_map.h:61</div></div>
+<div class="ttc" id="aflat__ordered__map_8h_html_a0f6c79e32b5b75645a8d93af21291565"><div class="ttname"><a href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></div><div class="ttdeci">union ccc_fomap_entry_ ccc_fomap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_ordered_map.h:63</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -426,7 +420,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_fom_equal_range(flat_ordered_map_ptr, begin_and_end_key_ptrs)      \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:23</div></div>
+<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:25</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired range. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -470,7 +464,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_fom_equal_rrange(flat_ordered_map_ptr, rbegin_and_rend_key_ptrs)   \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
+<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired rrange. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>

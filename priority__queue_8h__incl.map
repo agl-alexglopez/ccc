@@ -1,9 +1,6 @@
 <map id="ccc/priority_queue.h" name="ccc/priority_queue.h">
-<area shape="rect" id="node1" title="The Priority Queue Interface." alt="" coords="179,5,332,31"/>
-<area shape="rect" id="node2" href="$impl__priority__queue_8h_source.html" title=" " alt="" coords="233,79,397,104"/>
-<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="87,152,157,177"/>
-<area shape="rect" id="node6" title=" " alt="" coords="163,225,246,251"/>
-<area shape="rect" id="node7" title=" " alt="" coords="278,225,353,251"/>
-<area shape="rect" id="node4" href="$impl__types_8h_source.html" title=" " alt="" coords="33,225,139,251"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,299,76,324"/>
+<area shape="rect" id="node1" title="The Priority Queue Interface." alt="" coords="71,5,224,31"/>
+<area shape="rect" id="node2" href="$impl__priority__queue_8h_source.html" title=" " alt="" coords="5,79,169,104"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="112,152,183,177"/>
+<area shape="rect" id="node4" href="$impl__types_8h_source.html" title=" " alt="" coords="94,225,201,251"/>
 </map>
