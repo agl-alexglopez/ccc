@@ -1,31 +1,31 @@
-/* Author: Alexander G. Lopez
-   --------------------------
-   This file contains my implementation of a realtime ordered map. The added
-   realtime prefix is to indicate that this map meets specific run time bounds
-   that can be relied upon consistently. This is may not be the case if a map
-   is implemented with some self-optimizing data structure like a Splay Tree.
+/** Author: Alexander G. Lopez
+    --------------------------
+This file contains my implementation of a realtime ordered map. The added
+realtime prefix is to indicate that this map meets specific run time bounds
+that can be relied upon consistently. This is may not be the case if a map
+is implemented with some self-optimizing data structure like a Splay Tree.
 
-   This map, however, promises O(lg N) search, insert, and remove as a true
-   upper bound, inclusive. This is achieved through a Weak AVL (WAVL) tree
-   that is derived from the following two sources.
+This map, however, promises O(lg N) search, insert, and remove as a true
+upper bound, inclusive. This is achieved through a Weak AVL (WAVL) tree
+that is derived from the following two sources.
 
-   [1] Bernhard Haeupler, Siddhartha Sen, and Robert E. Tarjan, 2014.
-   Rank-Balanced Trees, J.ACM Transactions on Algorithms 11, 4, Article 0
-   (June 2015), 24 pages.
-   https://sidsen.azurewebsites.net//papers/rb-trees-talg.pdf
+[1] Bernhard Haeupler, Siddhartha Sen, and Robert E. Tarjan, 2014.
+Rank-Balanced Trees, J.ACM Transactions on Algorithms 11, 4, Article 0
+(June 2015), 24 pages.
+https://sidsen.azurewebsites.net//papers/rb-trees-talg.pdf
 
-   [2] Phil Vachon (pvachon) https://github.com/pvachon/wavl_tree
-   This implementation is heavily influential throughout. However there have
-   been some major adjustments and simplifications. Namely, the allocation has
-   been adjusted to accommodate this library's ability to be an allocating or
-   non-allocating container. All left-right symmetric cases have been united
-   into one and I chose to tackle rotations and deletions slightly differently,
-   shortening the code significantly. Finally, a few other changes and
-   improvements suggested by the authors of the original paper are implemented.
+[2] Phil Vachon (pvachon) https://github.com/pvachon/wavl_tree
+This implementation is heavily influential throughout. However there have
+been some major adjustments and simplifications. Namely, the allocation has
+been adjusted to accommodate this library's ability to be an allocating or
+non-allocating container. All left-right symmetric cases have been united
+into one and I chose to tackle rotations and deletions slightly differently,
+shortening the code significantly. Finally, a few other changes and
+improvements suggested by the authors of the original paper are implemented.
 
-   Overall a WAVL tree is quite impressive for it's simplicity and purported
-   improvements over AVL and Red-Black trees. The rank framework is intuitive
-   and flexible in how it can be implemented. */
+Overall a WAVL tree is quite impressive for it's simplicity and purported
+improvements over AVL and Red-Black trees. The rank framework is intuitive
+and flexible in how it can be implemented. */
 #include "realtime_ordered_map.h"
 #include "impl_realtime_ordered_map.h"
 #include "impl_types.h"
