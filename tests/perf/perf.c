@@ -38,7 +38,7 @@ static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
 static ccc_threeway_cmp val_key_cmp(ccc_key_cmp);
 static ccc_threeway_cmp val_cmp(ccc_cmp);
-static void val_update(ccc_user_type_mut);
+static void val_update(ccc_user_type);
 
 #define NUM_TESTS (size_t)6
 static perf_fn const perf_tests[NUM_TESTS] = {test_push,
@@ -457,7 +457,7 @@ val_cmp(ccc_cmp const cmp)
 }
 
 static void
-val_update(ccc_user_type_mut const u)
+val_update(ccc_user_type const u)
 {
     ((struct val *)u.user_type)->val = *((int *)u.aux);
 }

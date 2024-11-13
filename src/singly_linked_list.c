@@ -247,7 +247,7 @@ ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
         void *const mem = struct_base(sll, pop_front(sll));
         if (fn)
         {
-            fn((ccc_user_type_mut){.user_type = mem, .aux = sll->aux_});
+            fn((ccc_user_type){.user_type = mem, .aux = sll->aux_});
         }
         if (sll->alloc_)
         {

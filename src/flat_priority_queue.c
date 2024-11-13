@@ -173,7 +173,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
     {
         return false;
     }
-    fn((ccc_user_type_mut){e, aux});
+    fn((ccc_user_type){e, aux});
     void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     size_t const i = index_of(fpq, e);
     if (!i)
@@ -253,7 +253,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
         size_t const sz = ccc_buf_size(&fpq->buf_);
         for (size_t i = 0; i < sz; ++i)
         {
-            fn((ccc_user_type_mut){.user_type = at(fpq, i), .aux = fpq->aux_});
+            fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->aux_});
         }
     }
     return ccc_buf_size_set(&fpq->buf_, 0);
@@ -272,7 +272,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
         size_t const sz = ccc_buf_size(&fpq->buf_);
         for (size_t i = 0; i < sz; ++i)
         {
-            fn((ccc_user_type_mut){.user_type = at(fpq, i), .aux = fpq->aux_});
+            fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->aux_});
         }
     }
     return ccc_buf_alloc(&fpq->buf_, 0, fpq->buf_.alloc_);

@@ -102,7 +102,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             if (and_mod_fn_ && om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED) \
             {                                                                  \
                 __auto_type om_aux_data_ = aux_data;                           \
-                and_mod_fn_((ccc_user_type_mut){                               \
+                and_mod_fn_((ccc_user_type){                                   \
                     .user_type = (void *const)om_mod_ent_.entry_.e_,           \
                     .aux = &om_aux_data_});                                    \
             }                                                                  \

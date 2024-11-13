@@ -143,7 +143,7 @@ ccc_fom_and_modify(ccc_fomap_entry *const e, ccc_update_fn *const fn)
     }
     if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){
+        fn((ccc_user_type){
             .user_type = base_at(e->impl_.fom_, e->impl_.i_),
             .aux = NULL,
         });
@@ -161,7 +161,7 @@ ccc_fom_and_modify_aux(ccc_fomap_entry *const e, ccc_update_fn *const fn,
     }
     if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){
+        fn((ccc_user_type){
             .user_type = base_at(e->impl_.fom_, e->impl_.i_),
             .aux = aux,
         });
@@ -437,7 +437,7 @@ ccc_fom_clear(ccc_flat_ordered_map *const fom, ccc_destructor_fn *const fn)
     for (void *e = ccc_buf_at(&fom->buf_, 1); e != ccc_buf_end(&fom->buf_);
          e = ccc_buf_next(&fom->buf_, e))
     {
-        fn((ccc_user_type_mut){.user_type = e, .aux = fom->aux_});
+        fn((ccc_user_type){.user_type = e, .aux = fom->aux_});
     }
     (void)ccc_buf_size_set(&fom->buf_, 1);
     fom->root_ = 0;
@@ -459,7 +459,7 @@ ccc_fom_clear_and_free(ccc_flat_ordered_map *const fom,
     for (void *e = ccc_buf_at(&fom->buf_, 1); e != ccc_buf_end(&fom->buf_);
          e = ccc_buf_next(&fom->buf_, e))
     {
-        fn((ccc_user_type_mut){.user_type = e, .aux = fom->aux_});
+        fn((ccc_user_type){.user_type = e, .aux = fom->aux_});
     }
     fom->root_ = 0;
     return ccc_buf_alloc(&fom->buf_, 0, fom->buf_.alloc_);

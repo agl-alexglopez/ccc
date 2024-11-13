@@ -256,8 +256,8 @@ static bool eq_prev_vertices(ccc_key_cmp);
 static uint64_t hash_vertex_addr(ccc_user_key pointer_to_vertex);
 static uint64_t hash_64_bits(uint64_t);
 
-static void pq_update_dist(ccc_user_type_mut);
-static void map_pq_prev_vertex_dist_point_destructor(ccc_user_type_mut);
+static void pq_update_dist(ccc_user_type);
+static void map_pq_prev_vertex_dist_point_destructor(ccc_user_type);
 static unsigned count_digits(uintmax_t n);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -1107,13 +1107,13 @@ hash_64_bits(uint64_t x)
 }
 
 static void
-pq_update_dist(ccc_user_type_mut const u)
+pq_update_dist(ccc_user_type const u)
 {
     ((struct dist_point *)u.user_type)->dist = *((int *)u.aux);
 }
 
 static void
-map_pq_prev_vertex_dist_point_destructor(ccc_user_type_mut const e)
+map_pq_prev_vertex_dist_point_destructor(ccc_user_type const e)
 {
     struct prev_vertex *pv = e.user_type;
     free(pv->dist_point);

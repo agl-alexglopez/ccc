@@ -14,7 +14,7 @@ struct val
     ccc_pq_elem elem;
 };
 
-void val_update(ccc_user_type_mut);
+void val_update(ccc_user_type);
 ccc_threeway_cmp val_cmp(ccc_cmp);
 enum check_result insert_shuffled(ccc_priority_queue *, struct val[], size_t,
                                   int);

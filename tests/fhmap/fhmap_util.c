@@ -35,7 +35,7 @@ fhmap_int_to_u64(ccc_user_key const k)
 }
 
 void
-fhmap_modplus(ccc_user_type_mut const mod)
+fhmap_modplus(ccc_user_type const mod)
 {
     ((struct val *)mod.user_type)->val++;
 }
@@ -47,7 +47,7 @@ fhmap_create(int const id, int const val)
 }
 
 void
-fhmap_swap_val(ccc_user_type_mut const u)
+fhmap_swap_val(ccc_user_type const u)
 {
     struct val *v = u.user_type;
     v->val = *((int *)u.aux);

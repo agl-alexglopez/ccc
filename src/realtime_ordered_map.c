@@ -348,7 +348,7 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn)
     }
     if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, NULL});
+        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, NULL});
     }
     return e;
 }
@@ -362,7 +362,7 @@ ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_update_fn *fn, void *aux)
     }
     if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, aux});
+        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, aux});
     }
     return e;
 }
@@ -506,8 +506,7 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
         {
-            destructor(
-                (ccc_user_type_mut){.user_type = deleted, .aux = rom->aux_});
+            destructor((ccc_user_type){.user_type = deleted, .aux = rom->aux_});
         }
         if (rom->alloc_)
         {

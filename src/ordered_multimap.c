@@ -170,7 +170,7 @@ ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_update_fn *const fn)
     }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = NULL});
+        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
     }
     return e;
 }
@@ -185,7 +185,7 @@ ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_update_fn *const fn,
     }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = aux});
+        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
     }
     return e;
 }
@@ -437,7 +437,7 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
     {
         return false;
     }
-    fn((ccc_user_type_mut){e, aux});
+    fn((ccc_user_type){e, aux});
     (void)multimap_insert(&mm->impl_, &key_val_handle->impl_);
     return true;
 }
@@ -559,8 +559,8 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
         void *const popped = pop_min(&mm->impl_);
         if (destructor)
         {
-            destructor((ccc_user_type_mut){.user_type = popped,
-                                           .aux = mm->impl_.aux_});
+            destructor(
+                (ccc_user_type){.user_type = popped, .aux = mm->impl_.aux_});
         }
         if (mm->impl_.alloc_)
         {

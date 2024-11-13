@@ -134,7 +134,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         {                                                                      \
             __auto_type fhm_aux_ = aux;                                        \
             (fhm_mod_fn_)(                                                     \
-                (ccc_user_type_mut){fhm_mod_with_ent_.entry_.e_, &fhm_aux_});  \
+                (ccc_user_type){fhm_mod_with_ent_.entry_.e_, &fhm_aux_});      \
         }                                                                      \
         fhm_mod_with_ent_;                                                     \
     })

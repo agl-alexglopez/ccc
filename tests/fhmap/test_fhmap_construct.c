@@ -10,14 +10,14 @@
 #include <stddef.h>
 
 static void
-mod(ccc_user_type_mut const u)
+mod(ccc_user_type const u)
 {
     struct val *v = u.user_type;
     v->val += 5;
 }
 
 static void
-modw(ccc_user_type_mut const u)
+modw(ccc_user_type const u)
 {
     struct val *v = u.user_type;
     v->val = *((int *)u.aux);

@@ -119,7 +119,7 @@ typedef struct
     void *user_type;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_user_type_mut;
+} ccc_user_type;
 
 /** @brief A read only reference to a key type matching the key field type used
 for hash containers.
@@ -192,7 +192,7 @@ is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
 function is used when a container Interface exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
-typedef void ccc_update_fn(ccc_user_type_mut);
+typedef void ccc_update_fn(ccc_user_type);
 
 /** @brief A callback function for destroying an element in the container.
 
@@ -210,7 +210,7 @@ container frees. If the user has not given permission to the container to
 allocate memory, this a good function in which to free each element, if
 desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
-typedef void ccc_destructor_fn(ccc_user_type_mut);
+typedef void ccc_destructor_fn(ccc_user_type);
 
 /** @brief A callback function to determining equality between two stored keys.
 
@@ -324,7 +324,7 @@ typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
 typedef ccc_cmp cmp;
 typedef ccc_key_cmp key_cmp;
-typedef ccc_user_type_mut user_type_mut;
+typedef ccc_user_type user_type;
 typedef ccc_user_key user_key;
 typedef ccc_alloc_fn alloc_fn;
 typedef ccc_cmp_fn cmp_fn;

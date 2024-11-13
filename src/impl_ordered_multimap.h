@@ -96,9 +96,9 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
         if (omm_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                   \
         {                                                                      \
             __auto_type omm_aux_data_ = aux_data;                              \
-            (mod_fn)((ccc_user_type_mut){                                      \
-                .user_type = (void *const)omm_mod_ent_.entry_.e_,              \
-                .aux = &omm_aux_data_});                                       \
+            (mod_fn)((ccc_user_type){.user_type                                \
+                                     = (void *const)omm_mod_ent_.entry_.e_,    \
+                                     .aux = &omm_aux_data_});                  \
         }                                                                      \
         omm_mod_ent_;                                                          \
     })

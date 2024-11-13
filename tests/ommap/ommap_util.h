@@ -14,7 +14,7 @@ struct val
 };
 
 ccc_threeway_cmp val_cmp(ccc_key_cmp);
-void val_update(ccc_user_type_mut);
+void val_update(ccc_user_type);
 
 enum check_result insert_shuffled(ccc_ordered_multimap *, struct val[], size_t,
                                   int);

@@ -143,7 +143,7 @@ ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
     }
     if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = NULL});
+        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
     }
     return e;
 }
@@ -154,7 +154,7 @@ ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
 {
     if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type_mut){.user_type = e->impl_.entry_.e_, .aux = aux});
+        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
     }
     return e;
 }
@@ -405,8 +405,8 @@ ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
             = erase(&om->impl_, key_from_node(&om->impl_, om->impl_.root_));
         if (destructor)
         {
-            destructor((ccc_user_type_mut){.user_type = popped,
-                                           .aux = om->impl_.aux_});
+            destructor(
+                (ccc_user_type){.user_type = popped, .aux = om->impl_.aux_});
         }
         if (om->impl_.alloc_)
         {

@@ -17,7 +17,7 @@ val_cmp(ccc_cmp const cmp)
 }
 
 void
-val_update(ccc_user_type_mut const u)
+val_update(ccc_user_type const u)
 {
     struct val *const old = u.user_type;
     old->val = *(int *)u.aux;

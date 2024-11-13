@@ -120,8 +120,7 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
     {
         if (fn)
         {
-            fn((ccc_user_type_mut){.user_type = ccc_pq_front(pq),
-                                   .aux = pq->aux_});
+            fn((ccc_user_type){.user_type = ccc_pq_front(pq), .aux = pq->aux_});
         }
         (void)ccc_pq_pop(pq);
     }
@@ -154,7 +153,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return false;
     }
-    fn((ccc_user_type_mut){struct_base(pq, e), aux});
+    fn((ccc_user_type){struct_base(pq, e), aux});
     if (e->parent_ && cmp(pq, e, e->parent_) == pq->order_)
     {
         cut_child(e);
@@ -179,13 +178,13 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     }
     if (pq->order_ == CCC_GRT)
     {
-        fn((ccc_user_type_mut){struct_base(pq, e), aux});
+        fn((ccc_user_type){struct_base(pq, e), aux});
         cut_child(e);
     }
     else
     {
         pq->root_ = delete_node(pq, e);
-        fn((ccc_user_type_mut){struct_base(pq, e), aux});
+        fn((ccc_user_type){struct_base(pq, e), aux});
         init_node(e);
     }
     pq->root_ = merge(pq, pq->root_, e);
@@ -204,13 +203,13 @@ ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     }
     if (pq->order_ == CCC_LES)
     {
-        fn((ccc_user_type_mut){struct_base(pq, e), aux});
+        fn((ccc_user_type){struct_base(pq, e), aux});
         cut_child(e);
     }
     else
     {
         pq->root_ = delete_node(pq, e);
-        fn((ccc_user_type_mut){struct_base(pq, e), aux});
+        fn((ccc_user_type){struct_base(pq, e), aux});
         init_node(e);
     }
     pq->root_ = merge(pq, pq->root_, e);

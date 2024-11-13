@@ -145,8 +145,8 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
                 && rom_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)            \
             {                                                                  \
                 __auto_type rom_aux_data_ = aux_data;                          \
-                and_mod_fn_((ccc_user_type_mut){.user_type = e.entry,          \
-                                                .aux = &rom_aux_data_});       \
+                and_mod_fn_((ccc_user_type){.user_type = e.entry,              \
+                                            .aux = &rom_aux_data_});           \
             }                                                                  \
         }                                                                      \
         rom_mod_ent_;                                                          \

@@ -387,7 +387,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
         void *const node = struct_base(l, pop_front(l));
         if (fn)
         {
-            fn((ccc_user_type_mut){.user_type = node, .aux = l->aux_});
+            fn((ccc_user_type){.user_type = node, .aux = l->aux_});
         }
         if (l->alloc_)
         {
