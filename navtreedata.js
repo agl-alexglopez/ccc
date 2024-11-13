@@ -31,10 +31,10 @@ var NAVTREE =
       [ "Motivations", "index.html#autotoc_md6", null ],
       [ "Allocation", "index.html#autotoc_md7", [
         [ "Constructors", "index.html#autotoc_md8", null ],
-        [ "Destructors", "index.html#autotoc_md9", null ],
-        [ "Samples", "index.html#autotoc_md10", null ]
+        [ "Destructors", "index.html#autotoc_md9", null ]
       ] ]
     ] ],
+    [ "Samples", "index.html#autotoc_md10", null ],
     [ "Related", "index.html#autotoc_md11", null ],
     [ "Building and Installation", "md_INSTALL.html", [
       [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md13", null ],

@@ -165,8 +165,8 @@ Destructors</h3>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
-<h3><a class="anchor" id="autotoc_md10"></a>
-Samples</h3>
+<h1><a class="anchor" id="autotoc_md10"></a>
+Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
 <h1><a class="anchor" id="autotoc_md11"></a>
 Related</h1>
