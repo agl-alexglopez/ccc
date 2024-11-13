@@ -99,10 +99,77 @@ Installation</h1>
 <p>Currently, this library supports a manual installation via CMake. See the <a class="el" href="md_INSTALL.html">INSTALL.md</a> file for more details.</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
 Quick Start</h1>
-<p>Read the documentation <a href="https://agl-alexglopez.github.io/ccc">HERE</a>. If you want to dive in right away, it may be best to start with <a href="https://agl-alexglopez.github.io/ccc/files.html"><code>types.h</code></a> to acquaint yourself with the <code>ccc_alloc_fn</code> abstraction and decide if you need allocating or non-allocating containers in your project.</p>
+<p>Read the documentation <a href="https://agl-alexglopez.github.io/ccc">HERE</a>. To get started, read the <a href="https://agl-alexglopez.github.io/ccc/files.html">header</a> for the container you want to use. Also check out <a href="https://agl-alexglopez.github.io/ccc/files.html">types.h</a> to acquaint yourself with the <code>ccc_alloc_fn</code> abstraction and decide if you need allocating or non-allocating containers in your project.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
 Design</h1>
-<p><code>WIP</code> </p>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Motivations</h2>
+<p>The hypothesis of this library is as follows:</p>
+<blockquote class="doxtable">
+<p>&zwj;Containers in C should never limit the control and flexibility offered by the C language. </p>
+</blockquote>
+<p>There are many excellent data structure libraries in C (see the related section). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have non-trivial side effect by calling dynamic memory interfaces.</p>
+<p>The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer data structures in the truest sense of the word; they structure the data they are given according to the container's invariants with no alternative side effects. The concerns for the container are now separate from those for the programmer. The container takes no part in the scope or lifetime of the programmer's provided memory, simply structuring it within the container as promised by the interface.</p>
+<p>The reason for this decision is simple: if people are using C today, in the face of many other modern and safety-minded languages, they should benefit from all the language can provide, even when incorporating a third-party library. This means that they can manage all their memory as they see fit and these containers simply structure it when and how the programmer requires. This design style is not unique. Non-allocating intrusive containers are common in operating system kernel development where the idea of dynamic memory, where memory comes from, and when memory should be allocated or freed becomes more complex due to the structure of all the modules working together behind the scenes to support the user. Embedded developers also stand to benefit from this design. However, I think that all applications can benefit from thinking more carefully about their memory in C.</p>
+<p>While not all containers require the user accommodate intrusive elements, when they do it looks like this.</p>
+<div class="fragment"><div class="line">struct key_val</div>
+<div class="line">{</div>
+<div class="line">    int key;</div>
+<div class="line">    int val;</div>
+<div class="line">    ccc_omap_elem map_elem;</div>
+<div class="line">};</div>
+</div><!-- fragment --><p>The handle to the container element is then passed by reference to all functions that require it.</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
+Allocation</h2>
+<p>If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.</p>
+<div class="fragment"><div class="line">typedef void *ccc_alloc_fn(void *ptr, size_t size);</div>
+</div><!-- fragment --><p>This simplifies allocation and deallocation if the user chooses to hand these responsibilities to the container. It must implement the following behavior.</p>
+<ul>
+<li>If NULL is provided with a size of 0, NULL is returned.</li>
+<li>If NULL is provided with a non-zero size, new memory is allocated/returned.</li>
+<li>If ptr is non-NULL it has been previously allocated by the alloc function.</li>
+<li>If ptr is non-NULL with non-zero size, ptr is resized to at least size size. The pointer returned is NULL if resizing fails. Upon success, the pointer returned might not be equal to the pointer provided.</li>
+<li>If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.</li>
+</ul>
+<p>A function that implements such behavior on many platforms is realloc. If one is not sure that realloc implements all such behaviors, especially the final requirement for freeing memory, wrap it in a helper function. For example, one solution using the standard library allocator might be implemented as follows:</p>
+<div class="fragment"><div class="line">void *</div>
+<div class="line">std_alloc(void *const ptr, size_t const size)</div>
+<div class="line">{</div>
+<div class="line">    if (!ptr &amp;&amp; !size)</div>
+<div class="line">    {</div>
+<div class="line">        return NULL;</div>
+<div class="line">    }</div>
+<div class="line">    if (!ptr)</div>
+<div class="line">    {</div>
+<div class="line">        return malloc(size);</div>
+<div class="line">    }</div>
+<div class="line">    if (!size)</div>
+<div class="line">    {</div>
+<div class="line">        free(ptr);</div>
+<div class="line">        return NULL;</div>
+<div class="line">    }</div>
+<div class="line">    return realloc(ptr, size);</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient.</p>
+<p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped piece for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
+<p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this.</p>
+<div class="fragment"><div class="line">insert(container_ptr, container_handle_ptr); </div>
+</div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
+<p>For destructors, the argument is similar but the container does help with this at times. If an action other than freeing the memory of a user type is needed upon removal, there are multiple options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. The one exception is the following interfaces.</p>
+<p>The clear function works for pointer stable containers and flat containers.</p>
+<div class="fragment"><div class="line">clear(container_ptr, destructor_fn_ptr);</div>
+</div><!-- fragment --><p>The clear and free function works for flat containers.</p>
+<div class="fragment"><div class="line">clear_and_free(container_ptr, destructor_fn_ptr);</div>
+</div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
+<p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
+<h1><a class="anchor" id="autotoc_md6"></a>
+Related</h1>
+<p>Here are some excellent data structure libraries I have found for C. Many of them are simple, fast, and elegant, taking care of all memory management for you.</p>
+<ul>
+<li><a href="https://github.com/stclib/STC">STC - Smart Template Containers</a></li>
+<li><a href="https://github.com/glouw/ctl">C Template Library (CTL)</a></li>
+<li><a href="https://github.com/JacksonAllan/CC">CC: Convenient Containers</a> </li>
+</ul>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->

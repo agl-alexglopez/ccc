@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('md_INSTALL.html',''); initResizable();
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Currently, this library utilizes some features that many compilers support such as gcc, clang, and AppleClang, but support is not ready for Windows.</p>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 Manual Install Quick Start</h1>
 <ol type="1">
 <li>Use the provided defaults</li>
@@ -132,7 +132,7 @@ Manual Install Quick Start</h1>
 <div class="line">    │       └── cccTargets-release.cmake</div>
 <div class="line">    └── libccc_release.a</div>
 </div><!-- fragment --><p>Now to delete the library if needed, simply find all folders and files with the <code>*ccc*</code> string somewhere within them and delete. You can also check the <code>build/install_manifest.txt</code> to confirm the locations of any files installed with this library.</p>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Include the Library</h1>
 <p>Once CMake can find the package, link against it and include the <code>ccc.h</code> header.</p>
 <p>The <code>CMakeLists.txt</code> file.</p>
@@ -141,7 +141,7 @@ Include the Library</h1>
 </div><!-- fragment --><p>The C code.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__hash__map_8h.html">ccc/flat_hash_map.h</a>&quot;</span></div>
 <div class="ttc" id="aflat__hash__map_8h_html"><div class="ttname"><a href="flat__hash__map_8h.html">flat_hash_map.h</a></div><div class="ttdoc">The Flat Hash Map Interface.</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md7"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
 Alternative Builds</h1>
 <p>You may wish to use a different compiler and toolchain than what your system default specifies. Review the <code>CMakePrests.json</code> file for different compilers.</p>
 <div class="fragment"><div class="line">make gcc-rel [OPTIONAL/INSTALL/PATH]</div>
@@ -149,7 +149,7 @@ Alternative Builds</h1>
 </div><!-- fragment --><p>Use Clang to compile the library.</p>
 <div class="fragment"><div class="line">make clang-rel [OPTIONAL/INSTALL/PATH]</div>
 <div class="line">make install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md8"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md11"></a>
 Without Make</h1>
 <p>If your system does not support Makefiles or the <code>make</code> command here are the cmake commands one can run that will do the same.</p>
 <div class="fragment"><div class="line"># Configure the project cmake files. </div>
@@ -157,7 +157,7 @@ Without Make</h1>
 <div class="line">cmake --preset=default-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md12"></a>
 User Presets</h1>
 <p>If you do not like the default presets, create a <code>CMakeUserPresets.json</code> in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use a newer gcc version than the default presets specify.</p>
 <div class="fragment"><div class="line">{</div>
