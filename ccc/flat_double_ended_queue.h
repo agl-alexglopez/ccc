@@ -26,7 +26,9 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 #define CCC_FLAT_DOUBLE_ENDED_QUEUE_H
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 #include "impl_flat_double_ended_queue.h"
 #include "types.h"

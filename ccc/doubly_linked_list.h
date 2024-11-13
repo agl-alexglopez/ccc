@@ -25,7 +25,9 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_DOUBLY_LINKED_LIST_H
 #define CCC_DOUBLY_LINKED_LIST_H
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 #include "impl_doubly_linked_list.h"
 #include "types.h"

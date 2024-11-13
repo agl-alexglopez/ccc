@@ -21,11 +21,13 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_ORDERED_MAP_H
 #define CCC_ORDERED_MAP_H
 
-#include "impl_ordered_map.h"
-#include "types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
+
+#include "impl_ordered_map.h"
+#include "types.h"
 
 /** @brief A self-optimizing data structure offering amortized O(lg N) search,
 insert, and erase and pointer stability.

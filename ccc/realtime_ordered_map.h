@@ -17,7 +17,9 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_REALTIME_ORDERED_MAP_H
 #define CCC_REALTIME_ORDERED_MAP_H
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 #include "impl_realtime_ordered_map.h"
 #include "types.h"

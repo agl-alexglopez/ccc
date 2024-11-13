@@ -4,8 +4,10 @@
 #include "impl_types.h"
 #include "types.h"
 
+/** @cond */
 #include <stddef.h>
 #include <stdint.h>
+/** @endcond */
 
 /** @private */
 typedef struct ccc_romap_elem_

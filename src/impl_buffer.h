@@ -3,8 +3,10 @@
 
 #include "types.h"
 
+/** @cond */
 #include <assert.h>
 #include <stddef.h>
+/** @endcond */
 
 /** @private */
 struct ccc_buf_

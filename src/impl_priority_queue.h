@@ -3,7 +3,9 @@
 
 #include "types.h"
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 /** @private */
 struct ccc_pq_elem_

@@ -16,11 +16,13 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_PRIORITY_QUEUE_H
 #define CCC_FLAT_PRIORITY_QUEUE_H
 
-#include "impl_flat_priority_queue.h"
-#include "types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
+
+#include "impl_flat_priority_queue.h"
+#include "types.h"
 
 /** @brief A container offering direct storage and sorting of user data by heap
 order.

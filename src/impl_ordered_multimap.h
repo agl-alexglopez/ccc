@@ -3,7 +3,9 @@
 
 #include "impl_tree.h"
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 /** @private */
 union ccc_ordered_multimap_

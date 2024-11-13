@@ -24,11 +24,13 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_REALTIME_ORDERED_MAP_H
 #define CCC_FLAT_REALTIME_ORDERED_MAP_H
 
-#include "impl_flat_realtime_ordered_map.h"
-#include "types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
+
+#include "impl_flat_realtime_ordered_map.h"
+#include "types.h"
 
 /** @brief A flat realtime ordered map offers O(lg N) search and erase, and
 amortized O(lg N) insert.

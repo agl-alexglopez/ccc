@@ -4,8 +4,10 @@
 #include "buffer.h"
 #include "types.h"
 
+/** @cond */
 #include <stddef.h>
 #include <stdint.h>
+/** @endcond */
 
 /** @private */
 struct ccc_fromap_elem_

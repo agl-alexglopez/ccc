@@ -8,11 +8,13 @@ containers. */
 #ifndef CCC_TYPES_H
 #define CCC_TYPES_H
 
-#include "impl_types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+/** @endcond */
+
+#include "impl_types.h"
 
 /** @brief The result of a range query on iterable containers.
 

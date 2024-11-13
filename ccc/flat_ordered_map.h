@@ -31,11 +31,13 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_ORDERED_MAP_H
 #define CCC_FLAT_ORDERED_MAP_H
 
-#include "impl_flat_ordered_map.h"
-#include "types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
+
+#include "impl_flat_ordered_map.h"
+#include "types.h"
 
 /** @brief A self-optimizing data structure offering amortized O(lg N) search,
 insert, and erase.
@@ -383,6 +385,8 @@ bool ccc_fom_occupied(ccc_fomap_entry const *e);
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
 bool ccc_fom_insert_error(ccc_fomap_entry const *e);
+
+/**@}*/
 
 /** @name Iterator Interface
 Obtain and manage iterators over the container. */

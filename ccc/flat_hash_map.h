@@ -24,7 +24,9 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_FLAT_HASH_MAP_H
 #define CCC_FLAT_HASH_MAP_H
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 #include "impl_flat_hash_map.h"
 #include "types.h"

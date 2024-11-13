@@ -3,8 +3,10 @@
 
 #include "types.h"
 
+/** @cond */
 #include <assert.h>
 #include <stddef.h>
+/** @endcond */
 
 /** @private */
 typedef struct ccc_dll_elem_

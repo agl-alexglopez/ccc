@@ -3,7 +3,9 @@
 
 #include "buffer.h"
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 /** @private */
 struct ccc_fdeq_

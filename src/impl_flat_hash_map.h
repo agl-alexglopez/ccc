@@ -5,9 +5,11 @@
 #include "impl_types.h"
 #include "types.h"
 
+/** @cond */
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+/** @endcond */
 
 /** @private */
 enum : uint64_t

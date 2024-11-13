@@ -1,7 +1,9 @@
 #ifndef CCC_IMPL_TYPES_H
 #define CCC_IMPL_TYPES_H
 
+/** @cond */
 #include <stdint.h>
+/** @endcond */
 
 /** @private */
 enum ccc_entry_status_ : uint8_t

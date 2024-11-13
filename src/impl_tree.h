@@ -13,8 +13,10 @@
 #include "impl_types.h"
 #include "types.h"
 
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
 
 /** @private This node type will support more expressive implementations of a
    standard map and double ended priority queue. The array of pointers is to

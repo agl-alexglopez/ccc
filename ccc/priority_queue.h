@@ -18,11 +18,13 @@ All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_PRIORITY_QUEUE_H
 #define CCC_PRIORITY_QUEUE_H
 
-#include "impl_priority_queue.h"
-#include "types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
+
+#include "impl_priority_queue.h"
+#include "types.h"
 
 /** @brief A container for pointer stability and an O(1) push and amortized o(lg
 N) increase/decrease key.

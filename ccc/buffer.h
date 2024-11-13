@@ -31,11 +31,13 @@ Then, the `ccc_` prefix can be dropped from all types and functions. */
 #ifndef CCC_BUFFER_H
 #define CCC_BUFFER_H
 
-#include "impl_buffer.h"
-#include "types.h"
-
+/** @cond */
 #include <stdbool.h>
 #include <stddef.h>
+/** @endcond */
+
+#include "impl_buffer.h"
+#include "types.h"
 
 /** @brief A contiguous block of storage for elements of the same type.
 @warning it is undefined behavior to use an uninitialized buffer.

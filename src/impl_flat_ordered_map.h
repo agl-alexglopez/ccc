@@ -4,7 +4,9 @@
 #include "buffer.h"
 #include "types.h"
 
+/** @cond */
 #include <stddef.h>
+/** @endcond */
 
 /** @private */
 struct ccc_fomap_elem_
