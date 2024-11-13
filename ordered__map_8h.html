@@ -149,30 +149,6 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a04fb5474a27fed7faace243a60b76224"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry API.  <br /></td></tr>
 <tr class="separator:a04fb5474a27fed7faace243a60b76224"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr><td colspan="2"><div class="groupHeader">Membership Functions</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Test membership or obtain references to stored user types directly. </p>
-</div></td></tr>
-<tr class="memitem:a5bb85904a51441b67d5900e8a970cf05"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a5bb85904a51441b67d5900e8a970cf05">ccc_om_contains</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> *om, void const *key)</td></tr>
-<tr class="memdesc:a5bb85904a51441b67d5900e8a970cf05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the map for the presence of key.  <br /></td></tr>
-<tr class="separator:a5bb85904a51441b67d5900e8a970cf05"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa456fb2783b8183725fa2a8a09a15f5d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#aa456fb2783b8183725fa2a8a09a15f5d">ccc_om_get_key_val</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> *om, void const *key)</td></tr>
-<tr class="memdesc:aa456fb2783b8183725fa2a8a09a15f5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the map at entry key.  <br /></td></tr>
-<tr class="separator:aa456fb2783b8183725fa2a8a09a15f5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Getters</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Obtain the container state. </p>
-</div></td></tr>
-<tr class="memitem:aa583ae4fce958341792908a6cf2bc849"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#aa583ae4fce958341792908a6cf2bc849">ccc_om_is_empty</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> const *om)</td></tr>
-<tr class="memdesc:aa583ae4fce958341792908a6cf2bc849"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
-<tr class="separator:aa583ae4fce958341792908a6cf2bc849"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4451f0024f4f740732f273e07d55cc18"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a4451f0024f4f740732f273e07d55cc18">ccc_om_size</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> const *om)</td></tr>
-<tr class="memdesc:a4451f0024f4f740732f273e07d55cc18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
-<tr class="separator:a4451f0024f4f740732f273e07d55cc18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9a01af994b30240fefe73ee2dae259e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#af9a01af994b30240fefe73ee2dae259e">ccc_om_validate</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> const *om)</td></tr>
-<tr class="memdesc:af9a01af994b30240fefe73ee2dae259e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
-<tr class="separator:af9a01af994b30240fefe73ee2dae259e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry API Functions</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
 </td></tr>
@@ -282,6 +258,29 @@ Functions</h2></td></tr>
 <tr class="memitem:a9d75896b6b91654e7cefc3813317850c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a9d75896b6b91654e7cefc3813317850c">ccc_om_clear</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> *om, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:a9d75896b6b91654e7cefc3813317850c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops every element from the map calling destructor if destructor is non-NULL. O(N).  <br /></td></tr>
 <tr class="separator:a9d75896b6b91654e7cefc3813317850c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Functions</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
+</td></tr>
+<tr class="memitem:a5bb85904a51441b67d5900e8a970cf05"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a5bb85904a51441b67d5900e8a970cf05">ccc_om_contains</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> *om, void const *key)</td></tr>
+<tr class="memdesc:a5bb85904a51441b67d5900e8a970cf05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the map for the presence of key.  <br /></td></tr>
+<tr class="separator:a5bb85904a51441b67d5900e8a970cf05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa456fb2783b8183725fa2a8a09a15f5d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#aa456fb2783b8183725fa2a8a09a15f5d">ccc_om_get_key_val</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> *om, void const *key)</td></tr>
+<tr class="memdesc:aa456fb2783b8183725fa2a8a09a15f5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the map at entry key.  <br /></td></tr>
+<tr class="separator:aa456fb2783b8183725fa2a8a09a15f5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Getter Functions</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
+</td></tr>
+<tr class="memitem:aa583ae4fce958341792908a6cf2bc849"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#aa583ae4fce958341792908a6cf2bc849">ccc_om_is_empty</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> const *om)</td></tr>
+<tr class="memdesc:aa583ae4fce958341792908a6cf2bc849"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
+<tr class="separator:aa583ae4fce958341792908a6cf2bc849"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4451f0024f4f740732f273e07d55cc18"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a4451f0024f4f740732f273e07d55cc18">ccc_om_size</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> const *om)</td></tr>
+<tr class="memdesc:a4451f0024f4f740732f273e07d55cc18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
+<tr class="separator:a4451f0024f4f740732f273e07d55cc18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9a01af994b30240fefe73ee2dae259e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#af9a01af994b30240fefe73ee2dae259e">ccc_om_validate</a> (<a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a> const *om)</td></tr>
+<tr class="memdesc:af9a01af994b30240fefe73ee2dae259e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
+<tr class="separator:af9a01af994b30240fefe73ee2dae259e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Ordered Map Interface. </p>
@@ -321,7 +320,7 @@ Functions</h2></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_om_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data)      \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aordered__map_8h_html_a04fb5474a27fed7faace243a60b76224"><div class="ttname"><a href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></div><div class="ttdeci">union ccc_omap_entry_ ccc_omap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry API.</div><div class="ttdef"><b>Definition:</b> ordered_map.h:39</div></div>
+<div class="ttc" id="aordered__map_8h_html_a04fb5474a27fed7faace243a60b76224"><div class="ttname"><a href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></div><div class="ttdeci">union ccc_omap_entry_ ccc_omap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry API.</div><div class="ttdef"><b>Definition:</b> ordered_map.h:38</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>

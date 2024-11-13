@@ -153,11 +153,9 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a7d8dfe1437e87b31e7f5522d85080aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous block of storage for elements of the same type.  <br /></td></tr>
 <tr class="separator:a7d8dfe1437e87b31e7f5522d85080aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr><td colspan="2"><div class="groupHeader">Allocation Management Functions</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
-</div></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Allocation Management Functions</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
+</td></tr>
 <tr class="memitem:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae2359dd2088ea0cd0b7bfb8260cbaa66">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a71f0cea7931ffdae612b61631cb3c368">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates the buffer to the specified size according to the user defined allocation function.  <br /></td></tr>
 <tr class="separator:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,9 +177,10 @@ Functions</h2></td></tr>
 <tr class="memitem:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#acd3fe998c43ec179e503d9f7c98f2b83">ccc_buf_erase</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t i)</td></tr>
 <tr class="memdesc:acd3fe998c43ec179e503d9f7c98f2b83"><td class="mdescLeft">&#160;</td><td class="mdescRight">erase element at slot i according to size of the buffer maintaining contiguous storage of elements between 0 and size.  <br /></td></tr>
 <tr class="separator:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Slot Management Functions</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>These functions interact with slots in the buffer directly and do not modify the size of the buffer. These are best used for custom container implementations operating at a higher level of abstraction. </p>
-</div></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Slot Management Functions</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>These functions interact with slots in the buffer directly and do not modify the size of the buffer. These are best used for custom container implementations operating at a higher level of abstraction. </p>
+</td></tr>
 <tr class="memitem:a5f45a54a635295a962f520afcf61f3ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5f45a54a635295a962f520afcf61f3ad">ccc_buf_at</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> const *buf, size_t i)</td></tr>
 <tr class="memdesc:a5f45a54a635295a962f520afcf61f3ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the element at slot i in buf.  <br /></td></tr>
 <tr class="separator:a5f45a54a635295a962f520afcf61f3ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,9 +202,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a140e6e4c58ece0874c72524eed8ce0c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a140e6e4c58ece0874c72524eed8ce0c4">ccc_buf_swap</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, char tmp[], size_t i, size_t j)</td></tr>
 <tr class="memdesc:a140e6e4c58ece0874c72524eed8ce0c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">swap elements at i and j according to capacity of the bufer.  <br /></td></tr>
 <tr class="separator:a140e6e4c58ece0874c72524eed8ce0c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Iteration Functions</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>The following functions implement iterators over the buffer. </p>
-</div></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Functions</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>The following functions implement iterators over the buffer. </p>
+</td></tr>
 <tr class="memitem:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aa2025e9fa8daa95cd7b1f84147ecc14b">ccc_buf_begin</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> const *buf)</td></tr>
 <tr class="memdesc:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the base address of the buffer in preparation for iteration.  <br /></td></tr>
 <tr class="separator:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -227,9 +227,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a4d000d8e2b263a44fd0d754a98513931"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a4d000d8e2b263a44fd0d754a98513931">ccc_buf_rend</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> const *buf)</td></tr>
 <tr class="memdesc:a4d000d8e2b263a44fd0d754a98513931"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the rend position of the buffer.  <br /></td></tr>
 <tr class="separator:a4d000d8e2b263a44fd0d754a98513931"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">State Management Functions</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>These functions help manage or obtain state of the buffer. </p>
-</div></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Management Functions</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>These functions help manage or obtain state of the buffer. </p>
+</td></tr>
 <tr class="memitem:a771c734d199d4cc35654bcd5d62b3fb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a771c734d199d4cc35654bcd5d62b3fb3">ccc_buf_size_plus</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t n)</td></tr>
 <tr class="memdesc:a771c734d199d4cc35654bcd5d62b3fb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">add n to the size of the buffer.  <br /></td></tr>
 <tr class="separator:a771c734d199d4cc35654bcd5d62b3fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
