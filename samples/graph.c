@@ -217,6 +217,7 @@ static void paint_edge(struct graph *, struct vertex const *,
 static void add_edge_cost_label(struct graph *, struct vertex *,
                                 struct edge const *);
 static bool is_dst(Cell, char);
+static Cell make_edge(char src, char dst);
 
 static struct point random_vertex_placement(struct graph const *);
 static bool is_valid_vertex_pos(struct graph const *, struct point);
@@ -383,7 +384,6 @@ static bool
 connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 {
     size_t const graph_size = graph->vertices;
-    /* Bounded at size of the alphabet A-Z so alloca is fine here. */
     size_t vertex_title_indices[MAX_VERTICES];
     for (size_t i = 0; i < graph_size; ++i)
     {
@@ -423,7 +423,7 @@ static bool
 has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
-    Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
+    Cell const edge_id = make_edge(src->name, dst->name);
     ccc_flat_hash_map parent_map;
     [[maybe_unused]] ccc_result res
         = fhm_init(&parent_map, (struct parent_cell *)NULL, 0, key, elem,
@@ -437,7 +437,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     (void)push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {};
-    while (!is_empty(&bfs) && !success)
+    while (!is_empty(&bfs))
     {
         cur = *((struct point *)front(&bfs));
         (void)pop_front(&bfs);
@@ -451,7 +451,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             {
                 [[maybe_unused]] ccc_entry const in
                     = insert_or_assign(&parent_map, &push.elem);
-                assert(unwrap(&in) != NULL);
+                assert(!insert_error(&in));
                 cur = next;
                 success = true;
                 break;
@@ -501,7 +501,7 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
                     struct edge const *const e)
 {
     struct point cur = src->pos;
-    Cell const edge_id = sort_vertices(src->name, e->n.name) << edge_id_shift;
+    Cell const edge_id = make_edge(src->name, e->n.name);
     struct point prev = cur;
     /* Add a two space buffer to either side of the label so direction of lines
        is not lost to writing of digits. Otherwise it would be unclear which
@@ -796,7 +796,7 @@ paint_edge(struct graph *const g, struct vertex const *const src,
            struct vertex const *const dst)
 {
     struct point cur = src->pos;
-    Cell const edge_id = sort_vertices(src->name, dst->name) << edge_id_shift;
+    Cell const edge_id = make_edge(src->name, dst->name);
     struct point prev = cur;
     while (cur.r != dst->pos.r || cur.c != dst->pos.c)
     {
@@ -854,6 +854,12 @@ vertex_degree(struct vertex const *const v)
     for (int i = 0; i < MAX_DEGREE && v->edges[i].name; ++i, ++n)
     {}
     return n;
+}
+
+static inline Cell
+make_edge(char const src, char const dst)
+{
+    return sort_vertices(src, dst) << edge_id_shift;
 }
 
 static inline Cell *
