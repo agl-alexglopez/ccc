@@ -92,8 +92,7 @@ $(document).ready(function(){initNavTree('doubly__linked__list_8h.html',''); ini
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">doubly_linked_list.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -136,12 +135,6 @@ Macros</h2></td></tr>
 <tr class="memitem:a50ff4422f52bc1a5c2c926dc88a01e3e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(list_name,  struct_name,  list_elem_field,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
 <tr class="memdesc:a50ff4422f52bc1a5c2c926dc88a01e3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a doubly linked list with its l-value name, type containing the dll elems, the field of the dll elem, allocation function, compare function and any auxilliary data needed for comparison, printing, or destructors.  <br /></td></tr>
 <tr class="separator:a50ff4422f52bc1a5c2c926dc88a01e3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67936dadaece25c50d68e3dae247f686"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a67936dadaece25c50d68e3dae247f686">ccc_dll_emplace_back</a>(list_ptr,  type_initializer...)&#160;&#160;&#160;    ccc_impl_dll_emplace_back(list_ptr, type_initializer)</td></tr>
-<tr class="memdesc:a67936dadaece25c50d68e3dae247f686"><td class="mdescLeft">&#160;</td><td class="mdescRight">writes contents of type initializer directly to allocated memory at the back of the list. O(1).  <br /></td></tr>
-<tr class="separator:a67936dadaece25c50d68e3dae247f686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18c4d94d92918c9742aa1626ca724aa4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a18c4d94d92918c9742aa1626ca724aa4">ccc_dll_emplace_front</a>(list_ptr,  type_initializer...)&#160;&#160;&#160;    ccc_impl_dll_emplace_front(list_ptr, type_initializer)</td></tr>
-<tr class="memdesc:a18c4d94d92918c9742aa1626ca724aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">writes contents of type initializer directly to allocated memory at the front of the list. O(1).  <br /></td></tr>
-<tr class="separator:a18c4d94d92918c9742aa1626ca724aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -152,8 +145,15 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:ae6ab05fc0a5ac5f5d8ff31103209edf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A doubly linked list intrusive element to embedded in a user type.  <br /></td></tr>
 <tr class="separator:ae6ab05fc0a5ac5f5d8ff31103209edf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Insert Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Add elements to the doubly linked list. </p>
+</td></tr>
+<tr class="memitem:a67936dadaece25c50d68e3dae247f686"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a67936dadaece25c50d68e3dae247f686">ccc_dll_emplace_back</a>(list_ptr,  type_initializer...)&#160;&#160;&#160;    ccc_impl_dll_emplace_back(list_ptr, type_initializer)</td></tr>
+<tr class="memdesc:a67936dadaece25c50d68e3dae247f686"><td class="mdescLeft">&#160;</td><td class="mdescRight">writes contents of type initializer directly to allocated memory at the back of the list. O(1).  <br /></td></tr>
+<tr class="separator:a67936dadaece25c50d68e3dae247f686"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18c4d94d92918c9742aa1626ca724aa4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a18c4d94d92918c9742aa1626ca724aa4">ccc_dll_emplace_front</a>(list_ptr,  type_initializer...)&#160;&#160;&#160;    ccc_impl_dll_emplace_front(list_ptr, type_initializer)</td></tr>
+<tr class="memdesc:a18c4d94d92918c9742aa1626ca724aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">writes contents of type initializer directly to allocated memory at the front of the list. O(1).  <br /></td></tr>
+<tr class="separator:a18c4d94d92918c9742aa1626ca724aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac21312b92a33769a08c7e9cd334800a7"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *elem)</td></tr>
 <tr class="memdesc:ac21312b92a33769a08c7e9cd334800a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push user type wrapping elem to the front of the list. O(1).  <br /></td></tr>
 <tr class="separator:ac21312b92a33769a08c7e9cd334800a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,12 +163,10 @@ Functions</h2></td></tr>
 <tr class="memitem:aee123c04ee8e032cb1b7888bdfcbb049"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#aee123c04ee8e032cb1b7888bdfcbb049">ccc_dll_insert</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *pos_elem, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *elem)</td></tr>
 <tr class="memdesc:aee123c04ee8e032cb1b7888bdfcbb049"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert user type wrapping elem before pos_elem. O(1).  <br /></td></tr>
 <tr class="separator:aee123c04ee8e032cb1b7888bdfcbb049"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f7f1c337174a8c19091ab34d25587ff"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
-<tr class="memdesc:a4f7f1c337174a8c19091ab34d25587ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the user type at the front of the list. O(1).  <br /></td></tr>
-<tr class="separator:a4f7f1c337174a8c19091ab34d25587ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abea7c774a00b9e84da26660d20a0b1ac"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac">ccc_dll_back</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
-<tr class="memdesc:abea7c774a00b9e84da26660d20a0b1ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the user type at the back of the list. O(1).  <br /></td></tr>
-<tr class="separator:abea7c774a00b9e84da26660d20a0b1ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Remove Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Remove elements from the doubly linked list. </p>
+</td></tr>
 <tr class="memitem:a89eabf4c75464bc9e78f470fa7e942a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a89eabf4c75464bc9e78f470fa7e942a3">ccc_dll_pop_front</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l)</td></tr>
 <tr class="memdesc:a89eabf4c75464bc9e78f470fa7e942a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the user type at the front of the list. O(1).  <br /></td></tr>
 <tr class="separator:a89eabf4c75464bc9e78f470fa7e942a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,15 +191,22 @@ Functions</h2></td></tr>
 <tr class="memitem:a3f1e8eb64e99bab7cf3892a8683f30b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a3f1e8eb64e99bab7cf3892a8683f30b0">ccc_dll_splice_range</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *pos_sll, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *pos, <a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *to_cut_sll, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *begin, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *end)</td></tr>
 <tr class="memdesc:a3f1e8eb64e99bab7cf3892a8683f30b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Repositions begin to end before pos. Only list pointers are modified O(N).  <br /></td></tr>
 <tr class="separator:a3f1e8eb64e99bab7cf3892a8683f30b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ae92a3623c7bdfdd9ace703e2e18879d5">ccc_dll_clear</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the contents of the list freeing elements, if given allocation permission. O(N).  <br /></td></tr>
+<tr class="separator:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Iterate through the doubly linked list. </p>
+</td></tr>
 <tr class="memitem:a6659ba404965e290896edf2db6f85520"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a6659ba404965e290896edf2db6f85520">ccc_dll_begin</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a6659ba404965e290896edf2db6f85520"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type at the start of the list or NULL if empty. O(1).  <br /></td></tr>
 <tr class="separator:a6659ba404965e290896edf2db6f85520"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a97c4b1eb78dbb1056f83726a32fec5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a9a97c4b1eb78dbb1056f83726a32fec5">ccc_dll_next</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> const *elem)</td></tr>
-<tr class="memdesc:a9a97c4b1eb78dbb1056f83726a32fec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type following the element known to be in the list. O(1).  <br /></td></tr>
-<tr class="separator:a9a97c4b1eb78dbb1056f83726a32fec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab41ce312d610eff4154f1e08b96862d2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ab41ce312d610eff4154f1e08b96862d2">ccc_dll_rbegin</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:ab41ce312d610eff4154f1e08b96862d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type at the end of the list or NULL if empty. O(1).  <br /></td></tr>
 <tr class="separator:ab41ce312d610eff4154f1e08b96862d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a97c4b1eb78dbb1056f83726a32fec5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a9a97c4b1eb78dbb1056f83726a32fec5">ccc_dll_next</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> const *elem)</td></tr>
+<tr class="memdesc:a9a97c4b1eb78dbb1056f83726a32fec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type following the element known to be in the list. O(1).  <br /></td></tr>
+<tr class="separator:a9a97c4b1eb78dbb1056f83726a32fec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2226a51c3cf014707df4eb3bd057e8cb"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a2226a51c3cf014707df4eb3bd057e8cb">ccc_dll_rnext</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l, <a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> const *elem)</td></tr>
 <tr class="memdesc:a2226a51c3cf014707df4eb3bd057e8cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the user type following the element known to be in the list moving from back to front. O(1).  <br /></td></tr>
 <tr class="separator:a2226a51c3cf014707df4eb3bd057e8cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,6 +216,16 @@ Functions</h2></td></tr>
 <tr class="memitem:ad294dc09ecea5d46a8b69a88d184f924"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ad294dc09ecea5d46a8b69a88d184f924">ccc_dll_rend</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:ad294dc09ecea5d46a8b69a88d184f924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start sentinel with no accessible fields. O(1).  <br /></td></tr>
 <tr class="separator:ad294dc09ecea5d46a8b69a88d184f924"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Remove elements from the doubly linked list. </p>
+</td></tr>
+<tr class="memitem:a4f7f1c337174a8c19091ab34d25587ff"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
+<tr class="memdesc:a4f7f1c337174a8c19091ab34d25587ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the user type at the front of the list. O(1).  <br /></td></tr>
+<tr class="separator:a4f7f1c337174a8c19091ab34d25587ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abea7c774a00b9e84da26660d20a0b1ac"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac">ccc_dll_back</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
+<tr class="memdesc:abea7c774a00b9e84da26660d20a0b1ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the user type at the back of the list. O(1).  <br /></td></tr>
+<tr class="separator:abea7c774a00b9e84da26660d20a0b1ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cd9b16a6fe36296e4d95e2791b31a9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a1cd9b16a6fe36296e4d95e2791b31a9e">ccc_dll_begin_elem</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a1cd9b16a6fe36296e4d95e2791b31a9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a handle to the list element at the front of the list which may be the sentinel. O(1).  <br /></td></tr>
 <tr class="separator:a1cd9b16a6fe36296e4d95e2791b31a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -226,16 +241,14 @@ Functions</h2></td></tr>
 <tr class="memitem:a413ff34f19dbeebcacad61d3a8ef389e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a413ff34f19dbeebcacad61d3a8ef389e">ccc_dll_is_empty</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a413ff34f19dbeebcacad61d3a8ef389e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return if the size of the list is equal to 0. O(1).  <br /></td></tr>
 <tr class="separator:a413ff34f19dbeebcacad61d3a8ef389e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ae92a3623c7bdfdd9ace703e2e18879d5">ccc_dll_clear</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l, <a class="el" href="types_8h.html#a9ac447d6dd51a29b6d485a581fe6e20c">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the contents of the list freeing elements, if given allocation permission. O(N).  <br /></td></tr>
-<tr class="separator:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0946ef0b3b52c324fbb3438f77d3dd50"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a0946ef0b3b52c324fbb3438f77d3dd50">ccc_dll_validate</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a0946ef0b3b52c324fbb3438f77d3dd50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validates internal state of the list.  <br /></td></tr>
 <tr class="separator:a0946ef0b3b52c324fbb3438f77d3dd50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Doubly Linked List Interface. </p>
-<p>A doubly linked list offers efficient push, pop, extract, and erase operations for elements stored in the list. Notably, for single elements the list can offer O(1) push front/back, pop front/back, and removal of elements in arbitrary positions in the list. The cost of this efficiency is higher memory footprint. </p>
+<p>A doubly linked list offers efficient push, pop, extract, and erase operations for elements stored in the list. Notably, for single elements the list can offer O(1) push front/back, pop front/back, and removal of elements in arbitrary positions in the list. The cost of this efficiency is higher memory footprint.</p>
+<p>This container offers pointer stability. Also, if the container is not permitted to allocate all insertion code assumes that the user has allocated memory appropriately for the element to be inserted; it will not allocate or free in this case. If allocation is permitted upon initialization the container will manage the memory as expected on insert or erase operations as defined by the interface; memory is allocated for insertions and freed for removals. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a67936dadaece25c50d68e3dae247f686" name="a67936dadaece25c50d68e3dae247f686"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a67936dadaece25c50d68e3dae247f686">&#9670;&#160;</a></span>ccc_dll_emplace_back</h2>

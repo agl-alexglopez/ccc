@@ -153,7 +153,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a7d8dfe1437e87b31e7f5522d85080aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous block of storage for elements of the same type.  <br /></td></tr>
 <tr class="separator:a7d8dfe1437e87b31e7f5522d85080aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader">Allocation Management Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Allocation Management Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
 </td></tr>
 <tr class="memitem:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae2359dd2088ea0cd0b7bfb8260cbaa66">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a71f0cea7931ffdae612b61631cb3c368">ccc_alloc_fn</a> *fn)</td></tr>
@@ -178,7 +178,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:acd3fe998c43ec179e503d9f7c98f2b83"><td class="mdescLeft">&#160;</td><td class="mdescRight">erase element at slot i according to size of the buffer maintaining contiguous storage of elements between 0 and size.  <br /></td></tr>
 <tr class="separator:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader">Slot Management Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Slot Management Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions interact with slots in the buffer directly and do not modify the size of the buffer. These are best used for custom container implementations operating at a higher level of abstraction. </p>
 </td></tr>
 <tr class="memitem:a5f45a54a635295a962f520afcf61f3ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5f45a54a635295a962f520afcf61f3ad">ccc_buf_at</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> const *buf, size_t i)</td></tr>
@@ -203,7 +203,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a140e6e4c58ece0874c72524eed8ce0c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">swap elements at i and j according to capacity of the bufer.  <br /></td></tr>
 <tr class="separator:a140e6e4c58ece0874c72524eed8ce0c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>The following functions implement iterators over the buffer. </p>
 </td></tr>
 <tr class="memitem:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aa2025e9fa8daa95cd7b1f84147ecc14b">ccc_buf_begin</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> const *buf)</td></tr>
@@ -228,7 +228,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a4d000d8e2b263a44fd0d754a98513931"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the rend position of the buffer.  <br /></td></tr>
 <tr class="separator:a4d000d8e2b263a44fd0d754a98513931"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader">State Management Functions</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions help manage or obtain state of the buffer. </p>
 </td></tr>
 <tr class="memitem:a771c734d199d4cc35654bcd5d62b3fb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a771c734d199d4cc35654bcd5d62b3fb3">ccc_buf_size_plus</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t n)</td></tr>
@@ -259,8 +259,8 @@ Typedefs</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Buffer Interface. </p>
 <p>Buffer usage is similar to a C++ vector, with more flexible functions provided to support higher level containers and abstractions. While useful on its own&ndash;a stack could be implemented with the provided functions&ndash;a buffer is often used as the lower level abstraction for the flat data structures in this library that provide more specialized operations. A buffer does not require the user accommodate any intrusive elements.</p>
-<p>A buffer with allocation permission will resize when a new element is inserted in a contiguous fashion. Functions in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
-<p>Functions in the slot management section offer data movement and writing operations that do not affect the size of the container. If writing a more complex higher level container that does not need size management these functions offer more custom control over the buffer.</p>
+<p>A buffer with allocation permission will re-size when a new element is inserted in a contiguous fashion. Interface in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
+<p>Interface in the slot management section offer data movement and writing operations that do not affect the size of the container. If writing a more complex higher level container that does not need size management these functions offer more custom control over the buffer.</p>
 <p>If allocation is not permitted, resizing will not occur and the insertion function will fail when capacity is reached, returning some value to indicate the failure. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a6dd65488a38a96249793ecbcfbc98ca3" name="a6dd65488a38a96249793ecbcfbc98ca3"></a>

@@ -185,7 +185,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a44c4233eccbf32ecda47ae834b6fef20"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined type being stored in the map.  <br /></td></tr>
 <tr class="separator:a44c4233eccbf32ecda47ae834b6fef20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f6c79e32b5b75645a8d93af21291565"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fomap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></td></tr>
-<tr class="memdesc:a0f6c79e32b5b75645a8d93af21291565"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry API.  <br /></td></tr>
+<tr class="memdesc:a0f6c79e32b5b75645a8d93af21291565"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
 <tr class="separator:a0f6c79e32b5b75645a8d93af21291565"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -314,7 +314,7 @@ Functions</h2></td></tr>
 <div class="line">        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \</div>
 <div class="line">                                  aux_data)                                    \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__ordered__map_8h_html_a0f6c79e32b5b75645a8d93af21291565"><div class="ttname"><a href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></div><div class="ttdeci">union ccc_fomap_entry_ ccc_fomap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry API.</div><div class="ttdef"><b>Definition:</b> flat_ordered_map.h:47</div></div>
+<div class="ttc" id="aflat__ordered__map_8h_html_a0f6c79e32b5b75645a8d93af21291565"><div class="ttname"><a href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></div><div class="ttdeci">union ccc_fomap_entry_ ccc_fomap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_ordered_map.h:47</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -368,10 +368,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a specialized entry for use with other functions in the Entry API. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a specialized entry for use with other functions in the Entry Interface. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the contents of an entry should not be examined or modified. Use the provided functions, only.</dd></dl>
 <p>An entry is a search result that provides either an Occupied or Vacant entry in the map. An occupied entry signifies that the search was successful. A Vacant entry means the search was not successful but a handle is gained to where in the map such an element should be inserted.</p>
-<p>An entry is rarely useful on its own. It should be passed in a functional style to subsequent calls in the Entry API. </p>
+<p>An entry is rarely useful on its own. It should be passed in a functional style to subsequent calls in the Entry Interface. </p>
 
 </div>
 </div>
@@ -611,7 +611,7 @@ Functions</h2></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_fom_insert_or_assign_w(flat_ordered_map_ptr, key, lazy_value) \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry API.</div><div class="ttdef"><b>Definition:</b> traits.h:88</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:89</div></div>
 </div><!-- fragment -->
 <p>Inserts a new key value pair or overwrites the existing entry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -924,8 +924,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>A container specific entry used to implement the Entry API. </p>
-<p>The Entry API offers efficient search and subsequent insertion, deletion, or value update based on the needs of the user. </p>
+<p>A container specific entry used to implement the Entry Interface. </p>
+<p>The Entry Interface offers efficient search and subsequent insertion, deletion, or value update based on the needs of the user. </p>
 
 </div>
 </div>
@@ -965,7 +965,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the updated entry if it was Occupied or the unmodified vacant entry.</dd></dl>
-<p>This function is intended to make the function chaining in the Entry API more succinct if the entry will be modified in place based on its own value without the need of the auxiliary argument a ccc_update_fn can provide. </p>
+<p>This function is intended to make the function chaining in the Entry Interface more succinct if the entry will be modified in place based on its own value without the need of the auxiliary argument a ccc_update_fn can provide. </p>
 
 </div>
 </div>
@@ -1218,10 +1218,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a specialized entry for use with other functions in the Entry API. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a specialized entry for use with other functions in the Entry Interface. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the contents of an entry should not be examined or modified. Use the provided functions, only.</dd></dl>
 <p>An entry is a search result that provides either an Occupied or Vacant entry in the map. An occupied entry signifies that the search was successful. A Vacant entry means the search was not successful but a handle is gained to where in the map such an element should be inserted.</p>
-<p>An entry is rarely useful on its own. It should be passed in a functional style to subsequent calls in the Entry API. </p>
+<p>An entry is rarely useful on its own. It should be passed in a functional style to subsequent calls in the Entry Interface. </p>
 
 </div>
 </div>

@@ -171,7 +171,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a193ca25836d1807cc92289c600a40673"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined type stored in the multimap.  <br /></td></tr>
 <tr class="separator:a193ca25836d1807cc92289c600a40673"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_ommap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></td></tr>
-<tr class="memdesc:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The container specific type to support the Entry API.  <br /></td></tr>
+<tr class="memdesc:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The container specific type to support the Entry Interface.  <br /></td></tr>
 <tr class="separator:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -325,7 +325,7 @@ N).  <br /></td></tr>
 <div class="line">        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,          \</div>
 <div class="line">                                  lazy_aux_data)                               \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aordered__multimap_8h_html_a3b29c8dbbd10827d07c041fbfff7e2b4"><div class="ttname"><a href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></div><div class="ttdeci">union ccc_ommap_entry_ ccc_ommap_entry</div><div class="ttdoc">The container specific type to support the Entry API.</div><div class="ttdef"><b>Definition:</b> ordered_multimap.h:42</div></div>
+<div class="ttc" id="aordered__multimap_8h_html_a3b29c8dbbd10827d07c041fbfff7e2b4"><div class="ttname"><a href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></div><div class="ttdeci">union ccc_ommap_entry_ ccc_ommap_entry</div><div class="ttdoc">The container specific type to support the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_multimap.h:42</div></div>
 </div><!-- fragment -->
 <p>Modify the ordered multimap entry with a modification function requiring auxiliary data. If auxiliary data is passed as a function call, it will only execute if the entry is occupied. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -380,7 +380,7 @@ N).  <br /></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a container specific entry associated with the enclosing scope. This reference is always non-NULL.</dd></dl>
-<p>Note this is useful for nested calls where an entry pointer is requested by further operations in the Entry API, avoiding uneccessary intermediate values and references (e.g. struct val *v = or_insert(entry_r(...), ...)); </p>
+<p>Note this is useful for nested calls where an entry pointer is requested by further operations in the Entry Interface, avoiding uneccessary intermediate values and references (e.g. struct val *v = or_insert(entry_r(...), ...)); </p>
 
 </div>
 </div>
@@ -622,7 +622,7 @@ N).  <br /></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_omm_insert_or_assign_w(ordered_multimap_ptr, key, lazy_value) \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry API.</div><div class="ttdef"><b>Definition:</b> traits.h:88</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:89</div></div>
 </div><!-- fragment -->
 <p>Invariantly inserts the key value pair into the multimap either as the first entry or overwriting the oldest existing entry at key. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -758,8 +758,8 @@ N).  <br /></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The container specific type to support the Entry API. </p>
-<p>An Entry API offers efficient conditional searching, saving multiple searches. Entries are views of Vacant or Occupied multimap elements allowing further operations to be performed once they are obtained without a second search, insert, or remove query. </p>
+<p>The container specific type to support the Entry Interface. </p>
+<p>An Entry Interface offers efficient conditional searching, saving multiple searches. Entries are views of Vacant or Occupied multimap elements allowing further operations to be performed once they are obtained without a second search, insert, or remove query. </p>
 
 </div>
 </div>
@@ -1084,7 +1084,7 @@ N).  <br /></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a container specific entry for status, unwrapping, or further Entry API operations. Occupied indicates at least one user type with key exists and can be unwrapped to view. Vacant indicates no user type at key exists. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a container specific entry for status, unwrapping, or further Entry Interface operations. Occupied indicates at least one user type with key exists and can be unwrapped to view. Vacant indicates no user type at key exists. </dd></dl>
 
 </div>
 </div>
@@ -1443,7 +1443,7 @@ N). </p>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occured preventing completing of an Entry API series of operations.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occured preventing completing of an Entry Interface series of operations.</dd></dl>
 <p>Note that this will most commonly occur if the container is permitted to allocate but the allocation has failed. </p>
 
 </div>
