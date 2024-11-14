@@ -276,6 +276,7 @@ target_sources(${PROJECT_NAME}
             TYPE HEADERS
             BASE_DIRS ${PROJECT_SOURCE_DIR}
             FILES 
+              impl_types.h
               impl_flat_priority_queue.h
               impl_tree.h
               impl_priority_queue.h
