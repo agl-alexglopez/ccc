@@ -46,7 +46,9 @@ jobs:
 
       - name: Generate Compile Commands
         run: |
-          rm -rf tests/ util/ samples/
+          rm -rf tests/ 
+          rm -rf util/ 
+          rm -rf samples/
           cmake --preset=clang-deb
 
       - name: Review
