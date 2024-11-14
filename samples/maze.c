@@ -239,25 +239,18 @@ animate_maze(struct maze *maze)
             {
                 continue;
             }
-            int cur_weight = 0;
-            struct point_cost const *const found
-                = get_key_val(&cell_costs, &next);
-            if (!found)
+            /* The Entry Interface helps make what would be an if else branch
+               a simple lazily evaluated insertion. If the entry is Occupied
+               rand_range is never called. This technique also means cells
+               can be given weights lazily as we go rather than all at once
+               before the main algorithm starts. */
+            struct point_cost const *const found = om_or_insert_w(
+                entry_r(&cell_costs, &next),
+                (struct point_cost){.p = next, .cost = rand_range(0, 100)});
+            assert(found);
+            if (found->cost < min_weight)
             {
-                struct point_cost new_cost
-                    = {.p = next, .cost = rand_range(0, 100)};
-                cur_weight = new_cost.cost;
-                [[maybe_unused]] bool const inserted = insert_entry(
-                    entry_r(&cell_costs, &new_cost.p), &new_cost.elem);
-                assert(inserted);
-            }
-            else
-            {
-                cur_weight = found->cost;
-            }
-            if (cur_weight < min_weight)
-            {
-                min_weight = cur_weight;
+                min_weight = found->cost;
                 min_neighbor = next;
             }
         }
