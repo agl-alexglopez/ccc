@@ -57,12 +57,12 @@ jobs:
 
     - name: Build with Clang and Ninja Generator
       run: |
-        make clang-deb
+        make deb
         make install
 
     - name: Build with GCC and Makefile Generator
       run: |
         make clean
-        make gcc-deb
+        make cdeb
         make install
 
