@@ -266,10 +266,6 @@ animate_maze(struct maze *maze)
             (void)pop(&cells);
         }
     }
-    /* The priority queue does not need to be cleared because it's emptiness
-       determined the course of the maze building. It has no hidden allocations
-       either so no more work is needed if we know it's empty and the data
-       structure metadata is on the stack. */
     (void)om_clear(&cell_costs, NULL);
     (void)fpq_clear_and_free(&cells, NULL);
 }
