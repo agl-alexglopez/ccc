@@ -141,14 +141,6 @@ Include the Library</h1>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__hash__map_8h.html">ccc/flat_hash_map.h</a>&quot;</span></div>
 <div class="ttc" id="aflat__hash__map_8h_html"><div class="ttname"><a href="flat__hash__map_8h.html">flat_hash_map.h</a></div><div class="ttdoc">The Flat Hash Map Interface.</div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
-Alternative Builds</h1>
-<p>You may wish to use a different compiler and tool chain than what your system default specifies. Review the <code>CMakePrests.json</code> file for different compilers.</p>
-<div class="fragment"><div class="line">make gcc-rel [OPTIONAL/INSTALL/PATH]</div>
-<div class="line">make install</div>
-</div><!-- fragment --><p>Use Clang to compile the library.</p>
-<div class="fragment"><div class="line">make clang-rel [OPTIONAL/INSTALL/PATH]</div>
-<div class="line">make install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md17"></a>
 Without Make</h1>
 <p>If your system does not support Makefiles or the <code>make</code> command here are the CMake commands one can run that will do the same.</p>
 <div class="fragment"><div class="line"># Configure the project cmake files.</div>
@@ -156,7 +148,7 @@ Without Make</h1>
 <div class="line">cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md18"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md17"></a>
 User Presets</h1>
 <p>If you do not like the default presets, create a <code>CMakeUserPresets.json</code> in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.</p>
 <div class="fragment"><div class="line">{</div>

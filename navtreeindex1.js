@@ -28,7 +28,6 @@ var NAVTREEINDEX1 =
 "md_INSTALL.html#autotoc_md15":[6,1],
 "md_INSTALL.html#autotoc_md16":[6,2],
 "md_INSTALL.html#autotoc_md17":[6,3],
-"md_INSTALL.html#autotoc_md18":[6,4],
 "ordered__map_8h.html":[8,0,0,7],
 "ordered__map_8h.html#a045be328ffa0c57713f35148fe53bc57":[8,0,0,7,40],
 "ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224":[8,0,0,7,14],
@@ -249,5 +248,6 @@ var NAVTREEINDEX1 =
 "traits_8h.html#a71aee0ff5ef8b44bdab43a36d8179da5":[8,0,0,12,26],
 "traits_8h.html#a735bd49bbb6e0419aef7a60d36d22331":[8,0,0,12,34],
 "traits_8h.html#a784dd248770ce9ee55ea91c7b2a4ca1b":[8,0,0,12,39],
-"traits_8h.html#a7aa509795b87267c70e291f4c17de2b3":[8,0,0,12,35]
+"traits_8h.html#a7aa509795b87267c70e291f4c17de2b3":[8,0,0,12,35],
+"traits_8h.html#a7e4421e251272e1eb19a8b0c8e40d7c2":[8,0,0,12,45]
 };
