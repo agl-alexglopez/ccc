@@ -59,9 +59,8 @@ One may be tempted to use realloc to check all of these boxes but realloc is imp
 
 ```c
 void *
-std_alloc(void *const ptr, size_t const size, void *const aux)
+std_alloc(void *const ptr, size_t const size, void *)
 {
-    (void)aux;
     if (!ptr && !size)
     {
         return NULL;
