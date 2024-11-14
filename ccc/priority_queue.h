@@ -1,11 +1,11 @@
 /** @file
 @brief The Priority Queue Interface
 
-A priority queue offers simple, fast, pointer stable management of a prioriry
+A priority queue offers simple, fast, pointer stable management of a priority
 queue. Push is O(1). The cost to execute the increase key in a max heap and
 decrease key in a min heap is O(1). However, due to the restructuring this
 causes that increases the cost of later pops, the more accurate runtime is o(lg
-N). The cost of a pop operation is O(lgN).
+N). The cost of a pop operation is O(lg N).
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
