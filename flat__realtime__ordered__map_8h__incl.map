@@ -1,8 +1,6 @@
 <map id="ccc/flat_realtime_ordered_map.h" name="ccc/flat_realtime_ordered_map.h">
-<area shape="rect" id="node1" title="The Flat Realtime Ordered Map Interface." alt="" coords="103,5,289,45"/>
-<area shape="rect" id="node2" href="$impl__flat__realtime__ordered__map_8h_source.html" title=" " alt="" coords="72,93,213,133"/>
-<area shape="rect" id="node5" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="139,328,210,353"/>
-<area shape="rect" id="node3" href="$buffer_8h.html" title="The Buffer Interface." alt="" coords="91,181,162,207"/>
-<area shape="rect" id="node4" href="$impl__buffer_8h_source.html" title=" " alt="" coords="5,255,112,280"/>
-<area shape="rect" id="node6" href="$impl__types_8h_source.html" title=" " alt="" coords="121,401,228,427"/>
+<area shape="rect" id="node1" title="The Flat Realtime Ordered Map Interface." alt="" coords="73,5,259,45"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,93,180,133"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="204,101,275,126"/>
+<area shape="rect" id="node4" title=" " alt="" coords="170,181,309,207"/>
 </map>

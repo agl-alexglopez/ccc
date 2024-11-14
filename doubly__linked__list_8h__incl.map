@@ -1,6 +1,6 @@
 <map id="ccc/doubly_linked_list.h" name="ccc/doubly_linked_list.h">
-<area shape="rect" id="node1" title="The Doubly Linked List Interface." alt="" coords="47,5,223,31"/>
-<area shape="rect" id="node2" href="$impl__doubly__linked__list_8h_source.html" title=" " alt="" coords="5,79,153,119"/>
-<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="100,167,171,192"/>
-<area shape="rect" id="node4" href="$impl__types_8h_source.html" title=" " alt="" coords="82,240,189,265"/>
+<area shape="rect" id="node1" title="The Doubly Linked List Interface." alt="" coords="83,5,259,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,79,187,119"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="211,86,282,111"/>
+<area shape="rect" id="node4" title=" " alt="" coords="177,167,316,192"/>
 </map>

@@ -1,8 +1,6 @@
 <map id="ccc/flat_hash_map.h" name="ccc/flat_hash_map.h">
-<area shape="rect" id="node1" title="The Flat Hash Map Interface." alt="" coords="123,5,277,31"/>
-<area shape="rect" id="node2" href="$impl__flat__hash__map_8h_source.html" title=" " alt="" coords="57,79,223,104"/>
-<area shape="rect" id="node5" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="94,299,165,324"/>
-<area shape="rect" id="node3" href="$buffer_8h.html" title="The Buffer Interface." alt="" coords="94,152,165,177"/>
-<area shape="rect" id="node6" href="$impl__types_8h_source.html" title=" " alt="" coords="5,372,112,397"/>
-<area shape="rect" id="node4" href="$impl__buffer_8h_source.html" title=" " alt="" coords="76,225,183,251"/>
+<area shape="rect" id="node1" title="The Flat Hash Map Interface." alt="" coords="70,5,225,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,79,156,119"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="180,86,251,111"/>
+<area shape="rect" id="node4" title=" " alt="" coords="146,167,285,192"/>
 </map>
