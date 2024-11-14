@@ -76,6 +76,9 @@ If allocation is not permitted this function assumes the memory wrapping elem
 has been allocated with the appropriate lifetime for the user's needs. */
 ccc_result ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
+#define ccc_pq_emplace(priority_queue_ptr, lazy_value...)                      \
+    ccc_impl_pq_emplace(priority_queue_ptr, lazy_value)
+
 /** @brief Pops the front element from the priority queue. Amortized O(lgN).
 @param [in] pq a pointer to the priority queue.
 @return ok if pop was successful or an input error if pq is NULL or empty. */
@@ -210,6 +213,7 @@ typedef ccc_priority_queue priority_queue;
 #    define pq_init(args...) ccc_pq_init(args)
 #    define pq_front(args...) ccc_pq_front(args)
 #    define pq_push(args...) ccc_pq_push(args)
+#    define pq_emplace(args...) ccc_pq_emplace(args)
 #    define pq_pop(args...) ccc_pq_pop(args)
 #    define pq_extract(args...) ccc_pq_extract(args)
 #    define pq_is_empty(args...) ccc_pq_is_empty(args)
