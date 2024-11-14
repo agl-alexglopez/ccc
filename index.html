@@ -122,7 +122,8 @@ Motivations</h2>
 <h2><a class="anchor" id="autotoc_md7"></a>
 Allocation</h2>
 <p>If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.</p>
-<div class="fragment"><div class="line">typedef void *ccc_alloc_fn(void *ptr, size_t size);</div>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">void</span> *<a class="code hl_typedef" href="types_8h.html#a71f0cea7931ffdae612b61631cb3c368">ccc_alloc_fn</a>(<span class="keywordtype">void</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
+<div class="ttc" id="atypes_8h_html_a71f0cea7931ffdae612b61631cb3c368"><div class="ttname"><a href="types_8h.html#a71f0cea7931ffdae612b61631cb3c368">ccc_alloc_fn</a></div><div class="ttdeci">void * ccc_alloc_fn(void *ptr, size_t size)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:179</div></div>
 </div><!-- fragment --><p>This simplifies allocation and deallocation if the user chooses to hand these responsibilities to the container. It must implement the following behavior.</p>
 <ul>
 <li>If NULL is provided with a size of 0, NULL is returned.</li>
