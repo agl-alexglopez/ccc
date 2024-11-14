@@ -157,4 +157,4 @@ Documentation is available [HERE](https://agl-alexglopez.github.io/ccc/). Howeve
 doxygen Doxyfile
 ```
 
-This will generate documentation in the `docs` folder. To view the docs in your local browser, double click the `docs/html/index.htm` file.
+This will generate documentation in the `docs` folder. To view the docs in your local browser, double click the `docs/html/index.html` file.
