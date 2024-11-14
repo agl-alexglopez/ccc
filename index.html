@@ -93,22 +93,24 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">C Container Collection (CCC) </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_README"></a> The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. This means it is possible to write a program in which a container never allocates or frees a single byte of your memory. For the motivations of why such a library is helpful in C read on.</p>
+<div class="textblock"><p><a class="anchor" id="md_README"></a> The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. For the motivations of why such a library is helpful in C read on.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
 Installation</h1>
 <p>Currently, this library supports a manual installation via CMake. See the <a class="el" href="md_INSTALL.html">INSTALL.md</a> file for more details.</p>
 <h1><a class="anchor" id="autotoc_md4"></a>
 Quick Start</h1>
-<p>Read the documentation <a href="https://agl-alexglopez.github.io/ccc">HERE</a>. To get started, read the <a href="https://agl-alexglopez.github.io/ccc/files.html">header</a> for the container you want to use. Also check out <a href="https://agl-alexglopez.github.io/ccc/files.html">types.h</a> to acquaint yourself with the <code>ccc_alloc_fn</code> abstraction and decide if you need allocating or non-allocating containers in your project.</p>
+<ul>
+<li>Read the <a href="https://agl-alexglopez.github.io/ccc">DOCS</a>.</li>
+<li>Read <a href="https://agl-alexglopez.github.io/ccc/files.html">types.h</a> to understand the <code>ccc_alloc_fn</code> interface.</li>
+<li>Read the <a href="https://agl-alexglopez.github.io/ccc/files.html">header</a> for the desired container to understand its functionality.</li>
+</ul>
 <h1><a class="anchor" id="autotoc_md5"></a>
 Design</h1>
 <h2><a class="anchor" id="autotoc_md6"></a>
 Motivations</h2>
 <p>Here is the main argument of this library:</p>
-<blockquote class="doxtable">
-<p>&zwj;Containers in C should avoid limiting the control and flexibility offered by the C language. </p>
-</blockquote>
-<p>There are many excellent data structure libraries in C (see the related section). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.</p>
+<p><b>Containers in C should avoid limiting the control and flexibility offered by the C language.</b></p>
+<p>There are many excellent data structure libraries in C (see the related section of this document). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.</p>
 <p>The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer data structures as their literal interpretation; they structure the data they are given according to the container's invariants with no memory related side effects. The concerns of the container are now separate from those of the programmer. The container takes no part in the scope or lifetime of the programmer's provided memory, simply structuring it within the container as promised by the interface.</p>
 <p>The reason for this decision is simple: if people are using C today, in the face of many other modern and safety-minded languages, they should benefit from all the language can provide, even when incorporating a third-party library. This means that they can manage all their memory as they see fit and these containers simply structure it when and how the programmer requires. This design style is not unique. Non-allocating intrusive containers are common in operating system kernel development where the idea of dynamic memory, where memory comes from, and when memory should be allocated or freed becomes more complex due to the structure of all the modules working together behind the scenes to support the user. Embedded developers also stand to benefit from this design. However, I think that all applications can benefit from thinking more carefully about their memory in C.</p>
 <p>While not all containers require the user accommodate intrusive elements, when they do it looks like this.</p>
@@ -154,7 +156,7 @@ Allocation</h2>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.</p>
 <h3><a class="anchor" id="autotoc_md8"></a>
 Constructors</h3>
-<p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped block for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
+<p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
@@ -170,8 +172,16 @@ Destructors</h3>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
 <h1><a class="anchor" id="autotoc_md11"></a>
+Miscellaneous Why?</h1>
+<ul>
+<li>Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also debugging your own function is nice.</li>
+<li>Why not header only? I want the library to be readable, maintainable, and updateable, especially if I want to change implementations in the source files. If the user wants to explore the implementation everything should be easily understandable.</li>
+<li>Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.</li>
+<li>Why flat maps? Mostly experimenting. Flat maps track the tree structure through indices not pointers. This makes the data structure copyable, relocatable, serializable, or writable to disk at the cost of pointer stability in most cases.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md12"></a>
 Related</h1>
-<p>Here are some excellent data structure libraries I have found for C. Many of them are simple, fast, and elegant, taking care of all memory management for you.</p>
+<p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
 <li><a href="https://github.com/stclib/STC">STC - Smart Template Containers</a></li>
 <li><a href="https://github.com/glouw/ctl">C Template Library (CTL)</a></li>
