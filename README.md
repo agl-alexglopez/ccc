@@ -41,7 +41,7 @@ The handle to the container element is then passed by reference to all functions
 
 If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.
 
-```
+```c
 typedef void *ccc_alloc_fn(void *ptr, size_t size);
 ```
 
