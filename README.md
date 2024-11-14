@@ -80,7 +80,7 @@ However, the above example is only useful if the standard library allocator is u
 
 #### Constructors
 
-Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped piece for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.
+Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped block for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.
 
 Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).
 
