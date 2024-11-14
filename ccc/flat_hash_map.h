@@ -10,8 +10,8 @@ A flat hash map requires the user to provide a struct with known key and flat
 hash element fields as well as a hash function and key comparator function. The
 hash function should be well tailored to the key being stored in the table to
 prevent collisions. Currently, the flat hash map does not offer any default hash
-functions or hash strengthening algorithms so good hash functions should be
-used.
+functions or hash strengthening algorithms so strong hash functions should be
+obtained by the user for the data set.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
