@@ -36,14 +36,14 @@
             "name": "gcc-deb",
             "inherits": "default-deb",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-14.2.0"
             }
         },
         {
             "name": "gcc-rel",
             "inherits": "default-rel",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-14.2.0"
             }
         },
         {
