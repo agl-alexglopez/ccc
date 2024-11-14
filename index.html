@@ -175,6 +175,7 @@ Samples</h1>
 <h1><a class="anchor" id="autotoc_md11"></a>
 Miscellaneous Why?</h1>
 <ul>
+<li>Why is initialization so ugly? Yes, I know. Many intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> type macro that returns the user type wrapping the intruder, assuming the user gives the correct type and field names. I do not like this because it introduces the chance for extremely subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors in entering the wrong type or field name grows rapidly. At the cost of slightly more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
 <li>Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also debugging your own function is nice.</li>
 <li>Why not header only? I want the library to be readable, maintainable, and updateable, especially if I want to change implementations in the source files. If the user wants to explore the implementation everything should be easily understandable.</li>
 <li>Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.</li>
