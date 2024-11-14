@@ -19,7 +19,7 @@ functions offer more custom control over the buffer.
 
 If allocation is not permitted, resizing will not occur and the insertion
 function will fail when capacity is reached, returning some value to indicate
-the failure.
+failure.
 
 If shorter names are desired, define the following preprocessor directive.
 
