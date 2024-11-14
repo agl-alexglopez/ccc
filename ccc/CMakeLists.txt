@@ -1,12 +1,11 @@
+include_directories(${CMAKE_SOURCE_DIR}/src)
 add_library(types types.h ${CMAKE_SOURCE_DIR}/src/types.c)
-target_include_directories(types INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(types
   PRIVATE
     impl_types
 )
 
 add_library(buffer buffer.h ${CMAKE_SOURCE_DIR}/src/buffer.c)
-target_include_directories(buffer INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(buffer
   PUBLIC
     types
@@ -15,7 +14,6 @@ target_link_libraries(buffer
 )
 
 add_library(doubly_linked_list doubly_linked_list.h ${CMAKE_SOURCE_DIR}/src/doubly_linked_list.c)
-target_include_directories(doubly_linked_list INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(doubly_linked_list
   PUBLIC
     types
@@ -24,7 +22,6 @@ target_link_libraries(doubly_linked_list
 )
 
 add_library(singly_linked_list singly_linked_list.h ${CMAKE_SOURCE_DIR}/src/singly_linked_list.c)
-target_include_directories(singly_linked_list INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(singly_linked_list
   PUBLIC
     types
@@ -33,7 +30,6 @@ target_link_libraries(singly_linked_list
 )
 
 add_library(priority_queue priority_queue.h ${CMAKE_SOURCE_DIR}/src/priority_queue.c)
-target_include_directories(priority_queue INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(priority_queue 
   PUBLIC
     types
@@ -42,7 +38,6 @@ target_link_libraries(priority_queue
 )
 
 add_library(flat_priority_queue flat_priority_queue.h ${CMAKE_SOURCE_DIR}/src/flat_priority_queue.c)
-target_include_directories(flat_priority_queue INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(flat_priority_queue 
   PUBLIC
     types
@@ -51,7 +46,6 @@ target_link_libraries(flat_priority_queue
 )
 
 add_library(flat_hash_map flat_hash_map.h ${CMAKE_SOURCE_DIR}/src/flat_hash_map.c)
-target_include_directories(flat_hash_map INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(flat_hash_map
   PUBLIC
     types
@@ -60,7 +54,6 @@ target_link_libraries(flat_hash_map
 )
 
 add_library(ordered_multimap ordered_multimap.h ${CMAKE_SOURCE_DIR}/src/ordered_multimap.c)
-target_include_directories(ordered_multimap INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(ordered_multimap
   PUBLIC
     types
@@ -69,7 +62,6 @@ target_link_libraries(ordered_multimap
 )
 
 add_library(ordered_map ordered_map.h ${CMAKE_SOURCE_DIR}/src/ordered_map.c)
-target_include_directories(ordered_map INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(ordered_map
   PUBLIC
     types
@@ -78,7 +70,6 @@ target_link_libraries(ordered_map
 )
 
 add_library(flat_ordered_map flat_ordered_map.h ${CMAKE_SOURCE_DIR}/src/flat_ordered_map.c)
-target_include_directories(flat_ordered_map INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(flat_ordered_map
   PUBLIC
     types
@@ -87,7 +78,6 @@ target_link_libraries(flat_ordered_map
 )
 
 add_library(realtime_ordered_map realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/realtime_ordered_map.c)
-target_include_directories(realtime_ordered_map INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(realtime_ordered_map
   PUBLIC
     types
@@ -96,7 +86,6 @@ target_link_libraries(realtime_ordered_map
 )
 
 add_library(flat_realtime_ordered_map flat_realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/flat_realtime_ordered_map.c)
-target_include_directories(flat_realtime_ordered_map INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(flat_realtime_ordered_map
   PUBLIC
     types
@@ -105,7 +94,6 @@ target_link_libraries(flat_realtime_ordered_map
 )
 
 add_library(flat_double_ended_queue flat_double_ended_queue.h ${CMAKE_SOURCE_DIR}/src/flat_double_ended_queue.c)
-target_include_directories(flat_double_ended_queue INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(flat_double_ended_queue
   PUBLIC
     types
@@ -114,7 +102,6 @@ target_link_libraries(flat_double_ended_queue
 )
 
 add_library(traits INTERFACE traits.h)
-target_include_directories(traits INTERFACE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(traits
   INTERFACE
     impl_traits

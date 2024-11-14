@@ -1,4 +1,3 @@
-
 # for CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_BINDIR, CMAKE_INSTALL_INCLUDEDIR and others
 include(GNUInstallDirs)
 
@@ -23,7 +22,7 @@ else()
         EXPORT "${PROJECT_NAME}Targets"
         FILE_SET public_headers
         # All destinations are default in release except header location.
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/str_view/
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/ccc
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
     )
 endif()
