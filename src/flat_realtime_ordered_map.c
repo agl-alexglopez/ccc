@@ -499,7 +499,7 @@ ccc_frm_clear(ccc_flat_realtime_ordered_map *const frm,
     for (void *e = ccc_buf_at(&frm->buf_, 1); e != ccc_buf_end(&frm->buf_);
          e = ccc_buf_next(&frm->buf_, e))
     {
-        fn((ccc_user_type){.user_type = e, .aux = frm->aux_});
+        fn((ccc_user_type){.user_type = e, .aux = frm->buf_.aux_});
     }
     (void)ccc_buf_size_set(&frm->buf_, 1);
     frm->root_ = 0;
@@ -522,7 +522,7 @@ ccc_frm_clear_and_free(ccc_flat_realtime_ordered_map *const frm,
     for (void *e = ccc_buf_at(&frm->buf_, 1); e != ccc_buf_end(&frm->buf_);
          e = ccc_buf_next(&frm->buf_, e))
     {
-        fn((ccc_user_type){.user_type = e, .aux = frm->aux_});
+        fn((ccc_user_type){.user_type = e, .aux = frm->buf_.aux_});
     }
     frm->root_ = 0;
     return ccc_buf_alloc(&frm->buf_, 0, frm->buf_.alloc_);
@@ -729,8 +729,9 @@ static inline ccc_threeway_cmp
 cmp_elems(struct ccc_fromap_ const *const frm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
-        .key_lhs = key, .user_type_rhs = base_at(frm, node), .aux = frm->aux_});
+    return fn((ccc_key_cmp){.key_lhs = key,
+                            .user_type_rhs = base_at(frm, node),
+                            .aux = frm->buf_.aux_});
 }
 
 static inline void *

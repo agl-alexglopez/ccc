@@ -29,7 +29,6 @@ struct ccc_fhmap_
     ccc_buffer buf_;
     ccc_hash_fn *hash_fn_;
     ccc_key_eq_fn *eq_fn_;
-    void *aux_;
     size_t key_offset_;
     size_t hash_elem_offset_;
 };
@@ -53,7 +52,7 @@ union ccc_fhmap_entry_
     ({                                                                         \
         __auto_type fhm_mem_ptr_ = (memory_ptr);                               \
         (flat_hash_map_ptr)->buf_                                              \
-            = (ccc_buffer)ccc_buf_init(fhm_mem_ptr_, alloc_fn, capacity);      \
+            = (ccc_buffer)ccc_buf_init(fhm_mem_ptr_, alloc_fn, aux, capacity); \
         ccc_result res_ = ccc_impl_fhm_init_buf(                               \
             (flat_hash_map_ptr), offsetof(typeof(*(fhm_mem_ptr_)), key_field), \
             offsetof(typeof(*(fhm_mem_ptr_)), fhash_elem_field), (hash_fn),    \

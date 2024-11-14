@@ -498,7 +498,7 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
     if (furthest_pos >= a->cap)
     {
         size_t const new_cap = (furthest_pos) * 2;
-        void *const moved_arena = std_alloc(a->arena, new_cap);
+        void *const moved_arena = std_alloc(a->arena, new_cap, NULL);
         if (!moved_arena)
         {
             return CCC_MEM_ERR;

@@ -306,7 +306,7 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
     for (size_t i = fdeq->front_; i != back; i = increment(fdeq, i))
     {
         destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
-                                   .aux = fdeq->aux_});
+                                   .aux = fdeq->buf_.aux_});
     }
     return CCC_OK;
 }
@@ -328,7 +328,7 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
     for (size_t i = fdeq->front_; i != back; i = increment(fdeq, i))
     {
         destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
-                                   .aux = fdeq->aux_});
+                                   .aux = fdeq->buf_.aux_});
     }
     return ccc_buf_alloc(&fdeq->buf_, 0, fdeq->buf_.alloc_);
 }
@@ -557,8 +557,8 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
         = ccc_buf_capacity(&q->buf_)
               ? ((ccc_buf_capacity(&q->buf_) + additional_elems_to_add) * 2)
               : start_capacity;
-    void *const new_mem
-        = q->buf_.alloc_(NULL, ccc_buf_elem_size(&q->buf_) * new_cap);
+    void *const new_mem = q->buf_.alloc_(
+        NULL, ccc_buf_elem_size(&q->buf_) * new_cap, q->buf_.aux_);
     if (!new_mem)
     {
         return CCC_MEM_ERR;

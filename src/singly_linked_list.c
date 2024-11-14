@@ -35,7 +35,7 @@ ccc_sll_push_front(ccc_singly_linked_list *const sll, ccc_sll_elem *elem)
     }
     if (sll->alloc_)
     {
-        void *const node = sll->alloc_(NULL, sll->elem_sz_);
+        void *const node = sll->alloc_(NULL, sll->elem_sz_, sll->aux_);
         if (!node)
         {
             return NULL;
@@ -79,7 +79,7 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
     struct ccc_sll_elem_ *const remove = pop_front(sll);
     if (sll->alloc_)
     {
-        (void)sll->alloc_(struct_base(sll, remove), 0);
+        (void)sll->alloc_(struct_base(sll, remove), 0, sll->aux_);
     }
     return CCC_OK;
 }
@@ -154,7 +154,7 @@ ccc_sll_erase(ccc_singly_linked_list *const sll, ccc_sll_elem *const elem)
     elem->n_ = NULL;
     if (sll->alloc_)
     {
-        (void)sll->alloc_(struct_base(sll, elem), 0);
+        (void)sll->alloc_(struct_base(sll, elem), 0, sll->aux_);
     }
     --sll->sz_;
     return ret == &sll->sentinel_ ? NULL : struct_base(sll, ret);
@@ -251,7 +251,7 @@ ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
         }
         if (sll->alloc_)
         {
-            (void)sll->alloc_(mem, 0);
+            (void)sll->alloc_(mem, 0, sll->aux_);
         }
     }
     return CCC_OK;
@@ -350,9 +350,9 @@ erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
     {
         assert(sz <= sll->sz_);
         next = begin->n_;
-        (void)sll->alloc_(struct_base(sll, begin), 0);
+        (void)sll->alloc_(struct_base(sll, begin), 0, sll->aux_);
     }
-    (void)sll->alloc_(struct_base(sll, end), 0);
+    (void)sll->alloc_(struct_base(sll, end), 0, sll->aux_);
     return sz;
 }
 

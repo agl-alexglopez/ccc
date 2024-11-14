@@ -56,7 +56,7 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
             assert(sizeof(*dll_res_) == dll_->elem_sz_);                       \
             if (dll_->alloc_)                                                  \
             {                                                                  \
-                dll_res_ = dll_->alloc_(NULL, dll_->elem_sz_);                 \
+                dll_res_ = dll_->alloc_(NULL, dll_->elem_sz_, dll_->aux_);     \
                 if (dll_res_)                                                  \
                 {                                                              \
                     *dll_res_ = (typeof(*dll_res_))struct_initializer;         \
@@ -79,7 +79,7 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            dll_res_ = dll_->alloc_(NULL, dll_->elem_sz_);                     \
+            dll_res_ = dll_->alloc_(NULL, dll_->elem_sz_, dll_->aux_);         \
             if (dll_res_)                                                      \
             {                                                                  \
                 *dll_res_ = struct_initializer;                                \
