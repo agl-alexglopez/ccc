@@ -21,6 +21,10 @@ jobs:
       - name: Check the diff
         id: check
         run: |
+          make clean
+          rm -rf tests
+          rm -rf util
+          rm -rf samples
           echo "Here are the changed C files:"
           echo "$(git --no-pager diff --name-only HEAD HEAD~1 | grep -E '\.(c|h)$')"
           if git --no-pager diff --name-only HEAD HEAD~1 | grep -qE '\.(c|h)$'; then
@@ -46,9 +50,10 @@ jobs:
 
       - name: Generate Compile Commands
         run: |
-          rm -rf tests/ 
-          rm -rf util/ 
-          rm -rf samples/
+          make clean
+          rm -rf tests 
+          rm -rf util 
+          rm -rf samples
           cmake --preset=clang-deb
 
       - name: Review
