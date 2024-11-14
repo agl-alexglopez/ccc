@@ -3,7 +3,7 @@
 
 A flat priority queue is a contiguous container storing storing elements in
 heap order. This offers tightly packed data for efficient push, pop, min/max
-operations in O(lg N).
+operations in O(lg N). Also, this container requires no intrusive elements.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
