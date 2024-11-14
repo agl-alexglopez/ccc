@@ -97,9 +97,9 @@ $(document).ready(function(){initNavTree('md_INSTALL.html',''); initResizable();
 <h1><a class="anchor" id="autotoc_md12"></a>
 Manual Install Quick Start</h1>
 <ol type="1">
-<li>Use the provided defaults</li>
-<li>Build the library</li>
-<li>Install the library</li>
+<li>Use the provided defaults.</li>
+<li>Build the library.</li>
+<li>Install the library.</li>
 <li>Include the library.</li>
 </ol>
 <p>To complete steps 1-3 with one command try the following if your system supports <code>make</code>.</p>
@@ -196,7 +196,12 @@ User Presets</h1>
 <div class="line">cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
+Generate Documentation</h1>
+<p>Documentation is available <a href="https://agl-alexglopez.github.io/ccc/">HERE</a>. However, if you want to build the documentation locally you will need <code>doxygen</code> and <code>graphviz</code> installed. Then run:</p>
+<div class="fragment"><div class="line">doxygen Doxyfile</div>
+</div><!-- fragment --><p>This will generate documentation in the <code>docs</code> folder. To view the docs in your local browser, double click the <code>docs/html/index.htm</code> file. </p>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- start footer part -->

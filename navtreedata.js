@@ -41,7 +41,8 @@ var NAVTREE =
       [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md12", null ],
       [ "Include the Library", "md_INSTALL.html#autotoc_md13", null ],
       [ "Without Make", "md_INSTALL.html#autotoc_md14", null ],
-      [ "User Presets", "md_INSTALL.html#autotoc_md15", null ]
+      [ "User Presets", "md_INSTALL.html#autotoc_md15", null ],
+      [ "Generate Documentation", "md_INSTALL.html#autotoc_md16", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -69,7 +70,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "flat__realtime__ordered__map_8h.html#aee6facea4fd2cead46927b5391d0a156",
-"traits_8h.html#a27e2d18520c56b3796e6ce0d6aa31a95"
+"traits_8h.html#a25c5c848da545831e1efa54645aae2dd"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
