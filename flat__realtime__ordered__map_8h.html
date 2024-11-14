@@ -287,7 +287,7 @@ Typedefs</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Realtime Ordered Map Interface. </p>
-<p>A flat realtime ordered map offers storage and retrieval by key. This map is suitable for realtime applications if resizing can be limited or controlled.</p>
+<p>A flat realtime ordered map offers storage and retrieval by key. This map is suitable for realtime applications if resizing can be well controlled. Insert operations may cause resizing if allocation is allowed.</p>
 <p>The flat variant of the ordered map promises contiguous storage and random access if needed. Also, all elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
@@ -329,7 +329,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn, \</div>
 <div class="line">                                  aux_data)                                    \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__realtime__ordered__map_8h_html_a36e567ad62e658d6158cabe06d9ec487"><div class="ttname"><a href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></div><div class="ttdeci">union ccc_fromap_entry_ ccc_fromap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_realtime_ordered_map.h:54</div></div>
+<div class="ttc" id="aflat__realtime__ordered__map_8h_html_a36e567ad62e658d6158cabe06d9ec487"><div class="ttname"><a href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></div><div class="ttdeci">union ccc_fromap_entry_ ccc_fromap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_realtime_ordered_map.h:55</div></div>
 </div><!-- fragment -->
 <p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
