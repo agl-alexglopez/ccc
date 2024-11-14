@@ -4,7 +4,7 @@
 A realtime ordered map offers storage and retrieval by key. This map offers
 pointer stability and a strict runtime bound of O(lg N) which is helpful in
 realtime environments. Also, searching is a thread-safe read-only operation.
-Balancing modifications only occur upon insert or remove.
+Balancing modifications only occur upon insertion or removal.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
