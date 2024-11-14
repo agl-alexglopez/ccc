@@ -39,7 +39,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_remove_four_dups)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_insert_erase_shuffled)
 {
-    /* Seed the test with any integer for reproducible randome test sequence
+    /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const size = 50;
@@ -111,7 +111,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_pop_min)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
 {
-    /* Seed the test with any integer for reproducible randome test sequence
+    /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const size = 99;
@@ -180,7 +180,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_weak_srand)
 {
-    /* Seed the test with any integer for reproducible randome test sequence
+    /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_stack_elems = 1000;

@@ -36,7 +36,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
-       randome but a repeatable sequence that makes it
+       random but a repeatable sequence that makes it
        easier to debug if something goes wrong. Think
        of the prime number as a random seed, kind of. */
     size_t shuffled_index = larger_prime % size;

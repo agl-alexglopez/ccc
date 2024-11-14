@@ -176,7 +176,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_weak_srand)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
-    /* Seed the test with any integer for reproducible randome test sequence
+    /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_heap_elems = 1000;
