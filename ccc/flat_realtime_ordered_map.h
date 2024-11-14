@@ -2,7 +2,8 @@
 @brief The Flat Realtime Ordered Map Interface
 
 A flat realtime ordered map offers storage and retrieval by key. This map is
-suitable for realtime applications if resizing can be limited or controlled.
+suitable for realtime applications if resizing can be well controlled. Insert
+operations may cause resizing if allocation is allowed.
 
 The flat variant of the ordered map promises contiguous storage and random
 access if needed. Also, all elements in the map track their relationships via
