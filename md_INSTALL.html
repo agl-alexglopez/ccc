@@ -103,14 +103,16 @@ Manual Install Quick Start</h1>
 <li>Include the library.</li>
 </ol>
 <p>To complete steps 1-3 with one command try the following if your system supports <code>make</code>.</p>
-<div class="fragment"><div class="line">make ccc [OPTIONAL/INSTALL/PATH]</div>
+<div class="fragment"><div class="line">make clang-ccc [OPTIONAL/INSTALL/PATH]</div>
+</div><!-- fragment --><p>Or build and install with gcc. However, a newer gcc than the default on many systems may be required. For example, I compile this library with gcc-14.2 as of the time of writing. To set up a <code>CMakeUserPresets.json</code> file to use a newer gcc, see User Presets.</p>
+<div class="fragment"><div class="line">make gcc-ccc [OPTIONAL/INSTALL/PATH]</div>
 </div><!-- fragment --><p>This will use CMake and your default compiler to build and install the library in release mode. By default, this library does not touch your system paths and it is installed in the <code>install/</code> directory of this folder. This is best for testing the library out while pointing <code>cmake</code> to the install location. Then, deleting the <code>install/</code> folder deletes any trace of this library from your system.</p>
 <p>Then, in your <code>CMakeLists.txt</code>:</p>
 <div class="fragment"><div class="line">find_package(ccc HINTS &quot;~/path/to/ccc-v[VERSION]/install&quot;)</div>
 </div><!-- fragment --><p>If you want to simply write the following command in your <code>CMakeLists.txt</code>,</p>
 <div class="fragment"><div class="line">find_package(ccc)</div>
 </div><!-- fragment --><p>specify that this library shall be installed to a location CMake recognizes by default. For example, my preferred location is as follows:</p>
-<div class="fragment"><div class="line">make ccc ~/.local</div>
+<div class="fragment"><div class="line">make clang-ccc ~/.local</div>
 </div><!-- fragment --><p>Then the installation looks like this.</p>
 <div class="fragment"><div class="line">install</div>
 <div class="line">├── include</div>
@@ -151,7 +153,7 @@ Without Make</h1>
 <p>If your system does not support Makefiles or the <code>make</code> command here are the CMake commands one can run that will do the same.</p>
 <div class="fragment"><div class="line"># Configure the project cmake files.</div>
 <div class="line"># Replace this preset with your own if you&#39;d like.</div>
-<div class="line">cmake --preset=default-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
+<div class="line">cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build</div>
 <div class="line">cmake --build build --target install</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md18"></a>
@@ -197,6 +199,11 @@ User Presets</h1>
 <div class="line">        }</div>
 <div class="line">    ]</div>
 <div class="line">}</div>
+</div><!-- fragment --><p>Then your preset can be invoked as follows:</p>
+<div class="fragment"><div class="line"># Your preferred preset with the same other steps as before.</div>
+<div class="line">cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
+<div class="line">cmake --build build</div>
+<div class="line">cmake --build build --target install</div>
 </div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
