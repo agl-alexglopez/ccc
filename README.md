@@ -4,7 +4,7 @@ The C Container Collection offers a variety of containers for C programmers who 
 
 ## Installation
 
-Currently, this library supports a manual installation via CMake. See the [INSTALL.md](INSTALL.md) file for more details.
+Currently, this library supports a manual installation via CMake. See the [INSTALL.md](INSTALL.md) file for more details. This file is also included when you download a simplified release from the [Releases](https://github.com/agl-alexglopez/ccc/releases) page.
 
 ## Quick Start
 
