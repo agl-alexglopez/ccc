@@ -60,9 +60,3 @@ jobs:
         make clang-deb
         make install
 
-    - name: Build with GCC and Makefile Generator
-      run: |
-        make clean
-        make clang-deb
-        make install
-
