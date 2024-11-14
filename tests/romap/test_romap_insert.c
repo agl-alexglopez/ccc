@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
 {
     ccc_realtime_ordered_map s
         = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
-    /* Seed the test with any integer for reproducible randome test sequence
+    /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
