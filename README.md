@@ -42,10 +42,10 @@ The handle to the container element is then passed by reference to all functions
 If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.
 
 ```c
-typedef void *ccc_alloc_fn(void *ptr, size_t size);
+typedef void *ccc_alloc_fn(void *ptr, size_t size, void *aux);
 ```
 
-An allocation function implements the following behavior, where ptr is pointer to memory, size is number of bytes to allocate, and aux is a reference to any supplementary information required for allocation, deallocation, or reallocation. Aux is passed to a container upon its initialization and the programmer may choose how to best utilize this reference.
+An allocation function implements the following behavior, where ptr is pointer to memory, size is number of bytes to allocate, and aux is a reference to any supplementary information required for allocation, deallocation, or reallocation. The aux parameter is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (read on for more on aux).
 
 - If NULL is provided with a size of 0, NULL is returned.
 - If NULL is provided with a non-zero size, new memory is allocated/returned.
