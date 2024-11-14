@@ -240,6 +240,21 @@ ccc_pq_order(ccc_priority_queue const *const pq)
     return pq ? pq->order_ : CCC_CMP_ERR;
 }
 
+/*=========================  Private Interface     ==========================*/
+
+void
+ccc_impl_pq_push(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+{
+    (void)ccc_pq_push(pq, e);
+}
+
+struct ccc_pq_elem_ *
+ccc_impl_pq_elem_in(struct ccc_pq_ const *const pq,
+                    void const *const user_struct)
+{
+    return elem_in(pq, user_struct);
+}
+
 /*========================   Static Helpers   ================================*/
 
 static inline ccc_threeway_cmp

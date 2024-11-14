@@ -8,7 +8,8 @@
    opportunity. */
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define BUFFER_USING_NAMESPACE_CCC
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define ORDERED_MAP_USING_NAMESPACE_CCC
 
 #include <assert.h>
@@ -20,14 +21,15 @@
 #include <string.h>
 #include <time.h>
 
-#include "ccc/flat_priority_queue.h"
+#include "alloc.h"
+#include "ccc/buffer.h"
 #include "ccc/ordered_map.h"
+#include "ccc/priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
 #include "random.h"
 #include "str_view/str_view.h"
-#include "util/alloc.h"
 
 /*=======================   Maze Helper Types   =============================*/
 
@@ -63,13 +65,8 @@ struct priority_cell
 {
     struct point cell;
     int priority;
-};
-
-struct point_cost
-{
-    struct point p;
-    int cost;
-    omap_elem elem;
+    pq_elem pq_elem;
+    omap_elem map_elem;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -108,6 +105,9 @@ uint16_t const south_wall = 0b0100;
 uint16_t const west_wall = 0b1000;
 uint16_t const cached_bit = 0b0001000000000000;
 
+static buffer cell_bump_arena
+    = buf_init((struct priority_cell *)NULL, NULL, 0, 0);
+
 /*==========================   Prototypes  ================================= */
 
 static void animate_maze(struct maze *);
@@ -127,6 +127,7 @@ static struct point pick_rand_point(struct maze const *);
 static threeway_cmp cmp_priority_cells(cmp);
 static threeway_cmp cmp_points(key_cmp);
 static struct int_conversion parse_digits(str_view);
+static void *buf_bump_allocator(void *ptr, size_t size);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -205,22 +206,25 @@ main(int argc, char **argv)
 static void
 animate_maze(struct maze *maze)
 {
-    /* Setting up the data structures needed should look similar to C++.
-       A ordered_map could be replaced by a 2D vector copy of the maze with
-       costs mapped but the purpose of this program is to test both the set and
-       priority queue data structures. Also a 2D vector wastes space. */
-    flat_priority_queue cells
-        = fpq_init((struct priority_cell *)NULL, 0, CCC_LES, std_alloc,
-                   cmp_priority_cells, NULL);
-    ordered_map cell_costs = om_init(cell_costs, struct point_cost, elem, p,
-                                     std_alloc, cmp_points, NULL);
-    struct point_cost odd_point
-        = {.p = pick_rand_point(maze), .cost = rand_range(0, 100)};
-    [[maybe_unused]] entry const ent = try_insert(&cell_costs, &odd_point.elem);
-    assert(!occupied(&ent));
-    (void)fpq_emplace(&cells,
-                      (struct priority_cell){.cell = odd_point.p,
-                                             .priority = odd_point.cost});
+    /* When the container chooses not to participate in allocation we can form
+       some nice compositions of containers. And when we know that we will only
+       ever insert into a map we can make further optimizations with a dead
+       simple allocator. */
+    result r = buf_alloc(&cell_bump_arena, ((size_t)maze->rows * maze->cols),
+                         std_alloc);
+    assert(r == CCC_OK && buf_capacity(&cell_bump_arena) != 0);
+    priority_queue cells = pq_init(struct priority_cell, pq_elem, CCC_LES, NULL,
+                                   cmp_priority_cells, NULL);
+    ordered_map cell_costs
+        = om_init(cell_costs, struct priority_cell, map_elem, cell,
+                  buf_bump_allocator, cmp_points, NULL);
+    struct priority_cell *const cell = unwrap(om_try_insert_w(
+        &cell_costs, pick_rand_point(maze),
+        (struct priority_cell){.cell = pick_rand_point(maze),
+                               .priority = rand_range(0, 100)}));
+    assert(cell);
+    (void)push(&cells, &cell->pq_elem);
+    assert(ccc_buf_size(&cell_bump_arena) == 1);
 
     int const animation_speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
@@ -229,7 +233,7 @@ animate_maze(struct maze *maze)
     {
         struct priority_cell const *const cur = front(&cells);
         *maze_at_mut(maze, cur->cell) |= cached_bit;
-        struct point min_neighbor = {0};
+        struct priority_cell *min_neighbor = NULL;
         int min_weight = INT_MAX;
         for (size_t i = 0; i < build_dirs_size; ++i)
         {
@@ -244,30 +248,30 @@ animate_maze(struct maze *maze)
                rand_range is never called. This technique also means cells
                can be given weights lazily as we go rather than all at once
                before the main algorithm starts. */
-            struct point_cost const *const found = om_or_insert_w(
+            struct priority_cell *const found = om_or_insert_w(
                 entry_r(&cell_costs, &next),
-                (struct point_cost){.p = next, .cost = rand_range(0, 100)});
+                (struct priority_cell){.cell = next,
+                                       .priority = rand_range(0, 100)});
             assert(found);
-            if (found->cost < min_weight)
+            if (found->priority < min_weight)
             {
-                min_weight = found->cost;
-                min_neighbor = next;
+                min_weight = found->priority;
+                min_neighbor = found;
             }
         }
-        if (min_neighbor.r)
+        if (min_neighbor)
         {
-            join_squares_animated(maze, cur->cell, min_neighbor,
+            join_squares_animated(maze, cur->cell, min_neighbor->cell,
                                   animation_speed);
-            fpq_emplace(&cells, (struct priority_cell){.cell = min_neighbor,
-                                                       .priority = min_weight});
+            (void)push(&cells, &min_neighbor->pq_elem);
         }
         else
         {
             (void)pop(&cells);
         }
     }
-    (void)om_clear(&cell_costs, NULL);
-    (void)fpq_clear_and_free(&cells, NULL);
+    result l = ccc_buf_alloc(&cell_bump_arena, 0, std_alloc);
+    assert(l == CCC_OK);
 }
 
 static struct point
@@ -464,20 +468,36 @@ cmp_priority_cells(cmp const cmp_cells)
 static threeway_cmp
 cmp_points(key_cmp const cmp_points)
 {
-    struct point_cost const *const a = cmp_points.user_type_rhs;
+    struct priority_cell const *const a = cmp_points.user_type_rhs;
     struct point const *const key = cmp_points.key_lhs;
-    if (a->p.r == key->r && a->p.c == key->c)
+    if (a->cell.r == key->r && a->cell.c == key->c)
     {
         return CCC_EQL;
     }
-    if (a->p.r == key->r)
+    if (a->cell.r == key->r)
     {
-        return (key->c > a->p.c) - (key->c < a->p.c);
+        return (key->c > a->cell.c) - (key->c < a->cell.c);
     }
-    return (key->r > a->p.r) - (key->r < a->p.r);
+    return (key->r > a->cell.r) - (key->r < a->cell.r);
 }
 
 /*===========================    Misc    ====================================*/
+
+static void *
+buf_bump_allocator(void *const ptr, size_t const size)
+{
+    if (!ptr && !size)
+    {
+        return NULL;
+    }
+    if (!ptr)
+    {
+        return ccc_buf_alloc_back(&cell_bump_arena);
+    }
+    /* Freeing and reallocation are not supported in a bump allocator. */
+    assert(!"You shouldn't be here this is a bump allocator!");
+    return NULL;
+}
 
 static struct int_conversion
 parse_digits(str_view arg)
