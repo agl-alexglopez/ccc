@@ -4,9 +4,9 @@ Currently, this library utilizes some features that many compilers support such 
 
 ## Manual Install Quick Start
 
-1. Use the provided defaults
-2. Build the library
-3. Install the library
+1. Use the provided defaults.
+2. Build the library.
+3. Install the library.
 4. Include the library.
 
 To complete steps 1-3 with one command try the following if your system supports `make`.
@@ -148,3 +148,13 @@ cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
 cmake --build build
 cmake --build build --target install
 ```
+
+## Generate Documentation
+
+Documentation is available [HERE](https://agl-alexglopez.github.io/ccc/). However, if you want to build the documentation locally you will need `doxygen` and `graphviz` installed. Then run:
+
+```zsh
+doxygen Doxyfile
+```
+
+This will generate documentation in the `docs` folder. To view the docs in your local browser, double click the `docs/html/index.htm` file.
