@@ -36,28 +36,30 @@
             "name": "gcc-deb",
             "inherits": "default-deb",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-12"
+                "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {
             "name": "gcc-rel",
             "inherits": "default-rel",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-12"
+                "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {
             "name": "clang-deb",
             "inherits": "default-deb",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang"
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -static -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
             "name": "clang-rel",
             "inherits": "default-rel",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang"
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_C_FLAGS": "-Wall -Wextra -static -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
