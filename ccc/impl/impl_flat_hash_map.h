@@ -1,9 +1,9 @@
 #ifndef CCC_IMPL_FLAT_HASH_MAP_H
 #define CCC_IMPL_FLAT_HASH_MAP_H
 
-#include "buffer.h"
+#include "../buffer.h"
+#include "../types.h"
 #include "impl_types.h"
-#include "types.h"
 
 /** @cond */
 #include <assert.h>

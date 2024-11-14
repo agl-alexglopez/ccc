@@ -1,5 +1,5 @@
 #include "priority_queue.h"
-#include "impl_priority_queue.h"
+#include "impl/impl_priority_queue.h"
 #include "types.h"
 
 #include <stdbool.h>

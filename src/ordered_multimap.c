@@ -1,7 +1,7 @@
 #include "ordered_multimap.h"
-#include "impl_ordered_multimap.h"
-#include "impl_tree.h"
-#include "impl_types.h"
+#include "impl/impl_ordered_multimap.h"
+#include "impl/impl_tree.h"
+#include "impl/impl_types.h"
 #include "types.h"
 
 #include <assert.h>

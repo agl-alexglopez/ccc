@@ -11,7 +11,7 @@ traits. */
 #ifndef CCC_TRAITS_H
 #define CCC_TRAITS_H
 
-#include "impl_traits.h"
+#include "impl/impl_traits.h"
 
 /** @name Entry Interface
 Obtain and operate on container entries for efficient queries when non-trivial

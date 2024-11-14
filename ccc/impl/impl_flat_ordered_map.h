@@ -1,8 +1,8 @@
 #ifndef CCC_IMPL_FLAT_ORDERED_MAP_H
 #define CCC_IMPL_FLAT_ORDERED_MAP_H
 
-#include "buffer.h"
-#include "types.h"
+#include "../buffer.h"
+#include "../types.h"
 
 /** @cond */
 #include <stddef.h>

@@ -36,7 +36,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_flat_ordered_map.h"
+#include "impl/impl_flat_ordered_map.h"
 #include "types.h"
 
 /** @brief A self-optimizing data structure offering amortized O(lg N) search,

@@ -15,7 +15,7 @@ the allocation function interface. */
 #include <stdint.h>
 /** @endcond */
 
-#include "impl_types.h"
+#include "impl/impl_types.h"
 
 /** @brief The result of a range query on iterable containers.
 

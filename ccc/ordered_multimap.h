@@ -37,7 +37,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_ordered_multimap.h"
+#include "impl/impl_ordered_multimap.h"
 #include "types.h"
 
 /** @brief A container for membership testing by key field, allowing duplicate

@@ -2,23 +2,22 @@
 #define CCC_IMPL_TRAITS_H
 
 /* NOLINTBEGIN */
-#include "buffer.h"
-#include "doubly_linked_list.h"
-#include "flat_double_ended_queue.h"
-#include "flat_hash_map.h"
-#include "flat_ordered_map.h"
-#include "flat_priority_queue.h"
-#include "flat_realtime_ordered_map.h"
-#include "ordered_map.h"
-#include "ordered_multimap.h"
-#include "priority_queue.h"
-#include "realtime_ordered_map.h"
-#include "singly_linked_list.h"
-#include "types.h"
+#include "../buffer.h"
+#include "../doubly_linked_list.h"
+#include "../flat_double_ended_queue.h"
+#include "../flat_hash_map.h"
+#include "../flat_ordered_map.h"
+#include "../flat_priority_queue.h"
+#include "../flat_realtime_ordered_map.h"
+#include "../ordered_map.h"
+#include "../ordered_multimap.h"
+#include "../priority_queue.h"
+#include "../realtime_ordered_map.h"
+#include "../singly_linked_list.h"
+#include "../types.h"
 /* NOLINTEND */
 
-/*======================     Entry Interface
- * =====================================*/
+/*======================     Entry Interface   ==============================*/
 
 #define ccc_impl_insert(container_ptr, insert_args...)                         \
     _Generic((container_ptr),                                                  \
@@ -283,8 +282,7 @@
         ccc_romap_entry *: ccc_rom_insert_error,                               \
         ccc_romap_entry const *: ccc_rom_insert_error)((container_entry_ptr))
 
-/*======================    Misc Search Interface
- * ================================*/
+/*======================    Misc Search Interface ===========================*/
 
 #define ccc_impl_get_key_val(container_ptr, key_ptr...)                        \
     _Generic((container_ptr),                                                  \
@@ -311,7 +309,7 @@
         ccc_realtime_ordered_map const *: ccc_rom_contains,                    \
         ccc_ordered_multimap *: ccc_omm_contains)((container_ptr), key_ptr)
 
-/*================       Sequential Containers Interface =====================*/
+/*================    Sequential Containers Interface   =====================*/
 
 #define ccc_impl_push(container_ptr, container_handle_ptr...)                  \
     _Generic((container_ptr),                                                  \
@@ -591,8 +589,7 @@
         ccc_doubly_linked_list const *: ccc_dll_splice_range)(                 \
         (container_ptr), splice_range_args)
 
-/*===================    Standard Getters Interface
- * ==============================*/
+/*===================    Standard Getters Interface   =======================*/
 
 #define ccc_impl_size(container_ptr)                                           \
     _Generic((container_ptr),                                                  \

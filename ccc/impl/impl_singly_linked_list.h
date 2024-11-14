@@ -1,7 +1,7 @@
 #ifndef CCC_IMPL_SINGLY_LINKED_LIST_H
 #define CCC_IMPL_SINGLY_LINKED_LIST_H
 
-#include "types.h"
+#include "../types.h"
 
 /** @cond */
 #include <assert.h>

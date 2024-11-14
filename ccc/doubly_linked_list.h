@@ -29,7 +29,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_doubly_linked_list.h"
+#include "impl/impl_doubly_linked_list.h"
 #include "types.h"
 
 /** @brief A container offering bidirectional, insert, removal, and iteration.

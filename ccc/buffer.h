@@ -36,7 +36,7 @@ Then, the `ccc_` prefix can be dropped from all types and functions. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_buffer.h"
+#include "impl/impl_buffer.h"
 #include "types.h"
 
 /** @brief A contiguous block of storage for elements of the same type.

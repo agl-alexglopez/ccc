@@ -30,7 +30,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_flat_double_ended_queue.h"
+#include "impl/impl_flat_double_ended_queue.h"
 #include "types.h"
 
 /** @brief A contiguous buffer for O(1) push and pop from front and back.

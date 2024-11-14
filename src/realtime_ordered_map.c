@@ -27,8 +27,8 @@ Overall a WAVL tree is quite impressive for it's simplicity and purported
 improvements over AVL and Red-Black trees. The rank framework is intuitive
 and flexible in how it can be implemented. */
 #include "realtime_ordered_map.h"
-#include "impl_realtime_ordered_map.h"
-#include "impl_types.h"
+#include "impl/impl_realtime_ordered_map.h"
+#include "impl/impl_types.h"
 #include "types.h"
 
 #include <assert.h>

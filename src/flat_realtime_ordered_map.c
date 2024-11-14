@@ -30,8 +30,8 @@ improvements over AVL and Red-Black trees. The rank framework is intuitive
 and flexible in how it can be implemented. */
 #include "flat_realtime_ordered_map.h"
 #include "buffer.h"
-#include "impl_flat_realtime_ordered_map.h"
-#include "impl_types.h"
+#include "impl/impl_flat_realtime_ordered_map.h"
+#include "impl/impl_types.h"
 #include "types.h"
 
 #include <assert.h>

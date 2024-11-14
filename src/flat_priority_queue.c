@@ -1,6 +1,6 @@
 #include "flat_priority_queue.h"
 #include "buffer.h"
-#include "impl_flat_priority_queue.h"
+#include "impl/impl_flat_priority_queue.h"
 #include "types.h"
 
 #include <assert.h>

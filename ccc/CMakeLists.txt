@@ -2,7 +2,7 @@ add_library(types)
 target_sources(types
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/types.c
-        impl_types.h
+        impl/impl_types.h
     PUBLIC 
         FILE_SET types_header
             TYPE HEADERS
@@ -15,7 +15,7 @@ add_library(buffer)
 target_sources(buffer
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/buffer.c
-        impl_buffer.h
+        impl/impl_buffer.h
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS
@@ -32,7 +32,7 @@ add_library(doubly_linked_list)
 target_sources(doubly_linked_list
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
-        impl_doubly_linked_list.h
+        impl/impl_doubly_linked_list.h
     PUBLIC 
         FILE_SET doubly_linked_list_header
             TYPE HEADERS
@@ -49,7 +49,7 @@ add_library(singly_linked_list)
 target_sources(singly_linked_list
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
-        impl_singly_linked_list.h
+        impl/impl_singly_linked_list.h
     PUBLIC 
         FILE_SET singly_linked_list_header
             TYPE HEADERS
@@ -66,7 +66,7 @@ add_library(priority_queue)
 target_sources(priority_queue
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/priority_queue.c
-        impl_priority_queue.h
+        impl/impl_priority_queue.h
     PUBLIC 
         FILE_SET priority_queue_header
             TYPE HEADERS
@@ -83,7 +83,7 @@ add_library(flat_priority_queue)
 target_sources(flat_priority_queue
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
-        impl_flat_priority_queue.h
+        impl/impl_flat_priority_queue.h
     PUBLIC 
         FILE_SET buffer_header
             TYPE HEADERS
@@ -102,7 +102,7 @@ add_library(flat_hash_map)
 target_sources(flat_hash_map
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
-        impl_flat_hash_map.h
+        impl/impl_flat_hash_map.h
     PUBLIC 
         FILE_SET flat_hash_map_header
             TYPE HEADERS
@@ -121,7 +121,7 @@ add_library(ordered_multimap)
 target_sources(ordered_multimap
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/ordered_multimap.c
-        impl_ordered_multimap.h
+        impl/impl_ordered_multimap.h
     PUBLIC 
         FILE_SET ordered_multimap_header
             TYPE HEADERS
@@ -138,7 +138,7 @@ add_library(ordered_map)
 target_sources(ordered_map
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/ordered_map.c
-        impl_ordered_map.h
+        impl/impl_ordered_map.h
     PUBLIC 
         FILE_SET ordered_map_header
             TYPE HEADERS
@@ -155,7 +155,7 @@ add_library(flat_ordered_map)
 target_sources(flat_ordered_map
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/flat_ordered_map.c
-        impl_flat_ordered_map.h
+        impl/impl_flat_ordered_map.h
     PUBLIC 
         FILE_SET flat_ordered_map_header
             TYPE HEADERS
@@ -174,7 +174,7 @@ add_library(realtime_ordered_map)
 target_sources(realtime_ordered_map
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
-        impl_realtime_ordered_map.h
+        impl/impl_realtime_ordered_map.h
     PUBLIC 
         FILE_SET realtime_ordered_map_header
             TYPE HEADERS
@@ -191,7 +191,7 @@ add_library(flat_realtime_ordered_map)
 target_sources(flat_realtime_ordered_map
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/flat_realtime_ordered_map.c
-        impl_flat_realtime_ordered_map.h
+        impl/impl_flat_realtime_ordered_map.h
     PUBLIC 
         FILE_SET flat_realtime_ordered_map_header
             TYPE HEADERS
@@ -210,7 +210,7 @@ add_library(flat_double_ended_queue)
 target_sources(flat_double_ended_queue
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
-        impl_flat_double_ended_queue.h
+        impl/impl_flat_double_ended_queue.h
     PUBLIC 
         FILE_SET flat_double_ended_queue_header
             TYPE HEADERS
@@ -228,7 +228,7 @@ target_link_libraries(flat_double_ended_queue
 add_library(traits INTERFACE)
 target_sources(traits
     PRIVATE
-        impl_traits.h
+        impl/impl_traits.h
     INTERFACE
         FILE_SET traits_header
             TYPE HEADERS
@@ -276,21 +276,21 @@ target_sources(${PROJECT_NAME}
             TYPE HEADERS
             BASE_DIRS ${PROJECT_SOURCE_DIR}
             FILES 
-              impl_types.h
-              impl_flat_priority_queue.h
-              impl_tree.h
-              impl_priority_queue.h
-              impl_ordered_map.h
-              impl_flat_ordered_map.h
-              impl_ordered_multimap.h
-              impl_singly_linked_list.h
-              impl_doubly_linked_list.h
-              impl_realtime_ordered_map.h
-              impl_flat_realtime_ordered_map.h
-              impl_traits.h
-              impl_flat_double_ended_queue.h
-              impl_flat_hash_map.h
-              impl_buffer.h
+              impl/impl_types.h
+              impl/impl_flat_priority_queue.h
+              impl/impl_tree.h
+              impl/impl_priority_queue.h
+              impl/impl_ordered_map.h
+              impl/impl_flat_ordered_map.h
+              impl/impl_ordered_multimap.h
+              impl/impl_singly_linked_list.h
+              impl/impl_doubly_linked_list.h
+              impl/impl_realtime_ordered_map.h
+              impl/impl_flat_realtime_ordered_map.h
+              impl/impl_traits.h
+              impl/impl_flat_double_ended_queue.h
+              impl/impl_flat_hash_map.h
+              impl/impl_buffer.h
               types.h
               buffer.h
               flat_hash_map.h

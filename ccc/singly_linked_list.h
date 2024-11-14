@@ -30,7 +30,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_singly_linked_list.h"
+#include "impl/impl_singly_linked_list.h"
 #include "types.h"
 
 /** @brief A low overhead front tracking container with efficient push and pop.

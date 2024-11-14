@@ -1,8 +1,8 @@
 #ifndef CCC_IMPL_REALTIME_ORDERED_MAP_H
 #define CCC_IMPL_REALTIME_ORDERED_MAP_H
 
+#include "../types.h"
 #include "impl_types.h"
-#include "types.h"
 
 /** @cond */
 #include <stddef.h>

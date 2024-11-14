@@ -1,6 +1,6 @@
 #include "flat_double_ended_queue.h"
 #include "buffer.h"
-#include "impl_flat_double_ended_queue.h"
+#include "impl/impl_flat_double_ended_queue.h"
 #include "types.h"
 
 #include <assert.h>

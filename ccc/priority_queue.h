@@ -23,7 +23,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl_priority_queue.h"
+#include "impl/impl_priority_queue.h"
 #include "types.h"
 
 /** @brief A container for pointer stability and an O(1) push and amortized o(lg

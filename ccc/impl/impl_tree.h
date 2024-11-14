@@ -10,8 +10,8 @@
 #ifndef CCC_IMPL_TREE_H
 #define CCC_IMPL_TREE_H
 
+#include "../types.h"
 #include "impl_types.h"
-#include "types.h"
 
 /** @cond */
 #include <stdbool.h>
