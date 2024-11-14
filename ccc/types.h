@@ -141,7 +141,7 @@ An allocation function implements the following behavior, where ptr is pointer
 to memory, size is number of bytes to allocate, and aux is a reference to any
 supplementary information required for allocation, deallocation, or
 reallocation. Aux is passed to a container upon its initialization and the
-programmer may choose how to best utilize this reference.
+programmer may choose how to best utilize this reference (more on aux later).
 
 - If NULL is provided with a size of 0, NULL is returned.
 - If NULL is provided with a non-zero size, new memory is allocated/returned.
@@ -158,9 +158,8 @@ standard library allocator might be implemented as follows (aux is not needed):
 
 ```
 void *
-std_alloc(void *const ptr, size_t const size, void *const aux)
+std_alloc(void *const ptr, size_t const size, void *)
 {
-    (void)aux;
     if (!ptr && !size)
     {
         return NULL;
