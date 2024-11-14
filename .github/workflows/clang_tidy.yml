@@ -47,7 +47,7 @@ jobs:
       - name: Generate Compile Commands
         run: |
           rm -rf tests/ util/ samples/
-          cmake --preset=gcc-deb
+          cmake --preset=clang-deb
 
       - name: Review
         uses: ZedThree/clang-tidy-review@v0.19.0
