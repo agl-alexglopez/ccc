@@ -12,7 +12,13 @@ Currently, this library utilizes some features that many compilers support such 
 To complete steps 1-3 with one command try the following if your system supports `make`.
 
 ```zsh
-make ccc [OPTIONAL/INSTALL/PATH]
+make clang-ccc [OPTIONAL/INSTALL/PATH]
+```
+
+Or build and install with gcc. However, a newer gcc than the default on many systems may be required. For example, I compile this library with gcc-14.2 as of the time of writing. To set up a `CMakeUserPresets.json` file to use a newer gcc, see [User Presets](#user-presets).
+
+```zsh
+make gcc-ccc [OPTIONAL/INSTALL/PATH]
 ```
 
 This will use CMake and your default compiler to build and install the library in release mode. By default, this library does not touch your system paths and it is installed in the `install/` directory of this folder. This is best for testing the library out while pointing `cmake` to the install location. Then, deleting the `install/` folder deletes any trace of this library from your system.
@@ -32,7 +38,7 @@ find_package(ccc)
 specify that this library shall be installed to a location CMake recognizes by default. For example, my preferred location is as follows:
 
 ```zsh
-make ccc ~/.local
+make clang-ccc ~/.local
 ```
 
 Then the installation looks like this.
@@ -98,7 +104,7 @@ If your system does not support Makefiles or the `make` command here are the CMa
 ```zsh
 # Configure the project cmake files.
 # Replace this preset with your own if you'd like.
-cmake --preset=default-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
+cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
 cmake --build build
 cmake --build build --target install
 ```
@@ -148,4 +154,13 @@ If you do not like the default presets, create a `CMakeUserPresets.json` in this
         }
     ]
 }
+```
+
+Then your preset can be invoked as follows:
+
+```zsh
+# Your preferred preset with the same other steps as before.
+cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
+cmake --build build
+cmake --build build --target install
 ```
