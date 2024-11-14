@@ -221,10 +221,10 @@ animate_maze(struct maze *maze)
        so that is half of the squares. */
     size_t const cap = (((size_t)maze->rows * maze->cols) / 2) + 1;
     size_t bytes = cap * sizeof(struct prim_cell);
-    /* Calling malloc like this is kind of nice to get rid of a dangling ref
+    /* Calling alloc like this is kind of nice to get rid of a dangling ref
        but we need to have some kind of sanity check. */
-    buffer bump_arena
-        = buf_init(((struct prim_cell *)malloc(bytes)), NULL, NULL, cap);
+    buffer bump_arena = buf_init(
+        ((struct prim_cell *)std_alloc(NULL, bytes, NULL)), NULL, NULL, cap);
     assert(buf_begin(&bump_arena) != NULL);
     /* Priority queue elements will not participate in allocation. They piggy
        back on the ordered map memory because the relationship is 1-to-1. */
@@ -256,11 +256,11 @@ animate_maze(struct maze *maze)
             {
                 continue;
             }
-            /* The Entry Interface helps make what would be an if else branch
-               a simple lazily evaluated insertion. If the entry is Occupied
-               rand_range is never called. This technique also means cells
-               can be given weights lazily as we go rather than all at once
-               before the main algorithm starts. */
+            /* The Entry Interface helps make what would be an if else
+               branch a simple lazily evaluated insertion. If the entry is
+               Occupied rand_range is never called. This technique also
+               means cells can be given weights lazily as we go rather than
+               all at once before the main algorithm starts. */
             struct prim_cell *const cell = om_or_insert_w(
                 entry_r(&costs, &next),
                 (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
@@ -271,15 +271,13 @@ animate_maze(struct maze *maze)
                 min_cell = cell;
             }
         }
-        if (min_cell)
-        {
-            join_squares_animated(maze, c->cell, min_cell->cell, speed);
-            (void)push(&cells, &min_cell->pq_elem);
-        }
-        else
+        if (!min_cell)
         {
             (void)pop(&cells);
+            continue;
         }
+        join_squares_animated(maze, c->cell, min_cell->cell, speed);
+        (void)push(&cells, &min_cell->pq_elem);
     }
     /* Thanks to how the containers worked together there was only a single
        allocation and free from the heap's perspective. */
@@ -445,18 +443,21 @@ print_square(struct maze const *m, struct point p)
     }
 }
 
+/** Square by mutable reference. */
 static uint16_t *
 maze_at_r(struct maze const *const maze, struct point p)
 {
     return &maze->maze[(p.r * maze->cols) + p.c];
 }
 
+/** Square by value. */
 static uint16_t
 maze_at(struct maze const *const maze, struct point p)
 {
     return maze->maze[(p.r * maze->cols) + p.c];
 }
 
+/** Can't build if square has been seen/cached. */
 static bool
 can_build_new_square(struct maze const *const maze, struct point const next)
 {
@@ -477,8 +478,8 @@ cmp_priority_cells(cmp const cmp_cells)
 static threeway_cmp
 cmp_priority_pos(key_cmp const cmp_points)
 {
-    struct prim_cell const *const a_rhs = cmp_points.user_type_rhs;
     struct point const *const key_lhs = cmp_points.key_lhs;
+    struct prim_cell const *const a_rhs = cmp_points.user_type_rhs;
     if (a_rhs->cell.r == key_lhs->r && a_rhs->cell.c == key_lhs->c)
     {
         return CCC_EQL;
