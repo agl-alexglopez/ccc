@@ -4,7 +4,7 @@ Currently, this library utilizes some features that many compilers support such 
 
 ## Manual Install Quick Start
 
-1. Use the provided defaults 
+1. Use the provided defaults
 2. Build the library
 3. Install the library
 4. Include the library.
@@ -45,9 +45,6 @@ install
 │       ├── double_ended_priority_queue.h
 │       ├── doubly_linked_list.h
 │       ├── flat_hash_map.h
-│       ├── flat_priority_queue.h
-│       ├── ordered_map.h
-│       ├── priority_queue.h
 │       └── ...continues
 └── lib
     ├── cmake
@@ -63,7 +60,7 @@ Now to delete the library if needed, simply find all folders and files with the 
 
 ## Include the Library
 
-Once CMake can find the package, link against it and include the `ccc.h` header.
+Once CMake can find the package, link against it and include the container header.
 
 The `CMakeLists.txt` file.
 
@@ -80,7 +77,7 @@ The C code.
 
 ## Alternative Builds
 
-You may wish to use a different compiler and toolchain than what your system default specifies. Review the `CMakePrests.json` file for different compilers.
+You may wish to use a different compiler and tool chain than what your system default specifies. Review the `CMakePrests.json` file for different compilers.
 
 ```zsh
 make gcc-rel [OPTIONAL/INSTALL/PATH]
@@ -96,10 +93,10 @@ make install
 
 ## Without Make
 
-If your system does not support Makefiles or the `make` command here are the cmake commands one can run that will do the same.
+If your system does not support Makefiles or the `make` command here are the CMake commands one can run that will do the same.
 
 ```zsh
-# Configure the project cmake files. 
+# Configure the project cmake files.
 # Replace this preset with your own if you'd like.
 cmake --preset=default-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
 cmake --build build
@@ -108,7 +105,7 @@ cmake --build build --target install
 
 ## User Presets
 
-If you do not like the default presets, create a `CMakeUserPresets.json` in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use a newer gcc version than the default presets specify.
+If you do not like the default presets, create a `CMakeUserPresets.json` in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.
 
 ```json
 {
@@ -123,14 +120,14 @@ If you do not like the default presets, create a `CMakeUserPresets.json` in this
             "name": "deb",
             "inherits": "default-deb",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-12"
+                "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {
             "name": "rel",
             "inherits": "default-rel",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-12"
+                "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {

@@ -1,6 +1,6 @@
 # C Container Collection (CCC)
 
-The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. This means it is possible to write a program in which a container never allocates or frees a single byte of your memory. For the motivations of why such a library is helpful in C read on.
+The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. For the motivations of why such a library is helpful in C read on.
 
 ## Installation
 
@@ -8,7 +8,9 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 
 ## Quick Start
 
-Read the documentation [HERE](https://agl-alexglopez.github.io/ccc). To get started, read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the container you want to use. Also check out [types.h](https://agl-alexglopez.github.io/ccc/files.html) to acquaint yourself with the `ccc_alloc_fn` abstraction and decide if you need allocating or non-allocating containers in your project.
+- Read the [DOCS](https://agl-alexglopez.github.io/ccc).
+- Read [types.h](https://agl-alexglopez.github.io/ccc/files.html) to understand the `ccc_alloc_fn` interface.
+- Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
 
 ## Design
 
@@ -16,9 +18,9 @@ Read the documentation [HERE](https://agl-alexglopez.github.io/ccc). To get star
 
 Here is the main argument of this library:
 
-> Containers in C should avoid limiting the control and flexibility offered by the C language.
+**Containers in C should avoid limiting the control and flexibility offered by the C language.**
 
-There are many excellent data structure libraries in C (see the [related](#related) section). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.
+There are many excellent data structure libraries in C (see the [related](#related) section of this document). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.
 
 The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer data structures as their literal interpretation; they structure the data they are given according to the container's invariants with no memory related side effects. The concerns of the container are now separate from those of the programmer. The container takes no part in the scope or lifetime of the programmer's provided memory, simply structuring it within the container as promised by the interface.
 
@@ -82,7 +84,7 @@ However, the above example is only useful if the standard library allocator is u
 
 #### Constructors
 
-Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped block for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.
+Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.
 
 Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).
 
@@ -114,9 +116,16 @@ The above functions free the resources of the container. Because there is no way
 
 For examples of what code that uses these ideas looks like, read and use the sample programs in the `samples/`. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.
 
+## Miscellaneous Why?
+
+- Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also debugging your own function is nice.
+- Why not header only? I want the library to be readable, maintainable, and updateable, especially if I want to change implementations in the source files. If the user wants to explore the implementation everything should be easily understandable.
+- Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.
+- Why flat maps? Mostly experimenting. Flat maps track the tree structure through indices not pointers. This makes the data structure copyable, relocatable, serializable, or writable to disk at the cost of pointer stability in most cases.
+
 ## Related
 
-Here are some excellent data structure libraries I have found for C. Many of them are simple, fast, and elegant, taking care of all memory management for you.
+If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.
 
 - [STC - Smart Template Containers](https://github.com/stclib/STC)
 - [C Template Library (CTL)](https://github.com/glouw/ctl)
