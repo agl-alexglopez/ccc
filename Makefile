@@ -1,4 +1,4 @@
-.PHONY: ccc default build rel deb crel cdeb dsan rsan clean tests samples all-deb all-rel all-dsan all-rsan all-cdeb all-crel dtest rtest util tidy format fanalyze
+.PHONY: ccc default build gcc-rel gcc-deb clang-rel clang-deb dsan rsan clean tests samples all-gcc-deb all-gcc-rel all-dsan all-rsan all-clang-deb all-clang-rel dtest rtest util tidy format fanalyze
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
@@ -17,26 +17,26 @@ build:
 	cmake --build $(BUILD_DIR) $(JOBS)
 
 ccc:
-	cmake --preset=rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	cmake --build $(BUILD_DIR) --target install $(JOBS)
 
 install:
 	cmake --build $(BUILD_DIR) --target install $(JOBS)
 
-rel:
-	cmake --preset=rel
+gcc-rel:
+	cmake --preset=gcc-rel
 	$(MAKE) build
 
-deb:
-	cmake --preset=deb
+gcc-deb:
+	cmake --preset=gcc-deb
 	$(MAKE) build
 
-crel:
-	cmake --preset=crel
+clang-rel:
+	cmake --preset=clang-rel
 	$(MAKE) build
 
-cdeb:
-	cmake --preset=cdeb
+clang-deb:
+	cmake --preset=clang-deb
 	$(MAKE) build
 
 rsan:
@@ -62,13 +62,13 @@ samples:
 util:
 	cmake --build $(BUILD_DIR) --target util $(JOBS)
 
-all-deb:
-	$(MAKE) deb
+all-gcc-deb:
+	$(MAKE) gcc-deb
 	$(MAKE) tests
 	$(MAKE) samples
 
-all-rel:
-	$(MAKE) rel
+all-gcc-rel:
+	$(MAKE) gcc-rel
 	$(MAKE) tests
 	$(MAKE) samples
 
@@ -82,13 +82,13 @@ all-rsan:
 	$(MAKE) tests
 	$(MAKE) samples
 
-all-cdeb:
-	$(MAKE) cdeb
+all-clang-deb:
+	$(MAKE) clang-deb
 	$(MAKE) tests
 	$(MAKE) samples
 
-all-crel:
-	$(MAKE) crel
+all-clang-rel:
+	$(MAKE) clang-rel
 	$(MAKE) tests
 	$(MAKE) samples
 
