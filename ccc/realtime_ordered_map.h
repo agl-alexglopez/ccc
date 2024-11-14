@@ -24,7 +24,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl_realtime_ordered_map.h"
 #include "types.h"
 
-/** @brief A container for amortized O(lg N) search, insert, erase, ranges and
+/** @brief A container for amortized O(lg N) search, insert, erase, ranges, and
 pointer stability.
 @warning it is undefined behavior to access an uninitialized container.
 
