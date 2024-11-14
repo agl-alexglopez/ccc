@@ -36,7 +36,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 @warning it is undefined behavior to use an uninitialized container.
 
 A doubly linked list may be stored in the stack, heap, or data segment. Once
-Initialized it is passed by reference to all functions. A doubly linked list
+initialized it is passed by reference to all functions. A doubly linked list
 can be initialized at compile time or runtime. */
 typedef struct ccc_dll_ ccc_doubly_linked_list;
 
