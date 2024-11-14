@@ -1,4 +1,4 @@
-.PHONY: ccc ccc-deb default build gcc-rel gcc-deb clang-rel clang-deb dsan rsan clean tests samples all-gcc-deb all-gcc-rel all-dsan all-rsan all-clang-deb all-clang-rel dtest rtest util tidy format fanalyze
+.PHONY: ccc default build gcc-rel gcc-deb clang-rel clang-deb dsan rsan clean tests samples all-gcc-deb all-gcc-rel all-dsan all-rsan all-clang-deb all-clang-rel dtest rtest util tidy format fanalyze
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
@@ -18,10 +18,6 @@ build:
 
 ccc:
 	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
-	cmake --build $(BUILD_DIR) --target install $(JOBS)
-
-ccc-deb:
-	cmake --preset=gcc-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	cmake --build $(BUILD_DIR) --target install $(JOBS)
 
 install:
