@@ -1,10 +1,10 @@
-/* Author: Alexander Lopez, File: maze.c
+/* Author: Alexander Lopez
 This file provides a simple maze builder that implements Prim's algorithm
 to randomly generate a maze. I chose this algorithm because it can use
 both an ordered and a priority queue to achieve its purpose. Such data
 structures are provided by the library offering a perfect sample program
 opportunity. Also there are some interesting ways to combine allocating and
-non-allocating interfaces. */
+non-allocating interfaces. Adding more mazes could be fun. */
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 #define BUFFER_USING_NAMESPACE_CCC
