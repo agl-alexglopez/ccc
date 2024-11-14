@@ -48,7 +48,8 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
         {                                                                      \
             omm_ins_alloc_ret_                                                 \
                 = (ordered_map_entry)                                          \
-                      ->t_->alloc_(NULL, (ordered_map_entry)->t_->elem_sz_);   \
+                      ->t_->alloc_(NULL, (ordered_map_entry)->t_->elem_sz_,    \
+                                   (ordered_map_entry)->t_->aux_);             \
         }                                                                      \
         omm_ins_alloc_ret_;                                                    \
     })

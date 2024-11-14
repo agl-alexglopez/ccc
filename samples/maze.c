@@ -33,7 +33,7 @@
 
 /*=======================   Maze Helper Types   =============================*/
 
-enum speed
+enum animation_speed
 {
     INSTANT = 0,
     SPEED_1,
@@ -55,16 +55,16 @@ struct maze
 {
     int rows;
     int cols;
-    enum speed speed;
+    enum animation_speed speed;
     uint16_t *maze;
 };
 
 /*===================  Prim's Algorithm Helper Types   ======================*/
 
-struct priority_cell
+struct prim_cell
 {
     struct point cell;
-    int priority;
+    int cost;
     pq_elem pq_elem;
     omap_elem map_elem;
 };
@@ -80,12 +80,12 @@ int const speeds[] = {
     0, 5000000, 2500000, 1000000, 500000, 250000, 100000, 1000,
 };
 
-struct point const build_dirs[] = {{-2, 0}, {0, 2}, {2, 0}, {0, -2}};
-size_t const build_dirs_size = sizeof(build_dirs) / sizeof(build_dirs[0]);
+struct point const dir_offsets[] = {{-2, 0}, {0, 2}, {2, 0}, {0, -2}};
+size_t const dir_offsets_size = sizeof(dir_offsets) / sizeof(dir_offsets[0]);
 
-str_view const rows = SV("-r=");
-str_view const cols = SV("-c=");
-str_view const speed = SV("-s=");
+str_view const row_flag = SV("-r=");
+str_view const col_flag = SV("-c=");
+str_view const speed_flag = SV("-s=");
 str_view const help_flag = SV("-h");
 str_view const escape = SV("\033[");
 str_view const semi_colon = SV(";");
@@ -105,16 +105,13 @@ uint16_t const south_wall = 0b0100;
 uint16_t const west_wall = 0b1000;
 uint16_t const cached_bit = 0b0001000000000000;
 
-static buffer cell_bump_arena
-    = buf_init((struct priority_cell *)NULL, NULL, 0, 0);
-
 /*==========================   Prototypes  ================================= */
 
 static void animate_maze(struct maze *);
 static void fill_maze_with_walls(struct maze *);
 static void build_wall(struct maze *, struct point);
 static void print_square(struct maze const *, struct point);
-static uint16_t *maze_at_mut(struct maze const *, struct point);
+static uint16_t *maze_at_r(struct maze const *, struct point);
 static uint16_t maze_at(struct maze const *, struct point);
 static void clear_and_flush_maze(struct maze const *);
 static void carve_path_walls_animated(struct maze *, struct point, int);
@@ -123,11 +120,11 @@ static void join_squares_animated(struct maze *, struct point, struct point,
 static void flush_cursor_maze_coordinate(struct maze const *, struct point);
 static bool can_build_new_square(struct maze const *, struct point);
 static void help(void);
-static struct point pick_rand_point(struct maze const *);
+static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_priority_cells(cmp);
-static threeway_cmp cmp_points(key_cmp);
+static threeway_cmp cmp_priority_pos(key_cmp);
 static struct int_conversion parse_digits(str_view);
-static void *buf_bump_allocator(void *ptr, size_t size);
+static void *arena_bump_alloc(void *ptr, size_t size, void *arena);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -145,7 +142,7 @@ main(int argc, char **argv)
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
-        if (sv_starts_with(arg, rows))
+        if (sv_starts_with(arg, row_flag))
         {
             struct int_conversion const row_arg = parse_digits(arg);
             if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
@@ -155,7 +152,7 @@ main(int argc, char **argv)
             }
             maze.rows = row_arg.conversion;
         }
-        else if (sv_starts_with(arg, cols))
+        else if (sv_starts_with(arg, col_flag))
         {
             struct int_conversion const col_arg = parse_digits(arg);
             if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
@@ -165,7 +162,7 @@ main(int argc, char **argv)
             }
             maze.cols = col_arg.conversion;
         }
-        else if (sv_starts_with(arg, speed))
+        else if (sv_starts_with(arg, speed_flag))
         {
             struct int_conversion const speed_arg = parse_digits(arg);
             if (speed_arg.status == CONV_ER || speed_arg.conversion > speed_max
@@ -203,42 +200,59 @@ main(int argc, char **argv)
 
 /*======================      Maze Animation      ===========================*/
 
+/* This function aims to demonstrate how to compose various containers when
+   taking advantage of the flexible allocating or non-allocating options.
+   There are better ways to run Prim's algorithm, but this is just to show
+   how we can tailor allocations to the scope of this function by combining
+   a buffer and priority queue that do not allocate, with a map that does.
+   In fact, the composition allows us to present the buffer as if it is an
+   allocator to the map; all the while we benefit from one contiguous arena
+   of our data type. The priority queue and map also share the same memory
+   as intrusive struct fields, further simplifying locality of reference. */
 static void
 animate_maze(struct maze *maze)
 {
-    /* When the container chooses not to participate in allocation we can form
-       some nice compositions of containers. And when we know that we will only
-       ever insert into a map we can make further optimizations with a dead
-       simple allocator. */
-    result r = buf_alloc(&cell_bump_arena, ((size_t)maze->rows * maze->cols),
-                         std_alloc);
-    assert(r == CCC_OK && buf_capacity(&cell_bump_arena) != 0);
-    priority_queue cells = pq_init(struct priority_cell, pq_elem, CCC_LES, NULL,
-                                   cmp_priority_cells, NULL);
-    ordered_map cell_costs
-        = om_init(cell_costs, struct priority_cell, map_elem, cell,
-                  buf_bump_allocator, cmp_points, NULL);
-    struct priority_cell *const cell = unwrap(om_try_insert_w(
-        &cell_costs, pick_rand_point(maze),
-        (struct priority_cell){.cell = pick_rand_point(maze),
-                               .priority = rand_range(0, 100)}));
-    assert(cell);
-    (void)push(&cells, &cell->pq_elem);
-    assert(ccc_buf_size(&cell_bump_arena) == 1);
-
-    int const animation_speed = speeds[maze->speed];
+    int const speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
+
+    /* The buffer holds enough space for use to bump all cells into it,
+       eliminating the need for a non-contiguous allocator. In this type of
+       maze only odd squares can be paths, which is what we are building here
+       so that is half of the squares. */
+    size_t const cap = (((size_t)maze->rows * maze->cols) / 2) + 1;
+    size_t bytes = cap * sizeof(struct prim_cell);
+    /* Calling malloc like this is kind of nice to get rid of a dangling ref
+       but we need to have some kind of sanity check. */
+    buffer bump_arena
+        = buf_init(((struct prim_cell *)malloc(bytes)), NULL, NULL, cap);
+    assert(buf_begin(&bump_arena) != NULL);
+    /* Priority queue elements will not participate in allocation. They piggy
+       back on the ordered map memory because the relationship is 1-to-1. */
+    priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES, NULL,
+                                   cmp_priority_cells, NULL);
+    /* The ordered map uses a wrapper around the bump allocator as its backing
+       store making allocation speed optimal for the given problem. */
+    ordered_map costs
+        = om_init(costs, struct prim_cell, map_elem, cell, arena_bump_alloc,
+                  cmp_priority_pos, &bump_arena);
+    struct point s = rand_point(maze);
+    struct prim_cell *const first = om_insert_entry_w(
+        entry_r(&costs, &s),
+        (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
+    assert(first);
+    (void)push(&cells, &first->pq_elem);
+    assert(ccc_buf_size(&bump_arena) == 1);
     while (!is_empty(&cells))
     {
-        struct priority_cell const *const cur = front(&cells);
-        *maze_at_mut(maze, cur->cell) |= cached_bit;
-        struct priority_cell *min_neighbor = NULL;
-        int min_weight = INT_MAX;
-        for (size_t i = 0; i < build_dirs_size; ++i)
+        struct prim_cell const *const c = front(&cells);
+        *maze_at_r(maze, c->cell) |= cached_bit;
+        struct prim_cell *min_cell = NULL;
+        int min = INT_MAX;
+        for (size_t i = 0; i < dir_offsets_size; ++i)
         {
-            struct point const next = {.r = cur->cell.r + build_dirs[i].r,
-                                       .c = cur->cell.c + build_dirs[i].c};
+            struct point const next = {.r = c->cell.r + dir_offsets[i].r,
+                                       .c = c->cell.c + dir_offsets[i].c};
             if (!can_build_new_square(maze, next))
             {
                 continue;
@@ -248,34 +262,34 @@ animate_maze(struct maze *maze)
                rand_range is never called. This technique also means cells
                can be given weights lazily as we go rather than all at once
                before the main algorithm starts. */
-            struct priority_cell *const found = om_or_insert_w(
-                entry_r(&cell_costs, &next),
-                (struct priority_cell){.cell = next,
-                                       .priority = rand_range(0, 100)});
-            assert(found);
-            if (found->priority < min_weight)
+            struct prim_cell *const cell = om_or_insert_w(
+                entry_r(&costs, &next),
+                (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
+            assert(cell);
+            if (cell->cost < min)
             {
-                min_weight = found->priority;
-                min_neighbor = found;
+                min = cell->cost;
+                min_cell = cell;
             }
         }
-        if (min_neighbor)
+        if (min_cell)
         {
-            join_squares_animated(maze, cur->cell, min_neighbor->cell,
-                                  animation_speed);
-            (void)push(&cells, &min_neighbor->pq_elem);
+            join_squares_animated(maze, c->cell, min_cell->cell, speed);
+            (void)push(&cells, &min_cell->pq_elem);
         }
         else
         {
             (void)pop(&cells);
         }
     }
-    result l = ccc_buf_alloc(&cell_bump_arena, 0, std_alloc);
+    /* Thanks to how the containers worked together there was only a single
+       allocation and free from the heap's perspective. */
+    result l = ccc_buf_alloc(&bump_arena, 0, std_alloc);
     assert(l == CCC_OK);
 }
 
 static struct point
-pick_rand_point(struct maze const *const maze)
+rand_point(struct maze const *const maze)
 {
     return (struct point){
         .r = (2 * rand_range(1, (maze->rows - 2) / 2)) + 1,
@@ -345,31 +359,28 @@ join_squares_animated(struct maze *maze, struct point const cur,
 static void
 carve_path_walls_animated(struct maze *maze, struct point const p, int s)
 {
-    *maze_at_mut(maze, p) |= path_bit;
+    *maze_at_r(maze, p) |= path_bit;
     flush_cursor_maze_coordinate(maze, p);
     struct timespec ts = {.tv_sec = 0, .tv_nsec = s};
     nanosleep(&ts, NULL);
     if (p.r - 1 >= 0
         && !(maze_at(maze, (struct point){.r = p.r - 1, .c = p.c}) & path_bit))
     {
-        *maze_at_mut(maze, (struct point){.r = p.r - 1, .c = p.c})
-            &= ~south_wall;
+        *maze_at_r(maze, (struct point){.r = p.r - 1, .c = p.c}) &= ~south_wall;
         flush_cursor_maze_coordinate(maze, (struct point){p.r - 1, p.c});
         nanosleep(&ts, NULL);
     }
     if (p.r + 1 < maze->rows
         && !(maze_at(maze, (struct point){.r = p.r + 1, .c = p.c}) & path_bit))
     {
-        *maze_at_mut(maze, (struct point){.r = p.r + 1, .c = p.c})
-            &= ~north_wall;
+        *maze_at_r(maze, (struct point){.r = p.r + 1, .c = p.c}) &= ~north_wall;
         flush_cursor_maze_coordinate(maze, (struct point){p.r + 1, p.c});
         nanosleep(&ts, NULL);
     }
     if (p.c - 1 >= 0
         && !(maze_at(maze, (struct point){.r = p.r, .c = p.c - 1}) & path_bit))
     {
-        *maze_at_mut(maze, (struct point){.r = p.r, .c = p.c - 1})
-            &= ~east_wall;
+        *maze_at_r(maze, (struct point){.r = p.r, .c = p.c - 1}) &= ~east_wall;
         flush_cursor_maze_coordinate(maze,
                                      (struct point){.r = p.r, .c = p.c - 1});
         nanosleep(&ts, NULL);
@@ -377,13 +388,12 @@ carve_path_walls_animated(struct maze *maze, struct point const p, int s)
     if (p.c + 1 < maze->cols
         && !(maze_at(maze, (struct point){.r = p.r, .c = p.c + 1}) & path_bit))
     {
-        *maze_at_mut(maze, (struct point){.r = p.r, .c = p.c + 1})
-            &= ~west_wall;
+        *maze_at_r(maze, (struct point){.r = p.r, .c = p.c + 1}) &= ~west_wall;
         flush_cursor_maze_coordinate(maze,
                                      (struct point){.r = p.r, .c = p.c + 1});
         nanosleep(&ts, NULL);
     }
-    *maze_at_mut(maze, (struct point){.r = p.r, .c = p.c}) |= cached_bit;
+    *maze_at_r(maze, (struct point){.r = p.r, .c = p.c}) |= cached_bit;
 }
 
 static void
@@ -406,8 +416,8 @@ build_wall(struct maze *m, struct point p)
     {
         wall |= east_wall;
     }
-    *maze_at_mut(m, p) |= wall;
-    *maze_at_mut(m, p) &= ~path_bit;
+    *maze_at_r(m, p) |= wall;
+    *maze_at_r(m, p) &= ~path_bit;
 }
 
 static void
@@ -437,7 +447,7 @@ print_square(struct maze const *m, struct point p)
 }
 
 static uint16_t *
-maze_at_mut(struct maze const *const maze, struct point p)
+maze_at_r(struct maze const *const maze, struct point p)
 {
     return &maze->maze[(p.r * maze->cols) + p.c];
 }
@@ -460,31 +470,31 @@ can_build_new_square(struct maze const *const maze, struct point const next)
 static threeway_cmp
 cmp_priority_cells(cmp const cmp_cells)
 {
-    struct priority_cell const *const lhs = cmp_cells.user_type_rhs;
-    struct priority_cell const *const rhs = cmp_cells.user_type_rhs;
-    return (lhs->priority > rhs->priority) - (lhs->priority < rhs->priority);
+    struct prim_cell const *const lhs = cmp_cells.user_type_lhs;
+    struct prim_cell const *const rhs = cmp_cells.user_type_rhs;
+    return (lhs->cost > rhs->cost) - (lhs->cost < rhs->cost);
 }
 
 static threeway_cmp
-cmp_points(key_cmp const cmp_points)
+cmp_priority_pos(key_cmp const cmp_points)
 {
-    struct priority_cell const *const a = cmp_points.user_type_rhs;
-    struct point const *const key = cmp_points.key_lhs;
-    if (a->cell.r == key->r && a->cell.c == key->c)
+    struct prim_cell const *const a_rhs = cmp_points.user_type_rhs;
+    struct point const *const key_lhs = cmp_points.key_lhs;
+    if (a_rhs->cell.r == key_lhs->r && a_rhs->cell.c == key_lhs->c)
     {
         return CCC_EQL;
     }
-    if (a->cell.r == key->r)
+    if (a_rhs->cell.r == key_lhs->r)
     {
-        return (key->c > a->cell.c) - (key->c < a->cell.c);
+        return (key_lhs->c > a_rhs->cell.c) - (key_lhs->c < a_rhs->cell.c);
     }
-    return (key->r > a->cell.r) - (key->r < a->cell.r);
+    return (key_lhs->r > a_rhs->cell.r) - (key_lhs->r < a_rhs->cell.r);
 }
 
 /*===========================    Misc    ====================================*/
 
 static void *
-buf_bump_allocator(void *const ptr, size_t const size)
+arena_bump_alloc(void *const ptr, size_t const size, void *const arena)
 {
     if (!ptr && !size)
     {
@@ -492,7 +502,7 @@ buf_bump_allocator(void *const ptr, size_t const size)
     }
     if (!ptr)
     {
-        return ccc_buf_alloc_back(&cell_bump_arena);
+        return ccc_buf_alloc_back(arena);
     }
     /* Freeing and reallocation are not supported in a bump allocator. */
     assert(!"You shouldn't be here this is a bump allocator!");

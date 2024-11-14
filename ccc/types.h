@@ -138,7 +138,10 @@ typedef struct
 /** @brief An allocation function at the core of all containers.
 
 An allocation function implements the following behavior, where ptr is pointer
-to memory and size is number of bytes to allocate.
+to memory, size is number of bytes to allocate, and aux is a reference to any
+supplementary information required for allocation, deallocation, or
+reallocation. Aux is passed to a container upon its initialization and the
+programmer may choose how to best utilize this reference.
 
 - If NULL is provided with a size of 0, NULL is returned.
 - If NULL is provided with a non-zero size, new memory is allocated/returned.
@@ -148,15 +151,16 @@ to memory and size is number of bytes to allocate.
   pointer returned might not be equal to the pointer provided.
 - If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.
 
-A function that implements such behavior on many platforms is realloc. If one
-is not sure that realloc implements all such behaviors, especially the final
-requirement for freeing memory, wrap it in a helper function. For example, one
-solution using the standard library allocator might be implemented as follows:
+One may be tempted to use realloc to check all of these boxes but realloc is
+implementation defined on some of these points. So, the aux parameter also
+discourages users from providing realloc. For example, one solution using the
+standard library allocator might be implemented as follows (aux is not needed):
 
 ```
 void *
-std_alloc(void *const ptr, size_t const size)
+std_alloc(void *const ptr, size_t const size, void *const aux)
 {
+    (void)aux;
     if (!ptr && !size)
     {
         return NULL;
@@ -175,8 +179,11 @@ std_alloc(void *const ptr, size_t const size)
 ```
 
 However, the above example is only useful if the standard library allocator
-is used. Any allocator that implements the required behavior is sufficient. */
-typedef void *ccc_alloc_fn(void *ptr, size_t size);
+is used. Any allocator that implements the required behavior is sufficient.
+For example programs that utilize the aux parameter, see the sample programs.
+Using custom arena allocators or container compositions are cases when aux is
+needed. */
+typedef void *ccc_alloc_fn(void *ptr, size_t size, void *aux);
 
 /** @brief A callback function for comparing two elements in a container.
 

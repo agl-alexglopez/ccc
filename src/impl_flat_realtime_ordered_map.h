@@ -25,7 +25,6 @@ struct ccc_fromap_
     size_t key_offset_;
     size_t node_elem_offset_;
     ccc_key_cmp_fn *cmp_;
-    void *aux_;
 };
 
 /** @private */
@@ -63,10 +62,11 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
 #define ccc_impl_frm_init(memory_ptr, capacity, node_elem_field,               \
                           key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \
     {                                                                          \
-        .buf_ = ccc_buf_init(memory_ptr, alloc_fn, capacity), .root_ = 0,      \
+        .buf_ = ccc_buf_init(memory_ptr, alloc_fn, aux_data, capacity),        \
+        .root_ = 0,                                                            \
         .key_offset_ = offsetof(typeof(*(memory_ptr)), key_elem_field),        \
         .node_elem_offset_ = offsetof(typeof(*(memory_ptr)), node_elem_field), \
-        .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                              \
+        .cmp_ = (key_cmp_fn),                                                  \
     }
 
 /*==================     Core Macro Implementations     =====================*/

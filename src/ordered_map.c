@@ -259,7 +259,7 @@ ccc_om_remove(ccc_ordered_map *const om, ccc_omap_elem *const out_handle)
     {
         void *const user_struct = struct_base(&om->impl_, &out_handle->impl_);
         memcpy(user_struct, n, om->impl_.elem_sz_);
-        om->impl_.alloc_(n, 0);
+        om->impl_.alloc_(n, 0, om->impl_.aux_);
         return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -279,7 +279,7 @@ ccc_om_remove_entry(ccc_omap_entry *const e)
         assert(erased);
         if (e->impl_.t_->alloc_)
         {
-            e->impl_.t_->alloc_(erased, 0);
+            e->impl_.t_->alloc_(erased, 0, e->impl_.t_->aux_);
             return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -410,7 +410,7 @@ ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
         }
         if (om->impl_.alloc_)
         {
-            (void)om->impl_.alloc_(popped, 0);
+            (void)om->impl_.alloc_(popped, 0, om->impl_.aux_);
         }
     }
     return CCC_OK;
@@ -631,7 +631,7 @@ alloc_insert(struct ccc_tree_ *const t, struct ccc_node_ *out_handle)
     }
     if (t->alloc_)
     {
-        void *const node = t->alloc_(NULL, t->elem_sz_);
+        void *const node = t->alloc_(NULL, t->elem_sz_, t->aux_);
         if (!node)
         {
             return NULL;

@@ -34,7 +34,7 @@ ccc_dll_push_front(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
     }
     if (l->alloc_)
     {
-        void *const node = l->alloc_(NULL, l->elem_sz_);
+        void *const node = l->alloc_(NULL, l->elem_sz_, l->aux_);
         if (!node)
         {
             return NULL;
@@ -55,7 +55,7 @@ ccc_dll_push_back(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
     }
     if (l->alloc_)
     {
-        void *const node = l->alloc_(NULL, l->elem_sz_);
+        void *const node = l->alloc_(NULL, l->elem_sz_, l->aux_);
         if (!node)
         {
             return NULL;
@@ -97,7 +97,7 @@ ccc_dll_pop_front(ccc_doubly_linked_list *const l)
     struct ccc_dll_elem_ *remove = pop_front(l);
     if (l->alloc_)
     {
-        (void)l->alloc_(struct_base(l, remove), 0);
+        (void)l->alloc_(struct_base(l, remove), 0, l->aux_);
     }
     return CCC_OK;
 }
@@ -115,7 +115,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *const l)
     remove->n_ = remove->p_ = NULL;
     if (l->alloc_)
     {
-        (void)l->alloc_(struct_base(l, remove), 0);
+        (void)l->alloc_(struct_base(l, remove), 0, l->aux_);
     }
     --l->sz_;
     return CCC_OK;
@@ -131,7 +131,7 @@ ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
     }
     if (l->alloc_)
     {
-        void *const node = l->alloc_(NULL, l->elem_sz_);
+        void *const node = l->alloc_(NULL, l->elem_sz_, l->aux_);
         if (!node)
         {
             return NULL;
@@ -160,7 +160,7 @@ ccc_dll_erase(ccc_doubly_linked_list *const l, ccc_dll_elem *const elem)
     void *const ret = elem->n_ == &l->sentinel_ ? NULL : struct_base(l, elem);
     if (l->alloc_)
     {
-        (void)l->alloc_(struct_base(l, elem), 0);
+        (void)l->alloc_(struct_base(l, elem), 0, l->aux_);
     }
     --l->sz_;
     return ret;
@@ -391,7 +391,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
         }
         if (l->alloc_)
         {
-            (void)l->alloc_(node, 0);
+            (void)l->alloc_(node, 0, l->aux_);
         }
     }
     return CCC_OK;
@@ -510,10 +510,10 @@ erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
     {
         assert(sz <= l->sz_);
         struct ccc_dll_elem_ *const next = begin->n_;
-        (void)l->alloc_(struct_base(l, begin), 0);
+        (void)l->alloc_(struct_base(l, begin), 0, l->aux_);
         begin = next;
     }
-    (void)l->alloc_(struct_base(l, end), 0);
+    (void)l->alloc_(struct_base(l, end), 0, l->aux_);
     return sz;
 }
 

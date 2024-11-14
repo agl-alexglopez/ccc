@@ -25,7 +25,7 @@ ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
     {
         return CCC_NO_ALLOC;
     }
-    void *const new_mem = fn(buf->mem_, buf->elem_sz_ * capacity);
+    void *const new_mem = fn(buf->mem_, buf->elem_sz_ * capacity, buf->aux_);
     if (capacity && !new_mem)
     {
         return CCC_MEM_ERR;

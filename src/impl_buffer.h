@@ -16,6 +16,7 @@ struct ccc_buf_
     size_t sz_;
     size_t capacity_;
     ccc_alloc_fn *alloc_;
+    void *aux_;
 };
 
 #define IMPL_BUF_NON_IMPL_BUF_DEFAULT_SIZE(...) __VA_ARGS__
@@ -23,11 +24,14 @@ struct ccc_buf_
 #define IMPL_BUF_OPTIONAL_SIZE(...)                                            \
     __VA_OPT__(IMPL_BUF_NON_)##IMPL_BUF_DEFAULT_SIZE(__VA_ARGS__)
 
-#define ccc_impl_buf_init(mem, alloc_fn, capacity, ...)                        \
+#define ccc_impl_buf_init(mem, alloc_fn, aux_data, capacity, ...)              \
     {                                                                          \
-        .mem_ = (mem), .elem_sz_ = sizeof(*(mem)),                             \
-        .sz_ = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__), .capacity_ = (capacity),   \
+        .mem_ = (mem),                                                         \
+        .elem_sz_ = sizeof(*(mem)),                                            \
+        .sz_ = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                            \
+        .capacity_ = (capacity),                                               \
         .alloc_ = (alloc_fn),                                                  \
+        .aux_ = (aux_data),                                                    \
     }
 
 /* NOLINTBEGIN(readability-identifier-naming) */

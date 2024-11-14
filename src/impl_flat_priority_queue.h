@@ -18,7 +18,6 @@ struct ccc_fpq_
     ccc_buffer buf_;
     ccc_cmp_fn *cmp_;
     ccc_threeway_cmp order_;
-    void *aux_;
 };
 
 size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
@@ -31,8 +30,9 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 #define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \
                           aux_data)                                            \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, capacity), .cmp_ = (cmp_fn),   \
-        .order_ = (cmp_order), .aux_ = (aux_data),                             \
+        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity),           \
+        .cmp_ = (cmp_fn),                                                      \
+        .order_ = (cmp_order),                                                 \
     }
 
 #define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order,          \

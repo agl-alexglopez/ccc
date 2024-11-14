@@ -358,7 +358,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     {
         if (elem_in_slot(h, slot)->hash_ != CCC_FHM_EMPTY)
         {
-            fn((ccc_user_type){.user_type = slot, .aux = h->aux_});
+            fn((ccc_user_type){.user_type = slot, .aux = h->buf_.aux_});
         }
     }
     return CCC_OK;
@@ -382,7 +382,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     {
         if (elem_in_slot(h, slot)->hash_ != CCC_FHM_EMPTY)
         {
-            fn((ccc_user_type){.user_type = slot, .aux = h->aux_});
+            fn((ccc_user_type){.user_type = slot, .aux = h->buf_.aux_});
         }
     }
     return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
@@ -439,7 +439,7 @@ ccc_impl_fhm_init_buf(struct ccc_fhmap_ *const h, size_t key_offset,
     h->hash_elem_offset_ = hash_elem_offset;
     h->hash_fn_ = hash_fn;
     h->eq_fn_ = eq_fn;
-    h->aux_ = aux;
+    h->buf_.aux_ = aux;
     if (ccc_buf_begin(&h->buf_))
     {
         (void)memset(ccc_buf_begin(&h->buf_), CCC_FHM_EMPTY,
@@ -557,7 +557,7 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
         }
         if (hash == e->hash_
             && h->eq_fn_((ccc_key_cmp){
-                .key_lhs = key, .user_type_rhs = slot, .aux = h->aux_}))
+                .key_lhs = key, .user_type_rhs = slot, .aux = h->buf_.aux_}))
         {
             return (struct ccc_ent_){.e_ = slot, .stats_ = CCC_ENTRY_OCCUPIED};
         }
@@ -672,7 +672,8 @@ maybe_resize(struct ccc_fhmap_ *const h)
               ? ccc_fhm_next_prime(ccc_buf_size(&h->buf_) * 2)
               : default_prime;
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
-        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_);
+        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_,
+        h->buf_.aux_);
     if (!new_hash.buf_.mem_)
     {
         return CCC_MEM_ERR;
@@ -716,7 +717,7 @@ static inline uint64_t
 filter(struct ccc_fhmap_ const *const h, void const *const key)
 {
     uint64_t const hash
-        = h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_});
+        = h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->buf_.aux_});
     return hash == CCC_FHM_EMPTY ? hash + 1 : hash;
 }
 

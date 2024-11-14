@@ -67,8 +67,8 @@ provide an allocation function. If a dynamic buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define ccc_buf_init(mem_ptr, alloc_fn, capacity, optional_size...)            \
-    ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)
+#define ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)  \
+    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)
 
 /** @name Insert and Remove Interface
 These functions assume contiguity of elements in the buffer and increase or

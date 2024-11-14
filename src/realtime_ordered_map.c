@@ -307,7 +307,7 @@ ccc_rom_remove_entry(ccc_romap_entry const *const e)
         assert(erased);
         if (e->impl_.rom_->alloc_)
         {
-            e->impl_.rom_->alloc_(erased, 0);
+            e->impl_.rom_->alloc_(erased, 0, e->impl_.rom_->aux_);
             return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -333,7 +333,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     {
         void *const user_struct = struct_base(rom, out_handle);
         memcpy(user_struct, removed, rom->elem_sz_);
-        rom->alloc_(removed, 0);
+        rom->alloc_(removed, 0, rom->aux_);
         return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = removed, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -510,7 +510,7 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
         }
         if (rom->alloc_)
         {
-            (void)rom->alloc_(deleted, 0);
+            (void)rom->alloc_(deleted, 0, rom->aux_);
         }
     }
     return CCC_OK;
@@ -627,7 +627,7 @@ maybe_alloc_insert(struct ccc_romap_ *const rom,
 {
     if (rom->alloc_)
     {
-        void *new = rom->alloc_(NULL, rom->elem_sz_);
+        void *new = rom->alloc_(NULL, rom->elem_sz_, rom->aux_);
         if (!new)
         {
             return NULL;

@@ -52,10 +52,13 @@ union ccc_romap_entry_
         .end_ = {.parity_ = 1,                                                 \
                  .parent_ = &(map_name).end_,                                  \
                  .branch_ = {&(map_name).end_, &(map_name).end_}},             \
-        .sz_ = 0, .key_offset_ = offsetof(struct_name, key_elem_field),        \
+        .sz_ = 0,                                                              \
+        .key_offset_ = offsetof(struct_name, key_elem_field),                  \
         .node_elem_offset_ = offsetof(struct_name, node_elem_field),           \
-        .elem_sz_ = sizeof(struct_name), .alloc_ = (alloc_fn),                 \
-        .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                              \
+        .elem_sz_ = sizeof(struct_name),                                       \
+        .alloc_ = (alloc_fn),                                                  \
+        .cmp_ = (key_cmp_fn),                                                  \
+        .aux_ = (aux_data),                                                    \
     }
 
 void *ccc_impl_rom_key_from_node(struct ccc_romap_ const *rom,
@@ -82,7 +85,8 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             rom_ins_alloc_ret_                                                 \
                 = (realtime_ordered_map_entry)                                 \
                       ->rom_->alloc_(                                          \
-                          NULL, (realtime_ordered_map_entry)->rom_->elem_sz_); \
+                          NULL, (realtime_ordered_map_entry)->rom_->elem_sz_,  \
+                          (realtime_ordered_map_entry)->rom_->aux_);           \
         }                                                                      \
         rom_ins_alloc_ret_;                                                    \
     })

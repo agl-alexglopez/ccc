@@ -152,7 +152,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     void *const erased = at(fpq, ccc_buf_size(&fpq->buf_) - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
     ccc_threeway_cmp const erased_cmp
-        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->aux_});
+        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->buf_.aux_});
     if (erased_cmp == fpq->order_)
     {
         (void)bubble_up(fpq, tmp, swap_location);
@@ -181,8 +181,8 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
         bubble_down(fpq, tmp, 0);
         return true;
     }
-    ccc_threeway_cmp const parent_cmp
-        = fpq->cmp_((ccc_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->aux_});
+    ccc_threeway_cmp const parent_cmp = fpq->cmp_(
+        (ccc_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
     if (parent_cmp == fpq->order_)
     {
         (void)bubble_up(fpq, tmp, i);
@@ -253,7 +253,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
         size_t const sz = ccc_buf_size(&fpq->buf_);
         for (size_t i = 0; i < sz; ++i)
         {
-            fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->aux_});
+            fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->buf_.aux_});
         }
     }
     return ccc_buf_size_set(&fpq->buf_, 0);
@@ -272,7 +272,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
         size_t const sz = ccc_buf_size(&fpq->buf_);
         for (size_t i = 0; i < sz; ++i)
         {
-            fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->aux_});
+            fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->buf_.aux_});
         }
     }
     return ccc_buf_alloc(&fpq->buf_, 0, fpq->buf_.alloc_);
@@ -387,5 +387,5 @@ static inline bool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {
-    return fpq->cmp_((ccc_cmp){winner, loser, fpq->aux_}) == fpq->order_;
+    return fpq->cmp_((ccc_cmp){winner, loser, fpq->buf_.aux_}) == fpq->order_;
 }

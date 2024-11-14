@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 void *
-std_alloc(void *const ptr, size_t const size)
+std_alloc(void *const ptr, size_t const size, void *const)
 {
 
     if (!ptr && !size)

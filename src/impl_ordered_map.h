@@ -49,7 +49,8 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
         {                                                                      \
             om_ins_alloc_ret_                                                  \
                 = (ordered_map_entry)                                          \
-                      ->t_->alloc_(NULL, (ordered_map_entry)->t_->elem_sz_);   \
+                      ->t_->alloc_(NULL, (ordered_map_entry)->t_->elem_sz_,    \
+                                   (ordered_map_entry)->t_->aux_);             \
         }                                                                      \
         om_ins_alloc_ret_;                                                     \
     })

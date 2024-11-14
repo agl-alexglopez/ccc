@@ -201,7 +201,8 @@ ccc_omm_insert(ccc_ordered_multimap *const mm,
     struct ccc_node_ *n = &key_val_handle->impl_;
     if (mm->impl_.alloc_)
     {
-        void *const mem = mm->impl_.alloc_(NULL, mm->impl_.elem_sz_);
+        void *const mem
+            = mm->impl_.alloc_(NULL, mm->impl_.elem_sz_, mm->impl_.aux_);
         if (!mem)
         {
             return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
@@ -269,7 +270,7 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
     {
         void *const user_struct = struct_base(&mm->impl_, &out_handle->impl_);
         memcpy(user_struct, n, mm->impl_.elem_sz_);
-        mm->impl_.alloc_(n, 0);
+        mm->impl_.alloc_(n, 0, mm->impl_.aux_);
         return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -289,7 +290,7 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
         assert(erased);
         if (e->impl_.t_->alloc_)
         {
-            e->impl_.t_->alloc_(erased, 0);
+            e->impl_.t_->alloc_(erased, 0, e->impl_.t_->aux_);
             return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
         }
         return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -482,7 +483,7 @@ ccc_omm_pop_max(ccc_ordered_multimap *const mm)
     }
     if (mm->impl_.alloc_)
     {
-        mm->impl_.alloc_(n, 0);
+        mm->impl_.alloc_(n, 0, mm->impl_.aux_);
     }
     return CCC_OK;
 }
@@ -501,7 +502,7 @@ ccc_omm_pop_min(ccc_ordered_multimap *const mm)
     }
     if (mm->impl_.alloc_)
     {
-        mm->impl_.alloc_(struct_base(&mm->impl_, n), 0);
+        mm->impl_.alloc_(struct_base(&mm->impl_, n), 0, mm->impl_.aux_);
     }
     return CCC_OK;
 }
@@ -564,7 +565,7 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
         }
         if (mm->impl_.alloc_)
         {
-            (void)mm->impl_.alloc_(popped, 0);
+            (void)mm->impl_.alloc_(popped, 0, mm->impl_.aux_);
         }
     }
     return CCC_OK;

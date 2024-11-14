@@ -49,7 +49,7 @@ ccc_pq_push(ccc_priority_queue *const pq, ccc_pq_elem *e)
     init_node(e);
     if (pq->alloc_)
     {
-        void *const node = pq->alloc_(NULL, pq->elem_sz_);
+        void *const node = pq->alloc_(NULL, pq->elem_sz_, pq->aux_);
         if (!node)
         {
             return CCC_MEM_ERR;
@@ -75,7 +75,7 @@ ccc_pq_pop(ccc_priority_queue *const pq)
     clear_node(popped);
     if (pq->alloc_)
     {
-        (void)pq->alloc_(struct_base(pq, popped), 0);
+        (void)pq->alloc_(struct_base(pq, popped), 0, pq->aux_);
     }
     return CCC_OK;
 }
@@ -104,7 +104,7 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
     pq->sz_--;
     if (pq->alloc_)
     {
-        (void)pq->alloc_(struct_base(pq, e), 0);
+        (void)pq->alloc_(struct_base(pq, e), 0, pq->aux_);
     }
     return CCC_OK;
 }
