@@ -1,110 +1,255 @@
-include_directories(${CMAKE_SOURCE_DIR}/src)
-add_library(types types.h ${CMAKE_SOURCE_DIR}/src/types.c)
-target_link_libraries(types
-  PRIVATE
-    impl_types
+add_library(types)
+target_sources(types
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/types.c
+        impl_types.h
+    PUBLIC 
+        FILE_SET types_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              types.h
 )
 
-add_library(buffer buffer.h ${CMAKE_SOURCE_DIR}/src/buffer.c)
+add_library(buffer)
+target_sources(buffer
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/buffer.c
+        impl_buffer.h
+    PUBLIC 
+        FILE_SET public_headers
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              buffer.h
+)
 target_link_libraries(buffer
   PUBLIC
     types
-  PRIVATE
-    impl_buffer
 )
 
-add_library(doubly_linked_list doubly_linked_list.h ${CMAKE_SOURCE_DIR}/src/doubly_linked_list.c)
+add_library(doubly_linked_list)
+target_sources(doubly_linked_list
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
+        impl_doubly_linked_list.h
+    PUBLIC 
+        FILE_SET doubly_linked_list_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              doubly_linked_list.h
+)
 target_link_libraries(doubly_linked_list
   PUBLIC
     types
-  PRIVATE
-    impl_doubly_linked_list
 )
 
-add_library(singly_linked_list singly_linked_list.h ${CMAKE_SOURCE_DIR}/src/singly_linked_list.c)
+add_library(singly_linked_list)
+target_sources(singly_linked_list
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
+        impl_singly_linked_list.h
+    PUBLIC 
+        FILE_SET singly_linked_list_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              singly_linked_list.h
+)
 target_link_libraries(singly_linked_list
   PUBLIC
     types
-  PRIVATE
-    impl_singly_linked_list
 )
 
-add_library(priority_queue priority_queue.h ${CMAKE_SOURCE_DIR}/src/priority_queue.c)
-target_link_libraries(priority_queue 
+add_library(priority_queue)
+target_sources(priority_queue
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/priority_queue.c
+        impl_priority_queue.h
+    PUBLIC 
+        FILE_SET priority_queue_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              priority_queue.h
+)
+target_link_libraries(priority_queue
   PUBLIC
     types
-  PRIVATE
-    impl_priority_queue
 )
 
-add_library(flat_priority_queue flat_priority_queue.h ${CMAKE_SOURCE_DIR}/src/flat_priority_queue.c)
+add_library(flat_priority_queue)
+target_sources(flat_priority_queue
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
+        impl_flat_priority_queue.h
+    PUBLIC 
+        FILE_SET buffer_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              flat_priority_queue.h
+)
 target_link_libraries(flat_priority_queue 
   PUBLIC
     types
   PRIVATE
-    impl_flat_priority_queue
+    buffer
 )
 
-add_library(flat_hash_map flat_hash_map.h ${CMAKE_SOURCE_DIR}/src/flat_hash_map.c)
-target_link_libraries(flat_hash_map
+add_library(flat_hash_map)
+target_sources(flat_hash_map
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
+        impl_flat_hash_map.h
+    PUBLIC 
+        FILE_SET flat_hash_map_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              flat_hash_map.h
+)
+target_link_libraries(flat_hash_map 
   PUBLIC
     types
   PRIVATE
-    impl_flat_hash_map
+    buffer
 )
 
-add_library(ordered_multimap ordered_multimap.h ${CMAKE_SOURCE_DIR}/src/ordered_multimap.c)
+add_library(ordered_multimap)
+target_sources(ordered_multimap
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/ordered_multimap.c
+        impl_ordered_multimap.h
+    PUBLIC 
+        FILE_SET ordered_multimap_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              ordered_multimap.h
+)
 target_link_libraries(ordered_multimap
   PUBLIC
     types
-  PRIVATE
-    impl_ordered_multimap
 )
 
-add_library(ordered_map ordered_map.h ${CMAKE_SOURCE_DIR}/src/ordered_map.c)
+add_library(ordered_map)
+target_sources(ordered_map
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/ordered_map.c
+        impl_ordered_map.h
+    PUBLIC 
+        FILE_SET ordered_map_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              ordered_map.h
+)
 target_link_libraries(ordered_map
   PUBLIC
     types
-  PRIVATE
-    impl_ordered_map
 )
 
-add_library(flat_ordered_map flat_ordered_map.h ${CMAKE_SOURCE_DIR}/src/flat_ordered_map.c)
+add_library(flat_ordered_map)
+target_sources(flat_ordered_map
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/flat_ordered_map.c
+        impl_flat_ordered_map.h
+    PUBLIC 
+        FILE_SET flat_ordered_map_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              flat_ordered_map.h
+)
 target_link_libraries(flat_ordered_map
   PUBLIC
     types
   PRIVATE
-    impl_flat_ordered_map
+    buffer
 )
 
-add_library(realtime_ordered_map realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/realtime_ordered_map.c)
+add_library(realtime_ordered_map)
+target_sources(realtime_ordered_map
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
+        impl_realtime_ordered_map.h
+    PUBLIC 
+        FILE_SET realtime_ordered_map_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              realtime_ordered_map.h
+)
 target_link_libraries(realtime_ordered_map
   PUBLIC
     types
-  PRIVATE
-    impl_realtime_ordered_map
 )
 
-add_library(flat_realtime_ordered_map flat_realtime_ordered_map.h ${CMAKE_SOURCE_DIR}/src/flat_realtime_ordered_map.c)
+add_library(flat_realtime_ordered_map)
+target_sources(flat_realtime_ordered_map
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/flat_realtime_ordered_map.c
+        impl_flat_realtime_ordered_map.h
+    PUBLIC 
+        FILE_SET flat_realtime_ordered_map_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              flat_realtime_ordered_map.h
+)
 target_link_libraries(flat_realtime_ordered_map
   PUBLIC
     types
   PRIVATE
-    impl_flat_realtime_ordered_map
+    buffer
 )
 
-add_library(flat_double_ended_queue flat_double_ended_queue.h ${CMAKE_SOURCE_DIR}/src/flat_double_ended_queue.c)
+add_library(flat_double_ended_queue)
+target_sources(flat_double_ended_queue
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
+        impl_flat_double_ended_queue.h
+    PUBLIC 
+        FILE_SET flat_double_ended_queue_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              flat_double_ended_queue.h
+)
 target_link_libraries(flat_double_ended_queue
   PUBLIC
     types
   PRIVATE
-    impl_flat_double_ended_queue
+    buffer
 )
 
-add_library(traits INTERFACE traits.h)
+add_library(traits INTERFACE)
+target_sources(traits
+    PRIVATE
+        impl_traits.h
+    INTERFACE
+        FILE_SET traits_header
+            TYPE HEADERS
+            BASE_DIRS ${PROJECT_SOURCE_DIR}
+            FILES 
+              traits.h
+)
 target_link_libraries(traits
-  INTERFACE
-    impl_traits
+    INTERFACE
+        types
+        buffer
+        doubly_linked_list
+        singly_linked_list
+        priority_queue
+        flat_priority_queue
+        ordered_multimap
+        ordered_map
+        realtime_ordered_map
+        flat_realtime_ordered_map
+        flat_hash_map
+        flat_double_ended_queue
 )
 
 add_library(${PROJECT_NAME})
@@ -114,37 +259,37 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_sources(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/types.c
-        ${PROJECT_SOURCE_DIR}/src/impl_buffer.h
         ${PROJECT_SOURCE_DIR}/src/buffer.c
-        ${PROJECT_SOURCE_DIR}/src/impl_flat_hash_map.h
         ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
-        ${PROJECT_SOURCE_DIR}/src/impl_flat_double_ended_queue.h
         ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
-        ${PROJECT_SOURCE_DIR}/src/impl_flat_priority_queue.h
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
-        ${PROJECT_SOURCE_DIR}/src/impl_tree.h
-        ${PROJECT_SOURCE_DIR}/src/impl_priority_queue.h
-        ${PROJECT_SOURCE_DIR}/src/impl_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/impl_flat_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/flat_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/impl_ordered_multimap.h
         ${PROJECT_SOURCE_DIR}/src/ordered_multimap.c
         ${PROJECT_SOURCE_DIR}/src/priority_queue.c
-        ${PROJECT_SOURCE_DIR}/src/impl_singly_linked_list.h
         ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/src/impl_doubly_linked_list.h
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/src/impl_realtime_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/impl_flat_realtime_ordered_map.h
         ${PROJECT_SOURCE_DIR}/src/flat_realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/impl_traits.h
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS
             BASE_DIRS ${PROJECT_SOURCE_DIR}
             FILES 
+              impl_flat_priority_queue.h
+              impl_tree.h
+              impl_priority_queue.h
+              impl_ordered_map.h
+              impl_flat_ordered_map.h
+              impl_ordered_multimap.h
+              impl_singly_linked_list.h
+              impl_doubly_linked_list.h
+              impl_realtime_ordered_map.h
+              impl_flat_realtime_ordered_map.h
+              impl_traits.h
+              impl_flat_double_ended_queue.h
+              impl_flat_hash_map.h
+              impl_buffer.h
               types.h
               buffer.h
               flat_hash_map.h

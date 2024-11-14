@@ -10,8 +10,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(namespace "ccc")
 
-include_directories("${PROJECT_SOURCE_DIR}/src")
-add_subdirectory("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 add_subdirectory("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 

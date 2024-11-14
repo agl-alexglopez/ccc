@@ -31,8 +31,11 @@ struct ccc_sll_
     {                                                                          \
         .sentinel_.n_ = &(sll_name).sentinel_,                                 \
         .elem_sz_ = sizeof(struct_name),                                       \
-        .sll_elem_offset_ = offsetof(struct_name, sll_elem_field), .sz_ = 0,   \
-        .alloc_ = (alloc_fn), .cmp_ = (cmp_fn), .aux_ = (aux_data),            \
+        .sll_elem_offset_ = offsetof(struct_name, sll_elem_field),             \
+        .sz_ = 0,                                                              \
+        .alloc_ = (alloc_fn),                                                  \
+        .cmp_ = (cmp_fn),                                                      \
+        .aux_ = (aux_data),                                                    \
     }
 
 void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
