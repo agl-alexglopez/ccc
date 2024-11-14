@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ccc_5falloc_5ffn_0',['ccc_alloc_fn',['../types_8h.html#a71f0cea7931ffdae612b61631cb3c368',1,'types.h']]],
+  ['ccc_5falloc_5ffn_0',['ccc_alloc_fn',['../types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2',1,'types.h']]],
   ['ccc_5fbuffer_1',['ccc_buffer',['../buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba',1,'buffer.h']]],
   ['ccc_5fcmp_5ffn_2',['ccc_cmp_fn',['../types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231',1,'types.h']]],
   ['ccc_5fdestructor_5ffn_3',['ccc_destructor_fn',['../types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5',1,'types.h']]],

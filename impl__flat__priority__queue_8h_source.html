@@ -109,21 +109,21 @@ $(document).ready(function(){initNavTree('impl__flat__priority__queue_8h_source.
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <a class="code hl_typedef" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> buf_;</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <a class="code hl_typedef" href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a> *cmp_;</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> order_;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">void</span> *aux_;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>};</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keywordtype">size_t</span> ccc_impl_fpq_bubble_up(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">char</span>[], <span class="keywordtype">size_t</span>);</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keywordtype">void</span> ccc_impl_fpq_in_place_heapify(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">size_t</span> n);</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment">/* NOLINTBEGIN(readability-identifier-naming) */</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment">/*=======================    Convenience Macros    ======================== */</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">                          aux_data)                                            \</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">    {                                                                          \</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, capacity), .cmp_ = (cmp_fn),   \</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="preprocessor">        .order_ = (cmp_order), .aux_ = (aux_data),                             \</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>};</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keywordtype">size_t</span> ccc_impl_fpq_bubble_up(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">char</span>[], <span class="keywordtype">size_t</span>);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keywordtype">void</span> ccc_impl_fpq_in_place_heapify(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">size_t</span> n);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment">/* NOLINTBEGIN(readability-identifier-naming) */</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">/*=======================    Convenience Macros    ======================== */</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">                          aux_data)                                            \</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity),           \</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">        .cmp_ = (cmp_fn),                                                      \</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="preprocessor">        .order_ = (cmp_order),                                                 \</span></div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">    }</span></div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order,          \</span></div>
@@ -183,7 +183,7 @@ $(document).ready(function(){initNavTree('impl__flat__priority__queue_8h_source.
 <div class="ttc" id="abuffer_8h_html"><div class="ttname"><a href="buffer_8h.html">buffer.h</a></div><div class="ttdoc">The Buffer Interface.</div></div>
 <div class="ttc" id="abuffer_8h_html_a7d8dfe1437e87b31e7f5522d85080aba"><div class="ttname"><a href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></div><div class="ttdeci">struct ccc_buf_ ccc_buffer</div><div class="ttdoc">A contiguous block of storage for elements of the same type.</div><div class="ttdef"><b>Definition:</b> buffer.h:47</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">The C Container Collection Fundamental Types.</div></div>
-<div class="ttc" id="atypes_8h_html_a78ab7f61b1a36b2f31c2289bd6236231"><div class="ttname"><a href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_cmp_fn(ccc_cmp)</div><div class="ttdoc">A callback function for comparing two elements in a container.</div><div class="ttdef"><b>Definition:</b> types.h:187</div></div>
+<div class="ttc" id="atypes_8h_html_a78ab7f61b1a36b2f31c2289bd6236231"><div class="ttname"><a href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_cmp_fn(ccc_cmp)</div><div class="ttdoc">A callback function for comparing two elements in a container.</div><div class="ttdef"><b>Definition:</b> types.h:194</div></div>
 <div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:70</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

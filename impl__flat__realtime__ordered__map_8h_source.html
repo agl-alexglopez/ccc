@@ -115,46 +115,46 @@ $(document).ready(function(){initNavTree('impl__flat__realtime__ordered__map_8h_
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keywordtype">size_t</span> key_offset_;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">size_t</span> node_elem_offset_;</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <a class="code hl_typedef" href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a> *cmp_;</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keywordtype">void</span> *aux_;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>};</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">struct </span>ccc_frtree_entry_</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>{</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keyword">struct </span>ccc_fromap_ *frm_;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp_;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="comment">/* The types.h entry is not quite suitable for this container so change. */</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordtype">size_t</span> i_;</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="comment">/* Keep these types in sync in cases status reporting changes. */</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    typeof((<a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>){}.impl_.stats_) stats_;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>};</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">union </span>ccc_fromap_entry_</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>{</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keyword">struct </span>ccc_frtree_entry_ impl_;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>};</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keywordtype">void</span> *ccc_impl_frm_key_from_node(<span class="keyword">struct</span> ccc_fromap_ <span class="keyword">const</span> *frm,</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                                 <span class="keyword">struct</span> ccc_fromap_elem_ <span class="keyword">const</span> *elem);</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keywordtype">void</span> *ccc_impl_frm_key_in_slot(<span class="keyword">struct</span> ccc_fromap_ <span class="keyword">const</span> *frm, <span class="keywordtype">void</span> <span class="keyword">const</span> *slot);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keyword">struct </span>ccc_fromap_elem_ *</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>ccc_impl_frm_elem_in_slot(<span class="keyword">struct</span> ccc_fromap_ <span class="keyword">const</span> *frm, <span class="keywordtype">void</span> <span class="keyword">const</span> *slot);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keyword">struct </span>ccc_frtree_entry_ ccc_impl_frm_entry(struct ccc_fromap_ const *frm,</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                                            <span class="keywordtype">void</span> <span class="keyword">const</span> *key);</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keywordtype">void</span> *ccc_impl_frm_insert(<span class="keyword">struct</span> ccc_fromap_ *frm, <span class="keywordtype">size_t</span> parent_i,</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                          <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp, <span class="keywordtype">size_t</span> elem_i);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keywordtype">void</span> *ccc_impl_frm_alloc_back(<span class="keyword">struct</span> ccc_fromap_ *frm);</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment">/* NOLINTBEGIN(readability-identifier-naming) */</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment">/*=========================      Initialization     =========================*/</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#define ccc_impl_frm_init(memory_ptr, capacity, node_elem_field,               \</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">    {                                                                          \</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">        .buf_ = ccc_buf_init(memory_ptr, alloc_fn, capacity), .root_ = 0,      \</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>};</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">struct </span>ccc_frtree_entry_</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>{</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keyword">struct </span>ccc_fromap_ *frm_;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp_;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="comment">/* The types.h entry is not quite suitable for this container so change. */</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">size_t</span> i_;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="comment">/* Keep these types in sync in cases status reporting changes. */</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    typeof((<a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>){}.impl_.stats_) stats_;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>};</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="keyword">union </span>ccc_fromap_entry_</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>{</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keyword">struct </span>ccc_frtree_entry_ impl_;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>};</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keywordtype">void</span> *ccc_impl_frm_key_from_node(<span class="keyword">struct</span> ccc_fromap_ <span class="keyword">const</span> *frm,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                                 <span class="keyword">struct</span> ccc_fromap_elem_ <span class="keyword">const</span> *elem);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="keywordtype">void</span> *ccc_impl_frm_key_in_slot(<span class="keyword">struct</span> ccc_fromap_ <span class="keyword">const</span> *frm, <span class="keywordtype">void</span> <span class="keyword">const</span> *slot);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keyword">struct </span>ccc_fromap_elem_ *</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>ccc_impl_frm_elem_in_slot(<span class="keyword">struct</span> ccc_fromap_ <span class="keyword">const</span> *frm, <span class="keywordtype">void</span> <span class="keyword">const</span> *slot);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">struct </span>ccc_frtree_entry_ ccc_impl_frm_entry(struct ccc_fromap_ const *frm,</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>                                            <span class="keywordtype">void</span> <span class="keyword">const</span> *key);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">void</span> *ccc_impl_frm_insert(<span class="keyword">struct</span> ccc_fromap_ *frm, <span class="keywordtype">size_t</span> parent_i,</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>                          <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp, <span class="keywordtype">size_t</span> elem_i);</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> *ccc_impl_frm_alloc_back(<span class="keyword">struct</span> ccc_fromap_ *frm);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment">/* NOLINTBEGIN(readability-identifier-naming) */</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment">/*=========================      Initialization     =========================*/</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#define ccc_impl_frm_init(memory_ptr, capacity, node_elem_field,               \</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">        .buf_ = ccc_buf_init(memory_ptr, alloc_fn, aux_data, capacity),        \</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">        .root_ = 0,                                                            \</span></div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">        .key_offset_ = offsetof(typeof(*(memory_ptr)), key_elem_field),        \</span></div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">        .node_elem_offset_ = offsetof(typeof(*(memory_ptr)), node_elem_field), \</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">        .cmp_ = (key_cmp_fn), .aux_ = (aux_data),                              \</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">        .cmp_ = (key_cmp_fn),                                                  \</span></div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">    }</span></div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment">/*==================     Core Macro Implementations     =====================*/</span></div>
@@ -353,7 +353,7 @@ $(document).ready(function(){initNavTree('impl__flat__realtime__ordered__map_8h_
 <div class="ttc" id="abuffer_8h_html_a7d8dfe1437e87b31e7f5522d85080aba"><div class="ttname"><a href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></div><div class="ttdeci">struct ccc_buf_ ccc_buffer</div><div class="ttdoc">A contiguous block of storage for elements of the same type.</div><div class="ttdef"><b>Definition:</b> buffer.h:47</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">The C Container Collection Fundamental Types.</div></div>
 <div class="ttc" id="atypes_8h_html_a70feefd55fafc84e06d2f2a1dfd4f389"><div class="ttname"><a href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a></div><div class="ttdeci">union ccc_entry_ ccc_entry</div><div class="ttdoc">An Occupied or Vacant position in a searchable container.</div><div class="ttdef"><b>Definition:</b> types.h:43</div></div>
-<div class="ttc" id="atypes_8h_html_a8097dd574e739c360d2fa2d3e5de70db"><div class="ttname"><a href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function for three-way comparing two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:227</div></div>
+<div class="ttc" id="atypes_8h_html_a8097dd574e739c360d2fa2d3e5de70db"><div class="ttname"><a href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function for three-way comparing two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:234</div></div>
 <div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:70</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

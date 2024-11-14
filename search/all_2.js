@@ -1,7 +1,7 @@
 var searchData=
 [
   ['c_20container_20collection_20_28ccc_29_0',['C Container Collection (CCC)',['../index.html',1,'']]],
-  ['ccc_5falloc_5ffn_1',['ccc_alloc_fn',['../types_8h.html#a71f0cea7931ffdae612b61631cb3c368',1,'types.h']]],
+  ['ccc_5falloc_5ffn_1',['ccc_alloc_fn',['../types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2',1,'types.h']]],
   ['ccc_5fand_5fmodify_2',['ccc_and_modify',['../traits_8h.html#ab25eca1e59257aab34f67308a523553c',1,'traits.h']]],
   ['ccc_5fand_5fmodify_5faux_3',['ccc_and_modify_aux',['../traits_8h.html#a25c5c848da545831e1efa54645aae2dd',1,'traits.h']]],
   ['ccc_5fback_4',['ccc_back',['../traits_8h.html#ac17e62a101d2b926824c550ccc83b347',1,'traits.h']]],
@@ -20,7 +20,7 @@ var searchData=
   ['ccc_5fbuf_5ferase_17',['ccc_buf_erase',['../buffer_8h.html#acd3fe998c43ec179e503d9f7c98f2b83',1,'buffer.c']]],
   ['ccc_5fbuf_5ffront_18',['ccc_buf_front',['../buffer_8h.html#a910cea92529561713753a3450e34c436',1,'buffer.c']]],
   ['ccc_5fbuf_5fi_19',['ccc_buf_i',['../buffer_8h.html#ab113a7b29c2288ec307c81a1dffe47a6',1,'buffer.c']]],
-  ['ccc_5fbuf_5finit_20',['ccc_buf_init',['../buffer_8h.html#a6dd65488a38a96249793ecbcfbc98ca3',1,'buffer.h']]],
+  ['ccc_5fbuf_5finit_20',['ccc_buf_init',['../buffer_8h.html#a66b89d47e24996c7be07dea5d827e649',1,'buffer.h']]],
   ['ccc_5fbuf_5finsert_21',['ccc_buf_insert',['../buffer_8h.html#ae82c527efc9dc329c39375260d9384ed',1,'buffer.c']]],
   ['ccc_5fbuf_5fis_5fempty_22',['ccc_buf_is_empty',['../buffer_8h.html#a06cd0299aeb6c718195677dc3f0cddd1',1,'buffer.c']]],
   ['ccc_5fbuf_5fis_5ffull_23',['ccc_buf_is_full',['../buffer_8h.html#aa61275a99d04957d8c19d411c7053e4a',1,'buffer.h']]],

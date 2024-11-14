@@ -137,9 +137,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a6dd65488a38a96249793ecbcfbc98ca3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a6dd65488a38a96249793ecbcfbc98ca3">ccc_buf_init</a>(mem_ptr,  alloc_fn,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)</td></tr>
-<tr class="memdesc:a6dd65488a38a96249793ecbcfbc98ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size.  <br /></td></tr>
-<tr class="separator:a6dd65488a38a96249793ecbcfbc98ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66b89d47e24996c7be07dea5d827e649"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
+<tr class="memdesc:a66b89d47e24996c7be07dea5d827e649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size.  <br /></td></tr>
+<tr class="separator:a66b89d47e24996c7be07dea5d827e649"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -150,7 +150,7 @@ Typedefs</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
 </td></tr>
-<tr class="memitem:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae2359dd2088ea0cd0b7bfb8260cbaa66">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a71f0cea7931ffdae612b61631cb3c368">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae2359dd2088ea0cd0b7bfb8260cbaa66">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates the buffer to the specified size according to the user defined allocation function.  <br /></td></tr>
 <tr class="separator:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a176afe75a0442da95a8663efbb6ec8b3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a176afe75a0442da95a8663efbb6ec8b3">ccc_buf_alloc_back</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf)</td></tr>
@@ -255,13 +255,13 @@ Typedefs</h2></td></tr>
 <p>Buffer usage is similar to a C++ vector, with more flexible functions provided to support higher level containers and abstractions. While useful on its own&ndash;a stack could be implemented with the provided functions&ndash;a buffer is often used as the lower level abstraction for the flat data structures in this library that provide more specialized operations. A buffer does not require the user accommodate any intrusive elements.</p>
 <p>A buffer with allocation permission will re-size when a new element is inserted in a contiguous fashion. Interface in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
 <p>Interface in the slot management section offer data movement and writing operations that do not affect the size of the container. If writing a more complex higher level container that does not need size management these functions offer more custom control over the buffer.</p>
-<p>If allocation is not permitted, resizing will not occur and the insertion function will fail when capacity is reached, returning some value to indicate the failure.</p>
+<p>If allocation is not permitted, resizing will not occur and the insertion function will fail when capacity is reached, returning some value to indicate failure.</p>
 <p>If shorter names are desired, define the following preprocessor directive.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>Then, the <code>ccc_</code> prefix can be dropped from all types and functions. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a6dd65488a38a96249793ecbcfbc98ca3" name="a6dd65488a38a96249793ecbcfbc98ca3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6dd65488a38a96249793ecbcfbc98ca3">&#9670;&#160;</a></span>ccc_buf_init</h2>
+<a id="a66b89d47e24996c7be07dea5d827e649" name="a66b89d47e24996c7be07dea5d827e649"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66b89d47e24996c7be07dea5d827e649">&#9670;&#160;</a></span>ccc_buf_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -282,6 +282,12 @@ Typedefs</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
+          <td class="paramname">aux_data, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
           <td class="paramname">capacity, </td>
         </tr>
         <tr>
@@ -293,7 +299,7 @@ Typedefs</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, capacity, optional_size)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -308,7 +314,7 @@ Typedefs</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized buffer. Directly assign to buffer on the right hand side of the equality operator (e.g. ccc_buffer b = <a class="el" href="buffer_8h.html#a6dd65488a38a96249793ecbcfbc98ca3" title="Initialize a contiguous buffer of user a specified type, allocation policy, capacity,...">ccc_buf_init(...)</a>;).</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized buffer. Directly assign to buffer on the right hand side of the equality operator (e.g. ccc_buffer b = <a class="el" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649" title="Initialize a contiguous buffer of user a specified type, allocation policy, capacity,...">ccc_buf_init(...)</a>;).</dd></dl>
 <p>Initialization of a buffer can occur at compile time or run time depending on the arguments. The memory pointer should be of the same type one intends to store in the buffer. Therefore, if one desires a dynamic buffer with a starting capacity of 0 and mem_ptr of NULL, casting to a type is required (e.g. (int*)NULL).</p>
 <p>This initializer determines memory control for the lifetime of the buffer. If the buffer points to memory of a predetermined and fixed capacity do not provide an allocation function. If a dynamic buffer is preferred, provide the allocation function as defined by the signature in <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>. If resizing is desired on memory that has already been allocated, ensure allocation has occurred with the provided allocation function. </p>
 
@@ -355,7 +361,7 @@ Typedefs</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a71f0cea7931ffdae612b61631cb3c368">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>&#160;</td>
         </tr>
         <tr>

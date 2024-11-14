@@ -4,7 +4,7 @@ var searchData=
   ['ccc_5fand_5fmodify_5faux_1',['ccc_and_modify_aux',['../traits_8h.html#a25c5c848da545831e1efa54645aae2dd',1,'traits.h']]],
   ['ccc_5fback_2',['ccc_back',['../traits_8h.html#ac17e62a101d2b926824c550ccc83b347',1,'traits.h']]],
   ['ccc_5fbegin_3',['ccc_begin',['../traits_8h.html#a504d84577ccbf965001b0707cc67cc57',1,'traits.h']]],
-  ['ccc_5fbuf_5finit_4',['ccc_buf_init',['../buffer_8h.html#a6dd65488a38a96249793ecbcfbc98ca3',1,'buffer.h']]],
+  ['ccc_5fbuf_5finit_4',['ccc_buf_init',['../buffer_8h.html#a66b89d47e24996c7be07dea5d827e649',1,'buffer.h']]],
   ['ccc_5fcontains_5',['ccc_contains',['../traits_8h.html#a9be78791f2812eee308106b818fa506f',1,'traits.h']]],
   ['ccc_5fdecrease_6',['ccc_decrease',['../traits_8h.html#aa4903300ff492bcc09cb717a7d212fc1',1,'traits.h']]],
   ['ccc_5fdll_5femplace_5fback_7',['ccc_dll_emplace_back',['../doubly__linked__list_8h.html#a67936dadaece25c50d68e3dae247f686',1,'doubly_linked_list.h']]],
