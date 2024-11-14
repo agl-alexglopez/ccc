@@ -141,6 +141,7 @@ ccc_fom_and_modify(ccc_fomap_entry *const e, ccc_update_fn *const fn)
     {
         return NULL;
     }
+    void *unused;
     if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type){
