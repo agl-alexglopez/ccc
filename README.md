@@ -123,6 +123,7 @@ For examples of what code that uses these ideas looks like, read and use the sam
 - Why not header only? I want the library to be readable, maintainable, and updateable, especially if I want to change implementations in the source files. If the user wants to explore the implementation everything should be easily understandable.
 - Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.
 - Why flat maps? Mostly experimenting. Flat maps track the tree structure through indices not pointers. This makes the data structure copyable, relocatable, serializable, or writable to disk at the cost of pointer stability in most cases.
+- Why C23? It is a great standard that is pleasant to write with and allows for the expressiveness I like in a library. Clang already covers most of the features used on many platforms. Newer gcc versions also have them covered.
 
 ## Related
 
