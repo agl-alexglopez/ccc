@@ -81,22 +81,6 @@ The C code.
 #include "ccc/flat_hash_map.h"
 ```
 
-## Alternative Builds
-
-You may wish to use a different compiler and tool chain than what your system default specifies. Review the `CMakePrests.json` file for different compilers.
-
-```zsh
-make gcc-rel [OPTIONAL/INSTALL/PATH]
-make install
-```
-
-Use Clang to compile the library.
-
-```zsh
-make clang-rel [OPTIONAL/INSTALL/PATH]
-make install
-```
-
 ## Without Make
 
 If your system does not support Makefiles or the `make` command here are the CMake commands one can run that will do the same.
