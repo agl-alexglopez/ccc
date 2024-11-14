@@ -154,7 +154,7 @@ Allocation</h2>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient.</p>
 <h3><a class="anchor" id="autotoc_md8"></a>
 Constructors</h3>
-<p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped piece for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
+<p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped block for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
