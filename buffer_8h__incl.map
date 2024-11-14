@@ -1,6 +1,6 @@
 <map id="ccc/buffer.h" name="ccc/buffer.h">
-<area shape="rect" id="node1" title="The Buffer Interface." alt="" coords="91,5,187,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,79,145,104"/>
-<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="169,79,240,104"/>
-<area shape="rect" id="node4" title=" " alt="" coords="135,152,274,177"/>
+<area shape="rect" id="node1" title="The Buffer Interface." alt="" coords="81,5,177,31"/>
+<area shape="rect" id="node2" href="$impl__buffer_8h_source.html" title=" " alt="" coords="5,79,145,104"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="87,152,170,177"/>
+<area shape="rect" id="node4" href="$impl__types_8h_source.html" title=" " alt="" coords="59,225,198,251"/>
 </map>

@@ -1,6 +1,8 @@
 <map id="ccc/flat_priority_queue.h" name="ccc/flat_priority_queue.h">
-<area shape="rect" id="node1" title="The Flat Priority Queue Interface." alt="" coords="69,5,250,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,79,172,119"/>
-<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="196,86,267,111"/>
-<area shape="rect" id="node4" title=" " alt="" coords="162,167,301,192"/>
+<area shape="rect" id="node1" title="The Flat Priority Queue Interface." alt="" coords="133,5,314,31"/>
+<area shape="rect" id="node2" href="$impl__flat__priority__queue_8h_source.html" title=" " alt="" coords="80,79,247,119"/>
+<area shape="rect" id="node5" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="167,313,250,339"/>
+<area shape="rect" id="node3" href="$buffer_8h.html" title="The Buffer Interface." alt="" coords="114,167,197,192"/>
+<area shape="rect" id="node4" href="$impl__buffer_8h_source.html" title=" " alt="" coords="5,240,145,265"/>
+<area shape="rect" id="node6" href="$impl__types_8h_source.html" title=" " alt="" coords="139,387,278,412"/>
 </map>

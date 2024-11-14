@@ -1,6 +1,7 @@
 <map id="ccc/ordered_multimap.h" name="ccc/ordered_multimap.h">
-<area shape="rect" id="node1" title="The Ordered Multimap Interface." alt="" coords="113,5,291,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,79,228,104"/>
-<area shape="rect" id="node3" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="252,79,323,104"/>
-<area shape="rect" id="node4" title=" " alt="" coords="218,152,357,177"/>
+<area shape="rect" id="node1" title="The Ordered Multimap Interface." alt="" coords="101,5,279,31"/>
+<area shape="rect" id="node2" href="$impl__ordered__multimap_8h_source.html" title=" " alt="" coords="5,79,228,104"/>
+<area shape="rect" id="node4" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="185,225,267,251"/>
+<area shape="rect" id="node3" href="$impl__tree_8h_source.html" title=" " alt="" coords="99,152,195,177"/>
+<area shape="rect" id="node5" href="$impl__types_8h_source.html" title=" " alt="" coords="117,299,255,324"/>
 </map>

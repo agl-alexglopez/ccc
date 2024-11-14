@@ -25,23 +25,23 @@
 var NAVTREE =
 [
   [ "C Container Collection (CCC)", "index.html", [
-    [ "Installation", "index.html#autotoc_md3", null ],
-    [ "Quick Start", "index.html#autotoc_md4", null ],
-    [ "Design", "index.html#autotoc_md5", [
-      [ "Motivations", "index.html#autotoc_md6", null ],
-      [ "Allocation", "index.html#autotoc_md7", [
-        [ "Constructors", "index.html#autotoc_md8", null ],
-        [ "Destructors", "index.html#autotoc_md9", null ]
+    [ "Installation", "index.html#autotoc_md1", null ],
+    [ "Quick Start", "index.html#autotoc_md2", null ],
+    [ "Design", "index.html#autotoc_md3", [
+      [ "Motivations", "index.html#autotoc_md4", null ],
+      [ "Allocation", "index.html#autotoc_md5", [
+        [ "Constructors", "index.html#autotoc_md6", null ],
+        [ "Destructors", "index.html#autotoc_md7", null ]
       ] ]
     ] ],
-    [ "Samples", "index.html#autotoc_md10", null ],
-    [ "Miscellaneous Why?", "index.html#autotoc_md11", null ],
-    [ "Related", "index.html#autotoc_md12", null ],
+    [ "Samples", "index.html#autotoc_md8", null ],
+    [ "Miscellaneous Why?", "index.html#autotoc_md9", null ],
+    [ "Related", "index.html#autotoc_md10", null ],
     [ "Building and Installation", "md_INSTALL.html", [
-      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md14", null ],
-      [ "Include the Library", "md_INSTALL.html#autotoc_md15", null ],
-      [ "Without Make", "md_INSTALL.html#autotoc_md16", null ],
-      [ "User Presets", "md_INSTALL.html#autotoc_md17", null ]
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md12", null ],
+      [ "Include the Library", "md_INSTALL.html#autotoc_md13", null ],
+      [ "Without Make", "md_INSTALL.html#autotoc_md14", null ],
+      [ "User Presets", "md_INSTALL.html#autotoc_md15", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -68,8 +68,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"flat__realtime__ordered__map_8h.html#af683ffb3f432ab31a95ad30881a96e40",
-"traits_8h.html#a84f0169fda32e63d8cc40d2a65eff078"
+"flat__realtime__ordered__map_8h.html#aee6facea4fd2cead46927b5391d0a156",
+"traits_8h.html#a27e2d18520c56b3796e6ce0d6aa31a95"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -94,10 +94,10 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a> The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. For the motivations of why such a library is helpful in C read on.</p>
-<h1><a class="anchor" id="autotoc_md3"></a>
+<h1><a class="anchor" id="autotoc_md1"></a>
 Installation</h1>
-<p>Currently, this library supports a manual installation via CMake. See the <a class="el" href="md_INSTALL.html">INSTALL.md</a> file for more details.</p>
-<h1><a class="anchor" id="autotoc_md4"></a>
+<p>Currently, this library supports a manual installation via CMake. See the <a class="el" href="md_INSTALL.html">INSTALL.md</a> file for more details. This file is also included when you download a simplified release from the <a href="https://github.com/agl-alexglopez/ccc/releases">Releases</a> page.</p>
+<h1><a class="anchor" id="autotoc_md2"></a>
 Quick Start</h1>
 <ul>
 <li>Read the <a href="https://agl-alexglopez.github.io/ccc">DOCS</a>.</li>
@@ -105,9 +105,9 @@ Quick Start</h1>
 <li>Read the <a href="https://agl-alexglopez.github.io/ccc/files.html">header</a> for the desired container to understand its functionality.</li>
 <li>Read about generic <a href="https://agl-alexglopez.github.io/ccc/traits_8h.html">traits.h</a> shared across containers to make code more succinct.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h1><a class="anchor" id="autotoc_md3"></a>
 Design</h1>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md4"></a>
 Motivations</h2>
 <p>Here is the main argument of this library:</p>
 <p><b>Containers in C should avoid limiting the control and flexibility offered by the C language.</b></p>
@@ -122,7 +122,7 @@ Motivations</h2>
 <div class="line">    container_elem elem;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The handle to the container element is then passed by reference to all functions that require it.</p>
-<h2><a class="anchor" id="autotoc_md7"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Allocation</h2>
 <p>If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">void</span> *<a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(<span class="keywordtype">void</span> *ptr, <span class="keywordtype">size_t</span> size, <span class="keywordtype">void</span> *aux);</div>
@@ -155,13 +155,13 @@ Allocation</h2>
 <div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.</p>
-<h3><a class="anchor" id="autotoc_md8"></a>
+<h3><a class="anchor" id="autotoc_md6"></a>
 Constructors</h3>
 <p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
-<h3><a class="anchor" id="autotoc_md9"></a>
+<h3><a class="anchor" id="autotoc_md7"></a>
 Destructors</h3>
 <p>For destructors, the argument is similar but the container does help with this at times. If an action other than freeing the memory of a user type is needed upon removal, there are multiple options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. The one exception is the following interfaces.</p>
 <p>The clear function works for pointer stable containers and flat containers.</p>
@@ -169,10 +169,10 @@ Destructors</h3>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
-<h1><a class="anchor" id="autotoc_md10"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
-<h1><a class="anchor" id="autotoc_md11"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Miscellaneous Why?</h1>
 <ul>
 <li>Why is initialization so ugly? Yes, I know. Many intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> type macro that returns the user type wrapping the intruder, assuming the user gives the correct type and field names. I do not like this because it introduces the chance for extremely subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors in entering the wrong type or field name grows rapidly. At the cost of slightly more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
@@ -182,7 +182,7 @@ Miscellaneous Why?</h1>
 <li>Why flat maps? Mostly experimenting. Flat maps track the tree structure through indices not pointers. This makes the data structure copyable, relocatable, serializable, or writable to disk at the cost of pointer stability in most cases.</li>
 <li>Why C23? It is a great standard that is pleasant to write with and allows for the expressiveness I like in a library. Clang already covers most of the features used on many platforms. Newer gcc versions also have them covered.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md12"></a>
+<h1><a class="anchor" id="autotoc_md10"></a>
 Related</h1>
 <p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
