@@ -1,0 +1,68 @@
+name: linux-build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  check-diff:
+    runs-on: ubuntu-latest
+    outputs: 
+      handle: ${{ steps.check.outputs.run }}
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 2
+
+      # The goal is to force this to pass if it does not need to run.
+      - name: Check the diff
+        id: check
+        run: |
+          echo "Here are the changed build/C files:"
+          echo "$(git --no-pager diff --name-only HEAD HEAD~1 | grep -E '\.(c|h)$|\.cmake|CMakeLists|Config\.cmake\.in')"
+          if git --no-pager diff --name-only HEAD HEAD~1 | grep -qE '\.(c|h)$|\.cmake|CMakeLists|Config\.cmake\.in'; then
+            echo "run=true" >> $GITHUB_OUTPUT
+            echo "Implementation and/or build files have changed, rebuilding..."
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "Implementation and/or build files have NOT changed, skipping build..."
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check-diff
+    if: ${{ needs.check-diff.outputs.handle == 'true' }}
+
+    steps:
+
+    - name: Sanity Check
+      run: |
+        echo "${{ needs.check-diff.outputs.handle }}"
+  
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - uses: lukka/get-cmake@latest 
+
+    - name: Delete non-library files
+      run: |
+        rm -rf samples/
+        rm -rf tests/
+        rm -rf util/
+
+    - name: Build with Clang and Ninja Generator
+      run: |
+        make clang-deb
+        make install
+
+    - name: Build with GCC and Makefile Generator
+      run: |
+        make clean
+        make gcc-deb
+        make install
+
