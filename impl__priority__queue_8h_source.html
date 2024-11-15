@@ -148,10 +148,10 @@ $(document).ready(function(){initNavTree('impl__priority__queue_8h_source.html',
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">            }                                                                  \</span></div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">            else                                                               \</span></div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">            {                                                                  \</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">                pq_res_ = pq_-&gt;alloc_(NULL, pq_-&gt;elem_sz_);                    \</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">                pq_res_ = pq_-&gt;alloc_(NULL, pq_-&gt;elem_sz_, pq_-&gt;aux_);         \</span></div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">                if (pq_res_)                                                   \</span></div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">                {                                                              \</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">                    *pq_res_ = (typeof(*pq_res_))lazy_value;                   \</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">                    *pq_res_ = lazy_value;                                     \</span></div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">                    ccc_impl_pq_push(pq_, ccc_impl_pq_elem_in(pq_, pq_res_));  \</span></div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">                }                                                              \</span></div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">            }                                                                  \</span></div>
