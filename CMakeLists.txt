@@ -14,9 +14,8 @@ set(namespace "ccc")
 include_directories("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 add_subdirectory("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 
-# For the sake of vcpkg we will make sure cloning and building from
-# main will only build the minimal files in the all target. I can't
-# protect vcpkg from needlessly downloading 
+# Excluding from all simplifies cmake presets until cmake figures out how
+# to tame the combinatorial explosion of buildPresets
 if (EXISTS "${PROJECT_SOURCE_DIR}/samples")
     include_directories("${PROJECT_SOURCE_DIR}/samples")
     add_subdirectory("${PROJECT_SOURCE_DIR}/samples" EXCLUDE_FROM_ALL)
