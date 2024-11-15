@@ -7,6 +7,7 @@ project("ccc"
 # Specify that C23 should be used
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+option(BUILD_SHARED_LIBS "Building ccc as a shared library is available, but OFF by default." OFF)
 
 set(namespace "ccc")
 
@@ -38,8 +39,6 @@ else()
     message(STATUS "This project is a top-level one")
 endif()
 
-
-option(BUILD_SHARED_LIBS "Building ccc as a shared library is available, but OFF by default." OFF)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/debug/bin)
