@@ -57,6 +57,5 @@ jobs:
 
     - name: Build with Clang and Ninja Generator
       run: |
-        make clang-rel
-        make install
+        make clang-ccc
 
