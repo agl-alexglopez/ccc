@@ -51,7 +51,7 @@
             "inherits": "default-deb",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
-                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -static -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
