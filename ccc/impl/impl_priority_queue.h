@@ -58,10 +58,10 @@ struct ccc_pq_elem_ *ccc_impl_pq_elem_in(struct ccc_pq_ const *, void const *);
             }                                                                  \
             else                                                               \
             {                                                                  \
-                pq_res_ = pq_->alloc_(NULL, pq_->elem_sz_);                    \
+                pq_res_ = pq_->alloc_(NULL, pq_->elem_sz_, pq_->aux_);         \
                 if (pq_res_)                                                   \
                 {                                                              \
-                    *pq_res_ = (typeof(*pq_res_))lazy_value;                   \
+                    *pq_res_ = lazy_value;                                     \
                     ccc_impl_pq_push(pq_, ccc_impl_pq_elem_in(pq_, pq_res_));  \
                 }                                                              \
             }                                                                  \
