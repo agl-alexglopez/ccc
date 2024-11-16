@@ -166,7 +166,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a44d4acb598d4ef3170d4e90e4b394f80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the map for future use.  <br /></td></tr>
 <tr class="separator:a44d4acb598d4ef3170d4e90e4b394f80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26fbd43dce84c88582dfe82ddc267a19"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a26fbd43dce84c88582dfe82ddc267a19">ccc_om_and_modify_w</a>(ordered_map_entry_ptr,  closure_over_T...)</td></tr>
-<tr class="memdesc:a26fbd43dce84c88582dfe82ddc267a19"><td class="mdescLeft">&#160;</td><td class="mdescRight">modify the value stored in the map entry with a modification function and lazily constructed auxiliary data.  <br /></td></tr>
+<tr class="memdesc:a26fbd43dce84c88582dfe82ddc267a19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
 <tr class="separator:a26fbd43dce84c88582dfe82ddc267a19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a42bf33be1fbca2e57b31f97732dc18"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a4a42bf33be1fbca2e57b31f97732dc18">ccc_om_or_insert_w</a>(ordered_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_om_or_insert_w(ordered_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a4a42bf33be1fbca2e57b31f97732dc18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
@@ -319,7 +319,7 @@ Typedefs</h2></td></tr>
 <div class="line">    }</div>
 <div class="ttc" id="aordered__map_8h_html_a04fb5474a27fed7faace243a60b76224"><div class="ttname"><a href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></div><div class="ttdeci">union ccc_omap_entry_ ccc_omap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_map.h:53</div></div>
 </div><!-- fragment -->
-<p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
+<p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ordered_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>

@@ -173,7 +173,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
 <tr class="separator:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87e9a365d4d90f6e03246051e5744f03"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a87e9a365d4d90f6e03246051e5744f03">ccc_fhm_and_modify_w</a>(flat_hash_map_entry_ptr,  closure_over_T...)</td></tr>
-<tr class="memdesc:a87e9a365d4d90f6e03246051e5744f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">modify the value stored in the map entry with a modification function and lazily constructed auxiliary data.  <br /></td></tr>
+<tr class="memdesc:a87e9a365d4d90f6e03246051e5744f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
 <tr class="separator:a87e9a365d4d90f6e03246051e5744f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a147ceaca531b1d1a6980d77ae4cbf816">ccc_fhm_or_insert_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a147ceaca531b1d1a6980d77ae4cbf816"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
@@ -312,7 +312,7 @@ Typedefs</h2></td></tr>
 <div class="line">    }</div>
 <div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:51</div></div>
 </div><!-- fragment -->
-<p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
+<p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>

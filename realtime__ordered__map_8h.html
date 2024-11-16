@@ -165,7 +165,7 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a16d9c6fe21548604fb01acf0a3891338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the map for future use.  <br /></td></tr>
 <tr class="separator:a16d9c6fe21548604fb01acf0a3891338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab878b35bbe1c0143b6c71f79d3789dea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#ab878b35bbe1c0143b6c71f79d3789dea">ccc_rom_and_modify_w</a>(realtime_ordered_map_entry_ptr,  closure_over_T...)</td></tr>
-<tr class="memdesc:ab878b35bbe1c0143b6c71f79d3789dea"><td class="mdescLeft">&#160;</td><td class="mdescRight">modify the value stored in the map entry with a modification function and lazily constructed auxiliary data.  <br /></td></tr>
+<tr class="memdesc:ab878b35bbe1c0143b6c71f79d3789dea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
 <tr class="separator:ab878b35bbe1c0143b6c71f79d3789dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44a8b4b54c4dcec39d02a20795de0e8e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a44a8b4b54c4dcec39d02a20795de0e8e">ccc_rom_or_insert_w</a>(realtime_ordered_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a44a8b4b54c4dcec39d02a20795de0e8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
@@ -319,7 +319,7 @@ Typedefs</h2></td></tr>
 <div class="line">    }</div>
 <div class="ttc" id="arealtime__ordered__map_8h_html_aa12b57bbf811c5ceaddb04be774bf662"><div class="ttname"><a href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a></div><div class="ttdeci">union ccc_romap_entry_ ccc_romap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:50</div></div>
 </div><!-- fragment -->
-<p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
+<p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">realtime_ordered_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
