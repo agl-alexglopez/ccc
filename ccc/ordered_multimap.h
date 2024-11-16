@@ -261,9 +261,7 @@ function are NULL, NULL is returned. */
 [[nodiscard]] ccc_ommap_entry *
 ccc_omm_and_modify_aux(ccc_ommap_entry *e, ccc_update_fn *fn, void *aux);
 
-/** @brief Modify the ordered multimap entry with a modification function
-requiring auxiliary data. If auxiliary data is passed as a function call, it
-will only execute if the entry is occupied.
+/** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] ordered_multimap_entry_ptr the address of the multimap entry.
 @param [in] closure_over_T the code to be run on the reference to user type T,
 if Occupied. This may be a semicolon separated list of statements to execute on

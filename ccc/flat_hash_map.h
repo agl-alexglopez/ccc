@@ -323,8 +323,7 @@ ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_update_fn *fn, void *aux);
 
-/** @brief modify the value stored in the map entry with a modification
-function and lazily constructed auxiliary data.
+/** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
 @param [in] closure_over_T the code to be run on the reference to user type T,
 if Occupied. This may be a semicolon separated list of statements to execute on
