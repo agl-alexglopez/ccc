@@ -174,6 +174,7 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fhmap_elem *const out_handle)
         out_handle->hash_ = ent.hash_;
         void *const tmp = ccc_buf_at(&h->buf_, 0);
         swap(tmp, ent.entry_.e_, user_return, user_struct_size);
+        *hash_at(h, 0) = CCC_FHM_EMPTY;
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
@@ -217,6 +218,7 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle)
     struct ccc_fhash_entry_ ent = container_entry(h, key_in_slot(h, user_base));
     if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
+        key_val_handle->hash_ = ent.hash_;
         (void)memcpy(ent.entry_.e_, user_base, ccc_buf_elem_size(&h->buf_));
         return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -567,7 +569,7 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
 
 /* Assumes that element to be inserted does not already exist in the table.
    Assumes that the table has room for another insertion. Unexpected results
-   may occur if these assumptions are not accomodated. */
+   may occur if these assumptions are not accommodated. */
 static inline void
 insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
        size_t cur_i)
