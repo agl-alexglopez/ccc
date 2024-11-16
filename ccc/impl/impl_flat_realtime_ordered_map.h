@@ -71,8 +71,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
 
 /*==================     Core Macro Implementations     =====================*/
 
-#define ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, mod_fn, \
-                                  aux_data...)                                 \
+#define ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr,         \
+                                  closure_over_T...)                           \
     ({                                                                         \
         __auto_type frm_ent_ptr_ = (flat_realtime_ordered_map_entry_ptr);      \
         struct ccc_frtree_entry_ frm_mod_ent_                                  \
@@ -80,12 +80,14 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
         if (frm_ent_ptr_)                                                      \
         {                                                                      \
             frm_mod_ent_ = fom_ent_ptr_->impl_;                                \
-            ccc_update_fn *const and_mod_fn_ = (mod_fn);                       \
-            if (and_mod_fn_ && frm_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)       \
+            if (frm_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                      \
             {                                                                  \
-                __auto_type frm_aux_data_ = aux_data;                          \
-                and_mod_fn_((ccc_user_type){.user_type = (void *const)e.entry, \
-                                            .aux = &frm_aux_data_});           \
+                void *const T                                                  \
+                    = ccc_buf_at(&frm_mod_ent_.fom_->buf_, fom_rm_ent_.i_);    \
+                if (T)                                                         \
+                {                                                              \
+                    closure_over_T                                             \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         frm_mod_ent_;                                                          \

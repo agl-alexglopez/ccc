@@ -123,17 +123,22 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 
 /*=====================     Core Macro Implementations     ==================*/
 
-#define ccc_impl_fhm_and_modify_w(flat_hash_map_entry, mod_fn, aux...)         \
+#define ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, closure_over_T...)  \
     ({                                                                         \
+        __auto_type fhm_mod_ent_ptr_ = (flat_hash_map_entry_ptr);              \
         struct ccc_fhash_entry_ fhm_mod_with_ent_                              \
-            = (flat_hash_map_entry)->impl_;                                    \
-        ccc_update_fn *const fhm_mod_fn_ = (mod_fn);                           \
-        if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED              \
-            && fhm_mod_fn_)                                                    \
+            = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
+        if (fhm_mod_ent_ptr_)                                                  \
         {                                                                      \
-            __auto_type fhm_aux_ = aux;                                        \
-            (fhm_mod_fn_)(                                                     \
-                (ccc_user_type){fhm_mod_with_ent_.entry_.e_, &fhm_aux_});      \
+            fhm_mod_with_ent_ = fhm_mod_ent_ptr_->impl_;                       \
+            if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)         \
+            {                                                                  \
+                void *const T = fhm_mod_with_ent_.entry_.e_;                   \
+                if (T)                                                         \
+                {                                                              \
+                    closure_over_T                                             \
+                }                                                              \
+            }                                                                  \
         }                                                                      \
         fhm_mod_with_ent_;                                                     \
     })
@@ -146,8 +151,6 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         {                                                                      \
             struct ccc_fhash_entry_ *fhm_or_ins_entry_                         \
                 = &fhm_or_ins_ent_ptr_->impl_;                                 \
-            assert(sizeof(*fhm_or_ins_res_)                                    \
-                   == ccc_buf_elem_size(&(fhm_or_ins_entry_->h_->buf_)));      \
             if (fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_OCCUPIED)         \
             {                                                                  \
                 fhm_or_ins_res_ = fhm_or_ins_entry_->entry_.e_;                \

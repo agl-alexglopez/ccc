@@ -135,8 +135,8 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
 
 /*==================     Core Macro Implementations     =====================*/
 
-#define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, mod_fn,      \
-                                  aux_data...)                                 \
+#define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr,              \
+                                  closure_over_T...)                           \
     ({                                                                         \
         __auto_type rom_ent_ptr_ = (realtime_ordered_map_entry_ptr);           \
         struct ccc_rtree_entry_ rom_mod_ent_                                   \
@@ -144,13 +144,13 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         if (rom_ent_ptr_)                                                      \
         {                                                                      \
             rom_mod_ent_ = rom_ent_ptr_->impl_;                                \
-            ccc_update_fn *and_mod_fn_ = (mod_fn);                             \
-            if (and_mod_fn_                                                    \
-                && rom_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)            \
+            if (rom_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)               \
             {                                                                  \
-                __auto_type rom_aux_data_ = aux_data;                          \
-                and_mod_fn_((ccc_user_type){.user_type = e.entry,              \
-                                            .aux = &rom_aux_data_});           \
+                void *const T = e.entry_;                                      \
+                if (T)                                                         \
+                {                                                              \
+                    closure_over_T                                             \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         rom_mod_ent_;                                                          \

@@ -58,7 +58,7 @@ struct frequency
 struct word
 {
     str_ofs ofs;
-    int freq;
+    int cnt;
     /* Map element for logging frequencies by string key, freq value. */
     fomap_elem e;
 };
@@ -93,8 +93,9 @@ static str_view const space = SV(" ");
 
 static str_view const directions
     = SV("\nPlease specify a command as follows:\n"
-         "./build/[bin/] or [debug/bin]/words [flag] -f=[path/to/file.txt]\n"
+         "./build/[bin/] or [debug/bin]/words [flag] -f=[path/to/file]\n"
          "[flag]:\n"
+         "-f=[/path/to/file]\n"
          "-c\n"
          "\treports the words by count in descending order.\n"
          "-rc\n"
@@ -103,7 +104,7 @@ static str_view const directions
          "\treporst the top N words by frequency.\n"
          "-last=N\n"
          "\treports the last N words by frequency\n"
-         "find=[WORD]\n"
+         "-find=[WORD]\n"
          "\treports the count of the specified word.\n");
 
 /*=======================   Prototypes     ==================================*/
@@ -259,7 +260,7 @@ print_found(FILE *const f, str_view w)
         struct word const *const word = get_key_val(&map, &wc.str);
         if (word)
         {
-            printf("%s %d\n", str_arena_at(&a, word->ofs), word->freq);
+            printf("%s %d\n", str_arena_at(&a, word->ofs), word->cnt);
         }
     }
     str_arena_free(&a);
@@ -328,7 +329,7 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
          w = next(map, &w->e), ++i)
     {
         freqs[i].ofs = w->ofs;
-        freqs[i].freq = w->freq;
+        freqs[i].freq = w->cnt;
     }
     return (struct frequency_alloc){.arr = freqs, .cap = cap};
 }
@@ -373,10 +374,11 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
             PROG_ASSERT(cw.stat != WC_ARENA_ERR);
             if (cw.stat == WC_CLEAN_WORD)
             {
-                struct word *const w = or_insert(
-                    entry_r(&fom, &cw.str), &(struct word){.ofs = cw.str}.e);
+                struct word *w = fom_or_insert_w(
+                    fom_and_modify_w(entry_r(&fom, &cw.str),
+                                     ++((struct word *)T)->cnt;),
+                    (struct word){.ofs = cw.str, .cnt = 1});
                 PROG_ASSERT(w);
-                ++w->freq;
             }
         }
     }
