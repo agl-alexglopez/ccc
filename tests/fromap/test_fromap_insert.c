@@ -17,7 +17,7 @@
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_one)
 {
     flat_realtime_ordered_map s
-        = frm_init((struct val[2]){}, 2, elem, id, NULL, val_cmp, NULL);
+        = frm_init((struct val[2]){}, 2, elem, id, NULL, id_cmp, NULL);
     CHECK(occupied(insert_r(&s, &(struct val){}.elem)), false);
     CHECK(is_empty(&s), false);
     CHECK_END_FN();
@@ -28,7 +28,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_macros)
     /* This is also a good test to see if the buffer can manage its own memory
        when provided with a std_alloc function starting from NULL. */
     flat_realtime_ordered_map s
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, val_cmp, NULL);
+        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
     struct val *v = frm_or_insert_w(entry_r(&s, &(int){0}), (struct val){});
     CHECK(v != NULL, true);
     v = frm_insert_entry_w(entry_r(&s, &(int){0}),
@@ -67,7 +67,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_shuffle)
 {
     size_t const size = 50;
     ccc_flat_realtime_ordered_map s
-        = frm_init((struct val[51]){}, 51, elem, id, NULL, val_cmp, NULL);
+        = frm_init((struct val[51]){}, 51, elem, id, NULL, id_cmp, NULL);
     CHECK(size > 1, true);
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_weak_srand)
 {
     int const num_nodes = 1000;
     ccc_flat_realtime_ordered_map s
-        = frm_init((struct val[1001]){}, 1001, elem, id, NULL, val_cmp, NULL);
+        = frm_init((struct val[1001]){}, 1001, elem, id, NULL, id_cmp, NULL);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {

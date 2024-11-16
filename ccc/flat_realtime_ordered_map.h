@@ -380,8 +380,7 @@ returned if allocation failed or is not allowed when required. */
 @return an entry containing NULL or a reference to the old entry. If Occupied an
 entry in the map existed and was removed. If Vacant, no prior entry existed to
 be removed.
-
-Note that the reference to the removed entry is invalidated upon any further
+@warning the reference to the removed entry is invalidated upon any further
 insertions. */
 ccc_entry ccc_frm_remove_entry(ccc_fromap_entry const *e);
 

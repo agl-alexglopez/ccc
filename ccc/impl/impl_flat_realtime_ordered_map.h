@@ -79,11 +79,11 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
         if (frm_ent_ptr_)                                                      \
         {                                                                      \
-            frm_mod_ent_ = fom_ent_ptr_->impl_;                                \
+            frm_mod_ent_ = frm_ent_ptr_->impl_;                                \
             if (frm_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                      \
             {                                                                  \
                 void *const T                                                  \
-                    = ccc_buf_at(&frm_mod_ent_.fom_->buf_, fom_rm_ent_.i_);    \
+                    = ccc_buf_at(&frm_mod_ent_.frm_->buf_, frm_mod_ent_.i_);   \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \

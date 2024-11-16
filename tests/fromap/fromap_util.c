@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_key_cmp const cmp)
+id_cmp(ccc_key_cmp const cmp)
 {
     struct val const *const c = cmp.user_type_rhs;
     int const key = *((int *)cmp.key_lhs);
