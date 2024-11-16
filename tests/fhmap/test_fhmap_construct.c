@@ -114,7 +114,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
     CHECK(is_empty(&fh), true);
     struct val def = {.id = 137, .val = 0};
 
-    /* Returning a vacant entry is possible when modification is attemtped. */
+    /* Returning a vacant entry is possible when modification is attempted. */
     ccc_fhmap_entry *ent = and_modify(entry_r(&fh, &def.id), mod);
     CHECK(occupied(ent), false);
     CHECK((unwrap(ent) == NULL), true);
@@ -129,7 +129,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
     CHECK(inserted->val, 1);
 
     /* Modifying an existing value or inserting default is possible when no
-       auxilliary input is needed. */
+       auxiliary input is needed. */
     struct val *v2 = or_insert(and_modify(entry_r(&fh, &def.id), mod), &def.e);
     CHECK((v2 != NULL), true);
     CHECK(inserted->id, 137);
@@ -155,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
     CHECK(res, CCC_OK);
     CHECK(is_empty(&fh), true);
 
-    /* Returning a vacant entry is possible when modification is attemtped. */
+    /* Returning a vacant entry is possible when modification is attempted. */
     ccc_fhmap_entry *ent = and_modify(entry_r(&fh, &(int){137}), mod);
     CHECK(occupied(ent), false);
     CHECK((unwrap(ent) == NULL), true);
@@ -163,16 +163,17 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
     int mut = 99;
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v = fhm_or_insert_w(
-        fhm_and_modify_w(entry_r(&fh, &(int){137}), modw, gen(&mut)),
-        (struct val){.id = 137, .val = def(&mut)});
+    struct val *v
+        = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &(int){137}),
+                                           ((struct val *)T)->val = gen(&mut);),
+                          (struct val){.id = 137, .val = def(&mut)});
     CHECK((v != NULL), true);
     CHECK(v->id, 137);
     CHECK(v->val, 0);
     CHECK(mut, 100);
 
     /* Modifying an existing value or inserting default is possible when no
-       auxilliary input is needed. */
+       auxiliary input is needed. */
     struct val *v2 = fhm_or_insert_w(and_modify(entry_r(&fh, &(int){137}), mod),
                                      (struct val){.id = 137, .val = def(&mut)});
     CHECK((v2 != NULL), true);
@@ -185,9 +186,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
        lazy evaluation. The function gen executes with its side effect,
        but the function def does not execute and therefore does not modify
        mut. */
-    struct val *v3 = fhm_or_insert_w(
-        fhm_and_modify_w(entry_r(&fh, &(int){137}), modw, gen(&mut)),
-        (struct val){.id = 137, .val = def(&mut)});
+    struct val *v3
+        = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &(int){137}),
+                                           ((struct val *)T)->val = gen(&mut);),
+                          (struct val){.id = 137, .val = def(&mut)});
     CHECK((v3 != NULL), true);
     CHECK(v3->id, 137);
     CHECK(v3->val, 42);

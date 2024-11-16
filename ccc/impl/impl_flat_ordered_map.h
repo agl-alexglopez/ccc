@@ -66,20 +66,23 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
 
 /*==================     Core Macro Implementations     =====================*/
 
-#define ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \
-                                  aux_data...)                                 \
+#define ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr,                  \
+                                  closure_over_T...)                           \
     ({                                                                         \
         __auto_type fom_mod_ent_ptr_ = (flat_ordered_map_entry_ptr);           \
         struct ccc_ftree_entry_ fom_mod_ent_                                   \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
         if (fom_mod_ent_ptr_)                                                  \
         {                                                                      \
-            ccc_update_fn *and_mod_fn_ = (mod_fn);                             \
-            if (and_mod_fn_ && fom_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)       \
+            fom_mod_ent_ = fom_mod_ent_ptr_->impl_;                            \
+            if (fom_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                      \
             {                                                                  \
-                __auto_type fom_aux_data_ = aux_data;                          \
-                and_mod_fn_((ccc_user_type){.user_type = e.entry,              \
-                                            .aux = &fom_aux_data_});           \
+                void *const T                                                  \
+                    = ccc_buf_at(&fom_mod_ent_.fom_->buf_, fom_mod_ent_.i_);   \
+                if (T)                                                         \
+                {                                                              \
+                    closure_over_T                                             \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         fom_mod_ent_;                                                          \

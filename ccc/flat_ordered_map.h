@@ -285,21 +285,36 @@ ccc_update object will be passed to the update function callback. */
 ccc_fomap_entry *ccc_fom_and_modify_aux(ccc_fomap_entry *e, ccc_update_fn *fn,
                                         void *aux);
 
-/** @brief modify the value stored in the map entry with a modification
-function and lazily constructed auxiliary data.
+/** @brief Modify an Occupied entry with a closure.
 @param [in] flat_ordered_map_entry_ptr a pointer to the obtained entry.
-@param [in] mod_fn the function used to modify the entry value.
-@param [in] aux_data lazily constructed auxiliary data for mod_fn.
+@param [in] closure_over_T the code to be run on the reference to user type T,
+if Occupied. This may be a semicolon separated list of statements to execute on
+T or a section of code wrapped in braces {code here} which may be preferred
+for formatting.
 @return a compound literal reference to the modified entry if it was occupied
 or a vacant entry if it was vacant.
+@note T is a `void *` to the user type stored in the container if Occupied. The
+user does not need to create this local variable.
+@warning T is a mutable reference offering no type safety. However, T is
+guaranteed to be non-NULL if the closure executes.
 
-Note that if aux is a function call to generate a value it will only be called
-if the entry is occupied and thus able to be modified. */
-#define ccc_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn, aux_data...)  \
+```
+#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+// Increment the key k if found otherwise do nothing.
+fom_entry *e = fom_and_modify_w(entry_r(&m, &k), ++((struct word *)T)->cnt;);
+// Increment the key k if found otherwise insert a default value.
+word *w = fom_or_insert_w(fom_and_modify_w(entry_r(&m, &k),
+                                           { ++((word *)T)->cnt; }),
+                          (word){.key = k, .cnt = 1});
+```
+
+Note that any code written is only evaluated if the entry is Occupied and the
+container can deliver the user type T. This means any function calls are lazily
+evaluated in the closure scope. */
+#define ccc_fom_and_modify_w(flat_ordered_map_entry_ptr, closure_over_T...)    \
     &(ccc_fomap_entry)                                                         \
     {                                                                          \
-        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \
-                                  aux_data)                                    \
+        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, closure_over_T)  \
     }
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.

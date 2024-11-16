@@ -42,23 +42,25 @@ void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-#define ccc_impl_list_emplace_front(list_ptr, struct_initializer...)           \
+#define ccc_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
     ({                                                                         \
-        typeof(struct_initializer) *sll_res_;                                  \
+        typeof(struct_initializer) *sll_res_ = NULL;                           \
         struct ccc_sll_ *sll_ = (list_ptr);                                    \
-        assert(sizeof(*sll_res_) == sll_->elem_sz_);                           \
-        if (!sll_->alloc_)                                                     \
+        if (sll_)                                                              \
         {                                                                      \
-            sll_res_ = NULL;                                                   \
-        }                                                                      \
-        else                                                                   \
-        {                                                                      \
-            sll_res_ = sll_->alloc_(NULL, sll_->elem_sz_);                     \
-            if (sll_res_)                                                      \
+            if (!sll_->alloc_)                                                 \
             {                                                                  \
-                *sll_res_ = struct_initializer;                                \
-                ccc_impl_sll_push_front(sll_,                                  \
-                                        ccc_sll_elem_in(sll_, sll_res_));      \
+                sll_res_ = NULL;                                               \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                sll_res_ = sll_->alloc_(NULL, sll_->elem_sz_);                 \
+                if (sll_res_)                                                  \
+                {                                                              \
+                    *sll_res_ = struct_initializer;                            \
+                    ccc_impl_sll_push_front(sll_,                              \
+                                            ccc_sll_elem_in(sll_, sll_res_));  \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         sll_res_;                                                              \

@@ -265,20 +265,34 @@ ccc_omm_and_modify_aux(ccc_ommap_entry *e, ccc_update_fn *fn, void *aux);
 requiring auxiliary data. If auxiliary data is passed as a function call, it
 will only execute if the entry is occupied.
 @param [in] ordered_multimap_entry_ptr the address of the multimap entry.
-@param [in] mod_fn the ccc_update_fn used to update a stored value.
-@param [in] lazy_aux_data the rvalue that this operation will construct and pass
-to the modification function if the entry is occupied.
-@return a pointer to a new entry. This is a compound literal reference, not a
-pointer that requires any manual memory management.
+@param [in] closure_over_T the code to be run on the reference to user type T,
+if Occupied. This may be a semicolon separated list of statements to execute on
+T or a section of code wrapped in braces {code here} which may be preferred
+for formatting.
+@return a compound literal reference to the modified entry if it was occupied
+or a vacant entry if it was vacant.
+@note T is a `void *` to the user type stored in the container if Occupied. The
+user does not need to create this local variable.
+@warning T is a mutable reference offering no type safety. However, T is
+guaranteed to be non-NULL if the closure executes.
 
-Note that keys should not be modified by the modify operation, only values or
-other struct members. */
-#define ccc_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,               \
-                             lazy_aux_data...)                                 \
+```
+#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
+// Increment the key k if found otherwise do nothing.
+omm_entry *e = omm_and_modify_w(entry_r(&m, &k), ++((struct word *)T)->cnt;);
+// Increment the key k if found otherwise insert a default value.
+word *w = omm_or_insert_w(omm_and_modify_w(entry_r(&m, &k),
+                                           { ++((word *)T)->cnt; }),
+                          (word){.key = k, .cnt = 1});
+```
+
+Note that any code written is only evaluated if the entry is Occupied and the
+container can deliver the user type T. This means any function calls are lazily
+evaluated in the closure scope. */
+#define ccc_omm_and_modify_w(ordered_multimap_entry_ptr, closure_over_T...)    \
     &(ccc_ommap_entry)                                                         \
     {                                                                          \
-        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,          \
-                                  lazy_aux_data)                               \
+        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, closure_over_T)  \
     }
 
 /** @brief Insert an initial key value into the multimap if none is present,
