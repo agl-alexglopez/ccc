@@ -192,6 +192,9 @@ any subsequent insertions or deletions invalidate this reference. */
 inserted value. Occupied indicates the key existed, Vacant indicates the key
 was absent. Unwrapping in any case provides the current value unless an error
 occurs that prevents insertion. An insertion error will flag such a case.
+@warning ensure the key type matches the type stored in table as your key. For
+example, if your key is of type `int` and you pass a `size_t` variable to the
+key argument, you will overwrite adjacent bytes of your struct.
 
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
@@ -243,22 +246,6 @@ compound literal matches the searched key. */
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value)    \
-    }
-
-/** @brief Remove the entry from the table if Occupied.
-@param [in] e a pointer to the table entry.
-@return an entry containing NULL. If Occupied an entry in the table existed and
-was removed. If Vacant, no prior entry existed to be removed. */
-[[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
-
-/** @brief Remove the entry from the table if Occupied.
-@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
-@return an entry containing NULL. If Occupied an entry in the table existed and
-was removed. If Vacant, no prior entry existed to be removed. */
-#define ccc_fhm_remove_entry_r(flat_hash_map_entry_ptr)                        \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
     }
 
 /** @brief Obtains an entry for the provided key in the table for future use.
@@ -403,6 +390,22 @@ or a search error NULL is returned. Otherwise insertion should not fail. */
 returned if resizing is required but fails or is not allowed. */
 #define ccc_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value...)     \
     ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)
+
+/** @brief Remove the entry from the table if Occupied.
+@param [in] e a pointer to the table entry.
+@return an entry containing NULL. If Occupied an entry in the table existed and
+was removed. If Vacant, no prior entry existed to be removed. */
+[[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
+
+/** @brief Remove the entry from the table if Occupied.
+@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
+@return an entry containing NULL. If Occupied an entry in the table existed and
+was removed. If Vacant, no prior entry existed to be removed. */
+#define ccc_fhm_remove_entry_r(flat_hash_map_entry_ptr)                        \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \
+    }
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.

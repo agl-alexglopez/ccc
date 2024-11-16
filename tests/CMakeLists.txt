@@ -253,6 +253,7 @@ add_fhmap_test(test_fhmap_construct)
 add_fhmap_test(test_fhmap_insert)
 add_fhmap_test(test_fhmap_erase)
 add_fhmap_test(test_fhmap_lru)
+add_fhmap_test(test_fhmap_entry)
 
 #############  Doubly Linked List ##########################
 
