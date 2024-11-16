@@ -325,10 +325,11 @@ Typedefs</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>T is a mutable reference offering no type safety. However, T is guaranteed to be non-NULL if the closure executes.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
-<div class="line">fhm_entry *e = fhm_and_modify_w(entry_r(&amp;m, &amp;k), ++((<span class="keyword">struct</span> word *)T)-&gt;cnt;);</div>
+<div class="line">fhm_entry *e = fhm_and_modify_w(entry_r(&amp;m, &amp;k), ((word *)T)-&gt;cnt++;);</div>
+<div class="line"> </div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
 <div class="line">word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&amp;m, &amp;k),</div>
-<div class="line">                                           { ++((word *)T)-&gt;cnt; }),</div>
+<div class="line">                                           { ((word *)T)-&gt;cnt++; }),</div>
 <div class="line">                          (word){.key = k, .cnt = 1});</div>
 </div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
 
