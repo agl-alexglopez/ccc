@@ -88,8 +88,8 @@ static struct ccc_node_ *splay(struct ccc_tree_ *, struct ccc_node_ *,
 static struct ccc_node_ const *next_tree_node(struct ccc_tree_ const *,
                                               struct ccc_node_ const *,
                                               enum tree_link_);
-static struct ccc_node_ *get_parent(struct ccc_tree_ const *,
-                                    struct ccc_node_ const *);
+static struct ccc_node_ *parent_r(struct ccc_tree_ const *,
+                                  struct ccc_node_ const *);
 
 static struct ccc_tree_entry_ container_entry(struct ccc_tree_ *,
                                               void const *key);
@@ -757,7 +757,7 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
     {
         return NULL;
     }
-    assert(get_parent(t, t->root_) == &t->end_);
+    assert(parent_r(t, t->root_) == &t->end_);
     /* The node is a parent, backtracked to, or the end. */
     if (n->branch_[traversal] != &t->end_)
     {
@@ -767,16 +767,10 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
         {}
         return n;
     }
-    /* A leaf. Now it is time to visit the closest parent not yet visited.
-       The old stack overflow question I read about this type of iteration
-       (Boost's method, can't find the post anymore?) had the sentinel node
-       make the root its traversal child, but this means we would have to
-       write to the sentinel on every call to next. I want multiple threads to
-       iterate freely without undefined data race writes to memory locations.
-       So more expensive loop.*/
-    struct ccc_node_ *p = get_parent(t, n);
+    /* This is how to return internal nodes on the way back up from a leaf. */
+    struct ccc_node_ *p = parent_r(t, n);
     for (; p != &t->end_ && p->branch_[!traversal] != n;
-         n = p, p = get_parent(t, n))
+         n = p, p = parent_r(t, n))
     {}
     return p;
 }
@@ -1174,7 +1168,7 @@ has_dups(struct ccc_node_ const *const end, struct ccc_node_ const *const n)
 }
 
 static inline struct ccc_node_ *
-get_parent(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
+parent_r(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
 {
     return has_dups(&t->end_, n) ? n->dup_head_->parent_ : n->parent_;
 }

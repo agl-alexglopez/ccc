@@ -19,21 +19,22 @@
 /** @endcond */
 
 /** @private This node type will support more expressive implementations of a
-   standard map and double ended priority queue. The array of pointers is to
-   support unifying left and right symmetric cases. The union is only relevant
-   to the double ended priority queue code. Duplicate values are placed in a
-   circular doubly linked list. The head of this doubly linked list is the
-   oldest duplicate (aka round robin). The node still in the tree then
-   sacrifices its parent field to track this head of all duplicates. The
-   duplicate then uses its parent field to track the parent of the node
-   in the tree. Duplicates can be detected by detecting a cycle in the tree
-   (graph) that only uses child/branch pointers, which is normally impossible
-   in a binary tree. No additional flags or bits are needed. Splay trees, the
-   current underlying implementation, do not support duplicate values by
-   default and I have found trimming the tree with these "fat" tree nodes
+   standard map and multimap. The array of pointers is to support unifying left
+   and right symmetric cases. The union is only relevant to the multimap.
+   Duplicate values are placed in a circular doubly linked list. The head of
+   this doubly linked list is the oldest duplicate (aka round robin). The node
+   still in the tree then sacrifices its parent field to track this head of all
+   duplicates. The duplicate then uses its parent field to track the parent of
+   the node in the tree. Duplicates can be detected by detecting a cycle in the
+   tree (graph) that only uses child/branch pointers, which is normally
+   impossible in a binary tree. No additional flags or bits are needed. Splay
+   trees, the current underlying implementation, do not support duplicate values
+   by default and I have found trimming the tree with these "fat" tree nodes
    holding duplicates can net a nice performance boost in the pop operation for
-   the priority queue. The normal map does not pay for the complexity of this
-   cycle detection because its implementation is seperate from the omm. */
+   the multimap. The normal map does not pay for the complexity of this cycle
+   detection because its implementation is separate from the omm. This works
+   thanks to type punning in C combined with the types in the union having
+   the same size so it's safe. This would be undefined in C++. */
 typedef struct ccc_node_
 {
     union
