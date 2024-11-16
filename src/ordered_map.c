@@ -552,13 +552,7 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
         {}
         return n;
     }
-    /* A leaf. Now it is time to visit the closest parent not yet visited.
-       The old stack overflow question I read about this type of iteration
-       (Boost's method, can't find the post anymore?) had the sentinel node
-       make the root its traversal child, but this means we would have to
-       write to the sentinel on every call to next. I want multiple threads to
-       iterate freely without undefined data race writes to memory locations.
-       So more expensive loop.*/
+    /* This is how to return internal nodes on the way back up from a leaf. */
     struct ccc_node_ *p = n->parent_;
     for (; p != &t->end_ && p->branch_[!traversal] != n; n = p, p = n->parent_)
     {}

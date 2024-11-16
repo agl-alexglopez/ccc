@@ -768,7 +768,7 @@ next(struct ccc_fomap_ const *const t, size_t n,
         return 0;
     }
     assert(!parent_i(t, t->root_));
-    /* The node is an internal one that has a subtree to explore first. */
+    /* The node is an internal one that has a sub-tree to explore first. */
     if (branch_i(t, n, traversal))
     {
         /* The goal is to get far left/right ASAP in any traversal. */
@@ -777,17 +777,11 @@ next(struct ccc_fomap_ const *const t, size_t n,
         {}
         return n;
     }
-    /* A leaf. Now it is time to visit the closest parent not yet visited.
-       The old stack overflow question I read about this type of iteration
-       (Boost's method, can't find the post anymore?) had the sentinel node
-       make the root its traversal child, but this means we would have to
-       write to the sentinel on every call to next. I want multiple threads to
-       iterate freely without undefined data race writes to memory locations.
-       So more expensive loop.*/
-    for (; parent_i(t, n) && branch_i(t, parent_i(t, n), !traversal) != n;
-         n = parent_i(t, n))
+    /* This is how to return internal nodes on the way back up from a leaf. */
+    size_t p = parent_i(t, n);
+    for (; p && branch_i(t, p, !traversal) != n; n = p, p = parent_i(t, p))
     {}
-    return parent_i(t, n);
+    return p;
 }
 
 static inline ccc_threeway_cmp

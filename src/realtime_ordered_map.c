@@ -42,7 +42,10 @@ enum romap_link_
     R,
 };
 
-/** @private */
+/** @private This will utilize safe type punning in C. Both union fields have
+the same type and when obtaining an entry we either have the desired element
+or its parent. Preserving the known parent is what makes the Entry Interface
+No further look ups are required for insertions, modification, or removal. */
 struct romap_query_
 {
     ccc_threeway_cmp last_cmp_;
@@ -653,6 +656,7 @@ find(struct ccc_romap_ const *const rom, void const *const key)
             return q;
         }
     }
+    /* Type punning here OK as both union members have same type and size. */
     q.parent_ = parent;
     return q;
 }
@@ -666,7 +670,7 @@ next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
         return (struct ccc_romap_elem_ *)&rom->end_;
     }
     assert(rom->root_->parent_ == &rom->end_);
-    /* The node is an internal one that has a subtree to explore first. */
+    /* The node is an internal one that has a sub-tree to explore first. */
     if (n->branch_[traversal] != &rom->end_)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
@@ -675,13 +679,6 @@ next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
         {}
         return (struct ccc_romap_elem_ *)n;
     }
-    /* A leaf. Now it is time to visit the closest parent not yet visited.
-       The old stack overflow question I read about this type of iteration
-       (Boost's method, can't find the post anymore?) had the sentinel node
-       make the root its traversal child, but this means we would have to
-       write to the sentinel on every call to next. I want multiple threads to
-       iterate freely without undefined data race writes to memory locations.
-       So more expensive loop.*/
     for (; n->parent_ != &rom->end_ && n->parent_->branch_[!traversal] != n;
          n = n->parent_)
     {}
