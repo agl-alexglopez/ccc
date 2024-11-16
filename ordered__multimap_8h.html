@@ -156,9 +156,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a6b0cb99173678a3dd75b9cb1517ef40d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a6b0cb99173678a3dd75b9cb1517ef40d">ccc_omm_entry_r</a>(ordered_multimap_ptr,  key_ptr)</td></tr>
 <tr class="memdesc:a6b0cb99173678a3dd75b9cb1517ef40d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a compound literal reference to the entry generated from a search. No manual management of a compound literal reference is necessary. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a6b0cb99173678a3dd75b9cb1517ef40d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62175c278b698ffafb684d2f6a2f920f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a62175c278b698ffafb684d2f6a2f920f">ccc_omm_and_modify_w</a>(ordered_multimap_entry_ptr,  mod_fn,  lazy_aux_data...)</td></tr>
-<tr class="memdesc:a62175c278b698ffafb684d2f6a2f920f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the ordered multimap entry with a modification function requiring auxiliary data. If auxiliary data is passed as a function call, it will only execute if the entry is occupied.  <br /></td></tr>
-<tr class="separator:a62175c278b698ffafb684d2f6a2f920f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada7818920fd98b7b2185e166293e5390"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ada7818920fd98b7b2185e166293e5390">ccc_omm_and_modify_w</a>(ordered_multimap_entry_ptr,  closure_over_T...)</td></tr>
+<tr class="memdesc:ada7818920fd98b7b2185e166293e5390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the ordered multimap entry with a modification function requiring auxiliary data. If auxiliary data is passed as a function call, it will only execute if the entry is occupied.  <br /></td></tr>
+<tr class="separator:ada7818920fd98b7b2185e166293e5390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae93bb13a6d30e0cf569764cc004e85b3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae93bb13a6d30e0cf569764cc004e85b3">ccc_omm_or_insert_w</a>(ordered_multimap_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_omm_or_insert_w(ordered_multimap_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:ae93bb13a6d30e0cf569764cc004e85b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert an initial key value into the multimap if none is present, otherwise return the oldest user type stored at the specified key. O(1).  <br /></td></tr>
 <tr class="separator:ae93bb13a6d30e0cf569764cc004e85b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -310,8 +310,8 @@ N).  <br /></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a62175c278b698ffafb684d2f6a2f920f" name="a62175c278b698ffafb684d2f6a2f920f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62175c278b698ffafb684d2f6a2f920f">&#9670;&#160;</a></span>ccc_omm_and_modify_w</h2>
+<a id="ada7818920fd98b7b2185e166293e5390" name="ada7818920fd98b7b2185e166293e5390"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada7818920fd98b7b2185e166293e5390">&#9670;&#160;</a></span>ccc_omm_and_modify_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -326,13 +326,7 @@ N).  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">mod_fn, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">lazy_aux_data...&#160;</td>
+          <td class="paramname">closure_over_T...&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -343,8 +337,7 @@ N).  <br /></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a>)                                                         \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, mod_fn,          \</div>
-<div class="line">                                  lazy_aux_data)                               \</div>
+<div class="line">        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, closure_over_T)  \</div>
 <div class="line">    }</div>
 <div class="ttc" id="aordered__multimap_8h_html_a3b29c8dbbd10827d07c041fbfff7e2b4"><div class="ttname"><a href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></div><div class="ttdeci">union ccc_ommap_entry_ ccc_ommap_entry</div><div class="ttdoc">The container specific type to support the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_multimap.h:67</div></div>
 </div><!-- fragment -->
@@ -352,13 +345,21 @@ N).  <br /></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ordered_multimap_entry_ptr</td><td>the address of the multimap entry. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">mod_fn</td><td>the ccc_update_fn used to update a stored value. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lazy_aux_data</td><td>the rvalue that this operation will construct and pass to the modification function if the entry is occupied. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">closure_over_T</td><td>the code to be run on the reference to user type T, if Occupied. This may be a semicolon separated list of statements to execute on T or a section of code wrapped in braces {code here} which may be preferred for formatting. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to a new entry. This is a compound literal reference, not a pointer that requires any manual memory management.</dd></dl>
-<p>Note that keys should not be modified by the modify operation, only values or other struct members. </p>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>T is a <code>void *</code> to the user type stored in the container if Occupied. The user does not need to create this local variable. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>T is a mutable reference offering no type safety. However, T is guaranteed to be non-NULL if the closure executes.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
+<div class="line">omm_entry *e = omm_and_modify_w(entry_r(&amp;m, &amp;k), ++((<span class="keyword">struct</span> word *)T)-&gt;cnt;);</div>
+<div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
+<div class="line">word *w = omm_or_insert_w(omm_and_modify_w(entry_r(&amp;m, &amp;k),</div>
+<div class="line">                                           { ++((word *)T)-&gt;cnt; }),</div>
+<div class="line">                          (word){.key = k, .cnt = 1});</div>
+</div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
 
 </div>
 </div>

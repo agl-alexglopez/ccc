@@ -166,9 +166,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:af7eaea1824b6624d5342dd1849449433"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#af7eaea1824b6624d5342dd1849449433">ccc_fom_entry_r</a>(flat_ordered_map_ptr,  key_ptr)</td></tr>
 <tr class="memdesc:af7eaea1824b6624d5342dd1849449433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the map for future use.  <br /></td></tr>
 <tr class="separator:af7eaea1824b6624d5342dd1849449433"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a752f5ddaf41c86e7fa58817e6ec5de3f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a752f5ddaf41c86e7fa58817e6ec5de3f">ccc_fom_and_modify_w</a>(flat_ordered_map_entry_ptr,  mod_fn,  aux_data...)</td></tr>
-<tr class="memdesc:a752f5ddaf41c86e7fa58817e6ec5de3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">modify the value stored in the map entry with a modification function and lazily constructed auxiliary data.  <br /></td></tr>
-<tr class="separator:a752f5ddaf41c86e7fa58817e6ec5de3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7149a332292bfdbf1fdf237c74e15e8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#ad7149a332292bfdbf1fdf237c74e15e8">ccc_fom_and_modify_w</a>(flat_ordered_map_entry_ptr,  closure_over_T...)</td></tr>
+<tr class="memdesc:ad7149a332292bfdbf1fdf237c74e15e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure.  <br /></td></tr>
+<tr class="separator:ad7149a332292bfdbf1fdf237c74e15e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a307e9b02caf25f5a05cf431161949ad2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a307e9b02caf25f5a05cf431161949ad2">ccc_fom_or_insert_w</a>(flat_ordered_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fom_or_insert_w(flat_ordered_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a307e9b02caf25f5a05cf431161949ad2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
 <tr class="separator:a307e9b02caf25f5a05cf431161949ad2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -293,8 +293,8 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a752f5ddaf41c86e7fa58817e6ec5de3f" name="a752f5ddaf41c86e7fa58817e6ec5de3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a752f5ddaf41c86e7fa58817e6ec5de3f">&#9670;&#160;</a></span>ccc_fom_and_modify_w</h2>
+<a id="ad7149a332292bfdbf1fdf237c74e15e8" name="ad7149a332292bfdbf1fdf237c74e15e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7149a332292bfdbf1fdf237c74e15e8">&#9670;&#160;</a></span>ccc_fom_and_modify_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -309,13 +309,7 @@ Typedefs</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">mod_fn, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">aux_data...&#160;</td>
+          <td class="paramname">closure_over_T...&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -326,22 +320,29 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a>)                                                         \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, mod_fn,          \</div>
-<div class="line">                                  aux_data)                                    \</div>
+<div class="line">        ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, closure_over_T)  \</div>
 <div class="line">    }</div>
 <div class="ttc" id="aflat__ordered__map_8h_html_a0f6c79e32b5b75645a8d93af21291565"><div class="ttname"><a href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></div><div class="ttdeci">union ccc_fomap_entry_ ccc_fomap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_ordered_map.h:63</div></div>
 </div><!-- fragment -->
-<p>modify the value stored in the map entry with a modification function and lazily constructed auxiliary data. </p>
+<p>Modify an Occupied entry with a closure. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">flat_ordered_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">mod_fn</td><td>the function used to modify the entry value. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>lazily constructed auxiliary data for mod_fn. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">closure_over_T</td><td>the code to be run on the reference to user type T, if Occupied. This may be a semicolon separated list of statements to execute on T or a section of code wrapped in braces {code here} which may be preferred for formatting. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant.</dd></dl>
-<p>Note that if aux is a function call to generate a value it will only be called if the entry is occupied and thus able to be modified. </p>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>T is a <code>void *</code> to the user type stored in the container if Occupied. The user does not need to create this local variable. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>T is a mutable reference offering no type safety. However, T is guaranteed to be non-NULL if the closure executes.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
+<div class="line">fom_entry *e = fom_and_modify_w(entry_r(&amp;m, &amp;k), ++((<span class="keyword">struct</span> word *)T)-&gt;cnt;);</div>
+<div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
+<div class="line">word *w = fom_or_insert_w(fom_and_modify_w(entry_r(&amp;m, &amp;k),</div>
+<div class="line">                                           { ++((word *)T)-&gt;cnt; }),</div>
+<div class="line">                          (word){.key = k, .cnt = 1});</div>
+</div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
 
 </div>
 </div>

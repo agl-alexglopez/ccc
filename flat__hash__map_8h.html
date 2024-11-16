@@ -172,9 +172,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a90450f8ab0e3ed9356a35ec8d74b7b5e">ccc_fhm_entry_r</a>(flat_hash_map_ptr,  key_ptr)</td></tr>
 <tr class="memdesc:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
 <tr class="separator:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2959ac90ffbe517eade311f5d08b5201"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a2959ac90ffbe517eade311f5d08b5201">ccc_fhm_and_modify_w</a>(flat_hash_map_entry_ptr,  mod_fn,  aux...)</td></tr>
-<tr class="memdesc:a2959ac90ffbe517eade311f5d08b5201"><td class="mdescLeft">&#160;</td><td class="mdescRight">modify the value stored in the map entry with a modification function and lazily constructed auxiliary data.  <br /></td></tr>
-<tr class="separator:a2959ac90ffbe517eade311f5d08b5201"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87e9a365d4d90f6e03246051e5744f03"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a87e9a365d4d90f6e03246051e5744f03">ccc_fhm_and_modify_w</a>(flat_hash_map_entry_ptr,  closure_over_T...)</td></tr>
+<tr class="memdesc:a87e9a365d4d90f6e03246051e5744f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">modify the value stored in the map entry with a modification function and lazily constructed auxiliary data.  <br /></td></tr>
+<tr class="separator:a87e9a365d4d90f6e03246051e5744f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a147ceaca531b1d1a6980d77ae4cbf816">ccc_fhm_or_insert_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a147ceaca531b1d1a6980d77ae4cbf816"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
 <tr class="separator:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -281,8 +281,8 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a2959ac90ffbe517eade311f5d08b5201" name="a2959ac90ffbe517eade311f5d08b5201"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2959ac90ffbe517eade311f5d08b5201">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
+<a id="a87e9a365d4d90f6e03246051e5744f03" name="a87e9a365d4d90f6e03246051e5744f03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87e9a365d4d90f6e03246051e5744f03">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -297,13 +297,7 @@ Typedefs</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">mod_fn, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">aux...&#160;</td>
+          <td class="paramname">closure_over_T...&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -314,7 +308,7 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a>)                                                         \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, mod_fn, aux)        \</div>
+<div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, closure_over_T)     \</div>
 <div class="line">    }</div>
 <div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:51</div></div>
 </div><!-- fragment -->
@@ -322,13 +316,21 @@ Typedefs</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">mod_fn</td><td>the function used to modify the entry value. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>lazily constructed auxiliary data for mod_fn. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">closure_over_T</td><td>the code to be run on the reference to user type T, if Occupied. This may be a semicolon separated list of statements to execute on T or a section of code wrapped in braces {code here} which may be preferred for formatting. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant.</dd></dl>
-<p>Note that if aux is a function call to generate a value it will only be called if the entry is occupied and thus able to be modified. </p>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>T is a <code>void *</code> to the user type stored in the container if Occupied. The user does not need to create this local variable. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>T is a mutable reference offering no type safety. However, T is guaranteed to be non-NULL if the closure executes.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
+<div class="line">fhm_entry *e = fhm_and_modify_w(entry_r(&amp;m, &amp;k), ++((<span class="keyword">struct</span> word *)T)-&gt;cnt;);</div>
+<div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
+<div class="line">word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&amp;m, &amp;k),</div>
+<div class="line">                                           { ++((word *)T)-&gt;cnt; }),</div>
+<div class="line">                          (word){.key = k, .cnt = 1});</div>
+</div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
 
 </div>
 </div>
