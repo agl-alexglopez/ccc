@@ -277,10 +277,11 @@ guaranteed to be non-NULL if the closure executes.
 ```
 #define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-omm_entry *e = omm_and_modify_w(entry_r(&m, &k), ++((struct word *)T)->cnt;);
+omm_entry *e = omm_and_modify_w(entry_r(&m, &k), ((word *)T)->cnt++;);
+
 // Increment the key k if found otherwise insert a default value.
 word *w = omm_or_insert_w(omm_and_modify_w(entry_r(&m, &k),
-                                           { ++((word *)T)->cnt; }),
+                                           { ((word *)T)->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```
 
