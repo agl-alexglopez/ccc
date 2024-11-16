@@ -225,6 +225,7 @@ add_fromap_test(test_fromap_construct)
 add_fromap_test(test_fromap_insert)
 add_fromap_test(test_fromap_erase)
 add_fromap_test(test_fromap_iter)
+add_fromap_test(test_fromap_entry)
 
 #############  Flat Hash Map ##########################
 

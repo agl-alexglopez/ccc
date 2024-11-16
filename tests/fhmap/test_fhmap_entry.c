@@ -355,13 +355,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh), 1);
-    ent = insert_or_assign(&fh, &(struct val){.id = -1, .val = -1}.e);
+    ent = insert_or_assign(&fh, &(struct val){.id = -1, .val = -2}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
-    CHECK(v->val, -1);
+    CHECK(v->val, -2);
     CHECK(v->id, -1);
     int i = 0;
 
@@ -373,12 +373,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh), i + 2);
-    ent = insert_or_assign(&fh, &(struct val){.id = i, .val = i}.e);
+    ent = insert_or_assign(&fh, &(struct val){.id = i, .val = i + 1}.e);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
-    CHECK(v->val, i);
+    CHECK(v->val, i + 1);
     CHECK(v->id, i);
     ++i;
 
@@ -390,13 +390,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh), i + 2);
-    ent = insert_or_assign(&fh, &(struct val){.id = i, .val = i}.e);
+    ent = insert_or_assign(&fh, &(struct val){.id = i, .val = i + 1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
-    CHECK(v->val, i);
+    CHECK(v->val, i + 1);
     CHECK(v->id, i);
     CHECK_END_FN();
 }
@@ -415,13 +415,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign_with)
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
     CHECK(size(&fh), 1);
-    ent = fhm_insert_or_assign_w(&fh, -1, val(-1));
+    ent = fhm_insert_or_assign_w(&fh, -1, val(0));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
     CHECK(size(&fh), 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
-    CHECK(v->val, -1);
+    CHECK(v->val, 0);
     CHECK(v->id, -1);
     int i = 0;
 
@@ -433,12 +433,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign_with)
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
     CHECK(size(&fh), i + 2);
-    ent = fhm_insert_or_assign_w(&fh, i, val(i));
+    ent = fhm_insert_or_assign_w(&fh, i, val(i + 1));
     CHECK(occupied(ent), true);
     CHECK(size(&fh), i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
-    CHECK(v->val, i);
+    CHECK(v->val, i + 1);
     CHECK(v->id, i);
     ++i;
 
@@ -450,13 +450,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign_with)
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
     CHECK(size(&fh), i + 2);
-    ent = fhm_insert_or_assign_w(&fh, i, val(i));
+    ent = fhm_insert_or_assign_w(&fh, i, val(i + 1));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
     CHECK(size(&fh), i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
-    CHECK(v->val, i);
+    CHECK(v->val, i + 1);
     CHECK(v->id, i);
     CHECK_END_FN();
 }

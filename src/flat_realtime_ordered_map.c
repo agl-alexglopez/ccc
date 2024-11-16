@@ -237,6 +237,7 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
     if (CCC_EQL == q.last_cmp_)
     {
         void *const found = base_at(frm, q.found_);
+        *key_val_handle = *elem_in_slot(frm, found);
         (void)ccc_buf_write(&frm->buf_, q.found_,
                             struct_base(frm, key_val_handle));
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
@@ -733,7 +734,7 @@ static inline void *
 alloc_back(struct ccc_fromap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
-       initialized the internal size for implementor is always at least 1. */
+       initialized the internal size for implementer is always at least 1. */
     if (ccc_buf_is_empty(&t->buf_))
     {
         void *const sentinel = ccc_buf_alloc_back(&t->buf_);
@@ -1357,7 +1358,7 @@ is_storing_parent(struct ccc_fromap_ const *const t, size_t const p,
 static bool
 validate(struct ccc_fromap_ const *const frm)
 {
-    if (!at(frm, 0)->parity_)
+    if (!ccc_buf_is_empty(&frm->buf_) && !at(frm, 0)->parity_)
     {
         return false;
     }
