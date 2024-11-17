@@ -261,7 +261,7 @@ $(document).ready(function(){initNavTree('impl__ordered__map_8h_source.html','')
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="preprocessor">            __auto_type om_key_ = (key);                                       \</span></div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="preprocessor">            struct ccc_tree_ *om_try_ins_map_ptr_ = &amp;try_ins_map_ptr_-&gt;impl_;  \</span></div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="preprocessor">            struct ccc_tree_entry_ om_try_ins_ent_                             \</span></div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="preprocessor">                = ccc_impl_om_entry(om_try_ins_map_ptr_, &amp;om_key_);            \</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="preprocessor">                = ccc_impl_om_entry(om_try_ins_map_ptr_, (void *)&amp;om_key_);    \</span></div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="preprocessor">            if (!(om_try_ins_ent_.entry_.stats_ &amp; CCC_ENTRY_OCCUPIED))         \</span></div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="preprocessor">            {                                                                  \</span></div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="preprocessor">                ccc_impl_om_insert_and_copy_key(om_try_ins_ent_,               \</span></div>
@@ -287,7 +287,7 @@ $(document).ready(function(){initNavTree('impl__ordered__map_8h_source.html','')
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="preprocessor">            struct ccc_tree_ *ordered_map_ptr_                                 \</span></div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="preprocessor">                = &amp;ins_or_assign_map_ptr_-&gt;impl_;                              \</span></div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="preprocessor">            struct ccc_tree_entry_ om_ins_or_assign_ent_                       \</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="preprocessor">                = ccc_impl_om_entry(ordered_map_ptr_, &amp;om_key_);               \</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="preprocessor">                = ccc_impl_om_entry(ordered_map_ptr_, (void *)&amp;om_key_);       \</span></div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="preprocessor">            if (!(om_ins_or_assign_ent_.entry_.stats_ &amp; CCC_ENTRY_OCCUPIED))   \</span></div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="preprocessor">            {                                                                  \</span></div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="preprocessor">                ccc_impl_om_insert_and_copy_key(om_ins_or_assign_ent_,         \</span></div>
