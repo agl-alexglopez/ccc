@@ -60,3 +60,30 @@ inorder_fill(int vals[], size_t size, ccc_ordered_multimap *pq)
     }
     return i;
 }
+
+void *
+val_bump_alloc(void *const ptr, size_t const size, void *const aux)
+{
+    if (!ptr && !size)
+    {
+        return NULL;
+    }
+    if (!ptr)
+    {
+        assert(size == sizeof(struct val)
+               && "stack allocator for struct val only.");
+        struct val_pool *vals = aux;
+        if (vals->next_free >= vals->capacity)
+        {
+            return NULL;
+        }
+        return &vals->vals[vals->next_free++];
+    }
+    if (!size)
+    {
+        /* Don't do anything fancy on free, just bump forward so no op here. */
+        return NULL;
+    }
+    assert(!"Shouldn't attempt to realloc in bump allocator.");
+    return NULL;
+}
