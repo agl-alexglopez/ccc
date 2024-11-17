@@ -125,6 +125,7 @@ CHECK_BEGIN_STATIC_FN(run_test_process, struct path_bin pb)
         }
     });
     CHECK(WIFEXITED(status), true);
+    CHECK_STATUS = WEXITSTATUS(status);
     CHECK_END_FN();
 }
 

@@ -146,7 +146,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             rom_mod_ent_ = rom_ent_ptr_->impl_;                                \
             if (rom_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)               \
             {                                                                  \
-                type_name *const T = e.entry_;                                 \
+                type_name *const T = rom_mod_ent_.entry_.e_;                   \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \

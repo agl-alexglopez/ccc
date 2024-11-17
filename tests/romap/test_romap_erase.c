@@ -17,7 +17,7 @@
 CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 {
     ccc_realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -26,14 +26,14 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
     CHECK(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].val, sorted_check[i]);
+        CHECK(vals[i].id, sorted_check[i]);
     }
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         struct val *v = unwrap(remove_r(&s, &vals[i].elem));
         CHECK(v != NULL, true);
-        CHECK(v->val, vals[i].val);
+        CHECK(v->id, vals[i].id);
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
@@ -43,7 +43,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
 {
     ccc_realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -69,7 +69,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
     CHECK(rom_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].val))) || repeats[i],
+        CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].id))) || repeats[i],
               true);
         CHECK(validate(&s), true);
     }
@@ -79,7 +79,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
 {
     ccc_realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -87,14 +87,14 @@ CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
     struct val vals[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
-        vals[i].val = rand(); // NOLINT
-        vals[i].id = i;
+        vals[i].id = rand(); // NOLINT
+        vals[i].val = i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(rom_contains(&s, &vals[i].val), true);
+        CHECK(rom_contains(&s, &vals[i].id), true);
         (void)remove(&s, &vals[i].elem);
         CHECK(validate(&s), true);
     }
