@@ -8,12 +8,12 @@
 
 struct val
 {
-    int id;
+    int key;
     int val;
     ccc_ommap_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_key_cmp);
+ccc_threeway_cmp id_cmp(ccc_key_cmp);
 void val_update(ccc_user_type);
 
 enum check_result insert_shuffled(ccc_ordered_multimap *, struct val[], size_t,

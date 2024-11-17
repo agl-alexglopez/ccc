@@ -10,18 +10,18 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_key_cmp const cmp)
+id_cmp(ccc_key_cmp const cmp)
 {
     struct val const *const c = cmp.user_type_rhs;
     int key = *((int *)cmp.key_lhs);
-    return (key > c->val) - (key < c->val);
+    return (key > c->key) - (key < c->key);
 }
 
 void
 val_update(ccc_user_type const u)
 {
     struct val *old = u.user_type;
-    old->val = *(int *)u.aux;
+    old->key = *(int *)u.aux;
 }
 
 CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
@@ -35,7 +35,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        vals[shuffled_index].val = (int)shuffled_index;
+        vals[shuffled_index].key = (int)shuffled_index;
         CHECK(unwrap(insert_r(pq, &vals[shuffled_index].elem)) != NULL, true);
         CHECK(validate(pq), true);
         CHECK(size(pq), i + 1);
@@ -56,7 +56,7 @@ inorder_fill(int vals[], size_t size, ccc_ordered_multimap *pq)
     size_t i = 0;
     for (struct val *e = rbegin(pq); e != rend(pq); e = rnext(pq, &e->elem))
     {
-        vals[i++] = e->val;
+        vals[i++] = e->key;
     }
     return i;
 }
