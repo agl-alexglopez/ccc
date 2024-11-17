@@ -169,6 +169,7 @@ add_fomap_test(test_fomap_construct)
 add_fomap_test(test_fomap_insert)
 add_fomap_test(test_fomap_erase)
 add_fomap_test(test_fomap_iter)
+add_fomap_test(test_fomap_entry)
 
 #############  Realtime Map  ##########################
 add_library(romap_util romap/romap_util.h romap/romap_util.c)

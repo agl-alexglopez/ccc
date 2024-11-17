@@ -128,7 +128,7 @@ ccc_fom_insert_entry(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
         *elem = *at(e->impl_.fom_, e->impl_.i_);
         void *const ret = base_at(e->impl_.fom_, e->impl_.i_);
         memcpy(ret, struct_base(e->impl_.fom_, elem),
-               ccc_buf_size(&e->impl_.fom_->buf_));
+               ccc_buf_elem_size(&e->impl_.fom_->buf_));
         return ret;
     }
     return maybe_alloc_insert(e->impl_.fom_, elem);

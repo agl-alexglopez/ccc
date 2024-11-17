@@ -12,7 +12,7 @@
 CHECK_BEGIN_STATIC_FN(fomap_test_empty)
 {
     flat_ordered_map s
-        = fom_init((struct val[3]){}, 3, elem, id, NULL, val_cmp, NULL);
+        = fom_init((struct val[3]){}, 3, elem, id, NULL, id_cmp, NULL);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }

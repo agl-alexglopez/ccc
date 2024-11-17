@@ -14,7 +14,7 @@ struct val
     ccc_fomap_elem elem;
 };
 
-ccc_threeway_cmp val_cmp(ccc_key_cmp);
+ccc_threeway_cmp id_cmp(ccc_key_cmp);
 
 enum check_result insert_shuffled(ccc_flat_ordered_map *m, size_t size,
                                   int larger_prime);
