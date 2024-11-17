@@ -166,9 +166,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a7158d17069d3a903b3a5ddccc42689fb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a7158d17069d3a903b3a5ddccc42689fb">ccc_frm_entry_r</a>(flat_realtime_ordered_map_ptr,  key_ptr)</td></tr>
 <tr class="memdesc:a7158d17069d3a903b3a5ddccc42689fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the map for future use.  <br /></td></tr>
 <tr class="separator:a7158d17069d3a903b3a5ddccc42689fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66cdfb2a79f88d280f3805ffe70d021f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a66cdfb2a79f88d280f3805ffe70d021f">ccc_frm_and_modify_w</a>(flat_realtime_ordered_map_entry_ptr,  closure_over_T...)</td></tr>
-<tr class="memdesc:a66cdfb2a79f88d280f3805ffe70d021f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
-<tr class="separator:a66cdfb2a79f88d280f3805ffe70d021f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adde6624ad34c9a0749d072119625099e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#adde6624ad34c9a0749d072119625099e">ccc_frm_and_modify_w</a>(flat_realtime_ordered_map_entry_ptr,  type_name,  closure_over_T...)</td></tr>
+<tr class="memdesc:adde6624ad34c9a0749d072119625099e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
+<tr class="separator:adde6624ad34c9a0749d072119625099e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33cc79cd14aa4ef5cf099c7a58c9ee10"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__realtime__ordered__map_8h.html#a33cc79cd14aa4ef5cf099c7a58c9ee10">ccc_frm_or_insert_w</a>(flat_realtime_ordered_map_entry_ptr,  lazy_key_value...)</td></tr>
 <tr class="memdesc:a33cc79cd14aa4ef5cf099c7a58c9ee10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
 <tr class="separator:a33cc79cd14aa4ef5cf099c7a58c9ee10"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -293,8 +293,8 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a66cdfb2a79f88d280f3805ffe70d021f" name="a66cdfb2a79f88d280f3805ffe70d021f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66cdfb2a79f88d280f3805ffe70d021f">&#9670;&#160;</a></span>ccc_frm_and_modify_w</h2>
+<a id="adde6624ad34c9a0749d072119625099e" name="adde6624ad34c9a0749d072119625099e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adde6624ad34c9a0749d072119625099e">&#9670;&#160;</a></span>ccc_frm_and_modify_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -304,6 +304,12 @@ Typedefs</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">flat_realtime_ordered_map_entry_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -321,7 +327,7 @@ Typedefs</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a>)                                                        \</div>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr,         \</div>
-<div class="line">                                  closure_over_T)                              \</div>
+<div class="line">                                  type_name, closure_over_T)                   \</div>
 <div class="line">    }</div>
 <div class="ttc" id="aflat__realtime__ordered__map_8h_html_a36e567ad62e658d6158cabe06d9ec487"><div class="ttname"><a href="flat__realtime__ordered__map_8h.html#a36e567ad62e658d6158cabe06d9ec487">ccc_fromap_entry</a></div><div class="ttdeci">union ccc_fromap_entry_ ccc_fromap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_realtime_ordered_map.h:55</div></div>
 </div><!-- fragment -->
@@ -329,20 +335,20 @@ Typedefs</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">flat_realtime_ordered_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_name</td><td>the name of the user type stored in the container. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">closure_over_T</td><td>the code to be run on the reference to user type T, if Occupied. This may be a semicolon separated list of statements to execute on T or a section of code wrapped in braces {code here} which may be preferred for formatting. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>T is a <code>void *</code> to the user type stored in the container if Occupied. The user does not need to create this local variable. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>T is a mutable reference offering no type safety. However, T is guaranteed to be non-NULL if the closure executes.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>T is a reference to the user type stored in the entry guaranteed to be non-NULL if the closure executes.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
-<div class="line">frm_entry *e = frm_and_modify_w(entry_r(&amp;m, &amp;k), ((word *)T)-&gt;cnt++;);</div>
+<div class="line">frm_entry *e = frm_and_modify_w(entry_r(&amp;m, &amp;k), word, T-&gt;cnt++;);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
-<div class="line">word *w = frm_or_insert_w(frm_and_modify_w(entry_r(&amp;m, &amp;k),</div>
-<div class="line">                                           { ((word *)T)-&gt;cnt++; }),</div>
+<div class="line">word *w = frm_or_insert_w(frm_and_modify_w(entry_r(&amp;m, &amp;k), word,</div>
+<div class="line">                                           { T-&gt;cnt++; }),</div>
 <div class="line">                          (word){.key = k, .cnt = 1});</div>
 </div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
 
@@ -1755,8 +1761,8 @@ Typedefs</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>an entry containing NULL or a reference to the old entry. If Occupied an entry in the map existed and was removed. If Vacant, no prior entry existed to be removed.</dd></dl>
-<p>Note that the reference to the removed entry is invalidated upon any further insertions. </p>
+<dl class="section return"><dt>Returns</dt><dd>an entry containing NULL or a reference to the old entry. If Occupied an entry in the map existed and was removed. If Vacant, no prior entry existed to be removed. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the reference to the removed entry is invalidated upon any further insertions. </dd></dl>
 
 </div>
 </div>

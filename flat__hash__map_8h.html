@@ -166,21 +166,21 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a2499a64637dc03b73ecf141ac29e7da5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a2499a64637dc03b73ecf141ac29e7da5">ccc_fhm_insert_or_assign_w</a>(flat_hash_map_ptr,  key,  lazy_value...)</td></tr>
 <tr class="memdesc:a2499a64637dc03b73ecf141ac29e7da5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a new key value pair or overwrites the existing entry.  <br /></td></tr>
 <tr class="separator:a2499a64637dc03b73ecf141ac29e7da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb6b5779ecab7401ee0656c01a97696c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#adb6b5779ecab7401ee0656c01a97696c">ccc_fhm_remove_entry_r</a>(flat_hash_map_entry_ptr)</td></tr>
-<tr class="memdesc:adb6b5779ecab7401ee0656c01a97696c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
-<tr class="separator:adb6b5779ecab7401ee0656c01a97696c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a90450f8ab0e3ed9356a35ec8d74b7b5e">ccc_fhm_entry_r</a>(flat_hash_map_ptr,  key_ptr)</td></tr>
 <tr class="memdesc:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
 <tr class="separator:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87e9a365d4d90f6e03246051e5744f03"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a87e9a365d4d90f6e03246051e5744f03">ccc_fhm_and_modify_w</a>(flat_hash_map_entry_ptr,  closure_over_T...)</td></tr>
-<tr class="memdesc:a87e9a365d4d90f6e03246051e5744f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
-<tr class="separator:a87e9a365d4d90f6e03246051e5744f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a6693a6c7d797a7552deb4d7e7ae172"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a4a6693a6c7d797a7552deb4d7e7ae172">ccc_fhm_and_modify_w</a>(flat_hash_map_entry_ptr,  type_name,  closure_over_T...)</td></tr>
+<tr class="memdesc:a4a6693a6c7d797a7552deb4d7e7ae172"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
+<tr class="separator:a4a6693a6c7d797a7552deb4d7e7ae172"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a147ceaca531b1d1a6980d77ae4cbf816">ccc_fhm_or_insert_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a147ceaca531b1d1a6980d77ae4cbf816"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
 <tr class="separator:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a726c7b51ef2288a25cc9fc8e6d75bd22">ccc_fhm_insert_entry_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="mdescLeft">&#160;</td><td class="mdescRight">write the contents of the compound literal lazy_key_value to a slot.  <br /></td></tr>
 <tr class="separator:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb6b5779ecab7401ee0656c01a97696c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#adb6b5779ecab7401ee0656c01a97696c">ccc_fhm_remove_entry_r</a>(flat_hash_map_entry_ptr)</td></tr>
+<tr class="memdesc:adb6b5779ecab7401ee0656c01a97696c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
+<tr class="separator:adb6b5779ecab7401ee0656c01a97696c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb4c561620549320c6fd340626e7bb1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#afb4c561620549320c6fd340626e7bb1a">ccc_fhm_remove</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *out_handle)</td></tr>
 <tr class="memdesc:afb4c561620549320c6fd340626e7bb1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user.  <br /></td></tr>
 <tr class="separator:afb4c561620549320c6fd340626e7bb1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,9 +193,6 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a0dab2b6552aec50fb359413d2731f621"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a0dab2b6552aec50fb359413d2731f621">ccc_fhm_insert_or_assign</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *key_val_handle)</td></tr>
 <tr class="memdesc:a0dab2b6552aec50fb359413d2731f621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the table.  <br /></td></tr>
 <tr class="separator:a0dab2b6552aec50fb359413d2731f621"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8c4a0948272d97ceb1d8219388aedeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ad8c4a0948272d97ceb1d8219388aedeb">ccc_fhm_remove_entry</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
-<tr class="memdesc:ad8c4a0948272d97ceb1d8219388aedeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
-<tr class="separator:ad8c4a0948272d97ceb1d8219388aedeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada83753a5e8c45b3daa127a6f70eb96f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada83753a5e8c45b3daa127a6f70eb96f">ccc_fhm_entry</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
 <tr class="memdesc:ada83753a5e8c45b3daa127a6f70eb96f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
 <tr class="separator:ada83753a5e8c45b3daa127a6f70eb96f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,6 +208,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a516fb468afdcff82caade184337560ee"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a516fb468afdcff82caade184337560ee">ccc_fhm_insert_entry</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *elem)</td></tr>
 <tr class="memdesc:a516fb468afdcff82caade184337560ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the provided entry invariantly.  <br /></td></tr>
 <tr class="separator:a516fb468afdcff82caade184337560ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8c4a0948272d97ceb1d8219388aedeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ad8c4a0948272d97ceb1d8219388aedeb">ccc_fhm_remove_entry</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
+<tr class="memdesc:ad8c4a0948272d97ceb1d8219388aedeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
+<tr class="separator:ad8c4a0948272d97ceb1d8219388aedeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6ddbf73bfeed2721c35d7a374edf7c1"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ae6ddbf73bfeed2721c35d7a374edf7c1">ccc_fhm_unwrap</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
 <tr class="memdesc:ae6ddbf73bfeed2721c35d7a374edf7c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided entry to obtain a view into the table element.  <br /></td></tr>
 <tr class="separator:ae6ddbf73bfeed2721c35d7a374edf7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -281,8 +281,8 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a87e9a365d4d90f6e03246051e5744f03" name="a87e9a365d4d90f6e03246051e5744f03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87e9a365d4d90f6e03246051e5744f03">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
+<a id="a4a6693a6c7d797a7552deb4d7e7ae172" name="a4a6693a6c7d797a7552deb4d7e7ae172"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a6693a6c7d797a7552deb4d7e7ae172">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -292,6 +292,12 @@ Typedefs</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">flat_hash_map_entry_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -308,7 +314,8 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a>)                                                         \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, closure_over_T)     \</div>
+<div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, type_name,          \</div>
+<div class="line">                                  closure_over_T)                              \</div>
 <div class="line">    }</div>
 <div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:51</div></div>
 </div><!-- fragment -->
@@ -316,20 +323,20 @@ Typedefs</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_name</td><td>the name of the user type stored in the container. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">closure_over_T</td><td>the code to be run on the reference to user type T, if Occupied. This may be a semicolon separated list of statements to execute on T or a section of code wrapped in braces {code here} which may be preferred for formatting. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>T is a <code>void *</code> to the user type stored in the container if Occupied. The user does not need to create this local variable. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>T is a mutable reference offering no type safety. However, T is guaranteed to be non-NULL if the closure executes.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>T is a reference to the user type stored in the entry guaranteed to be non-NULL if the closure executes.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
-<div class="line">fhm_entry *e = fhm_and_modify_w(entry_r(&amp;m, &amp;k), ((word *)T)-&gt;cnt++;);</div>
+<div class="line">fhm_entry *e = fhm_and_modify_w(entry_r(&amp;m, &amp;k), word, T-&gt;cnt++;);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
-<div class="line">word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&amp;m, &amp;k),</div>
-<div class="line">                                           { ((word *)T)-&gt;cnt++; }),</div>
+<div class="line">word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&amp;m, &amp;k), word,</div>
+<div class="line">                                           { T-&gt;cnt++; }),</div>
 <div class="line">                          (word){.key = k, .cnt = 1});</div>
 </div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
 
@@ -846,7 +853,8 @@ Typedefs</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the entry of the existing or newly inserted value. Occupied indicates the key existed, Vacant indicates the key was absent. Unwrapping in any case provides the current value unless an error occurs that prevents insertion. An insertion error will flag such a case.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the entry of the existing or newly inserted value. Occupied indicates the key existed, Vacant indicates the key was absent. Unwrapping in any case provides the current value unless an error occurs that prevents insertion. An insertion error will flag such a case. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>ensure the key type matches the type stored in table as your key. For example, if your key is of type <code>int</code> and you pass a <code>size_t</code> variable to the key argument, you will overwrite adjacent bytes of your struct.</dd></dl>
 <p>Note that for brevity and convenience the user need not write the key to the lazy value compound literal as well. This function ensures the key in the compound literal matches the searched key. </p>
 
 </div>
