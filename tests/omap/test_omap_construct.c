@@ -11,7 +11,7 @@
 CHECK_BEGIN_STATIC_FN(omap_test_empty)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = ccc_om_init(s, struct val, elem, key, NULL, id_cmp, NULL);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }

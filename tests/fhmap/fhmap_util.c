@@ -20,7 +20,7 @@ bool
 fhmap_id_eq(ccc_key_cmp const cmp)
 {
     struct val const *const va = cmp.user_type_rhs;
-    return va->id == *((int *)cmp.key_lhs);
+    return va->key == *((int *)cmp.key_lhs);
 }
 
 uint64_t
@@ -43,7 +43,7 @@ fhmap_modplus(ccc_user_type const mod)
 struct val
 fhmap_create(int const id, int const val)
 {
-    return (struct val){.id = id, .val = val};
+    return (struct val){.key = id, .val = val};
 }
 
 void

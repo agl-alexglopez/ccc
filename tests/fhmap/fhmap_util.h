@@ -8,7 +8,7 @@
 
 struct val
 {
-    int id;
+    int key;
     int val;
     ccc_fhmap_elem e;
 };
