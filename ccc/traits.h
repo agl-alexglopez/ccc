@@ -7,7 +7,16 @@ of the topic). Only a selections of shared traits across containers are
 represented here because some containers implement unique functionality that
 cannot be shared with other containers. These can simplify code greatly at a
 slightly higher compilation time cost. There is no runtime cost to using
-traits. */
+traits.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define TRAITS_USING_NAMESPACE_CCC
+```
+
+All traits can then be written without the `ccc_` prefix. */
 #ifndef CCC_TRAITS_H
 #define CCC_TRAITS_H
 
