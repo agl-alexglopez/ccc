@@ -138,6 +138,7 @@ add_omap_test(test_omap_construct)
 add_omap_test(test_omap_insert)
 add_omap_test(test_omap_erase)
 add_omap_test(test_omap_iter)
+add_omap_test(test_omap_entry)
 
 #############  Flat Map  ##########################
 add_library(fomap_util fomap/fomap_util.h fomap/fomap_util.c)
