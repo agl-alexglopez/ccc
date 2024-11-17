@@ -312,7 +312,10 @@ Include dependency graph for traits.h:</div>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The C Container Collection Traits Interface. </p>
-<p>Many functionalities across containers are similar. These can be described as traits that each container implements (see Rust Traits for a more pure example of the topic). Only a selections of shared traits across containers are represented here because some containers implement unique functionality that cannot be shared with other containers. These can simplify code greatly at a slightly higher compilation time cost. There is no runtime cost to using traits. </p>
+<p>Many functionalities across containers are similar. These can be described as traits that each container implements (see Rust Traits for a more pure example of the topic). Only a selections of shared traits across containers are represented here because some containers implement unique functionality that cannot be shared with other containers. These can simplify code greatly at a slightly higher compilation time cost. There is no runtime cost to using traits.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All traits can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ab25eca1e59257aab34f67308a523553c" name="ab25eca1e59257aab34f67308a523553c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab25eca1e59257aab34f67308a523553c">&#9670;&#160;</a></span>ccc_and_modify</h2>
