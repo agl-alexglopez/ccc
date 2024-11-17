@@ -21,9 +21,9 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 
 There are many excellent data structure libraries in C (see the [related](#related) section of this document). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.
 
-The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer a more literal definition of a data structure; they structure the data they are given according to the container's invariants with no memory related side effects. The container does not control scope or lifetime of the programmer's provided memory. It simply structures data according to the interface.
+The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer a more literal definition of a data structure; they structure the data they are given according to the container's invariants with no memory related side effects.
 
-If people are using C today, in the face of many other modern and safety-minded languages, they should benefit from all the language can provide, even when incorporating a third-party library. This means that they can manage all their memory as they see fit and these containers simply structure it when and how the programmer requires. This design style is not unique. Non-allocating intrusive containers are common in operating system kernel development where the idea of dynamic memory, where memory comes from, and when memory should be allocated or freed becomes more complex due to the structure of all the modules working together behind the scenes to support the user. Embedded developers also stand to benefit from this design. However, I think that all applications can benefit from thinking more carefully about their memory in C.
+If people are using C today, in the face of many other modern and safety-minded languages, they should benefit from all the language can provide, even when incorporating a third-party library. This means that they can manage all their memory as they see fit and these containers simply structure it when and how the programmer requires. This design style is not unique. Non-allocating intrusive containers are common in operating system kernel development (search for the Linux Kernel doubly linked list or rbtree as canonical examples). Embedded developers also stand to benefit from this design. However, I think that all applications can benefit from thinking more carefully about their memory in C.
 
 While not all containers require the user accommodate intrusive elements, when they do it looks like this.
 
@@ -40,7 +40,7 @@ The handle to the container element is then passed by reference to all functions
 
 ### Allocation
 
-If the non-allocating features are of the most interest to you, this section may not be relevant. However, to support the previously mentioned design motivations, this collection offers the following interface for allocation. The user defines this function and provides it to containers upon initialization.
+To support the previously mentioned design motivations, when allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.
 
 ```c
 typedef void *ccc_alloc_fn(void *ptr, size_t size, void *aux);
@@ -56,7 +56,7 @@ An allocation function implements the following behavior, where ptr is pointer t
   pointer returned might not be equal to the pointer provided.
 - If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.
 
-One may be tempted to use realloc to check all of these boxes but realloc is implementation defined on some of these points. So, the aux parameter also discourages users from providing realloc. For example, one solution using the standard library allocator might be implemented as follows (aux is not needed):
+One may be tempted to use realloc to check all of these boxes but realloc is implementation defined on some of these points. The aux parameter also discourages users from providing realloc. For example, one solution using the standard library allocator might be implemented as follows (aux is not needed):
 
 ```c
 void *
@@ -91,11 +91,11 @@ Consider a constructor. If the container is allowed to allocate, and the user wa
 void *insert(container *c, container_elem *e);
 ```
 
-Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces also offer functions that return references to successfully inserted elements if global program state should be set depending on this success. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
+Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
 
 #### Destructors
 
-For destructors, the argument is similar but the container does help with this at times. If an action other than freeing the memory of a user type is needed upon removal, there are multiple options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. The one exception is the following interfaces.
+For destructors, the argument is similar but the container does offer more help. If an action other than freeing the memory of a user type is needed upon removal, there are options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. One exception is the following interfaces.
 
 The clear function works for pointer stable containers and flat containers.
 
@@ -117,13 +117,13 @@ For examples of what code that uses these ideas looks like, read and use the sam
 
 ## Miscellaneous Why?
 
-- Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a `container_of` type macro that gets user type wrapping the intruder, assuming the user gives the correct type and field names. I do not like this because it introduces the chance for extremely subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors in entering the wrong type or field name grows rapidly. At the cost of slightly more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.
+- Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a `container_of` style macro that gets user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.
 - Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also debugging your own function is nice.
-- Why not header only? I want the library to be readable, maintainable, and updateable, especially if I want to change implementations in the source files. If the user wants to explore the implementation everything should be easily understandable. Smaller object size and easier modular compilation is also nice.
+- Why not header only? Readability, maintainability, and update ability, for changing implementations in the source files. If the user wants to explore the implementation everything should be easily understandable. Smaller object size and easier modular compilation is also nice.
 - Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.
 - Why flat maps? Mostly experimenting. Flat maps track the tree structure through indices not pointers. This makes the data structure copyable, relocatable, serializable, or writable to disk at the cost of pointer stability in most cases.
-- Why not a better hash map? Haven't gotten to it yet. There are many interesting ways to improve the hash map implementation.
-- Why C23? It is a great standard that is pleasant to write with and allows for the expressiveness I like in a library. Clang already covers most of the features used on many platforms. Newer gcc versions also have them covered.
+- Why not a better hash map? Haven't gotten to it yet. This container has the most room for improvement.
+- Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.
 
 ## Related
 
