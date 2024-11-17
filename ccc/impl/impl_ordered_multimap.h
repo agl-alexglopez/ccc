@@ -91,7 +91,8 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
 
 /*=====================     Core Macro Implementations     ==================*/
 
-#define ccc_impl_omm_and_modify_w(ordered_map_entry_ptr, mod_fn, aux_data...)  \
+#define ccc_impl_omm_and_modify_w(ordered_map_entry_ptr, type_name,            \
+                                  closure_over_T...)                           \
     ({                                                                         \
         __auto_type omm_ent_ptr_ = (ordered_map_entry_ptr);                    \
         struct ccc_tree_entry_ omm_mod_ent_                                    \
@@ -101,7 +102,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             omm_mod_ent_ = omm_ent_ptr_->impl_;                                \
             if (omm_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)               \
             {                                                                  \
-                void *const T = omm_mod_ent_.entry_.e_;                        \
+                type_name *const T = omm_mod_ent_.entry_.e_;                   \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \

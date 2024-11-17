@@ -163,10 +163,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
     int mut = 99;
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v
-        = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &(int){137}),
-                                           ((struct val *)T)->val = gen(&mut);),
-                          (struct val){.id = 137, .val = def(&mut)});
+    struct val *v = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &(int){137}),
+                                                     struct val,
+                                                     {
+                                                         T->val = gen(&mut);
+                                                     }),
+                                    (struct val){.id = 137, .val = def(&mut)});
     CHECK((v != NULL), true);
     CHECK(v->id, 137);
     CHECK(v->val, 0);
@@ -186,10 +188,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
        lazy evaluation. The function gen executes with its side effect,
        but the function def does not execute and therefore does not modify
        mut. */
-    struct val *v3
-        = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &(int){137}),
-                                           ((struct val *)T)->val = gen(&mut);),
-                          (struct val){.id = 137, .val = def(&mut)});
+    struct val *v3 = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &(int){137}),
+                                                      struct val,
+                                                      {
+                                                          T->val = gen(&mut);
+                                                      }),
+                                     (struct val){.id = 137, .val = def(&mut)});
     CHECK((v3 != NULL), true);
     CHECK(v3->id, 137);
     CHECK(v3->val, 42);

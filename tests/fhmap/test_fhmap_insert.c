@@ -434,13 +434,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val const *const in_table
-            = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &shuffled_index),
-                                               {
-                                                   ((struct val *)T)->val
-                                                       = shuffled_index;
-                                               }),
-                              (struct val){});
+        struct val const *const in_table = fhm_or_insert_w(
+            fhm_and_modify_w(entry_r(&fh, &shuffled_index), struct val,
+                             {
+                                 T->val = shuffled_index;
+                             }),
+            (struct val){});
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
         struct val *v
@@ -510,13 +509,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val const *const in_table
-            = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fh, &shuffled_index),
-                                               {
-                                                   ((struct val *)T)->val
-                                                       = shuffled_index;
-                                               }),
-                              (struct val){});
+        struct val const *const in_table = fhm_or_insert_w(
+            fhm_and_modify_w(entry_r(&fh, &shuffled_index), struct val,
+                             {
+                                 T->val = shuffled_index;
+                             }),
+            (struct val){});
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
         struct val *v

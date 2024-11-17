@@ -281,7 +281,7 @@ animate_maze(struct maze *maze)
     }
     /* Thanks to how the containers worked together there was only a single
        allocation and free from the heap's perspective. */
-    result l = ccc_buf_alloc(&bump_arena, 0, std_alloc);
+    [[maybe_unused]] result l = ccc_buf_alloc(&bump_arena, 0, std_alloc);
     assert(l == CCC_OK);
 }
 

@@ -575,7 +575,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_with)
         = frm_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
     int size = 30;
     ccc_fromap_entry *ent = entry_r(&frm, &(int){-1});
-    ent = frm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = frm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(size(&frm), 0);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -587,7 +587,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->id, -1);
-    ent = frm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = frm_and_modify_w(ent, struct val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
@@ -599,14 +599,14 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_with)
 
     i += (size / 2);
     ent = entry_r(&frm, &i);
-    ent = frm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = frm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(size(&frm), i + 1);
     (void)frm_insert_or_assign_w(&frm, i, val(i));
     CHECK(validate(&frm), true);
     ent = entry_r(&frm, &i);
-    ent = frm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = frm_and_modify_w(ent, struct val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -618,14 +618,14 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_with)
 
     i = size;
     ent = entry_r(&frm, &i);
-    ent = frm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = frm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(size(&frm), i + 1);
     (void)frm_insert_or_assign_w(&frm, i, val(i));
     CHECK(validate(&frm), true);
     ent = entry_r(&frm, &i);
-    ent = frm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = frm_and_modify_w(ent, struct val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
