@@ -11,7 +11,7 @@
 CHECK_BEGIN_STATIC_FN(ommap_test_empty)
 {
     ccc_ordered_multimap pq
-        = ccc_omm_init(pq, struct val, elem, val, NULL, id_cmp, NULL);
+        = ccc_omm_init(pq, struct val, elem, key, NULL, id_cmp, NULL);
     CHECK(is_empty(&pq), true);
     CHECK_END_FN();
 }
