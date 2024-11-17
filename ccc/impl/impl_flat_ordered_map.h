@@ -66,7 +66,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
 
 /*==================     Core Macro Implementations     =====================*/
 
-#define ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr,                  \
+#define ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, type_name,       \
                                   closure_over_T...)                           \
     ({                                                                         \
         __auto_type fom_mod_ent_ptr_ = (flat_ordered_map_entry_ptr);           \
@@ -77,7 +77,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
             fom_mod_ent_ = fom_mod_ent_ptr_->impl_;                            \
             if (fom_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                      \
             {                                                                  \
-                void *const T                                                  \
+                type_name *const T                                             \
                     = ccc_buf_at(&fom_mod_ent_.fom_->buf_, fom_mod_ent_.i_);   \
                 if (T)                                                         \
                 {                                                              \

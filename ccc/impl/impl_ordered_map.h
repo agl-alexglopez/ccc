@@ -91,7 +91,8 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 
 /*=====================     Core Macro Implementations     ==================*/
 
-#define ccc_impl_om_and_modify_w(ordered_map_entry_ptr, closure_over_T...)     \
+#define ccc_impl_om_and_modify_w(ordered_map_entry_ptr, type_name,             \
+                                 closure_over_T...)                            \
     ({                                                                         \
         __auto_type om_ent_ptr_ = (ordered_map_entry_ptr);                     \
         struct ccc_tree_entry_ om_mod_ent_                                     \
@@ -101,7 +102,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             om_mod_ent_ = om_ent_ptr_->impl_;                                  \
             if (om_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)                \
             {                                                                  \
-                void *const T = om_mod_ent_.entry_.e_;                         \
+                type_name *const T = om_mod_ent_.entry_.e_;                    \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \

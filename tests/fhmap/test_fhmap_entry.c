@@ -614,7 +614,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
                    fhmap_int_to_u64, fhmap_id_eq, NULL);
     CHECK(res, CCC_OK);
     ccc_fhmap_entry *ent = entry_r(&fh, &(int){-1});
-    ent = fhm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(size(&fh), 0);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -626,7 +626,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->id, -1);
-    ent = fhm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
@@ -638,14 +638,14 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
 
     i += (size / 2);
     ent = entry_r(&fh, &i);
-    ent = fhm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(size(&fh), i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
-    ent = fhm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -657,14 +657,14 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
 
     i = size;
     ent = entry_r(&fh, &i);
-    ent = fhm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(size(&fh), i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
-    ent = fhm_and_modify_w(ent, { ((struct val *)T)->val++; });
+    ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);

@@ -72,7 +72,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
 /*==================     Core Macro Implementations     =====================*/
 
 #define ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr,         \
-                                  closure_over_T...)                           \
+                                  type_name, closure_over_T...)                \
     ({                                                                         \
         __auto_type frm_ent_ptr_ = (flat_realtime_ordered_map_entry_ptr);      \
         struct ccc_frtree_entry_ frm_mod_ent_                                  \
@@ -82,7 +82,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             frm_mod_ent_ = frm_ent_ptr_->impl_;                                \
             if (frm_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                      \
             {                                                                  \
-                void *const T                                                  \
+                type_name *const T                                             \
                     = ccc_buf_at(&frm_mod_ent_.frm_->buf_, frm_mod_ent_.i_);   \
                 if (T)                                                         \
                 {                                                              \

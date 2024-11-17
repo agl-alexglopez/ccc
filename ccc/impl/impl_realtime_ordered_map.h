@@ -135,7 +135,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
 
 /*==================     Core Macro Implementations     =====================*/
 
-#define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr,              \
+#define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,   \
                                   closure_over_T...)                           \
     ({                                                                         \
         __auto_type rom_ent_ptr_ = (realtime_ordered_map_entry_ptr);           \
@@ -146,7 +146,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             rom_mod_ent_ = rom_ent_ptr_->impl_;                                \
             if (rom_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)               \
             {                                                                  \
-                void *const T = e.entry_;                                      \
+                type_name *const T = e.entry_;                                 \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \

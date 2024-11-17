@@ -380,10 +380,10 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
                    over the user type (void * T;) if the entry is Occupied. If
                    the entry is Vacant the closure does not execute. */
                 struct word const *w;
-                w = fom_or_insert_w(
-                    fom_and_modify_w(entry_r(&fom, &cw.str),
-                                     { ((struct word *)T)->cnt++; }),
-                    (struct word){.ofs = cw.str, .cnt = 1});
+                w = fom_or_insert_w(fom_and_modify_w(entry_r(&fom, &cw.str),
+                                                     struct word,
+                                                     { T->cnt++; }),
+                                    (struct word){.ofs = cw.str, .cnt = 1});
                 PROG_ASSERT(w);
             }
         }

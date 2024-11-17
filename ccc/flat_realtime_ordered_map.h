@@ -294,37 +294,36 @@ ccc_fromap_entry *ccc_frm_and_modify_aux(ccc_fromap_entry *e, ccc_update_fn *fn,
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] flat_realtime_ordered_map_entry_ptr a pointer to the obtained entry.
+@param [in] type_name the name of the user type stored in the container.
 @param [in] closure_over_T the code to be run on the reference to user type T,
 if Occupied. This may be a semicolon separated list of statements to execute on
 T or a section of code wrapped in braces {code here} which may be preferred
 for formatting.
 @return a compound literal reference to the modified entry if it was occupied
 or a vacant entry if it was vacant.
-@note T is a `void *` to the user type stored in the container if Occupied. The
-user does not need to create this local variable.
-@warning T is a mutable reference offering no type safety. However, T is
-guaranteed to be non-NULL if the closure executes.
+@note T is a reference to the user type stored in the entry guaranteed to be
+non-NULL if the closure executes.
 
 ```
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-frm_entry *e = frm_and_modify_w(entry_r(&m, &k), ((word *)T)->cnt++;);
+frm_entry *e = frm_and_modify_w(entry_r(&m, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = frm_or_insert_w(frm_and_modify_w(entry_r(&m, &k),
-                                           { ((word *)T)->cnt++; }),
+word *w = frm_or_insert_w(frm_and_modify_w(entry_r(&m, &k), word,
+                                           { T->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```
 
 Note that any code written is only evaluated if the entry is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define ccc_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr,              \
+#define ccc_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr, type_name,   \
                              closure_over_T...)                                \
     &(ccc_fromap_entry)                                                        \
     {                                                                          \
         ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr,         \
-                                  closure_over_T)                              \
+                                  type_name, closure_over_T)                   \
     }
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
