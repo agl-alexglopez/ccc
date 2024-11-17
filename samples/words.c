@@ -377,13 +377,14 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
                 /* There are a few idiomatic ways we could tackle this step.
                    However, this demonstrates the user of "closures" in the
                    and modify with macro. The and modify macro gives a closure
-                   over the user type (void * T;) if the entry is Occupied. If
-                   the entry is Vacant the closure does not execute. */
-                struct word const *w;
-                w = fom_or_insert_w(fom_and_modify_w(entry_r(&fom, &cw.str),
-                                                     struct word,
-                                                     { T->cnt++; }),
-                                    (struct word){.ofs = cw.str, .cnt = 1});
+                   over the user type T if the entry is Occupied. If the entry
+                   is Vacant the closure does not execute. */
+                struct word const *const w = fom_or_insert_w(
+                    fom_and_modify_w(entry_r(&fom, &cw.str), struct word,
+                                     {
+                                         T->cnt++;
+                                     }),
+                    (struct word){.ofs = cw.str, .cnt = 1});
                 PROG_ASSERT(w);
             }
         }
