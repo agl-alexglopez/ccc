@@ -54,7 +54,7 @@ struct lru_request
     union
     {
         enum check_result (*putter)(struct lru_cache *, int, int);
-        int (*getter)(struct lru_cache *, int);
+        enum check_result (*getter)(struct lru_cache *, int, int *);
         struct key_val *(*header)(struct lru_cache *);
     };
 };
@@ -71,12 +71,6 @@ static bool const quiet = true;
         }                                                                      \
     } while (0)
 
-static struct key_val *
-lru_head(struct lru_cache *const lru)
-{
-    return dll_front(&lru->l);
-}
-
 static bool
 lru_lookup_cmp(ccc_key_cmp const cmp)
 {
@@ -92,47 +86,62 @@ cmp_by_key(ccc_cmp const cmp)
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 
+static struct key_val *
+lru_head(struct lru_cache *const lru)
+{
+    return dll_front(&lru->l);
+}
+
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
 {
     ccc_fhmap_entry *const ent = entry_r(&lru->fh, &key);
-    struct lru_lookup const *const found = unwrap(ent);
-    if (found)
+    if (occupied(ent))
     {
+        struct lru_lookup const *const found = unwrap(ent);
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        CHECK(dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
-                         &found->kv_in_list->list_elem),
-              CCC_OK);
-        return PASS;
+        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                                  &found->kv_in_list->list_elem);
+        CHECK(r, CCC_OK);
     }
-    struct lru_lookup *const new
-        = insert_entry(ent, &(struct lru_lookup){.key = key}.hash_elem);
-    CHECK(new == NULL, false);
-    new->kv_in_list
-        = dll_emplace_front(&lru->l, (struct key_val){.key = key, .val = val});
-    if (size(&lru->l) > lru->cap)
+    else
     {
-        struct key_val const *const to_drop = back(&lru->l);
-        CHECK(to_drop == NULL, false);
-        ccc_entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
-        CHECK(occupied(&e), true);
-        (void)pop_back(&lru->l);
+        struct lru_lookup *const new
+            = insert_entry(ent, &(struct lru_lookup){.key = key}.hash_elem);
+        CHECK(new == NULL, false);
+        new->kv_in_list = dll_emplace_front(
+            &lru->l, (struct key_val){.key = key, .val = val});
+        CHECK(new->kv_in_list == NULL, false);
+        if (size(&lru->l) > lru->cap)
+        {
+            struct key_val const *const to_drop = back(&lru->l);
+            CHECK(to_drop == NULL, false);
+            ccc_entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
+            CHECK(occupied(&e), true);
+            (void)pop_back(&lru->l);
+        }
     }
     CHECK_END_FN();
 }
 
-static int
-lru_get(struct lru_cache *const lru, int const key)
+CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
+                      int *val)
 {
+    CHECK_ERROR(val != NULL, true);
     struct lru_lookup const *const found = get_key_val(&lru->fh, &key);
     if (!found)
     {
-        return -1;
+        *val = -1;
     }
-    (void)dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
-                     &found->kv_in_list->list_elem);
-    return found->kv_in_list->val;
+    else
+    {
+        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                                  &found->kv_in_list->list_elem);
+        CHECK(r, CCC_OK);
+        *val = found->kv_in_list->val;
+    }
+    CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(run_lru_cache)
@@ -163,25 +172,35 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         switch (requests[i].call)
         {
         case PUT:
+        {
             CHECK(requests[i].putter(&lru, requests[i].key, requests[i].val),
                   PASS);
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
             CHECK(validate(&lru.fh), true);
             CHECK(validate(&lru.l), true);
-            break;
+        }
+        break;
         case GET:
+        {
             QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(requests[i].getter(&lru, requests[i].key), requests[i].val);
+            int val = {};
+            CHECK(requests[i].getter(&lru, requests[i].key, &val), PASS);
+            CHECK(val, requests[i].val);
             CHECK(validate(&lru.l), true);
-            break;
+        }
+        break;
         case HED:
+        {
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(requests[i].header(&lru)->key, requests[i].key);
-            CHECK(requests[i].header(&lru)->val, requests[i].val);
-            break;
+            struct key_val const *const kv = requests[i].header(&lru);
+            CHECK(kv != NULL, true);
+            CHECK(kv->key, requests[i].key);
+            CHECK(kv->val, requests[i].val);
+        }
+        break;
         default:
             break;
         }
