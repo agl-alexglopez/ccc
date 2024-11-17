@@ -49,6 +49,7 @@ add_ommap_test(test_ommap_construct)
 add_ommap_test(test_ommap_insert)
 add_ommap_test(test_ommap_erase)
 add_ommap_test(test_ommap_iter)
+add_ommap_test(test_ommap_entry)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)

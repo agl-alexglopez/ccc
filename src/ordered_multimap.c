@@ -895,6 +895,7 @@ multimap_erase(struct ccc_tree_ *const t, void const *const key)
     {
         return NULL;
     }
+    --t->size_;
     if (has_dups(&t->end_, ret))
     {
         ret = pop_front_dup(t, ret, key_from_node(t, ret));
