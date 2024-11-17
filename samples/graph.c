@@ -1,7 +1,7 @@
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -45,8 +45,8 @@ struct parent_cell
 
 struct prev_vertex
 {
-    struct vertex *v;
-    struct vertex *prev;
+    char cur_name;
+    char prev_name;
     ccc_fhmap_elem elem;
     /* A pointer to the corresponding pq_entry for this element. */
     struct dist_point *dist_point;
@@ -54,15 +54,15 @@ struct prev_vertex
 
 struct dist_point
 {
-    struct vertex *v;
+    char v_name;
     int dist;
     ccc_pq_elem pq_elem;
 };
 
 struct path_request
 {
-    struct vertex *src;
-    struct vertex *dst;
+    char src;
+    char dst;
 };
 
 /* Helper type for labelling costs for edges between vertices in the graph. */
@@ -135,6 +135,18 @@ static char const vertex_titles[MAX_VERTICES] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 };
+
+#define prog_assert(cond, ...)                                                 \
+    do                                                                         \
+    {                                                                          \
+        if (!(cond))                                                           \
+        {                                                                      \
+            __VA_OPT__(__VA_ARGS__)                                            \
+            printf("%s, %d, condition is false: %s\n", __FILE__, __LINE__,     \
+                   #cond);                                                     \
+            exit(1);                                                           \
+        }                                                                      \
+    } while (0)
 
 static str_view const rows = SV("-r=");
 static str_view const cols = SV("-c=");
@@ -211,7 +223,7 @@ static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void prepare_vertices(struct graph *, ccc_priority_queue *,
-                             ccc_flat_hash_map *, struct path_request const *);
+                             flat_hash_map *, struct path_request const *);
 static void paint_edge(struct graph *, struct vertex const *,
                        struct vertex const *);
 static void add_edge_cost_label(struct graph *, struct vertex *,
@@ -364,10 +376,7 @@ build_graph(struct graph *const graph)
     {
         char key = (char)vertex_title;
         struct vertex *const src = vertex_at(graph, key);
-        if (!src)
-        {
-            quit("Vertex that should be present in the map is absent.\n", 1);
-        }
+        prog_assert(src != NULL);
         int const degree = vertex_degree(src);
         if (degree == MAX_DEGREE)
         {
@@ -400,11 +409,7 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
             continue;
         }
         dst = vertex_at(graph, key);
-        if (!dst)
-        {
-            quit("Broken or corrupted adjacency list.\n", 1);
-        }
-        assert(dst);
+        prog_assert(dst != NULL);
         if (!has_edge_with(src_vertex, dst->name)
             && vertex_degree(dst) < MAX_DEGREE
             && has_built_edge(graph, src_vertex, dst))
@@ -424,16 +429,16 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
     Cell const edge_id = make_edge(src->name, dst->name);
-    ccc_flat_hash_map parent_map;
-    [[maybe_unused]] ccc_result res
+    flat_hash_map parent_map;
+    ccc_result res
         = fhm_init(&parent_map, (struct parent_cell *)NULL, 0, key, elem,
                    std_alloc, hash_parent_cells, eq_parent_cells, NULL);
-    assert(res == CCC_OK);
-    ccc_flat_double_ended_queue bfs
+    prog_assert(res == CCC_OK);
+    flat_double_ended_queue bfs
         = ccc_fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
-    [[maybe_unused]] ccc_entry *e = fhm_insert_or_assign_w(
+    ccc_entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
-    assert(!insert_error(e));
+    prog_assert(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
     bool success = false;
     struct point cur = {};
@@ -449,9 +454,8 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                [[maybe_unused]] ccc_entry const in
-                    = insert_or_assign(&parent_map, &push.elem);
-                assert(!insert_error(&in));
+                ccc_entry const in = insert_or_assign(&parent_map, &push.elem);
+                prog_assert(!insert_error(&in));
                 cur = next;
                 success = true;
                 break;
@@ -459,25 +463,23 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             if (!is_path(next_cell)
                 && !occupied(try_insert_r(&parent_map, &push.elem)))
             {
-                [[maybe_unused]] struct point const *const n
-                    = push_back(&bfs, &next);
-                assert(n);
+                struct point const *const n = push_back(&bfs, &next);
+                prog_assert(n);
             }
         }
     }
     if (success)
     {
         struct parent_cell const *cell = get_key_val(&parent_map, &cur);
-        assert(cell);
+        prog_assert(cell);
         struct edge edge
             = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
         while (cell->parent.r > 0)
         {
             cell = get_key_val(&parent_map, &cell->parent);
-            if (!cell)
-            {
-                quit("Cannot find cell parent to rebuild path.\n", 1);
-            }
+            prog_assert(cell, {
+                printf("Cannot find cell parent to rebuild path.\n");
+            });
             ++edge.n.cost;
             *grid_at_mut(graph, cell->key) |= edge_id;
             build_path_cell(graph, cell->key, edge_id);
@@ -493,7 +495,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     return success;
 }
 
-/* A edge cost lable will only be added if there is sufficient space. For
+/* A edge cost label will only be added if there is sufficient space. For
    edges that are too small to fit a digit or two the line length can be
    easily counted with the mouse or by eye. */
 static void
@@ -682,10 +684,12 @@ find_shortest_paths(struct graph *const graph)
             }
             if (!dijkstra_shortest_path(graph, pr))
             {
-                set_cursor_position(pr.src->pos.r, pr.src->pos.c);
-                printf("\033[38;5;9m%c\033[0m", pr.src->name);
-                set_cursor_position(pr.dst->pos.r, pr.dst->pos.c);
-                printf("\033[38;5;9m%c\033[0m", pr.dst->name);
+                struct point const *const src = &vertex_at(graph, pr.src)->pos;
+                struct point const *const dst = &vertex_at(graph, pr.dst)->pos;
+                set_cursor_position(src->r, src->c);
+                printf("\033[38;5;9m%c\033[0m", pr.src);
+                set_cursor_position(dst->r, dst->c);
+                printf("\033[38;5;9m%c\033[0m", pr.dst);
             }
             break;
         }
@@ -699,39 +703,40 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
     ccc_priority_queue dist_q = ccc_pq_init(struct dist_point, pq_elem, CCC_LES,
                                             NULL, cmp_pq_dist_points, NULL);
-    ccc_flat_hash_map prev_map;
-    [[maybe_unused]] ccc_result res
-        = fhm_init(&prev_map, (struct prev_vertex *)NULL, 0, v, elem, std_alloc,
-                   hash_vertex_addr, eq_prev_vertices, NULL);
-    assert(res == CCC_OK);
+    flat_hash_map prev_map;
+    ccc_result res
+        = fhm_init(&prev_map, (struct prev_vertex *)NULL, 0, cur_name, elem,
+                   std_alloc, hash_vertex_addr, eq_prev_vertices, NULL);
+    prog_assert(res == CCC_OK);
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
     struct dist_point *cur = NULL;
+    struct vertex *cur_v = NULL;
     while (!is_empty(&dist_q))
     {
         /* PQ entries are popped but the map will free the memory at
            the end because it always holds a reference to its pq_elem. */
         cur = front(&dist_q);
         (void)pop(&dist_q);
-        if (cur->v == pr.dst || cur->dist == INT_MAX)
+        cur_v = vertex_at(graph, cur->v_name);
+        if (cur->v_name == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
             break;
         }
-        for (int i = 0; i < MAX_DEGREE && cur->v->edges[i].name; ++i)
+        for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
         {
-            struct vertex const *const v
-                = vertex_at(graph, cur->v->edges[i].name);
-            struct prev_vertex *next = get_key_val(&prev_map, (void const *)&v);
-            assert(next);
+            struct prev_vertex *next
+                = get_key_val(&prev_map, &cur_v->edges[i].name);
+            prog_assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
             struct dist_point *dist = next->dist_point;
-            int alt = cur->dist + cur->v->edges[i].cost;
+            int alt = cur->dist + cur_v->edges[i].cost;
             if (alt < dist->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                next->prev = cur->v;
+                next->prev_name = cur->v_name;
                 /* Dijkstra with update technique tests the pq abilities. */
                 if (!decrease(&dist_q, &dist->pq_elem, pq_update_dist, &alt))
                 {
@@ -742,16 +747,14 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     }
     if (success)
     {
-        struct vertex *v = cur->v;
-        struct prev_vertex const *prev
-            = get_key_val(&prev_map, (void const *)&v);
-        assert(prev);
-        while (prev->prev)
+        struct prev_vertex const *prev = get_key_val(&prev_map, &cur_v->name);
+        prog_assert(prev);
+        while (prev->prev_name)
         {
-            paint_edge(graph, v, prev->prev);
-            v = prev->prev;
-            prev = get_key_val(&prev_map, (void const *)&prev->prev);
-            assert(prev);
+            paint_edge(graph, cur_v, vertex_at(graph, prev->prev_name));
+            cur_v = vertex_at(graph, prev->prev_name);
+            prev = get_key_val(&prev_map, &prev->prev_name);
+            prog_assert(prev);
         }
     }
     /* Choosing when to free gets tricky during the algorithm. So, the
@@ -766,7 +769,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 
 static void
 prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
-                 ccc_flat_hash_map *prev_map, struct path_request const *pr)
+                 flat_hash_map *prev_map, struct path_request const *pr)
 {
     for (int count = 0, name = start_vertex_title; count < graph->vertices;
          ++count, ++name)
@@ -774,20 +777,18 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
         struct vertex *v = vertex_at(graph, (char)name);
         struct dist_point *p = valid_malloc(sizeof(struct dist_point));
         *p = (struct dist_point){
-            .v = v,
-            .dist = v == pr->src ? 0 : INT_MAX,
+            .v_name = (char)name,
+            .dist = v->name == pr->src ? 0 : INT_MAX,
         };
         ccc_entry const *const inserted = fhm_try_insert_w(
-            prev_map, p->v,
-            (struct prev_vertex){.prev = NULL, .dist_point = p});
-        if (insert_error(inserted) || occupied(inserted))
-        {
-            quit_and("duplicate vertex during graph prep or insert failed.\n",
-                     1, free(p););
-            return;
-        }
-        [[maybe_unused]] ccc_result const res = push(dist_q, &p->pq_elem);
-        assert(res == CCC_OK);
+            prev_map, p->v_name,
+            (struct prev_vertex){.prev_name = '\0', .dist_point = p});
+        prog_assert(!insert_error(inserted) && !occupied(inserted), {
+            printf("duplicate vertex during graph prep or insert failed.\n");
+            free(p);
+        });
+        ccc_result const res = push(dist_q, &p->pq_elem);
+        prog_assert(res == CCC_OK);
     }
 }
 
@@ -1085,16 +1086,16 @@ static bool
 eq_prev_vertices(ccc_key_cmp const cmp)
 {
     struct prev_vertex const *const a = cmp.user_type_rhs;
-    struct vertex const *const *const v
-        = (struct vertex const *const *const)cmp.key_lhs;
-    return a->v == *v;
+    char const v = *(char *)cmp.key_lhs;
+    return a->cur_name == v;
 }
 
 static uint64_t
 hash_vertex_addr(ccc_user_key const pointer_to_vertex)
 {
-    return hash_64_bits((uintptr_t)
-                        * ((struct vertex **)pointer_to_vertex.user_key));
+    char const name = *(char *)pointer_to_vertex.user_key;
+    uint64_t wide_name = (unsigned)name;
+    return hash_64_bits(wide_name);
 }
 
 static uint64_t
@@ -1135,8 +1136,8 @@ parse_path_request(struct graph *const g, str_view r)
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex *v = vertex_at(g, *c);
-            assert(v);
-            res.src ? (res.dst = v) : (res.src = v);
+            prog_assert(v);
+            res.src ? (res.dst = v->name) : (res.src = v->name);
         }
     }
     return res.src && res.dst ? res : (struct path_request){};

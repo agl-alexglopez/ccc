@@ -163,7 +163,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
         {                                                                      \
             __auto_type fom_key_ = (key);                                      \
             struct ccc_ftree_entry_ fom_try_ins_ent_                           \
-                = ccc_impl_fom_entry(fom_try_ins_map_ptr_, &fom_key_);         \
+                = ccc_impl_fom_entry(fom_try_ins_map_ptr_, (void *)&fom_key_); \
             if (!(fom_try_ins_ent_.stats_ & CCC_ENTRY_OCCUPIED))               \
             {                                                                  \
                 fom_try_ins_ent_ret_ = (struct ccc_ent_){                      \
@@ -204,7 +204,8 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
         {                                                                      \
             __auto_type fom_key_ = (key);                                      \
             struct ccc_ftree_entry_ fom_ins_or_assign_ent_                     \
-                = ccc_impl_fom_entry((flat_ordered_map_ptr), &fom_key_);       \
+                = ccc_impl_fom_entry((flat_ordered_map_ptr),                   \
+                                     (void *)&fom_key_);                       \
             if (!(fom_ins_or_assign_ent_.stats_ & CCC_ENTRY_OCCUPIED))         \
             {                                                                  \
                 fom_ins_or_assign_ent_ret_                                     \

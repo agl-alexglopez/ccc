@@ -158,7 +158,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             __auto_type omm_key_ = (key);                                      \
             struct ccc_tree_ *omm_try_ins_map_ptr_ = &omm_try_ins_ptr_->impl_; \
             struct ccc_tree_entry_ omm_try_ins_ent_                            \
-                = ccc_impl_omm_entry(omm_try_ins_map_ptr_, &omm_key_);         \
+                = ccc_impl_omm_entry(omm_try_ins_map_ptr_, (void *)&omm_key_); \
             if (!(omm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))        \
             {                                                                  \
                 ccc_impl_omm_insert_and_copy_key(omm_try_ins_ent_,             \
@@ -184,7 +184,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             struct ccc_tree_ *ordered_map_ptr_                                 \
                 = &omm_ins_or_assign_ptr_->impl_;                              \
             struct ccc_tree_entry_ omm_ins_or_assign_ent_                      \
-                = ccc_impl_omm_entry(ordered_map_ptr_, &omm_key_);             \
+                = ccc_impl_omm_entry(ordered_map_ptr_, (void *)&omm_key_);     \
             if (!(omm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))  \
             {                                                                  \
                 ccc_impl_omm_insert_and_copy_key(omm_ins_or_assign_ent_,       \

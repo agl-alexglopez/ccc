@@ -171,7 +171,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
         {                                                                      \
             __auto_type frm_key_ = (key);                                      \
             struct ccc_frtree_entry_ frm_try_ins_ent_                          \
-                = ccc_impl_frm_entry(try_ins_map_ptr_, &frm_key_);             \
+                = ccc_impl_frm_entry(try_ins_map_ptr_, (void *)&frm_key_);     \
             if (!(frm_try_ins_ent_.stats_ & CCC_ENTRY_OCCUPIED))               \
             {                                                                  \
                 frm_try_ins_ent_ret_ = (struct ccc_ent_){                      \
@@ -213,7 +213,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
         {                                                                      \
             __auto_type frm_key_ = (key);                                      \
             struct ccc_frtree_entry_ frm_ins_or_assign_ent_                    \
-                = ccc_impl_frm_entry(ins_or_assign_map_ptr_, &frm_key_);       \
+                = ccc_impl_frm_entry(ins_or_assign_map_ptr_,                   \
+                                     (void *)&frm_key_);                       \
             if (!(frm_ins_or_assign_ent_.stats_ & CCC_ENTRY_OCCUPIED))         \
             {                                                                  \
                 frm_ins_or_assign_ent_ret_                                     \

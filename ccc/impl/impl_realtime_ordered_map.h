@@ -220,7 +220,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         {                                                                      \
             __auto_type rom_key_ = (key);                                      \
             struct ccc_rtree_entry_ rom_try_ins_ent_                           \
-                = ccc_impl_rom_entry(try_ins_map_ptr_, &rom_key_);             \
+                = ccc_impl_rom_entry(try_ins_map_ptr_, (void *)&rom_key_);     \
             if (!(rom_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))        \
             {                                                                  \
                 ccc_impl_rom_insert_and_copy_key(                              \
@@ -245,7 +245,8 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         {                                                                      \
             __auto_type rom_key_ = (key);                                      \
             struct ccc_rtree_entry_ rom_ins_or_assign_ent_                     \
-                = ccc_impl_rom_entry(ins_or_assign_map_ptr_, &rom_key_);       \
+                = ccc_impl_rom_entry(ins_or_assign_map_ptr_,                   \
+                                     (void *)&rom_key_);                       \
             if (!(rom_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))  \
             {                                                                  \
                 ccc_impl_rom_insert_and_copy_key(rom_ins_or_assign_ent_,       \
