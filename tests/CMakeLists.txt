@@ -196,6 +196,7 @@ add_romap_test(test_romap_construct)
 add_romap_test(test_romap_insert)
 add_romap_test(test_romap_erase)
 add_romap_test(test_romap_iter)
+add_romap_test(test_romap_entry)
 
 #############  Flat Realtime Map  ##########################
 add_library(fromap_util fromap/fromap_util.h fromap/fromap_util.c)

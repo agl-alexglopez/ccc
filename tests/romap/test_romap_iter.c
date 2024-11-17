@@ -20,24 +20,24 @@ CHECK_BEGIN_STATIC_FN(check_range, realtime_ordered_map const *const rom,
 {
     if (begin_range(r))
     {
-        CHECK(((struct val *)begin_range(r))->val, expect_range[0]);
+        CHECK(((struct val *)begin_range(r))->id, expect_range[0]);
     }
     if (ccc_end_range(r))
     {
-        CHECK(((struct val *)end_range(r))->val, expect_range[n - 1]);
+        CHECK(((struct val *)end_range(r))->id, expect_range[n - 1]);
     }
     size_t index = 0;
     struct val *iter = begin_range(r);
     for (; iter != end_range(r) && index < n;
          iter = next(rom, &iter->elem), ++index)
     {
-        int const cur_val = iter->val;
-        CHECK(expect_range[index], cur_val);
+        int const cur_id = iter->id;
+        CHECK(expect_range[index], cur_id);
     }
     CHECK(iter, end_range(r));
     if (iter)
     {
-        CHECK(((struct val *)iter)->val, expect_range[n - 1]);
+        CHECK(((struct val *)iter)->id, expect_range[n - 1]);
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
@@ -55,18 +55,18 @@ CHECK_BEGIN_STATIC_FN(check_range, realtime_ordered_map const *const rom,
             {
                 return CHECK_STATUS;
             }
-            if (expect_range[j] == iter->val)
+            if (expect_range[j] == iter->id)
             {
                 (void)fprintf(stderr, "%s%d, %s", GREEN, expect_range[j], NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+                (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
             }
         }
         for (; iter != end_range(r); iter = next(rom, &iter->elem))
         {
-            (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+            (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
     });
@@ -78,24 +78,24 @@ CHECK_BEGIN_STATIC_FN(check_rrange, realtime_ordered_map const *const rom,
 {
     if (rbegin_rrange(r))
     {
-        CHECK(((struct val *)rbegin_rrange(r))->val, expect_rrange[0]);
+        CHECK(((struct val *)rbegin_rrange(r))->id, expect_rrange[0]);
     }
     if (rend_rrange(r))
     {
-        CHECK(((struct val *)rend_rrange(r))->val, expect_rrange[n - 1]);
+        CHECK(((struct val *)rend_rrange(r))->id, expect_rrange[n - 1]);
     }
     struct val *iter = rbegin_rrange(r);
     size_t index = 0;
     for (; iter != rend_rrange(r); iter = rnext(rom, &iter->elem))
     {
-        int const cur_val = iter->val;
+        int const cur_val = iter->id;
         CHECK(expect_rrange[index], cur_val);
         ++index;
     }
     CHECK(iter, rend_rrange(r));
     if (iter)
     {
-        CHECK(((struct val *)iter)->val, expect_rrange[n - 1]);
+        CHECK(((struct val *)iter)->id, expect_rrange[n - 1]);
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
@@ -114,19 +114,19 @@ CHECK_BEGIN_STATIC_FN(check_rrange, realtime_ordered_map const *const rom,
             {
                 return CHECK_STATUS;
             }
-            if (expect_rrange[j] == iter->val)
+            if (expect_rrange[j] == iter->id)
             {
                 (void)fprintf(stderr, "%s%d, %s", GREEN, expect_rrange[j],
                               NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+                (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
             }
         }
         for (; iter != rend_rrange(r); iter = rnext(rom, &iter->elem))
         {
-            (void)fprintf(stderr, "%s%d, %s", RED, iter->val, NONE);
+            (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
     });
@@ -155,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(iterator_check, realtime_ordered_map *s)
 CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -167,8 +167,8 @@ CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
-        vals[i].val = (int)shuffled_index;
-        vals[i].id = i;
+        vals[i].id = (int)shuffled_index;
+        vals[i].val = i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
@@ -179,7 +179,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
     for (struct val *e = begin(&s); e && j < num_nodes;
          e = next(&s, &e->elem), ++j)
     {
-        CHECK(e->val, val_keys_inorder[j]);
+        CHECK(e->id, val_keys_inorder[j]);
     }
     CHECK_END_FN();
 }
@@ -187,7 +187,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
 CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -196,8 +196,8 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].val = rand() % (num_nodes + 1); // NOLINT
-        vals[i].id = (int)i;
+        vals[i].id = rand() % (num_nodes + 1); // NOLINT
+        vals[i].val = (int)i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
     for (struct val *i = begin(&s), *next = NULL; i; i = next)
     {
         next = next(&s, &i->elem);
-        if (i->val > limit)
+        if (i->id > limit)
         {
             (void)remove(&s, &i->elem);
             CHECK(validate(&s), true);
@@ -218,7 +218,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
 CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -227,8 +227,8 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].val = rand() % (num_nodes + 1); // NOLINT
-        vals[i].id = (int)i;
+        vals[i].id = rand() % (num_nodes + 1); // NOLINT
+        vals[i].val = (int)i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
@@ -239,11 +239,11 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
     for (struct val *i = begin(&s), *next = NULL; i; i = next)
     {
         next = next(&s, &i->elem);
-        if (i->val < limit)
+        if (i->id < limit)
         {
             (void)remove(&s, &i->elem);
-            i->val = new_unique_entry_val;
-            CHECK(insert_entry(entry_r(&s, &i->val), &i->elem) != NULL, true);
+            i->id = new_unique_entry_val;
+            CHECK(insert_entry(entry_r(&s, &i->id), &i->elem) != NULL, true);
             CHECK(validate(&s), true);
             ++new_unique_entry_val;
         }
@@ -255,15 +255,15 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
 CHECK_BEGIN_STATIC_FN(romap_test_valid_range)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
-    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].val = val; // NOLINT
-        vals[i].id = i;
+        vals[i].id = id; // NOLINT
+        vals[i].val = i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
@@ -285,15 +285,15 @@ CHECK_BEGIN_STATIC_FN(romap_test_valid_range)
 CHECK_BEGIN_STATIC_FN(romap_test_valid_range_equals)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
-    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].val = val; // NOLINT
-        vals[i].id = i;
+        vals[i].id = id; // NOLINT
+        vals[i].val = i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
@@ -314,14 +314,14 @@ CHECK_BEGIN_STATIC_FN(romap_test_valid_range_equals)
 CHECK_BEGIN_STATIC_FN(romap_test_invalid_range)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
-    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].val = val; // NOLINT
-        vals[i].id = i;
+        vals[i].id = id; // NOLINT
+        vals[i].val = i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
@@ -343,14 +343,14 @@ CHECK_BEGIN_STATIC_FN(romap_test_invalid_range)
 CHECK_BEGIN_STATIC_FN(romap_test_empty_range)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, val, NULL, val_cmp, NULL);
+        = rom_init(s, struct val, elem, id, NULL, id_cmp, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
-    for (int i = 0, val = 0; i < num_nodes; ++i, val += 5)
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].val = val; // NOLINT
-        vals[i].id = i;
+        vals[i].id = id; // NOLINT
+        vals[i].val = i;
         (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
@@ -358,13 +358,12 @@ CHECK_BEGIN_STATIC_FN(romap_test_empty_range)
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
     ccc_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
-    CHECK(((struct val *)begin_range(&forward_range))->val, vals[0].val);
-    CHECK(((struct val *)end_range(&forward_range))->val, vals[0].val);
+    CHECK(((struct val *)begin_range(&forward_range))->id, vals[0].id);
+    CHECK(((struct val *)end_range(&forward_range))->id, vals[0].id);
     ccc_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
-    CHECK(((struct val *)rbegin_rrange(&rev_range))->val,
-          vals[num_nodes - 1].val);
-    CHECK(((struct val *)rend_rrange(&rev_range))->val,
-          vals[num_nodes - 1].val);
+    CHECK(((struct val *)rbegin_rrange(&rev_range))->id,
+          vals[num_nodes - 1].id);
+    CHECK(((struct val *)rend_rrange(&rev_range))->id, vals[num_nodes - 1].id);
     CHECK_END_FN();
 }
 

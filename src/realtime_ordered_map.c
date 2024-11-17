@@ -239,6 +239,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
     if (CCC_EQL == q.last_cmp_)
     {
         void *const found = struct_base(rom, q.found_);
+        *key_val_handle = *elem_in_slot(rom, found);
         memcpy(found, struct_base(rom, key_val_handle), rom->elem_sz_);
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
