@@ -16,10 +16,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     struct val vals[10] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), id, e, NULL,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
                    fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(res, CCC_OK);
-    struct val query = {.id = 137, .val = 99};
+    struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&fh, &query.e);
     CHECK(occupied(&ent), false);
@@ -29,15 +29,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
-    CHECK(v->id, 137);
+    CHECK(v->key, 137);
     CHECK(v->val, 99);
     CHECK(size(&fh), 0);
-    query.id = 101;
+    query.key = 101;
     ent = remove(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), 0);
     ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
-                           (struct val){.id = 137, .val = 99});
+                           (struct val){.key = 137, .val = 99});
     CHECK(size(&fh), 1);
     CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
     CHECK(size(&fh), 0);
@@ -47,8 +47,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
     ccc_flat_hash_map h;
-    ccc_result const res = fhm_init(&h, (struct val *)NULL, 0, id, e, std_alloc,
-                                    fhmap_int_to_u64, fhmap_id_eq, NULL);
+    ccc_result const res
+        = fhm_init(&h, (struct val *)NULL, 0, key, e, std_alloc,
+                   fhmap_int_to_u64, fhmap_id_eq, NULL);
     CHECK(res, CCC_OK);
     int const to_insert = 100;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -58,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         struct val *v = unwrap(
             fhm_insert_or_assign_w(&h, shuffle, (struct val){.val = i}));
         CHECK(v != NULL, true);
-        CHECK(v->id, shuffle);
+        CHECK(v->key, shuffle);
         CHECK(v->val, i);
         CHECK(validate(&h), true);
     }
@@ -71,9 +72,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         if (i % 2)
         {
             struct val const *const old_val
-                = unwrap(remove_r(&h, &(struct val){.id = i}.e));
+                = unwrap(remove_r(&h, &(struct val){.key = i}.e));
             CHECK(old_val != NULL, true);
-            CHECK(old_val->id, i);
+            CHECK(old_val->key, i);
         }
         else
         {

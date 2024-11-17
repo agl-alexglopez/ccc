@@ -13,7 +13,7 @@ id_cmp(ccc_key_cmp const cmp)
 {
     struct val const *const c = cmp.user_type_rhs;
     int const key = *((int *)cmp.key_lhs);
-    return (key > c->id) - (key < c->id);
+    return (key > c->key) - (key < c->key);
 }
 
 CHECK_BEGIN_FN(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
@@ -22,7 +22,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        vals[shuffled_index].id = (int)shuffled_index;
+        vals[shuffled_index].key = (int)shuffled_index;
         vals[shuffled_index].val = (int)i;
         (void)ccc_rom_insert(m, &vals[shuffled_index].elem,
                              &(struct val){}.elem);
@@ -44,7 +44,7 @@ inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map const *const m)
     size_t i = 0;
     for (struct val *e = begin(m); e != end(m); e = next(m, &e->elem))
     {
-        vals[i++] = e->id;
+        vals[i++] = e->key;
     }
     return i;
 }
