@@ -171,7 +171,23 @@ Destructors</h3>
 <h1><a class="anchor" id="autotoc_md8"></a>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
-<h1><a class="anchor" id="autotoc_md9"></a>
+<p>The samples are not included in the release. To build them, clone the repository. Usage instructions should be available with the <code>-h</code> flag to any program or at the top of the file.</p>
+<p>Clang.</p>
+<div class="fragment"><div class="line">make all-clang-rel</div>
+<div class="line">./build/bin/[SAMPLE] [SAMPLE CLI ARGS]</div>
+</div><!-- fragment --><p>GCC.</p>
+<div class="fragment"><div class="line">make all-gcc-rel</div>
+<div class="line">./build/bin/[SAMPLE] [SAMPLE CLI ARGS]</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
+Tests</h1>
+<p>The tests also include various use cases that may be of interest. Tests are not included in the release. Clone the repository.</p>
+<p>Clang.</p>
+<div class="fragment"><div class="line">make all-clang-rel</div>
+<div class="line">make rtest</div>
+</div><!-- fragment --><p>GCC.</p>
+<div class="fragment"><div class="line">make all-gcc-rel</div>
+<div class="line">make rtest</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
 Miscellaneous Why?</h1>
 <ul>
 <li>Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> style macro that gets user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
@@ -182,7 +198,7 @@ Miscellaneous Why?</h1>
 <li>Why not a better hash map? Haven't gotten to it yet. This container has the most room for improvement.</li>
 <li>Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md10"></a>
+<h1><a class="anchor" id="autotoc_md11"></a>
 Related</h1>
 <p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
