@@ -115,6 +115,40 @@ The above functions free the resources of the container. Because there is no way
 
 For examples of what code that uses these ideas looks like, read and use the sample programs in the `samples/`. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.
 
+The samples are not included in the release. To build them, clone the repository. Usage instructions should be available with the `-h` flag to any program or at the top of the file.
+
+Clang.
+
+```zsh
+make all-clang-rel
+./build/bin/[SAMPLE] [SAMPLE CLI ARGS]
+```
+
+GCC.
+
+```zsh
+make all-gcc-rel
+./build/bin/[SAMPLE] [SAMPLE CLI ARGS]
+```
+
+## Tests
+
+The tests also include various use cases that may be of interest. Tests are not included in the release. Clone the repository.
+
+Clang.
+
+```zsh
+make all-clang-rel
+make rtest
+```
+
+GCC.
+
+```zsh
+make all-gcc-rel
+make rtest
+```
+
 ## Miscellaneous Why?
 
 - Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a `container_of` style macro that gets user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.

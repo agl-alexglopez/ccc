@@ -1,3 +1,20 @@
+/** The graph program runs Dijkstra's shortest path algorithm over randomly
+generated graphs displayed in the terminal.
+
+Builds weighted graphs for Dijkstra's Algorithm to demonstrate usage of the
+priority queue and map provided by this library.
+Usage:
+-r=N The row flag lets you specify area for grid rows > 7.
+-c=N The col flag lets you specify area for grid cols > 7.
+-v=N specify 1 to 26 vertices for the randomly generated and connected graph.
+Example:
+./build/[debug/]bin/graph -c=111 -r=33 -v=4
+Once the graph is built seek the shortest path between two uppercase vertices.
+Examples:
+AB
+A->B
+CtoD
+Enter 'q' to quit. */
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
@@ -1192,7 +1209,8 @@ help(void)
         "library.\nUsage:\n-r=N The row flag lets you specify area for grid "
         "rows > 7.\n-c=N The col flag lets you specify area for grid cols > "
         "7.\n-v=N specify 1 to 26 vertices for the randomly generated and "
-        "connected graph.\nExample:\n./build/rel/graph -c=111 -r=33 -v=4\n"
+        "connected graph.\nExample:\n./build/[debug/]bin/graph -c=111 -r=33 "
+        "-v=4\n"
         "Once the graph is built seek the shortest path between two uppercase "
         "vertices. Examples:\nAB\nA->B\nCtoD\nEnter 'q' to quit.\n");
     exit(0);

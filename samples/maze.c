@@ -4,7 +4,17 @@ to randomly generate a maze. I chose this algorithm because it can use
 both an ordered and a priority queue to achieve its purpose. Such data
 structures are provided by the library offering a perfect sample program
 opportunity. Also there are some interesting ways to combine allocating and
-non-allocating interfaces. Adding more mazes could be fun. */
+non-allocating interfaces. Adding more mazes could be fun.
+
+Maze Builder:
+Builds a Perfect Maze with Prim's Algorithm to demonstrate usage of the priority
+queue and ordered_map provided by this library.
+Usage:
+-r=N The row flag lets you specify maze rows > 7.
+-c=N The col flag lets you specify maze cols > 7.
+-s=N The speed flag lets you specify the speed of the animation 0-7.
+Example:
+./build/[debug/]bin/maze -c=111 -r=33 -s=4 */
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 #define BUFFER_USING_NAMESPACE_CCC
@@ -186,6 +196,7 @@ main(int argc, char **argv)
         else if (sv_starts_with(arg, help_flag))
         {
             help();
+            return 0;
         }
         else
         {
@@ -577,5 +588,5 @@ help(void)
         "row flag lets you specify maze rows > 7.\n-c=N The col flag "
         "lets you specify maze cols > 7.\n-s=N The speed flag lets "
         "you specify the speed of the animation "
-        "0-7.\nExample:\n./build/rel/maze -c=111 -r=33 -s=4\n");
+        "0-7.\nExample:\n./build/[debug/]bin/maze -c=111 -r=33 -s=4\n");
 }

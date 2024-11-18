@@ -1,3 +1,15 @@
+/** The words program is a simple word counter that aims to demonstrate
+the benefits of flexible memory layouts and auxiliary data.
+
+Please specify a command as follows:
+./build/[debug/]bin/words [flag] -f=[path/to/file]
+[flag]:
+-f=[/path/to/file]
+-c reports the words by count in descending order.
+-rc reports words by count in ascending order.
+-top=N reports the top N words by frequency.
+-last=N reports the last N words by frequency
+-find=[WORD] reports the count of the specified word. */
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
 
@@ -93,7 +105,7 @@ static str_view const space = SV(" ");
 
 static str_view const directions
     = SV("\nPlease specify a command as follows:\n"
-         "./build/[bin/] or [debug/bin]/words [flag] -f=[path/to/file]\n"
+         "./build/[debug/]bin/words [flag] -f=[path/to/file]\n"
          "[flag]:\n"
          "-f=[/path/to/file]\n"
          "-c\n"
@@ -101,7 +113,7 @@ static str_view const directions
          "-rc\n"
          "\treports words by count in ascending order.\n"
          "-top=N\n"
-         "\treporst the top N words by frequency.\n"
+         "\treports the top N words by frequency.\n"
          "-last=N\n"
          "\treports the last N words by frequency\n"
          "-find=[WORD]\n"
@@ -164,6 +176,11 @@ static FILE *open_file(str_view file);
 int
 main(int argc, char *argv[])
 {
+    if (argc == 2 && sv_starts_with(sv(argv[1]), SV("-h")))
+    {
+        sv_print(stdout, directions);
+        return 0;
+    }
     if (argc < 3)
     {
         return 0;
@@ -218,6 +235,11 @@ main(int argc, char *argv[])
             PROG_ASSERT(!sv_empty(raw_file), "file string is empty");
             exe.file = raw_file;
         }
+        else if (sv_starts_with(sv_arg, SV("-h")))
+        {
+            sv_print(stdout, directions);
+            return 0;
+        }
         else
         {
             QUIT_MSG(stderr, "unrecognized argument: %s\n", sv_begin(sv_arg));
@@ -228,7 +250,7 @@ main(int argc, char *argv[])
     {
         (void)fprintf(stderr, "error opening: %s\n", exe.file.s);
     }
-    if (exe.type == COUNT && exe.n)
+    if (exe.type == COUNT)
     {
         exe.freq_fn(f, exe.n);
     }
@@ -238,8 +260,7 @@ main(int argc, char *argv[])
     }
     else
     {
-        (void)fprintf(stderr,
-                      "no word counts requested or empty word searched\n");
+        (void)fprintf(stderr, "invalid count or empty word searched\n");
     }
     (void)fclose(f);
     return 0;
