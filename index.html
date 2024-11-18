@@ -124,9 +124,9 @@ Motivations</h2>
 <p>While not all containers require the user accommodate intrusive elements, when they do it looks like this.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>key_val</div>
 <div class="line">{</div>
+<div class="line">    container_elem elem;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
-<div class="line">    container_elem elem;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The handle to the container element is then passed by reference to all functions that require it.</p>
 <h2><a class="anchor" id="autotoc_md5"></a>
