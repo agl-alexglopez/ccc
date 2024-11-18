@@ -80,7 +80,7 @@ struct prim_cell
     int cost;
 };
 
-/** Rather than ask the hep for nodes as a memory managing container would do
+/** Rather than ask the heap for nodes as a memory managing container would do
 we will ask the heap for one slab/arena and force the containers to use this
 as the allocator. Then, the memory allocation part of the problem becomes O(1)
 optimal. There is only one malloc and one free for the entire program. */
