@@ -8,6 +8,7 @@ var types_8h =
     [ "ccc_cmp_fn", "types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231", null ],
     [ "ccc_destructor_fn", "types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5", null ],
     [ "ccc_entry", "types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389", null ],
+    [ "ccc_entry_status", "types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859", null ],
     [ "ccc_hash_fn", "types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e", null ],
     [ "ccc_key_cmp_fn", "types_8h.html#a8097dd574e739c360d2fa2d3e5de70db", null ],
     [ "ccc_key_eq_fn", "types_8h.html#ad08b6b1d54268f3f739a22fea39e2c2d", null ],
@@ -32,7 +33,9 @@ var types_8h =
     [ "ccc_entry_input_error", "types_8h.html#a9fd223cf4a594565a536ae518174a9b5", null ],
     [ "ccc_entry_insert_error", "types_8h.html#a7a10c6e74f36faa343419f01df2da690", null ],
     [ "ccc_entry_occupied", "types_8h.html#ac0847e7b4ff4901c016fc1e06142364f", null ],
+    [ "ccc_entry_status_msg", "types_8h.html#aafe7ba3aee377815856ab5581e0eac0e", null ],
     [ "ccc_entry_unwrap", "types_8h.html#a013507ec0883722ec0d986ce1f51ee37", null ],
+    [ "ccc_get_entry_status", "types_8h.html#ae903680190e65b29c45401e76e9fcf85", null ],
     [ "ccc_rbegin_rrange", "types_8h.html#ae9efbe3d5a2e7066add960fc334dab30", null ],
     [ "ccc_rend_rrange", "types_8h.html#a91dfac06c009f98de694c2d9fecfa36b", null ],
     [ "ccc_result_msg", "types_8h.html#a0e9964d90c381797ba6ce9d76ad1f63a", null ]

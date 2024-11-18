@@ -175,6 +175,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a70feefd55fafc84e06d2f2a1dfd4f389"><td class="memItemLeft" align="right" valign="top">typedef union ccc_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a></td></tr>
 <tr class="memdesc:a70feefd55fafc84e06d2f2a1dfd4f389"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Occupied or Vacant position in a searchable container.  <br /></td></tr>
 <tr class="separator:a70feefd55fafc84e06d2f2a1dfd4f389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d823fb6d9cdbebc760e8cde231ed859"><td class="memItemLeft" align="right" valign="top">typedef enum ccc_entry_status_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a></td></tr>
+<tr class="memdesc:a8d823fb6d9cdbebc760e8cde231ed859"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status monitoring and entry state once it is obtained.  <br /></td></tr>
+<tr class="separator:a8d823fb6d9cdbebc760e8cde231ed859"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8be6e2d1b150a5b77b2eba5ae85764f2"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(void *ptr, size_t size, void *aux)</td></tr>
 <tr class="memdesc:a8be6e2d1b150a5b77b2eba5ae85764f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">An allocation function at the core of all containers.  <br /></td></tr>
 <tr class="separator:a8be6e2d1b150a5b77b2eba5ae85764f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -247,6 +250,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0e9964d90c381797ba6ce9d76ad1f63a">ccc_result_msg</a> (<a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res)</td></tr>
 <tr class="memdesc:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the error returned from a container operation, possible causes, and possible fixes to such error.  <br /></td></tr>
 <tr class="separator:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae903680190e65b29c45401e76e9fcf85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ae903680190e65b29c45401e76e9fcf85">ccc_get_entry_status</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
+<tr class="memdesc:ae903680190e65b29c45401e76e9fcf85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the entry status from a generic entry.  <br /></td></tr>
+<tr class="separator:ae903680190e65b29c45401e76e9fcf85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafe7ba3aee377815856ab5581e0eac0e"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aafe7ba3aee377815856ab5581e0eac0e">ccc_entry_status_msg</a> (<a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a> status)</td></tr>
+<tr class="memdesc:aafe7ba3aee377815856ab5581e0eac0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the entry status.  <br /></td></tr>
+<tr class="separator:aafe7ba3aee377815856ab5581e0eac0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The C Container Collection Fundamental Types. </p>
@@ -344,6 +353,23 @@ Functions</h2></td></tr>
 
 <p>An Occupied or Vacant position in a searchable container. </p>
 <p>A entry is the basis for more complex container specific Entry Interface for all search-by-key containers. An entry is returned from various operations to provide both a reference to data and any auxiliary status that is important for the user. An entry can be Occupied or Vacant. See individual headers for containers that return this type for its meaning in context. </p>
+
+</div>
+</div>
+<a id="a8d823fb6d9cdbebc760e8cde231ed859" name="a8d823fb6d9cdbebc760e8cde231ed859"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d823fb6d9cdbebc760e8cde231ed859">&#9670;&#160;</a></span>ccc_entry_status</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef enum ccc_entry_status_ <a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The status monitoring and entry state once it is obtained. </p>
+<p>To manage safe and efficient views into associative containers entries use status flags internally. The provided functions in the Entry Interface for each container are sufficient to obtain the needed status. However if more information is needed, the status can be passed to the <a class="el" href="types_8h.html#aafe7ba3aee377815856ab5581e0eac0e" title="Obtain a string message with a description of the entry status.">ccc_entry_status_msg()</a> function for detailed string messages regarding the entry status. This may be helpful for debugging or logging. </p>
 
 </div>
 </div>
@@ -644,6 +670,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="aafe7ba3aee377815856ab5581e0eac0e" name="aafe7ba3aee377815856ab5581e0eac0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafe7ba3aee377815856ab5581e0eac0e">&#9670;&#160;</a></span>ccc_entry_status_msg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char const  * ccc_entry_status_msg </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a>&#160;</td>
+          <td class="paramname"><em>status</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain a string message with a description of the entry status. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">status</td><td>the status obtained from an entry. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a string message with more detailed information regarding the status.</dd></dl>
+<p>Note that status for an entry is relevant when it is first obtained and when an action completes. Obtaining an entry can provide information on whether the search yielded an Occupied or Vacant Entry or any errors that may have occurred. If a function tries to complete an action like insertion or removal the status can reflect if any errors occurred in this process as well. Usually, the provided interface gives all the functions needed to check status but these strings can be used when more details are required. </p>
+
+</div>
+</div>
 <a id="a013507ec0883722ec0d986ce1f51ee37" name="a013507ec0883722ec0d986ce1f51ee37"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a013507ec0883722ec0d986ce1f51ee37">&#9670;&#160;</a></span>ccc_entry_unwrap()</h2>
 
@@ -669,6 +723,33 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the user type stored in the Occupied entry or NULL if the entry is Vacant or otherwise cannot be viewed.</dd></dl>
 <p>The expected return value from unwrapping a value will change depending on the container from which the entry is obtained. Read the documentation for the container being used to understand what to expect from this function once an entry is obtained. </p>
+
+</div>
+</div>
+<a id="ae903680190e65b29c45401e76e9fcf85" name="ae903680190e65b29c45401e76e9fcf85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae903680190e65b29c45401e76e9fcf85">&#9670;&#160;</a></span>ccc_get_entry_status()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a> ccc_get_entry_status </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the entry status from a generic entry. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a pointer to the entry. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the status stored in the entry after the required action on the container completes. If e is NULL an entry input error is returned so ensure e is non-NULL to avoid an inaccurate status returned. </dd></dl>
 
 </div>
 </div>

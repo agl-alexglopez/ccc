@@ -20,6 +20,7 @@ var ordered__multimap_8h =
     [ "ccc_omm_decrease", "ordered__multimap_8h.html#acabce7eb8fc409b1b67d13e3ca4fbb95", null ],
     [ "ccc_omm_end", "ordered__multimap_8h.html#a2f1a77090968a266287c22f518a6a995", null ],
     [ "ccc_omm_entry", "ordered__multimap_8h.html#a155e54fd97aa520dacfca655d2b7decf", null ],
+    [ "ccc_omm_entry_status", "ordered__multimap_8h.html#a4d2462a83280dc8f752a5f98f903123d", null ],
     [ "ccc_omm_equal_range", "ordered__multimap_8h.html#abc92ac4c7779edd7f6ef056810396ca5", null ],
     [ "ccc_omm_equal_rrange", "ordered__multimap_8h.html#ab2a3a364d4f32667648e4a7ff14c1fb6", null ],
     [ "ccc_omm_extract", "ordered__multimap_8h.html#ab6cccc31a6c0503e8ac4340459adfbee", null ],

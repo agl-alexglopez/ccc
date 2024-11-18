@@ -23,6 +23,7 @@ var ordered__map_8h =
     [ "ccc_om_contains", "ordered__map_8h.html#a5bb85904a51441b67d5900e8a970cf05", null ],
     [ "ccc_om_end", "ordered__map_8h.html#af806ac45be451e0f1022b7efe2e1ad67", null ],
     [ "ccc_om_entry", "ordered__map_8h.html#aff49753b6d6e63597cddc5cbd27f75bf", null ],
+    [ "ccc_om_entry_status", "ordered__map_8h.html#a37be0896d2ae80e927cf6626d4d87ab3", null ],
     [ "ccc_om_equal_range", "ordered__map_8h.html#a1d0d21ca7478701b4cf28bc8d98d6c66", null ],
     [ "ccc_om_equal_rrange", "ordered__map_8h.html#ab6b04c6542a7bce86f3f3661d75a4c31", null ],
     [ "ccc_om_get_key_val", "ordered__map_8h.html#aa456fb2783b8183725fa2a8a09a15f5d", null ],

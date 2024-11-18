@@ -220,6 +220,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:abcb080315f7f8b5f7db0570a5e2ed69e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#abcb080315f7f8b5f7db0570a5e2ed69e">ccc_fhm_insert_error</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
 <tr class="memdesc:abcb080315f7f8b5f7db0570a5e2ed69e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the status of the entry should an insertion follow.  <br /></td></tr>
 <tr class="separator:abcb080315f7f8b5f7db0570a5e2ed69e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b8c4131b6b6a3da6402aa820de8ff27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a5b8c4131b6b6a3da6402aa820de8ff27">ccc_fhm_entry_status</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
+<tr class="memdesc:a5b8c4131b6b6a3da6402aa820de8ff27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the entry status from a container entry.  <br /></td></tr>
+<tr class="separator:a5b8c4131b6b6a3da6402aa820de8ff27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
@@ -1233,6 +1236,34 @@ Typedefs</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>the contents of an entry should not be examined or modified. Use the provided functions, only.</dd></dl>
 <p>An entry is a search result that provides either an Occupied or Vacant entry in the table. An occupied entry signifies that the search was successful. A Vacant entry means the search was not successful but we now have a handle to where in the table such an element should be inserted.</p>
 <p>An entry is rarely useful on its own. It should be passed in a functional style to subsequent calls in the Entry Interface. </p>
+
+</div>
+</div>
+<a id="a5b8c4131b6b6a3da6402aa820de8ff27" name="a5b8c4131b6b6a3da6402aa820de8ff27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b8c4131b6b6a3da6402aa820de8ff27">&#9670;&#160;</a></span>ccc_fhm_entry_status()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a> ccc_fhm_entry_status </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the entry status from a container entry. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a pointer to the entry. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the status stored in the entry after the required action on the container completes. If e is NULL an entry input error is returned so ensure e is non-NULL to avoid an inaccurate status returned.</dd></dl>
+<p>Note that this function can be useful for debugging or if more detailed messages are needed for logging purposes. See <a class="el" href="types_8h.html#aafe7ba3aee377815856ab5581e0eac0e" title="Obtain a string message with a description of the entry status.">ccc_entry_status_msg()</a> in <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">ccc/types.h</a> for more information on detailed entry statuses. </p>
 
 </div>
 </div>

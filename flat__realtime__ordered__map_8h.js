@@ -24,6 +24,7 @@ var flat__realtime__ordered__map_8h =
     [ "ccc_frm_contains", "flat__realtime__ordered__map_8h.html#a220d32bc2a1d5a262a0ef25751064b46", null ],
     [ "ccc_frm_end", "flat__realtime__ordered__map_8h.html#a02e1c47f744dd644498f40e2245f3163", null ],
     [ "ccc_frm_entry", "flat__realtime__ordered__map_8h.html#a8f15a0f10e6eefcd72929c2eb46e8e6a", null ],
+    [ "ccc_frm_entry_status", "flat__realtime__ordered__map_8h.html#ad208a8a03e0d527e98f6f4ace18d0a9c", null ],
     [ "ccc_frm_equal_range", "flat__realtime__ordered__map_8h.html#aee6facea4fd2cead46927b5391d0a156", null ],
     [ "ccc_frm_equal_rrange", "flat__realtime__ordered__map_8h.html#a86ea7126712aa956006985769a0dee53", null ],
     [ "ccc_frm_get_key_val", "flat__realtime__ordered__map_8h.html#a60885be73688b2e27b112d80f1e71263", null ],

@@ -23,6 +23,7 @@ var realtime__ordered__map_8h =
     [ "ccc_rom_contains", "realtime__ordered__map_8h.html#ae404d3b06ae63a4f6e94ac43f82a0dff", null ],
     [ "ccc_rom_end", "realtime__ordered__map_8h.html#a9bfbf21f54f6fcc5324bac794ffd33cf", null ],
     [ "ccc_rom_entry", "realtime__ordered__map_8h.html#a099ad3e2844c3b0efe75bc5660e04bd5", null ],
+    [ "ccc_rom_entry_status", "realtime__ordered__map_8h.html#adcad91b2ffccc366d506ab88d70a9713", null ],
     [ "ccc_rom_equal_range", "realtime__ordered__map_8h.html#a4a4687d82d4b5490e5b0fd9e7bdcc76a", null ],
     [ "ccc_rom_equal_rrange", "realtime__ordered__map_8h.html#abf4e6150812af0fc0163788abf8701fa", null ],
     [ "ccc_rom_get_key_val", "realtime__ordered__map_8h.html#aac7dd87eacfd4c71677ee7510c6f61bb", null ],
