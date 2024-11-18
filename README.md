@@ -19,6 +19,15 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 - Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
 - Read about generic [traits.h](https://agl-alexglopez.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
 
+## Features
+
+- Intrusive and non-intrusive containers.
+- No `container_of` macro required of the user to get to their type after a function call.
+- Non-allocating container options.
+- Rust's Entry API for associative containers with C influences.
+- Container Traits implemented with C `_Generic` capabilities.
+- Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
+
 ## Design
 
 ### Motivations
