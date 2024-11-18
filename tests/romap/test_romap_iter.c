@@ -22,7 +22,7 @@ CHECK_BEGIN_STATIC_FN(check_range, realtime_ordered_map const *const rom,
     {
         CHECK(((struct val *)begin_range(r))->key, expect_range[0]);
     }
-    if (ccc_end_range(r))
+    if (end_range(r))
     {
         CHECK(((struct val *)end_range(r))->key, expect_range[n - 1]);
     }
