@@ -6,7 +6,7 @@ The C Container Collection offers a variety of containers for C programmers who 
 
 The following are required for install:
 
-- GCC or Clang supporting C23
+- GCC or Clang supporting C23.
     - 100% coverage of C23 is not required. For example, at the time of writing Clang 19.1.1 and GCC 14.2 have all features used in this collection covered, but older versions of each compiler may work as well.
 - CMake >= 3.23.
 
