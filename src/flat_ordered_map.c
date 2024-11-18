@@ -314,6 +314,12 @@ ccc_fom_occupied(ccc_fomap_entry const *const e)
     return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
+ccc_entry_status
+ccc_fom_entry_status(ccc_fomap_entry const *const e)
+{
+    return e ? e->impl_.stats_ : CCC_ENTRY_INPUT_ERROR;
+}
+
 bool
 ccc_fom_is_empty(ccc_flat_ordered_map const *const fom)
 {

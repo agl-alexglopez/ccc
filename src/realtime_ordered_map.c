@@ -393,6 +393,12 @@ ccc_rom_insert_error(ccc_romap_entry const *const e)
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
+ccc_entry_status
+ccc_rom_entry_status(ccc_romap_entry const *const e)
+{
+    return e ? e->impl_.entry_.stats_ : CCC_ENTRY_INPUT_ERROR;
+}
+
 void *
 ccc_rom_begin(ccc_realtime_ordered_map const *rom)
 {

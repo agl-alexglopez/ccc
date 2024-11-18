@@ -397,6 +397,17 @@ Note bad arguments usually mean NULL pointers were passed to functions expecting
 non-NULL arguments. */
 [[nodiscard]] bool ccc_omm_input_error(ccc_ommap_entry const *e);
 
+/** @brief Obtain the entry status from a container entry.
+@param [in] e a pointer to the entry.
+@return the status stored in the entry after the required action on the
+container completes. If e is NULL an entry input error is returned so ensure
+e is non-NULL to avoid an inaccurate status returned.
+
+Note that this function can be useful for debugging or if more detailed
+messages are needed for logging purposes. See ccc_entry_status_msg() in
+ccc/types.h for more information on detailed entry statuses. */
+[[nodiscard]] ccc_entry_status ccc_omm_entry_status(ccc_ommap_entry const *e);
+
 /**@}*/
 
 /**@name Push and Pop Interface

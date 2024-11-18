@@ -320,6 +320,12 @@ ccc_om_occupied(ccc_omap_entry const *const e)
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
+ccc_entry_status
+ccc_om_entry_status(ccc_omap_entry const *const e)
+{
+    return e ? e->impl_.entry_.stats_ : CCC_ENTRY_INPUT_ERROR;
+}
+
 void *
 ccc_om_begin(ccc_ordered_map const *const om)
 {

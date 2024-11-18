@@ -81,14 +81,20 @@ ccc_result_msg(ccc_result const res)
     return result_msgs[res];
 }
 
-char const *
-ccc_entry_status_msg(ccc_entry const *const e)
+ccc_entry_status
+ccc_get_entry_status(ccc_entry const *e)
 {
     if (!e)
     {
-        return "error: NULL entry pointer provided";
+        return CCC_ENTRY_INPUT_ERROR;
     }
-    switch (e->impl_.stats_)
+    return e->impl_.stats_;
+}
+
+char const *
+ccc_entry_status_msg(ccc_entry_status const status)
+{
+    switch (status)
     {
     case CCC_ENTRY_VACANT:
         return "entry is Vacant with no errors";

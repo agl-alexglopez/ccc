@@ -42,6 +42,16 @@ important for the user. An entry can be Occupied or Vacant. See individual
 headers for containers that return this type for its meaning in context. */
 typedef union ccc_entry_ ccc_entry;
 
+/** @brief The status monitoring and entry state once it is obtained.
+
+To manage safe and efficient views into associative containers entries use
+status flags internally. The provided functions in the Entry Interface for
+each container are sufficient to obtain the needed status. However if more
+information is needed, the status can be passed to the ccc_entry_status_msg()
+function for detailed string messages regarding the entry status. This may
+be helpful for debugging or logging. */
+typedef enum ccc_entry_status_ ccc_entry_status;
+
 /** @brief A result of actions on containers.
 
 A result indicates the status of the requested operation. Each container
@@ -321,6 +331,26 @@ These messages can be used for logging or to help with debugging by providing
 more information for why such a result might be obtained from a container. */
 char const *ccc_result_msg(ccc_result res);
 
+/** @brief Obtain the entry status from a generic entry.
+@param [in] e a pointer to the entry.
+@return the status stored in the entry after the required action on the
+container completes. If e is NULL an entry input error is returned so ensure
+e is non-NULL to avoid an inaccurate status returned. */
+ccc_entry_status ccc_get_entry_status(ccc_entry const *e);
+
+/** @brief Obtain a string message with a description of the entry status.
+@param [in] status the status obtained from an entry.
+@return a string message with more detailed information regarding the status.
+
+Note that status for an entry is relevant when it is first obtained and when
+an action completes. Obtaining an entry can provide information on whether
+the search yielded an Occupied or Vacant Entry or any errors that may have
+occurred. If a function tries to complete an action like insertion or removal
+the status can reflect if any errors occurred in this process as well. Usually,
+the provided interface gives all the functions needed to check status but these
+strings can be used when more details are required. */
+char const *ccc_entry_status_msg(ccc_entry_status status);
+
 /** Define this directive at the top of a translation unit if shorter names are
 desired. By default the ccc prefix is used to avoid namespace clashes. */
 #ifdef TYPES_USING_NAMESPACE_CCC
@@ -347,6 +377,8 @@ typedef ccc_hash_fn hash_fn;
 #    define end_range(range_ptr) ccc_end_range(range_ptr)
 #    define rbegin_rrange(range_ptr) ccc_rbegin_rrange(range_ptr)
 #    define rend_rrange(range_ptr) ccc_rend_rrange(range_ptr)
+#    define result_msg(res) ccc_result_msg(res)
+#    define entry_status_msg(status) ccc_entry_status_msg(status)
 #endif /* TYPES_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TYPES_H */

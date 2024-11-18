@@ -537,6 +537,12 @@ ccc_omm_occupied(ccc_ommap_entry const *e)
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
+ccc_entry_status
+ccc_omm_entry_status(ccc_ommap_entry const *const e)
+{
+    return e ? e->impl_.entry_.stats_ : CCC_ENTRY_INPUT_ERROR;
+}
+
 bool
 ccc_omm_validate(ccc_ordered_multimap const *const mm)
 {

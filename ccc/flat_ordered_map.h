@@ -403,6 +403,17 @@ bool ccc_fom_occupied(ccc_fomap_entry const *e);
 due to an allocation failure when allocation success was expected. */
 bool ccc_fom_insert_error(ccc_fomap_entry const *e);
 
+/** @brief Obtain the entry status from a container entry.
+@param [in] e a pointer to the entry.
+@return the status stored in the entry after the required action on the
+container completes. If e is NULL an entry input error is returned so ensure
+e is non-NULL to avoid an inaccurate status returned.
+
+Note that this function can be useful for debugging or if more detailed
+messages are needed for logging purposes. See ccc_entry_status_msg() in
+ccc/types.h for more information on detailed entry statuses. */
+[[nodiscard]] ccc_entry_status ccc_fom_entry_status(ccc_fomap_entry const *e);
+
 /**@}*/
 
 /** @name Iterator Interface

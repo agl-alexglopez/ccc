@@ -401,6 +401,12 @@ ccc_frm_occupied(ccc_fromap_entry const *const e)
     return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
 
+ccc_entry_status
+ccc_frm_entry_status(ccc_fromap_entry const *const e)
+{
+    return e ? e->impl_.stats_ : CCC_ENTRY_INPUT_ERROR;
+}
+
 bool
 ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *const frm)
 {

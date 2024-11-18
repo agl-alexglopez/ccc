@@ -293,6 +293,12 @@ ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
+ccc_entry_status
+ccc_fhm_entry_status(ccc_fhmap_entry const *const e)
+{
+    return e ? e->impl_.entry_.stats_ : CCC_ENTRY_INPUT_ERROR;
+}
+
 void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
