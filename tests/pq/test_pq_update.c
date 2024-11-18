@@ -26,7 +26,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
     size_t pop_count = 0;
@@ -54,7 +54,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -84,7 +84,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -116,7 +116,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -154,7 +154,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem), CCC_OK);
+        CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;

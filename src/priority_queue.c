@@ -39,27 +39,29 @@ ccc_pq_front(ccc_priority_queue const *const pq)
     return pq->root_ ? struct_base(pq, pq->root_) : NULL;
 }
 
-ccc_result
+void *
 ccc_pq_push(ccc_priority_queue *const pq, ccc_pq_elem *e)
 {
     if (!e || !pq)
     {
-        return CCC_INPUT_ERR;
+        return NULL;
     }
     init_node(e);
+    void *ret = struct_base(pq, e);
     if (pq->alloc_)
     {
         void *const node = pq->alloc_(NULL, pq->elem_sz_, pq->aux_);
         if (!node)
         {
-            return CCC_MEM_ERR;
+            return NULL;
         }
-        (void)memcpy(node, struct_base(pq, e), pq->elem_sz_);
+        (void)memcpy(node, ret, pq->elem_sz_);
+        ret = node;
         e = elem_in(pq, e);
     }
     pq->root_ = merge(pq, pq->root_, e);
     ++pq->sz_;
-    return CCC_OK;
+    return ret;
 }
 
 ccc_result

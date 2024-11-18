@@ -787,8 +787,8 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
             printf("duplicate vertex during graph prep or insert failed.\n");
             free(p);
         });
-        ccc_result const res = push(dist_q, &p->pq_elem);
-        prog_assert(res == CCC_OK);
+        struct dist_point const *const res = push(dist_q, &p->pq_elem);
+        prog_assert(res != NULL);
     }
 }
 

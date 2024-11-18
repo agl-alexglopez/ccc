@@ -65,16 +65,15 @@ Insert and remove elements from the priority queue. */
 /** @brief Adds an element to the priority queue in correct total order. O(1).
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
-@return ok if the push succeeded. If NULL arguments are provided an input error
-is returned. If allocation is permitted but allocation fails a memory error
-is returned.
+@return a reference to the newly inserted user type or NULL if NULL arguments
+are provided or allocation fails when permitted.
 
 Note that if allocation is permitted the user type is copied into a newly
 allocated node.
 
 If allocation is not permitted this function assumes the memory wrapping elem
 has been allocated with the appropriate lifetime for the user's needs. */
-ccc_result ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
+[[nodiscard]] void *ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
 /** @brief Write user type directly to a newly allocated priority queue elem.
 @param [in] priority_queue_ptr a pointer to the priority queue.

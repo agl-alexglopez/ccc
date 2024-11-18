@@ -20,7 +20,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&ppq, &three_vals[i].elem), CCC_OK);
+        CHECK(push(&ppq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
         size_t const size = i + 1;
         CHECK(ccc_pq_size(&ppq), size);
@@ -118,7 +118,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&ppq, &vals[i].elem), CCC_OK);
+        CHECK(push(&ppq, &vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
         size_t const s = i + 1;
         CHECK(ccc_pq_size(&ppq), s);
@@ -155,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&ppq, &vals[i].elem), CCC_OK);
+        CHECK(push(&ppq, &vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -185,7 +185,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&ppq, &vals[i].elem), CCC_OK);
+        CHECK(push(&ppq, &vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
     }
     for (int i = 0; i < num_heap_elems; ++i)
