@@ -74,9 +74,16 @@ struct prim_cell
 
 /*======================   Maze Constants   =================================*/
 
-char const *const walls[] = {
-    "■", "╵", "╶", "└", "╷", "│", "┌", "├",
-    "╴", "┘", "─", "┴", "┐", "┤", "┬", "┼",
+/** Using these half Unicode squares for now because they create symmetrical
+mazes. A terminal cell is about 2x as tall as it is wide so many ways to
+produce a maze result in vertically stretched paths/walls. These are
+symmetrical but require a little more logic to print to the screen because
+there are two for every cell and the terminal cannot help us with that. Notably
+when printing to a position on the screen you need to halve the position because
+there are two of these mini squares per cell of the terminal. */
+char const *const walls[16] = {
+    "▀", "▀", "▀", "▀", "█", "█", "█", "█",
+    "▀", "▀", "▀", "▀", "█", "█", "█", "█",
 };
 
 int const speeds[] = {
@@ -93,7 +100,7 @@ str_view const help_flag = SV("-h");
 str_view const escape = SV("\033[");
 str_view const semi_colon = SV(";");
 str_view const cursor_pos_specifier = SV("f");
-int const default_rows = 33;
+int const default_rows = 66;
 int const default_cols = 111;
 int const default_speed = 4;
 int const row_col_min = 7;
@@ -112,16 +119,16 @@ uint16_t const cached_bit = 0b0001000000000000;
 
 static void animate_maze(struct maze *);
 static void fill_maze_with_walls(struct maze *);
-static void build_wall(struct maze *, struct point);
-static void print_square(struct maze const *, struct point);
-static uint16_t *maze_at_r(struct maze const *, struct point);
-static uint16_t maze_at(struct maze const *, struct point);
+static void build_wall(struct maze *, int r, int c);
+static void print_square(struct maze const *, int r, int c);
+static uint16_t *maze_at_r(struct maze const *, int r, int c);
+static uint16_t maze_at(struct maze const *, int r, int c);
 static void clear_and_flush_maze(struct maze const *);
 static void carve_path_walls_animated(struct maze *, struct point, int);
 static void join_squares_animated(struct maze *, struct point, struct point,
                                   int);
-static void flush_cursor_maze_coordinate(struct maze const *, struct point);
-static bool can_build_new_square(struct maze const *, struct point);
+static void flush_cursor_maze_coordinate(struct maze const *, int r, int c);
+static bool can_build_new_square(struct maze const *, int r, int c);
 static void help(void);
 static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_priority_cells(cmp);
@@ -197,7 +204,8 @@ main(int argc, char **argv)
         return 1;
     }
     animate_maze(&maze);
-    set_cursor_position(maze.rows + 1, maze.cols + 1);
+    /* The squares are mini so there are 2 per row. Halve the position. */
+    set_cursor_position((maze.rows / 2) + 1, maze.cols + 1);
     printf("\n");
 }
 
@@ -252,14 +260,14 @@ animate_maze(struct maze *maze)
     while (!is_empty(&cells))
     {
         struct prim_cell const *const c = front(&cells);
-        *maze_at_r(maze, c->cell) |= cached_bit;
+        *maze_at_r(maze, c->cell.r, c->cell.c) |= cached_bit;
         struct prim_cell *min_cell = NULL;
         int min = INT_MAX;
         for (size_t i = 0; i < dir_offsets_size; ++i)
         {
             struct point const n = {.r = c->cell.r + dir_offsets[i].r,
                                     .c = c->cell.c + dir_offsets[i].c};
-            if (can_build_new_square(maze, n))
+            if (can_build_new_square(maze, n.r, n.c))
             {
                 /* The Entry Interface helps make what would be an if else
                    branch a simple lazily evaluated insertion. If the entry is
@@ -293,187 +301,7 @@ animate_maze(struct maze *maze)
     assert(l == CCC_OK);
 }
 
-static struct point
-rand_point(struct maze const *const maze)
-{
-    return (struct point){
-        .r = (2 * rand_range(1, (maze->rows - 2) / 2)) + 1,
-        .c = (2 * rand_range(1, (maze->cols - 2) / 2)) + 1,
-    };
-}
-
-/*=========================   Maze Support Code   ===========================*/
-
-static void
-fill_maze_with_walls(struct maze *maze)
-{
-    for (int row = 0; row < maze->rows; ++row)
-    {
-        for (int col = 0; col < maze->cols; ++col)
-        {
-            build_wall(maze, (struct point){.r = row, .c = col});
-        }
-    }
-}
-
-static void
-clear_and_flush_maze(struct maze const *const maze)
-{
-    clear_screen();
-    for (int row = 0; row < maze->rows; ++row)
-    {
-        for (int col = 0; col < maze->cols; ++col)
-        {
-            print_square(maze, (struct point){.r = row, .c = col});
-        }
-        printf("\n");
-    }
-    (void)fflush(stdout);
-}
-
-static void
-join_squares_animated(struct maze *maze, struct point const cur,
-                      struct point const next, int s)
-{
-    struct point wall = cur;
-    if (next.r < cur.r)
-    {
-        wall.r--;
-    }
-    else if (next.r > cur.r)
-    {
-        wall.r++;
-    }
-    else if (next.c < cur.c)
-    {
-        wall.c--;
-    }
-    else if (next.c > cur.c)
-    {
-        wall.c++;
-    }
-    else
-    {
-        printf("Wall break error. Step through wall didn't work\n");
-    }
-    carve_path_walls_animated(maze, cur, s);
-    carve_path_walls_animated(maze, wall, s);
-    carve_path_walls_animated(maze, next, s);
-}
-
-static void
-carve_path_walls_animated(struct maze *maze, struct point const p, int s)
-{
-    *maze_at_r(maze, p) |= path_bit;
-    flush_cursor_maze_coordinate(maze, p);
-    struct timespec ts = {.tv_sec = 0, .tv_nsec = s};
-    nanosleep(&ts, NULL);
-    if (p.r - 1 >= 0
-        && !(maze_at(maze, (struct point){.r = p.r - 1, .c = p.c}) & path_bit))
-    {
-        *maze_at_r(maze, (struct point){.r = p.r - 1, .c = p.c}) &= ~south_wall;
-        flush_cursor_maze_coordinate(maze, (struct point){p.r - 1, p.c});
-        nanosleep(&ts, NULL);
-    }
-    if (p.r + 1 < maze->rows
-        && !(maze_at(maze, (struct point){.r = p.r + 1, .c = p.c}) & path_bit))
-    {
-        *maze_at_r(maze, (struct point){.r = p.r + 1, .c = p.c}) &= ~north_wall;
-        flush_cursor_maze_coordinate(maze, (struct point){p.r + 1, p.c});
-        nanosleep(&ts, NULL);
-    }
-    if (p.c - 1 >= 0
-        && !(maze_at(maze, (struct point){.r = p.r, .c = p.c - 1}) & path_bit))
-    {
-        *maze_at_r(maze, (struct point){.r = p.r, .c = p.c - 1}) &= ~east_wall;
-        flush_cursor_maze_coordinate(maze,
-                                     (struct point){.r = p.r, .c = p.c - 1});
-        nanosleep(&ts, NULL);
-    }
-    if (p.c + 1 < maze->cols
-        && !(maze_at(maze, (struct point){.r = p.r, .c = p.c + 1}) & path_bit))
-    {
-        *maze_at_r(maze, (struct point){.r = p.r, .c = p.c + 1}) &= ~west_wall;
-        flush_cursor_maze_coordinate(maze,
-                                     (struct point){.r = p.r, .c = p.c + 1});
-        nanosleep(&ts, NULL);
-    }
-    *maze_at_r(maze, (struct point){.r = p.r, .c = p.c}) |= cached_bit;
-}
-
-static void
-build_wall(struct maze *m, struct point p)
-{
-    uint16_t wall = 0;
-    if (p.r - 1 >= 0)
-    {
-        wall |= north_wall;
-    }
-    if (p.r + 1 < m->rows)
-    {
-        wall |= south_wall;
-    }
-    if (p.c - 1 >= 0)
-    {
-        wall |= west_wall;
-    }
-    if (p.c + 1 < m->cols)
-    {
-        wall |= east_wall;
-    }
-    *maze_at_r(m, p) |= wall;
-    *maze_at_r(m, p) &= ~path_bit;
-}
-
-static void
-flush_cursor_maze_coordinate(struct maze const *maze, struct point const p)
-{
-    set_cursor_position(p.r, p.c);
-    print_square(maze, p);
-    (void)fflush(stdout);
-}
-
-static void
-print_square(struct maze const *m, struct point p)
-{
-    uint16_t const square = maze_at(m, p);
-    if (!(square & path_bit))
-    {
-        printf("%s", walls[square & wall_mask]);
-    }
-    else if (square & path_bit)
-    {
-        printf(" ");
-    }
-    else
-    {
-        (void)fprintf(stderr, "uncategorizable square.\n");
-    }
-}
-
-/** Square by mutable reference. */
-static uint16_t *
-maze_at_r(struct maze const *const maze, struct point p)
-{
-    return &maze->maze[(p.r * maze->cols) + p.c];
-}
-
-/** Square by value. */
-static uint16_t
-maze_at(struct maze const *const maze, struct point p)
-{
-    return maze->maze[(p.r * maze->cols) + p.c];
-}
-
-/** Can't build if square has been seen/cached. */
-static bool
-can_build_new_square(struct maze const *const maze, struct point const next)
-{
-    return next.r > 0 && next.r < maze->rows - 1 && next.c > 0
-           && next.c < maze->cols - 1 && !(maze_at(maze, next) & cached_bit);
-}
-
-/*===================   Data Structure Comparators   ========================*/
+/*===================     Container Support Code     ========================*/
 
 static threeway_cmp
 cmp_priority_cells(cmp const cmp_cells)
@@ -499,8 +327,6 @@ cmp_priority_pos(key_cmp const cmp_points)
     return (key_lhs->r > a_rhs->cell.r) - (key_lhs->r < a_rhs->cell.r);
 }
 
-/*===========================    Misc    ====================================*/
-
 static void *
 arena_bump_alloc(void *const ptr, size_t const size, void *const arena)
 {
@@ -516,6 +342,211 @@ arena_bump_alloc(void *const ptr, size_t const size, void *const arena)
     assert(!"You shouldn't be here this is a bump allocator!");
     return NULL;
 }
+
+/*=========================   Maze Support Code   ===========================*/
+
+static struct point
+rand_point(struct maze const *const maze)
+{
+    return (struct point){
+        .r = (2 * rand_range(1, (maze->rows - 2) / 2)) + 1,
+        .c = (2 * rand_range(1, (maze->cols - 2) / 2)) + 1,
+    };
+}
+
+static void
+fill_maze_with_walls(struct maze *maze)
+{
+    for (int row = 0; row < maze->rows; ++row)
+    {
+        for (int col = 0; col < maze->cols; ++col)
+        {
+            build_wall(maze, row, col);
+        }
+    }
+}
+
+static void
+clear_and_flush_maze(struct maze const *const maze)
+{
+    clear_screen();
+    for (int row = 0; row < maze->rows; ++row)
+    {
+        for (int col = 0; col < maze->cols; ++col)
+        {
+            flush_cursor_maze_coordinate(maze, row, col);
+        }
+        printf("\n");
+    }
+    (void)fflush(stdout);
+}
+
+static void
+join_squares_animated(struct maze *maze, struct point const cur,
+                      struct point const next, int const time)
+{
+    struct point wall = cur;
+    if (next.r < cur.r)
+    {
+        wall.r--;
+    }
+    else if (next.r > cur.r)
+    {
+        wall.r++;
+    }
+    else if (next.c < cur.c)
+    {
+        wall.c--;
+    }
+    else if (next.c > cur.c)
+    {
+        wall.c++;
+    }
+    else
+    {
+        printf("Wall break error. Step through wall didn't work\n");
+    }
+    carve_path_walls_animated(maze, cur, time);
+    carve_path_walls_animated(maze, wall, time);
+    carve_path_walls_animated(maze, next, time);
+}
+
+static void
+carve_path_walls_animated(struct maze *maze, struct point const p,
+                          int const time)
+{
+    *maze_at_r(maze, p.r, p.c) |= path_bit;
+    flush_cursor_maze_coordinate(maze, p.r, p.c);
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = time};
+    nanosleep(&ts, NULL);
+    if (p.r - 1 >= 0 && !(maze_at(maze, p.r - 1, p.c) & path_bit))
+    {
+        *maze_at_r(maze, p.r - 1, p.c) &= ~south_wall;
+        flush_cursor_maze_coordinate(maze, p.r - 1, p.c);
+        nanosleep(&ts, NULL);
+    }
+    if (p.r + 1 < maze->rows && !(maze_at(maze, p.r + 1, p.c) & path_bit))
+    {
+        *maze_at_r(maze, p.r + 1, p.c) &= ~north_wall;
+        flush_cursor_maze_coordinate(maze, p.r + 1, p.c);
+        nanosleep(&ts, NULL);
+    }
+    if (p.c - 1 >= 0 && !(maze_at(maze, p.r, p.c - 1) & path_bit))
+    {
+        *maze_at_r(maze, p.r, p.c - 1) &= ~east_wall;
+        flush_cursor_maze_coordinate(maze, p.r, p.c - 1);
+        nanosleep(&ts, NULL);
+    }
+    if (p.c + 1 < maze->cols && !(maze_at(maze, p.r, p.c + 1) & path_bit))
+    {
+        *maze_at_r(maze, p.r, p.c + 1) &= ~west_wall;
+        flush_cursor_maze_coordinate(maze, p.r, p.c + 1);
+        nanosleep(&ts, NULL);
+    }
+    *maze_at_r(maze, p.r, p.c) |= cached_bit;
+}
+
+static void
+build_wall(struct maze *m, int const r, int const c)
+{
+    uint16_t wall = 0;
+    if (r - 1 >= 0)
+    {
+        wall |= north_wall;
+    }
+    if (r + 1 < m->rows)
+    {
+        wall |= south_wall;
+    }
+    if (c - 1 >= 0)
+    {
+        wall |= west_wall;
+    }
+    if (c + 1 < m->cols)
+    {
+        wall |= east_wall;
+    }
+    *maze_at_r(m, r, c) |= wall;
+    *maze_at_r(m, r, c) &= ~path_bit;
+}
+
+static void
+flush_cursor_maze_coordinate(struct maze const *maze, int const r, int const c)
+{
+    set_cursor_position(r / 2, c);
+    print_square(maze, r, c);
+    (void)fflush(stdout);
+}
+
+static void
+print_square(struct maze const *m, int const r, int const c)
+{
+    uint16_t const square = maze_at(m, r, c);
+    if (!(square & path_bit))
+    {
+        if (r % 2 != 0)
+        {
+            printf("%s", walls[maze_at(m, r - 1, c) & wall_mask]);
+        }
+        else
+        {
+            printf("%s", walls[square & wall_mask]);
+        }
+    }
+    else if (square & path_bit)
+    {
+        if (r % 2 == 0)
+        {
+            if (!(maze_at(m, r + 1, c) & path_bit))
+            {
+                printf("▄");
+            }
+            else
+            {
+                printf(" ");
+            }
+        }
+        else
+        {
+            if (r > 0 && !(maze_at(m, r - 1, c) & path_bit))
+            {
+                printf("▀");
+            }
+            else
+            {
+                printf(" ");
+            }
+        }
+    }
+    else
+    {
+        (void)fprintf(stderr, "uncategorizable square.\n");
+    }
+}
+
+/** Square by mutable reference. */
+static uint16_t *
+maze_at_r(struct maze const *const maze, int const r, int const c)
+{
+    return &maze->maze[(r * maze->cols) + c];
+}
+
+/** Square by value. */
+static uint16_t
+maze_at(struct maze const *const maze, int const r, int const c)
+{
+    return maze->maze[(r * maze->cols) + c];
+}
+
+/** Can't build if square has been seen/cached. */
+static bool
+can_build_new_square(struct maze const *const maze, int const r, int const c)
+{
+    return r > 0 && r < maze->rows - 1 && c > 0 && c < maze->cols - 1
+           && !(maze_at(maze, r, c) & cached_bit);
+}
+
+/*===========================    Misc    ====================================*/
 
 static struct int_conversion
 parse_digits(str_view arg)
