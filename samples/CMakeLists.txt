@@ -5,31 +5,31 @@ project("ccc samples"
     DESCRIPTION "Testing the C Container Collection with sample programs."
 )
 
-find_package(str_view)
-include_directories("../util")
-
 add_executable(maze maze.c)
+target_include_directories(maze PRIVATE "../util")
 target_link_libraries(maze PRIVATE
   cli
   random
-  str_view::str_view
+  str_view
   ccc
   alloc
 )
 
 add_executable(graph graph.c)
+target_include_directories(graph PRIVATE "../util")
 target_link_libraries(graph PRIVATE
   cli
   random
-  str_view::str_view
+  str_view
   ccc
   alloc
 )
 
 add_executable(words words.c)
+target_include_directories(words PRIVATE "../util")
 target_link_libraries(words PRIVATE
   cli
-  str_view::str_view
+  str_view
   ccc
   alloc
 )

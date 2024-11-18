@@ -28,7 +28,7 @@ non-allocating interfaces. Adding more mazes could be fun. */
 #include "ccc/types.h"
 #include "cli.h"
 #include "random.h"
-#include "str_view/str_view.h"
+#include "str_view.h"
 
 /*=======================   Maze Helper Types   =============================*/
 

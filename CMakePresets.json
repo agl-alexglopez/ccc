@@ -16,7 +16,7 @@
                 "CMAKE_C_STANDARD": "23",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/debug/bin",
-                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
@@ -29,7 +29,7 @@
                 "CMAKE_C_STANDARD": "23",
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin",
-                "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
@@ -51,7 +51,7 @@
             "inherits": "default-deb",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
-                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
@@ -59,7 +59,7 @@
             "inherits": "default-rel",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
-                "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
+                "CMAKE_C_FLAGS": "-Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option"
             }
         },
         {
@@ -68,7 +68,7 @@
             "hidden": true,
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -fanalyzer -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
+                "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -fanalyzer -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
                 "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow"
             }
         },
@@ -78,7 +78,7 @@
             "hidden": true,
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
+                "CMAKE_C_FLAGS": "-Wall -Wextra -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
                 "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow"
             }
         }

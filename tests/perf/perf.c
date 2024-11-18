@@ -5,7 +5,7 @@
 #include "ordered_multimap.h"
 #include "priority_queue.h"
 #include "random.h"
-#include "str_view/str_view.h"
+#include "str_view.h"
 #include "traits.h"
 #include "types.h"
 

@@ -16,7 +16,7 @@
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
-#include "str_view/str_view.h"
+#include "str_view.h"
 
 typedef ptrdiff_t str_ofs;
 
@@ -366,7 +366,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
         = ccc_fom_init((word *)NULL, 0, e, ofs, std_alloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
-        str_view const line = {.s = lineptr, .sz = read - 1};
+        str_view const line = {.s = lineptr, .len = read - 1};
         for (str_view word_view = sv_begin_tok(line, space);
              !sv_end_tok(line, word_view);
              word_view = sv_next_tok(line, word_view, space))

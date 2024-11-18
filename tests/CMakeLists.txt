@@ -5,13 +5,11 @@ project("ccc tests"
     DESCRIPTION "Testing the C Container Collection (ccc)."
 )
 
-find_package(str_view)
-
 add_library(checkers INTERFACE checkers.h)
-include_directories("../util")
 
 add_executable(run_tests run_tests.c)
-target_link_libraries(run_tests PRIVATE checkers str_view::str_view)
+target_include_directories(run_tests PRIVATE "../util")
+target_link_libraries(run_tests PRIVATE checkers str_view)
 
 ###########   Add Test Files Below This Point   ###########
 
@@ -30,6 +28,7 @@ target_link_libraries(ommap_util
 
 macro(add_ommap_test TEST_NAME)
   add_executable(${TEST_NAME} ommap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -61,6 +60,7 @@ target_link_libraries(fpq_util
 
 macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       fpq_util
@@ -91,6 +91,7 @@ target_link_libraries(pq_util
 
 macro(add_pq_test TEST_NAME)
   add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       pq_util
@@ -121,6 +122,7 @@ target_link_libraries(omap_util
 
 macro(add_omap_test TEST_NAME)
   add_executable(${TEST_NAME} omap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       omap_util
@@ -151,6 +153,7 @@ target_link_libraries(fomap_util
 
 macro(add_fomap_test TEST_NAME)
   add_executable(${TEST_NAME} fomap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       fomap_util
@@ -181,6 +184,7 @@ target_link_libraries(romap_util
 
 macro(add_romap_test TEST_NAME)
   add_executable(${TEST_NAME} romap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       romap_util
@@ -211,6 +215,7 @@ target_link_libraries(fromap_util
 
 macro(add_fromap_test TEST_NAME)
   add_executable(${TEST_NAME} fromap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       fromap_util
@@ -240,6 +245,7 @@ target_link_libraries(fhmap_util
 
 macro(add_fhmap_test TEST_NAME)
   add_executable(${TEST_NAME} fhmap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       checkers
@@ -269,6 +275,7 @@ target_link_libraries(dll_util
 
 macro(add_dll_test TEST_NAME)
   add_executable(${TEST_NAME} dll/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -296,6 +303,7 @@ target_link_libraries(sll_util
 
 macro(add_sll_test TEST_NAME)
   add_executable(${TEST_NAME} sll/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -323,6 +331,7 @@ target_link_libraries(fdeq_util
 
 macro(add_fdeq_test TEST_NAME)
   add_executable(${TEST_NAME} fdeq/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -343,11 +352,12 @@ add_fdeq_test(test_fdeq_erase)
 
 ################### Performance Testing #################
 add_executable(perf perf/perf.c)
+target_include_directories(perf PRIVATE "../util")
 target_link_libraries(perf 
   PRIVATE 
     ccc
     random
-    str_view::str_view
+    str_view
     cli
     alloc
 )

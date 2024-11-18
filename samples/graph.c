@@ -19,7 +19,7 @@
 #include "ccc/types.h"
 #include "cli.h"
 #include "random.h"
-#include "str_view/str_view.h"
+#include "str_view.h"
 
 enum
 {
@@ -670,7 +670,7 @@ find_shortest_paths(struct graph *const graph)
         while ((read = getline(&lineptr, &len, stdin)) > 0)
         {
             struct path_request pr = parse_path_request(
-                graph, (str_view){.s = lineptr, .sz = read - 1});
+                graph, (str_view){.s = lineptr, .len = read - 1});
             if (!pr.src)
             {
                 clear_line();
