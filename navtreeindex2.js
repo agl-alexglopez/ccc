@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"traits_8h.html#a1c157dfada3fb8d3beddcab00d2fade4":[8,0,0,13,28],
 "traits_8h.html#a25c5c848da545831e1efa54645aae2dd":[8,0,0,13,1],
 "traits_8h.html#a27e2d18520c56b3796e6ce0d6aa31a95":[8,0,0,13,41],
 "traits_8h.html#a2a647d74e82d876a0883f52a07a715ff":[8,0,0,13,43],
