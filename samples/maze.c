@@ -60,12 +60,16 @@ struct maze
 
 /*===================  Prim's Algorithm Helper Types   ======================*/
 
+/** The intrusive style lets us bundle all the necessary components for a
+problem together. Instead of two containers using a non contiguous heap in
+their own ways, we are able to put these prim cells in a contiguous bump arena
+and have access to the map and priority queue. */
 struct prim_cell
 {
+    omap_elem map_elem;
+    pq_elem pq_elem;
     struct point cell;
     int cost;
-    pq_elem pq_elem;
-    omap_elem map_elem;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -222,7 +226,8 @@ animate_maze(struct maze *maze)
     size_t const cap = (((size_t)maze->rows * maze->cols) / 2) + 1;
     size_t bytes = cap * sizeof(struct prim_cell);
     /* Calling alloc like this is kind of nice to get rid of a dangling ref
-       but we need to have some kind of sanity check. */
+       but we need to have some kind of sanity check. The cast is required to
+       inform the buffer of the size of the contiguous elements. */
     buffer bump_arena = buf_init(
         ((struct prim_cell *)std_alloc(NULL, bytes, NULL)), NULL, NULL, cap);
     assert(buf_begin(&bump_arena) != NULL);
@@ -231,7 +236,9 @@ animate_maze(struct maze *maze)
     priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES, NULL,
                                    cmp_priority_cells, NULL);
     /* The ordered map uses a wrapper around the bump allocator as its backing
-       store making allocation speed optimal for the given problem. */
+       store making allocation speed optimal for the given problem. We use the
+       ordered map because it offers pointer stability which the priority queue
+       elements will need. A hash map does not offer pointer stability. */
     ordered_map costs
         = om_init(costs, struct prim_cell, map_elem, cell, arena_bump_alloc,
                   cmp_priority_pos, &bump_arena);
@@ -250,34 +257,35 @@ animate_maze(struct maze *maze)
         int min = INT_MAX;
         for (size_t i = 0; i < dir_offsets_size; ++i)
         {
-            struct point const next = {.r = c->cell.r + dir_offsets[i].r,
-                                       .c = c->cell.c + dir_offsets[i].c};
-            if (!can_build_new_square(maze, next))
+            struct point const n = {.r = c->cell.r + dir_offsets[i].r,
+                                    .c = c->cell.c + dir_offsets[i].c};
+            if (can_build_new_square(maze, n))
             {
-                continue;
-            }
-            /* The Entry Interface helps make what would be an if else
-               branch a simple lazily evaluated insertion. If the entry is
-               Occupied rand_range is never called. This technique also
-               means cells can be given weights lazily as we go rather than
-               all at once before the main algorithm starts. */
-            struct prim_cell *const cell = om_or_insert_w(
-                entry_r(&costs, &next),
-                (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
-            assert(cell);
-            if (cell->cost < min)
-            {
-                min = cell->cost;
-                min_cell = cell;
+                /* The Entry Interface helps make what would be an if else
+                   branch a simple lazily evaluated insertion. If the entry is
+                   Occupied rand_range is never called. This technique also
+                   means cells can be given weights lazily as we go rather than
+                   all at once before the main algorithm starts. */
+                struct prim_cell *const cell = om_or_insert_w(
+                    entry_r(&costs, &n),
+                    (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
+                assert(cell);
+                if (cell->cost < min)
+                {
+                    min = cell->cost;
+                    min_cell = cell;
+                }
             }
         }
         if (!min_cell)
         {
             (void)pop(&cells);
-            continue;
         }
-        join_squares_animated(maze, c->cell, min_cell->cell, speed);
-        (void)push(&cells, &min_cell->pq_elem);
+        else
+        {
+            join_squares_animated(maze, c->cell, min_cell->cell, speed);
+            (void)push(&cells, &min_cell->pq_elem);
+        }
     }
     /* Thanks to how the containers worked together there was only a single
        allocation and free from the heap's perspective. */
