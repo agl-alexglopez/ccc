@@ -27,22 +27,34 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-#define ccc_impl_fdeq_emplace_back(fq_ptr, value...)                           \
+#define ccc_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
     ({                                                                         \
-        void *const fdeq_emplace_ret_ = ccc_impl_fdeq_alloc_back((fq_ptr));    \
-        if (fdeq_emplace_ret_)                                                 \
+        __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
+        void *const fdeq_emplace_ret_ = NULL;                                  \
+        if (fdeq_ptr_)                                                         \
         {                                                                      \
-            *((typeof(value) *)fdeq_emplace_ret_) = value;                     \
+            void *const fdeq_emplace_ret_                                      \
+                = ccc_impl_fdeq_alloc_back(fdeq_ptr_);                         \
+            if (fdeq_emplace_ret_)                                             \
+            {                                                                  \
+                *((typeof(value) *)fdeq_emplace_ret_) = value;                 \
+            }                                                                  \
         }                                                                      \
         fdeq_emplace_ret_;                                                     \
     })
 
-#define ccc_impl_fdeq_emplace_front(fq_ptr, value...)                          \
+#define ccc_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
     ({                                                                         \
-        void *const fdeq_emplace_ret_ = ccc_impl_fdeq_alloc_front((fq_ptr));   \
-        if (fdeq_emplace_ret_)                                                 \
+        __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
+        void *const fdeq_emplace_ret_ = NULL;                                  \
+        if (fdeq_ptr_)                                                         \
         {                                                                      \
-            *((typeof(value) *)fdeq_emplace_ret_) = value;                     \
+            void *const fdeq_emplace_ret_                                      \
+                = ccc_impl_fdeq_alloc_front(fdeq_ptr_);                        \
+            if (fdeq_emplace_ret_)                                             \
+            {                                                                  \
+                *((typeof(value) *)fdeq_emplace_ret_) = value;                 \
+            }                                                                  \
         }                                                                      \
         fdeq_emplace_ret_;                                                     \
     })
