@@ -76,6 +76,14 @@ If allocation is not permitted this function assumes the memory wrapping elem
 has been allocated with the appropriate lifetime for the user's needs. */
 ccc_result ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
+/** @brief Write user type directly to a newly allocated priority queue elem.
+@param [in] priority_queue_ptr a pointer to the priority queue.
+@param [in] lazy_value the compound literal to write to the allocation.
+@return a reference to the successfully inserted element or NULL if allocation
+fails or is not allowed.
+
+Note that the priority queue must be initialized with allocation permission to
+use this macro. */
 #define ccc_pq_emplace(priority_queue_ptr, lazy_value...)                      \
     ccc_impl_pq_emplace(priority_queue_ptr, lazy_value)
 

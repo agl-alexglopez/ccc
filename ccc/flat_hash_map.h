@@ -458,7 +458,7 @@ forfeit.
 @return the result of free operation. If no alloc function is provided it is
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
-ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *, ccc_destructor_fn *);
+ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
 
 /**@}*/
 

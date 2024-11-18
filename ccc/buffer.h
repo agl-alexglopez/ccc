@@ -50,6 +50,7 @@ typedef struct ccc_buf_ ccc_buffer;
 policy, capacity, and optional starting size.
 @param [in] mem_ptr the pointer to existing memory or ((Type *)NULL).
 @param [in] alloc_fn ccc_alloc_fn or NULL if no allocation is permitted.
+@param [in] aux_data any auxiliary data needed for managing buffer memory.
 @param [in] capacity the capacity of memory at mem_ptr.
 @param [in] optional_size optional starting size of the buffer <= capacity.
 @return the initialized buffer. Directly assign to buffer on the right hand
