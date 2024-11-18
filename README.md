@@ -4,6 +4,12 @@ The C Container Collection offers a variety of containers for C programmers who 
 
 ## Installation
 
+The following are required for install:
+
+- GCC or Clang supporting C23
+    - 100% coverage of C23 is not required. For example, at the time of writing Clang 19.1.1 and GCC 14.2 have all features used in this collection covered, but older versions of each compiler may work as well.
+- CMake >= 3.23.
+
 Currently, this library supports a manual installation via CMake. See the [INSTALL.md](INSTALL.md) file for more details. This file is also included when you download a simplified release from the [Releases](https://github.com/agl-alexglopez/ccc/releases) page.
 
 ## Quick Start
@@ -151,7 +157,7 @@ make rtest
 
 ## Miscellaneous Why?
 
-- Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a `container_of` style macro that gets user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.
+- Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a `container_of` style macro that gets the user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.
 - Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also debugging your own function is nice.
 - Why not header only? Readability, maintainability, and update ability, for changing implementations in the source files. If the user wants to explore the implementation everything should be easily understandable. Smaller object size and easier modular compilation is also nice.
 - Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.
