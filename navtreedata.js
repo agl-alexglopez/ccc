@@ -27,23 +27,24 @@ var NAVTREE =
   [ "C Container Collection (CCC)", "index.html", [
     [ "Installation", "index.html#autotoc_md1", null ],
     [ "Quick Start", "index.html#autotoc_md2", null ],
-    [ "Design", "index.html#autotoc_md3", [
-      [ "Motivations", "index.html#autotoc_md4", null ],
-      [ "Allocation", "index.html#autotoc_md5", [
-        [ "Constructors", "index.html#autotoc_md6", null ],
-        [ "Destructors", "index.html#autotoc_md7", null ]
+    [ "Features", "index.html#autotoc_md3", null ],
+    [ "Design", "index.html#autotoc_md4", [
+      [ "Motivations", "index.html#autotoc_md5", null ],
+      [ "Allocation", "index.html#autotoc_md6", [
+        [ "Constructors", "index.html#autotoc_md7", null ],
+        [ "Destructors", "index.html#autotoc_md8", null ]
       ] ]
     ] ],
-    [ "Samples", "index.html#autotoc_md8", null ],
-    [ "Tests", "index.html#autotoc_md9", null ],
-    [ "Miscellaneous Why?", "index.html#autotoc_md10", null ],
-    [ "Related", "index.html#autotoc_md11", null ],
+    [ "Samples", "index.html#autotoc_md9", null ],
+    [ "Tests", "index.html#autotoc_md10", null ],
+    [ "Miscellaneous Why?", "index.html#autotoc_md11", null ],
+    [ "Related", "index.html#autotoc_md12", null ],
     [ "Building and Installation", "md_INSTALL.html", [
-      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md13", null ],
-      [ "Include the Library", "md_INSTALL.html#autotoc_md14", null ],
-      [ "Without Make", "md_INSTALL.html#autotoc_md15", null ],
-      [ "User Presets", "md_INSTALL.html#autotoc_md16", null ],
-      [ "Generate Documentation", "md_INSTALL.html#autotoc_md17", null ]
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md14", null ],
+      [ "Include the Library", "md_INSTALL.html#autotoc_md15", null ],
+      [ "Without Make", "md_INSTALL.html#autotoc_md16", null ],
+      [ "User Presets", "md_INSTALL.html#autotoc_md17", null ],
+      [ "Generate Documentation", "md_INSTALL.html#autotoc_md18", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -71,7 +72,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "flat__realtime__ordered__map_8h.html#ae8452b1b25613be831444b27f0c46698",
-"traits_8h.html"
+"structccc__user__type.html#a1cb30e04afb536fb4922098ec030d640"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -114,8 +114,18 @@ Quick Start</h1>
 <li>Read about generic <a href="https://agl-alexglopez.github.io/ccc/traits_8h.html">traits.h</a> shared across containers to make code more succinct.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md3"></a>
+Features</h1>
+<ul>
+<li>Intrusive and non-intrusive containers.</li>
+<li>No <code>container_of</code> macro required of the user to get to their type after a function call.</li>
+<li>Non-allocating container options.</li>
+<li>Rust's Entry API for associative containers with C influences.</li>
+<li>Container Traits implemented with C <code>_Generic</code> capabilities.</li>
+<li>Opt-in macros for more succinct insertion and in place modifications (see "closures" in the <a href="https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html">and_modify_w</a> interface for associative containers).</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Design</h1>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Motivations</h2>
 <p><b>Containers in C should avoid limiting the control and flexibility offered by the C language.</b></p>
 <p>There are many excellent data structure libraries in C (see the related section of this document). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.</p>
@@ -129,7 +139,7 @@ Motivations</h2>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The handle to the container element is then passed by reference to all functions that require it.</p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Allocation</h2>
 <p>To support the previously mentioned design motivations, when allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">void</span> *<a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(<span class="keywordtype">void</span> *ptr, <span class="keywordtype">size_t</span> size, <span class="keywordtype">void</span> *aux);</div>
@@ -162,13 +172,13 @@ Allocation</h2>
 <div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.</p>
-<h3><a class="anchor" id="autotoc_md6"></a>
+<h3><a class="anchor" id="autotoc_md7"></a>
 Constructors</h3>
 <p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
-<h3><a class="anchor" id="autotoc_md7"></a>
+<h3><a class="anchor" id="autotoc_md8"></a>
 Destructors</h3>
 <p>For destructors, the argument is similar but the container does offer more help. If an action other than freeing the memory of a user type is needed upon removal, there are options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. One exception is the following interfaces.</p>
 <p>The clear function works for pointer stable containers and flat containers.</p>
@@ -176,7 +186,7 @@ Destructors</h3>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
-<h1><a class="anchor" id="autotoc_md8"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
 <p>The samples are not included in the release. To build them, clone the repository. Usage instructions should be available with the <code>-h</code> flag to any program or at the top of the file.</p>
@@ -186,7 +196,7 @@ Samples</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">./build/bin/[SAMPLE] [SAMPLE CLI ARGS]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
 Tests</h1>
 <p>The tests also include various use cases that may be of interest. Tests are not included in the release. Clone the repository.</p>
 <p>Clang.</p>
@@ -195,7 +205,7 @@ Tests</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">make rtest</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md11"></a>
 Miscellaneous Why?</h1>
 <ul>
 <li>Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> style macro that gets the user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
@@ -206,7 +216,7 @@ Miscellaneous Why?</h1>
 <li>Why not a better hash map? Haven't gotten to it yet. This container has the most room for improvement.</li>
 <li>Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md11"></a>
+<h1><a class="anchor" id="autotoc_md12"></a>
 Related</h1>
 <p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
