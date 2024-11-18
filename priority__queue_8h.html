@@ -147,9 +147,9 @@ N) increase/decrease key.  <br /></td></tr>
 <tr class="memitem:ada85255159c46fcaf747cd9a60473ceb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ada85255159c46fcaf747cd9a60473ceb">ccc_pq_emplace</a>(priority_queue_ptr,  lazy_value...)&#160;&#160;&#160;    ccc_impl_pq_emplace(priority_queue_ptr, lazy_value)</td></tr>
 <tr class="memdesc:ada85255159c46fcaf747cd9a60473ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write user type directly to a newly allocated priority queue elem.  <br /></td></tr>
 <tr class="separator:ada85255159c46fcaf747cd9a60473ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57b0378d7b9a78cc68284447bbc2aea0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a57b0378d7b9a78cc68284447bbc2aea0">ccc_pq_push</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem)</td></tr>
-<tr class="memdesc:a57b0378d7b9a78cc68284447bbc2aea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the priority queue in correct total order. O(1).  <br /></td></tr>
-<tr class="separator:a57b0378d7b9a78cc68284447bbc2aea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17fc73bd17733632f5712e3220f3216a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a17fc73bd17733632f5712e3220f3216a">ccc_pq_push</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem)</td></tr>
+<tr class="memdesc:a17fc73bd17733632f5712e3220f3216a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the priority queue in correct total order. O(1).  <br /></td></tr>
+<tr class="separator:a17fc73bd17733632f5712e3220f3216a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed66e1a4ed0e9ed2de60147cda9394d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aed66e1a4ed0e9ed2de60147cda9394d8">ccc_pq_pop</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq)</td></tr>
 <tr class="memdesc:aed66e1a4ed0e9ed2de60147cda9394d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops the front element from the priority queue. Amortized O(lgN).  <br /></td></tr>
 <tr class="separator:aed66e1a4ed0e9ed2de60147cda9394d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -680,14 +680,14 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
-<a id="a57b0378d7b9a78cc68284447bbc2aea0" name="a57b0378d7b9a78cc68284447bbc2aea0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57b0378d7b9a78cc68284447bbc2aea0">&#9670;&#160;</a></span>ccc_pq_push()</h2>
+<a id="a17fc73bd17733632f5712e3220f3216a" name="a17fc73bd17733632f5712e3220f3216a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17fc73bd17733632f5712e3220f3216a">&#9670;&#160;</a></span>ccc_pq_push()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_pq_push </td>
+          <td class="memname">void * ccc_pq_push </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>pq</em>, </td>
@@ -714,7 +714,7 @@ N) increase/decrease key. </p>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>ok if the push succeeded. If NULL arguments are provided an input error is returned. If allocation is permitted but allocation fails a memory error is returned.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the newly inserted user type or NULL if NULL arguments are provided or allocation fails when permitted.</dd></dl>
 <p>Note that if allocation is permitted the user type is copied into a newly allocated node.</p>
 <p>If allocation is not permitted this function assumes the memory wrapping elem has been allocated with the appropriate lifetime for the user's needs. </p>
 

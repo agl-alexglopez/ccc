@@ -13,7 +13,7 @@ var priority__queue_8h =
     [ "ccc_pq_is_empty", "priority__queue_8h.html#a56f96b2f0327630ebf1ac7305d5889b5", null ],
     [ "ccc_pq_order", "priority__queue_8h.html#ac93c8b051f2c6d02f706b7d71ce9bed5", null ],
     [ "ccc_pq_pop", "priority__queue_8h.html#aed66e1a4ed0e9ed2de60147cda9394d8", null ],
-    [ "ccc_pq_push", "priority__queue_8h.html#a57b0378d7b9a78cc68284447bbc2aea0", null ],
+    [ "ccc_pq_push", "priority__queue_8h.html#a17fc73bd17733632f5712e3220f3216a", null ],
     [ "ccc_pq_size", "priority__queue_8h.html#aa87411d342eff2335f15d54542fa4ad8", null ],
     [ "ccc_pq_update", "priority__queue_8h.html#a2a7d0fcc1464b01ed233f3c8e47ab1bf", null ],
     [ "ccc_pq_validate", "priority__queue_8h.html#a9d48c9cd894bcfa150d4fb4d5afc1995", null ]
