@@ -629,7 +629,7 @@ insert(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const parent,
     return struct_base(rom, out_handle);
 }
 
-static void *
+static inline void *
 maybe_alloc_insert(struct ccc_romap_ *const rom,
                    struct ccc_romap_elem_ *const parent,
                    ccc_threeway_cmp last_cmp,

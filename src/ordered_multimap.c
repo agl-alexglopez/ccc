@@ -1151,7 +1151,7 @@ link_trees(struct ccc_tree_ *const t, struct ccc_node_ *const parent,
    find itself by checking its doubly linked list. A node in a tree
    could never do this because there is no route back to a node from
    its child pointers by definition of a binary tree. However, we must be
-   careful not to access the end helper becuase it can store any pointers
+   careful not to access the end helper because it can store any pointers
    in its fields that should not be accessed for directions.
 
                              *────┐

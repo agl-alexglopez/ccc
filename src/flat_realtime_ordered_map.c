@@ -585,7 +585,7 @@ ccc_impl_frm_alloc_back(struct ccc_fromap_ *const frm)
 
 /*==========================  Static Helpers   ==============================*/
 
-static void *
+static inline void *
 maybe_alloc_insert(struct ccc_fromap_ *const frm, size_t const parent,
                    ccc_threeway_cmp const last_cmp,
                    struct ccc_fromap_elem_ *const elem)
