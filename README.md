@@ -36,9 +36,9 @@ While not all containers require the user accommodate intrusive elements, when t
 ```c
 struct key_val
 {
+    container_elem elem;
     int key;
     int val;
-    container_elem elem;
 };
 ```
 
