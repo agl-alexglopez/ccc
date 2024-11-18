@@ -30,8 +30,6 @@ Example:
 #include <string.h>
 #include <time.h>
 
-#include "alloc.h"
-#include "ccc/buffer.h"
 #include "ccc/ordered_map.h"
 #include "ccc/priority_queue.h"
 #include "ccc/traits.h"
@@ -80,6 +78,17 @@ struct prim_cell
     pq_elem pq_elem;
     struct point cell;
     int cost;
+};
+
+/** Rather than ask the hep for nodes as a memory managing container would do
+we will ask the heap for one slab/arena and force the containers to use this
+as the allocator. Then, the memory allocation part of the problem becomes O(1)
+optimal. There is only one malloc and one free for the entire program. */
+struct prim_cell_arena
+{
+    struct prim_cell *arena;
+    size_t next_free;
+    size_t capacity;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -226,8 +235,8 @@ main(int argc, char **argv)
    taking advantage of the flexible allocating or non-allocating options.
    There are better ways to run Prim's algorithm, but this is just to show
    how we can tailor allocations to the scope of this function by combining
-   a buffer and priority queue that do not allocate, with a map that does.
-   In fact, the composition allows us to present the buffer as if it is an
+   a priority queue that does not allocate, with a map uses an arena allocator.
+   In fact, the composition allows us to present the arena as if it is an
    allocator to the map; all the while we benefit from one contiguous arena
    of our data type. The priority queue and map also share the same memory
    as intrusive struct fields, further simplifying locality of reference. */
@@ -238,18 +247,17 @@ animate_maze(struct maze *maze)
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
 
-    /* The buffer holds enough space for use to bump all cells into it,
+    /* The arena holds enough space for use to bump all cells into it,
        eliminating the need for a non-contiguous allocator. In this type of
        maze only odd squares can be paths, which is what we are building here
        so that is half of the squares. */
     size_t const cap = (((size_t)maze->rows * maze->cols) / 2) + 1;
     size_t bytes = cap * sizeof(struct prim_cell);
-    /* Calling alloc like this is kind of nice to get rid of a dangling ref
-       but we need to have some kind of sanity check. The cast is required to
-       inform the buffer of the size of the contiguous elements. */
-    buffer bump_arena = buf_init(
-        ((struct prim_cell *)std_alloc(NULL, bytes, NULL)), NULL, NULL, cap);
-    assert(buf_begin(&bump_arena) != NULL);
+    /* Calling malloc like this is kind of nice to get rid of a dangling ref
+       but we need to have some kind of sanity check. */
+    struct prim_cell_arena bump_arena
+        = {.arena = malloc(bytes), .next_free = 0, .capacity = cap};
+    assert(bump_arena.arena != NULL);
     /* Priority queue elements will not participate in allocation. They piggy
        back on the ordered map memory because the relationship is 1-to-1. */
     priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES, NULL,
@@ -267,7 +275,7 @@ animate_maze(struct maze *maze)
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
     assert(first);
     (void)push(&cells, &first->pq_elem);
-    assert(ccc_buf_size(&bump_arena) == 1);
+    assert(bump_arena.next_free == 1);
     while (!is_empty(&cells))
     {
         struct prim_cell const *const c = front(&cells);
@@ -296,23 +304,42 @@ animate_maze(struct maze *maze)
                 }
             }
         }
-        if (!min_cell)
-        {
-            (void)pop(&cells);
-        }
-        else
+        if (min_cell)
         {
             join_squares_animated(maze, c->cell, min_cell->cell, speed);
             (void)push(&cells, &min_cell->pq_elem);
         }
+        else
+        {
+            (void)pop(&cells);
+        }
     }
     /* Thanks to how the containers worked together there was only a single
        allocation and free from the heap's perspective. */
-    [[maybe_unused]] result l = ccc_buf_alloc(&bump_arena, 0, std_alloc);
-    assert(l == CCC_OK);
+    free(bump_arena.arena);
 }
 
 /*===================     Container Support Code     ========================*/
+
+static void *
+arena_bump_alloc(void *const ptr, size_t const size, void *const prim_arena)
+{
+    if (!ptr && !size)
+    {
+        return NULL;
+    }
+    if (!ptr)
+    {
+        struct prim_cell_arena *const a = prim_arena;
+        if (a->next_free >= a->capacity)
+        {
+            return NULL;
+        }
+        return &a->arena[a->next_free++];
+    }
+    assert(!"You can't free nodes in a bump arena allocator!");
+    return NULL;
+}
 
 static threeway_cmp
 cmp_priority_cells(cmp const cmp_cells)
@@ -336,22 +363,6 @@ cmp_priority_pos(key_cmp const cmp_points)
         return (key_lhs->c > a_rhs->cell.c) - (key_lhs->c < a_rhs->cell.c);
     }
     return (key_lhs->r > a_rhs->cell.r) - (key_lhs->r < a_rhs->cell.r);
-}
-
-static void *
-arena_bump_alloc(void *const ptr, size_t const size, void *const arena)
-{
-    if (!ptr && !size)
-    {
-        return NULL;
-    }
-    if (!ptr)
-    {
-        return ccc_buf_alloc_back(arena);
-    }
-    /* Freeing and reallocation are not supported in a bump allocator. */
-    assert(!"You shouldn't be here this is a bump allocator!");
-    return NULL;
 }
 
 /*=========================   Maze Support Code   ===========================*/
