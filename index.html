@@ -96,6 +96,14 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="textblock"><p><a class="anchor" id="md_README"></a> The C Container Collection offers a variety of containers for C programmers who want fine-grained control of memory in their programs. All containers offer both allocating and non-allocating interfaces. For the motivations of why such a library is helpful in C read on.</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Installation</h1>
+<p>The following are required for install:</p>
+<ul>
+<li>GCC or Clang supporting C23<ul>
+<li>100% coverage of C23 is not required. For example, at the time of writing Clang 19.1.1 and GCC 14.2 have all features used in this collection covered, but older versions of each compiler may work as well.</li>
+</ul>
+</li>
+<li>CMake &gt;= 3.23.</li>
+</ul>
 <p>Currently, this library supports a manual installation via CMake. See the <a class="el" href="md_INSTALL.html">INSTALL.md</a> file for more details. This file is also included when you download a simplified release from the <a href="https://github.com/agl-alexglopez/ccc/releases">Releases</a> page.</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
 Quick Start</h1>
@@ -190,7 +198,7 @@ Tests</h1>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
 Miscellaneous Why?</h1>
 <ul>
-<li>Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> style macro that gets user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
+<li>Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> style macro that gets the user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
 <li>Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also debugging your own function is nice.</li>
 <li>Why not header only? Readability, maintainability, and update ability, for changing implementations in the source files. If the user wants to explore the implementation everything should be easily understandable. Smaller object size and easier modular compilation is also nice.</li>
 <li>Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.</li>
