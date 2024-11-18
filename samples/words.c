@@ -55,13 +55,13 @@ struct frequency
     int freq;
 };
 
-struct word
+typedef struct
 {
     str_ofs ofs;
     int cnt;
     /* Map element for logging frequencies by string key, freq value. */
     fomap_elem e;
-};
+} word;
 
 struct frequency_alloc
 {
@@ -135,7 +135,7 @@ static void print_n(ccc_flat_priority_queue *, struct str_arena const *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
-static struct clean_word clean_word(struct str_arena *, str_view word);
+static struct clean_word clean_word(struct str_arena *, str_view wv);
 
 /* String Arena Functions */
 static struct str_arena str_arena_create(size_t);
@@ -257,10 +257,10 @@ print_found(FILE *const f, str_view w)
     struct clean_word wc = clean_word(&a, w);
     if (wc.stat == WC_CLEAN_WORD)
     {
-        struct word const *const word = get_key_val(&map, &wc.str);
-        if (word)
+        word const *const found_w = get_key_val(&map, &wc.str);
+        if (found_w)
         {
-            printf("%s %d\n", str_arena_at(&a, word->ofs), word->cnt);
+            printf("%s %d\n", str_arena_at(&a, found_w->ofs), found_w->cnt);
         }
     }
     str_arena_free(&a);
@@ -325,7 +325,7 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
     struct frequency *const freqs = malloc(cap);
     PROG_ASSERT(freqs);
     size_t i = 0;
-    for (struct word const *w = begin(map); w != end(map) && i < cap;
+    for (word const *w = begin(map); w != end(map) && i < cap;
          w = next(map, &w->e), ++i)
     {
         freqs[i].ofs = w->ofs;
@@ -344,11 +344,11 @@ print_n(ccc_flat_priority_queue *const fpq, struct str_arena const *const a,
     }
     for (int w = 0; w < n && !is_empty(fpq); ++w)
     {
-        struct frequency *const word = front(fpq);
-        char const *const arena_str = str_arena_at(a, word->ofs);
+        struct frequency *const front_w = front(fpq);
+        char const *const arena_str = str_arena_at(a, front_w->ofs);
         if (arena_str)
         {
-            printf("%d. %s %d\n", w + 1, arena_str, word->freq);
+            printf("%d. %s %d\n", w + 1, arena_str, front_w->freq);
         }
         (void)pop(fpq);
     }
@@ -362,15 +362,16 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     char *lineptr = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
-    ccc_flat_ordered_map fom = ccc_fom_init((struct word *)NULL, 0, e, ofs,
-                                            std_alloc, cmp_string_keys, a);
+    ccc_flat_ordered_map fom
+        = ccc_fom_init((word *)NULL, 0, e, ofs, std_alloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .sz = read - 1};
-        for (str_view word = sv_begin_tok(line, space); !sv_end_tok(line, word);
-             word = sv_next_tok(line, word, space))
+        for (str_view word_view = sv_begin_tok(line, space);
+             !sv_end_tok(line, word_view);
+             word_view = sv_next_tok(line, word_view, space))
         {
-            struct clean_word const cw = clean_word(a, word);
+            struct clean_word const cw = clean_word(a, word_view);
             PROG_ASSERT(cw.stat != WC_ARENA_ERR);
             if (cw.stat == WC_CLEAN_WORD)
             {
@@ -378,13 +379,17 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
                    However, this demonstrates the user of "closures" in the
                    and modify with macro. The and modify macro gives a closure
                    over the user type T if the entry is Occupied. If the entry
-                   is Vacant the closure does not execute. */
-                struct word const *const w = fom_or_insert_w(
-                    fom_and_modify_w(entry_r(&fom, &cw.str), struct word,
-                                     {
-                                         T->cnt++;
-                                     }),
-                    (struct word){.ofs = cw.str, .cnt = 1});
+                   is Vacant the closure does not execute. You can uncomment
+                   the below code if you prefer a more sequential style. */
+                /*
+                ccc_fomap_entry *e = entry_r(&fom, &cw.str);
+                e = fom_and_modify_w(e, word, { T->cnt++; });
+                word *w = fom_or_insert_w(e, (word){.ofs = cw.str, .cnt = 1});
+                */
+                word *w
+                    = fom_or_insert_w(fom_and_modify_w(entry_r(&fom, &cw.str),
+                                                       word, { T->cnt++; }),
+                                      (word){.ofs = cw.str, .cnt = 1});
                 PROG_ASSERT(w);
             }
         }
@@ -394,7 +399,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
 }
 
 static struct clean_word
-clean_word(struct str_arena *const a, str_view word)
+clean_word(struct str_arena *const a, str_view wv)
 {
     /* It is hard to know how many characters will make it to a cleaned word
        and one pass is ideal so arena api allows push back on last alloc. */
@@ -404,7 +409,7 @@ clean_word(struct str_arena *const a, str_view word)
         return (struct clean_word){.stat = WC_ARENA_ERR};
     }
     size_t str_len = 0;
-    for (char const *c = sv_begin(word); c != sv_end(word); c = sv_next(c))
+    for (char const *c = sv_begin(wv); c != sv_end(wv); c = sv_next(c))
     {
         if (!isalpha(*c) && *c != '-')
         {
@@ -569,7 +574,7 @@ str_arena_at(struct str_arena const *const a, str_ofs const i)
 static ccc_threeway_cmp
 cmp_string_keys(ccc_key_cmp const c)
 {
-    struct word const *const w = c.user_type_rhs;
+    word const *const w = c.user_type_rhs;
     struct str_arena const *const a = c.aux;
     str_ofs const *const id = c.key_lhs;
     char const *const key_word = str_arena_at(a, *id);
