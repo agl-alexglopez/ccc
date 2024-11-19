@@ -85,10 +85,12 @@ all-clang-rel:
 	cmake --preset=clang-rel && cmake --build build $(JOBS) --target ccc tests samples
 
 dtest: tests
+	cmake --build build $(JOBS) --target tests
 	$(BUILD_DIR)debug/bin/run_tests $(BUILD_DIR)debug/bin/tests/
 	@echo "RAN TESTS"
 
 rtest: tests
+	cmake --build build $(JOBS) --target tests
 	$(BUILD_DIR)bin/run_tests $(BUILD_DIR)bin/tests/
 	@echo "RAN TESTS"
 

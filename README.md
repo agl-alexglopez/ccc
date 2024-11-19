@@ -23,7 +23,7 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 
 - buffer.h ([buffer snippet](#buffer))
 - doubly_linked_list.h ([doubly_linked_list snippet](#doubly-linked-list))
-- flat_double_ended_queue.h
+- flat_double_ended_queue.h ([flat_double_ended_queue snippet](#flat-double-ended-queue))
 - flat_hash_map.h
 - flat_ordered_map.h
 - flat_priority_queue.h
@@ -521,3 +521,32 @@ main(void)
 }
 ```
 
+## Flat Double Ended Queue
+
+A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.
+
+```c
+#include "ccc/flat_double_ended_queue.h"
+
+#include <assert.h>
+
+int
+main(void)
+{
+    /* stack array, no allocation permission, no aux data, capacity 2 */
+    ccc_flat_double_ended_queue q = ccc_fdeq_init((int[2]){}, NULL, NULL, 2);
+    (void)ccc_fdeq_push_back(&q, &(int){3});
+    (void)ccc_fdeq_push_front(&q, &(int){2});
+    (void)ccc_fdeq_push_back(&q, &(int){1});
+    int *i = ccc_fdeq_front(&q);
+    assert(*i == 3);
+    i = ccc_fdeq_back(&q);
+    assert(*i == 1);
+    (void)ccc_fdeq_pop_back(&q);
+    i = ccc_fdeq_back(&q);
+    assert(*i == 3);
+    i = ccc_fdeq_front(&q);
+    assert(*i == 3);
+    return 0;
+}
+```
