@@ -15,6 +15,7 @@ AB
 A->B
 CtoD
 Enter 'q' to quit. */
+#include "realtime_ordered_map.h"
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
@@ -62,18 +63,18 @@ struct parent_cell
 
 struct prev_vertex
 {
+    ccc_romap_elem elem;
+    ccc_pq_elem pq_elem;
+    int dist;
     char cur_name;
     char prev_name;
-    ccc_fhmap_elem elem;
-    /* A pointer to the corresponding pq_entry for this element. */
-    struct dist_point *dist_point;
 };
 
-struct dist_point
+struct prev_vertex_arena
 {
-    char v_name;
-    int dist;
-    ccc_pq_elem pq_elem;
+    struct prev_vertex *vertices;
+    size_t next_free;
+    size_t capacity;
 };
 
 struct path_request
@@ -240,7 +241,8 @@ static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void prepare_vertices(struct graph *, ccc_priority_queue *,
-                             flat_hash_map *, struct path_request const *);
+                             ccc_realtime_ordered_map *,
+                             struct path_request const *);
 static void paint_edge(struct graph *, struct vertex const *,
                        struct vertex const *);
 static void add_edge_cost_label(struct graph *, struct vertex *,
@@ -274,19 +276,17 @@ static enum label_orientation get_direction(struct point const *,
                                             struct point const *);
 static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
-static void *valid_malloc(size_t);
 static void help(void);
 
 static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
+static ccc_threeway_cmp cmp_prev_vertices(ccc_key_cmp cmp);
 
+static void *prev_vertex_arena_alloc(void *ptr, size_t size, void *aux);
 static bool eq_parent_cells(ccc_key_cmp);
 static uint64_t hash_parent_cells(ccc_user_key point_struct);
-static bool eq_prev_vertices(ccc_key_cmp);
-static uint64_t hash_vertex_addr(ccc_user_key pointer_to_vertex);
 static uint64_t hash_64_bits(uint64_t);
 
 static void pq_update_dist(ccc_user_type);
-static void map_pq_prev_vertex_dist_point_destructor(ccc_user_type);
 static unsigned count_digits(uintmax_t n);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -718,16 +718,29 @@ find_shortest_paths(struct graph *const graph)
 static bool
 dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 {
-    ccc_priority_queue dist_q = ccc_pq_init(struct dist_point, pq_elem, CCC_LES,
-                                            NULL, cmp_pq_dist_points, NULL);
-    flat_hash_map prev_map;
-    ccc_result res
-        = fhm_init(&prev_map, (struct prev_vertex *)NULL, 0, cur_name, elem,
-                   std_alloc, hash_vertex_addr, eq_prev_vertices, NULL);
-    prog_assert(res == CCC_OK);
+    /* We will use the common arena and container composition present in a
+       few samples. The vertices are part of a priority queue to run Dijkstra
+       but also part of a parent chaining map to rebuild the shortest path.
+       We can keep all of the distances, names, and parents tightly packed in
+       one struct and keep these structs tightly packed in a bump allocator. */
+    struct prev_vertex_arena bump_arena
+        = {.vertices = malloc(sizeof(struct prev_vertex) * graph->vertices),
+           .next_free = 0,
+           .capacity = graph->vertices};
+    prog_assert(bump_arena.vertices);
+    /* The realtime ordered map and priority queue both have pointer stability
+       and therefore can be safely composed together in the same struct. */
+    ccc_realtime_ordered_map prev_map
+        = ccc_rom_init(prev_map, struct prev_vertex, elem, cur_name,
+                       prev_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
+    ccc_priority_queue dist_q = ccc_pq_init(
+        struct prev_vertex, pq_elem, CCC_LES, NULL, cmp_pq_dist_points, NULL);
+    /* The lifetime of elements in the map and priority queue are identical.
+       We don't have to worry about removing one before the other. All stay
+       in the map and priority queue for the entirety of the algorithm. */
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
-    struct dist_point *cur = NULL;
+    struct prev_vertex *cur = NULL;
     struct vertex *cur_v = NULL;
     while (!is_empty(&dist_q))
     {
@@ -735,8 +748,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
            the end because it always holds a reference to its pq_elem. */
         cur = front(&dist_q);
         (void)pop(&dist_q);
-        cur_v = vertex_at(graph, cur->v_name);
-        if (cur->v_name == pr.dst || cur->dist == INT_MAX)
+        cur_v = vertex_at(graph, cur->cur_name);
+        if (cur->cur_name == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
             break;
@@ -748,14 +761,13 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             prog_assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
-            struct dist_point *dist = next->dist_point;
             int alt = cur->dist + cur_v->edges[i].cost;
-            if (alt < dist->dist)
+            if (alt < next->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                next->prev_name = cur->v_name;
+                next->prev_name = cur->cur_name;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!decrease(&dist_q, &dist->pq_elem, pq_update_dist, &alt))
+                if (!decrease(&dist_q, &next->pq_elem, pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -774,37 +786,30 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             prog_assert(prev);
         }
     }
-    /* Choosing when to free gets tricky during the algorithm. So, the
-       prev map is the last allocation with access to the priority queue
-       elements that have been popped but not freed. It will free its
-       own map and its references to priority queue elements. */
-    (void)fhm_clear_and_free(&prev_map,
-                             map_pq_prev_vertex_dist_point_destructor);
+    /* Complex algorithm but one alloc one free from heap's perspective. */
+    free(bump_arena.vertices);
     clear_and_flush_graph(graph);
     return success;
 }
 
 static void
 prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
-                 flat_hash_map *prev_map, struct path_request const *pr)
+                 ccc_realtime_ordered_map *prev_map,
+                 struct path_request const *pr)
 {
     for (int count = 0, name = start_vertex_title; count < graph->vertices;
          ++count, ++name)
     {
         struct vertex *v = vertex_at(graph, (char)name);
-        struct dist_point *p = valid_malloc(sizeof(struct dist_point));
-        *p = (struct dist_point){
-            .v_name = (char)name,
-            .dist = v->name == pr->src ? 0 : INT_MAX,
-        };
-        ccc_entry const *const inserted = fhm_try_insert_w(
-            prev_map, p->v_name,
-            (struct prev_vertex){.prev_name = '\0', .dist_point = p});
-        prog_assert(!insert_error(inserted) && !occupied(inserted), {
-            printf("duplicate vertex during graph prep or insert failed.\n");
-            free(p);
-        });
-        struct dist_point const *const res = push(dist_q, &p->pq_elem);
+        struct prev_vertex *const inserted
+            = ccc_rom_or_insert_w(entry_r(prev_map, &name),
+                                  (struct prev_vertex){
+                                      .cur_name = (char)name,
+                                      .dist = v->name == pr->src ? 0 : INT_MAX,
+                                      .prev_name = '\0',
+                                  });
+        prog_assert(inserted);
+        struct dist_point const *const res = push(dist_q, &inserted->pq_elem);
         prog_assert(res != NULL);
     }
 }
@@ -1075,6 +1080,26 @@ build_path_outline(struct graph *graph)
 
 /*====================    Data Structure Helpers    =========================*/
 
+static void *
+prev_vertex_arena_alloc(void *const ptr, size_t const size, void *const aux)
+{
+    if (!ptr && !size)
+    {
+        return NULL;
+    }
+    if (!ptr)
+    {
+        struct prev_vertex_arena *const a = aux;
+        if (a->next_free >= a->capacity)
+        {
+            return NULL;
+        }
+        return &a->vertices[a->next_free++];
+    }
+    quit("A bumping arena allocator should not free or realloc.", 1);
+    return NULL;
+}
+
 static bool
 eq_parent_cells(ccc_key_cmp const c)
 {
@@ -1094,25 +1119,17 @@ hash_parent_cells(ccc_user_key const point_struct)
 static ccc_threeway_cmp
 cmp_pq_dist_points(ccc_cmp const cmp)
 {
-    struct dist_point const *const a = cmp.user_type_lhs;
-    struct dist_point const *const b = cmp.user_type_rhs;
+    struct prev_vertex const *const a = cmp.user_type_lhs;
+    struct prev_vertex const *const b = cmp.user_type_rhs;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
-static bool
-eq_prev_vertices(ccc_key_cmp const cmp)
+static ccc_threeway_cmp
+cmp_prev_vertices(ccc_key_cmp const cmp)
 {
-    struct prev_vertex const *const a = cmp.user_type_rhs;
-    char const v = *(char *)cmp.key_lhs;
-    return a->cur_name == v;
-}
-
-static uint64_t
-hash_vertex_addr(ccc_user_key const pointer_to_vertex)
-{
-    char const name = *(char *)pointer_to_vertex.user_key;
-    uint64_t wide_name = (unsigned)name;
-    return hash_64_bits(wide_name);
+    char const key_lhs = *(char *)cmp.key_lhs;
+    struct prev_vertex const *const user_rhs = cmp.user_type_rhs;
+    return (key_lhs > user_rhs->cur_name) - (key_lhs < user_rhs->cur_name);
 }
 
 static uint64_t
@@ -1127,14 +1144,7 @@ hash_64_bits(uint64_t x)
 static void
 pq_update_dist(ccc_user_type const u)
 {
-    ((struct dist_point *)u.user_type)->dist = *((int *)u.aux);
-}
-
-static void
-map_pq_prev_vertex_dist_point_destructor(ccc_user_type const e)
-{
-    struct prev_vertex *pv = e.user_type;
-    free(pv->dist_point);
+    ((struct prev_vertex *)u.user_type)->dist = *((int *)u.aux);
 }
 
 /*===========================    Misc    ====================================*/
@@ -1184,19 +1194,6 @@ count_digits(uintmax_t n)
     for (; n; ++res, n /= 10)
     {}
     return res;
-}
-
-/* Promises valid memory or exits the program if the heap has an error. */
-static void *
-valid_malloc(size_t n)
-{
-    void *mem = malloc(n);
-    if (!mem)
-    {
-        (void)fprintf(stderr, "heap is exhausted, exiting program.\n");
-        exit(1);
-    }
-    return mem;
 }
 
 static void
