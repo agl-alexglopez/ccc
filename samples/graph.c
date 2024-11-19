@@ -54,11 +54,11 @@ struct point
     int c;
 };
 
-struct parent_cell
+struct path_backtrack_cell
 {
-    struct point key;
-    struct point parent;
     ccc_fhmap_elem elem;
+    struct point current;
+    struct point parent;
 };
 
 /** Containers can easily share the same storage location for their elements.
@@ -284,7 +284,7 @@ static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
-static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
+static ccc_threeway_cmp cmp_pq_costs(ccc_cmp);
 static ccc_threeway_cmp cmp_prev_vertices(ccc_key_cmp cmp);
 
 static void *dijkstra_vertex_arena_alloc(void *ptr, size_t size, void *aux);
@@ -454,13 +454,14 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     Cell const edge_id = make_edge(src->name, dst->name);
     flat_hash_map parent_map;
     ccc_result res
-        = fhm_init(&parent_map, (struct parent_cell *)NULL, 0, key, elem,
-                   std_alloc, hash_parent_cells, eq_parent_cells, NULL);
+        = fhm_init(&parent_map, (struct path_backtrack_cell *)NULL, 0, current,
+                   elem, std_alloc, hash_parent_cells, eq_parent_cells, NULL);
     prog_assert(res == CCC_OK);
     flat_double_ended_queue bfs
         = ccc_fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     ccc_entry *e = fhm_insert_or_assign_w(
-        &parent_map, src->pos, (struct parent_cell){.parent = {-1, -1}});
+        &parent_map, src->pos,
+        (struct path_backtrack_cell){.parent = {-1, -1}});
     prog_assert(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
     bool success = false;
@@ -473,7 +474,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         {
             struct point next
                 = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
-            struct parent_cell push = {.key = next, .parent = cur};
+            struct path_backtrack_cell push = {.current = next, .parent = cur};
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
@@ -493,7 +494,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     }
     if (success)
     {
-        struct parent_cell const *cell = get_key_val(&parent_map, &cur);
+        struct path_backtrack_cell const *cell = get_key_val(&parent_map, &cur);
         prog_assert(cell);
         struct edge edge
             = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
@@ -504,8 +505,8 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 printf("Cannot find cell parent to rebuild path.\n");
             });
             ++edge.n.cost;
-            *grid_at_mut(graph, cell->key) |= edge_id;
-            build_path_cell(graph, cell->key, edge_id);
+            *grid_at_mut(graph, cell->current) |= edge_id;
+            build_path_cell(graph, cell->current, edge_id);
         }
         (void)add_edge(src, &edge);
         edge.n.name = src->name;
@@ -736,25 +737,24 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     prog_assert(bump_arena.vertices);
     /* The realtime ordered map and priority queue both have pointer stability
        and therefore can be safely composed together in the same struct. */
-    ccc_realtime_ordered_map prev_map = ccc_rom_init(
-        prev_map, struct dijkstra_vertex, elem, cur_name,
+    ccc_realtime_ordered_map path_map = ccc_rom_init(
+        path_map, struct dijkstra_vertex, elem, cur_name,
         dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
-    ccc_priority_queue dist_q
-        = ccc_pq_init(struct dijkstra_vertex, pq_elem, CCC_LES, NULL,
-                      cmp_pq_dist_points, NULL);
+    ccc_priority_queue costs_pq = ccc_pq_init(
+        struct dijkstra_vertex, pq_elem, CCC_LES, NULL, cmp_pq_costs, NULL);
     /* The lifetime of elements in the map and priority queue are identical.
        We don't have to worry about removing one before the other. All stay
        in the map and priority queue for the entirety of the algorithm. */
-    prepare_vertices(graph, &dist_q, &prev_map, &pr);
+    prepare_vertices(graph, &costs_pq, &path_map, &pr);
     bool success = false;
     struct dijkstra_vertex *cur = NULL;
     struct vertex *cur_v = NULL;
-    while (!is_empty(&dist_q))
+    while (!is_empty(&costs_pq))
     {
         /* PQ entries are popped but the map will free the memory at
            the end because it always holds a reference to its pq_elem. */
-        cur = front(&dist_q);
-        (void)pop(&dist_q);
+        cur = front(&costs_pq);
+        (void)pop(&costs_pq);
         cur_v = vertex_at(graph, cur->cur_name);
         if (cur->cur_name == pr.dst || cur->dist == INT_MAX)
         {
@@ -764,7 +764,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
         {
             struct dijkstra_vertex *next
-                = get_key_val(&prev_map, &cur_v->edges[i].name);
+                = get_key_val(&path_map, &cur_v->edges[i].name);
             prog_assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
@@ -774,7 +774,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev_name = cur->cur_name;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!decrease(&dist_q, &next->pq_elem, pq_update_dist, &alt))
+                if (!decrease(&costs_pq, &next->pq_elem, pq_update_dist, &alt))
                 {
                     quit("Updating vertex that is not in queue.\n", 1);
                 }
@@ -784,13 +784,13 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     if (success)
     {
         struct dijkstra_vertex const *prev
-            = get_key_val(&prev_map, &cur_v->name);
+            = get_key_val(&path_map, &cur_v->name);
         prog_assert(prev);
         while (prev->prev_name)
         {
             paint_edge(graph, cur_v, vertex_at(graph, prev->prev_name));
             cur_v = vertex_at(graph, prev->prev_name);
-            prev = get_key_val(&prev_map, &prev->prev_name);
+            prev = get_key_val(&path_map, &prev->prev_name);
             prog_assert(prev);
         }
     }
@@ -1111,9 +1111,9 @@ dijkstra_vertex_arena_alloc(void *const ptr, size_t const size, void *const aux)
 static bool
 eq_parent_cells(ccc_key_cmp const c)
 {
-    struct parent_cell const *const pc = c.user_type_rhs;
+    struct path_backtrack_cell const *const pc = c.user_type_rhs;
     struct point const *const p = c.key_lhs;
-    return pc->key.r == p->r && pc->key.c == p->c;
+    return pc->current.r == p->r && pc->current.c == p->c;
 }
 
 static uint64_t
@@ -1125,7 +1125,7 @@ hash_parent_cells(ccc_user_key const point_struct)
 }
 
 static ccc_threeway_cmp
-cmp_pq_dist_points(ccc_cmp const cmp)
+cmp_pq_costs(ccc_cmp const cmp)
 {
     struct dijkstra_vertex const *const a = cmp.user_type_lhs;
     struct dijkstra_vertex const *const b = cmp.user_type_rhs;
