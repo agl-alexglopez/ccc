@@ -457,40 +457,40 @@ Related</h1>
 <h1><a class="anchor" id="autotoc_md17"></a>
 Buffer</h1>
 <p>A fixed or dynamic contiguous array of a single user defined type.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="buffer_8h.html">ccc/buffer.h</a>&quot;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="buffer_8h.html">ccc/buffer.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span></div>
 <div class="line">main(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
 <div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 5 */</span></div>
-<div class="line">    <a class="code hl_typedef" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> b = <a class="code hl_define" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a>((<span class="keywordtype">int</span>[5]){}, NULL, NULL, 5);</div>
-<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a>(&amp;b, &amp;(<span class="keywordtype">int</span>){3});</div>
-<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a>(&amp;b, &amp;(<span class="keywordtype">int</span>){2});</div>
-<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a>(&amp;b, &amp;(<span class="keywordtype">int</span>){1});</div>
-<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#a1150613b4392aae875aaf3c96146a39a">ccc_buf_pop_back</a>(&amp;b);</div>
-<div class="line">    <span class="keywordtype">int</span> *i = <a class="code hl_function" href="buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a">ccc_buf_back</a>(&amp;b);</div>
+<div class="line">    buffer b = buf_init((<span class="keywordtype">int</span>[5]){}, NULL, NULL, 5);</div>
+<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){3});</div>
+<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){2});</div>
+<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){1});</div>
+<div class="line">    (void)pop_back(&amp;b);</div>
+<div class="line">    <span class="keywordtype">int</span> *i = back(&amp;b);</div>
 <div class="line">    assert(*i == 2);</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="abuffer_8h_html"><div class="ttname"><a href="buffer_8h.html">buffer.h</a></div><div class="ttdoc">The Buffer Interface.</div></div>
-<div class="ttc" id="abuffer_8h_html_a1150613b4392aae875aaf3c96146a39a"><div class="ttname"><a href="buffer_8h.html#a1150613b4392aae875aaf3c96146a39a">ccc_buf_pop_back</a></div><div class="ttdeci">ccc_result ccc_buf_pop_back(ccc_buffer *buf)</div><div class="ttdoc">pop the back element from the buffer according to size.</div></div>
-<div class="ttc" id="abuffer_8h_html_a63e900d415ab4c7fca82ad65756d9b6a"><div class="ttname"><a href="buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a">ccc_buf_back</a></div><div class="ttdeci">void * ccc_buf_back(ccc_buffer const *buf)</div><div class="ttdoc">return the final element in the buffer according the current size.</div></div>
-<div class="ttc" id="abuffer_8h_html_a66b89d47e24996c7be07dea5d827e649"><div class="ttname"><a href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a></div><div class="ttdeci">#define ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)</div><div class="ttdoc">Initialize a contiguous buffer of user a specified type, allocation policy, capacity,...</div><div class="ttdef"><b>Definition:</b> buffer.h:71</div></div>
-<div class="ttc" id="abuffer_8h_html_a7d8dfe1437e87b31e7f5522d85080aba"><div class="ttname"><a href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></div><div class="ttdeci">struct ccc_buf_ ccc_buffer</div><div class="ttdoc">A contiguous block of storage for elements of the same type.</div><div class="ttdef"><b>Definition:</b> buffer.h:47</div></div>
-<div class="ttc" id="abuffer_8h_html_af52c4be9804b8639755e424e4177173c"><div class="ttname"><a href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a></div><div class="ttdeci">void * ccc_buf_push_back(ccc_buffer *buf, void const *data)</div><div class="ttdoc">return the newly pushed data into the last slot of the buffer according to size.</div></div>
+<div class="ttc" id="atraits_8h_html"><div class="ttname"><a href="traits_8h.html">traits.h</a></div><div class="ttdoc">The C Container Collection Traits Interface.</div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md18"></a>
 Doubly Linked List</h1>
 <p>A dynamic container for efficient insertion and removal at any position.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">ccc/doubly_linked_list.h</a>&quot;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">ccc/doubly_linked_list.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">struct </span>int_elem</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">int</span> i;</div>
-<div class="line">    <a class="code hl_typedef" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> e;</div>
+<div class="line">    dll_elem e;</div>
 <div class="line">};</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
@@ -506,55 +506,46 @@ Doubly Linked List</h1>
 <div class="line">{</div>
 <div class="line">    <span class="comment">/* doubly linked list l, list elem field e, no allocation permission,</span></div>
 <div class="line"><span class="comment">       comparing integers, no auxiliary data. */</span></div>
-<div class="line">    <a class="code hl_typedef" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> l</div>
-<div class="line">        = <a class="code hl_define" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(l, <span class="keyword">struct</span> int_elem, e, NULL, int_cmp, NULL);</div>
+<div class="line">    doubly_linked_list l = dll_init(l, <span class="keyword">struct</span> int_elem, e, NULL, int_cmp, NULL);</div>
 <div class="line">    <span class="keyword">struct </span>int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};</div>
-<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#a327884c1903e8729e7a6ca0377f4c185">ccc_dll_push_back</a>(&amp;l, &amp;elems[0].e);</div>
-<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a>(&amp;l, &amp;elems[1].e);</div>
-<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#a327884c1903e8729e7a6ca0377f4c185">ccc_dll_push_back</a>(&amp;l, &amp;elems[2].e);</div>
-<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#a387ada0e3dcfb0df8d4fc3a8845cb536">ccc_dll_pop_back</a>(&amp;l);</div>
-<div class="line">    <span class="keyword">struct </span>int_elem *e = <a class="code hl_function" href="doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac">ccc_dll_back</a>(&amp;l);</div>
+<div class="line">    (void)push_back(&amp;l, &amp;elems[0].e);</div>
+<div class="line">    (void)push_front(&amp;l, &amp;elems[1].e);</div>
+<div class="line">    (void)push_back(&amp;l, &amp;elems[2].e);</div>
+<div class="line">    (void)pop_back(&amp;l);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem *e = back(&amp;l);</div>
 <div class="line">    assert(e-&gt;i == 3);</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="adoubly__linked__list_8h_html"><div class="ttname"><a href="doubly__linked__list_8h.html">doubly_linked_list.h</a></div><div class="ttdoc">The Doubly Linked List Interface.</div></div>
-<div class="ttc" id="adoubly__linked__list_8h_html_a327884c1903e8729e7a6ca0377f4c185"><div class="ttname"><a href="doubly__linked__list_8h.html#a327884c1903e8729e7a6ca0377f4c185">ccc_dll_push_back</a></div><div class="ttdeci">void * ccc_dll_push_back(ccc_doubly_linked_list *l, ccc_dll_elem *elem)</div><div class="ttdoc">Push user type wrapping elem to the back of the list. O(1).</div></div>
-<div class="ttc" id="adoubly__linked__list_8h_html_a387ada0e3dcfb0df8d4fc3a8845cb536"><div class="ttname"><a href="doubly__linked__list_8h.html#a387ada0e3dcfb0df8d4fc3a8845cb536">ccc_dll_pop_back</a></div><div class="ttdeci">ccc_result ccc_dll_pop_back(ccc_doubly_linked_list *l)</div><div class="ttdoc">Pop the user type at the back of the list. O(1).</div></div>
-<div class="ttc" id="adoubly__linked__list_8h_html_abea7c774a00b9e84da26660d20a0b1ac"><div class="ttname"><a href="doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac">ccc_dll_back</a></div><div class="ttdeci">void * ccc_dll_back(ccc_doubly_linked_list const *l)</div><div class="ttdoc">Returns the user type at the back of the list. O(1).</div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md19"></a>
 Flat Double Ended Queue</h1>
 <p>A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__double__ended__queue_8h.html">ccc/flat_double_ended_queue.h</a>&quot;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__double__ended__queue_8h.html">ccc/flat_double_ended_queue.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span></div>
 <div class="line">main(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
 <div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 2 */</span></div>
-<div class="line">    <a class="code hl_typedef" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> q = <a class="code hl_define" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>((<span class="keywordtype">int</span>[2]){}, NULL, NULL, 2);</div>
-<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a>(&amp;q, &amp;(<span class="keywordtype">int</span>){3});</div>
-<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a6e8aa8edc1a18d945b8bdd664709e7a2">ccc_fdeq_push_front</a>(&amp;q, &amp;(<span class="keywordtype">int</span>){2});</div>
-<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a>(&amp;q, &amp;(<span class="keywordtype">int</span>){1}); <span class="comment">/* Overwrite 2. */</span></div>
-<div class="line">    <span class="keywordtype">int</span> *i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a>(&amp;q);</div>
+<div class="line">    flat_double_ended_queue q = fdeq_init((<span class="keywordtype">int</span>[2]){}, NULL, NULL, 2);</div>
+<div class="line">    (void)push_back(&amp;q, &amp;(<span class="keywordtype">int</span>){3});</div>
+<div class="line">    (void)push_front(&amp;q, &amp;(<span class="keywordtype">int</span>){2});</div>
+<div class="line">    (void)push_back(&amp;q, &amp;(<span class="keywordtype">int</span>){1}); <span class="comment">/* Overwrite 2. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> *i = front(&amp;q);</div>
 <div class="line">    assert(*i == 3);</div>
-<div class="line">    i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a>(&amp;q);</div>
+<div class="line">    i = back(&amp;q);</div>
 <div class="line">    assert(*i == 1);</div>
-<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a>(&amp;q);</div>
-<div class="line">    i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a>(&amp;q);</div>
+<div class="line">    (void)pop_back(&amp;q);</div>
+<div class="line">    i = back(&amp;q);</div>
 <div class="line">    assert(*i == 3);</div>
-<div class="line">    i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a>(&amp;q);</div>
+<div class="line">    i = front(&amp;q);</div>
 <div class="line">    assert(*i == 3);</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="aflat__double__ended__queue_8h_html"><div class="ttname"><a href="flat__double__ended__queue_8h.html">flat_double_ended_queue.h</a></div><div class="ttdoc">The Flat Double Ended Queue Interface.</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a0b47511ed59d60a9e66bdb2fee438eb0"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></div><div class="ttdeci">struct ccc_fdeq_ ccc_flat_double_ended_queue</div><div class="ttdoc">A contiguous buffer for O(1) push and pop from front and back.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:42</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a5f6c51ae30c8f0cae6e1b05466008784"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a></div><div class="ttdeci">#define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)</div><div class="ttdoc">Initialize the fdeq with memory and allocation permission.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:52</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a60e38bd6dacaf6204fa8de34c7732789"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a></div><div class="ttdeci">ccc_result ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fdeq)</div><div class="ttdoc">Pop an element from the back of the fdeq. O(1).</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a6e8aa8edc1a18d945b8bdd664709e7a2"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a6e8aa8edc1a18d945b8bdd664709e7a2">ccc_fdeq_push_front</a></div><div class="ttdeci">void * ccc_fdeq_push_front(ccc_flat_double_ended_queue *fdeq, void const *elem)</div><div class="ttdoc">Push the user type to the front of the fdeq. O(1) if no allocation permission amortized O(1) if alloc...</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a88d9f08549c2ce4edf9d575caccb3fb4"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a></div><div class="ttdeci">void * ccc_fdeq_front(ccc_flat_double_ended_queue const *fdeq)</div><div class="ttdoc">Return a reference to the front of the fdeq. O(1).</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a9cd07edbd36d2c84bbb633e910a4d59a"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a></div><div class="ttdeci">void * ccc_fdeq_back(ccc_flat_double_ended_queue const *fdeq)</div><div class="ttdoc">Return a reference to the back of the fdeq. O(1).</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_aa352727365879daa6510133a768cc628"><div class="ttname"><a href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a></div><div class="ttdeci">void * ccc_fdeq_push_back(ccc_flat_double_ended_queue *fdeq, void const *elem)</div><div class="ttdoc">Push the user type to the back of the fdeq. O(1) if no allocation permission amortized O(1) if alloca...</div></div>
 </div><!-- fragment --> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
