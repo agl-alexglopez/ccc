@@ -24,7 +24,7 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 - Intrusive and non-intrusive containers.
 - No `container_of` macro required of the user to get to their type after a function call.
 - Non-allocating container options.
-- Rust's Entry API for associative containers with C influences.
+- Rust's Entry API for associative containers with C and C++ influences.
 - Container Traits implemented with C `_Generic` capabilities.
 - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
 
