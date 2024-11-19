@@ -9,9 +9,9 @@
 
 struct val
 {
+    ccc_dll_elem e;
     int id;
     int val;
-    ccc_dll_elem e;
 };
 
 enum push_end

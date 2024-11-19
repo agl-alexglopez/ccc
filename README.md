@@ -47,7 +47,7 @@ Currently on offer:
 
 ### Intrusive and Non-Intrusive Containers
 
-Currently, all associative containers ask the user to stored an element in their type. This means wrapping an element in a struct such as this type found in `samples/graph.c` for the flat hash map.
+Currently, all associative containers ask the user to store an element in their type. This means wrapping an element in a struct such as this type found in `samples/graph.c` for the flat hash map.
 
 ```c
 struct path_backtrack_cell
@@ -80,7 +80,7 @@ ccc_flat_priority_queue fpq
 
 ```
 
-Here a small min flat priority queue of integers with a maximum capacity of 40 has been allocated on the stack. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function.
+Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
 
 ```c
 ccc_flat_priority_queue fpq
@@ -135,7 +135,7 @@ void push_three(ccc_doubly_linked_list *const dll)
 }
 ```
 
-Here, the container pushes stack allocated structs directly into the list. The container has not been given allocation permission so it assumes the memory it is given has the appropriate lifetime for the programmer's needs. When this function ends, that memory is invalid because its scope and lifetime has ended. Using `malloc` in this case would be the traditional approach, but there are a variety of ways a programmer can control scope and lifetime and this library does not prescribe any specific strategy to managing memory when allocation is prohibited. For example compositions of allocating and non-allocating containers, see the `samples/`.
+Here, the container pushes stack allocated structs directly into the list. The container has not been given allocation permission so it assumes the memory it is given has the appropriate lifetime for the programmer's needs. When this function ends, that memory is invalid because its scope and lifetime has ended. Using `malloc` in this case would be the traditional approach, but there are a variety of ways a programmer can control scope and lifetime. This library does not prescribe any specific strategy to managing memory when allocation is prohibited. For example compositions of allocating and non-allocating containers, see the `samples/`.
 
 ### No `container_of` Macros
 
@@ -171,9 +171,9 @@ struct id *front = list_entry(list_front(&id_list), struct id, id_elem);
 bool id_less_compare(struct list_elem const *const a,
                      struct list_elem const *const b, void *const aux)
 {
-    struct id const *const a = list_entry(a, struct id, id_elem);
-    struct id const *const b = list_entry(b, struct id, id_elem);
-    return a->id < b->id;
+    struct id const *const a_ = list_entry(a, struct id, id_elem);
+    struct id const *const b_ = list_entry(b, struct id, id_elem);
+    return a_->id < b_->id;
 }
 ```
 
@@ -210,7 +210,7 @@ Composing multiple containers with this approach is also possible. Consider the 
 ```c
 struct dijkstra_vertex
 {
-    ccc_romap_elem elem;
+    ccc_romap_elem path_elem;
     ccc_pq_elem pq_elem;
     int dist;
     char cur_name;
@@ -218,8 +218,8 @@ struct dijkstra_vertex
 };
 /* ... Later Initialization After Memory is Prepared ... */
 ccc_realtime_ordered_map path_map = ccc_rom_init(
-    path_map, struct dijkstra_vertex, elem, cur_name,
-    dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
+    path_map, struct dijkstra_vertex, path_elem, cur_name, arena_alloc,
+    cmp_prev_vertices, &bump_arena);
 ccc_priority_queue costs_pq
     = ccc_pq_init(struct dijkstra_vertex, pq_elem, CCC_LES, NULL,
                   cmp_pq_costs, NULL);
@@ -227,6 +227,7 @@ ccc_priority_queue costs_pq
 while (!is_empty(&costs_pq))
 {
     struct dijkstra_vertex *current = front(&costs_pq);
+    (void)pop(&costs_pq);
     struct vertex *cur_v = vertex_at(graph, cur->cur_name);
     /* ... Check for Stopping Condition Then Continue ... */
     for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
@@ -321,9 +322,7 @@ word *w = or_insert(e, &default.e);
 
 Using the first method in your code may expand the code evaluated in different `_Generic` cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the `traits.h` header.
 
-## Design
-
-### Allocation
+## Allocation
 
 When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.
 
@@ -366,7 +365,7 @@ std_alloc(void *const ptr, size_t const size, void *)
 
 However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.
 
-#### Constructors
+### Constructors
 
 Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.
 
@@ -378,7 +377,7 @@ void *insert(container *c, container_elem *e);
 
 Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
 
-#### Destructors
+### Destructors
 
 For destructors, the argument is similar but the container does offer more help. If an action other than freeing the memory of a user type is needed upon removal, there are options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. One exception is the following interfaces.
 
