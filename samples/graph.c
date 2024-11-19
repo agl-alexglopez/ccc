@@ -67,7 +67,7 @@ same vertices as the "object" of their containers. They will share the same
 storage and live the same lifetime for the algorithm. */
 struct dijkstra_vertex
 {
-    ccc_romap_elem elem;
+    ccc_romap_elem path_elem;
     ccc_pq_elem pq_elem;
     int dist;
     char cur_name;
@@ -738,7 +738,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     /* The realtime ordered map and priority queue both have pointer stability
        and therefore can be safely composed together in the same struct. */
     ccc_realtime_ordered_map path_map = ccc_rom_init(
-        path_map, struct dijkstra_vertex, elem, cur_name,
+        path_map, struct dijkstra_vertex, path_elem, cur_name,
         dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
     ccc_priority_queue costs_pq = ccc_pq_init(
         struct dijkstra_vertex, pq_elem, CCC_LES, NULL, cmp_pq_costs, NULL);
@@ -751,8 +751,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     struct vertex *cur_v = NULL;
     while (!is_empty(&costs_pq))
     {
-        /* PQ entries are popped but the map will free the memory at
-           the end because it always holds a reference to its pq_elem. */
+        /* PQ entries are safely popped due to no allocation permission. */
         cur = front(&costs_pq);
         (void)pop(&costs_pq);
         cur_v = vertex_at(graph, cur->cur_name);
