@@ -10,13 +10,6 @@
 
 static size_t const start_capacity = 8;
 
-#define MIN(a, b)                                                              \
-    ({                                                                         \
-        size_t a_ = (a);                                                       \
-        size_t b_ = (b);                                                       \
-        a_ < b_ ? a_ : b_;                                                     \
-    })
-
 /*==========================    Prototypes    ===============================*/
 
 static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t);
@@ -37,6 +30,7 @@ static void *push_range(struct ccc_fdeq_ *fdeq, char const *pos, size_t n,
                         char const *elems);
 static void *alloc_front(struct ccc_fdeq_ *fdeq);
 static void *alloc_back(struct ccc_fdeq_ *fdeq);
+static size_t min(size_t a, size_t b);
 
 /*==========================     Interface    ===============================*/
 
@@ -352,7 +346,6 @@ ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *const fdeq)
 static inline void *
 alloc_front(struct ccc_fdeq_ *const fdeq)
 {
-    void *new_slot = NULL;
     bool const full = maybe_resize(fdeq, 0) != CCC_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
@@ -360,7 +353,7 @@ alloc_front(struct ccc_fdeq_ *const fdeq)
         return NULL;
     }
     fdeq->front_ = front_free_slot(fdeq->front_, ccc_buf_capacity(&fdeq->buf_));
-    new_slot = ccc_buf_at(&fdeq->buf_, fdeq->front_);
+    void *const new_slot = ccc_buf_at(&fdeq->buf_, fdeq->front_);
     if (!full)
     {
         (void)ccc_buf_size_plus(&fdeq->buf_, 1);
@@ -371,14 +364,13 @@ alloc_front(struct ccc_fdeq_ *const fdeq)
 static inline void *
 alloc_back(struct ccc_fdeq_ *const fdeq)
 {
-    void *new_slot = NULL;
     bool const full = maybe_resize(fdeq, 0) != CCC_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
         return NULL;
     }
-    new_slot = ccc_buf_at(&fdeq->buf_, back_free_slot(fdeq));
+    void *const new_slot = ccc_buf_at(&fdeq->buf_, back_free_slot(fdeq));
     /* If no reallocation policy is given we are a ring buffer. */
     if (full)
     {
@@ -413,7 +405,7 @@ push_back_range(struct ccc_fdeq_ *const fdeq, size_t const n, char const *elems)
     }
     size_t const new_size = ccc_buf_size(&fdeq->buf_) + n;
     size_t const back_slot = back_free_slot(fdeq);
-    size_t const chunk = MIN(n, cap - back_slot);
+    size_t const chunk = min(n, cap - back_slot);
     size_t const remainder_back_slot = (back_slot + chunk) % cap;
     size_t const remainder = (n - chunk);
     char const *const second_chunk = elems + (chunk * elem_sz);
@@ -427,7 +419,7 @@ push_back_range(struct ccc_fdeq_ *const fdeq, size_t const n, char const *elems)
     {
         fdeq->front_ = (fdeq->front_ + (new_size - cap)) % cap;
     }
-    (void)ccc_buf_size_set(&fdeq->buf_, MIN(cap, new_size));
+    (void)ccc_buf_size_set(&fdeq->buf_, min(cap, new_size));
     return CCC_OK;
 }
 
@@ -454,7 +446,7 @@ push_front_range(struct ccc_fdeq_ *const fdeq, size_t const n,
     }
     size_t const space_ahead = front_free_slot(fdeq->front_, cap) + 1;
     size_t const i = n > space_ahead ? 0 : space_ahead - n;
-    size_t const chunk = MIN(n, space_ahead);
+    size_t const chunk = min(n, space_ahead);
     size_t const remainder = (n - chunk);
     char const *const first_chunk = elems + ((n - chunk) * elem_sz);
     (void)memcpy(ccc_buf_at(&fdeq->buf_, i), first_chunk, chunk * elem_sz);
@@ -464,7 +456,7 @@ push_front_range(struct ccc_fdeq_ *const fdeq, size_t const n,
                      remainder * elem_sz);
     }
     (void)ccc_buf_size_set(&fdeq->buf_,
-                           MIN(cap, ccc_buf_size(&fdeq->buf_) + n));
+                           min(cap, ccc_buf_size(&fdeq->buf_) + n));
     fdeq->front_ = remainder ? cap - remainder : i;
     return CCC_OK;
 }
@@ -495,8 +487,8 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
     size_t const to_move = back > pos_i ? back - pos_i : cap - pos_i + back;
     size_t const move_i = (pos_i + n) % cap;
     size_t move_chunk = move_i + to_move > cap ? cap - move_i : to_move;
-    move_chunk = back < pos_i ? MIN(cap - pos_i, move_chunk)
-                              : MIN(back - pos_i, move_chunk);
+    move_chunk = back < pos_i ? min(cap - pos_i, move_chunk)
+                              : min(back - pos_i, move_chunk);
     size_t const move_remain = to_move - move_chunk;
     (void)memmove(ccc_buf_at(&fdeq->buf_, move_i),
                   ccc_buf_at(&fdeq->buf_, pos_i), move_chunk * elem_sz);
@@ -508,7 +500,7 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
                       ccc_buf_at(&fdeq->buf_, remaining_start_i),
                       move_remain * elem_sz);
     }
-    size_t const elems_chunk = MIN(n, cap - pos_i);
+    size_t const elems_chunk = min(n, cap - pos_i);
     size_t const elems_remain = n - elems_chunk;
     (void)memcpy(ccc_buf_at(&fdeq->buf_, pos_i), elems, elems_chunk * elem_sz);
     if (elems_remain)
@@ -536,7 +528,7 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
             fdeq->front_ = (fdeq->front_ + excess) % cap;
         }
     }
-    (void)ccc_buf_size_set(&fdeq->buf_, MIN(cap, new_size));
+    (void)ccc_buf_size_set(&fdeq->buf_, min(cap, new_size));
     return ccc_buf_at(&fdeq->buf_, pos_i);
 }
 
@@ -565,7 +557,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     }
     if (ccc_buf_size(&q->buf_))
     {
-        size_t const first_chunk = MIN(ccc_buf_size(&q->buf_),
+        size_t const first_chunk = min(ccc_buf_size(&q->buf_),
                                        ccc_buf_capacity(&q->buf_) - q->front_);
         (void)memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_),
                      elem_sz * first_chunk);
@@ -616,15 +608,15 @@ at(struct ccc_fdeq_ const *const fdeq, size_t const i)
 }
 
 size_t
-increment(struct ccc_fdeq_ const *const fdeq, size_t i)
+increment(struct ccc_fdeq_ const *const fdeq, size_t const i)
 {
-    return i == (ccc_buf_capacity(&fdeq->buf_) - 1) ? 0 : ++i;
+    return i == (ccc_buf_capacity(&fdeq->buf_) - 1) ? 0 : i + 1;
 }
 
 size_t
-decrement(struct ccc_fdeq_ const *const fdeq, size_t i)
+decrement(struct ccc_fdeq_ const *const fdeq, size_t const i)
 {
-    return i ? --i : ccc_buf_capacity(&fdeq->buf_) - 1;
+    return i ? i - 1 : ccc_buf_capacity(&fdeq->buf_) - 1;
 }
 
 static inline size_t
@@ -646,4 +638,10 @@ last_elem_index(struct ccc_fdeq_ const *const fdeq)
 {
     return (fdeq->front_ + (ccc_buf_size(&fdeq->buf_) - 1))
            % ccc_buf_capacity(&fdeq->buf_);
+}
+
+static inline size_t
+min(size_t const a, size_t const b)
+{
+    return a < b ? a : b;
 }
