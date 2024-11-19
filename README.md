@@ -537,7 +537,7 @@ main(void)
     ccc_flat_double_ended_queue q = ccc_fdeq_init((int[2]){}, NULL, NULL, 2);
     (void)ccc_fdeq_push_back(&q, &(int){3});
     (void)ccc_fdeq_push_front(&q, &(int){2});
-    (void)ccc_fdeq_push_back(&q, &(int){1});
+    (void)ccc_fdeq_push_back(&q, &(int){1}); /* Overwrite 2. */
     int *i = ccc_fdeq_front(&q);
     assert(*i == 3);
     i = ccc_fdeq_back(&q);
