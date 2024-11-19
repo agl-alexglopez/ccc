@@ -173,7 +173,7 @@ struct id *front = list_entry(list_front(&id_list), struct id, id_elem);
 /* Or when writing a comparison callback. */
 bool
 is_id_a_less(struct list_elem const *const a,
-                  struct list_elem const *const b, void *const aux)
+             struct list_elem const *const b, void *const aux)
 {
     struct id const *const a_ = list_entry(a, struct id, id_elem);
     struct id const *const b_ = list_entry(b, struct id, id_elem);
