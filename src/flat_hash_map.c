@@ -1,3 +1,11 @@
+/** This implementation is a placeholder. It is a somewhat naive Robin Hood
+hash table. It caches the hash values for efficient resizing and faster
+comparison before being forced to call user comparison callback. However,
+these days such a hash table is not up to the standards set by Abseil's hash
+table from Google. SSSE/SIMD is the way these days and I'd be willing to give
+it a shot. A pointer stable hash table might be nice if you can ensure the
+user elements don't move if the table does not resize. Now elements are swapped
+often. */
 #include "flat_hash_map.h"
 #include "buffer.h"
 #include "impl/impl_flat_hash_map.h"
@@ -10,6 +18,8 @@
 #include <stdint.h>
 #include <string.h>
 
+/* Placeholder until real hash map is implemented with more robust features
+and heuristics. */
 static double const load_factor = 0.8;
 static size_t const default_prime = 11;
 static size_t const last_swap_slot = 1;
