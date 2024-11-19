@@ -80,7 +80,7 @@ ccc_flat_priority_queue fpq
 
 ```
 
-Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
+Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and non auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
 
 ```c
 ccc_flat_priority_queue fpq
@@ -123,15 +123,18 @@ ccc_doubly_linked_list dll
 All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs.
 
 ```c
-/* WARNING: THIS IS A BAD IDEA FOR DEMONSTRATION PURPOSES! */
+/* !WARNING: THIS IS A BAD IDEA FOR DEMONSTRATION PURPOSES! */
 void push_three(ccc_doubly_linked_list *const dll)
 {
     struct id_val v0 = {};
-    push_back(dll, &v0.e);
+    struct id_val *v = push_back(dll, &v0.e);
+    assert(v == &v0);
     struct id_val v1 = {.id = 1, .val = 1};
-    push_back(dll, &v1.e);
+    v = push_back(dll, &v1.e);
+    assert(v == &v1);
     struct id_val v2 = {.id = 2, .val = 2};
-    push_back(dll, &v2.e);
+    v = push_back(dll, &v2.e);
+    assert(v == &v2);
 }
 ```
 
@@ -249,7 +252,7 @@ One conceptual element, a `dijkstra_vertex`, is part of two containers, a map an
 
 ### Rust's Entry Interface
 
-Rust has solid interfaces for their associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers inspired by the Entry Interface are as follows (found in `ccc/traits.h` but specific behavior and parameters can be read in each container's header).
+Rust has solid interfaces for associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in `ccc/traits.h` but specific names, behaviors, and parameters can be read in each container's header).
 
 - `ccc_entry(container_ptr, key_ptr...)` - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.
 - `ccc_and_modify(entry_ptr, mod_fn)` - Modify an occupied entry with a callback.
@@ -301,6 +304,7 @@ typedef struct
     int cnt;
     fomap_elem e;
 } word;
+/* ... Generate offset (ofs). */
 word default = {.str_arena_offset = ofs, .cnt = 1};
 word *w = or_insert(and_modify(entry_r(&fom, &ofs), increment), &default.e);
 ```
@@ -314,6 +318,7 @@ typedef struct
     int cnt;
     fomap_elem e;
 } word;
+/* ... Generate offset (ofs). */
 word default = {.str_arena_offset = ofs, .cnt = 1};
 fomap_entry *e = entry_r(&fom, &ofs);
 e = and_modify(e, increment)
