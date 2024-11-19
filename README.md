@@ -171,8 +171,9 @@ static struct list id_list = LIST_INIT(id_list);
 /* ...  */
 struct id *front = list_entry(list_front(&id_list), struct id, id_elem);
 /* Or when writing a comparison callback. */
-bool id_less_compare(struct list_elem const *const a,
-                     struct list_elem const *const b, void *const aux)
+bool
+is_id_a_less(struct list_elem const *const a,
+                  struct list_elem const *const b, void *const aux)
 {
     struct id const *const a_ = list_entry(a, struct id, id_elem);
     struct id const *const b_ = list_entry(b, struct id, id_elem);
@@ -198,7 +199,8 @@ struct id *front = ccc_dll_front(&id_list);
 struct id *new_id = generate_id();
 struct id *new_front = ccc_dll_push_front(&id_list, &new_id->id_elem);
 /* Or when writing a comparison callback. */
-ccc_threeway_cmp id_cmp(ccc_cmp const cmp)
+ccc_threeway_cmp
+id_cmp(ccc_cmp const cmp)
 {
     struct id const *const lhs = cmp.user_type_lhs;
     struct id const *const rhs = cmp.user_type_rhs;
