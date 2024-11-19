@@ -21,10 +21,8 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 
 ## Containers
 
-Currently on offer:
-
-- buffer.h
-- doubly_linked_list.h
+- buffer.h ([buffer snippet](#buffer))
+- doubly_linked_list.h ([doubly_linked_list snippet](#doubly-linked-list))
 - flat_double_ended_queue.h
 - flat_hash_map.h
 - flat_ordered_map.h
@@ -457,3 +455,69 @@ If these containers do not fit your needs, here are some excellent data structur
 - [STC - Smart Template Containers](https://github.com/stclib/STC)
 - [C Template Library (CTL)](https://github.com/glouw/ctl)
 - [CC: Convenient Containers](https://github.com/JacksonAllan/CC)
+
+## Buffer
+
+A fixed or dynamic contiguous array of a single user defined type.
+
+```c
+#include "ccc/buffer.h"
+
+#include <assert.h>
+
+int
+main(void)
+{
+    /* stack array, no allocation permission, no aux data, capacity 5 */
+    ccc_buffer b = ccc_buf_init((int[5]){}, NULL, NULL, 5);
+    (void)ccc_buf_push_back(&b, &(int){3});
+    (void)ccc_buf_push_back(&b, &(int){2});
+    (void)ccc_buf_push_back(&b, &(int){1});
+    (void)ccc_buf_pop_back(&b);
+    int *i = ccc_buf_back(&b);
+    assert(*i == 2);
+    return 0;
+}
+```
+
+## Doubly Linked List
+
+A dynamic container for efficient insertion and removal at any position.
+
+```c
+#include "ccc/doubly_linked_list.h"
+
+#include <assert.h>
+
+struct int_elem
+{
+    int i;
+    ccc_dll_elem e;
+};
+
+static ccc_threeway_cmp
+int_cmp(ccc_cmp const cmp)
+{
+    struct int_elem const *const lhs = cmp.user_type_lhs;
+    struct int_elem const *const rhs = cmp.user_type_rhs;
+    return (lhs->i > rhs->i) - (lhs->i < rhs->i);
+}
+
+int
+main(void)
+{
+    /* doubly linked list l, list elem field e, no allocation permission,
+       comparing integers, no auxiliary data. */
+    ccc_doubly_linked_list l
+        = ccc_dll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
+    struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
+    (void)ccc_dll_push_back(&l, &elems[0].e);
+    (void)ccc_dll_push_front(&l, &elems[1].e);
+    (void)ccc_dll_push_back(&l, &elems[2].e);
+    (void)ccc_dll_pop_back(&l);
+    struct int_elem *e = ccc_dll_back(&l);
+    assert(e->i == 3);
+    return 0;
+}
+```
+
