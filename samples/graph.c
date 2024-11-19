@@ -140,7 +140,7 @@ struct edge
    access to vertices. */
 static struct vertex network[MAX_VERTICES];
 
-/* Go to the box drawing unicode character wikipedia page to change styles. */
+/* Go to the box drawing Unicode character Wikipedia page to change styles. */
 static char const *paths[] = {
     "●", "╵", "╶", "╰", "╷", "│", "╭", "├",
     "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼",
