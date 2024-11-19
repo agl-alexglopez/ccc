@@ -16,6 +16,25 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_three)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite)
+{
+    flat_double_ended_queue q = fdeq_init((int[2]){}, NULL, NULL, 2);
+    (void)ccc_fdeq_push_back(&q, &(int){3});
+    CHECK(*(int *)ccc_fdeq_back(&q), 3);
+    (void)ccc_fdeq_push_front(&q, &(int){2});
+    CHECK(*(int *)ccc_fdeq_front(&q), 2);
+    CHECK(*(int *)ccc_fdeq_back(&q), 3);
+    (void)ccc_fdeq_push_back(&q, &(int){1});
+    CHECK(*(int *)ccc_fdeq_back(&q), 1);
+    CHECK(*(int *)ccc_fdeq_front(&q), 3);
+    (void)ccc_fdeq_pop_back(&q);
+    int *i = ccc_fdeq_back(&q);
+    CHECK(*i, 3);
+    i = ccc_fdeq_front(&q);
+    CHECK(*i, 3);
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
@@ -129,8 +148,8 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges)
 int
 main()
 {
-    return CHECK_RUN(fdeq_test_insert_three(),
-                     fdeq_test_insert_overwrite_three(),
-                     fdeq_test_push_back_ranges(),
-                     fdeq_test_push_front_ranges(), fdeq_test_insert_ranges());
+    return CHECK_RUN(
+        fdeq_test_insert_three(), fdeq_test_insert_overwrite_three(),
+        fdeq_test_push_back_ranges(), fdeq_test_push_front_ranges(),
+        fdeq_test_insert_ranges(), fdeq_test_insert_overwrite());
 }
