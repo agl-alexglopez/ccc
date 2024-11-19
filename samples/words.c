@@ -178,7 +178,7 @@ main(int argc, char *argv[])
 {
     if (argc == 2 && sv_starts_with(sv(argv[1]), SV("-h")))
     {
-        sv_print( stdout, directions);
+        sv_print(stdout, directions);
         return 0;
     }
     if (argc < 3)
