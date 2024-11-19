@@ -461,20 +461,22 @@ If these containers do not fit your needs, here are some excellent data structur
 A fixed or dynamic contiguous array of a single user defined type.
 
 ```c
-#include "ccc/buffer.h"
-
 #include <assert.h>
+#define BUFFER_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/buffer.h"
+#include "ccc/traits.h"
 
 int
 main(void)
 {
     /* stack array, no allocation permission, no aux data, capacity 5 */
-    ccc_buffer b = ccc_buf_init((int[5]){}, NULL, NULL, 5);
-    (void)ccc_buf_push_back(&b, &(int){3});
-    (void)ccc_buf_push_back(&b, &(int){2});
-    (void)ccc_buf_push_back(&b, &(int){1});
-    (void)ccc_buf_pop_back(&b);
-    int *i = ccc_buf_back(&b);
+    buffer b = buf_init((int[5]){}, NULL, NULL, 5);
+    (void)push_back(&b, &(int){3});
+    (void)push_back(&b, &(int){2});
+    (void)push_back(&b, &(int){1});
+    (void)pop_back(&b);
+    int *i = back(&b);
     assert(*i == 2);
     return 0;
 }
@@ -485,14 +487,16 @@ main(void)
 A dynamic container for efficient insertion and removal at any position.
 
 ```c
-#include "ccc/doubly_linked_list.h"
-
 #include <assert.h>
+#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/doubly_linked_list.h"
+#include "ccc/traits.h"
 
 struct int_elem
 {
     int i;
-    ccc_dll_elem e;
+    dll_elem e;
 };
 
 static ccc_threeway_cmp
@@ -508,14 +512,13 @@ main(void)
 {
     /* doubly linked list l, list elem field e, no allocation permission,
        comparing integers, no auxiliary data. */
-    ccc_doubly_linked_list l
-        = ccc_dll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
+    doubly_linked_list l = dll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
     struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
-    (void)ccc_dll_push_back(&l, &elems[0].e);
-    (void)ccc_dll_push_front(&l, &elems[1].e);
-    (void)ccc_dll_push_back(&l, &elems[2].e);
-    (void)ccc_dll_pop_back(&l);
-    struct int_elem *e = ccc_dll_back(&l);
+    (void)push_back(&l, &elems[0].e);
+    (void)push_front(&l, &elems[1].e);
+    (void)push_back(&l, &elems[2].e);
+    (void)pop_back(&l);
+    struct int_elem *e = back(&l);
     assert(e->i == 3);
     return 0;
 }
@@ -526,26 +529,28 @@ main(void)
 A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.
 
 ```c
-#include "ccc/flat_double_ended_queue.h"
-
 #include <assert.h>
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/flat_double_ended_queue.h"
+#include "ccc/traits.h"
 
 int
 main(void)
 {
     /* stack array, no allocation permission, no aux data, capacity 2 */
-    ccc_flat_double_ended_queue q = ccc_fdeq_init((int[2]){}, NULL, NULL, 2);
-    (void)ccc_fdeq_push_back(&q, &(int){3});
-    (void)ccc_fdeq_push_front(&q, &(int){2});
-    (void)ccc_fdeq_push_back(&q, &(int){1}); /* Overwrite 2. */
-    int *i = ccc_fdeq_front(&q);
+    flat_double_ended_queue q = fdeq_init((int[2]){}, NULL, NULL, 2);
+    (void)push_back(&q, &(int){3});
+    (void)push_front(&q, &(int){2});
+    (void)push_back(&q, &(int){1}); /* Overwrite 2. */
+    int *i = front(&q);
     assert(*i == 3);
-    i = ccc_fdeq_back(&q);
+    i = back(&q);
     assert(*i == 1);
-    (void)ccc_fdeq_pop_back(&q);
-    i = ccc_fdeq_back(&q);
+    (void)pop_back(&q);
+    i = back(&q);
     assert(*i == 3);
-    i = ccc_fdeq_front(&q);
+    i = front(&q);
     assert(*i == 3);
     return 0;
 }
