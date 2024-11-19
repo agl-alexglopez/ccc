@@ -178,7 +178,7 @@ main(int argc, char *argv[])
 {
     if (argc == 2 && sv_starts_with(sv(argv[1]), SV("-h")))
     {
-        sv_print( stdout, directions);
+        sv_print(stdout, directions);
         return 0;
     }
     if (argc < 3)
@@ -245,7 +245,7 @@ main(int argc, char *argv[])
             QUIT_MSG(stderr, "unrecognized argument: %s\n", sv_begin(sv_arg));
         }
     }
-    FILE *f = open_file(exe.file);
+    FILE *const f = open_file(exe.file);
     if (!f)
     {
         (void)fprintf(stderr, "error opening: %s\n", exe.file.s);
