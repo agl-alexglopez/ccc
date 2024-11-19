@@ -80,7 +80,7 @@ ccc_flat_priority_queue fpq
 
 ```
 
-Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and non auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
+Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
 
 ```c
 ccc_flat_priority_queue fpq
