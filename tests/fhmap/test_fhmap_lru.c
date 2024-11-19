@@ -18,18 +18,18 @@ The leetcode lru problem in C. */
 
 #define REQS 11
 
-struct key_val
-{
-    int key;
-    int val;
-    dll_elem list_elem;
-};
-
 struct lru_cache
 {
     ccc_flat_hash_map fh;
     ccc_doubly_linked_list l;
     size_t cap;
+};
+
+struct key_val
+{
+    int key;
+    int val;
+    dll_elem list_elem;
 };
 
 struct lru_lookup

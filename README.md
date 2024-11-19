@@ -19,43 +19,313 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 - Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
 - Read about generic [traits.h](https://agl-alexglopez.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
 
+## Containers
+
+Currently on offer:
+
+- buffer.h
+- doubly_linked_list.h
+- flat_double_ended_queue.h
+- flat_hash_map.h
+- flat_ordered_map.h
+- flat_priority_queue.h
+- flat_realtime_ordered_map.h
+- ordered_map.h
+- ordered_multimap.h
+- priority_queue.h
+- realtime_ordered_map.h
+- singly_linked_list.h
+
 ## Features
 
 - Intrusive and non-intrusive containers.
-- No `container_of` macro required of the user to get to their type after a function call.
 - Non-allocating container options.
+- No `container_of` macro required of the user to get to their type after a function call.
 - Rust's Entry API for associative containers with C and C++ influences.
-- Container Traits implemented with C `_Generic` capabilities.
 - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
+- Container Traits implemented with C `_Generic` capabilities.
 
-## Design
+### Intrusive and Non-Intrusive Containers
 
-### Motivations
-
-**Containers in C should avoid limiting the control and flexibility offered by the C language.**
-
-There are many excellent data structure libraries in C (see the [related](#related) section of this document). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.
-
-The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer a more literal definition of a data structure; they structure the data they are given according to the container's invariants with no memory related side effects.
-
-If people are using C today, in the face of many other modern and safety-minded languages, they should benefit from all the language can provide, even when incorporating a third-party library. This means that they can manage all their memory as they see fit and these containers simply structure it when and how the programmer requires. This design style is not unique. Non-allocating intrusive containers are common in operating system kernel development (search for the Linux Kernel doubly linked list or rbtree as canonical examples). Embedded developers also stand to benefit from this design. However, I think that all applications can benefit from thinking more carefully about their memory in C.
-
-While not all containers require the user accommodate intrusive elements, when they do it looks like this.
+Currently, all associative containers ask the user to stored an element in their type. This means wrapping an element in a struct such as this type found in `samples/graph.c` for the flat hash map.
 
 ```c
-struct key_val
+struct path_backtrack_cell
 {
-    container_elem elem;
-    int key;
-    int val;
+    ccc_fhmap_elem elem;
+    struct point current;
+    struct point parent;
 };
 ```
 
-The handle to the container element is then passed by reference to all functions that require it.
+The interface may then ask for a handle to this type for certain operations. For example, a flat hash map we have the following interface for `try_insert`.
+
+```c
+ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
+                             ccc_fhmap_elem *key_val_handle);
+```
+
+Here, the user is trying to insert a new key and value into the hash map which in the above example would be a `struct path_backtrack_cell` with the `current` and `parent` fields set appropriately.
+
+Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
+
+```c
+#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
+    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
+
+/* For example: */
+
+ccc_flat_priority_queue fpq
+    = ccc_fpq_init((int[40]){}, 40, CCC_LES, NULL, int_cmp, NULL);
+
+```
+
+Here a small min flat priority queue of integers with a maximum capacity of 40 has been allocated on the stack. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function.
+
+```c
+ccc_flat_priority_queue fpq
+    = ccc_fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+```
+
+Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.
+
+```c
+void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e);
+```
+
+The element `e` here is just a generic reference to whatever type the user stores in the container.
+
+### Non-Allocating Containers
+
+As was mentioned in the previous section, all containers can be forbidden from allocating memory. In the flat priority queue example we had this initialization.
+
+```c
+ccc_flat_priority_queue fpq
+    = ccc_fpq_init((int[40]){}, 40, CCC_LES, NULL, int_cmp, NULL);
+```
+
+For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used.
+
+For non-flat containers that can't assume they are stored contiguously in memory, the initialization looks like this when allocation is prohibited.
+
+```c
+struct id_val
+{
+    ccc_dll_elem e;
+    int id;
+    int val;
+};
+
+ccc_doubly_linked_list dll
+    = ccc_dll_init(dll, struct id_val, e, NULL, val_cmp, NULL);
+```
+
+All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs.
+
+```c
+/* WARNING: THIS IS A BAD IDEA FOR DEMONSTRATION PURPOSES! */
+void push_three(ccc_doubly_linked_list *const dll)
+{
+    struct id_val v0 = {};
+    push_back(dll, &v0.e);
+    struct id_val v1 = {.id = 1, .val = 1};
+    push_back(dll, &v1.e);
+    struct id_val v2 = {.id = 2, .val = 2};
+    push_back(dll, &v2.e);
+}
+```
+
+Here, the container pushes stack allocated structs directly into the list. The container has not been given allocation permission so it assumes the memory it is given has the appropriate lifetime for the programmer's needs. When this function ends, that memory is invalid because its scope and lifetime has ended. Using `malloc` in this case would be the traditional approach, but there are a variety of ways a programmer can control scope and lifetime and this library does not prescribe any specific strategy to managing memory when allocation is prohibited. For example compositions of allocating and non-allocating containers, see the `samples/`.
+
+### No `container_of` Macros
+
+Traditionally, intrusive containers provide the following macro.
+
+```c
+/**
+ * list_entry - get the struct for this entry
+ * @ptr:	the &struct list_elem pointer.
+ * @type:	the type of the struct this is embedded in.
+ * @member:	the name of the list_head within the struct.
+ */
+#define list_entry(ptr, type, member) \
+	container_of(ptr, type, member)
+
+/* A provided function by the container. */
+struct list_elem *list_front(list *l);
+```
+
+Then, the user code looks like this.
+
+```c
+struct id
+{
+    int id;
+    struct list_elem id_elem;
+};
+/* ...  */
+static struct list id_list = LIST_INIT(id_list);
+/* ...  */
+struct id *front = list_entry(list_front(&id_list), struct id, id_elem);
+/* Or when writing a comparison callback. */
+bool id_less_compare(struct list_elem const *const a,
+                     struct list_elem const *const b, void *const aux)
+{
+    struct id const *const a = list_entry(a, struct id, id_elem);
+    struct id const *const b = list_entry(b, struct id, id_elem);
+    return a->id < b->id;
+}
+```
+
+Here, it may seem manageable to use such a macro, but it is required at every location in the code where the user type is needed. The opportunity for bugs in entering the type or field name grows the more the macro is used. It is better to take care of this step for the user and present a cleaner interface.
+
+Here is the same list example in the C Container Collection.
+
+```c
+struct id
+{
+    int id;
+    ccc_dll_elem id_elem;
+};
+/* ... */
+static ccc_doubly_linked_list id_list
+    = ccc_dll_init(id_list, struct id, id_elem, NULL, id_cmp, NULL);
+/* ... */
+struct id *front = ccc_dll_front(&id_list);
+struct id *new_id = generate_id();
+struct id *new_front = ccc_dll_push_front(&id_list, &new_id->id_elem);
+/* Or when writing a comparison callback. */
+ccc_threeway_cmp id_cmp(ccc_cmp const cmp)
+{
+    struct id const *const lhs = cmp.user_type_lhs;
+    struct id const *const rhs = cmp.user_type_rhs;
+    return (lhs->id > rhs->id) - (lhs->id < rhs->id);
+}
+```
+
+Internally the containers will remember the offsets of the provided elements within the user struct wrapping the intruder. Then, the contract of the interface is simpler: provide a handle to the container and receive your type in return. The user takes on less complexity overall by providing a slightly more detailed initialization.
+
+Composing multiple containers with this approach is also possible. Consider the following struct from `samples/graph.c` used to run Dijkstra's algorithm.
+
+```c
+struct dijkstra_vertex
+{
+    ccc_romap_elem elem;
+    ccc_pq_elem pq_elem;
+    int dist;
+    char cur_name;
+    char prev_name;
+};
+/* ... Later Initialization After Memory is Prepared ... */
+ccc_realtime_ordered_map path_map = ccc_rom_init(
+    path_map, struct dijkstra_vertex, elem, cur_name,
+    dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
+ccc_priority_queue costs_pq
+    = ccc_pq_init(struct dijkstra_vertex, pq_elem, CCC_LES, NULL,
+                  cmp_pq_costs, NULL);
+/*... Steps to Prepare to Run the Algorithm ...*/
+while (!is_empty(&costs_pq))
+{
+    struct dijkstra_vertex *current = front(&costs_pq);
+    struct vertex *cur_v = vertex_at(graph, cur->cur_name);
+    /* ... Check for Stopping Condition Then Continue ... */
+    for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
+    {
+        struct dijkstra_vertex *next
+            = get_key_val(&path_map, &cur_v->edges[i].name);
+        int alt = cur->dist + cur_v->edges[i].cost;
+        if (alt < next->dist)
+        {
+            next->prev_name = cur->cur_name;
+            decrease(&costs_pq, &next->pq_elem, pq_update_dist, &alt);
+        }
+    }
+}
+/* ... Rebuild Shortest Path etc... */
+```
+
+One conceptual element, a `dijkstra_vertex`, is part of two containers, a map and a priority queue. The priority queue piggy backs of the memory controlled by the map so that we always have access to all vertices while the algorithm runs. An already complex algorithm is not cluttered by further steps to accommodate macros.
+
+### Rust's Entry Interface
+
+Rust has solid interfaces for their associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers inspired by the Entry Interface are as follows (found in `ccc/traits.h` but specific behavior and parameters can be read in each container's header).
+
+- `ccc_entry(container_ptr, key_ptr...)` - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.
+- `ccc_and_modify(entry_ptr, mod_fn)` - Modify an occupied entry with a callback.
+- `ccc_and_modify_aux(entry_ptr, mod_fn, aux_args)` - Modify an Occupied entry with a callback that requires auxiliary data.
+- `ccc_or_insert(entry_ptr, or_insert_args)` - Insert a default key value if Vacant or return the Occupied entry.
+- `ccc_insert_entry(entry_ptr, insert_entry_args)` - Invariantly insert a new key value, overwriting an Occupied entry if needed.
+- `ccc_remove_entry(entry_ptr)` - Remove an Occupied entry from the container or do nothing.
+
+Other Rust Interface functions like `get_key_val`, `insert`, and `remove` are included and can provide information about previous values stored in the container.
+
+Each container offers it's own C version of "closures" for the `and_modify_w` macro, short for and modify "with". Here is an example from the `samples/words.c` program.
+
+- `and_modify_w(flat_ordered_map_entry_ptr, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
+
+```c
+typedef struct
+{
+    str_ofs str_arena_offset;
+    int cnt;
+    fomap_elem e;
+} word;
+/* Increment a found word or insert a default count of 1. */
+word *w =
+fom_or_insert_w(
+    fom_and_modify_w(entry_r(&fom, &ofs), word, { T->cnt++; }),
+    (word){.str_arena_offset = ofs, .cnt = 1}
+);
+```
+
+This is possible because of the details discussed in the previous section. Containers can always provide the user type stored in the container directly. However, there are other options to achieve the same result.
+
+Some C++ associative container interfaces have also been adapted to the Entry Interface.
+
+- `ccc_try_insert(container_ptr, try_insert_args)` - Inserts a new element if none was present and reports if a previous entry existed.
+- `ccc_insert_or_assign(container_ptr, insert_or_assign_args)` - Inserts a new element invariantly and reports if a previous entry existed.
+
+Many other containers fall back to C++ style interfaces when it makes sense to do so.
+
+### Traits
+
+Traits, found in `ccc/traits.h`, offer a more succinct way to use shared functionality across containers. Instead of calling `ccc_fhm_entry` when trying to obtain an entry from a flat hash map, one can simply call `entry`. Traits utilize `_Generic` in C to choose the correct container function based on parameters provided.
+
+Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.
+
+```c
+typedef struct
+{
+    str_ofs str_arena_offset;
+    int cnt;
+    fomap_elem e;
+} word;
+word default = {.str_arena_offset = ofs, .cnt = 1};
+word *w = or_insert(and_modify(entry_r(&fom, &ofs), increment), &default.e);
+```
+
+Or the following.
+
+```c
+typedef struct
+{
+    str_ofs str_arena_offset;
+    int cnt;
+    fomap_elem e;
+} word;
+word default = {.str_arena_offset = ofs, .cnt = 1};
+fomap_entry *e = entry_r(&fom, &ofs);
+e = and_modify(e, increment)
+word *w = or_insert(e, &default.e);
+```
+
+Using the first method in your code may expand the code evaluated in different `_Generic` cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the `traits.h` header.
+
+## Design
 
 ### Allocation
 
-To support the previously mentioned design motivations, when allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.
+When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.
 
 ```c
 typedef void *ccc_alloc_fn(void *ptr, size_t size, void *aux);
