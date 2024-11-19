@@ -342,10 +342,10 @@ Typedefs</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>T is a reference to the user type stored in the entry guaranteed to be non-NULL if the closure executes.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
-<div class="line">om_entry *e = om_and_modify_w(entry_r(&amp;m, &amp;k), word, T-&gt;cnt++;);</div>
+<div class="line">om_entry *e = om_and_modify_w(entry_r(&amp;om, &amp;k), word, T-&gt;cnt++;);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
-<div class="line">word *w = om_or_insert_w(om_and_modify_w(entry_r(&amp;m, &amp;k), word,</div>
+<div class="line">word *w = om_or_insert_w(om_and_modify_w(entry_r(&amp;om, &amp;k), word,</div>
 <div class="line">                                         { T-&gt;cnt++; }),</div>
 <div class="line">                         (word){.key = k, .cnt = 1});</div>
 </div><!-- fragment --><p>Note that any code written is only evaluated if the entry is Occupied and the container can deliver the user type T. This means any function calls are lazily evaluated in the closure scope. </p>
