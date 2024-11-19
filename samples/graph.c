@@ -61,7 +61,11 @@ struct parent_cell
     ccc_fhmap_elem elem;
 };
 
-struct prev_vertex
+/** Containers can easily share the same storage location for their elements.
+Dijkstra runs the parent map to rebuild the path and priority queue with the
+same vertices as the "object" of their containers. They will share the same
+storage and live the same lifetime for the algorithm. */
+struct dijkstra_vertex
 {
     ccc_romap_elem elem;
     ccc_pq_elem pq_elem;
@@ -70,9 +74,11 @@ struct prev_vertex
     char prev_name;
 };
 
-struct prev_vertex_arena
+/** In running Dijkstra, we can allocate all needed nodes upfront so we only
+have one allocation and one free from the heaps perspective. */
+struct dijkstra_vertex_arena
 {
-    struct prev_vertex *vertices;
+    struct dijkstra_vertex *vertices;
     size_t next_free;
     size_t capacity;
 };
@@ -281,7 +287,7 @@ static void help(void);
 static ccc_threeway_cmp cmp_pq_dist_points(ccc_cmp);
 static ccc_threeway_cmp cmp_prev_vertices(ccc_key_cmp cmp);
 
-static void *prev_vertex_arena_alloc(void *ptr, size_t size, void *aux);
+static void *dijkstra_vertex_arena_alloc(void *ptr, size_t size, void *aux);
 static bool eq_parent_cells(ccc_key_cmp);
 static uint64_t hash_parent_cells(ccc_user_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
@@ -723,24 +729,25 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
        but also part of a parent chaining map to rebuild the shortest path.
        We can keep all of the distances, names, and parents tightly packed in
        one struct and keep these structs tightly packed in a bump allocator. */
-    struct prev_vertex_arena bump_arena
-        = {.vertices = malloc(sizeof(struct prev_vertex) * graph->vertices),
+    struct dijkstra_vertex_arena bump_arena
+        = {.vertices = malloc(sizeof(struct dijkstra_vertex) * graph->vertices),
            .next_free = 0,
            .capacity = graph->vertices};
     prog_assert(bump_arena.vertices);
     /* The realtime ordered map and priority queue both have pointer stability
        and therefore can be safely composed together in the same struct. */
-    ccc_realtime_ordered_map prev_map
-        = ccc_rom_init(prev_map, struct prev_vertex, elem, cur_name,
-                       prev_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
-    ccc_priority_queue dist_q = ccc_pq_init(
-        struct prev_vertex, pq_elem, CCC_LES, NULL, cmp_pq_dist_points, NULL);
+    ccc_realtime_ordered_map prev_map = ccc_rom_init(
+        prev_map, struct dijkstra_vertex, elem, cur_name,
+        dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
+    ccc_priority_queue dist_q
+        = ccc_pq_init(struct dijkstra_vertex, pq_elem, CCC_LES, NULL,
+                      cmp_pq_dist_points, NULL);
     /* The lifetime of elements in the map and priority queue are identical.
        We don't have to worry about removing one before the other. All stay
        in the map and priority queue for the entirety of the algorithm. */
     prepare_vertices(graph, &dist_q, &prev_map, &pr);
     bool success = false;
-    struct prev_vertex *cur = NULL;
+    struct dijkstra_vertex *cur = NULL;
     struct vertex *cur_v = NULL;
     while (!is_empty(&dist_q))
     {
@@ -756,7 +763,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         }
         for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
         {
-            struct prev_vertex *next
+            struct dijkstra_vertex *next
                 = get_key_val(&prev_map, &cur_v->edges[i].name);
             prog_assert(next);
             /* The seen map also holds a pointer to the corresponding
@@ -776,7 +783,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     }
     if (success)
     {
-        struct prev_vertex const *prev = get_key_val(&prev_map, &cur_v->name);
+        struct dijkstra_vertex const *prev
+            = get_key_val(&prev_map, &cur_v->name);
         prog_assert(prev);
         while (prev->prev_name)
         {
@@ -801,9 +809,9 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
          ++count, ++name)
     {
         struct vertex *v = vertex_at(graph, (char)name);
-        struct prev_vertex *const inserted
+        struct dijkstra_vertex *const inserted
             = ccc_rom_or_insert_w(entry_r(prev_map, &name),
-                                  (struct prev_vertex){
+                                  (struct dijkstra_vertex){
                                       .cur_name = (char)name,
                                       .dist = v->name == pr->src ? 0 : INT_MAX,
                                       .prev_name = '\0',
@@ -1081,7 +1089,7 @@ build_path_outline(struct graph *graph)
 /*====================    Data Structure Helpers    =========================*/
 
 static void *
-prev_vertex_arena_alloc(void *const ptr, size_t const size, void *const aux)
+dijkstra_vertex_arena_alloc(void *const ptr, size_t const size, void *const aux)
 {
     if (!ptr && !size)
     {
@@ -1089,7 +1097,7 @@ prev_vertex_arena_alloc(void *const ptr, size_t const size, void *const aux)
     }
     if (!ptr)
     {
-        struct prev_vertex_arena *const a = aux;
+        struct dijkstra_vertex_arena *const a = aux;
         if (a->next_free >= a->capacity)
         {
             return NULL;
@@ -1119,8 +1127,8 @@ hash_parent_cells(ccc_user_key const point_struct)
 static ccc_threeway_cmp
 cmp_pq_dist_points(ccc_cmp const cmp)
 {
-    struct prev_vertex const *const a = cmp.user_type_lhs;
-    struct prev_vertex const *const b = cmp.user_type_rhs;
+    struct dijkstra_vertex const *const a = cmp.user_type_lhs;
+    struct dijkstra_vertex const *const b = cmp.user_type_rhs;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
@@ -1128,7 +1136,7 @@ static ccc_threeway_cmp
 cmp_prev_vertices(ccc_key_cmp const cmp)
 {
     char const key_lhs = *(char *)cmp.key_lhs;
-    struct prev_vertex const *const user_rhs = cmp.user_type_rhs;
+    struct dijkstra_vertex const *const user_rhs = cmp.user_type_rhs;
     return (key_lhs > user_rhs->cur_name) - (key_lhs < user_rhs->cur_name);
 }
 
@@ -1144,7 +1152,7 @@ hash_64_bits(uint64_t x)
 static void
 pq_update_dist(ccc_user_type const u)
 {
-    ((struct prev_vertex *)u.user_type)->dist = *((int *)u.aux);
+    ((struct dijkstra_vertex *)u.user_type)->dist = *((int *)u.aux);
 }
 
 /*===========================    Misc    ====================================*/
