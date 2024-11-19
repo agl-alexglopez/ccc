@@ -300,10 +300,10 @@ non-NULL if the closure executes.
 ```
 #define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-fom_entry *e = fom_and_modify_w(entry_r(&m, &k), word, T->cnt++;);
+fom_entry *e = fom_and_modify_w(entry_r(&fom, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = fom_or_insert_w(fom_and_modify_w(entry_r(&m, &k), word,
+word *w = fom_or_insert_w(fom_and_modify_w(entry_r(&fom, &k), word,
                                            { T->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```

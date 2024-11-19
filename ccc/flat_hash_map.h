@@ -325,10 +325,10 @@ non-NULL if the closure executes.
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-fhm_entry *e = fhm_and_modify_w(entry_r(&m, &k), word, T->cnt++;);
+fhm_entry *e = fhm_and_modify_w(entry_r(&fhm, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&m, &k), word,
+word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fhm, &k), word,
                                            { T->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```

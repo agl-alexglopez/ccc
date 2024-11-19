@@ -317,10 +317,10 @@ non-NULL if the closure executes.
 ```
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-rom_entry *e = rom_and_modify_w(entry_r(&m, &k), word, T->cnt++;);
+rom_entry *e = rom_and_modify_w(entry_r(&rom, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = rom_or_insert_w(rom_and_modify_w(entry_r(&m, &k), word,
+word *w = rom_or_insert_w(rom_and_modify_w(entry_r(&rom, &k), word,
                                            { T->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```

@@ -307,10 +307,10 @@ non-NULL if the closure executes.
 ```
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-frm_entry *e = frm_and_modify_w(entry_r(&m, &k), word, T->cnt++;);
+frm_entry *e = frm_and_modify_w(entry_r(&frm, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = frm_or_insert_w(frm_and_modify_w(entry_r(&m, &k), word,
+word *w = frm_or_insert_w(frm_and_modify_w(entry_r(&frm, &k), word,
                                            { T->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```
