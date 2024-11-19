@@ -114,34 +114,264 @@ Quick Start</h1>
 <li>Read about generic <a href="https://agl-alexglopez.github.io/ccc/traits_8h.html">traits.h</a> shared across containers to make code more succinct.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md3"></a>
+Containers</h1>
+<ul>
+<li><a class="el" href="buffer_8h.html" title="The Buffer Interface.">buffer.h</a> (buffer snippet)</li>
+<li><a class="el" href="doubly__linked__list_8h.html" title="The Doubly Linked List Interface.">doubly_linked_list.h</a> (doubly_linked_list snippet)</li>
+<li><a class="el" href="flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface.">flat_double_ended_queue.h</a> (flat_double_ended_queue snippet)</li>
+<li><a class="el" href="flat__hash__map_8h.html" title="The Flat Hash Map Interface.">flat_hash_map.h</a></li>
+<li><a class="el" href="flat__ordered__map_8h.html" title="The Flat Ordered Map Interface.">flat_ordered_map.h</a></li>
+<li><a class="el" href="flat__priority__queue_8h.html" title="The Flat Priority Queue Interface.">flat_priority_queue.h</a></li>
+<li><a class="el" href="flat__realtime__ordered__map_8h.html" title="The Flat Realtime Ordered Map Interface.">flat_realtime_ordered_map.h</a></li>
+<li><a class="el" href="ordered__map_8h.html" title="The Ordered Map Interface.">ordered_map.h</a></li>
+<li><a class="el" href="ordered__multimap_8h.html" title="The Ordered Multimap Interface.">ordered_multimap.h</a></li>
+<li><a class="el" href="priority__queue_8h.html" title="The Priority Queue Interface.">priority_queue.h</a></li>
+<li><a class="el" href="realtime__ordered__map_8h.html" title="The Realtime Ordered Map Interface.">realtime_ordered_map.h</a></li>
+<li><a class="el" href="singly__linked__list_8h.html" title="The Singly Linked List Interface.">singly_linked_list.h</a></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Features</h1>
 <ul>
 <li>Intrusive and non-intrusive containers.</li>
-<li>No <code>container_of</code> macro required of the user to get to their type after a function call.</li>
 <li>Non-allocating container options.</li>
+<li>No <code>container_of</code> macro required of the user to get to their type after a function call.</li>
 <li>Rust's Entry API for associative containers with C and C++ influences.</li>
-<li>Container Traits implemented with C <code>_Generic</code> capabilities.</li>
 <li>Opt-in macros for more succinct insertion and in place modifications (see "closures" in the <a href="https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html">and_modify_w</a> interface for associative containers).</li>
+<li>Container Traits implemented with C <code>_Generic</code> capabilities.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4"></a>
-Design</h1>
 <h2><a class="anchor" id="autotoc_md5"></a>
-Motivations</h2>
-<p><b>Containers in C should avoid limiting the control and flexibility offered by the C language.</b></p>
-<p>There are many excellent data structure libraries in C (see the related section of this document). However, many of them try to approximate more modern languages like C++ and Rust in both form and function; they implement memory owning containers where the interface implicitly forces you to agree to the container's opinion of how and when memory should be managed. While many accept custom allocators for the container, a core assumption seems to be that it is OK for calls to container functions to have a non-trivial side effect by calling dynamic memory interfaces.</p>
-<p>The C Container Collection takes a different approach. When initializing the containers in this library the user chooses if memory management is allowed by the container. If allowed, these containers will manage allocation as one may be used to in higher level languages. However, if allocation is prohibited then these containers offer a more literal definition of a data structure; they structure the data they are given according to the container's invariants with no memory related side effects.</p>
-<p>If people are using C today, in the face of many other modern and safety-minded languages, they should benefit from all the language can provide, even when incorporating a third-party library. This means that they can manage all their memory as they see fit and these containers simply structure it when and how the programmer requires. This design style is not unique. Non-allocating intrusive containers are common in operating system kernel development (search for the Linux Kernel doubly linked list or rbtree as canonical examples). Embedded developers also stand to benefit from this design. However, I think that all applications can benefit from thinking more carefully about their memory in C.</p>
-<p>While not all containers require the user accommodate intrusive elements, when they do it looks like this.</p>
-<div class="fragment"><div class="line"><span class="keyword">struct </span>key_val</div>
+Intrusive and Non-Intrusive Containers</h2>
+<p>Currently, all associative containers ask the user to store an element in their type. This means wrapping an element in a struct such as this type found in <code>samples/graph.c</code> for the flat hash map.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>path_backtrack_cell</div>
 <div class="line">{</div>
-<div class="line">    container_elem elem;</div>
-<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> elem;</div>
+<div class="line">    <span class="keyword">struct </span>point current;</div>
+<div class="line">    <span class="keyword">struct </span>point parent;</div>
+<div class="line">};</div>
+<div class="ttc" id="aflat__hash__map_8h_html_ada2d334ae54ac456f5ff1a37ac546994"><div class="ttname"><a href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></div><div class="ttdeci">struct ccc_fhmap_elem_ ccc_fhmap_elem</div><div class="ttdoc">An intrusive element for a user provided type.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:45</div></div>
+</div><!-- fragment --><p>The interface may then ask for a handle to this type for certain operations. For example, a flat hash map we have the following interface for <code>try_insert</code>.</p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> <a class="code hl_function" href="flat__hash__map_8h.html#aba9e915d0b006d759c55689c27731829">ccc_fhm_try_insert</a>(<a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h,</div>
+<div class="line">                             <a class="code hl_typedef" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *key_val_handle);</div>
+<div class="ttc" id="aflat__hash__map_8h_html_aba9e915d0b006d759c55689c27731829"><div class="ttname"><a href="flat__hash__map_8h.html#aba9e915d0b006d759c55689c27731829">ccc_fhm_try_insert</a></div><div class="ttdeci">ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle)</div><div class="ttdoc">Attempts to insert the key value wrapping key_val_handle.</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_af8251d1f96c8a10e8ff2b20d7f117447"><div class="ttname"><a href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></div><div class="ttdeci">struct ccc_fhmap_ ccc_flat_hash_map</div><div class="ttdoc">A container for storing key-value structures defined by the user in a contiguous buffer.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:39</div></div>
+<div class="ttc" id="atypes_8h_html_a70feefd55fafc84e06d2f2a1dfd4f389"><div class="ttname"><a href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a></div><div class="ttdeci">union ccc_entry_ ccc_entry</div><div class="ttdoc">An Occupied or Vacant position in a searchable container.</div><div class="ttdef"><b>Definition:</b> types.h:43</div></div>
+</div><!-- fragment --><p>Here, the user is trying to insert a new key and value into the hash map which in the above example would be a <code>struct path_backtrack_cell</code> with the <code>current</code> and <code>parent</code> fields set appropriately.</p>
+<p>Non-Intrusive containers exist when a flat container can operate without such help from the user. The <code>flat_priority_queue</code> is a good example of this. When initializing we give it the following information.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \</span></div>
+<div class="line"><span class="preprocessor">    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* For example: */</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> fpq</div>
+<div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span>[40]){}, 40, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="ttc" id="aflat__priority__queue_8h_html_a8ed534b783c08382f5e3cd0456a1d72c"><div class="ttname"><a href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></div><div class="ttdeci">struct ccc_fpq_ ccc_flat_priority_queue</div><div class="ttdoc">A container offering direct storage and sorting of user data by heap order.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:33</div></div>
+<div class="ttc" id="aflat__priority__queue_8h_html_aef56a4bcfd5a33aeb767c177d43c51bf"><div class="ttname"><a href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a></div><div class="ttdeci">#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a fpq as a min or max heap.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:48</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:82</div></div>
+</div><!-- fragment --><p>Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see allocation for more on allocation permission).</p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> fpq</div>
+<div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+</div><!-- fragment --><p>Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> *<a class="code hl_function" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a>(<a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <span class="keywordtype">void</span> <span class="keyword">const</span> *e);</div>
+<div class="ttc" id="aflat__priority__queue_8h_html_af3629428e2a5117d810852fc70c283c8"><div class="ttname"><a href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a></div><div class="ttdeci">void * ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e)</div><div class="ttdoc">Pushes element pointed to at e into fpq. O(lgN).</div></div>
+</div><!-- fragment --><p>The element <code>e</code> here is just a generic reference to whatever type the user stores in the container.</p>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Non-Allocating Containers</h2>
+<p>As was mentioned in the previous section, all containers can be forbidden from allocating memory. In the flat priority queue example we had this initialization.</p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> fpq</div>
+<div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span>[40]){}, 40, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+</div><!-- fragment --><p>For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used.</p>
+<p>For non-flat containers that can't assume they are stored contiguously in memory, the initialization looks like this when allocation is prohibited.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>id_val</div>
+<div class="line">{</div>
+<div class="line">    <a class="code hl_typedef" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> e;</div>
+<div class="line">    <span class="keywordtype">int</span> id;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-</div><!-- fragment --><p>The handle to the container element is then passed by reference to all functions that require it.</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
-Allocation</h2>
-<p>To support the previously mentioned design motivations, when allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.</p>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> dll</div>
+<div class="line">    = <a class="code hl_define" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(dll, <span class="keyword">struct</span> id_val, e, NULL, val_cmp, NULL);</div>
+<div class="ttc" id="adoubly__linked__list_8h_html_a50ff4422f52bc1a5c2c926dc88a01e3e"><div class="ttname"><a href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a></div><div class="ttdeci">#define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a doubly linked list with its l-value name, type containing the dll elems,...</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:67</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_aaceb2c981b30f064750203fcb938e774"><div class="ttname"><a href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a></div><div class="ttdeci">struct ccc_dll_ ccc_doubly_linked_list</div><div class="ttdoc">A container offering bidirectional, insert, removal, and iteration.</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:41</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_ae6ab05fc0a5ac5f5d8ff31103209edf0"><div class="ttname"><a href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a></div><div class="ttdeci">struct ccc_dll_elem_ ccc_dll_elem</div><div class="ttdoc">A doubly linked list intrusive element to embedded in a user type.</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:51</div></div>
+</div><!-- fragment --><p>All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs.</p>
+<div class="fragment"><div class="line"><span class="comment">/* !WARNING: THIS IS A BAD IDEA FOR DEMONSTRATION PURPOSES! */</span></div>
+<div class="line"><span class="keywordtype">void</span> push_three(<a class="code hl_typedef" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *<span class="keyword">const</span> dll)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>id_val v0 = {};</div>
+<div class="line">    <span class="keyword">struct </span>id_val *v = push_back(dll, &amp;v0.e);</div>
+<div class="line">    assert(v == &amp;v0);</div>
+<div class="line">    <span class="keyword">struct </span>id_val v1 = {.id = 1, .val = 1};</div>
+<div class="line">    v = push_back(dll, &amp;v1.e);</div>
+<div class="line">    assert(v == &amp;v1);</div>
+<div class="line">    <span class="keyword">struct </span>id_val v2 = {.id = 2, .val = 2};</div>
+<div class="line">    v = push_back(dll, &amp;v2.e);</div>
+<div class="line">    assert(v == &amp;v2);</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Here, the container pushes stack allocated structs directly into the list. The container has not been given allocation permission so it assumes the memory it is given has the appropriate lifetime for the programmer's needs. When this function ends, that memory is invalid because its scope and lifetime has ended. Using <code>malloc</code> in this case would be the traditional approach, but there are a variety of ways a programmer can control scope and lifetime. This library does not prescribe any specific strategy to managing memory when allocation is prohibited. For example compositions of allocating and non-allocating containers, see the <code>samples/</code>.</p>
+<h2><a class="anchor" id="autotoc_md7"></a>
+No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
+<p>Traditionally, intrusive containers provide the following macro.</p>
+<div class="fragment"><div class="line"> </div>
+<div class="line"><span class="preprocessor">#define list_entry(ptr, type, member) \</span></div>
+<div class="line"><span class="preprocessor">    container_of(ptr, type, member)</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* A provided function by the container. */</span></div>
+<div class="line"><span class="keyword">struct </span>list_elem *list_front(list *l);</div>
+</div><!-- fragment --><p>Then, the user code looks like this.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>id</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> id;</div>
+<div class="line">    <span class="keyword">struct </span>list_elem id_elem;</div>
+<div class="line">};</div>
+<div class="line"><span class="comment">/* ...  */</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">struct </span>list id_list = LIST_INIT(id_list);</div>
+<div class="line"><span class="comment">/* ...  */</span></div>
+<div class="line"><span class="keyword">struct </span>id *front = list_entry(list_front(&amp;id_list), <span class="keyword">struct</span> <span class="keywordtype">id</span>, id_elem);</div>
+<div class="line"><span class="comment">/* Or when writing a comparison callback. */</span></div>
+<div class="line"><span class="keywordtype">bool</span></div>
+<div class="line">is_id_a_less(<span class="keyword">struct</span> list_elem <span class="keyword">const</span> *<span class="keyword">const</span> a,</div>
+<div class="line">             <span class="keyword">struct</span> list_elem <span class="keyword">const</span> *<span class="keyword">const</span> b, <span class="keywordtype">void</span> *<span class="keyword">const</span> aux)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> a_ = list_entry(a, <span class="keyword">struct</span> <span class="keywordtype">id</span>, id_elem);</div>
+<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> b_ = list_entry(b, <span class="keyword">struct</span> <span class="keywordtype">id</span>, id_elem);</div>
+<div class="line">    <span class="keywordflow">return</span> a_-&gt;id &lt; b_-&gt;id;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Here, it may seem manageable to use such a macro, but it is required at every location in the code where the user type is needed. The opportunity for bugs in entering the type or field name grows the more the macro is used. It is better to take care of this step for the user and present a cleaner interface.</p>
+<p>Here is the same list example in the C Container Collection.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>id</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> id;</div>
+<div class="line">    <a class="code hl_typedef" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> id_elem;</div>
+<div class="line">};</div>
+<div class="line"><span class="comment">/* ... */</span></div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> id_list</div>
+<div class="line">    = <a class="code hl_define" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(id_list, <span class="keyword">struct</span> <span class="keywordtype">id</span>, id_elem, NULL, id_cmp, NULL);</div>
+<div class="line"><span class="comment">/* ... */</span></div>
+<div class="line"><span class="keyword">struct </span>id *front = <a class="code hl_function" href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a>(&amp;id_list);</div>
+<div class="line"><span class="keyword">struct </span>id *new_id = generate_id();</div>
+<div class="line"><span class="keyword">struct </span>id *new_front = <a class="code hl_function" href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a>(&amp;id_list, &amp;new_id-&gt;id_elem);</div>
+<div class="line"><span class="comment">/* Or when writing a comparison callback. */</span></div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">id_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> (lhs-&gt;id &gt; rhs-&gt;id) - (lhs-&gt;id &lt; rhs-&gt;id);</div>
+<div class="line">}</div>
+<div class="ttc" id="adoubly__linked__list_8h_html_a4f7f1c337174a8c19091ab34d25587ff"><div class="ttname"><a href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a></div><div class="ttdeci">void * ccc_dll_front(ccc_doubly_linked_list const *l)</div><div class="ttdoc">Returns the user type at the front of the list. O(1).</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_ac21312b92a33769a08c7e9cd334800a7"><div class="ttname"><a href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a></div><div class="ttdeci">void * ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *elem)</div><div class="ttdoc">Push user type wrapping elem to the front of the list. O(1).</div></div>
+<div class="ttc" id="astructccc__cmp_html"><div class="ttname"><a href="structccc__cmp.html">ccc_cmp</a></div><div class="ttdoc">An element comparison helper.</div><div class="ttdef"><b>Definition:</b> types.h:100</div></div>
+<div class="ttc" id="astructccc__cmp_html_a413783988aeb931cebe1ff2355147e49"><div class="ttname"><a href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">ccc_cmp::user_type_lhs</a></div><div class="ttdeci">void const  *const user_type_lhs</div><div class="ttdef"><b>Definition:</b> types.h:102</div></div>
+<div class="ttc" id="astructccc__cmp_html_aad71faef58d3c2d057d2f2953372f32f"><div class="ttname"><a href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">ccc_cmp::user_type_rhs</a></div><div class="ttdeci">void const  *const user_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:104</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:80</div></div>
+</div><!-- fragment --><p>Internally the containers will remember the offsets of the provided elements within the user struct wrapping the intruder. Then, the contract of the interface is simpler: provide a handle to the container and receive your type in return. The user takes on less complexity overall by providing a slightly more detailed initialization.</p>
+<p>Composing multiple containers with this approach is also possible. Consider the following struct from <code>samples/graph.c</code> used to run Dijkstra's algorithm.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>dijkstra_vertex</div>
+<div class="line">{</div>
+<div class="line">    <a class="code hl_typedef" href="realtime__ordered__map_8h.html#a94267021d5f511eee484f5bd986da6c2">ccc_romap_elem</a> path_elem;</div>
+<div class="line">    <a class="code hl_typedef" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> pq_elem;</div>
+<div class="line">    <span class="keywordtype">int</span> dist;</div>
+<div class="line">    <span class="keywordtype">char</span> cur_name;</div>
+<div class="line">    <span class="keywordtype">char</span> prev_name;</div>
+<div class="line">};</div>
+<div class="line"><span class="comment">/* ... Later Initialization After Memory is Prepared ... */</span></div>
+<div class="line"><a class="code hl_typedef" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> path_map = <a class="code hl_define" href="realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143">ccc_rom_init</a>(</div>
+<div class="line">    path_map, <span class="keyword">struct</span> dijkstra_vertex, path_elem, cur_name, arena_alloc,</div>
+<div class="line">    cmp_prev_vertices, &amp;bump_arena);</div>
+<div class="line"><a class="code hl_typedef" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> costs_pq</div>
+<div class="line">    = <a class="code hl_define" href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a>(<span class="keyword">struct</span> dijkstra_vertex, pq_elem, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL,</div>
+<div class="line">                  cmp_pq_costs, NULL);</div>
+<div class="line"><span class="comment">/*... Steps to Prepare to Run the Algorithm ...*/</span></div>
+<div class="line"><span class="keywordflow">while</span> (!is_empty(&amp;costs_pq))</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>dijkstra_vertex *current = front(&amp;costs_pq);</div>
+<div class="line">    (void)pop(&amp;costs_pq);</div>
+<div class="line">    <span class="keyword">struct </span>vertex *cur_v = vertex_at(graph, cur-&gt;cur_name);</div>
+<div class="line">    <span class="comment">/* ... Check for Stopping Condition Then Continue ... */</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; MAX_DEGREE &amp;&amp; cur_v-&gt;edges[i].name; ++i)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keyword">struct </span>dijkstra_vertex *next</div>
+<div class="line">            = get_key_val(&amp;path_map, &amp;cur_v-&gt;edges[i].name);</div>
+<div class="line">        <span class="keywordtype">int</span> alt = cur-&gt;dist + cur_v-&gt;edges[i].cost;</div>
+<div class="line">        <span class="keywordflow">if</span> (alt &lt; next-&gt;dist)</div>
+<div class="line">        {</div>
+<div class="line">            next-&gt;prev_name = cur-&gt;cur_name;</div>
+<div class="line">            decrease(&amp;costs_pq, &amp;next-&gt;pq_elem, pq_update_dist, &amp;alt);</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line">}</div>
+<div class="line"><span class="comment">/* ... Rebuild Shortest Path etc... */</span></div>
+<div class="ttc" id="apriority__queue_8h_html_a5438f40477e5a79f1055adb17b055b44"><div class="ttname"><a href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a></div><div class="ttdeci">struct ccc_pq_elem_ ccc_pq_elem</div><div class="ttdoc">The embedded struct type for operation of the priority queue.</div><div class="ttdef"><b>Definition:</b> priority_queue.h:45</div></div>
+<div class="ttc" id="apriority__queue_8h_html_aa7e8b96d45a5f0ea4b9b6e128746111a"><div class="ttname"><a href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a></div><div class="ttdeci">#define ccc_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a priority queue at runtime or compile time.</div><div class="ttdef"><b>Definition:</b> priority_queue.h:56</div></div>
+<div class="ttc" id="apriority__queue_8h_html_ae4003f166727edbb815d333c9c27972b"><div class="ttname"><a href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a></div><div class="ttdeci">struct ccc_pq_ ccc_priority_queue</div><div class="ttdoc">A container for pointer stability and an O(1) push and amortized o(lg N) increase/decrease key.</div><div class="ttdef"><b>Definition:</b> priority_queue.h:35</div></div>
+<div class="ttc" id="arealtime__ordered__map_8h_html_a7dd816319f62ee38e5c1e265b2a15143"><div class="ttname"><a href="realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143">ccc_rom_init</a></div><div class="ttdeci">#define ccc_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field, alloc_fn, key_cmp_fn, aux_data)</div><div class="ttdoc">Initializes the ordered map at runtime or compile time.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:63</div></div>
+<div class="ttc" id="arealtime__ordered__map_8h_html_a94267021d5f511eee484f5bd986da6c2"><div class="ttname"><a href="realtime__ordered__map_8h.html#a94267021d5f511eee484f5bd986da6c2">ccc_romap_elem</a></div><div class="ttdeci">struct ccc_romap_elem_ ccc_romap_elem</div><div class="ttdoc">The intrusive element of the user defined struct being stored in the map.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:44</div></div>
+<div class="ttc" id="arealtime__ordered__map_8h_html_af95aa6d6e35234cabe7b3f7c4101175c"><div class="ttname"><a href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a></div><div class="ttdeci">struct ccc_romap_ ccc_realtime_ordered_map</div><div class="ttdoc">A container for amortized O(lg N) search, insert, erase, ranges, and pointer stability.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:33</div></div>
+</div><!-- fragment --><p>One conceptual element, a <code>dijkstra_vertex</code>, is part of two containers, a map and a priority queue. The priority queue piggy backs of the memory controlled by the map so that we always have access to all vertices while the algorithm runs. An already complex algorithm is not cluttered by further steps to accommodate macros.</p>
+<h2><a class="anchor" id="autotoc_md8"></a>
+Rust's Entry Interface</h2>
+<p>Rust has solid interfaces for associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code> but specific names, behaviors, and parameters can be read in each container's header).</p>
+<ul>
+<li><code><a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723" title="Obtain a container specific entry for the Entry Interface.">ccc_entry(container_ptr, key_ptr...)</a></code> - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.</li>
+<li><code><a class="el" href="traits_8h.html#ab25eca1e59257aab34f67308a523553c" title="Modify an entry if Occupied.">ccc_and_modify(entry_ptr, mod_fn)</a></code> - Modify an occupied entry with a callback.</li>
+<li><code><a class="el" href="traits_8h.html#a25c5c848da545831e1efa54645aae2dd" title="Modify an entry if Occupied.">ccc_and_modify_aux(entry_ptr, mod_fn, aux_args)</a></code> - Modify an Occupied entry with a callback that requires auxiliary data.</li>
+<li><code><a class="el" href="traits_8h.html#a1c157dfada3fb8d3beddcab00d2fade4" title="Insert new element if the entry is Vacant.">ccc_or_insert(entry_ptr, or_insert_args)</a></code> - Insert a default key value if Vacant or return the Occupied entry.</li>
+<li><code><a class="el" href="traits_8h.html#aa79106d83ff5343b2b3aff707a9f5447" title="Insert new element or overwrite old element.">ccc_insert_entry(entry_ptr, insert_entry_args)</a></code> - Invariantly insert a new key value, overwriting an Occupied entry if needed.</li>
+<li><code><a class="el" href="traits_8h.html#a3157c1ad2dc111b73f8018bd4fdbc7a4" title="Remove the element if the entry is Occupied.">ccc_remove_entry(entry_ptr)</a></code> - Remove an Occupied entry from the container or do nothing.</li>
+</ul>
+<p>Other Rust Interface functions like <code>get_key_val</code>, <code>insert</code>, and <code>remove</code> are included and can provide information about previous values stored in the container.</p>
+<p>Each container offers it's own C version of "closures" for the <code>and_modify_w</code> macro, short for and modify "with". Here is an example from the <code>samples/words.c</code> program.</p>
+<ul>
+<li><code>and_modify_w(flat_ordered_map_entry_ptr, type_name, closure_over_T...)</code> - Run code in <code>closure_over_T</code> on the stored user type <code>T</code>.</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line">{</div>
+<div class="line">    str_ofs str_arena_offset;</div>
+<div class="line">    <span class="keywordtype">int</span> cnt;</div>
+<div class="line">    fomap_elem e;</div>
+<div class="line">} word;</div>
+<div class="line"><span class="comment">/* Increment a found word or insert a default count of 1. */</span></div>
+<div class="line">word *w =</div>
+<div class="line">fom_or_insert_w(</div>
+<div class="line">    fom_and_modify_w(entry_r(&amp;fom, &amp;ofs), word, { T-&gt;cnt++; }),</div>
+<div class="line">    (word){.str_arena_offset = ofs, .cnt = 1}</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>This is possible because of the details discussed in the previous section. Containers can always provide the user type stored in the container directly. However, there are other options to achieve the same result.</p>
+<p>Some C++ associative container interfaces have also been adapted to the Entry Interface.</p>
+<ul>
+<li><code><a class="el" href="traits_8h.html#a7e4421e251272e1eb19a8b0c8e40d7c2" title="Insert an element if the entry is Vacant.">ccc_try_insert(container_ptr, try_insert_args)</a></code> - Inserts a new element if none was present and reports if a previous entry existed.</li>
+<li><code><a class="el" href="traits_8h.html#af535d3d2b63e8c68efb85e5c54bb0f77" title="Insert an element or overwrite the Occupied entry.">ccc_insert_or_assign(container_ptr, insert_or_assign_args)</a></code> - Inserts a new element invariantly and reports if a previous entry existed.</li>
+</ul>
+<p>Many other containers fall back to C++ style interfaces when it makes sense to do so.</p>
+<h2><a class="anchor" id="autotoc_md9"></a>
+Traits</h2>
+<p>Traits, found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code>, offer a more succinct way to use shared functionality across containers. Instead of calling <code>ccc_fhm_entry</code> when trying to obtain an entry from a flat hash map, one can simply call <code>entry</code>. Traits utilize <code>_Generic</code> in C to choose the correct container function based on parameters provided.</p>
+<p>Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line">{</div>
+<div class="line">    str_ofs str_arena_offset;</div>
+<div class="line">    <span class="keywordtype">int</span> cnt;</div>
+<div class="line">    fomap_elem e;</div>
+<div class="line">} word;</div>
+<div class="line"><span class="comment">/* ... Generate offset (ofs). */</span></div>
+<div class="line">word <span class="keywordflow">default</span> = {.str_arena_offset = ofs, .cnt = 1};</div>
+<div class="line">word *w = or_insert(and_modify(entry_r(&amp;fom, &amp;ofs), increment), &amp;<span class="keywordflow">default</span>.e);</div>
+</div><!-- fragment --><p>Or the following.</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line">{</div>
+<div class="line">    str_ofs str_arena_offset;</div>
+<div class="line">    <span class="keywordtype">int</span> cnt;</div>
+<div class="line">    fomap_elem e;</div>
+<div class="line">} word;</div>
+<div class="line"><span class="comment">/* ... Generate offset (ofs). */</span></div>
+<div class="line">word <span class="keywordflow">default</span> = {.str_arena_offset = ofs, .cnt = 1};</div>
+<div class="line">fomap_entry *e = entry_r(&amp;fom, &amp;ofs);</div>
+<div class="line">e = and_modify(e, increment)</div>
+<div class="line">word *w = or_insert(e, &amp;<span class="keywordflow">default</span>.e);</div>
+</div><!-- fragment --><p>Using the first method in your code may expand the code evaluated in different <code>_Generic</code> cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">traits.h</a></code> header.</p>
+<h1><a class="anchor" id="autotoc_md10"></a>
+Allocation</h1>
+<p>When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">void</span> *<a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(<span class="keywordtype">void</span> *ptr, <span class="keywordtype">size_t</span> size, <span class="keywordtype">void</span> *aux);</div>
 <div class="ttc" id="atypes_8h_html_a8be6e2d1b150a5b77b2eba5ae85764f2"><div class="ttname"><a href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a></div><div class="ttdeci">void * ccc_alloc_fn(void *ptr, size_t size, void *aux)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:195</div></div>
 </div><!-- fragment --><p>An allocation function implements the following behavior, where ptr is pointer to memory, size is number of bytes to allocate, and aux is a reference to any supplementary information required for allocation, deallocation, or reallocation. The aux parameter is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (read on for more on aux).</p>
@@ -172,21 +402,21 @@ Allocation</h2>
 <div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.</p>
-<h3><a class="anchor" id="autotoc_md7"></a>
-Constructors</h3>
+<h2><a class="anchor" id="autotoc_md11"></a>
+Constructors</h2>
 <p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
-<h3><a class="anchor" id="autotoc_md8"></a>
-Destructors</h3>
+<h2><a class="anchor" id="autotoc_md12"></a>
+Destructors</h2>
 <p>For destructors, the argument is similar but the container does offer more help. If an action other than freeing the memory of a user type is needed upon removal, there are options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. One exception is the following interfaces.</p>
 <p>The clear function works for pointer stable containers and flat containers.</p>
 <div class="fragment"><div class="line">result clear(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
-<h1><a class="anchor" id="autotoc_md9"></a>
+<h1><a class="anchor" id="autotoc_md13"></a>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
 <p>The samples are not included in the release. To build them, clone the repository. Usage instructions should be available with the <code>-h</code> flag to any program or at the top of the file.</p>
@@ -196,7 +426,7 @@ Samples</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">./build/bin/[SAMPLE] [SAMPLE CLI ARGS]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md14"></a>
 Tests</h1>
 <p>The tests also include various use cases that may be of interest. Tests are not included in the release. Clone the repository.</p>
 <p>Clang.</p>
@@ -205,7 +435,7 @@ Tests</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">make rtest</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md11"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md15"></a>
 Miscellaneous Why?</h1>
 <ul>
 <li>Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> style macro that gets the user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
@@ -216,15 +446,116 @@ Miscellaneous Why?</h1>
 <li>Why not a better hash map? Haven't gotten to it yet. This container has the most room for improvement.</li>
 <li>Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md12"></a>
+<h1><a class="anchor" id="autotoc_md16"></a>
 Related</h1>
 <p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
 <li><a href="https://github.com/stclib/STC">STC - Smart Template Containers</a></li>
 <li><a href="https://github.com/glouw/ctl">C Template Library (CTL)</a></li>
-<li><a href="https://github.com/JacksonAllan/CC">CC: Convenient Containers</a> </li>
+<li><a href="https://github.com/JacksonAllan/CC">CC: Convenient Containers</a></li>
 </ul>
-</div></div><!-- PageDoc -->
+<h1><a class="anchor" id="autotoc_md17"></a>
+Buffer</h1>
+<p>A fixed or dynamic contiguous array of a single user defined type.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="buffer_8h.html">ccc/buffer.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 5 */</span></div>
+<div class="line">    <a class="code hl_typedef" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> b = <a class="code hl_define" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a>((<span class="keywordtype">int</span>[5]){}, NULL, NULL, 5);</div>
+<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a>(&amp;b, &amp;(<span class="keywordtype">int</span>){3});</div>
+<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a>(&amp;b, &amp;(<span class="keywordtype">int</span>){2});</div>
+<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a>(&amp;b, &amp;(<span class="keywordtype">int</span>){1});</div>
+<div class="line">    (void)<a class="code hl_function" href="buffer_8h.html#a1150613b4392aae875aaf3c96146a39a">ccc_buf_pop_back</a>(&amp;b);</div>
+<div class="line">    <span class="keywordtype">int</span> *i = <a class="code hl_function" href="buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a">ccc_buf_back</a>(&amp;b);</div>
+<div class="line">    assert(*i == 2);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="abuffer_8h_html"><div class="ttname"><a href="buffer_8h.html">buffer.h</a></div><div class="ttdoc">The Buffer Interface.</div></div>
+<div class="ttc" id="abuffer_8h_html_a1150613b4392aae875aaf3c96146a39a"><div class="ttname"><a href="buffer_8h.html#a1150613b4392aae875aaf3c96146a39a">ccc_buf_pop_back</a></div><div class="ttdeci">ccc_result ccc_buf_pop_back(ccc_buffer *buf)</div><div class="ttdoc">pop the back element from the buffer according to size.</div></div>
+<div class="ttc" id="abuffer_8h_html_a63e900d415ab4c7fca82ad65756d9b6a"><div class="ttname"><a href="buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a">ccc_buf_back</a></div><div class="ttdeci">void * ccc_buf_back(ccc_buffer const *buf)</div><div class="ttdoc">return the final element in the buffer according the current size.</div></div>
+<div class="ttc" id="abuffer_8h_html_a66b89d47e24996c7be07dea5d827e649"><div class="ttname"><a href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a></div><div class="ttdeci">#define ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)</div><div class="ttdoc">Initialize a contiguous buffer of user a specified type, allocation policy, capacity,...</div><div class="ttdef"><b>Definition:</b> buffer.h:71</div></div>
+<div class="ttc" id="abuffer_8h_html_a7d8dfe1437e87b31e7f5522d85080aba"><div class="ttname"><a href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></div><div class="ttdeci">struct ccc_buf_ ccc_buffer</div><div class="ttdoc">A contiguous block of storage for elements of the same type.</div><div class="ttdef"><b>Definition:</b> buffer.h:47</div></div>
+<div class="ttc" id="abuffer_8h_html_af52c4be9804b8639755e424e4177173c"><div class="ttname"><a href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a></div><div class="ttdeci">void * ccc_buf_push_back(ccc_buffer *buf, void const *data)</div><div class="ttdoc">return the newly pushed data into the last slot of the buffer according to size.</div></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md18"></a>
+Doubly Linked List</h1>
+<p>A dynamic container for efficient insertion and removal at any position.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">ccc/doubly_linked_list.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>int_elem</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> i;</div>
+<div class="line">    <a class="code hl_typedef" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> e;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> (lhs-&gt;i &gt; rhs-&gt;i) - (lhs-&gt;i &lt; rhs-&gt;i);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* doubly linked list l, list elem field e, no allocation permission,</span></div>
+<div class="line"><span class="comment">       comparing integers, no auxiliary data. */</span></div>
+<div class="line">    <a class="code hl_typedef" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> l</div>
+<div class="line">        = <a class="code hl_define" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(l, <span class="keyword">struct</span> int_elem, e, NULL, int_cmp, NULL);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};</div>
+<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#a327884c1903e8729e7a6ca0377f4c185">ccc_dll_push_back</a>(&amp;l, &amp;elems[0].e);</div>
+<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a>(&amp;l, &amp;elems[1].e);</div>
+<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#a327884c1903e8729e7a6ca0377f4c185">ccc_dll_push_back</a>(&amp;l, &amp;elems[2].e);</div>
+<div class="line">    (void)<a class="code hl_function" href="doubly__linked__list_8h.html#a387ada0e3dcfb0df8d4fc3a8845cb536">ccc_dll_pop_back</a>(&amp;l);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem *e = <a class="code hl_function" href="doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac">ccc_dll_back</a>(&amp;l);</div>
+<div class="line">    assert(e-&gt;i == 3);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="adoubly__linked__list_8h_html"><div class="ttname"><a href="doubly__linked__list_8h.html">doubly_linked_list.h</a></div><div class="ttdoc">The Doubly Linked List Interface.</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_a327884c1903e8729e7a6ca0377f4c185"><div class="ttname"><a href="doubly__linked__list_8h.html#a327884c1903e8729e7a6ca0377f4c185">ccc_dll_push_back</a></div><div class="ttdeci">void * ccc_dll_push_back(ccc_doubly_linked_list *l, ccc_dll_elem *elem)</div><div class="ttdoc">Push user type wrapping elem to the back of the list. O(1).</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_a387ada0e3dcfb0df8d4fc3a8845cb536"><div class="ttname"><a href="doubly__linked__list_8h.html#a387ada0e3dcfb0df8d4fc3a8845cb536">ccc_dll_pop_back</a></div><div class="ttdeci">ccc_result ccc_dll_pop_back(ccc_doubly_linked_list *l)</div><div class="ttdoc">Pop the user type at the back of the list. O(1).</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_abea7c774a00b9e84da26660d20a0b1ac"><div class="ttname"><a href="doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac">ccc_dll_back</a></div><div class="ttdeci">void * ccc_dll_back(ccc_doubly_linked_list const *l)</div><div class="ttdoc">Returns the user type at the back of the list. O(1).</div></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md19"></a>
+Flat Double Ended Queue</h1>
+<p>A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__double__ended__queue_8h.html">ccc/flat_double_ended_queue.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 2 */</span></div>
+<div class="line">    <a class="code hl_typedef" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> q = <a class="code hl_define" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>((<span class="keywordtype">int</span>[2]){}, NULL, NULL, 2);</div>
+<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a>(&amp;q, &amp;(<span class="keywordtype">int</span>){3});</div>
+<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a6e8aa8edc1a18d945b8bdd664709e7a2">ccc_fdeq_push_front</a>(&amp;q, &amp;(<span class="keywordtype">int</span>){2});</div>
+<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a>(&amp;q, &amp;(<span class="keywordtype">int</span>){1}); <span class="comment">/* Overwrite 2. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> *i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a>(&amp;q);</div>
+<div class="line">    assert(*i == 3);</div>
+<div class="line">    i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a>(&amp;q);</div>
+<div class="line">    assert(*i == 1);</div>
+<div class="line">    (void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a>(&amp;q);</div>
+<div class="line">    i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a>(&amp;q);</div>
+<div class="line">    assert(*i == 3);</div>
+<div class="line">    i = <a class="code hl_function" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a>(&amp;q);</div>
+<div class="line">    assert(*i == 3);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html"><div class="ttname"><a href="flat__double__ended__queue_8h.html">flat_double_ended_queue.h</a></div><div class="ttdoc">The Flat Double Ended Queue Interface.</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a0b47511ed59d60a9e66bdb2fee438eb0"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></div><div class="ttdeci">struct ccc_fdeq_ ccc_flat_double_ended_queue</div><div class="ttdoc">A contiguous buffer for O(1) push and pop from front and back.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:42</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a5f6c51ae30c8f0cae6e1b05466008784"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a></div><div class="ttdeci">#define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)</div><div class="ttdoc">Initialize the fdeq with memory and allocation permission.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:52</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a60e38bd6dacaf6204fa8de34c7732789"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a></div><div class="ttdeci">ccc_result ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fdeq)</div><div class="ttdoc">Pop an element from the back of the fdeq. O(1).</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a6e8aa8edc1a18d945b8bdd664709e7a2"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a6e8aa8edc1a18d945b8bdd664709e7a2">ccc_fdeq_push_front</a></div><div class="ttdeci">void * ccc_fdeq_push_front(ccc_flat_double_ended_queue *fdeq, void const *elem)</div><div class="ttdoc">Push the user type to the front of the fdeq. O(1) if no allocation permission amortized O(1) if alloc...</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a88d9f08549c2ce4edf9d575caccb3fb4"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a></div><div class="ttdeci">void * ccc_fdeq_front(ccc_flat_double_ended_queue const *fdeq)</div><div class="ttdoc">Return a reference to the front of the fdeq. O(1).</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a9cd07edbd36d2c84bbb633e910a4d59a"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a></div><div class="ttdeci">void * ccc_fdeq_back(ccc_flat_double_ended_queue const *fdeq)</div><div class="ttdoc">Return a reference to the back of the fdeq. O(1).</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_aa352727365879daa6510133a768cc628"><div class="ttname"><a href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a></div><div class="ttdeci">void * ccc_fdeq_push_back(ccc_flat_double_ended_queue *fdeq, void const *elem)</div><div class="ttdoc">Push the user type to the back of the fdeq. O(1) if no allocation permission amortized O(1) if alloca...</div></div>
+</div><!-- fragment --> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
