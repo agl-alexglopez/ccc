@@ -78,7 +78,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 #define ccc_impl_rom_new(realtime_ordered_map_entry)                           \
-    ({                                                                         \
+    (__extension__({                                                           \
         void *rom_ins_alloc_ret_ = NULL;                                       \
         if ((realtime_ordered_map_entry)->rom_->alloc_)                        \
         {                                                                      \
@@ -89,11 +89,11 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
                           (realtime_ordered_map_entry)->rom_->aux_);           \
         }                                                                      \
         rom_ins_alloc_ret_;                                                    \
-    })
+    }))
 
 #define ccc_impl_rom_insert_key_val(realtime_ordered_map_entry, new_mem,       \
                                     lazy_key_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         if (new_mem)                                                           \
         {                                                                      \
             *new_mem = lazy_key_value;                                         \
@@ -106,11 +106,11 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
                 ccc_impl_romap_elem_in_slot(                                   \
                     (realtime_ordered_map_entry)->rom_, new_mem));             \
         }                                                                      \
-    })
+    }))
 
 #define ccc_impl_rom_insert_and_copy_key(                                      \
     rom_insert_entry, rom_insert_entry_ret, key, lazy_value...)                \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(lazy_value) *rom_new_ins_base_                                  \
             = ccc_impl_rom_new((&rom_insert_entry));                           \
         rom_insert_entry_ret = (struct ccc_ent_){                              \
@@ -131,13 +131,13 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
                 ccc_impl_romap_elem_in_slot(rom_insert_entry.rom_,             \
                                             rom_new_ins_base_));               \
         }                                                                      \
-    })
+    }))
 
 /*==================     Core Macro Implementations     =====================*/
 
 #define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,   \
                                   closure_over_T...)                           \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type rom_ent_ptr_ = (realtime_ordered_map_entry_ptr);           \
         struct ccc_rtree_entry_ rom_mod_ent_                                   \
             = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
@@ -154,11 +154,11 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             }                                                                  \
         }                                                                      \
         rom_mod_ent_;                                                          \
-    })
+    }))
 
 #define ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr,               \
                                  lazy_key_value...)                            \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type or_ins_entry_ptr_ = (realtime_ordered_map_entry_ptr);      \
         typeof(lazy_key_value) *rom_or_ins_ret_ = NULL;                        \
         if (or_ins_entry_ptr_)                                                 \
@@ -177,11 +177,11 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             }                                                                  \
         }                                                                      \
         rom_or_ins_ret_;                                                       \
-    })
+    }))
 
 #define ccc_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr,            \
                                     lazy_key_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type ins_entry_ptr_ = (realtime_ordered_map_entry_ptr);         \
         typeof(lazy_key_value) *rom_ins_ent_ret_ = NULL;                       \
         if (ins_entry_ptr_)                                                    \
@@ -207,11 +207,11 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             }                                                                  \
         }                                                                      \
         rom_ins_ent_ret_;                                                      \
-    })
+    }))
 
 #define ccc_impl_rom_try_insert_w(realtime_ordered_map_ptr, key,               \
                                   lazy_value...)                               \
-    ({                                                                         \
+    (__extension__({                                                           \
         struct ccc_romap_ *const try_ins_map_ptr_                              \
             = (realtime_ordered_map_ptr);                                      \
         struct ccc_ent_ rom_try_ins_ent_ret_                                   \
@@ -232,11 +232,11 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             }                                                                  \
         }                                                                      \
         rom_try_ins_ent_ret_;                                                  \
-    })
+    }))
 
 #define ccc_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
                                         lazy_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         struct ccc_romap_ *const ins_or_assign_map_ptr_                        \
             = (realtime_ordered_map_ptr);                                      \
         struct ccc_ent_ rom_ins_or_assign_ent_ret_                             \
@@ -273,7 +273,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
             }                                                                  \
         }                                                                      \
         rom_ins_or_assign_ent_ret_;                                            \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

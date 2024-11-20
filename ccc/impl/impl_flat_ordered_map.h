@@ -68,7 +68,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
 
 #define ccc_impl_fom_and_modify_w(flat_ordered_map_entry_ptr, type_name,       \
                                   closure_over_T...)                           \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fom_mod_ent_ptr_ = (flat_ordered_map_entry_ptr);           \
         struct ccc_ftree_entry_ fom_mod_ent_                                   \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -86,11 +86,11 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
             }                                                                  \
         }                                                                      \
         fom_mod_ent_;                                                          \
-    })
+    }))
 
 #define ccc_impl_fom_or_insert_w(flat_ordered_map_entry_ptr,                   \
                                  lazy_key_value...)                            \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fom_or_ins_ent_ptr_ = (flat_ordered_map_entry_ptr);        \
         typeof(lazy_key_value) *fom_or_ins_ret_ = NULL;                        \
         if (fom_or_ins_ent_ptr_)                                               \
@@ -116,11 +116,11 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
             }                                                                  \
         }                                                                      \
         fom_or_ins_ret_;                                                       \
-    })
+    }))
 
 #define ccc_impl_fom_insert_entry_w(flat_ordered_map_entry_ptr,                \
                                     lazy_key_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fom_ins_ent_ptr_ = (flat_ordered_map_entry_ptr);           \
         typeof(lazy_key_value) *fom_ins_ent_ret_ = NULL;                       \
         if (fom_ins_ent_ptr_)                                                  \
@@ -152,10 +152,10 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
             }                                                                  \
         }                                                                      \
         fom_ins_ent_ret_;                                                      \
-    })
+    }))
 
 #define ccc_impl_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value...)    \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fom_try_ins_map_ptr_ = (flat_ordered_map_ptr);             \
         struct ccc_ent_ fom_try_ins_ent_ret_                                   \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -192,11 +192,11 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
             }                                                                  \
         }                                                                      \
         fom_try_ins_ent_ret_;                                                  \
-    })
+    }))
 
 #define ccc_impl_fom_insert_or_assign_w(flat_ordered_map_ptr, key,             \
                                         lazy_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fom_ins_or_assign_map_ptr_ = (flat_ordered_map_ptr);       \
         struct ccc_ent_ fom_ins_or_assign_ent_ret_                             \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -248,7 +248,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
             }                                                                  \
         }                                                                      \
         fom_ins_or_assign_ent_ret_;                                            \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

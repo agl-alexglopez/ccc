@@ -42,7 +42,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 #define ccc_impl_omm_new(ordered_map_entry)                                    \
-    ({                                                                         \
+    (__extension__({                                                           \
         void *omm_ins_alloc_ret_ = NULL;                                       \
         if ((ordered_map_entry)->t_->alloc_)                                   \
         {                                                                      \
@@ -52,11 +52,11 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
                                    (ordered_map_entry)->t_->aux_);             \
         }                                                                      \
         omm_ins_alloc_ret_;                                                    \
-    })
+    }))
 
 #define ccc_impl_omm_insert_key_val(ordered_map_entry, new_mem,                \
                                     lazy_key_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         if (new_mem)                                                           \
         {                                                                      \
             *new_mem = lazy_key_value;                                         \
@@ -65,11 +65,11 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 ccc_impl_ommap_elem_in_slot((ordered_map_entry)->t_,           \
                                             new_mem));                         \
         }                                                                      \
-    })
+    }))
 
 #define ccc_impl_omm_insert_and_copy_key(                                      \
     omm_insert_entry, omm_insert_entry_ret, key, lazy_value...)                \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(lazy_value) *omm_new_ins_base_                                  \
             = ccc_impl_omm_new((&omm_insert_entry));                           \
         omm_insert_entry_ret = (struct ccc_ent_){                              \
@@ -87,13 +87,13 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 ccc_impl_ommap_elem_in_slot(omm_insert_entry.t_,               \
                                             omm_new_ins_base_));               \
         }                                                                      \
-    })
+    }))
 
 /*=====================     Core Macro Implementations     ==================*/
 
 #define ccc_impl_omm_and_modify_w(ordered_map_entry_ptr, type_name,            \
                                   closure_over_T...)                           \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type omm_ent_ptr_ = (ordered_map_entry_ptr);                    \
         struct ccc_tree_entry_ omm_mod_ent_                                    \
             = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
@@ -110,10 +110,10 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         omm_mod_ent_;                                                          \
-    })
+    }))
 
 #define ccc_impl_omm_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)     \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type omm_or_ins_ent_ptr_ = (ordered_map_entry_ptr);             \
         typeof(lazy_key_value) *or_ins_ret_ = NULL;                            \
         if (omm_or_ins_ent_ptr_)                                               \
@@ -132,10 +132,10 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         or_ins_ret_;                                                           \
-    })
+    }))
 
 #define ccc_impl_omm_insert_entry_w(ordered_map_entry_ptr, lazy_key_value...)  \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type omm_ins_ent_ptr_ = (ordered_map_entry_ptr);                \
         typeof(lazy_key_value) *omm_ins_ent_ret_ = NULL;                       \
         if (omm_ins_ent_ptr_)                                                  \
@@ -146,10 +146,10 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
                                         lazy_key_value);                       \
         }                                                                      \
         omm_ins_ent_ret_;                                                      \
-    })
+    }))
 
 #define ccc_impl_omm_try_insert_w(ordered_map_ptr, key, lazy_value...)         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type omm_try_ins_ptr_ = (ordered_map_ptr);                      \
         struct ccc_ent_ omm_try_ins_ent_ret_                                   \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -171,10 +171,10 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         omm_try_ins_ent_ret_;                                                  \
-    })
+    }))
 
 #define ccc_impl_omm_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)   \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type omm_ins_or_assign_ptr_ = (ordered_map_ptr);                \
         struct ccc_ent_ omm_ins_or_assign_ent_ret_                             \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -210,7 +210,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         omm_ins_or_assign_ent_ret_;                                            \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

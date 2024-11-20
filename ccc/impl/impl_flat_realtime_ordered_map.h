@@ -73,7 +73,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
 
 #define ccc_impl_frm_and_modify_w(flat_realtime_ordered_map_entry_ptr,         \
                                   type_name, closure_over_T...)                \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type frm_ent_ptr_ = (flat_realtime_ordered_map_entry_ptr);      \
         struct ccc_frtree_entry_ frm_mod_ent_                                  \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -91,11 +91,11 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             }                                                                  \
         }                                                                      \
         frm_mod_ent_;                                                          \
-    })
+    }))
 
 #define ccc_impl_frm_or_insert_w(flat_realtime_ordered_map_entry_ptr,          \
                                  lazy_key_value...)                            \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type or_ins_entry_ptr_ = (flat_realtime_ordered_map_entry_ptr); \
         typeof(lazy_key_value) *frm_or_ins_ret_ = NULL;                        \
         if (or_ins_entry_ptr_)                                                 \
@@ -122,11 +122,11 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             }                                                                  \
         }                                                                      \
         frm_or_ins_ret_;                                                       \
-    })
+    }))
 
 #define ccc_impl_frm_insert_entry_w(flat_realtime_ordered_map_entry_ptr,       \
                                     lazy_key_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type ins_entry_ptr_ = (flat_realtime_ordered_map_entry_ptr);    \
         typeof(lazy_key_value) *frm_ins_ent_ret_ = NULL;                       \
         if (ins_entry_ptr_)                                                    \
@@ -159,11 +159,11 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             }                                                                  \
         }                                                                      \
         frm_ins_ent_ret_;                                                      \
-    })
+    }))
 
 #define ccc_impl_frm_try_insert_w(flat_realtime_ordered_map_ptr, key,          \
                                   lazy_value...)                               \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type try_ins_map_ptr_ = (flat_realtime_ordered_map_ptr);        \
         struct ccc_ent_ frm_try_ins_ent_ret_                                   \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -201,11 +201,11 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             }                                                                  \
         }                                                                      \
         frm_try_ins_ent_ret_;                                                  \
-    })
+    }))
 
 #define ccc_impl_frm_insert_or_assign_w(flat_realtime_ordered_map_ptr, key,    \
                                         lazy_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type ins_or_assign_map_ptr_ = (flat_realtime_ordered_map_ptr);  \
         struct ccc_ent_ frm_ins_or_assign_ent_ret_                             \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -259,7 +259,7 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
             }                                                                  \
         }                                                                      \
         frm_ins_or_assign_ent_ret_;                                            \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 
