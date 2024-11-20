@@ -22,7 +22,7 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 ## Containers
 
 <details>
-<summary>buffer.h</summary>
+<summary>buffer.h (dropdown)</summary>
 A fixed or dynamic contiguous array of a single user defined type.
 
 ```c
@@ -49,7 +49,7 @@ main(void)
 </details>
 
 <details>
-<summary>doubly_linked_list.h</summary>
+<summary>doubly_linked_list.h (dropdown)</summary>
 A dynamic container for efficient insertion and removal at any position.
 
 ```c
@@ -93,7 +93,7 @@ main(void)
 </details>
 
 <details>
-<summary>flat_double_ended_queue.h</summary>
+<summary>flat_double_ended_queue.h (dropdown)</summary>
 A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.
 
 ```c
@@ -127,7 +127,7 @@ main(void)
 </details>
 
 <details>
-<summary>flat_hash_map.h</summary>
+<summary>flat_hash_map.h (dropdown)</summary>
 Amortized O(1) access to elements stored in a flat array by key. Not pointer stable.
 
 ```c
@@ -205,7 +205,7 @@ main(void)
 </details>
 
 <details>
-<summary>flat_ordered_map.h</summary>
+<summary>flat_ordered_map.h (dropdown)</summary>
 An ordered map implemented in array with an index based self-optimizing tree.
 
 ```c
@@ -275,7 +275,7 @@ main(void)
 </details>
 
 <details>
-<summary>flat_priority_queue.h</summary>
+<summary>flat_priority_queue.h (dropdown)</summary>
 
 ```c
 #include <assert.h>
@@ -318,7 +318,7 @@ main(void)
 </details>
 
 <details>
-<summary>flat_realtime_ordered_map.h</summary>
+<summary>flat_realtime_ordered_map.h (dropdown)</summary>
 An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure..
 
 ```c
@@ -388,23 +388,23 @@ main(void)
 </details>
 
 <details>
-<summary>ordered_map.h</summary>
+<summary>ordered_map.h (dropdown)</summary>
 </details>
 
 <details>
-<summary>ordered_multimap.h</summary>
+<summary>ordered_multimap.h (dropdown)</summary>
 </details>
 
 <details>
-<summary>priority_queue.h</summary>
+<summary>priority_queue.h (dropdown)</summary>
 </details>
 
 <details>
-<summary>realtime_ordered_map.h</summary>
+<summary>realtime_ordered_map.h (dropdown)</summary>
 </details>
 
 <details>
-<summary>singly_linked_list.h</summary>
+<summary>singly_linked_list.h (dropdown)</summary>
 </details>
 
 ## Features
