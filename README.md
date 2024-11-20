@@ -389,10 +389,145 @@ main(void)
 
 <details>
 <summary>ordered_map.h (dropdown)</summary>
+A pointer stable ordered map that stores unique keys, implemented with a self-optimizing tree structure.
+
+```c
+#include <assert.h>
+#include <string.h>
+#define ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/ordered_map.h"
+#include "ccc/traits.h"
+
+struct name
+{
+    omap_elem e;
+    char const *name;
+};
+
+ccc_threeway_cmp
+kval_cmp(ccc_key_cmp cmp)
+{
+    char const *const key = *(char **)cmp.key_lhs;
+    struct name const *const rhs = cmp.user_type_rhs;
+    int const res = strcmp(key, rhs->name);
+    if (res == 0)
+    {
+        return CCC_EQL;
+    }
+    if (res < 0)
+    {
+        return CCC_LES;
+    }
+    return CCC_GRT;
+}
+
+int
+main(void)
+{
+    struct name nodes[5];
+    /* ordered_map named om, stores struct name, intrusive field e, key field
+       name, no allocation permission, comparison fn, no aux */
+    ordered_map om = om_init(om, struct name, e, name, NULL, kval_cmp, NULL);
+    char const *const sorted_names[5]
+        = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
+    size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
+    size_t j = 7 % size;
+    for (size_t i = 0; i < size; ++i, j = (j + 7) % size)
+    {
+        nodes[size(&om)].name = sorted_names[j];
+        ccc_entry e = insert_or_assign(&om, &nodes[size(&om)].e);
+        assert(!insert_error(&e) && !occupied(&e));
+    }
+    j = 0;
+    for (struct name const *n = begin(&om); n != end(&om); n = next(&om, &n->e))
+    {
+        assert(n->name == sorted_names[j]);
+        assert(strcmp(n->name, sorted_names[j]) == 0);
+        ++j;
+    }
+    assert(size(&om) == size);
+    ccc_entry e = try_insert(&om, &(struct name){.name = "Ferris"}.e);
+    assert(size(&om) == size);
+    assert(occupied(&e));
+    return 0;
+}
+```
+
 </details>
 
 <details>
 <summary>ordered_multimap.h (dropdown)</summary>
+An ordered map allowing storage of duplicate keys; searches and removals of duplicates will yield the oldest duplicate. An ordered multimap uses a self optimizing tree structures and is suitable for a priority queue if round robin fairness among duplicates is needed.
+
+```c
+#include <assert.h>
+#include <string.h>
+#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/ordered_multimap.h"
+#include "ccc/traits.h"
+
+struct name
+{
+    ommap_elem e;
+    char const *name;
+};
+
+ccc_threeway_cmp
+kval_cmp(ccc_key_cmp cmp)
+{
+    char const *const key = *(char **)cmp.key_lhs;
+    struct name const *const rhs = cmp.user_type_rhs;
+    int const res = strcmp(key, rhs->name);
+    if (res == 0)
+    {
+        return CCC_EQL;
+    }
+    if (res < 0)
+    {
+        return CCC_LES;
+    }
+    return CCC_GRT;
+}
+
+int
+main(void)
+{
+    struct name nodes[10];
+    /* ordered_map named om, stores struct name, intrusive field e, key field
+       name, no allocation permission, comparison fn, no aux */
+    ordered_multimap om
+        = omm_init(om, struct name, e, name, NULL, kval_cmp, NULL);
+    char const *const sorted_repeat_names[10]
+        = {"Ferris", "Ferris", "Glenda", "Glenda", "Rocky",
+           "Rocky",  "Tux",    "Tux",    "Ziggy",  "Ziggy"};
+    size_t const size
+        = sizeof(sorted_repeat_names) / sizeof(sorted_repeat_names[0]);
+    size_t j = 11 % size;
+    for (size_t i = 0; i < size; ++i, j = (j + 11) % size)
+    {
+        nodes[size(&om)].name = sorted_repeat_names[j];
+        ccc_entry e = insert(&om, &nodes[size(&om)].e);
+        assert(!insert_error(&e));
+    };
+    j = 1;
+    for (struct name *prev = rbegin(&om), *n = rnext(&om, &prev->e);
+         n != rend(&om); n = rnext(&om, &n->e), n = rnext(&om, &n->e),
+                     prev = rnext(&om, &prev->e), prev = rnext(&om, &prev->e))
+    {
+        assert(strcmp(n->name, sorted_repeat_names[j]) == 0);
+        assert(strcmp(n->name, prev->name) == 0);
+        j += 2;
+    }
+    assert(size(&om) == size);
+    ccc_entry e = insert(&om, &(struct name){.name = "Ferris"}.e);
+    assert(size(&om) == size + 1);
+    assert(occupied(&e));
+    return 0;
+}
+```
+
 </details>
 
 <details>
