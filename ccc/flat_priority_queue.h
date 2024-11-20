@@ -230,6 +230,8 @@ flat priority queue container. Check for collisions before name shortening. */
 #ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_init(args...) ccc_fpq_init(args)
+#    define fpq_heapify_init(args...) ccc_fpq_heapify_init(args)
+#    define fpq_heapify(args...) ccc_fpq_heapify(args)
 #    define fpq_emplace(args...) ccc_fpq_emplace(args)
 #    define fpq_realloc(args...) ccc_fpq_realloc(args)
 #    define fpq_push(args...) ccc_fpq_push(args)
