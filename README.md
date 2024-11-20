@@ -49,17 +49,124 @@ main(void)
 <br>
 </details>
 
-- doubly_linked_list.h ([doubly_linked_list snippet](#doubly-linked-list))
-- flat_double_ended_queue.h ([flat_double_ended_queue snippet](#flat-double-ended-queue))
-- flat_hash_map.h
-- flat_ordered_map.h
-- flat_priority_queue.h
-- flat_realtime_ordered_map.h
-- ordered_map.h
-- ordered_multimap.h
-- priority_queue.h
-- realtime_ordered_map.h
-- singly_linked_list.h
+<details>
+<summary>doubly_linked_list.h</summary>
+<br>
+A dynamic container for efficient insertion and removal at any position.
+
+```c
+#include <assert.h>
+#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/doubly_linked_list.h"
+#include "ccc/traits.h"
+
+struct int_elem
+{
+    int i;
+    dll_elem e;
+};
+
+static ccc_threeway_cmp
+int_cmp(ccc_cmp const cmp)
+{
+    struct int_elem const *const lhs = cmp.user_type_lhs;
+    struct int_elem const *const rhs = cmp.user_type_rhs;
+    return (lhs->i > rhs->i) - (lhs->i < rhs->i);
+}
+
+int
+main(void)
+{
+    /* doubly linked list l, list elem field e, no allocation permission,
+       comparing integers, no auxiliary data. */
+    doubly_linked_list l = dll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
+    struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
+    (void)push_back(&l, &elems[0].e);
+    (void)push_front(&l, &elems[1].e);
+    (void)push_back(&l, &elems[2].e);
+    (void)pop_back(&l);
+    struct int_elem *e = back(&l);
+    assert(e->i == 3);
+    return 0;
+}
+```
+</details>
+
+<details>
+<summary>flat_double_ended_queue.h</summary>
+<br>
+A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.
+
+```c
+#include <assert.h>
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/flat_double_ended_queue.h"
+#include "ccc/traits.h"
+
+int
+main(void)
+{
+    /* stack array, no allocation permission, no aux data, capacity 2 */
+    flat_double_ended_queue q = fdeq_init((int[2]){}, NULL, NULL, 2);
+    (void)push_back(&q, &(int){3});
+    (void)push_front(&q, &(int){2});
+    (void)push_back(&q, &(int){1}); /* Overwrite 2. */
+    int *i = front(&q);
+    assert(*i == 3);
+    i = back(&q);
+    assert(*i == 1);
+    (void)pop_back(&q);
+    i = back(&q);
+    assert(*i == 3);
+    i = front(&q);
+    assert(*i == 3);
+    return 0;
+}
+```
+</details>
+
+<details>
+<summary>flat_hash_map.h</summary>
+
+<br>
+</details>
+
+<details>
+<summary>flat_ordered_map.h</summary>
+<br>
+</details>
+
+<details>
+<summary>flat_priority_queue.h</summary>
+<br>
+</details>
+
+<details>
+<summary>flat_realtime_ordered_map.h</summary>
+<br>
+</details>
+
+<details>
+<summary>ordered_map.h</summary>
+<br>
+</details>
+
+<details>
+<summary>priority_queue.h</summary>
+<br>
+</details>
+
+<details>
+<summary>realtime_ordered_map.h</summary>
+<br>
+</details>
+
+<details>
+<summary>singly_linked_list.h</summary>
+<br>
+</details>
 
 ## Features
 
@@ -553,32 +660,3 @@ main(void)
 
 ## Flat Double Ended Queue
 
-A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.
-
-```c
-#include <assert.h>
-#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-#include "ccc/flat_double_ended_queue.h"
-#include "ccc/traits.h"
-
-int
-main(void)
-{
-    /* stack array, no allocation permission, no aux data, capacity 2 */
-    flat_double_ended_queue q = fdeq_init((int[2]){}, NULL, NULL, 2);
-    (void)push_back(&q, &(int){3});
-    (void)push_front(&q, &(int){2});
-    (void)push_back(&q, &(int){1}); /* Overwrite 2. */
-    int *i = front(&q);
-    assert(*i == 3);
-    i = back(&q);
-    assert(*i == 1);
-    (void)pop_back(&q);
-    i = back(&q);
-    assert(*i == 3);
-    i = front(&q);
-    assert(*i == 3);
-    return 0;
-}
-```
