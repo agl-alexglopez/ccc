@@ -126,43 +126,101 @@ main(void)
 
 <details>
 <summary>flat_hash_map.h</summary>
+Amortized O(1) access to elements stored in a flat array by key. Not pointer stable.
 
-<br>
+```c
+#include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/flat_hash_map.h"
+#include "ccc/traits.h"
+
+struct key_val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+
+static uint64_t
+fhmap_int_to_u64(ccc_user_key const k)
+{
+    int const key_int = *((int *)k.user_key);
+    uint64_t x = key_int;
+    x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
+    x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
+    x = x ^ (x >> 31);
+    return x;
+}
+
+bool
+fhmap_id_eq(ccc_key_cmp const cmp)
+{
+    struct key_val const *const va = cmp.user_type_rhs;
+    return va->key == *((int *)cmp.key_lhs);
+}
+
+/* Two Sum */
+int
+main(void)
+{
+    struct key_val vals[20];
+    ccc_flat_hash_map fh;
+    ccc_result const res
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
+                   fhmap_int_to_u64, fhmap_id_eq, NULL);
+    assert(res == CCC_OK);
+    int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
+    int const target = 15;
+    int solution_indices[2] = {-1, -1};
+    for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
+    {
+        struct key_val const *const other_addend
+            = get_key_val(&fh, &(int){target - addends[i]});
+        if (other_addend)
+        {
+            solution_indices[0] = (int)i;
+            solution_indices[1] = other_addend->val;
+            break;
+        }
+        (void)insert_or_assign(
+            &fh, &(struct key_val){.key = addends[i], .val = i}.e);
+    }
+    assert(solution_indices[0] == 8);
+    assert(solution_indices[1] == 2);
+    return 0;
+}
+```
 </details>
 
 <details>
 <summary>flat_ordered_map.h</summary>
-<br>
 </details>
 
 <details>
 <summary>flat_priority_queue.h</summary>
-<br>
 </details>
 
 <details>
 <summary>flat_realtime_ordered_map.h</summary>
-<br>
 </details>
 
 <details>
 <summary>ordered_map.h</summary>
-<br>
 </details>
 
 <details>
 <summary>priority_queue.h</summary>
-<br>
 </details>
 
 <details>
 <summary>realtime_ordered_map.h</summary>
-<br>
 </details>
 
 <details>
 <summary>singly_linked_list.h</summary>
-<br>
 </details>
 
 ## Features
