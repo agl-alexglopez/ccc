@@ -321,7 +321,7 @@ main(void)
 
 <details>
 <summary>flat_realtime_ordered_map.h (dropdown)</summary>
-An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure..
+An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.
 
 ```c
 #include <assert.h>
