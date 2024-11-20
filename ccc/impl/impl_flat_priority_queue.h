@@ -37,20 +37,20 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 
 #define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order,          \
                                   alloc_fn, cmp_fn, aux_data)                  \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fpq_heapify_mem_ = (mem_ptr);                              \
         struct ccc_fpq_ fpq_heapify_res_                                       \
             = ccc_impl_fpq_init(fpq_heapify_mem_, capacity, cmp_order,         \
                                 alloc_fn, cmp_fn, aux_data);                   \
         ccc_impl_fpq_in_place_heapify(&fpq_heapify_res_, (size));              \
         fpq_heapify_res_;                                                      \
-    })
+    }))
 
 /* This macro "returns" a value thanks to clang and gcc statement expressions.
    See documentation in the flat pqueue header for usage. The ugly details
    of the macro are hidden here in the impl header. */
 #define ccc_impl_fpq_emplace(fpq, type_initializer...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(type_initializer) *fpq_res_;                                    \
         struct ccc_fpq_ *fpq_ = (fpq);                                         \
         assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf_));           \
@@ -84,7 +84,7 @@ void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
             }                                                                  \
         }                                                                      \
         fpq_res_;                                                              \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

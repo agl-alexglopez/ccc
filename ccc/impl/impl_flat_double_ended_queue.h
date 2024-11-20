@@ -28,7 +28,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 #define ccc_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
         void *const fdeq_emplace_ret_ = NULL;                                  \
         if (fdeq_ptr_)                                                         \
@@ -41,10 +41,10 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
             }                                                                  \
         }                                                                      \
         fdeq_emplace_ret_;                                                     \
-    })
+    }))
 
 #define ccc_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
         void *const fdeq_emplace_ret_ = NULL;                                  \
         if (fdeq_ptr_)                                                         \
@@ -57,7 +57,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
             }                                                                  \
         }                                                                      \
         fdeq_emplace_ret_;                                                     \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

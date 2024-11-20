@@ -48,7 +48,7 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 #define ccc_impl_dll_emplace_back(dll_ptr, struct_initializer...)              \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(struct_initializer) *dll_res_ = NULL;                           \
         struct ccc_dll_ *dll_ = (dll_ptr);                                     \
         if (dll_)                                                              \
@@ -65,10 +65,10 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
             }                                                                  \
         }                                                                      \
         dll_res_;                                                              \
-    })
+    }))
 
 #define ccc_impl_dll_emplace_front(dll_ptr, struct_initializer...)             \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(struct_initializer) *dll_res_;                                  \
         struct ccc_dll_ *dll_ = (dll_ptr);                                     \
         assert(sizeof(*dll_res_) == dll_->elem_sz_);                           \
@@ -87,7 +87,7 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
             }                                                                  \
         }                                                                      \
         dll_res_;                                                              \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

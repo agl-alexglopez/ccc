@@ -43,7 +43,7 @@ void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 #define ccc_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(struct_initializer) *sll_res_ = NULL;                           \
         struct ccc_sll_ *sll_ = (list_ptr);                                    \
         if (sll_)                                                              \
@@ -64,7 +64,7 @@ void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
             }                                                                  \
         }                                                                      \
         sll_res_;                                                              \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

@@ -43,7 +43,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 #define ccc_impl_om_new(ordered_map_entry)                                     \
-    ({                                                                         \
+    (__extension__({                                                           \
         void *om_ins_alloc_ret_ = NULL;                                        \
         if ((ordered_map_entry)->t_->alloc_)                                   \
         {                                                                      \
@@ -53,11 +53,11 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
                                    (ordered_map_entry)->t_->aux_);             \
         }                                                                      \
         om_ins_alloc_ret_;                                                     \
-    })
+    }))
 
 #define ccc_impl_om_insert_key_val(ordered_map_entry, new_mem,                 \
                                    lazy_key_value...)                          \
-    ({                                                                         \
+    (__extension__({                                                           \
         if (new_mem)                                                           \
         {                                                                      \
             *new_mem = lazy_key_value;                                         \
@@ -65,11 +65,11 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 (ordered_map_entry)->t_,                                       \
                 ccc_impl_omap_elem_in_slot((ordered_map_entry)->t_, new_mem)); \
         }                                                                      \
-    })
+    }))
 
 #define ccc_impl_om_insert_and_copy_key(om_insert_entry, om_insert_entry_ret,  \
                                         key, lazy_value...)                    \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(lazy_value) *om_new_ins_base_                                   \
             = ccc_impl_om_new((&om_insert_entry));                             \
         om_insert_entry_ret = (struct ccc_ent_){                               \
@@ -87,13 +87,13 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 ccc_impl_omap_elem_in_slot(om_insert_entry.t_,                 \
                                            om_new_ins_base_));                 \
         }                                                                      \
-    })
+    }))
 
 /*=====================     Core Macro Implementations     ==================*/
 
 #define ccc_impl_om_and_modify_w(ordered_map_entry_ptr, type_name,             \
                                  closure_over_T...)                            \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type om_ent_ptr_ = (ordered_map_entry_ptr);                     \
         struct ccc_tree_entry_ om_mod_ent_                                     \
             = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
@@ -110,10 +110,10 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         om_mod_ent_;                                                           \
-    })
+    }))
 
 #define ccc_impl_om_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)      \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type or_ins_entry_ptr_ = (ordered_map_entry_ptr);               \
         typeof(lazy_key_value) *or_ins_ret_ = NULL;                            \
         if (or_ins_entry_ptr_)                                                 \
@@ -132,10 +132,10 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         or_ins_ret_;                                                           \
-    })
+    }))
 
 #define ccc_impl_om_insert_entry_w(ordered_map_entry_ptr, lazy_key_value...)   \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type ins_entry_ptr_ = (ordered_map_entry_ptr);                  \
         typeof(lazy_key_value) *om_ins_ent_ret_ = NULL;                        \
         if (ins_entry_ptr_)                                                    \
@@ -160,10 +160,10 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         om_ins_ent_ret_;                                                       \
-    })
+    }))
 
 #define ccc_impl_om_try_insert_w(ordered_map_ptr, key, lazy_value...)          \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type try_ins_map_ptr_ = (ordered_map_ptr);                      \
         struct ccc_ent_ om_try_ins_ent_ret_                                    \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -185,10 +185,10 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         om_try_ins_ent_ret_;                                                   \
-    })
+    }))
 
 #define ccc_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)    \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type ins_or_assign_map_ptr_ = (ordered_map_ptr);                \
         struct ccc_ent_ om_ins_or_assign_ent_ret_                              \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -223,7 +223,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
             }                                                                  \
         }                                                                      \
         om_ins_or_assign_ent_ret_;                                             \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

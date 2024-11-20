@@ -49,7 +49,7 @@ union ccc_fhmap_entry_
 
 #define ccc_impl_fhm_init(flat_hash_map_ptr, memory_ptr, capacity, key_field,  \
                           fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux) \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fhm_mem_ptr_ = (memory_ptr);                               \
         (flat_hash_map_ptr)->buf_                                              \
             = (ccc_buffer)ccc_buf_init(fhm_mem_ptr_, alloc_fn, aux, capacity); \
@@ -58,7 +58,7 @@ union ccc_fhmap_entry_
             offsetof(typeof(*(fhm_mem_ptr_)), fhash_elem_field), (hash_fn),    \
             (key_eq_fn), (aux));                                               \
         res_;                                                                  \
-    })
+    }))
 
 ccc_result ccc_impl_fhm_init_buf(struct ccc_fhmap_ *, size_t key_offset,
                                  size_t hash_elem_offset, ccc_hash_fn *,
@@ -89,7 +89,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 /* Internal helper assumes that swap_entry has already been evaluated once
    which it must have to make it to this point. */
 #define ccc_impl_fhm_swaps(swap_entry, lazy_key_value...)                      \
-    ({                                                                         \
+    (__extension__({                                                           \
         size_t fhm_i_                                                          \
             = ccc_buf_i(&((swap_entry)->h_->buf_), (swap_entry)->entry_.e_);   \
         if (*ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_) == CCC_FHM_EMPTY)  \
@@ -119,13 +119,13 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                 fhm_i_);                                                       \
         }                                                                      \
         (swap_entry)->entry_.e_;                                               \
-    })
+    }))
 
 /*=====================     Core Macro Implementations     ==================*/
 
 #define ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, type_name,          \
                                   closure_over_T...)                           \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fhm_mod_ent_ptr_ = (flat_hash_map_entry_ptr);              \
         struct ccc_fhash_entry_ fhm_mod_with_ent_                              \
             = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
@@ -142,10 +142,10 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             }                                                                  \
         }                                                                      \
         fhm_mod_with_ent_;                                                     \
-    })
+    }))
 
 #define ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)   \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fhm_or_ins_ent_ptr_ = (flat_hash_map_entry_ptr);           \
         typeof(lazy_key_value) *fhm_or_ins_res_ = NULL;                        \
         if (fhm_or_ins_ent_ptr_)                                               \
@@ -168,11 +168,11 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             }                                                                  \
         }                                                                      \
         fhm_or_ins_res_;                                                       \
-    })
+    }))
 
 #define ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr,                   \
                                     lazy_key_value...)                         \
-    ({                                                                         \
+    (__extension__({                                                           \
         __auto_type fhm_ins_ent_ptr_ = (flat_hash_map_entry_ptr);              \
         typeof(lazy_key_value) *fhm_res_ = NULL;                               \
         if (fhm_ins_ent_ptr_)                                                  \
@@ -200,10 +200,10 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             }                                                                  \
         }                                                                      \
         fhm_res_;                                                              \
-    })
+    }))
 
 #define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
-    ({                                                                         \
+    (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
         struct ccc_ent_ fhm_try_insert_res_                                    \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -229,10 +229,10 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             }                                                                  \
         }                                                                      \
         fhm_try_insert_res_;                                                   \
-    })
+    }))
 
 #define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
-    ({                                                                         \
+    (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
         struct ccc_ent_ fhm_ins_or_assign_res_                                 \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
@@ -272,7 +272,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             }                                                                  \
         }                                                                      \
         fhm_ins_or_assign_res_;                                                \
-    })
+    }))
 
 /* NOLINTEND(readability-identifier-naming) */
 

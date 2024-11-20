@@ -46,7 +46,7 @@ void ccc_impl_pq_push(struct ccc_pq_ *, struct ccc_pq_elem_ *);
 struct ccc_pq_elem_ *ccc_impl_pq_elem_in(struct ccc_pq_ const *, void const *);
 
 #define ccc_impl_pq_emplace(pq_ptr, lazy_value...)                             \
-    ({                                                                         \
+    (__extension__({                                                           \
         typeof(lazy_value) *pq_res_ = NULL;                                    \
         struct ccc_pq_ *pq_ = (pq_ptr);                                        \
         if (pq_)                                                               \
@@ -67,6 +67,6 @@ struct ccc_pq_elem_ *ccc_impl_pq_elem_in(struct ccc_pq_ const *, void const *);
             }                                                                  \
         }                                                                      \
         pq_res_;                                                               \
-    })
+    }))
 
 #endif /* CCC_IMPL_PRIORITY_QUEUE_H */
