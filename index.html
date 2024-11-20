@@ -115,20 +115,692 @@ Quick Start</h1>
 </ul>
 <h1><a class="anchor" id="autotoc_md3"></a>
 Containers</h1>
-<ul>
-<li><a class="el" href="buffer_8h.html" title="The Buffer Interface.">buffer.h</a> (buffer snippet)</li>
-<li><a class="el" href="doubly__linked__list_8h.html" title="The Doubly Linked List Interface.">doubly_linked_list.h</a> (doubly_linked_list snippet)</li>
-<li><a class="el" href="flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface.">flat_double_ended_queue.h</a> (flat_double_ended_queue snippet)</li>
-<li><a class="el" href="flat__hash__map_8h.html" title="The Flat Hash Map Interface.">flat_hash_map.h</a></li>
-<li><a class="el" href="flat__ordered__map_8h.html" title="The Flat Ordered Map Interface.">flat_ordered_map.h</a></li>
-<li><a class="el" href="flat__priority__queue_8h.html" title="The Flat Priority Queue Interface.">flat_priority_queue.h</a></li>
-<li><a class="el" href="flat__realtime__ordered__map_8h.html" title="The Flat Realtime Ordered Map Interface.">flat_realtime_ordered_map.h</a></li>
-<li><a class="el" href="ordered__map_8h.html" title="The Ordered Map Interface.">ordered_map.h</a></li>
-<li><a class="el" href="ordered__multimap_8h.html" title="The Ordered Multimap Interface.">ordered_multimap.h</a></li>
-<li><a class="el" href="priority__queue_8h.html" title="The Priority Queue Interface.">priority_queue.h</a></li>
-<li><a class="el" href="realtime__ordered__map_8h.html" title="The Realtime Ordered Map Interface.">realtime_ordered_map.h</a></li>
-<li><a class="el" href="singly__linked__list_8h.html" title="The Singly Linked List Interface.">singly_linked_list.h</a></li>
-</ul>
+<details >
+<summary >
+buffer.h (dropdown)</summary>
+<p>A fixed or dynamic contiguous array of a single user defined type.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="buffer_8h.html">ccc/buffer.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 5 */</span></div>
+<div class="line">    buffer b = buf_init((<span class="keywordtype">int</span>[5]){}, NULL, NULL, 5);</div>
+<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){3});</div>
+<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){2});</div>
+<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){1});</div>
+<div class="line">    (void)pop_back(&amp;b);</div>
+<div class="line">    <span class="keywordtype">int</span> *i = back(&amp;b);</div>
+<div class="line">    assert(*i == 2);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="abuffer_8h_html"><div class="ttname"><a href="buffer_8h.html">buffer.h</a></div><div class="ttdoc">The Buffer Interface.</div></div>
+<div class="ttc" id="atraits_8h_html"><div class="ttname"><a href="traits_8h.html">traits.h</a></div><div class="ttdoc">The C Container Collection Traits Interface.</div></div>
+</div><!-- fragment --> </details>
+<details >
+<summary >
+doubly_linked_list.h (dropdown)</summary>
+<p>A dynamic container for efficient insertion and removal at any position.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">ccc/doubly_linked_list.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>int_elem</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> i;</div>
+<div class="line">    dll_elem e;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> (lhs-&gt;i &gt; rhs-&gt;i) - (lhs-&gt;i &lt; rhs-&gt;i);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* doubly linked list l, list elem field e, no allocation permission,</span></div>
+<div class="line"><span class="comment">       comparing integers, no auxiliary data. */</span></div>
+<div class="line">    doubly_linked_list l = dll_init(l, <span class="keyword">struct</span> int_elem, e, NULL, int_cmp, NULL);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};</div>
+<div class="line">    (void)push_back(&amp;l, &amp;elems[0].e);</div>
+<div class="line">    (void)push_front(&amp;l, &amp;elems[1].e);</div>
+<div class="line">    (void)push_back(&amp;l, &amp;elems[2].e);</div>
+<div class="line">    (void)pop_back(&amp;l);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem *e = back(&amp;l);</div>
+<div class="line">    assert(e-&gt;i == 3);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="adoubly__linked__list_8h_html"><div class="ttname"><a href="doubly__linked__list_8h.html">doubly_linked_list.h</a></div><div class="ttdoc">The Doubly Linked List Interface.</div></div>
+<div class="ttc" id="astructccc__cmp_html"><div class="ttname"><a href="structccc__cmp.html">ccc_cmp</a></div><div class="ttdoc">An element comparison helper.</div><div class="ttdef"><b>Definition:</b> types.h:100</div></div>
+<div class="ttc" id="astructccc__cmp_html_a413783988aeb931cebe1ff2355147e49"><div class="ttname"><a href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">ccc_cmp::user_type_lhs</a></div><div class="ttdeci">void const  *const user_type_lhs</div><div class="ttdef"><b>Definition:</b> types.h:102</div></div>
+<div class="ttc" id="astructccc__cmp_html_aad71faef58d3c2d057d2f2953372f32f"><div class="ttname"><a href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">ccc_cmp::user_type_rhs</a></div><div class="ttdeci">void const  *const user_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:104</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:80</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+flat_double_ended_queue.h (dropdown)</summary>
+<p>A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__double__ended__queue_8h.html">ccc/flat_double_ended_queue.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 2 */</span></div>
+<div class="line">    flat_double_ended_queue q = fdeq_init((<span class="keywordtype">int</span>[2]){}, NULL, NULL, 2);</div>
+<div class="line">    (void)push_back(&amp;q, &amp;(<span class="keywordtype">int</span>){3});</div>
+<div class="line">    (void)push_front(&amp;q, &amp;(<span class="keywordtype">int</span>){2});</div>
+<div class="line">    (void)push_back(&amp;q, &amp;(<span class="keywordtype">int</span>){1}); <span class="comment">/* Overwrite 2. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> *i = front(&amp;q);</div>
+<div class="line">    assert(*i == 3);</div>
+<div class="line">    i = back(&amp;q);</div>
+<div class="line">    assert(*i == 1);</div>
+<div class="line">    (void)pop_back(&amp;q);</div>
+<div class="line">    i = back(&amp;q);</div>
+<div class="line">    assert(*i == 3);</div>
+<div class="line">    i = front(&amp;q);</div>
+<div class="line">    assert(*i == 3);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html"><div class="ttname"><a href="flat__double__ended__queue_8h.html">flat_double_ended_queue.h</a></div><div class="ttdoc">The Flat Double Ended Queue Interface.</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+flat_hash_map.h (dropdown)</summary>
+<p>Amortized O(1) access to elements stored in a flat array by key. Not pointer stable.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__hash__map_8h.html">ccc/flat_hash_map.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>key_val</div>
+<div class="line">{</div>
+<div class="line">    fhmap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> uint64_t</div>
+<div class="line">fhmap_int_to_u64(<a class="code hl_struct" href="structccc__user__key.html">ccc_user_key</a> <span class="keyword">const</span> k)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_int = *((<span class="keywordtype">int</span> *)k.<a class="code hl_variable" href="structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35">user_key</a>);</div>
+<div class="line">    uint64_t x = key_int;</div>
+<div class="line">    x = (x ^ (x &gt;&gt; 30)) * UINT64_C(0xbf58476d1ce4e5b9);</div>
+<div class="line">    x = (x ^ (x &gt;&gt; 27)) * UINT64_C(0x94d049bb133111eb);</div>
+<div class="line">    x = x ^ (x &gt;&gt; 31);</div>
+<div class="line">    <span class="keywordflow">return</span> x;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">bool</span></div>
+<div class="line">fhmap_id_eq(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>key_val const *<span class="keyword">const</span> va = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> va-&gt;key == *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Two Sum */</span></div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>key_val vals[20];</div>
+<div class="line">    <span class="comment">/* stack array backed, key field named key, intrusive field e, no</span></div>
+<div class="line"><span class="comment">       allocation permission, a hash function, an equality function, no aux. */</span></div>
+<div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> fh;</div>
+<div class="line">    <a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> <span class="keyword">const</span> res</div>
+<div class="line">        = fhm_init(&amp;fh, vals, <span class="keyword">sizeof</span>(vals) / <span class="keyword">sizeof</span>(vals[0]), key, e, NULL,</div>
+<div class="line">                   fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line">    assert(res == <a class="code hl_enumvalue" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a>);</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> target = 15;</div>
+<div class="line">    <span class="keywordtype">int</span> solution_indices[2] = {-1, -1};</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; (<span class="keyword">sizeof</span>(addends) / <span class="keyword">sizeof</span>(addends[0])); ++i)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="comment">/* Functions take keys and structs by reference. */</span></div>
+<div class="line">        <span class="keyword">struct </span>key_val const *<span class="keyword">const</span> other_addend</div>
+<div class="line">            = get_key_val(&amp;fh, &amp;(<span class="keywordtype">int</span>){target - addends[i]});</div>
+<div class="line">        <span class="keywordflow">if</span> (other_addend)</div>
+<div class="line">        {</div>
+<div class="line">            solution_indices[0] = (int)i;</div>
+<div class="line">            solution_indices[1] = other_addend-&gt;val;</div>
+<div class="line">            <span class="keywordflow">break</span>;</div>
+<div class="line">        }</div>
+<div class="line">        <span class="comment">/* Macros take keys and structs by value. */</span></div>
+<div class="line">        (void)fhm_insert_or_assign_w(&amp;fh, addends[i],</div>
+<div class="line">                                     (<span class="keyword">struct</span> key_val){.val = i});</div>
+<div class="line">    }</div>
+<div class="line">    assert(solution_indices[0] == 8);</div>
+<div class="line">    assert(solution_indices[1] == 2);</div>
+<div class="line">    assert(addends[solution_indices[0]] + addends[solution_indices[1]]</div>
+<div class="line">           == target);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aflat__hash__map_8h_html"><div class="ttname"><a href="flat__hash__map_8h.html">flat_hash_map.h</a></div><div class="ttdoc">The Flat Hash Map Interface.</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_af8251d1f96c8a10e8ff2b20d7f117447"><div class="ttname"><a href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></div><div class="ttdeci">struct ccc_fhmap_ ccc_flat_hash_map</div><div class="ttdoc">A container for storing key-value structures defined by the user in a contiguous buffer.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:39</div></div>
+<div class="ttc" id="astructccc__key__cmp_html"><div class="ttname"><a href="structccc__key__cmp.html">ccc_key_cmp</a></div><div class="ttdoc">A key comparison helper to avoid argument swapping.</div><div class="ttdef"><b>Definition:</b> types.h:114</div></div>
+<div class="ttc" id="astructccc__key__cmp_html_a1378c81c5089d815ce1d61090bd391c4"><div class="ttname"><a href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">ccc_key_cmp::user_type_rhs</a></div><div class="ttdeci">void const  *const user_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:118</div></div>
+<div class="ttc" id="astructccc__key__cmp_html_a6077551b8a72a5149f78b81f3cb90951"><div class="ttname"><a href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">ccc_key_cmp::key_lhs</a></div><div class="ttdeci">void const  *const key_lhs</div><div class="ttdef"><b>Definition:</b> types.h:116</div></div>
+<div class="ttc" id="astructccc__user__key_html"><div class="ttname"><a href="structccc__user__key.html">ccc_user_key</a></div><div class="ttdoc">A read only reference to a key type matching the key field type used for hash containers.</div><div class="ttdef"><b>Definition:</b> types.h:141</div></div>
+<div class="ttc" id="astructccc__user__key_html_aa8ccc5020a1cada149fb7d1509868b35"><div class="ttname"><a href="structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35">ccc_user_key::user_key</a></div><div class="ttdeci">void const  *const user_key</div><div class="ttdef"><b>Definition:</b> types.h:143</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a></div><div class="ttdeci">@ CCC_OK</div><div class="ttdef"><b>Definition:</b> types.h:63</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+flat_ordered_map.h (dropdown)</summary>
+<p>An ordered map implemented in array with an index based self-optimizing tree.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TYPES_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__ordered__map_8h.html">ccc/flat_ordered_map.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>kval</div>
+<div class="line">{</div>
+<div class="line">    fomap_elem elem;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_lhs = *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
+<div class="line">    <span class="keywordflow">return</span> (key_lhs &gt; rhs-&gt;key) - (key_lhs &lt; rhs-&gt;key);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* stack array of 25 elements with one slot for sentinel, intrusive field</span></div>
+<div class="line"><span class="comment">       named elem, key field named key, no allocation permission, key comparison</span></div>
+<div class="line"><span class="comment">       function, no aux data. */</span></div>
+<div class="line">    flat_ordered_map s</div>
+<div class="line">        = fom_init((<span class="keyword">struct</span> kval[26]){}, 26, elem, key, NULL, kval_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> num_nodes = 25;</div>
+<div class="line">    <span class="comment">/* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0, <span class="keywordtype">id</span> = 0; i &lt; num_nodes; ++i, <span class="keywordtype">id</span> += 5)</div>
+<div class="line">    {</div>
+<div class="line">        (void)insert_or_assign(&amp;s, &amp;(<span class="keyword">struct</span> kval){.key = id, .val = i}.elem);</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">/* This should be the following range [6,44). 6 should raise to</span></div>
+<div class="line"><span class="comment">       next value not less than 6, 10 and 44 should be the first</span></div>
+<div class="line"><span class="comment">       value greater than 44, 45. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};</div>
+<div class="line">    range r = equal_range(&amp;s, &amp;(<span class="keywordtype">int</span>){6}, &amp;(int){44});</div>
+<div class="line">    <span class="keywordtype">int</span> index = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> kval *i = begin_range(&amp;r); i != end_range(&amp;r);</div>
+<div class="line">         i = next(&amp;s, &amp;i-&gt;elem))</div>
+<div class="line">    {</div>
+<div class="line">        assert(i-&gt;key == range_keys[index]);</div>
+<div class="line">        ++index;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">/* This should be the following range [119,84). 119 should be</span></div>
+<div class="line"><span class="comment">       dropped to first value not greater than 119 and last should</span></div>
+<div class="line"><span class="comment">       be dropped to first value less than 84. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};</div>
+<div class="line">    rrange rr = equal_rrange(&amp;s, &amp;(<span class="keywordtype">int</span>){119}, &amp;(int){84});</div>
+<div class="line">    index = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> kval *i = rbegin_rrange(&amp;rr); i != rend_rrange(&amp;rr);</div>
+<div class="line">         i = rnext(&amp;s, &amp;i-&gt;elem))</div>
+<div class="line">    {</div>
+<div class="line">        assert(i-&gt;key == rrange_keys[index]);</div>
+<div class="line">        ++index;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aflat__ordered__map_8h_html"><div class="ttname"><a href="flat__ordered__map_8h.html">flat_ordered_map.h</a></div><div class="ttdoc">The Flat Ordered Map Interface.</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+flat_priority_queue.h (dropdown)</summary>
+<p></p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__priority__queue_8h.html">ccc/flat_priority_queue.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> ints)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> lhs = *(<span class="keywordtype">int</span> *)ints.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> rhs = *(<span class="keywordtype">int</span> *)ints.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> (lhs &gt; rhs) - (lhs &lt; rhs);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* In place O(n) time O(1) space partial sort. */</span></div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> heap[20] = {12, 61, -39, 76, 48, -93, -77, -81, 35, 21,</div>
+<div class="line">                    -3, 90, 20,  27, 97, -22, -20, -19, 70, 76};</div>
+<div class="line">    <span class="comment">/* Heapify existing array of values, with capacity, size one less than</span></div>
+<div class="line"><span class="comment">       capacity for swap space, min priority queue, no allocation, no aux. */</span></div>
+<div class="line">    flat_priority_queue pq = fpq_heapify_init(</div>
+<div class="line">        heap, (<span class="keyword">sizeof</span>(heap) / <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)), 19, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">int</span> prev = *((<span class="keywordtype">int</span> *)front(&amp;pq));</div>
+<div class="line">    (void)pop(&amp;pq);</div>
+<div class="line">    <span class="keywordflow">while</span> (!is_empty(&amp;pq))</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordtype">int</span> cur = *((<span class="keywordtype">int</span> *)front(&amp;pq));</div>
+<div class="line">        (void)pop(&amp;pq);</div>
+<div class="line">        assert(cur &gt;= prev);</div>
+<div class="line">        prev = cur;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aflat__priority__queue_8h_html"><div class="ttname"><a href="flat__priority__queue_8h.html">flat_priority_queue.h</a></div><div class="ttdoc">The Flat Priority Queue Interface.</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:82</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+flat_realtime_ordered_map.h (dropdown)</summary>
+<p>An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TYPES_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__realtime__ordered__map_8h.html">ccc/flat_realtime_ordered_map.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>kval</div>
+<div class="line">{</div>
+<div class="line">    fromap_elem elem;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_lhs = *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
+<div class="line">    <span class="keywordflow">return</span> (key_lhs &gt; rhs-&gt;key) - (key_lhs &lt; rhs-&gt;key);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* stack array of 25 elements with one slot for sentinel, intrusive field</span></div>
+<div class="line"><span class="comment">       named elem, key field named key, no allocation permission, key comparison</span></div>
+<div class="line"><span class="comment">       function, no aux data. */</span></div>
+<div class="line">    flat_realtime_ordered_map s</div>
+<div class="line">        = frm_init((<span class="keyword">struct</span> kval[26]){}, 26, elem, key, NULL, kval_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> num_nodes = 25;</div>
+<div class="line">    <span class="comment">/* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0, <span class="keywordtype">id</span> = 0; i &lt; num_nodes; ++i, <span class="keywordtype">id</span> += 5)</div>
+<div class="line">    {</div>
+<div class="line">        (void)insert_or_assign(&amp;s, &amp;(<span class="keyword">struct</span> kval){.key = id, .val = i}.elem);</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">/* This should be the following range [6,44). 6 should raise to</span></div>
+<div class="line"><span class="comment">       next value not less than 6, 10 and 44 should be the first</span></div>
+<div class="line"><span class="comment">       value greater than 44, 45. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};</div>
+<div class="line">    range r = equal_range(&amp;s, &amp;(<span class="keywordtype">int</span>){6}, &amp;(int){44});</div>
+<div class="line">    <span class="keywordtype">int</span> index = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> kval *i = begin_range(&amp;r); i != end_range(&amp;r);</div>
+<div class="line">         i = next(&amp;s, &amp;i-&gt;elem))</div>
+<div class="line">    {</div>
+<div class="line">        assert(i-&gt;key == range_keys[index]);</div>
+<div class="line">        ++index;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">/* This should be the following range [119,84). 119 should be</span></div>
+<div class="line"><span class="comment">       dropped to first value not greater than 119 and last should</span></div>
+<div class="line"><span class="comment">       be dropped to first value less than 84. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};</div>
+<div class="line">    rrange rr = equal_rrange(&amp;s, &amp;(<span class="keywordtype">int</span>){119}, &amp;(int){84});</div>
+<div class="line">    index = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> kval *i = rbegin_rrange(&amp;rr); i != rend_rrange(&amp;rr);</div>
+<div class="line">         i = rnext(&amp;s, &amp;i-&gt;elem))</div>
+<div class="line">    {</div>
+<div class="line">        assert(i-&gt;key == rrange_keys[index]);</div>
+<div class="line">        ++index;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aflat__realtime__ordered__map_8h_html"><div class="ttname"><a href="flat__realtime__ordered__map_8h.html">flat_realtime_ordered_map.h</a></div><div class="ttdoc">The Flat Realtime Ordered Map Interface.</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+ordered_map.h (dropdown)</summary>
+<p>A pointer stable ordered map that stores unique keys, implemented with a self-optimizing tree structure.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="ordered__map_8h.html">ccc/ordered_map.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>name</div>
+<div class="line">{</div>
+<div class="line">    omap_elem e;</div>
+<div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *name;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> key = *(<span class="keywordtype">char</span> **)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct</span> name <span class="keyword">const</span> *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> res = strcmp(key, rhs-&gt;name);</div>
+<div class="line">    <span class="keywordflow">if</span> (res == 0)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">if</span> (res &lt; 0)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a>;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>name nodes[5];</div>
+<div class="line">    <span class="comment">/* ordered_map named om, stores struct name, intrusive field e, key field</span></div>
+<div class="line"><span class="comment">       name, no allocation permission, comparison fn, no aux */</span></div>
+<div class="line">    ordered_map om = om_init(om, <span class="keyword">struct</span> name, e, name, NULL, kval_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> sorted_names[5]</div>
+<div class="line">        = {<span class="stringliteral">&quot;Ferris&quot;</span>, <span class="stringliteral">&quot;Glenda&quot;</span>, <span class="stringliteral">&quot;Rocky&quot;</span>, <span class="stringliteral">&quot;Tux&quot;</span>, <span class="stringliteral">&quot;Ziggy&quot;</span>};</div>
+<div class="line">    <span class="keywordtype">size_t</span> <span class="keyword">const</span> size = <span class="keyword">sizeof</span>(sorted_names) / <span class="keyword">sizeof</span>(sorted_names[0]);</div>
+<div class="line">    <span class="keywordtype">size_t</span> j = 7 % size;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size; ++i, j = (j + 7) % size)</div>
+<div class="line">    {</div>
+<div class="line">        nodes[size(&amp;om)].name = sorted_names[j];</div>
+<div class="line">        <a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = insert_or_assign(&amp;om, &amp;nodes[size(&amp;om)].e);</div>
+<div class="line">        assert(!insert_error(&amp;e) &amp;&amp; !occupied(&amp;e));</div>
+<div class="line">    }</div>
+<div class="line">    j = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> name <span class="keyword">const</span> *n = begin(&amp;om); n != end(&amp;om); n = next(&amp;om, &amp;n-&gt;e))</div>
+<div class="line">    {</div>
+<div class="line">        assert(n-&gt;name == sorted_names[j]);</div>
+<div class="line">        assert(strcmp(n-&gt;name, sorted_names[j]) == 0);</div>
+<div class="line">        ++j;</div>
+<div class="line">    }</div>
+<div class="line">    assert(size(&amp;om) == size);</div>
+<div class="line">    <a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = try_insert(&amp;om, &amp;(<span class="keyword">struct</span> name){.name = <span class="stringliteral">&quot;Ferris&quot;</span>}.e);</div>
+<div class="line">    assert(size(&amp;om) == size);</div>
+<div class="line">    assert(occupied(&amp;e));</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aordered__map_8h_html"><div class="ttname"><a href="ordered__map_8h.html">ordered_map.h</a></div><div class="ttdoc">The Ordered Map Interface.</div></div>
+<div class="ttc" id="atypes_8h_html_a70feefd55fafc84e06d2f2a1dfd4f389"><div class="ttname"><a href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a></div><div class="ttdeci">union ccc_entry_ ccc_entry</div><div class="ttdoc">An Occupied or Vacant position in a searchable container.</div><div class="ttdef"><b>Definition:</b> types.h:43</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a></div><div class="ttdeci">@ CCC_EQL</div><div class="ttdef"><b>Definition:</b> types.h:84</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a></div><div class="ttdeci">@ CCC_GRT</div><div class="ttdef"><b>Definition:</b> types.h:86</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+ordered_multimap.h (dropdown)</summary>
+<p>A pointer stable ordered map allowing storage of duplicate keys; searches and removals of duplicates will yield the oldest duplicate. An ordered multimap uses a self optimizing tree structures and is suitable for a priority queue if round robin fairness among duplicates is needed.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define ORDERED_MULTIMAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="ordered__multimap_8h.html">ccc/ordered_multimap.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>name</div>
+<div class="line">{</div>
+<div class="line">    ommap_elem e;</div>
+<div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *name;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> key = *(<span class="keywordtype">char</span> **)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct</span> name <span class="keyword">const</span> *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> res = strcmp(key, rhs-&gt;name);</div>
+<div class="line">    <span class="keywordflow">if</span> (res == 0)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">if</span> (res &lt; 0)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a>;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>name nodes[10];</div>
+<div class="line">    <span class="comment">/* ordered_map named om, stores struct name, intrusive field e, key field</span></div>
+<div class="line"><span class="comment">       name, no allocation permission, comparison fn, no aux */</span></div>
+<div class="line">    ordered_multimap om</div>
+<div class="line">        = omm_init(om, <span class="keyword">struct</span> name, e, name, NULL, kval_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> sorted_repeat_names[10]</div>
+<div class="line">        = {<span class="stringliteral">&quot;Ferris&quot;</span>, <span class="stringliteral">&quot;Ferris&quot;</span>, <span class="stringliteral">&quot;Glenda&quot;</span>, <span class="stringliteral">&quot;Glenda&quot;</span>, <span class="stringliteral">&quot;Rocky&quot;</span>,</div>
+<div class="line">           <span class="stringliteral">&quot;Rocky&quot;</span>,  <span class="stringliteral">&quot;Tux&quot;</span>,    <span class="stringliteral">&quot;Tux&quot;</span>,    <span class="stringliteral">&quot;Ziggy&quot;</span>,  <span class="stringliteral">&quot;Ziggy&quot;</span>};</div>
+<div class="line">    <span class="keywordtype">size_t</span> <span class="keyword">const</span> size</div>
+<div class="line">        = <span class="keyword">sizeof</span>(sorted_repeat_names) / <span class="keyword">sizeof</span>(sorted_repeat_names[0]);</div>
+<div class="line">    <span class="keywordtype">size_t</span> j = 11 % size;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size; ++i, j = (j + 11) % size)</div>
+<div class="line">    {</div>
+<div class="line">        nodes[size(&amp;om)].name = sorted_repeat_names[j];</div>
+<div class="line">        <a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = insert(&amp;om, &amp;nodes[size(&amp;om)].e);</div>
+<div class="line">        assert(!insert_error(&amp;e));</div>
+<div class="line">    };</div>
+<div class="line">    j = 1;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> name *prev = rbegin(&amp;om), *n = rnext(&amp;om, &amp;prev-&gt;e);</div>
+<div class="line">         n != rend(&amp;om); n = rnext(&amp;om, &amp;n-&gt;e), n = rnext(&amp;om, &amp;n-&gt;e),</div>
+<div class="line">                     prev = rnext(&amp;om, &amp;prev-&gt;e), prev = rnext(&amp;om, &amp;prev-&gt;e))</div>
+<div class="line">    {</div>
+<div class="line">        assert(strcmp(n-&gt;name, sorted_repeat_names[j]) == 0);</div>
+<div class="line">        assert(strcmp(n-&gt;name, prev-&gt;name) == 0);</div>
+<div class="line">        j += 2;</div>
+<div class="line">    }</div>
+<div class="line">    assert(size(&amp;om) == size);</div>
+<div class="line">    <a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = insert(&amp;om, &amp;(<span class="keyword">struct</span> name){.name = <span class="stringliteral">&quot;Ferris&quot;</span>}.e);</div>
+<div class="line">    assert(size(&amp;om) == size + 1);</div>
+<div class="line">    assert(occupied(&amp;e));</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aordered__multimap_8h_html"><div class="ttname"><a href="ordered__multimap_8h.html">ordered_multimap.h</a></div><div class="ttdoc">The Ordered Multimap Interface.</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+priority_queue.h (dropdown)</summary>
+<p>A pointer stable priority queue offering O(1) push and efficient decrease, increase, erase, and extract operations.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TYPES_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="priority__queue_8h.html">ccc/priority_queue.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    pq_elem elem;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">val_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> (lhs-&gt;val &gt; rhs-&gt;val) - (lhs-&gt;val &lt; rhs-&gt;val);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span></div>
+<div class="line">decrease_val(<a class="code hl_struct" href="structccc__user__type.html">ccc_user_type</a> <span class="keyword">const</span> t)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>val *<span class="keyword">const</span> v = t.<a class="code hl_variable" href="structccc__user__type.html#a0c45a0d5361770253bc3c00428cb9855">user_type</a>;</div>
+<div class="line">    v-&gt;val = *(<span class="keywordtype">int</span> *)t.<a class="code hl_variable" href="structccc__user__type.html#a1cb30e04afb536fb4922098ec030d640">aux</a>;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>val elems[5]</div>
+<div class="line">        = {{.val = 3}, {.val = 3}, {.val = 7}, {.val = -1}, {.val = 5}};</div>
+<div class="line">    priority_queue pq = pq_init(<span class="keyword">struct</span> val, elem, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, val_cmp, NULL);</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <span class="keyword">sizeof</span>(elems) / <span class="keyword">sizeof</span>(elems[0]); ++i)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keyword">struct </span>val const *<span class="keyword">const</span> v = push(&amp;pq, &amp;elems[i].elem);</div>
+<div class="line">        assert(v &amp;&amp; v-&gt;val == elems[i].val);</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordtype">int</span> new_v = -99;</div>
+<div class="line">    <span class="keywordtype">bool</span> <span class="keyword">const</span> decreased = decrease(&amp;pq, &amp;elems[4].elem, decrease_val, &amp;new_v);</div>
+<div class="line">    assert(decreased);</div>
+<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> v = front(&amp;pq);</div>
+<div class="line">    assert(v-&gt;val == -99);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="apriority__queue_8h_html"><div class="ttname"><a href="priority__queue_8h.html">priority_queue.h</a></div><div class="ttdoc">The Priority Queue Interface.</div></div>
+<div class="ttc" id="astructccc__user__type_html"><div class="ttname"><a href="structccc__user__type.html">ccc_user_type</a></div><div class="ttdoc">A reference to a user type within the container.</div><div class="ttdef"><b>Definition:</b> types.h:128</div></div>
+<div class="ttc" id="astructccc__user__type_html_a0c45a0d5361770253bc3c00428cb9855"><div class="ttname"><a href="structccc__user__type.html#a0c45a0d5361770253bc3c00428cb9855">ccc_user_type::user_type</a></div><div class="ttdeci">void * user_type</div><div class="ttdef"><b>Definition:</b> types.h:130</div></div>
+<div class="ttc" id="astructccc__user__type_html_a1cb30e04afb536fb4922098ec030d640"><div class="ttname"><a href="structccc__user__type.html#a1cb30e04afb536fb4922098ec030d640">ccc_user_type::aux</a></div><div class="ttdeci">void * aux</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+realtime_ordered_map.h (dropdown)</summary>
+<p>A pointer stable ordered map meeting strict O(lg N) runtime bounds for realtime applications.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TYPES_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="realtime__ordered__map_8h.html">ccc/realtime_ordered_map.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>kval</div>
+<div class="line">{</div>
+<div class="line">    romap_elem elem;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_lhs = *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
+<div class="line">    <span class="keywordflow">return</span> (key_lhs &gt; rhs-&gt;key) - (key_lhs &lt; rhs-&gt;key);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>kval elems[25];</div>
+<div class="line">    <span class="comment">/* stack array of 25 elements with one slot for sentinel, intrusive field</span></div>
+<div class="line"><span class="comment">       named elem, key field named key, no allocation permission, key comparison</span></div>
+<div class="line"><span class="comment">       function, no aux data. */</span></div>
+<div class="line">    realtime_ordered_map s</div>
+<div class="line">        = rom_init(s, <span class="keyword">struct</span> kval, elem, key, NULL, kval_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> num_nodes = 25;</div>
+<div class="line">    <span class="comment">/* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0, <span class="keywordtype">id</span> = 0; i &lt; num_nodes; ++i, <span class="keywordtype">id</span> += 5)</div>
+<div class="line">    {</div>
+<div class="line">        elems[i].key = id;</div>
+<div class="line">        elems[i].val = i;</div>
+<div class="line">        (void)insert_or_assign(&amp;s, &amp;elems[i].elem);</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">/* This should be the following range [6,44). 6 should raise to</span></div>
+<div class="line"><span class="comment">       next value not less than 6, 10 and 44 should be the first</span></div>
+<div class="line"><span class="comment">       value greater than 44, 45. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};</div>
+<div class="line">    range r = equal_range(&amp;s, &amp;(<span class="keywordtype">int</span>){6}, &amp;(int){44});</div>
+<div class="line">    <span class="keywordtype">int</span> index = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> kval *i = begin_range(&amp;r); i != end_range(&amp;r);</div>
+<div class="line">         i = next(&amp;s, &amp;i-&gt;elem))</div>
+<div class="line">    {</div>
+<div class="line">        assert(i-&gt;key == range_keys[index]);</div>
+<div class="line">        ++index;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">/* This should be the following range [119,84). 119 should be</span></div>
+<div class="line"><span class="comment">       dropped to first value not greater than 119 and last should</span></div>
+<div class="line"><span class="comment">       be dropped to first value less than 84. */</span></div>
+<div class="line">    <span class="keywordtype">int</span> rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};</div>
+<div class="line">    rrange rr = equal_rrange(&amp;s, &amp;(<span class="keywordtype">int</span>){119}, &amp;(int){84});</div>
+<div class="line">    index = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">struct</span> kval *i = rbegin_rrange(&amp;rr); i != rend_rrange(&amp;rr);</div>
+<div class="line">         i = rnext(&amp;s, &amp;i-&gt;elem))</div>
+<div class="line">    {</div>
+<div class="line">        assert(i-&gt;key == rrange_keys[index]);</div>
+<div class="line">        ++index;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="arealtime__ordered__map_8h_html"><div class="ttname"><a href="realtime__ordered__map_8h.html">realtime_ordered_map.h</a></div><div class="ttdoc">The Realtime Ordered Map Interface.</div></div>
+</div><!-- fragment --><p></p>
+</details>
+<details >
+<summary >
+singly_linked_list.h (dropdown)</summary>
+<p>A low overhead push-to-front container. When contiguity is not possible and the access pattern resembles a stack this is more-efficient than a doubly-linked list.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="singly__linked__list_8h.html">ccc/singly_linked_list.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>int_elem</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> i;</div>
+<div class="line">    sll_elem e;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
+<div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> (lhs-&gt;i &gt; rhs-&gt;i) - (lhs-&gt;i &lt; rhs-&gt;i);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">/* singly linked list l, list elem field e, no allocation permission,</span></div>
+<div class="line"><span class="comment">       comparing integers, no auxiliary data. */</span></div>
+<div class="line">    singly_linked_list l = sll_init(l, <span class="keyword">struct</span> int_elem, e, NULL, int_cmp, NULL);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};</div>
+<div class="line">    (void)push_front(&amp;l, &amp;elems[0].e);</div>
+<div class="line">    (void)push_front(&amp;l, &amp;elems[1].e);</div>
+<div class="line">    (void)push_front(&amp;l, &amp;elems[2].e);</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *i = front(&amp;l);</div>
+<div class="line">    assert(i-&gt;i == 1);</div>
+<div class="line">    pop_front(&amp;l);</div>
+<div class="line">    i = front(&amp;l);</div>
+<div class="line">    assert(i-&gt;i == 2);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="asingly__linked__list_8h_html"><div class="ttname"><a href="singly__linked__list_8h.html">singly_linked_list.h</a></div><div class="ttdoc">The Singly Linked List Interface.</div></div>
+</div><!-- fragment --><p></p>
+</details>
 <h1><a class="anchor" id="autotoc_md4"></a>
 Features</h1>
 <ul>
@@ -153,8 +825,6 @@ Intrusive and Non-Intrusive Containers</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> <a class="code hl_function" href="flat__hash__map_8h.html#aba9e915d0b006d759c55689c27731829">ccc_fhm_try_insert</a>(<a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h,</div>
 <div class="line">                             <a class="code hl_typedef" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *key_val_handle);</div>
 <div class="ttc" id="aflat__hash__map_8h_html_aba9e915d0b006d759c55689c27731829"><div class="ttname"><a href="flat__hash__map_8h.html#aba9e915d0b006d759c55689c27731829">ccc_fhm_try_insert</a></div><div class="ttdeci">ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle)</div><div class="ttdoc">Attempts to insert the key value wrapping key_val_handle.</div></div>
-<div class="ttc" id="aflat__hash__map_8h_html_af8251d1f96c8a10e8ff2b20d7f117447"><div class="ttname"><a href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></div><div class="ttdeci">struct ccc_fhmap_ ccc_flat_hash_map</div><div class="ttdoc">A container for storing key-value structures defined by the user in a contiguous buffer.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:39</div></div>
-<div class="ttc" id="atypes_8h_html_a70feefd55fafc84e06d2f2a1dfd4f389"><div class="ttname"><a href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a></div><div class="ttdeci">union ccc_entry_ ccc_entry</div><div class="ttdoc">An Occupied or Vacant position in a searchable container.</div><div class="ttdef"><b>Definition:</b> types.h:43</div></div>
 </div><!-- fragment --><p>Here, the user is trying to insert a new key and value into the hash map which in the above example would be a <code>struct path_backtrack_cell</code> with the <code>current</code> and <code>parent</code> fields set appropriately.</p>
 <p>Non-Intrusive containers exist when a flat container can operate without such help from the user. The <code>flat_priority_queue</code> is a good example of this. When initializing we give it the following information.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \</span></div>
@@ -166,7 +836,6 @@ Intrusive and Non-Intrusive Containers</h2>
 <div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span>[40]){}, 40, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
 <div class="ttc" id="aflat__priority__queue_8h_html_a8ed534b783c08382f5e3cd0456a1d72c"><div class="ttname"><a href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></div><div class="ttdeci">struct ccc_fpq_ ccc_flat_priority_queue</div><div class="ttdoc">A container offering direct storage and sorting of user data by heap order.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:33</div></div>
 <div class="ttc" id="aflat__priority__queue_8h_html_aef56a4bcfd5a33aeb767c177d43c51bf"><div class="ttname"><a href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a></div><div class="ttdeci">#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a fpq as a min or max heap.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:48</div></div>
-<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:82</div></div>
 </div><!-- fragment --><p>Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see allocation for more on allocation permission).</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> fpq</div>
 <div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
@@ -260,10 +929,6 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <div class="line">}</div>
 <div class="ttc" id="adoubly__linked__list_8h_html_a4f7f1c337174a8c19091ab34d25587ff"><div class="ttname"><a href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a></div><div class="ttdeci">void * ccc_dll_front(ccc_doubly_linked_list const *l)</div><div class="ttdoc">Returns the user type at the front of the list. O(1).</div></div>
 <div class="ttc" id="adoubly__linked__list_8h_html_ac21312b92a33769a08c7e9cd334800a7"><div class="ttname"><a href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a></div><div class="ttdeci">void * ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *elem)</div><div class="ttdoc">Push user type wrapping elem to the front of the list. O(1).</div></div>
-<div class="ttc" id="astructccc__cmp_html"><div class="ttname"><a href="structccc__cmp.html">ccc_cmp</a></div><div class="ttdoc">An element comparison helper.</div><div class="ttdef"><b>Definition:</b> types.h:100</div></div>
-<div class="ttc" id="astructccc__cmp_html_a413783988aeb931cebe1ff2355147e49"><div class="ttname"><a href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">ccc_cmp::user_type_lhs</a></div><div class="ttdeci">void const  *const user_type_lhs</div><div class="ttdef"><b>Definition:</b> types.h:102</div></div>
-<div class="ttc" id="astructccc__cmp_html_aad71faef58d3c2d057d2f2953372f32f"><div class="ttname"><a href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">ccc_cmp::user_type_rhs</a></div><div class="ttdeci">void const  *const user_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:104</div></div>
-<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:80</div></div>
 </div><!-- fragment --><p>Internally the containers will remember the offsets of the provided elements within the user struct wrapping the intruder. Then, the contract of the interface is simpler: provide a handle to the container and receive your type in return. The user takes on less complexity overall by providing a slightly more detailed initialization.</p>
 <p>Composing multiple containers with this approach is also possible. Consider the following struct from <code>samples/graph.c</code> used to run Dijkstra's algorithm.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>dijkstra_vertex</div>
@@ -452,101 +1117,9 @@ Related</h1>
 <ul>
 <li><a href="https://github.com/stclib/STC">STC - Smart Template Containers</a></li>
 <li><a href="https://github.com/glouw/ctl">C Template Library (CTL)</a></li>
-<li><a href="https://github.com/JacksonAllan/CC">CC: Convenient Containers</a></li>
+<li><a href="https://github.com/JacksonAllan/CC">CC: Convenient Containers</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md17"></a>
-Buffer</h1>
-<p>A fixed or dynamic contiguous array of a single user defined type.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
-<div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="buffer_8h.html">ccc/buffer.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span></div>
-<div class="line">main(<span class="keywordtype">void</span>)</div>
-<div class="line">{</div>
-<div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 5 */</span></div>
-<div class="line">    buffer b = buf_init((<span class="keywordtype">int</span>[5]){}, NULL, NULL, 5);</div>
-<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){3});</div>
-<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){2});</div>
-<div class="line">    (void)push_back(&amp;b, &amp;(<span class="keywordtype">int</span>){1});</div>
-<div class="line">    (void)pop_back(&amp;b);</div>
-<div class="line">    <span class="keywordtype">int</span> *i = back(&amp;b);</div>
-<div class="line">    assert(*i == 2);</div>
-<div class="line">    <span class="keywordflow">return</span> 0;</div>
-<div class="line">}</div>
-<div class="ttc" id="abuffer_8h_html"><div class="ttname"><a href="buffer_8h.html">buffer.h</a></div><div class="ttdoc">The Buffer Interface.</div></div>
-<div class="ttc" id="atraits_8h_html"><div class="ttname"><a href="traits_8h.html">traits.h</a></div><div class="ttdoc">The C Container Collection Traits Interface.</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md18"></a>
-Doubly Linked List</h1>
-<p>A dynamic container for efficient insertion and removal at any position.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
-<div class="line"><span class="preprocessor">#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">ccc/doubly_linked_list.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keyword">struct </span>int_elem</div>
-<div class="line">{</div>
-<div class="line">    <span class="keywordtype">int</span> i;</div>
-<div class="line">    dll_elem e;</div>
-<div class="line">};</div>
-<div class="line"> </div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div>
-<div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
-<div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
-<div class="line">    <span class="keywordflow">return</span> (lhs-&gt;i &gt; rhs-&gt;i) - (lhs-&gt;i &lt; rhs-&gt;i);</div>
-<div class="line">}</div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span></div>
-<div class="line">main(<span class="keywordtype">void</span>)</div>
-<div class="line">{</div>
-<div class="line">    <span class="comment">/* doubly linked list l, list elem field e, no allocation permission,</span></div>
-<div class="line"><span class="comment">       comparing integers, no auxiliary data. */</span></div>
-<div class="line">    doubly_linked_list l = dll_init(l, <span class="keyword">struct</span> int_elem, e, NULL, int_cmp, NULL);</div>
-<div class="line">    <span class="keyword">struct </span>int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};</div>
-<div class="line">    (void)push_back(&amp;l, &amp;elems[0].e);</div>
-<div class="line">    (void)push_front(&amp;l, &amp;elems[1].e);</div>
-<div class="line">    (void)push_back(&amp;l, &amp;elems[2].e);</div>
-<div class="line">    (void)pop_back(&amp;l);</div>
-<div class="line">    <span class="keyword">struct </span>int_elem *e = back(&amp;l);</div>
-<div class="line">    assert(e-&gt;i == 3);</div>
-<div class="line">    <span class="keywordflow">return</span> 0;</div>
-<div class="line">}</div>
-<div class="ttc" id="adoubly__linked__list_8h_html"><div class="ttname"><a href="doubly__linked__list_8h.html">doubly_linked_list.h</a></div><div class="ttdoc">The Doubly Linked List Interface.</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md19"></a>
-Flat Double Ended Queue</h1>
-<p>A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
-<div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__double__ended__queue_8h.html">ccc/flat_double_ended_queue.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span></div>
-<div class="line">main(<span class="keywordtype">void</span>)</div>
-<div class="line">{</div>
-<div class="line">    <span class="comment">/* stack array, no allocation permission, no aux data, capacity 2 */</span></div>
-<div class="line">    flat_double_ended_queue q = fdeq_init((<span class="keywordtype">int</span>[2]){}, NULL, NULL, 2);</div>
-<div class="line">    (void)push_back(&amp;q, &amp;(<span class="keywordtype">int</span>){3});</div>
-<div class="line">    (void)push_front(&amp;q, &amp;(<span class="keywordtype">int</span>){2});</div>
-<div class="line">    (void)push_back(&amp;q, &amp;(<span class="keywordtype">int</span>){1}); <span class="comment">/* Overwrite 2. */</span></div>
-<div class="line">    <span class="keywordtype">int</span> *i = front(&amp;q);</div>
-<div class="line">    assert(*i == 3);</div>
-<div class="line">    i = back(&amp;q);</div>
-<div class="line">    assert(*i == 1);</div>
-<div class="line">    (void)pop_back(&amp;q);</div>
-<div class="line">    i = back(&amp;q);</div>
-<div class="line">    assert(*i == 3);</div>
-<div class="line">    i = front(&amp;q);</div>
-<div class="line">    assert(*i == 3);</div>
-<div class="line">    <span class="keywordflow">return</span> 0;</div>
-<div class="line">}</div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html"><div class="ttname"><a href="flat__double__ended__queue_8h.html">flat_double_ended_queue.h</a></div><div class="ttdoc">The Flat Double Ended Queue Interface.</div></div>
-</div><!-- fragment --> </div></div><!-- PageDoc -->
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

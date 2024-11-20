@@ -155,24 +155,26 @@ $(document).ready(function(){initNavTree('flat__priority__queue_8h_source.html',
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="preprocessor">#ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><span class="keyword">typedef</span> <a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> flat_priority_queue;</div>
 <div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="preprocessor">#    define fpq_init(args...) ccc_fpq_init(args)</span></div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="preprocessor">#    define fpq_emplace(args...) ccc_fpq_emplace(args)</span></div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="preprocessor">#    define fpq_realloc(args...) ccc_fpq_realloc(args)</span></div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="preprocessor">#    define fpq_push(args...) ccc_fpq_push(args)</span></div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="preprocessor">#    define fpq_front(args...) ccc_fpq_front(args)</span></div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="preprocessor">#    define fpq_pop(args...) ccc_fpq_pop(args)</span></div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="preprocessor">#    define fpq_extract(args...) ccc_fpq_extract(args)</span></div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="preprocessor">#    define fpq_update(args...) ccc_fpq_update(args)</span></div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="preprocessor">#    define fpq_increase(args...) ccc_fpq_increase(args)</span></div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="preprocessor">#    define fpq_decrease(args...) ccc_fpq_decrease(args)</span></div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="preprocessor">#    define fpq_clear(args...) ccc_fpq_clear(args)</span></div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="preprocessor">#    define fpq_clear_and_free(args...) ccc_fpq_clear_and_free(args)</span></div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="preprocessor">#    define fpq_is_empty(args...) ccc_fpq_is_empty(args)</span></div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="preprocessor">#    define fpq_size(args...) ccc_fpq_size(args)</span></div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="preprocessor">#    define fpq_validate(args...) ccc_fpq_validate(args)</span></div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="preprocessor">#    define fpq_order(args...) ccc_fpq_order(args)</span></div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span><span class="preprocessor">#endif </span><span class="comment">/* FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC */</span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_FLAT_PRIORITY_QUEUE_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="preprocessor">#    define fpq_heapify_init(args...) ccc_fpq_heapify_init(args)</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="preprocessor">#    define fpq_heapify(args...) ccc_fpq_heapify(args)</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="preprocessor">#    define fpq_emplace(args...) ccc_fpq_emplace(args)</span></div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="preprocessor">#    define fpq_realloc(args...) ccc_fpq_realloc(args)</span></div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="preprocessor">#    define fpq_push(args...) ccc_fpq_push(args)</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="preprocessor">#    define fpq_front(args...) ccc_fpq_front(args)</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="preprocessor">#    define fpq_pop(args...) ccc_fpq_pop(args)</span></div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="preprocessor">#    define fpq_extract(args...) ccc_fpq_extract(args)</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="preprocessor">#    define fpq_update(args...) ccc_fpq_update(args)</span></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="preprocessor">#    define fpq_increase(args...) ccc_fpq_increase(args)</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="preprocessor">#    define fpq_decrease(args...) ccc_fpq_decrease(args)</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="preprocessor">#    define fpq_clear(args...) ccc_fpq_clear(args)</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="preprocessor">#    define fpq_clear_and_free(args...) ccc_fpq_clear_and_free(args)</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="preprocessor">#    define fpq_is_empty(args...) ccc_fpq_is_empty(args)</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="preprocessor">#    define fpq_size(args...) ccc_fpq_size(args)</span></div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span><span class="preprocessor">#    define fpq_validate(args...) ccc_fpq_validate(args)</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="preprocessor">#    define fpq_order(args...) ccc_fpq_order(args)</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="preprocessor">#endif </span><span class="comment">/* FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span> </div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_FLAT_PRIORITY_QUEUE_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="aflat__priority__queue_8h_html_a11a936861d17aa714b2ad105468c3a1a"><div class="ttname"><a href="flat__priority__queue_8h.html#a11a936861d17aa714b2ad105468c3a1a">ccc_fpq_clear</a></div><div class="ttdeci">ccc_result ccc_fpq_clear(ccc_flat_priority_queue *fpq, ccc_destructor_fn *fn)</div><div class="ttdoc">Clears the fpq calling fn on every element if provided. O(1)-O(N).</div></div>
 <div class="ttc" id="aflat__priority__queue_8h_html_a260c7d003dc4db56264d3248912d5471"><div class="ttname"><a href="flat__priority__queue_8h.html#a260c7d003dc4db56264d3248912d5471">ccc_fpq_decrease</a></div><div class="ttdeci">bool ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn, void *aux)</div><div class="ttdoc">Decrease e that is a handle to the stored fpq element. O(lgN).</div></div>
 <div class="ttc" id="aflat__priority__queue_8h_html_a422acb75de11ece2ae4d9725fc4a468b"><div class="ttname"><a href="flat__priority__queue_8h.html#a422acb75de11ece2ae4d9725fc4a468b">ccc_fpq_order</a></div><div class="ttdeci">ccc_threeway_cmp ccc_fpq_order(ccc_flat_priority_queue const *fpq)</div><div class="ttdoc">Return the order used to initialize the fpq.</div></div>
