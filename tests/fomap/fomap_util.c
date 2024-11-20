@@ -6,8 +6,6 @@
 #include "traits.h"
 #include "types.h"
 
-#include <stdio.h>
-
 ccc_threeway_cmp
 id_cmp(ccc_key_cmp const cmp)
 {
