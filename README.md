@@ -21,7 +21,34 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 
 ## Containers
 
-- buffer.h ([buffer snippet](#buffer))
+<details>
+<summary>buffer.h</summary>
+A fixed or dynamic contiguous array of a single user defined type.
+
+```c
+#include <assert.h>
+#define BUFFER_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/buffer.h"
+#include "ccc/traits.h"
+
+int
+main(void)
+{
+    /* stack array, no allocation permission, no aux data, capacity 5 */
+    buffer b = buf_init((int[5]){}, NULL, NULL, 5);
+    (void)push_back(&b, &(int){3});
+    (void)push_back(&b, &(int){2});
+    (void)push_back(&b, &(int){1});
+    (void)pop_back(&b);
+    int *i = back(&b);
+    assert(*i == 2);
+    return 0;
+}
+```
+<br>
+</details>
+
 - doubly_linked_list.h ([doubly_linked_list snippet](#doubly-linked-list))
 - flat_double_ended_queue.h ([flat_double_ended_queue snippet](#flat-double-ended-queue))
 - flat_hash_map.h
