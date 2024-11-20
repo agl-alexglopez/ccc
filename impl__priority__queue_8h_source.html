@@ -136,7 +136,7 @@ $(document).ready(function(){initNavTree('impl__priority__queue_8h_source.html',
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keyword">struct </span>ccc_pq_elem_ *ccc_impl_pq_elem_in(<span class="keyword">struct</span> ccc_pq_ <span class="keyword">const</span> *, <span class="keywordtype">void</span> <span class="keyword">const</span> *);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#define ccc_impl_pq_emplace(pq_ptr, lazy_value...)                             \</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">    ({                                                                         \</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">    (__extension__({                                                           \</span></div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">        typeof(lazy_value) *pq_res_ = NULL;                                    \</span></div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">        struct ccc_pq_ *pq_ = (pq_ptr);                                        \</span></div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">        if (pq_)                                                               \</span></div>
@@ -157,7 +157,7 @@ $(document).ready(function(){initNavTree('impl__priority__queue_8h_source.html',
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">            }                                                                  \</span></div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">        }                                                                      \</span></div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">        pq_res_;                                                               \</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">    })</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">    }))</span></div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_PRIORITY_QUEUE_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="atypes_8h_html_a78ab7f61b1a36b2f31c2289bd6236231"><div class="ttname"><a href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_cmp_fn(ccc_cmp)</div><div class="ttdoc">A callback function for comparing two elements in a container.</div><div class="ttdef"><b>Definition:</b> types.h:203</div></div>
