@@ -167,6 +167,8 @@ int
 main(void)
 {
     struct key_val vals[20];
+    /* stack array backed, key field named key, intrusive field e, no
+       allocation permission, a hash function, an equality function, no aux. */
     ccc_flat_hash_map fh;
     ccc_result const res
         = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
@@ -177,6 +179,7 @@ main(void)
     int solution_indices[2] = {-1, -1};
     for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
     {
+        /* Functions take keys and structs by reference. */
         struct key_val const *const other_addend
             = get_key_val(&fh, &(int){target - addends[i]});
         if (other_addend)
@@ -185,11 +188,14 @@ main(void)
             solution_indices[1] = other_addend->val;
             break;
         }
-        (void)insert_or_assign(
-            &fh, &(struct key_val){.key = addends[i], .val = i}.e);
+        /* Macros take keys and structs by value. */
+        (void)fhm_insert_or_assign_w(&fh, addends[i],
+                                     (struct key_val){.val = i});
     }
     assert(solution_indices[0] == 8);
     assert(solution_indices[1] == 2);
+    assert(addends[solution_indices[0]] + addends[solution_indices[1]]
+           == target);
     return 0;
 }
 ```
