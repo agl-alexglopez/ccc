@@ -255,7 +255,8 @@ main(void)
     for (struct kval *i = begin_range(&r); i != end_range(&r);
          i = next(&s, &i->elem))
     {
-        assert(i->key == range_keys[index++]);
+        assert(i->key == range_keys[index]);
+        ++index;
     }
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
@@ -266,7 +267,8 @@ main(void)
     for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
          i = rnext(&s, &i->elem))
     {
-        assert(i->key == rrange_keys[index++]);
+        assert(i->key == rrange_keys[index]);
+        ++index;
     }
     return 0;
 }
@@ -327,7 +329,7 @@ An ordered map with strict runtime bounds implemented in an array with indices t
 #define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/flat_ordered_map.h"
+#include "ccc/flat_realtime_ordered_map.h"
 #include "ccc/traits.h"
 
 struct kval
@@ -368,7 +370,8 @@ main(void)
     for (struct kval *i = begin_range(&r); i != end_range(&r);
          i = next(&s, &i->elem))
     {
-        assert(i->key == range_keys[index++]);
+        assert(i->key == range_keys[index]);
+        ++index;
     }
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
@@ -379,7 +382,8 @@ main(void)
     for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
          i = rnext(&s, &i->elem))
     {
-        assert(i->key == rrange_keys[index++]);
+        assert(i->key == rrange_keys[index]);
+        ++index;
     }
     return 0;
 }
@@ -458,7 +462,7 @@ main(void)
 
 <details>
 <summary>ordered_multimap.h (dropdown)</summary>
-An ordered map allowing storage of duplicate keys; searches and removals of duplicates will yield the oldest duplicate. An ordered multimap uses a self optimizing tree structures and is suitable for a priority queue if round robin fairness among duplicates is needed.
+A pointer stable ordered map allowing storage of duplicate keys; searches and removals of duplicates will yield the oldest duplicate. An ordered multimap uses a self optimizing tree structures and is suitable for a priority queue if round robin fairness among duplicates is needed.
 
 ```c
 #include <assert.h>
@@ -532,14 +536,178 @@ main(void)
 
 <details>
 <summary>priority_queue.h (dropdown)</summary>
+A pointer stable priority queue offering O(1) push and efficient decrease, increase, erase, and extract operations.
+
+```c
+#include <assert.h>
+#include <stdbool.h>
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#include "ccc/priority_queue.h"
+#include "ccc/traits.h"
+
+struct val
+{
+    pq_elem elem;
+    int val;
+};
+
+static ccc_threeway_cmp
+val_cmp(ccc_cmp const cmp)
+{
+    struct val const *const lhs = cmp.user_type_lhs;
+    struct val const *const rhs = cmp.user_type_rhs;
+    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+}
+
+static void
+decrease_val(ccc_user_type const t)
+{
+    struct val *const v = t.user_type;
+    v->val = *(int *)t.aux;
+}
+
+int
+main(void)
+{
+    struct val elems[5]
+        = {{.val = 3}, {.val = 3}, {.val = 7}, {.val = -1}, {.val = 5}};
+    priority_queue pq = pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+    for (size_t i = 0; i < sizeof(elems) / sizeof(elems[0]); ++i)
+    {
+        struct val const *const v = push(&pq, &elems[i].elem);
+        assert(v && v->val == elems[i].val);
+    }
+    int new_v = -99;
+    bool const decreased = decrease(&pq, &elems[4].elem, decrease_val, &new_v);
+    assert(decreased);
+    struct val const *const v = front(&pq);
+    assert(v->val == -99);
+    return 0;
+}
+```
+
 </details>
 
 <details>
 <summary>realtime_ordered_map.h (dropdown)</summary>
+A pointer stable ordered map meeting strict O(lg N) runtime bounds for realtime applications.
+
+```c
+#include <assert.h>
+#define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#include "ccc/realtime_ordered_map.h"
+#include "ccc/traits.h"
+
+struct kval
+{
+    romap_elem elem;
+    int key;
+    int val;
+};
+
+static ccc_threeway_cmp
+kval_cmp(ccc_key_cmp const cmp)
+{
+    struct kval const *const rhs = cmp.user_type_rhs;
+    int const key_lhs = *((int *)cmp.key_lhs);
+    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
+}
+
+int
+main(void)
+{
+    struct kval elems[25];
+    /* stack array of 25 elements with one slot for sentinel, intrusive field
+       named elem, key field named key, no allocation permission, key comparison
+       function, no aux data. */
+    realtime_ordered_map s
+        = rom_init(s, struct kval, elem, key, NULL, kval_cmp, NULL);
+    int const num_nodes = 25;
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
+    {
+        elems[i].key = id;
+        elems[i].val = i;
+        (void)insert_or_assign(&s, &elems[i].elem);
+    }
+    /* This should be the following range [6,44). 6 should raise to
+       next value not less than 6, 10 and 44 should be the first
+       value greater than 44, 45. */
+    int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    range r = equal_range(&s, &(int){6}, &(int){44});
+    int index = 0;
+    for (struct kval *i = begin_range(&r); i != end_range(&r);
+         i = next(&s, &i->elem))
+    {
+        assert(i->key == range_keys[index]);
+        ++index;
+    }
+    /* This should be the following range [119,84). 119 should be
+       dropped to first value not greater than 119 and last should
+       be dropped to first value less than 84. */
+    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
+    index = 0;
+    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
+         i = rnext(&s, &i->elem))
+    {
+        assert(i->key == rrange_keys[index]);
+        ++index;
+    }
+    return 0;
+}
+```
+
 </details>
 
 <details>
 <summary>singly_linked_list.h (dropdown)</summary>
+A low overhead push-to-front container. When contiguity is not possible and the access pattern resembles a stack this is more-efficient than a doubly-linked list.
+
+```c
+#include <assert.h>
+#define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/singly_linked_list.h"
+#include "ccc/traits.h"
+
+struct int_elem
+{
+    int i;
+    sll_elem e;
+};
+
+static ccc_threeway_cmp
+int_cmp(ccc_cmp const cmp)
+{
+    struct int_elem const *const lhs = cmp.user_type_lhs;
+    struct int_elem const *const rhs = cmp.user_type_rhs;
+    return (lhs->i > rhs->i) - (lhs->i < rhs->i);
+}
+
+int
+main(void)
+{
+    /* singly linked list l, list elem field e, no allocation permission,
+       comparing integers, no auxiliary data. */
+    singly_linked_list l = sll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
+    struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
+    (void)push_front(&l, &elems[0].e);
+    (void)push_front(&l, &elems[1].e);
+    (void)push_front(&l, &elems[2].e);
+    struct int_elem const *i = front(&l);
+    assert(i->i == 1);
+    pop_front(&l);
+    i = front(&l);
+    assert(i->i == 2);
+    return 0;
+}
+```
+
 </details>
 
 ## Features
