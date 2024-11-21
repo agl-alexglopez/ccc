@@ -401,8 +401,7 @@ flat_priority_queue.h (dropdown)</summary>
 <div class="line"><span class="comment">       capacity for swap space, min priority queue, no allocation, no aux. */</span></div>
 <div class="line">    flat_priority_queue pq = fpq_heapify_init(</div>
 <div class="line">        heap, (<span class="keyword">sizeof</span>(heap) / <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)), 19, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
-<div class="line">    <span class="keywordtype">int</span> *elem = &amp;heap[5];</div>
-<div class="line">    fpq_update_w(&amp;pq, elem, { *elem -= 4; });</div>
+<div class="line">    (void)fpq_update_w(&amp;pq, &amp;heap[5], { heap[5] -= 4; });</div>
 <div class="line">    <span class="keywordtype">int</span> prev = *((<span class="keywordtype">int</span> *)front(&amp;pq));</div>
 <div class="line">    (void)pop(&amp;pq);</div>
 <div class="line">    <span class="keywordflow">while</span> (!is_empty(&amp;pq))</div>
