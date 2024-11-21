@@ -1,8 +1,11 @@
 var flat__priority__queue_8h =
 [
+    [ "ccc_fpq_decrease_w", "flat__priority__queue_8h.html#a9c326f5c31cefcc03712c578f983304c", null ],
     [ "ccc_fpq_emplace", "flat__priority__queue_8h.html#a1c8103699b633d1da090dd867b46d1ec", null ],
     [ "ccc_fpq_heapify_init", "flat__priority__queue_8h.html#ab4ba72083dbab502b7392a44619f2f07", null ],
+    [ "ccc_fpq_increase_w", "flat__priority__queue_8h.html#a51467f720aae8d731c9fb42c35638a4d", null ],
     [ "ccc_fpq_init", "flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf", null ],
+    [ "ccc_fpq_update_w", "flat__priority__queue_8h.html#acd761093fc66e00d95e55cafddb1cc4a", null ],
     [ "ccc_flat_priority_queue", "flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c", null ],
     [ "ccc_fpq_alloc", "flat__priority__queue_8h.html#a5b186988d4e3b2d9bf01750d6977962f", null ],
     [ "ccc_fpq_clear", "flat__priority__queue_8h.html#a11a936861d17aa714b2ad105468c3a1a", null ],

@@ -401,6 +401,8 @@ flat_priority_queue.h (dropdown)</summary>
 <div class="line"><span class="comment">       capacity for swap space, min priority queue, no allocation, no aux. */</span></div>
 <div class="line">    flat_priority_queue pq = fpq_heapify_init(</div>
 <div class="line">        heap, (<span class="keyword">sizeof</span>(heap) / <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)), 19, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line">    <span class="keywordtype">int</span> *elem = &amp;heap[5];</div>
+<div class="line">    fpq_update_w(&amp;pq, elem, { elem -= 4; });</div>
 <div class="line">    <span class="keywordtype">int</span> prev = *((<span class="keywordtype">int</span> *)front(&amp;pq));</div>
 <div class="line">    (void)pop(&amp;pq);</div>
 <div class="line">    <span class="keywordflow">while</span> (!is_empty(&amp;pq))</div>
@@ -654,13 +656,6 @@ priority_queue.h (dropdown)</summary>
 <div class="line">    <span class="keywordflow">return</span> (lhs-&gt;val &gt; rhs-&gt;val) - (lhs-&gt;val &lt; rhs-&gt;val);</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span></div>
-<div class="line">decrease_val(<a class="code hl_struct" href="structccc__user__type.html">ccc_user_type</a> <span class="keyword">const</span> t)</div>
-<div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>val *<span class="keyword">const</span> v = t.<a class="code hl_variable" href="structccc__user__type.html#a0c45a0d5361770253bc3c00428cb9855">user_type</a>;</div>
-<div class="line">    v-&gt;val = *(<span class="keywordtype">int</span> *)t.<a class="code hl_variable" href="structccc__user__type.html#a1cb30e04afb536fb4922098ec030d640">aux</a>;</div>
-<div class="line">}</div>
-<div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span></div>
 <div class="line">main(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
@@ -672,17 +667,14 @@ priority_queue.h (dropdown)</summary>
 <div class="line">        <span class="keyword">struct </span>val const *<span class="keyword">const</span> v = push(&amp;pq, &amp;elems[i].elem);</div>
 <div class="line">        assert(v &amp;&amp; v-&gt;val == elems[i].val);</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordtype">int</span> new_v = -99;</div>
-<div class="line">    <span class="keywordtype">bool</span> <span class="keyword">const</span> decreased = decrease(&amp;pq, &amp;elems[4].elem, decrease_val, &amp;new_v);</div>
+<div class="line">    <span class="keywordtype">bool</span> <span class="keyword">const</span> decreased = pq_decrease_w(&amp;pq, &amp;elems[4].elem,</div>
+<div class="line">                                         { elems[4].val = -99; });</div>
 <div class="line">    assert(decreased);</div>
 <div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> v = front(&amp;pq);</div>
 <div class="line">    assert(v-&gt;val == -99);</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="apriority__queue_8h_html"><div class="ttname"><a href="priority__queue_8h.html">priority_queue.h</a></div><div class="ttdoc">The Priority Queue Interface.</div></div>
-<div class="ttc" id="astructccc__user__type_html"><div class="ttname"><a href="structccc__user__type.html">ccc_user_type</a></div><div class="ttdoc">A reference to a user type within the container.</div><div class="ttdef"><b>Definition:</b> types.h:128</div></div>
-<div class="ttc" id="astructccc__user__type_html_a0c45a0d5361770253bc3c00428cb9855"><div class="ttname"><a href="structccc__user__type.html#a0c45a0d5361770253bc3c00428cb9855">ccc_user_type::user_type</a></div><div class="ttdeci">void * user_type</div><div class="ttdef"><b>Definition:</b> types.h:130</div></div>
-<div class="ttc" id="astructccc__user__type_html_a1cb30e04afb536fb4922098ec030d640"><div class="ttname"><a href="structccc__user__type.html#a1cb30e04afb536fb4922098ec030d640">ccc_user_type::aux</a></div><div class="ttdeci">void * aux</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p></p>
 </details>
 <details >
@@ -933,19 +925,17 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <p>Composing multiple containers with this approach is also possible. Consider the following struct from <code>samples/graph.c</code> used to run Dijkstra's algorithm.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>dijkstra_vertex</div>
 <div class="line">{</div>
-<div class="line">    <a class="code hl_typedef" href="realtime__ordered__map_8h.html#a94267021d5f511eee484f5bd986da6c2">ccc_romap_elem</a> path_elem;</div>
-<div class="line">    <a class="code hl_typedef" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> pq_elem;</div>
+<div class="line">    romap_elem path_elem;</div>
+<div class="line">    pq_elem pq_elem;</div>
 <div class="line">    <span class="keywordtype">int</span> dist;</div>
 <div class="line">    <span class="keywordtype">char</span> cur_name;</div>
 <div class="line">    <span class="keywordtype">char</span> prev_name;</div>
 <div class="line">};</div>
 <div class="line"><span class="comment">/* ... Later Initialization After Memory is Prepared ... */</span></div>
-<div class="line"><a class="code hl_typedef" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> path_map = <a class="code hl_define" href="realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143">ccc_rom_init</a>(</div>
-<div class="line">    path_map, <span class="keyword">struct</span> dijkstra_vertex, path_elem, cur_name, arena_alloc,</div>
-<div class="line">    cmp_prev_vertices, &amp;bump_arena);</div>
-<div class="line"><a class="code hl_typedef" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> costs_pq</div>
-<div class="line">    = <a class="code hl_define" href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a>(<span class="keyword">struct</span> dijkstra_vertex, pq_elem, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL,</div>
-<div class="line">                  cmp_pq_costs, NULL);</div>
+<div class="line">realtime_ordered_map path_map = rom_init(path_map, <span class="keyword">struct</span> dijkstra_vertex,</div>
+<div class="line">    path_elem, cur_name, arena_alloc, cmp_prev_vertices, &amp;bump_arena);</div>
+<div class="line">priority_queue costs_pq</div>
+<div class="line">    = pq_init(<span class="keyword">struct</span> dijkstra_vertex, pq_elem, LES, NULL, cmp_pq_costs, NULL);</div>
 <div class="line"><span class="comment">/*... Steps to Prepare to Run the Algorithm ...*/</span></div>
 <div class="line"><span class="keywordflow">while</span> (!is_empty(&amp;costs_pq))</div>
 <div class="line">{</div>
@@ -961,17 +951,11 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <div class="line">        <span class="keywordflow">if</span> (alt &lt; next-&gt;dist)</div>
 <div class="line">        {</div>
 <div class="line">            next-&gt;prev_name = cur-&gt;cur_name;</div>
-<div class="line">            decrease(&amp;costs_pq, &amp;next-&gt;pq_elem, pq_update_dist, &amp;alt);</div>
+<div class="line">            pq_decrease_w(&amp;costs_pq, &amp;next-&gt;pq_elem, { next-&gt;dist = alt; });</div>
 <div class="line">        }</div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="line"><span class="comment">/* ... Rebuild Shortest Path etc... */</span></div>
-<div class="ttc" id="apriority__queue_8h_html_a5438f40477e5a79f1055adb17b055b44"><div class="ttname"><a href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a></div><div class="ttdeci">struct ccc_pq_elem_ ccc_pq_elem</div><div class="ttdoc">The embedded struct type for operation of the priority queue.</div><div class="ttdef"><b>Definition:</b> priority_queue.h:45</div></div>
-<div class="ttc" id="apriority__queue_8h_html_aa7e8b96d45a5f0ea4b9b6e128746111a"><div class="ttname"><a href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a></div><div class="ttdeci">#define ccc_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a priority queue at runtime or compile time.</div><div class="ttdef"><b>Definition:</b> priority_queue.h:56</div></div>
-<div class="ttc" id="apriority__queue_8h_html_ae4003f166727edbb815d333c9c27972b"><div class="ttname"><a href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a></div><div class="ttdeci">struct ccc_pq_ ccc_priority_queue</div><div class="ttdoc">A container for pointer stability and an O(1) push and amortized o(lg N) increase/decrease key.</div><div class="ttdef"><b>Definition:</b> priority_queue.h:35</div></div>
-<div class="ttc" id="arealtime__ordered__map_8h_html_a7dd816319f62ee38e5c1e265b2a15143"><div class="ttname"><a href="realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143">ccc_rom_init</a></div><div class="ttdeci">#define ccc_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field, alloc_fn, key_cmp_fn, aux_data)</div><div class="ttdoc">Initializes the ordered map at runtime or compile time.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:63</div></div>
-<div class="ttc" id="arealtime__ordered__map_8h_html_a94267021d5f511eee484f5bd986da6c2"><div class="ttname"><a href="realtime__ordered__map_8h.html#a94267021d5f511eee484f5bd986da6c2">ccc_romap_elem</a></div><div class="ttdeci">struct ccc_romap_elem_ ccc_romap_elem</div><div class="ttdoc">The intrusive element of the user defined struct being stored in the map.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:44</div></div>
-<div class="ttc" id="arealtime__ordered__map_8h_html_af95aa6d6e35234cabe7b3f7c4101175c"><div class="ttname"><a href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a></div><div class="ttdeci">struct ccc_romap_ ccc_realtime_ordered_map</div><div class="ttdoc">A container for amortized O(lg N) search, insert, erase, ranges, and pointer stability.</div><div class="ttdef"><b>Definition:</b> realtime_ordered_map.h:33</div></div>
 </div><!-- fragment --><p>One conceptual element, a <code>dijkstra_vertex</code>, is part of two containers, a map and a priority queue. The priority queue piggy backs of the memory controlled by the map so that we always have access to all vertices while the algorithm runs. An already complex algorithm is not cluttered by further steps to accommodate macros.</p>
 <h2><a class="anchor" id="autotoc_md8"></a>
 Rust's Entry Interface</h2>

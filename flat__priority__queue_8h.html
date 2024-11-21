@@ -148,6 +148,15 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a1c8103699b633d1da090dd867b46d1ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a1c8103699b633d1da090dd867b46d1ec">ccc_fpq_emplace</a>(fpq,  val_initializer...)&#160;&#160;&#160;    ccc_impl_fpq_emplace(fpq, val_initializer)</td></tr>
 <tr class="memdesc:a1c8103699b633d1da090dd867b46d1ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a type directly to a priority queue slot. O(lgN).  <br /></td></tr>
 <tr class="separator:a1c8103699b633d1da090dd867b46d1ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd761093fc66e00d95e55cafddb1cc4a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#acd761093fc66e00d95e55cafddb1cc4a">ccc_fpq_update_w</a>(fpq_ptr,  T_ptr,  update_closure_over_T)&#160;&#160;&#160;    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)</td></tr>
+<tr class="memdesc:acd761093fc66e00d95e55cafddb1cc4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the user type stored in the priority queue directly. O(lgN).  <br /></td></tr>
+<tr class="separator:acd761093fc66e00d95e55cafddb1cc4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51467f720aae8d731c9fb42c35638a4d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51467f720aae8d731c9fb42c35638a4d">ccc_fpq_increase_w</a>(fpq_ptr,  T_ptr,  increase_closure_over_T)&#160;&#160;&#160;    ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)</td></tr>
+<tr class="memdesc:a51467f720aae8d731c9fb42c35638a4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the user type stored in the priority queue directly. O(lgN).  <br /></td></tr>
+<tr class="separator:a51467f720aae8d731c9fb42c35638a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c326f5c31cefcc03712c578f983304c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a9c326f5c31cefcc03712c578f983304c">ccc_fpq_decrease_w</a>(fpq_ptr,  T_ptr,  decrease_closure_over_T)&#160;&#160;&#160;    ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)</td></tr>
+<tr class="memdesc:a9c326f5c31cefcc03712c578f983304c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the user type stored in the priority queue directly. O(lgN).  <br /></td></tr>
+<tr class="separator:a9c326f5c31cefcc03712c578f983304c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ef3dc2632fab0c00dce97c16957beba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ef3dc2632fab0c00dce97c16957beba">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_elem_size)</td></tr>
 <tr class="memdesc:a8ef3dc2632fab0c00dce97c16957beba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
 <tr class="separator:a8ef3dc2632fab0c00dce97c16957beba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +218,57 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a9c326f5c31cefcc03712c578f983304c" name="a9c326f5c31cefcc03712c578f983304c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c326f5c31cefcc03712c578f983304c">&#9670;&#160;</a></span>ccc_fpq_decrease_w</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_fpq_decrease_w</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fpq_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">T_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">decrease_closure_over_T&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Increase the user type stored in the priority queue directly. O(lgN). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq_ptr</td><td>a pointer to the flat priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">T_ptr</td><td>a pointer to the user type being updated. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">decrease_closure_over_T</td><td>the semicolon separated statements to execute on the user type at T_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false if parameters are invalid or fpq is empty. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure T_ptr is in the fpq.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_priority_queue fpq = build_rand_int_fpq();</div>
+<div class="line"><span class="keywordtype">int</span> *i = get_rand_fpq_elem(&amp;fpq);</div>
+<div class="line">fpq_update_w(&amp;fpq, i, { (*i)--; });</div>
+</div><!-- fragment --><p>Note that if this priority queue is min or max, the runtime is the same. </p>
+
+</div>
+</div>
 <a id="a1c8103699b633d1da090dd867b46d1ec" name="a1c8103699b633d1da090dd867b46d1ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1c8103699b633d1da090dd867b46d1ec">&#9670;&#160;</a></span>ccc_fpq_emplace</h2>
 
@@ -323,6 +383,57 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
+<a id="a51467f720aae8d731c9fb42c35638a4d" name="a51467f720aae8d731c9fb42c35638a4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51467f720aae8d731c9fb42c35638a4d">&#9670;&#160;</a></span>ccc_fpq_increase_w</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_fpq_increase_w</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fpq_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">T_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">increase_closure_over_T&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Increase the user type stored in the priority queue directly. O(lgN). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq_ptr</td><td>a pointer to the flat priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">T_ptr</td><td>a pointer to the user type being updated. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">increase_closure_over_T</td><td>the semicolon separated statements to execute on the user type at T_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false if parameters are invalid or fpq is empty. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure T_ptr is in the fpq.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_priority_queue fpq = build_rand_int_fpq();</div>
+<div class="line"><span class="keywordtype">int</span> *i = get_rand_fpq_elem(&amp;fpq);</div>
+<div class="line">fpq_update_w(&amp;fpq, i, { (*i)++; });</div>
+</div><!-- fragment --><p>Note that if this priority queue is min or max, the runtime is the same. </p>
+
+</div>
+</div>
 <a id="aef56a4bcfd5a33aeb767c177d43c51bf" name="aef56a4bcfd5a33aeb767c177d43c51bf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aef56a4bcfd5a33aeb767c177d43c51bf">&#9670;&#160;</a></span>ccc_fpq_init</h2>
 
@@ -387,6 +498,57 @@ Typedefs</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the initilialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf" title="Initialize a fpq as a min or max heap.">ccc_fpq_init(...)</a>;).</dd></dl>
 <p>Note that to avoid temporary or unpredictable allocation the fpq requires one slot for swapping. Therefore if the user wants a fixed size fpq of size N, N + 1 capacity is required. </p>
+
+</div>
+</div>
+<a id="acd761093fc66e00d95e55cafddb1cc4a" name="acd761093fc66e00d95e55cafddb1cc4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd761093fc66e00d95e55cafddb1cc4a">&#9670;&#160;</a></span>ccc_fpq_update_w</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_fpq_update_w</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fpq_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">T_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">update_closure_over_T&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update the user type stored in the priority queue directly. O(lgN). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq_ptr</td><td>a pointer to the flat priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">T_ptr</td><td>a pointer to the user type being updated. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">update_closure_over_T</td><td>the semicolon separated statements to execute on the user type at T_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false if parameters are invalid or fpq is empty. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure T_ptr is in the fpq.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_priority_queue fpq = build_rand_int_fpq();</div>
+<div class="line"><span class="keywordtype">int</span> *i = get_rand_fpq_elem(&amp;fpq);</div>
+<div class="line">fpq_update_w(&amp;fpq, i, { *i = rand_key(); });</div>
+</div><!-- fragment --><p>Note that whether the key increases or decreases does not affect runtime. </p>
 
 </div>
 </div>
