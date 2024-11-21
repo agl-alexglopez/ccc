@@ -292,7 +292,6 @@ static bool eq_parent_cells(ccc_key_cmp);
 static uint64_t hash_parent_cells(ccc_user_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
 
-static void pq_update_dist(ccc_user_type);
 static unsigned count_digits(uintmax_t n);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -773,10 +772,9 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev_name = cur->cur_name;
                 /* Dijkstra with update technique tests the pq abilities. */
-                if (!decrease(&costs_pq, &next->pq_elem, pq_update_dist, &alt))
-                {
-                    quit("Updating vertex that is not in queue.\n", 1);
-                }
+                bool const relax_res = ccc_pq_decrease_w(
+                    &costs_pq, &next->pq_elem, { next->dist = alt; });
+                prog_assert(relax_res == true);
             }
         }
     }
@@ -1146,12 +1144,6 @@ hash_64_bits(uint64_t x)
     x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
     x = x ^ (x >> 31);
     return x;
-}
-
-static void
-pq_update_dist(ccc_user_type const u)
-{
-    ((struct dijkstra_vertex *)u.user_type)->dist = *((int *)u.aux);
 }
 
 /*===========================    Misc    ====================================*/
