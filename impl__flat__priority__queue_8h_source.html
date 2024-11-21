@@ -180,7 +180,7 @@ $(document).ready(function(){initNavTree('impl__flat__priority__queue_8h_source.
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment">/* Only one update fn is needed because there is no advantage to updates if</span></div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment">   it is known they are min/max increase/decrease etc. */</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)           \</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \</span></div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">    (__extension__({                                                           \</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">        struct ccc_fpq_ *const fpq_ = (fpq_ptr);                               \</span></div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">        bool fpq_update_res_ = false;                                          \</span></div>
@@ -194,10 +194,10 @@ $(document).ready(function(){initNavTree('impl__flat__priority__queue_8h_source.
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="preprocessor">        fpq_update_res_;                                                       \</span></div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="preprocessor">    }))</span></div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="preprocessor">#define ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)       \</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="preprocessor">#define ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)    \</span></div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="preprocessor">    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, increase_closure_over_T)</span></div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="preprocessor">#define ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)       \</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="preprocessor">#define ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)    \</span></div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="preprocessor">    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, decrease_closure_over_T)</span></div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment">/* NOLINTEND(readability-identifier-naming) */</span></div>
