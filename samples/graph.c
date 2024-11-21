@@ -18,6 +18,7 @@ Enter 'q' to quit. */
 #include "realtime_ordered_map.h"
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include <limits.h>
@@ -772,8 +773,8 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
                 /* Build the map with the appropriate best candidate parent. */
                 next->prev_name = cur->cur_name;
                 /* Dijkstra with update technique tests the pq abilities. */
-                bool const relax_res = ccc_pq_decrease_w(
-                    &costs_pq, &next->pq_elem, { next->dist = alt; });
+                bool const relax_res = pq_decrease_w(&costs_pq, &next->pq_elem,
+                                                     { next->dist = alt; });
                 prog_assert(relax_res == true);
             }
         }

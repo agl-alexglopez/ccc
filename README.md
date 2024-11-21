@@ -884,19 +884,17 @@ Composing multiple containers with this approach is also possible. Consider the 
 ```c
 struct dijkstra_vertex
 {
-    ccc_romap_elem path_elem;
-    ccc_pq_elem pq_elem;
+    romap_elem path_elem;
+    pq_elem pq_elem;
     int dist;
     char cur_name;
     char prev_name;
 };
 /* ... Later Initialization After Memory is Prepared ... */
-ccc_realtime_ordered_map path_map = ccc_rom_init(
-    path_map, struct dijkstra_vertex, path_elem, cur_name, arena_alloc,
-    cmp_prev_vertices, &bump_arena);
-ccc_priority_queue costs_pq
-    = ccc_pq_init(struct dijkstra_vertex, pq_elem, CCC_LES, NULL,
-                  cmp_pq_costs, NULL);
+realtime_ordered_map path_map = rom_init(path_map, struct dijkstra_vertex,
+    path_elem, cur_name, arena_alloc, cmp_prev_vertices, &bump_arena);
+priority_queue costs_pq
+    = pq_init(struct dijkstra_vertex, pq_elem, LES, NULL, cmp_pq_costs, NULL);
 /*... Steps to Prepare to Run the Algorithm ...*/
 while (!is_empty(&costs_pq))
 {
@@ -912,7 +910,7 @@ while (!is_empty(&costs_pq))
         if (alt < next->dist)
         {
             next->prev_name = cur->cur_name;
-            decrease(&costs_pq, &next->pq_elem, pq_update_dist, &alt);
+            pq_decrease_w(&costs_pq, &next->pq_elem, { next->dist = alt; });
         }
     }
 }
