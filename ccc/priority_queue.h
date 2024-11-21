@@ -124,6 +124,9 @@ operations. O(1) best case, O(lgN) worst case. */
 bool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem, ccc_update_fn *fn,
                    void *aux);
 
+#define ccc_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)            \
+    ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)
+
 /** @brief Increases the value of the type wrapping elem. O(1) or O(lgN)
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
@@ -141,6 +144,9 @@ from the pq creates an amortized o(lgN) runtime for this function. */
 bool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
                      ccc_update_fn *fn, void *aux);
 
+#define ccc_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)        \
+    ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)
+
 /** @brief Decreases the value of the type wrapping elem. O(1) or O(lgN)
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
@@ -157,6 +163,9 @@ While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 bool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
                      ccc_update_fn *fn, void *aux);
+
+#define ccc_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)        \
+    ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)
 
 /**@}*/
 

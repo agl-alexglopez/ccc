@@ -26,6 +26,9 @@ static void *elem_in(struct ccc_pq_ const *, struct ccc_pq_elem_ const *);
 static ccc_threeway_cmp cmp(struct ccc_pq_ const *,
                             struct ccc_pq_elem_ const *a,
                             struct ccc_pq_elem_ const *b);
+static void update_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+static void increase_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+static void decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
 
 /*=========================  Interface Functions   ==========================*/
 
@@ -156,15 +159,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
         return false;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
-    if (e->parent_ && cmp(pq, e, e->parent_) == pq->order_)
-    {
-        cut_child(e);
-        pq->root_ = merge(pq, pq->root_, e);
-        return true;
-    }
-    pq->root_ = delete_node(pq, e);
-    init_node(e);
-    pq->root_ = merge(pq, pq->root_, e);
+    update_fixup(pq, e);
     return true;
 }
 
@@ -178,18 +173,8 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return false;
     }
-    if (pq->order_ == CCC_GRT)
-    {
-        fn((ccc_user_type){struct_base(pq, e), aux});
-        cut_child(e);
-    }
-    else
-    {
-        pq->root_ = delete_node(pq, e);
-        fn((ccc_user_type){struct_base(pq, e), aux});
-        init_node(e);
-    }
-    pq->root_ = merge(pq, pq->root_, e);
+    fn((ccc_user_type){struct_base(pq, e), aux});
+    increase_fixup(pq, e);
     return true;
 }
 
@@ -203,18 +188,8 @@ ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return false;
     }
-    if (pq->order_ == CCC_LES)
-    {
-        fn((ccc_user_type){struct_base(pq, e), aux});
-        cut_child(e);
-    }
-    else
-    {
-        pq->root_ = delete_node(pq, e);
-        fn((ccc_user_type){struct_base(pq, e), aux});
-        init_node(e);
-    }
-    pq->root_ = merge(pq, pq->root_, e);
+    fn((ccc_user_type){struct_base(pq, e), aux});
+    decrease_fixup(pq, e);
     return true;
 }
 
@@ -257,7 +232,71 @@ ccc_impl_pq_elem_in(struct ccc_pq_ const *const pq,
     return elem_in(pq, user_struct);
 }
 
+void
+ccc_impl_pq_update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+{
+    return update_fixup(pq, e);
+}
+
+void
+ccc_impl_pq_increase_fixup(struct ccc_pq_ *const pq,
+                           struct ccc_pq_elem_ *const e)
+{
+    return increase_fixup(pq, e);
+}
+
+void
+ccc_impl_pq_decrease_fixup(struct ccc_pq_ *const pq,
+                           struct ccc_pq_elem_ *const e)
+{
+    return decrease_fixup(pq, e);
+}
+
 /*========================   Static Helpers   ================================*/
+
+static inline void
+update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+{
+    if (e->parent_ && cmp(pq, e, e->parent_) == pq->order_)
+    {
+        cut_child(e);
+        pq->root_ = merge(pq, pq->root_, e);
+        return;
+    }
+    pq->root_ = delete_node(pq, e);
+    init_node(e);
+    pq->root_ = merge(pq, pq->root_, e);
+}
+
+static inline void
+increase_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+{
+    if (pq->order_ == CCC_GRT)
+    {
+        cut_child(e);
+    }
+    else
+    {
+        pq->root_ = delete_node(pq, e);
+        init_node(e);
+    }
+    pq->root_ = merge(pq, pq->root_, e);
+}
+
+static inline void
+decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+{
+    if (pq->order_ == CCC_LES)
+    {
+        cut_child(e);
+    }
+    else
+    {
+        pq->root_ = delete_node(pq, e);
+        init_node(e);
+    }
+    pq->root_ = merge(pq, pq->root_, e);
+}
 
 static inline ccc_threeway_cmp
 cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
