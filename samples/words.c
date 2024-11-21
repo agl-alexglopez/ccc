@@ -249,6 +249,7 @@ main(int argc, char *argv[])
     if (!f)
     {
         (void)fprintf(stderr, "error opening: %s\n", exe.file.s);
+        return 1;
     }
     if (exe.type == COUNT)
     {
