@@ -154,7 +154,7 @@ fpq_update_w(&fpq, i, { *i = rand_key(); });
 ```
 
 Note that whether the key increases or decreases does not affect runtime. */
-#define ccc_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)                \
+#define ccc_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)             \
     ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)
 
 /** @brief Increase e that is a handle to the stored fpq element. O(lgN).
@@ -185,7 +185,7 @@ fpq_update_w(&fpq, i, { (*i)++; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
-#define ccc_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)            \
+#define ccc_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)         \
     ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)
 
 /** @brief Decrease e that is a handle to the stored fpq element. O(lgN).
@@ -216,7 +216,7 @@ fpq_update_w(&fpq, i, { (*i)--; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
-#define ccc_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)            \
+#define ccc_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)         \
     ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)
 
 /**@}*/

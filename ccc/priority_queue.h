@@ -151,7 +151,7 @@ pq_update_w(&pq, &i->e, { i->key = rand_key(); });
 Note that this operation may incur unnecessary overhead if the user can't
 deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
-#define ccc_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)            \
+#define ccc_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T...)         \
     ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)
 
 /** @brief Increases the priority of the type wrapping elem. O(1) or O(lgN)
@@ -205,7 +205,7 @@ value. If this is a max heap O(1), otherwise O(lgN).
 
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
-#define ccc_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)        \
+#define ccc_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T...)     \
     ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)
 
 /** @brief Decreases the value of the type wrapping elem. O(1) or O(lgN)
@@ -256,7 +256,7 @@ value. If this is a min heap O(1), otherwise O(lgN).
 
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
-#define ccc_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)        \
+#define ccc_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T...)     \
     ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)
 
 /**@}*/
