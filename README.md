@@ -304,6 +304,8 @@ main(void)
        capacity for swap space, min priority queue, no allocation, no aux. */
     flat_priority_queue pq = fpq_heapify_init(
         heap, (sizeof(heap) / sizeof(int)), 19, CCC_LES, NULL, int_cmp, NULL);
+    int *elem = &heap[5];
+    fpq_update_w(&pq, elem, { elem -= 4; });
     int prev = *((int *)front(&pq));
     (void)pop(&pq);
     while (!is_empty(&pq))
@@ -561,13 +563,6 @@ val_cmp(ccc_cmp const cmp)
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
-static void
-decrease_val(ccc_user_type const t)
-{
-    struct val *const v = t.user_type;
-    v->val = *(int *)t.aux;
-}
-
 int
 main(void)
 {
@@ -579,8 +574,8 @@ main(void)
         struct val const *const v = push(&pq, &elems[i].elem);
         assert(v && v->val == elems[i].val);
     }
-    int new_v = -99;
-    bool const decreased = decrease(&pq, &elems[4].elem, decrease_val, &new_v);
+    bool const decreased = pq_decrease_w(&pq, &elems[4].elem,
+                                         { elems[4].val = -99; });
     assert(decreased);
     struct val const *const v = front(&pq);
     assert(v->val == -99);
