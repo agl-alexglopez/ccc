@@ -993,7 +993,7 @@ struct prim_cell *const cell = om_or_insert_w(
     (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
 ```
 
-The second example is slightly more convenient and efficient. The compound literal is directly provided, but it is only constructed if there is no entry present in the map. This also means the random generation function is only called if a Vacant entry requires the insertion of a new value. So, expensive function calls can be lazily evaluated only when needed.
+The second example is slightly more convenient and efficient. The compound literal is provided to be directly assigned to a Vacant memory location; it is only constructed if there is no entry present. This also means the random generation function is only called if a Vacant entry requires the insertion of a new value. So, expensive function calls can be lazily evaluated only when needed.
 
 Here is another example illustrating the difference between the two.
 
@@ -1005,7 +1005,7 @@ struct val
     int val;
 };
 
-ccc_entry e = om_try_insert(&om, &(struct val){.key = 3, .val = 3}.e);
+ccc_entry e = om_try_insert(&om, &(struct val){.key = 3, .val = 1}.e);
 ```
 
 The same insertion with the "with" variant.
@@ -1017,12 +1017,12 @@ val(int val_arg)
     return (struct val){.val = val_args};
 }
 
-ccc_entry *e = om_try_insert_w(&om, 3, val(3));
+ccc_entry *e = om_try_insert_w(&om, 3, val(1));
 ```
 
 This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_w` and `insert_or_assign_w` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.
 
-The lazy evaluation that the `_w` family of functions offer is an expressive way to write C code when needed. See each container's header for more.
+The lazy evaluation of the `_w` family of functions offer an expressive way to write C code when needed. See each container's header for more.
 
 ### Traits
 
