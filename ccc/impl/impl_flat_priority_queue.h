@@ -87,6 +87,8 @@ void ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         fpq_res_;                                                              \
     }))
 
+/* Only one update fn is needed because there is no advantage to updates if
+   it is known they are min/max increase/decrease etc. */
 #define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)           \
     (__extension__({                                                           \
         struct ccc_fpq_ *const fpq_ = (fpq_ptr);                               \
