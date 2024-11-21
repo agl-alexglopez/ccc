@@ -14,6 +14,7 @@ static bool wins(struct ccc_fpq_ const *, void const *winner,
 static void swap(struct ccc_fpq_ *, char tmp[], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
 static void bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
+static void update_fixup(struct ccc_fpq_ *, void *e);
 
 ccc_result
 ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
@@ -24,21 +25,6 @@ ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
         return CCC_INPUT_ERR;
     }
     return ccc_buf_alloc(&fpq->buf_, new_capacity, fn);
-}
-
-void
-ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
-{
-    if (!fpq || ccc_buf_capacity(&fpq->buf_) < n + 1)
-    {
-        return;
-    }
-    (void)ccc_buf_size_set(&fpq->buf_, n);
-    void *const tmp = ccc_buf_at(&fpq->buf_, n);
-    for (size_t i = (n / 2) + 1; i--;)
-    {
-        bubble_down(fpq, tmp, i);
-    }
 }
 
 ccc_result
@@ -174,26 +160,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
         return false;
     }
     fn((ccc_user_type){e, aux});
-    void *tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
-    size_t const i = index_of(fpq, e);
-    if (!i)
-    {
-        bubble_down(fpq, tmp, 0);
-        return true;
-    }
-    ccc_threeway_cmp const parent_cmp = fpq->cmp_(
-        (ccc_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
-    if (parent_cmp == fpq->order_)
-    {
-        (void)bubble_up(fpq, tmp, i);
-        return true;
-    }
-    if (parent_cmp != CCC_EQL)
-    {
-        bubble_down(fpq, tmp, i);
-        return true;
-    }
-    /* If the comparison is equal do nothing. Element is in right spot. */
+    update_fixup(fpq, e);
     return true;
 }
 
@@ -295,7 +262,7 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     {
         void *const cur = at(fpq, i);
         /* Putting the child in the comparison function first evaluates
-           the childs three way comparison in relation to the parent. If
+           the child's three way comparison in relation to the parent. If
            the child beats the parent in total ordering (min/max) something
            has gone wrong. */
         if (left < sz && wins(fpq, at(fpq, left), cur))
@@ -318,7 +285,53 @@ ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
     return bubble_up(fpq, tmp, i);
 }
 
+void
+ccc_impl_fpq_update_fixup(struct ccc_fpq_ *const fpq, void *const e)
+{
+    update_fixup(fpq, e);
+}
+
+void
+ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
+{
+    if (!fpq || ccc_buf_capacity(&fpq->buf_) < n + 1)
+    {
+        return;
+    }
+    (void)ccc_buf_size_set(&fpq->buf_, n);
+    void *const tmp = ccc_buf_at(&fpq->buf_, n);
+    for (size_t i = (n / 2) + 1; i--;)
+    {
+        bubble_down(fpq, tmp, i);
+    }
+}
+
 /*===============================  Static Helpers  =========================*/
+
+static inline void
+update_fixup(struct ccc_fpq_ *const fpq, void *const e)
+{
+    void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
+    size_t const i = index_of(fpq, e);
+    if (!i)
+    {
+        bubble_down(fpq, tmp, 0);
+        return;
+    }
+    ccc_threeway_cmp const parent_cmp = fpq->cmp_(
+        (ccc_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
+    if (parent_cmp == fpq->order_)
+    {
+        (void)bubble_up(fpq, tmp, i);
+        return;
+    }
+    if (parent_cmp != CCC_EQL)
+    {
+        bubble_down(fpq, tmp, i);
+        return;
+    }
+    /* If the comparison is equal do nothing. Element is in right spot. */
+}
 
 static inline size_t
 bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
