@@ -109,31 +109,60 @@ pq is empty.
 Note that the user must ensure that elem is in the priority queue. */
 ccc_result ccc_pq_erase(ccc_priority_queue *pq, ccc_pq_elem *elem);
 
-/** @brief Update the value in the user type wrapping elem.
+/** @brief Update the priority in the user type wrapping elem.
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
 @param [in] fn the update function to act on the type wrapping elem.
 @param [in] aux any auxiliary data needed for the update function.
-@return true if the update occured false if parameters were invalid or the
+@return true if the update occurred false if parameters were invalid or the
 function can deduce elem is not in the pq.
 @warning the user must ensure elem is in the pq.
 
-Note that this operation may incur uneccessary overhead if the user can't
-deduce if an increase or decrease is occuring. See the increase and decrease
+Note that this operation may incur unnecessary overhead if the user can't
+deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
 bool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem, ccc_update_fn *fn,
                    void *aux);
 
+/** @brief Update the priority in the user type stored in the container.
+@param [in] pq_ptr a pointer to the priority queue.
+@param [in] pq_elem_ptr a pointer to the intrusive handle in the user type.
+@param [in] update_closure_over_T the semicolon separated statements to execute
+on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in
+braces may help with formatting). This closure may safely modify the key used to
+track the user element's priority in the priority queue.
+@return true if the update occurred false if parameters were invalid or the
+function can deduce elem is not in the pq.
+@warning the user must ensure elem is in the pq and pq_elem_ptr points to the
+intrusive element in the same user type that is being updated.
+
+```
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+struct val
+{
+    pq_elem e;
+    int key;
+};
+priority_queue pq = build_rand_pq();
+struct val *i = get_rand_pq_elem(&pq);
+pq_update_w(&pq, &i->e, { i->key = rand_key(); });
+```
+
+Note that this operation may incur unnecessary overhead if the user can't
+deduce if an increase or decrease is occurring. See the increase and decrease
+operations. O(1) best case, O(lgN) worst case. */
 #define ccc_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)            \
     ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)
 
-/** @brief Increases the value of the type wrapping elem. O(1) or O(lgN)
+/** @brief Increases the priority of the type wrapping elem. O(1) or O(lgN)
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
 @param [in] fn the update function to act on the type wrapping elem.
 @param [in] aux any auxiliary data needed for the update function.
-@return true if the increase occured false if parameters were invalid or the
+@return true if the increase occurred false if parameters were invalid or the
 function can deduce elem is not in the pq.
+@warning the data structure will be in an invalid state if the user decreases
+the priority by mistake in this function.
 
 Note that this is optimal update technique if the priority queue has been
 initialized as a max queue and the new value is known to be greater than the old
@@ -144,6 +173,38 @@ from the pq creates an amortized o(lgN) runtime for this function. */
 bool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
                      ccc_update_fn *fn, void *aux);
 
+/** @brief Increases the priority of the user type stored in the container.
+@param [in] pq_ptr a pointer to the priority queue.
+@param [in] pq_elem_ptr a pointer to the intrusive handle in the user type.
+@param [in] increase_closure_over_T the semicolon separated statements to
+execute on the user type which wraps pq_elem_ptr (optionally wrapping {code
+here} in braces may help with formatting). This closure may safely increase the
+key used to track the user element's priority in the priority queue.
+@return true if the increase occurred false if parameters were invalid or the
+function can deduce elem is not in the pq.
+@warning the user must ensure elem is in the pq and pq_elem_ptr points to the
+intrusive element in the same user type that is being increased. The data
+structure will be in an invalid state if the user decreases the priority by
+mistake in this function.
+
+```
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+struct val
+{
+    pq_elem e;
+    int key;
+};
+priority_queue pq = build_rand_pq();
+struct val *i = get_rand_pq_elem(&pq);
+pq_increase_w(&pq, &i->e, { i->key++; });
+```
+
+Note that this is optimal update technique if the priority queue has been
+initialized as a max queue and the new value is known to be greater than the old
+value. If this is a max heap O(1), otherwise O(lgN).
+
+While the best case operation is O(1) the impact of restructuring on future pops
+from the pq creates an amortized o(lgN) runtime for this function. */
 #define ccc_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)        \
     ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)
 
@@ -152,7 +213,7 @@ bool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
 @param [in] elem a pointer to the intrusive element in the user type.
 @param [in] fn the update function to act on the type wrapping elem.
 @param [in] aux any auxiliary data needed for the update function.
-@return true if the decrease occured false if parameters were invalid or the
+@return true if the decrease occurred false if parameters were invalid or the
 function can deduce elem is not in the pq.
 
 Note that this is optimal update technique if the priority queue has been
@@ -164,6 +225,37 @@ from the pq creates an amortized o(lgN) runtime for this function. */
 bool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
                      ccc_update_fn *fn, void *aux);
 
+/** @brief Decreases the priority of the user type stored in the container.
+@param [in] pq_ptr a pointer to the priority queue.
+@param [in] pq_elem_ptr a pointer to the intrusive handle in the user type.
+@param [in] decrease_closure_over_T the semicolon separated statements to
+execute on the user type which wraps pq_elem_ptr (optionally wrapping {code
+here} in braces may help with formatting). This closure may safely decrease the
+key used to track the user element's priority in the priority queue.
+@return true if the decrease occurred false if parameters were invalid or the
+function can deduce elem is not in the pq.
+@warning the user must ensure elem is in the pq and pq_elem_ptr points to the
+intrusive element in the same user type that is being decreased. The data
+structure will be in an invalid state if the user decreases the priority by
+mistake in this function.
+
+```
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+struct val
+{
+    pq_elem e;
+    int key;
+};
+priority_queue pq = build_rand_pq();
+struct val *i = get_rand_pq_elem(&pq);
+pq_decrease_w(&pq, &i->e, { i->key--; });
+```
+Note that this is optimal update technique if the priority queue has been
+initialized as a min queue and the new value is known to be less than the old
+value. If this is a min heap O(1), otherwise O(lgN).
+
+While the best case operation is O(1) the impact of restructuring on future pops
+from the pq creates an amortized o(lgN) runtime for this function. */
 #define ccc_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)        \
     ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)
 
