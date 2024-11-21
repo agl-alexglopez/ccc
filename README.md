@@ -304,8 +304,7 @@ main(void)
        capacity for swap space, min priority queue, no allocation, no aux. */
     flat_priority_queue pq = fpq_heapify_init(
         heap, (sizeof(heap) / sizeof(int)), 19, CCC_LES, NULL, int_cmp, NULL);
-    int *elem = &heap[5];
-    fpq_update_w(&pq, elem, { *elem -= 4; });
+    (void)fpq_update_w(&pq, &heap[5], { heap[5] -= 4; });
     int prev = *((int *)front(&pq));
     (void)pop(&pq);
     while (!is_empty(&pq))
