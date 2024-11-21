@@ -1,8 +1,9 @@
-#define TRAITS_USING_NAMESPACE_CCC
+#include <stddef.h>
 
-#include "fomap_util.h"
+#define TRAITS_USING_NAMESPACE_CCC
 #include "checkers.h"
 #include "flat_ordered_map.h"
+#include "fomap_util.h"
 #include "traits.h"
 #include "types.h"
 

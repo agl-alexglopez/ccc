@@ -1,12 +1,12 @@
-#define TRAITS_USING_NAMESPACE_CCC
+#include <assert.h>
+#include <stdio.h>
 
-#include "romap_util.h"
+#define TRAITS_USING_NAMESPACE_CCC
 #include "checkers.h"
 #include "realtime_ordered_map.h"
+#include "romap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stdio.h>
 
 ccc_threeway_cmp
 id_cmp(ccc_key_cmp const cmp)
