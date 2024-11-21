@@ -89,7 +89,7 @@ void ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 
 /* Only one update fn is needed because there is no advantage to updates if
    it is known they are min/max increase/decrease etc. */
-#define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)           \
+#define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
         struct ccc_fpq_ *const fpq_ = (fpq_ptr);                               \
         bool fpq_update_res_ = false;                                          \
@@ -103,10 +103,10 @@ void ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         fpq_update_res_;                                                       \
     }))
 
-#define ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)       \
+#define ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)    \
     ccc_impl_fpq_update_w(fpq_ptr, T_ptr, increase_closure_over_T)
 
-#define ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)       \
+#define ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)    \
     ccc_impl_fpq_update_w(fpq_ptr, T_ptr, decrease_closure_over_T)
 
 /* NOLINTEND(readability-identifier-naming) */

@@ -74,7 +74,7 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
         pq_res_;                                                               \
     }))
 
-#define ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)       \
+#define ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T...)    \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
         bool pq_update_res_ = false;                                           \
@@ -89,7 +89,8 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
         pq_update_res_;                                                        \
     }))
 
-#define ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)   \
+#define ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr,                            \
+                               increase_closure_over_T...)                     \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
         bool pq_increase_res_ = false;                                         \
@@ -104,7 +105,8 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
         pq_increase_res_;                                                      \
     }))
 
-#define ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)   \
+#define ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr,                            \
+                               decrease_closure_over_T...)                     \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
         bool pq_decrease_res_ = false;                                         \
