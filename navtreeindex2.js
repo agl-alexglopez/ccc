@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"structccc__user__key.html":[10,0,2],
 "structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35":[10,0,2,1],
 "structccc__user__key.html#ab67ca7e9abd498baf89fb030c0cab8ac":[10,0,2,0],
 "structccc__user__type.html":[10,0,3],

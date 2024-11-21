@@ -1008,7 +1008,43 @@ Rust's Entry Interface</h2>
 <li><code><a class="el" href="traits_8h.html#af535d3d2b63e8c68efb85e5c54bb0f77" title="Insert an element or overwrite the Occupied entry.">ccc_insert_or_assign(container_ptr, insert_or_assign_args)</a></code> - Inserts a new element invariantly and reports if a previous entry existed.</li>
 </ul>
 <p>Many other containers fall back to C++ style interfaces when it makes sense to do so.</p>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h3><a class="anchor" id="autotoc_md9"></a>
+Lazy Evaluation</h3>
+<p>Many of the above functions come with an optional macro variant. For example, the <code>or_insert</code> function for associative containers will come with an <code>or_insert_w</code> variant, short for or insert "with." The word "with" in this context means a direct r-value.</p>
+<p>Here is an example for generating a maze with Prim's algorithm in the <code>samples/maze.c</code> sample.</p>
+<p>The functional version.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>point const next = {.r = c-&gt;cell.r + dir_offsets[i].r,</div>
+<div class="line">                           .c = c-&gt;cell.c + dir_offsets[i].c};</div>
+<div class="line"><span class="keyword">struct </span>prim_cell new = (<span class="keyword">struct </span>prim_cell){.cell = next,</div>
+<div class="line">                                          .cost = rand_range(0, 100)};</div>
+<div class="line"><span class="keyword">struct </span>prim_cell *<span class="keyword">const</span> cell = or_insert(entry_r(&amp;costs, &amp;next), &amp;<span class="keyword">new</span>.map_elem);</div>
+</div><!-- fragment --><p>The lazily evaluated macro version.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>point const next = {.r = c-&gt;cell.r + dir_offsets[i].r,</div>
+<div class="line">                           .c = c-&gt;cell.c + dir_offsets[i].c};</div>
+<div class="line"><span class="keyword">struct </span>prim_cell *<span class="keyword">const</span> cell = om_or_insert_w(</div>
+<div class="line">    entry_r(&amp;costs, &amp;next),</div>
+<div class="line">    (<span class="keyword">struct</span> prim_cell){.cell = next, .cost = rand_range(0, 100)});</div>
+</div><!-- fragment --><p>The second example is slightly more convenient and efficient. The compound literal is provided to be directly assigned to a Vacant memory location; it is only constructed if there is no entry present. This also means the random generation function is only called if a Vacant entry requires the insertion of a new value. So, expensive function calls can be lazily evaluated only when needed.</p>
+<p>Here is another example illustrating the difference between the two.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    omap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = om_try_insert(&amp;om, &amp;(<span class="keyword">struct</span> val){.key = 3, .val = 1}.e);</div>
+</div><!-- fragment --><p>The same insertion with the "with" variant.</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">struct </span>val</div>
+<div class="line">val(int val_arg)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordflow">return</span> (<span class="keyword">struct</span> val){.val = val_args};</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> *e = om_try_insert_w(&amp;om, 3, val(1));</div>
+</div><!-- fragment --><p>This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions <code>try_insert_w</code> and <code>insert_or_assign_w</code> will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.</p>
+<p>The lazy evaluation of the <code>_w</code> family of functions offer an expressive way to write C code when needed. See each container's header for more.</p>
+<h2><a class="anchor" id="autotoc_md10"></a>
 Traits</h2>
 <p>Traits, found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code>, offer a more succinct way to use shared functionality across containers. Instead of calling <code>ccc_fhm_entry</code> when trying to obtain an entry from a flat hash map, one can simply call <code>entry</code>. Traits utilize <code>_Generic</code> in C to choose the correct container function based on parameters provided.</p>
 <p>Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.</p>
@@ -1034,7 +1070,7 @@ Traits</h2>
 <div class="line">e = and_modify(e, increment)</div>
 <div class="line">word *w = or_insert(e, &amp;<span class="keywordflow">default</span>.e);</div>
 </div><!-- fragment --><p>Using the first method in your code may expand the code evaluated in different <code>_Generic</code> cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">traits.h</a></code> header.</p>
-<h1><a class="anchor" id="autotoc_md10"></a>
+<h1><a class="anchor" id="autotoc_md11"></a>
 Allocation</h1>
 <p>When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">void</span> *<a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(<span class="keywordtype">void</span> *ptr, <span class="keywordtype">size_t</span> size, <span class="keywordtype">void</span> *aux);</div>
@@ -1067,13 +1103,13 @@ Allocation</h1>
 <div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.</p>
-<h2><a class="anchor" id="autotoc_md11"></a>
+<h2><a class="anchor" id="autotoc_md12"></a>
 Constructors</h2>
 <p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
-<h2><a class="anchor" id="autotoc_md12"></a>
+<h2><a class="anchor" id="autotoc_md13"></a>
 Destructors</h2>
 <p>For destructors, the argument is similar but the container does offer more help. If an action other than freeing the memory of a user type is needed upon removal, there are options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. One exception is the following interfaces.</p>
 <p>The clear function works for pointer stable containers and flat containers.</p>
@@ -1081,7 +1117,7 @@ Destructors</h2>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
-<h1><a class="anchor" id="autotoc_md13"></a>
+<h1><a class="anchor" id="autotoc_md14"></a>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
 <p>The samples are not included in the release. To build them, clone the repository. Usage instructions should be available with the <code>-h</code> flag to any program or at the top of the file.</p>
@@ -1091,7 +1127,7 @@ Samples</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">./build/bin/[SAMPLE] [SAMPLE CLI ARGS]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md14"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md15"></a>
 Tests</h1>
 <p>The tests also include various use cases that may be of interest. Tests are not included in the release. Clone the repository.</p>
 <p>Clang.</p>
@@ -1100,7 +1136,7 @@ Tests</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">make rtest</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md15"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
 Miscellaneous Why?</h1>
 <ul>
 <li>Why is initialization so ugly? Yes, I know. Traditionally, intrusive data structures take intrusive elements as parameters or return references to them from functions. The user then has to use a <code>container_of</code> style macro that gets the user type wrapping the intruder. This introduces the chance for subtle bugs. The user has to use the macro in all locations in the code where their type is needed from the container. The opportunity for errors grows rapidly. At the cost of more initialization complexity, I can offer the user a cleaner interface; give me the intrusive handle and I will give you back your type without the need for extra macro wrapping.</li>
@@ -1111,7 +1147,7 @@ Miscellaneous Why?</h1>
 <li>Why not a better hash map? Haven't gotten to it yet. This container has the most room for improvement.</li>
 <li>Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md16"></a>
+<h1><a class="anchor" id="autotoc_md17"></a>
 Related</h1>
 <p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>
