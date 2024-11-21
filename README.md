@@ -967,6 +967,63 @@ Some C++ associative container interfaces have also been adapted to the Entry In
 
 Many other containers fall back to C++ style interfaces when it makes sense to do so.
 
+#### Lazy Evaluation
+
+Many of the above functions come with an optional macro variant. For example, the `or_insert` function for associative containers will come with an `or_insert_w` variant, short for or insert "with." The word "with" in this context means a direct r-value.
+
+Here is an example for generating a maze with Prim's algorithm in the `samples/maze.c` sample.
+
+The functional version.
+
+```c
+struct point const next = {.r = c->cell.r + dir_offsets[i].r,
+                           .c = c->cell.c + dir_offsets[i].c};
+struct prim_cell new = (struct prim_cell){.cell = next,
+                                          .cost = rand_range(0, 100)};
+struct prim_cell *const cell = or_insert(entry_r(&costs, &next), &new.map_elem);
+```
+
+The lazily evaluated macro version.
+
+```c
+struct point const next = {.r = c->cell.r + dir_offsets[i].r,
+                           .c = c->cell.c + dir_offsets[i].c};
+struct prim_cell *const cell = om_or_insert_w(
+    entry_r(&costs, &next),
+    (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
+```
+
+The second example is slightly more convenient and efficient. The compound literal is directly provided, but it is only constructed if there is no entry present in the map. This also means the random generation function is only called if a Vacant entry requires the insertion of a new value. So, expensive function calls can be lazily evaluated only when needed.
+
+Here is another example illustrating the difference between the two.
+
+```c
+struct val
+{
+    omap_elem e;
+    int key;
+    int val;
+};
+
+ccc_entry e = om_try_insert(&om, &(struct val){.key = 3, .val = 3}.e);
+```
+
+The same insertion with the "with" variant.
+
+```c
+static inline struct val
+val(int val_arg)
+{
+    return (struct val){.val = val_args};
+}
+
+ccc_entry *e = om_try_insert_w(&om, 3, val(3));
+```
+
+This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_w` and `insert_or_assign_w` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.
+
+The lazy evaluation that the `_w` family of functions offer is an expressive way to write C code when needed. See each container's header for more.
+
 ### Traits
 
 Traits, found in `ccc/traits.h`, offer a more succinct way to use shared functionality across containers. Instead of calling `ccc_fhm_entry` when trying to obtain an entry from a flat hash map, one can simply call `entry`. Traits utilize `_Generic` in C to choose the correct container function based on parameters provided.
