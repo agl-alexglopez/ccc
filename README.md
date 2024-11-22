@@ -813,12 +813,10 @@ Here, the container pushes stack allocated structs directly into the list. The c
 Traditionally, intrusive containers provide the following macro.
 
 ```c
-/**
- * list_entry - get the struct for this entry
- * @ptr:	the &struct list_elem pointer.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
- */
+/** list_entry - get the struct for this entry
+@ptr the &struct list_elem pointer.
+@type the type of the struct this is embedded in.
+@member	the name of the list_elem within the struct. */
 #define list_entry(ptr, type, member) \
 	container_of(ptr, type, member)
 
@@ -892,8 +890,8 @@ struct dijkstra_vertex
 /* ... Later Initialization After Memory is Prepared ... */
 realtime_ordered_map path_map = rom_init(path_map, struct dijkstra_vertex,
     path_elem, cur_name, arena_alloc, cmp_prev_vertices, &bump_arena);
-priority_queue costs_pq
-    = pq_init(struct dijkstra_vertex, pq_elem, LES, NULL, cmp_pq_costs, NULL);
+priority_queue costs_pq = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
+    NULL, cmp_pq_costs, NULL);
 /*... Steps to Prepare to Run the Algorithm ...*/
 while (!is_empty(&costs_pq))
 {
@@ -1029,7 +1027,7 @@ typedef struct
     int cnt;
     fomap_elem e;
 } word;
-/* ... Generate offset (ofs). */
+/* ... Elsewhere generate offset ofs as key. */
 word default = {.str_arena_offset = ofs, .cnt = 1};
 word *w = or_insert(and_modify(entry_r(&fom, &ofs), increment), &default.e);
 ```
@@ -1043,7 +1041,7 @@ typedef struct
     int cnt;
     fomap_elem e;
 } word;
-/* ... Generate offset (ofs). */
+/* ... Elsewhere generate offset ofs as key. */
 word default = {.str_arena_offset = ofs, .cnt = 1};
 fomap_entry *e = entry_r(&fom, &ofs);
 e = and_modify(e, increment)
