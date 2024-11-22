@@ -906,8 +906,10 @@ while (!is_empty(&costs_pq))
         int alt = cur->dist + cur_v->edges[i].cost;
         if (alt < next->dist)
         {
-            next->prev_name = cur->cur_name;
-            pq_decrease_w(&costs_pq, &next->pq_elem, { next->dist = alt; });
+            pq_decrease_w(&costs_pq, &next->pq_elem, {
+                next->prev_name = cur->cur_name;
+                next->dist = alt;
+            });
         }
     }
 }

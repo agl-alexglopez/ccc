@@ -771,11 +771,11 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             if (alt < next->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                next->prev_name = cur->cur_name;
-                /* Dijkstra with update technique tests the pq abilities. */
-                bool const relax_res = pq_decrease_w(&costs_pq, &next->pq_elem,
-                                                     { next->dist = alt; });
-                prog_assert(relax_res == true);
+                bool const relax = pq_decrease_w(&costs_pq, &next->pq_elem, {
+                    next->prev_name = cur->cur_name;
+                    next->dist = alt;
+                });
+                prog_assert(relax == true);
             }
         }
     }
