@@ -748,26 +748,25 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     prepare_vertices(graph, &costs_pq, &path_map, &pr);
     bool success = false;
     struct dijkstra_vertex *cur = NULL;
-    struct vertex *cur_v = NULL;
     while (!is_empty(&costs_pq))
     {
         /* PQ entries are safely popped due to no allocation permission. */
         cur = front(&costs_pq);
         (void)pop(&costs_pq);
-        cur_v = vertex_at(graph, cur->cur_name);
         if (cur->cur_name == pr.dst || cur->dist == INT_MAX)
         {
             success = cur->dist != INT_MAX;
             break;
         }
-        for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
+        struct node const *const edges = vertex_at(graph, cur->cur_name)->edges;
+        for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
             struct dijkstra_vertex *next
-                = get_key_val(&path_map, &cur_v->edges[i].name);
+                = get_key_val(&path_map, &edges[i].name);
             prog_assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
-            int alt = cur->dist + cur_v->edges[i].cost;
+            int alt = cur->dist + edges[i].cost;
             if (alt < next->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
@@ -781,15 +780,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     }
     if (success)
     {
-        struct dijkstra_vertex const *prev
-            = get_key_val(&path_map, &cur_v->name);
-        prog_assert(prev);
-        while (prev->prev_name)
+        while (cur->prev_name)
         {
-            paint_edge(graph, cur_v, vertex_at(graph, prev->prev_name));
-            cur_v = vertex_at(graph, prev->prev_name);
-            prev = get_key_val(&path_map, &prev->prev_name);
-            prog_assert(prev);
+            paint_edge(graph, vertex_at(graph, cur->cur_name),
+                       vertex_at(graph, cur->prev_name));
+            cur = get_key_val(&path_map, &cur->prev_name);
+            prog_assert(cur);
         }
     }
     /* Complex algorithm but one alloc one free from heap's perspective. */

@@ -895,15 +895,15 @@ priority_queue costs_pq = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
 /*... Steps to Prepare to Run the Algorithm ...*/
 while (!is_empty(&costs_pq))
 {
-    struct dijkstra_vertex *current = front(&costs_pq);
+    struct dijkstra_vertex *cur = front(&costs_pq);
     (void)pop(&costs_pq);
-    struct vertex *cur_v = vertex_at(graph, cur->cur_name);
     /* ... Check for Stopping Condition Then Continue ... */
-    for (int i = 0; i < MAX_DEGREE && cur_v->edges[i].name; ++i)
+    struct node const *const edges = vertex_at(graph, cur->cur_name)->edges;
+    for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
     {
         struct dijkstra_vertex *next
-            = get_key_val(&path_map, &cur_v->edges[i].name);
-        int alt = cur->dist + cur_v->edges[i].cost;
+            = get_key_val(&path_map, &edges[i].name);
+        int alt = cur->dist + edges[i].cost;
         if (alt < next->dist)
         {
             pq_decrease_w(&costs_pq, &next->pq_elem, {
