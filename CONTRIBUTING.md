@@ -22,11 +22,11 @@ Here is a description of the current repository organization.
 Required tools:
 
 - [pre-commit](https://pre-commit.com/) - Run `pre-commit install` once the repo is forked/cloned. This will ensure pointless formatting changes don't enter the commit history.
-- clang-format - This is needed less so now that `pre-commit` helps with formatting.
-- .editorconfig - Settles cross platform issues like line endings and editor concerns like tabs vs spaces. Ensure your editor supports .editorconfig.
 - clangd - This is helpful for your editor if you have a `LSP` that can auto-format on save. This repo has both a `.clang-tidy` and `.clang-format` file that help `LSP`'s and other tools with warnings while you write.
-- clang-tidy - Clang tidy should be run often on any changes to the code to catch obvious errors.
 - gcc-14+ - GCC 14 onward added excellent `-fanalyzer` capabilities. There are GCC presets in `CMakePresets.json` to run `-fanalyzer` and numerous sanitizers. These work best with newer GCC versions.
+- .editorconfig - Settles cross platform issues like line endings and editor concerns like tabs vs spaces. Ensure your editor supports .editorconfig.
+- .clang-format - This is needed less so now that `pre-commit` helps with formatting.
+- .clang-tidy - Clang tidy should be run often on any changes to the code to catch obvious errors.
 
 Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets found in `CMakePresets.json`. Here is my setup as a sample.
 
