@@ -12,36 +12,45 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Clang and GCC support static array parameter declarations while
-   MSVC does not. This is how to solve the differing declaration
-   signature requirements. */
-#if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
-/* Clang and GCC support static array parameter declarations while
-   MSVC does not. This is how to solve the differing declaration
-   signature requirements. */
+/* This is the old way I did this in the str_view lib. But I banned vla's in
+   the ccc library and compilers don't seem to like vla params even though
+   they are technically not the same issue. So I'll just disable them here.
 
-/* A static array parameter declaration helper. Function parameters
+   Clang and GCC support static array parameter declarations while
+   MSVC does not. This is how to solve the differing declaration
+   signature requirements.
+#if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
+   Clang and GCC support static array parameter declarations while
+   MSVC does not. This is how to solve the differing declaration
+   signature requirements.
+
+   A static array parameter declaration helper. Function parameters
    may specify an array of a type of at least SIZE elements large,
    allowing compiler optimizations and safety errors. Specify
-   a parameter such as `void func(int size, ARR_GEQ(arr, size))`. */
+   a parameter such as `void func(int size, ARR_GEQ(arr, size))`.
 #    define ARR_GEQ(str, size) str[static(size)]
-/* A static array parameter declaration helper. Function parameters
+   A static array parameter declaration helper. Function parameters
    may specify an array of a type of at least SIZE elements large,
    allowing compiler optimizations and safety errors. Specify
    a parameter such as `void func(int size, int ARR_GEQ(arr,size))`.
    This declarations adds the additional constraint that the pointer
-   to the begginning of the array of types will not move. */
+   to the begginning of the array of types will not move.
 #    define ARR_CONST_GEQ(str, size) str[static const(size)]
 #else
-/* Dummy macro for MSVC compatibility. Specifies a function parameter shall
-   have at least one element. Compiler warnings may differ from GCC/Clang. */
+   Dummy macro for MSVC compatibility. Specifies a function parameter shall
+   have at least one element. Compiler warnings may differ from GCC/Clang.
 #    define ARR_GEQ(str, size) *str
-/* Dummy macro for MSVC compatibility. Specifies a function parameter shall
+   Dummy macro for MSVC compatibility. Specifies a function parameter shall
    have at least one element. MSVC does not allow specification of a const
    pointer to the begginning of an array function parameter when using array
-   size parameter syntax. Compiler warnings may differ from GCC/Clang. */
+   size parameter syntax. Compiler warnings may differ from GCC/Clang.
 #    define ARR_CONST_GEQ(str, size) *const str
 #endif
+
+*/
+
+#define ARR_GEQ(str, size) *str
+#define ARR_CONST_GEQ(str, size) *const str
 
 /* ========================   Type Definitions   =========================== */
 
@@ -1460,7 +1469,7 @@ sv_rstrnchr(size_t const n, char const ARR_CONST_GEQ(s, n), char const c)
 
 static inline size_t
 sv_twobyte_strnstrn(size_t const sz, unsigned char const ARR_GEQ(h, sz),
-                    size_t const n_sz,
+                    [[maybe_unused]] size_t const n_sz,
                     unsigned char const ARR_CONST_GEQ(n, n_sz))
 {
     unsigned char const *const end = h + sz;
@@ -1473,7 +1482,7 @@ sv_twobyte_strnstrn(size_t const sz, unsigned char const ARR_GEQ(h, sz),
 
 static inline size_t
 sv_rtwobyte_strnstrn(size_t const sz, unsigned char const ARR_CONST_GEQ(h, sz),
-                     size_t const n_sz,
+                     [[maybe_unused]] size_t const n_sz,
                      unsigned char const ARR_CONST_GEQ(n, n_sz))
 {
     unsigned char const *i = h + (sz - 2);
@@ -1489,7 +1498,7 @@ sv_rtwobyte_strnstrn(size_t const sz, unsigned char const ARR_CONST_GEQ(h, sz),
 
 static inline size_t
 sv_threebyte_strnstrn(size_t const sz, unsigned char const ARR_GEQ(h, sz),
-                      size_t const n_sz,
+                      [[maybe_unused]] size_t const n_sz,
                       unsigned char const ARR_CONST_GEQ(n, n_sz))
 {
     unsigned char const *const end = h + sz;
@@ -1503,7 +1512,7 @@ sv_threebyte_strnstrn(size_t const sz, unsigned char const ARR_GEQ(h, sz),
 static inline size_t
 sv_rthreebyte_strnstrn(size_t const sz,
                        unsigned char const ARR_CONST_GEQ(h, sz),
-                       size_t const n_sz,
+                       [[maybe_unused]] size_t const n_sz,
                        unsigned char const ARR_CONST_GEQ(n, n_sz))
 {
     unsigned char const *i = h + (sz - 3);
@@ -1519,7 +1528,7 @@ sv_rthreebyte_strnstrn(size_t const sz,
 
 static inline size_t
 sv_fourbyte_strnstrn(size_t const sz, unsigned char const ARR_GEQ(h, sz),
-                     size_t const n_sz,
+                     [[maybe_unused]] size_t const n_sz,
                      unsigned char const ARR_CONST_GEQ(n, n_sz))
 {
     unsigned char const *const end = h + sz;
@@ -1532,7 +1541,7 @@ sv_fourbyte_strnstrn(size_t const sz, unsigned char const ARR_GEQ(h, sz),
 
 static inline size_t
 sv_rfourbyte_strnstrn(size_t const sz, unsigned char const ARR_CONST_GEQ(h, sz),
-                      size_t const n_sz,
+                      [[maybe_unused]] size_t const n_sz,
                       unsigned char const ARR_CONST_GEQ(n, n_sz))
 {
     unsigned char const *i = h + (sz - 4);
