@@ -746,18 +746,18 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
        in the map and priority queue for the entirety of the algorithm. */
     prepare_vertices(graph, &costs_pq, &path_map, &pr);
     bool success = false;
-    struct dijkstra_vertex *cur = NULL;
+    struct dijkstra_vertex *v = NULL;
     while (!is_empty(&costs_pq))
     {
         /* PQ entries are safely popped due to no allocation permission. */
-        cur = front(&costs_pq);
+        v = front(&costs_pq);
         (void)pop(&costs_pq);
-        if (cur->cur_name == pr.dst || cur->dist == INT_MAX)
+        if (v->cur_name == pr.dst || v->dist == INT_MAX)
         {
-            success = cur->dist != INT_MAX;
+            success = v->dist != INT_MAX;
             break;
         }
-        struct node const *const edges = vertex_at(graph, cur->cur_name)->edges;
+        struct node const *const edges = vertex_at(graph, v->cur_name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
             struct dijkstra_vertex *next
@@ -765,12 +765,12 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             prog_assert(next);
             /* The seen map also holds a pointer to the corresponding
                priority queue element so that this update is easier. */
-            int alt = cur->dist + edges[i].cost;
+            int alt = v->dist + edges[i].cost;
             if (alt < next->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
                 bool const relax = pq_decrease_w(&costs_pq, &next->pq_elem, {
-                    next->prev_name = cur->cur_name;
+                    next->prev_name = v->cur_name;
                     next->dist = alt;
                 });
                 prog_assert(relax == true);
@@ -779,12 +779,11 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     }
     if (success)
     {
-        while (cur->prev_name)
+        for (; v && v->prev_name; v = get_key_val(&path_map, &v->prev_name))
         {
-            paint_edge(graph, cur->cur_name, cur->prev_name);
-            cur = get_key_val(&path_map, &cur->prev_name);
-            prog_assert(cur);
+            paint_edge(graph, v->cur_name, v->prev_name);
         }
+        prog_assert(v);
     }
     /* Complex algorithm but one alloc one free from heap's perspective. */
     free(bump_arena.vertices);
@@ -854,6 +853,8 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name)
 static struct vertex *
 vertex_at(struct graph const *const g, char const name)
 {
+    prog_assert(name >= start_vertex_title
+                && name < start_vertex_title + g->vertices);
     return &((struct vertex *)g->graph)[((size_t)name - start_vertex_title)];
 }
 
