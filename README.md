@@ -18,6 +18,7 @@ Currently, this library supports a manual installation via CMake. See the [INSTA
 - Read [types.h](https://agl-alexglopez.github.io/ccc/types_8h.html) to understand the `ccc_alloc_fn` interface.
 - Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
 - Read about generic [traits.h](https://agl-alexglopez.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) if interested in project structure, tools, and todos.
 
 ## Containers
 
