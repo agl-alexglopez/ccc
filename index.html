@@ -933,8 +933,8 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <div class="line"><span class="comment">/* ... Later Initialization After Memory is Prepared ... */</span></div>
 <div class="line">realtime_ordered_map path_map = rom_init(path_map, <span class="keyword">struct</span> dijkstra_vertex,</div>
 <div class="line">    path_elem, cur_name, arena_alloc, cmp_prev_vertices, &amp;bump_arena);</div>
-<div class="line">priority_queue costs_pq</div>
-<div class="line">    = pq_init(<span class="keyword">struct</span> dijkstra_vertex, pq_elem, LES, NULL, cmp_pq_costs, NULL);</div>
+<div class="line">priority_queue costs_pq = pq_init(<span class="keyword">struct</span> dijkstra_vertex, pq_elem, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>,</div>
+<div class="line">    NULL, cmp_pq_costs, NULL);</div>
 <div class="line"><span class="comment">/*... Steps to Prepare to Run the Algorithm ...*/</span></div>
 <div class="line"><span class="keywordflow">while</span> (!is_empty(&amp;costs_pq))</div>
 <div class="line">{</div>
@@ -1037,7 +1037,7 @@ Traits</h2>
 <div class="line">    <span class="keywordtype">int</span> cnt;</div>
 <div class="line">    fomap_elem e;</div>
 <div class="line">} word;</div>
-<div class="line"><span class="comment">/* ... Generate offset (ofs). */</span></div>
+<div class="line"><span class="comment">/* ... Elsewhere generate offset ofs as key. */</span></div>
 <div class="line">word <span class="keywordflow">default</span> = {.str_arena_offset = ofs, .cnt = 1};</div>
 <div class="line">word *w = or_insert(and_modify(entry_r(&amp;fom, &amp;ofs), increment), &amp;<span class="keywordflow">default</span>.e);</div>
 </div><!-- fragment --><p>Or the following.</p>
@@ -1047,7 +1047,7 @@ Traits</h2>
 <div class="line">    <span class="keywordtype">int</span> cnt;</div>
 <div class="line">    fomap_elem e;</div>
 <div class="line">} word;</div>
-<div class="line"><span class="comment">/* ... Generate offset (ofs). */</span></div>
+<div class="line"><span class="comment">/* ... Elsewhere generate offset ofs as key. */</span></div>
 <div class="line">word <span class="keywordflow">default</span> = {.str_arena_offset = ofs, .cnt = 1};</div>
 <div class="line">fomap_entry *e = entry_r(&amp;fom, &amp;ofs);</div>
 <div class="line">e = and_modify(e, increment)</div>
