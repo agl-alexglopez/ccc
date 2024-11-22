@@ -939,19 +939,19 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <div class="line"><span class="comment">/*... Steps to Prepare to Run the Algorithm ...*/</span></div>
 <div class="line"><span class="keywordflow">while</span> (!is_empty(&amp;costs_pq))</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>dijkstra_vertex *cur = front(&amp;costs_pq);</div>
+<div class="line">    <span class="keyword">struct </span>dijkstra_vertex const *<span class="keyword">const</span> v = front(&amp;costs_pq);</div>
 <div class="line">    (void)pop(&amp;costs_pq);</div>
 <div class="line">    <span class="comment">/* ... Check for Stopping Condition Then Continue ... */</span></div>
-<div class="line">    <span class="keyword">struct </span>node const *<span class="keyword">const</span> edges = vertex_at(graph, cur-&gt;cur_name)-&gt;edges;</div>
+<div class="line">    <span class="keyword">struct </span>node const *<span class="keyword">const</span> edges = vertex_at(graph, v-&gt;cur_name)-&gt;edges;</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; MAX_DEGREE &amp;&amp; edges[i].name; ++i)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="keyword">struct </span>dijkstra_vertex *next</div>
+<div class="line">        <span class="keyword">struct </span>dijkstra_vertex *<span class="keyword">const</span> next</div>
 <div class="line">            = get_key_val(&amp;path_map, &amp;edges[i].name);</div>
-<div class="line">        <span class="keywordtype">int</span> alt = cur-&gt;dist + edges[i].cost;</div>
+<div class="line">        <span class="keywordtype">int</span> alt = v-&gt;dist + edges[i].cost;</div>
 <div class="line">        <span class="keywordflow">if</span> (alt &lt; next-&gt;dist)</div>
 <div class="line">        {</div>
 <div class="line">            pq_decrease_w(&amp;costs_pq, &amp;next-&gt;pq_elem, {</div>
-<div class="line">                next-&gt;prev_name = cur-&gt;cur_name;</div>
+<div class="line">                next-&gt;prev_name = v-&gt;cur_name;</div>
 <div class="line">                next-&gt;dist = alt;</div>
 <div class="line">            });</div>
 <div class="line">        }</div>
