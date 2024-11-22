@@ -250,8 +250,7 @@ static bool dijkstra_shortest_path(struct graph *, struct path_request);
 static void prepare_vertices(struct graph *, ccc_priority_queue *,
                              ccc_realtime_ordered_map *,
                              struct path_request const *);
-static void paint_edge(struct graph *, struct vertex const *,
-                       struct vertex const *);
+static void paint_edge(struct graph *, char, char);
 static void add_edge_cost_label(struct graph *, struct vertex *,
                                 struct edge const *);
 static bool is_dst(Cell, char);
@@ -782,8 +781,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     {
         while (cur->prev_name)
         {
-            paint_edge(graph, vertex_at(graph, cur->cur_name),
-                       vertex_at(graph, cur->prev_name));
+            paint_edge(graph, cur->cur_name, cur->prev_name);
             cur = get_key_val(&path_map, &cur->prev_name);
             prog_assert(cur);
         }
@@ -817,9 +815,10 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
 }
 
 static void
-paint_edge(struct graph *const g, struct vertex const *const src,
-           struct vertex const *const dst)
+paint_edge(struct graph *const g, char const src_name, char const dst_name)
 {
+    struct vertex const *const src = vertex_at(g, src_name);
+    struct vertex const *const dst = vertex_at(g, dst_name);
     struct point cur = src->pos;
     Cell const edge_id = make_edge(src->name, dst->name);
     struct point prev = cur;
