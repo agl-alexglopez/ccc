@@ -15,12 +15,6 @@ AB
 A->B
 CtoD
 Enter 'q' to quit. */
-#include "realtime_ordered_map.h"
-#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -30,10 +24,16 @@ Enter 'q' to quit. */
 #include <string.h>
 #include <time.h>
 
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+#define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
 #include "alloc.h"
 #include "ccc/flat_double_ended_queue.h"
 #include "ccc/flat_hash_map.h"
 #include "ccc/priority_queue.h"
+#include "ccc/realtime_ordered_map.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
@@ -457,7 +457,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                    elem, std_alloc, hash_parent_cells, eq_parent_cells, NULL);
     prog_assert(res == CCC_OK);
     flat_double_ended_queue bfs
-        = ccc_fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
+        = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     ccc_entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos,
         (struct path_backtrack_cell){.parent = {-1, -1}});
@@ -736,11 +736,11 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     prog_assert(bump_arena.vertices);
     /* The realtime ordered map and priority queue both have pointer stability
        and therefore can be safely composed together in the same struct. */
-    ccc_realtime_ordered_map path_map = ccc_rom_init(
-        path_map, struct dijkstra_vertex, path_elem, cur_name,
-        dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
-    ccc_priority_queue costs_pq = ccc_pq_init(
-        struct dijkstra_vertex, pq_elem, CCC_LES, NULL, cmp_pq_costs, NULL);
+    realtime_ordered_map path_map
+        = rom_init(path_map, struct dijkstra_vertex, path_elem, cur_name,
+                   dijkstra_vertex_arena_alloc, cmp_prev_vertices, &bump_arena);
+    priority_queue costs_pq = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
+                                      NULL, cmp_pq_costs, NULL);
     /* The lifetime of elements in the map and priority queue are identical.
        We don't have to worry about removing one before the other. All stay
        in the map and priority queue for the entirety of the algorithm. */

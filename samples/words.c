@@ -10,9 +10,6 @@ Please specify a command as follows:
 -top=N reports the top N words by frequency.
 -last=N reports the last N words by frequency
 -find=[WORD] reports the count of the specified word. */
-#define TRAITS_USING_NAMESPACE_CCC
-#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
-
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -22,6 +19,8 @@ Please specify a command as follows:
 #include <stdlib.h>
 #include <string.h>
 
+#define TRAITS_USING_NAMESPACE_CCC
+#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
 #include "alloc.h"
 #include "ccc/flat_ordered_map.h"
 #include "ccc/flat_priority_queue.h"

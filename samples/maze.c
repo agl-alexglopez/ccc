@@ -15,12 +15,6 @@ Usage:
 -s=N The speed flag lets you specify the speed of the animation 0-7.
 Example:
 ./build/[debug/]bin/maze -c=111 -r=33 -s=4 */
-#define TRAITS_USING_NAMESPACE_CCC
-#define TYPES_USING_NAMESPACE_CCC
-#define BUFFER_USING_NAMESPACE_CCC
-#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-#define ORDERED_MAP_USING_NAMESPACE_CCC
-
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -30,6 +24,11 @@ Example:
 #include <string.h>
 #include <time.h>
 
+#define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#define BUFFER_USING_NAMESPACE_CCC
+#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define ORDERED_MAP_USING_NAMESPACE_CCC
 #include "ccc/ordered_map.h"
 #include "ccc/priority_queue.h"
 #include "ccc/traits.h"
