@@ -44,12 +44,7 @@ jobs:
 
     - uses: lukka/get-cmake@latest 
 
-    - name: Delete non-library files
-      run: |
-        rm -rf samples/
-        rm -rf tests/
-        rm -rf util/
-
     - name: Build with Ninja and Clang
       run: |
+        make all-clang-rel
         make clang-ccc
