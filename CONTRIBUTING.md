@@ -96,7 +96,7 @@ Now that tooling is set up, the workflow is roughly as follows.
 - Checkout a branch and start working on changes.
 - When ready or almost ready, open a draft pr so CI can start running checks.
 - Before completion run the following tools (I am working on getting more of this into CI so it does not always have to happen locally).
-    - Run `make tidy` and fix any issues from `clang-tidy`.
+    - Run `make tidy` and fix any issues from `clang-tidy`. This will also run as an action on any pull request in case you forget, but it only runs if it detects the most recent commit has changed a `.c` or `.h` file. It is also easier to quickly fix feedback locally.
     - Run `make clean && cmake --preset=dsan && cmake --build build -j8 --target ccc tests samples`. Replace the `-j8` flag with the number of cores on your system. This runs GCC's `-fanalyzer` and supplementary sanitizer flags. GCC's `-fanalyzer` will flag issues at compile time. Sanitizers requires you run actual programs so it can observe undefined behavior, buffer overflow, out of bounds memory access, etc. Run the tests `make dtest` and any samples your changes affect.
     - Run `make clean && cmake --preset=rsan && cmake --build build -j8 --target ccc tests samples`. Replace the `-j8` flag with the number of cores on your system. This is the same as the previous step just in release mode. Sometimes the compiler can optimize in such a way to create different issues the sanitizer can catch. Run `make rtest`.
 - Mark the pr as ready for review when all CI checks pass and tools show no errors locally.

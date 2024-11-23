@@ -1,14 +1,14 @@
 /** This implementation is a starter. It is a Robin Hood hash table. It caches
 the hash values for efficient distance calculations, resizing, and faster
 comparison before being forced to call user comparison callback. It also
-implements backfill deletions. At first I though this was not a good starter
+implements backfill deletions. At first I thought this was not a good starter
 implementation but it actually has some nice features for its required use case
 
     - Robin Hood hash tables do not use tombstones. They suffer from primary
       clustering under linear probing, but deletions do allow us to heal the
       table in some cases. This is very beneficial when the hash table is not
       initialized with allocation permission. Long term use of a fixed size
-      table may be a use case to support.
+      table may is a use case we must support.
     - Strict-aliasing is an issue for more complex table schemes. Here we
       require an intrusive element in the user type meaning they can pass us
       a block of their type for us to manage as a hash table. If we were to
