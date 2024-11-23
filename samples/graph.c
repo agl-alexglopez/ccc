@@ -421,7 +421,8 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
         vertex_title_indices[i] = i;
     }
     /* Cycle through all vertices with which to join an edge randomly. */
-    rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size, &(size_t){});
+    rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size,
+                 &(size_t){0});
     struct vertex *dst = NULL;
     for (size_t i = 0; i < graph_size; ++i)
     {
