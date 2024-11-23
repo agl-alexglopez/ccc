@@ -25,9 +25,9 @@ implementation but it actually has some nice features for its required use case
       high efficiency with likely few collisions in the find op. This is a
       higher space overhead choice, however,
 
-Those are just some considerations I can think of now. When attempting to
-improve this table we need to consider these points. For brevity here are the
-most important considerations for a new design.
+Those are some considerations I can think of now. When attempting to improve
+this table we need to consider these points. For brevity here are the most
+important considerations for a new design.
 
     - The hash table must support a non-allocating mode without the ability to
       resize to correct from any type of tombstone overload; an in-place
