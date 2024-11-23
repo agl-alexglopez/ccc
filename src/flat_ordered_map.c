@@ -1,3 +1,14 @@
+/** This file implements a splay tree that does not support duplicates.
+The code to support a splay tree that does not allow duplicates is much simpler
+than the code to support a multimap implementation. This implementation is
+based on the following source.
+
+    1. Daniel Sleator, Carnegie Mellon University. Sleator's implementation of a
+       topdown splay tree was instrumental in starting things off, but required
+       extensive modification. I had to update parent and child tracking, and
+       unite the left and right cases for fun. See the code for a generalizable
+       strategy to eliminate symmetric left and right cases for any binary tree
+       code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
 #include "flat_ordered_map.h"
 #include "buffer.h"
 #include "impl/impl_flat_ordered_map.h"
