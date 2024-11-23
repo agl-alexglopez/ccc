@@ -592,18 +592,18 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
 {
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
     size_t const cap = ccc_buf_capacity(&h->buf_);
-    void *floater = ccc_buf_at(&h->buf_, 0);
+    void *const floater = ccc_buf_at(&h->buf_, 0);
     (void)memcpy(floater, e, elem_sz);
 
     /* This function cannot modify e and e may be copied over to new
        insertion from old table. So should this function invariantly assign
        starting hash to this slot copy for insertion? I think yes so far. */
     elem_in_slot(h, floater)->hash_ = hash;
-    size_t dist = distance(cap, cur_i, to_i(cap, hash));
-    for (;; cur_i = increment(cap, cur_i), ++dist)
+    for (size_t dist = distance(cap, cur_i, to_i(cap, hash)); /* true */;
+         cur_i = increment(cap, cur_i), ++dist)
     {
         void *const slot = ccc_buf_at(&h->buf_, cur_i);
-        struct ccc_fhmap_elem_ const *slot_hash = elem_in_slot(h, slot);
+        struct ccc_fhmap_elem_ const *const slot_hash = elem_in_slot(h, slot);
         if (slot_hash->hash_ == CCC_FHM_EMPTY)
         {
             (void)memcpy(slot, floater, elem_sz);
@@ -616,7 +616,7 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
             = distance(cap, cur_i, to_i(cap, slot_hash->hash_));
         if (dist > slot_dist)
         {
-            void *tmp = ccc_buf_at(&h->buf_, 1);
+            void *const tmp = ccc_buf_at(&h->buf_, 1);
             swap(tmp, floater, slot, elem_sz);
             dist = slot_dist;
         }
@@ -626,14 +626,12 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
 static void
 erase(struct ccc_fhmap_ *const h, void *const e)
 {
+    *hash_at(h, ccc_buf_i(&h->buf_, e)) = CCC_FHM_EMPTY;
     size_t const cap = ccc_buf_capacity(&h->buf_);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
-    size_t stopped_at = ccc_buf_i(&h->buf_, e);
-    *hash_at(h, stopped_at) = CCC_FHM_EMPTY;
-    size_t next = increment(cap, stopped_at);
-    void *tmp = ccc_buf_at(&h->buf_, 0);
-    for (;;
-         stopped_at = increment(cap, stopped_at), next = increment(cap, next))
+    void *const tmp = ccc_buf_at(&h->buf_, 0);
+    for (size_t i = ccc_buf_i(&h->buf_, e), next = increment(cap, i);
+         /* true */; i = next, next = increment(cap, next))
     {
         void *const next_slot = ccc_buf_at(&h->buf_, next);
         struct ccc_fhmap_elem_ *const next_elem = elem_in_slot(h, next_slot);
@@ -642,7 +640,7 @@ erase(struct ccc_fhmap_ *const h, void *const e)
         {
             break;
         }
-        swap(tmp, next_slot, ccc_buf_at(&h->buf_, stopped_at), elem_sz);
+        swap(tmp, next_slot, ccc_buf_at(&h->buf_, i), elem_sz);
     }
     *hash_at(h, 0) = CCC_FHM_EMPTY;
     (void)ccc_buf_size_minus(&h->buf_, 1);
