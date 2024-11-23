@@ -211,6 +211,7 @@ ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fhmap_elem *const out_handle)
     }
     void *const user_return = struct_base(h, out_handle);
     void *const key = key_in_slot(h, user_return);
+    size_t const user_strct_size = ccc_buf_elem_size(&h->buf_);
     size_t const user_struct_size = ccc_buf_elem_size(&h->buf_);
     struct ccc_fhash_entry_ ent = container_entry(h, key);
     if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
