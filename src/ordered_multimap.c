@@ -1,3 +1,15 @@
+/** This file implements a splay tree that supports duplicates.
+The code to support a splay tree that allows duplicates. It requires
+significant modification from a traditional splay tree. This implementation is
+based on the following source.
+
+    1. Daniel Sleator, Carnegie Mellon University. Sleator's implementation of a
+       topdown splay tree was instrumental in starting things off, but required
+       extensive modification. I had to add the ability to track duplicates,
+       update parent and child tracking, and unite the left and right cases for
+       fun. See the code for a generalizable strategy to eliminate symmetric
+       left and right cases for any binary tree code.
+       https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
 #include "ordered_multimap.h"
 #include "impl/impl_ordered_multimap.h"
 #include "impl/impl_tree.h"
