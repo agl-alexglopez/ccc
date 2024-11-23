@@ -1,0 +1,63 @@
+name: clang-tidy-review
+
+# You can be more specific, but it currently only works on pull requests
+on: [pull_request]
+
+jobs:
+  check-diff:
+    runs-on: ubuntu-latest
+    outputs: 
+      handle: ${{ steps.check.outputs.run }}
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 2
+
+      # The goal is to force this to pass if it does not need to run.
+      - name: Check the diff
+        id: check
+        run: |
+          echo "Here are the changed C files:"
+          echo "$(git --no-pager diff --name-only HEAD HEAD~1 | grep -E '\.(c|h)$')"
+          if git --no-pager diff --name-only HEAD HEAD~1 | grep -qE '\.(c|h)$'; then
+            echo "run=true" >> $GITHUB_OUTPUT
+            echo "C files have changed, reviewing now..."
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "C files have not changed, skipping review..."
+          fi
+
+  review:
+    runs-on: ubuntu-latest
+    needs: check-diff
+    if: ${{ needs.check-diff.outputs.handle == 'true' }}
+
+    steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest 
+
+      - name: Generate Compile Commands
+        run: cmake --preset=clang-deb
+
+      - name: Review
+        uses: ZedThree/clang-tidy-review@v0.20.1
+        id: review
+        with:
+          split_workflow: true
+          config_file: ./.clang-tidy
+
+      - name: Upload artifacts
+        uses: ZedThree/clang-tidy-review/upload@v0.20.1
+        id: upload-review
+
+      # If there are any comments, fail the check
+      - if: steps.review.outputs.total_comments > 0
+        run: exit 1
