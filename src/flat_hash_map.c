@@ -39,7 +39,7 @@ most important considerations for a new design.
       user wants to write correct C code meaning it cannot violate this.
 
 Overall, this means any new design needs slightly more consideration than I
-first thought. */
+first thought. However, improvements can still be made. */
 #include "flat_hash_map.h"
 #include "buffer.h"
 #include "impl/impl_flat_hash_map.h"
