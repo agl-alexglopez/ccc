@@ -185,7 +185,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         {
             QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            int val = {};
+            int val = 0;
             CHECK(requests[i].getter(&lru, requests[i].key, &val), PASS);
             CHECK(val, requests[i].val);
             CHECK(validate(&lru.l), true);
