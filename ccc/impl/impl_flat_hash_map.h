@@ -152,19 +152,17 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         {                                                                      \
             struct ccc_fhash_entry_ *fhm_or_ins_entry_                         \
                 = &fhm_or_ins_ent_ptr_->impl_;                                 \
-            if (fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_OCCUPIED)         \
+            if (!(fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR))  \
             {                                                                  \
-                fhm_or_ins_res_ = fhm_or_ins_entry_->entry_.e_;                \
-            }                                                                  \
-            else if (fhm_or_ins_entry_->entry_.stats_                          \
-                     & CCC_ENTRY_INSERT_ERROR)                                 \
-            {                                                                  \
-                fhm_or_ins_res_ = NULL;                                        \
-            }                                                                  \
-            else                                                               \
-            {                                                                  \
-                fhm_or_ins_res_                                                \
-                    = ccc_impl_fhm_swaps(fhm_or_ins_entry_, lazy_key_value);   \
+                if (fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_OCCUPIED)     \
+                {                                                              \
+                    fhm_or_ins_res_ = fhm_or_ins_entry_->entry_.e_;            \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    fhm_or_ins_res_ = ccc_impl_fhm_swaps(fhm_or_ins_entry_,    \
+                                                         lazy_key_value);      \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         fhm_or_ins_res_;                                                       \
@@ -178,25 +176,24 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         if (fhm_ins_ent_ptr_)                                                  \
         {                                                                      \
             struct ccc_fhash_entry_ *fhm_ins_ent_ = &fhm_ins_ent_ptr_->impl_;  \
-            assert(sizeof(*fhm_res_)                                           \
-                   == ccc_buf_elem_size(&(fhm_ins_ent_->h_->buf_)));           \
-            if (fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_OCCUPIED)              \
+            if (!(fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR))       \
             {                                                                  \
-                fhm_ins_ent_->entry_.stats_ = CCC_ENTRY_OCCUPIED;              \
-                *((typeof(fhm_res_))fhm_ins_ent_->entry_.e_) = lazy_key_value; \
-                ccc_impl_fhm_in_slot(fhm_ins_ent_->h_,                         \
-                                     fhm_ins_ent_->entry_.e_)                  \
-                    ->hash_                                                    \
-                    = fhm_ins_ent_->hash_;                                     \
-                fhm_res_ = fhm_ins_ent_->entry_.e_;                            \
-            }                                                                  \
-            else if (fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR)     \
-            {                                                                  \
-                fhm_res_ = NULL;                                               \
-            }                                                                  \
-            else                                                               \
-            {                                                                  \
-                fhm_res_ = ccc_impl_fhm_swaps(fhm_ins_ent_, lazy_key_value);   \
+                if (fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_OCCUPIED)          \
+                {                                                              \
+                    fhm_ins_ent_->entry_.stats_ = CCC_ENTRY_OCCUPIED;          \
+                    *((typeof(fhm_res_))fhm_ins_ent_->entry_.e_)               \
+                        = lazy_key_value;                                      \
+                    ccc_impl_fhm_in_slot(fhm_ins_ent_->h_,                     \
+                                         fhm_ins_ent_->entry_.e_)              \
+                        ->hash_                                                \
+                        = fhm_ins_ent_->hash_;                                 \
+                    fhm_res_ = fhm_ins_ent_->entry_.e_;                        \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    fhm_res_                                                   \
+                        = ccc_impl_fhm_swaps(fhm_ins_ent_, lazy_key_value);    \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         fhm_res_;                                                              \
