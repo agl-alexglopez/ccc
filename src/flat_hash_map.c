@@ -1,11 +1,45 @@
-/** This implementation is a placeholder. It is a somewhat naive Robin Hood
-hash table. It caches the hash values for efficient resizing and faster
-comparison before being forced to call user comparison callback. However,
-these days such a hash table is not up to the standards set by Abseil's hash
-table from Google. SSSE/SIMD is the way these days and I'd be willing to give
-it a shot. A pointer stable hash table might be nice if you can ensure the
-user elements don't move if the table does not resize. Now elements are swapped
-often. */
+/** This implementation is a starter. It is a Robin Hood hash table. It caches
+the hash values for efficient distance calculations, resizing, and faster
+comparison before being forced to call user comparison callback. It also
+implements backfill deletions. At first I though this was not a good starter
+implementation but it actually has some nice features for its required use case
+
+    - Robin Hood hash tables do not use tombstones. They suffer from primary
+      clustering under linear probing, but deletions do allow us to heal the
+      table in some cases. This is very beneficial when the hash table is not
+      initialized with allocation permission. Long term use of a fixed size
+      table may be a use case to support.
+    - Strict-aliasing is an issue for more complex table schemes. Here we
+      require an intrusive element in the user type meaning they can pass us
+      a block of their type for us to manage as a hash table. If we were to
+      attempt to implement a small metadata array at the start and the user
+      type after that--with no intrusive elements--we would need to likely
+      expose some sort of new type to the user for initialization to help
+      them avoid passing us just some generic char buffer they have on the
+      data segment, stack, or heap; that would be a strict-aliasing violation.
+    - Tailoring callback resistance. Right now, the table caches the full hash
+      for the user because it is needed to accurately calculate distances to
+      the home slot for the Robin Hood swapping purposes. This also helps
+      prevent calling the user comparison callback which is nice; in this table
+      if the user hash is good, they could hash strings and still operate at
+      high efficiency with likely few collisions in the find op. This is a
+      higher space overhead choice, however,
+
+Those are just some considerations I can think of now. When attempting to
+improve this table we need to consider these points. For brevity here are the
+most important considerations for a new design.
+
+    - The hash table must support a non-allocating mode without the ability to
+      resize to correct from any type of tombstone overload; an in-place
+      compaction and rehash would be the only option (not sure if possible).
+    - It must work with the user choosing where the memory comes from for the
+      table. This is the other side of non-allocating mode. The user should
+      be able to give us memory coming from the stack, heap, or data segment.
+    - No strict-aliasing violations. I want this library to be useful if the
+      user wants to write correct C code meaning it cannot violate this.
+
+Overall, this means any new design needs slightly more consideration than I
+first thought. */
 #include "flat_hash_map.h"
 #include "buffer.h"
 #include "impl/impl_flat_hash_map.h"
