@@ -93,7 +93,7 @@ static ccc_result maybe_resize(struct ccc_fhmap_ *h);
 static struct ccc_ent_ find(struct ccc_fhmap_ const *h, void const *key,
                             uint64_t hash);
 static void insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
-                   size_t cur_i);
+                   size_t i);
 static uint64_t *hash_at(struct ccc_fhmap_ const *h, size_t i);
 static uint64_t filter(struct ccc_fhmap_ const *h, void const *key);
 
@@ -614,26 +614,26 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
     {
         return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR};
     }
-    size_t cur_i = to_i(cap, hash);
+    size_t i = to_i(cap, hash);
     size_t dist = 0;
     do
     {
-        void *const slot = ccc_buf_at(&h->buf_, cur_i);
-        struct ccc_fhmap_elem_ *const e = elem_in_slot(h, slot);
-        if (e->hash_ == CCC_FHM_EMPTY
-            || dist > distance(cap, cur_i, to_i(cap, e->hash_)))
+        void *const slot = ccc_buf_at(&h->buf_, i);
+        uint64_t const slot_hash = elem_in_slot(h, slot)->hash_;
+        if (slot_hash == CCC_FHM_EMPTY
+            || dist > distance(cap, i, to_i(cap, slot_hash)))
         {
             return (struct ccc_ent_){
                 .e_ = slot, .stats_ = CCC_ENTRY_VACANT | CCC_ENTRY_NO_UNWRAP};
         }
-        if (hash == e->hash_
+        if (hash == slot_hash
             && h->eq_fn_((ccc_key_cmp){
                 .key_lhs = key, .user_type_rhs = slot, .aux = h->buf_.aux_}))
         {
             return (struct ccc_ent_){.e_ = slot, .stats_ = CCC_ENTRY_OCCUPIED};
         }
         ++dist;
-        cur_i = increment(cap, cur_i);
+        i = increment(cap, i);
     } while (true);
 }
 
@@ -642,10 +642,11 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
    may occur if these assumptions are not accommodated. */
 static inline void
 insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
-       size_t cur_i)
+       size_t i)
 {
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
     size_t const cap = ccc_buf_capacity(&h->buf_);
+    void *const tmp = ccc_buf_at(&h->buf_, 1);
     void *const floater = ccc_buf_at(&h->buf_, 0);
     (void)memcpy(floater, e, elem_sz);
 
@@ -653,32 +654,33 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
        insertion from old table. So should this function invariantly assign
        starting hash to this slot copy for insertion? I think yes so far. */
     elem_in_slot(h, floater)->hash_ = hash;
-    size_t dist = distance(cap, cur_i, to_i(cap, hash));
+    size_t dist = distance(cap, i, to_i(cap, hash));
     do
     {
-        void *const slot = ccc_buf_at(&h->buf_, cur_i);
-        struct ccc_fhmap_elem_ const *const slot_hash = elem_in_slot(h, slot);
-        if (slot_hash->hash_ == CCC_FHM_EMPTY)
+        void *const slot = ccc_buf_at(&h->buf_, i);
+        uint64_t const slot_hash = elem_in_slot(h, slot)->hash_;
+        if (slot_hash == CCC_FHM_EMPTY)
         {
             (void)memcpy(slot, floater, elem_sz);
             (void)ccc_buf_size_plus(&h->buf_, 1);
-            *hash_at(h, 0) = CCC_FHM_EMPTY;
-            *hash_at(h, 1) = CCC_FHM_EMPTY;
+            elem_in_slot(h, floater)->hash_ = CCC_FHM_EMPTY;
+            elem_in_slot(h, tmp)->hash_ = CCC_FHM_EMPTY;
             return;
         }
-        size_t const slot_dist
-            = distance(cap, cur_i, to_i(cap, slot_hash->hash_));
+        size_t const slot_dist = distance(cap, i, to_i(cap, slot_hash));
         if (dist > slot_dist)
         {
-            void *const tmp = ccc_buf_at(&h->buf_, 1);
             swap(tmp, floater, slot, elem_sz);
             dist = slot_dist;
         }
-        cur_i = increment(cap, cur_i);
+        i = increment(cap, i);
         ++dist;
     } while (true);
 }
 
+/* Backshift deletion is important in for this table because it may not be able
+   to allocate. This prevents the need for tombstones which would hurt table
+   quality quickly if we can't resize. */
 static void
 erase(struct ccc_fhmap_ *const h, void *const e)
 {
@@ -691,11 +693,11 @@ erase(struct ccc_fhmap_ *const h, void *const e)
     do
     {
         void *const next_slot = ccc_buf_at(&h->buf_, next);
-        struct ccc_fhmap_elem_ *const next_elem = elem_in_slot(h, next_slot);
-        if (next_elem->hash_ == CCC_FHM_EMPTY
-            || !distance(cap, next, to_i(cap, next_elem->hash_)))
+        uint64_t const next_hash = elem_in_slot(h, next_slot)->hash_;
+        if (next_hash == CCC_FHM_EMPTY
+            || !distance(cap, next, to_i(cap, next_hash)))
         {
-            *hash_at(h, 0) = CCC_FHM_EMPTY;
+            elem_in_slot(h, tmp)->hash_ = CCC_FHM_EMPTY;
             (void)ccc_buf_size_minus(&h->buf_, 1);
             return;
         }
