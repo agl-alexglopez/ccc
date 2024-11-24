@@ -327,8 +327,10 @@ All tests to completion even if the overall result is a failure.
 
 Return this macro from the main function of the test program. All tests
 will run but the testing result for the entire program will be set to FAIL
-upon the first failure. All functions must share the same signature, returning
-a test_result and taking no arguments. */
+upon the first failure. All functions must return an enum check_result though
+their signatures may vary. If a test fails with an error, this runner will
+simply set the overall test state to fail and the user should examine the
+individual test that failed with FAIL or ERROR. */
 #define CHECK_RUN(test_fn_list...)                                             \
     ({                                                                         \
         enum check_result const check_all_checks_[] = {test_fn_list};          \
@@ -336,7 +338,7 @@ a test_result and taking no arguments. */
         for (unsigned long long i = 0;                                         \
              i < sizeof(check_all_checks_) / sizeof(enum check_result); ++i)   \
         {                                                                      \
-            if (check_all_checks_[i] == FAIL)                                  \
+            if (check_all_checks_[i] != PASS)                                  \
             {                                                                  \
                 check_all_checks_res_ = FAIL;                                  \
             }                                                                  \
