@@ -522,7 +522,7 @@ init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)
 static inline bool
 empty(struct ccc_tree_ const *const t)
 {
-    return !t->size_;
+    return !t->size_ || !t->root_ || t->root_ == &t->end_;
 }
 
 static inline void *
@@ -653,7 +653,7 @@ alloc_insert(struct ccc_tree_ *const t, struct ccc_node_ *out_handle)
     if (empty(t))
     {
         t->root_ = out_handle;
-        t->size_++;
+        t->size_ = 1;
         return struct_base(t, out_handle);
     }
     assert(root_cmp != CCC_CMP_ERR);
@@ -668,7 +668,7 @@ insert(struct ccc_tree_ *const t, struct ccc_node_ *const n)
     if (empty(t))
     {
         t->root_ = n;
-        t->size_++;
+        t->size_ = 1;
         return struct_base(t, n);
     }
     void const *const key = key_from_node(t, n);
