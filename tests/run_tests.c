@@ -87,8 +87,7 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
         }
         ++tests;
     }
-    passed == tests ? printf("%sPASSED %zu/%zu%s\n", GREEN, passed, tests, NONE)
-                    : printf("%sPASSED %zu/%zu%s\n", RED, passed, tests, NONE);
+    CHECK(passed, tests);
     CHECK_END_FN(closedir(dir_ptr););
 }
 
