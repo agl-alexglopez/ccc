@@ -21,7 +21,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK(res, CCC_OK);
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&fh, &(struct val){.key = 137, .val = 99}.e);
-    CHECK(occupied(&ent), true);
+    CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
     CHECK_END_FN();
