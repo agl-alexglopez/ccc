@@ -68,7 +68,7 @@ static uint64_t filter(struct ccc_fhmap_ const *h, void const *key);
 bool
 ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 {
-    if (!h)
+    if (unlikely(!h))
     {
         return true;
     }
@@ -78,7 +78,7 @@ ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 bool
 ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 {
-    if (!h || !key)
+    if (unlikely(!h || !key))
     {
         return false;
     }
@@ -88,13 +88,17 @@ ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 size_t
 ccc_fhm_size(ccc_flat_hash_map const *const h)
 {
-    return h ? ccc_buf_size(&h->buf_) : 0;
+    if (unlikely(!h))
+    {
+        return 0;
+    }
+    return ccc_buf_size(&h->buf_);
 }
 
 ccc_fhmap_entry
 ccc_fhm_entry(ccc_flat_hash_map *h, void const *const key)
 {
-    if (!h || !key)
+    if (unlikely(!h || !key))
     {
         return (ccc_fhmap_entry){{.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}}};
     }
@@ -104,7 +108,7 @@ ccc_fhm_entry(ccc_flat_hash_map *h, void const *const key)
 void *
 ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
 {
-    if (!e || !elem)
+    if (unlikely(!e || !elem))
     {
         return NULL;
     }
@@ -128,7 +132,7 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
 void *
 ccc_fhm_get_key_val(ccc_flat_hash_map *const h, void const *const key)
 {
-    if (!h || !key || !ccc_buf_capacity(&h->buf_))
+    if (unlikely(!h || !key || !ccc_buf_capacity(&h->buf_)))
     {
         return NULL;
     }
@@ -143,7 +147,7 @@ ccc_fhm_get_key_val(ccc_flat_hash_map *const h, void const *const key)
 ccc_entry
 ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
 {
-    if (!e)
+    if (unlikely(!e))
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
@@ -165,7 +169,7 @@ ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
                        void *aux)
 {
-    if (!e)
+    if (unlikely(!e))
     {
         return NULL;
     }
@@ -179,7 +183,7 @@ ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
 ccc_entry
 ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fhmap_elem *const out_handle)
 {
-    if (!h || !out_handle)
+    if (unlikely(!h || !out_handle))
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
@@ -207,7 +211,7 @@ ccc_entry
 ccc_fhm_try_insert(ccc_flat_hash_map *const h,
                    ccc_fhmap_elem *const key_val_handle)
 {
-    if (!h || !key_val_handle)
+    if (unlikely(!h || !key_val_handle))
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
@@ -228,7 +232,7 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h,
 ccc_entry
 ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle)
 {
-    if (!h || !key_val_handle)
+    if (unlikely(!h || !key_val_handle))
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
@@ -251,7 +255,7 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle)
 ccc_entry
 ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
 {
-    if (!h || !out_handle)
+    if (unlikely(!h || !out_handle))
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
@@ -270,7 +274,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
 void *
 ccc_fhm_or_insert(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
 {
-    if (!e || !elem)
+    if (unlikely(!e || !elem))
     {
         return NULL;
     }
@@ -292,7 +296,7 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
 void *
 ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 {
-    if (!e || !(e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED))
+    if (unlikely(!e) || !(e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
@@ -302,25 +306,37 @@ ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 bool
 ccc_fhm_occupied(ccc_fhmap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
+    if (unlikely(!e))
+    {
+        return false;
+    }
+    return e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED;
 }
 
 bool
 ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+    if (unlikely(!e))
+    {
+        return false;
+    }
+    return e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR;
 }
 
 ccc_entry_status
 ccc_fhm_entry_status(ccc_fhmap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ : CCC_ENTRY_INPUT_ERROR;
+    if (unlikely(!e))
+    {
+        return CCC_ENTRY_INPUT_ERROR;
+    }
+    return e->impl_.entry_.stats_;
 }
 
 void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
-    if (!h || ccc_buf_is_empty(&h->buf_))
+    if (unlikely(!h || ccc_buf_is_empty(&h->buf_)))
     {
         return NULL;
     }
@@ -335,7 +351,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
 void *
 ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fhmap_elem const *iter)
 {
-    if (!h)
+    if (unlikely(!h))
     {
         return NULL;
     }
@@ -369,7 +385,7 @@ ccc_fhm_next_prime(size_t n)
 ccc_result
 ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
-    if (!h)
+    if (unlikely(!h))
     {
         return CCC_INPUT_ERR;
     }
@@ -393,7 +409,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 ccc_result
 ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
-    if (!h)
+    if (unlikely(!h))
     {
         return CCC_INPUT_ERR;
     }
@@ -417,7 +433,11 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 size_t
 ccc_fhm_capacity(ccc_flat_hash_map const *const h)
 {
-    return h ? ccc_buf_capacity(&h->buf_) : 0;
+    if (unlikely(!h))
+    {
+        return 0;
+    }
+    return ccc_buf_capacity(&h->buf_);
 }
 
 bool
