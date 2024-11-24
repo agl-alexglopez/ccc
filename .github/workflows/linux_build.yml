@@ -49,13 +49,22 @@ jobs:
 
     - uses: lukka/get-cmake@latest 
 
-    - name: Build with Clang and Ninja Generator
+    - name: Build Debug Clang and Ninja
       run: |
         cmake --preset=clang-deb -G "Ninja" && cmake --build build --target ccc tests samples
         cmake --build build --target install
+    
+    - name: Test Debug
+      run: |
         make dtest
+
+    - name: Build Release Clang and Ninja
+      run: |
         make clean
         cmake --preset=clang-rel -G "Ninja" && cmake --build build --target ccc tests samples
         cmake --build build --target install
+        
+    - name: Test Release
+      run: |
         make rtest
 
