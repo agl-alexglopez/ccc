@@ -18,6 +18,14 @@ often. */
 #include <stdint.h>
 #include <string.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+#    define unlikely(expr) __builtin_expect(!!(expr), 0)
+#    define likely(expr) __builtin_expect(!!(expr), 1)
+#else
+#    define unlikely(expr) expr
+#    define likely(expr) expr
+#endif
+
 /* Placeholder until real hash map is implemented with more robust features
 and heuristics. */
 static double const load_factor = 0.8;
@@ -561,11 +569,22 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
      uint64_t const hash)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
-    assert(cap);
-    size_t cur_i = to_i(cap, hash);
-    for (size_t dist = 0; dist < cap; ++dist, cur_i = increment(cap, cur_i))
+    /* A few sanity checks. The load factor should be managed a full table is
+       never allowed even under no allocation permission because that could
+       lead to an infinite loop and illustrates a degenerate table anyway. */
+    if (unlikely(!cap))
     {
-        void *slot = ccc_buf_at(&h->buf_, cur_i);
+        return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_ENTRY_VACANT};
+    }
+    if (unlikely(ccc_buf_size(&h->buf_) >= ccc_buf_capacity(&h->buf_)))
+    {
+        return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_ENTRY_INPUT_ERROR};
+    }
+    size_t cur_i = to_i(cap, hash);
+    size_t dist = 0;
+    do
+    {
+        void *const slot = ccc_buf_at(&h->buf_, cur_i);
         struct ccc_fhmap_elem_ *const e = elem_in_slot(h, slot);
         if (e->hash_ == CCC_FHM_EMPTY
             || dist > distance(cap, cur_i, to_i(cap, e->hash_)))
@@ -579,8 +598,9 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
         {
             return (struct ccc_ent_){.e_ = slot, .stats_ = CCC_ENTRY_OCCUPIED};
         }
-    }
-    return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_ENTRY_VACANT};
+        ++dist;
+        cur_i = increment(cap, cur_i);
+    } while (true);
 }
 
 /* Assumes that element to be inserted does not already exist in the table.
@@ -599,8 +619,8 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
        insertion from old table. So should this function invariantly assign
        starting hash to this slot copy for insertion? I think yes so far. */
     elem_in_slot(h, floater)->hash_ = hash;
-    for (size_t dist = distance(cap, cur_i, to_i(cap, hash)); /* true */;
-         cur_i = increment(cap, cur_i), ++dist)
+    size_t dist = distance(cap, cur_i, to_i(cap, hash));
+    do
     {
         void *const slot = ccc_buf_at(&h->buf_, cur_i);
         struct ccc_fhmap_elem_ const *const slot_hash = elem_in_slot(h, slot);
@@ -620,7 +640,9 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
             swap(tmp, floater, slot, elem_sz);
             dist = slot_dist;
         }
-    }
+        cur_i = increment(cap, cur_i);
+        ++dist;
+    } while (true);
 }
 
 static void
@@ -630,20 +652,23 @@ erase(struct ccc_fhmap_ *const h, void *const e)
     size_t const cap = ccc_buf_capacity(&h->buf_);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
     void *const tmp = ccc_buf_at(&h->buf_, 0);
-    for (size_t i = ccc_buf_i(&h->buf_, e), next = increment(cap, i);
-         /* true */; i = next, next = increment(cap, next))
+    size_t i = ccc_buf_i(&h->buf_, e);
+    size_t next = increment(cap, i);
+    do
     {
         void *const next_slot = ccc_buf_at(&h->buf_, next);
         struct ccc_fhmap_elem_ *const next_elem = elem_in_slot(h, next_slot);
         if (next_elem->hash_ == CCC_FHM_EMPTY
             || !distance(cap, next, to_i(cap, next_elem->hash_)))
         {
-            break;
+            *hash_at(h, 0) = CCC_FHM_EMPTY;
+            (void)ccc_buf_size_minus(&h->buf_, 1);
+            return;
         }
         swap(tmp, next_slot, ccc_buf_at(&h->buf_, i), elem_sz);
-    }
-    *hash_at(h, 0) = CCC_FHM_EMPTY;
-    (void)ccc_buf_size_minus(&h->buf_, 1);
+        i = next;
+        next = increment(cap, next);
+    } while (true);
 }
 
 static inline struct ccc_fhash_entry_
