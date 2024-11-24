@@ -61,7 +61,9 @@ first thought. However, improvements can still be made. */
 #endif
 
 /* We are fairly close to the maximum 64 bit address space size by the last
-   prime so we will stop there as max size if we ever get there. Not likely. */
+   prime so we will stop there as max size if we ever get there. Not likely.
+   The last prime is closer to the second to last because doubling breaks down
+   at the end. */
 #define PRIMES_SIZE 58ULL
 static size_t const primes[PRIMES_SIZE] = {
     11ULL,
