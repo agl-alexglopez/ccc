@@ -828,7 +828,7 @@ maybe_resize(struct ccc_fhmap_ *const h)
     new_hash.buf_.capacity_ = new_hash.buf_.capacity_
                                   ? next_prime(ccc_buf_size(&h->buf_) * 2)
                                   : primes[0];
-    if (!new_hash.buf_.capacity_)
+    if (new_hash.buf_.capacity_ <= h->buf_.capacity_)
     {
         return CCC_MEM_ERR;
     }
