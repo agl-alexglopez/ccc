@@ -513,6 +513,10 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
     }
     while (!ccc_rom_is_empty(rom))
     {
+        if (!rom->root_->branch_[L] || !rom->root_->branch_[R])
+        {
+            return CCC_INPUT_ERR;
+        }
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
         {
