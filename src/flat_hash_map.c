@@ -62,7 +62,8 @@ first thought. However, improvements can still be made. */
 
 /* We are fairly close to the maximum 64 bit address space size by the last
    prime so we will stop there as max size if we ever get there. Not likely. */
-static size_t const primes[58] = {
+#define PRIMES_SIZE 58ULL
+static size_t const primes[PRIMES_SIZE] = {
     11ULL,
     37ULL,
     79ULL,
@@ -123,7 +124,6 @@ static size_t const primes[58] = {
     17617221824571301183ULL,
 };
 
-static size_t const primes_size = sizeof(primes) / sizeof(primes[0]);
 /* Some claim that Robin Hood tables can support a much higher load factor. I
    would not be so sure. The primary clustering effect in these types of
    tables can quickly rise. Mitigating with a lower load factor and prime
@@ -867,7 +867,7 @@ maybe_resize(struct ccc_fhmap_ *const h)
 static inline size_t
 next_prime(size_t n)
 {
-    for (size_t i = 0; i < primes_size; ++i)
+    for (size_t i = 0; i < PRIMES_SIZE; ++i)
     {
         if (primes[i] > n)
         {
