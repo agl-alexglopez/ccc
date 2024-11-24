@@ -869,6 +869,8 @@ maybe_resize(struct ccc_fhmap_ *const h)
 static inline size_t
 next_prime(size_t n)
 {
+    /* Compiler should help us out here. No need to do fancy bit tricks to
+       tell how far along the list we are. The table is small already. */
     for (size_t i = 0; i < PRIMES_SIZE; ++i)
     {
         if (primes[i] > n)
