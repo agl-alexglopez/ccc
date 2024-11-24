@@ -1,14 +1,15 @@
-/** This implementation is a starter. It is a Robin Hood hash table. It caches
+/** This implementation is a Robin Hood hash table with shift delete. It caches
 the hash values for efficient distance calculations, resizing, and faster
 comparison before being forced to call user comparison callback. It also
-implements backfill deletions. At first I thought this was not a good starter
+implements backshift deletions. At first I thought this was not a good starter
 implementation but it actually has some nice features for its required use case
 
     - Robin Hood hash tables do not use tombstones. They suffer from primary
       clustering under linear probing, but deletions do allow us to heal the
-      table in some cases. This is very beneficial when the hash table is not
-      initialized with allocation permission. Long term use of a fixed size
-      table may is a use case we must support.
+      table in some cases. We also try to mitigate primary clustering by
+      choosing prime number table sizes. This is very beneficial when the hash
+      table is not initialized with allocation permission. Long term use of a
+      fixed size table is a use case we must support.
     - Strict-aliasing is an issue for more complex table schemes. Here we
       require an intrusive element in the user type meaning they can pass us
       a block of their type for us to manage as a hash table. If we were to
@@ -23,11 +24,10 @@ implementation but it actually has some nice features for its required use case
       prevent calling the user comparison callback which is nice; in this table
       if the user hash is good, they could hash strings and still operate at
       high efficiency with likely few collisions in the find op. This is a
-      higher space overhead choice, however,
+      higher space overhead choice, however.
 
 Those are some considerations I can think of now. When attempting to improve
-this table we need to consider these points. For brevity here are the most
-important considerations for a new design.
+this table we need to consider these points.
 
     - The hash table must support a non-allocating mode without the ability to
       resize to correct from any type of tombstone overload; an in-place
@@ -60,17 +60,81 @@ first thought. However, improvements can still be made. */
 #    define likely(expr) expr
 #endif
 
-/* Placeholder until real hash map is implemented with more robust features
-and heuristics. */
+/* We are fairly close to the maximum 64 bit address space size by the last
+   prime so we will stop there as max size if we ever get there. Not likely. */
+static size_t const primes[58] = {
+    11ULL,
+    37ULL,
+    79ULL,
+    163ULL,
+    331ULL,
+    691ULL,
+    1439ULL,
+    2999ULL,
+    6079ULL,
+    12263ULL,
+    25717ULL,
+    53611ULL,
+    111697ULL,
+    232499ULL,
+    483611ULL,
+    1005761ULL,
+    2091191ULL,
+    4347799ULL,
+    9039167ULL,
+    18792019ULL,
+    39067739ULL,
+    81219493ULL,
+    168849973ULL,
+    351027263ULL,
+    729760741ULL,
+    1517120861ULL,
+    3153985903ULL,
+    6556911073ULL,
+    13631348041ULL,
+    28338593999ULL,
+    58913902231ULL,
+    122477772247ULL,
+    254622492793ULL,
+    529341875947ULL,
+    1100463743389ULL,
+    2287785087839ULL,
+    4756140888377ULL,
+    9887675318611ULL,
+    20555766849589ULL,
+    42733962953639ULL,
+    88840839803449ULL,
+    184693725350723ULL,
+    383964990193007ULL,
+    798235638020831ULL,
+    1659474561692683ULL,
+    3449928429320413ULL,
+    7172153428667531ULL,
+    14910391869919981ULL,
+    30997633824443711ULL,
+    64441854452711651ULL,
+    133969987155270011ULL,
+    278513981492471381ULL,
+    579010564484755961ULL,
+    1203721378684243091ULL,
+    2502450294306576181ULL,
+    5202414434410211531ULL,
+    10815445968671840317ULL,
+    17617221824571301183ULL,
+};
+
+static size_t const primes_size = sizeof(primes) / sizeof(primes[0]);
+/* Some claim that Robin Hood tables can support a much higher load factor. I
+   would not be so sure. The primary clustering effect in these types of
+   tables can quickly rise. Mitigating with a lower load factor and prime
+   table sizes is a decent approach. Measure. */
 static double const load_factor = 0.8;
-static size_t const default_prime = 11;
 static size_t const last_swap_slot = 1;
 static size_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
 static void erase(struct ccc_fhmap_ *, void *);
-static bool is_prime(size_t);
 static void swap(char tmp[], void *, void *, size_t);
 static void *struct_base(struct ccc_fhmap_ const *,
                          struct ccc_fhmap_elem_ const *);
@@ -96,6 +160,7 @@ static void insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
                    size_t i);
 static uint64_t *hash_at(struct ccc_fhmap_ const *h, size_t i);
 static uint64_t filter(struct ccc_fhmap_ const *h, void const *key);
+static size_t next_prime(size_t n);
 
 /*=========================   Interface    ==================================*/
 
@@ -407,13 +472,7 @@ ccc_fhm_end(ccc_flat_hash_map const *const)
 size_t
 ccc_fhm_next_prime(size_t n)
 {
-    if (n <= 1)
-    {
-        return 2;
-    }
-    while (!is_prime(++n))
-    {}
-    return n;
+    return next_prime(n);
 }
 
 ccc_result
@@ -764,10 +823,13 @@ maybe_resize(struct ccc_fhmap_ *const h)
     }
     struct ccc_fhmap_ new_hash = *h;
     new_hash.buf_.sz_ = 0;
-    new_hash.buf_.capacity_
-        = new_hash.buf_.capacity_
-              ? ccc_fhm_next_prime(ccc_buf_size(&h->buf_) * 2)
-              : default_prime;
+    new_hash.buf_.capacity_ = new_hash.buf_.capacity_
+                                  ? next_prime(ccc_buf_size(&h->buf_) * 2)
+                                  : primes[0];
+    if (!new_hash.buf_.capacity_)
+    {
+        return CCC_MEM_ERR;
+    }
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
         NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_,
         h->buf_.aux_);
@@ -800,6 +862,19 @@ maybe_resize(struct ccc_fhmap_ *const h)
     }
     *h = new_hash;
     return CCC_OK;
+}
+
+static inline size_t
+next_prime(size_t n)
+{
+    for (size_t i = 0; i < primes_size; ++i)
+    {
+        if (primes[i] > n)
+        {
+            return primes[i];
+        }
+    }
+    return 0;
 }
 
 static inline uint64_t *
@@ -876,44 +951,18 @@ swap(char tmp[], void *const a, void *const b, size_t ab_size)
     (void)memcpy(b, tmp, ab_size);
 }
 
-static inline bool
-is_prime(size_t const n)
-{
-    if (n <= 1)
-    {
-        return false;
-    }
-    if (n <= 3)
-    {
-        return true;
-    }
-    if (n % 2 == 0 || n % 3 == 0)
-    {
-        return false;
-    }
-    for (size_t i = 5; i * i <= n; i += 6)
-    {
-        if (n % i == 0 || n % (i + 2) == 0)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 static bool
 valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
-    uint64_t const hash = ccc_impl_fhm_in_slot(h, slot)->hash_;
+    uint64_t const hash = elem_in_slot(h, slot)->hash_;
     size_t const home = to_i(cap, hash);
     size_t const end = decrement(cap, home);
     for (size_t i = ccc_buf_i(&h->buf_, slot),
-                distance_to_home
-                = ccc_impl_fhm_distance(cap, i, to_i(cap, hash));
+                distance_to_home = distance(cap, i, to_i(cap, hash));
          i != end; --distance_to_home, i = decrement(cap, i))
     {
-        uint64_t const cur_hash = *ccc_impl_fhm_hash_at(h, i);
+        uint64_t const cur_hash = *hash_at(h, i);
         /* The only reason an element is not home is because it has been
            moved away to help another element be closer to its home. This
            would break the purpose of doing that. Upon erase everyone needs
@@ -925,8 +974,7 @@ valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
         /* This shouldn't happen either. The whole point of Robin Hood is
            taking from the close and giving to the far. If this happens
            we have made our algorithm greedy not altruistic. */
-        if (distance_to_home
-            > ccc_impl_fhm_distance(cap, i, to_i(cap, cur_hash)))
+        if (distance_to_home > distance(cap, i, to_i(cap, cur_hash)))
         {
             return false;
         }

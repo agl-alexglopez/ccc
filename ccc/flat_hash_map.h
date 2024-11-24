@@ -97,35 +97,6 @@ Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
 
-/** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle provided by the user.
-@param [in] h the pointer to the flat hash map.
-@param [out] out_handle the handle to the user type wrapping fhash elem.
-@return the removed entry. If Occupied it may be unwrapped to obtain the old key
-value pair. If Vacant the key value pair was not stored in the map. If bad input
-is provided an input error is set.
-
-Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
-                                       ccc_fhmap_elem *out_handle);
-
-/** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle_ptr provided by the user.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
-@param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
-@return a compound literal reference to the removed entry. If Occupied it may
-be unwrapped to obtain the old key value pair. If Vacant the key value pair
-was not stored in the map. If bad input is provided an input error is set.
-
-Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
-#define ccc_fhm_remove_r(flat_hash_map_ptr, out_handle_ptr)                    \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
-    }
-
 /** @brief Invariantly inserts the key value wrapping out_handle.
 @param [in] h the pointer to the flat hash map.
 @param [out] out_handle the handle to the user type wrapping fhash elem.
@@ -154,6 +125,35 @@ and wraps it in an entry to provide information about the old value. */
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
+    }
+
+/** @brief Removes the key value in the map storing the old value, if present,
+in the struct containing out_handle provided by the user.
+@param [in] h the pointer to the flat hash map.
+@param [out] out_handle the handle to the user type wrapping fhash elem.
+@return the removed entry. If Occupied it may be unwrapped to obtain the old key
+value pair. If Vacant the key value pair was not stored in the map. If bad input
+is provided an input error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
+[[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
+                                       ccc_fhmap_elem *out_handle);
+
+/** @brief Removes the key value in the map storing the old value, if present,
+in the struct containing out_handle_ptr provided by the user.
+@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
+@return a compound literal reference to the removed entry. If Occupied it may
+be unwrapped to obtain the old key value pair. If Vacant the key value pair
+was not stored in the map. If bad input is provided an input error is set.
+
+Note that this function may write to the struct containing the second parameter
+and wraps it in an entry to provide information about the old value. */
+#define ccc_fhm_remove_r(flat_hash_map_ptr, out_handle_ptr)                    \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle
