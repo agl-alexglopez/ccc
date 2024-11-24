@@ -328,8 +328,8 @@ All tests to completion even if the overall result is a failure.
 Return this macro from the main function of the test program. All tests
 will run but the testing result for the entire program will be set to FAIL
 upon the first failure. All functions must return an enum check_result though
-their signatures may vary. If a test fails with an error, this runner will
-simply set the overall test state to fail and the user should examine the
+their argument signatures may vary. If a test fails with an error, this runner
+will simply set the overall test state to fail and the user should examine the
 individual test that failed with FAIL or ERROR. */
 #define CHECK_RUN(test_fn_list...)                                             \
     ({                                                                         \
