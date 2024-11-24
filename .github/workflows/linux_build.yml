@@ -51,6 +51,11 @@ jobs:
 
     - name: Build with Clang and Ninja Generator
       run: |
+        cmake --preset=clang-deb -G "Ninja" && cmake --build build --target ccc tests samples
+        cmake --build build --target install
+        make dtest
+        make clean
         cmake --preset=clang-rel -G "Ninja" && cmake --build build --target ccc tests samples
         cmake --build build --target install
+        make rtest
 
