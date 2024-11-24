@@ -45,7 +45,7 @@ main(int argc, char **argv)
         return 0;
     }
     str_view arg_view = sv(argv[1]);
-    CHECK_RUN(run(arg_view));
+    return CHECK_RUN(run(arg_view));
 }
 
 CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
@@ -53,8 +53,8 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
     DIR *dir_ptr = open_test_dir(tests_dir);
     CHECK(dir_ptr != NULL, true);
     char absolute_path[FILESYS_MAX_PATH];
-    size_t tests = 0;
-    size_t passed = 0;
+    size_t tests_ran = 0;
+    size_t tests_passed = 0;
     struct dirent const *d;
     while ((d = readdir(dir_ptr)))
     {
@@ -83,11 +83,11 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
         }
         if (res == PASS)
         {
-            ++passed;
+            ++tests_passed;
         }
-        ++tests;
+        ++tests_ran;
     }
-    CHECK(passed, tests);
+    CHECK(tests_passed, tests_ran);
     CHECK_END_FN(closedir(dir_ptr););
 }
 
