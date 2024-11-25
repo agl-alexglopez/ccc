@@ -949,8 +949,7 @@ distance(size_t const capacity, size_t const i, size_t const j)
 static inline size_t
 increment(size_t const capacity, size_t i)
 {
-    i = (i + 1) % capacity;
-    return i <= last_swap_slot ? last_swap_slot + 1 : i;
+    return (i + 1) >= capacity ? last_swap_slot + 1 : i + 1;
 }
 
 static inline size_t
