@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 /** @endcond */
 
 /** @private */
@@ -47,22 +48,35 @@ union ccc_fhmap_entry_
     struct ccc_fhash_entry_ impl_;
 };
 
-#define ccc_impl_fhm_init(flat_hash_map_ptr, memory_ptr, capacity, key_field,  \
-                          fhash_elem_field, alloc_fn, hash_fn, key_eq_fn, aux) \
+#define ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,   \
+                          alloc_fn, hash_fn, key_eq_fn, aux)                   \
     (__extension__({                                                           \
+        struct ccc_fhmap_ new_fhmap_ = {};                                     \
         __auto_type fhm_mem_ptr_ = (memory_ptr);                               \
-        (flat_hash_map_ptr)->buf_                                              \
+        new_fhmap_.buf_                                                        \
             = (ccc_buffer)ccc_buf_init(fhm_mem_ptr_, alloc_fn, aux, capacity); \
-        ccc_result res_ = ccc_impl_fhm_init_buf(                               \
-            (flat_hash_map_ptr), offsetof(typeof(*(fhm_mem_ptr_)), key_field), \
+        ccc_impl_fhm_init_buf(                                                 \
+            &new_fhmap_, offsetof(typeof(*(fhm_mem_ptr_)), key_field),         \
             offsetof(typeof(*(fhm_mem_ptr_)), fhash_elem_field), (hash_fn),    \
             (key_eq_fn), (aux));                                               \
-        res_;                                                                  \
+        new_fhmap_;                                                            \
     }))
 
-ccc_result ccc_impl_fhm_init_buf(struct ccc_fhmap_ *, size_t key_offset,
-                                 size_t hash_elem_offset, ccc_hash_fn *,
-                                 ccc_key_eq_fn *, void *aux);
+#define ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field,      \
+                                 hash_fn, key_eq_fn, aux)                      \
+    {                                                                          \
+        .buf_ = ccc_buf_init(memory_ptr, NULL, aux,                            \
+                             sizeof(memory_ptr) / sizeof((memory_ptr)[0])),    \
+        .hash_fn_ = (hash_fn),                                                 \
+        .eq_fn_ = (key_eq_fn),                                                 \
+        .key_offset_ = (offsetof(typeof(*(memory_ptr)), key_field)),           \
+        .hash_elem_offset_                                                     \
+        = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
+    }
+
+void ccc_impl_fhm_init_buf(struct ccc_fhmap_ *, size_t key_offset,
+                           size_t hash_elem_offset, ccc_hash_fn *,
+                           ccc_key_eq_fn *, void *aux);
 struct ccc_ent_ ccc_impl_fhm_find(struct ccc_fhmap_ const *, void const *key,
                                   uint64_t hash);
 void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
