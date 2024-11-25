@@ -173,10 +173,8 @@ main(void)
     /* stack array backed, key field named key, intrusive field e, no
        allocation permission, a hash function, an equality function, no aux. */
     ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
+        = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
                    fhmap_int_to_u64, fhmap_id_eq, NULL);
-    assert(res == CCC_OK);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
