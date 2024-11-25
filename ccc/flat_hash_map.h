@@ -50,16 +50,14 @@ The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
 
-/** @brief The initialization helper macro for a hash table. Must be called
-at runtime.
+/** @brief Initialize a flat hash map from any buffer of user types at runtime.
 @param [in] memory_ptr the pointer to the backing buffer array of user types.
 May be NULL if the user provides a allocation function. The buffer will be
 interpreted in units of type size that the user intends to store.
 @param [in] capacity the starting capacity of the provided buffer or 0 if no
-buffer is provided and a allocation function is given.
+buffer is provided and an allocation function is given.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] fhash_elem_field the name of the field holding the fhash_elem
-handle.
+@param [in] fhash_elem_field the name of the fhmap_elem field.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
@@ -75,8 +73,7 @@ equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
 /** @brief Initialize a zero capacity table with allocation permission.
 @param [in] type_name the type being stored in the hash table.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] fhash_elem_field the name of the field holding the fhash_elem
-handle.
+@param [in] fhash_elem_field the name of the fhmap_elem field.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
@@ -129,12 +126,9 @@ it is used at runtime with the provided allocation function. */
 /** @brief the initialization helper macro for a hash table. May be called at
 compile time only if the memory to which it points is of static storage
 duration and thus implicitly zero initialized.
-@param [in] memory_ptr the pointer to the backing buffer array of user types.
-May be NULL if the user provides a allocation function. The buffer will be
-interpreted in units of type size that the user intends to store.
+@param [in] memory_ptr the pointer to the static array of user types.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] fhash_elem_field the name of the field holding the fhash_elem
-handle.
+@param [in] fhash_elem_field the name of the fhmap_elem field.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
@@ -175,7 +169,9 @@ This version of the initialization function is designed to provide convenient
 initialization at compile time. It is common in C to have data structures
 implemented at static global file scope for a module. Therefore, this method
 lets one initialize a static global hash table at compile time so the data
-structure is ready as soon as program execution begins. Note that */
+structure is ready as soon as program execution begins. Note that an allocation
+function is explicitly excluded. A static storage duration array of user types
+cannot be resized or freed. */
 #define ccc_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn,  \
                             key_eq_fn, aux_data)                               \
     ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn, \
