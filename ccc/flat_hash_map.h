@@ -50,9 +50,8 @@ The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
 
-/** @brief the initialization helper macro for a hash table. Must be called
+/** @brief The initialization helper macro for a hash table. Must be called
 at runtime.
-@param [in] fhash_name the name of the flat hash map.
 @param [in] memory_ptr the pointer to the backing buffer array of user types.
 May be NULL if the user provides a allocation function. The buffer will be
 interpreted in units of type size that the user intends to store.
@@ -73,6 +72,60 @@ equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
     ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,       \
                       alloc_fn, hash_fn, key_eq_fn, aux_data)
 
+/** @brief Initialize a zero capacity table with allocation permission.
+@param [in] type_name the type being stored in the hash table.
+@param [in] key_field the field of the struct used for key storage.
+@param [in] fhash_elem_field the name of the field holding the fhash_elem
+handle.
+@param [in] alloc_fn the allocation function for resizing or NULL if no
+resizing is allowed.
+@param [in] hash_fn the ccc_hash_fn function the user desires for the table.
+@param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
+@param [in] aux_data auxiliary data that is needed for hashing or comparison.
+@return the flat hash map directly initialized on the right hand side of the
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_zero_init(...);)
+@warning this initialization requires an allocation function be provided.
+
+At compile time.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+static flat_hash_map fh = fhm_zero_init(
+    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+```
+
+At runtime.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+int main(void)
+{
+    static flat_hash_map fh = fhm_zero_init(
+        struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+    return 0;
+}
+```
+
+This initializer is designed to be used at compile time or runtime. The table
+is assumed to start with no allocation and zero capacity. It will resize as
+it is used at runtime with the provided allocation function. */
+#define ccc_fhm_zero_init(type_name, key_field, fhash_elem_field, alloc_fn,    \
+                          hash_fn, key_eq_fn, aux_data)                        \
+    ccc_impl_fhm_zero_init(type_name, key_field, fhash_elem_field, alloc_fn,   \
+                           hash_fn, key_eq_fn, aux_data)
+
 /** @brief the initialization helper macro for a hash table. May be called at
 compile time only if the memory to which it points is of static storage
 duration and thus implicitly zero initialized.
@@ -86,7 +139,7 @@ handle.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_static_init(...);)
 @warning the memory pointed to for the backing buffer of the hash table must
 be of static storage duration and non-NULL. Implicit zeroing is needed.
 @note for best performance of the hash table choose a prime number for the
@@ -122,9 +175,7 @@ This version of the initialization function is designed to provide convenient
 initialization at compile time. It is common in C to have data structures
 implemented at static global file scope for a module. Therefore, this method
 lets one initialize a static global hash table at compile time so the data
-structure is ready as soon as program execution begins. No allocation function
-may be entered because global or static global buffers cannot resize or be
-freed at runtime. */
+structure is ready as soon as program execution begins. Note that */
 #define ccc_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn,  \
                             key_eq_fn, aux_data)                               \
     ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn, \
@@ -604,6 +655,7 @@ typedef ccc_flat_hash_map flat_hash_map;
 typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_init(args...) ccc_fhm_init(args)
 #    define fhm_static_init(args...) ccc_fhm_static_init(args)
+#    define fhm_zero_init(args...) ccc_fhm_zero_init(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
 #    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
 #    define fhm_insert_entry_w(args...) ccc_fhm_insert_entry_w(args)
