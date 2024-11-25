@@ -565,6 +565,37 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
            && empties == (ccc_buf_capacity(&h->buf_) - occupied);
 }
 
+static bool
+valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
+{
+    size_t const cap = ccc_buf_capacity(&h->buf_);
+    uint64_t const hash = elem_in_slot(h, slot)->hash_;
+    size_t const home = to_i(cap, hash);
+    size_t const end = decrement(cap, home);
+    for (size_t i = ccc_buf_i(&h->buf_, slot),
+                distance_to_home = distance(cap, i, to_i(cap, hash));
+         i != end; --distance_to_home, i = decrement(cap, i))
+    {
+        uint64_t const cur_hash = *hash_at(h, i);
+        /* The only reason an element is not home is because it has been
+           moved away to help another element be closer to its home. This
+           would break the purpose of doing that. Upon erase everyone needs
+           to shuffle closer to home. */
+        if (cur_hash == CCC_FHM_EMPTY)
+        {
+            return false;
+        }
+        /* This shouldn't happen either. The whole point of Robin Hood is
+           taking from the close and giving to the far. If this happens
+           we have made our algorithm greedy not altruistic. */
+        if (distance_to_home > distance(cap, i, to_i(cap, cur_hash)))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 /*=======================   Private Interface   =============================*/
 
 ccc_result
@@ -652,7 +683,7 @@ ccc_impl_fhm_base(struct ccc_fhmap_ const *const h)
     return ccc_buf_begin(&h->buf_);
 }
 
-inline uint64_t *
+uint64_t *
 ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *const h, size_t const i)
 {
     return hash_at(h, i);
@@ -929,13 +960,6 @@ decrement(size_t const capacity, size_t i)
     return i <= last_swap_slot ? capacity - 1 : i;
 }
 
-static size_t
-to_i(size_t const capacity, uint64_t hash)
-{
-    hash = hash % capacity;
-    return hash <= last_swap_slot ? last_swap_slot + 1 : hash;
-}
-
 static inline void *
 struct_base(struct ccc_fhmap_ const *const h,
             struct ccc_fhmap_elem_ const *const e)
@@ -955,33 +979,238 @@ swap(char tmp[], void *const a, void *const b, size_t ab_size)
     (void)memcpy(b, tmp, ab_size);
 }
 
-static bool
-valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
+/** This function converts a hash to its home index in the table. Because this
+operation is in the hot path of all table functions and Robin Hood relies on
+home slot distance calculations, this function tries to use Daniel Lemire's
+fastrange library modulo calculation alternative:
+    https://github.com/lemire/fastrange
+Such a technique is helpful because the prime table capacities used to mitigate
+primary clustering of Robin Hood hash tables make efficient modulo calculations
+more difficult than power of two table capacities. The appropriate license for
+this technique is included immediately following this function and only applies
+to this function in this source file. */
+static inline size_t
+to_i(size_t const capacity, uint64_t hash)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_);
-    uint64_t const hash = elem_in_slot(h, slot)->hash_;
-    size_t const home = to_i(cap, hash);
-    size_t const end = decrement(cap, home);
-    for (size_t i = ccc_buf_i(&h->buf_, slot),
-                distance_to_home = distance(cap, i, to_i(cap, hash));
-         i != end; --distance_to_home, i = decrement(cap, i))
-    {
-        uint64_t const cur_hash = *hash_at(h, i);
-        /* The only reason an element is not home is because it has been
-           moved away to help another element be closer to its home. This
-           would break the purpose of doing that. Upon erase everyone needs
-           to shuffle closer to home. */
-        if (cur_hash == CCC_FHM_EMPTY)
-        {
-            return false;
-        }
-        /* This shouldn't happen either. The whole point of Robin Hood is
-           taking from the close and giving to the far. If this happens
-           we have made our algorithm greedy not altruistic. */
-        if (distance_to_home > distance(cap, i, to_i(cap, cur_hash)))
-        {
-            return false;
-        }
-    }
-    return true;
+#ifdef __SIZEOF_INT128__
+    hash = (uint64_t)(((__uint128_t)hash * (__uint128_t)capacity) >> 64);
+#else
+    hash %= capacity;
+#endif
+    return hash <= last_swap_slot ? last_swap_slot + 1 : hash;
 }
+
+/** The following Apache License applies only to the above function. This
+function uses one line from Daniel Lemire's fastrange library to compute the
+modulo of a number range with multiplication and shifts rather than  modulo
+division. Specifically, the 128 bit widening is from the fastrange library which
+can be found here: https://github.com/lemire/fastrange
+
+Below is the required license for the code in the above function. Note that in
+the Appendix at the end of the license where Lemire should indicate his
+copyright claim where the brackets appear, he has not and I have left the
+license as it appears in his repository. However, his copyright still applies to
+this line of code as he copyrights the source file from which it came with his
+name and the year.
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License. */
