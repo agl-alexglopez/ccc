@@ -14,11 +14,9 @@
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
 {
     struct val vals[10] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&fh, &(struct val){.key = 137, .val = 99}.e);
     CHECK(occupied(&ent), false);
@@ -30,11 +28,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
 {
     struct val vals[10] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+
     struct val const *ins = ccc_fhm_or_insert_w(
         entry_r(&fh, &(int){2}), (struct val){.key = 2, .val = 0});
     CHECK(ins != NULL, true);
@@ -77,11 +73,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
 {
     struct val vals[10] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e);
     CHECK(occupied(&ent), false);
@@ -113,11 +107,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
 {
     struct val vals[10] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e);
     CHECK(occupied(&ent), false);
@@ -148,10 +140,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_functional)
     /* Over allocate size now because we don't want to worry about resizing. */
     struct val vals[200];
     size_t const size = sizeof(vals) / sizeof(vals[0]);
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init(vals, size, key, e, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
@@ -207,10 +198,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[200];
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init(vals, size, key, e, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
@@ -254,10 +244,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     struct val vals[200];
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init(vals, size, key, e, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
@@ -296,10 +285,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     struct val vals[200];
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init(vals, size, key, e, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
@@ -350,11 +338,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
 CHECK_BEGIN_STATIC_FN(fhmap_test_two_sum)
 {
     struct val vals[20];
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
+    ccc_flat_hash_map fh
+        = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
                    fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -382,10 +369,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals == NULL, false);
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, prime_start, key, e, std_alloc,
+    ccc_flat_hash_map fh = fhm_init(vals, prime_start, key, e, std_alloc,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -417,10 +403,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
     size_t const prime_start = 5;
     struct val *vals = malloc(sizeof(struct val) * prime_start);
     CHECK(vals == NULL, false);
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, prime_start, key, e, std_alloc,
+    ccc_flat_hash_map fh = fhm_init(vals, prime_start, key, e, std_alloc,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -458,11 +443,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
 {
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, (struct val *)NULL, 0, key, e, std_alloc,
-                   fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+                                    fhmap_int_to_u64, fhmap_id_eq, NULL);
+
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -491,11 +474,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
 CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
 {
     size_t const prime_start = 0;
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, (struct val *)NULL, prime_start, key, e, std_alloc,
+    ccc_flat_hash_map fh
+        = fhm_init((struct val *)NULL, prime_start, key, e, std_alloc,
                    fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -535,10 +517,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
 {
     int const size = 101;
     struct val vals[101];
-    ccc_flat_hash_map fh;
-    ccc_result const res = fhm_init(&fh, vals, size, key, e, NULL,
-                                    fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, size, key, e, NULL, fhmap_int_to_u64,
+                                    fhmap_id_eq, NULL);
+
     int const larger_prime = (int)fhm_next_prime(size);
     int last_index = 0;
     int shuffled_index = larger_prime % size;

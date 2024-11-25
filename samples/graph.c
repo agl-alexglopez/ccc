@@ -452,11 +452,9 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                struct vertex *const dst)
 {
     Cell const edge_id = make_edge(src->name, dst->name);
-    flat_hash_map parent_map;
-    ccc_result res
-        = fhm_init(&parent_map, (struct path_backtrack_cell *)NULL, 0, current,
-                   elem, std_alloc, hash_parent_cells, eq_parent_cells, NULL);
-    prog_assert(res == CCC_OK);
+    flat_hash_map parent_map
+        = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
+                   std_alloc, hash_parent_cells, eq_parent_cells, NULL);
     flat_double_ended_queue bfs
         = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     ccc_entry *e = fhm_insert_or_assign_w(

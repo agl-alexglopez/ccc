@@ -37,14 +37,55 @@ gen(int *to_affect)
     return 42;
 }
 
+static struct val s_vals[10];
+static flat_hash_map s_fh
+    = fhm_static_init(s_vals, key, e, fhmap_int_to_u64, fhmap_id_eq, NULL);
+
+CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
+{
+    CHECK(fhm_capacity(&s_fh), sizeof(s_vals) / sizeof(s_vals[0]));
+    CHECK(fhm_size(&s_fh), 0);
+    CHECK(validate(&s_fh), true);
+    CHECK(is_empty(&s_fh), true);
+    struct val def = {.key = 137, .val = 0};
+
+    /* Returning a vacant entry is possible when modification is attempted. */
+    ccc_fhmap_entry *ent = and_modify(entry_r(&s_fh, &def.key), mod);
+    CHECK(occupied(ent), false);
+    CHECK((unwrap(ent) == NULL), true);
+
+    /* Inserting default value before an in place modification is possible. */
+    struct val *v = or_insert(entry_r(&s_fh, &def.key), &def.e);
+    CHECK(v != NULL, true);
+    v->val++;
+    struct val const *const inserted = get_key_val(&s_fh, &def.key);
+    CHECK((inserted != NULL), true);
+    CHECK(inserted->key, 137);
+    CHECK(inserted->val, 1);
+
+    /* Modifying an existing value or inserting default is possible when no
+       auxiliary input is needed. */
+    struct val *v2
+        = or_insert(and_modify(entry_r(&s_fh, &def.key), mod), &def.e);
+    CHECK((v2 != NULL), true);
+    CHECK(inserted->key, 137);
+    CHECK(v2->val, 6);
+
+    /* Modifying an existing value that requires external input is also
+       possible with slightly different signature. */
+    struct val *v3 = or_insert(
+        and_modify_aux(entry_r(&s_fh, &def.key), modw, &def.key), &def.e);
+    CHECK((v3 != NULL), true);
+    CHECK(inserted->key, 137);
+    CHECK(v3->val, 137);
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
 {
     struct val vals[5] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     CHECK_END_FN();
 }
@@ -52,11 +93,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_functional)
 {
     struct val vals[5] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     struct val def = {.key = 137, .val = 0};
     ccc_fhmap_entry ent = entry(&fh, &def.key);
@@ -78,11 +116,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_functional)
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_macros)
 {
     struct val vals[5] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     CHECK(get_key_val(&fh, &(int){137}) == NULL, true);
     int const key = 137;
@@ -106,11 +141,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_macros)
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
 {
     struct val vals[5] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     struct val def = {.key = 137, .val = 0};
 
@@ -148,11 +180,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
 {
     struct val vals[5] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
 
     /* Returning a vacant entry is possible when modification is attempted. */
@@ -205,8 +234,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
 int
 main()
 {
-    return CHECK_RUN(fhmap_test_empty(), fhmap_test_entry_macros(),
-                     fhmap_test_entry_functional(),
+    return CHECK_RUN(fhmap_test_static_init(), fhmap_test_empty(),
+                     fhmap_test_entry_macros(), fhmap_test_entry_functional(),
                      fhmap_test_entry_and_modify_functional(),
                      fhmap_test_entry_and_modify_macros());
 }

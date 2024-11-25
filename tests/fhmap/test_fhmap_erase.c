@@ -14,11 +14,9 @@
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
     struct val vals[10] = {};
-    ccc_flat_hash_map fh;
-    ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
+                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&fh, &query.e);
@@ -46,11 +44,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
-    ccc_flat_hash_map h;
-    ccc_result const res
-        = fhm_init(&h, (struct val *)NULL, 0, key, e, std_alloc,
-                   fhmap_int_to_u64, fhmap_id_eq, NULL);
-    CHECK(res, CCC_OK);
+    ccc_flat_hash_map h = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+                                   fhmap_int_to_u64, fhmap_id_eq, NULL);
+
     int const to_insert = 100;
     int const larger_prime = (int)fhm_next_prime(to_insert);
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;

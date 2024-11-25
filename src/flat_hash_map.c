@@ -538,7 +538,7 @@ ccc_fhm_capacity(ccc_flat_hash_map const *const h)
 bool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
-    if (!h)
+    if (!h || !h->eq_fn_ || !h->hash_fn_)
     {
         return false;
     }
@@ -598,14 +598,14 @@ valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
 
 /*=======================   Private Interface   =============================*/
 
-ccc_result
+void
 ccc_impl_fhm_init_buf(struct ccc_fhmap_ *const h, size_t key_offset,
                       size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
                       ccc_key_eq_fn *const eq_fn, void *const aux)
 {
     if (!h || !hash_fn || !eq_fn)
     {
-        return CCC_INPUT_ERR;
+        return;
     }
     h->key_offset_ = key_offset;
     h->hash_elem_offset_ = hash_elem_offset;
@@ -617,7 +617,6 @@ ccc_impl_fhm_init_buf(struct ccc_fhmap_ *const h, size_t key_offset,
         (void)memset(ccc_buf_begin(&h->buf_), CCC_FHM_EMPTY,
                      ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
     }
-    return CCC_OK;
 }
 
 struct ccc_fhash_entry_

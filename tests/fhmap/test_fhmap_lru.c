@@ -150,10 +150,10 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         .cap = 3,
         .l = dll_init(lru.l, struct key_val, list_elem, std_alloc, cmp_by_key,
                       NULL),
+        .fh = fhm_init((struct lru_lookup *)NULL, 0, key, hash_elem, std_alloc,
+                       fhmap_int_to_u64, lru_lookup_cmp, NULL),
     };
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
-    fhm_init(&lru.fh, (struct lru_lookup *)NULL, 0, key, hash_elem, std_alloc,
-             fhmap_int_to_u64, lru_lookup_cmp, NULL);
     struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .putter = lru_put},
         {PUT, .key = 2, .val = 2, .putter = lru_put},
