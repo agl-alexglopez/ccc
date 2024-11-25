@@ -265,10 +265,8 @@ flat_hash_map.h (dropdown)</summary>
 <div class="line">    <span class="comment">/* stack array backed, key field named key, intrusive field e, no</span></div>
 <div class="line"><span class="comment">       allocation permission, a hash function, an equality function, no aux. */</span></div>
 <div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> fh;</div>
-<div class="line">    <a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> <span class="keyword">const</span> res</div>
-<div class="line">        = fhm_init(&amp;fh, vals, <span class="keyword">sizeof</span>(vals) / <span class="keyword">sizeof</span>(vals[0]), key, e, NULL,</div>
+<div class="line">        = fhm_init(vals, <span class="keyword">sizeof</span>(vals) / <span class="keyword">sizeof</span>(vals[0]), key, e, NULL,</div>
 <div class="line">                   fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
-<div class="line">    assert(res == <a class="code hl_enumvalue" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a>);</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> target = 15;</div>
 <div class="line">    <span class="keywordtype">int</span> solution_indices[2] = {-1, -1};</div>
@@ -300,8 +298,6 @@ flat_hash_map.h (dropdown)</summary>
 <div class="ttc" id="astructccc__key__cmp_html_a6077551b8a72a5149f78b81f3cb90951"><div class="ttname"><a href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">ccc_key_cmp::key_lhs</a></div><div class="ttdeci">void const  *const key_lhs</div><div class="ttdef"><b>Definition:</b> types.h:116</div></div>
 <div class="ttc" id="astructccc__user__key_html"><div class="ttname"><a href="structccc__user__key.html">ccc_user_key</a></div><div class="ttdoc">A read only reference to a key type matching the key field type used for hash containers.</div><div class="ttdef"><b>Definition:</b> types.h:141</div></div>
 <div class="ttc" id="astructccc__user__key_html_aa8ccc5020a1cada149fb7d1509868b35"><div class="ttname"><a href="structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35">ccc_user_key::user_key</a></div><div class="ttdeci">void const  *const user_key</div><div class="ttdef"><b>Definition:</b> types.h:143</div></div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a></div><div class="ttdeci">@ CCC_OK</div><div class="ttdef"><b>Definition:</b> types.h:63</div></div>
 </div><!-- fragment --><p></p>
 </details>
 <details >
