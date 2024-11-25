@@ -61,7 +61,6 @@ struct lru_request
 
 /* Disable me if tests start failing! */
 static bool const quiet = true;
-
 #define QUIET_PRINT(format_string...)                                          \
     do                                                                         \
     {                                                                          \
@@ -91,6 +90,21 @@ lru_head(struct lru_cache *const lru)
 {
     return dll_front(&lru->l);
 }
+
+#define CAP 3
+#define PRIME_FHASH_SIZE 11
+static struct lru_lookup map_buf[PRIME_FHASH_SIZE];
+static_assert(PRIME_FHASH_SIZE > CAP);
+
+/* This is a good opportunity to test the static initialization capabilities
+   of the hash table and list. */
+static struct lru_cache lru_cache = {
+    .cap = CAP,
+    .l = dll_init(lru_cache.l, struct key_val, list_elem, std_alloc, cmp_by_key,
+                  NULL),
+    .fh = fhm_static_init(map_buf, key, hash_elem, fhmap_int_to_u64,
+                          lru_lookup_cmp, NULL),
+};
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
@@ -146,14 +160,7 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
 
 CHECK_BEGIN_STATIC_FN(run_lru_cache)
 {
-    struct lru_cache lru = {
-        .cap = 3,
-        .l = dll_init(lru.l, struct key_val, list_elem, std_alloc, cmp_by_key,
-                      NULL),
-        .fh = fhm_init((struct lru_lookup *)NULL, 0, key, hash_elem, std_alloc,
-                       fhmap_int_to_u64, lru_lookup_cmp, NULL),
-    };
-    QUIET_PRINT("LRU CAPACITY -> %zu\n", lru.cap);
+    QUIET_PRINT("LRU CAPACITY -> %zu\n", lru_cache.cap);
     struct lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .putter = lru_put},
         {PUT, .key = 2, .val = 2, .putter = lru_put},
@@ -173,12 +180,13 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         {
         case PUT:
         {
-            CHECK(requests[i].putter(&lru, requests[i].key, requests[i].val),
+            CHECK(requests[i].putter(&lru_cache, requests[i].key,
+                                     requests[i].val),
                   PASS);
             QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            CHECK(validate(&lru.fh), true);
-            CHECK(validate(&lru.l), true);
+            CHECK(validate(&lru_cache.fh), true);
+            CHECK(validate(&lru_cache.l), true);
         }
         break;
         case GET:
@@ -186,16 +194,16 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
             QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
             int val = 0;
-            CHECK(requests[i].getter(&lru, requests[i].key, &val), PASS);
+            CHECK(requests[i].getter(&lru_cache, requests[i].key, &val), PASS);
             CHECK(val, requests[i].val);
-            CHECK(validate(&lru.l), true);
+            CHECK(validate(&lru_cache.l), true);
         }
         break;
         case HED:
         {
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
-            struct key_val const *const kv = requests[i].header(&lru);
+            struct key_val const *const kv = requests[i].header(&lru_cache);
             CHECK(kv != NULL, true);
             CHECK(kv->key, requests[i].key);
             CHECK(kv->val, requests[i].val);
@@ -206,8 +214,8 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         }
     }
     CHECK_END_FN({
-        (void)ccc_fhm_clear_and_free(&lru.fh, NULL);
-        (void)dll_clear(&lru.l, NULL);
+        (void)ccc_fhm_clear_and_free(&lru_cache.fh, NULL);
+        (void)dll_clear(&lru_cache.l, NULL);
     });
 }
 

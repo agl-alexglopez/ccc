@@ -1,13 +1,13 @@
+#include <stddef.h>
+
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
-
+#include "alloc.h"
 #include "checkers.h"
 #include "fhmap_util.h"
 #include "flat_hash_map.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
 
 static void
 mod(ccc_user_type const u)
@@ -38,27 +38,27 @@ gen(int *to_affect)
 }
 
 static struct val s_vals[10];
-static flat_hash_map s_fh
+static flat_hash_map static_fh
     = fhm_static_init(s_vals, key, e, fhmap_int_to_u64, fhmap_id_eq, NULL);
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
 {
-    CHECK(fhm_capacity(&s_fh), sizeof(s_vals) / sizeof(s_vals[0]));
-    CHECK(fhm_size(&s_fh), 0);
-    CHECK(validate(&s_fh), true);
-    CHECK(is_empty(&s_fh), true);
+    CHECK(fhm_capacity(&static_fh), sizeof(s_vals) / sizeof(s_vals[0]));
+    CHECK(fhm_size(&static_fh), 0);
+    CHECK(validate(&static_fh), true);
+    CHECK(is_empty(&static_fh), true);
     struct val def = {.key = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attempted. */
-    ccc_fhmap_entry *ent = and_modify(entry_r(&s_fh, &def.key), mod);
+    ccc_fhmap_entry *ent = and_modify(entry_r(&static_fh, &def.key), mod);
     CHECK(occupied(ent), false);
     CHECK((unwrap(ent) == NULL), true);
 
     /* Inserting default value before an in place modification is possible. */
-    struct val *v = or_insert(entry_r(&s_fh, &def.key), &def.e);
+    struct val *v = or_insert(entry_r(&static_fh, &def.key), &def.e);
     CHECK(v != NULL, true);
     v->val++;
-    struct val const *const inserted = get_key_val(&s_fh, &def.key);
+    struct val const *const inserted = get_key_val(&static_fh, &def.key);
     CHECK((inserted != NULL), true);
     CHECK(inserted->key, 137);
     CHECK(inserted->val, 1);
@@ -66,7 +66,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
     /* Modifying an existing value or inserting default is possible when no
        auxiliary input is needed. */
     struct val *v2
-        = or_insert(and_modify(entry_r(&s_fh, &def.key), mod), &def.e);
+        = or_insert(and_modify(entry_r(&static_fh, &def.key), mod), &def.e);
     CHECK((v2 != NULL), true);
     CHECK(inserted->key, 137);
     CHECK(v2->val, 6);
@@ -74,11 +74,33 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
     struct val *v3 = or_insert(
-        and_modify_aux(entry_r(&s_fh, &def.key), modw, &def.key), &def.e);
+        and_modify_aux(entry_r(&static_fh, &def.key), modw, &def.key), &def.e);
     CHECK((v3 != NULL), true);
     CHECK(inserted->key, 137);
     CHECK(v3->val, 137);
     CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(fhmap_test_zero_init)
+{
+    ccc_flat_hash_map fh = fhm_zero_init(struct val, key, e, std_alloc,
+                                         fhmap_int_zero, fhmap_id_eq, NULL);
+    CHECK(is_empty(&fh), true);
+    CHECK(fhm_capacity(&fh), 0);
+    struct val def = {.key = 137, .val = 0};
+    ccc_fhmap_entry ent = entry(&fh, &def.key);
+    CHECK(unwrap(&ent) == NULL, true);
+    struct val *v = or_insert(entry_r(&fh, &def.key), &def.e);
+    CHECK(v != NULL, true);
+    v->val += 1;
+    struct val const *const inserted = get_key_val(&fh, &def.key);
+    CHECK((inserted != NULL), true);
+    CHECK(inserted->val, 1);
+    v = or_insert(entry_r(&fh, &def.key), &def.e);
+    CHECK(v != NULL, true);
+    v->val += 1;
+    CHECK(inserted->val, 2);
+    CHECK_END_FN(fhm_clear_and_free(&fh, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
@@ -109,7 +131,6 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_functional)
     CHECK(v != NULL, true);
     v->val += 1;
     CHECK(inserted->val, 2);
-    return PASS;
     CHECK_END_FN();
 }
 
@@ -234,8 +255,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
 int
 main()
 {
-    return CHECK_RUN(fhmap_test_static_init(), fhmap_test_empty(),
-                     fhmap_test_entry_macros(), fhmap_test_entry_functional(),
+    return CHECK_RUN(fhmap_test_static_init(), fhmap_test_zero_init(),
+                     fhmap_test_empty(), fhmap_test_entry_macros(),
+                     fhmap_test_entry_functional(),
                      fhmap_test_entry_and_modify_functional(),
                      fhmap_test_entry_and_modify_macros());
 }
