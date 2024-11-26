@@ -44,6 +44,10 @@ the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
 typedef struct ccc_pq_elem_ ccc_pq_elem;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a priority queue at runtime or compile time.
 @param [in] struct_name the name of the user type wrapping pq elems.
 @param [in] pq_elem_field the name of the field for the pq elem.
@@ -57,6 +61,8 @@ typedef struct ccc_pq_elem_ ccc_pq_elem;
                     aux_data)                                                  \
     ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
                      aux_data)
+
+/**@}*/
 
 /** @name Insert and Remove Interface
 Insert and remove elements from the priority queue. */

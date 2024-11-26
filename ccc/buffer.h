@@ -46,6 +46,10 @@ A buffer may be initialized on the stack, heap, or data segment at compile time
 or runtime. */
 typedef struct ccc_buf_ ccc_buffer;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a contiguous buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
 @param [in] mem_ptr the pointer to existing memory or ((Type *)NULL).
@@ -70,6 +74,8 @@ desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
 #define ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)  \
     ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+
+/**@}*/
 
 /** @name Insert and Remove Interface
 These functions assume contiguity of elements in the buffer and increase or

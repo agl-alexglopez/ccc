@@ -52,6 +52,10 @@ The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_omap_entry_ ccc_omap_entry;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initializes the ordered map at runtime or compile time.
 @param [in] om_name the name of the ordered map being initialized.
 @param [in] struct_name the user type wrapping the intrusive element.
@@ -66,6 +70,8 @@ typedef union ccc_omap_entry_ ccc_omap_entry;
                     alloc_fn, key_cmp, aux)                                    \
     ccc_impl_om_init(om_name, struct_name, om_elem_field, key_elem_field,      \
                      alloc_fn, key_cmp, aux)
+
+/**@}*/
 
 /**@name Membership Interface
 Test membership or obtain references to stored user types directly. */

@@ -50,6 +50,10 @@ the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
 typedef struct ccc_sll_elem_ ccc_sll_elem;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a singly linked list at compile or runtime.
 @param [in] list_name the name the user has chosen for the list.
 @param [in] struct_name the user type wrapping the intrusive sll elem.
@@ -65,6 +69,8 @@ destruction.
                      cmp_fn, aux_data)                                         \
     ccc_impl_sll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
                       cmp_fn, aux_data)
+
+/**@}*/
 
 /** @brief Write a compound literal directly to allocated memory at the front.
 O(1).

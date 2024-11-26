@@ -49,6 +49,10 @@ The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_romap_entry_ ccc_romap_entry;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initializes the ordered map at runtime or compile time.
 @param [in] rom_name the name of the ordered map being initialized.
 @param [in] struct_name the user type wrapping the intrusive element.
@@ -64,6 +68,8 @@ destruction.
                      alloc_fn, key_cmp_fn, aux_data)                           \
     ccc_impl_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,   \
                       alloc_fn, key_cmp_fn, aux_data)
+
+/**@}*/
 
 /**@name Membership Interface
 Test membership or obtain references to stored user types directly. */
