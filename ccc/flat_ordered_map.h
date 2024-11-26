@@ -578,6 +578,11 @@ Obtain the container state. */
 @return the size_t size. */
 size_t ccc_fom_size(ccc_flat_ordered_map const *fom);
 
+/** @brief Returns the capacity of the map
+@param [in] fom the map.
+@return the size_t capacity. */
+size_t ccc_fom_capacity(ccc_flat_ordered_map const *fom);
+
 /** @brief Returns the size status of the map.
 @param [in] fom the map.
 @return true if empty else false. */

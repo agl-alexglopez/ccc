@@ -171,6 +171,12 @@ ccc_fdeq_size(ccc_flat_double_ended_queue const *const fdeq)
     return fdeq ? ccc_buf_size(&fdeq->buf_) : 0;
 }
 
+size_t
+ccc_fdeq_capacity(ccc_flat_double_ended_queue const *const fdeq)
+{
+    return fdeq ? ccc_buf_capacity(&fdeq->buf_) : 0;
+}
+
 void *
 ccc_fdeq_at(ccc_flat_double_ended_queue const *const fdeq, size_t const i)
 {

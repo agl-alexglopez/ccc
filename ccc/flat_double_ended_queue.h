@@ -291,6 +291,11 @@ empty. */
 @return the size of the fdeq or 0 if fdeq is NULL. */
 [[nodiscard]] size_t ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
 
+/** @brief Return the capacity of the fdeq. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@return the capacity of the fdeq or 0 if fdeq is NULL. */
+[[nodiscard]] size_t ccc_fdeq_capacity(ccc_flat_double_ended_queue const *fdeq);
+
 /** @brief Return true if the internal invariants of the fdeq.
 @param [in] fdeq a pointer to the fdeq.
 @return true if the internal invariants of the fdeq are held, else false. */

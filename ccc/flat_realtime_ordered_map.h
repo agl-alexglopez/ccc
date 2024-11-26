@@ -84,15 +84,15 @@ Test membership or obtain references to stored user types directly. */
 @param [in] frm the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
-                      void const *key);
+[[nodiscard]] bool ccc_frm_contains(ccc_flat_realtime_ordered_map const *frm,
+                                    void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] frm the ordered map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the map entry if it is present, else NULL. */
-void *ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm,
-                          void const *key);
+[[nodiscard]] void *
+ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *frm, void const *key);
 
 /**@}*/
 
@@ -111,8 +111,8 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
 it in an entry to provide information about the old value. */
-ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
-                         ccc_fromap_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_frm_insert(ccc_flat_realtime_ordered_map *frm,
+                                       ccc_fromap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] flat_realtime_ordered_map_ptr the pointer to the ordered map.
@@ -139,8 +139,8 @@ it in an entry to provide information about the old value. */
 user type in the map and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the map. If more space is needed but
 allocation fails, an insert error is set. */
-ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
-                             ccc_fromap_elem *key_val_handle);
+[[nodiscard]] ccc_entry ccc_frm_try_insert(ccc_flat_realtime_ordered_map *frm,
+                                           ccc_fromap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] flat_realtime_ordered_map_ptr the pointer to the map.
@@ -186,8 +186,9 @@ Vacant no prior map entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-ccc_entry ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *frm,
-                                   ccc_fromap_elem *key_val_handle);
+[[nodiscard]] ccc_entry
+ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *frm,
+                         ccc_fromap_elem *key_val_handle);
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
 @param [in] flat_realtime_ordered_map_ptr the pointer to the flat hash map.
@@ -219,8 +220,8 @@ is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-ccc_entry ccc_frm_remove(ccc_flat_realtime_ordered_map *frm,
-                         ccc_fromap_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_frm_remove(ccc_flat_realtime_ordered_map *frm,
+                                       ccc_fromap_elem *out_handle);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
@@ -253,8 +254,8 @@ where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface. */
-ccc_fromap_entry ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm,
-                               void const *key);
+[[nodiscard]] ccc_fromap_entry
+ccc_frm_entry(ccc_flat_realtime_ordered_map const *frm, void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
 @param [in] flat_realtime_ordered_map_ptr the map to be searched.
@@ -285,7 +286,8 @@ to subsequent calls in the Entry Interface. */
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
 without the need of the auxiliary argument a ccc_update_fn can provide. */
-ccc_fromap_entry *ccc_frm_and_modify(ccc_fromap_entry *e, ccc_update_fn *fn);
+[[nodiscard]] ccc_fromap_entry *ccc_frm_and_modify(ccc_fromap_entry *e,
+                                                   ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -295,8 +297,8 @@ ccc_fromap_entry *ccc_frm_and_modify(ccc_fromap_entry *e, ccc_update_fn *fn);
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-ccc_fromap_entry *ccc_frm_and_modify_aux(ccc_fromap_entry *e, ccc_update_fn *fn,
-                                         void *aux);
+[[nodiscard]] ccc_fromap_entry *
+ccc_frm_and_modify_aux(ccc_fromap_entry *e, ccc_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] flat_realtime_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -343,7 +345,8 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-void *ccc_frm_or_insert(ccc_fromap_entry const *e, ccc_fromap_elem *elem);
+[[nodiscard]] void *ccc_frm_or_insert(ccc_fromap_entry const *e,
+                                      ccc_fromap_elem *elem);
 
 /** @brief Lazily insert the desired key value into the entry if it is Vacant.
 @param [in] flat_realtime_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -368,7 +371,8 @@ or other data, such functions will not be called if the entry is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-void *ccc_frm_insert_entry(ccc_fromap_entry const *e, ccc_fromap_elem *elem);
+[[nodiscard]] void *ccc_frm_insert_entry(ccc_fromap_entry const *e,
+                                         ccc_fromap_elem *elem);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] flat_realtime_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -406,18 +410,18 @@ insertions. */
 /** @brief Unwraps the provided entry to obtain a view into the map element.
 @param [in] e the entry from a query to the map via function or macro.
 @return a view into the table entry if one is present, or NULL. */
-void *ccc_frm_unwrap(ccc_fromap_entry const *e);
+[[nodiscard]] void *ccc_frm_unwrap(ccc_fromap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. */
-bool ccc_frm_occupied(ccc_fromap_entry const *e);
+[[nodiscard]] bool ccc_frm_occupied(ccc_fromap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
-bool ccc_frm_insert_error(ccc_fromap_entry const *e);
+[[nodiscard]] bool ccc_frm_insert_error(ccc_fromap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -483,8 +487,9 @@ for (struct val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-ccc_range ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
-                              void const *begin_key, void const *end_key);
+[[nodiscard]] ccc_range
+ccc_frm_equal_range(ccc_flat_realtime_ordered_map const *frm,
+                    void const *begin_key, void const *end_key);
 
 /** @brief Returns a compound literal reference to the desired range. O(lg N).
 @param [in] flat_realtime_ordered_map_ptr a pointer to the map.
@@ -519,8 +524,9 @@ for (struct val *i = rrange_begin(&rrange);
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
-ccc_rrange ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
-                                void const *rbegin_key, void const *rend_key);
+[[nodiscard]] ccc_rrange
+ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *frm,
+                     void const *rbegin_key, void const *rend_key);
 
 /** @brief Returns a compound literal reference to the desired rrange.
 O(lg N).
@@ -541,20 +547,20 @@ enclosing scope. This reference is always non-NULL. */
 /** @brief Return the start of an inorder traversal of the map. O(lg N).
 @param [in] frm a pointer to the map.
 @return the oldest minimum element of the map. */
-void *ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] void *ccc_frm_begin(ccc_flat_realtime_ordered_map const *frm);
 
 /** @brief Return the start of a reverse inorder traversal of the map. O(lg N).
 @param [in] frm a pointer to the map.
 @return the oldest maximum element of the map. */
-void *ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] void *ccc_frm_rbegin(ccc_flat_realtime_ordered_map const *frm);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] frm a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-void *ccc_frm_next(ccc_flat_realtime_ordered_map const *frm,
-                   ccc_fromap_elem const *iter_handle);
+[[nodiscard]] void *ccc_frm_next(ccc_flat_realtime_ordered_map const *frm,
+                                 ccc_fromap_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -562,18 +568,18 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-void *ccc_frm_rnext(ccc_flat_realtime_ordered_map const *frm,
-                    ccc_fromap_elem const *iter_handle);
+[[nodiscard]] void *ccc_frm_rnext(ccc_flat_realtime_ordered_map const *frm,
+                                  ccc_fromap_elem const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] frm a pointer to the map.
 @return the newest maximum element of the map. */
-void *ccc_frm_end(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] void *ccc_frm_end(ccc_flat_realtime_ordered_map const *frm);
 
 /** @brief Return the rend of a reverse inorder traversal of the map. O(1).
 @param [in] frm a pointer to the map.
 @return the newest minimum element of the map. */
-void *ccc_frm_rend(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] void *ccc_frm_rend(ccc_flat_realtime_ordered_map const *frm);
 
 /**@}*/
 
@@ -584,17 +590,22 @@ Obtain the container state. */
 /** @brief Returns the size status of the map.
 @param [in] frm the map.
 @return true if empty else false. */
-bool ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] bool ccc_frm_is_empty(ccc_flat_realtime_ordered_map const *frm);
 
 /** @brief Returns the size of the map
 @param [in] frm the map.
 @return the size_t size. */
-size_t ccc_frm_size(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] size_t ccc_frm_size(ccc_flat_realtime_ordered_map const *frm);
+
+/** @brief Returns the capacity of the map
+@param [in] frm the map.
+@return the size_t capacity. */
+[[nodiscard]] size_t ccc_frm_capacity(ccc_flat_realtime_ordered_map const *frm);
 
 /** @brief Validation of invariants for the map.
 @param [in] frm the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
-bool ccc_frm_validate(ccc_flat_realtime_ordered_map const *frm);
+[[nodiscard]] bool ccc_frm_validate(ccc_flat_realtime_ordered_map const *frm);
 
 /**@}*/
 

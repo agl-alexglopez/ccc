@@ -348,6 +348,16 @@ ccc_fom_size(ccc_flat_ordered_map const *const fom)
     return !sz ? sz : sz - 1;
 }
 
+size_t
+ccc_fom_capacity(ccc_flat_ordered_map const *const fom)
+{
+    if (!fom)
+    {
+        return 0;
+    }
+    return ccc_buf_capacity(&fom->buf_);
+}
+
 void *
 ccc_fom_begin(ccc_flat_ordered_map const *const fom)
 {

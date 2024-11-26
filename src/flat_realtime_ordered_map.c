@@ -424,6 +424,16 @@ ccc_frm_size(ccc_flat_realtime_ordered_map const *const frm)
     return !sz ? sz : sz - 1;
 }
 
+size_t
+ccc_frm_capacity(ccc_flat_realtime_ordered_map const *const frm)
+{
+    if (!frm)
+    {
+        return 0;
+    }
+    return ccc_buf_capacity(&frm->buf_);
+}
+
 void *
 ccc_frm_begin(ccc_flat_realtime_ordered_map const *const frm)
 {
