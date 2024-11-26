@@ -281,6 +281,11 @@ Obtain state from the container. */
 @return the size of the fpq or 0 if fpq is NULL or fpq is empty. */
 [[nodiscard]] size_t ccc_fpq_size(ccc_flat_priority_queue const *fpq);
 
+/** @brief Returns the capacity of the fpq.
+@param [in] fpq a pointer to the flat priority queue.
+@return the capacity of the fpq or 0 if fpq is NULL or fpq is empty. */
+[[nodiscard]] size_t ccc_fpq_capacity(ccc_flat_priority_queue const *fpq);
+
 /** @brief Verifies the internal invariants of the fpq hold.
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the fpq is valid false if fpq is NULL or invalid. */
