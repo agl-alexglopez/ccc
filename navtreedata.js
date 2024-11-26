@@ -46,11 +46,13 @@ var NAVTREE =
     [ "Miscellaneous Why?", "index.html#autotoc_md16", null ],
     [ "Related", "index.html#autotoc_md17", null ],
     [ "Building and Installation", "md_INSTALL.html", [
-      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md19", null ],
-      [ "Include the Library", "md_INSTALL.html#autotoc_md20", null ],
-      [ "Without Make", "md_INSTALL.html#autotoc_md21", null ],
-      [ "User Presets", "md_INSTALL.html#autotoc_md22", null ],
-      [ "Generate Documentation", "md_INSTALL.html#autotoc_md23", null ]
+      [ "Fetch Content Install", "md_INSTALL.html#autotoc_md19", null ],
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md20", [
+        [ "Include the Library", "md_INSTALL.html#autotoc_md21", null ],
+        [ "Without Make", "md_INSTALL.html#autotoc_md22", null ],
+        [ "User Presets", "md_INSTALL.html#autotoc_md23", null ]
+      ] ],
+      [ "Generate Documentation", "md_INSTALL.html#autotoc_md24", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -78,7 +80,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "flat__realtime__ordered__map_8h.html#adc5ce17bf98d8f106c31d04a437115fd",
-"structccc__cmp.html"
+"singly__linked__list_8h_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

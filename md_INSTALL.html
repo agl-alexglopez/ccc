@@ -95,6 +95,31 @@ $(document).ready(function(){initNavTree('md_INSTALL.html',''); initResizable();
 <div class="contents">
 <div class="textblock"><p>Currently, this library utilizes some features that many compilers support such as gcc, clang, and AppleClang, but support is not ready for Windows.</p>
 <h1><a class="anchor" id="autotoc_md19"></a>
+Fetch Content Install</h1>
+<p>This approach will allow CMake to build the collection from source as part of your project. The collection does not have external dependencies, besides the standard library, so this may be viable for you. This is helpful if you want the ability to build the library in release or debug mode along with your project and possibly step through it in GDB when in debug mode. If you would rather link to the release build library file see the next section for the manual install.</p>
+<p>To avoid including tests, samples, and other extraneous files when fetching content download a release.</p>
+<div class="fragment"><div class="line">include(FetchContent)</div>
+<div class="line">FetchContent_Declare(</div>
+<div class="line">  ccc</div>
+<div class="line">  URL https://github.com/agl-alexglopez/ccc/releases/download/v[MAJOR.MINOR.PATCH]/ccc-v[MAJOR.MINOR.PATCH].zip</div>
+<div class="line">  #DOWNLOAD_EXTRACT_TIMESTAMP FALSE # CMake may raise a warning to set this. If so, uncomment and set.</div>
+<div class="line">)</div>
+<div class="line">FetchContent_MakeAvailable(ccc)</div>
+</div><!-- fragment --><p>To link against the library in the project use the <code>ccc</code> namespace.</p>
+<div class="fragment"><div class="line">add_executable(main main.c)</div>
+<div class="line">target_link_libraries(main ccc::ccc)</div>
+</div><!-- fragment --><p>Here is a concrete example with an arbitrary release that is likely out of date. Replace this version with the newest version on the releases page.</p>
+<div class="fragment"><div class="line">include(FetchContent)</div>
+<div class="line">FetchContent_Declare(</div>
+<div class="line">  ccc</div>
+<div class="line">  URL https://github.com/agl-alexglopez/ccc/releases/download/v0.7.0/ccc-v0.7.0.zip</div>
+<div class="line">  #DOWNLOAD_EXTRACT_TIMESTAMP FALSE # CMake may raise a warning to set this. If so, uncomment and set.</div>
+<div class="line">)</div>
+<div class="line">FetchContent_MakeAvailable(ccc)</div>
+<div class="line">add_executable(main main.c)</div>
+<div class="line">target_link_libraries(main ccc::ccc)</div>
+</div><!-- fragment --><p>Now, the C Container Collection is part of your project build, allowing you to configure as you see fit. For a more traditional approach read the manual install section below.</p>
+<h1><a class="anchor" id="autotoc_md20"></a>
 Manual Install Quick Start</h1>
 <ol type="1">
 <li>Use the provided defaults.</li>
@@ -109,9 +134,9 @@ Manual Install Quick Start</h1>
 </div><!-- fragment --><p>This will use CMake and your default compiler to build and install the library in release mode. By default, this library does not touch your system paths and it is installed in the <code>install/</code> directory of this folder. This is best for testing the library out while pointing <code>cmake</code> to the install location. Then, deleting the <code>install/</code> folder deletes any trace of this library from your system.</p>
 <p>Then, in your <code>CMakeLists.txt</code>:</p>
 <div class="fragment"><div class="line">find_package(ccc HINTS &quot;~/path/to/ccc-v[VERSION]/install&quot;)</div>
-</div><!-- fragment --><p>If you want to simply write the following command in your <code>CMakeLists.txt</code>,</p>
+</div><!-- fragment --><p>You can simply write the following command in your <code>CMakeLists.txt</code>.</p>
 <div class="fragment"><div class="line">find_package(ccc)</div>
-</div><!-- fragment --><p>specify that this library shall be installed to a location CMake recognizes by default. For example, my preferred location is as follows:</p>
+</div><!-- fragment --><p>To do so, specify that this library shall be installed to a location CMake recognizes by default. For example, my preferred location is as follows:</p>
 <div class="fragment"><div class="line">make clang-ccc ~/.local</div>
 </div><!-- fragment --><p>Then the installation looks like this.</p>
 <div class="fragment"><div class="line">install</div>
@@ -131,24 +156,24 @@ Manual Install Quick Start</h1>
 <div class="line">    │       └── cccTargets-release.cmake</div>
 <div class="line">    └── libccc_release.a</div>
 </div><!-- fragment --><p>Now to delete the library if needed, simply find all folders and files with the <code>*ccc*</code> string somewhere within them and delete. You can also check the <code>build/install_manifest.txt</code> to confirm the locations of any files installed with this library.</p>
-<h1><a class="anchor" id="autotoc_md20"></a>
-Include the Library</h1>
+<h2><a class="anchor" id="autotoc_md21"></a>
+Include the Library</h2>
 <p>Once CMake can find the package, link against it and include the container header.</p>
 <p>The <code>CMakeLists.txt</code> file.</p>
-<div class="fragment"><div class="line">add_executable(my_exe my_exe.c)</div>
-<div class="line">target_link_libraries(my_exe ccc::ccc)</div>
+<div class="fragment"><div class="line">add_executable(main main.c)</div>
+<div class="line">target_link_libraries(main ccc::ccc)</div>
 </div><!-- fragment --><p>The C code.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__hash__map_8h.html">ccc/flat_hash_map.h</a>&quot;</span></div>
 <div class="ttc" id="aflat__hash__map_8h_html"><div class="ttname"><a href="flat__hash__map_8h.html">flat_hash_map.h</a></div><div class="ttdoc">The Flat Hash Map Interface.</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md21"></a>
-Without Make</h1>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md22"></a>
+Without Make</h2>
 <p>If your system does not support Makefiles or the <code>make</code> command here are the CMake commands one can run that will do the same.</p>
 <div class="fragment"><div class="line"># Configure the project cmake files.</div>
 <div class="line"># Replace this preset with your own if you&#39;d like.</div>
 <div class="line">cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md22"></a>
-User Presets</h1>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md23"></a>
+User Presets</h2>
 <p>If you do not like the default presets, create a <code>CMakeUserPresets.json</code> in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    &quot;version&quot;: 3,</div>
@@ -194,7 +219,7 @@ User Presets</h1>
 <div class="fragment"><div class="line"># Your preferred preset with the same other steps as before.</div>
 <div class="line">cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md23"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md24"></a>
 Generate Documentation</h1>
 <p>Documentation is available <a href="https://agl-alexglopez.github.io/ccc/">HERE</a>. However, if you want to build the documentation locally you will need <code>doxygen</code> and <code>graphviz</code> installed. Then run:</p>
 <div class="fragment"><div class="line">doxygen Doxyfile</div>
