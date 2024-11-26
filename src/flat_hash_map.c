@@ -1009,7 +1009,17 @@ the Appendix at the end of the license where Lemire should indicate his
 copyright claim where the brackets appear, he has not and I have left the
 license as it appears in his repository. However, his copyright still applies to
 this line of code as he copyrights the source file from which it came with his
-name and the year.
+name and the year. The notice in https://github.com/lemire/fastrange/fastrange.h
+appears as follows:
+
+Fair maps to intervals without division.
+Reference :
+http://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+
+(c) Daniel Lemire
+Apache License 2.0
+
+The license for this line is included below for completeness.
 
                                  Apache License
                            Version 2.0, January 2004
