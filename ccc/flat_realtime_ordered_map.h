@@ -54,6 +54,10 @@ The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fromap_entry_ ccc_fromap_entry;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initializes the map at runtime or compile time.
 @param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
 @param [in] capacity the capacity at mem_ptr or 0 if ((T *)NULL).
@@ -69,6 +73,8 @@ destruction.
                      alloc_fn, key_cmp_fn, aux_data)                           \
     ccc_impl_frm_init(memory_ptr, capacity, frm_elem_field, key_elem_field,    \
                       alloc_fn, key_cmp_fn, aux_data)
+
+/**@}*/
 
 /**@name Membership Interface
 Test membership or obtain references to stored user types directly. */

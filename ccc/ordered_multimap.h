@@ -66,6 +66,10 @@ further operations to be performed once they are obtained without a second
 search, insert, or remove query. */
 typedef union ccc_ommap_entry_ ccc_ommap_entry;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a ordered multimap of the user specified type.
 @param [in] omm_name the name of the ordered multimap being initialized.
 @param [in] user_struct_name the struct the user intends to store.
@@ -82,6 +86,8 @@ hand side of the variable at compile or run time
                      alloc_fn, key_cmp_fn, aux)                                \
     ccc_impl_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field, \
                       alloc_fn, key_cmp_fn, aux)
+
+/**@}*/
 
 /**@name Membership Interface
 Test membership or obtain references to stored user types directly. */

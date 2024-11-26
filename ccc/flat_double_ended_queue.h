@@ -41,6 +41,10 @@ A flat double ended queue can be initialized on the stack, heap, or data
 segment at compile time or runtime. */
 typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize the fdeq with memory and allocation permission.
 @param [in] mem_ptr a pointer to existing memory or ((T *)NULL).
 @param [in] alloc_fn the allocator function, if allocation is allowed.
@@ -52,6 +56,8 @@ compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
 #define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
     (ccc_flat_double_ended_queue) ccc_impl_fdeq_init(                          \
         mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+
+/**@}*/
 
 /** @name Insert and Remove Interface
 Add or remove elements from the FDEQ. */

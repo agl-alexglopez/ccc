@@ -50,6 +50,10 @@ the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
 typedef struct ccc_dll_elem_ ccc_dll_elem;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a doubly linked list with its l-value name, type
 containing the dll elems, the field of the dll elem, allocation function,
 compare function and any auxilliary data needed for comparison, printing, or
@@ -68,6 +72,8 @@ time (e.g. ccc_doubly_linked l = ccc_dll_init(...);). */
                      cmp_fn, aux_data)                                         \
     ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
                       cmp_fn, aux_data)
+
+/**@}*/
 
 /** @name Insert and Remove Interface
 Add or remove elements from the doubly linked list. */

@@ -50,6 +50,10 @@ The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a flat hash map from any buffer of user types at runtime.
 @param [in] memory_ptr the pointer to the backing buffer array of user types.
 May be NULL if the user provides a allocation function. The buffer will be
@@ -74,8 +78,7 @@ equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
 @param [in] type_name the type being stored in the hash table.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] fhash_elem_field the name of the fhmap_elem field.
-@param [in] alloc_fn the allocation function for resizing or NULL if no
-resizing is allowed.
+@param [in] alloc_fn the allocation function for resizing.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
@@ -176,6 +179,8 @@ cannot be resized or freed. */
                             key_eq_fn, aux_data)                               \
     ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn, \
                              key_eq_fn, aux_data)
+
+/**@}*/
 
 /**@name Membership Interface
 Test membership or obtain references to stored user types directly. */

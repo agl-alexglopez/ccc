@@ -32,6 +32,10 @@ A flat priority queue can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
 typedef struct ccc_fpq_ ccc_flat_priority_queue;
 
+/** @name Initialization Interface
+Initialize the container with memory, callbacks, and permissions. */
+/**@{*/
+
 /** @brief Initialize a fpq as a min or max heap.
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
@@ -47,10 +51,6 @@ slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
 #define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
     ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
-
-/** @name Insert and Remove Interface
-Insert or remove elements from the flat priority queue. */
-/**@{*/
 
 /** @brief Order an existing array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
@@ -70,6 +70,12 @@ N + 1 capacity is required. */
                              cmp_fn, aux_data)                                 \
     ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,    \
                               cmp_fn, aux_data)
+
+/**@}*/
+
+/** @name Insert and Remove Interface
+Insert or remove elements from the flat priority queue. */
+/**@{*/
 
 /** @brief Write a type directly to a priority queue slot. O(lgN).
 @param [in] fpq a pointer to the priority queue.
