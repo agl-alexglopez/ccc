@@ -645,7 +645,9 @@ size to mitigate hash collisions. */
 @param [in] h a pointer to the map.
 @return a reference to the base of the backing array.
 @note the reference is to the base of the backing array at index 0 with no
-consideration for the organization of map. */
+consideration for the organization of map.
+@warning it is the users responsibility to ensure that access to any data is
+within the capacity of the backing buffer. */
 [[nodiscard]] void *ccc_fhm_data(ccc_flat_hash_map const *h);
 
 /** @brief Validation of invariants for the hash table.
