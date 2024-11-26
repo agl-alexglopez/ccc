@@ -286,6 +286,13 @@ Obtain state from the container. */
 @return the capacity of the fpq or 0 if fpq is NULL or fpq is empty. */
 [[nodiscard]] size_t ccc_fpq_capacity(ccc_flat_priority_queue const *fpq);
 
+/** @brief Return a pointer to the base of the backing array. O(1).
+@param [in] fpq a pointer to the priority queue.
+@return A pointer to the base of the backing array or NULL if fpq is NULL.
+@note this reference starts at index 0 of the backing array. All fpq elements
+are stored contiguously starting at the base through size of the fpq. */
+[[nodiscard]] void *ccc_fpq_data(ccc_flat_priority_queue const *fpq);
+
 /** @brief Verifies the internal invariants of the fpq hold.
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the fpq is valid false if fpq is NULL or invalid. */

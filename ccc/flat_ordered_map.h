@@ -91,13 +91,14 @@ Test membership or obtain references to stored user types directly. */
 @param [in] fom the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-bool ccc_fom_contains(ccc_flat_ordered_map *fom, void const *key);
+[[nodiscard]] bool ccc_fom_contains(ccc_flat_ordered_map *fom, void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] fom the ordered map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the map entry if it is present, else NULL. */
-void *ccc_fom_get_key_val(ccc_flat_ordered_map *fom, void const *key);
+[[nodiscard]] void *ccc_fom_get_key_val(ccc_flat_ordered_map *fom,
+                                        void const *key);
 
 /**@}*/
 
@@ -116,7 +117,8 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
 it in an entry to provide information about the old value. */
-ccc_entry ccc_fom_insert(ccc_flat_ordered_map *fom, ccc_fomap_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_fom_insert(ccc_flat_ordered_map *fom,
+                                       ccc_fomap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] flat_ordered_map_ptr the pointer to the ordered map.
@@ -142,8 +144,8 @@ it in an entry to provide information about the old value. */
 user type in the map and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the map. If more space is needed but
 allocation fails, an insert error is set. */
-ccc_entry ccc_fom_try_insert(ccc_flat_ordered_map *fom,
-                             ccc_fomap_elem *key_val_handle);
+[[nodiscard]] ccc_entry ccc_fom_try_insert(ccc_flat_ordered_map *fom,
+                                           ccc_fomap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] flat_ordered_map_ptr the pointer to the map.
@@ -184,8 +186,9 @@ Vacant no prior map entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-ccc_entry ccc_fom_insert_or_assign(ccc_flat_ordered_map *fom,
-                                   ccc_fomap_elem *key_val_handle);
+[[nodiscard]] ccc_entry
+ccc_fom_insert_or_assign(ccc_flat_ordered_map *fom,
+                         ccc_fomap_elem *key_val_handle);
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
 @param [in] flat_ordered_map_ptr the pointer to the flat hash map.
@@ -215,7 +218,8 @@ is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-ccc_entry ccc_fom_remove(ccc_flat_ordered_map *fom, ccc_fomap_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_fom_remove(ccc_flat_ordered_map *fom,
+                                       ccc_fomap_elem *out_handle);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
@@ -247,7 +251,8 @@ where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface. */
-ccc_fomap_entry ccc_fom_entry(ccc_flat_ordered_map *fom, void const *key);
+[[nodiscard]] ccc_fomap_entry ccc_fom_entry(ccc_flat_ordered_map *fom,
+                                            void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
 @param [in] flat_ordered_map_ptr the map to be searched.
@@ -278,7 +283,8 @@ to subsequent calls in the Entry Interface. */
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
 without the need of the auxiliary argument a ccc_update_fn can provide. */
-ccc_fomap_entry *ccc_fom_and_modify(ccc_fomap_entry *e, ccc_update_fn *fn);
+[[nodiscard]] ccc_fomap_entry *ccc_fom_and_modify(ccc_fomap_entry *e,
+                                                  ccc_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -288,8 +294,8 @@ ccc_fomap_entry *ccc_fom_and_modify(ccc_fomap_entry *e, ccc_update_fn *fn);
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-ccc_fomap_entry *ccc_fom_and_modify_aux(ccc_fomap_entry *e, ccc_update_fn *fn,
-                                        void *aux);
+[[nodiscard]] ccc_fomap_entry *
+ccc_fom_and_modify_aux(ccc_fomap_entry *e, ccc_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] flat_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -336,7 +342,8 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-void *ccc_fom_or_insert(ccc_fomap_entry const *e, ccc_fomap_elem *elem);
+[[nodiscard]] void *ccc_fom_or_insert(ccc_fomap_entry const *e,
+                                      ccc_fomap_elem *elem);
 
 /** @brief Lazily insert the desired key value into the entry if it is Vacant.
 @param [in] flat_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -359,7 +366,8 @@ or other data, such functions will not be called if the entry is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-void *ccc_fom_insert_entry(ccc_fomap_entry const *e, ccc_fomap_elem *elem);
+[[nodiscard]] void *ccc_fom_insert_entry(ccc_fomap_entry const *e,
+                                         ccc_fomap_elem *elem);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] flat_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -377,7 +385,7 @@ be removed.
 
 Note that the reference to the removed entry is invalidated upon any further
 insertions. */
-ccc_entry ccc_fom_remove_entry(ccc_fomap_entry *e);
+[[nodiscard]] ccc_entry ccc_fom_remove_entry(ccc_fomap_entry *e);
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] flat_ordered_map_entry_ptr a pointer to the map entry.
@@ -396,18 +404,18 @@ insertions. */
 /** @brief Unwraps the provided entry to obtain a view into the map element.
 @param [in] e the entry from a query to the map via function or macro.
 @return a view into the table entry if one is present, or NULL. */
-void *ccc_fom_unwrap(ccc_fomap_entry const *e);
+[[nodiscard]] void *ccc_fom_unwrap(ccc_fomap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. */
-bool ccc_fom_occupied(ccc_fomap_entry const *e);
+[[nodiscard]] bool ccc_fom_occupied(ccc_fomap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
-bool ccc_fom_insert_error(ccc_fomap_entry const *e);
+[[nodiscard]] bool ccc_fom_insert_error(ccc_fomap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -446,8 +454,9 @@ for (struct val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-ccc_range ccc_fom_equal_range(ccc_flat_ordered_map *fom, void const *begin_key,
-                              void const *end_key);
+[[nodiscard]] ccc_range ccc_fom_equal_range(ccc_flat_ordered_map *fom,
+                                            void const *begin_key,
+                                            void const *end_key);
 
 /** @brief Returns a compound literal reference to the desired range. Amortized
 O(lg N).
@@ -482,8 +491,9 @@ for (struct val *i = rrange_begin(&rrange);
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
-ccc_rrange ccc_fom_equal_rrange(ccc_flat_ordered_map *fom,
-                                void const *rbegin_key, void const *rend_key);
+[[nodiscard]] ccc_rrange ccc_fom_equal_rrange(ccc_flat_ordered_map *fom,
+                                              void const *rbegin_key,
+                                              void const *rend_key);
 
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
 O(lg N).
@@ -504,21 +514,21 @@ enclosing scope. This reference is always valid. */
 O(lg N).
 @param [in] fom a pointer to the map.
 @return the oldest minimum element of the map. */
-void *ccc_fom_begin(ccc_flat_ordered_map const *fom);
+[[nodiscard]] void *ccc_fom_begin(ccc_flat_ordered_map const *fom);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param [in] fom a pointer to the map.
 @return the oldest maximum element of the map. */
-void *ccc_fom_rbegin(ccc_flat_ordered_map const *fom);
+[[nodiscard]] void *ccc_fom_rbegin(ccc_flat_ordered_map const *fom);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] fom a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-void *ccc_fom_next(ccc_flat_ordered_map const *fom,
-                   ccc_fomap_elem const *iter_handle);
+[[nodiscard]] void *ccc_fom_next(ccc_flat_ordered_map const *fom,
+                                 ccc_fomap_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -526,18 +536,18 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-void *ccc_fom_rnext(ccc_flat_ordered_map const *fom,
-                    ccc_fomap_elem const *iter_handle);
+[[nodiscard]] void *ccc_fom_rnext(ccc_flat_ordered_map const *fom,
+                                  ccc_fomap_elem const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] fom a pointer to the map.
 @return the newest maximum element of the map. */
-void *ccc_fom_end(ccc_flat_ordered_map const *fom);
+[[nodiscard]] void *ccc_fom_end(ccc_flat_ordered_map const *fom);
 
 /** @brief Return the rend of a reverse inorder traversal of the map. O(1).
 @param [in] fom a pointer to the map.
 @return the newest minimum element of the map. */
-void *ccc_fom_rend(ccc_flat_ordered_map const *fom);
+[[nodiscard]] void *ccc_fom_rend(ccc_flat_ordered_map const *fom);
 
 /**@}*/
 
@@ -552,7 +562,7 @@ maintenance is required on the elements in the map before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-void ccc_fom_clear(ccc_flat_ordered_map *fom, ccc_destructor_fn *fn);
+ccc_result ccc_fom_clear(ccc_flat_ordered_map *fom, ccc_destructor_fn *fn);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param [in] fom the map to be cleared.
@@ -576,22 +586,31 @@ Obtain the container state. */
 /** @brief Returns the size of the map
 @param [in] fom the map.
 @return the size_t size. */
-size_t ccc_fom_size(ccc_flat_ordered_map const *fom);
+[[nodiscard]] size_t ccc_fom_size(ccc_flat_ordered_map const *fom);
 
 /** @brief Returns the capacity of the map
 @param [in] fom the map.
 @return the size_t capacity. */
-size_t ccc_fom_capacity(ccc_flat_ordered_map const *fom);
+[[nodiscard]] size_t ccc_fom_capacity(ccc_flat_ordered_map const *fom);
+
+/** @brief Return a reference to the base of backing array. O(1).
+@param [in] fom a pointer to the map.
+@return a reference to the base of the backing array.
+@note the reference is to the base of the backing array at index 0 with no
+consideration for the organization of map. However, all nodes of the map
+are guaranteed to be stored contiguously starting at index 1. Index 0 is
+reserved for the sentinel node. */
+[[nodiscard]] void *ccc_fom_data(ccc_flat_ordered_map const *fom);
 
 /** @brief Returns the size status of the map.
 @param [in] fom the map.
 @return true if empty else false. */
-bool ccc_fom_is_empty(ccc_flat_ordered_map const *fom);
+[[nodiscard]] bool ccc_fom_is_empty(ccc_flat_ordered_map const *fom);
 
 /** @brief Validation of invariants for the map.
 @param [in] fom the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
-bool ccc_fom_validate(ccc_flat_ordered_map const *fom);
+[[nodiscard]] bool ccc_fom_validate(ccc_flat_ordered_map const *fom);
 
 /**@}*/
 

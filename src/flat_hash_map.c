@@ -535,6 +535,12 @@ ccc_fhm_capacity(ccc_flat_hash_map const *const h)
     return ccc_buf_capacity(&h->buf_);
 }
 
+void *
+ccc_fhm_data(ccc_flat_hash_map const *const h)
+{
+    return h ? ccc_buf_begin(&h->buf_) : NULL;
+}
+
 bool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {

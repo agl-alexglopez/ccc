@@ -208,6 +208,12 @@ ccc_fpq_capacity(ccc_flat_priority_queue const *const fpq)
     return fpq ? ccc_buf_capacity(&fpq->buf_) : 0;
 }
 
+void *
+ccc_fpq_data(ccc_flat_priority_queue const *const fpq)
+{
+    return fpq ? ccc_buf_begin(&fpq->buf_) : NULL;
+}
+
 ccc_threeway_cmp
 ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 {

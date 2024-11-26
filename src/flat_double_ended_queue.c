@@ -248,6 +248,12 @@ ccc_fdeq_rend(ccc_flat_double_ended_queue const *const)
     return NULL;
 }
 
+void *
+ccc_fdeq_data(ccc_flat_double_ended_queue const *const fdeq)
+{
+    return fdeq ? ccc_buf_begin(&fdeq->buf_) : NULL;
+}
+
 bool
 ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
 {

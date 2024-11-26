@@ -602,6 +602,15 @@ Obtain the container state. */
 @return the size_t capacity. */
 [[nodiscard]] size_t ccc_frm_capacity(ccc_flat_realtime_ordered_map const *frm);
 
+/** @brief Return a reference to the base of backing array. O(1).
+@param [in] frm a pointer to the map.
+@return a reference to the base of the backing array.
+@note the reference is to the base of the backing array at index 0 with no
+consideration for the organization of map. However, all nodes of the map
+are guaranteed to be stored contiguously starting at index 1. Index 0 is
+reserved for the sentinel node. */
+[[nodiscard]] void *ccc_frm_data(ccc_flat_realtime_ordered_map const *frm);
+
 /** @brief Validation of invariants for the map.
 @param [in] frm the map to validate.
 @return true if all invariants hold, false if corruption occurs. */

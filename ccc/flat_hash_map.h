@@ -641,6 +641,13 @@ size to mitigate hash collisions. */
 @return the capacity. */
 [[nodiscard]] size_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
+/** @brief Return a reference to the base of backing array. O(1).
+@param [in] h a pointer to the map.
+@return a reference to the base of the backing array.
+@note the reference is to the base of the backing array at index 0 with no
+consideration for the organization of map. */
+[[nodiscard]] void *ccc_fhm_data(ccc_flat_hash_map const *h);
+
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
