@@ -296,6 +296,16 @@ empty. */
 @return the capacity of the fdeq or 0 if fdeq is NULL. */
 [[nodiscard]] size_t ccc_fdeq_capacity(ccc_flat_double_ended_queue const *fdeq);
 
+/** @brief Return a reference to the base of backing array. O(1).
+@param [in] fdeq a pointer to the fdeq.
+@return a reference to the base of the backing array.
+@note the reference is to the base of the backing array at index 0 with no
+consideration to where the front index of the fdeq may be.
+
+This method is exposed for serialization or writing purposes but the base of
+the array may not point to valid data in terms of organization of the fdeq. */
+[[nodiscard]] void *ccc_fdeq_data(ccc_flat_double_ended_queue const *fdeq);
+
 /** @brief Return true if the internal invariants of the fdeq.
 @param [in] fdeq a pointer to the fdeq.
 @return true if the internal invariants of the fdeq are held, else false. */

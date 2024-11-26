@@ -424,6 +424,12 @@ ccc_fom_rend(ccc_flat_ordered_map const *const fom)
     return base_at(fom, 0);
 }
 
+void *
+ccc_fom_data(ccc_flat_ordered_map const *const fom)
+{
+    return fom ? ccc_buf_begin(&fom->buf_) : NULL;
+}
+
 ccc_range
 ccc_fom_equal_range(ccc_flat_ordered_map *const fom,
                     void const *const begin_key, void const *const end_key)
@@ -448,18 +454,18 @@ ccc_fom_equal_rrange(ccc_flat_ordered_map *const fom,
         equal_range(fom, rbegin_key, rend_key, reverse_inorder_traversal)};
 }
 
-void
+ccc_result
 ccc_fom_clear(ccc_flat_ordered_map *const fom, ccc_destructor_fn *const fn)
 {
     if (!fom)
     {
-        return;
+        return CCC_INPUT_ERR;
     }
     if (!fn)
     {
         (void)ccc_buf_size_set(&fom->buf_, 1);
         fom->root_ = 0;
-        return;
+        return CCC_OK;
     }
     for (void *e = ccc_buf_at(&fom->buf_, 1); e != ccc_buf_end(&fom->buf_);
          e = ccc_buf_next(&fom->buf_, e))
@@ -468,6 +474,7 @@ ccc_fom_clear(ccc_flat_ordered_map *const fom, ccc_destructor_fn *const fn)
     }
     (void)ccc_buf_size_set(&fom->buf_, 1);
     fom->root_ = 0;
+    return CCC_OK;
 }
 
 ccc_result

@@ -435,6 +435,12 @@ ccc_frm_capacity(ccc_flat_realtime_ordered_map const *const frm)
 }
 
 void *
+ccc_frm_data(ccc_flat_realtime_ordered_map const *const frm)
+{
+    return frm ? ccc_buf_begin(&frm->buf_) : NULL;
+}
+
+void *
 ccc_frm_begin(ccc_flat_realtime_ordered_map const *const frm)
 {
     if (!frm || ccc_buf_is_empty(&frm->buf_))
