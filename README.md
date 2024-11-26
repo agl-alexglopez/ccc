@@ -9,8 +9,9 @@ The following are required for install:
 - GCC or Clang supporting C23.
     - 100% coverage of C23 is not required. For example, at the time of writing Clang 19.1.1 and GCC 14.2 have all features used in this collection covered, but older versions of each compiler may work as well.
 - CMake >= 3.23.
+- Read [INSTALL.md](INSTALL.md).
 
-Currently, this library supports a manual installation via CMake. See the [INSTALL.md](INSTALL.md) file for more details. This file is also included when you download a simplified release from the [Releases](https://github.com/agl-alexglopez/ccc/releases) page.
+Currently, this library supports a `FetchContent` or manual installation via CMake. The [INSTALL.md](INSTALL.md) file is included in all [Releases](https://github.com/agl-alexglopez/ccc/releases).
 
 ## Quick Start
 
