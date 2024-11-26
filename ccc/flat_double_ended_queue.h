@@ -301,6 +301,8 @@ empty. */
 @return a reference to the base of the backing array.
 @note the reference is to the base of the backing array at index 0 with no
 consideration to where the front index of the fdeq may be.
+@warning it is the users responsibility to ensure that access to any data is
+within the capacity of the backing buffer.
 
 This method is exposed for serialization or writing purposes but the base of
 the array may not point to valid data in terms of organization of the fdeq. */

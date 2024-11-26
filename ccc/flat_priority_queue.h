@@ -290,7 +290,9 @@ Obtain state from the container. */
 @param [in] fpq a pointer to the priority queue.
 @return A pointer to the base of the backing array or NULL if fpq is NULL.
 @note this reference starts at index 0 of the backing array. All fpq elements
-are stored contiguously starting at the base through size of the fpq. */
+are stored contiguously starting at the base through size of the fpq.
+@warning it is the users responsibility to ensure that access to any data is
+within the capacity of the backing buffer. */
 [[nodiscard]] void *ccc_fpq_data(ccc_flat_priority_queue const *fpq);
 
 /** @brief Verifies the internal invariants of the fpq hold.

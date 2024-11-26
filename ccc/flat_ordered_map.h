@@ -599,7 +599,9 @@ Obtain the container state. */
 @note the reference is to the base of the backing array at index 0 with no
 consideration for the organization of map. However, all nodes of the map
 are guaranteed to be stored contiguously starting at index 1. Index 0 is
-reserved for the sentinel node. */
+reserved for the sentinel node.
+@warning it is the users responsibility to ensure that access to any data is
+within the capacity of the backing buffer. */
 [[nodiscard]] void *ccc_fom_data(ccc_flat_ordered_map const *fom);
 
 /** @brief Returns the size status of the map.
