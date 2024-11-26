@@ -2,6 +2,45 @@
 
 Currently, this library utilizes some features that many compilers support such as gcc, clang, and AppleClang, but support is not ready for Windows.
 
+## Fetch Content Install
+
+This approach will allow CMake to build the collection from source as part of your project. The collection does not have external dependencies, besides the standard library, so this may be viable for you. This is helpful if you want the ability to build the library in release or debug mode along with your project and possibly step through it in GDB when in debug mode. If you would rather link to the release build library file see the next section for the manual install.
+
+To avoid including tests, samples, and other extraneous files when fetching content download a release.
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  ccc
+  URL https://github.com/agl-alexglopez/ccc/releases/download/v[MAJOR.MINOR.PATCH]/ccc-v[MAJOR.MINOR.PATCH].zip
+  #DOWNLOAD_EXTRACT_TIMESTAMP FALSE # CMake may raise a warning to set this. If so, uncomment and set.
+)
+FetchContent_MakeAvailable(ccc)
+```
+
+To link against the library in the project use the `ccc` namespace.
+
+```cmake
+add_executable(main main.c)
+target_link_libraries(main ccc::ccc)
+```
+
+Here is a concrete example with an arbitrary release that is likely out of date. Replace this version with the newest version on the releases page.
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  ccc
+  URL https://github.com/agl-alexglopez/ccc/releases/download/v0.7.0/ccc-v0.7.0.zip
+  #DOWNLOAD_EXTRACT_TIMESTAMP FALSE # CMake may raise a warning to set this. If so, uncomment and set.
+)
+FetchContent_MakeAvailable(ccc)
+add_executable(main main.c)
+target_link_libraries(main ccc::ccc)
+```
+
+Now, the C Container Collection is part of your project build, allowing you to configure as you see fit. For a more traditional approach read the manual install section below.
+
 ## Manual Install Quick Start
 
 1. Use the provided defaults.
@@ -29,13 +68,13 @@ Then, in your `CMakeLists.txt`:
 find_package(ccc HINTS "~/path/to/ccc-v[VERSION]/install")
 ```
 
-If you want to simply write the following command in your `CMakeLists.txt`,
+You can simply write the following command in your `CMakeLists.txt`.
 
 ```cmake
 find_package(ccc)
 ```
 
-specify that this library shall be installed to a location CMake recognizes by default. For example, my preferred location is as follows:
+To do so, specify that this library shall be installed to a location CMake recognizes by default. For example, my preferred location is as follows:
 
 ```zsh
 make clang-ccc ~/.local
@@ -64,15 +103,15 @@ install
 
 Now to delete the library if needed, simply find all folders and files with the `*ccc*` string somewhere within them and delete. You can also check the `build/install_manifest.txt` to confirm the locations of any files installed with this library.
 
-## Include the Library
+### Include the Library
 
 Once CMake can find the package, link against it and include the container header.
 
 The `CMakeLists.txt` file.
 
 ```cmake
-add_executable(my_exe my_exe.c)
-target_link_libraries(my_exe ccc::ccc)
+add_executable(main main.c)
+target_link_libraries(main ccc::ccc)
 ```
 
 The C code.
@@ -81,7 +120,7 @@ The C code.
 #include "ccc/flat_hash_map.h"
 ```
 
-## Without Make
+### Without Make
 
 If your system does not support Makefiles or the `make` command here are the CMake commands one can run that will do the same.
 
@@ -92,7 +131,7 @@ cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
 cmake --build build --target install
 ```
 
-## User Presets
+### User Presets
 
 If you do not like the default presets, create a `CMakeUserPresets.json` in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.
 
