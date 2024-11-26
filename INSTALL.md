@@ -4,7 +4,7 @@ Currently, this library utilizes some features that many compilers support such 
 
 ## Fetch Content Install
 
-This approach will allow CMake to build the collection from source as part of your project. The collection does not have external dependencies, besides the standard library, so this may be viable for you. This is helpful if you want the ability to build the library in release or debug mode along with your project and possibly step through it in GDB when in debug mode. If you would rather link to the release build library file see the next section for the manual install.
+This approach will allow CMake to build the collection from source as part of your project. The collection does not have external dependencies, besides the standard library, so this may be viable for you. This is helpful if you want the ability to build the library in release or debug mode along with your project and possibly step through it with a debugger during a debug build. If you would rather link to the release build library file see the next section for the manual install.
 
 To avoid including tests, samples, and other extraneous files when fetching content download a release.
 
