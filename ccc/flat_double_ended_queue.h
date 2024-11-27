@@ -54,8 +54,7 @@ Initialize the container with memory, callbacks, and permissions. */
 @return the fdeq on the right hand side of an equality operator at runtime or
 compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
 #define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
-    (ccc_flat_double_ended_queue) ccc_impl_fdeq_init(                          \
-        mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)
 
 /**@}*/
 
