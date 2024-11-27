@@ -68,7 +68,10 @@ resizing is allowed.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
+@warning this version initialization can only operate at runtime and memory_ptr
+must not be a compound literal. It must be an existing l-value of user types
+allocated on the stack, heap, or data segment. */
 #define ccc_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,        \
                      alloc_fn, hash_fn, key_eq_fn, aux_data)                   \
     ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,       \
