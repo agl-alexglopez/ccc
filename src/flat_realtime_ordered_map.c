@@ -507,6 +507,41 @@ ccc_frm_rend(ccc_flat_realtime_ordered_map const *const frm)
 }
 
 ccc_result
+ccc_frm_copy(ccc_flat_realtime_ordered_map *const dst,
+             ccc_flat_realtime_ordered_map const *const src,
+             ccc_alloc_fn *const fn)
+{
+    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    {
+        return CCC_INPUT_ERR;
+    }
+    /* Copy everything so we don't worry about staying in sync with future
+       changes to buf container. But we have to give back original destination
+       memory in case it has already been allocated. Alloc will remain the
+       same as in dst initialization because that controls permission. */
+    void *const dst_mem = dst->buf_.mem_;
+    size_t const dst_cap = dst->buf_.capacity_;
+    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    *dst = *src;
+    dst->buf_.mem_ = dst_mem;
+    dst->buf_.capacity_ = dst_cap;
+    dst->buf_.alloc_ = dst_alloc;
+    if (dst->buf_.capacity_ < src->buf_.capacity_)
+    {
+        ccc_result resize_res
+            = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
+        if (resize_res != CCC_OK)
+        {
+            return resize_res;
+        }
+        dst->buf_.capacity_ = src->buf_.capacity_;
+    }
+    (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
+                 src->buf_.capacity_ * src->buf_.elem_sz_);
+    return CCC_OK;
+}
+
+ccc_result
 ccc_frm_clear(ccc_flat_realtime_ordered_map *const frm,
               ccc_destructor_fn *const fn)
 {

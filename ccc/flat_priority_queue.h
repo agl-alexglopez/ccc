@@ -71,6 +71,73 @@ N + 1 capacity is required. */
     ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,    \
                               cmp_fn, aux_data)
 
+/** @brief Copy the fpq from src to newly initialized dst.
+@param [in] dst the destination that will copy the source fpq.
+@param [in] src the source of the fpq.
+@param [in] fn the allocation function in case resizing of dst is needed.
+@return the result of the copy operation. If the destination capacity is less
+than the source capacity and no allocation function is provided an input error
+is returned. If resizing is required and resizing of dst fails a memory error
+is returned.
+@note dst must have capacity greater than or equal to src. If dst capacity is
+less than src, an allocation function must be provided with the fn argument.
+
+Note that there are two ways to copy data from source to destination: provide
+sufficient memory and pass NULL as fn, or allow the copy function to take care
+of allocation for the copy.
+
+Manual memory management with no allocation function provided.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+flat_priority_queue src
+    = fpq_init((int[10]){}, 10, CCC_LES, NULL, int_cmp, NULL);
+push_rand_ints(&src);
+flat_priority_queue dst
+    = fpq_init((int[11]){}, 11, CCC_LES, NULL, int_cmp, NULL);
+ccc_result res = fpq_copy(&dst, &src, NULL);
+```
+
+The above requires dst capacity be greater than or equal to src capacity. Here
+is memory management handed over to the copy function.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+flat_priority_queue src
+    = fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+push_rand_ints(&src);
+flat_priority_queue dst
+    = fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+ccc_result res = fpq_copy(&dst, &src, std_alloc);
+```
+
+The above allows dst to have a capacity less than that of the src as long as
+copy has been provided an allocation function to resize dst. Note that this
+would still work if copying to a destination that the user wants as a fixed
+size fpq.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+flat_priority_queue src
+    = fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+push_rand_ints(&src);
+flat_priority_queue dst
+    = fpq_init((int *)NULL, 0, CCC_LES, NULL, int_cmp, NULL);
+ccc_result res = fpq_copy(&dst, &src, std_alloc);
+```
+
+The above sets up dst with fixed size while src is a dynamic fpq. Because an
+allocation function is provided, the dst is resized once for the copy and
+retains its fixed size after the copy is complete. This would require the user
+to manually free the underlying buffer at dst eventually if this method is used.
+Usually it is better to allocate the memory explicitly before the copy if
+copying between ring buffers.
+
+These options allow users to stay consistent across containers with their
+memory management strategies. */
+ccc_result ccc_fpq_copy(ccc_flat_priority_queue *dst,
+                        ccc_flat_priority_queue const *src, ccc_alloc_fn *fn);
+
 /**@}*/
 
 /** @name Insert and Remove Interface
@@ -314,6 +381,7 @@ flat priority queue container. Check for collisions before name shortening. */
 typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_init(args...) ccc_fpq_init(args)
 #    define fpq_heapify_init(args...) ccc_fpq_heapify_init(args)
+#    define fpq_copy(args...) ccc_fpq_copy(args)
 #    define fpq_heapify(args...) ccc_fpq_heapify(args)
 #    define fpq_emplace(args...) ccc_fpq_emplace(args)
 #    define fpq_realloc(args...) ccc_fpq_realloc(args)
@@ -331,6 +399,7 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_clear_and_free(args...) ccc_fpq_clear_and_free(args)
 #    define fpq_is_empty(args...) ccc_fpq_is_empty(args)
 #    define fpq_size(args...) ccc_fpq_size(args)
+#    define fpq_data(args...) ccc_fpq_data(args)
 #    define fpq_validate(args...) ccc_fpq_validate(args)
 #    define fpq_order(args...) ccc_fpq_order(args)
 #endif /* FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC */

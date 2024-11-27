@@ -81,6 +81,91 @@ Initialize the container with memory, callbacks, and permissions. */
     ccc_impl_fom_init(mem_ptr, capacity, om_elem_field, key_elem_field,        \
                       alloc_fn, key_cmp, aux)
 
+/** @brief Copy the map at source to destination.
+@param [in] dst the initialized destination for the copy of the src map.
+@param [in] src the initialized source of the map.
+@param [in] fn the allocation function to resize dst or NULL.
+@return the result of the copy operation. If the destination capacity is less
+than the source capacity and no allocation function is provided an input error
+is returned. If resizing is required and resizing of dst fails a memory error
+is returned.
+@note dst must have capacity greater than or equal to src. If dst capacity is
+less than src, an allocation function must be provided with the fn argument.
+
+Note that there are two ways to copy data from source to destination: provide
+sufficient memory and pass NULL as fn, or allow the copy function to take care
+of allocation for the copy.
+
+Manual memory management with no allocation function provided.
+
+```
+#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fomap_elem e;
+    int key;
+    int val;
+};
+static flat_ordered_map src
+    = fom_init((static struct val[11]){}, 11, e, key, NULL, key_cmp, NULL);
+insert_rand_vals(&src);
+static flat_ordered_map dst
+    = fom_init((static struct val[13]){}, 13, e, key, NULL, key_cmp, NULL);
+ccc_result res = fom_copy(&dst, &src, NULL);
+```
+
+The above requires dst capacity be greater than or equal to src capacity. Here
+is memory management handed over to the copy function.
+
+```
+#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fomap_elem e;
+    int key;
+    int val;
+};
+static flat_ordered_map src
+    = fom_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+insert_rand_vals(&src);
+static flat_ordered_map dst
+    = fom_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+ccc_result res = fom_copy(&dst, &src, std_alloc);
+```
+
+The above allows dst to have a capacity less than that of the src as long as
+copy has been provided an allocation function to resize dst. Note that this
+would still work if copying to a destination that the user wants as a fixed
+size map.
+
+```
+#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fomap_elem e;
+    int key;
+    int val;
+};
+static flat_ordered_map src
+    = fom_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+insert_rand_vals(&src);
+static flat_ordered_map dst
+    = fom_init((struct val *)NULL, 0, e, key, NULL, key_cmp, NULL);
+ccc_result res = fom_copy(&dst, &src, std_alloc);
+```
+
+The above sets up dst with fixed size while src is a dynamic map. Because an
+allocation function is provided, the dst is resized once for the copy and
+retains its fixed size after the copy is complete. This would require the user
+to manually free the underlying buffer at dst eventually if this method is used.
+Usually it is better to allocate the memory explicitly before the copy if
+copying between maps without allocation permission.
+
+These options allow users to stay consistent across containers with their
+memory management strategies. */
+ccc_result ccc_fom_copy(ccc_flat_ordered_map *dst,
+                        ccc_flat_ordered_map const *src, ccc_alloc_fn *fn);
+
 /**@}*/
 
 /**@name Membership Interface
@@ -628,6 +713,7 @@ typedef ccc_fomap_entry fomap_entry;
 #    define fom_try_insert_w(args...) ccc_fom_try_insert_w(args)
 #    define fom_insert_or_assign_w(args...) ccc_fom_insert_or_assign_w(args)
 #    define fom_init(args...) ccc_fom_init(args)
+#    define fom_copy(args...) ccc_fom_copy(args)
 #    define fom_contains(args...) ccc_fom_contains(args)
 #    define fom_get_key_val(args...) ccc_fom_get_key_val(args)
 #    define fom_insert_r(args...) ccc_fom_insert_r(args)
@@ -656,7 +742,7 @@ typedef ccc_fomap_entry fomap_entry;
 #    define fom_rend(args...) ccc_fom_rend(args)
 #    define fom_next(args...) ccc_fom_next(args)
 #    define fom_rnext(args...) ccc_fom_rnext(args)
-#    define fom_root(args...) ccc_fom_root(args)
+#    define fom_data(args...) ccc_fom_data(args)
 #    define fom_size(args...) ccc_fom_size(args)
 #    define fom_is_empty(args...) ccc_fom_is_empty(args)
 #    define fom_validate(args...) ccc_fom_validate(args)
