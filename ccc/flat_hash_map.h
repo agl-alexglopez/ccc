@@ -71,7 +71,8 @@ resizing is allowed.
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
 @warning this version initialization can only operate at runtime and memory_ptr
 must not be a compound literal. It must be an existing l-value of user types
-allocated on the stack, heap, or data segment. */
+allocated on the stack, heap, or data segment. For compound literal
+initialization, see ccc_fhm_static_init(). */
 #define ccc_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,        \
                      alloc_fn, hash_fn, key_eq_fn, aux_data)                   \
     ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,       \
