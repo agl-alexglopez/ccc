@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+static size_t const swap_space = 1;
+
 static void *at(struct ccc_fpq_ const *, size_t);
 static size_t index_of(struct ccc_fpq_ const *, void const *);
 static bool wins(struct ccc_fpq_ const *, void const *winner,
@@ -61,24 +63,23 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         return NULL;
     }
-    void *new = ccc_buf_alloc_back(&fpq->buf_);
-    if (ccc_buf_size(&fpq->buf_) == ccc_buf_capacity(&fpq->buf_))
+    if (ccc_buf_size(&fpq->buf_) + swap_space >= ccc_buf_capacity(&fpq->buf_))
     {
-        new = NULL;
         ccc_result const extra_space = ccc_buf_alloc(
             &fpq->buf_, ccc_buf_capacity(&fpq->buf_) * 2, fpq->buf_.alloc_);
-        if (extra_space == CCC_OK)
+        if (extra_space != CCC_OK)
         {
-            new = ccc_buf_back(&fpq->buf_);
+            return NULL;
         }
     }
+    void *const new = ccc_buf_alloc_back(&fpq->buf_);
     if (!new)
     {
         return NULL;
     }
     if (new != e)
     {
-        memcpy(new, e, ccc_buf_elem_size(&fpq->buf_));
+        (void)memcpy(new, e, ccc_buf_elem_size(&fpq->buf_));
     }
     size_t const buf_sz = ccc_buf_size(&fpq->buf_);
     size_t i = buf_sz - 1;
@@ -218,6 +219,40 @@ ccc_threeway_cmp
 ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 {
     return fpq ? fpq->order_ : CCC_CMP_ERR;
+}
+
+ccc_result
+ccc_fpq_copy(ccc_flat_priority_queue *const dst,
+             ccc_flat_priority_queue const *const src, ccc_alloc_fn *const fn)
+{
+    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    {
+        return CCC_INPUT_ERR;
+    }
+    /* Copy everything so we don't worry about staying in sync with future
+       changes to buf container. But we have to give back original destination
+       memory in case it has already been allocated. Alloc will remain the
+       same as in dst initialization because that controls permission. */
+    void *const dst_mem = dst->buf_.mem_;
+    size_t const dst_cap = dst->buf_.capacity_;
+    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    *dst = *src;
+    dst->buf_.mem_ = dst_mem;
+    dst->buf_.capacity_ = dst_cap;
+    dst->buf_.alloc_ = dst_alloc;
+    if (dst->buf_.capacity_ < src->buf_.capacity_)
+    {
+        ccc_result resize_res
+            = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
+        if (resize_res != CCC_OK)
+        {
+            return resize_res;
+        }
+        dst->buf_.capacity_ = src->buf_.capacity_;
+    }
+    (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
+                 src->buf_.capacity_ * src->buf_.elem_sz_);
+    return CCC_OK;
 }
 
 ccc_result
