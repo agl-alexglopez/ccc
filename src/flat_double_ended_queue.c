@@ -254,45 +254,62 @@ ccc_fdeq_data(ccc_flat_double_ended_queue const *const fdeq)
     return fdeq ? ccc_buf_begin(&fdeq->buf_) : NULL;
 }
 
-bool
-ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
+ccc_result
+ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
+              ccc_flat_double_ended_queue const *const src,
+              ccc_alloc_fn *const fn)
 {
-    if (ccc_fdeq_is_empty(fdeq))
+    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
-        return true;
+        return CCC_INPUT_ERR;
     }
-    void *iter = ccc_fdeq_begin(fdeq);
-    if (ccc_buf_i(&fdeq->buf_, iter) != (ptrdiff_t)fdeq->front_)
+    /* The user just wants another fdeq that will behave as the empty src. */
+    if (!src->buf_.capacity_)
     {
-        return false;
+        *dst = *src;
+        return CCC_OK;
     }
-    size_t size = 0;
-    for (; iter != ccc_fdeq_end(fdeq); iter = ccc_fdeq_next(fdeq, iter), ++size)
+    /* Copy everything so we don't worry about staying in sync with future
+       changes to buf container. But we have to give back original destination
+       memory in case it has already been allocated. Alloc will remain the
+       same as in dst initialization because that controls whether the fdeq
+       is a ring buffer or dynamic fdeq. */
+    void *const dst_mem = dst->buf_.mem_;
+    size_t const dst_cap = dst->buf_.capacity_;
+    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    *dst = *src;
+    dst->buf_.mem_ = dst_mem;
+    dst->buf_.capacity_ = dst_cap;
+    dst->buf_.alloc_ = dst_alloc;
+    if (dst->buf_.capacity_ > src->buf_.capacity_)
     {
-        if (size >= ccc_fdeq_size(fdeq))
+        size_t const first_chunk
+            = min(src->buf_.sz_, src->buf_.capacity_ - src->front_);
+        (void)memcpy(dst->buf_.mem_, ccc_buf_at(&src->buf_, src->front_),
+                     src->buf_.elem_sz_ * first_chunk);
+        if (first_chunk < src->buf_.sz_)
         {
-            return false;
+            (void)memcpy((char *)dst->buf_.mem_
+                             + (src->buf_.elem_sz_ * first_chunk),
+                         src->buf_.mem_,
+                         src->buf_.elem_sz_ * (src->buf_.sz_ - first_chunk));
         }
+        dst->front_ = 0;
+        return CCC_OK;
     }
-    if (size != ccc_fdeq_size(fdeq))
+    if (dst->buf_.capacity_ < src->buf_.capacity_)
     {
-        return false;
-    }
-    size = 0;
-    iter = ccc_fdeq_rbegin(fdeq);
-    if (ccc_buf_i(&fdeq->buf_, iter) != (ptrdiff_t)last_elem_index(fdeq))
-    {
-        return false;
-    }
-    for (; iter != ccc_fdeq_rend(fdeq);
-         iter = ccc_fdeq_rnext(fdeq, iter), ++size)
-    {
-        if (size >= ccc_fdeq_size(fdeq))
+        ccc_result resize_res
+            = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
+        if (resize_res != CCC_OK)
         {
-            return false;
+            return resize_res;
         }
+        dst->buf_.capacity_ = src->buf_.capacity_;
     }
-    return size == ccc_fdeq_size(fdeq);
+    (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
+                 src->buf_.capacity_ * src->buf_.elem_sz_);
+    return CCC_OK;
 }
 
 ccc_result
@@ -337,6 +354,47 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
                                    .aux = fdeq->buf_.aux_});
     }
     return ccc_buf_alloc(&fdeq->buf_, 0, fdeq->buf_.alloc_);
+}
+
+bool
+ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
+{
+    if (ccc_fdeq_is_empty(fdeq))
+    {
+        return true;
+    }
+    void *iter = ccc_fdeq_begin(fdeq);
+    if (ccc_buf_i(&fdeq->buf_, iter) != (ptrdiff_t)fdeq->front_)
+    {
+        return false;
+    }
+    size_t size = 0;
+    for (; iter != ccc_fdeq_end(fdeq); iter = ccc_fdeq_next(fdeq, iter), ++size)
+    {
+        if (size >= ccc_fdeq_size(fdeq))
+        {
+            return false;
+        }
+    }
+    if (size != ccc_fdeq_size(fdeq))
+    {
+        return false;
+    }
+    size = 0;
+    iter = ccc_fdeq_rbegin(fdeq);
+    if (ccc_buf_i(&fdeq->buf_, iter) != (ptrdiff_t)last_elem_index(fdeq))
+    {
+        return false;
+    }
+    for (; iter != ccc_fdeq_rend(fdeq);
+         iter = ccc_fdeq_rnext(fdeq, iter), ++size)
+    {
+        if (size >= ccc_fdeq_size(fdeq))
+        {
+            return false;
+        }
+    }
+    return size == ccc_fdeq_size(fdeq);
 }
 
 /*======================   Private Interface   ==============================*/

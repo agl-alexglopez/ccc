@@ -42,7 +42,7 @@ segment at compile time or runtime. */
 typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
 
 /** @name Initialization Interface
-Initialize the container with memory, callbacks, and permissions. */
+Initialize and create containers with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize the fdeq with memory and allocation permission.
@@ -55,6 +55,69 @@ Initialize the container with memory, callbacks, and permissions. */
 compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
 #define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
     ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+
+/** @brief Copy the fdeq from src to newly initialized dst.
+@param [in] dst the destination that will copy the source fdeq.
+@param [in] src the source of the fdeq.
+@param [in] fn the allocation function in case resizing of dst is needed.
+@return the result of the copy operation. If the destination capacity is less
+than the source capacity and no allocation function is provided an input error
+is returned. If resizing is required and resizing of dst fails a memory error
+is returned.
+@note dst must have capacity greater than or equal to src. If dst capacity is
+less than src, an allocation function must be provided with the fn argument.
+
+Note that there are two ways to copy data from source to destination: provide
+sufficient memory and pass NULL as fn, or allow the copy function to take care
+of allocation for the copy.
+
+Manual memory management with no allocation function provided.
+
+```
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+flat_double_ended_queue src = fdeq_init((int[10]){}, NULL, NULL, 10);
+int *new_mem = malloc(sizeof(int) * fdeq_capacity(&src));
+flat_double_ended_queue dst
+    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&src));
+ccc_result res = fdeq_copy(&dst, &src, NULL);
+```
+
+The above requires dst capacity be greater than or equal to src capacity. Here
+is memory management handed over to the copy function.
+
+```
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+flat_double_ended_queue src = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+(void)ccc_fdeq_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
+flat_double_ended_queue dst = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+ccc_result res = fdeq_copy(&dst, &src, std_alloc);
+```
+
+The above allows dst to have a capacity less than that of the src as long as
+copy has been provided an allocation function to resize dst. Note that this
+would still work if copying to a destination that the user wants as a fixed
+size fdeq (ring buffer).
+
+```
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+flat_double_ended_queue src = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+(void)ccc_fdeq_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
+flat_double_ended_queue dst = fdeq_init((int *)NULL, NULL, NULL, 0);
+ccc_result res = fdeq_copy(&dst, &src, std_alloc);
+```
+
+The above sets up dst as a ring buffer while src is a dynamic fdeq. Because an
+allocation function is provided, the dst is resized once for the copy and
+retains its fixed size after the copy is complete. This would require the user
+to manually free the underlying buffer at dst eventually if this method is used.
+Usually it is better to allocate the memory explicitly before the copy if
+copying between ring buffers.
+
+These optional allow users to stay consistent across containers with their
+memory management strategies. */
+ccc_result ccc_fdeq_copy(ccc_flat_double_ended_queue *dst,
+                         ccc_flat_double_ended_queue const *src,
+                         ccc_alloc_fn *fn);
 
 /**@}*/
 
@@ -319,6 +382,7 @@ fdeq container. Ensure no namespace collisions occur before name shortening. */
 #ifdef FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_init(args...) ccc_fdeq_init(args)
+#    define fdeq_copy(args...) ccc_fdeq_copy(args)
 #    define fdeq_emplace(args...) ccc_fdeq_emplace(args)
 #    define fdeq_push_back(args...) ccc_fdeq_push_back(args)
 #    define fdeq_push_back_range(args...) ccc_fdeq_push_back_range(args)
@@ -334,6 +398,7 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_clear(args...) ccc_fdeq_clear(args)
 #    define fdeq_clear_and_free(args...) ccc_fdeq_clear_and_free(args)
 #    define fdeq_at(args...) ccc_fdeq_at(args)
+#    define fdeq_data(args...) ccc_fdeq_data(args)
 #    define fdeq_begin(args...) ccc_fdeq_begin(args)
 #    define fdeq_rbegin(args...) ccc_fdeq_rbegin(args)
 #    define fdeq_next(args...) ccc_fdeq_next(args)
