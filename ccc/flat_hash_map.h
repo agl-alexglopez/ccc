@@ -180,6 +180,92 @@ cannot be resized or freed. */
     ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn, \
                              key_eq_fn, aux_data)
 
+/** @brief Copy the map at source to destination.
+@param [in] dst the initialized destination for the copy of the src map.
+@param [in] src the initialized source of the map.
+@return the result of the copy operation. If the destination capacity is less
+than the source capacity and no allocation function is provided an input error
+is returned. If resizing is required and resizing of dst fails a memory error
+is returned.
+@note dst must have capacity greater than or equal to src. If dst capacity is
+less than src, an allocation function must be provided with the fn argument.
+
+Note that there are two ways to copy data from source to destination: provide
+sufficient memory and pass NULL as fn, or allow the copy function to take care
+of allocation for the copy.
+
+Manual memory management with no allocation function provided.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+static flat_hash_map src
+    = fhm_static_init((static struct val[11]){}, key, e, fhmap_int_to_u64,
+                      fhmap_id_eq, NULL);
+insert_rand_vals(&src);
+static flat_hash_map dst
+    = fhm_static_init((static struct val[13]){}, key, e, fhmap_int_to_u64,
+                      fhmap_id_eq, NULL);
+ccc_result res = fhm_copy(&dst, &src, NULL);
+```
+
+The above requires dst capacity be greater than or equal to src capacity. Here
+is memory management handed over to the copy function.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+static flat_hash_map src = fhm_zero_init(
+    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+insert_rand_vals(&src);
+static flat_hash_map dst = fhm_zero_init(
+    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+ccc_result res = fhm_copy(&dst, &src, std_alloc);
+```
+
+The above allows dst to have a capacity less than that of the src as long as
+copy has been provided an allocation function to resize dst. Note that this
+would still work if copying to a destination that the user wants as a fixed
+size map.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+static flat_hash_map src = fhm_zero_init(
+    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+insert_rand_vals(&src);
+static flat_hash_map dst = fhm_zero_init(
+    struct val, key, e, NULL, fhmap_int_to_u64, fhmap_id_eq, NULL);
+ccc_result res = fhm_copy(&dst, &src, std_alloc);
+```
+
+The above sets up dst with fixed size while src is a dynamic map. Because an
+allocation function is provided, the dst is resized once for the copy and
+retains its fixed size after the copy is complete. This would require the user
+to manually free the underlying buffer at dst eventually if this method is used.
+Usually it is better to allocate the memory explicitly before the copy if
+copying between maps without allocation permission.
+
+These options allow users to stay consistent across containers with their
+memory management strategies. */
+ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
+                        ccc_alloc_fn *fn);
+
 /**@}*/
 
 /**@name Membership Interface
@@ -666,6 +752,7 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_init(args...) ccc_fhm_init(args)
 #    define fhm_static_init(args...) ccc_fhm_static_init(args)
 #    define fhm_zero_init(args...) ccc_fhm_zero_init(args)
+#    define fhm_copy(args...) ccc_fhm_copy(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
 #    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
 #    define fhm_insert_entry_w(args...) ccc_fhm_insert_entry_w(args)
@@ -695,6 +782,7 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_begin(args...) ccc_fhm_begin(args)
 #    define fhm_next(args...) ccc_fhm_next(args)
 #    define fhm_end(args...) ccc_fhm_end(args)
+#    define fhm_data(args...) ccc_fhm_data(args)
 #    define fhm_is_empty(args...) ccc_fhm_is_empty(args)
 #    define fhm_size(args...) ccc_fhm_size(args)
 #    define fhm_clear(args...) ccc_fhm_clear(args)
