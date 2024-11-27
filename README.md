@@ -710,7 +710,7 @@ main(void)
 - [Non-allocating container options](#non-allocating-containers).
 - [Compile time initialization](#compile-time-initialization).
 - [No `container_of` macro required of the user to get to their type after a function call](#no-container_of-macros).
-- [Rust's Entry API for associative containers with C and C++ influences](#rust's-entry-interface).
+- [Rust's Entry API for associative containers with C and C++ influences](#rusts-entry-interface).
     - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
 - [Container Traits implemented with C `_Generic` capabilities](#traits).
 
