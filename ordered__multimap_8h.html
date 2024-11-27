@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('ordered__multimap_8h.html',''); initRe
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">ordered_multimap.h File Reference</div></div>
 </div><!--header-->
@@ -126,12 +125,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="ordered__multimap_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab0a4874d3d0e1c089b8a11e37a3167f6">ccc_omm_init</a>(omm_name,  user_struct_name,  ommap_elem_field,  key_field,  alloc_fn,  key_cmp_fn,  aux)</td></tr>
-<tr class="memdesc:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a ordered multimap of the user specified type.  <br /></td></tr>
-<tr class="separator:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a2689cf9c610ca8b3a6b680ae2cf39a54"><td class="memItemLeft" align="right" valign="top">typedef union ccc_ordered_multimap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a></td></tr>
@@ -143,6 +136,13 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_ommap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></td></tr>
 <tr class="memdesc:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The container specific type to support the Entry Interface.  <br /></td></tr>
 <tr class="separator:a3b29c8dbbd10827d07c041fbfff7e2b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab0a4874d3d0e1c089b8a11e37a3167f6">ccc_omm_init</a>(omm_name,  user_struct_name,  ommap_elem_field,  key_field,  alloc_fn,  key_cmp_fn,  aux)</td></tr>
+<tr class="memdesc:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a ordered multimap of the user specified type.  <br /></td></tr>
+<tr class="separator:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>

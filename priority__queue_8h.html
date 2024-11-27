@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('priority__queue_8h.html',''); initResi
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">priority_queue.h File Reference</div></div>
 </div><!--header-->
@@ -125,12 +124,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="priority__queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a>(struct_name,  pq_elem_field,  pq_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime or compile time.  <br /></td></tr>
-<tr class="separator:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ae4003f166727edbb815d333c9c27972b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a></td></tr>
@@ -140,6 +133,13 @@ N) increase/decrease key.  <br /></td></tr>
 <tr class="memitem:a5438f40477e5a79f1055adb17b055b44"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a></td></tr>
 <tr class="memdesc:a5438f40477e5a79f1055adb17b055b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">The embedded struct type for operation of the priority queue.  <br /></td></tr>
 <tr class="separator:a5438f40477e5a79f1055adb17b055b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a>(struct_name,  pq_elem_field,  pq_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
+<tr class="memdesc:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime or compile time.  <br /></td></tr>
+<tr class="separator:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Insert and remove elements from the priority queue. </p>

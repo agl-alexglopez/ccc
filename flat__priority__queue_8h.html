@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('flat__priority__queue_8h.html',''); in
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_priority_queue.h File Reference</div></div>
 </div><!--header-->
@@ -127,24 +126,28 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__priority__queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>(mem_ptr,  capacity,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</td></tr>
-<tr class="memdesc:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fpq as a min or max heap.  <br /></td></tr>
-<tr class="separator:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fpq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></td></tr>
 <tr class="memdesc:a8ed534b783c08382f5e3cd0456a1d72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container offering direct storage and sorting of user data by heap order.  <br /></td></tr>
 <tr class="separator:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
-<tr><td class="ititle" colspan="2"><p>Insert or remove elements from the flat priority queue. </p>
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
+<tr class="memitem:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>(mem_ptr,  capacity,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</td></tr>
+<tr class="memdesc:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fpq as a min or max heap.  <br /></td></tr>
+<tr class="separator:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4ba72083dbab502b7392a44619f2f07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab4ba72083dbab502b7392a44619f2f07">ccc_fpq_heapify_init</a>(mem_ptr,  capacity,  size,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
 <tr class="memdesc:ab4ba72083dbab502b7392a44619f2f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order an existing array of elements as a min or max heap. O(N).  <br /></td></tr>
 <tr class="separator:ab4ba72083dbab502b7392a44619f2f07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0765c008f4ab6a8a59a0d5f8282a4572">ccc_fpq_copy</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *dst, <a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fpq from src to newly initialized dst.  <br /></td></tr>
+<tr class="separator:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Insert or remove elements from the flat priority queue. </p>
+</td></tr>
 <tr class="memitem:a1c8103699b633d1da090dd867b46d1ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a1c8103699b633d1da090dd867b46d1ec">ccc_fpq_emplace</a>(fpq,  val_initializer...)&#160;&#160;&#160;    ccc_impl_fpq_emplace(fpq, val_initializer)</td></tr>
 <tr class="memdesc:a1c8103699b633d1da090dd867b46d1ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a type directly to a priority queue slot. O(lgN).  <br /></td></tr>
 <tr class="separator:a1c8103699b633d1da090dd867b46d1ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,6 +207,12 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a604abe9e7144e462970f0b2ac8aaa818"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a604abe9e7144e462970f0b2ac8aaa818">ccc_fpq_size</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a604abe9e7144e462970f0b2ac8aaa818"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the fpq.  <br /></td></tr>
 <tr class="separator:a604abe9e7144e462970f0b2ac8aaa818"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fb1a7f6a119f88bce5af506ff95e652"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a5fb1a7f6a119f88bce5af506ff95e652">ccc_fpq_capacity</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memdesc:a5fb1a7f6a119f88bce5af506ff95e652"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the fpq.  <br /></td></tr>
+<tr class="separator:a5fb1a7f6a119f88bce5af506ff95e652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a005d37789d5cc821356252292cba646b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a005d37789d5cc821356252292cba646b">ccc_fpq_data</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memdesc:a005d37789d5cc821356252292cba646b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the base of the backing array. O(1).  <br /></td></tr>
+<tr class="separator:a005d37789d5cc821356252292cba646b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a630bf35ddbd3f1864a55f3e55777da22"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a630bf35ddbd3f1864a55f3e55777da22">ccc_fpq_validate</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a630bf35ddbd3f1864a55f3e55777da22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the internal invariants of the fpq hold.  <br /></td></tr>
 <tr class="separator:a630bf35ddbd3f1864a55f3e55777da22"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -617,6 +626,33 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
+<a id="a5fb1a7f6a119f88bce5af506ff95e652" name="a5fb1a7f6a119f88bce5af506ff95e652"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fb1a7f6a119f88bce5af506ff95e652">&#9670;&#160;</a></span>ccc_fpq_capacity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t ccc_fpq_capacity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>fpq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the capacity of the fpq. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the capacity of the fpq or 0 if fpq is NULL or fpq is empty. </dd></dl>
+
+</div>
+</div>
 <a id="a11a936861d17aa714b2ad105468c3a1a" name="a11a936861d17aa714b2ad105468c3a1a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a11a936861d17aa714b2ad105468c3a1a">&#9670;&#160;</a></span>ccc_fpq_clear()</h2>
 
@@ -694,6 +730,110 @@ Typedefs</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>OK if input is valid and clear succeeds, otherwise input error. If the buffer attempts to free but is not allowed a no alloc error is returned.</dd></dl>
 <p>Note that because the priority queue is flat there is no need to free elements stored in the fpq. However, the destructor is free to manage cleanup in other parts of user code as needed upon destruction of each element.</p>
 <p>If the destructor is NULL, the function is O(1) and only relies on the runtime of the provided allocation function free operation. </p>
+
+</div>
+</div>
+<a id="a0765c008f4ab6a8a59a0d5f8282a4572" name="a0765c008f4ab6a8a59a0d5f8282a4572"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0765c008f4ab6a8a59a0d5f8282a4572">&#9670;&#160;</a></span>ccc_fpq_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fpq_copy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy the fpq from src to newly initialized dst. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>the destination that will copy the source fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>the source of the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function in case resizing of dst is needed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of dst fails a memory error is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument.</dd></dl>
+<p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
+<p>Manual memory management with no allocation function provided.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_priority_queue src</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span>[10]){}, 10, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line">push_rand_ints(&amp;src);</div>
+<div class="line">flat_priority_queue dst</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span>[11]){}, 11, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:82</div></div>
+</div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_priority_queue src</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+<div class="line">push_rand_ints(&amp;src);</div>
+<div class="line">flat_priority_queue dst</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size fpq.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_priority_queue src</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+<div class="line">push_rand_ints(&amp;src);</div>
+<div class="line">flat_priority_queue dst</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic fpq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
+<p>These options allow users to stay consistent across containers with their memory management strategies. </p>
+
+</div>
+</div>
+<a id="a005d37789d5cc821356252292cba646b" name="a005d37789d5cc821356252292cba646b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a005d37789d5cc821356252292cba646b">&#9670;&#160;</a></span>ccc_fpq_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * ccc_fpq_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>fpq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a pointer to the base of the backing array. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the base of the backing array or NULL if fpq is NULL. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>this reference starts at index 0 of the backing array. All fpq elements are stored contiguously starting at the base through size of the fpq. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>it is the users responsibility to ensure that access to any data is within the capacity of the backing buffer. </dd></dl>
 
 </div>
 </div>

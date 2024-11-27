@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('flat__hash__map_8h.html',''); initResi
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_hash_map.h File Reference</div></div>
 </div><!--header-->
@@ -127,18 +126,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__hash__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:af26e0aac66a113372ffd845e7f3b5d5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af26e0aac66a113372ffd845e7f3b5d5f">ccc_fhm_init</a>(memory_ptr,  capacity,  key_field,  fhash_elem_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
-<tr class="memdesc:af26e0aac66a113372ffd845e7f3b5d5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a flat hash map from any buffer of user types at runtime.  <br /></td></tr>
-<tr class="separator:af26e0aac66a113372ffd845e7f3b5d5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a925565b52174e9ea4325c7bd3b3bbdaf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a925565b52174e9ea4325c7bd3b3bbdaf">ccc_fhm_zero_init</a>(type_name,  key_field,  fhash_elem_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
-<tr class="memdesc:a925565b52174e9ea4325c7bd3b3bbdaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a zero capacity table with allocation permission.  <br /></td></tr>
-<tr class="separator:a925565b52174e9ea4325c7bd3b3bbdaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55c28ee177e9d614a4036e98060e50c3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a55c28ee177e9d614a4036e98060e50c3">ccc_fhm_static_init</a>(memory_ptr,  key_field,  fhash_elem_field,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
-<tr class="memdesc:a55c28ee177e9d614a4036e98060e50c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">the initialization helper macro for a hash table. May be called at compile time only if the memory to which it points is of static storage duration and thus implicitly zero initialized.  <br /></td></tr>
-<tr class="separator:a55c28ee177e9d614a4036e98060e50c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></td></tr>
@@ -150,6 +137,22 @@ Typedefs</h2></td></tr>
 <tr class="memitem:aefcfb8e4e21401e417bac1f3921606b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fhmap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></td></tr>
 <tr class="memdesc:aefcfb8e4e21401e417bac1f3921606b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
 <tr class="separator:aefcfb8e4e21401e417bac1f3921606b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:af26e0aac66a113372ffd845e7f3b5d5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af26e0aac66a113372ffd845e7f3b5d5f">ccc_fhm_init</a>(memory_ptr,  capacity,  key_field,  fhash_elem_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
+<tr class="memdesc:af26e0aac66a113372ffd845e7f3b5d5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a flat hash map from any buffer of user types at runtime.  <br /></td></tr>
+<tr class="separator:af26e0aac66a113372ffd845e7f3b5d5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a925565b52174e9ea4325c7bd3b3bbdaf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a925565b52174e9ea4325c7bd3b3bbdaf">ccc_fhm_zero_init</a>(type_name,  key_field,  fhash_elem_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
+<tr class="memdesc:a925565b52174e9ea4325c7bd3b3bbdaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a zero capacity table with allocation permission.  <br /></td></tr>
+<tr class="separator:a925565b52174e9ea4325c7bd3b3bbdaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55c28ee177e9d614a4036e98060e50c3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a55c28ee177e9d614a4036e98060e50c3">ccc_fhm_static_init</a>(memory_ptr,  key_field,  fhash_elem_field,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
+<tr class="memdesc:a55c28ee177e9d614a4036e98060e50c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">the initialization helper macro for a hash table. May be called at compile time only if the memory to which it points is of static storage duration and thus implicitly zero initialized.  <br /></td></tr>
+<tr class="separator:a55c28ee177e9d614a4036e98060e50c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7940f9fa1e22af3e8090fca1d5ae4767">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
+<tr class="separator:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
@@ -278,6 +281,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:af55bfc47534f55c0c1ccddfc461a651d"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af55bfc47534f55c0c1ccddfc461a651d">ccc_fhm_capacity</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:af55bfc47534f55c0c1ccddfc461a651d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full capacity of the backing storage.  <br /></td></tr>
 <tr class="separator:af55bfc47534f55c0c1ccddfc461a651d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa2b797b90c223882d91781d56f3351e"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#afa2b797b90c223882d91781d56f3351e">ccc_fhm_data</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
+<tr class="memdesc:afa2b797b90c223882d91781d56f3351e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
+<tr class="separator:afa2b797b90c223882d91781d56f3351e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec9935488ddcd22310213b4da852dd3b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aec9935488ddcd22310213b4da852dd3b">ccc_fhm_validate</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:aec9935488ddcd22310213b4da852dd3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the hash table.  <br /></td></tr>
 <tr class="separator:aec9935488ddcd22310213b4da852dd3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -475,6 +481,7 @@ Typedefs</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#af26e0aac66a113372ffd845e7f3b5d5f" title="Initialize a flat hash map from any buffer of user types at runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>this version initialization can only operate at runtime and memory_ptr must not be a compound literal. It must be an existing l-value of user types allocated on the stack, heap, or data segment. For compound literal initialization, see <a class="el" href="flat__hash__map_8h.html#a55c28ee177e9d614a4036e98060e50c3" title="the initialization helper macro for a hash table. May be called at compile time only if the memory to...">ccc_fhm_static_init()</a>. </dd></dl>
 
 </div>
 </div>
@@ -1010,7 +1017,7 @@ Typedefs</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">type_name</td><td>the type being stored in the hash table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fhash_elem_field</td><td>the name of the fhmap_elem field. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for resizing or NULL if no resizing is allowed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for resizing. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hash_fn</td><td>the ccc_hash_fn function the user desires for the table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_eq_fn</td><td>the ccc_key_eq_fn the user intends to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>auxiliary data that is needed for hashing or comparison. </td></tr>
@@ -1352,6 +1359,128 @@ Typedefs</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the struct containing key is stored, false if not. </dd></dl>
+
+</div>
+</div>
+<a id="a7940f9fa1e22af3e8090fca1d5ae4767" name="a7940f9fa1e22af3e8090fca1d5ae4767"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7940f9fa1e22af3e8090fca1d5ae4767">&#9670;&#160;</a></span>ccc_fhm_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fhm_copy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy the map at source to destination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>the initialized destination for the copy of the src map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>the initialized source of the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of dst fails a memory error is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument.</dd></dl>
+<p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
+<p>Manual memory management with no allocation function provided.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fhmap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map src</div>
+<div class="line">    = fhm_static_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[11]){}, key, e, fhmap_int_to_u64,</div>
+<div class="line">                      fhmap_id_eq, NULL);</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
+<div class="line">    = fhm_static_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[13]){}, key, e, fhmap_int_to_u64,</div>
+<div class="line">                      fhmap_id_eq, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+</div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fhmap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map src = fhm_zero_init(</div>
+<div class="line">    <span class="keyword">struct</span> val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map dst = fhm_zero_init(</div>
+<div class="line">    <span class="keyword">struct</span> val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fhmap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map src = fhm_zero_init(</div>
+<div class="line">    <span class="keyword">struct</span> val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map dst = fhm_zero_init(</div>
+<div class="line">    <span class="keyword">struct</span> val, key, e, NULL, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between maps without allocation permission.</p>
+<p>These options allow users to stay consistent across containers with their memory management strategies. </p>
+
+</div>
+</div>
+<a id="afa2b797b90c223882d91781d56f3351e" name="afa2b797b90c223882d91781d56f3351e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa2b797b90c223882d91781d56f3351e">&#9670;&#160;</a></span>ccc_fhm_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * ccc_fhm_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *&#160;</td>
+          <td class="paramname"><em>h</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a reference to the base of backing array. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>a pointer to the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the base of the backing array. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>the reference is to the base of the backing array at index 0 with no consideration for the organization of map. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>it is the users responsibility to ensure that access to any data is within the capacity of the backing buffer. </dd></dl>
 
 </div>
 </div>

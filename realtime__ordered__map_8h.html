@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('realtime__ordered__map_8h.html',''); i
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">realtime_ordered_map.h File Reference</div></div>
 </div><!--header-->
@@ -125,12 +124,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="realtime__ordered__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a7dd816319f62ee38e5c1e265b2a15143"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143">ccc_rom_init</a>(rom_name,  struct_name,  rom_elem_field,  key_elem_field,  alloc_fn,  key_cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:a7dd816319f62ee38e5c1e265b2a15143"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the ordered map at runtime or compile time.  <br /></td></tr>
-<tr class="separator:a7dd816319f62ee38e5c1e265b2a15143"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:af95aa6d6e35234cabe7b3f7c4101175c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_romap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a></td></tr>
@@ -142,6 +135,13 @@ Typedefs</h2></td></tr>
 <tr class="memitem:aa12b57bbf811c5ceaddb04be774bf662"><td class="memItemLeft" align="right" valign="top">typedef union ccc_romap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a></td></tr>
 <tr class="memdesc:aa12b57bbf811c5ceaddb04be774bf662"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
 <tr class="separator:aa12b57bbf811c5ceaddb04be774bf662"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:a7dd816319f62ee38e5c1e265b2a15143"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143">ccc_rom_init</a>(rom_name,  struct_name,  rom_elem_field,  key_elem_field,  alloc_fn,  key_cmp_fn,  aux_data)</td></tr>
+<tr class="memdesc:a7dd816319f62ee38e5c1e265b2a15143"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the ordered map at runtime or compile time.  <br /></td></tr>
+<tr class="separator:a7dd816319f62ee38e5c1e265b2a15143"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>

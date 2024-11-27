@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('flat__ordered__map_8h.html',''); initR
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_ordered_map.h File Reference</div></div>
 </div><!--header-->
@@ -127,12 +126,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__ordered__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a5d7b831a2ac2a4e9097112cd31fa18b0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a5d7b831a2ac2a4e9097112cd31fa18b0">ccc_fom_init</a>(mem_ptr,  capacity,  om_elem_field,  key_elem_field,  alloc_fn,  key_cmp,  aux)</td></tr>
-<tr class="memdesc:a5d7b831a2ac2a4e9097112cd31fa18b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the map at runtime or compile time.  <br /></td></tr>
-<tr class="separator:a5d7b831a2ac2a4e9097112cd31fa18b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:abfd2eb75c909369155f447e525878983"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fomap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a></td></tr>
@@ -144,6 +137,16 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a0f6c79e32b5b75645a8d93af21291565"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fomap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a0f6c79e32b5b75645a8d93af21291565">ccc_fomap_entry</a></td></tr>
 <tr class="memdesc:a0f6c79e32b5b75645a8d93af21291565"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
 <tr class="separator:a0f6c79e32b5b75645a8d93af21291565"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:a5d7b831a2ac2a4e9097112cd31fa18b0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a5d7b831a2ac2a4e9097112cd31fa18b0">ccc_fom_init</a>(mem_ptr,  capacity,  om_elem_field,  key_elem_field,  alloc_fn,  key_cmp,  aux)</td></tr>
+<tr class="memdesc:a5d7b831a2ac2a4e9097112cd31fa18b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the map at runtime or compile time.  <br /></td></tr>
+<tr class="separator:a5d7b831a2ac2a4e9097112cd31fa18b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdf3d31b0bb3650e160c9354c7d4ccf3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#acdf3d31b0bb3650e160c9354c7d4ccf3">ccc_fom_copy</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> *dst, <a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:acdf3d31b0bb3650e160c9354c7d4ccf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
+<tr class="separator:acdf3d31b0bb3650e160c9354c7d4ccf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
@@ -268,9 +271,9 @@ Typedefs</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
 </td></tr>
-<tr class="memitem:ad759f7883574f146925cb85d575718cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#ad759f7883574f146925cb85d575718cf">ccc_fom_clear</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> *fom, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:ad759f7883574f146925cb85d575718cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map for use without affecting capacity.  <br /></td></tr>
-<tr class="separator:ad759f7883574f146925cb85d575718cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a91637f760e68c2cfe2bce8b34a0b34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a8a91637f760e68c2cfe2bce8b34a0b34">ccc_fom_clear</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> *fom, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:a8a91637f760e68c2cfe2bce8b34a0b34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map for use without affecting capacity.  <br /></td></tr>
+<tr class="separator:a8a91637f760e68c2cfe2bce8b34a0b34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a961da38d38fc28af2ffe5f4ceb0d0158"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a961da38d38fc28af2ffe5f4ceb0d0158">ccc_fom_clear_and_free</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> *fom, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a961da38d38fc28af2ffe5f4ceb0d0158"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map and frees the underlying buffer.  <br /></td></tr>
 <tr class="separator:a961da38d38fc28af2ffe5f4ceb0d0158"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -281,6 +284,12 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a6453906093f3e19eb6b198d8c92016b5"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a6453906093f3e19eb6b198d8c92016b5">ccc_fom_size</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *fom)</td></tr>
 <tr class="memdesc:a6453906093f3e19eb6b198d8c92016b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
 <tr class="separator:a6453906093f3e19eb6b198d8c92016b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a639913000f1b180745ac118b5f9bba2c"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a639913000f1b180745ac118b5f9bba2c">ccc_fom_capacity</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *fom)</td></tr>
+<tr class="memdesc:a639913000f1b180745ac118b5f9bba2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the map.  <br /></td></tr>
+<tr class="separator:a639913000f1b180745ac118b5f9bba2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad17c6f695dcc32aeb46e9ce57d7df53c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#ad17c6f695dcc32aeb46e9ce57d7df53c">ccc_fom_data</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *fom)</td></tr>
+<tr class="memdesc:ad17c6f695dcc32aeb46e9ce57d7df53c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
+<tr class="separator:ad17c6f695dcc32aeb46e9ce57d7df53c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3478165731cf59b2aa022e27a0d09236"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__ordered__map_8h.html#a3478165731cf59b2aa022e27a0d09236">ccc_fom_is_empty</a> (<a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *fom)</td></tr>
 <tr class="memdesc:a3478165731cf59b2aa022e27a0d09236"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
 <tr class="separator:a3478165731cf59b2aa022e27a0d09236"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1069,14 +1078,41 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
-<a id="ad759f7883574f146925cb85d575718cf" name="ad759f7883574f146925cb85d575718cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad759f7883574f146925cb85d575718cf">&#9670;&#160;</a></span>ccc_fom_clear()</h2>
+<a id="a639913000f1b180745ac118b5f9bba2c" name="a639913000f1b180745ac118b5f9bba2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a639913000f1b180745ac118b5f9bba2c">&#9670;&#160;</a></span>ccc_fom_capacity()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ccc_fom_clear </td>
+          <td class="memname">size_t ccc_fom_capacity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *&#160;</td>
+          <td class="paramname"><em>fom</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the capacity of the map. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fom</td><td>the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size_t capacity. </dd></dl>
+
+</div>
+</div>
+<a id="a8a91637f760e68c2cfe2bce8b34a0b34" name="a8a91637f760e68c2cfe2bce8b34a0b34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a91637f760e68c2cfe2bce8b34a0b34">&#9670;&#160;</a></span>ccc_fom_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fom_clear </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> *&#160;</td>
           <td class="paramname"><em>fom</em>, </td>
@@ -1181,6 +1217,127 @@ Typedefs</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the struct containing key is stored, false if not. </dd></dl>
+
+</div>
+</div>
+<a id="acdf3d31b0bb3650e160c9354c7d4ccf3" name="acdf3d31b0bb3650e160c9354c7d4ccf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdf3d31b0bb3650e160c9354c7d4ccf3">&#9670;&#160;</a></span>ccc_fom_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fom_copy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy the map at source to destination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>the initialized destination for the copy of the src map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>the initialized source of the map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to resize dst or NULL. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of dst fails a memory error is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument.</dd></dl>
+<p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
+<p>Manual memory management with no allocation function provided.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fomap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_ordered_map src</div>
+<div class="line">    = fom_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[11]){}, 11, e, key, NULL, key_cmp, NULL);</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> flat_ordered_map dst</div>
+<div class="line">    = fom_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[13]){}, 13, e, key, NULL, key_cmp, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fom_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+</div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fomap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_ordered_map src</div>
+<div class="line">    = fom_init((<span class="keyword">struct</span> val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> flat_ordered_map dst</div>
+<div class="line">    = fom_init((<span class="keyword">struct</span> val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fom_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fomap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_ordered_map src</div>
+<div class="line">    = fom_init((<span class="keyword">struct</span> val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> flat_ordered_map dst</div>
+<div class="line">    = fom_init((<span class="keyword">struct</span> val *)NULL, 0, e, key, NULL, key_cmp, NULL);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fom_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between maps without allocation permission.</p>
+<p>These options allow users to stay consistent across containers with their memory management strategies. </p>
+
+</div>
+</div>
+<a id="ad17c6f695dcc32aeb46e9ce57d7df53c" name="ad17c6f695dcc32aeb46e9ce57d7df53c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad17c6f695dcc32aeb46e9ce57d7df53c">&#9670;&#160;</a></span>ccc_fom_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * ccc_fom_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__ordered__map_8h.html#abfd2eb75c909369155f447e525878983">ccc_flat_ordered_map</a> const *&#160;</td>
+          <td class="paramname"><em>fom</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a reference to the base of backing array. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fom</td><td>a pointer to the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the base of the backing array. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>the reference is to the base of the backing array at index 0 with no consideration for the organization of map. However, all nodes of the map are guaranteed to be stored contiguously starting at index 1. Index 0 is reserved for the sentinel node. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>it is the users responsibility to ensure that access to any data is within the capacity of the backing buffer. </dd></dl>
 
 </div>
 </div>

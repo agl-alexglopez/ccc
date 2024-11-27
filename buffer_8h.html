@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('buffer_8h.html',''); initResizable(); 
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">buffer.h File Reference</div></div>
 </div><!--header-->
@@ -135,17 +134,18 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="buffer_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a66b89d47e24996c7be07dea5d827e649"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
-<tr class="memdesc:a66b89d47e24996c7be07dea5d827e649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size.  <br /></td></tr>
-<tr class="separator:a66b89d47e24996c7be07dea5d827e649"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a7d8dfe1437e87b31e7f5522d85080aba"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_buf_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></td></tr>
 <tr class="memdesc:a7d8dfe1437e87b31e7f5522d85080aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous block of storage for elements of the same type.  <br /></td></tr>
 <tr class="separator:a7d8dfe1437e87b31e7f5522d85080aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:a66b89d47e24996c7be07dea5d827e649"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
+<tr class="memdesc:a66b89d47e24996c7be07dea5d827e649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size.  <br /></td></tr>
+<tr class="separator:a66b89d47e24996c7be07dea5d827e649"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>

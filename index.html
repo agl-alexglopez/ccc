@@ -795,10 +795,13 @@ Features</h1>
 <ul>
 <li>Intrusive and non-intrusive containers.</li>
 <li>Non-allocating container options.</li>
-<li>No <code>container_of</code> macro required of the user to get to their type after a function call.</li>
-<li>Rust's Entry API for associative containers with C and C++ influences.</li>
+<li>Compile time initialization.</li>
+<li>No `container_of` macro required of the user to get to their type after a function call.</li>
+<li>Rust's Entry API for associative containers with C and C++ influences.<ul>
 <li>Opt-in macros for more succinct insertion and in place modifications (see "closures" in the <a href="https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html">and_modify_w</a> interface for associative containers).</li>
-<li>Container Traits implemented with C <code>_Generic</code> capabilities.</li>
+</ul>
+</li>
+<li>Container Traits implemented with C `_Generic` capabilities.</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md5"></a>
 Intrusive and Non-Intrusive Containers</h2>
@@ -824,7 +827,7 @@ Intrusive and Non-Intrusive Containers</h2>
 <div class="line"><a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> fpq</div>
 <div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span>[40]){}, 40, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
 <div class="ttc" id="aflat__priority__queue_8h_html_a8ed534b783c08382f5e3cd0456a1d72c"><div class="ttname"><a href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></div><div class="ttdeci">struct ccc_fpq_ ccc_flat_priority_queue</div><div class="ttdoc">A container offering direct storage and sorting of user data by heap order.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:33</div></div>
-<div class="ttc" id="aflat__priority__queue_8h_html_aef56a4bcfd5a33aeb767c177d43c51bf"><div class="ttname"><a href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a></div><div class="ttdeci">#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a fpq as a min or max heap.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:48</div></div>
+<div class="ttc" id="aflat__priority__queue_8h_html_aef56a4bcfd5a33aeb767c177d43c51bf"><div class="ttname"><a href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a></div><div class="ttdeci">#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a fpq as a min or max heap.</div><div class="ttdef"><b>Definition:</b> flat_priority_queue.h:52</div></div>
 </div><!-- fragment --><p>Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see allocation for more on allocation permission).</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> fpq</div>
 <div class="line">    = <a class="code hl_define" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
@@ -848,7 +851,7 @@ Non-Allocating Containers</h2>
 <div class="line"> </div>
 <div class="line"><a class="code hl_typedef" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> dll</div>
 <div class="line">    = <a class="code hl_define" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(dll, <span class="keyword">struct</span> id_val, e, NULL, val_cmp, NULL);</div>
-<div class="ttc" id="adoubly__linked__list_8h_html_a50ff4422f52bc1a5c2c926dc88a01e3e"><div class="ttname"><a href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a></div><div class="ttdeci">#define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a doubly linked list with its l-value name, type containing the dll elems,...</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:67</div></div>
+<div class="ttc" id="adoubly__linked__list_8h_html_a50ff4422f52bc1a5c2c926dc88a01e3e"><div class="ttname"><a href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a></div><div class="ttdeci">#define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn, cmp_fn, aux_data)</div><div class="ttdoc">Initialize a doubly linked list with its l-value name, type containing the dll elems,...</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:71</div></div>
 <div class="ttc" id="adoubly__linked__list_8h_html_aaceb2c981b30f064750203fcb938e774"><div class="ttname"><a href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a></div><div class="ttdeci">struct ccc_dll_ ccc_doubly_linked_list</div><div class="ttdoc">A container offering bidirectional, insert, removal, and iteration.</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:41</div></div>
 <div class="ttc" id="adoubly__linked__list_8h_html_ae6ab05fc0a5ac5f5d8ff31103209edf0"><div class="ttname"><a href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a></div><div class="ttdeci">struct ccc_dll_elem_ ccc_dll_elem</div><div class="ttdoc">A doubly linked list intrusive element to embedded in a user type.</div><div class="ttdef"><b>Definition:</b> doubly_linked_list.h:51</div></div>
 </div><!-- fragment --><p>All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs.</p>
@@ -867,6 +870,36 @@ Non-Allocating Containers</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p>Here, the container pushes stack allocated structs directly into the list. The container has not been given allocation permission so it assumes the memory it is given has the appropriate lifetime for the programmer's needs. When this function ends, that memory is invalid because its scope and lifetime has ended. Using <code>malloc</code> in this case would be the traditional approach, but there are a variety of ways a programmer can control scope and lifetime. This library does not prescribe any specific strategy to managing memory when allocation is prohibited. For example compositions of allocating and non-allocating containers, see the <code>samples/</code>.</p>
 <h2><a class="anchor" id="autotoc_md7"></a>
+Compile Time Initialization</h2>
+<p>Because the user may choose the source of memory for a container, initialization at compile time is possible for all containers.</p>
+<p>A flat hash map may be initialized at compile time with memory of static storage duration if the maximum size of the map is known.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fhmap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map val_map</div>
+<div class="line">    = fhm_static_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[2999]){}, key, e, fhmap_int_to_u64,</div>
+<div class="line">                      fhmap_id_eq, NULL);</div>
+</div><!-- fragment --><p>A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see allocation for more on <code>std_alloc</code>).</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    fhmap_elem e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map val_map = fhm_zero_init(</div>
+<div class="line">    <span class="keyword">struct</span> val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+</div><!-- fragment --><p>All other containers provide default initialization macros can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> ring_buffer</div>
+<div class="line">    = <a class="code hl_define" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>((<span class="keyword">static</span> <span class="keywordtype">int</span>[4096]){}, NULL, NULL, 4096);</div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a0b47511ed59d60a9e66bdb2fee438eb0"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></div><div class="ttdeci">struct ccc_fdeq_ ccc_flat_double_ended_queue</div><div class="ttdoc">A contiguous buffer for O(1) push and pop from front and back.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:42</div></div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a5f6c51ae30c8f0cae6e1b05466008784"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a></div><div class="ttdeci">#define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)</div><div class="ttdoc">Initialize the fdeq with memory and allocation permission.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:56</div></div>
+</div><!-- fragment --><p>In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.</p>
+<h2><a class="anchor" id="autotoc_md8"></a>
 No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <p>Traditionally, intrusive containers provide the following macro.</p>
 <div class="fragment"><div class="line"> </div>
@@ -956,7 +989,7 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <div class="line">}</div>
 <div class="line"><span class="comment">/* ... Rebuild Shortest Path etc... */</span></div>
 </div><!-- fragment --><p>One conceptual element, a <code>dijkstra_vertex</code>, is part of two containers, a map and a priority queue. The priority queue piggy backs of the memory controlled by the map so that we always have access to all vertices while the algorithm runs. An already complex algorithm is not cluttered by further steps to accommodate macros.</p>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md9"></a>
 Rust's Entry Interface</h2>
 <p>Rust has solid interfaces for associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code> but specific names, behaviors, and parameters can be read in each container's header).</p>
 <ul>
@@ -991,7 +1024,7 @@ Rust's Entry Interface</h2>
 <li><code><a class="el" href="traits_8h.html#af535d3d2b63e8c68efb85e5c54bb0f77" title="Insert an element or overwrite the Occupied entry.">ccc_insert_or_assign(container_ptr, insert_or_assign_args)</a></code> - Inserts a new element invariantly and reports if a previous entry existed.</li>
 </ul>
 <p>Many other containers fall back to C++ style interfaces when it makes sense to do so.</p>
-<h3><a class="anchor" id="autotoc_md9"></a>
+<h3><a class="anchor" id="autotoc_md10"></a>
 Lazy Evaluation</h3>
 <p>Many of the above functions come with an optional macro variant. For example, the <code>or_insert</code> function for associative containers will come with an <code>or_insert_w</code> variant, short for or insert "with." The word "with" in this context means a direct r-value.</p>
 <p>Here is an example for generating a maze with Prim's algorithm in the <code>samples/maze.c</code> sample.</p>
@@ -1027,7 +1060,7 @@ Lazy Evaluation</h3>
 <div class="line"><a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> *e = om_try_insert_w(&amp;om, 3, val(1));</div>
 </div><!-- fragment --><p>This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions <code>try_insert_w</code> and <code>insert_or_assign_w</code> will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.</p>
 <p>The lazy evaluation of the <code>_w</code> family of functions offer an expressive way to write C code when needed. See each container's header for more.</p>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="autotoc_md11"></a>
 Traits</h2>
 <p>Traits, found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code>, offer a more succinct way to use shared functionality across containers. Instead of calling <code>ccc_fhm_entry</code> when trying to obtain an entry from a flat hash map, one can simply call <code>entry</code>. Traits utilize <code>_Generic</code> in C to choose the correct container function based on parameters provided.</p>
 <p>Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.</p>
@@ -1053,7 +1086,7 @@ Traits</h2>
 <div class="line">e = and_modify(e, increment)</div>
 <div class="line">word *w = or_insert(e, &amp;<span class="keywordflow">default</span>.e);</div>
 </div><!-- fragment --><p>Using the first method in your code may expand the code evaluated in different <code>_Generic</code> cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">traits.h</a></code> header.</p>
-<h1><a class="anchor" id="autotoc_md11"></a>
+<h1><a class="anchor" id="autotoc_md12"></a>
 Allocation</h1>
 <p>When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">void</span> *<a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(<span class="keywordtype">void</span> *ptr, <span class="keywordtype">size_t</span> size, <span class="keywordtype">void</span> *aux);</div>
@@ -1086,13 +1119,13 @@ Allocation</h1>
 <div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.</p>
-<h2><a class="anchor" id="autotoc_md12"></a>
+<h2><a class="anchor" id="autotoc_md13"></a>
 Constructors</h2>
 <p>Another concern for the programmer related to allocation may be constructors and destructors, a C++ shaped peg for a C shaped hole. In general, this library has some limited support for destruction but does not provide an interface for direct constructors as C++ would define them; though this may change.</p>
 <p>Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *insert(container *c, container_elem *e);</div>
 </div><!-- fragment --><p>Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.</p>
-<h2><a class="anchor" id="autotoc_md13"></a>
+<h2><a class="anchor" id="autotoc_md14"></a>
 Destructors</h2>
 <p>For destructors, the argument is similar but the container does offer more help. If an action other than freeing the memory of a user type is needed upon removal, there are options in an interface to obtain the element to be removed. Associative containers offer functions that can obtain entries (similar to Rust's Entry API). This reference can then be examined and complex destructor actions can occur before removal. Other containers like lists or priority queues offer references to an element of interest such as front, back, max, min, etc. These can all allow destructor-like actions before removal. One exception is the following interfaces.</p>
 <p>The clear function works for pointer stable containers and flat containers.</p>
@@ -1100,7 +1133,7 @@ Destructors</h2>
 </div><!-- fragment --><p>The clear and free function works for flat containers.</p>
 <div class="fragment"><div class="line">result clear_and_free(container *c, destructor_fn *fn);</div>
 </div><!-- fragment --><p>The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.</p>
-<h1><a class="anchor" id="autotoc_md14"></a>
+<h1><a class="anchor" id="autotoc_md15"></a>
 Samples</h1>
 <p>For examples of what code that uses these ideas looks like, read and use the sample programs in the <code>samples/</code>. I try to only add non-trivial samples that do something mildly interesting to give a good idea of how to take advantage of this flexible memory philosophy.</p>
 <p>The samples are not included in the release. To build them, clone the repository. Usage instructions should be available with the <code>-h</code> flag to any program or at the top of the file.</p>
@@ -1110,7 +1143,7 @@ Samples</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">./build/bin/[SAMPLE] [SAMPLE CLI ARGS]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md15"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
 Tests</h1>
 <p>The tests also include various use cases that may be of interest. Tests are not included in the release. Clone the repository.</p>
 <p>Clang.</p>
@@ -1119,7 +1152,7 @@ Tests</h1>
 </div><!-- fragment --><p>GCC.</p>
 <div class="fragment"><div class="line">make all-gcc-rel</div>
 <div class="line">make rtest</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md17"></a>
 Miscellaneous Why?</h1>
 <ul>
 <li>Why are non-allocating containers needed? They are quite common in Operating Systems development. Kernel code may manage a process or thread that is part of many OS subsystems: the CPU scheduler, the virtual memory paging system, the child and parent process spawn and wait mechanisms. All of these systems require that the process use or be a part of some data structures. It is easiest to separate participation in these data structures from memory allocation. The process holds handles to intrusive elements to participate in these data structures because the thread/task/process will live until it has finished executing meaning its lifetime is greater than or equal to the longest lifetime data structure of which it is a part. Embedded developers also often seem interested in non-allocating containers when an entire program's memory use is known before execution begins. However, this library explores if non-allocating containers can have more general applications for creative C programming.</li>
@@ -1131,7 +1164,7 @@ Miscellaneous Why?</h1>
 <li>Why not a better hash map? Haven't gotten to it yet. This container has the most room for improvement. There are many exciting recent developments in hash tables that can be built upon to improve this container.</li>
 <li>Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md18"></a>
 Related</h1>
 <p>If these containers do not fit your needs, here are some excellent data structure libraries I have found for C. They are clever, fast, and elegant, taking care of all memory management for you.</p>
 <ul>

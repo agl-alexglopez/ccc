@@ -31,28 +31,29 @@ var NAVTREE =
     [ "Features", "index.html#autotoc_md4", [
       [ "Intrusive and Non-Intrusive Containers", "index.html#autotoc_md5", null ],
       [ "Non-Allocating Containers", "index.html#autotoc_md6", null ],
-      [ "No <tt>container_of</tt> Macros", "index.html#autotoc_md7", null ],
-      [ "Rust's Entry Interface", "index.html#autotoc_md8", [
-        [ "Lazy Evaluation", "index.html#autotoc_md9", null ]
+      [ "Compile Time Initialization", "index.html#autotoc_md7", null ],
+      [ "No <tt>container_of</tt> Macros", "index.html#autotoc_md8", null ],
+      [ "Rust's Entry Interface", "index.html#autotoc_md9", [
+        [ "Lazy Evaluation", "index.html#autotoc_md10", null ]
       ] ],
-      [ "Traits", "index.html#autotoc_md10", null ]
+      [ "Traits", "index.html#autotoc_md11", null ]
     ] ],
-    [ "Allocation", "index.html#autotoc_md11", [
-      [ "Constructors", "index.html#autotoc_md12", null ],
-      [ "Destructors", "index.html#autotoc_md13", null ]
+    [ "Allocation", "index.html#autotoc_md12", [
+      [ "Constructors", "index.html#autotoc_md13", null ],
+      [ "Destructors", "index.html#autotoc_md14", null ]
     ] ],
-    [ "Samples", "index.html#autotoc_md14", null ],
-    [ "Tests", "index.html#autotoc_md15", null ],
-    [ "Miscellaneous Why?", "index.html#autotoc_md16", null ],
-    [ "Related", "index.html#autotoc_md17", null ],
+    [ "Samples", "index.html#autotoc_md15", null ],
+    [ "Tests", "index.html#autotoc_md16", null ],
+    [ "Miscellaneous Why?", "index.html#autotoc_md17", null ],
+    [ "Related", "index.html#autotoc_md18", null ],
     [ "Building and Installation", "md_INSTALL.html", [
-      [ "Fetch Content Install", "md_INSTALL.html#autotoc_md19", null ],
-      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md20", [
-        [ "Include the Library", "md_INSTALL.html#autotoc_md21", null ],
-        [ "Without Make", "md_INSTALL.html#autotoc_md22", null ],
-        [ "User Presets", "md_INSTALL.html#autotoc_md23", null ]
+      [ "Fetch Content Install", "md_INSTALL.html#autotoc_md20", null ],
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md21", [
+        [ "Include the Library", "md_INSTALL.html#autotoc_md22", null ],
+        [ "Without Make", "md_INSTALL.html#autotoc_md23", null ],
+        [ "User Presets", "md_INSTALL.html#autotoc_md24", null ]
       ] ],
-      [ "Generate Documentation", "md_INSTALL.html#autotoc_md24", null ]
+      [ "Generate Documentation", "md_INSTALL.html#autotoc_md25", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -79,8 +80,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"flat__realtime__ordered__map_8h.html#adc5ce17bf98d8f106c31d04a437115fd",
-"singly__linked__list_8h_source.html"
+"flat__realtime__ordered__map_8h.html#a86f366e1170e53c3d0f69c3bc29ad2c2",
+"singly__linked__list_8h.html#a792d38a075b9f51c29886193fea53f8f"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

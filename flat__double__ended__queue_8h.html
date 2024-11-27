@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('flat__double__ended__queue_8h.html',''
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_double_ended_queue.h File Reference</div></div>
 </div><!--header-->
@@ -127,17 +126,21 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__double__ended__queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)</td></tr>
-<tr class="memdesc:a5f6c51ae30c8f0cae6e1b05466008784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the fdeq with memory and allocation permission.  <br /></td></tr>
-<tr class="separator:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fdeq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></td></tr>
 <tr class="memdesc:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous buffer for O(1) push and pop from front and back.  <br /></td></tr>
 <tr class="separator:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
+<tr class="memdesc:a5f6c51ae30c8f0cae6e1b05466008784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the fdeq with memory and allocation permission.  <br /></td></tr>
+<tr class="separator:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7164375cce93f29179ed077fb7ede7db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a7164375cce93f29179ed077fb7ede7db">ccc_fdeq_copy</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *dst, <a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a7164375cce93f29179ed077fb7ede7db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fdeq from src to newly initialized dst.  <br /></td></tr>
+<tr class="separator:a7164375cce93f29179ed077fb7ede7db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Add or remove elements from the FDEQ. </p>
@@ -216,6 +219,12 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a0b7f79aa1f843a86074c16904a554aa3"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a0b7f79aa1f843a86074c16904a554aa3">ccc_fdeq_size</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:a0b7f79aa1f843a86074c16904a554aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the fdeq. O(1).  <br /></td></tr>
 <tr class="separator:a0b7f79aa1f843a86074c16904a554aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf3edec85610bbe6b39ea2069ada7466"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#acf3edec85610bbe6b39ea2069ada7466">ccc_fdeq_capacity</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
+<tr class="memdesc:acf3edec85610bbe6b39ea2069ada7466"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity of the fdeq. O(1).  <br /></td></tr>
+<tr class="separator:acf3edec85610bbe6b39ea2069ada7466"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab49f9096ecd1127d3f8501613ab45602"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ab49f9096ecd1127d3f8501613ab45602">ccc_fdeq_data</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
+<tr class="memdesc:ab49f9096ecd1127d3f8501613ab45602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
+<tr class="separator:ab49f9096ecd1127d3f8501613ab45602"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f29d7c972b62fb12e52611aeded5062"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a3f29d7c972b62fb12e52611aeded5062">ccc_fdeq_validate</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:a3f29d7c972b62fb12e52611aeded5062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the internal invariants of the fdeq.  <br /></td></tr>
 <tr class="separator:a3f29d7c972b62fb12e52611aeded5062"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -344,14 +353,11 @@ Typedefs</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    (<a class="code hl_typedef" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a>) ccc_impl_fdeq_init(                          \</div>
-<div class="line">        mem_ptr, alloc_fn, aux_data, capacity, optional_size)</div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a0b47511ed59d60a9e66bdb2fee438eb0"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></div><div class="ttdeci">struct ccc_fdeq_ ccc_flat_double_ended_queue</div><div class="ttdoc">A contiguous buffer for O(1) push and pop from front and back.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:42</div></div>
-</div><!-- fragment -->
+
 <p>Initialize the fdeq with memory and allocation permission. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -480,6 +486,33 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
+<a id="acf3edec85610bbe6b39ea2069ada7466" name="acf3edec85610bbe6b39ea2069ada7466"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf3edec85610bbe6b39ea2069ada7466">&#9670;&#160;</a></span>ccc_fdeq_capacity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t ccc_fdeq_capacity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the capacity of the fdeq. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the capacity of the fdeq or 0 if fdeq is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="a1b352898bcc66874d9808fd58e4dab5b" name="a1b352898bcc66874d9808fd58e4dab5b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b352898bcc66874d9808fd58e4dab5b">&#9670;&#160;</a></span>ccc_fdeq_clear()</h2>
 
@@ -553,6 +586,106 @@ Typedefs</h2></td></tr>
   </dd>
 </dl>
 <p>Note that if destructor is non-NULL it will be called on each element in the fdeq. After all elements are processed the buffer is freed and capacity is 0. If destructor is NULL the buffer is freed directly and capacity is 0. </p>
+
+</div>
+</div>
+<a id="a7164375cce93f29179ed077fb7ede7db" name="a7164375cce93f29179ed077fb7ede7db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7164375cce93f29179ed077fb7ede7db">&#9670;&#160;</a></span>ccc_fdeq_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_copy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy the fdeq from src to newly initialized dst. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>the destination that will copy the source fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>the source of the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function in case resizing of dst is needed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of dst fails a memory error is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument.</dd></dl>
+<p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
+<p>Manual memory management with no allocation function provided.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span>[10]){}, NULL, NULL, 10);</div>
+<div class="line"><span class="keywordtype">int</span> *new_mem = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * fdeq_capacity(&amp;src));</div>
+<div class="line">flat_double_ended_queue dst</div>
+<div class="line">    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&amp;src));</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+</div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
+<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
+<div class="line">flat_double_ended_queue dst = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a2d8c8988041f24a63d46defee8db29bd"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a></div><div class="ttdeci">ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq, size_t n, void const *elems)</div><div class="ttdoc">Push the range of user types to the back of the fdeq. O(N).</div></div>
+</div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size fdeq (ring buffer).</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
+<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
+<div class="line">flat_double_ended_queue dst = fdeq_init((<span class="keywordtype">int</span> *)NULL, NULL, NULL, 0);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
+</div><!-- fragment --><p>The above sets up dst as a ring buffer while src is a dynamic fdeq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
+<p>These options allow users to stay consistent across containers with their memory management strategies. </p>
+
+</div>
+</div>
+<a id="ab49f9096ecd1127d3f8501613ab45602" name="ab49f9096ecd1127d3f8501613ab45602"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab49f9096ecd1127d3f8501613ab45602">&#9670;&#160;</a></span>ccc_fdeq_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * ccc_fdeq_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a reference to the base of backing array. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the base of the backing array. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>the reference is to the base of the backing array at index 0 with no consideration to where the front index of the fdeq may be. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>it is the users responsibility to ensure that access to any data is within the capacity of the backing buffer.</dd></dl>
+<p>This method is exposed for serialization or writing purposes but the base of the array may not point to valid data in terms of organization of the fdeq. </p>
 
 </div>
 </div>

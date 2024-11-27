@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('ordered__map_8h.html',''); initResizab
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">ordered_map.h File Reference</div></div>
 </div><!--header-->
@@ -126,12 +125,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="ordered__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a336a7a16e6d316294fe1756c6f40bd99"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a336a7a16e6d316294fe1756c6f40bd99">ccc_om_init</a>(om_name,  struct_name,  om_elem_field,  key_elem_field,  alloc_fn,  key_cmp,  aux)</td></tr>
-<tr class="memdesc:a336a7a16e6d316294fe1756c6f40bd99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the ordered map at runtime or compile time.  <br /></td></tr>
-<tr class="separator:a336a7a16e6d316294fe1756c6f40bd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a9bd4fb695dfba3a125802323f8b64a34"><td class="memItemLeft" align="right" valign="top">typedef union ccc_ordered_map_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a></td></tr>
@@ -143,6 +136,13 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a04fb5474a27fed7faace243a60b76224"><td class="memItemLeft" align="right" valign="top">typedef union ccc_omap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></td></tr>
 <tr class="memdesc:a04fb5474a27fed7faace243a60b76224"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
 <tr class="separator:a04fb5474a27fed7faace243a60b76224"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+</td></tr>
+<tr class="memitem:a336a7a16e6d316294fe1756c6f40bd99"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a336a7a16e6d316294fe1756c6f40bd99">ccc_om_init</a>(om_name,  struct_name,  om_elem_field,  key_elem_field,  alloc_fn,  key_cmp,  aux)</td></tr>
+<tr class="memdesc:a336a7a16e6d316294fe1756c6f40bd99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the ordered map at runtime or compile time.  <br /></td></tr>
+<tr class="separator:a336a7a16e6d316294fe1756c6f40bd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
