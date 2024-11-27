@@ -706,12 +706,13 @@ main(void)
 
 ## Features
 
-- Intrusive and non-intrusive containers.
-- Non-allocating container options.
-- No `container_of` macro required of the user to get to their type after a function call.
-- Rust's Entry API for associative containers with C and C++ influences.
-- Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
-- Container Traits implemented with C `_Generic` capabilities.
+- [Intrusive and non-intrusive containers](#intrusive-and-non-intrusive-containers).
+- [Non-allocating container options](#non-allocating-container-options).
+- [Compile time initialization](#compile-time-initialization).
+- [No `container_of` macro required of the user to get to their type after a function call](#no-container_of-macros).
+- [Rust's Entry API for associative containers with C and C++ influences](#rust's-entry-interface).
+    - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
+- [Container Traits implemented with C `_Generic` capabilities](#traits).
 
 ### Intrusive and Non-Intrusive Containers
 
@@ -807,6 +808,49 @@ void push_three(ccc_doubly_linked_list *const dll)
 ```
 
 Here, the container pushes stack allocated structs directly into the list. The container has not been given allocation permission so it assumes the memory it is given has the appropriate lifetime for the programmer's needs. When this function ends, that memory is invalid because its scope and lifetime has ended. Using `malloc` in this case would be the traditional approach, but there are a variety of ways a programmer can control scope and lifetime. This library does not prescribe any specific strategy to managing memory when allocation is prohibited. For example compositions of allocating and non-allocating containers, see the `samples/`.
+
+### Compile Time Initialization
+
+Because the user may choose the source of memory for a container, initialization at compile time is possible for all containers.
+
+A flat hash map may be initialized at compile time with memory of static storage duration if the maximum size of the map is known.
+
+```c
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+static flat_hash_map val_map
+    = fhm_static_init((static struct val[2999]){}, key, e, fhmap_int_to_u64,
+                      fhmap_id_eq, NULL);
+```
+
+A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see [allocation](#allocation) for more on `std_alloc`).
+
+```c
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    fhmap_elem e;
+    int key;
+    int val;
+};
+static flat_hash_map val_map = fhm_zero_init(
+    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+```
+
+All other containers provide default initialization macros can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
+
+```c
+static ccc_flat_double_ended_queue ring_buffer
+    = ccc_fdeq_init((static int[4096]){}, NULL, NULL, 4096);
+```
+
+In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.
+
 
 ### No `container_of` Macros
 
