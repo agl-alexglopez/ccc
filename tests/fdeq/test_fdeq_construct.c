@@ -6,6 +6,7 @@
 #include "checkers.h"
 #include "flat_double_ended_queue.h"
 #include "traits.h"
+#include "types.h"
 
 CHECK_BEGIN_STATIC_FN(fdeq_test_construct)
 {
