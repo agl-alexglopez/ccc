@@ -707,7 +707,7 @@ main(void)
 ## Features
 
 - [Intrusive and non-intrusive containers](#intrusive-and-non-intrusive-containers).
-- [Non-allocating container options](#non-allocating-container-options).
+- [Non-allocating container options](#non-allocating-containers).
 - [Compile time initialization](#compile-time-initialization).
 - [No `container_of` macro required of the user to get to their type after a function call](#no-container_of-macros).
 - [Rust's Entry API for associative containers with C and C++ influences](#rust's-entry-interface).
