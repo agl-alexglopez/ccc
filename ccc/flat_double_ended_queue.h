@@ -113,7 +113,7 @@ to manually free the underlying buffer at dst eventually if this method is used.
 Usually it is better to allocate the memory explicitly before the copy if
 copying between ring buffers.
 
-These optional allow users to stay consistent across containers with their
+These options allow users to stay consistent across containers with their
 memory management strategies. */
 ccc_result ccc_fdeq_copy(ccc_flat_double_ended_queue *dst,
                          ccc_flat_double_ended_queue const *src,

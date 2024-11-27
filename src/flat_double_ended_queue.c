@@ -263,12 +263,6 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
     {
         return CCC_INPUT_ERR;
     }
-    /* The user just wants another fdeq that will behave as the empty src. */
-    if (!src->buf_.capacity_)
-    {
-        *dst = *src;
-        return CCC_OK;
-    }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
        memory in case it has already been allocated. Alloc will remain the
@@ -281,6 +275,11 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
     dst->buf_.mem_ = dst_mem;
     dst->buf_.capacity_ = dst_cap;
     dst->buf_.alloc_ = dst_alloc;
+    /* Copying from an empty source is odd but supported. */
+    if (!src->buf_.capacity_)
+    {
+        return CCC_OK;
+    }
     if (dst->buf_.capacity_ > src->buf_.capacity_)
     {
         size_t const first_chunk
