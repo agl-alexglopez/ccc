@@ -286,7 +286,7 @@ print_found(FILE *const f, str_view w)
         }
     }
     str_arena_free(&a);
-    (void)ccc_fom_clear_and_free(&map, NULL);
+    (void)fom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -314,7 +314,7 @@ print_top_n(FILE *const f, int n)
     print_n(&fpq, &a, n);
     str_arena_free(&a);
     (void)ccc_fpq_clear_and_free(&fpq, NULL);
-    (void)ccc_fom_clear_and_free(&map, NULL);
+    (void)fom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -336,7 +336,7 @@ print_last_n(FILE *const f, int n)
     print_n(&fpq, &a, n);
     str_arena_free(&a);
     (void)ccc_fpq_clear_and_free(&fpq, NULL);
-    (void)ccc_fom_clear_and_free(&map, NULL);
+    (void)fom_clear_and_free(&map, NULL);
 }
 
 static struct frequency_alloc
@@ -385,7 +385,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     size_t len = 0;
     ptrdiff_t read = 0;
     flat_ordered_map fom
-        = ccc_fom_init((word *)NULL, 0, e, ofs, std_alloc, cmp_string_keys, a);
+        = fom_init((word *)NULL, 0, e, ofs, std_alloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};
@@ -404,7 +404,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
                    is Vacant the closure does not execute. You can uncomment
                    the below code if you prefer a more sequential style. */
                 /*
-                ccc_fomap_entry *e = entry_r(&fom, &cw.str);
+                fomap_entry *e = entry_r(&fom, &cw.str);
                 e = fom_and_modify_w(e, word, { T->cnt++; });
                 word *w = fom_or_insert_w(e, (word){.ofs = cw.str, .cnt = 1});
                 */
