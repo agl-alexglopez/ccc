@@ -9,6 +9,8 @@ Please specify a command as follows:
 -rc reports words by count in ascending order.
 -top=N reports the top N words by frequency.
 -last=N reports the last N words by frequency
+-alph=N reports the first N words alphabetically with counts.
+-ralph=N reports the last N words alphabetically with counts.
 -find=[WORD] reports the count of the specified word. */
 #include <ctype.h>
 #include <errno.h>
@@ -36,6 +38,7 @@ typedef ptrdiff_t str_ofs;
 enum action_type
 {
     COUNT,
+    ALPHA,
     FIND,
 };
 
@@ -70,10 +73,10 @@ struct frequency
 
 typedef struct
 {
-    str_ofs ofs;
-    int cnt;
     /* Map element for logging frequencies by string key, freq value. */
     fomap_elem e;
+    str_ofs ofs;
+    int cnt;
 } word;
 
 struct frequency_alloc
@@ -117,6 +120,10 @@ static str_view const directions
          "\treports the top N words by frequency.\n"
          "-last=N\n"
          "\treports the last N words by frequency\n"
+         "-alph=N\n"
+         "\treports the first N words alphabetically with counts.\n"
+         "-ralph=N\n"
+         "\treports the last N words alphabetically with counts.\n"
          "-find=[WORD]\n"
          "\treports the count of the specified word.\n");
 
@@ -143,6 +150,8 @@ static str_view const directions
 static void print_found(FILE *file, str_view w);
 static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
+static void print_alpha_n(FILE *file, int n);
+static void print_ralpha_n(FILE *file, int n);
 static struct frequency_alloc copy_frequencies(flat_ordered_map const *map);
 static void print_n(flat_priority_queue *, struct str_arena const *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
@@ -217,6 +226,24 @@ main(int argc, char *argv[])
             struct int_conversion c = parse_n_ranks(sv_arg);
             PROG_ASSERT(c.status != CONV_ER,
                         "cannot convert -last= flat to int");
+            exe.n = c.conversion;
+        }
+        else if (sv_starts_with(sv_arg, SV("-alph=")))
+        {
+            exe.type = COUNT;
+            exe.freq_fn = print_alpha_n;
+            struct int_conversion c = parse_n_ranks(sv_arg);
+            PROG_ASSERT(c.status != CONV_ER,
+                        "cannot convert -alph= flag to int");
+            exe.n = c.conversion;
+        }
+        else if (sv_starts_with(sv_arg, SV("-ralph=")))
+        {
+            exe.type = COUNT;
+            exe.freq_fn = print_ralpha_n;
+            struct int_conversion c = parse_n_ranks(sv_arg);
+            PROG_ASSERT(c.status != CONV_ER,
+                        "cannot convert -ralph= flat to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-find=")))
@@ -336,6 +363,50 @@ print_last_n(FILE *const f, int n)
     print_n(&fpq, &a, n);
     str_arena_free(&a);
     (void)fpq_clear_and_free(&fpq, NULL);
+    (void)fom_clear_and_free(&map, NULL);
+}
+
+static void
+print_alpha_n(FILE *const f, int n)
+{
+    struct str_arena a = str_arena_create(arena_start_cap);
+    PROG_ASSERT(a.arena);
+    flat_ordered_map map = create_frequency_map(&a, f);
+    PROG_ASSERT(!is_empty(&map));
+    if (!n)
+    {
+        n = size(&map);
+    }
+    int i = 0;
+    /* The ordered nature of the map comes in handy for alpha printing. */
+    for (word *w = begin(&map); w != end(&map) && i < n;
+         w = next(&map, &w->e), ++i)
+    {
+        printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
+    }
+    str_arena_free(&a);
+    (void)fom_clear_and_free(&map, NULL);
+}
+
+static void
+print_ralpha_n(FILE *const f, int n)
+{
+    struct str_arena a = str_arena_create(arena_start_cap);
+    PROG_ASSERT(a.arena);
+    flat_ordered_map map = create_frequency_map(&a, f);
+    PROG_ASSERT(!is_empty(&map));
+    if (!n)
+    {
+        n = size(&map);
+    }
+    int i = 0;
+    /* The ordered nature of the map comes in handy for reverse iteration. */
+    for (word *w = rbegin(&map); w != rend(&map) && i < n;
+         w = rnext(&map, &w->e), ++i)
+    {
+        printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
+    }
+    str_arena_free(&a);
     (void)fom_clear_and_free(&map, NULL);
 }
 
