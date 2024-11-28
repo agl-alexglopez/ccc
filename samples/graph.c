@@ -69,7 +69,7 @@ storage and live the same lifetime for the algorithm. */
 struct dijkstra_vertex
 {
     ccc_romap_elem path_elem;
-    ccc_pq_elem pq_elem;
+    pq_elem pq_elem;
     int dist;
     char cur_name;
     char prev_name;
