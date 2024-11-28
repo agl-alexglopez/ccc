@@ -68,7 +68,7 @@ same vertices as the "object" of their containers. They will share the same
 storage and live the same lifetime for the algorithm. */
 struct dijkstra_vertex
 {
-    ccc_romap_elem path_elem;
+    romap_elem path_elem;
     pq_elem pq_elem;
     int dist;
     char cur_name;
