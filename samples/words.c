@@ -19,9 +19,10 @@ Please specify a command as follows:
 #include <stdlib.h>
 #include <string.h>
 
-#define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
 #include "alloc.h"
 #include "ccc/flat_ordered_map.h"
 #include "ccc/flat_priority_queue.h"
@@ -152,10 +153,9 @@ static struct clean_word clean_word(struct str_arena *, str_view wv);
 /* String Arena Functions */
 static struct str_arena str_arena_create(size_t);
 static ptrdiff_t str_arena_alloc(struct str_arena *, size_t bytes);
-static ccc_result str_arena_maybe_resize(struct str_arena *,
-                                         size_t byte_request);
-static ccc_result str_arena_maybe_resize_pos(struct str_arena *,
-                                             size_t furthest_pos);
+static result str_arena_maybe_resize(struct str_arena *, size_t byte_request);
+static result str_arena_maybe_resize_pos(struct str_arena *,
+                                         size_t furthest_pos);
 static void str_arena_free_to_pos(struct str_arena *, str_ofs last_str,
                                   size_t str_len);
 static bool str_arena_push_back(struct str_arena *, str_ofs str, size_t len,
@@ -165,8 +165,8 @@ static char *str_arena_at(struct str_arena const *, str_ofs);
 
 /* Container Functions */
 static flat_ordered_map create_frequency_map(struct str_arena *, FILE *);
-static ccc_threeway_cmp cmp_string_keys(ccc_key_cmp);
-static ccc_threeway_cmp cmp_freqs(ccc_cmp);
+static threeway_cmp cmp_string_keys(key_cmp);
+static threeway_cmp cmp_freqs(cmp);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -304,7 +304,7 @@ print_top_n(FILE *const f, int n)
        environment might choose this approach for sorting. Granted any O(1)
        space approach to sorting may beat the slower pop operation but strict
        O(lgN) runtime for heap pop is pretty good. */
-    flat_priority_queue fpq = ccc_fpq_heapify_init(
+    flat_priority_queue fpq = fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_GRT, std_alloc, cmp_freqs, &a);
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
@@ -313,7 +313,7 @@ print_top_n(FILE *const f, int n)
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    (void)ccc_fpq_clear_and_free(&fpq, NULL);
+    (void)fpq_clear_and_free(&fpq, NULL);
     (void)fom_clear_and_free(&map, NULL);
 }
 
@@ -326,7 +326,7 @@ print_last_n(FILE *const f, int n)
     PROG_ASSERT(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
     PROG_ASSERT(freqs.cap);
-    flat_priority_queue fpq = ccc_fpq_heapify_init(
+    flat_priority_queue fpq = fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_LES, std_alloc, cmp_freqs, &a);
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
@@ -335,7 +335,7 @@ print_last_n(FILE *const f, int n)
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    (void)ccc_fpq_clear_and_free(&fpq, NULL);
+    (void)fpq_clear_and_free(&fpq, NULL);
     (void)fom_clear_and_free(&map, NULL);
 }
 
@@ -514,7 +514,7 @@ str_arena_push_back(struct str_arena *const a, str_ofs const str,
     return true;
 }
 
-static ccc_result
+static result
 str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
 {
     if (!a)
@@ -524,7 +524,7 @@ str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
     return str_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
 }
 
-static ccc_result
+static result
 str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
 {
     if (!a)
@@ -593,8 +593,8 @@ str_arena_at(struct str_arena const *const a, str_ofs const i)
 
 /*=======================   Container Helpers    ============================*/
 
-static ccc_threeway_cmp
-cmp_string_keys(ccc_key_cmp const c)
+static threeway_cmp
+cmp_string_keys(key_cmp const c)
 {
     word const *const w = c.user_type_rhs;
     struct str_arena const *const a = c.aux;
@@ -615,12 +615,12 @@ cmp_string_keys(ccc_key_cmp const c)
 }
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
-static ccc_threeway_cmp
-cmp_freqs(ccc_cmp const c)
+static threeway_cmp
+cmp_freqs(cmp const c)
 {
     struct frequency const *const lhs = c.user_type_lhs;
     struct frequency const *const rhs = c.user_type_rhs;
-    ccc_threeway_cmp cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
+    threeway_cmp cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
     if (cmp != CCC_EQL)
     {
         return cmp;
