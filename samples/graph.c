@@ -57,7 +57,7 @@ struct point
 
 struct path_backtrack_cell
 {
-    ccc_fhmap_elem elem;
+    fhmap_elem elem;
     struct point current;
     struct point parent;
 };
