@@ -21,6 +21,7 @@ Please specify a command as follows:
 
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #include "alloc.h"
 #include "ccc/flat_ordered_map.h"
 #include "ccc/flat_priority_queue.h"
@@ -142,7 +143,7 @@ static void print_found(FILE *file, str_view w);
 static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static struct frequency_alloc copy_frequencies(ccc_flat_ordered_map const *map);
-static void print_n(ccc_flat_priority_queue *, struct str_arena const *, int n);
+static void print_n(flat_priority_queue *, struct str_arena const *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
@@ -303,7 +304,7 @@ print_top_n(FILE *const f, int n)
        environment might choose this approach for sorting. Granted any O(1)
        space approach to sorting may beat the slower pop operation but strict
        O(lgN) runtime for heap pop is pretty good. */
-    ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
+    flat_priority_queue fpq = ccc_fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_GRT, std_alloc, cmp_freqs, &a);
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
@@ -325,7 +326,7 @@ print_last_n(FILE *const f, int n)
     PROG_ASSERT(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
     PROG_ASSERT(freqs.cap);
-    ccc_flat_priority_queue fpq = ccc_fpq_heapify_init(
+    flat_priority_queue fpq = ccc_fpq_heapify_init(
         freqs.arr, freqs.cap, size(&map), CCC_LES, std_alloc, cmp_freqs, &a);
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
@@ -356,7 +357,7 @@ copy_frequencies(ccc_flat_ordered_map const *const map)
 }
 
 static void
-print_n(ccc_flat_priority_queue *const fpq, struct str_arena const *const a,
+print_n(flat_priority_queue *const fpq, struct str_arena const *const a,
         int const n)
 {
     if (n <= 0)
