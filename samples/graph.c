@@ -29,6 +29,7 @@ Enter 'q' to quit. */
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
 #include "alloc.h"
 #include "ccc/flat_double_ended_queue.h"
 #include "ccc/flat_hash_map.h"
@@ -247,8 +248,8 @@ static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
 static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
 static bool dijkstra_shortest_path(struct graph *, struct path_request);
-static void prepare_vertices(struct graph *, ccc_priority_queue *,
-                             ccc_realtime_ordered_map *,
+static void prepare_vertices(struct graph *, priority_queue *,
+                             realtime_ordered_map *,
                              struct path_request const *);
 static void paint_edge(struct graph *, char, char);
 static void add_edge_cost_label(struct graph *, struct vertex *,
@@ -284,12 +285,12 @@ static struct int_conversion parse_digits(str_view);
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
-static ccc_threeway_cmp cmp_pq_costs(ccc_cmp);
-static ccc_threeway_cmp cmp_prev_vertices(ccc_key_cmp cmp);
+static threeway_cmp cmp_pq_costs(cmp);
+static threeway_cmp cmp_prev_vertices(key_cmp cmp);
 
 static void *dijkstra_vertex_arena_alloc(void *ptr, size_t size, void *aux);
-static bool eq_parent_cells(ccc_key_cmp);
-static uint64_t hash_parent_cells(ccc_user_key point_struct);
+static bool eq_parent_cells(key_cmp);
+static uint64_t hash_parent_cells(user_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
 
 static unsigned count_digits(uintmax_t n);
@@ -457,7 +458,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                    std_alloc, hash_parent_cells, eq_parent_cells, NULL);
     flat_double_ended_queue bfs
         = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
-    ccc_entry *e = fhm_insert_or_assign_w(
+    entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos,
         (struct path_backtrack_cell){.parent = {-1, -1}});
     prog_assert(!insert_error(e));
@@ -476,7 +477,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             Cell const next_cell = grid_at(graph, next);
             if (is_dst(next_cell, dst->name))
             {
-                ccc_entry const in = insert_or_assign(&parent_map, &push.elem);
+                entry const in = insert_or_assign(&parent_map, &push.elem);
                 prog_assert(!insert_error(&in));
                 cur = next;
                 success = true;
@@ -513,7 +514,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
         add_edge_cost_label(graph, dst, &edge);
     }
     (void)fhm_clear_and_free(&parent_map, NULL);
-    (void)ccc_fdeq_clear_and_free(&bfs, NULL);
+    (void)fdeq_clear_and_free(&bfs, NULL);
     return success;
 }
 
@@ -791,20 +792,19 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
 }
 
 static void
-prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
-                 ccc_realtime_ordered_map *prev_map,
-                 struct path_request const *pr)
+prepare_vertices(struct graph *const graph, priority_queue *dist_q,
+                 realtime_ordered_map *prev_map, struct path_request const *pr)
 {
     for (int count = 0, name = start_vertex_title; count < graph->vertices;
          ++count, ++name)
     {
-        struct dijkstra_vertex *const inserted = ccc_rom_or_insert_w(
-            entry_r(prev_map, &name),
-            (struct dijkstra_vertex){
-                .cur_name = (char)name,
-                .prev_name = '\0',
-                .dist = (char)name == pr->src ? 0 : INT_MAX,
-            });
+        struct dijkstra_vertex *const inserted
+            = rom_or_insert_w(entry_r(prev_map, &name),
+                              (struct dijkstra_vertex){
+                                  .cur_name = (char)name,
+                                  .prev_name = '\0',
+                                  .dist = (char)name == pr->src ? 0 : INT_MAX,
+                              });
         prog_assert(inserted);
         struct dist_point const *const res = push(dist_q, &inserted->pq_elem);
         prog_assert(res != NULL);
@@ -1101,7 +1101,7 @@ dijkstra_vertex_arena_alloc(void *const ptr, size_t const size, void *const aux)
 }
 
 static bool
-eq_parent_cells(ccc_key_cmp const c)
+eq_parent_cells(key_cmp const c)
 {
     struct path_backtrack_cell const *const pc = c.user_type_rhs;
     struct point const *const p = c.key_lhs;
@@ -1109,23 +1109,23 @@ eq_parent_cells(ccc_key_cmp const c)
 }
 
 static uint64_t
-hash_parent_cells(ccc_user_key const point_struct)
+hash_parent_cells(user_key const point_struct)
 {
     struct point const *const p = point_struct.user_key;
     uint64_t const wr = p->r;
     return hash_64_bits((wr << 31) | p->c);
 }
 
-static ccc_threeway_cmp
-cmp_pq_costs(ccc_cmp const cmp)
+static threeway_cmp
+cmp_pq_costs(cmp const cmp)
 {
     struct dijkstra_vertex const *const a = cmp.user_type_lhs;
     struct dijkstra_vertex const *const b = cmp.user_type_rhs;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
-static ccc_threeway_cmp
-cmp_prev_vertices(ccc_key_cmp const cmp)
+static threeway_cmp
+cmp_prev_vertices(key_cmp const cmp)
 {
     char const key_lhs = *(char *)cmp.key_lhs;
     struct dijkstra_vertex const *const user_rhs = cmp.user_type_rhs;
