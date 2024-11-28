@@ -798,14 +798,13 @@ prepare_vertices(struct graph *const graph, ccc_priority_queue *dist_q,
     for (int count = 0, name = start_vertex_title; count < graph->vertices;
          ++count, ++name)
     {
-        struct vertex *v = vertex_at(graph, (char)name);
-        struct dijkstra_vertex *const inserted
-            = ccc_rom_or_insert_w(entry_r(prev_map, &name),
-                                  (struct dijkstra_vertex){
-                                      .cur_name = (char)name,
-                                      .dist = v->name == pr->src ? 0 : INT_MAX,
-                                      .prev_name = '\0',
-                                  });
+        struct dijkstra_vertex *const inserted = ccc_rom_or_insert_w(
+            entry_r(prev_map, &name),
+            (struct dijkstra_vertex){
+                .cur_name = (char)name,
+                .prev_name = '\0',
+                .dist = (char)name == pr->src ? 0 : INT_MAX,
+            });
         prog_assert(inserted);
         struct dist_point const *const res = push(dist_q, &inserted->pq_elem);
         prog_assert(res != NULL);
