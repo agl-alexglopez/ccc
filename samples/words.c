@@ -142,7 +142,7 @@ static str_view const directions
 static void print_found(FILE *file, str_view w);
 static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
-static struct frequency_alloc copy_frequencies(ccc_flat_ordered_map const *map);
+static struct frequency_alloc copy_frequencies(flat_ordered_map const *map);
 static void print_n(flat_priority_queue *, struct str_arena const *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
@@ -164,7 +164,7 @@ static void str_arena_free(struct str_arena *);
 static char *str_arena_at(struct str_arena const *, str_ofs);
 
 /* Container Functions */
-static ccc_flat_ordered_map create_frequency_map(struct str_arena *, FILE *);
+static flat_ordered_map create_frequency_map(struct str_arena *, FILE *);
 static ccc_threeway_cmp cmp_string_keys(ccc_key_cmp);
 static ccc_threeway_cmp cmp_freqs(ccc_cmp);
 
@@ -274,7 +274,7 @@ print_found(FILE *const f, str_view w)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    ccc_flat_ordered_map map = create_frequency_map(&a, f);
+    flat_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     struct clean_word wc = clean_word(&a, w);
     if (wc.stat == WC_CLEAN_WORD)
@@ -294,7 +294,7 @@ print_top_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    ccc_flat_ordered_map map = create_frequency_map(&a, f);
+    flat_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     /* O(n) copy */
     struct frequency_alloc freqs = copy_frequencies(&map);
@@ -322,7 +322,7 @@ print_last_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    ccc_flat_ordered_map map = create_frequency_map(&a, f);
+    flat_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
     PROG_ASSERT(freqs.cap);
@@ -340,7 +340,7 @@ print_last_n(FILE *const f, int n)
 }
 
 static struct frequency_alloc
-copy_frequencies(ccc_flat_ordered_map const *const map)
+copy_frequencies(flat_ordered_map const *const map)
 {
     PROG_ASSERT(!is_empty(map));
     size_t const cap = sizeof(struct frequency) * (size(map) + 1);
@@ -378,13 +378,13 @@ print_n(flat_priority_queue *const fpq, struct str_arena const *const a,
 
 /*=====================    Container Construction     =======================*/
 
-static ccc_flat_ordered_map
+static flat_ordered_map
 create_frequency_map(struct str_arena *const a, FILE *const f)
 {
     char *lineptr = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
-    ccc_flat_ordered_map fom
+    flat_ordered_map fom
         = ccc_fom_init((word *)NULL, 0, e, ofs, std_alloc, cmp_string_keys, a);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
