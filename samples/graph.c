@@ -286,7 +286,7 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
 static threeway_cmp cmp_pq_costs(cmp);
-static threeway_cmp cmp_prev_vertices(key_cmp cmp);
+static threeway_cmp cmp_prev_vertices(key_cmp prev_vert_cmp);
 
 static void *dijkstra_vertex_arena_alloc(void *ptr, size_t size, void *aux);
 static bool eq_parent_cells(key_cmp);
@@ -1117,18 +1117,18 @@ hash_parent_cells(user_key const point_struct)
 }
 
 static threeway_cmp
-cmp_pq_costs(cmp const cmp)
+cmp_pq_costs(cmp const cost_cmp)
 {
-    struct dijkstra_vertex const *const a = cmp.user_type_lhs;
-    struct dijkstra_vertex const *const b = cmp.user_type_rhs;
+    struct dijkstra_vertex const *const a = cost_cmp.user_type_lhs;
+    struct dijkstra_vertex const *const b = cost_cmp.user_type_rhs;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 
 static threeway_cmp
-cmp_prev_vertices(key_cmp const cmp)
+cmp_prev_vertices(key_cmp const prev_vert_cmp)
 {
-    char const key_lhs = *(char *)cmp.key_lhs;
-    struct dijkstra_vertex const *const user_rhs = cmp.user_type_rhs;
+    char const key_lhs = *(char *)prev_vert_cmp.key_lhs;
+    struct dijkstra_vertex const *const user_rhs = prev_vert_cmp.user_type_rhs;
     return (key_lhs > user_rhs->cur_name) - (key_lhs < user_rhs->cur_name);
 }
 

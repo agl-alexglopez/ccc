@@ -691,10 +691,10 @@ cmp_freqs(cmp const c)
 {
     struct frequency const *const lhs = c.user_type_lhs;
     struct frequency const *const rhs = c.user_type_rhs;
-    threeway_cmp cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
-    if (cmp != CCC_EQL)
+    threeway_cmp freq_cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
+    if (freq_cmp != CCC_EQL)
     {
-        return cmp;
+        return freq_cmp;
     }
     struct str_arena const *const arena = c.aux;
     char const *const lhs_word = str_arena_at(arena, lhs->ofs);
