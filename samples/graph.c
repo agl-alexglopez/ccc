@@ -94,25 +94,17 @@ struct path_backtrack_cell
     struct point parent;
 };
 
-/** Containers can easily share the same storage location for their elements.
-Dijkstra runs the parent map to rebuild the path and priority queue with the
-same vertices as the "object" of their containers. They will share the same
-storage and live the same lifetime for the algorithm. */
+/** A dijkstra_vertex optimizes the problem so that we can store the path
+rebuilding map implicitly in an array of dijkstra_vertex[A-Z]. Then the pq
+element can run the efficient push and decrease key operations with pointer
+stability guaranteed. Finally these can be allocated on the stack because
+there will be at most 26 of them which is very small. */
 struct dijkstra_vertex
 {
     pq_elem pq_elem;
     int dist;
     char name;
     char from;
-};
-
-/** In running Dijkstra, we can allocate all needed nodes upfront so we only
-have one allocation and one free from the heaps perspective. */
-struct dijkstra_vertex_arena
-{
-    struct dijkstra_vertex *vertices;
-    size_t next_free;
-    size_t capacity;
 };
 
 struct path_request
