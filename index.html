@@ -893,7 +893,7 @@ Compile Time Initialization</h2>
 <div class="line">};</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map val_map = fhm_zero_init(</div>
 <div class="line">    <span class="keyword">struct</span> val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
-</div><!-- fragment --><p>All other containers provide default initialization macros can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.</p>
+</div><!-- fragment --><p>All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> ring_buffer</div>
 <div class="line">    = <a class="code hl_define" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>((<span class="keyword">static</span> <span class="keywordtype">int</span>[4096]){}, NULL, NULL, 4096);</div>
 <div class="ttc" id="aflat__double__ended__queue_8h_html_a0b47511ed59d60a9e66bdb2fee438eb0"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></div><div class="ttdeci">struct ccc_fdeq_ ccc_flat_double_ended_queue</div><div class="ttdoc">A contiguous buffer for O(1) push and pop from front and back.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:42</div></div>
