@@ -1027,7 +1027,8 @@ Lazy Evaluation</h3>
 Traits</h2>
 <p>Traits, found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code>, offer a more succinct way to use shared functionality across containers. Instead of calling <code>ccc_fhm_entry</code> when trying to obtain an entry from a flat hash map, one can simply call <code>entry</code>. Traits utilize <code>_Generic</code> in C to choose the correct container function based on parameters provided.</p>
 <p>Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.</p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
 <div class="line">{</div>
 <div class="line">    str_ofs str_arena_offset;</div>
 <div class="line">    <span class="keywordtype">int</span> cnt;</div>
@@ -1037,7 +1038,8 @@ Traits</h2>
 <div class="line">word <span class="keywordflow">default</span> = {.str_arena_offset = ofs, .cnt = 1};</div>
 <div class="line">word *w = or_insert(and_modify(entry_r(&amp;fom, &amp;ofs), increment), &amp;<span class="keywordflow">default</span>.e);</div>
 </div><!-- fragment --><p>Or the following.</p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
 <div class="line">{</div>
 <div class="line">    str_ofs str_arena_offset;</div>
 <div class="line">    <span class="keywordtype">int</span> cnt;</div>
