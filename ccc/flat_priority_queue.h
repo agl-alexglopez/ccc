@@ -225,7 +225,7 @@ NULL if parameters are invalid or fpq is empty.
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue fpq = build_rand_int_fpq();
 int *i = get_rand_fpq_elem(&fpq);
-fpq_update_w(&fpq, i, { *i = rand_key(); });
+(void)fpq_update_w(&fpq, i, { *i = rand_key(); });
 ```
 
 Note that whether the key increases or decreases does not affect runtime. */
@@ -258,7 +258,7 @@ NULL if parameters are invalid or fpq is empty.
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue fpq = build_rand_int_fpq();
 int *i = get_rand_fpq_elem(&fpq);
-fpq_update_w(&fpq, i, { (*i)++; });
+(void)fpq_increase_w(&fpq, i, { (*i)++; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
@@ -291,7 +291,7 @@ NULL if parameters are invalid or fpq is empty.
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue fpq = build_rand_int_fpq();
 int *i = get_rand_fpq_elem(&fpq);
-fpq_update_w(&fpq, i, { (*i)--; });
+(void)fpq_decrease_w(&fpq, i, { (*i)--; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
