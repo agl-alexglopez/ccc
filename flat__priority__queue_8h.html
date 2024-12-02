@@ -276,7 +276,7 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue fpq = build_rand_int_fpq();</div>
 <div class="line"><span class="keywordtype">int</span> *i = get_rand_fpq_elem(&amp;fpq);</div>
-<div class="line">fpq_update_w(&amp;fpq, i, { (*i)--; });</div>
+<div class="line">(void)fpq_decrease_w(&amp;fpq, i, { (*i)--; });</div>
 </div><!-- fragment --><p>Note that if this priority queue is min or max, the runtime is the same. </p>
 
 </div>
@@ -441,7 +441,7 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue fpq = build_rand_int_fpq();</div>
 <div class="line"><span class="keywordtype">int</span> *i = get_rand_fpq_elem(&amp;fpq);</div>
-<div class="line">fpq_update_w(&amp;fpq, i, { (*i)++; });</div>
+<div class="line">(void)fpq_increase_w(&amp;fpq, i, { (*i)++; });</div>
 </div><!-- fragment --><p>Note that if this priority queue is min or max, the runtime is the same. </p>
 
 </div>
@@ -559,7 +559,7 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue fpq = build_rand_int_fpq();</div>
 <div class="line"><span class="keywordtype">int</span> *i = get_rand_fpq_elem(&amp;fpq);</div>
-<div class="line">fpq_update_w(&amp;fpq, i, { *i = rand_key(); });</div>
+<div class="line">(void)fpq_update_w(&amp;fpq, i, { *i = rand_key(); });</div>
 </div><!-- fragment --><p>Note that whether the key increases or decreases does not affect runtime. </p>
 
 </div>
