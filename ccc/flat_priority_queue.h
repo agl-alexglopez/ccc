@@ -204,10 +204,11 @@ ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *e);
 @param [in] e a handle to the stored fpq element. Must be in the fpq.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
-@return true on success, false if parameters are invalid or fpq is empty.
+@return a reference to the element at its new position in the fpq on success,
+NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
-bool ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
-                    void *aux);
+void *ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
+                     void *aux);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -216,7 +217,8 @@ bool ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
 on the user type at T_ptr (optionally wrapping {code here} in braces may help
 with formatting). This closure may safely modify the key used to track the user
 element's priority in the priority queue.
-@return true on success, false if parameters are invalid or fpq is empty.
+@return a reference to the element at its new position in the fpq on success,
+NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure T_ptr is in the fpq.
 
 ```
@@ -235,10 +237,11 @@ Note that whether the key increases or decreases does not affect runtime. */
 @param [in] e a handle to the stored fpq element. Must be in the fpq.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
-@return true on success, false if parameters are invalid or fpq is empty.
+@return a reference to the element at its new position in the fpq on success,
+NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
-bool ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
-                      void *aux);
+void *ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
+                       void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -247,7 +250,8 @@ bool ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
 execute on the user type at T_ptr (optionally wrapping {code here} in braces may
 help with formatting). This closure may safely modify the key used to track the
 user element's priority in the priority queue.
-@return true on success, false if parameters are invalid or fpq is empty.
+@return a reference to the element at its new position in the fpq on success,
+NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure T_ptr is in the fpq.
 
 ```
@@ -266,10 +270,11 @@ Note that if this priority queue is min or max, the runtime is the same. */
 @param [in] e a handle to the stored fpq element. Must be in the fpq.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
-@return true on success, false if parameters are invalid or fpq is empty.
+@return a reference to the element at its new position in the fpq on success,
+NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
-bool ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
-                      void *aux);
+void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
+                       void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -278,7 +283,8 @@ bool ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, ccc_update_fn *fn,
 execute on the user type at T_ptr (optionally wrapping {code here} in braces may
 help with formatting). This closure may safely modify the key used to track the
 user element's priority in the priority queue.
-@return true on success, false if parameters are invalid or fpq is empty.
+@return a reference to the element at its new position in the fpq on success,
+NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure T_ptr is in the fpq.
 
 ```
@@ -338,6 +344,14 @@ Obtain state from the container. */
 @return A pointer to the front element or NULL if empty or fpq is NULL. */
 [[nodiscard]] void *ccc_fpq_front(ccc_flat_priority_queue const *fpq);
 
+/** @brief Return the index of an element known to be in the fpq. O(1).
+@param [in] fpq a pointer to the priority queue.
+@param [in] e an element known to be in the fpq.
+@return the index of the element known to be in the fpq or -1 if e is out of
+range of the fpq. */
+[[nodiscard]] ptrdiff_t ccc_fpq_i(ccc_flat_priority_queue const *fpq,
+                                  void const *e);
+
 /** @brief Returns true if the fpq is empty false if not. O(1).
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the size is 0 or fpq is NULL, false if not empty.  */
@@ -387,6 +401,7 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_realloc(args...) ccc_fpq_realloc(args)
 #    define fpq_push(args...) ccc_fpq_push(args)
 #    define fpq_front(args...) ccc_fpq_front(args)
+#    define fpq_i(args...) ccc_fpq_i(args)
 #    define fpq_pop(args...) ccc_fpq_pop(args)
 #    define fpq_extract(args...) ccc_fpq_extract(args)
 #    define fpq_update(args...) ccc_fpq_update(args)

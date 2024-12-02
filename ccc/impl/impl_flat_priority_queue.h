@@ -22,7 +22,7 @@ struct ccc_fpq_
 
 size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
 void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
-void ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
+void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
@@ -92,13 +92,12 @@ void ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 #define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
         struct ccc_fpq_ *const fpq_ = (fpq_ptr);                               \
-        bool fpq_update_res_ = false;                                          \
+        void *fpq_update_res_ = NULL;                                          \
         void *const fpq_t_ptr_ = (T_ptr);                                      \
         if (fpq_ && fpq_t_ptr_ && !ccc_buf_is_empty(&fpq_->buf_))              \
         {                                                                      \
-            fpq_update_res_ = true;                                            \
-            {update_closure_over_T} ccc_impl_fpq_update_fixup(fpq_,            \
-                                                              fpq_t_ptr_);     \
+            {update_closure_over_T} fpq_update_res_                            \
+                = ccc_impl_fpq_update_fixup(fpq_, fpq_t_ptr_);                 \
         }                                                                      \
         fpq_update_res_;                                                       \
     }))

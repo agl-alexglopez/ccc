@@ -15,8 +15,8 @@ static bool wins(struct ccc_fpq_ const *, void const *winner,
                  void const *loser);
 static void swap(struct ccc_fpq_ *, char tmp[], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
-static void bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
-static void update_fixup(struct ccc_fpq_ *, void *e);
+static size_t bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
+static size_t update_fixup(struct ccc_fpq_ *, void *e);
 
 ccc_result
 ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
@@ -51,7 +51,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
     void *const tmp = ccc_buf_at(&fpq->buf_, n);
     for (size_t i = (n / 2) + 1; i--;)
     {
-        bubble_down(fpq, tmp, i);
+        (void)bubble_down(fpq, tmp, i);
     }
     return CCC_OK;
 }
@@ -110,7 +110,7 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
     void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, 0, ccc_buf_size(&fpq->buf_) - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
-    bubble_down(fpq, tmp, 0);
+    (void)bubble_down(fpq, tmp, 0);
     return CCC_OK;
 }
 
@@ -146,27 +146,26 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     }
     else if (erased_cmp != CCC_EQL)
     {
-        bubble_down(fpq, tmp, swap_location);
+        (void)bubble_down(fpq, tmp, swap_location);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return CCC_OK;
 }
 
-bool
+void *
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
                ccc_update_fn *fn, void *aux)
 {
     if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf_))
     {
-        return false;
+        return NULL;
     }
     fn((ccc_user_type){e, aux});
-    update_fixup(fpq, e);
-    return true;
+    return ccc_buf_at(&fpq->buf_, update_fixup(fpq, e));
 }
 
 /* There are no efficiency benefits in knowing an increase will occur. */
-bool
+void *
 ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
                  ccc_update_fn *const fn, void *const aux)
 {
@@ -174,7 +173,7 @@ ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
 }
 
 /* There are no efficiency benefits in knowing an decrease will occur. */
-bool
+void *
 ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
                  ccc_update_fn *const fn, void *const aux)
 {
@@ -189,6 +188,17 @@ ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
         return NULL;
     }
     return at(fpq, 0);
+}
+
+ptrdiff_t
+ccc_fpq_i(ccc_flat_priority_queue const *const fpq, void const *const e)
+{
+    if (!fpq || !e || e < ccc_buf_begin(&fpq->buf_)
+        || e >= ccc_buf_end(&fpq->buf_))
+    {
+        return -1;
+    }
+    return ccc_buf_i(&fpq->buf_, e);
 }
 
 bool
@@ -332,10 +342,10 @@ ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
     return bubble_up(fpq, tmp, i);
 }
 
-void
+void *
 ccc_impl_fpq_update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 {
-    update_fixup(fpq, e);
+    return ccc_buf_at(&fpq->buf_, update_fixup(fpq, e));
 }
 
 void
@@ -349,35 +359,33 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
     void *const tmp = ccc_buf_at(&fpq->buf_, n);
     for (size_t i = (n / 2) + 1; i--;)
     {
-        bubble_down(fpq, tmp, i);
+        (void)bubble_down(fpq, tmp, i);
     }
 }
 
 /*===============================  Static Helpers  =========================*/
 
-static inline void
+static inline size_t
 update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 {
     void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     size_t const i = index_of(fpq, e);
     if (!i)
     {
-        bubble_down(fpq, tmp, 0);
-        return;
+        return bubble_down(fpq, tmp, 0);
     }
     ccc_threeway_cmp const parent_cmp = fpq->cmp_(
         (ccc_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
     if (parent_cmp == fpq->order_)
     {
-        (void)bubble_up(fpq, tmp, i);
-        return;
+        return bubble_up(fpq, tmp, i);
     }
     if (parent_cmp != CCC_EQL)
     {
-        bubble_down(fpq, tmp, i);
-        return;
+        return bubble_down(fpq, tmp, i);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
+    return i;
 }
 
 static inline size_t
@@ -394,7 +402,7 @@ bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
     return 0;
 }
 
-static inline void
+static inline size_t
 bubble_down(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
 {
     size_t const sz = ccc_buf_size(&fpq->buf_);
@@ -407,10 +415,11 @@ bubble_down(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
         /* If the child beats the parent we must swap. Equal is ok to break. */
         if (!wins(fpq, at(fpq, next), at(fpq, i)))
         {
-            break;
+            return i;
         }
         swap(fpq, tmp, next, i);
     }
+    return i;
 }
 
 static inline void
