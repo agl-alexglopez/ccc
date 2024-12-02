@@ -101,7 +101,10 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(update(&fpq, cur, val_update, &backoff), true);
+            struct val const *const updated
+                = update(&fpq, cur, val_update, &backoff);
+            CHECK(updated != NULL, true);
+            CHECK(updated->val, backoff);
             CHECK(validate(&fpq), true);
         }
     }
@@ -136,7 +139,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            CHECK(ccc_fpq_update_w(&fpq, cur, { cur->val = backoff; }), true);
+            struct val const *const updated
+                = ccc_fpq_update_w(&fpq, cur,
+                                   {
+                                       cur->val = backoff;
+                                   });
+            CHECK(updated != NULL, true);
+            CHECK(updated->val, backoff);
             CHECK(validate(&fpq), true);
         }
     }
