@@ -920,48 +920,6 @@ id_cmp(ccc_cmp const cmp)
 
 Internally the containers will remember the offsets of the provided elements within the user struct wrapping the intruder. Then, the contract of the interface is simpler: provide a handle to the container and receive your type in return. The user takes on less complexity overall by providing a slightly more detailed initialization.
 
-Composing multiple containers with this approach is also possible. Consider the following struct from `samples/graph.c` used to run Dijkstra's algorithm.
-
-```c
-struct dijkstra_vertex
-{
-    romap_elem path_elem;
-    pq_elem pq_elem;
-    int dist;
-    char cur_name;
-    char prev_name;
-};
-/* ... Later Initialization After Memory is Prepared ... */
-realtime_ordered_map path_map = rom_init(path_map, struct dijkstra_vertex,
-    path_elem, cur_name, arena_alloc, cmp_prev_vertices, &bump_arena);
-priority_queue costs_pq = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
-    NULL, cmp_pq_costs, NULL);
-/*... Steps to Prepare to Run the Algorithm ...*/
-while (!is_empty(&costs_pq))
-{
-    struct dijkstra_vertex const *const v = front(&costs_pq);
-    (void)pop(&costs_pq);
-    /* ... Check for Stopping Condition Then Continue ... */
-    struct node const *const edges = vertex_at(graph, v->cur_name)->edges;
-    for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
-    {
-        struct dijkstra_vertex *const next
-            = get_key_val(&path_map, &edges[i].name);
-        int alt = v->dist + edges[i].cost;
-        if (alt < next->dist)
-        {
-            pq_decrease_w(&costs_pq, &next->pq_elem, {
-                next->prev_name = v->cur_name;
-                next->dist = alt;
-            });
-        }
-    }
-}
-/* ... Rebuild Shortest Path etc... */
-```
-
-One conceptual element, a `dijkstra_vertex`, is part of two containers, a map and a priority queue. The priority queue piggy backs of the memory controlled by the map so that we always have access to all vertices while the algorithm runs. An already complex algorithm is not cluttered by further steps to accommodate macros.
-
 ### Rust's Entry Interface
 
 Rust has solid interfaces for associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in `ccc/traits.h` but specific names, behaviors, and parameters can be read in each container's header).
