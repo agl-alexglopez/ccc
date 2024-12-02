@@ -842,7 +842,7 @@ static flat_hash_map val_map = fhm_zero_init(
     struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
 ```
 
-All other containers provide default initialization macros can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
+All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
 
 ```c
 static ccc_flat_double_ended_queue ring_buffer
