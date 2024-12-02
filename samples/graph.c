@@ -31,7 +31,6 @@ Enter 'q' to quit. */
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 #include "alloc.h"
-#include "ccc/buffer.h"
 #include "ccc/flat_double_ended_queue.h"
 #include "ccc/flat_hash_map.h"
 #include "ccc/priority_queue.h"
@@ -242,7 +241,6 @@ static void paint_edge(struct graph *, char, char);
 static void add_edge_cost_label(struct graph *, struct vertex *,
                                 struct edge const *);
 static cell make_edge(char src, char dst);
-static bool can_reach_dst(struct graph const *g, char src, char dst);
 
 static struct point random_vertex_placement(struct graph const *);
 static bool is_valid_vertex_pos(struct graph const *, int r, int c);
@@ -263,6 +261,7 @@ static bool is_valid_edge_cell(cell, cell);
 static void clear_paint(struct graph *);
 static bool is_vertex(cell);
 static bool is_path(cell);
+static inline bool is_dst(cell c, char dst);
 static struct vertex *vertex_at(struct graph const *g, char name);
 
 static void encode_digits(struct graph const *, struct digit_encoding *);
@@ -459,9 +458,7 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
                 = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
             struct path_backtrack_cell push = {.current = next, .parent = cur};
             cell const next_cell = grid_at(graph, next.r, next.c);
-            if (is_vertex(next_cell)
-                && can_reach_dst(graph, get_cell_vertex_title(next_cell),
-                                 dst->name))
+            if (is_dst(next_cell, dst->name))
             {
                 entry const in = insert_or_assign(&parent_map, &push.elem);
                 prog_assert(!insert_error(&in));
@@ -501,51 +498,6 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
     (void)fhm_clear_and_free(&parent_map, NULL);
     (void)fdeq_clear_and_free(&bfs, NULL);
     return success;
-}
-
-static bool
-can_reach_dst(struct graph const *const g, char const src, char const dst)
-{
-    if (src == dst)
-    {
-        return true;
-    }
-    if (vertex_degree(vertex_at(g, src)) == MAX_DEGREE)
-    {
-        return false;
-    }
-    /* Maximum bounds on this dfs are known to be very small [A-Z] so allocate
-       on the stack because we may be calling this function quite often. */
-    bool seen[MAX_VERTICES] = {};
-    seen[(size_t)src - start_vertex_title] = true;
-    buffer dfs
-        = buf_init((char[MAX_VERTICES]){src}, NULL, NULL, MAX_VERTICES, 1);
-    while (!is_empty(&dfs))
-    {
-        struct vertex *const v = vertex_at(g, *(char *)back(&dfs));
-        struct node *const edges = v->edges;
-        bool backtracking = true;
-        for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
-        {
-            if (i == dst)
-            {
-                return true;
-            }
-            size_t const seen_i = (size_t)edges[i].name - start_vertex_title;
-            if (!seen[seen_i])
-            {
-                backtracking = false;
-                seen[seen_i] = true;
-                prog_assert(push_back(&dfs, &edges[i].name));
-                break;
-            }
-        }
-        if (backtracking)
-        {
-            prog_assert(pop_back(&dfs) == CCC_OK);
-        }
-    }
-    return false;
 }
 
 /* A edge cost label will only be added if there is sufficient space. For
@@ -847,6 +799,12 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name)
 }
 
 /*========================  Graph/Grid Helpers  =============================*/
+
+static inline bool
+is_dst(cell const c, char const dst)
+{
+    return is_vertex(c) && get_cell_vertex_title(c) == dst;
+}
 
 static struct vertex *
 vertex_at(struct graph const *const g, char const name)
