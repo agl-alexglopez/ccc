@@ -142,6 +142,7 @@ add_omap_test(test_omap_insert)
 add_omap_test(test_omap_erase)
 add_omap_test(test_omap_iter)
 add_omap_test(test_omap_entry)
+add_omap_test(test_omap_lru)
 
 #############  Flat Map  ##########################
 add_library(fomap_util fomap/fomap_util.h fomap/fomap_util.c)
@@ -204,6 +205,7 @@ add_romap_test(test_romap_insert)
 add_romap_test(test_romap_erase)
 add_romap_test(test_romap_iter)
 add_romap_test(test_romap_entry)
+add_romap_test(test_romap_lru)
 
 #############  Flat Realtime Map  ##########################
 add_library(fromap_util fromap/fromap_util.h fromap/fromap_util.c)
