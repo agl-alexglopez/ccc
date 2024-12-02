@@ -1025,6 +1025,7 @@ Traits, found in `ccc/traits.h`, offer a more succinct way to use shared functio
 Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.
 
 ```c
+#define TRAITS_USING_NAMESPACE_CCC
 typedef struct
 {
     str_ofs str_arena_offset;
@@ -1039,6 +1040,7 @@ word *w = or_insert(and_modify(entry_r(&fom, &ofs), increment), &default.e);
 Or the following.
 
 ```c
+#define TRAITS_USING_NAMESPACE_CCC
 typedef struct
 {
     str_ofs str_arena_offset;
