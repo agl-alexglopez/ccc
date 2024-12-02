@@ -205,6 +205,7 @@ static int const default_vertices = 4;
 static int const row_col_min = 7;
 static int const vertex_placement_padding = 3;
 static char const start_vertex_title = 'A';
+static char const end_vertex_title = 'Z';
 
 static size_t const vertex_cell_title_shift = 8;
 static cell const vertex_title_mask = 0xFF00;
@@ -263,6 +264,8 @@ static bool is_vertex(cell);
 static bool is_path(cell);
 static inline bool is_dst(cell c, char dst);
 static struct vertex *vertex_at(struct graph const *g, char name);
+static struct dijkstra_vertex *map_pq_at(struct dijkstra_vertex const *dj_arr,
+                                         char vertex);
 
 static void encode_digits(struct graph const *, struct digit_encoding *);
 static enum label_orientation get_direction(struct point const *,
@@ -712,55 +715,60 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
     struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     priority_queue distances = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
                                        NULL, cmp_pq_costs, NULL);
-    for (int count = 0, vx = start_vertex_title; count < graph->vertices;
-         ++count, ++vx)
+    for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
     {
-        map_pq[vx - start_vertex_title] = (struct dijkstra_vertex){
+        *map_pq_at(map_pq, (char)vx) = (struct dijkstra_vertex){
             .name = (char)vx,
             .from = '\0',
             .dist = (char)vx == pr.src ? 0 : INT_MAX,
         };
-        prog_assert(push(&distances, &map_pq[vx - start_vertex_title].pq_elem));
+        prog_assert(push(&distances, &map_pq_at(map_pq, vx)->pq_elem));
     }
-    bool success = false;
-    struct dijkstra_vertex *v = NULL;
+    bool is_path = false;
+    struct dijkstra_vertex const *u = NULL;
     while (!is_empty(&distances))
     {
-        /* The reference to v is valid after the pop because the pop does not
+        /* The reference to u is valid after the pop because the pop does not
            deallocate any memory. The pq has no allocation permissions. */
-        v = front(&distances);
+        u = front(&distances);
         (void)pop(&distances);
-        if (v->name == pr.dst || v->dist == INT_MAX)
+        if (u->name == pr.dst || u->dist == INT_MAX)
         {
-            success = v->dist != INT_MAX;
+            is_path = u->dist != INT_MAX;
             break;
         }
-        struct node const *const edges = vertex_at(graph, v->name)->edges;
+        struct node const *const edges = vertex_at(graph, u->name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
-            struct dijkstra_vertex *next
-                = &map_pq[edges[i].name - start_vertex_title];
-            int alt = v->dist + edges[i].cost;
-            if (alt < next->dist)
+            struct dijkstra_vertex *const v = map_pq_at(map_pq, edges[i].name);
+            int const alt = u->dist + edges[i].cost;
+            if (alt < v->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                bool const relax = pq_decrease_w(&distances, &next->pq_elem, {
-                    next->from = v->name;
-                    next->dist = alt;
+                bool const relax = pq_decrease_w(&distances, &v->pq_elem, {
+                    v->dist = alt;
+                    v->from = u->name;
                 });
                 prog_assert(relax == true);
             }
         }
     }
-    if (success)
+    if (is_path)
     {
-        for (; v && v->from; v = &map_pq[v->from - start_vertex_title])
+        for (; u->from; u = map_pq_at(map_pq, u->from))
         {
-            paint_edge(graph, v->name, v->from);
+            paint_edge(graph, u->name, u->from);
         }
     }
     clear_and_flush_graph(graph);
-    return success;
+    return is_path;
+}
+
+static inline struct dijkstra_vertex *
+map_pq_at(struct dijkstra_vertex const *const dj_arr, char const vertex)
+{
+    prog_assert(vertex >= start_vertex_title && vertex <= end_vertex_title);
+    return (struct dijkstra_vertex *)&dj_arr[vertex - start_vertex_title];
 }
 
 static void
