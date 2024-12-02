@@ -952,43 +952,6 @@ No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
 <div class="ttc" id="adoubly__linked__list_8h_html_a4f7f1c337174a8c19091ab34d25587ff"><div class="ttname"><a href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a></div><div class="ttdeci">void * ccc_dll_front(ccc_doubly_linked_list const *l)</div><div class="ttdoc">Returns the user type at the front of the list. O(1).</div></div>
 <div class="ttc" id="adoubly__linked__list_8h_html_ac21312b92a33769a08c7e9cd334800a7"><div class="ttname"><a href="doubly__linked__list_8h.html#ac21312b92a33769a08c7e9cd334800a7">ccc_dll_push_front</a></div><div class="ttdeci">void * ccc_dll_push_front(ccc_doubly_linked_list *l, ccc_dll_elem *elem)</div><div class="ttdoc">Push user type wrapping elem to the front of the list. O(1).</div></div>
 </div><!-- fragment --><p>Internally the containers will remember the offsets of the provided elements within the user struct wrapping the intruder. Then, the contract of the interface is simpler: provide a handle to the container and receive your type in return. The user takes on less complexity overall by providing a slightly more detailed initialization.</p>
-<p>Composing multiple containers with this approach is also possible. Consider the following struct from <code>samples/graph.c</code> used to run Dijkstra's algorithm.</p>
-<div class="fragment"><div class="line"><span class="keyword">struct </span>dijkstra_vertex</div>
-<div class="line">{</div>
-<div class="line">    romap_elem path_elem;</div>
-<div class="line">    pq_elem pq_elem;</div>
-<div class="line">    <span class="keywordtype">int</span> dist;</div>
-<div class="line">    <span class="keywordtype">char</span> cur_name;</div>
-<div class="line">    <span class="keywordtype">char</span> prev_name;</div>
-<div class="line">};</div>
-<div class="line"><span class="comment">/* ... Later Initialization After Memory is Prepared ... */</span></div>
-<div class="line">realtime_ordered_map path_map = rom_init(path_map, <span class="keyword">struct</span> dijkstra_vertex,</div>
-<div class="line">    path_elem, cur_name, arena_alloc, cmp_prev_vertices, &amp;bump_arena);</div>
-<div class="line">priority_queue costs_pq = pq_init(<span class="keyword">struct</span> dijkstra_vertex, pq_elem, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>,</div>
-<div class="line">    NULL, cmp_pq_costs, NULL);</div>
-<div class="line"><span class="comment">/*... Steps to Prepare to Run the Algorithm ...*/</span></div>
-<div class="line"><span class="keywordflow">while</span> (!is_empty(&amp;costs_pq))</div>
-<div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>dijkstra_vertex const *<span class="keyword">const</span> v = front(&amp;costs_pq);</div>
-<div class="line">    (void)pop(&amp;costs_pq);</div>
-<div class="line">    <span class="comment">/* ... Check for Stopping Condition Then Continue ... */</span></div>
-<div class="line">    <span class="keyword">struct </span>node const *<span class="keyword">const</span> edges = vertex_at(graph, v-&gt;cur_name)-&gt;edges;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; MAX_DEGREE &amp;&amp; edges[i].name; ++i)</div>
-<div class="line">    {</div>
-<div class="line">        <span class="keyword">struct </span>dijkstra_vertex *<span class="keyword">const</span> next</div>
-<div class="line">            = get_key_val(&amp;path_map, &amp;edges[i].name);</div>
-<div class="line">        <span class="keywordtype">int</span> alt = v-&gt;dist + edges[i].cost;</div>
-<div class="line">        <span class="keywordflow">if</span> (alt &lt; next-&gt;dist)</div>
-<div class="line">        {</div>
-<div class="line">            pq_decrease_w(&amp;costs_pq, &amp;next-&gt;pq_elem, {</div>
-<div class="line">                next-&gt;prev_name = v-&gt;cur_name;</div>
-<div class="line">                next-&gt;dist = alt;</div>
-<div class="line">            });</div>
-<div class="line">        }</div>
-<div class="line">    }</div>
-<div class="line">}</div>
-<div class="line"><span class="comment">/* ... Rebuild Shortest Path etc... */</span></div>
-</div><!-- fragment --><p>One conceptual element, a <code>dijkstra_vertex</code>, is part of two containers, a map and a priority queue. The priority queue piggy backs of the memory controlled by the map so that we always have access to all vertices while the algorithm runs. An already complex algorithm is not cluttered by further steps to accommodate macros.</p>
 <h2><a class="anchor" id="autotoc_md9"></a>
 Rust's Entry Interface</h2>
 <p>Rust has solid interfaces for associative containers, largely due to the Entry API/Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in <code><a class="el" href="traits_8h.html" title="The C Container Collection Traits Interface.">ccc/traits.h</a></code> but specific names, behaviors, and parameters can be read in each container's header).</p>
