@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 static size_t const swap_space = 1;
