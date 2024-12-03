@@ -236,8 +236,13 @@ static str_view const quit_cmd = SV("q");
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
-static bool has_built_edge(struct graph *, struct vertex *, struct vertex *);
-static bool dijkstra_shortest_path(struct graph *, struct path_request);
+static int edge_construction_cost(struct graph *, flat_hash_map *,
+                                  struct vertex *, struct vertex *);
+static void edge_construct(struct graph *g, flat_hash_map *parent_map,
+                           struct vertex *src, struct vertex *dst);
+static int dijkstra_shortest_path(struct graph *,
+                                  struct dijkstra_vertex *map_pq, char src,
+                                  char dst);
 static void paint_edge(struct graph *, char, char);
 static void add_edge_cost_label(struct graph *, struct vertex *,
                                 struct edge const *);
@@ -249,7 +254,7 @@ static cell *grid_at_mut(struct graph const *, int r, int c);
 static cell grid_at(struct graph const *, int r, int c);
 static uint16_t sort_vertices(char, char);
 static int vertex_degree(struct vertex const *);
-static bool connect_random_edge(struct graph *, struct vertex *);
+static bool connect_rand_dst(struct graph *, struct vertex *);
 static void build_path_outline(struct graph *);
 static void build_path_cell(struct graph *, int r, int c, cell);
 static void clear_and_flush_graph(struct graph const *);
@@ -261,7 +266,7 @@ static bool is_edge_vertex(cell, cell);
 static bool is_valid_edge_cell(cell, cell);
 static void clear_paint(struct graph *);
 static bool is_vertex(cell);
-static bool is_path(cell);
+static bool is_path_cell(cell);
 static inline bool is_dst(cell c, char dst);
 static struct vertex *vertex_at(struct graph const *g, char name);
 static struct dijkstra_vertex *map_pq_at(struct dijkstra_vertex const *dj_arr,
@@ -360,9 +365,10 @@ main(int argc, char **argv)
 /* The undirected graphs produced are randomly generated graphs where each
    vertex is placed on the grid of terminal cells. Each vertex then tries
    to connect a random number of out edges to vertices that can accept an
-   in edge. The search for another vertex is a simple bfs search and thus
-   connects the edge via shortest path in the grid. The number of cells taken
-   to connect the edge to the other vertex is the cost/weight of that edge. */
+   in edge. The search for another vertex chooses the shortest path from two
+   options: the shortest existing route between src and dst among vertices or
+   the cost of building a new edge in the terminal. The number of cells taken to
+   connect the edge to another other vertex is the cost/weight of that edge. */
 static void
 build_graph(struct graph *const graph)
 {
@@ -392,14 +398,18 @@ build_graph(struct graph *const graph)
             continue;
         }
         int const out_edges = rand_range(1, MAX_DEGREE - degree);
-        for (int i = 0; i < out_edges && connect_random_edge(graph, src); ++i)
+        for (int i = 0; i < out_edges && connect_rand_dst(graph, src); ++i)
         {}
     }
     clear_and_flush_graph(graph);
 }
 
+/* Connects source to random destination vertex. A connection can mean
+   confirming an efficient path already exists between source and destination
+   across connected vertices or that we build a new edge between source and
+   destination. The more efficient (less distance) option is always chosen. */
 static bool
-connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
+connect_rand_dst(struct graph *const graph, struct vertex *const src_vertex)
 {
     size_t const graph_size = graph->vertices;
     size_t vertex_title_indices[MAX_VERTICES];
@@ -410,21 +420,39 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
     /* Cycle through all vertices with which to join an edge randomly. */
     rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size,
                  &(size_t){0});
-    struct vertex *dst = NULL;
     for (size_t i = 0; i < graph_size; ++i)
     {
-        char key = vertex_titles[vertex_title_indices[i]];
-        if (key == src_vertex->name)
+        struct vertex *const dst
+            = vertex_at(graph, vertex_titles[vertex_title_indices[i]]);
+        if (src_vertex->name != dst->name
+            && !has_edge_with(src_vertex, dst->name)
+            && vertex_degree(dst) < MAX_DEGREE)
         {
-            continue;
-        }
-        dst = vertex_at(graph, key);
-        prog_assert(dst != NULL);
-        if (!has_edge_with(src_vertex, dst->name)
-            && vertex_degree(dst) < MAX_DEGREE
-            && has_built_edge(graph, src_vertex, dst))
-        {
-            return true;
+            /* A graph will look more visually pleasing if it does not make
+               excessively dumb choices. Before building a new edge check if a
+               good route between source and destination already exists even if
+               it is not direct. */
+            struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
+            int const path_cost = dijkstra_shortest_path(
+                graph, map_pq, src_vertex->name, dst->name);
+
+            flat_hash_map parent_map
+                = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
+                           std_alloc, hash_parent_cells, eq_parent_cells, NULL);
+            int const construction_cost
+                = edge_construction_cost(graph, &parent_map, src_vertex, dst);
+            if (path_cost < construction_cost)
+            {
+                (void)fhm_clear_and_free(&parent_map, NULL);
+                return true;
+            }
+            if (construction_cost != INT_MAX)
+            {
+                edge_construct(graph, &parent_map, src_vertex, dst);
+                (void)fhm_clear_and_free(&parent_map, NULL);
+                return true;
+            }
+            (void)fhm_clear_and_free(&parent_map, NULL);
         }
     }
     return false;
@@ -433,27 +461,30 @@ connect_random_edge(struct graph *const graph, struct vertex *const src_vertex)
 /* This function assumes that the destination is valid. Valid means that
    source is not already connected to destination and that destination
    has less than the maximum allowable in degree. However, edge formation
-   still may fail if no path exists from source to destination. */
-static bool
-has_built_edge(struct graph *const graph, struct vertex *const src,
-               struct vertex *const dst)
+   still may fail if no path exists from source to destination. The cost
+   reported is the distance in cells in the terminal screen it would take
+   to complete this path. The parent map will hold the shortest path from dst
+   back to src on the terminal screen if it exists. */
+static int
+edge_construction_cost(struct graph *const graph,
+                       flat_hash_map *const parent_map,
+                       struct vertex *const src, struct vertex *const dst)
 {
-    cell const edge_id = make_edge(src->name, dst->name);
-    flat_hash_map parent_map
-        = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
-                   std_alloc, hash_parent_cells, eq_parent_cells, NULL);
+    if (src->name == dst->name)
+    {
+        return 0;
+    }
     flat_double_ended_queue bfs
         = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     entry *e = fhm_insert_or_assign_w(
-        &parent_map, src->pos,
-        (struct path_backtrack_cell){.parent = {-1, -1}});
+        parent_map, src->pos, (struct path_backtrack_cell){.parent = {-1, -1}});
     prog_assert(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
-    bool success = false;
-    struct point cur = {};
-    while (!is_empty(&bfs) && !success)
+    int cost = -1;
+    while (!is_empty(&bfs))
     {
-        cur = *((struct point *)front(&bfs));
+        ++cost;
+        struct point cur = *((struct point *)front(&bfs));
         (void)pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
@@ -463,44 +494,51 @@ has_built_edge(struct graph *const graph, struct vertex *const src,
             cell const next_cell = grid_at(graph, next.r, next.c);
             if (is_dst(next_cell, dst->name))
             {
-                entry const in = insert_or_assign(&parent_map, &push.elem);
+                ++cost;
+                entry const in = insert_or_assign(parent_map, &push.elem);
                 prog_assert(!insert_error(&in));
                 cur = next;
-                success = true;
-                break;
+                (void)fdeq_clear_and_free(&bfs, NULL);
+                return cost;
             }
-            if (!is_path(next_cell)
-                && !occupied(try_insert_r(&parent_map, &push.elem)))
+            if (!is_path_cell(next_cell)
+                && !occupied(try_insert_r(parent_map, &push.elem)))
             {
                 struct point const *const n = push_back(&bfs, &next);
                 prog_assert(n);
             }
         }
     }
-    if (success)
-    {
-        struct path_backtrack_cell const *c = get_key_val(&parent_map, &cur);
-        prog_assert(c);
-        struct edge edge
-            = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
-        while (c->parent.r > 0)
-        {
-            c = get_key_val(&parent_map, &c->parent);
-            prog_assert(
-                c, { printf("Cannot find cell parent to rebuild path.\n"); });
-            ++edge.n.cost;
-            *grid_at_mut(graph, c->current.r, c->current.c) |= edge_id;
-            build_path_cell(graph, c->current.r, c->current.c, edge_id);
-        }
-        (void)add_edge(src, &edge);
-        edge.n.name = src->name;
-        edge.pos = src->pos;
-        (void)add_edge(dst, &edge);
-        add_edge_cost_label(graph, dst, &edge);
-    }
-    (void)fhm_clear_and_free(&parent_map, NULL);
     (void)fdeq_clear_and_free(&bfs, NULL);
-    return success;
+    return INT_MAX;
+}
+
+/* Assumes that src and dst have not already been connected in the graph or in
+   the terminal cells via edge ids. Creates the appropriate edge and updates the
+   edge lists of src and dst. */
+static void
+edge_construct(struct graph *const g, flat_hash_map *const parent_map,
+               struct vertex *const src, struct vertex *const dst)
+{
+    cell const edge_id = make_edge(src->name, dst->name);
+    struct point cur = dst->pos;
+    struct path_backtrack_cell const *c = get_key_val(parent_map, &cur);
+    prog_assert(c);
+    struct edge edge = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
+    while (c->parent.r > 0)
+    {
+        c = get_key_val(parent_map, &c->parent);
+        prog_assert(c,
+                    { printf("Cannot find cell parent to rebuild path.\n"); });
+        ++edge.n.cost;
+        *grid_at_mut(g, c->current.r, c->current.c) |= edge_id;
+        build_path_cell(g, c->current.r, c->current.c, edge_id);
+    }
+    (void)add_edge(src, &edge);
+    edge.n.name = src->name;
+    edge.pos = src->pos;
+    (void)add_edge(dst, &edge);
+    add_edge_cost_label(g, dst, &edge);
 }
 
 /* A edge cost label will only be added if there is sufficient space. For
@@ -686,14 +724,29 @@ find_shortest_paths(struct graph *const graph)
                      1);
                 return;
             }
-            if (!dijkstra_shortest_path(graph, pr))
+            struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
+            int const cost
+                = dijkstra_shortest_path(graph, map_pq, pr.src, pr.dst);
+            if (cost != INT_MAX)
             {
+                struct dijkstra_vertex const *u = map_pq_at(map_pq, pr.dst);
+                for (; u->from; u = map_pq_at(map_pq, u->from))
+                {
+                    paint_edge(graph, u->name, u->from);
+                }
+                clear_and_flush_graph(graph);
+            }
+            else
+            {
+                clear_paint(graph);
+                clear_and_flush_graph(graph);
                 struct point const *const src = &vertex_at(graph, pr.src)->pos;
                 struct point const *const dst = &vertex_at(graph, pr.dst)->pos;
                 set_cursor_position(src->r, src->c);
                 printf("\033[38;5;9m%c\033[0m", pr.src);
                 set_cursor_position(dst->r, dst->c);
                 printf("\033[38;5;9m%c\033[0m", pr.dst);
+                (void)fflush(stdout);
             }
             break;
         }
@@ -702,8 +755,10 @@ find_shortest_paths(struct graph *const graph)
     }
 }
 
-static bool
-dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
+static int
+dijkstra_shortest_path(struct graph *const graph,
+                       struct dijkstra_vertex *const map_pq, char const src,
+                       char const dst)
 {
     /* One struct dijkstra_vertex will represent the path rebuilding map and the
        priority queue. The intrusive pq elem will give us an O(1) (technically
@@ -712,7 +767,6 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
        structure not the memory that is used to store the elements; the path
        rebuild map remains accessible. Best of all, maximum pq/map size is known
        to be small [A-Z] so provide memory on the stack for speed and safety. */
-    struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     priority_queue distances = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
                                        NULL, cmp_pq_costs, NULL);
     for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
@@ -720,11 +774,10 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
         *map_pq_at(map_pq, (char)vx) = (struct dijkstra_vertex){
             .name = (char)vx,
             .from = '\0',
-            .dist = (char)vx == pr.src ? 0 : INT_MAX,
+            .dist = (char)vx == src ? 0 : INT_MAX,
         };
         prog_assert(push(&distances, &map_pq_at(map_pq, vx)->pq_elem));
     }
-    bool is_path = false;
     struct dijkstra_vertex const *u = NULL;
     while (!is_empty(&distances))
     {
@@ -732,10 +785,9 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
            deallocate any memory. The pq has no allocation permissions. */
         u = front(&distances);
         (void)pop(&distances);
-        if (u->name == pr.dst || u->dist == INT_MAX)
+        if (u->name == dst || u->dist == INT_MAX)
         {
-            is_path = u->dist != INT_MAX;
-            break;
+            return u->dist;
         }
         struct node const *const edges = vertex_at(graph, u->name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
@@ -753,15 +805,7 @@ dijkstra_shortest_path(struct graph *const graph, struct path_request const pr)
             }
         }
     }
-    if (is_path)
-    {
-        for (; u->from; u = map_pq_at(map_pq, u->from))
-        {
-            paint_edge(graph, u->name, u->from);
-        }
-    }
-    clear_and_flush_graph(graph);
-    return is_path;
+    return INT_MAX;
 }
 
 static inline struct dijkstra_vertex *
@@ -912,7 +956,7 @@ is_vertex(cell c)
 }
 
 static bool
-is_path(cell c)
+is_path_cell(cell c)
 {
     return (c & path_bit) != 0;
 }
