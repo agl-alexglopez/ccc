@@ -1439,7 +1439,10 @@ validate(struct ccc_fromap_ const *const frm)
 /* NOLINTEND(*misc-no-recursion) */
 
 /* Below you will find the required license for code that inspired the
-implementation of a WAVL tree in this repository for some map containers.
+implementation of a WAVL tree in this repository for some map containers. This
+license is identical to that used for the entire repository that I provide at
+the root of the repository.
+
 The original repository can be found here:
 
 https://github.com/pvachon/wavl_tree

@@ -21,7 +21,8 @@ been adjusted to accommodate this library's ability to be an allocating or
 non-allocating container. All left-right symmetric cases have been united
 into one and I chose to tackle rotations and deletions slightly differently,
 shortening the code significantly. Finally, a few other changes and
-improvements suggested by the authors of the original paper are implemented.
+improvements suggested by the authors of the original paper are implemented. See
+the required license at the bottom of the file for BSD-2-Clause compliance.
 
 Overall a WAVL tree is quite impressive for it's simplicity and purported
 improvements over AVL and Red-Black trees. The rank framework is intuitive
@@ -1313,7 +1314,10 @@ validate(struct ccc_romap_ const *const rom)
 /* NOLINTEND(*misc-no-recursion) */
 
 /* Below you will find the required license for code that inspired the
-implementation of a WAVL tree in this repository for some map containers.
+implementation of a WAVL tree in this repository for some map containers. This
+license is identical to that used for the entire repository that I provide at
+the root of the repository.
+
 The original repository can be found here:
 
 https://github.com/pvachon/wavl_tree
