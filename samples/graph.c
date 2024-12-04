@@ -420,42 +420,42 @@ connect_rand_dst(struct graph *const graph, struct vertex *const src_vertex)
     /* Cycle through all vertices with which to join an edge randomly. */
     rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size,
                  &(size_t){0});
-    for (size_t i = 0; i < graph_size; ++i)
+    bool connected = false;
+    for (size_t i = 0; i < graph_size && !connected; ++i)
     {
         struct vertex *const dst
             = vertex_at(graph, vertex_titles[vertex_title_indices[i]]);
-        if (src_vertex->name != dst->name
-            && !has_edge_with(src_vertex, dst->name)
-            && vertex_degree(dst) < MAX_DEGREE)
+        if (src_vertex->name == dst->name
+            || has_edge_with(src_vertex, dst->name)
+            || vertex_degree(dst) == MAX_DEGREE)
         {
-            /* A graph will look more visually pleasing if it does not make
-               excessively dumb choices. Before building a new edge check if a
-               good route between source and destination already exists even if
-               it is not direct. */
-            struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
-            int const path_cost = dijkstra_shortest_path(
-                graph, map_pq, src_vertex->name, dst->name);
-
-            flat_hash_map parent_map
-                = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
-                           std_alloc, hash_parent_cells, eq_parent_cells, NULL);
-            int const construction_cost
-                = edge_construction_cost(graph, &parent_map, src_vertex, dst);
-            if (path_cost < construction_cost)
-            {
-                (void)fhm_clear_and_free(&parent_map, NULL);
-                return true;
-            }
-            if (construction_cost != INT_MAX)
-            {
-                edge_construct(graph, &parent_map, src_vertex, dst);
-                (void)fhm_clear_and_free(&parent_map, NULL);
-                return true;
-            }
-            (void)fhm_clear_and_free(&parent_map, NULL);
+            continue;
         }
+        /* A graph will look more visually pleasing if it does not make
+           excessively dumb choices. Before building a new edge check if a
+           good route between source and destination already exists even if
+           it is not direct. */
+        int const path_cost = dijkstra_shortest_path(
+            graph, (struct dijkstra_vertex[MAX_VERTICES]){}, src_vertex->name,
+            dst->name);
+
+        flat_hash_map parent_map
+            = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
+                       std_alloc, hash_parent_cells, eq_parent_cells, NULL);
+        int const construction_cost
+            = edge_construction_cost(graph, &parent_map, src_vertex, dst);
+        if (path_cost < construction_cost)
+        {
+            connected = true;
+        }
+        else if (construction_cost != INT_MAX)
+        {
+            connected = true;
+            edge_construct(graph, &parent_map, src_vertex, dst);
+        }
+        (void)fhm_clear_and_free(&parent_map, NULL);
     }
-    return false;
+    return connected;
 }
 
 /* This function assumes that the destination is valid. Valid means that
