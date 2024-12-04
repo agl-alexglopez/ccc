@@ -178,10 +178,9 @@ static char const *paths[] = {
 
 /* North, East, South, West */
 static struct point const dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-static char const vertex_titles[MAX_VERTICES] = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-};
+/* Graphs are limited to 26 vertices. */
+static char const start_vertex_title = 'A';
+static char const end_vertex_title = 'Z';
 
 #define prog_assert(cond, ...)                                                 \
     do                                                                         \
@@ -204,8 +203,6 @@ static int const default_cols = 111;
 static int const default_vertices = 4;
 static int const row_col_min = 7;
 static int const vertex_placement_padding = 3;
-static char const start_vertex_title = 'A';
-static char const end_vertex_title = 'Z';
 
 static size_t const vertex_cell_title_shift = 8;
 static cell const vertex_title_mask = 0xFF00;
@@ -236,8 +233,7 @@ static str_view const quit_cmd = SV("q");
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
-static int edge_construction_cost(struct graph *, flat_hash_map *,
-                                  struct vertex *, struct vertex *);
+static bool found_dst(struct graph *, struct vertex *);
 static void edge_construct(struct graph *g, flat_hash_map *parent_map,
                            struct vertex *src, struct vertex *dst);
 static int dijkstra_shortest_path(struct graph *,
@@ -254,7 +250,6 @@ static cell *grid_at_mut(struct graph const *, int r, int c);
 static cell grid_at(struct graph const *, int r, int c);
 static uint16_t sort_vertices(char, char);
 static int vertex_degree(struct vertex const *);
-static bool connect_rand_dst(struct graph *, struct vertex *);
 static void build_path_outline(struct graph *);
 static void build_path_cell(struct graph *, int r, int c, cell);
 static void clear_and_flush_graph(struct graph const *);
@@ -267,7 +262,6 @@ static bool is_valid_edge_cell(cell, cell);
 static void clear_paint(struct graph *);
 static bool is_vertex(cell);
 static bool is_path_cell(cell);
-static inline bool is_dst(cell c, char dst);
 static struct vertex *vertex_at(struct graph const *g, char name);
 static struct dijkstra_vertex *map_pq_at(struct dijkstra_vertex const *dj_arr,
                                          char vertex);
@@ -392,98 +386,35 @@ build_graph(struct graph *const graph)
         char key = (char)vertex_title;
         struct vertex *const src = vertex_at(graph, key);
         prog_assert(src != NULL);
-        int const degree = vertex_degree(src);
-        if (degree == MAX_DEGREE)
-        {
-            continue;
-        }
-        int const out_edges = rand_range(1, MAX_DEGREE - degree);
-        for (int i = 0; i < out_edges && connect_rand_dst(graph, src); ++i)
+        while (vertex_degree(src) < MAX_DEGREE && found_dst(graph, src))
         {}
     }
     clear_and_flush_graph(graph);
 }
 
-/* Connects source to random destination vertex. A connection can mean
-   confirming an efficient path already exists between source and destination
-   across connected vertices or that we build a new edge between source and
-   destination. The more efficient (less distance) option is always chosen. */
+/* This function uses a breadth first search to find the closest vertex it has
+   not already formed an edge with. If the dst has an available out degree it
+   will form an edge with src. This creates graphs that require the later
+   Dijkstra's algorithm to be correct because there will likely be multiple
+   paths between vertices that may have small differences in distance. The
+   graphs also are more visually pleasing and make some sense because routes
+   are formed efficiently due to the bfs. */
 static bool
-connect_rand_dst(struct graph *const graph, struct vertex *const src_vertex)
+found_dst(struct graph *const graph, struct vertex *const src)
 {
-    size_t const graph_size = graph->vertices;
-    size_t vertex_title_indices[MAX_VERTICES];
-    for (size_t i = 0; i < graph_size; ++i)
-    {
-        vertex_title_indices[i] = i;
-    }
-    /* Cycle through all vertices with which to join an edge randomly. */
-    rand_shuffle(sizeof(size_t), vertex_title_indices, graph_size,
-                 &(size_t){0});
-    bool connected = false;
-    for (size_t i = 0; i < graph_size && !connected; ++i)
-    {
-        struct vertex *const dst
-            = vertex_at(graph, vertex_titles[vertex_title_indices[i]]);
-        if (src_vertex->name == dst->name
-            || has_edge_with(src_vertex, dst->name)
-            || vertex_degree(dst) == MAX_DEGREE)
-        {
-            continue;
-        }
-        /* A graph will look more visually pleasing if it does not make
-           excessively dumb choices. Before building a new edge check if a
-           good route between source and destination already exists even if
-           it is not direct. */
-        int const path_cost = dijkstra_shortest_path(
-            graph, (struct dijkstra_vertex[MAX_VERTICES]){}, src_vertex->name,
-            dst->name);
-
-        flat_hash_map parent_map
-            = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
-                       std_alloc, hash_parent_cells, eq_parent_cells, NULL);
-        int const construction_cost
-            = edge_construction_cost(graph, &parent_map, src_vertex, dst);
-        if (path_cost < construction_cost)
-        {
-            connected = true;
-        }
-        else if (construction_cost != INT_MAX)
-        {
-            connected = true;
-            edge_construct(graph, &parent_map, src_vertex, dst);
-        }
-        (void)fhm_clear_and_free(&parent_map, NULL);
-    }
-    return connected;
-}
-
-/* This function assumes that the destination is valid. Valid means that
-   source is not already connected to destination and that destination
-   has less than the maximum allowable in degree. However, edge formation
-   still may fail if no path exists from source to destination. The cost
-   reported is the distance in cells in the terminal screen it would take
-   to complete this path. The parent map will hold the shortest path from dst
-   back to src on the terminal screen if it exists. */
-static int
-edge_construction_cost(struct graph *const graph,
-                       flat_hash_map *const parent_map,
-                       struct vertex *const src, struct vertex *const dst)
-{
-    if (src->name == dst->name)
-    {
-        return 0;
-    }
+    flat_hash_map parent_map
+        = fhm_init((struct path_backtrack_cell *)NULL, 0, current, elem,
+                   std_alloc, hash_parent_cells, eq_parent_cells, NULL);
     flat_double_ended_queue bfs
         = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     entry *e = fhm_insert_or_assign_w(
-        parent_map, src->pos, (struct path_backtrack_cell){.parent = {-1, -1}});
+        &parent_map, src->pos,
+        (struct path_backtrack_cell){.parent = {-1, -1}});
     prog_assert(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
-    int cost = -1;
+    bool dst_connection = false;
     while (!is_empty(&bfs))
     {
-        ++cost;
         struct point cur = *((struct point *)front(&bfs));
         (void)pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
@@ -492,25 +423,32 @@ edge_construction_cost(struct graph *const graph,
                 = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
             struct path_backtrack_cell push = {.current = next, .parent = cur};
             cell const next_cell = grid_at(graph, next.r, next.c);
-            if (is_dst(next_cell, dst->name))
+            if (is_vertex(next_cell))
             {
-                ++cost;
-                entry const in = insert_or_assign(parent_map, &push.elem);
-                prog_assert(!insert_error(&in));
-                cur = next;
-                (void)fdeq_clear_and_free(&bfs, NULL);
-                return cost;
+                struct vertex *const nv
+                    = vertex_at(graph, get_cell_vertex_title(next_cell));
+                if (src->name != nv->name && vertex_degree(nv) < MAX_DEGREE
+                    && !has_edge_with(src, nv->name))
+                {
+                    entry const in = insert_or_assign(&parent_map, &push.elem);
+                    prog_assert(!insert_error(&in));
+                    edge_construct(graph, &parent_map, src, nv);
+                    dst_connection = true;
+                    goto done;
+                }
             }
             if (!is_path_cell(next_cell)
-                && !occupied(try_insert_r(parent_map, &push.elem)))
+                && !occupied(try_insert_r(&parent_map, &push.elem)))
             {
                 struct point const *const n = push_back(&bfs, &next);
                 prog_assert(n);
             }
         }
     }
+done:
     (void)fdeq_clear_and_free(&bfs, NULL);
-    return INT_MAX;
+    (void)fhm_clear_and_free(&parent_map, NULL);
+    return dst_connection;
 }
 
 /* Assumes that src and dst have not already been connected in the graph or in
@@ -851,12 +789,6 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name)
 }
 
 /*========================  Graph/Grid Helpers  =============================*/
-
-static inline bool
-is_dst(cell const c, char const dst)
-{
-    return is_vertex(c) && get_cell_vertex_title(c) == dst;
-}
 
 static struct vertex *
 vertex_at(struct graph const *const g, char const name)
