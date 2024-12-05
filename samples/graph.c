@@ -6,9 +6,10 @@ priority queue and map provided by this library.
 Usage:
 -r=N The row flag lets you specify area for grid rows > 7.
 -c=N The col flag lets you specify area for grid cols > 7.
--v=N specify 1 to 26 vertices for the randomly generated and connected graph.
+-v=N specify 1-26 vertices for the randomly generated and connected graph.
+-s=N specify 1-7 animation speed for Dijkstra's algorithm.
 Example:
-./build/[debug/]bin/graph -c=111 -r=33 -v=4
+./build/[debug/]bin/graph -c=111 -r=33 -v=4 -s=3
 Once the graph is built seek the shortest path between two uppercase vertices.
 Examples:
 AB
@@ -40,11 +41,16 @@ Enter 'q' to quit. */
 #include "random.h"
 #include "str_view.h"
 
+#define CYN "\033[38;5;14m"
+#define MAG "\033[38;5;13m"
+#define NIL "\033[0m"
+
 enum
 {
     DIRS_SIZE = 4,
     MAX_VERTICES = 26,
     MAX_DEGREE = 4,
+    MAX_SPEED = 7,
 };
 
 /* The highest order 16 bits in the grid shall be reserved for the edge
@@ -152,6 +158,7 @@ struct graph
     int rows;
     int cols;
     int vertices;
+    struct timespec speed;
     cell *grid;
     struct vertex *graph;
 };
@@ -176,6 +183,10 @@ static char const *paths[] = {
     "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼",
 };
 
+int const speeds[8] = {
+    0, 500000000, 250000000, 100000000, 50000000, 25000000, 10000000, 1000000,
+};
+
 /* North, East, South, West */
 static struct point const dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 /* Graphs are limited to 26 vertices. */
@@ -194,10 +205,6 @@ static char const end_vertex_title = 'Z';
         }                                                                      \
     } while (0)
 
-static str_view const rows = SV("-r=");
-static str_view const cols = SV("-c=");
-static str_view const vertices_flag = SV("-v=");
-static str_view const help_flag = SV("-h");
 static int const default_rows = 33;
 static int const default_cols = 111;
 static int const default_vertices = 4;
@@ -237,10 +244,12 @@ static bool found_dst(struct graph *, struct vertex *);
 static void edge_construct(struct graph *g, flat_hash_map *parent_map,
                            struct vertex *src, struct vertex *dst);
 static int dijkstra_shortest_path(struct graph *, char src, char dst);
-static void paint_edge(struct graph *, char, char);
+static void paint_edge(struct graph *, char, char, char const *edge_color);
 static void add_edge_cost_label(struct graph *, struct vertex *,
                                 struct edge const *);
 static cell make_edge(char src, char dst);
+static void flush_at(struct graph const *g, int r, int c,
+                     char const *edge_color);
 
 static struct point random_vertex_placement(struct graph const *);
 static bool is_valid_vertex_pos(struct graph const *, int r, int c);
@@ -250,8 +259,8 @@ static uint16_t sort_vertices(char, char);
 static int vertex_degree(struct vertex const *);
 static void build_path_outline(struct graph *);
 static void build_path_cell(struct graph *, int r, int c, cell);
-static void clear_and_flush_graph(struct graph const *);
-static void print_cell(cell);
+static void clear_and_flush_graph(struct graph const *, char const *edge_color);
+static void print_cell(cell, char const *edge_color);
 static char get_cell_vertex_title(cell);
 static bool has_edge_with(struct vertex const *, char);
 static bool add_edge(struct vertex *, struct edge const *);
@@ -267,7 +276,8 @@ static struct dijkstra_vertex *map_pq_at(struct dijkstra_vertex const *dj_arr,
 static void encode_digits(struct graph const *, struct digit_encoding *);
 static enum label_orientation get_direction(struct point const *,
                                             struct point const *);
-static struct int_conversion parse_digits(str_view);
+static struct int_conversion parse_digits(str_view, int lower_bound,
+                                          int upper_bound, char const *err_msg);
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
@@ -290,40 +300,41 @@ main(int argc, char **argv)
     struct graph graph = {.rows = default_rows,
                           .cols = default_cols,
                           .vertices = default_vertices,
+                          .speed = {},
                           .grid = NULL,
                           .graph = network};
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
-        if (sv_starts_with(arg, rows))
+        if (sv_starts_with(arg, SV("-r=")))
         {
-            struct int_conversion const row_arg = parse_digits(arg);
-            if (row_arg.status == CONV_ER || row_arg.conversion < row_col_min)
-            {
-                quit("rows below required minimum or negative.\n", 1);
-            }
+            struct int_conversion const row_arg
+                = parse_digits(arg, row_col_min, INT_MAX,
+                               "rows_below required minimum or negative\n");
             graph.rows = row_arg.conversion;
         }
-        else if (sv_starts_with(arg, cols))
+        else if (sv_starts_with(arg, SV("-c=")))
         {
-            struct int_conversion const col_arg = parse_digits(arg);
-            if (col_arg.status == CONV_ER || col_arg.conversion < row_col_min)
-            {
-                quit("cols below required minimum or negative.\n", 1);
-            }
+            struct int_conversion const col_arg
+                = parse_digits(arg, row_col_min, INT_MAX,
+                               "cols below required minimum or negative.\n");
             graph.cols = col_arg.conversion;
         }
-        else if (sv_starts_with(arg, vertices_flag))
+        else if (sv_starts_with(arg, SV("-v=")))
         {
-            struct int_conversion const vert_arg = parse_digits(arg);
-            if (vert_arg.status == CONV_ER || vert_arg.conversion > MAX_VERTICES
-                || vert_arg.conversion < 1)
-            {
-                quit("vertices outside of valid range (1-26).\n", 1);
-            }
+            struct int_conversion const vert_arg
+                = parse_digits(arg, 1, MAX_VERTICES,
+                               "vertices outside of valid range (1-26).\n");
             graph.vertices = vert_arg.conversion;
         }
-        else if (sv_starts_with(arg, help_flag))
+        else if (sv_starts_with(arg, SV("-s=")))
+        {
+            struct int_conversion const vert_arg = parse_digits(
+                arg, 0, MAX_SPEED,
+                "animation speed outside of valid range (1-7).\n");
+            graph.speed.tv_nsec = speeds[vert_arg.conversion];
+        }
+        else if (sv_starts_with(arg, SV("-h")))
         {
             help();
         }
@@ -365,7 +376,7 @@ static void
 build_graph(struct graph *const graph)
 {
     build_path_outline(graph);
-    clear_and_flush_graph(graph);
+    clear_and_flush_graph(graph, MAG);
     for (int vertex = 0, vertex_title = start_vertex_title;
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
@@ -387,7 +398,7 @@ build_graph(struct graph *const graph)
         while (vertex_degree(src) < MAX_DEGREE && found_dst(graph, src))
         {}
     }
-    clear_and_flush_graph(graph);
+    clear_and_flush_graph(graph, MAG);
 }
 
 /* This function uses a breadth first search to find the closest vertex it has
@@ -638,7 +649,6 @@ find_shortest_paths(struct graph *const graph)
 {
     for (;;)
     {
-        clear_paint(graph);
         set_cursor_position(graph->rows, 0);
         clear_line();
         sv_print(stdout, prompt_msg);
@@ -681,6 +691,8 @@ static int
 dijkstra_shortest_path(struct graph *const graph, char const src,
                        char const dst)
 {
+    clear_paint(graph);
+    clear_and_flush_graph(graph, NIL);
     /* One struct dijkstra_vertex will represent the path rebuilding map and the
        priority queue. The intrusive pq elem will give us an O(1) (technically
        o(lg N)) decrease key. The pq element is not given allocation permissions
@@ -709,17 +721,23 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         (void)pop(&distances);
         if (u->name == dst || u->dist == INT_MAX)
         {
-            for (; u->from; u = map_pq_at(map_pq, u->from))
+            if (u->dist != INT_MAX)
             {
-                paint_edge(graph, u->name, u->from);
+                clear_paint(graph);
+                for (; u->from; u = map_pq_at(map_pq, u->from))
+                {
+                    paint_edge(graph, u->name, u->from, CYN);
+                    nanosleep(&graph->speed, NULL);
+                }
             }
-            clear_and_flush_graph(graph);
             return u->dist;
         }
         struct node const *const edges = vertex_at(graph, u->name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
             struct dijkstra_vertex *const v = map_pq_at(map_pq, edges[i].name);
+            paint_edge(graph, u->name, v->name, MAG);
+            nanosleep(&graph->speed, NULL);
             int const alt = u->dist + edges[i].cost;
             if (alt < v->dist)
             {
@@ -743,7 +761,8 @@ map_pq_at(struct dijkstra_vertex const *const dj_arr, char const vertex)
 }
 
 static void
-paint_edge(struct graph *const g, char const src_name, char const dst_name)
+paint_edge(struct graph *const g, char const src_name, char const dst_name,
+           char const *const edge_color)
 {
     struct vertex const *const src = vertex_at(g, src_name);
     struct vertex const *const dst = vertex_at(g, dst_name);
@@ -753,6 +772,7 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name)
     while (cur.r != dst->pos.r || cur.c != dst->pos.c)
     {
         *grid_at_mut(g, cur.r, cur.c) |= paint_bit;
+        flush_at(g, cur.r, cur.c, edge_color);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
             struct point next = {
@@ -883,7 +903,7 @@ is_path_cell(cell c)
 }
 
 static void
-clear_and_flush_graph(struct graph const *const g)
+clear_and_flush_graph(struct graph const *const g, char const *const edge_color)
 {
     clear_screen();
     for (int row = 0; row < g->rows; ++row)
@@ -891,7 +911,7 @@ clear_and_flush_graph(struct graph const *const g)
         for (int col = 0; col < g->cols; ++col)
         {
             set_cursor_position(row, col);
-            print_cell(grid_at(g, row, col));
+            print_cell(grid_at(g, row, col), edge_color);
         }
         printf("\n");
     }
@@ -910,8 +930,17 @@ clear_paint(struct graph *const graph)
     }
 }
 
-static void
-print_cell(cell const c)
+static inline void
+flush_at(struct graph const *const g, int const r, int const c,
+         char const *const edge_color)
+{
+    set_cursor_position(r, c);
+    print_cell(grid_at(g, r, c), edge_color);
+    (void)fflush(stdout);
+}
+
+static inline void
+print_cell(cell const c, char const *const edge_color)
 {
 
     if (c & vertex_bit)
@@ -924,8 +953,9 @@ print_cell(cell const c)
     }
     else if (c & path_bit)
     {
-        (c & paint_bit) ? printf("\033[38;5;13m%s\033[0m", paths[c & path_mask])
-                        : printf("%s", paths[c & path_mask]);
+        (c & paint_bit)
+            ? printf("%s%s%s", edge_color, paths[c & path_mask], NIL)
+            : printf("%s", paths[c & path_mask]);
     }
     else if (!(c & path_bit))
     {
@@ -1057,7 +1087,8 @@ parse_path_request(struct graph *const g, str_view r)
 }
 
 static struct int_conversion
-parse_digits(str_view arg)
+parse_digits(str_view arg, int const lower_bound, int const upper_bound,
+             char const *const err_msg)
 {
     size_t const eql = sv_rfind(arg, sv_npos(arg), SV("="));
     if (eql == sv_npos(arg))
@@ -1070,7 +1101,15 @@ parse_digits(str_view arg)
         (void)fprintf(stderr, "please specify element to convert.\n");
         return (struct int_conversion){.status = CONV_ER};
     }
-    return convert_to_int(sv_begin(arg));
+    struct int_conversion res = convert_to_int(sv_begin(arg));
+    if (res.status == CONV_ER || res.conversion > upper_bound
+        || res.conversion < lower_bound)
+    {
+        printf("flag argument outside of valid range (%d-%d).\n", lower_bound,
+               upper_bound);
+        quit(err_msg, 1);
+    }
+    return res;
 }
 
 static unsigned
@@ -1091,10 +1130,11 @@ help(void)
         "demonstrate usage of the priority queue and map provided by this "
         "library.\nUsage:\n-r=N The row flag lets you specify area for grid "
         "rows > 7.\n-c=N The col flag lets you specify area for grid cols > "
-        "7.\n-v=N specify 1 to 26 vertices for the randomly generated and "
-        "connected graph.\nExample:\n./build/[debug/]bin/graph -c=111 -r=33 "
-        "-v=4\n"
-        "Once the graph is built seek the shortest path between two uppercase "
-        "vertices. Examples:\nAB\nA->B\nCtoD\nEnter 'q' to quit.\n");
+        "7.\n-v=N specify 1-26 vertices for the randomly generated and "
+        "connected graph.\n-s=N specify 1-7 animation speed for Dijkstra's "
+        "algorithm.\nExample:\n./build/[debug/]bin/graph -c=111 -r=33 "
+        "-v=19 -s=3\nOnce the graph is built seek the shortest path between "
+        "two "
+        "uppercase vertices. Examples:\nAB\nA->B\nCtoD\nEnter 'q' to quit.\n");
     exit(0);
 }
