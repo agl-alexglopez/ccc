@@ -236,9 +236,7 @@ static void find_shortest_paths(struct graph *);
 static bool found_dst(struct graph *, struct vertex *);
 static void edge_construct(struct graph *g, flat_hash_map *parent_map,
                            struct vertex *src, struct vertex *dst);
-static int dijkstra_shortest_path(struct graph *,
-                                  struct dijkstra_vertex *map_pq, char src,
-                                  char dst);
+static int dijkstra_shortest_path(struct graph *, char src, char dst);
 static void paint_edge(struct graph *, char, char);
 static void add_edge_cost_label(struct graph *, struct vertex *,
                                 struct edge const *);
@@ -662,22 +660,8 @@ find_shortest_paths(struct graph *const graph)
                      1);
                 return;
             }
-            struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
-            int const cost
-                = dijkstra_shortest_path(graph, map_pq, pr.src, pr.dst);
-            if (cost != INT_MAX)
+            if (dijkstra_shortest_path(graph, pr.src, pr.dst) == INT_MAX)
             {
-                struct dijkstra_vertex const *u = map_pq_at(map_pq, pr.dst);
-                for (; u->from; u = map_pq_at(map_pq, u->from))
-                {
-                    paint_edge(graph, u->name, u->from);
-                }
-                clear_and_flush_graph(graph);
-            }
-            else
-            {
-                clear_paint(graph);
-                clear_and_flush_graph(graph);
                 struct point const *const src = &vertex_at(graph, pr.src)->pos;
                 struct point const *const dst = &vertex_at(graph, pr.dst)->pos;
                 set_cursor_position(src->r, src->c);
@@ -694,10 +678,10 @@ find_shortest_paths(struct graph *const graph)
 }
 
 static int
-dijkstra_shortest_path(struct graph *const graph,
-                       struct dijkstra_vertex *const map_pq, char const src,
+dijkstra_shortest_path(struct graph *const graph, char const src,
                        char const dst)
 {
+    struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     /* One struct dijkstra_vertex will represent the path rebuilding map and the
        priority queue. The intrusive pq elem will give us an O(1) (technically
        o(lg N)) decrease key. The pq element is not given allocation permissions
@@ -725,6 +709,11 @@ dijkstra_shortest_path(struct graph *const graph,
         (void)pop(&distances);
         if (u->name == dst || u->dist == INT_MAX)
         {
+            for (; u->from; u = map_pq_at(map_pq, u->from))
+            {
+                paint_edge(graph, u->name, u->from);
+            }
+            clear_and_flush_graph(graph);
             return u->dist;
         }
         struct node const *const edges = vertex_at(graph, u->name)->edges;
