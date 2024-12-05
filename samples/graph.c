@@ -681,7 +681,6 @@ static int
 dijkstra_shortest_path(struct graph *const graph, char const src,
                        char const dst)
 {
-    struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     /* One struct dijkstra_vertex will represent the path rebuilding map and the
        priority queue. The intrusive pq elem will give us an O(1) (technically
        o(lg N)) decrease key. The pq element is not given allocation permissions
@@ -689,6 +688,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
        structure not the memory that is used to store the elements; the path
        rebuild map remains accessible. Best of all, maximum pq/map size is known
        to be small [A-Z] so provide memory on the stack for speed and safety. */
+    struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     priority_queue distances = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
                                        NULL, cmp_pq_costs, NULL);
     for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
