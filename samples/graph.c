@@ -1069,6 +1069,10 @@ hash_64_bits(uint64_t x)
 
 /*===========================    Misc    ====================================*/
 
+/* Parses the path request. Returns the character 'q' as the src and dst if
+   the user has requested to quit. Otherwise tries to parse. If parsing
+   cannot be completed an empty path request with the null terminator is
+   returned. */
 static struct path_request
 parse_path_request(struct graph *const g, str_view r)
 {
