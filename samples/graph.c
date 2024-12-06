@@ -395,7 +395,6 @@ build_graph(struct graph *const graph)
     {
         char key = (char)vertex_title;
         struct vertex *const src = vertex_at(graph, key);
-        prog_assert(src != NULL);
         while (vertex_degree(src) < MAX_DEGREE && found_dst(graph, src))
         {}
     }
@@ -476,8 +475,7 @@ edge_construct(struct graph *const g, flat_hash_map *const parent_map,
     while (c->parent.r > 0)
     {
         c = get_key_val(parent_map, &c->parent);
-        prog_assert(c,
-                    { printf("Cannot find cell parent to rebuild path.\n"); });
+        prog_assert(c, printf("Cannot find cell parent to rebuild path.\n"););
         ++edge.n.cost;
         *grid_at_mut(g, c->current.r, c->current.c) |= edge_id;
         build_path_cell(g, c->current.r, c->current.c, edge_id);
