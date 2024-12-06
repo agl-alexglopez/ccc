@@ -45,14 +45,6 @@ Enter 'q' to quit. */
 #define MAG "\033[38;5;13m"
 #define NIL "\033[0m"
 
-enum
-{
-    DIRS_SIZE = 4,
-    MAX_VERTICES = 26,
-    MAX_DEGREE = 4,
-    MAX_SPEED = 7,
-};
-
 /* The highest order 16 bits in the grid shall be reserved for the edge
    id if the square is a path. An edge ID is a concatenation of two
    vertex names. Vertex names are 8 bit characters, so two vertices can
@@ -85,6 +77,14 @@ enum
        with the lower value in the leftmost bits.
      - the vertex title is stored in 8 bits if the cell is a vertex. */
 typedef uint32_t cell;
+
+enum
+{
+    DIRS_SIZE = 4,
+    MAX_VERTICES = 26,
+    MAX_DEGREE = 4,
+    MAX_SPEED = 7,
+};
 
 struct point
 {
@@ -549,13 +549,12 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
 static void
 encode_digits(struct graph const *const g, struct digit_encoding *const e)
 {
-    uintmax_t digits = e->cost;
     if (e->orientation == NORTH || e->orientation == SOUTH)
     {
         e->start.r = e->orientation == NORTH
                          ? e->start.r + (int)e->spaces_needed - 2
                          : e->start.r - 1;
-        for (; digits; digits /= 10, --e->start.r)
+        for (uintmax_t digits = e->cost; digits; digits /= 10, --e->start.r)
         {
             *grid_at_mut(g, e->start.r, e->start.c) |= digit_bit;
             *grid_at_mut(g, e->start.r, e->start.c)
@@ -567,7 +566,7 @@ encode_digits(struct graph const *const g, struct digit_encoding *const e)
         e->start.c = e->orientation == WEST
                          ? e->start.c + (int)e->spaces_needed - 2
                          : e->start.c - 1;
-        for (; digits; digits /= 10, --e->start.c)
+        for (uintmax_t digits = e->cost; digits; digits /= 10, --e->start.c)
         {
             *grid_at_mut(g, e->start.r, e->start.c) |= digit_bit;
             *grid_at_mut(g, e->start.r, e->start.c)
@@ -663,17 +662,17 @@ find_shortest_paths(struct graph *const graph)
             if (pr.src == 'q')
             {
                 free(lineptr);
-                quit("Exiting now.\n", 0);
+                printf("Exiting now.\n");
+                return;
             }
             if (!pr.src)
             {
                 clear_line();
                 free(lineptr);
-                quit("Please provide any source and destination vertex "
-                     "represented in the grid\nExamples: AB, A B, B-C, X->Y, "
-                     "DtoF\nMost formats work but two capital vertices are "
-                     "needed.\n",
-                     1);
+                printf("Please provide any source and destination vertex "
+                       "represented in the grid\nExamples: AB, A B, B-C, X->Y, "
+                       "DtoF\nMost formats work but two capital vertices are "
+                       "needed.\n");
                 return;
             }
             if (dijkstra_shortest_path(graph, pr.src, pr.dst) == INT_MAX)
@@ -714,14 +713,13 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
             .from = '\0',
             .dist = (char)vx == src ? 0 : INT_MAX,
         };
-        prog_assert(push(&distances, &map_pq_at(map_pq, vx)->pq_elem));
+        prog_assert(push(&distances, &map_pq_at(map_pq, (char)vx)->pq_elem));
     }
-    struct dijkstra_vertex const *u = NULL;
     while (!is_empty(&distances))
     {
         /* The reference to u is valid after the pop because the pop does not
            deallocate any memory. The pq has no allocation permissions. */
-        u = front(&distances);
+        struct dijkstra_vertex const *u = front(&distances);
         (void)pop(&distances);
         if (u->name == dst || u->dist == INT_MAX)
         {
