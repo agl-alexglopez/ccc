@@ -183,6 +183,7 @@ static char const *paths[] = {
     "╴", "╯", "─", "┴", "╮", "┤", "┬", "┼",
 };
 
+/* Animation speed for edge coloring during solving phase. */
 int const speeds[8] = {
     0, 500000000, 250000000, 100000000, 50000000, 25000000, 10000000, 1000000,
 };
@@ -647,18 +648,23 @@ random_vertex_placement(struct graph const *const graph)
 static void
 find_shortest_paths(struct graph *const graph)
 {
+    char *lineptr = NULL;
+    size_t len = 0;
     for (;;)
     {
         set_cursor_position(graph->rows, 0);
         clear_line();
         sv_print(stdout, prompt_msg);
-        size_t len = 0;
         ssize_t read = 0;
-        char *lineptr = NULL;
         while ((read = getline(&lineptr, &len, stdin)) > 0)
         {
             struct path_request pr = parse_path_request(
                 graph, (str_view){.s = lineptr, .len = read - 1});
+            if (pr.src == 'q')
+            {
+                free(lineptr);
+                quit("Exiting now.\n", 0);
+            }
             if (!pr.src)
             {
                 clear_line();
@@ -682,8 +688,6 @@ find_shortest_paths(struct graph *const graph)
             }
             break;
         }
-        /* Allocating and freeing in a loop is bad but getline is nice. */
-        free(lineptr);
     }
 }
 
@@ -1070,7 +1074,7 @@ parse_path_request(struct graph *const g, str_view r)
 {
     if (sv_contains(r, quit_cmd))
     {
-        quit("Exiting now.\n", 0);
+        return (struct path_request){'q', 'q'};
     }
     struct path_request res = {};
     char const end_title = (char)(start_vertex_title + g->vertices - 1);
