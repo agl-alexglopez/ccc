@@ -894,12 +894,12 @@ maybe_resize(struct ccc_fhmap_ *const h)
     {
         return CCC_MEM_ERR;
     }
-    (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
     (void)memset(ccc_buf_begin(&new_hash.buf_), CCC_FHM_EMPTY,
                  ccc_buf_capacity(&new_hash.buf_)
                      * ccc_buf_elem_size(&new_hash.buf_));
+    (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
          slot = ccc_buf_next(&h->buf_, slot))

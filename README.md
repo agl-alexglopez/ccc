@@ -170,12 +170,11 @@ fhmap_id_eq(ccc_key_cmp const cmp)
 int
 main(void)
 {
-    struct key_val vals[20];
     /* stack array backed, key field named key, intrusive field e, no
        allocation permission, a hash function, an equality function, no aux. */
     ccc_flat_hash_map fh;
-        = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e, NULL,
-                   fhmap_int_to_u64, fhmap_id_eq, NULL);
+        = fhm_init((struct val[20]){}, 20, key, e, NULL, fhmap_int_to_u64,
+                    fhmap_id_eq, NULL);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -813,7 +812,7 @@ Here, the container pushes stack allocated structs directly into the list. The c
 
 Because the user may choose the source of memory for a container, initialization at compile time is possible for all containers.
 
-A flat hash map may be initialized at compile time with memory of static storage duration if the maximum size of the map is known.
+A flat hash map may be initialized at compile time if the maximum size is fixed and no allocation permission is needed.
 
 ```c
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
@@ -824,8 +823,8 @@ struct val
     int val;
 };
 static flat_hash_map val_map
-    = fhm_static_init((static struct val[2999]){}, key, e, fhmap_int_to_u64,
-                      fhmap_id_eq, NULL);
+    = fhm_init((static struct val[2999]){}, 2999, key, e, NULL,
+               fhmap_int_to_u64, fhmap_id_eq, NULL);
 ```
 
 A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see [allocation](#allocation) for more on `std_alloc`).
@@ -838,15 +837,17 @@ struct val
     int key;
     int val;
 };
-static flat_hash_map val_map = fhm_zero_init(
-    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+static flat_hash_map val_map
+    = fhm_init((struct val *)NULL, 0, key, e, std_alloc, fhmap_int_to_u64,
+               fhmap_id_eq, NULL);
 ```
 
 All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
 
 ```c
-static ccc_flat_double_ended_queue ring_buffer
-    = ccc_fdeq_init((static int[4096]){}, NULL, NULL, 4096);
+#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
+static flat_double_ended_queue ring_buffer
+    = fdeq_init((static int[4096]){}, NULL, NULL, 4096);
 ```
 
 In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.
