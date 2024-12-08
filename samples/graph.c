@@ -42,6 +42,7 @@ Enter 'q' to quit. */
 #include "str_view.h"
 
 #define CYN "\033[38;5;14m"
+#define RED "\033[38;5;9m"
 #define MAG "\033[38;5;13m"
 #define NIL "\033[0m"
 
@@ -678,9 +679,9 @@ find_shortest_paths(struct graph *const graph)
                 struct point const *const src = &vertex_at(graph, pr.src)->pos;
                 struct point const *const dst = &vertex_at(graph, pr.dst)->pos;
                 set_cursor_position(src->r, src->c);
-                printf("\033[38;5;9m%c\033[0m", pr.src);
+                printf("%s%c", RED, pr.src);
                 set_cursor_position(dst->r, dst->c);
-                printf("\033[38;5;9m%c\033[0m", pr.dst);
+                printf("%c%s", pr.dst, NIL);
                 (void)fflush(stdout);
             }
             break;
