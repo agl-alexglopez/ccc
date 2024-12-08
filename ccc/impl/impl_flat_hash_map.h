@@ -50,17 +50,15 @@ union ccc_fhmap_entry_
 
 #define ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,   \
                           alloc_fn, hash_fn, key_eq_fn, aux)                   \
-    (__extension__({                                                           \
-        struct ccc_fhmap_ new_fhmap_ = {};                                     \
-        __auto_type fhm_mem_ptr_ = (memory_ptr);                               \
-        new_fhmap_.buf_                                                        \
-            = (ccc_buffer)ccc_buf_init(fhm_mem_ptr_, alloc_fn, aux, capacity); \
-        ccc_impl_fhm_init_buf(                                                 \
-            &new_fhmap_, offsetof(typeof(*(fhm_mem_ptr_)), key_field),         \
-            offsetof(typeof(*(fhm_mem_ptr_)), fhash_elem_field), (hash_fn),    \
-            (key_eq_fn), (aux));                                               \
-        new_fhmap_;                                                            \
-    }))
+    {                                                                          \
+        .buf_                                                                  \
+        = (ccc_buffer)ccc_buf_init((memory_ptr), (alloc_fn), (aux), capacity), \
+        .hash_fn_ = (hash_fn),                                                 \
+        .eq_fn_ = (key_eq_fn),                                                 \
+        .key_offset_ = offsetof(typeof(*(memory_ptr)), key_field),             \
+        .hash_elem_offset_                                                     \
+        = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
+    }
 
 #define ccc_impl_fhm_zero_init(type_name, key_field, fhash_elem_field,         \
                                alloc_fn, hash_fn, key_eq_fn, aux)              \
@@ -84,9 +82,6 @@ union ccc_fhmap_entry_
         = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
     }
 
-void ccc_impl_fhm_init_buf(struct ccc_fhmap_ *, size_t key_offset,
-                           size_t hash_elem_offset, ccc_hash_fn *,
-                           ccc_key_eq_fn *, void *aux);
 struct ccc_ent_ ccc_impl_fhm_find(struct ccc_fhmap_ const *, void const *key,
                                   uint64_t hash);
 void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,

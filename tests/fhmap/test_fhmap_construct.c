@@ -39,7 +39,8 @@ gen(int *to_affect)
 
 static struct val s_vals[10];
 static flat_hash_map static_fh
-    = fhm_static_init(s_vals, key, e, fhmap_int_to_u64, fhmap_id_eq, NULL);
+    = fhm_init(s_vals, sizeof(s_vals) / sizeof(s_vals[0]), key, e, NULL,
+               fhmap_int_to_u64, fhmap_id_eq, NULL);
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
 {
@@ -81,38 +82,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_zero_init)
-{
-    flat_hash_map fh = fhm_zero_init(struct val, key, e, std_alloc,
-                                     fhmap_int_zero, fhmap_id_eq, NULL);
-    CHECK(is_empty(&fh), true);
-    CHECK(fhm_capacity(&fh), 0);
-    struct val def = {.key = 137, .val = 0};
-    fhmap_entry ent = entry(&fh, &def.key);
-    CHECK(unwrap(&ent) == NULL, true);
-    struct val *v = or_insert(entry_r(&fh, &def.key), &def.e);
-    CHECK(v != NULL, true);
-    v->val += 1;
-    struct val const *const inserted = get_key_val(&fh, &def.key);
-    CHECK((inserted != NULL), true);
-    CHECK(inserted->val, 1);
-    v = or_insert(entry_r(&fh, &def.key), &def.e);
-    CHECK(v != NULL, true);
-    v->val += 1;
-    CHECK(inserted->val, 2);
-    CHECK_END_FN(fhm_clear_and_free(&fh, NULL););
-}
-
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
 {
-    struct val src_vals[11];
-    struct val dst_vals[13];
-    flat_hash_map src
-        = fhm_init(src_vals, sizeof(src_vals) / sizeof(src_vals[0]), key, e,
-                   NULL, fhmap_int_zero, fhmap_id_eq, NULL);
-    flat_hash_map dst
-        = fhm_init(dst_vals, sizeof(dst_vals) / sizeof(dst_vals[0]), key, e,
-                   NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map src = fhm_init((struct val[11]){}, 11, key, e, NULL,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map dst = fhm_init((struct val[13]){}, 13, key, e, NULL,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
     (void)insert(&src, &(struct val){.key = 0}.e);
     (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
@@ -134,14 +109,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
 {
-    struct val src_vals[11];
-    struct val dst_vals[7];
-    flat_hash_map src
-        = fhm_init(src_vals, sizeof(src_vals) / sizeof(src_vals[0]), key, e,
-                   NULL, fhmap_int_zero, fhmap_id_eq, NULL);
-    flat_hash_map dst
-        = fhm_init(dst_vals, sizeof(dst_vals) / sizeof(dst_vals[0]), key, e,
-                   NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map src = fhm_init((struct val[11]){}, 11, key, e, NULL,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map dst = fhm_init((struct val[7]){}, 7, key, e, NULL,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
     (void)insert(&src, &(struct val){.key = 0}.e);
     (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
@@ -154,10 +125,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
 {
-    flat_hash_map src = fhm_zero_init(struct val, key, e, std_alloc,
-                                      fhmap_int_zero, fhmap_id_eq, NULL);
-    flat_hash_map dst = fhm_zero_init(struct val, key, e, std_alloc,
-                                      fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map src = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map dst = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
     (void)insert(&src, &(struct val){.key = 0}.e);
     (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
@@ -182,10 +153,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc_fail)
 {
-    flat_hash_map src = fhm_zero_init(struct val, key, e, std_alloc,
-                                      fhmap_int_zero, fhmap_id_eq, NULL);
-    flat_hash_map dst = fhm_zero_init(struct val, key, e, std_alloc,
-                                      fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map src = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map dst = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+                                 fhmap_int_zero, fhmap_id_eq, NULL);
     (void)insert(&src, &(struct val){.key = 0}.e);
     (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
@@ -207,9 +178,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_functional)
 {
-    struct val vals[5] = {};
-    flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e,
-                                NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map fh = fhm_init((struct val[5]){}, 5, key, e, NULL,
+                                fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     struct val def = {.key = 137, .val = 0};
     fhmap_entry ent = entry(&fh, &def.key);
@@ -229,9 +199,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_functional)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_macros)
 {
-    struct val vals[5] = {};
-    flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e,
-                                NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map fh = fhm_init((struct val[5]){}, 5, key, e, NULL,
+                                fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     CHECK(get_key_val(&fh, &(int){137}) == NULL, true);
     int const key = 137;
@@ -254,9 +223,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_macros)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
 {
-    struct val vals[5] = {};
-    flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e,
-                                NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map fh = fhm_init((struct val[5]){}, 5, key, e, NULL,
+                                fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     struct val def = {.key = 137, .val = 0};
 
@@ -293,9 +261,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_functional)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
 {
-    struct val vals[5] = {};
-    flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e,
-                                NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    flat_hash_map fh = fhm_init((struct val[5]){}, 5, key, e, NULL,
+                                fhmap_int_zero, fhmap_id_eq, NULL);
     CHECK(is_empty(&fh), true);
 
     /* Returning a vacant entry is possible when modification is attempted. */
@@ -348,8 +315,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_macros)
 int
 main()
 {
-    return CHECK_RUN(fhmap_test_static_init(), fhmap_test_zero_init(),
-                     fhmap_test_copy_no_alloc(),
+    return CHECK_RUN(fhmap_test_static_init(), fhmap_test_copy_no_alloc(),
                      fhmap_test_copy_no_alloc_fail(), fhmap_test_copy_alloc(),
                      fhmap_test_copy_alloc_fail(), fhmap_test_empty(),
                      fhmap_test_entry_macros(), fhmap_test_entry_functional(),

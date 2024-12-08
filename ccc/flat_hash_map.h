@@ -54,7 +54,7 @@ typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
 Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
-/** @brief Initialize a flat hash map from any buffer of user types at runtime.
+/** @brief Initialize a map with a buffer of types at compile time or runtime.
 @param [in] memory_ptr the pointer to the backing buffer array of user types.
 May be NULL if the user provides a allocation function. The buffer will be
 interpreted in units of type size that the user intends to store.
@@ -68,121 +68,11 @@ resizing is allowed.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
-@warning this version initialization can only operate at runtime and memory_ptr
-must not be a compound literal. It must be an existing l-value of user types
-allocated on the stack, heap, or data segment. For compound literal
-initialization, see ccc_fhm_static_init(). */
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
 #define ccc_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,        \
                      alloc_fn, hash_fn, key_eq_fn, aux_data)                   \
     ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,       \
                       alloc_fn, hash_fn, key_eq_fn, aux_data)
-
-/** @brief Initialize a zero capacity table with allocation permission.
-@param [in] type_name the type being stored in the hash table.
-@param [in] key_field the field of the struct used for key storage.
-@param [in] fhash_elem_field the name of the fhmap_elem field.
-@param [in] alloc_fn the allocation function for resizing.
-@param [in] hash_fn the ccc_hash_fn function the user desires for the table.
-@param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
-@param [in] aux_data auxiliary data that is needed for hashing or comparison.
-@return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_zero_init(...);)
-@warning this initialization requires an allocation function be provided.
-
-At compile time.
-
-```
-#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
-{
-    fhmap_elem e;
-    int key;
-    int val;
-};
-static flat_hash_map fh = fhm_zero_init(
-    struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
-```
-
-At runtime.
-
-```
-#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
-{
-    fhmap_elem e;
-    int key;
-    int val;
-};
-int main(void)
-{
-    static flat_hash_map fh = fhm_zero_init(
-        struct val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
-    return 0;
-}
-```
-
-This initializer is designed to be used at compile time or runtime. The table
-is assumed to start with no allocation and zero capacity. It will resize as
-it is used at runtime with the provided allocation function. */
-#define ccc_fhm_zero_init(type_name, key_field, fhash_elem_field, alloc_fn,    \
-                          hash_fn, key_eq_fn, aux_data)                        \
-    ccc_impl_fhm_zero_init(type_name, key_field, fhash_elem_field, alloc_fn,   \
-                           hash_fn, key_eq_fn, aux_data)
-
-/** @brief the initialization helper macro for a hash table. May be called at
-compile time only if the memory to which it points is of static storage
-duration and thus implicitly zero initialized.
-@param [in] memory_ptr the pointer to the static array of user types.
-@param [in] key_field the field of the struct used for key storage.
-@param [in] fhash_elem_field the name of the fhmap_elem field.
-@param [in] hash_fn the ccc_hash_fn function the user desires for the table.
-@param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
-@param [in] aux_data auxiliary data that is needed for hashing or comparison.
-@return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_static_init(...);)
-@warning the memory pointed to for the backing buffer of the hash table must
-be of static storage duration and non-NULL. Implicit zeroing is needed.
-@note for best performance of the hash table choose a prime number for the
-table size as the hash map cannot participate in resizing to help with this.
-
-```
-#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
-{
-    fhmap_elem e;
-    int key;
-    int val;
-};
-static struct val vals[37];
-static flat_hash_map fh
-    = fhm_static_init(vals, key, e, fhmap_int_to_u64, fhmap_id_eq, NULL);
-```
-
-If the compiler has sufficient support for C23, the above can be rewritten more
-cleanly as follows:
-
-```
-static flat_hash_map fh
-    = fhm_static_init((static struct val[37]){}, key, e, fhmap_int_to_u64,
-                      fhmap_id_eq, NULL);
-```
-
-In this example, the flat hash map has more complete ownership of the anonymous
-static buffer of user types with static storage duration. There is no dangling
-reference that other code can access.
-
-This version of the initialization function is designed to provide convenient
-initialization at compile time. It is common in C to have data structures
-implemented at static global file scope for a module. Therefore, this method
-lets one initialize a static global hash table at compile time so the data
-structure is ready as soon as program execution begins. Note that an allocation
-function is explicitly excluded. A static storage duration array of user types
-cannot be resized or freed. */
-#define ccc_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn,  \
-                            key_eq_fn, aux_data)                               \
-    ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field, hash_fn, \
-                             key_eq_fn, aux_data)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.

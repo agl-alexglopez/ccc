@@ -13,9 +13,8 @@
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
-    struct val vals[10] = {};
-    ccc_flat_hash_map fh = fhm_init(vals, sizeof(vals) / sizeof(vals[0]), key,
-                                    e, NULL, fhmap_int_zero, fhmap_id_eq, NULL);
+    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, key, e, NULL,
+                                    fhmap_int_zero, fhmap_id_eq, NULL);
 
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
