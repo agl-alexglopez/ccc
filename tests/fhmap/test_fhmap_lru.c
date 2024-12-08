@@ -102,8 +102,8 @@ static struct lru_cache lru_cache = {
     .cap = CAP,
     .l = dll_init(lru_cache.l, struct key_val, list_elem, std_alloc, cmp_by_key,
                   NULL),
-    .fh = fhm_static_init(map_buf, key, hash_elem, fhmap_int_to_u64,
-                          lru_lookup_cmp, NULL),
+    .fh = fhm_init(map_buf, sizeof(map_buf) / sizeof(map_buf[0]), key,
+                   hash_elem, NULL, fhmap_int_to_u64, lru_lookup_cmp, NULL),
 };
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,

@@ -173,7 +173,7 @@ ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
     {
         return true;
     }
-    return !ccc_buf_size(&h->buf_);
+    return !ccc_fhm_size(h);
 }
 
 bool
@@ -193,7 +193,8 @@ ccc_fhm_size(ccc_flat_hash_map const *const h)
     {
         return 0;
     }
-    return ccc_buf_size(&h->buf_);
+    size_t const size = ccc_buf_size(&h->buf_);
+    return size ? size - num_swap_slots : 0;
 }
 
 ccc_fhmap_entry
@@ -638,27 +639,6 @@ valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
 
 /*=======================   Private Interface   =============================*/
 
-void
-ccc_impl_fhm_init_buf(struct ccc_fhmap_ *const h, size_t key_offset,
-                      size_t const hash_elem_offset, ccc_hash_fn *const hash_fn,
-                      ccc_key_eq_fn *const eq_fn, void *const aux)
-{
-    if (!h || !hash_fn || !eq_fn)
-    {
-        return;
-    }
-    h->key_offset_ = key_offset;
-    h->hash_elem_offset_ = hash_elem_offset;
-    h->hash_fn_ = hash_fn;
-    h->eq_fn_ = eq_fn;
-    h->buf_.aux_ = aux;
-    if (ccc_buf_begin(&h->buf_))
-    {
-        (void)memset(ccc_buf_begin(&h->buf_), CCC_FHM_EMPTY,
-                     ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
-    }
-}
-
 struct ccc_fhash_entry_
 ccc_impl_fhm_entry(struct ccc_fhmap_ *h, void const *key)
 {
@@ -879,12 +859,17 @@ and_modify(struct ccc_fhash_entry_ *const e, ccc_update_fn *const fn)
     return e;
 }
 
-static ccc_result
+static inline ccc_result
 maybe_resize(struct ccc_fhmap_ *const h)
 {
+    if (ccc_buf_capacity(&h->buf_) && ccc_buf_size(&h->buf_) < num_swap_slots)
+    {
+        (void)memset(h->buf_.mem_, CCC_FHM_EMPTY,
+                     ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
+        (void)ccc_buf_size_set(&h->buf_, num_swap_slots);
+    }
     if (ccc_buf_capacity(&h->buf_)
-        && (double)(ccc_buf_size(&h->buf_) + num_swap_slots)
-                   / (double)ccc_buf_capacity(&h->buf_)
+        && (double)(ccc_buf_size(&h->buf_)) / (double)ccc_buf_capacity(&h->buf_)
                <= load_factor)
     {
         return CCC_OK;
@@ -909,6 +894,7 @@ maybe_resize(struct ccc_fhmap_ *const h)
     {
         return CCC_MEM_ERR;
     }
+    (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
     (void)memset(ccc_buf_begin(&new_hash.buf_), CCC_FHM_EMPTY,
