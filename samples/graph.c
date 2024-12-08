@@ -58,23 +58,23 @@ Enter 'q' to quit. */
    vertex bit────────────────────────────────────┐ │ │  │
    paint bit───────────────────────────────────┐ │ │ │  │
    digit bit─────────────────────────────────┐ │ │ │ │  │
+   edge cost digit──────────────────────↓──↓ │ │ │ │ │  │
    vertex title────────────────────┬───────┐ │ │ │ │ │  │
-   edge cost digit─────────────────┼────┬──┤ │ │ │ │ │  │
-   edge id───────┬──────┬─┬──────┐ │    │  │ │ │ │ │ │  │
-               0b00000000 00000000 0000 0000 0 0 0 0 0000
+   edge id───────┬───────────────┐ │       │ │ │ │ │ │  │
+   unused─────┬─┐↓               ↓ ↓       ↓ ↓ ↓ ↓ ↓ ↓  ↓
+            0b...00000000 00000000 0000 0000 0 0 0 0 0000
    If various signal bits such as paint or digit are turned on we know
    which bits to look at and how to interpret them.
      - path shape bits determine how edges join as they run and turn.
      - path bit marks a cell as a path
-     - vertex bit marks a cell as a vertex with a title in the highest eight
-       bits
-     - paint bit is a single bit to mark a path should be lit up.
+     - vertex bit marks a cell as a vertex meaning it holds a vertex title.
+     - paint bit is a single bit to mark a path should have a color.
      - digit bit marks that one digit of an edge cost is stored in a edge cell.
      - edge cost digit is stored in at most four bits. 9 is highest digit
        in base 10.
      - unused is not currently used but could be in the future.
      - edge id is the concatenation of two vertex titles in an edge to signify
-       which vertices are connected. The edge id is sorted lexicographically
+       which vertices are connected. The edge id is sorted lexicographical
        with the lower value in the leftmost bits.
      - the vertex title is stored in 8 bits if the cell is a vertex. */
 typedef uint32_t cell;
