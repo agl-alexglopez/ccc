@@ -262,12 +262,11 @@ flat_hash_map.h (dropdown)</summary>
 <div class="line"><span class="keywordtype">int</span></div>
 <div class="line">main(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>key_val vals[20];</div>
 <div class="line">    <span class="comment">/* stack array backed, key field named key, intrusive field e, no</span></div>
 <div class="line"><span class="comment">       allocation permission, a hash function, an equality function, no aux. */</span></div>
 <div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> fh;</div>
-<div class="line">        = fhm_init(vals, <span class="keyword">sizeof</span>(vals) / <span class="keyword">sizeof</span>(vals[0]), key, e, NULL,</div>
-<div class="line">                   fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line">        = fhm_init((<span class="keyword">struct</span> val[20]){}, 20, key, e, NULL, fhmap_int_to_u64,</div>
+<div class="line">                    fhmap_id_eq, NULL);</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> target = 15;</div>
 <div class="line">    <span class="keywordtype">int</span> solution_indices[2] = {-1, -1};</div>
@@ -872,7 +871,7 @@ Non-Allocating Containers</h2>
 <h2><a class="anchor" id="autotoc_md7"></a>
 Compile Time Initialization</h2>
 <p>Because the user may choose the source of memory for a container, initialization at compile time is possible for all containers.</p>
-<p>A flat hash map may be initialized at compile time with memory of static storage duration if the maximum size of the map is known.</p>
+<p>A flat hash map may be initialized at compile time if the maximum size is fixed and no allocation permission is needed.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
@@ -881,8 +880,8 @@ Compile Time Initialization</h2>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map val_map</div>
-<div class="line">    = fhm_static_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[2999]){}, key, e, fhmap_int_to_u64,</div>
-<div class="line">                      fhmap_id_eq, NULL);</div>
+<div class="line">    = fhm_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[2999]){}, 2999, key, e, NULL,</div>
+<div class="line">               fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
 </div><!-- fragment --><p>A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see allocation for more on <code>std_alloc</code>).</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
@@ -891,13 +890,13 @@ Compile Time Initialization</h2>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map val_map = fhm_zero_init(</div>
-<div class="line">    <span class="keyword">struct</span> val, key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map val_map</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, 0, key, e, std_alloc, fhmap_int_to_u64,</div>
+<div class="line">               fhmap_id_eq, NULL);</div>
 </div><!-- fragment --><p>All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> ring_buffer</div>
-<div class="line">    = <a class="code hl_define" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>((<span class="keyword">static</span> <span class="keywordtype">int</span>[4096]){}, NULL, NULL, 4096);</div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a0b47511ed59d60a9e66bdb2fee438eb0"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></div><div class="ttdeci">struct ccc_fdeq_ ccc_flat_double_ended_queue</div><div class="ttdoc">A contiguous buffer for O(1) push and pop from front and back.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:42</div></div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a5f6c51ae30c8f0cae6e1b05466008784"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a></div><div class="ttdeci">#define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)</div><div class="ttdoc">Initialize the fdeq with memory and allocation permission.</div><div class="ttdef"><b>Definition:</b> flat_double_ended_queue.h:56</div></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">static</span> flat_double_ended_queue ring_buffer</div>
+<div class="line">    = fdeq_init((<span class="keyword">static</span> <span class="keywordtype">int</span>[4096]){}, NULL, NULL, 4096);</div>
 </div><!-- fragment --><p>In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.</p>
 <h2><a class="anchor" id="autotoc_md8"></a>
 No &lt;tt&gt;container_of&lt;/tt&gt; Macros</h2>
