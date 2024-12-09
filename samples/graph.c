@@ -724,7 +724,6 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         {
             if (u->dist != INT_MAX)
             {
-                clear_paint(graph);
                 for (; u->from; u = map_pq_at(map_pq, u->from))
                 {
                     paint_edge(graph, u->name, u->from, CYN);
@@ -737,8 +736,6 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
             struct dijkstra_vertex *const v = map_pq_at(map_pq, edges[i].name);
-            paint_edge(graph, u->name, v->name, MAG);
-            nanosleep(&graph->speed, NULL);
             int const alt = u->dist + edges[i].cost;
             if (alt < v->dist)
             {
@@ -748,6 +745,8 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
                     v->from = u->name;
                 });
                 prog_assert(relax == true);
+                paint_edge(graph, u->name, v->name, MAG);
+                nanosleep(&graph->speed, NULL);
             }
         }
     }
@@ -761,6 +760,9 @@ map_pq_at(struct dijkstra_vertex const *const dj_arr, char const vertex)
     return (struct dijkstra_vertex *)&dj_arr[vertex - start_vertex_title];
 }
 
+/* Paints the edge and flushes the specified color at that position. If NULL
+   is passed as the edge color then the paint bit is removed and default path
+   color will be flushed at the patch square location. */
 static void
 paint_edge(struct graph *const g, char const src_name, char const dst_name,
            char const *const edge_color)
@@ -772,7 +774,14 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name,
     struct point prev = cur;
     while (cur.r != dst->pos.r || cur.c != dst->pos.c)
     {
-        *grid_at_mut(g, cur.r, cur.c) |= paint_bit;
+        if (edge_color)
+        {
+            *grid_at_mut(g, cur.r, cur.c) |= paint_bit;
+        }
+        else
+        {
+            *grid_at_mut(g, cur.r, cur.c) &= ~paint_bit;
+        }
         flush_at(g, cur.r, cur.c, edge_color);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
@@ -946,7 +955,7 @@ print_cell(cell const c, char const *const edge_color)
 
     if (c & vertex_bit)
     {
-        printf("\033[38;5;14m%c\033[0m", (char)(c >> vertex_cell_title_shift));
+        printf("%s%c%s", CYN, (char)(c >> vertex_cell_title_shift), NIL);
     }
     else if (c & digit_bit)
     {
@@ -954,9 +963,9 @@ print_cell(cell const c, char const *const edge_color)
     }
     else if (c & path_bit)
     {
-        (c & paint_bit)
-            ? printf("%s%s%s", edge_color, paths[c & path_mask], NIL)
-            : printf("%s", paths[c & path_mask]);
+        (c & paint_bit) ? printf("%s%s%s", edge_color ? edge_color : NIL,
+                                 paths[c & path_mask], NIL)
+                        : printf("%s", paths[c & path_mask]);
     }
     else if (!(c & path_bit))
     {
