@@ -38,7 +38,6 @@ typedef ptrdiff_t str_ofs;
 enum action_type
 {
     COUNT,
-    ALPHA,
     FIND,
 };
 
