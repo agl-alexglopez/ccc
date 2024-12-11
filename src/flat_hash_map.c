@@ -442,12 +442,12 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
     {
         return NULL;
     }
-    void *iter = ccc_buf_begin(&h->buf_);
+    void const *iter = ccc_buf_begin(&h->buf_);
     for (; iter != ccc_buf_capacity_end(&h->buf_)
            && elem_in_slot(h, iter)->hash_ == CCC_FHM_EMPTY;
          iter = ccc_buf_next(&h->buf_, iter))
     {}
-    return iter == ccc_buf_capacity_end(&h->buf_) ? NULL : iter;
+    return (void *)(iter == ccc_buf_capacity_end(&h->buf_) ? NULL : iter);
 }
 
 void *
