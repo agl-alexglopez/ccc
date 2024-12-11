@@ -570,7 +570,7 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
         return n;
     }
     /* This is how to return internal nodes on the way back up from a leaf. */
-    struct ccc_node_ *p = n->parent_;
+    struct ccc_node_ const *p = n->parent_;
     for (; p != &t->end_ && p->branch_[!traversal] != n; n = p, p = n->parent_)
     {}
     return p;
