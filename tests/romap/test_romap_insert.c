@@ -113,8 +113,10 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_and_find)
         vals[curval] = (struct val){.key = i, .val = i};
         ccc_entry e = try_insert(&s, &vals[curval].elem);
         CHECK(occupied(&e), false);
+        CHECK(validate(&s), true);
         e = try_insert(&s, &vals[curval].elem);
         CHECK(occupied(&e), true);
+        CHECK(validate(&s), true);
         struct val const *const v = unwrap(&e);
         CHECK(v == NULL, false);
         CHECK(v->key, i);
@@ -124,11 +126,13 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_and_find)
     {
         CHECK(contains(&s, &i), true);
         CHECK(occupied(entry_r(&s, &i)), true);
+        CHECK(validate(&s), true);
     }
     for (int i = 1; i < size; i += 2)
     {
         CHECK(contains(&s, &i), false);
         CHECK(occupied(entry_r(&s, &i)), false);
+        CHECK(validate(&s), true);
     }
     CHECK_END_FN();
 }

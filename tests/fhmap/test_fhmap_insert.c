@@ -566,8 +566,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
     {
         ccc_entry e = try_insert(&fh, &(struct val){.key = i, .val = i}.e);
         CHECK(occupied(&e), false);
+        CHECK(validate(&fh), true);
         e = try_insert(&fh, &(struct val){.key = i, .val = i}.e);
         CHECK(occupied(&e), true);
+        CHECK(validate(&fh), true);
         struct val const *const v = unwrap(&e);
         CHECK(v == NULL, false);
         CHECK(v->key, i);
@@ -577,11 +579,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
     {
         CHECK(contains(&fh, &i), true);
         CHECK(occupied(entry_r(&fh, &i)), true);
+        CHECK(validate(&fh), true);
     }
     for (int i = 1; i < size; i += 2)
     {
         CHECK(contains(&fh, &i), false);
         CHECK(occupied(entry_r(&fh, &i)), false);
+        CHECK(validate(&fh), true);
     }
     CHECK_END_FN();
 }
