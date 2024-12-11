@@ -46,7 +46,6 @@ first thought. However, improvements can still be made. */
 #include "impl/impl_types.h"
 #include "types.h"
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -198,7 +197,7 @@ ccc_fhm_size(ccc_flat_hash_map const *const h)
 }
 
 ccc_fhmap_entry
-ccc_fhm_entry(ccc_flat_hash_map *h, void const *const key)
+ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
@@ -269,7 +268,7 @@ ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_update_fn *const fn)
 
 ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
-                       void *aux)
+                       void *const aux)
 {
     if (unlikely(!e))
     {
@@ -283,7 +282,7 @@ ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_fhm_insert(ccc_flat_hash_map *h, ccc_fhmap_elem *const out_handle)
+ccc_fhm_insert(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
 {
     if (unlikely(!h || !out_handle))
     {
@@ -332,7 +331,8 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h,
 }
 
 ccc_entry
-ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, ccc_fhmap_elem *key_val_handle)
+ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h,
+                         ccc_fhmap_elem *const key_val_handle)
 {
     if (unlikely(!h || !key_val_handle))
     {
@@ -451,19 +451,19 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
 }
 
 void *
-ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fhmap_elem const *iter)
+ccc_fhm_next(ccc_flat_hash_map const *const h, ccc_fhmap_elem const *const iter)
 {
     if (unlikely(!h))
     {
         return NULL;
     }
-    void *i = struct_base(h, iter);
+    void const *i = struct_base(h, iter);
     for (i = ccc_buf_next(&h->buf_, i);
          i != ccc_buf_capacity_end(&h->buf_)
          && elem_in_slot(h, i)->hash_ == CCC_FHM_EMPTY;
          i = ccc_buf_next(&h->buf_, i))
     {}
-    return i == ccc_buf_capacity_end(&h->buf_) ? NULL : i;
+    return (void *)(i == ccc_buf_capacity_end(&h->buf_) ? NULL : i);
 }
 
 void *
@@ -473,7 +473,7 @@ ccc_fhm_end(ccc_flat_hash_map const *const)
 }
 
 size_t
-ccc_fhm_next_prime(size_t n)
+ccc_fhm_next_prime(size_t const n)
 {
     return next_prime(n);
 }
@@ -607,7 +607,8 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
 }
 
 static bool
-valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
+valid_distance_from_home(struct ccc_fhmap_ const *const h,
+                         void const *const slot)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     uint64_t const hash = elem_in_slot(h, slot)->hash_;
@@ -640,7 +641,7 @@ valid_distance_from_home(struct ccc_fhmap_ const *h, void const *slot)
 /*=======================   Private Interface   =============================*/
 
 struct ccc_fhash_entry_
-ccc_impl_fhm_entry(struct ccc_fhmap_ *h, void const *key)
+ccc_impl_fhm_entry(struct ccc_fhmap_ *const h, void const *const key)
 {
     return container_entry(h, key);
 }
@@ -667,7 +668,7 @@ ccc_impl_fhm_insert(struct ccc_fhmap_ *const h, void const *const e,
 }
 
 ccc_result
-ccc_impl_fhm_maybe_resize(struct ccc_fhmap_ *h)
+ccc_impl_fhm_maybe_resize(struct ccc_fhmap_ *const h)
 {
     return maybe_resize(h);
 }
@@ -679,7 +680,8 @@ ccc_impl_fhm_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
 }
 
 void *
-ccc_impl_fhm_key_in_slot(struct ccc_fhmap_ const *h, void const *slot)
+ccc_impl_fhm_key_in_slot(struct ccc_fhmap_ const *const h,
+                         void const *const slot)
 {
     return key_in_slot(h, slot);
 }
@@ -691,7 +693,7 @@ ccc_impl_fhm_distance(size_t const capacity, size_t const i, size_t const j)
 }
 
 size_t
-ccc_impl_fhm_increment(size_t const capacity, size_t i)
+ccc_impl_fhm_increment(size_t const capacity, size_t const i)
 {
     return increment(capacity, i);
 }
@@ -717,7 +719,7 @@ ccc_impl_fhm_filter(struct ccc_fhmap_ const *const h, void const *const key)
 /*=======================     Static Helpers    =============================*/
 
 static inline struct ccc_ent_
-entry(struct ccc_fhmap_ *const h, void const *key, uint64_t const hash)
+entry(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
 {
     char upcoming_insertion_error = 0;
     if (maybe_resize(h) != CCC_OK)
@@ -923,9 +925,9 @@ maybe_resize(struct ccc_fhmap_ *const h)
 }
 
 static inline size_t
-next_prime(size_t n)
+next_prime(size_t const n)
 {
-    /* Compiler should help us out here. No need to do fancy bit tricks to
+    /* Compiler should help us out here. No fancy binary search/tricks to
        tell how far along the list we are. The table is small already. */
     for (size_t i = 0; i < PRIMES_SIZE; ++i)
     {
@@ -972,16 +974,15 @@ distance(size_t const capacity, size_t const i, size_t const j)
 }
 
 static inline size_t
-increment(size_t const capacity, size_t i)
+increment(size_t const capacity, size_t const i)
 {
     return (i + 1) >= capacity ? last_swap_slot + 1 : i + 1;
 }
 
 static inline size_t
-decrement(size_t const capacity, size_t i)
+decrement(size_t const capacity, size_t const i)
 {
-    i = i ? i - 1 : capacity - 1;
-    return i <= last_swap_slot ? capacity - 1 : i;
+    return i <= num_swap_slots ? capacity - 1 : i - 1;
 }
 
 static inline void *
@@ -992,7 +993,7 @@ struct_base(struct ccc_fhmap_ const *const h,
 }
 
 static inline void
-swap(char tmp[], void *const a, void *const b, size_t ab_size)
+swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
 {
     if (a == b)
     {
