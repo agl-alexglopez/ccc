@@ -556,15 +556,46 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
+{
+    int const size = 101;
+    ccc_flat_hash_map fh = fhm_init((struct val[101]){}, 101, key, e, NULL,
+                                    fhmap_int_to_u64, fhmap_id_eq, NULL);
+
+    for (int i = 0; i < size; i += 2)
+    {
+        ccc_entry e = try_insert(&fh, &(struct val){.key = i, .val = i}.e);
+        CHECK(occupied(&e), false);
+        e = try_insert(&fh, &(struct val){.key = i, .val = i}.e);
+        CHECK(occupied(&e), true);
+        struct val const *const v = unwrap(&e);
+        CHECK(v == NULL, false);
+        CHECK(v->key, i);
+        CHECK(v->val, i);
+    }
+    for (int i = 0; i < size; i += 2)
+    {
+        CHECK(contains(&fh, &i), true);
+        CHECK(occupied(entry_r(&fh, &i)), true);
+    }
+    for (int i = 1; i < size; i += 2)
+    {
+        CHECK(contains(&fh, &i), false);
+        CHECK(occupied(entry_r(&fh, &i)), false);
+    }
+    CHECK_END_FN();
+}
+
 int
 main()
 {
     return CHECK_RUN(
         fhmap_test_insert(), fhmap_test_insert_macros(),
-        fhmap_test_insert_overwrite(), fhmap_test_insert_then_bad_ideas(),
-        fhmap_test_insert_via_entry(), fhmap_test_insert_via_entry_macros(),
-        fhmap_test_entry_api_functional(), fhmap_test_entry_api_macros(),
-        fhmap_test_two_sum(), fhmap_test_resize(), fhmap_test_resize_macros(),
+        fhmap_test_insert_and_find(), fhmap_test_insert_overwrite(),
+        fhmap_test_insert_then_bad_ideas(), fhmap_test_insert_via_entry(),
+        fhmap_test_insert_via_entry_macros(), fhmap_test_entry_api_functional(),
+        fhmap_test_entry_api_macros(), fhmap_test_two_sum(),
+        fhmap_test_resize(), fhmap_test_resize_macros(),
         fhmap_test_resize_from_null(), fhmap_test_resize_from_null_macros(),
         fhmap_test_insert_limit());
 }

@@ -157,10 +157,40 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_shuffle)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(omap_test_insert_and_find)
+{
+    int const size = 100;
+    ordered_map s = om_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+    struct val vals[101];
+    for (int i = 0, curval = 0; i < size; i += 2, ++curval)
+    {
+        vals[curval] = (struct val){.key = i, .val = i};
+        ccc_entry e = try_insert(&s, &vals[curval].elem);
+        CHECK(occupied(&e), false);
+        e = try_insert(&s, &vals[curval].elem);
+        CHECK(occupied(&e), true);
+        struct val const *const v = unwrap(&e);
+        CHECK(v == NULL, false);
+        CHECK(v->key, i);
+        CHECK(v->val, i);
+    }
+    for (int i = 0; i < size; i += 2)
+    {
+        CHECK(contains(&s, &i), true);
+        CHECK(occupied(entry_r(&s, &i)), true);
+    }
+    for (int i = 1; i < size; i += 2)
+    {
+        CHECK(contains(&s, &i), false);
+        CHECK(occupied(entry_r(&s, &i)), false);
+    }
+    CHECK_END_FN();
+}
+
 int
 main()
 {
     return CHECK_RUN(omap_test_insert_one(), omap_test_insert_three(),
-                     omap_test_insert_macros(), omap_test_struct_getter(),
-                     omap_test_insert_shuffle());
+                     omap_test_insert_and_find(), omap_test_insert_macros(),
+                     omap_test_struct_getter(), omap_test_insert_shuffle());
 }
