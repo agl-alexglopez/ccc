@@ -115,26 +115,25 @@ static size_t *branch_r(struct ccc_fromap_ const *t, size_t node,
                         enum frm_branch_ branch);
 static size_t *parent_r(struct ccc_fromap_ const *t, size_t node);
 /* Returning WAVL tree status. */
-static bool is_0_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
-static bool is_1_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
-static bool is_2_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
-static bool is_3_child(struct ccc_fromap_ const *, size_t p_of_x, size_t x);
-static bool is_01_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
+static bool is_0_child(struct ccc_fromap_ const *, size_t p, size_t x);
+static bool is_1_child(struct ccc_fromap_ const *, size_t p, size_t x);
+static bool is_2_child(struct ccc_fromap_ const *, size_t p, size_t x);
+static bool is_3_child(struct ccc_fromap_ const *, size_t p, size_t x);
+static bool is_01_parent(struct ccc_fromap_ const *, size_t x, size_t p,
                          size_t y);
-static bool is_11_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
+static bool is_11_parent(struct ccc_fromap_ const *, size_t x, size_t p,
                          size_t y);
-static bool is_02_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
+static bool is_02_parent(struct ccc_fromap_ const *, size_t x, size_t p,
                          size_t y);
-static bool is_22_parent(struct ccc_fromap_ const *, size_t x, size_t p_of_xy,
+static bool is_22_parent(struct ccc_fromap_ const *, size_t x, size_t p,
                          size_t y);
 static bool is_leaf(struct ccc_fromap_ const *t, size_t x);
 static uint8_t parity(struct ccc_fromap_ const *t, size_t node);
 static bool validate(struct ccc_fromap_ const *frm);
 /* Returning void and maintaining the WAVL tree. */
 static void init_node(struct ccc_fromap_elem_ *e);
-static void insert_fixup(struct ccc_fromap_ *t, size_t z_p_of_xy, size_t x);
-static void rebalance_3_child(struct ccc_fromap_ *t, size_t z_p_of_xy,
-                              size_t x);
+static void insert_fixup(struct ccc_fromap_ *t, size_t z, size_t x);
+static void rebalance_3_child(struct ccc_fromap_ *t, size_t z, size_t x);
 static void transplant(struct ccc_fromap_ *t, size_t remove,
                        size_t replacement);
 static void swap_and_pop(struct ccc_fromap_ *t, size_t vacant_i);
@@ -143,10 +142,10 @@ static void demote(struct ccc_fromap_ const *t, size_t x);
 static void double_promote(struct ccc_fromap_ const *t, size_t x);
 static void double_demote(struct ccc_fromap_ const *t, size_t x);
 
-static void rotate(struct ccc_fromap_ *t, size_t z_p_of_x, size_t x_p_of_y,
-                   size_t y, enum frm_branch_ dir);
-static void double_rotate(struct ccc_fromap_ *t, size_t z_p_of_x,
-                          size_t x_p_of_y, size_t y, enum frm_branch_ dir);
+static void rotate(struct ccc_fromap_ *t, size_t z, size_t x, size_t y,
+                   enum frm_branch_ dir);
+static void double_rotate(struct ccc_fromap_ *t, size_t z, size_t x, size_t y,
+                          enum frm_branch_ dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
 
@@ -171,7 +170,7 @@ ccc_frm_get_key_val(ccc_flat_realtime_ordered_map const *const frm,
     {
         return NULL;
     }
-    struct frm_query_ q = find(frm, key);
+    struct frm_query_ const q = find(frm, key);
     return (CCC_EQL == q.last_cmp_) ? base_at(frm, q.found_) : NULL;
 }
 
@@ -183,7 +182,7 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    struct frm_query_ q = find(frm, key_from_node(frm, out_handle));
+    struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         void *const slot = ccc_buf_at(&frm->buf_, q.found_);
@@ -194,9 +193,7 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
         elem_in_slot(frm, tmp)->parity_ = 1;
         return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *const inserted
-        = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, out_handle);
-    if (!inserted)
+    if (!maybe_alloc_insert(frm, q.parent_, q.last_cmp_, out_handle))
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -211,13 +208,13 @@ ccc_frm_try_insert(ccc_flat_realtime_ordered_map *const frm,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
+    struct frm_query_ const q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         return (ccc_entry){
             {.e_ = base_at(frm, q.found_), .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted
+    void *const inserted
         = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
@@ -234,7 +231,7 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    struct frm_query_ q = find(frm, key_from_node(frm, key_val_handle));
+    struct frm_query_ const q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         void *const found = base_at(frm, q.found_);
@@ -243,7 +240,7 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
                             struct_base(frm, key_val_handle));
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted
+    void *const inserted
         = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
@@ -529,7 +526,7 @@ ccc_frm_copy(ccc_flat_realtime_ordered_map *const dst,
     dst->buf_.alloc_ = dst_alloc;
     if (dst->buf_.capacity_ < src->buf_.capacity_)
     {
-        ccc_result resize_res
+        ccc_result const resize_res
             = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
         if (resize_res != CCC_OK)
         {
@@ -679,7 +676,7 @@ insert(struct ccc_fromap_ *const frm, size_t const parent_i,
 static inline struct ccc_frtree_entry_
 entry(struct ccc_fromap_ const *const frm, void const *const key)
 {
-    struct frm_query_ q = find(frm, key);
+    struct frm_query_ const q = find(frm, key);
     if (CCC_EQL == q.last_cmp_)
     {
         return (struct ccc_frtree_entry_){
@@ -865,7 +862,7 @@ branch_r(struct ccc_fromap_ const *t, size_t const node,
 }
 
 static inline size_t *
-parent_r(struct ccc_fromap_ const *t, size_t node)
+parent_r(struct ccc_fromap_ const *t, size_t const node)
 {
 
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
@@ -907,39 +904,39 @@ key_at(struct ccc_fromap_ const *const t, size_t const i)
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
+insert_fixup(struct ccc_fromap_ *const t, size_t z, size_t x)
 {
     do
     {
-        promote(t, z_p_of_xy);
-        x = z_p_of_xy;
-        z_p_of_xy = parent_i(t, z_p_of_xy);
-        if (!z_p_of_xy)
+        promote(t, z);
+        x = z;
+        z = parent_i(t, z);
+        if (!z)
         {
             return;
         }
-    } while (is_01_parent(t, x, z_p_of_xy, sibling_of(t, x)));
+    } while (is_01_parent(t, x, z, sibling_of(t, x)));
 
-    if (!is_02_parent(t, x, z_p_of_xy, sibling_of(t, x)))
+    if (!is_02_parent(t, x, z, sibling_of(t, x)))
     {
         return;
     }
     assert(x);
-    assert(is_0_child(t, z_p_of_xy, x));
-    enum frm_branch_ const p_to_x_dir = branch_i(t, z_p_of_xy, R) == x;
+    assert(is_0_child(t, z, x));
+    enum frm_branch_ const p_to_x_dir = branch_i(t, z, R) == x;
     size_t const y = branch_i(t, x, !p_to_x_dir);
-    if (!y || is_2_child(t, z_p_of_xy, y))
+    if (!y || is_2_child(t, z, y))
     {
-        rotate(t, z_p_of_xy, x, y, !p_to_x_dir);
-        demote(t, z_p_of_xy);
+        rotate(t, z, x, y, !p_to_x_dir);
+        demote(t, z);
     }
     else
     {
-        assert(is_1_child(t, z_p_of_xy, y));
-        double_rotate(t, z_p_of_xy, x, y, p_to_x_dir);
+        assert(is_1_child(t, z, y));
+        double_rotate(t, z, x, y, p_to_x_dir);
         promote(t, y);
         demote(t, x);
-        demote(t, z_p_of_xy);
+        demote(t, z);
     }
 }
 
@@ -948,59 +945,58 @@ remove_fixup(struct ccc_fromap_ *const t, size_t const remove)
 {
     size_t y = 0;
     size_t x = 0;
-    size_t p_of_xy = 0;
+    size_t p = 0;
     bool two_child = false;
     if (!branch_i(t, remove, R) || !branch_i(t, remove, L))
     {
         y = remove;
-        p_of_xy = parent_i(t, y);
+        p = parent_i(t, y);
         x = branch_i(t, y, !branch_i(t, y, L));
         *parent_r(t, x) = parent_i(t, y);
-        if (!p_of_xy)
+        if (!p)
         {
             t->root_ = x;
         }
-        two_child = is_2_child(t, p_of_xy, y);
-        *branch_r(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
+        two_child = is_2_child(t, p, y);
+        *branch_r(t, p, branch_i(t, p, R) == y) = x;
     }
     else
     {
         y = min_max_from(t, branch_i(t, remove, R), min);
-        p_of_xy = parent_i(t, y);
+        p = parent_i(t, y);
         x = branch_i(t, y, !branch_i(t, y, L));
         *parent_r(t, x) = parent_i(t, y);
 
         /* Save if check and improve readability by assuming this is true. */
-        assert(p_of_xy);
+        assert(p);
 
-        two_child = is_2_child(t, p_of_xy, y);
-        *branch_r(t, p_of_xy, branch_i(t, p_of_xy, R) == y) = x;
+        two_child = is_2_child(t, p, y);
+        *branch_r(t, p, branch_i(t, p, R) == y) = x;
         transplant(t, remove, y);
-        if (remove == p_of_xy)
+        if (remove == p)
         {
-            p_of_xy = y;
+            p = y;
         }
     }
 
-    if (p_of_xy)
+    if (p)
     {
         if (two_child)
         {
-            assert(p_of_xy);
-            rebalance_3_child(t, p_of_xy, x);
+            assert(p);
+            rebalance_3_child(t, p, x);
         }
-        else if (!x && branch_i(t, p_of_xy, L) == branch_i(t, p_of_xy, R))
+        else if (!x && branch_i(t, p, L) == branch_i(t, p, R))
         {
-            assert(p_of_xy);
-            bool const demote_makes_3_child
-                = is_2_child(t, parent_i(t, p_of_xy), p_of_xy);
-            demote(t, p_of_xy);
+            assert(p);
+            bool const demote_makes_3_child = is_2_child(t, parent_i(t, p), p);
+            demote(t, p);
             if (demote_makes_3_child)
             {
-                rebalance_3_child(t, parent_i(t, p_of_xy), p_of_xy);
+                rebalance_3_child(t, parent_i(t, p), p);
             }
         }
-        assert(!is_leaf(t, p_of_xy) || !parity(t, p_of_xy));
+        assert(!is_leaf(t, p) || !parity(t, p));
     }
     swap_and_pop(t, remove);
     return base_at(t, ccc_buf_size(&t->buf_));
@@ -1032,37 +1028,37 @@ transplant(struct ccc_fromap_ *const t, size_t const remove,
 }
 
 static inline void
-rebalance_3_child(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
+rebalance_3_child(struct ccc_fromap_ *const t, size_t z, size_t x)
 {
-    assert(z_p_of_xy);
+    assert(z);
     bool made_3_child = false;
     do
     {
-        size_t const p_of_p_of_x = parent_i(t, z_p_of_xy);
-        size_t const y = branch_i(t, z_p_of_xy, branch_i(t, z_p_of_xy, L) == x);
-        made_3_child = is_2_child(t, p_of_p_of_x, z_p_of_xy);
-        if (is_2_child(t, z_p_of_xy, y))
+        size_t const g = parent_i(t, z);
+        size_t const y = branch_i(t, z, branch_i(t, z, L) == x);
+        made_3_child = is_2_child(t, g, z);
+        if (is_2_child(t, z, y))
         {
-            demote(t, z_p_of_xy);
+            demote(t, z);
         }
         else if (is_22_parent(t, branch_i(t, y, L), y, branch_i(t, y, R)))
         {
-            demote(t, z_p_of_xy);
+            demote(t, z);
             demote(t, y);
         }
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
-            assert(is_3_child(t, z_p_of_xy, x));
-            enum frm_branch_ const z_to_x_dir = branch_i(t, z_p_of_xy, R) == x;
+            assert(is_3_child(t, z, x));
+            enum frm_branch_ const z_to_x_dir = branch_i(t, z, R) == x;
             size_t const w = branch_i(t, y, !z_to_x_dir);
             if (is_1_child(t, y, w))
             {
-                rotate(t, z_p_of_xy, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
+                rotate(t, z, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
                 promote(t, y);
-                demote(t, z_p_of_xy);
-                if (is_leaf(t, z_p_of_xy))
+                demote(t, z);
+                if (is_leaf(t, z))
                 {
-                    demote(t, z_p_of_xy);
+                    demote(t, z);
                 }
             }
             else /* w is a 2-child and v will be a 1-child. */
@@ -1070,10 +1066,10 @@ rebalance_3_child(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
                 size_t const v = branch_i(t, y, z_to_x_dir);
                 assert(is_2_child(t, y, w));
                 assert(is_1_child(t, y, v));
-                double_rotate(t, z_p_of_xy, y, v, !z_to_x_dir);
+                double_rotate(t, z, y, v, !z_to_x_dir);
                 double_promote(t, v);
                 demote(t, y);
-                double_demote(t, z_p_of_xy);
+                double_demote(t, z);
                 /* Optional "Rebalancing with Promotion," defined as follows:
                        if node z is a non-leaf 1,1 node, we promote it;
                        otherwise, if y is a non-leaf 1,1 node, we promote it.
@@ -1081,11 +1077,10 @@ rebalance_3_child(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
                    This reduces constants in some of theorems mentioned in the
                    paper but may not be worth doing. Rotations stay at 2 worst
                    case. Should revisit after more performance testing. */
-                if (!is_leaf(t, z_p_of_xy)
-                    && is_11_parent(t, branch_i(t, z_p_of_xy, L), z_p_of_xy,
-                                    branch_i(t, z_p_of_xy, R)))
+                if (!is_leaf(t, z)
+                    && is_11_parent(t, branch_i(t, z, L), z, branch_i(t, z, R)))
                 {
-                    promote(t, z_p_of_xy);
+                    promote(t, z);
                 }
                 else if (!is_leaf(t, y)
                          && is_11_parent(t, branch_i(t, y, L), y,
@@ -1096,9 +1091,9 @@ rebalance_3_child(struct ccc_fromap_ *const t, size_t z_p_of_xy, size_t x)
             }
             return;
         }
-        x = z_p_of_xy;
-        z_p_of_xy = p_of_p_of_x;
-    } while (z_p_of_xy && made_3_child);
+        x = z;
+        z = g;
+    } while (z && made_3_child);
 }
 
 /** Swaps in the back buffer element into vacated slot*/
@@ -1144,27 +1139,27 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B */
 static inline void
-rotate(struct ccc_fromap_ *const t, size_t const z_p_of_x,
-       size_t const x_p_of_y, size_t const y, enum frm_branch_ const dir)
+rotate(struct ccc_fromap_ *const t, size_t const z, size_t const x,
+       size_t const y, enum frm_branch_ const dir)
 {
-    assert(z_p_of_x);
-    struct ccc_fromap_elem_ *const z_r = at(t, z_p_of_x);
-    struct ccc_fromap_elem_ *const x_r = at(t, x_p_of_y);
-    size_t const p_of_p_of_x = parent_i(t, z_p_of_x);
-    x_r->parent_ = p_of_p_of_x;
-    if (!p_of_p_of_x)
+    assert(z);
+    struct ccc_fromap_elem_ *const z_r = at(t, z);
+    struct ccc_fromap_elem_ *const x_r = at(t, x);
+    size_t const g = parent_i(t, z);
+    x_r->parent_ = g;
+    if (!g)
     {
-        t->root_ = x_p_of_y;
+        t->root_ = x;
     }
     else
     {
-        struct ccc_fromap_elem_ *const g = at(t, p_of_p_of_x);
-        g->branch_[g->branch_[R] == z_p_of_x] = x_p_of_y;
+        struct ccc_fromap_elem_ *const g_r = at(t, g);
+        g_r->branch_[g_r->branch_[R] == z] = x;
     }
-    x_r->branch_[dir] = z_p_of_x;
-    z_r->parent_ = x_p_of_y;
+    x_r->branch_[dir] = z;
+    z_r->parent_ = x;
     z_r->branch_[!dir] = y;
-    *parent_r(t, y) = z_p_of_x;
+    *parent_r(t, y) = z;
 }
 
 /** A double rotation shouldn't actually be two calls to rotate because that
@@ -1179,32 +1174,32 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      ╭─┴─╮
      B   C */
 static inline void
-double_rotate(struct ccc_fromap_ *const t, size_t const z_p_of_x,
-              size_t const x_p_of_y, size_t const y, enum frm_branch_ const dir)
+double_rotate(struct ccc_fromap_ *const t, size_t const z, size_t const x,
+              size_t const y, enum frm_branch_ const dir)
 {
-    assert(z_p_of_x && x_p_of_y && y);
-    struct ccc_fromap_elem_ *const z_r = at(t, z_p_of_x);
-    struct ccc_fromap_elem_ *const x_r = at(t, x_p_of_y);
+    assert(z && x && y);
+    struct ccc_fromap_elem_ *const z_r = at(t, z);
+    struct ccc_fromap_elem_ *const x_r = at(t, x);
     struct ccc_fromap_elem_ *const y_r = at(t, y);
-    size_t const p_of_p_of_x = z_r->parent_;
-    y_r->parent_ = p_of_p_of_x;
-    if (!p_of_p_of_x)
+    size_t const g = z_r->parent_;
+    y_r->parent_ = g;
+    if (!g)
     {
         t->root_ = y;
     }
     else
     {
-        struct ccc_fromap_elem_ *const g = at(t, p_of_p_of_x);
-        g->branch_[g->branch_[R] == z_p_of_x] = y;
+        struct ccc_fromap_elem_ *const g_r = at(t, g);
+        g_r->branch_[g_r->branch_[R] == z] = y;
     }
     x_r->branch_[!dir] = y_r->branch_[dir];
-    *parent_r(t, y_r->branch_[dir]) = x_p_of_y;
-    y_r->branch_[dir] = x_p_of_y;
+    *parent_r(t, y_r->branch_[dir]) = x;
+    y_r->branch_[dir] = x;
     x_r->parent_ = y;
 
     z_r->branch_[dir] = y_r->branch_[!dir];
-    *parent_r(t, y_r->branch_[!dir]) = z_p_of_x;
-    y_r->branch_[!dir] = z_p_of_x;
+    *parent_r(t, y_r->branch_[!dir]) = z;
+    y_r->branch_[!dir] = z;
     z_r->parent_ = y;
 }
 
@@ -1213,10 +1208,9 @@ double_rotate(struct ccc_fromap_ *const t, size_t const z_p_of_x,
       0╭─╯
        x */
 [[maybe_unused]] static inline bool
-is_0_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
-           size_t const x)
+is_0_child(struct ccc_fromap_ const *const t, size_t const p, size_t const x)
 {
-    return p_of_x && parity(t, p_of_x) == parity(t, x);
+    return p && parity(t, p) == parity(t, x);
 }
 
 /* Returns true for rank difference 1 between the parent and node.
@@ -1224,10 +1218,9 @@ is_0_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
       1╭─╯
        x */
 static inline bool
-is_1_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
-           size_t const x)
+is_1_child(struct ccc_fromap_ const *const t, size_t const p, size_t const x)
 {
-    return p_of_x && parity(t, p_of_x) != parity(t, x);
+    return p && parity(t, p) != parity(t, x);
 }
 
 /* Returns true for rank difference 2 between the parent and node.
@@ -1235,10 +1228,9 @@ is_1_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
       2╭─╯
        x */
 static inline bool
-is_2_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
-           size_t const x)
+is_2_child(struct ccc_fromap_ const *const t, size_t const p, size_t const x)
 {
-    return p_of_x && parity(t, p_of_x) == parity(t, x);
+    return p && parity(t, p) == parity(t, x);
 }
 
 /* Returns true for rank difference 3 between the parent and node.
@@ -1246,10 +1238,9 @@ is_2_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
       3╭─╯
        x */
 [[maybe_unused]] static inline bool
-is_3_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
-           size_t const x)
+is_3_child(struct ccc_fromap_ const *const t, size_t const p, size_t const x)
 {
-    return p_of_x && parity(t, p_of_x) != parity(t, x);
+    return p && parity(t, p) != parity(t, x);
 }
 
 /* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
@@ -1258,12 +1249,12 @@ is_3_child(struct ccc_fromap_ const *const t, size_t const p_of_x,
       0╭─┴─╮1
        x   y */
 static inline bool
-is_01_parent(struct ccc_fromap_ const *const t, size_t const x,
-             size_t const p_of_xy, size_t const y)
+is_01_parent(struct ccc_fromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
-    assert(p_of_xy);
-    return (!parity(t, x) && !parity(t, p_of_xy) && parity(t, y))
-           || (parity(t, x) && parity(t, p_of_xy) && !parity(t, y));
+    assert(p);
+    return (!parity(t, x) && !parity(t, p) && parity(t, y))
+           || (parity(t, x) && parity(t, p) && !parity(t, y));
 }
 
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
@@ -1272,12 +1263,12 @@ is_01_parent(struct ccc_fromap_ const *const t, size_t const x,
       1╭─┴─╮1
        x   y */
 static inline bool
-is_11_parent(struct ccc_fromap_ const *const t, size_t const x,
-             size_t const p_of_xy, size_t const y)
+is_11_parent(struct ccc_fromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
-    assert(p_of_xy);
-    return (!parity(t, x) && parity(t, p_of_xy) && !parity(t, y))
-           || (parity(t, x) && !parity(t, p_of_xy) && parity(t, y));
+    assert(p);
+    return (!parity(t, x) && parity(t, p) && !parity(t, y))
+           || (parity(t, x) && !parity(t, p) && parity(t, y));
 }
 
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
@@ -1286,12 +1277,11 @@ is_11_parent(struct ccc_fromap_ const *const t, size_t const x,
       0╭─┴─╮2
        x   y */
 static inline bool
-is_02_parent(struct ccc_fromap_ const *const t, size_t const x,
-             size_t const p_of_xy, size_t const y)
+is_02_parent(struct ccc_fromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
-    assert(p_of_xy);
-    return (parity(t, x) == parity(t, p_of_xy))
-           && (parity(t, p_of_xy) == parity(t, y));
+    assert(p);
+    return (parity(t, x) == parity(t, p)) && (parity(t, p) == parity(t, y));
 }
 
 /* Returns true if a parent is a 2,2 or 2,2 node, which is allowed. 2,2 nodes
@@ -1303,12 +1293,11 @@ is_02_parent(struct ccc_fromap_ const *const t, size_t const x,
       2╭─┴─╮2
        x   y */
 static inline bool
-is_22_parent(struct ccc_fromap_ const *const t, size_t const x,
-             size_t const p_of_xy, size_t const y)
+is_22_parent(struct ccc_fromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
-    assert(p_of_xy);
-    return (parity(t, x) == parity(t, p_of_xy))
-           && (parity(t, p_of_xy) == parity(t, y));
+    assert(p);
+    return (parity(t, x) == parity(t, p)) && (parity(t, p) == parity(t, y));
 }
 
 static inline void
@@ -1326,10 +1315,14 @@ demote(struct ccc_fromap_ const *const t, size_t const x)
     promote(t, x);
 }
 
+/* Parity based ranks mean this is no-op but leave in case implementation ever
+   changes. Also, makes clear what sections of code are trying to do. */
 static inline void
 double_promote(struct ccc_fromap_ const *const, size_t const)
 {}
 
+/* Parity based ranks mean this is no-op but leave in case implementation ever
+   changes. Also, makes clear what sections of code are trying to do. */
 static inline void
 double_demote(struct ccc_fromap_ const *const, size_t const)
 {}
