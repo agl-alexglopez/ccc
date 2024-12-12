@@ -376,7 +376,7 @@ delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
         cur = next_cur;
     }
     /* This covers the odd or even case for number of pairings. */
-    root = cur != eldest ? merge(pq, accumulator, cur) : accumulator;
+    root = cur == eldest ? accumulator : merge(pq, accumulator, cur);
     /* The root is always alone in its circular list at the end of merges. */
     root->next_sibling_ = root->prev_sibling_ = root;
     root->parent_ = NULL;

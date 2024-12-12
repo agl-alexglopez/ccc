@@ -202,7 +202,7 @@ ccc_fom_insert(ccc_flat_ordered_map *const fom,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    void *found = find(fom, key_from_node(fom, out_handle));
+    void *const found = find(fom, key_from_node(fom, out_handle));
     if (found)
     {
         assert(fom->root_);
@@ -211,9 +211,9 @@ ccc_fom_insert(ccc_flat_ordered_map *const fom,
         void *const ret = base_at(fom, fom->root_);
         void *const tmp = ccc_buf_at(&fom->buf_, 0);
         swap(tmp, user_struct, ret, ccc_buf_elem_size(&fom->buf_));
-        return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted = maybe_alloc_insert(fom, out_handle);
+    void *const inserted = maybe_alloc_insert(fom, out_handle);
     if (!inserted)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};

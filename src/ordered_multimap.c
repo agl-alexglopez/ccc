@@ -1,7 +1,7 @@
 /** This file implements a splay tree that supports duplicates.
-The code to support a splay tree that allows duplicates. It requires
-significant modification from a traditional splay tree. This implementation is
-based on the following source.
+The code to support a splay tree that allows duplicates is more complicated than
+a traditional splay tree. It requires significant modification. This
+implementation is based on the following source.
 
     1. Daniel Sleator, Carnegie Mellon University. Sleator's implementation of a
        topdown splay tree was instrumental in starting things off, but required
@@ -22,18 +22,17 @@ based on the following source.
 
 #define LR 2
 
-/** @private
-   Instead of thinking about left and right consider only links
-   in the abstract sense. Put them in an array and then flip
-   this enum and left and right code paths can be united into one */
+/** @private Instead of thinking about left and right consider only links in
+the abstract sense. Put them in an array and then flip this enum and left and
+right code paths can be united into one */
 enum tree_link_
 {
     L = 0,
     R = 1
 };
 
-/* @private Trees are just a different interpretation of the same links used
-   for doubly linked lists. We take advantage of this for duplicates. */
+/** @private Trees are just a different interpretation of the same links used
+for doubly linked lists. We take advantage of this for duplicates. */
 enum list_link_
 {
     P = 0,
@@ -160,7 +159,8 @@ ccc_omm_insert_entry(ccc_ommap_entry const *const e,
 }
 
 void *
-ccc_omm_or_insert(ccc_ommap_entry const *e, ccc_ommap_elem *key_val_handle)
+ccc_omm_or_insert(ccc_ommap_entry const *const e,
+                  ccc_ommap_elem *const key_val_handle)
 {
     if (!e || !key_val_handle)
     {
@@ -526,25 +526,25 @@ ccc_omm_size(ccc_ordered_multimap const *const mm)
 }
 
 void *
-ccc_omm_unwrap(ccc_ommap_entry const *e)
+ccc_omm_unwrap(ccc_ommap_entry const *const e)
 {
     return ccc_entry_unwrap(&(ccc_entry){e->impl_.entry_});
 }
 
 bool
-ccc_omm_insert_error(ccc_ommap_entry const *e)
+ccc_omm_insert_error(ccc_ommap_entry const *const e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
 }
 
 bool
-ccc_omm_input_error(ccc_ommap_entry const *e)
+ccc_omm_input_error(ccc_ommap_entry const *const e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INPUT_ERROR : false;
 }
 
 bool
-ccc_omm_occupied(ccc_ommap_entry const *e)
+ccc_omm_occupied(ccc_ommap_entry const *const e)
 {
     return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
 }
@@ -598,7 +598,8 @@ ccc_impl_omm_entry(struct ccc_tree_ *const t, void const *const key)
 }
 
 void *
-ccc_impl_omm_multimap_insert(struct ccc_tree_ *const t, struct ccc_node_ *n)
+ccc_impl_omm_multimap_insert(struct ccc_tree_ *const t,
+                             struct ccc_node_ *const n)
 {
     return multimap_insert(t, n).e_;
 }
@@ -786,7 +787,7 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
         return n;
     }
     /* This is how to return internal nodes on the way back up from a leaf. */
-    struct ccc_node_ *p = parent_r(t, n);
+    struct ccc_node_ const *p = parent_r(t, n);
     for (; p != &t->end_ && p->branch_[!traversal] != n;
          n = p, p = parent_r(t, n))
     {}

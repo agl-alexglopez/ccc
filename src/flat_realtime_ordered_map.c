@@ -192,7 +192,7 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
         void *const tmp = ccc_buf_at(&frm->buf_, 0);
         swap(tmp, user_struct, slot, ccc_buf_elem_size(&frm->buf_));
         elem_in_slot(frm, tmp)->parity_ = 1;
-        return (ccc_entry){{.e_ = slot, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     void *const inserted
         = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, out_handle);
