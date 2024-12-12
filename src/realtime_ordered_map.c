@@ -78,39 +78,39 @@ static void *maybe_alloc_insert(struct ccc_romap_ *,
                                 ccc_threeway_cmp last_cmp,
                                 struct ccc_romap_elem_ *);
 static void *remove_fixup(struct ccc_romap_ *, struct ccc_romap_elem_ *);
-static void insert_fixup(struct ccc_romap_ *, struct ccc_romap_elem_ *z_p_of_x,
+static void insert_fixup(struct ccc_romap_ *, struct ccc_romap_elem_ *z,
                          struct ccc_romap_elem_ *x);
 static void transplant(struct ccc_romap_ *, struct ccc_romap_elem_ *remove,
                        struct ccc_romap_elem_ *replacement);
 static void rebalance_3_child(struct ccc_romap_ *rom, struct ccc_romap_elem_ *z,
                               struct ccc_romap_elem_ *x);
 static bool is_0_child(struct ccc_romap_ const *,
-                       struct ccc_romap_elem_ const *p_of_x,
+                       struct ccc_romap_elem_ const *p,
                        struct ccc_romap_elem_ const *x);
 static bool is_1_child(struct ccc_romap_ const *,
-                       struct ccc_romap_elem_ const *p_of_x,
+                       struct ccc_romap_elem_ const *p,
                        struct ccc_romap_elem_ const *x);
 static bool is_2_child(struct ccc_romap_ const *,
-                       struct ccc_romap_elem_ const *p_of_x,
+                       struct ccc_romap_elem_ const *p,
                        struct ccc_romap_elem_ const *x);
 static bool is_3_child(struct ccc_romap_ const *,
-                       struct ccc_romap_elem_ const *p_of_x,
+                       struct ccc_romap_elem_ const *p,
                        struct ccc_romap_elem_ const *x);
 static bool is_01_parent(struct ccc_romap_ const *,
                          struct ccc_romap_elem_ const *x,
-                         struct ccc_romap_elem_ const *p_of_xy,
+                         struct ccc_romap_elem_ const *p,
                          struct ccc_romap_elem_ const *y);
 static bool is_11_parent(struct ccc_romap_ const *,
                          struct ccc_romap_elem_ const *x,
-                         struct ccc_romap_elem_ const *p_of_xy,
+                         struct ccc_romap_elem_ const *p,
                          struct ccc_romap_elem_ const *y);
 static bool is_02_parent(struct ccc_romap_ const *,
                          struct ccc_romap_elem_ const *x,
-                         struct ccc_romap_elem_ const *p_of_xy,
+                         struct ccc_romap_elem_ const *p,
                          struct ccc_romap_elem_ const *y);
 static bool is_22_parent(struct ccc_romap_ const *,
                          struct ccc_romap_elem_ const *x,
-                         struct ccc_romap_elem_ const *p_of_xy,
+                         struct ccc_romap_elem_ const *p,
                          struct ccc_romap_elem_ const *y);
 static bool is_leaf(struct ccc_romap_ const *rom,
                     struct ccc_romap_elem_ const *x);
@@ -123,13 +123,12 @@ static void double_promote(struct ccc_romap_ const *rom,
 static void double_demote(struct ccc_romap_ const *rom,
                           struct ccc_romap_elem_ *x);
 
-static void rotate(struct ccc_romap_ *rom, struct ccc_romap_elem_ *z_p_of_x,
-                   struct ccc_romap_elem_ *x_p_of_y, struct ccc_romap_elem_ *y,
+static void rotate(struct ccc_romap_ *rom, struct ccc_romap_elem_ *z,
+                   struct ccc_romap_elem_ *x, struct ccc_romap_elem_ *y,
                    enum romap_link_ dir);
-static void double_rotate(struct ccc_romap_ *rom,
-                          struct ccc_romap_elem_ *z_p_of_x,
-                          struct ccc_romap_elem_ *x_p_of_y,
-                          struct ccc_romap_elem_ *y, enum romap_link_ dir);
+static void double_rotate(struct ccc_romap_ *rom, struct ccc_romap_elem_ *z,
+                          struct ccc_romap_elem_ *x, struct ccc_romap_elem_ *y,
+                          enum romap_link_ dir);
 static bool validate(struct ccc_romap_ const *rom);
 static struct ccc_romap_elem_ *next(struct ccc_romap_ const *,
                                     struct ccc_romap_elem_ const *,
@@ -171,7 +170,7 @@ ccc_rom_get_key_val(ccc_realtime_ordered_map const *const rom,
     {
         return NULL;
     }
-    struct romap_query_ q = find(rom, key);
+    struct romap_query_ const q = find(rom, key);
     return (CCC_EQL == q.last_cmp_) ? struct_base(rom, q.found_) : NULL;
 }
 
@@ -183,7 +182,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    struct romap_query_ q = find(rom, key_from_node(rom, key_val_handle));
+    struct romap_query_ const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         *key_val_handle = *q.found_;
@@ -196,9 +195,7 @@ ccc_rom_insert(ccc_realtime_ordered_map *const rom,
         tmp->branch_[L] = tmp->branch_[R] = tmp->parent_ = NULL;
         return (ccc_entry){{.e_ = old_val, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted
-        = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
-    if (!inserted)
+    if (!maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle))
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -213,13 +210,13 @@ ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    struct romap_query_ q = find(rom, key_from_node(rom, key_val_handle));
+    struct romap_query_ const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         return (ccc_entry){
             {.e_ = struct_base(rom, q.found_), .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted
+    void *const inserted
         = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
@@ -236,7 +233,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
     }
-    struct romap_query_ q = find(rom, key_from_node(rom, key_val_handle));
+    struct romap_query_ const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         void *const found = struct_base(rom, q.found_);
@@ -244,7 +241,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
         memcpy(found, struct_base(rom, key_val_handle), rom->elem_sz_);
         return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    void *inserted
+    void *const inserted
         = maybe_alloc_insert(rom, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
@@ -407,7 +404,7 @@ ccc_rom_begin(ccc_realtime_ordered_map const *rom)
     {
         return NULL;
     }
-    struct ccc_romap_elem_ *m = min_max_from(rom, rom->root_, min);
+    struct ccc_romap_elem_ *const m = min_max_from(rom, rom->root_, min);
     return m == &rom->end_ ? NULL : struct_base(rom, m);
 }
 
@@ -434,7 +431,7 @@ ccc_rom_rbegin(ccc_realtime_ordered_map const *const rom)
     {
         return NULL;
     }
-    struct ccc_romap_elem_ *m = min_max_from(rom, rom->root_, max);
+    struct ccc_romap_elem_ *const m = min_max_from(rom, rom->root_, max);
     return m == &rom->end_ ? NULL : struct_base(rom, m);
 }
 
@@ -587,7 +584,7 @@ min_max_from(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ *start,
 static inline struct ccc_rtree_entry_
 entry(struct ccc_romap_ const *const rom, void const *const key)
 {
-    struct romap_query_ q = find(rom, key);
+    struct romap_query_ const q = find(rom, key);
     if (CCC_EQL == q.last_cmp_)
     {
         return (struct ccc_rtree_entry_){
@@ -637,12 +634,12 @@ insert(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const parent,
 static inline void *
 maybe_alloc_insert(struct ccc_romap_ *const rom,
                    struct ccc_romap_elem_ *const parent,
-                   ccc_threeway_cmp last_cmp,
+                   ccc_threeway_cmp const last_cmp,
                    struct ccc_romap_elem_ *out_handle)
 {
     if (rom->alloc_)
     {
-        void *new = rom->alloc_(NULL, rom->elem_sz_, rom->aux_);
+        void *const new = rom->alloc_(NULL, rom->elem_sz_, rom->aux_);
         if (!new)
         {
             return NULL;
@@ -783,40 +780,40 @@ elem_in_slot(struct ccc_romap_ const *const rom, void const *const slot)
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z_p_of_xy,
+insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
              struct ccc_romap_elem_ *x)
 {
     do
     {
-        promote(rom, z_p_of_xy);
-        x = z_p_of_xy;
-        z_p_of_xy = z_p_of_xy->parent_;
-        if (z_p_of_xy == &rom->end_)
+        promote(rom, z);
+        x = z;
+        z = z->parent_;
+        if (z == &rom->end_)
         {
             return;
         }
-    } while (is_01_parent(rom, x, z_p_of_xy, sibling_of(rom, x)));
+    } while (is_01_parent(rom, x, z, sibling_of(rom, x)));
 
-    if (!is_02_parent(rom, x, z_p_of_xy, sibling_of(rom, x)))
+    if (!is_02_parent(rom, x, z, sibling_of(rom, x)))
     {
         return;
     }
     assert(x != &rom->end_);
-    assert(is_0_child(rom, z_p_of_xy, x));
-    enum romap_link_ const p_to_x_dir = z_p_of_xy->branch_[R] == x;
-    struct ccc_romap_elem_ *y = x->branch_[!p_to_x_dir];
-    if (y == &rom->end_ || is_2_child(rom, z_p_of_xy, y))
+    assert(is_0_child(rom, z, x));
+    enum romap_link_ const p_to_x_dir = z->branch_[R] == x;
+    struct ccc_romap_elem_ *const y = x->branch_[!p_to_x_dir];
+    if (y == &rom->end_ || is_2_child(rom, z, y))
     {
-        rotate(rom, z_p_of_xy, x, y, !p_to_x_dir);
-        demote(rom, z_p_of_xy);
+        rotate(rom, z, x, y, !p_to_x_dir);
+        demote(rom, z);
     }
     else
     {
-        assert(is_1_child(rom, z_p_of_xy, y));
-        double_rotate(rom, z_p_of_xy, x, y, p_to_x_dir);
+        assert(is_1_child(rom, z, y));
+        double_rotate(rom, z, x, y, p_to_x_dir);
         promote(rom, y);
         demote(rom, x);
-        demote(rom, z_p_of_xy);
+        demote(rom, z);
     }
 }
 
@@ -887,39 +884,38 @@ remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
 }
 
 static inline void
-rebalance_3_child(struct ccc_romap_ *const rom,
-                  struct ccc_romap_elem_ *z_p_of_xy, struct ccc_romap_elem_ *x)
+rebalance_3_child(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
+                  struct ccc_romap_elem_ *x)
 {
-    assert(z_p_of_xy != &rom->end_);
+    assert(z != &rom->end_);
     bool made_3_child = false;
     do
     {
-        struct ccc_romap_elem_ *const p_of_p_of_xy = z_p_of_xy->parent_;
-        struct ccc_romap_elem_ *y
-            = z_p_of_xy->branch_[z_p_of_xy->branch_[L] == x];
-        made_3_child = is_2_child(rom, p_of_p_of_xy, z_p_of_xy);
-        if (is_2_child(rom, z_p_of_xy, y))
+        struct ccc_romap_elem_ *const g = z->parent_;
+        struct ccc_romap_elem_ *const y = z->branch_[z->branch_[L] == x];
+        made_3_child = is_2_child(rom, g, z);
+        if (is_2_child(rom, z, y))
         {
-            demote(rom, z_p_of_xy);
+            demote(rom, z);
         }
         else if (is_22_parent(rom, y->branch_[L], y, y->branch_[R]))
         {
-            demote(rom, z_p_of_xy);
+            demote(rom, z);
             demote(rom, y);
         }
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
-            assert(is_3_child(rom, z_p_of_xy, x));
-            enum romap_link_ const z_to_x_dir = z_p_of_xy->branch_[R] == x;
+            assert(is_3_child(rom, z, x));
+            enum romap_link_ const z_to_x_dir = z->branch_[R] == x;
             struct ccc_romap_elem_ *const w = y->branch_[!z_to_x_dir];
             if (is_1_child(rom, y, w))
             {
-                rotate(rom, z_p_of_xy, y, y->branch_[z_to_x_dir], z_to_x_dir);
+                rotate(rom, z, y, y->branch_[z_to_x_dir], z_to_x_dir);
                 promote(rom, y);
-                demote(rom, z_p_of_xy);
-                if (is_leaf(rom, z_p_of_xy))
+                demote(rom, z);
+                if (is_leaf(rom, z))
                 {
-                    demote(rom, z_p_of_xy);
+                    demote(rom, z);
                 }
             }
             else /* w is a 2-child and v will be a 1-child. */
@@ -927,10 +923,10 @@ rebalance_3_child(struct ccc_romap_ *const rom,
                 struct ccc_romap_elem_ *const v = y->branch_[z_to_x_dir];
                 assert(is_2_child(rom, y, w));
                 assert(is_1_child(rom, y, v));
-                double_rotate(rom, z_p_of_xy, y, v, !z_to_x_dir);
+                double_rotate(rom, z, y, v, !z_to_x_dir);
                 double_promote(rom, v);
                 demote(rom, y);
-                double_demote(rom, z_p_of_xy);
+                double_demote(rom, z);
                 /* Optional "Rebalancing with Promotion," defined as follows:
                        if node z is a non-leaf 1,1 node, we promote it;
                        otherwise, if y is a non-leaf 1,1 node, we promote it.
@@ -938,11 +934,10 @@ rebalance_3_child(struct ccc_romap_ *const rom,
                    This reduces constants in some of theorems mentioned in the
                    paper but may not be worth doing. Rotations stay at 2 worst
                    case. Should revisit after more performance testing. */
-                if (!is_leaf(rom, z_p_of_xy)
-                    && is_11_parent(rom, z_p_of_xy->branch_[L], z_p_of_xy,
-                                    z_p_of_xy->branch_[R]))
+                if (!is_leaf(rom, z)
+                    && is_11_parent(rom, z->branch_[L], z, z->branch_[R]))
                 {
-                    promote(rom, z_p_of_xy);
+                    promote(rom, z);
                 }
                 else if (!is_leaf(rom, y)
                          && is_11_parent(rom, y->branch_[L], y, y->branch_[R]))
@@ -952,9 +947,9 @@ rebalance_3_child(struct ccc_romap_ *const rom,
             }
             return;
         }
-        x = z_p_of_xy;
-        z_p_of_xy = p_of_p_of_xy;
-    } while (z_p_of_xy != &rom->end_ && made_3_child);
+        x = z;
+        z = g;
+    } while (z != &rom->end_ && made_3_child);
 }
 
 static inline void
@@ -990,25 +985,25 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B*/
 static inline void
-rotate(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const z_p_of_x,
-       struct ccc_romap_elem_ *const x_p_of_y, struct ccc_romap_elem_ *const y,
+rotate(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const z,
+       struct ccc_romap_elem_ *const x, struct ccc_romap_elem_ *const y,
        enum romap_link_ dir)
 {
-    assert(z_p_of_x != &rom->end_);
-    struct ccc_romap_elem_ *const p_of_p_of_x = z_p_of_x->parent_;
-    x_p_of_y->parent_ = p_of_p_of_x;
-    if (p_of_p_of_x == &rom->end_)
+    assert(z != &rom->end_);
+    struct ccc_romap_elem_ *const g = z->parent_;
+    x->parent_ = g;
+    if (g == &rom->end_)
     {
-        rom->root_ = x_p_of_y;
+        rom->root_ = x;
     }
     else
     {
-        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = x_p_of_y;
+        g->branch_[g->branch_[R] == z] = x;
     }
-    x_p_of_y->branch_[dir] = z_p_of_x;
-    z_p_of_x->parent_ = x_p_of_y;
-    z_p_of_x->branch_[!dir] = y;
-    y->parent_ = z_p_of_x;
+    x->branch_[dir] = z;
+    z->parent_ = x;
+    z->branch_[!dir] = y;
+    y->parent_ = z;
 }
 
 /** A double rotation shouldn't actually be two calls to rotate because that
@@ -1023,33 +1018,32 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      ╭─┴─╮
      B   C */
 static inline void
-double_rotate(struct ccc_romap_ *const rom,
-              struct ccc_romap_elem_ *const z_p_of_x,
-              struct ccc_romap_elem_ *const x_p_of_y,
-              struct ccc_romap_elem_ *const y, enum romap_link_ dir)
+double_rotate(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const z,
+              struct ccc_romap_elem_ *const x, struct ccc_romap_elem_ *const y,
+              enum romap_link_ dir)
 {
-    assert(z_p_of_x != &rom->end_);
-    assert(x_p_of_y != &rom->end_);
+    assert(z != &rom->end_);
+    assert(x != &rom->end_);
     assert(y != &rom->end_);
-    struct ccc_romap_elem_ *const p_of_p_of_x = z_p_of_x->parent_;
-    y->parent_ = p_of_p_of_x;
-    if (p_of_p_of_x == &rom->end_)
+    struct ccc_romap_elem_ *const g = z->parent_;
+    y->parent_ = g;
+    if (g == &rom->end_)
     {
         rom->root_ = y;
     }
     else
     {
-        p_of_p_of_x->branch_[p_of_p_of_x->branch_[R] == z_p_of_x] = y;
+        g->branch_[g->branch_[R] == z] = y;
     }
-    x_p_of_y->branch_[!dir] = y->branch_[dir];
-    y->branch_[dir]->parent_ = x_p_of_y;
-    y->branch_[dir] = x_p_of_y;
-    x_p_of_y->parent_ = y;
+    x->branch_[!dir] = y->branch_[dir];
+    y->branch_[dir]->parent_ = x;
+    y->branch_[dir] = x;
+    x->parent_ = y;
 
-    z_p_of_x->branch_[dir] = y->branch_[!dir];
-    y->branch_[!dir]->parent_ = z_p_of_x;
-    y->branch_[!dir] = z_p_of_x;
-    z_p_of_x->parent_ = y;
+    z->branch_[dir] = y->branch_[!dir];
+    y->branch_[!dir]->parent_ = z;
+    y->branch_[!dir] = z;
+    z->parent_ = y;
 }
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
@@ -1058,10 +1052,10 @@ double_rotate(struct ccc_romap_ *const rom,
        x */
 [[maybe_unused]] static inline bool
 is_0_child(struct ccc_romap_ const *const rom,
-           struct ccc_romap_elem_ const *p_of_x,
-           struct ccc_romap_elem_ const *x)
+           struct ccc_romap_elem_ const *const p,
+           struct ccc_romap_elem_ const *const x)
 {
-    return p_of_x != &rom->end_ && p_of_x->parity_ == x->parity_;
+    return p != &rom->end_ && p->parity_ == x->parity_;
 }
 
 /* Returns true for rank difference 1 between the parent and node.
@@ -1070,10 +1064,10 @@ is_0_child(struct ccc_romap_ const *const rom,
        x*/
 static inline bool
 is_1_child(struct ccc_romap_ const *const rom,
-           struct ccc_romap_elem_ const *p_of_x,
-           struct ccc_romap_elem_ const *x)
+           struct ccc_romap_elem_ const *const p,
+           struct ccc_romap_elem_ const *const x)
 {
-    return p_of_x != &rom->end_ && p_of_x->parity_ != x->parity_;
+    return p != &rom->end_ && p->parity_ != x->parity_;
 }
 
 /* Returns true for rank difference 2 between the parent and node.
@@ -1082,10 +1076,10 @@ is_1_child(struct ccc_romap_ const *const rom,
        x */
 static inline bool
 is_2_child(struct ccc_romap_ const *const rom,
-           struct ccc_romap_elem_ const *const p_of_x,
+           struct ccc_romap_elem_ const *const p,
            struct ccc_romap_elem_ const *const x)
 {
-    return p_of_x != &rom->end_ && p_of_x->parity_ == x->parity_;
+    return p != &rom->end_ && p->parity_ == x->parity_;
 }
 
 /* Returns true for rank difference 3 between the parent and node.
@@ -1094,10 +1088,10 @@ is_2_child(struct ccc_romap_ const *const rom,
        x */
 [[maybe_unused]] static inline bool
 is_3_child(struct ccc_romap_ const *const rom,
-           struct ccc_romap_elem_ const *const p_of_x,
+           struct ccc_romap_elem_ const *const p,
            struct ccc_romap_elem_ const *const x)
 {
-    return p_of_x != &rom->end_ && p_of_x->parity_ != x->parity_;
+    return p != &rom->end_ && p->parity_ != x->parity_;
 }
 
 /* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
@@ -1108,12 +1102,12 @@ is_3_child(struct ccc_romap_ const *const rom,
 static inline bool
 is_01_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
              struct ccc_romap_elem_ const *const x,
-             struct ccc_romap_elem_ const *const p_of_xy,
+             struct ccc_romap_elem_ const *const p,
              struct ccc_romap_elem_ const *const y)
 {
-    assert(p_of_xy != &rom->end_);
-    return (!x->parity_ && !p_of_xy->parity_ && y->parity_)
-           || (x->parity_ && p_of_xy->parity_ && !y->parity_);
+    assert(p != &rom->end_);
+    return (!x->parity_ && !p->parity_ && y->parity_)
+           || (x->parity_ && p->parity_ && !y->parity_);
 }
 
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
@@ -1124,12 +1118,12 @@ is_01_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
 static inline bool
 is_11_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
              struct ccc_romap_elem_ const *const x,
-             struct ccc_romap_elem_ const *const p_of_xy,
+             struct ccc_romap_elem_ const *const p,
              struct ccc_romap_elem_ const *const y)
 {
-    assert(p_of_xy != &rom->end_);
-    return (!x->parity_ && p_of_xy->parity_ && !y->parity_)
-           || (x->parity_ && !p_of_xy->parity_ && y->parity_);
+    assert(p != &rom->end_);
+    return (!x->parity_ && p->parity_ && !y->parity_)
+           || (x->parity_ && !p->parity_ && y->parity_);
 }
 
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
@@ -1140,11 +1134,11 @@ is_11_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
 static inline bool
 is_02_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
              struct ccc_romap_elem_ const *const x,
-             struct ccc_romap_elem_ const *const p_of_xy,
+             struct ccc_romap_elem_ const *const p,
              struct ccc_romap_elem_ const *const y)
 {
-    assert(p_of_xy != &rom->end_);
-    return (x->parity_ == p_of_xy->parity_) && (p_of_xy->parity_ == y->parity_);
+    assert(p != &rom->end_);
+    return (x->parity_ == p->parity_) && (p->parity_ == y->parity_);
 }
 
 /* Returns true if a parent is a 2,2 or 2,2 node, which is allowed. 2,2 nodes
@@ -1158,11 +1152,11 @@ is_02_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
 static inline bool
 is_22_parent([[maybe_unused]] struct ccc_romap_ const *const rom,
              struct ccc_romap_elem_ const *const x,
-             struct ccc_romap_elem_ const *const p_of_xy,
+             struct ccc_romap_elem_ const *const p,
              struct ccc_romap_elem_ const *const y)
 {
-    assert(p_of_xy != &rom->end_);
-    return (x->parity_ == p_of_xy->parity_) && (p_of_xy->parity_ == y->parity_);
+    assert(p != &rom->end_);
+    return (x->parity_ == p->parity_) && (p->parity_ == y->parity_);
 }
 
 static inline void
@@ -1180,10 +1174,16 @@ demote(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ *const x)
     promote(rom, x);
 }
 
+/* One could imagine non-parity based rank tracking making this function
+   meaningful, but two parity changes are the same as a no-op. Leave for
+   clarity of what the code is meant to do through certain sections. */
 static inline void
 double_promote(struct ccc_romap_ const *const, struct ccc_romap_elem_ *const)
 {}
 
+/* One could imagine non-parity based rank tracking making this function
+   meaningful, but two parity changes are the same as a no-op. Leave for
+   clarity of what the code is meant to do through certain sections. */
 static inline void
 double_demote(struct ccc_romap_ const *const, struct ccc_romap_elem_ *const)
 {}
