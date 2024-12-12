@@ -291,7 +291,8 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 /*=========================    Private Interface   ==========================*/
 
 void
-ccc_impl_sll_push_front(struct ccc_sll_ *const sll, struct ccc_sll_elem_ *elem)
+ccc_impl_sll_push_front(struct ccc_sll_ *const sll,
+                        struct ccc_sll_elem_ *const elem)
 {
     push_front(sll, elem);
 }
