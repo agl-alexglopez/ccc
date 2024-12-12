@@ -10,6 +10,8 @@
 
 static size_t const swap_space = 1;
 
+/*=====================      Prototypes      ================================*/
+
 static void *at(struct ccc_fpq_ const *, size_t);
 static size_t index_of(struct ccc_fpq_ const *, void const *);
 static bool wins(struct ccc_fpq_ const *, void const *winner,
@@ -18,6 +20,8 @@ static void swap(struct ccc_fpq_ *, char tmp[], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
 static size_t bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
 static size_t update_fixup(struct ccc_fpq_ *, void *e);
+
+/*=====================       Interface      ================================*/
 
 ccc_result
 ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
@@ -155,7 +159,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 
 void *
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
-               ccc_update_fn *fn, void *aux)
+               ccc_update_fn *const fn, void *const aux)
 {
     if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf_))
     {
@@ -335,7 +339,7 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     return true;
 }
 
-/*===========================   Implementation   ========================== */
+/*===================     Private Interface     =============================*/
 
 size_t
 ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
@@ -364,8 +368,9 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
     }
 }
 
-/*===============================  Static Helpers  =========================*/
+/*====================     Static Helpers     ===============================*/
 
+/* Fixes the position of element e after its key value has been changed. */
 static inline size_t
 update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 {
@@ -389,11 +394,13 @@ update_fixup(struct ccc_fpq_ *const fpq, void *const e)
     return i;
 }
 
+/* Returns the sorted position of the element starting at position i. */
 static inline size_t
-bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
+bubble_up(struct ccc_fpq_ *const fpq, char tmp[const], size_t i)
 {
     for (size_t parent = (i - 1) / 2; i; i = parent, parent = (parent - 1) / 2)
     {
+        /* Not winning here means we are in correct order or equal. */
         if (!wins(fpq, at(fpq, i), at(fpq, parent)))
         {
             return i;
@@ -403,16 +410,17 @@ bubble_up(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
     return 0;
 }
 
+/* Returns the sorted position of the element starting at position i. */
 static inline size_t
-bubble_down(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
+bubble_down(struct ccc_fpq_ *const fpq, char tmp[const], size_t i)
 {
     size_t const sz = ccc_buf_size(&fpq->buf_);
     for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < sz;
          i = next, left = (i * 2) + 1, right = left + 1)
     {
         /* Avoid one comparison call if there is no right child. */
-        next = right < sz && wins(fpq, at(fpq, right), at(fpq, left)) ? right
-                                                                      : left;
+        next = (right < sz && wins(fpq, at(fpq, right), at(fpq, left))) ? right
+                                                                        : left;
         /* If the child beats the parent we must swap. Equal is ok to break. */
         if (!wins(fpq, at(fpq, next), at(fpq, i)))
         {
@@ -423,8 +431,11 @@ bubble_down(struct ccc_fpq_ *const fpq, char tmp[], size_t i)
     return i;
 }
 
+/* Swaps i and j using the underlying buffer capabilities. Not checked for
+   an error in release. */
 static inline void
-swap(struct ccc_fpq_ *const fpq, char tmp[], size_t const i, size_t const j)
+swap(struct ccc_fpq_ *const fpq, char tmp[const], size_t const i,
+     size_t const j)
 {
     [[maybe_unused]] ccc_result const res = ccc_buf_swap(&fpq->buf_, tmp, i, j);
     assert(res == CCC_OK);
@@ -440,7 +451,7 @@ at(struct ccc_fpq_ const *const fpq, size_t const i)
     return addr;
 }
 
-/* Flat pqueue code that uses indices of the underlying buffer should always
+/* Flat pq code that uses indices of the underlying buffer should always
    be within the buffer range. It should never exceed the current size and
    start at or after the buffer base. Only checked in debug. */
 static inline size_t
@@ -453,6 +464,11 @@ index_of(struct ccc_fpq_ const *const fpq, void const *const slot)
     return i;
 }
 
+/* Returns true if the winner (the "left hand side") wins the comparison.
+   Winning in a three-way comparison means satisfying the total order of the
+   priority queue. So, there is no winner if the elements are equal and this
+   function would return false. If the winner is in the wrong order, thus
+   losing the total order comparison, the function also returns false. */
 static inline bool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
