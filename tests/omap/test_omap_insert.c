@@ -574,7 +574,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_weak_srand)
         CHECK(validate(&om), true);
     }
     CHECK(size(&om), (size_t)num_nodes);
-    CHECK_END_FN();
+    CHECK_END_FN(om_clear(&om, NULL););
 }
 
 int

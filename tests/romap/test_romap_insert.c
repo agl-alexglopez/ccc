@@ -578,7 +578,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
         CHECK(validate(&rom), true);
     }
     CHECK(size(&rom), (size_t)num_nodes);
-    CHECK_END_FN();
+    CHECK_END_FN(rom_clear(&rom, NULL););
 }
 
 int
