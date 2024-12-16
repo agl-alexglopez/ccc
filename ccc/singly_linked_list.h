@@ -78,20 +78,6 @@ destruction.
 
 /**@}*/
 
-/** @brief Write a compound literal directly to allocated memory at the front.
-O(1).
-@param [in] list_ptr a pointer to the singly linked list.
-@param [in] struct_initializer a compound literal containing the elements to
-be written to a newly allocated node.
-@return a reference to the element pushed to the front or NULL if allocation
-failed.
-
-Note that it only makes sense to use this method when the container is given
-allocation permission. Otherwise NULL is returned due to an inability for the
-container to allocate memory. */
-#define ccc_sll_emplace_front(list_ptr, struct_initializer...)                 \
-    ccc_impl_sll_emplace_front(list_ptr, struct_initializer)
-
 /** @name Insert and Remove Interface
 Add or remove elements from the container. */
 /**@{*/
@@ -107,6 +93,20 @@ elem has been allocated appropriately and with the correct lifetime by the user.
 If allocation is allowed the provided element is copied to a new allocation. */
 [[nodiscard]] void *ccc_sll_push_front(ccc_singly_linked_list *sll,
                                        ccc_sll_elem *elem);
+
+/** @brief Write a compound literal directly to allocated memory at the front.
+O(1).
+@param [in] list_ptr a pointer to the singly linked list.
+@param [in] struct_initializer a compound literal containing the elements to
+be written to a newly allocated node.
+@return a reference to the element pushed to the front or NULL if allocation
+failed.
+
+Note that it only makes sense to use this method when the container is given
+allocation permission. Otherwise NULL is returned due to an inability for the
+container to allocate memory. */
+#define ccc_sll_emplace_front(list_ptr, struct_initializer...)                 \
+    ccc_impl_sll_emplace_front(list_ptr, struct_initializer)
 
 /** @brief Pop the front element from the list. O(1).
 @param [in] sll a pointer to the singly linked list.
