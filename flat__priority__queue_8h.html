@@ -90,8 +90,6 @@ $(document).ready(function(){initNavTree('flat__priority__queue_8h.html',''); in
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_priority_queue.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -126,12 +124,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__priority__queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fpq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></td></tr>
-<tr class="memdesc:a8ed534b783c08382f5e3cd0456a1d72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container offering direct storage and sorting of user data by heap order.  <br /></td></tr>
-<tr class="separator:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -184,6 +176,13 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a7850eb9c6d9d8c2bd8cd23ee134bf5a5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a7850eb9c6d9d8c2bd8cd23ee134bf5a5">ccc_fpq_decrease</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a7850eb9c6d9d8c2bd8cd23ee134bf5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
 <tr class="separator:a7850eb9c6d9d8c2bd8cd23ee134bf5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
+</td></tr>
+<tr class="memitem:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fpq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></td></tr>
+<tr class="memdesc:a8ed534b783c08382f5e3cd0456a1d72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container offering direct storage and sorting of user data by heap order.  <br /></td></tr>
+<tr class="separator:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
@@ -788,8 +787,8 @@ Typedefs</h2></td></tr>
 <div class="line">flat_priority_queue dst</div>
 <div class="line">    = fpq_init((<span class="keywordtype">int</span>[11]){}, 11, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
-<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:82</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:65</div></div>
+<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:86</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue src</div>

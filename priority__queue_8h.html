@@ -90,8 +90,6 @@ $(document).ready(function(){initNavTree('priority__queue_8h.html',''); initResi
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">priority_queue.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -124,16 +122,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="priority__queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:ae4003f166727edbb815d333c9c27972b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a></td></tr>
-<tr class="memdesc:ae4003f166727edbb815d333c9c27972b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for pointer stability and an O(1) push and amortized o(lg
-N) increase/decrease key.  <br /></td></tr>
-<tr class="separator:ae4003f166727edbb815d333c9c27972b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5438f40477e5a79f1055adb17b055b44"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a></td></tr>
-<tr class="memdesc:a5438f40477e5a79f1055adb17b055b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">The embedded struct type for operation of the priority queue.  <br /></td></tr>
-<tr class="separator:a5438f40477e5a79f1055adb17b055b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -176,6 +164,17 @@ N) increase/decrease key.  <br /></td></tr>
 <tr class="memitem:a4f71b0326f9c72019dd17021dc2fe0c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a4f71b0326f9c72019dd17021dc2fe0c6">ccc_pq_decrease</a> (<a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a> *pq, <a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a> *elem, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a4f71b0326f9c72019dd17021dc2fe0c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the value of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
 <tr class="separator:a4f71b0326f9c72019dd17021dc2fe0c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
+</td></tr>
+<tr class="memitem:ae4003f166727edbb815d333c9c27972b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ae4003f166727edbb815d333c9c27972b">ccc_priority_queue</a></td></tr>
+<tr class="memdesc:ae4003f166727edbb815d333c9c27972b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for pointer stability and an O(1) push and amortized o(lg
+N) increase/decrease key.  <br /></td></tr>
+<tr class="separator:ae4003f166727edbb815d333c9c27972b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5438f40477e5a79f1055adb17b055b44"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5438f40477e5a79f1055adb17b055b44">ccc_pq_elem</a></td></tr>
+<tr class="memdesc:a5438f40477e5a79f1055adb17b055b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">The embedded struct type for operation of the priority queue.  <br /></td></tr>
+<tr class="separator:a5438f40477e5a79f1055adb17b055b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>

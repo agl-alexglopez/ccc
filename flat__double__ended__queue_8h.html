@@ -90,8 +90,6 @@ $(document).ready(function(){initNavTree('flat__double__ended__queue_8h.html',''
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_double_ended_queue.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -126,12 +124,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__double__ended__queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fdeq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></td></tr>
-<tr class="memdesc:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous buffer for O(1) push and pop from front and back.  <br /></td></tr>
-<tr class="separator:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -172,6 +164,13 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a60e38bd6dacaf6204fa8de34c7732789"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
 <tr class="memdesc:a60e38bd6dacaf6204fa8de34c7732789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the back of the fdeq. O(1).  <br /></td></tr>
 <tr class="separator:a60e38bd6dacaf6204fa8de34c7732789"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
+</td></tr>
+<tr class="memitem:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fdeq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a></td></tr>
+<tr class="memdesc:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous buffer for O(1) push and pop from front and back.  <br /></td></tr>
+<tr class="separator:a0b47511ed59d60a9e66bdb2fee438eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
@@ -640,7 +639,7 @@ Typedefs</h2></td></tr>
 <div class="line">flat_double_ended_queue dst</div>
 <div class="line">    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&amp;src));</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:65</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>

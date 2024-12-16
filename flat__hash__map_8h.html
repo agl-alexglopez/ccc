@@ -90,8 +90,6 @@ $(document).ready(function(){initNavTree('flat__hash__map_8h.html',''); initResi
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">flat_hash_map.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -126,18 +124,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="flat__hash__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></td></tr>
-<tr class="memdesc:af8251d1f96c8a10e8ff2b20d7f117447"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for storing key-value structures defined by the user in a contiguous buffer.  <br /></td></tr>
-<tr class="separator:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada2d334ae54ac456f5ff1a37ac546994"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></td></tr>
-<tr class="memdesc:ada2d334ae54ac456f5ff1a37ac546994"><td class="mdescLeft">&#160;</td><td class="mdescRight">An intrusive element for a user provided type.  <br /></td></tr>
-<tr class="separator:ada2d334ae54ac456f5ff1a37ac546994"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefcfb8e4e21401e417bac1f3921606b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fhmap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></td></tr>
-<tr class="memdesc:aefcfb8e4e21401e417bac1f3921606b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
-<tr class="separator:aefcfb8e4e21401e417bac1f3921606b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -226,6 +212,19 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a5b8c4131b6b6a3da6402aa820de8ff27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a5b8c4131b6b6a3da6402aa820de8ff27">ccc_fhm_entry_status</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
 <tr class="memdesc:a5b8c4131b6b6a3da6402aa820de8ff27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the entry status from a container entry.  <br /></td></tr>
 <tr class="separator:a5b8c4131b6b6a3da6402aa820de8ff27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
+</td></tr>
+<tr class="memitem:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></td></tr>
+<tr class="memdesc:af8251d1f96c8a10e8ff2b20d7f117447"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for storing key-value structures defined by the user in a contiguous buffer.  <br /></td></tr>
+<tr class="separator:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada2d334ae54ac456f5ff1a37ac546994"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></td></tr>
+<tr class="memdesc:ada2d334ae54ac456f5ff1a37ac546994"><td class="mdescLeft">&#160;</td><td class="mdescRight">An intrusive element for a user provided type.  <br /></td></tr>
+<tr class="separator:ada2d334ae54ac456f5ff1a37ac546994"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefcfb8e4e21401e417bac1f3921606b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fhmap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></td></tr>
+<tr class="memdesc:aefcfb8e4e21401e417bac1f3921606b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
+<tr class="separator:aefcfb8e4e21401e417bac1f3921606b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
@@ -326,7 +325,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, type_name,          \</div>
 <div class="line">                                  closure_over_T)                              \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:51</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:55</div></div>
 </div><!-- fragment -->
 <p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1205,6 +1204,7 @@ Typedefs</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>the initialized destination for the copy of the src map. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>the initialized source of the map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the optional allocation function if resizing is needed. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1227,7 +1227,7 @@ Typedefs</h2></td></tr>
 <div class="line">    = fhm_static_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[13]){}, key, e, fhmap_int_to_u64,</div>
 <div class="line">                      fhmap_id_eq, NULL);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:61</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:65</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>

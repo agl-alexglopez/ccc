@@ -90,8 +90,6 @@ $(document).ready(function(){initNavTree('ordered__map_8h.html',''); initResizab
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle"><div class="title">ordered_map.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -125,18 +123,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="ordered__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a9bd4fb695dfba3a125802323f8b64a34"><td class="memItemLeft" align="right" valign="top">typedef union ccc_ordered_map_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a></td></tr>
-<tr class="memdesc:a9bd4fb695dfba3a125802323f8b64a34"><td class="mdescLeft">&#160;</td><td class="mdescRight">A self-optimizing data structure offering amortized O(lg N) search, insert, and erase and pointer stability.  <br /></td></tr>
-<tr class="separator:a9bd4fb695dfba3a125802323f8b64a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b6a4c9ae41631f9a8cee9549376dd6d"><td class="memItemLeft" align="right" valign="top">typedef union ccc_omap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a8b6a4c9ae41631f9a8cee9549376dd6d">ccc_omap_elem</a></td></tr>
-<tr class="memdesc:a8b6a4c9ae41631f9a8cee9549376dd6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined struct being stored in the map.  <br /></td></tr>
-<tr class="separator:a8b6a4c9ae41631f9a8cee9549376dd6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04fb5474a27fed7faace243a60b76224"><td class="memItemLeft" align="right" valign="top">typedef union ccc_omap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></td></tr>
-<tr class="memdesc:a04fb5474a27fed7faace243a60b76224"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
-<tr class="separator:a04fb5474a27fed7faace243a60b76224"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -254,6 +240,19 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a29368f1e1b994e651944b6b8af91b6f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the rend of a reverse inorder traversal of the map. O(1).  <br /></td></tr>
 <tr class="separator:a29368f1e1b994e651944b6b8af91b6f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
+</td></tr>
+<tr class="memitem:a9bd4fb695dfba3a125802323f8b64a34"><td class="memItemLeft" align="right" valign="top">typedef union ccc_ordered_map_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a9bd4fb695dfba3a125802323f8b64a34">ccc_ordered_map</a></td></tr>
+<tr class="memdesc:a9bd4fb695dfba3a125802323f8b64a34"><td class="mdescLeft">&#160;</td><td class="mdescRight">A self-optimizing data structure offering amortized O(lg N) search, insert, and erase and pointer stability.  <br /></td></tr>
+<tr class="separator:a9bd4fb695dfba3a125802323f8b64a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b6a4c9ae41631f9a8cee9549376dd6d"><td class="memItemLeft" align="right" valign="top">typedef union ccc_omap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a8b6a4c9ae41631f9a8cee9549376dd6d">ccc_omap_elem</a></td></tr>
+<tr class="memdesc:a8b6a4c9ae41631f9a8cee9549376dd6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined struct being stored in the map.  <br /></td></tr>
+<tr class="separator:a8b6a4c9ae41631f9a8cee9549376dd6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04fb5474a27fed7faace243a60b76224"><td class="memItemLeft" align="right" valign="top">typedef union ccc_omap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></td></tr>
+<tr class="memdesc:a04fb5474a27fed7faace243a60b76224"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
+<tr class="separator:a04fb5474a27fed7faace243a60b76224"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
 </td></tr>
@@ -327,7 +326,7 @@ Typedefs</h2></td></tr>
 <div class="line">        ccc_impl_om_and_modify_w(ordered_map_entry_ptr, type_name,             \</div>
 <div class="line">                                 closure_over_T)                               \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aordered__map_8h_html_a04fb5474a27fed7faace243a60b76224"><div class="ttname"><a href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></div><div class="ttdeci">union ccc_omap_entry_ ccc_omap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_map.h:53</div></div>
+<div class="ttc" id="aordered__map_8h_html_a04fb5474a27fed7faace243a60b76224"><div class="ttname"><a href="ordered__map_8h.html#a04fb5474a27fed7faace243a60b76224">ccc_omap_entry</a></div><div class="ttdeci">union ccc_omap_entry_ ccc_omap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_map.h:57</div></div>
 </div><!-- fragment -->
 <p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -426,7 +425,7 @@ Typedefs</h2></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_om_equal_range(ordered_map_ptr, begin_and_end_key_ptrs).impl_      \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:26</div></div>
+<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:30</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired range. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -469,7 +468,7 @@ Typedefs</h2></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_om_equal_rrange(ordered_map_ptr, rbegin_and_rend_key_ptrs).impl_   \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:34</div></div>
+<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:38</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired rrange. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
