@@ -90,8 +90,6 @@ $(document).ready(function(){initNavTree('singly__linked__list_8h.html',''); ini
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#define-members">Macros</a>  </div>
   <div class="headertitle"><div class="title">singly_linked_list.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -124,12 +122,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="singly__linked__list_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a9002202a3809db1cf28ab47146f5cb3a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a9002202a3809db1cf28ab47146f5cb3a">ccc_sll_emplace_front</a>(list_ptr,  struct_initializer...)&#160;&#160;&#160;    ccc_impl_sll_emplace_front(list_ptr, struct_initializer)</td></tr>
-<tr class="memdesc:a9002202a3809db1cf28ab47146f5cb3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a compound literal directly to allocated memory at the front. O(1).  <br /></td></tr>
-<tr class="separator:a9002202a3809db1cf28ab47146f5cb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -137,19 +129,12 @@ Macros</h2></td></tr>
 <tr class="memdesc:a76fa7a679858852029b6ac191b9868b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a singly linked list at compile or runtime.  <br /></td></tr>
 <tr class="separator:a76fa7a679858852029b6ac191b9868b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
-<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
-</td></tr>
-<tr class="memitem:a900d4f0c536208547abfbc1e79e74fbf"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_sll_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a></td></tr>
-<tr class="memdesc:a900d4f0c536208547abfbc1e79e74fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">A low overhead front tracking container with efficient push and pop.  <br /></td></tr>
-<tr class="separator:a900d4f0c536208547abfbc1e79e74fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adfeb9ade999c0c98572b636601a72bb9"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_sll_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a></td></tr>
-<tr class="memdesc:adfeb9ade999c0c98572b636601a72bb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A singly linked list intrusive element to embedded in a user type.  <br /></td></tr>
-<tr class="separator:adfeb9ade999c0c98572b636601a72bb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Add or remove elements from the container. </p>
 </td></tr>
+<tr class="memitem:a9002202a3809db1cf28ab47146f5cb3a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a9002202a3809db1cf28ab47146f5cb3a">ccc_sll_emplace_front</a>(list_ptr,  struct_initializer...)&#160;&#160;&#160;    ccc_impl_sll_emplace_front(list_ptr, struct_initializer)</td></tr>
+<tr class="memdesc:a9002202a3809db1cf28ab47146f5cb3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a compound literal directly to allocated memory at the front. O(1).  <br /></td></tr>
+<tr class="separator:a9002202a3809db1cf28ab47146f5cb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20652f3d5f4e73dd77b3490c7534a54b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a20652f3d5f4e73dd77b3490c7534a54b">ccc_sll_push_front</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *elem)</td></tr>
 <tr class="memdesc:a20652f3d5f4e73dd77b3490c7534a54b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the type wrapping elem to the front of the list. O(1).  <br /></td></tr>
 <tr class="separator:a20652f3d5f4e73dd77b3490c7534a54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,6 +159,16 @@ Macros</h2></td></tr>
 <tr class="memitem:aebdb50adbf99f6a07b531a6d962a7f83"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#aebdb50adbf99f6a07b531a6d962a7f83">ccc_sll_extract_range</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *begin, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *end)</td></tr>
 <tr class="memdesc:aebdb50adbf99f6a07b531a6d962a7f83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts a range of elements from the list without freeing them. O(N).  <br /></td></tr>
 <tr class="separator:aebdb50adbf99f6a07b531a6d962a7f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
+</td></tr>
+<tr class="memitem:a900d4f0c536208547abfbc1e79e74fbf"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_sll_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a></td></tr>
+<tr class="memdesc:a900d4f0c536208547abfbc1e79e74fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">A low overhead front tracking container with efficient push and pop.  <br /></td></tr>
+<tr class="separator:a900d4f0c536208547abfbc1e79e74fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfeb9ade999c0c98572b636601a72bb9"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_sll_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a></td></tr>
+<tr class="memdesc:adfeb9ade999c0c98572b636601a72bb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A singly linked list intrusive element to embedded in a user type.  <br /></td></tr>
+<tr class="separator:adfeb9ade999c0c98572b636601a72bb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
