@@ -13,7 +13,7 @@
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, e, key, NULL,
                                     fhmap_int_zero, fhmap_id_eq, NULL);
 
     struct val query = {.key = 137, .val = 99};
@@ -43,7 +43,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
-    ccc_flat_hash_map h = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+    ccc_flat_hash_map h = fhm_init((struct val *)NULL, 0, e, key, std_alloc,
                                    fhmap_int_to_u64, fhmap_id_eq, NULL);
 
     int const to_insert = 100;

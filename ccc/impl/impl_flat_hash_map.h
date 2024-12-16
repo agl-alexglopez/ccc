@@ -48,7 +48,7 @@ union ccc_fhmap_entry_
     struct ccc_fhash_entry_ impl_;
 };
 
-#define ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,   \
+#define ccc_impl_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,   \
                           alloc_fn, hash_fn, key_eq_fn, aux)                   \
     {                                                                          \
         .buf_                                                                  \
@@ -56,28 +56,6 @@ union ccc_fhmap_entry_
         .hash_fn_ = (hash_fn),                                                 \
         .eq_fn_ = (key_eq_fn),                                                 \
         .key_offset_ = offsetof(typeof(*(memory_ptr)), key_field),             \
-        .hash_elem_offset_                                                     \
-        = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
-    }
-
-#define ccc_impl_fhm_zero_init(type_name, key_field, fhash_elem_field,         \
-                               alloc_fn, hash_fn, key_eq_fn, aux)              \
-    {                                                                          \
-        .buf_ = ccc_buf_init((type_name *)NULL, alloc_fn, aux, 0),             \
-        .hash_fn_ = (hash_fn),                                                 \
-        .eq_fn_ = (key_eq_fn),                                                 \
-        .key_offset_ = (offsetof(type_name, key_field)),                       \
-        .hash_elem_offset_ = offsetof(type_name, fhash_elem_field),            \
-    }
-
-#define ccc_impl_fhm_static_init(memory_ptr, key_field, fhash_elem_field,      \
-                                 hash_fn, key_eq_fn, aux)                      \
-    {                                                                          \
-        .buf_ = ccc_buf_init(memory_ptr, NULL, aux,                            \
-                             sizeof(memory_ptr) / sizeof((memory_ptr)[0])),    \
-        .hash_fn_ = (hash_fn),                                                 \
-        .eq_fn_ = (key_eq_fn),                                                 \
-        .key_offset_ = (offsetof(typeof(*(memory_ptr)), key_field)),           \
         .hash_elem_offset_                                                     \
         = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
     }

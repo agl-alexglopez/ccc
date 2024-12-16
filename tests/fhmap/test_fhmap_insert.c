@@ -13,7 +13,7 @@
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, e, key, NULL,
                                     fhmap_int_zero, fhmap_id_eq, NULL);
 
     /* Nothing was there before so nothing is in the entry. */
@@ -26,7 +26,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, e, key, NULL,
                                     fhmap_int_zero, fhmap_id_eq, NULL);
 
     struct val const *ins = ccc_fhm_or_insert_w(
@@ -70,7 +70,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, e, key, NULL,
                                     fhmap_int_zero, fhmap_id_eq, NULL);
 
     struct val q = {.key = 137, .val = 99};
@@ -103,7 +103,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, 10, e, key, NULL,
                                     fhmap_int_zero, fhmap_id_eq, NULL);
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = insert(&fh, &q.e);
@@ -133,7 +133,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
 CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, e, key, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
     size_t const size = 200;
 
@@ -191,7 +191,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, e, key, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
 
     /* Test entry or insert with for all even values. Default should be
@@ -236,7 +236,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, e, key, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
 
     /* Test entry or insert with for all even values. Default should be
@@ -276,7 +276,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
-    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[200]){}, 200, e, key, NULL,
                                     fhmap_int_last_digit, fhmap_id_eq, NULL);
 
     /* Test entry or insert with for all even values. Default should be
@@ -328,7 +328,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_two_sum)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[20]){}, 20, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[20]){}, 20, e, key, NULL,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
@@ -356,8 +356,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
 {
     size_t const prime_start = 11;
     ccc_flat_hash_map fh = fhm_init(
-        (struct val *)malloc(sizeof(struct val) * prime_start), prime_start,
-        key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+        (struct val *)malloc(sizeof(struct val) * prime_start), prime_start, e,
+        key, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
     CHECK(fhm_data(&fh) != NULL, true);
 
     int const to_insert = 1000;
@@ -390,8 +390,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
 {
     size_t const prime_start = 11;
     ccc_flat_hash_map fh = fhm_init(
-        (struct val *)malloc(sizeof(struct val) * prime_start), prime_start,
-        key, e, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
+        (struct val *)malloc(sizeof(struct val) * prime_start), prime_start, e,
+        key, std_alloc, fhmap_int_to_u64, fhmap_id_eq, NULL);
     CHECK(fhm_data(&fh) != NULL, true);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -430,7 +430,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+    ccc_flat_hash_map fh = fhm_init((struct val *)NULL, 0, e, key, std_alloc,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -459,7 +459,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val *)NULL, 0, key, e, std_alloc,
+    ccc_flat_hash_map fh = fhm_init((struct val *)NULL, 0, e, key, std_alloc,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
     int const to_insert = 1000;
     int const larger_prime = (int)fhm_next_prime(to_insert);
@@ -499,7 +499,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
 {
     int const size = 101;
-    ccc_flat_hash_map fh = fhm_init((struct val[101]){}, 101, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[101]){}, 101, e, key, NULL,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
 
     int const larger_prime = (int)fhm_next_prime(size);
@@ -559,7 +559,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
 {
     int const size = 101;
-    ccc_flat_hash_map fh = fhm_init((struct val[101]){}, 101, key, e, NULL,
+    ccc_flat_hash_map fh = fhm_init((struct val[101]){}, 101, e, key, NULL,
                                     fhmap_int_to_u64, fhmap_id_eq, NULL);
 
     for (int i = 0; i < size; i += 2)
