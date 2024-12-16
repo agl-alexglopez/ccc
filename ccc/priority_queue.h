@@ -26,6 +26,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_priority_queue.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A container for pointer stability and an O(1) push and amortized o(lg
 N) increase/decrease key.
 @warning it is undefined behavior to access an uninitialized container.
@@ -43,6 +47,8 @@ container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
 typedef struct ccc_pq_elem_ ccc_pq_elem;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

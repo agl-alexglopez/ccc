@@ -40,6 +40,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_ordered_multimap.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A container for membership testing by key field, allowing duplicate
 keys.
 @warning it is undefined behavior to use an uninitialized container.
@@ -65,6 +69,8 @@ searches. Entries are views of Vacant or Occupied multimap elements allowing
 further operations to be performed once they are obtained without a second
 search, insert, or remove query. */
 typedef union ccc_ommap_entry_ ccc_ommap_entry;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

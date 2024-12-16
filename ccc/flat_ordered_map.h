@@ -39,6 +39,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_flat_ordered_map.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A self-optimizing data structure offering amortized O(lg N) search,
 insert, and erase.
 @warning it is undefined behavior to access an uninitialized container.
@@ -61,6 +65,8 @@ typedef struct ccc_fomap_elem_ ccc_fomap_elem;
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fomap_entry_ ccc_fomap_entry;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

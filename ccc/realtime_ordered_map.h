@@ -24,6 +24,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_realtime_ordered_map.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A container for amortized O(lg N) search, insert, erase, ranges, and
 pointer stability.
 @warning it is undefined behavior to access an uninitialized container.
@@ -48,6 +52,8 @@ typedef struct ccc_romap_elem_ ccc_romap_elem;
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_romap_entry_ ccc_romap_entry;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

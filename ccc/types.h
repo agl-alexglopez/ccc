@@ -17,6 +17,10 @@ the allocation function interface. */
 
 #include "impl/impl_types.h"
 
+/** @name Container Types
+Types used across many containers. */
+/**@{*/
+
 /** @brief The result of a range query on iterable containers.
 
 A range provides a view all elements that fit the equals range criteria
@@ -248,6 +252,12 @@ A reference to any aux data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
 typedef uint64_t ccc_hash_fn(ccc_user_key to_hash);
 
+/**@}*/
+
+/** @name Entry Interface
+The generic interface for associative container entries. */
+/**@{*/
+
 /** @brief Determine if an entry is Occupied in the container.
 @param [in] e the pointer to the entry obtained from a container.
 @return true if Occupied false if Vacant. */
@@ -279,6 +289,12 @@ container from which the entry is obtained. Read the documentation for the
 container being used to understand what to expect from this function once an
 entry is obtained. */
 void *ccc_entry_unwrap(ccc_entry const *e);
+
+/**@}*/
+
+/** @name Range Interface
+The generic range interface for associative containers. */
+/**@{*/
 
 /** @brief Obtain a reference to the beginning user element stored in a
 container in the provided range.
@@ -321,6 +337,12 @@ NULL. Functions that obtain ranges treat the reverse end as an exclusive bound
 and therefore it is undefined to access this element. */
 void *ccc_rend_rrange(ccc_rrange const *r);
 
+/**@}*/
+
+/** @name Status Interface
+Functions for obtaining more descriptive status information. */
+/**@{*/
+
 /** @brief Obtain a string message with a description of the error returned
 from a container operation, possible causes, and possible fixes to such error.
 @param [in] res the result obtained from a container operation.
@@ -350,6 +372,8 @@ the status can reflect if any errors occurred in this process as well. Usually,
 the provided interface gives all the functions needed to check status but these
 strings can be used when more details are required. */
 char const *ccc_entry_status_msg(ccc_entry_status status);
+
+/**@}*/
 
 /** Define this directive at the top of a translation unit if shorter names are
 desired. By default the ccc prefix is used to avoid namespace clashes. */

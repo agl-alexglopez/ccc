@@ -33,6 +33,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_flat_realtime_ordered_map.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A flat realtime ordered map offers O(lg N) search and erase, and
 amortized O(lg N) insert.
 @warning it is undefined behavior to access an uninitialized container.
@@ -53,6 +57,8 @@ typedef struct ccc_fromap_elem_ ccc_fromap_elem;
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fromap_entry_ ccc_fromap_entry;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

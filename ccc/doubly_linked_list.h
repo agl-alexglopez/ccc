@@ -32,6 +32,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_doubly_linked_list.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A container offering bidirectional, insert, removal, and iteration.
 @warning it is undefined behavior to use an uninitialized container.
 
@@ -49,6 +53,8 @@ container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
 typedef struct ccc_dll_elem_ ccc_dll_elem;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

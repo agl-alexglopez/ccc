@@ -24,6 +24,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_flat_priority_queue.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A container offering direct storage and sorting of user data by heap
 order.
 @warning it is undefined behavior to access an uninitialized container.
@@ -31,6 +35,8 @@ order.
 A flat priority queue can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
 typedef struct ccc_fpq_ ccc_flat_priority_queue;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

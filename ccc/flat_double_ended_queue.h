@@ -33,6 +33,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_flat_double_ended_queue.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A contiguous buffer for O(1) push and pop from front and back.
 @warning it is undefined behavior to use an uninitialized flat double ended
 queue.
@@ -40,6 +44,8 @@ queue.
 A flat double ended queue can be initialized on the stack, heap, or data
 segment at compile time or runtime. */
 typedef struct ccc_fdeq_ ccc_flat_double_ended_queue;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize and create containers with memory, callbacks, and permissions. */

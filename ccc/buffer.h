@@ -39,12 +39,18 @@ Then, the `ccc_` prefix can be dropped from all types and functions. */
 #include "impl/impl_buffer.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A contiguous block of storage for elements of the same type.
 @warning it is undefined behavior to use an uninitialized buffer.
 
 A buffer may be initialized on the stack, heap, or data segment at compile time
 or runtime. */
 typedef struct ccc_buf_ ccc_buffer;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

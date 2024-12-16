@@ -29,6 +29,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_ordered_map.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A self-optimizing data structure offering amortized O(lg N) search,
 insert, and erase and pointer stability.
 @warning it is undefined behavior to access an uninitialized container.
@@ -51,6 +55,8 @@ typedef union ccc_omap_elem_ ccc_omap_elem;
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_omap_entry_ ccc_omap_entry;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */

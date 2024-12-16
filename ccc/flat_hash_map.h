@@ -31,6 +31,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_flat_hash_map.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A container for storing key-value structures defined by the user in
 a contiguous buffer.
 
@@ -49,6 +53,8 @@ typedef struct ccc_fhmap_elem_ ccc_fhmap_elem;
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
 typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */
@@ -77,6 +83,7 @@ equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
 @param [in] src the initialized source of the map.
+@param [in] fn the optional allocation function if resizing is needed.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
 is returned. If resizing is required and resizing of dst fails a memory error

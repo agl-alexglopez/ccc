@@ -33,6 +33,10 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include "impl/impl_singly_linked_list.h"
 #include "types.h"
 
+/** @name Container Types
+Types available in the container interface. */
+/**@{*/
+
 /** @brief A low overhead front tracking container with efficient push and pop.
 
 A singly linked list may be stored in the stack, heap, or data segment. Once
@@ -49,6 +53,8 @@ container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
 typedef struct ccc_sll_elem_ ccc_sll_elem;
+
+/**@}*/
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. */
