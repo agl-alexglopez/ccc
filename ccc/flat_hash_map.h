@@ -60,8 +60,8 @@ May be NULL if the user provides a allocation function. The buffer will be
 interpreted in units of type size that the user intends to store.
 @param [in] capacity the starting capacity of the provided buffer or 0 if no
 buffer is provided and an allocation function is given.
-@param [in] key_field the field of the struct used for key storage.
 @param [in] fhash_elem_field the name of the fhmap_elem field.
+@param [in] key_field the field of the struct used for key storage.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
@@ -69,9 +69,9 @@ resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
-#define ccc_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,        \
+#define ccc_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,        \
                      alloc_fn, hash_fn, key_eq_fn, aux_data)                   \
-    ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,       \
+    ccc_impl_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,       \
                       alloc_fn, hash_fn, key_eq_fn, aux_data)
 
 /** @brief Copy the map at source to destination.
