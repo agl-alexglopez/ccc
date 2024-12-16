@@ -141,9 +141,9 @@ Typedefs</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:af26e0aac66a113372ffd845e7f3b5d5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af26e0aac66a113372ffd845e7f3b5d5f">ccc_fhm_init</a>(memory_ptr,  capacity,  key_field,  fhash_elem_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
-<tr class="memdesc:af26e0aac66a113372ffd845e7f3b5d5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
-<tr class="separator:af26e0aac66a113372ffd845e7f3b5d5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc59d084e446d793cbb386f9486e4bcc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#abc59d084e446d793cbb386f9486e4bcc">ccc_fhm_init</a>(memory_ptr,  capacity,  fhash_elem_field,  key_field,  alloc_fn,  hash_fn,  key_eq_fn,  aux_data)</td></tr>
+<tr class="memdesc:abc59d084e446d793cbb386f9486e4bcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
+<tr class="separator:abc59d084e446d793cbb386f9486e4bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7940f9fa1e22af3e8090fca1d5ae4767">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -396,8 +396,8 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
-<a id="af26e0aac66a113372ffd845e7f3b5d5f" name="af26e0aac66a113372ffd845e7f3b5d5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af26e0aac66a113372ffd845e7f3b5d5f">&#9670;&#160;</a></span>ccc_fhm_init</h2>
+<a id="abc59d084e446d793cbb386f9486e4bcc" name="abc59d084e446d793cbb386f9486e4bcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc59d084e446d793cbb386f9486e4bcc">&#9670;&#160;</a></span>ccc_fhm_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -418,13 +418,13 @@ Typedefs</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_field, </td>
+          <td class="paramname">fhash_elem_field, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">fhash_elem_field, </td>
+          <td class="paramname">key_field, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -457,7 +457,7 @@ Typedefs</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(memory_ptr, capacity, key_field, fhash_elem_field,       \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,       \</div>
 <div class="line">                      alloc_fn, hash_fn, key_eq_fn, aux_data)</div>
 </div><!-- fragment -->
 <p>Initialize a map with a buffer of types at compile time or runtime. </p>
@@ -465,8 +465,8 @@ Typedefs</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">memory_ptr</td><td>the pointer to the backing buffer array of user types. May be NULL if the user provides a allocation function. The buffer will be interpreted in units of type size that the user intends to store. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the starting capacity of the provided buffer or 0 if no buffer is provided and an allocation function is given. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fhash_elem_field</td><td>the name of the fhmap_elem field. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for resizing or NULL if no resizing is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hash_fn</td><td>the ccc_hash_fn function the user desires for the table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_eq_fn</td><td>the ccc_key_eq_fn the user intends to use. </td></tr>
@@ -474,7 +474,7 @@ Typedefs</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#af26e0aac66a113372ffd845e7f3b5d5f" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#abc59d084e446d793cbb386f9486e4bcc" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
 
 </div>
 </div>
