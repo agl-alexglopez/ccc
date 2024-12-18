@@ -61,6 +61,27 @@ from the stack or data segment as determined by the user. */
 
 /**@}*/
 
+/** @name Bit Membership Interface
+Test for the presence of bits. */
+/**@{*/
+
+/** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
+@param [in] btst a pointer to the bit set.
+@param [in] i the index identifying the bit to set.
+@return the state of the bit, or CCC_BOOL_ERR if btst is NULL.
+@warning no bounds checking occurs in the release target. For bounds checking,
+see ccc_btst_test_at(). */
+ccc_tribool ccc_btst_test(ccc_bitset const *, size_t i);
+
+/** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
+@param [in] btst a pointer to the bit set.
+@param [in] i the index identifying the bit to set.
+@return the state of the bit, or CCC_BOOL_ERR if btst is NULL.
+@note this function performs bounds checking in the release target. */
+ccc_tribool ccc_btst_test_at(ccc_bitset const *, size_t i);
+
+/**@}*/
+
 /** @name Bit Modification Interface
 Set and flip bits in the set. */
 /**@{*/
