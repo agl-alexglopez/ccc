@@ -3,6 +3,7 @@
 
 #include "bitset.h"
 #include "impl/impl_bitset.h"
+#include "types.h"
 
 /*=========================   Prototypes   ==================================*/
 
