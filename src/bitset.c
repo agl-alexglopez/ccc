@@ -19,6 +19,27 @@ static unsigned popcount(ccc_bitblock_);
 /*=======================   Public Interface   ==============================*/
 
 ccc_tribool
+ccc_btst_test(ccc_bitset const *const btst, size_t const i)
+{
+    if (!btst)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return status(&btst->set_[block_i(i)], i);
+}
+
+ccc_tribool
+ccc_btst_test_at(ccc_bitset const *const btst, size_t const i)
+{
+    size_t const b_i = block_i(i);
+    if (!btst || b_i >= btst->cap_)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return status(&btst->set_[b_i], i);
+}
+
+ccc_tribool
 ccc_btst_set(ccc_bitset *const btst, size_t const i, ccc_tribool const b)
 {
     if (!btst)
@@ -48,7 +69,7 @@ ccc_btst_set_at(ccc_bitset *const btst, size_t const i, ccc_tribool const b)
 ccc_result
 ccc_btst_set_all(ccc_bitset *const btst, ccc_tribool const b)
 {
-    if (!btst || b == CCC_BOOL_ERR)
+    if (!btst || b <= CCC_BOOL_ERR || b > CCC_TRUE)
     {
         return CCC_INPUT_ERR;
     }
@@ -111,7 +132,7 @@ ccc_btst_flip(ccc_bitset *const btst, size_t const i)
     }
     ccc_bitblock_ *const block = &btst->set_[block_i(i)];
     ccc_tribool const was = status(block, i);
-    *block ^= on(i);
+    *block = ~(*block);
     return was;
 }
 
@@ -125,7 +146,7 @@ ccc_btst_flip_at(ccc_bitset *const btst, size_t const i)
     }
     ccc_bitblock_ *const block = &btst->set_[b_i];
     ccc_tribool const was = status(block, i);
-    *block ^= on(i);
+    *block = ~(*block);
     return was;
 }
 
@@ -190,7 +211,7 @@ set(ccc_bitblock_ *const block, size_t const bit_i, ccc_tribool const b)
 static inline ccc_tribool
 status(ccc_bitblock_ const *const btst, size_t const bit_i)
 {
-    return *btst & on(bit_i);
+    return (*btst & on(bit_i)) != 0;
 }
 
 static inline ccc_bitblock_
@@ -238,7 +259,7 @@ popcount(ccc_bitblock_ const b)
     return __builtin_popcount(b);
 #else
     unsigned cnt = 0;
-    for (; b; cnt += b & 1U, b >>= 1U)
+    for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
     {}
     return cnt;
 #endif
