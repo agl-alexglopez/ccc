@@ -174,6 +174,10 @@ on(size_t bit_i)
     return (ccc_bitblock_)1 << (bit_i % CCC_IMPL_BTST_BLOCK_BITS);
 }
 
+/* Returns a mask of all bits on in the final bit block that represent only
+   those bits which are in use according to the bit set capacity. The remaining
+   higher order bits in the last block will be set to 0 because they are not
+   used. If the capacity is zero a block with all bits on is returned. */
 static ccc_bitblock_
 last_on(struct ccc_bitset_ const *const btst)
 {
