@@ -54,11 +54,10 @@ from the stack or data segment as determined by the user. */
 @param [in] cap the number of bits that will be stored in this bit set.
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
 @param [in] aux auxiliary data needed for allocation of the bit set.
-@param [in] optional_size the number of existing bits set to true, if any.
 @return the initialized bit set on the right hand side of an equality operator
 (e.g. ccc_bitset b = ccc_btst_init(...);). */
-#define ccc_btst_init(bitblock_ptr, cap, alloc_fn, aux, optional_size...)      \
-    ccc_impl_btst_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)
+#define ccc_btst_init(bitblock_ptr, cap, alloc_fn, aux)                        \
+    ccc_impl_btst_init(bitblock_ptr, cap, alloc_fn, aux)
 
 /**@}*/
 
@@ -140,6 +139,24 @@ ccc_tribool ccc_btst_flip_at(ccc_bitset *btst, size_t i);
 @return the result of the operation. OK if successful, or an input error if
 btst is NULL. */
 ccc_result ccc_btst_flip_all(ccc_bitset *btst);
+
+/**@}*/
+
+/** @name State Interface
+Obtain state from the container. */
+/**@{*/
+
+/** @brief Return total number of bits tracked by the set.
+@param [in] btst a pointer to the bit set.
+@return the total number of bits currently tracked by the set regardless of
+true or false state of each. 0 is returned if btst is NULL. */
+size_t ccc_btst_capacity(ccc_bitset const *btst);
+
+/** @brief Return the number of bits set to CCC_TRUE. O(n).
+@param [in] btst a pointer to the bit set.
+@return the total number of bits currently set to CCC_TRUE. 0 is returned if
+btst is NULL. */
+size_t ccc_btst_popcount(ccc_bitset const *btst);
 
 /**@}*/
 

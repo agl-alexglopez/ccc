@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <limits.h>
 #include <string.h>
 
@@ -13,6 +14,7 @@ static ccc_bitblock_ on(size_t bit_i);
 static ccc_bitblock_ last_on(struct ccc_bitset_ const *);
 static ccc_tribool status(ccc_bitblock_ const *, size_t bit_i);
 static size_t blocks(size_t bits);
+static unsigned popcount(ccc_bitblock_);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -24,9 +26,9 @@ ccc_btst_set(ccc_bitset *const btst, size_t const i, ccc_tribool const b)
         return CCC_BOOL_ERR;
     }
     ccc_bitblock_ *const block = &btst->set_[block_i(i)];
-    ccc_tribool const res = status(block, i);
+    ccc_tribool const was = status(block, i);
     set(block, i, b);
-    return res;
+    return was;
 }
 
 ccc_tribool
@@ -38,9 +40,9 @@ ccc_btst_set_at(ccc_bitset *const btst, size_t const i, ccc_tribool const b)
         return CCC_BOOL_ERR;
     }
     ccc_bitblock_ *const block = &btst->set_[b_i];
-    ccc_tribool const res = status(block, i);
+    ccc_tribool const was = status(block, i);
     set(block, i, b);
-    return res;
+    return was;
 }
 
 ccc_result
@@ -66,9 +68,9 @@ ccc_btst_reset(ccc_bitset *const btst, size_t const i)
         return CCC_BOOL_ERR;
     }
     ccc_bitblock_ *const block = &btst->set_[block_i(i)];
-    ccc_tribool const res = status(block, i);
+    ccc_tribool const was = status(block, i);
     *block &= ~on(i);
-    return res;
+    return was;
 }
 
 ccc_tribool
@@ -80,9 +82,9 @@ ccc_btst_reset_at(ccc_bitset *const btst, size_t const i)
         return CCC_BOOL_ERR;
     }
     ccc_bitblock_ *const block = &btst->set_[b_i];
-    ccc_tribool const res = status(block, i);
+    ccc_tribool const was = status(block, i);
     *block &= ~on(i);
-    return res;
+    return was;
 }
 
 ccc_result
@@ -108,9 +110,9 @@ ccc_btst_flip(ccc_bitset *const btst, size_t const i)
         return CCC_BOOL_ERR;
     }
     ccc_bitblock_ *const block = &btst->set_[block_i(i)];
-    ccc_tribool const res = status(block, i);
+    ccc_tribool const was = status(block, i);
     *block ^= on(i);
-    return res;
+    return was;
 }
 
 ccc_tribool
@@ -122,9 +124,9 @@ ccc_btst_flip_at(ccc_bitset *const btst, size_t const i)
         return CCC_BOOL_ERR;
     }
     ccc_bitblock_ *const block = &btst->set_[b_i];
-    ccc_tribool const res = status(block, i);
+    ccc_tribool const was = status(block, i);
     *block ^= on(i);
-    return res;
+    return was;
 }
 
 ccc_result
@@ -145,6 +147,29 @@ ccc_btst_flip_all(ccc_bitset *const btst)
     }
     btst->set_[end - 1] &= last_on(btst);
     return CCC_OK;
+}
+
+size_t
+ccc_btst_capacity(ccc_bitset const *const btst)
+{
+    if (!btst)
+    {
+        return 0;
+    }
+    return btst->cap_;
+}
+
+size_t
+ccc_btst_popcount(ccc_bitset const *const btst)
+{
+    if (!btst)
+    {
+        return 0;
+    }
+    size_t cnt = 0;
+    for (size_t i = 0; i < btst->cap_; cnt += popcount(btst->set_[i]), ++i)
+    {}
+    return cnt;
 }
 
 /*=======================    Static Helpers    ==============================*/
@@ -201,4 +226,20 @@ blocks(size_t const bits)
     return ((
         size_t)((bits)
                 + ((CCC_IMPL_BTST_BLOCK_BITS - 1) / CCC_IMPL_BTST_BLOCK_BITS)));
+}
+
+static inline unsigned
+popcount(ccc_bitblock_ const b)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    /* There are different pop counts for different integer widths. Be sure to
+       catch the use of the wrong one by mistake here at compile time. */
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    return __builtin_popcount(b);
+#else
+    unsigned cnt = 0;
+    for (; b; cnt += b & 1U, b >>= 1U)
+    {}
+    return cnt;
+#endif
 }
