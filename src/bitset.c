@@ -211,6 +211,8 @@ set(ccc_bitblock_ *const block, size_t const bit_i, ccc_tribool const b)
 static inline ccc_tribool
 status(ccc_bitblock_ const *const btst, size_t const bit_i)
 {
+    /* Be careful. Bitwise & does not promise to evaluate to 1 or 0. We often
+       just use it where that conversion takes place implicitly for us. */
     return (*btst & on(bit_i)) != 0;
 }
 
