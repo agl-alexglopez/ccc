@@ -56,6 +56,21 @@ function for detailed string messages regarding the entry status. This may
 be helpful for debugging or logging. */
 typedef enum ccc_entry_status_ ccc_entry_status;
 
+/** @brief A three state boolean to allow for an error state. Error is -1, False
+is 0, and True is 1.
+
+Some containers conceptually take or return a boolean value as part of their
+operations. However, booleans cannot indicate errors and this library offers
+no errno or C++ throw-like behavior. Therefore, a three state boolean can offer
+additional information while still maintaining the truthy and falsey bool
+behavior one would normally expect. */
+typedef enum : int8_t
+{
+    CCC_BOOL_ERR = -1,
+    CCC_FALSE,
+    CCC_TRUE,
+} ccc_tribool;
+
 /** @brief A result of actions on containers.
 
 A result indicates the status of the requested operation. Each container
