@@ -116,10 +116,12 @@ CHECK_BEGIN_STATIC_FN(btst_test_flip_all)
         if (i % 2)
         {
             CHECK(ccc_btst_test(&btst, i), CCC_TRUE);
+            CHECK(ccc_btst_test_at(&btst, i), CCC_TRUE);
         }
         else
         {
             CHECK(ccc_btst_test(&btst, i), CCC_FALSE);
+            CHECK(ccc_btst_test_at(&btst, i), CCC_FALSE);
         }
     }
     CHECK_END_FN();
