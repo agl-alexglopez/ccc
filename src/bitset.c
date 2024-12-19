@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <limits.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "bitset.h"
@@ -7,6 +8,7 @@
 #include "types.h"
 
 #define BLOCK_BITS (sizeof(ccc_bitblock_) * CHAR_BIT)
+#define ALL_ON ((ccc_bitblock_)~0)
 
 /*=========================   Prototypes   ==================================*/
 
@@ -17,6 +19,10 @@ static ccc_bitblock_ last_on(struct ccc_bitset_ const *);
 static ccc_tribool status(ccc_bitblock_ const *, size_t bit_i);
 static size_t blocks(size_t bits);
 static unsigned popcount(ccc_bitblock_);
+static ccc_tribool any_or_none_range(struct ccc_bitset_ const *, size_t i,
+                                     size_t count, ccc_tribool);
+static ccc_tribool all_range(struct ccc_bitset_ const *bs, size_t i,
+                             size_t count);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -90,7 +96,7 @@ ccc_bs_set_all(ccc_bitset *const bs, ccc_tribool const b)
    can avoid this by handling the first and last block and then handling
    everything in between with a bulk memset. */
 ccc_result
-ccc_bs_set_range(ccc_bitset *const bs, size_t i, size_t const count,
+ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
                  ccc_tribool const b)
 {
     size_t const end = i + count;
@@ -101,11 +107,10 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t i, size_t const count,
     }
     size_t const start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = (ccc_bitblock_)~0 << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (((ccc_bitblock_)~0)
-                           >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     if (b)
     {
@@ -120,7 +125,7 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t i, size_t const count,
     {
         size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
         ccc_bitblock_ last_block_on
-            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_i_in_block) - 1);
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
         if (b)
         {
             bs->set_[end_block] |= last_block_on;
@@ -186,7 +191,7 @@ ccc_bs_reset_all(ccc_bitset *const bs)
 /* Same concept as set range but easier. Handle first and last then set
    everything in between to false with memset. */
 ccc_result
-ccc_bs_reset_range(ccc_bitset *const bs, size_t i, size_t const count)
+ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
 {
     size_t const end = i + count;
     if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
@@ -195,11 +200,10 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t i, size_t const count)
     }
     size_t const start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = (ccc_bitblock_)~0 << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (((ccc_bitblock_)~0)
-                           >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     bs->set_[start_block] &= ~first_block_on;
     size_t const end_block = block_i(end - 1);
@@ -207,7 +211,7 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t i, size_t const count)
     {
         size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
         ccc_bitblock_ last_block_on
-            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_i_in_block) - 1);
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
         bs->set_[end_block] &= ~last_block_on;
         if (end_block - start_block > 1)
         {
@@ -271,7 +275,7 @@ ccc_bs_flip_all(ccc_bitset *const bs)
    the same strat of handling first and last which just leaves a simpler bulk
    operation in the middle. But we don't benefit from memset here. */
 ccc_result
-ccc_bs_flip_range(ccc_bitset *const bs, size_t i, size_t const count)
+ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
 {
     size_t const end = i + count;
     if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
@@ -280,11 +284,10 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t i, size_t const count)
     }
     size_t const start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = (ccc_bitblock_)~0 << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (((ccc_bitblock_)~0)
-                           >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     bs->set_[start_block] ^= first_block_on;
     size_t const end_block = block_i(end - 1);
@@ -292,7 +295,7 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t i, size_t const count)
     {
         size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
         ccc_bitblock_ last_block_on
-            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_i_in_block) - 1);
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
         bs->set_[end_block] ^= last_block_on;
         if (end_block - start_block > 1)
         {
@@ -330,7 +333,174 @@ ccc_bs_popcount(ccc_bitset const *const bs)
     return cnt;
 }
 
+ptrdiff_t
+ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
+                      size_t const count)
+{
+    size_t const end = i + count;
+    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
+    {
+        return -1;
+    }
+    ptrdiff_t popped = 0;
+    size_t const start_block = block_i(i);
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
+    {
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+    }
+    popped += popcount(first_block_on & bs->set_[start_block]);
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+        popped += popcount(last_block_on & bs->set_[end_block]);
+        if (end_block - start_block > 1)
+        {
+            for (size_t block = start_block + 1; block < end_block; ++block)
+            {
+                popped += popcount(bs->set_[block]);
+            }
+        }
+    }
+    return popped;
+}
+
+ccc_tribool
+ccc_bs_any_range(ccc_bitset const *const bs, size_t const i, size_t const count)
+{
+    return any_or_none_range(bs, i, count, CCC_TRUE);
+}
+
+ccc_tribool
+ccc_bs_any(ccc_bitset const *const bs)
+{
+    return any_or_none_range(bs, 0, bs->cap_, CCC_TRUE);
+}
+
+ccc_tribool
+ccc_bs_none_range(ccc_bitset const *const bs, size_t const i,
+                  size_t const count)
+{
+    return any_or_none_range(bs, i, count, CCC_FALSE);
+}
+
+ccc_tribool
+ccc_bs_none(ccc_bitset const *const bs)
+{
+    return any_or_none_range(bs, 0, bs->cap_, CCC_FALSE);
+}
+
+ccc_tribool
+ccc_bs_all_range(ccc_bitset const *const bs, size_t const i, size_t const count)
+{
+    return all_range(bs, i, count);
+}
+
+ccc_tribool
+ccc_bs_all(ccc_bitset const *const bs)
+{
+    return all_range(bs, 0, bs->cap_);
+}
+
 /*=======================    Static Helpers    ==============================*/
+
+/* Performs the any or none scan operation over the specified range. The only
+   difference between the operations is the return value. Specify the desired
+   tribool value to return upon encountering an on bit. For any this is
+   CCC_TRUE. For none this is CCC_FALSE. Saves writing two identical fns. */
+static inline ccc_tribool
+any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
+                  size_t const count, ccc_tribool const ret)
+{
+    size_t const end = i + count;
+    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
+    {
+        return CCC_BOOL_ERR;
+    }
+    size_t const start_block = block_i(i);
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
+    {
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+    }
+    if (first_block_on & bs->set_[start_block])
+    {
+        return ret;
+    }
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+        if (last_block_on & bs->set_[end_block])
+        {
+            return ret;
+        }
+        if (end_block - start_block > 1)
+        {
+            for (size_t block = start_block + 1; block < end_block; ++block)
+            {
+                if (bs->set_[block] & ALL_ON)
+                {
+                    return ret;
+                }
+            }
+        }
+    }
+    return !ret;
+}
+
+/* Check for all on is slightly different from the any or none checks so we
+   need a painfully repetitive function. */
+static inline ccc_tribool
+all_range(struct ccc_bitset_ const *const bs, size_t const i,
+          size_t const count)
+{
+    size_t const end = i + count;
+    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
+    {
+        return CCC_BOOL_ERR;
+    }
+    size_t const start_block = block_i(i);
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
+    {
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+    }
+    if ((first_block_on & bs->set_[start_block]) != first_block_on)
+    {
+        return CCC_FALSE;
+    }
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+        if ((last_block_on & bs->set_[end_block]) != last_block_on)
+        {
+            return CCC_FALSE;
+        }
+        if (end_block - start_block > 1)
+        {
+            for (size_t block = start_block + 1; block < end_block; ++block)
+            {
+                if (bs->set_[block] != ALL_ON)
+                {
+                    return CCC_FALSE;
+                }
+            }
+        }
+    }
+    return CCC_TRUE;
+}
 
 static inline void
 set(ccc_bitblock_ *const block, size_t const bit_i, ccc_tribool const b)
