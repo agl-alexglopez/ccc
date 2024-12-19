@@ -1,3 +1,18 @@
+/** @file
+@brief The Bit Set Interface
+
+A bit set offers efficient set membership operations when the range of values
+can be tracked via an index. Both a fixed size and dynamic variant are possible
+depending on initialization options.
+
+To shorten names in the interface, define the following preprocessor directive
+at the top of your file.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+```
+
+All types and functions can then be written without the `ccc_` prefix. */
 #ifndef CCC_BITSET
 #define CCC_BITSET
 
@@ -11,9 +26,9 @@
 Types available in the container interface. */
 /**@{*/
 
-typedef ccc_bitblock_ ccc_bitblock;
-
 typedef struct ccc_bitset_ ccc_bitset;
+
+typedef ccc_bitblock_ ccc_bitblock;
 
 /**@}*/
 
@@ -117,6 +132,16 @@ ccc_tribool ccc_btst_set_at(ccc_bitset *btst, size_t i, ccc_tribool b);
 btst is NULL. */
 ccc_result ccc_btst_set_all(ccc_bitset *btst, ccc_tribool b);
 
+/** @brief Set all the bits in the specified range (CCC_TRUE or CCC_FALSE).
+@param [in] btst a pointer to the bit set.
+@param [in] b the value to set (CCC_TRUE or CCC_FALSE).
+@param [in] i the starting index to set.
+@param [in] count the count of bits starting at i to set.
+@return the result of the operation. OK if successful, or an input error if
+btst is NULL or the range is invalid by position, count, or both. */
+ccc_result ccc_btst_set_range(ccc_bitset *btst, size_t i, size_t count,
+                              ccc_tribool b);
+
 /** @brief Set the bit at index i to CCC_FALSE.
 @param [in] btst a pointer to the bit set.
 @param [in] i the index identifying the bit to reset.
@@ -140,6 +165,14 @@ ccc_tribool ccc_btst_reset_at(ccc_bitset *btst, size_t i);
 @return the result of the operation. OK if successful, or an input error if
 btst is NULL. */
 ccc_result ccc_btst_reset_all(ccc_bitset *btst);
+
+/** @brief Set all the bits in the range to CCC_FALSE.
+@param [in] btst a pointer to the bit set.
+@param [in] i the starting index to reset.
+@param [in] count the count of bits starting at i to reset.
+@return the result of the operation. OK if successful, or an input error if
+btst is NULL or the range is invalid by position, count, or both. */
+ccc_result ccc_btst_reset_range(ccc_bitset *btst, size_t i, size_t count);
 
 /** @brief Toggle the bit at index i.
 @param [in] btst a pointer to the bit set.
