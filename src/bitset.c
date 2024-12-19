@@ -133,7 +133,7 @@ ccc_btst_flip(ccc_bitset *const btst, size_t const i)
     }
     ccc_bitblock_ *const block = &btst->set_[block_i(i)];
     ccc_tribool const was = status(block, i);
-    *block = ~(*block);
+    *block ^= on(i);
     return was;
 }
 
@@ -147,7 +147,7 @@ ccc_btst_flip_at(ccc_bitset *const btst, size_t const i)
     }
     ccc_bitblock_ *const block = &btst->set_[b_i];
     ccc_tribool const was = status(block, i);
-    *block = ~(*block);
+    *block ^= on(i);
     return was;
 }
 
