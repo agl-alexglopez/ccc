@@ -73,6 +73,10 @@ validate_box(int board[9][9], ccc_bitset *const row_check,
     return CCC_TRUE;
 }
 
+/* A small problem like this is a perfect use case for a stack based bit set.
+   All sizes are known at compile time meaning we get memory management for
+   free and the optimal space and time complexity for this problem. */
+
 CHECK_BEGIN_STATIC_FN(btst_test_valid_sudoku)
 {
     /* clang-format off */

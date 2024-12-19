@@ -55,7 +55,11 @@ from the stack or data segment as determined by the user. */
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
 @param [in] aux auxiliary data needed for allocation of the bit set.
 @return the initialized bit set on the right hand side of an equality operator
-(e.g. ccc_bitset b = ccc_btst_init(...);). */
+@warning the user must use the ccc_bitblocks macro to help determine the size of
+the bitblock array if a fixed size bitblock array is provided at compile time;
+the necessary conversion from bits requested to number of bitblocks required to
+store those bits must occur before use.
+(e.g. ccc_bitset b = ccc_btst_init((ccc_bitblock[ccc_bitblocks(9)]){},...);). */
 #define ccc_btst_init(bitblock_ptr, cap, alloc_fn, aux)                        \
     ccc_impl_btst_init(bitblock_ptr, cap, alloc_fn, aux)
 
