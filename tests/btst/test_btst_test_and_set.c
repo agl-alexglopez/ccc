@@ -55,6 +55,40 @@ CHECK_BEGIN_STATIC_FN(btst_test_set_all)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(btst_test_set_range)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(512)]){}, 512, NULL, NULL);
+    /* Start with a full range and reduce from the end. */
+    for (size_t i = 0; i < 512; ++i)
+    {
+        size_t const count = 512 - i;
+        CHECK(ccc_btst_set_range(&btst, 0, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), count);
+        CHECK(ccc_btst_set_range(&btst, 0, count, CCC_FALSE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), 0);
+    }
+    /* Start with a full range and reduce by moving start forward. */
+    for (size_t i = 0; i < 512; ++i)
+    {
+        size_t const count = 512 - i;
+        CHECK(ccc_btst_set_range(&btst, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), count);
+        CHECK(ccc_btst_set_range(&btst, i, count, CCC_FALSE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), 0);
+    }
+    /* Shrink range from both ends. */
+    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    {
+        size_t const count = end - i;
+        CHECK(ccc_btst_set_range(&btst, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), count);
+        CHECK(ccc_btst_set_range(&btst, i, count, CCC_FALSE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), 0);
+    }
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(btst_test_reset)
 {
     ccc_bitset btst
@@ -82,6 +116,40 @@ CHECK_BEGIN_STATIC_FN(btst_test_reset_all)
     CHECK(ccc_btst_popcount(&btst), 10);
     CHECK(ccc_btst_reset_all(&btst), CCC_OK);
     CHECK(ccc_btst_popcount(&btst), 0);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(btst_test_reset_range)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(512)]){}, 512, NULL, NULL);
+    /* Start with a full range and reduce from the end. */
+    for (size_t i = 0; i < 512; ++i)
+    {
+        size_t const count = 512 - i;
+        CHECK(ccc_btst_set_range(&btst, 0, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), count);
+        CHECK(ccc_btst_reset_range(&btst, 0, count), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), 0);
+    }
+    /* Start with a full range and reduce by moving start forward. */
+    for (size_t i = 0; i < 512; ++i)
+    {
+        size_t const count = 512 - i;
+        CHECK(ccc_btst_set_range(&btst, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), count);
+        CHECK(ccc_btst_reset_range(&btst, i, count), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), 0);
+    }
+    /* Shrink range from both ends. */
+    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    {
+        size_t const count = end - i;
+        CHECK(ccc_btst_set_range(&btst, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), count);
+        CHECK(ccc_btst_reset_range(&btst, i, count), CCC_OK);
+        CHECK(ccc_btst_popcount(&btst), 0);
+    }
     CHECK_END_FN();
 }
 
@@ -256,7 +324,8 @@ int
 main(void)
 {
     return CHECK_RUN(btst_test_set_one(), btst_test_set_shuffled(),
-                     btst_test_set_all(), btst_test_reset(), btst_test_flip(),
-                     btst_test_flip_all(), btst_test_reset_all(),
+                     btst_test_set_all(), btst_test_set_range(),
+                     btst_test_reset(), btst_test_flip(), btst_test_flip_all(),
+                     btst_test_reset_all(), btst_test_reset_range(),
                      btst_test_valid_sudoku(), btst_test_invalid_sudoku());
 }

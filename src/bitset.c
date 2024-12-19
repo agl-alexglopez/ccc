@@ -76,9 +76,67 @@ ccc_btst_set_all(ccc_bitset *const btst, ccc_tribool const b)
     if (btst->cap_)
     {
         int const v = b ? ~0 : 0;
-        memset(btst->set_, v, blocks(btst->cap_) * sizeof(ccc_bitblock_));
+        (void)memset(btst->set_, v, blocks(btst->cap_) * sizeof(ccc_bitblock_));
         btst->set_[block_i(btst->cap_ - 1)] &= last_on(btst);
     }
+    return CCC_OK;
+}
+
+/* A naive implementation might just call set for every index between the
+   start and start + count. However, calculating the block and index within
+   each block for every call to set costs a division and a modulo operation. We
+   can avoid this by handling the first and last block and then handling
+   everything in between with a bulk memset. */
+ccc_result
+ccc_btst_set_range(ccc_bitset *const btst, size_t i, size_t const count,
+                   ccc_tribool const b)
+{
+    size_t const end = i + count;
+    if (!btst || b <= CCC_BOOL_ERR || b > CCC_TRUE || i >= btst->cap_
+        || end > btst->cap_ || end < i)
+    {
+        return CCC_INPUT_ERR;
+    }
+    size_t const start_block = block_i(i);
+    size_t const start_block_index = i % CCC_IMPL_BTST_BLOCK_BITS;
+    ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
+    if (start_block_index + count < CCC_IMPL_BTST_BLOCK_BITS)
+    {
+        first_mask &= ((ccc_bitblock_)~0 >> (CCC_IMPL_BTST_BLOCK_BITS
+                                             - (start_block_index + count)));
+    }
+    if (b)
+    {
+        btst->set_[start_block] |= first_mask;
+    }
+    else
+    {
+        btst->set_[start_block] &= ~first_mask;
+    }
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        size_t const end_block_index = (end - 1) % CCC_IMPL_BTST_BLOCK_BITS;
+        ccc_bitblock_ last_mask
+            = (((ccc_bitblock_)~0))
+              >> ((CCC_IMPL_BTST_BLOCK_BITS - end_block_index) - 1);
+        if (b)
+        {
+            btst->set_[end_block] |= last_mask;
+        }
+        else
+        {
+            btst->set_[end_block] &= ~last_mask;
+        }
+        if (end_block - start_block > 1)
+        {
+            int const v = b ? ~0 : 0;
+            (void)memset(&btst->set_[start_block + 1], v,
+                         (end_block - (start_block + 1))
+                             * sizeof(ccc_bitblock_));
+        }
+    }
+    btst->set_[block_i(btst->cap_ - 1)] &= last_on(btst);
     return CCC_OK;
 }
 
@@ -118,9 +176,45 @@ ccc_btst_reset_all(ccc_bitset *const btst)
     }
     if (btst->cap_)
     {
-        memset(btst->set_, CCC_FALSE,
-               blocks(btst->cap_) * sizeof(ccc_bitblock_));
+        (void)memset(btst->set_, CCC_FALSE,
+                     blocks(btst->cap_) * sizeof(ccc_bitblock_));
     }
+    return CCC_OK;
+}
+
+ccc_result
+ccc_btst_reset_range(ccc_bitset *const btst, size_t i, size_t const count)
+{
+    size_t const end = i + count;
+    if (!btst || i >= btst->cap_ || end > btst->cap_ || end < i)
+    {
+        return CCC_INPUT_ERR;
+    }
+    size_t const start_block = block_i(i);
+    size_t const start_block_index = i % CCC_IMPL_BTST_BLOCK_BITS;
+    ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
+    if (start_block_index + count < CCC_IMPL_BTST_BLOCK_BITS)
+    {
+        first_mask &= ((ccc_bitblock_)~0 >> (CCC_IMPL_BTST_BLOCK_BITS
+                                             - (start_block_index + count)));
+    }
+    btst->set_[start_block] &= ~first_mask;
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        size_t const end_block_index = (end - 1) % CCC_IMPL_BTST_BLOCK_BITS;
+        ccc_bitblock_ last_mask
+            = (((ccc_bitblock_)~0))
+              >> ((CCC_IMPL_BTST_BLOCK_BITS - end_block_index) - 1);
+        btst->set_[end_block] &= ~last_mask;
+        if (end_block - start_block > 1)
+        {
+            (void)memset(&btst->set_[start_block + 1], 0,
+                         (end_block - (start_block + 1))
+                             * sizeof(ccc_bitblock_));
+        }
+    }
+    btst->set_[block_i(btst->cap_ - 1)] &= last_on(btst);
     return CCC_OK;
 }
 
