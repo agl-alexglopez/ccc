@@ -89,6 +89,7 @@ validate_box(int board[9][9], ccc_bitset *const row_check,
 {
     ccc_bitset box_check
         = ccc_btst_init((ccc_bitblock[ccc_bitblocks(9)]){}, 9, NULL, NULL);
+    ccc_tribool was_on = CCC_FALSE;
     for (size_t r = row_start; r < row_start + 3; ++r)
     {
         for (size_t c = col_start; c < col_start + 3; ++c)
@@ -99,24 +100,33 @@ validate_box(int board[9][9], ccc_bitset *const row_check,
             }
             /* Need the zero based digit. */
             size_t const digit = board[r][c] - 1;
-            ccc_tribool was_on = ccc_btst_set(&box_check, digit, CCC_TRUE);
+            was_on = ccc_btst_set(&box_check, digit, CCC_TRUE);
             if (was_on != CCC_FALSE)
             {
-                return CCC_FALSE;
+                goto done;
             }
             was_on = ccc_btst_set(row_check, (r * 9) + digit, CCC_TRUE);
             if (was_on != CCC_FALSE)
             {
-                return CCC_FALSE;
+                goto done;
             }
             was_on = ccc_btst_set(col_check, (c * 9) + digit, CCC_TRUE);
             if (was_on != CCC_FALSE)
             {
-                return CCC_FALSE;
+                goto done;
             }
         }
     }
-    return CCC_TRUE;
+done:
+    switch (was_on)
+    {
+    case CCC_TRUE:
+        return CCC_FALSE;
+    case CCC_FALSE:
+        return CCC_TRUE;
+    case CCC_BOOL_ERR:
+        return CCC_BOOL_ERR;
+    }
 }
 
 /* A small problem like this is a perfect use case for a stack based bit set.
