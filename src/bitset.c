@@ -218,6 +218,7 @@ status(ccc_bitblock_ const *const btst, size_t const bit_i)
     return (*btst & on(bit_i)) != 0;
 }
 
+/* Return a block with only the desired bit turned on to true. */
 static inline ccc_bitblock_
 on(size_t bit_i)
 {
