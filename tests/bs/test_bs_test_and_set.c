@@ -64,8 +64,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_range)
     {
         size_t const count = 512 - i;
         CHECK(ccc_bs_set_range(&bs, 0, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, 0, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
         CHECK(ccc_bs_set_range(&bs, 0, count, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, 0, count), 0);
         CHECK(ccc_bs_popcount(&bs), 0);
     }
     /* Start with a full range and reduce by moving start forward. */
@@ -73,8 +75,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_range)
     {
         size_t const count = 512 - i;
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
         CHECK(ccc_bs_popcount(&bs), 0);
     }
     /* Shrink range from both ends. */
@@ -82,8 +86,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_range)
     {
         size_t const count = end - i;
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
         CHECK(ccc_bs_popcount(&bs), 0);
     }
     CHECK_END_FN();
@@ -128,8 +134,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_range)
     {
         size_t const count = 512 - i;
         CHECK(ccc_bs_set_range(&bs, 0, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, 0, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
         CHECK(ccc_bs_reset_range(&bs, 0, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, 0, count), 0);
         CHECK(ccc_bs_popcount(&bs), 0);
     }
     /* Start with a full range and reduce by moving start forward. */
@@ -137,8 +145,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_range)
     {
         size_t const count = 512 - i;
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
         CHECK(ccc_bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
         CHECK(ccc_bs_popcount(&bs), 0);
     }
     /* Shrink range from both ends. */
@@ -146,8 +156,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_range)
     {
         size_t const count = end - i;
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
         CHECK(ccc_bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
         CHECK(ccc_bs_popcount(&bs), 0);
     }
     CHECK_END_FN();
@@ -206,8 +218,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
     {
         size_t const count = 512 - i;
         CHECK(ccc_bs_flip_range(&bs, 0, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, 0, count), 0);
         CHECK(ccc_bs_popcount(&bs), orignal_popcount - count);
         CHECK(ccc_bs_flip_range(&bs, 0, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, 0, count), count);
         CHECK(ccc_bs_popcount(&bs), orignal_popcount);
     }
     /* Start with a full range and reduce by moving start forward. */
@@ -215,8 +229,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
     {
         size_t const count = 512 - i;
         CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
         CHECK(ccc_bs_popcount(&bs), orignal_popcount - count);
         CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), orignal_popcount);
     }
     /* Shrink range from both ends. */
@@ -224,9 +240,84 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
     {
         size_t const count = end - i;
         CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
         CHECK(ccc_bs_popcount(&bs), orignal_popcount - count);
         CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), orignal_popcount);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_any)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const cap = ccc_bs_capacity(&bs);
+    /* Start with a full range and reduce by moving start forward. */
+    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    {
+        size_t const count = end - i;
+        CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
+        CHECK(ccc_bs_popcount(&bs), count);
+        CHECK(ccc_bs_any(&bs), CCC_TRUE);
+        CHECK(ccc_bs_any_range(&bs, 0, cap), CCC_TRUE);
+        CHECK(ccc_bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
+        CHECK(ccc_bs_popcount(&bs), 0);
+        CHECK(ccc_bs_any(&bs), CCC_FALSE);
+        CHECK(ccc_bs_any_range(&bs, 0, cap), CCC_FALSE);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_none)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const cap = ccc_bs_capacity(&bs);
+    /* Start with a full range and reduce by moving start forward. */
+    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    {
+        size_t const count = end - i;
+        CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
+        CHECK(ccc_bs_popcount(&bs), count);
+        CHECK(ccc_bs_none(&bs), CCC_FALSE);
+        CHECK(ccc_bs_none_range(&bs, 0, cap), CCC_FALSE);
+        CHECK(ccc_bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
+        CHECK(ccc_bs_popcount(&bs), 0);
+        CHECK(ccc_bs_none(&bs), CCC_TRUE);
+        CHECK(ccc_bs_none_range(&bs, 0, cap), CCC_TRUE);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_all)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    size_t const cap = ccc_bs_capacity(&bs);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_all(&bs), CCC_TRUE);
+    CHECK(ccc_bs_all_range(&bs, 0, cap), CCC_TRUE);
+    /* Start with a full range and reduce by moving start forward. */
+    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    {
+        size_t const count = end - i;
+        CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), count);
+        CHECK(ccc_bs_popcount(&bs), count);
+        CHECK(ccc_bs_all_range(&bs, i, count), CCC_TRUE);
+        CHECK(ccc_bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
+        CHECK(ccc_bs_popcount(&bs), 0);
+        CHECK(ccc_bs_all(&bs), CCC_FALSE);
+        CHECK(ccc_bs_all_range(&bs, i, count), CCC_FALSE);
     }
     CHECK_END_FN();
 }
@@ -362,6 +453,7 @@ main(void)
     return CHECK_RUN(bs_test_set_one(), bs_test_set_shuffled(),
                      bs_test_set_all(), bs_test_set_range(), bs_test_reset(),
                      bs_test_flip(), bs_test_flip_all(), bs_test_flip_range(),
-                     bs_test_reset_all(), bs_test_reset_range(),
-                     bs_test_valid_sudoku(), bs_test_invalid_sudoku());
+                     bs_test_reset_all(), bs_test_reset_range(), bs_test_any(),
+                     bs_test_all(), bs_test_none(), bs_test_valid_sudoku(),
+                     bs_test_invalid_sudoku());
 }

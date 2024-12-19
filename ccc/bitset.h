@@ -223,6 +223,60 @@ size_t ccc_bs_capacity(ccc_bitset const *bs);
 bs is NULL. */
 size_t ccc_bs_popcount(ccc_bitset const *bs);
 
+/** @brief Return the number of bits set to CCC_TRUE in the range. O(n).
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting position.
+@param [in] count the size of the range to check.
+@return the total number of bits currently set in the range to CCC_TRUE. A -1 is
+returned if bs is NULL, i is invalid, count is invalid, or both i and count are
+invalid. */
+ptrdiff_t ccc_bs_popcount_range(ccc_bitset const *bs, size_t i, size_t count);
+
+/** @brief Return true if any bits in set are on.
+@param [in] bs a pointer to the bit set.
+@return CCC_TRUE if any bits are on, CCC_FALSE if no bits are on, CCC_BOOL_ERR
+if bs is NULL. */
+ccc_tribool ccc_bs_any(ccc_bitset const *bs);
+
+/** @brief Return true if any bits are on in the specified range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting position.
+@param [in] count the size of the range to check.
+@return CCC_TRUE if any bits are on, CCC_FALSE if no bits are on, CCC_BOOL_ERR
+if bs is NULL, i is invalid, count is invalid, or both i and count are
+invalid. */
+ccc_tribool ccc_bs_any_range(ccc_bitset const *bs, size_t i, size_t count);
+
+/** @brief Return true if no bits in set are on.
+@param [in] bs a pointer to the bit set.
+@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+if bs is NULL. */
+ccc_tribool ccc_bs_none(ccc_bitset const *bs);
+
+/** @brief Return true if no bits are on in the specified range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting position.
+@param [in] count the size of the range to check.
+@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+if bs is NULL, i is invalid, count is invalid, or both i and count are
+invalid. */
+ccc_tribool ccc_bs_none_range(ccc_bitset const *bs, size_t i, size_t count);
+
+/** @brief Return true if no bits in set are on.
+@param [in] bs a pointer to the bit set.
+@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+if bs is NULL. */
+ccc_tribool ccc_bs_all(ccc_bitset const *bs);
+
+/** @brief Return true if no bits are on in the specified range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting position.
+@param [in] count the size of the range to check.
+@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+if bs is NULL, i is invalid, count is invalid, or both i and count are
+invalid. */
+ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, size_t i, size_t count);
+
 /**@}*/
 
 #endif /* CCC_BITSET */
