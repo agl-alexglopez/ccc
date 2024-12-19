@@ -75,7 +75,8 @@ ccc_btst_set_all(ccc_bitset *const btst, ccc_tribool const b)
     }
     if (btst->cap_)
     {
-        memset(btst->set_, b, blocks(btst->cap_) * sizeof(ccc_bitblock_));
+        int const v = b ? ~0 : 0;
+        memset(btst->set_, v, blocks(btst->cap_) * sizeof(ccc_bitblock_));
         btst->set_[block_i(btst->cap_ - 1)] &= last_on(btst);
     }
     return CCC_OK;
@@ -183,12 +184,13 @@ ccc_btst_capacity(ccc_bitset const *const btst)
 size_t
 ccc_btst_popcount(ccc_bitset const *const btst)
 {
-    if (!btst)
+    if (!btst || !btst->cap_)
     {
         return 0;
     }
+    size_t const end = blocks(btst->cap_);
     size_t cnt = 0;
-    for (size_t i = 0; i < btst->cap_; cnt += popcount(btst->set_[i]), ++i)
+    for (size_t i = 0; i < end; cnt += popcount(btst->set_[i]), ++i)
     {}
     return cnt;
 }
@@ -246,9 +248,7 @@ block_i(size_t const bit_i)
 static inline size_t
 blocks(size_t const bits)
 {
-    return ((
-        size_t)((bits)
-                + ((CCC_IMPL_BTST_BLOCK_BITS - 1) / CCC_IMPL_BTST_BLOCK_BITS)));
+    return (bits + (CCC_IMPL_BTST_BLOCK_BITS - 1)) / CCC_IMPL_BTST_BLOCK_BITS;
 }
 
 static inline unsigned
