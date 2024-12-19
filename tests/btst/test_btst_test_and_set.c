@@ -85,6 +85,46 @@ CHECK_BEGIN_STATIC_FN(btst_test_reset_all)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(btst_test_flip)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(10)]){}, 10, NULL, NULL);
+    CHECK(ccc_btst_capacity(&btst), 10);
+    CHECK(ccc_btst_set_all(&btst, CCC_TRUE), CCC_OK);
+    CHECK(ccc_btst_popcount(&btst), 10);
+    CHECK(ccc_btst_flip(&btst, 9), CCC_TRUE);
+    CHECK(ccc_btst_popcount(&btst), 9);
+    CHECK(ccc_btst_flip_at(&btst, 9), CCC_FALSE);
+    CHECK(ccc_btst_popcount(&btst), 10);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(btst_test_flip_all)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(10)]){}, 10, NULL, NULL);
+    CHECK(ccc_btst_capacity(&btst), 10);
+    for (size_t i = 0; i < 10; i += 2)
+    {
+        CHECK(ccc_btst_set(&btst, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_btst_popcount(&btst), 5);
+    CHECK(ccc_btst_flip_all(&btst), CCC_OK);
+    CHECK(ccc_btst_popcount(&btst), 5);
+    for (size_t i = 0; i < 10; ++i)
+    {
+        if (i % 2)
+        {
+            CHECK(ccc_btst_test(&btst, i), CCC_TRUE);
+        }
+        else
+        {
+            CHECK(ccc_btst_test(&btst, i), CCC_FALSE);
+        }
+    }
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
 validate_box(int board[9][9], ccc_bitset *const row_check,
@@ -214,7 +254,7 @@ int
 main(void)
 {
     return CHECK_RUN(btst_test_set_one(), btst_test_set_shuffled(),
-                     btst_test_set_all(), btst_test_reset(),
-                     btst_test_reset_all(), btst_test_valid_sudoku(),
-                     btst_test_invalid_sudoku());
+                     btst_test_set_all(), btst_test_reset(), btst_test_flip(),
+                     btst_test_flip_all(), btst_test_reset_all(),
+                     btst_test_valid_sudoku(), btst_test_invalid_sudoku());
 }
