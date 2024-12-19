@@ -100,34 +100,34 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t i, size_t const count,
         return CCC_INPUT_ERR;
     }
     size_t const start_block = block_i(i);
-    size_t const start_block_index = i % BLOCK_BITS;
-    ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
-    if (start_block_index + count < BLOCK_BITS)
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = (ccc_bitblock_)~0 << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_mask &= (((ccc_bitblock_)~0)
-                       >> (BLOCK_BITS - (start_block_index + count)));
+        first_block_on &= (((ccc_bitblock_)~0)
+                           >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     if (b)
     {
-        bs->set_[start_block] |= first_mask;
+        bs->set_[start_block] |= first_block_on;
     }
     else
     {
-        bs->set_[start_block] &= ~first_mask;
+        bs->set_[start_block] &= ~first_block_on;
     }
     size_t const end_block = block_i(end - 1);
     if (end_block != start_block)
     {
-        size_t const end_block_index = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_mask
-            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_block_index) - 1);
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_i_in_block) - 1);
         if (b)
         {
-            bs->set_[end_block] |= last_mask;
+            bs->set_[end_block] |= last_block_on;
         }
         else
         {
-            bs->set_[end_block] &= ~last_mask;
+            bs->set_[end_block] &= ~last_block_on;
         }
         if (end_block - start_block > 1)
         {
@@ -194,21 +194,21 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t i, size_t const count)
         return CCC_INPUT_ERR;
     }
     size_t const start_block = block_i(i);
-    size_t const start_block_index = i % BLOCK_BITS;
-    ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
-    if (start_block_index + count < BLOCK_BITS)
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = (ccc_bitblock_)~0 << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_mask &= (((ccc_bitblock_)~0)
-                       >> (BLOCK_BITS - (start_block_index + count)));
+        first_block_on &= (((ccc_bitblock_)~0)
+                           >> (BLOCK_BITS - (start_i_in_block + count)));
     }
-    bs->set_[start_block] &= ~first_mask;
+    bs->set_[start_block] &= ~first_block_on;
     size_t const end_block = block_i(end - 1);
     if (end_block != start_block)
     {
-        size_t const end_block_index = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_mask
-            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_block_index) - 1);
-        bs->set_[end_block] &= ~last_mask;
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_i_in_block) - 1);
+        bs->set_[end_block] &= ~last_block_on;
         if (end_block - start_block > 1)
         {
             (void)memset(&bs->set_[start_block + 1], 0,
@@ -279,21 +279,21 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t i, size_t const count)
         return CCC_INPUT_ERR;
     }
     size_t const start_block = block_i(i);
-    size_t const start_block_index = i % BLOCK_BITS;
-    ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
-    if (start_block_index + count < BLOCK_BITS)
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = (ccc_bitblock_)~0 << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_mask &= (((ccc_bitblock_)~0)
-                       >> (BLOCK_BITS - (start_block_index + count)));
+        first_block_on &= (((ccc_bitblock_)~0)
+                           >> (BLOCK_BITS - (start_i_in_block + count)));
     }
-    bs->set_[start_block] ^= first_mask;
+    bs->set_[start_block] ^= first_block_on;
     size_t const end_block = block_i(end - 1);
     if (end_block != start_block)
     {
-        size_t const end_block_index = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_mask
-            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_block_index) - 1);
-        bs->set_[end_block] ^= last_mask;
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_i_in_block) - 1);
+        bs->set_[end_block] ^= last_block_on;
         if (end_block - start_block > 1)
         {
             for (size_t block = start_block + 1; block < end_block; ++block)
