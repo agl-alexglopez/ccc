@@ -137,15 +137,17 @@ CHECK_BEGIN_STATIC_FN(btst_test_valid_sudoku)
 {
     /* clang-format off */
     int valid_board[9][9] =
-    {{5,3,0,0,7,0,0,0,0}
-    ,{6,0,0,1,9,5,0,0,0}
-    ,{0,9,8,0,0,0,0,6,0}
-    ,{8,0,0,0,6,0,0,0,3}
-    ,{4,0,0,8,0,3,0,0,1}
-    ,{7,0,0,0,2,0,0,0,6}
-    ,{0,6,0,0,0,0,2,8,0}
-    ,{0,0,0,4,1,9,0,0,5}
-    ,{0,0,0,0,8,0,0,7,9}};
+    {{5,3,0, 0,7,0, 0,0,0}
+    ,{6,0,0, 1,9,5, 0,0,0}
+    ,{0,9,8, 0,0,0, 0,6,0}
+
+    ,{8,0,0, 0,6,0, 0,0,3}
+    ,{4,0,0, 8,0,3, 0,0,1}
+    ,{7,0,0, 0,2,0, 0,0,6}
+
+    ,{0,6,0, 0,0,0, 2,8,0}
+    ,{0,0,0, 4,1,9, 0,0,5}
+    ,{0,0,0, 0,8,0, 0,7,9}};
     /* clang-format on */
     ccc_bitset row_check = ccc_btst_init(
         (ccc_bitblock[ccc_bitblocks(9ULL * 9ULL)]){}, 9ULL * 9ULL, NULL, NULL);
@@ -168,15 +170,17 @@ CHECK_BEGIN_STATIC_FN(btst_test_invalid_sudoku)
 {
     /* clang-format off */
     int invalid_board[9][9] =
-    {{8,3,0,0,7,0,0,0,0} /* 8 in first box top left. */
-    ,{6,0,0,1,9,5,0,0,0}
-    ,{0,9,8,0,0,0,0,6,0} /* 8 in first box bottom right. */
-    ,{8,0,0,0,6,0,0,0,3} /* 8 also overlaps with 8 in top left by row. */
-    ,{4,0,0,8,0,3,0,0,1}
-    ,{7,0,0,0,2,0,0,0,6}
-    ,{0,6,0,0,0,0,2,8,0}
-    ,{0,0,0,4,1,9,0,0,5}
-    ,{0,0,0,0,8,0,0,7,9}};
+    {{8,3,0, 0,7,0, 0,0,0} /* 8 in first box top left. */
+    ,{6,0,0, 1,9,5, 0,0,0}
+    ,{0,9,8, 0,0,0, 0,6,0} /* 8 in first box bottom right. */
+
+    ,{8,0,0, 0,6,0, 0,0,3} /* 8 also overlaps with 8 in top left by row. */
+    ,{4,0,0, 8,0,3, 0,0,1}
+    ,{7,0,0, 0,2,0, 0,0,6}
+
+    ,{0,6,0, 0,0,0, 2,8,0}
+    ,{0,0,0, 4,1,9, 0,0,5}
+    ,{0,0,0, 0,8,0, 0,7,9}};
     /* clang-format on */
     ccc_bitset row_check = ccc_btst_init(
         (ccc_bitblock[ccc_bitblocks(9ULL * 9ULL)]){}, 9ULL * 9ULL, NULL, NULL);
