@@ -69,6 +69,18 @@ CHECK_BEGIN_STATIC_FN(btst_test_reset)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(btst_test_reset_all)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(10)]){}, 10, NULL, NULL);
+    CHECK(ccc_btst_capacity(&btst), 10);
+    CHECK(ccc_btst_set_all(&btst, CCC_TRUE), CCC_OK);
+    CHECK(ccc_btst_popcount(&btst), 10);
+    CHECK(ccc_btst_reset_all(&btst), CCC_OK);
+    CHECK(ccc_btst_popcount(&btst), 0);
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
 validate_box(int board[9][9], ccc_bitset *const row_check,
@@ -185,5 +197,6 @@ main(void)
 {
     return CHECK_RUN(btst_test_set_one(), btst_test_set_shuffled(),
                      btst_test_set_all(), btst_test_reset(),
-                     btst_test_valid_sudoku(), btst_test_invalid_sudoku());
+                     btst_test_reset_all(), btst_test_valid_sudoku(),
+                     btst_test_invalid_sudoku());
 }
