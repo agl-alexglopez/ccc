@@ -46,8 +46,7 @@ need to worry about the underlying bit set representation. For example:
 
 ```
 static ccc_bitset b
-    = ccc_btst_init((static ccc_bitblock[ccc_bitblocks(256)]){}, 256, NULL,
-                    NULL);
+    = ccc_bs_init((static ccc_bitblock[ccc_bs_blocks(256)]){}, 256, NULL, NULL);
 ```
 
 The above example also illustrates the benefits of a static compound literal
@@ -56,13 +55,13 @@ If your compiler has not implemented storage duration of compound literals the
 more traditional example would look like this.
 
 ```
-static ccc_bitblock blocks[ccc_bitblocks(256)];
-static ccc_bitset b = ccc_btst_init(blocks, 256, NULL, NULL);
+static ccc_bitblock blocks[ccc_bs_blocks(256)];
+static ccc_bitset b = ccc_bs_init(blocks, 256, NULL, NULL);
 ```
 
 This macro is required for any initialization where the bit block memory comes
 from the stack or data segment as determined by the user. */
-#define ccc_bitblocks(bit_cap) ccc_impl_bitblocks(bit_cap)
+#define ccc_bs_blocks(bit_cap) ccc_impl_bs_blocks(bit_cap)
 
 /** @brief Initialize the bit set with memory and allocation permissions.
 @param [in] bitblock_ptr the pointer to existing blocks or NULL.
@@ -70,13 +69,13 @@ from the stack or data segment as determined by the user. */
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
 @param [in] aux auxiliary data needed for allocation of the bit set.
 @return the initialized bit set on the right hand side of an equality operator
-@warning the user must use the ccc_bitblocks macro to help determine the size of
+@warning the user must use the ccc_bs_blocks macro to help determine the size of
 the bitblock array if a fixed size bitblock array is provided at compile time;
-the necessary conversion from bits requested to number of bitblocks required to
+the necessary conversion from bits requested to number of blocks required to
 store those bits must occur before use.
-(e.g. ccc_bitset b = ccc_btst_init((ccc_bitblock[ccc_bitblocks(9)]){},...);). */
-#define ccc_btst_init(bitblock_ptr, cap, alloc_fn, aux)                        \
-    ccc_impl_btst_init(bitblock_ptr, cap, alloc_fn, aux)
+(e.g. ccc_bitset b = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){},...);). */
+#define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux)                          \
+    ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux)
 
 /**@}*/
 
@@ -85,19 +84,19 @@ Test for the presence of bits. */
 /**@{*/
 
 /** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
-@return the state of the bit, or CCC_BOOL_ERR if btst is NULL.
+@return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_btst_test_at(). */
-ccc_tribool ccc_btst_test(ccc_bitset const *, size_t i);
+see ccc_bs_test_at(). */
+ccc_tribool ccc_bs_test(ccc_bitset const *, size_t i);
 
 /** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
-@return the state of the bit, or CCC_BOOL_ERR if btst is NULL.
+@return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_btst_test_at(ccc_bitset const *, size_t i);
+ccc_tribool ccc_bs_test_at(ccc_bitset const *, size_t i);
 
 /**@}*/
 
@@ -106,97 +105,97 @@ Set and flip bits in the set. */
 /**@{*/
 
 /** @brief Set the bit at index i to value b (CCC_TRUE or CCC_FALSE).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
 @param [in] b the value to set at position i (CCC_TRUE or CCC_FALSE).
 @return the state of the bit before the set operation, true if it was
-previously true, false if it was previously false, or error if btst is NULL.
+previously true, false if it was previously false, or error if bs is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_btst_set_at(). */
-ccc_tribool ccc_btst_set(ccc_bitset *btst, size_t i, ccc_tribool b);
+see ccc_bs_set_at(). */
+ccc_tribool ccc_bs_set(ccc_bitset *bs, size_t i, ccc_tribool b);
 
 /** @brief Set the bit at valid index i to value b (true or false).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the valid index identifying the bit to set.
 @param [in] b the value to set at position i (CCC_TRUE or CCC_FALSE).
 @return the state of the bit before the set operation, true if it was
-previously true, false if it was previously false, or error if btst is NULL or
+previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_btst_set_at(ccc_bitset *btst, size_t i, ccc_tribool b);
+ccc_tribool ccc_bs_set_at(ccc_bitset *bs, size_t i, ccc_tribool b);
 
 /** @brief Set all the bits to the provided value (CCC_TRUE or CCC_FALSE).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] b the value to set (CCC_TRUE or CCC_FALSE).
 @return the result of the operation. OK if successful, or an input error if
-btst is NULL. */
-ccc_result ccc_btst_set_all(ccc_bitset *btst, ccc_tribool b);
+bs is NULL. */
+ccc_result ccc_bs_set_all(ccc_bitset *bs, ccc_tribool b);
 
 /** @brief Set all the bits in the specified range (CCC_TRUE or CCC_FALSE).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] b the value to set (CCC_TRUE or CCC_FALSE).
 @param [in] i the starting index to set.
 @param [in] count the count of bits starting at i to set.
 @return the result of the operation. OK if successful, or an input error if
-btst is NULL or the range is invalid by position, count, or both. */
-ccc_result ccc_btst_set_range(ccc_bitset *btst, size_t i, size_t count,
-                              ccc_tribool b);
+bs is NULL or the range is invalid by position, count, or both. */
+ccc_result ccc_bs_set_range(ccc_bitset *bs, size_t i, size_t count,
+                            ccc_tribool b);
 
 /** @brief Set the bit at index i to CCC_FALSE.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to reset.
 @return the state of the bit before the reset operation, true if it was
-previously true, false if it was previously false, or error if btsts is NULL.
+previously true, false if it was previously false, or error if bss is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_btst_set_at(). */
-ccc_tribool ccc_btst_reset(ccc_bitset *btst, size_t i);
+see ccc_bs_set_at(). */
+ccc_tribool ccc_bs_reset(ccc_bitset *bs, size_t i);
 
 /** @brief Set the bit at valid index i to boolean value b (true or false).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the valid index identifying the bit to set.
 @return the state of the bit before the set operation, true if it was
-previously true, false if it was previously false, or error if btst is NULL or
+previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_btst_reset_at(ccc_bitset *btst, size_t i);
+ccc_tribool ccc_bs_reset_at(ccc_bitset *bs, size_t i);
 
 /** @brief Set all the bits to CCC_FALSE.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @return the result of the operation. OK if successful, or an input error if
-btst is NULL. */
-ccc_result ccc_btst_reset_all(ccc_bitset *btst);
+bs is NULL. */
+ccc_result ccc_bs_reset_all(ccc_bitset *bs);
 
 /** @brief Set all the bits in the range to CCC_FALSE.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the starting index to reset.
 @param [in] count the count of bits starting at i to reset.
 @return the result of the operation. OK if successful, or an input error if
-btst is NULL or the range is invalid by position, count, or both. */
-ccc_result ccc_btst_reset_range(ccc_bitset *btst, size_t i, size_t count);
+bs is NULL or the range is invalid by position, count, or both. */
+ccc_result ccc_bs_reset_range(ccc_bitset *bs, size_t i, size_t count);
 
 /** @brief Toggle the bit at index i.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to toggle
 @return the state of the bit before the toggle operation, true if it was
-previously true, false if it was previously false, or error if btsts is NULL.
+previously true, false if it was previously false, or error if bss is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_btst_set_at(). */
-ccc_tribool ccc_btst_flip(ccc_bitset *btst, size_t i);
+see ccc_bs_set_at(). */
+ccc_tribool ccc_bs_flip(ccc_bitset *bs, size_t i);
 
 /** @brief Toggle the bit at index i.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to toggle
 @return the state of the bit before the toggle operation, true if it was
-previously true, false if it was previously false, or error if btst is NULL or
+previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_btst_flip_at(ccc_bitset *btst, size_t i);
+ccc_tribool ccc_bs_flip_at(ccc_bitset *bs, size_t i);
 
 /** @brief Toggle all of the bits to their opposing boolean value.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @return the result of the operation. OK if successful, or an input error if
-btst is NULL. */
-ccc_result ccc_btst_flip_all(ccc_bitset *btst);
+bs is NULL. */
+ccc_result ccc_bs_flip_all(ccc_bitset *bs);
 
 /**@}*/
 
@@ -205,16 +204,16 @@ Obtain state from the container. */
 /**@{*/
 
 /** @brief Return total number of bits tracked by the set.
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @return the total number of bits currently tracked by the set regardless of
-true or false state of each. 0 is returned if btst is NULL. */
-size_t ccc_btst_capacity(ccc_bitset const *btst);
+true or false state of each. 0 is returned if bs is NULL. */
+size_t ccc_bs_capacity(ccc_bitset const *bs);
 
 /** @brief Return the number of bits set to CCC_TRUE. O(n).
-@param [in] btst a pointer to the bit set.
+@param [in] bs a pointer to the bit set.
 @return the total number of bits currently set to CCC_TRUE. 0 is returned if
-btst is NULL. */
-size_t ccc_btst_popcount(ccc_bitset const *btst);
+bs is NULL. */
+size_t ccc_bs_popcount(ccc_bitset const *bs);
 
 /**@}*/
 

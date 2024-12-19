@@ -19,8 +19,8 @@ target_link_libraries(run_tests PRIVATE checkers str_view)
 # depending on the build type. The run_tests program then runs all binaries.
 
 #############  Bit Set ##########################
-macro(add_btst_test TEST_NAME)
-  add_executable(${TEST_NAME} btst/${TEST_NAME}.c)
+macro(add_bs_test TEST_NAME)
+  add_executable(${TEST_NAME} bs/${TEST_NAME}.c)
   target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
@@ -36,10 +36,10 @@ macro(add_btst_test TEST_NAME)
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
-add_btst_test(test_btst_construct)
-add_btst_test(test_btst_insert)
-add_btst_test(test_btst_erase)
-add_btst_test(test_btst_test_and_set)
+add_bs_test(test_bs_construct)
+add_bs_test(test_bs_insert)
+add_bs_test(test_bs_erase)
+add_bs_test(test_bs_test_and_set)
 
 #############  Ordered Multimap ##########################
 add_library(ommap_util ommap/ommap_util.h ommap/ommap_util.c)
