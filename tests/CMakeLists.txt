@@ -18,6 +18,29 @@ target_link_libraries(run_tests PRIVATE checkers str_view)
 # the test executable in the tests folder either in debug or release
 # depending on the build type. The run_tests program then runs all binaries.
 
+#############  Bit Set ##########################
+macro(add_btst_test TEST_NAME)
+  add_executable(${TEST_NAME} btst/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      ccc
+      checkers
+      alloc
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+# Add tests below here by the name of the c file without the .c suffix
+add_btst_test(test_btst_construct)
+add_btst_test(test_btst_insert)
+add_btst_test(test_btst_erase)
+add_btst_test(test_btst_test_and_set)
+
 #############  Ordered Multimap ##########################
 add_library(ommap_util ommap/ommap_util.h ommap/ommap_util.c)
 target_link_libraries(ommap_util

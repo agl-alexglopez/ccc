@@ -17,6 +17,7 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
         ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
         ${PROJECT_SOURCE_DIR}/src/flat_realtime_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/bitset.c
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS
@@ -37,8 +38,10 @@ target_sources(${PROJECT_NAME}
               impl/impl_flat_double_ended_queue.h
               impl/impl_flat_hash_map.h
               impl/impl_buffer.h
+              impl/impl_bitset.h
               types.h
               buffer.h
+              bitset.h
               flat_hash_map.h
               flat_double_ended_queue.h
               flat_priority_queue.h
