@@ -195,11 +195,47 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_all)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const orignal_popcount = ccc_bs_popcount(&bs);
+    /* Start with a full range and reduce from the end. */
+    for (size_t i = 0; i < 512; ++i)
+    {
+        size_t const count = 512 - i;
+        CHECK(ccc_bs_flip_range(&bs, 0, count), CCC_OK);
+        CHECK(ccc_bs_popcount(&bs), orignal_popcount - count);
+        CHECK(ccc_bs_flip_range(&bs, 0, count), CCC_OK);
+        CHECK(ccc_bs_popcount(&bs), orignal_popcount);
+    }
+    /* Start with a full range and reduce by moving start forward. */
+    for (size_t i = 0; i < 512; ++i)
+    {
+        size_t const count = 512 - i;
+        CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount(&bs), orignal_popcount - count);
+        CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount(&bs), orignal_popcount);
+    }
+    /* Shrink range from both ends. */
+    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    {
+        size_t const count = end - i;
+        CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount(&bs), orignal_popcount - count);
+        CHECK(ccc_bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(ccc_bs_popcount(&bs), orignal_popcount);
+    }
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
-validate_box(int board[9][9], ccc_bitset *const row_check,
-             ccc_bitset *const col_check, size_t const row_start,
-             size_t const col_start)
+validate_sudoku_box(int board[9][9], ccc_bitset *const row_check,
+                    ccc_bitset *const col_check, size_t const row_start,
+                    size_t const col_start)
 {
     ccc_bitset box_check
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){}, 9, NULL, NULL);
@@ -272,8 +308,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_valid_sudoku)
     {
         for (size_t col = 0; col < 9ULL; col += box_step)
         {
-            ccc_tribool const valid
-                = validate_box(valid_board, &row_check, &col_check, row, col);
+            ccc_tribool const valid = validate_sudoku_box(
+                valid_board, &row_check, &col_check, row, col);
             CHECK(valid, CCC_TRUE);
         }
     }
@@ -306,8 +342,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_invalid_sudoku)
     {
         for (size_t col = 0; col < 9ULL; col += box_step)
         {
-            pass
-                = validate_box(invalid_board, &row_check, &col_check, row, col);
+            pass = validate_sudoku_box(invalid_board, &row_check, &col_check,
+                                       row, col);
             CHECK(pass != CCC_BOOL_ERR, true);
             if (!pass)
             {
@@ -325,7 +361,7 @@ main(void)
 {
     return CHECK_RUN(bs_test_set_one(), bs_test_set_shuffled(),
                      bs_test_set_all(), bs_test_set_range(), bs_test_reset(),
-                     bs_test_flip(), bs_test_flip_all(), bs_test_reset_all(),
-                     bs_test_reset_range(), bs_test_valid_sudoku(),
-                     bs_test_invalid_sudoku());
+                     bs_test_flip(), bs_test_flip_all(), bs_test_flip_range(),
+                     bs_test_reset_all(), bs_test_reset_range(),
+                     bs_test_valid_sudoku(), bs_test_invalid_sudoku());
 }

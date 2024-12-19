@@ -104,7 +104,7 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t i, size_t const count,
     ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
     if (start_block_index + count < BLOCK_BITS)
     {
-        first_mask &= ((ccc_bitblock_)~0
+        first_mask &= (((ccc_bitblock_)~0)
                        >> (BLOCK_BITS - (start_block_index + count)));
     }
     if (b)
@@ -183,6 +183,8 @@ ccc_bs_reset_all(ccc_bitset *const bs)
     return CCC_OK;
 }
 
+/* Same concept as set range but easier. Handle first and last then set
+   everything in between to false with memset. */
 ccc_result
 ccc_bs_reset_range(ccc_bitset *const bs, size_t i, size_t const count)
 {
@@ -196,7 +198,7 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t i, size_t const count)
     ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
     if (start_block_index + count < BLOCK_BITS)
     {
-        first_mask &= ((ccc_bitblock_)~0
+        first_mask &= (((ccc_bitblock_)~0)
                        >> (BLOCK_BITS - (start_block_index + count)));
     }
     bs->set_[start_block] &= ~first_mask;
@@ -262,6 +264,45 @@ ccc_bs_flip_all(ccc_bitset *const bs)
         bs->set_[i] = ~bs->set_[i];
     }
     bs->set_[end - 1] &= last_on(bs);
+    return CCC_OK;
+}
+
+/* Maybe future SIMD vectorization could speed things up here because we use
+   the same strat of handling first and last which just leaves a simpler bulk
+   operation in the middle. But we don't benefit from memset here. */
+ccc_result
+ccc_bs_flip_range(ccc_bitset *const bs, size_t i, size_t const count)
+{
+    size_t const end = i + count;
+    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
+    {
+        return CCC_INPUT_ERR;
+    }
+    size_t const start_block = block_i(i);
+    size_t const start_block_index = i % BLOCK_BITS;
+    ccc_bitblock_ first_mask = (ccc_bitblock_)~0 << start_block_index;
+    if (start_block_index + count < BLOCK_BITS)
+    {
+        first_mask &= (((ccc_bitblock_)~0)
+                       >> (BLOCK_BITS - (start_block_index + count)));
+    }
+    bs->set_[start_block] ^= first_mask;
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        size_t const end_block_index = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_mask
+            = (((ccc_bitblock_)~0)) >> ((BLOCK_BITS - end_block_index) - 1);
+        bs->set_[end_block] ^= last_mask;
+        if (end_block - start_block > 1)
+        {
+            for (size_t block = start_block + 1; block < end_block; ++block)
+            {
+                bs->set_[block] = ~bs->set_[block];
+            }
+        }
+    }
+    bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
     return CCC_OK;
 }
 
