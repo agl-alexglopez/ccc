@@ -305,13 +305,15 @@ CHECK_BEGIN_STATIC_FN(bs_test_all)
     CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
     CHECK(ccc_bs_all(&bs), CCC_TRUE);
     CHECK(ccc_bs_all_range(&bs, 0, cap), CCC_TRUE);
-    /* Start with a full range and reduce by moving start forward. */
-    for (size_t i = 0, end = 512; i < end; ++i, --end)
+    CHECK(ccc_bs_reset_all(&bs), CCC_OK);
+    /* Start with an almost full range and reduce by moving start forward. */
+    for (size_t i = 1, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
         CHECK(ccc_bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
         CHECK(ccc_bs_popcount_range(&bs, i, count), count);
         CHECK(ccc_bs_popcount(&bs), count);
+        CHECK(ccc_bs_all(&bs), CCC_FALSE);
         CHECK(ccc_bs_all_range(&bs, i, count), CCC_TRUE);
         CHECK(ccc_bs_reset_range(&bs, i, count), CCC_OK);
         CHECK(ccc_bs_popcount_range(&bs, i, count), 0);
