@@ -197,6 +197,14 @@ ccc_tribool ccc_bs_flip_at(ccc_bitset *bs, size_t i);
 bs is NULL. */
 ccc_result ccc_bs_flip_all(ccc_bitset *bs);
 
+/** @brief Flip all the bits in the range to their opposite value.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting index to reset.
+@param [in] count the count of bits starting at i to reset.
+@return the result of the operation. OK if successful, or an input error if
+bs is NULL or the range is invalid by position, count, or both. */
+ccc_result ccc_bs_flip_range(ccc_bitset *bs, size_t i, size_t count);
+
 /**@}*/
 
 /** @name State Interface
