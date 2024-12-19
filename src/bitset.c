@@ -190,7 +190,7 @@ ccc_btst_popcount(ccc_bitset const *const btst)
     }
     size_t const end = blocks(btst->cap_);
     size_t cnt = 0;
-    for (size_t i = 0; i < end; cnt += popcount(btst->set_[i]), ++i)
+    for (size_t i = 0; i < end; cnt += popcount(btst->set_[i++]))
     {}
     return cnt;
 }
