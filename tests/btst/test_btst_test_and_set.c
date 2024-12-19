@@ -9,6 +9,7 @@ CHECK_BEGIN_STATIC_FN(btst_test_set_one)
     /* Was false before. */
     CHECK(ccc_btst_set(&btst, 5, CCC_TRUE), CCC_FALSE);
     CHECK(ccc_btst_set_at(&btst, 5, CCC_TRUE), CCC_TRUE);
+    CHECK(ccc_btst_popcount(&btst), 1);
     CHECK(ccc_btst_set(&btst, 5, CCC_FALSE), CCC_TRUE);
     CHECK(ccc_btst_set_at(&btst, 5, CCC_FALSE), CCC_FALSE);
     CHECK_END_FN();
@@ -25,12 +26,45 @@ CHECK_BEGIN_STATIC_FN(btst_test_set_shuffled)
         CHECK(ccc_btst_set(&btst, i, CCC_TRUE), CCC_FALSE);
         CHECK(ccc_btst_set_at(&btst, i, CCC_TRUE), CCC_TRUE);
     }
-    for (size_t i = 0, shuf_i = larger_prime % 10; i < 10;
-         ++i, shuf_i = (shuf_i + larger_prime) % 10)
+    CHECK(ccc_btst_popcount(&btst), 10);
+    for (size_t i = 0; i < 10; ++i)
     {
         CHECK(ccc_btst_test(&btst, i), CCC_TRUE);
         CHECK(ccc_btst_test_at(&btst, i), CCC_TRUE);
     }
+    CHECK(ccc_btst_capacity(&btst), 10);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(btst_test_set_all)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(10)]){}, 10, NULL, NULL);
+    CHECK(ccc_btst_set_all(&btst, CCC_TRUE), CCC_OK);
+    CHECK(ccc_btst_popcount(&btst), 10);
+    for (size_t i = 0; i < 10; ++i)
+    {
+        CHECK(ccc_btst_test(&btst, i), CCC_TRUE);
+        CHECK(ccc_btst_test_at(&btst, i), CCC_TRUE);
+    }
+    CHECK(ccc_btst_capacity(&btst), 10);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(btst_test_reset)
+{
+    ccc_bitset btst
+        = ccc_btst_init((ccc_bitblock[ccc_bitblocks(10)]){}, 10, NULL, NULL);
+    size_t const larger_prime = 11;
+    for (size_t i = 0, shuf_i = larger_prime % 10; i < 10;
+         ++i, shuf_i = (shuf_i + larger_prime) % 10)
+    {
+        CHECK(ccc_btst_set(&btst, i, CCC_TRUE), CCC_FALSE);
+        CHECK(ccc_btst_set_at(&btst, i, CCC_TRUE), CCC_TRUE);
+    }
+    CHECK(ccc_btst_reset(&btst, 9), CCC_TRUE);
+    CHECK(ccc_btst_reset(&btst, 9), CCC_FALSE);
+    CHECK(ccc_btst_popcount(&btst), 9);
     CHECK(ccc_btst_capacity(&btst), 10);
     CHECK_END_FN();
 }
@@ -150,5 +184,6 @@ int
 main(void)
 {
     return CHECK_RUN(btst_test_set_one(), btst_test_set_shuffled(),
+                     btst_test_set_all(), btst_test_reset(),
                      btst_test_valid_sudoku(), btst_test_invalid_sudoku());
 }

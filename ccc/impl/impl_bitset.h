@@ -23,8 +23,8 @@ struct ccc_bitset_
 
 /** @private */
 #define ccc_impl_bitblocks(bit_cap)                                            \
-    ((size_t)((bit_cap)                                                        \
-              + ((CCC_IMPL_BTST_BLOCK_BITS - 1) / CCC_IMPL_BTST_BLOCK_BITS)))
+    ((size_t)(((bit_cap) + (CCC_IMPL_BTST_BLOCK_BITS - 1))                     \
+              / CCC_IMPL_BTST_BLOCK_BITS))
 
 /** @private */
 #define ccc_impl_btst_init(bitblock_ptr, cap, alloc_fn, aux)                   \
