@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "ccc/bitset.h"
 #include "checkers.h"
 

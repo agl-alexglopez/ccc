@@ -1,4 +1,8 @@
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "ccc/bitset.h"
+#include "ccc/types.h"
 #include "checkers.h"
 
 CHECK_BEGIN_STATIC_FN(btst_test_set_one)
