@@ -282,7 +282,7 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
     {
         return CCC_INPUT_ERR;
     }
-    size_t const start_block = block_i(i);
+    size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
@@ -299,9 +299,9 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
         bs->set_[end_block] ^= last_block_on;
         if (end_block - start_block > 1)
         {
-            for (size_t block = start_block + 1; block < end_block; ++block)
+            for (++start_block; start_block < end_block; ++start_block)
             {
-                bs->set_[block] = ~bs->set_[block];
+                bs->set_[start_block] = ~bs->set_[start_block];
             }
         }
     }
