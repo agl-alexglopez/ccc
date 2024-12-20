@@ -343,7 +343,7 @@ ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
         return -1;
     }
     ptrdiff_t popped = 0;
-    size_t const start_block = block_i(i);
+    size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
@@ -360,10 +360,9 @@ ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
         popped += popcount(last_block_on & bs->set_[end_block]);
         if (end_block - start_block > 1)
         {
-            for (size_t block = start_block + 1; block < end_block; ++block)
-            {
-                popped += popcount(bs->set_[block]);
-            }
+            for (++start_block; start_block < end_block;
+                 popped += popcount(bs->set_[start_block++]))
+            {}
         }
     }
     return popped;
