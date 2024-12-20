@@ -5,6 +5,14 @@ A bit set offers efficient set membership operations when the range of values
 can be tracked via an index. Both a fixed size and dynamic variant are possible
 depending on initialization options.
 
+Conceptually, the bit set can be thought of as an arbitrary length integer with
+index 0 being the Least Significant Bit and index N - 1 being the Most
+Significant Bit of the integer. Internally, this is implemented by populating
+each block of the bit set from Least Significant Bit to Most Significant Bit.
+Therefore, "trailing" means starting from the Least Significant Bit and
+"leading" means starting from the Most Significant Bit; this is done to stay
+consistent with upcoming bit operations introduced to the C23 standard.
+
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
 
@@ -281,7 +289,7 @@ ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, size_t i, size_t count);
 @param [in] bs a pointer to the bit set.
 @return the index of the first bit set to 1 or -1 if no 1 bit is found or bs in
 NULL. */
-ptrdiff_t ccc_bs_first_1(ccc_bitset const *bs);
+ptrdiff_t ccc_bs_first_trailing_1(ccc_bitset const *bs);
 
 /** @brief Return the index of the first bit set to 1 in the range.
 @param [in] bs a pointer to the bit set.
@@ -293,13 +301,14 @@ NULL, or the range is invalid.
 invalid range therefore -1 is returned. To distinguish a valid negative result
 signifying not found and a negative result indicating a range error the user
 must check their input. */
-ptrdiff_t ccc_bs_first_1_range(ccc_bitset const *bs, size_t i, size_t count);
+ptrdiff_t ccc_bs_first_trailing_1_range(ccc_bitset const *bs, size_t i,
+                                        size_t count);
 
 /** @brief Return the index of the first bit set to 0 in the set.
 @param [in] bs a pointer to the bit set.
 @return the index of the first bit set to 0 or -1 if no 0 bit is found or bs in
 NULL. */
-ptrdiff_t ccc_bs_first_0(ccc_bitset const *bs);
+ptrdiff_t ccc_bs_first_trailing_0(ccc_bitset const *bs);
 
 /** @brief Return the index of the first bit set to 0 in the range.
 @param [in] bs a pointer to the bit set.
@@ -311,7 +320,8 @@ NULL, or the range is invalid.
 invalid range therefore -1 is returned. To distinguish a valid negative result
 signifying not found and a negative result indicating a range error the user
 must check their input. */
-ptrdiff_t ccc_bs_first_0_range(ccc_bitset const *bs, size_t i, size_t count);
+ptrdiff_t ccc_bs_first_trailing_0_range(ccc_bitset const *bs, size_t i,
+                                        size_t count);
 
 /**@}*/
 

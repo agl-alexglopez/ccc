@@ -26,10 +26,10 @@ static ccc_tribool any_or_none_range(struct ccc_bitset_ const *, size_t i,
                                      size_t count, ccc_tribool);
 static ccc_tribool all_range(struct ccc_bitset_ const *bs, size_t i,
                              size_t count);
-static ptrdiff_t first_1_range(struct ccc_bitset_ const *bs, size_t i,
-                               size_t count);
-static ptrdiff_t first_0_range(struct ccc_bitset_ const *bs, size_t i,
-                               size_t count);
+static ptrdiff_t first_trailing_1_range(struct ccc_bitset_ const *bs, size_t i,
+                                        size_t count);
+static ptrdiff_t first_trailing_0_range(struct ccc_bitset_ const *bs, size_t i,
+                                        size_t count);
 static ptrdiff_t countr_0(ccc_bitblock_);
 
 /*=======================   Public Interface   ==============================*/
@@ -414,36 +414,36 @@ ccc_bs_all(ccc_bitset const *const bs)
 }
 
 ptrdiff_t
-ccc_bs_first_1_range(ccc_bitset const *const bs, size_t const i,
-                     size_t const count)
+ccc_bs_first_trailing_1_range(ccc_bitset const *const bs, size_t const i,
+                              size_t const count)
 {
-    return first_1_range(bs, i, count);
+    return first_trailing_1_range(bs, i, count);
 }
 
 ptrdiff_t
-ccc_bs_first_1(ccc_bitset const *const bs)
+ccc_bs_first_trailing_1(ccc_bitset const *const bs)
 {
-    return first_1_range(bs, 0, bs->cap_);
+    return first_trailing_1_range(bs, 0, bs->cap_);
 }
 
 ptrdiff_t
-ccc_bs_first_0_range(ccc_bitset const *const bs, size_t const i,
-                     size_t const count)
+ccc_bs_first_trailing_0_range(ccc_bitset const *const bs, size_t const i,
+                              size_t const count)
 {
-    return first_0_range(bs, i, count);
+    return first_trailing_0_range(bs, i, count);
 }
 
 ptrdiff_t
-ccc_bs_first_0(ccc_bitset const *const bs)
+ccc_bs_first_trailing_0(ccc_bitset const *const bs)
 {
-    return first_0_range(bs, 0, bs->cap_);
+    return first_trailing_0_range(bs, 0, bs->cap_);
 }
 
 /*=======================    Static Helpers    ==============================*/
 
 static inline ptrdiff_t
-first_1_range(struct ccc_bitset_ const *const bs, size_t const i,
-              size_t const count)
+first_trailing_1_range(struct ccc_bitset_ const *const bs, size_t const i,
+                       size_t const count)
 {
     size_t const end = i + count;
     if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
@@ -488,8 +488,8 @@ first_1_range(struct ccc_bitset_ const *const bs, size_t const i,
 }
 
 static inline ptrdiff_t
-first_0_range(struct ccc_bitset_ const *const bs, size_t const i,
-              size_t const count)
+first_trailing_0_range(struct ccc_bitset_ const *const bs, size_t const i,
+                       size_t const count)
 {
     size_t const end = i + count;
     if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
