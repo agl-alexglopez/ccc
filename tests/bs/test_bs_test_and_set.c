@@ -324,6 +324,22 @@ CHECK_BEGIN_STATIC_FN(bs_test_all)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_first_1)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    /* Start with an almost full range and reduce by moving start forward. */
+    for (size_t i = 0, end = 512; i < end - 1; ++i)
+    {
+        CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
+        CHECK(ccc_bs_first_1(&bs), i + 1);
+        CHECK(ccc_bs_first_1_range(&bs, 0, i + 1), -1);
+        CHECK(ccc_bs_first_1_range(&bs, i, end - i), i + 1);
+    }
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
 validate_sudoku_box(int board[9][9], ccc_bitset *const row_check,
@@ -365,9 +381,14 @@ done:
     {
     case CCC_TRUE:
         return CCC_FALSE;
+        break;
     case CCC_FALSE:
         return CCC_TRUE;
+        break;
     case CCC_BOOL_ERR:
+        return CCC_BOOL_ERR;
+        break;
+    default:
         return CCC_BOOL_ERR;
     }
 }
@@ -456,6 +477,6 @@ main(void)
                      bs_test_set_all(), bs_test_set_range(), bs_test_reset(),
                      bs_test_flip(), bs_test_flip_all(), bs_test_flip_range(),
                      bs_test_reset_all(), bs_test_reset_range(), bs_test_any(),
-                     bs_test_all(), bs_test_none(), bs_test_valid_sudoku(),
-                     bs_test_invalid_sudoku());
+                     bs_test_all(), bs_test_none(), bs_test_first_1(),
+                     bs_test_valid_sudoku(), bs_test_invalid_sudoku());
 }

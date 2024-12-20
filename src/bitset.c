@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
+#include <strings.h>
 
 #include "bitset.h"
 #include "impl/impl_bitset.h"
@@ -9,6 +10,8 @@
 
 #define BLOCK_BITS (sizeof(ccc_bitblock_) * CHAR_BIT)
 #define ALL_ON ((ccc_bitblock_)~0)
+#define BITBLOCK_MSB                                                           \
+    (((ccc_bitblock_)1) << (((sizeof(ccc_bitblock_) * CHAR_BIT)) - 1))
 
 /*=========================   Prototypes   ==================================*/
 
@@ -23,6 +26,10 @@ static ccc_tribool any_or_none_range(struct ccc_bitset_ const *, size_t i,
                                      size_t count, ccc_tribool);
 static ccc_tribool all_range(struct ccc_bitset_ const *bs, size_t i,
                              size_t count);
+static ptrdiff_t first_1_range(struct ccc_bitset_ const *bs, size_t i,
+                               size_t count);
+static ptrdiff_t countr_0(ccc_bitblock_);
+static ptrdiff_t countl_0(ccc_bitblock_);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -405,7 +412,68 @@ ccc_bs_all(ccc_bitset const *const bs)
     return all_range(bs, 0, bs->cap_);
 }
 
+ptrdiff_t
+ccc_bs_first_1_range(ccc_bitset const *const bs, size_t const i,
+                     size_t const count)
+{
+    return first_1_range(bs, i, count);
+}
+
+ptrdiff_t
+ccc_bs_first_1(ccc_bitset const *const bs)
+{
+    return first_1_range(bs, 0, bs->cap_);
+}
+
 /*=======================    Static Helpers    ==============================*/
+
+static inline ptrdiff_t
+first_1_range(struct ccc_bitset_ const *const bs, size_t const i,
+              size_t const count)
+{
+    size_t const end = i + count;
+    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
+    {
+        return -1;
+    }
+    ptrdiff_t index = 0;
+    size_t start_block = block_i(i);
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    if (start_i_in_block + count < BLOCK_BITS)
+    {
+        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+    }
+    index = countr_0(first_block_on & bs->set_[start_block]);
+    if (index != BLOCK_BITS)
+    {
+        return ((ptrdiff_t)(start_block * BLOCK_BITS)) + index;
+    }
+    size_t const end_block = block_i(end - 1);
+    if (end_block != start_block)
+    {
+        if (end_block - start_block > 1)
+        {
+            for (++start_block; start_block < end_block; ++start_block)
+            {
+                index = countr_0(bs->set_[start_block]);
+                if (index != BLOCK_BITS)
+                {
+                    return ((ptrdiff_t)(start_block * BLOCK_BITS)) + index;
+                }
+            }
+        }
+        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+        ccc_bitblock_ last_block_on
+            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+        index = countr_0(last_block_on & bs->set_[end_block]);
+        if (index != BLOCK_BITS)
+        {
+            return ((ptrdiff_t)(end_block * BLOCK_BITS)) + index;
+        }
+    }
+    return -1;
+}
 
 /* Performs the any or none scan operation over the specified range. The only
    difference between the operations is the return value. Specify the desired
@@ -540,7 +608,7 @@ last_on(struct ccc_bitset_ const *const bs)
        order bit which is why we do the second funky flip on the whole op. */
     return bs->cap_
                ? ~(((ccc_bitblock_)~1) << ((size_t)(bs->cap_ - 1) % BLOCK_BITS))
-               : ~0;
+               : ALL_ON;
 }
 
 static inline size_t
@@ -566,6 +634,48 @@ popcount(ccc_bitblock_ const b)
 #else
     unsigned cnt = 0;
     for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
+    {}
+    return cnt;
+#endif
+}
+
+static ptrdiff_t
+countr_0(ccc_bitblock_ const b)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    return b ? __builtin_ctz(b) : (ptrdiff_t)BLOCK_BITS;
+#else
+    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    if (!b)
+    {
+        return (ptrdiff_t)BLOCK_BITS;
+    }
+    ptrdiff_t cnt = 0;
+    for (; !(b & 1U); ++cnt, b >>= 1U)
+    {}
+    return cnt;
+#endif
+}
+
+static ptrdiff_t
+countl_0(ccc_bitblock_ const b)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    return b ? __builtin_clz(b) : (ptrdiff_t)BLOCK_BITS;
+#else
+    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    if (!b)
+    {
+        return (ptrdiff_t)BLOCK_BITS;
+    }
+    ptrdiff_t cnt = 0;
+    for (; !(b & BITBLOCK_MSB); ++cnt, b <<= 1U)
     {}
     return cnt;
 #endif
