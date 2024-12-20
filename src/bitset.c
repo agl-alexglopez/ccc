@@ -117,7 +117,7 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
     {
         return CCC_INPUT_ERR;
     }
-    size_t const start_block = block_i(i);
+    size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
@@ -133,26 +133,26 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
         bs->set_[start_block] &= ~first_block_on;
     }
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (end_block == start_block)
     {
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        if (b)
-        {
-            bs->set_[end_block] |= last_block_on;
-        }
-        else
-        {
-            bs->set_[end_block] &= ~last_block_on;
-        }
-        if (end_block - start_block > 1)
-        {
-            int const v = b ? ~0 : 0;
-            (void)memset(&bs->set_[start_block + 1], v,
-                         (end_block - (start_block + 1))
-                             * sizeof(ccc_bitblock_));
-        }
+        bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
+        return CCC_OK;
+    }
+    if (++start_block != end_block)
+    {
+        int const v = b ? ~0 : 0;
+        (void)memset(&bs->set_[start_block], v,
+                     (end_block - start_block) * sizeof(ccc_bitblock_));
+    }
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    if (b)
+    {
+        bs->set_[end_block] |= last_block_on;
+    }
+    else
+    {
+        bs->set_[end_block] &= ~last_block_on;
     }
     bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
     return CCC_OK;
@@ -210,7 +210,7 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
     {
         return CCC_INPUT_ERR;
     }
-    size_t const start_block = block_i(i);
+    size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
@@ -219,19 +219,19 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
     }
     bs->set_[start_block] &= ~first_block_on;
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (end_block == start_block)
     {
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        bs->set_[end_block] &= ~last_block_on;
-        if (end_block - start_block > 1)
-        {
-            (void)memset(&bs->set_[start_block + 1], 0,
-                         (end_block - (start_block + 1))
-                             * sizeof(ccc_bitblock_));
-        }
+        bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
+        return CCC_OK;
     }
+    if (++start_block != end_block)
+    {
+        (void)memset(&bs->set_[start_block], CCC_FALSE,
+                     (end_block - start_block) * sizeof(ccc_bitblock_));
+    }
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    bs->set_[end_block] &= ~last_block_on;
     bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
     return CCC_OK;
 }
@@ -303,20 +303,18 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
     }
     bs->set_[start_block] ^= first_block_on;
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (end_block == start_block)
     {
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        bs->set_[end_block] ^= last_block_on;
-        if (end_block - start_block > 1)
-        {
-            for (++start_block; start_block < end_block; ++start_block)
-            {
-                bs->set_[start_block] = ~bs->set_[start_block];
-            }
-        }
+        bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
+        return CCC_OK;
     }
+    for (++start_block; start_block < end_block; ++start_block)
+    {
+        bs->set_[start_block] = ~bs->set_[start_block];
+    }
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    bs->set_[end_block] ^= last_block_on;
     bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
     return CCC_OK;
 }
@@ -691,6 +689,8 @@ any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         return !ret;
     }
+    /* If this is the any check we might get lucky by checking the last block
+       before looping over everything. */
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
     ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     if (last_block_on & bs->set_[end_block])
@@ -734,18 +734,18 @@ all_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         return CCC_TRUE;
     }
-    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-    if ((last_block_on & bs->set_[end_block]) != last_block_on)
-    {
-        return CCC_FALSE;
-    }
     for (++start_block; start_block < end_block; ++start_block)
     {
         if (bs->set_[start_block] != ALL_ON)
         {
             return CCC_FALSE;
         }
+    }
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    if ((last_block_on & bs->set_[end_block]) != last_block_on)
+    {
+        return CCC_FALSE;
     }
     return CCC_TRUE;
 }
