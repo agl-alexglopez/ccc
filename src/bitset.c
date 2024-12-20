@@ -463,27 +463,26 @@ first_1_range(struct ccc_bitset_ const *const bs, size_t const i,
         return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
     }
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (end_block == start_block)
     {
-        if (end_block - start_block > 1)
-        {
-            for (++start_block; start_block < end_block; ++start_block)
-            {
-                i_in_block = countr_0(bs->set_[start_block]);
-                if (i_in_block != BLOCK_BITS)
-                {
-                    return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
-                }
-            }
-        }
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        i_in_block = countr_0(last_block_on & bs->set_[end_block]);
+        return -1;
+    }
+    /* Handle all values in between start and end in bulk. */
+    for (++start_block; start_block < end_block; ++start_block)
+    {
+        i_in_block = countr_0(bs->set_[start_block]);
         if (i_in_block != BLOCK_BITS)
         {
-            return ((ptrdiff_t)(end_block * BLOCK_BITS)) + i_in_block;
+            return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
         }
+    }
+    /* Handle last block. */
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    i_in_block = countr_0(last_block_on & bs->set_[end_block]);
+    if (i_in_block != BLOCK_BITS)
+    {
+        return ((ptrdiff_t)(end_block * BLOCK_BITS)) + i_in_block;
     }
     return -1;
 }
@@ -510,27 +509,26 @@ first_0_range(struct ccc_bitset_ const *const bs, size_t const i,
         return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
     }
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (start_block == end_block)
     {
-        if (end_block - start_block > 1)
-        {
-            for (++start_block; start_block < end_block; ++start_block)
-            {
-                i_in_block = countr_0(~bs->set_[start_block]);
-                if (i_in_block != BLOCK_BITS)
-                {
-                    return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
-                }
-            }
-        }
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        i_in_block = countr_0(last_block_on & ~bs->set_[end_block]);
+        return -1;
+    }
+    /* Handle all values in between start and end in bulk. */
+    for (++start_block; start_block < end_block; ++start_block)
+    {
+        i_in_block = countr_0(~bs->set_[start_block]);
         if (i_in_block != BLOCK_BITS)
         {
-            return ((ptrdiff_t)(end_block * BLOCK_BITS)) + i_in_block;
+            return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
         }
+    }
+    /* Handle last block. */
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    i_in_block = countr_0(last_block_on & ~bs->set_[end_block]);
+    if (i_in_block != BLOCK_BITS)
+    {
+        return ((ptrdiff_t)(end_block * BLOCK_BITS)) + i_in_block;
     }
     return -1;
 }
@@ -548,7 +546,7 @@ any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         return CCC_BOOL_ERR;
     }
-    size_t const start_block = block_i(i);
+    size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
@@ -560,24 +558,21 @@ any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
         return ret;
     }
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (end_block == start_block)
     {
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        if (last_block_on & bs->set_[end_block])
+        return !ret;
+    }
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    if (last_block_on & bs->set_[end_block])
+    {
+        return ret;
+    }
+    for (++start_block; start_block < end_block; ++start_block)
+    {
+        if (bs->set_[start_block] & ALL_ON)
         {
             return ret;
-        }
-        if (end_block - start_block > 1)
-        {
-            for (size_t block = start_block + 1; block < end_block; ++block)
-            {
-                if (bs->set_[block] & ALL_ON)
-                {
-                    return ret;
-                }
-            }
         }
     }
     return !ret;
@@ -594,7 +589,7 @@ all_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         return CCC_BOOL_ERR;
     }
-    size_t const start_block = block_i(i);
+    size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
@@ -606,24 +601,21 @@ all_range(struct ccc_bitset_ const *const bs, size_t const i,
         return CCC_FALSE;
     }
     size_t const end_block = block_i(end - 1);
-    if (end_block != start_block)
+    if (end_block == start_block)
     {
-        size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-        ccc_bitblock_ last_block_on
-            = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
-        if ((last_block_on & bs->set_[end_block]) != last_block_on)
+        return CCC_TRUE;
+    }
+    size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    if ((last_block_on & bs->set_[end_block]) != last_block_on)
+    {
+        return CCC_FALSE;
+    }
+    for (++start_block; start_block < end_block; ++start_block)
+    {
+        if (bs->set_[start_block] != ALL_ON)
         {
             return CCC_FALSE;
-        }
-        if (end_block - start_block > 1)
-        {
-            for (size_t block = start_block + 1; block < end_block; ++block)
-            {
-                if (bs->set_[block] != ALL_ON)
-                {
-                    return CCC_FALSE;
-                }
-            }
         }
     }
     return CCC_TRUE;
