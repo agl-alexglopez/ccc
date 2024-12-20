@@ -25,11 +25,16 @@ static ccc_tribool any_or_none_range(struct ccc_bitset_ const *, size_t i,
                                      size_t count, ccc_tribool);
 static ccc_tribool all_range(struct ccc_bitset_ const *bs, size_t i,
                              size_t count);
-static ptrdiff_t first_trailing_1_range(struct ccc_bitset_ const *bs, size_t i,
-                                        size_t count);
-static ptrdiff_t first_trailing_0_range(struct ccc_bitset_ const *bs, size_t i,
-                                        size_t count);
+static ptrdiff_t first_trailing_one_range(struct ccc_bitset_ const *bs,
+                                          size_t i, size_t count);
+static ptrdiff_t first_trailing_zero_range(struct ccc_bitset_ const *bs,
+                                           size_t i, size_t count);
+static ptrdiff_t first_leading_one_range(struct ccc_bitset_ const *bs, size_t i,
+                                         size_t count);
+static ptrdiff_t first_leading_zero_range(struct ccc_bitset_ const *bs,
+                                          size_t i, size_t count);
 static ptrdiff_t countr_0(ccc_bitblock_);
+static ptrdiff_t countl_0(ccc_bitblock_);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -413,36 +418,62 @@ ccc_bs_all(ccc_bitset const *const bs)
 }
 
 ptrdiff_t
-ccc_bs_first_trailing_1_range(ccc_bitset const *const bs, size_t const i,
-                              size_t const count)
+ccc_bs_first_trailing_one_range(ccc_bitset const *const bs, size_t const i,
+                                size_t const count)
 {
-    return first_trailing_1_range(bs, i, count);
+    return first_trailing_one_range(bs, i, count);
 }
 
 ptrdiff_t
-ccc_bs_first_trailing_1(ccc_bitset const *const bs)
+ccc_bs_first_trailing_one(ccc_bitset const *const bs)
 {
-    return first_trailing_1_range(bs, 0, bs->cap_);
+    return first_trailing_one_range(bs, 0, bs->cap_);
 }
 
 ptrdiff_t
-ccc_bs_first_trailing_0_range(ccc_bitset const *const bs, size_t const i,
-                              size_t const count)
+ccc_bs_first_trailing_zero_range(ccc_bitset const *const bs, size_t const i,
+                                 size_t const count)
 {
-    return first_trailing_0_range(bs, i, count);
+    return first_trailing_zero_range(bs, i, count);
 }
 
 ptrdiff_t
-ccc_bs_first_trailing_0(ccc_bitset const *const bs)
+ccc_bs_first_trailing_zero(ccc_bitset const *const bs)
 {
-    return first_trailing_0_range(bs, 0, bs->cap_);
+    return first_trailing_zero_range(bs, 0, bs->cap_);
+}
+
+ptrdiff_t
+ccc_bs_first_leading_one_range(ccc_bitset const *const bs, size_t const i,
+                               size_t const count)
+{
+    return first_leading_one_range(bs, i, count);
+}
+
+ptrdiff_t
+ccc_bs_first_leading_one(ccc_bitset const *const bs)
+{
+    return first_leading_one_range(bs, bs->cap_ - 1, bs->cap_);
+}
+
+ptrdiff_t
+ccc_bs_first_leading_zero_range(ccc_bitset const *const bs, size_t const i,
+                                size_t const count)
+{
+    return first_leading_zero_range(bs, i, count);
+}
+
+ptrdiff_t
+ccc_bs_first_leading_zero(ccc_bitset const *const bs)
+{
+    return first_leading_zero_range(bs, bs->cap_ - 1, bs->cap_);
 }
 
 /*=======================    Static Helpers    ==============================*/
 
 static inline ptrdiff_t
-first_trailing_1_range(struct ccc_bitset_ const *const bs, size_t const i,
-                       size_t const count)
+first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
+                         size_t const count)
 {
     size_t const end = i + count;
     if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
@@ -487,8 +518,8 @@ first_trailing_1_range(struct ccc_bitset_ const *const bs, size_t const i,
 }
 
 static inline ptrdiff_t
-first_trailing_0_range(struct ccc_bitset_ const *const bs, size_t const i,
-                       size_t const count)
+first_trailing_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
+                          size_t const count)
 {
     size_t const end = i + count;
     if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i)
@@ -528,6 +559,108 @@ first_trailing_0_range(struct ccc_bitset_ const *const bs, size_t const i,
     if (i_in_block != BLOCK_BITS)
     {
         return ((ptrdiff_t)(end_block * BLOCK_BITS)) + i_in_block;
+    }
+    return -1;
+}
+
+static inline ptrdiff_t
+first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
+                        size_t const count)
+{
+    if (!bs || i >= bs->cap_ || count > bs->cap_ || (ptrdiff_t)(i - count) < -1)
+    {
+        return -1;
+    }
+    ptrdiff_t const end = (ptrdiff_t)(i - count);
+    ptrdiff_t start_block = (ptrdiff_t)block_i(i);
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on
+        = ALL_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
+    if (end >= 0 && i - end < BLOCK_BITS)
+    {
+        first_block_on &= (ALL_ON << (BLOCK_BITS - (i - end)));
+    }
+    ptrdiff_t lead_zeros = countl_0(first_block_on & bs->set_[start_block]);
+    if (lead_zeros != BLOCK_BITS)
+    {
+        return (ptrdiff_t)((start_block * BLOCK_BITS)
+                           + (BLOCK_BITS - lead_zeros - 1));
+    }
+    ptrdiff_t const end_block = (ptrdiff_t)block_i(end + 1);
+    if (end_block == start_block)
+    {
+        return -1;
+    }
+    /* Handle all values in between start and end in bulk. */
+    for (--start_block; start_block > end_block; --start_block)
+    {
+        lead_zeros = countl_0(bs->set_[start_block]);
+        if (lead_zeros != BLOCK_BITS)
+        {
+            return (ptrdiff_t)((start_block * BLOCK_BITS)
+                               + (BLOCK_BITS - lead_zeros - 1));
+        }
+    }
+    /* Handle last block. */
+    size_t const end_i_in_block = (end + 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on
+        = ~(ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
+    lead_zeros = countl_0(last_block_on & bs->set_[end_block]);
+    if (lead_zeros != BLOCK_BITS)
+    {
+        return (ptrdiff_t)((end_block * BLOCK_BITS)
+                           + (BLOCK_BITS - lead_zeros - 1));
+    }
+    return -1;
+}
+
+static inline ptrdiff_t
+first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
+                         size_t const count)
+{
+    if (!bs || i >= bs->cap_ || count > bs->cap_ || (ptrdiff_t)(i - count) < -1)
+    {
+        return -1;
+    }
+    ptrdiff_t const end = (ptrdiff_t)(i - count);
+    ptrdiff_t start_block = (ptrdiff_t)block_i(i);
+    size_t const start_i_in_block = i % BLOCK_BITS;
+    ccc_bitblock_ first_block_on
+        = ALL_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
+    if (end >= 0 && i - end < BLOCK_BITS)
+    {
+        first_block_on &= (ALL_ON << (BLOCK_BITS - (i - end)));
+    }
+    ptrdiff_t lead_zeros = countl_0(first_block_on & ~bs->set_[start_block]);
+    if (lead_zeros != BLOCK_BITS)
+    {
+        return (ptrdiff_t)((start_block * BLOCK_BITS)
+                           + (BLOCK_BITS - lead_zeros - 1));
+    }
+    ptrdiff_t const end_block = (ptrdiff_t)block_i(end + 1);
+    if (end_block == start_block)
+    {
+        return -1;
+    }
+    /* Handle all values in between start and end in bulk. */
+    for (--start_block; start_block > end_block; --start_block)
+    {
+        lead_zeros = countl_0(~bs->set_[start_block]);
+        if (lead_zeros != BLOCK_BITS)
+        {
+            return (ptrdiff_t)((start_block * BLOCK_BITS)
+                               + (BLOCK_BITS - lead_zeros - 1));
+        }
+    }
+    /* Handle last block. */
+    size_t const end_i_in_block = (end + 1) % BLOCK_BITS;
+    ccc_bitblock_ last_block_on
+        = ~(ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
+    lead_zeros = countl_0(last_block_on & ~bs->set_[end_block]);
+    if (lead_zeros != BLOCK_BITS)
+    {
+        return (ptrdiff_t)((end_block * BLOCK_BITS)
+                           + (BLOCK_BITS - lead_zeros - 1));
     }
     return -1;
 }
@@ -696,7 +829,7 @@ countr_0(ccc_bitblock_ const b)
 #if defined(__GNUC__) || defined(__clang__)
     static_assert(BITBLOCK_MSB < ALL_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
-    return b ? __builtin_ctz(b) : (ptrdiff_t)BLOCK_BITS;
+    return __builtin_ctzg(b, (int)BLOCK_BITS);
 #else
     static_assert(BITBLOCK_MSB < ALL_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
@@ -706,6 +839,27 @@ countr_0(ccc_bitblock_ const b)
     }
     ptrdiff_t cnt = 0;
     for (; !(b & 1U); ++cnt, b >>= 1U)
+    {}
+    return cnt;
+#endif
+}
+
+static inline ptrdiff_t
+countl_0(ccc_bitblock_ const b)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    return __builtin_clzg(b, (int)BLOCK_BITS);
+#else
+    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    if (!b)
+    {
+        return (ptrdiff_t)BLOCK_BITS;
+    }
+    ptrdiff_t cnt = 0;
+    for (; !(b & BITBLOCK_MSB); ++cnt, b <<= 1U)
     {}
     return cnt;
 #endif

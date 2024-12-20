@@ -324,7 +324,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_all)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(bs_test_first_1)
+CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_one)
 {
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
@@ -333,14 +333,14 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_1)
     for (size_t i = 0, end = 512; i < end - 1; ++i)
     {
         CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
-        CHECK(ccc_bs_first_trailing_1(&bs), i + 1);
-        CHECK(ccc_bs_first_trailing_1_range(&bs, 0, i + 1), -1);
-        CHECK(ccc_bs_first_trailing_1_range(&bs, i, end - i), i + 1);
+        CHECK(ccc_bs_first_trailing_one(&bs), i + 1);
+        CHECK(ccc_bs_first_trailing_one_range(&bs, 0, i + 1), -1);
+        CHECK(ccc_bs_first_trailing_one_range(&bs, i, end - i), i + 1);
     }
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(bs_test_first_0)
+CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zero)
 {
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
@@ -348,9 +348,42 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_0)
     for (size_t i = 0, end = 512; i < end - 1; ++i)
     {
         CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
-        CHECK(ccc_bs_first_trailing_0(&bs), i + 1);
-        CHECK(ccc_bs_first_trailing_0_range(&bs, 0, i + 1), -1);
-        CHECK(ccc_bs_first_trailing_0_range(&bs, i, end - i), i + 1);
+        CHECK(ccc_bs_first_trailing_zero(&bs), i + 1);
+        CHECK(ccc_bs_first_trailing_zero_range(&bs, 0, i + 1), -1);
+        CHECK(ccc_bs_first_trailing_zero_range(&bs, i, end - i), i + 1);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_leading_one)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const last_i = 511;
+    /* Start with an almost full range and reduce by moving start backwards. */
+    for (size_t i = last_i; i > 1; --i)
+    {
+        CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
+        CHECK(ccc_bs_first_leading_one(&bs), i - 1);
+        CHECK(ccc_bs_first_leading_one_range(&bs, last_i, 512 - i), -1);
+        CHECK(ccc_bs_first_leading_one_range(&bs, i, i + 1), i - 1);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zero)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    size_t const last_i = 511;
+    /* Start with an almost full range and reduce by moving start backwards. */
+    for (size_t i = last_i; i > 1; --i)
+    {
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+        CHECK(ccc_bs_first_leading_zero(&bs), i - 1);
+        CHECK(ccc_bs_first_leading_zero_range(&bs, last_i, 512 - i), -1);
+        CHECK(ccc_bs_first_leading_zero_range(&bs, i, i + 1), i - 1);
     }
     CHECK_END_FN();
 }
@@ -488,11 +521,12 @@ done:
 int
 main(void)
 {
-    return CHECK_RUN(bs_test_set_one(), bs_test_set_shuffled(),
-                     bs_test_set_all(), bs_test_set_range(), bs_test_reset(),
-                     bs_test_flip(), bs_test_flip_all(), bs_test_flip_range(),
-                     bs_test_reset_all(), bs_test_reset_range(), bs_test_any(),
-                     bs_test_all(), bs_test_none(), bs_test_first_1(),
-                     bs_test_first_0(), bs_test_valid_sudoku(),
-                     bs_test_invalid_sudoku());
+    return CHECK_RUN(
+        bs_test_set_one(), bs_test_set_shuffled(), bs_test_set_all(),
+        bs_test_set_range(), bs_test_reset(), bs_test_flip(),
+        bs_test_flip_all(), bs_test_flip_range(), bs_test_reset_all(),
+        bs_test_reset_range(), bs_test_any(), bs_test_all(), bs_test_none(),
+        bs_test_first_trailing_one(), bs_test_first_trailing_zero(),
+        bs_test_first_leading_one(), bs_test_first_leading_zero(),
+        bs_test_valid_sudoku(), bs_test_invalid_sudoku());
 }
