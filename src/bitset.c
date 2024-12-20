@@ -631,11 +631,11 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         first_block_on &= (ALL_ON << (BLOCK_BITS - (i - end)));
     }
-    ptrdiff_t lead_zeros = countl_0(first_block_on & ~bs->set_[start_block]);
-    if (lead_zeros != BLOCK_BITS)
+    ptrdiff_t lead_ones = countl_0(first_block_on & ~bs->set_[start_block]);
+    if (lead_ones != BLOCK_BITS)
     {
         return (ptrdiff_t)((start_block * BLOCK_BITS)
-                           + (BLOCK_BITS - lead_zeros - 1));
+                           + (BLOCK_BITS - lead_ones - 1));
     }
     ptrdiff_t const end_block = (ptrdiff_t)block_i(end + 1);
     if (end_block == start_block)
@@ -645,22 +645,22 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (--start_block; start_block > end_block; --start_block)
     {
-        lead_zeros = countl_0(~bs->set_[start_block]);
-        if (lead_zeros != BLOCK_BITS)
+        lead_ones = countl_0(~bs->set_[start_block]);
+        if (lead_ones != BLOCK_BITS)
         {
             return (ptrdiff_t)((start_block * BLOCK_BITS)
-                               + (BLOCK_BITS - lead_zeros - 1));
+                               + (BLOCK_BITS - lead_ones - 1));
         }
     }
     /* Handle last block. */
     size_t const end_i_in_block = (end + 1) % BLOCK_BITS;
     ccc_bitblock_ last_block_on
         = ~(ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
-    lead_zeros = countl_0(last_block_on & ~bs->set_[end_block]);
-    if (lead_zeros != BLOCK_BITS)
+    lead_ones = countl_0(last_block_on & ~bs->set_[end_block]);
+    if (lead_ones != BLOCK_BITS)
     {
         return (ptrdiff_t)((end_block * BLOCK_BITS)
-                           + (BLOCK_BITS - lead_zeros - 1));
+                           + (BLOCK_BITS - lead_ones - 1));
     }
     return -1;
 }
