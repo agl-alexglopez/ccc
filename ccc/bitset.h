@@ -277,6 +277,24 @@ if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
 ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, size_t i, size_t count);
 
+/** @brief Return the index of the first bit set to 1 in the set.
+@param [in] bs a pointer to the bit set.
+@return the index of the first bit set to 1 or -1 if no 1 bit is found or bs in
+NULL. */
+ptrdiff_t ccc_bs_first_1(ccc_bitset const *bs);
+
+/** @brief Return the index of the first bit set to 1 in the range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting index to search.
+@param [in] count the size of the range to check.
+@return the index of the first bit set to 1 or -1 if no 1 bit is found, bs is
+NULL, or the range is invalid.
+@warning the user must validate their own range. A bit does not exist in an
+invalid range therefore -1 is returned. To distinguish a valid negative result
+signifying not found and a negative result indicating a range error the user
+must check their input. */
+ptrdiff_t ccc_bs_first_1_range(ccc_bitset const *bs, size_t i, size_t count);
+
 /**@}*/
 
 #endif /* CCC_BITSET */
