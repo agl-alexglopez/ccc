@@ -333,9 +333,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_1)
     for (size_t i = 0, end = 512; i < end - 1; ++i)
     {
         CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
-        CHECK(ccc_bs_first_1(&bs), i + 1);
-        CHECK(ccc_bs_first_1_range(&bs, 0, i + 1), -1);
-        CHECK(ccc_bs_first_1_range(&bs, i, end - i), i + 1);
+        CHECK(ccc_bs_first_trailing_1(&bs), i + 1);
+        CHECK(ccc_bs_first_trailing_1_range(&bs, 0, i + 1), -1);
+        CHECK(ccc_bs_first_trailing_1_range(&bs, i, end - i), i + 1);
     }
     CHECK_END_FN();
 }
@@ -348,9 +348,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_0)
     for (size_t i = 0, end = 512; i < end - 1; ++i)
     {
         CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
-        CHECK(ccc_bs_first_0(&bs), i + 1);
-        CHECK(ccc_bs_first_0_range(&bs, 0, i + 1), -1);
-        CHECK(ccc_bs_first_0_range(&bs, i, end - i), i + 1);
+        CHECK(ccc_bs_first_trailing_0(&bs), i + 1);
+        CHECK(ccc_bs_first_trailing_0_range(&bs, 0, i + 1), -1);
+        CHECK(ccc_bs_first_trailing_0_range(&bs, i, end - i), i + 1);
     }
     CHECK_END_FN();
 }
