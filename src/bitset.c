@@ -2,7 +2,6 @@
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
-#include <strings.h>
 
 #include "bitset.h"
 #include "impl/impl_bitset.h"
