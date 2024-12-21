@@ -219,47 +219,47 @@ ccc_result ccc_bs_flip_range(ccc_bitset *bs, size_t i, size_t count);
 Find bits with a specific status. */
 /**@{*/
 
-/** @brief Return true if any bits in set are on.
+/** @brief Return true if any bits in set are 1.
 @param [in] bs a pointer to the bit set.
-@return CCC_TRUE if any bits are on, CCC_FALSE if no bits are on, CCC_BOOL_ERR
+@return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR
 if bs is NULL. */
 ccc_tribool ccc_bs_any(ccc_bitset const *bs);
 
-/** @brief Return true if any bits are on in the specified range.
+/** @brief Return true if any bits are 1 in the specified range.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
-@return CCC_TRUE if any bits are on, CCC_FALSE if no bits are on, CCC_BOOL_ERR
+@return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR
 if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
 ccc_tribool ccc_bs_any_range(ccc_bitset const *bs, size_t i, size_t count);
 
-/** @brief Return true if no bits in set are on.
+/** @brief Return true if all bits are set to 0.
 @param [in] bs a pointer to the bit set.
-@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+@return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR
 if bs is NULL. */
 ccc_tribool ccc_bs_none(ccc_bitset const *bs);
 
-/** @brief Return true if no bits are on in the specified range.
+/** @brief Return true if all bits are 0 in the specified range.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
-@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+@return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR
 if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
 ccc_tribool ccc_bs_none_range(ccc_bitset const *bs, size_t i, size_t count);
 
-/** @brief Return true if no bits in set are on.
+/** @brief Return true if all bits in set are 1.
 @param [in] bs a pointer to the bit set.
-@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+@return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR
 if bs is NULL. */
 ccc_tribool ccc_bs_all(ccc_bitset const *bs);
 
-/** @brief Return true if no bits are on in the specified range.
+/** @brief Return true if all bits are set to 1 in the specified range.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
-@return CCC_TRUE if no bits are on, CCC_FALSE if any bits are on, CCC_BOOL_ERR
+@return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR
 if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
 ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, size_t i, size_t count);
@@ -284,6 +284,25 @@ must check their input. */
 ptrdiff_t ccc_bs_first_trailing_one_range(ccc_bitset const *bs, size_t i,
                                           size_t count);
 
+/** @brief Return the index of the first bit set to 0 in the set.
+@param [in] bs a pointer to the bit set.
+@return the index of the first bit set to 0 or -1 if no 0 bit is found or bs in
+NULL. */
+ptrdiff_t ccc_bs_first_trailing_zero(ccc_bitset const *bs);
+
+/** @brief Return the index of the first bit set to 0 in the range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting index to search.
+@param [in] count the size of the range to check.
+@return the index of the first bit set to 0 or -1 if no 0 bit is found, bs is
+NULL, or the range is invalid.
+@warning the user must validate their own range. A bit does not exist in an
+invalid range therefore -1 is returned. To distinguish a valid negative result
+signifying not found and a negative result indicating a range error the user
+must check their input. */
+ptrdiff_t ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
+                                           size_t count);
+
 /** @brief Return the index of the first leading bit set to 1 in the set,
 starting from the Most Significant Bit at index size - 1.
 @param [in] bs a pointer to the bit set.
@@ -304,25 +323,6 @@ signifying not found and a negative result indicating a range error the user
 must check their input. */
 ptrdiff_t ccc_bs_first_leading_one_range(ccc_bitset const *bs, size_t i,
                                          size_t count);
-
-/** @brief Return the index of the first bit set to 0 in the set.
-@param [in] bs a pointer to the bit set.
-@return the index of the first bit set to 0 or -1 if no 0 bit is found or bs in
-NULL. */
-ptrdiff_t ccc_bs_first_trailing_zero(ccc_bitset const *bs);
-
-/** @brief Return the index of the first bit set to 0 in the range.
-@param [in] bs a pointer to the bit set.
-@param [in] i the starting index to search.
-@param [in] count the size of the range to check.
-@return the index of the first bit set to 0 or -1 if no 0 bit is found, bs is
-NULL, or the range is invalid.
-@warning the user must validate their own range. A bit does not exist in an
-invalid range therefore -1 is returned. To distinguish a valid negative result
-signifying not found and a negative result indicating a range error the user
-must check their input. */
-ptrdiff_t ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
-                                           size_t count);
 
 /** @brief Return the index of the first leading bit set to 0 in the set,
 starting from the Most Significant Bit at index size - 1.
