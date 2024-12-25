@@ -8,7 +8,7 @@
 #include "types.h"
 
 #define BLOCK_BITS (sizeof(ccc_bitblock_) * CHAR_BIT)
-#define ALL_ON ((ccc_bitblock_)~0)
+#define ALL_BITS_ON ((ccc_bitblock_)~0)
 #define BITBLOCK_MSB                                                           \
     (((ccc_bitblock_)1) << (((sizeof(ccc_bitblock_) * CHAR_BIT)) - 1))
 
@@ -130,10 +130,11 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     if (b)
     {
@@ -156,7 +157,8 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
                      (end_block - start_block) * sizeof(ccc_bitblock_));
     }
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     if (b)
     {
         bs->set_[end_block] |= last_block_on;
@@ -223,10 +225,11 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     bs->set_[start_block] &= ~first_block_on;
     size_t const end_block = block_i(end - 1);
@@ -241,7 +244,8 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
                      (end_block - start_block) * sizeof(ccc_bitblock_));
     }
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     bs->set_[end_block] &= ~last_block_on;
     bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
     return CCC_OK;
@@ -307,10 +311,11 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     bs->set_[start_block] ^= first_block_on;
     size_t const end_block = block_i(end - 1);
@@ -324,7 +329,8 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
         bs->set_[start_block] = ~bs->set_[start_block];
     }
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     bs->set_[end_block] ^= last_block_on;
     bs->set_[block_i(bs->cap_ - 1)] &= last_on(bs);
     return CCC_OK;
@@ -366,10 +372,11 @@ ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
     ptrdiff_t popped = 0;
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     popped += popcount(first_block_on & bs->set_[start_block]);
     size_t const end_block = block_i(end - 1);
@@ -381,7 +388,8 @@ ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
          popped += popcount(bs->set_[start_block++]))
     {}
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     popped += popcount(last_block_on & bs->set_[end_block]);
     return popped;
 }
@@ -494,10 +502,11 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     ptrdiff_t i_in_block = countr_0(first_block_on & bs->set_[start_block]);
     if (i_in_block != BLOCK_BITS)
@@ -520,7 +529,8 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     /* Handle last block. */
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     i_in_block = countr_0(last_block_on & bs->set_[end_block]);
     if (i_in_block != BLOCK_BITS)
     {
@@ -571,6 +581,7 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
             /* Fail but we have largest skip possible to continue our search
                from in order to save double checking unnecessary prefixes. */
             set_start_i = (cur_block * BLOCK_BITS) + (ptrdiff_t)found.block_i;
+            /* This should always be 0 I think. */
             num_found = found.count;
         }
         block_i = 0;
@@ -583,7 +594,10 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
    number of consecutive ones needed cannot be found the function returns where
    the next search should start from. If the block is all zeros or the search
    must start at the next block the BLOCK_BITS index is returned with a group
-   size of 0. */
+   size of 0. The caller should determine based on the return value if the
+   sequence is continuing as required from index 0 or has restarted. This
+   function does not partake in the larger group seeking logic, only focusing
+   on the largest contiguous group of ones possible. */
 static inline struct block_group
 max_ones_in_block(ccc_bitblock_ const b, size_t const i_in_block,
                   size_t const ones_remaining)
@@ -608,8 +622,10 @@ max_ones_in_block(ccc_bitblock_ const b, size_t const i_in_block,
        the most work required in this algorithm. We have some tricks to tell
        when to give up on this as soon as possible. */
     ccc_bitblock_ shifted = b >> i_in_block;
-    ccc_bitblock_ const required_ones = ALL_ON >> (BLOCK_BITS - ones_remaining);
-    /* Because of power of 2 rules */
+    ccc_bitblock_ const required_ones
+        = ALL_BITS_ON >> (BLOCK_BITS - ones_remaining);
+    /* Because of power of 2 rules we can stop early when the shifted becomes
+       impossible to match. */
     for (size_t shifts = 0; shifted >= required_ones; shifted >>= 1, ++shifts)
     {
         if ((required_ones & shifted) == required_ones)
@@ -637,10 +653,11 @@ first_trailing_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     ptrdiff_t i_in_block = countr_0(first_block_on & ~bs->set_[start_block]);
     if (i_in_block != BLOCK_BITS)
@@ -663,7 +680,8 @@ first_trailing_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     /* Handle last block. */
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     i_in_block = countr_0(last_block_on & ~bs->set_[end_block]);
     if (i_in_block != BLOCK_BITS)
     {
@@ -684,10 +702,10 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     ptrdiff_t start_block = (ptrdiff_t)block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on
-        = ALL_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
+        = ALL_BITS_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
     if (end >= 0 && i - end < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON << (BLOCK_BITS - (i - end)));
+        first_block_on &= (ALL_BITS_ON << (BLOCK_BITS - (i - end)));
     }
     ptrdiff_t lead_zeros = countl_0(first_block_on & bs->set_[start_block]);
     if (lead_zeros != BLOCK_BITS)
@@ -713,7 +731,7 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle last block. */
     size_t const end_i_in_block = (end + 1) % BLOCK_BITS;
     ccc_bitblock_ last_block_on
-        = ~(ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
+        = ~(ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
     lead_zeros = countl_0(last_block_on & bs->set_[end_block]);
     if (lead_zeros != BLOCK_BITS)
     {
@@ -735,10 +753,10 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     ptrdiff_t start_block = (ptrdiff_t)block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on
-        = ALL_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
+        = ALL_BITS_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
     if (end >= 0 && i - end < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON << (BLOCK_BITS - (i - end)));
+        first_block_on &= (ALL_BITS_ON << (BLOCK_BITS - (i - end)));
     }
     ptrdiff_t lead_ones = countl_0(first_block_on & ~bs->set_[start_block]);
     if (lead_ones != BLOCK_BITS)
@@ -764,7 +782,7 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle last block. */
     size_t const end_i_in_block = (end + 1) % BLOCK_BITS;
     ccc_bitblock_ last_block_on
-        = ~(ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
+        = ~(ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1));
     lead_ones = countl_0(last_block_on & ~bs->set_[end_block]);
     if (lead_ones != BLOCK_BITS)
     {
@@ -789,10 +807,11 @@ any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     if (first_block_on & bs->set_[start_block])
     {
@@ -806,14 +825,15 @@ any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* If this is the any check we might get lucky by checking the last block
        before looping over everything. */
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     if (last_block_on & bs->set_[end_block])
     {
         return ret;
     }
     for (++start_block; start_block < end_block; ++start_block)
     {
-        if (bs->set_[start_block] & ALL_ON)
+        if (bs->set_[start_block] & ALL_BITS_ON)
         {
             return ret;
         }
@@ -834,10 +854,11 @@ all_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     size_t start_block = block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
-    ccc_bitblock_ first_block_on = ALL_ON << start_i_in_block;
+    ccc_bitblock_ first_block_on = ALL_BITS_ON << start_i_in_block;
     if (start_i_in_block + count < BLOCK_BITS)
     {
-        first_block_on &= (ALL_ON >> (BLOCK_BITS - (start_i_in_block + count)));
+        first_block_on
+            &= (ALL_BITS_ON >> (BLOCK_BITS - (start_i_in_block + count)));
     }
     if ((first_block_on & bs->set_[start_block]) != first_block_on)
     {
@@ -850,13 +871,14 @@ all_range(struct ccc_bitset_ const *const bs, size_t const i,
     }
     for (++start_block; start_block < end_block; ++start_block)
     {
-        if (bs->set_[start_block] != ALL_ON)
+        if (bs->set_[start_block] != ALL_BITS_ON)
         {
             return CCC_FALSE;
         }
     }
     size_t const end_i_in_block = (end - 1) % BLOCK_BITS;
-    ccc_bitblock_ last_block_on = ALL_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
+    ccc_bitblock_ last_block_on
+        = ALL_BITS_ON >> ((BLOCK_BITS - end_i_in_block) - 1);
     if ((last_block_on & bs->set_[end_block]) != last_block_on)
     {
         return CCC_FALSE;
@@ -903,7 +925,7 @@ last_on(struct ccc_bitset_ const *const bs)
        order bit which is why we do the second funky flip on the whole op. */
     return bs->cap_
                ? ~(((ccc_bitblock_)~1) << ((size_t)(bs->cap_ - 1) % BLOCK_BITS))
-               : ALL_ON;
+               : ALL_BITS_ON;
 }
 
 static inline size_t
@@ -938,11 +960,11 @@ static inline ptrdiff_t
 countr_0(ccc_bitblock_ const b)
 {
 #if defined(__GNUC__) || defined(__clang__)
-    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     return b ? __builtin_ctz(b) : (ptrdiff_t)BLOCK_BITS;
 #else
-    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     if (!b)
     {
@@ -959,11 +981,11 @@ static inline ptrdiff_t
 countl_0(ccc_bitblock_ const b)
 {
 #if defined(__GNUC__) || defined(__clang__)
-    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     return b ? __builtin_clz(b) : (ptrdiff_t)BLOCK_BITS;
 #else
-    static_assert(BITBLOCK_MSB < ALL_ON);
+    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     if (!b)
     {
