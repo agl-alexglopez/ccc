@@ -555,7 +555,8 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
                           size_t const count, size_t const num_ones)
 {
     size_t const end = i + count;
-    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i || !num_ones)
+    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i || !num_ones
+        || num_ones > count)
     {
         return -1;
     }
@@ -565,8 +566,14 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
     size_t block_i = i % BLOCK_BITS;
     while (set_start_i + num_ones <= end)
     {
-        struct block_group const found = max_ones_in_block(
-            bs->set_[cur_block], block_i, num_ones - num_found);
+        ccc_bitblock_ bits_in_range
+            = bs->set_[cur_block] & (ALL_BITS_ON << block_i);
+        if ((cur_block * BLOCK_BITS) + BLOCK_BITS > end)
+        {
+            bits_in_range &= (ALL_BITS_ON >> (BLOCK_BITS - (end % BLOCK_BITS)));
+        }
+        struct block_group const found
+            = max_ones_in_block(bits_in_range, block_i, num_ones - num_found);
         if (found.count >= num_ones)
         {
             /* Found the solution all at once within a block. */
@@ -614,10 +621,6 @@ max_ones_in_block(ccc_bitblock_ b, size_t const i_in_block,
     {
         return (struct block_group){.block_i = BLOCK_BITS};
     }
-    /* For any results we achieve, we must only report them from the index in
-       the block onward. The search may be starting from a specified range.
-       Pretend that any bits before the index in the block don't exist. */
-    b &= (ALL_BITS_ON << i_in_block);
     if (ones_remaining > (ptrdiff_t)BLOCK_BITS)
     {
         /* The best we could do is find that we have a block of all 1's, which
