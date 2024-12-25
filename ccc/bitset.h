@@ -284,6 +284,9 @@ must check their input. */
 ptrdiff_t ccc_bs_first_trailing_one_range(ccc_bitset const *bs, size_t i,
                                           size_t count);
 
+/** TODO */
+ptrdiff_t ccc_bs_first_trailing_ones(ccc_bitset const *bs, size_t num_ones);
+
 /** @brief Return the index of the first bit set to 0 in the set.
 @param [in] bs a pointer to the bit set.
 @return the index of the first bit set to 0 or -1 if no 0 bit is found or bs in
