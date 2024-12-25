@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -340,6 +341,24 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_one)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    size_t const window = sizeof(ccc_bitblock_) * CHAR_BIT;
+    /* Slide a group of the required size as a window across the set. */
+    for (size_t i = 0; i < (512 - window); ++i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_first_trailing_ones(&bs, window), i);
+        CHECK(ccc_bs_first_trailing_ones(&bs, window - 1), i);
+        CHECK(ccc_bs_first_trailing_ones(&bs, window + 1), -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
+    }
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zero)
 {
     ccc_bitset bs
@@ -526,7 +545,8 @@ main(void)
         bs_test_set_range(), bs_test_reset(), bs_test_flip(),
         bs_test_flip_all(), bs_test_flip_range(), bs_test_reset_all(),
         bs_test_reset_range(), bs_test_any(), bs_test_all(), bs_test_none(),
-        bs_test_first_trailing_one(), bs_test_first_trailing_zero(),
-        bs_test_first_leading_one(), bs_test_first_leading_zero(),
-        bs_test_valid_sudoku(), bs_test_invalid_sudoku());
+        bs_test_first_trailing_one(), bs_test_first_trailing_ones(),
+        bs_test_first_trailing_zero(), bs_test_first_leading_one(),
+        bs_test_first_leading_zero(), bs_test_valid_sudoku(),
+        bs_test_invalid_sudoku());
 }
