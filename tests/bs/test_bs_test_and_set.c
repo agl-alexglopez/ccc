@@ -345,7 +345,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
 {
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
-    size_t const window = sizeof(ccc_bitblock_) * CHAR_BIT;
+    size_t const window = sizeof(unsigned) * CHAR_BIT;
     /* Slide a group of the required size as a window across the set. */
     for (size_t i = 0; i < (512 - window); ++i)
     {
