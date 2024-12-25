@@ -353,6 +353,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
         CHECK(ccc_bs_first_trailing_ones(&bs, window), i);
         CHECK(ccc_bs_first_trailing_ones(&bs, window - 1), i);
         CHECK(ccc_bs_first_trailing_ones(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, i + 1, window, window), -1);
         /* Cleanup behind as we go. */
         CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }

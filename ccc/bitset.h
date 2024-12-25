@@ -284,8 +284,33 @@ must check their input. */
 ptrdiff_t ccc_bs_first_trailing_one_range(ccc_bitset const *bs, size_t i,
                                           size_t count);
 
-/** TODO */
+/** @brief Returns the index of the start of the first trailing num_ones
+contiguous 1 bits.
+@param [in] bs a pointer to the bit set.
+@param [in] num_ones the number of trailing contiguous 1 bits to find.
+@return the index in a search starting from the Least Significant Bit of the
+set of the first 1 in a sequence of num_ones 1 bits. If the input is invalid
+or such a sequence cannot be found -1 is returned.
+@warning the user must validate that bs is non-NULL and num_ones is less than
+the size of the set in order to distinguish -1 returned as a result of a failed
+search or bad input. */
 ptrdiff_t ccc_bs_first_trailing_ones(ccc_bitset const *bs, size_t num_ones);
+
+/** @brief Returns the index of the start of the first trailing num_ones
+contiguous 1 bits in the specified range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting index to search.
+@param [in] count the size of the range to check.
+@param [in] num_ones the number of trailing contiguous 1 bits to find.
+@return the index in a search starting from the Least Significant Bit of the
+range of the first 1 in a sequence of num_ones 1 bits. If the input is invalid
+or such a sequence cannot be found -1 is returned.
+@warning the user must validate their own range. A group of 1's does not exist
+in an invalid range therefore -1 is returned. To distinguish a valid negative
+result signifying not found and a negative result indicating a range error the
+user must check their input. */
+ptrdiff_t ccc_bs_first_trailing_ones_range(ccc_bitset const *bs, size_t i,
+                                           size_t count, size_t num_ones);
 
 /** @brief Return the index of the first bit set to 0 in the set.
 @param [in] bs a pointer to the bit set.
