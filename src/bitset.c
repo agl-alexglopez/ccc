@@ -451,6 +451,13 @@ ccc_bs_first_trailing_ones(ccc_bitset const *const bs, size_t const num_ones)
 }
 
 ptrdiff_t
+ccc_bs_first_trailing_ones_range(ccc_bitset const *const bs, size_t const i,
+                                 size_t const count, size_t const num_ones)
+{
+    return first_trailing_ones_range(bs, i, count, num_ones);
+}
+
+ptrdiff_t
 ccc_bs_first_trailing_zero_range(ccc_bitset const *const bs, size_t const i,
                                  size_t const count)
 {
@@ -556,7 +563,7 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
     size_t set_start_i = i;
     size_t cur_block = block_i(i);
     size_t block_i = i % BLOCK_BITS;
-    while (set_start_i + num_ones < end)
+    while (set_start_i + num_ones <= end)
     {
         struct block_group const found = max_ones_in_block(
             bs->set_[cur_block], block_i, num_ones - num_found);
@@ -599,7 +606,7 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
    function does not partake in the larger group seeking logic, only focusing
    on the largest contiguous group of ones possible. */
 static inline struct block_group
-max_ones_in_block(ccc_bitblock_ const b, size_t const i_in_block,
+max_ones_in_block(ccc_bitblock_ b, size_t const i_in_block,
                   size_t const ones_remaining)
 {
     /* Easy exit skip to the next block. Helps with sparse sets. */
@@ -607,6 +614,10 @@ max_ones_in_block(ccc_bitblock_ const b, size_t const i_in_block,
     {
         return (struct block_group){.block_i = BLOCK_BITS};
     }
+    /* For any results we achieve, we must only report them from the index in
+       the block onward. The search may be starting from a specified range.
+       Pretend that any bits before the index in the block don't exist. */
+    b &= (ALL_BITS_ON << i_in_block);
     if (ones_remaining > (ptrdiff_t)BLOCK_BITS)
     {
         /* The best we could do is find that we have a block of all 1's, which
@@ -634,9 +645,8 @@ max_ones_in_block(ccc_bitblock_ const b, size_t const i_in_block,
                                         .count = ones_remaining};
         }
     }
-    /* Ok, we gave up on finding the group of ones of a small size. Let's now
-       find the start of our search for this group that will cross block
-       boundaries. */
+    /* Give up. Let's now find the start of our search for this group that will
+       cross block boundaries. */
     ptrdiff_t const num_ones_found = countl_0(~b);
     return (struct block_group){.block_i = BLOCK_BITS - num_ones_found,
                                 .count = num_ones_found};
