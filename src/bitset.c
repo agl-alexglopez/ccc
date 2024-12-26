@@ -608,13 +608,14 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
 }
 
 /* Returns the maximum group of consecutive ones in the bitblock given. If the
-   number of consecutive ones needed cannot be found the function returns where
-   the next search should start from. If the block is all zeros or the search
-   must start at the next block the BLOCK_BITS index is returned with a group
-   size of 0. The caller should determine based on the return value if the
-   sequence is continuing as required from index 0 or has restarted. This
-   function does not partake in the larger group seeking logic, only focusing
-   on the largest contiguous group of ones possible. */
+   number of consecutive ones remaining cannot be found the function returns
+   where the next search should start from, a critical step to a linear search;
+   specifically, we seek any group of continuous ones that runs from some index
+   in the block to the end of the block. If no continuous group of ones exist
+   that runs to the end of the block, the BLOCK_BITS index is retuned with a
+   group size of 0 meaning the search for ones will need to continue in the
+   next block. This is helpful for the main search loop adding to its start
+   index and number of ones found so far. */
 static inline struct block_group
 max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
                   size_t const ones_remaining)
