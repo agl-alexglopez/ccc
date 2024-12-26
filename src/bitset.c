@@ -44,7 +44,7 @@ static ptrdiff_t countl_0(ccc_bitblock_);
 static ptrdiff_t first_trailing_ones_range(struct ccc_bitset_ const *bs,
                                            size_t i, size_t count,
                                            size_t num_ones);
-static struct block_group max_ones_in_block(ccc_bitblock_ b, size_t i_in_block,
+static struct block_group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
                                             size_t num_ones_remaining);
 
 /*=======================   Public Interface   ==============================*/
@@ -518,7 +518,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     ptrdiff_t i_in_block = countr_0(first_block_on & bs->set_[start_block]);
     if (i_in_block != BLOCK_BITS)
     {
-        return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
+        return (ptrdiff_t)((start_block * BLOCK_BITS) + i_in_block);
     }
     size_t const end_block = block_i(end - 1);
     if (end_block == start_block)
@@ -531,7 +531,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
         i_in_block = countr_0(bs->set_[start_block]);
         if (i_in_block != BLOCK_BITS)
         {
-            return ((ptrdiff_t)(start_block * BLOCK_BITS)) + i_in_block;
+            return (ptrdiff_t)((start_block * BLOCK_BITS) + i_in_block);
         }
     }
     /* Handle last block. */
@@ -541,7 +541,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     i_in_block = countr_0(last_block_on & bs->set_[end_block]);
     if (i_in_block != BLOCK_BITS)
     {
-        return ((ptrdiff_t)(end_block * BLOCK_BITS)) + i_in_block;
+        return (ptrdiff_t)((end_block * BLOCK_BITS) + i_in_block);
     }
     return -1;
 }
@@ -554,52 +554,55 @@ static inline ptrdiff_t
 first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
                           size_t const count, size_t const num_ones)
 {
-    size_t const end = i + count;
-    if (!bs || i >= bs->cap_ || end > bs->cap_ || end < i || !num_ones
-        || num_ones > count)
+    size_t const range_end = i + count;
+    if (!bs || i >= bs->cap_ || range_end > bs->cap_ || range_end < i
+        || !num_ones || num_ones > count)
     {
         return -1;
     }
     size_t num_found = 0;
-    size_t set_start_i = i;
+    size_t ones_start = i;
     size_t cur_block = block_i(i);
+    size_t cur_end = (cur_block * BLOCK_BITS) + BLOCK_BITS;
     size_t block_i = i % BLOCK_BITS;
-    while (set_start_i + num_ones <= end)
+    while (ones_start + num_ones <= range_end)
     {
-        ccc_bitblock_ bits_in_range
-            = bs->set_[cur_block] & (ALL_BITS_ON << block_i);
-        if ((cur_block * BLOCK_BITS) + BLOCK_BITS > end)
+        /* Clean up some edge cases for the helper function because we allow
+           the user to specify any range. What if our range ends before the
+           end of this block? What if it starts after index 0 of the first
+           block? Pretend out of range bits don't exist. */
+        ccc_bitblock_ bits = bs->set_[cur_block] & (ALL_BITS_ON << block_i);
+        if (cur_end > range_end)
         {
-            bits_in_range &= (ALL_BITS_ON >> (BLOCK_BITS - (end % BLOCK_BITS)));
+            bits &= (ALL_BITS_ON >> (cur_end - range_end));
         }
-        struct block_group const found
-            = max_ones_in_block(bits_in_range, block_i, num_ones - num_found);
-        if (found.count >= num_ones)
+        struct block_group const ones
+            = max_trailing_ones(bits, block_i, num_ones - num_found);
+        if (ones.count >= num_ones)
         {
             /* Found the solution all at once within a block. */
-            return (ptrdiff_t)(cur_block * BLOCK_BITS)
-                   + (ptrdiff_t)found.block_i;
+            return (ptrdiff_t)((cur_block * BLOCK_BITS) + ones.block_i);
         }
-        if (!found.block_i)
+        if (!ones.block_i)
         {
-            if (num_found + found.count >= num_ones)
+            if (num_found + ones.count >= num_ones)
             {
                 /* Found solution crossing block boundary from prefix blocks. */
-                return (ptrdiff_t)set_start_i;
+                return (ptrdiff_t)ones_start;
             }
             /* Found a full block so keep on trucking. */
-            num_found += found.count;
+            num_found += ones.count;
         }
         else
         {
             /* Fail but we have largest skip possible to continue our search
                from in order to save double checking unnecessary prefixes. */
-            set_start_i = (cur_block * BLOCK_BITS) + (ptrdiff_t)found.block_i;
-            /* This should always be 0 I think. */
-            num_found = found.count;
+            ones_start = (cur_block * BLOCK_BITS) + (ptrdiff_t)ones.block_i;
+            num_found = ones.count;
         }
         block_i = 0;
         ++cur_block;
+        cur_end += BLOCK_BITS;
     }
     return -1;
 }
@@ -613,7 +616,7 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
    function does not partake in the larger group seeking logic, only focusing
    on the largest contiguous group of ones possible. */
 static inline struct block_group
-max_ones_in_block(ccc_bitblock_ b, size_t const i_in_block,
+max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
                   size_t const ones_remaining)
 {
     /* Easy exit skip to the next block. Helps with sparse sets. */

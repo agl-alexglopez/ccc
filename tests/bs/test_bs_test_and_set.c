@@ -347,7 +347,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
     size_t window = sizeof(unsigned) * CHAR_BIT;
     /* Slide a group of int size as a window across the set. */
-    for (size_t i = 0; i < (512 - window); ++i)
+    for (size_t i = 0; i < (512 - window - 1); ++i)
     {
         CHECK(ccc_bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
         CHECK(ccc_bs_first_trailing_ones(&bs, window), i);
@@ -362,7 +362,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
     CHECK(ccc_bs_reset_all(&bs), CCC_OK);
     window /= 4;
     /* Slide a very small group across the set. */
-    for (size_t i = 0; i < (512 - window); ++i)
+    for (size_t i = 0; i < (512 - window - 1); ++i)
     {
         CHECK(ccc_bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
         CHECK(ccc_bs_first_trailing_ones(&bs, window), i);
@@ -377,12 +377,15 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
     CHECK(ccc_bs_reset_all(&bs), CCC_OK);
     window *= 8;
     /* Slide a very large group across the set. */
-    for (size_t i = 0; i < (512 - window); ++i)
+    for (size_t i = 0; i < (512 - window - 1); ++i)
     {
         CHECK(ccc_bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
         CHECK(ccc_bs_first_trailing_ones(&bs, window), i);
         CHECK(ccc_bs_first_trailing_ones(&bs, window - 1), i);
         CHECK(ccc_bs_first_trailing_ones(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, i + 1, window, window), -1);
         /* Cleanup behind as we go. */
         CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }
