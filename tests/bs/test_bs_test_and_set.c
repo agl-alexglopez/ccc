@@ -345,7 +345,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
 {
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
-    size_t window = sizeof(unsigned) * CHAR_BIT;
+    size_t window = sizeof(ccc_bitblock) * CHAR_BIT;
     /* Slide a group of int size as a window across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
@@ -389,6 +389,42 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
         /* Cleanup behind as we go. */
         CHECK(ccc_bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    size_t const end = ccc_bs_blocks(512);
+    size_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
+    static_assert(sizeof(ccc_bitblock) % 2 == 0);
+    size_t const first_half = bits_in_block / 2;
+    size_t const second_half = first_half - 1;
+    /* We are going to search for a group of 17 which we will be very close
+       to finding every time but it will be broken by an off bit before the
+       17th in a group in every block. */
+    for (size_t block = 0, i = 0; block < end;
+         ++block, i = block * bits_in_block)
+    {
+        CHECK(ccc_bs_set_range(&bs, i, first_half, CCC_TRUE), CCC_OK);
+        CHECK(ccc_bs_set_range(&bs, i + first_half + 1, second_half, CCC_TRUE),
+              CCC_OK);
+        CHECK(ccc_bs_first_trailing_ones_range(&bs, i, bits_in_block,
+                                               first_half + 1),
+              -1);
+    }
+    /* Then we will search for a full block worth which we will never find
+       thanks to the off bit embedded in each block. */
+    CHECK(ccc_bs_first_trailing_ones(&bs, bits_in_block), -1);
+    /* Now fix the last group and we should pass. */
+    CHECK(
+        ccc_bs_set_at(&bs, ((end - 1) * bits_in_block) + first_half, CCC_TRUE),
+        CCC_FALSE);
+    /* Now the solution crosses the block border from second to last to last
+       block. */
+    CHECK(ccc_bs_first_trailing_ones(&bs, bits_in_block),
+          (((end - 2) * bits_in_block) + first_half + 1));
     CHECK_END_FN();
 }
 
@@ -579,7 +615,7 @@ main(void)
         bs_test_flip_all(), bs_test_flip_range(), bs_test_reset_all(),
         bs_test_reset_range(), bs_test_any(), bs_test_all(), bs_test_none(),
         bs_test_first_trailing_one(), bs_test_first_trailing_ones(),
-        bs_test_first_trailing_zero(), bs_test_first_leading_one(),
-        bs_test_first_leading_zero(), bs_test_valid_sudoku(),
-        bs_test_invalid_sudoku());
+        bs_test_first_trailing_ones_fail(), bs_test_first_trailing_zero(),
+        bs_test_first_leading_one(), bs_test_first_leading_zero(),
+        bs_test_valid_sudoku(), bs_test_invalid_sudoku());
 }
