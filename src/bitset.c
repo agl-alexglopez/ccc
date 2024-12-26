@@ -47,8 +47,13 @@ static ptrdiff_t countl_0(ccc_bitblock_);
 static ptrdiff_t first_trailing_ones_range(struct ccc_bitset_ const *bs,
                                            size_t i, size_t count,
                                            size_t num_ones);
+static ptrdiff_t first_leading_ones_range(struct ccc_bitset_ const *bs,
+                                          size_t i, size_t count,
+                                          size_t num_ones);
 static struct group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
                                       size_t num_ones_remaining);
+static struct group max_leading_ones(ccc_bitblock_ b, ptrdiff_t i_in_block,
+                                     ptrdiff_t num_ones_remaining);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -487,6 +492,19 @@ ccc_bs_first_leading_one(ccc_bitset const *const bs)
 }
 
 ptrdiff_t
+ccc_bs_first_leading_ones(ccc_bitset const *const bs, size_t const num_ones)
+{
+    return first_leading_ones_range(bs, bs->cap_ - 1, bs->cap_, num_ones);
+}
+
+ptrdiff_t
+ccc_bs_first_leading_ones_range(ccc_bitset const *const bs, size_t const i,
+                                size_t const count, size_t const num_ones)
+{
+    return first_leading_ones_range(bs, i, count, num_ones);
+}
+
+ptrdiff_t
 ccc_bs_first_leading_zero_range(ccc_bitset const *const bs, size_t const i,
                                 size_t const count)
 {
@@ -762,6 +780,94 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
                            + (BLOCK_BITS - lead_zeros - 1));
     }
     return -1;
+}
+
+/* Finds the starting index of a sequence of 1's of the num_ones size in linear
+   time. The algorithm aims to efficiently skip as many bits as possible while
+   searching for the desired group. This avoids both an O(N^2) runtime and the
+   use of any unnecessary modulo or division operations in a hot loop. */
+static inline ptrdiff_t
+first_leading_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
+                         size_t const count, size_t const num_ones)
+{
+    ptrdiff_t const range_end = (ptrdiff_t)(i - count);
+    if (!bs || i >= bs->cap_ || range_end > (ptrdiff_t)bs->cap_
+        || range_end < -1 || !num_ones || num_ones > count)
+    {
+        return -1;
+    }
+    size_t num_found = 0;
+    ptrdiff_t ones_start = (ptrdiff_t)i;
+    ptrdiff_t cur_block = (ptrdiff_t)block_i(i);
+    ptrdiff_t cur_end = (ptrdiff_t)((cur_block * BLOCK_BITS) - 1);
+    ptrdiff_t block_i = (ptrdiff_t)(i % BLOCK_BITS);
+    while (ones_start - (ptrdiff_t)num_ones >= range_end)
+    {
+        /* Clean up some edge cases for the helper function because we allow
+           the user to specify any range. What if our range ends before the
+           end of this block? What if it starts after index 0 of the first
+           block? Pretend out of range bits don't exist. */
+        ccc_bitblock_ bits = bs->set_[cur_block]
+                             & (ALL_BITS_ON >> ((BLOCK_BITS - block_i) - 1));
+        if (cur_end < range_end)
+        {
+            bits &= (ALL_BITS_ON << (range_end - cur_end));
+        }
+        struct group const ones = max_leading_ones(
+            bits, block_i, (ptrdiff_t)(num_ones - num_found));
+        if (ones.count >= num_ones)
+        {
+            return (ptrdiff_t)((cur_block * BLOCK_BITS) + ones.block_start_i);
+        }
+        if (ones.block_start_i == BLOCK_BITS - 1)
+        {
+            if (num_found + ones.count >= num_ones)
+            {
+                return ones_start;
+            }
+            num_found += ones.count;
+        }
+        else
+        {
+            ones_start
+                = (ptrdiff_t)((cur_block * BLOCK_BITS) + ones.block_start_i);
+            num_found = ones.count;
+        }
+        block_i = BLOCK_BITS - 1;
+        --cur_block;
+        cur_end -= BLOCK_BITS;
+    }
+    return -1;
+}
+
+static inline struct group
+max_leading_ones(ccc_bitblock_ b, ptrdiff_t const i_in_block,
+                 ptrdiff_t const ones_remaining)
+{
+    if (!b)
+    {
+        return (struct group){.block_start_i = -1};
+    }
+    if (ones_remaining > (ptrdiff_t)BLOCK_BITS)
+    {
+        ptrdiff_t const trailing_ones = countr_0(~b);
+        return (struct group){.block_start_i = trailing_ones - 1,
+                              .count = trailing_ones};
+    }
+    ccc_bitblock_ shifted = b << (BLOCK_BITS - i_in_block - 1);
+    ccc_bitblock_ const required_ones = ALL_BITS_ON
+                                        << (BLOCK_BITS - ones_remaining);
+    for (size_t shifts = 0; shifted; shifted <<= 1, ++shifts)
+    {
+        if ((required_ones & shifted) == required_ones)
+        {
+            return (struct group){.block_start_i = i_in_block - shifts,
+                                  .count = ones_remaining};
+        }
+    }
+    ptrdiff_t const num_ones_found = countr_0(~b);
+    return (struct group){.block_start_i = num_ones_found - 1,
+                          .count = num_ones_found};
 }
 
 static inline ptrdiff_t
