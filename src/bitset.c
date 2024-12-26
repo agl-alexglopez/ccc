@@ -7,14 +7,17 @@
 #include "impl/impl_bitset.h"
 #include "types.h"
 
+/* How many total bits that fit in a ccc_bitblock_. */
 #define BLOCK_BITS (sizeof(ccc_bitblock_) * CHAR_BIT)
+/* A mask of a ccc_bitblock_ with all bits on. */
 #define ALL_BITS_ON ((ccc_bitblock_)~0)
+/* The Most Significant Bit of a ccc_bitblock_ turned on to 1. */
 #define BITBLOCK_MSB                                                           \
     (((ccc_bitblock_)1) << (((sizeof(ccc_bitblock_) * CHAR_BIT)) - 1))
 
-struct block_group
+struct group
 {
-    size_t block_i;
+    size_t block_start_i;
     size_t count;
 };
 
@@ -44,8 +47,8 @@ static ptrdiff_t countl_0(ccc_bitblock_);
 static ptrdiff_t first_trailing_ones_range(struct ccc_bitset_ const *bs,
                                            size_t i, size_t count,
                                            size_t num_ones);
-static struct block_group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
-                                            size_t num_ones_remaining);
+static struct group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
+                                      size_t num_ones_remaining);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -576,14 +579,14 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
         {
             bits &= (ALL_BITS_ON >> (cur_end - range_end));
         }
-        struct block_group const ones
+        struct group const ones
             = max_trailing_ones(bits, block_i, num_ones - num_found);
         if (ones.count >= num_ones)
         {
             /* Found the solution all at once within a block. */
-            return (ptrdiff_t)((cur_block * BLOCK_BITS) + ones.block_i);
+            return (ptrdiff_t)((cur_block * BLOCK_BITS) + ones.block_start_i);
         }
-        if (!ones.block_i)
+        if (!ones.block_start_i)
         {
             if (num_found + ones.count >= num_ones)
             {
@@ -597,7 +600,8 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
         {
             /* Fail but we have largest skip possible to continue our search
                from in order to save double checking unnecessary prefixes. */
-            ones_start = (cur_block * BLOCK_BITS) + (ptrdiff_t)ones.block_i;
+            ones_start
+                = (cur_block * BLOCK_BITS) + (ptrdiff_t)ones.block_start_i;
             num_found = ones.count;
         }
         block_i = 0;
@@ -616,14 +620,14 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
    group size of 0 meaning the search for ones will need to continue in the
    next block. This is helpful for the main search loop adding to its start
    index and number of ones found so far. */
-static inline struct block_group
+static inline struct group
 max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
                   size_t const ones_remaining)
 {
     /* Easy exit skip to the next block. Helps with sparse sets. */
     if (!b)
     {
-        return (struct block_group){.block_i = BLOCK_BITS};
+        return (struct group){.block_start_i = BLOCK_BITS};
     }
     if (ones_remaining > (ptrdiff_t)BLOCK_BITS)
     {
@@ -633,8 +637,8 @@ max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
            sequence of 1's to start the search at. Counting zeros from the left
            on the inverted block achieves both of these cases in one. */
         ptrdiff_t const leading_ones = countl_0(~b);
-        return (struct block_group){.block_i = BLOCK_BITS - leading_ones,
-                                    .count = leading_ones};
+        return (struct group){.block_start_i = BLOCK_BITS - leading_ones,
+                              .count = leading_ones};
     }
     /* This branch must find a smaller group anywhere in this block which is
        the most work required in this algorithm. We have some tricks to tell
@@ -648,15 +652,17 @@ max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
     {
         if ((required_ones & shifted) == required_ones)
         {
-            return (struct block_group){.block_i = i_in_block + shifts,
-                                        .count = ones_remaining};
+            return (struct group){.block_start_i = i_in_block + shifts,
+                                  .count = ones_remaining};
         }
     }
-    /* Give up. Let's now find the start of our search for this group that will
-       cross block boundaries. */
+    /* Most important step. If we can't satisfy ones remaining, this function
+       must give the main search loop the correct position to start a new
+       search from so it can reset its starting index and current group size
+       correctly. */
     ptrdiff_t const num_ones_found = countl_0(~b);
-    return (struct block_group){.block_i = BLOCK_BITS - num_ones_found,
-                                .count = num_ones_found};
+    return (struct group){.block_start_i = BLOCK_BITS - num_ones_found,
+                          .count = num_ones_found};
 }
 
 static inline ptrdiff_t
