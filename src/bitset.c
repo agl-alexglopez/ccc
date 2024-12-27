@@ -783,10 +783,6 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     return -1;
 }
 
-/* Finds the starting index of a sequence of 1's of the num_ones size in linear
-   time. The algorithm aims to efficiently skip as many bits as possible while
-   searching for the desired group. This avoids both an O(N^2) runtime and the
-   use of any unnecessary modulo or division operations in a hot loop. */
 static inline ptrdiff_t
 first_leading_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
                          size_t const count, size_t const num_ones)
