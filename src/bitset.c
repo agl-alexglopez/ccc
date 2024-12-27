@@ -595,7 +595,7 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
         ccc_bitblock_ bits = bs->set_[cur_block] & (ALL_BITS_ON << block_i);
         if (cur_end > range_end)
         {
-            bits &= ~(ALL_BITS_ON << range_end);
+            bits &= (ALL_BITS_ON >> (cur_end - range_end));
         }
         struct group const ones
             = max_trailing_ones(bits, block_i, num_ones - num_found);
@@ -807,7 +807,8 @@ first_leading_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
                              & (ALL_BITS_ON >> ((BLOCK_BITS - block_i) - 1));
         if (cur_end < range_end)
         {
-            bits &= ~(ALL_BITS_ON >> (BLOCK_BITS - range_end - 1));
+            assert(range_end - cur_end < (ptrdiff_t)BLOCK_BITS);
+            bits &= (ALL_BITS_ON << (range_end - cur_end));
         }
         struct group const ones = max_leading_ones(
             bits, block_i, (ptrdiff_t)(num_ones - num_found));

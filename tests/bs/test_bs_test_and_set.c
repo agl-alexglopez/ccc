@@ -398,7 +398,6 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
     size_t const end = ccc_bs_blocks(512);
     size_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
-    static_assert(sizeof(ccc_bitblock) % 2 == 0);
     size_t const first_half = bits_in_block / 2;
     size_t const second_half = first_half - 1;
     /* We are going to search for a group of 16 which we will be very close
@@ -516,7 +515,6 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones_fail)
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
     ptrdiff_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
-    static_assert(sizeof(ccc_bitblock) % 2 == 0);
     size_t const first_half = bits_in_block / 2;
     size_t const second_half = first_half - 1;
     /* We are going to search for a group of 17 which we will be very close
