@@ -595,7 +595,7 @@ first_trailing_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
         ccc_bitblock_ bits = bs->set_[cur_block] & (ALL_BITS_ON << block_i);
         if (cur_end > range_end)
         {
-            bits &= (ALL_BITS_ON >> (cur_end - range_end));
+            bits &= ~(ALL_BITS_ON << range_end);
         }
         struct group const ones
             = max_trailing_ones(bits, block_i, num_ones - num_found);
@@ -803,15 +803,11 @@ first_leading_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
     ptrdiff_t block_i = (ptrdiff_t)(i % BLOCK_BITS);
     while (ones_start - (ptrdiff_t)num_ones >= range_end)
     {
-        /* Clean up some edge cases for the helper function because we allow
-           the user to specify any range. What if our range ends before the
-           end of this block? What if it starts after index 0 of the first
-           block? Pretend out of range bits don't exist. */
         ccc_bitblock_ bits = bs->set_[cur_block]
                              & (ALL_BITS_ON >> ((BLOCK_BITS - block_i) - 1));
         if (cur_end < range_end)
         {
-            bits &= (ALL_BITS_ON << (range_end - cur_end));
+            bits &= ~(ALL_BITS_ON >> (BLOCK_BITS - range_end - 1));
         }
         struct group const ones = max_leading_ones(
             bits, block_i, (ptrdiff_t)(num_ones - num_found));
