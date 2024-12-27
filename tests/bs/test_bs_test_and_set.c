@@ -424,6 +424,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
        block. */
     CHECK(ccc_bs_first_trailing_ones(&bs, bits_in_block),
           (((end - 2) * bits_in_block) + first_half + 1));
+    ccc_bs_reset_all(&bs);
+    ccc_bs_set_range(&bs, 0, bits_in_block * 3, CCC_TRUE);
+    CHECK(ccc_bs_set_at(&bs, first_half, CCC_FALSE), CCC_TRUE);
+    CHECK(
+        ccc_bs_first_trailing_ones_range(&bs, 0, bits_in_block, bits_in_block),
+        -1);
     CHECK_END_FN();
 }
 
@@ -542,6 +548,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones_fail)
        block. */
     CHECK(ccc_bs_first_leading_ones(&bs, bits_in_block),
           bits_in_block + first_half - 1);
+    ccc_bs_reset_all(&bs);
+    ccc_bs_set_range(&bs, 512 - (bits_in_block * 3), bits_in_block * 3,
+                     CCC_TRUE);
+    CHECK(ccc_bs_set_at(&bs, 512 - first_half, CCC_FALSE), CCC_TRUE);
+    CHECK(
+        ccc_bs_first_leading_ones_range(&bs, 511, bits_in_block, bits_in_block),
+        -1);
     CHECK_END_FN();
 }
 
