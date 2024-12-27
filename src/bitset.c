@@ -740,13 +740,14 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
         return -1;
     }
     ptrdiff_t const end = (ptrdiff_t)(i - count);
+    ptrdiff_t const final_block_i = (ptrdiff_t)((i - count + 1) % BLOCK_BITS);
     ptrdiff_t start_block = (ptrdiff_t)block_i(i);
     size_t const start_i_in_block = i % BLOCK_BITS;
     ccc_bitblock_ first_block_on
         = ALL_BITS_ON >> ((BLOCK_BITS - start_i_in_block) - 1);
     if (end >= 0 && i - end < BLOCK_BITS)
     {
-        first_block_on &= (ALL_BITS_ON << (BLOCK_BITS - (i - end)));
+        first_block_on &= (ALL_BITS_ON << final_block_i);
     }
     ptrdiff_t lead_zeros = countl_0(first_block_on & bs->set_[start_block]);
     if (lead_zeros != BLOCK_BITS)
@@ -796,6 +797,7 @@ first_leading_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         return -1;
     }
+    ptrdiff_t const final_block_i = (ptrdiff_t)((range_end + 1) % BLOCK_BITS);
     size_t num_found = 0;
     ptrdiff_t ones_start = (ptrdiff_t)i;
     ptrdiff_t cur_block = (ptrdiff_t)block_i(i);
@@ -807,8 +809,8 @@ first_leading_ones_range(struct ccc_bitset_ const *const bs, size_t const i,
                              & (ALL_BITS_ON >> ((BLOCK_BITS - block_i) - 1));
         if (cur_end < range_end)
         {
-            assert(range_end - cur_end < (ptrdiff_t)BLOCK_BITS);
-            bits &= (ALL_BITS_ON << (range_end - cur_end));
+            assert(final_block_i < (ptrdiff_t)BLOCK_BITS);
+            bits &= (ALL_BITS_ON << final_block_i);
         }
         struct group const ones = max_leading_ones(
             bits, block_i, (ptrdiff_t)(num_ones - num_found));
