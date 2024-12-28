@@ -424,8 +424,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
        block. */
     CHECK(ccc_bs_first_trailing_ones(&bs, bits_in_block),
           (((end - 2) * bits_in_block) + first_half + 1));
-    ccc_bs_reset_all(&bs);
-    ccc_bs_set_range(&bs, 0, bits_in_block * 3, CCC_TRUE);
+    (void)ccc_bs_reset_all(&bs);
+    (void)ccc_bs_set_range(&bs, 0, bits_in_block * 3, CCC_TRUE);
     CHECK(ccc_bs_set_at(&bs, first_half, CCC_FALSE), CCC_TRUE);
     CHECK(
         ccc_bs_first_trailing_ones_range(&bs, 0, bits_in_block, bits_in_block),
@@ -445,6 +445,103 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zero)
         CHECK(ccc_bs_first_trailing_zero_range(&bs, 0, i + 1), -1);
         CHECK(ccc_bs_first_trailing_zero_range(&bs, i, end - i), i + 1);
     }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t window = sizeof(ccc_bitblock) * CHAR_BIT;
+    /* Slide a group of int size as a window across the set. */
+    for (size_t i = 0; i < (512 - window - 1); ++i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i, window, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window), i);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window - 1), i);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i + 1, window, window),
+              -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    window /= 4;
+    /* Slide a very small group across the set. */
+    for (size_t i = 0; i < (512 - window - 1); ++i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i, window, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window), i);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window - 1), i);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i + 1, window, window),
+              -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    window *= 8;
+    /* Slide a very large group across the set. */
+    for (size_t i = 0; i < (512 - window - 1); ++i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i, window, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window), i);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window - 1), i);
+        CHECK(ccc_bs_first_trailing_zeros(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i + 1, window, window),
+              -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros_fail)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const end = ccc_bs_blocks(512);
+    size_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
+    size_t const first_half = bits_in_block / 2;
+    size_t const second_half = first_half - 1;
+    /* We are going to search for a group of 16 which we will be very close
+       to finding every time but it will be broken by an off bit before the
+       16th in a group in every block. */
+    for (size_t block = 0, i = 0; block < end;
+         ++block, i = block * bits_in_block)
+    {
+        CHECK(ccc_bs_set_range(&bs, i, first_half, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_set_range(&bs, i + first_half + 1, second_half, CCC_FALSE),
+              CCC_OK);
+        CHECK(ccc_bs_first_trailing_zeros_range(&bs, i, bits_in_block,
+                                                first_half + 1),
+              -1);
+    }
+    /* Then we will search for a full block worth which we will never find
+       thanks to the off bit embedded in each block. */
+    CHECK(ccc_bs_first_trailing_zeros(&bs, bits_in_block), -1);
+    /* Now fix the last group and we should pass. */
+    CHECK(
+        ccc_bs_set_at(&bs, ((end - 1) * bits_in_block) + first_half, CCC_FALSE),
+        CCC_TRUE);
+    /* Now the solution crosses the block border from second to last to last
+       block. */
+    CHECK(ccc_bs_first_trailing_zeros(&bs, bits_in_block),
+          (((end - 2) * bits_in_block) + first_half + 1));
+    (void)ccc_bs_reset_all(&bs);
+    (void)ccc_bs_set_range(&bs, 0, bits_in_block * 3, CCC_FALSE);
+    CHECK(ccc_bs_set_at(&bs, first_half, CCC_TRUE), CCC_FALSE);
+    CHECK(
+        ccc_bs_first_trailing_zeros_range(&bs, 0, bits_in_block, bits_in_block),
+        -1);
     CHECK_END_FN();
 }
 
@@ -548,9 +645,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones_fail)
        block. */
     CHECK(ccc_bs_first_leading_ones(&bs, bits_in_block),
           bits_in_block + first_half - 1);
-    ccc_bs_reset_all(&bs);
-    ccc_bs_set_range(&bs, 512 - (bits_in_block * 3), bits_in_block * 3,
-                     CCC_TRUE);
+    (void)ccc_bs_reset_all(&bs);
+    (void)ccc_bs_set_range(&bs, 512 - (bits_in_block * 3), bits_in_block * 3,
+                           CCC_TRUE);
     CHECK(ccc_bs_set_at(&bs, 512 - first_half, CCC_FALSE), CCC_TRUE);
     CHECK(
         ccc_bs_first_leading_ones_range(&bs, 511, bits_in_block, bits_in_block),
@@ -571,6 +668,101 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zero)
         CHECK(ccc_bs_first_leading_zero_range(&bs, last_i, 512 - i), -1);
         CHECK(ccc_bs_first_leading_zero_range(&bs, i, i + 1), i - 1);
     }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t window = sizeof(ccc_bitblock) * CHAR_BIT;
+    /* Slide a group of int size as a window across the set. */
+    for (size_t i = 511; i > window + 1; --i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i - window + 1, window, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window), i);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window - 1), i);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i + 1, window, window), -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    window /= 4;
+    /* Slide a very small group across the set. */
+    for (size_t i = 511; i > window + 1; --i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i - window + 1, window, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window), i);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window - 1), i);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i + 1, window, window), -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    window *= 8;
+    /* Slide a very large group across the set. */
+    for (size_t i = 511; i > window + 1; --i)
+    {
+        CHECK(ccc_bs_set_range(&bs, i - window + 1, window, CCC_FALSE), CCC_OK);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window), i);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window - 1), i);
+        CHECK(ccc_bs_first_leading_zeros(&bs, window + 1), -1);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, 0, i, window), -1);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i, window, window), i);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i + 1, window, window), -1);
+        /* Cleanup behind as we go. */
+        CHECK(ccc_bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros_fail)
+{
+    ccc_bitset bs
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL, NULL);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    ptrdiff_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
+    size_t const first_half = bits_in_block / 2;
+    size_t const second_half = first_half - 1;
+    /* We are going to search for a group of 17 which we will be very close
+       to finding every time but it will be broken by an off bit before the
+       17th in a group in every block. */
+    for (ptrdiff_t block = ccc_bs_blocks(512) - 1, i = 511; block >= 0;
+         --block, i -= bits_in_block)
+    {
+        CHECK(ccc_bs_set_range(&bs, (block * bits_in_block), first_half,
+                               CCC_FALSE),
+              CCC_OK);
+        CHECK(ccc_bs_set_range(&bs, (block * bits_in_block) + first_half + 1,
+                               second_half, CCC_FALSE),
+              CCC_OK);
+        CHECK(ccc_bs_first_leading_zeros_range(&bs, i, bits_in_block,
+                                               first_half + 1),
+              -1);
+    }
+    /* Then we will search for a full block worth which we will never find
+       thanks to the off bit embedded in each block. */
+    CHECK(ccc_bs_first_leading_zeros(&bs, bits_in_block), -1);
+    /* Now fix the last group and we should pass. */
+    CHECK(ccc_bs_set_at(&bs, first_half, CCC_FALSE), CCC_TRUE);
+    /* Now the solution crosses the block border from second to last to last
+       block. */
+    CHECK(ccc_bs_first_leading_zeros(&bs, bits_in_block),
+          bits_in_block + first_half - 1);
+    (void)ccc_bs_reset_all(&bs);
+    (void)ccc_bs_set_range(&bs, 512 - (bits_in_block * 3), bits_in_block * 3,
+                           CCC_FALSE);
+    CHECK(ccc_bs_set_at(&bs, 512 - first_half, CCC_TRUE), CCC_FALSE);
+    CHECK(ccc_bs_first_leading_zeros_range(&bs, 511, bits_in_block,
+                                           bits_in_block),
+          -1);
     CHECK_END_FN();
 }
 
@@ -714,7 +906,9 @@ main(void)
         bs_test_reset_range(), bs_test_any(), bs_test_all(), bs_test_none(),
         bs_test_first_trailing_one(), bs_test_first_trailing_ones(),
         bs_test_first_trailing_ones_fail(), bs_test_first_trailing_zero(),
+        bs_test_first_trailing_zeros(), bs_test_first_trailing_zeros_fail(),
         bs_test_first_leading_one(), bs_test_first_leading_ones(),
         bs_test_first_leading_ones_fail(), bs_test_first_leading_zero(),
+        bs_test_first_leading_zeros(), bs_test_first_leading_zeros_fail(),
         bs_test_valid_sudoku(), bs_test_invalid_sudoku());
 }
