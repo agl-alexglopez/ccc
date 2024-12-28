@@ -331,6 +331,34 @@ must check their input. */
 ptrdiff_t ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
                                            size_t count);
 
+/** @brief Returns the index of the start of the first trailing num_zeros
+contiguous 0 bits.
+@param [in] bs a pointer to the bit set.
+@param [in] num_zeros the number of trailing contiguous 0 bits to find.
+@return the index in a search starting from the Least Significant Bit of the
+set of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+or such a sequence cannot be found -1 is returned.
+@warning the user must validate that bs is non-NULL and num_zeros is less than
+the size of the set in order to distinguish -1 returned as a result of a failed
+search or bad input. */
+ptrdiff_t ccc_bs_first_trailing_zeros(ccc_bitset const *bs, size_t num_zeros);
+
+/** @brief Returns the index of the start of the first trailing num_zeros
+contiguous 0 bits in the specified range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting index to search.
+@param [in] count the size of the range to check.
+@param [in] num_zeros the number of trailing contiguous 0 bits to find.
+@return the index in a search starting from the Least Significant Bit of the
+range of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+or such a sequence cannot be found -1 is returned.
+@warning the user must validate their own range. A group of 1's does not exist
+in an invalid range therefore -1 is returned. To distinguish a valid negative
+result signifying not found and a negative result indicating a range error the
+user must check their input. */
+ptrdiff_t ccc_bs_first_trailing_zeros_range(ccc_bitset const *bs, size_t i,
+                                            size_t count, size_t num_zeros);
+
 /** @brief Return the index of the first leading bit set to 1 in the set,
 starting from the Most Significant Bit at index size - 1.
 @param [in] bs a pointer to the bit set.
@@ -394,6 +422,22 @@ starting from the Most Significant Bit at index size - 1.
 NULL. */
 ptrdiff_t ccc_bs_first_leading_zero_range(ccc_bitset const *bs, size_t i,
                                           size_t count);
+
+/** @brief Returns the index of the start of the first leading num_zeros
+contiguous 0 bits in the specified range.
+@param [in] bs a pointer to the bit set.
+@param [in] i the starting index to search.
+@param [in] count the size of the range to check.
+@param [in] num_zeros the number of leading contiguous 0 bits to find.
+@return the index in a search starting from the Least Significant Bit of the
+range of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+or such a sequence cannot be found -1 is returned.
+@warning the user must validate their own range. A group of 1's does not exist
+in an invalid range therefore -1 is returned. To distinguish a valid negative
+result signifying not found and a negative result indicating a range error the
+user must check their input. */
+ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
+                                           size_t count, size_t num_zeros);
 
 /**@}*/
 
