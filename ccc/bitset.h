@@ -34,8 +34,22 @@ All types and functions can then be written without the `ccc_` prefix. */
 Types available in the container interface. */
 /**@{*/
 
+/** @brief The bit set type that may be stored and initialized on the stack,
+heap, or data segment at compile time or runtime.
+
+A bit set offers fast membership testing and bit range manipulations when the
+data can be modeled as a 0-indexed key value data set. In the case of a bit
+set the key is the index in the bit set and the value is 1 or 0 depending on
+how the bit has been set. Operations on single bits occur in O(1) time. All
+scanning operations operate in O(N) time. */
 typedef struct ccc_bitset_ ccc_bitset;
 
+/** @brief The type used to efficiently store bits in the bit set.
+
+A block is a pre-determined integer width that allows for efficient block sized
+bit operations for various scanning and setting tasks. The user must participate
+in the storage of the bit set by using the provided ccc_bs_blocks macro to
+determine how many blocks are needed for the desired bits in the bit set. */
 typedef ccc_bitblock_ ccc_bitblock;
 
 /**@}*/
@@ -76,14 +90,17 @@ from the stack or data segment as determined by the user. */
 @param [in] cap the number of bits that will be stored in this bit set.
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
 @param [in] aux auxiliary data needed for allocation of the bit set.
+@param [in] optional_size an optional starting size <= capacity. If the bitset
+is of fixed size with no allocation permission, and dynamic push and pop are not
+needed, the optional size parameter should be set equivalent to capacity.
 @return the initialized bit set on the right hand side of an equality operator
 @warning the user must use the ccc_bs_blocks macro to help determine the size of
 the bitblock array if a fixed size bitblock array is provided at compile time;
 the necessary conversion from bits requested to number of blocks required to
 store those bits must occur before use.
 (e.g. ccc_bitset b = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){},...);). */
-#define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux)                          \
-    ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux)
+#define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size...)        \
+    ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)
 
 /**@}*/
 
@@ -97,14 +114,34 @@ Test for the presence of bits. */
 @return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
 see ccc_bs_test_at(). */
-ccc_tribool ccc_bs_test(ccc_bitset const *, size_t i);
+ccc_tribool ccc_bs_test(ccc_bitset const *bs, size_t i);
 
 /** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
 @return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_test_at(ccc_bitset const *, size_t i);
+ccc_tribool ccc_bs_test_at(ccc_bitset const *bs, size_t i);
+
+/**@}*/
+
+/** @name Dynamic Interface
+Allows adding to and removing from the set. */
+/**@{*/
+
+/** @brief Add a bit value to the set as the new Most Significant Bit.
+@param [in] bs a pointer to the bit set.
+@param [in] b the value to push at the Most Significant Bit CCC_TRUE/CCC_FALSE.
+@return the result of the operation, ok if successful or an error if bad
+parameters are provided or resizing is required to accommodate a new bit but
+resizing fails. */
+ccc_result ccc_bs_push_back(ccc_bitset *bs, ccc_tribool b);
+
+/** @brief Remove the Most Significant Bit from the set.
+@param [in] bs a pointer to the bit set.
+@return the previous value of the Most Significant Bit (CCC_TRUE or CCC_FALSE)
+or a bool error if bs is NULL or bs is empty. */
+ccc_tribool ccc_bs_pop_back(ccc_bitset *bs);
 
 /**@}*/
 
@@ -457,11 +494,16 @@ ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
 Obtain state from the container. */
 /**@{*/
 
-/** @brief Return total number of bits tracked by the set.
+/** @brief Return total number of bits the capacity of the set can hold.
+@param [in] bs a pointer to the bit set.
+@return capacity of bits capable of being stored in the current set. */
+size_t ccc_bs_capacity(ccc_bitset const *bs);
+
+/** @brief Return total number of bits actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
 @return the total number of bits currently tracked by the set regardless of
 true or false state of each. 0 is returned if bs is NULL. */
-size_t ccc_bs_capacity(ccc_bitset const *bs);
+size_t ccc_bs_size(ccc_bitset const *bs);
 
 /** @brief Return the number of bits set to CCC_TRUE. O(n).
 @param [in] bs a pointer to the bit set.
@@ -477,6 +519,26 @@ size_t ccc_bs_popcount(ccc_bitset const *bs);
 returned if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
 ptrdiff_t ccc_bs_popcount_range(ccc_bitset const *bs, size_t i, size_t count);
+
+/**@}*/
+
+/** @name Destructor Interface
+Clear the set and manage its memory. */
+/**@{*/
+
+/** @brief Clears the bit set by setting the size to 0 and all bits to 0.
+The underlying memory capacity remains unchanged.
+@param [in] bs a pointer to the bit set.
+@return the result of the clear operation, error is returned if bs is NULL . */
+ccc_result ccc_bs_clear(ccc_bitset *bs);
+
+/** @brief Clears the bit set by setting the size to 0 and freeing the
+underlying memory. Capacity becomes 0 as well.
+@param [in] bs a pointer to the bit set.
+@return the result of the clear operation, error is returned if bs is NULL or
+the set cannot be freed because no allocation function was provided upon
+initialization. */
+ccc_result ccc_bs_clear_and_free(ccc_bitset *bs);
 
 /**@}*/
 

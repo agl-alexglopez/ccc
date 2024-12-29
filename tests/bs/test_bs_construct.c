@@ -7,7 +7,7 @@
 CHECK_BEGIN_STATIC_FN(bs_test_construct)
 {
     ccc_bitset bs
-        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(10)]){}, 10, NULL, NULL);
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(10)]){}, 10, NULL, NULL, 10);
     CHECK(ccc_bs_popcount(&bs), 0);
     for (size_t i = 0; i < ccc_bs_capacity(&bs); ++i)
     {
