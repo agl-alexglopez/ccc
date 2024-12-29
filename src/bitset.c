@@ -365,6 +365,16 @@ ccc_bs_size(ccc_bitset const *const bs)
     return bs->sz_;
 }
 
+ccc_tribool
+ccc_bs_empty(ccc_bitset const *const bs)
+{
+    if (!bs)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return !bs->sz_;
+}
+
 size_t
 ccc_bs_popcount(ccc_bitset const *const bs)
 {

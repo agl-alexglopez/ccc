@@ -505,6 +505,13 @@ size_t ccc_bs_capacity(ccc_bitset const *bs);
 true or false state of each. 0 is returned if bs is NULL. */
 size_t ccc_bs_size(ccc_bitset const *bs);
 
+/** @brief Return true if no bits are actively tracked by the user and set.
+@param [in] bs a pointer to the bit set.
+@return CCC_TRUE if the size of the set is 0 meaning no bits, regardless of
+0 or 1 status, are tracked by the set. CCC_BOOL_ERR is returned if bs is NULL.
+@warning if the number of bits set to 1 is desired see ccc_bs_popcount. */
+ccc_tribool ccc_bs_empty(ccc_bitset const *bs);
+
 /** @brief Return the number of bits set to CCC_TRUE. O(n).
 @param [in] bs a pointer to the bit set.
 @return the total number of bits currently set to CCC_TRUE. 0 is returned if
