@@ -102,6 +102,69 @@ store those bits must occur before use.
 #define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size...)        \
     ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)
 
+/** @brief Copy the bit set at source to destination.
+@param [in] dst the initialized destination for the copy of the src set.
+@param [in] src the initialized source of the set.
+@param [in] fn the optional allocation function if resizing is needed.
+@return the result of the copy operation. If the destination capacity is less
+than the source capacity and no allocation function is provided an input error
+is returned. If resizing is required and resizing of dst fails a memory error
+is returned.
+@note dst must have capacity greater than or equal to src. If dst capacity is
+less than src, an allocation function must be provided with the fn argument.
+
+Note that there are two ways to copy data from source to destination: provide
+sufficient memory and pass NULL as fn, or allow the copy function to take care
+of allocation for the copy.
+
+Manual memory management with no allocation function provided.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+static bitset src
+    = bs_init((static bitblock[bs_blocks(11)]){}, 11, NULL, NULL);
+set_rand_bits(&src);
+static bitset src
+    = bs_init((static bitblock[bs_blocks(13)]){}, 13, NULL, NULL);
+ccc_result res = bs_copy(&dst, &src, NULL);
+```
+
+The above requires dst capacity be greater than or equal to src capacity. Here
+is memory management handed over to the copy function.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+static bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);
+push_rand_bits(&src);
+static bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);
+ccc_result res = bs_copy(&dst, &src, std_alloc);
+```
+
+The above allows dst to have a capacity less than that of the src as long as
+copy has been provided an allocation function to resize dst. Note that this
+would still work if copying to a destination that the user wants as a fixed
+size map.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+static bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);
+push_rand_bits(&src);
+static bitset src = bs_init((bitblock *)NULL, 0, NULL, NULL);
+ccc_result res = bs_copy(&dst, &src, std_alloc);
+```
+
+The above sets up dst with fixed size while src is a dynamic map. Because an
+allocation function is provided, the dst is resized once for the copy and
+retains its fixed size after the copy is complete. This would require the user
+to manually free the underlying buffer at dst eventually if this method is used.
+Usually it is better to allocate the memory explicitly before the copy if
+copying between maps without allocation permission.
+
+These options allow users to stay consistent across containers with their
+memory management strategies. */
+ccc_result ccc_bs_copy(ccc_bitset *dst, ccc_bitset const *src,
+                       ccc_alloc_fn *fn);
+
 /**@}*/
 
 /** @name Bit Membership Interface
@@ -493,6 +556,15 @@ ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
 /** @name State Interface
 Obtain state from the container. */
 /**@{*/
+
+/** @brief Return a reference to the base of the underlying block array.
+@param [in] bs a pointer to the bit set.
+@return a reference to the base of the first block of the bit set block array
+or NULL if bs is NULL or has no capacity.
+
+Every block populates bits from Least Significant Bit (LSB) to Most Significant
+Bit (MSB) so this reference is to the base or LSB of the entire set. */
+ccc_bitblock *ccc_bs_data(ccc_bitset const *bs);
 
 /** @brief Return total number of bits the capacity of the set can hold.
 @param [in] bs a pointer to the bit set.
