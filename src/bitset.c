@@ -886,7 +886,8 @@ max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
        hold or we did not find a match by the masking we just did. In either
        case we need the maximum contiguous ones that run all the way to the
        MSB. The best we could have is a full block of 1's. Otherwise we need
-       to find where to start our new search for contiguous 1's. */
+       to find where to start our new search for contiguous 1's. This could be
+       the next block if there are not 1's that continue all the way to MSB. */
     ptrdiff_t const num_ones_found = countl_0(~b);
     return (struct group){.block_start_i = BLOCK_BITS - num_ones_found,
                           .count = num_ones_found};
