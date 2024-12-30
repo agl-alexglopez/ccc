@@ -865,6 +865,7 @@ max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
     }
     if (ones_remaining <= (ptrdiff_t)BLOCK_BITS)
     {
+        assert(i_in_block < (ptrdiff_t)BLOCK_BITS);
         /* This branch must find a smaller group anywhere in this block which is
            the most work required in this algorithm. We have some tricks to tell
            when to give up on this as soon as possible. */
@@ -1058,6 +1059,7 @@ max_leading_ones(ccc_bitblock_ b, ptrdiff_t const i_in_block,
     }
     if (ones_remaining <= (ptrdiff_t)BLOCK_BITS)
     {
+        assert(i_in_block < (ptrdiff_t)BLOCK_BITS);
         ccc_bitblock_ shifted = b << (BLOCK_BITS - i_in_block - 1);
         ccc_bitblock_ const required_ones = ALL_BITS_ON
                                             << (BLOCK_BITS - ones_remaining);
