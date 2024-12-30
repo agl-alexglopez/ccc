@@ -356,6 +356,16 @@ ccc_bs_capacity(ccc_bitset const *const bs)
 }
 
 size_t
+ccc_bs_blocks_capacity(ccc_bitset const *const bs)
+{
+    if (!bs)
+    {
+        return 0;
+    }
+    return blocks(bs->cap_);
+}
+
+size_t
 ccc_bs_size(ccc_bitset const *const bs)
 {
     if (!bs)
@@ -363,6 +373,16 @@ ccc_bs_size(ccc_bitset const *const bs)
         return 0;
     }
     return bs->sz_;
+}
+
+size_t
+ccc_bs_blocks_size(ccc_bitset const *const bs)
+{
+    if (!bs)
+    {
+        return 0;
+    }
+    return blocks(bs->sz_);
 }
 
 ccc_tribool
