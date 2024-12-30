@@ -810,7 +810,8 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
                      : ~bs->mem_[cur_block] & (ALL_BITS_ON << block_i);
         if (cur_end > range_end)
         {
-            bits &= (ALL_BITS_ON >> (cur_end - range_end));
+            /* Modulo at most once entire function, not every loop cycle. */
+            bits &= ~(ALL_BITS_ON << (range_end % BLOCK_BITS));
         }
         struct group const ones
             = max_trailing_ones(bits, block_i, num_bits - num_found);
@@ -1004,7 +1005,6 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         return -1;
     }
-    ptrdiff_t const final_block_i = (ptrdiff_t)((range_end + 1) % BLOCK_BITS);
     size_t num_found = 0;
     ptrdiff_t bits_start = (ptrdiff_t)i;
     ptrdiff_t cur_block = (ptrdiff_t)block_i(i);
@@ -1019,8 +1019,7 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
                            & (ALL_BITS_ON >> ((BLOCK_BITS - block_i) - 1));
         if (cur_end < range_end)
         {
-            assert(final_block_i < (ptrdiff_t)BLOCK_BITS);
-            bits &= (ALL_BITS_ON << final_block_i);
+            bits &= (ALL_BITS_ON << ((range_end + 1) % BLOCK_BITS));
         }
         struct group const ones = max_leading_ones(
             bits, block_i, (ptrdiff_t)(num_bits - num_found));
