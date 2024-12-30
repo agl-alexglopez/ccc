@@ -499,11 +499,23 @@ Obtain state from the container. */
 @return capacity of bits capable of being stored in the current set. */
 size_t ccc_bs_capacity(ccc_bitset const *bs);
 
+/** @brief Return number of ccc_bitblocks used by bit set for capacity bits.
+@param [in] bs a pointer to the bit set.
+@return capacity in number of bit blocks used to hold the entire capacity of
+bits in the set. Capacity may be greater than or equal to size. */
+size_t ccc_bs_blocks_capacity(ccc_bitset const *bs);
+
 /** @brief Return total number of bits actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
 @return the total number of bits currently tracked by the set regardless of
 true or false state of each. 0 is returned if bs is NULL. */
 size_t ccc_bs_size(ccc_bitset const *bs);
+
+/** @brief Return number of ccc_bitblocks used by the bit set for size bits.
+@param [in] bs a pointer to the bit set.
+@return size in number of bit blocks used to hold the current size of bits in
+the set. Size may be less than or equal to capacity. */
+size_t ccc_bs_blocks_size(ccc_bitset const *bs);
 
 /** @brief Return true if no bits are actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
