@@ -188,26 +188,6 @@ ccc_tribool ccc_bs_test_at(ccc_bitset const *bs, size_t i);
 
 /**@}*/
 
-/** @name Dynamic Interface
-Allows adding to and removing from the set. */
-/**@{*/
-
-/** @brief Add a bit value to the set as the new Most Significant Bit.
-@param [in] bs a pointer to the bit set.
-@param [in] b the value to push at the Most Significant Bit CCC_TRUE/CCC_FALSE.
-@return the result of the operation, ok if successful or an error if bad
-parameters are provided or resizing is required to accommodate a new bit but
-resizing fails. */
-ccc_result ccc_bs_push_back(ccc_bitset *bs, ccc_tribool b);
-
-/** @brief Remove the Most Significant Bit from the set.
-@param [in] bs a pointer to the bit set.
-@return the previous value of the Most Significant Bit (CCC_TRUE or CCC_FALSE)
-or a bool error if bs is NULL or bs is empty. */
-ccc_tribool ccc_bs_pop_back(ccc_bitset *bs);
-
-/**@}*/
-
 /** @name Bit Modification Interface
 Set and flip bits in the set. */
 /**@{*/
@@ -553,6 +533,56 @@ ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
 
 /**@}*/
 
+/** @name Bit Operations Interface
+User standard integer width bit operations on the entire set. */
+/**@{*/
+
+/** @brief Bitwise OR dst set with src set.
+@param [in] dst the set to modified with the OR operation.
+@param [in] src the set to be read as the source bits for the OR operation.
+@return an OK result if the operation is successful or an input error if dst
+or src are NULL.
+
+Note that sets are aligned from their Least Significant Bit and a smaller src
+set is conceptually padded with 0's in its higher order bits to align with
+the larger dst set (no modifications to the smaller set are performed to achieve
+this). This is done to stay consistent with how the operation would work on
+a smaller integer being stored in a larger integer to align with the larger. */
+ccc_result ccc_bs_or(ccc_bitset *dst, ccc_bitset const *src);
+
+/** @brief Bitwise AND dst set with src set.
+@param [in] dst the set to modified with the AND operation.
+@param [in] src the set to be read as the source bits for the AND operation.
+@return an OK result if the operation is successful or an input error if dst
+or src are NULL.
+@warning sets behave identically to integers for the AND operation when widening
+occurs. If dst is larger than src, src is padded with zeros in its Most
+Significant Bits. This means any higher order bits in the larger dst set will be
+set to 0 as a result of the bitwise AND operation.
+
+Note that sets are aligned from their Least Significant Bit and a smaller src
+set is conceptually padded with 0's in its higher order bits to align with
+the larger dst set (no modifications to the smaller set are performed to achieve
+this). This is done to stay consistent with how the operation would work on
+a smaller integer being stored in a larger integer to align with the larger
+for a bitwise operation. */
+ccc_result ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src);
+
+/** @brief Bitwise XOR dst set with src set.
+@param [in] dst the set to modified with the XOR operation.
+@param [in] src the set to be read as the source bits for the XOR operation.
+@return an OK result if the operation is successful or an input error if dst
+or src are NULL.
+
+Note that sets are aligned from their Least Significant Bit and a smaller src
+set is conceptually padded with 0's in its higher order bits to align with
+the larger dst set (no modifications to the smaller set are performed to achieve
+this). This is done to stay consistent with how the operation would work on
+a smaller integer being stored in a larger integer to align with the larger. */
+ccc_result ccc_bs_xor(ccc_bitset *dst, ccc_bitset const *src);
+
+/**@}*/
+
 /** @name State Interface
 Obtain state from the container. */
 /**@{*/
@@ -630,6 +660,26 @@ underlying memory. Capacity becomes 0 as well.
 the set cannot be freed because no allocation function was provided upon
 initialization. */
 ccc_result ccc_bs_clear_and_free(ccc_bitset *bs);
+
+/**@}*/
+
+/** @name Dynamic Interface
+Allows adding to and removing from the set. */
+/**@{*/
+
+/** @brief Add a bit value to the set as the new Most Significant Bit.
+@param [in] bs a pointer to the bit set.
+@param [in] b the value to push at the Most Significant Bit CCC_TRUE/CCC_FALSE.
+@return the result of the operation, ok if successful or an error if bad
+parameters are provided or resizing is required to accommodate a new bit but
+resizing fails. */
+ccc_result ccc_bs_push_back(ccc_bitset *bs, ccc_tribool b);
+
+/** @brief Remove the Most Significant Bit from the set.
+@param [in] bs a pointer to the bit set.
+@return the previous value of the Most Significant Bit (CCC_TRUE or CCC_FALSE)
+or a bool error if bs is NULL or bs is empty. */
+ccc_tribool ccc_bs_pop_back(ccc_bitset *bs);
 
 /**@}*/
 

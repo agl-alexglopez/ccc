@@ -55,8 +55,80 @@ static struct group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
 static struct group max_leading_ones(ccc_bitblock_ b, ptrdiff_t i_in_block,
                                      ptrdiff_t num_ones_remaining);
 static ccc_result maybe_resize(struct ccc_bitset_ *bs, size_t to_add);
+static size_t min(size_t, size_t);
+static void set_all(struct ccc_bitset_ *bs, ccc_tribool b);
 
 /*=======================   Public Interface   ==============================*/
+
+ccc_result
+ccc_bs_or(ccc_bitset *const dst, ccc_bitset const *const src)
+{
+    if (!dst || !src)
+    {
+        return CCC_INPUT_ERR;
+    }
+    if (!dst->sz_ || !src->sz_)
+    {
+        return CCC_OK;
+    }
+    size_t const end_block = blocks(min(dst->sz_, src->sz_));
+    for (size_t b = 0; b < end_block; ++b)
+    {
+        dst->mem_[b] |= src->mem_[b];
+    }
+    return CCC_OK;
+}
+
+ccc_result
+ccc_bs_xor(ccc_bitset *const dst, ccc_bitset const *const src)
+{
+    if (!dst || !src)
+    {
+        return CCC_INPUT_ERR;
+    }
+    if (!dst->sz_ || !src->sz_)
+    {
+        return CCC_OK;
+    }
+    size_t const end_block = blocks(min(dst->sz_, src->sz_));
+    for (size_t b = 0; b < end_block; ++b)
+    {
+        dst->mem_[b] ^= src->mem_[b];
+    }
+    return CCC_OK;
+}
+
+ccc_result
+ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src)
+{
+    if (!dst || !src)
+    {
+        return CCC_INPUT_ERR;
+    }
+    if (!src->sz_)
+    {
+        set_all(dst, CCC_FALSE);
+        return CCC_OK;
+    }
+    if (!dst->sz_)
+    {
+        return CCC_OK;
+    }
+    size_t smaller_end = blocks(min(dst->sz_, src->sz_));
+    for (size_t b = 0; b < smaller_end; ++b)
+    {
+        dst->mem_[b] &= src->mem_[b];
+    }
+    if (dst->sz_ <= src->sz_)
+    {
+        return CCC_OK;
+    }
+    size_t const dst_blocks = blocks(dst->sz_);
+    size_t const remaining_blocks = dst_blocks - smaller_end;
+    (void)memset(dst->mem_ + smaller_end, CCC_FALSE,
+                 remaining_blocks * sizeof(ccc_bitblock_));
+    return CCC_OK;
+}
 
 ccc_tribool
 ccc_bs_test(ccc_bitset const *const bs, size_t const i)
@@ -115,9 +187,7 @@ ccc_bs_set_all(ccc_bitset *const bs, ccc_tribool const b)
     }
     if (bs->sz_)
     {
-        int const v = b ? ~0 : 0;
-        (void)memset(bs->mem_, v, blocks(bs->sz_) * sizeof(ccc_bitblock_));
-        bs->mem_[block_i(bs->sz_ - 1)] &= last_on(bs);
+        set_all(bs, b);
     }
     return CCC_OK;
 }
@@ -1222,6 +1292,14 @@ all_range(struct ccc_bitset_ const *const bs, size_t const i,
     return CCC_TRUE;
 }
 
+static inline void
+set_all(struct ccc_bitset_ *const bs, ccc_tribool b)
+{
+    int const v = b ? ~0 : 0;
+    (void)memset(bs->mem_, v, blocks(bs->sz_) * sizeof(ccc_bitblock_));
+    bs->mem_[block_i(bs->sz_ - 1)] &= last_on(bs);
+}
+
 /* Given a reference to the correct block in the set, the true set index (may be
    greater than size of a block), and the value to set, sets the index in the
    block to the given tribool value. */
@@ -1279,6 +1357,12 @@ static inline size_t
 blocks(size_t const bits)
 {
     return (bits + (BLOCK_BITS - 1)) / BLOCK_BITS;
+}
+
+static inline size_t
+min(size_t a, size_t b)
+{
+    return a < b ? a : b;
 }
 
 static inline unsigned
