@@ -881,6 +881,58 @@ CHECK_BEGIN_STATIC_FN(bs_test_xor_diff_size)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_shiftl)
+{
+    ccc_bitset bs = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL,
+                                NULL, 512);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_popcount(&bs), 512);
+    CHECK(ccc_bs_shiftl(&bs, 512), CCC_OK);
+    CHECK(ccc_bs_popcount(&bs), 0);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
+    size_t ones = 512;
+    CHECK(ccc_bs_shiftl(&bs, bits_in_block), CCC_OK);
+    ones -= bits_in_block;
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK(ccc_bs_shiftl(&bs, bits_in_block / 2), CCC_OK);
+    ones -= (bits_in_block / 2);
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK(ccc_bs_shiftl(&bs, bits_in_block * 2), CCC_OK);
+    ones -= (bits_in_block * 2);
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK(ccc_bs_shiftl(&bs, (bits_in_block - 3) * 3), CCC_OK);
+    ones -= ((bits_in_block - 3) * 3);
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_shiftr)
+{
+    ccc_bitset bs = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512, NULL,
+                                NULL, 512);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_popcount(&bs), 512);
+    CHECK(ccc_bs_shiftr(&bs, 512), CCC_OK);
+    CHECK(ccc_bs_popcount(&bs), 0);
+    CHECK(ccc_bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    size_t const bits_in_block = sizeof(ccc_bitblock) * CHAR_BIT;
+    size_t ones = 512;
+    CHECK(ccc_bs_shiftr(&bs, bits_in_block), CCC_OK);
+    ones -= bits_in_block;
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK(ccc_bs_shiftr(&bs, bits_in_block / 2), CCC_OK);
+    ones -= (bits_in_block / 2);
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK(ccc_bs_shiftr(&bs, bits_in_block * 2), CCC_OK);
+    ones -= (bits_in_block * 2);
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK(ccc_bs_shiftr(&bs, (bits_in_block - 3) * 3), CCC_OK);
+    ones -= ((bits_in_block - 3) * 3);
+    CHECK(ccc_bs_popcount(&bs), ones);
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
 validate_sudoku_box(int board[9][9], ccc_bitset *const row_check,
@@ -1031,6 +1083,6 @@ main(void)
         bs_test_first_leading_zeros(), bs_test_first_leading_zeros_fail(),
         bs_test_or_same_size(), bs_test_or_diff_size(), bs_test_and_same_size(),
         bs_test_and_diff_size(), bs_test_xor_same_size(),
-        bs_test_xor_diff_size(), bs_test_valid_sudoku(),
-        bs_test_invalid_sudoku());
+        bs_test_xor_diff_size(), bs_test_shiftl(), bs_test_shiftr(),
+        bs_test_valid_sudoku(), bs_test_invalid_sudoku());
 }
