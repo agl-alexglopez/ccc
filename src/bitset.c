@@ -215,7 +215,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
     else
     {
         blockwidth_t shift_remainder = BLOCK_BITS - shift_start;
-        for (size_t i = remaining_start; i <= last_block; ++i)
+        for (size_t i = remaining_start; i < last_block; ++i)
         {
             bs->mem_[i - remaining_start]
                 = (bs->mem_[i] >> shift_start)
@@ -223,6 +223,12 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         }
         bs->mem_[last_block - remaining_start]
             = bs->mem_[last_block] >> shift_start;
+    }
+    for (ptrdiff_t i = (ptrdiff_t)last_block,
+                   end = (ptrdiff_t)(last_block - remaining_start);
+         i > end; --i)
+    {
+        bs->mem_[i] = 0;
     }
     bs->mem_[set_block_i(bs->sz_ - 1)] &= last_on(bs);
     return CCC_OK;
