@@ -581,6 +581,28 @@ this). This is done to stay consistent with how the operation would work on
 a smaller integer being stored in a larger integer to align with the larger. */
 ccc_result ccc_bs_xor(ccc_bitset *dst, ccc_bitset const *src);
 
+/** @brief Shift the bit set left by left_shifts amount.
+@param [in] bs a pointer to the bit set.
+@param [in] left_shifts the number of left shifts to perform.
+@return an ok result if the operation was successful or an error if the bitset
+is NULL.
+
+Note that if the number of shifts is greater than the bit set size the bit set
+is zeroed out rather than exhibiting undefined behavior as in the equivalent
+integer operation. */
+ccc_result ccc_bs_shiftl(ccc_bitset *bs, size_t left_shifts);
+
+/** @brief Shift the bit set right by right_shifts amount.
+@param [in] bs a pointer to the bit set.
+@param [in] right_shifts the number of right shifts to perform.
+@return an ok result if the operation was successful or an error if the bitset
+is NULL.
+
+Note that if the number of shifts is greater than the bit set size the bit set
+is zeroed out rather than exhibiting undefined behavior as in the equivalent
+integer operation. */
+ccc_result ccc_bs_shiftr(ccc_bitset *bs, size_t right_shifts);
+
 /**@}*/
 
 /** @name State Interface
