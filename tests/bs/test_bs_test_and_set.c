@@ -766,6 +766,121 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros_fail)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_or_same_size)
+{
+    ccc_bitset src = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    ccc_bitset dst = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    size_t const size = 512;
+    for (size_t i = 0; i < size; i += 2)
+    {
+        CHECK(ccc_bs_set(&dst, i, CCC_TRUE), CCC_FALSE);
+    }
+    for (size_t i = 1; i < size; i += 2)
+    {
+        CHECK(ccc_bs_set(&src, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_popcount(&src), size / 2);
+    CHECK(ccc_bs_popcount(&dst), size / 2);
+    CHECK(ccc_bs_or(&dst, &src), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), size);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_or_diff_size)
+{
+    ccc_bitset dst = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    /* Make it slightly harder by not ending on a perfect block boundary. */
+    ccc_bitset src = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(244)]){}, 244,
+                                 NULL, NULL, 244);
+    CHECK(ccc_bs_set_all(&src, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_popcount(&src), 244);
+    CHECK(ccc_bs_popcount(&dst), 0);
+    CHECK(ccc_bs_or(&dst, &src), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), 244);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_and_same_size)
+{
+    ccc_bitset src = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    ccc_bitset dst = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    size_t const size = 512;
+    for (size_t i = 0; i < size; i += 2)
+    {
+        CHECK(ccc_bs_set(&dst, i, CCC_TRUE), CCC_FALSE);
+    }
+    for (size_t i = 1; i < size; i += 2)
+    {
+        CHECK(ccc_bs_set(&src, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_popcount(&src), size / 2);
+    CHECK(ccc_bs_popcount(&dst), size / 2);
+    CHECK(ccc_bs_and(&dst, &src), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), 0);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_and_diff_size)
+{
+    ccc_bitset dst = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    /* Make it slightly harder by not ending on a perfect block boundary. */
+    ccc_bitset src = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(244)]){}, 244,
+                                 NULL, NULL, 244);
+    CHECK(ccc_bs_set_all(&dst, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_set_all(&src, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), 512);
+    CHECK(ccc_bs_popcount(&src), 244);
+    CHECK(ccc_bs_and(&dst, &src), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), 244);
+    CHECK(ccc_bs_size(&dst), 512);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_xor_same_size)
+{
+    ccc_bitset src = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    ccc_bitset dst = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    size_t const size = 512;
+    for (size_t i = 0; i < size; i += 2)
+    {
+        CHECK(ccc_bs_set(&dst, i, CCC_TRUE), CCC_FALSE);
+    }
+    for (size_t i = 1; i < size; i += 2)
+    {
+        CHECK(ccc_bs_set(&src, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_popcount(&src), size / 2);
+    CHECK(ccc_bs_popcount(&dst), size / 2);
+    CHECK(ccc_bs_xor(&dst, &src), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), size);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_xor_diff_size)
+{
+    ccc_bitset dst = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    /* Make it slightly harder by not ending on a perfect block boundary. */
+    ccc_bitset src = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(244)]){}, 244,
+                                 NULL, NULL, 244);
+    CHECK(ccc_bs_set_all(&dst, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_set_all(&src, CCC_TRUE), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), 512);
+    CHECK(ccc_bs_popcount(&src), 244);
+    CHECK(ccc_bs_xor(&dst, &src), CCC_OK);
+    CHECK(ccc_bs_popcount(&dst), 512 - 244);
+    CHECK(ccc_bs_size(&dst), 512);
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
 validate_sudoku_box(int board[9][9], ccc_bitset *const row_check,
@@ -914,5 +1029,8 @@ main(void)
         bs_test_first_leading_one(), bs_test_first_leading_ones(),
         bs_test_first_leading_ones_fail(), bs_test_first_leading_zero(),
         bs_test_first_leading_zeros(), bs_test_first_leading_zeros_fail(),
-        bs_test_valid_sudoku(), bs_test_invalid_sudoku());
+        bs_test_or_same_size(), bs_test_or_diff_size(), bs_test_and_same_size(),
+        bs_test_and_diff_size(), bs_test_xor_same_size(),
+        bs_test_xor_diff_size(), bs_test_valid_sudoku(),
+        bs_test_invalid_sudoku());
 }

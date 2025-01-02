@@ -603,6 +603,14 @@ is zeroed out rather than exhibiting undefined behavior as in the equivalent
 integer operation. */
 ccc_result ccc_bs_shiftr(ccc_bitset *bs, size_t right_shifts);
 
+/** @brief Checks two bit sets of the same size for equality.
+@param [in] a pointer to a bit set.
+@param [in] b pointer to another bit set of equal size.
+@return true if the bit sets are of equal size with identical bit values at
+every position, false if the sets are different sizes ore have mismatched bits.
+A bool error is returned if either pointer is NULL. */
+ccc_tribool ccc_bs_eq(ccc_bitset const *a, ccc_bitset const *b);
+
 /**@}*/
 
 /** @name State Interface
