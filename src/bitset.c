@@ -83,6 +83,7 @@ ccc_bs_or(ccc_bitset *const dst, ccc_bitset const *const src)
     {
         dst->mem_[b] |= src->mem_[b];
     }
+    dst->mem_[set_block_i(dst->sz_ - 1)] &= last_on(dst);
     return CCC_OK;
 }
 
@@ -102,6 +103,7 @@ ccc_bs_xor(ccc_bitset *const dst, ccc_bitset const *const src)
     {
         dst->mem_[b] ^= src->mem_[b];
     }
+    dst->mem_[set_block_i(dst->sz_ - 1)] &= last_on(dst);
     return CCC_OK;
 }
 
@@ -134,6 +136,7 @@ ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src)
     size_t const remaining_blocks = dst_blocks - smaller_end;
     (void)memset(dst->mem_ + smaller_end, CCC_FALSE,
                  remaining_blocks * sizeof(ccc_bitblock_));
+    dst->mem_[set_block_i(dst->sz_ - 1)] &= last_on(dst);
     return CCC_OK;
 }
 
@@ -144,7 +147,7 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
     {
         return CCC_INPUT_ERR;
     }
-    if (!bs->sz_)
+    if (!bs->sz_ || !left_shifts)
     {
         return CCC_OK;
     }
@@ -153,6 +156,33 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
         set_all(bs, CCC_FALSE);
         return CCC_OK;
     }
+    size_t const last_block = set_block_i(bs->sz_ - 1);
+    size_t const remaining_start = set_block_i(left_shifts);
+    blockwidth_t shift_start = blockwidth_i(left_shifts);
+    if (!shift_start)
+    {
+        for (size_t i = (last_block - remaining_start) + 1; i--;)
+        {
+            bs->mem_[i + remaining_start] = bs->mem_[i];
+        }
+        bs->mem_[remaining_start] = bs->mem_[0];
+    }
+    else
+    {
+        blockwidth_t const shift_remainder = BLOCK_BITS - shift_start;
+        for (size_t i = (last_block - remaining_start) + 1; i--;)
+        {
+            bs->mem_[i + remaining_start]
+                = (bs->mem_[i] << shift_start)
+                  | (bs->mem_[i - 1] >> shift_remainder);
+        }
+        bs->mem_[remaining_start] = bs->mem_[0];
+    }
+    for (size_t i = 0; i < remaining_start; ++i)
+    {
+        bs->mem_[i] = 0;
+    }
+    bs->mem_[set_block_i(bs->sz_ - 1)] &= last_on(bs);
     return CCC_OK;
 }
 
@@ -172,6 +202,29 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         set_all(bs, CCC_FALSE);
         return CCC_OK;
     }
+    size_t const last_block = set_block_i(bs->sz_ - 1);
+    size_t const remaining_start = set_block_i(right_shifts);
+    blockwidth_t shift_start = blockwidth_i(right_shifts);
+    if (!shift_start)
+    {
+        for (size_t i = remaining_start; i <= last_block; ++i)
+        {
+            bs->mem_[i - remaining_start] = bs->mem_[i];
+        }
+    }
+    else
+    {
+        blockwidth_t shift_remainder = BLOCK_BITS - shift_start;
+        for (size_t i = remaining_start; i <= last_block; ++i)
+        {
+            bs->mem_[i - remaining_start]
+                = (bs->mem_[i] >> shift_start)
+                  | (bs->mem_[i + 1] << shift_remainder);
+        }
+        bs->mem_[last_block - remaining_start]
+            = bs->mem_[last_block] >> shift_start;
+    }
+    bs->mem_[set_block_i(bs->sz_ - 1)] &= last_on(bs);
     return CCC_OK;
 }
 
@@ -811,6 +864,21 @@ ccc_bs_data(ccc_bitset const *const bs)
         return NULL;
     }
     return bs->mem_;
+}
+
+ccc_tribool
+ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
+{
+    if (!a || !b)
+    {
+        return CCC_BOOL_ERR;
+    }
+    if (a->sz_ != b->sz_)
+    {
+        return CCC_FALSE;
+    }
+    return memcmp(a->mem_, b->mem_, blocks(a->sz_) * sizeof(ccc_bitblock_))
+           == 0;
 }
 
 /*=======================    Static Helpers    ==============================*/
