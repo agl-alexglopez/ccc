@@ -64,8 +64,39 @@ static ccc_result maybe_resize(struct ccc_bitset_ *bs, size_t to_add);
 static size_t min(size_t, size_t);
 static void set_all(struct ccc_bitset_ *bs, ccc_tribool b);
 static blockwidth_t blockwidth_i(size_t bit_i);
+static ccc_tribool is_subset_of(struct ccc_bitset_ const *set,
+                                struct ccc_bitset_ const *subset);
 
 /*=======================   Public Interface   ==============================*/
+
+ccc_tribool
+ccc_bs_is_proper_subset(ccc_bitset const *const set,
+                        ccc_bitset const *const subset)
+{
+    if (!set || !subset)
+    {
+        return CCC_BOOL_ERR;
+    }
+    if (set->sz_ <= subset->sz_)
+    {
+        return CCC_FALSE;
+    }
+    return is_subset_of(set, subset);
+}
+
+ccc_tribool
+ccc_bs_is_subset(ccc_bitset const *const set, ccc_bitset const *const subset)
+{
+    if (!set || !subset)
+    {
+        return CCC_BOOL_ERR;
+    }
+    if (set->sz_ < subset->sz_)
+    {
+        return CCC_FALSE;
+    }
+    return is_subset_of(set, subset);
+}
 
 ccc_result
 ccc_bs_or(ccc_bitset *const dst, ccc_bitset const *const src)
@@ -888,6 +919,22 @@ ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
 }
 
 /*=======================    Static Helpers    ==============================*/
+
+/* Assumes set is greater than or equal to subset. */
+static inline ccc_tribool
+is_subset_of(struct ccc_bitset_ const *const set,
+             struct ccc_bitset_ const *const subset)
+{
+    assert(set->sz_ >= subset->sz_);
+    for (size_t i = 0, end = blocks(subset->sz_); i < end; ++i)
+    {
+        if ((set->mem_[i] & subset->mem_[i]) != subset->mem_[i])
+        {
+            return CCC_FALSE;
+        }
+    }
+    return CCC_TRUE;
+}
 
 static inline ccc_result
 maybe_resize(struct ccc_bitset_ *const bs, size_t const to_add)
