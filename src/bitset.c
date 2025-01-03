@@ -1487,13 +1487,11 @@ popcount(ccc_bitblock_ const b)
 static inline ptrdiff_t
 countr_0(ccc_bitblock_ const b)
 {
-#if defined(__GNUC__) || defined(__clang__)
     static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+#if defined(__GNUC__) || defined(__clang__)
     return b ? __builtin_ctz(b) : (ptrdiff_t)BLOCK_BITS;
 #else
-    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
-    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     if (!b)
     {
         return (ptrdiff_t)BLOCK_BITS;
@@ -1508,13 +1506,11 @@ countr_0(ccc_bitblock_ const b)
 static inline ptrdiff_t
 countl_0(ccc_bitblock_ const b)
 {
-#if defined(__GNUC__) || defined(__clang__)
     static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+#if defined(__GNUC__) || defined(__clang__)
     return b ? __builtin_clz(b) : (ptrdiff_t)BLOCK_BITS;
 #else
-    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
-    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     if (!b)
     {
         return (ptrdiff_t)BLOCK_BITS;
