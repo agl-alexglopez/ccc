@@ -132,6 +132,7 @@ ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src)
     {
         return CCC_OK;
     }
+    /* The src widens to align with dst as integers would; same consequences. */
     size_t const dst_blocks = blocks(dst->sz_);
     size_t const remaining_blocks = dst_blocks - smaller_end;
     (void)memset(dst->mem_ + smaller_end, CCC_FALSE,

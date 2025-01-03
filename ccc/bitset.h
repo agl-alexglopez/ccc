@@ -415,8 +415,8 @@ ptrdiff_t ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
 contiguous 0 bits.
 @param [in] bs a pointer to the bit set.
 @param [in] num_zeros the number of trailing contiguous 0 bits to find.
-@return the index in a search starting from the Least Significant Bit of the
-set of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+@return the index in a search, starting from the Least Significant Bit of the
+set, of the first 0 in a sequence of num_zeros 0 bits. If the input is invalid
 or such a sequence cannot be found -1 is returned.
 @warning the user must validate that bs is non-NULL and num_zeros is less than
 the size of the set in order to distinguish -1 returned as a result of a failed
@@ -429,8 +429,8 @@ contiguous 0 bits in the specified range.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
 @param [in] num_zeros the number of trailing contiguous 0 bits to find.
-@return the index in a search starting from the Least Significant Bit of the
-range of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+@return the index in a search, starting from the Least Significant Bit of the
+range, of the first 0 in a sequence of num_zeros 0 bits. If the input is invalid
 or such a sequence cannot be found -1 is returned.
 @warning the user must validate their own range. A group of 1's does not exist
 in an invalid range therefore -1 is returned. To distinguish a valid negative
@@ -498,7 +498,9 @@ ptrdiff_t ccc_bs_first_leading_zero(ccc_bitset const *bs);
 /** @brief Return the index of the first leading bit set to 0 in the set,
 starting from the Most Significant Bit at index size - 1.
 @param [in] bs a pointer to the bit set.
-@return the index of the first bit set to 1 or -1 if no 1 bit is found or bs in
+@param [in] i the starting index to search for a 0 bit.
+@param [in] count size to search from Most Significant Bit to Least in range.
+@return the index of the first bit set to 0 or -1 if no 0 bit is found or bs in
 NULL. */
 ptrdiff_t ccc_bs_first_leading_zero_range(ccc_bitset const *bs, size_t i,
                                           size_t count);
@@ -507,8 +509,8 @@ ptrdiff_t ccc_bs_first_leading_zero_range(ccc_bitset const *bs, size_t i,
 contiguous 0 bits.
 @param [in] bs a pointer to the bit set.
 @param [in] num_zeros the number of leading contiguous 0 bits to find.
-@return the index in a search starting from the Least Significant Bit of the
-set of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+@return the index in a search, starting from the Most Significant Bit of the
+set, of the first 0 in a sequence of num_zeros 0 bits. If the input is invalid
 or such a sequence cannot be found -1 is returned.
 @warning the user must validate that bs is non-NULL and num_zeros is less than
 the size of the set in order to distinguish -1 returned as a result of a failed
@@ -521,8 +523,8 @@ contiguous 0 bits in the specified range.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
 @param [in] num_zeros the number of leading contiguous 0 bits to find.
-@return the index in a search starting from the Least Significant Bit of the
-range of the first 1 in a sequence of num_zeros 0 bits. If the input is invalid
+@return the index in a search, starting from the Most Significant Bit of the
+range, of the first 0 in a sequence of num_zeros 0 bits. If the input is invalid
 or such a sequence cannot be found -1 is returned.
 @warning the user must validate their own range. A group of 1's does not exist
 in an invalid range therefore -1 is returned. To distinguish a valid negative
@@ -557,15 +559,15 @@ ccc_result ccc_bs_or(ccc_bitset *dst, ccc_bitset const *src);
 or src are NULL.
 @warning sets behave identically to integers for the AND operation when widening
 occurs. If dst is larger than src, src is padded with zeros in its Most
-Significant Bits. This means any higher order bits in the larger dst set will be
-set to 0 as a result of the bitwise AND operation.
+Significant Bits. This means a bitwise AND operations will occur with the higher
+order bits in dst and 0's in this padded range (this results in all bits in dst
+being set to 0 in that range).
 
 Note that sets are aligned from their Least Significant Bit and a smaller src
 set is conceptually padded with 0's in its higher order bits to align with
 the larger dst set (no modifications to the smaller set are performed to achieve
-this). This is done to stay consistent with how the operation would work on
-a smaller integer being stored in a larger integer to align with the larger
-for a bitwise operation. */
+this). This is done to stay consistent with integer promotion and widening rules
+in C. */
 ccc_result ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src);
 
 /** @brief Bitwise XOR dst set with src set.
