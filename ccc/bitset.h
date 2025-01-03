@@ -13,6 +13,18 @@ Therefore, "trailing" means starting from the Least Significant Bit and
 "leading" means starting from the Most Significant Bit; this is done to stay
 consistent with upcoming bit operations introduced to the C23 standard.
 
+A bit set can be used for modeling integer operations on integers that exceed
+the widths available on one's platform. The provided bitwise operation
+functions are helpful for these types of manipulations.
+
+A bit set can also be used for modeling data that can be abstracted to a
+position and binary value. For example, disk blocks in a file system, free
+blocks in a memory allocator, and many other resource abstractions can benefit
+from a bit set. For these use cases the bit set offers efficient functions to
+find the first bits set to zero or one from either the trailing or leading
+direction. A bit set can also efficiently report if contiguous ranges of zeros
+or ones are available.
+
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
 
