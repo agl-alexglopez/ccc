@@ -619,7 +619,7 @@ ccc_tribool ccc_bs_eq(ccc_bitset const *a, ccc_bitset const *b);
 Perform basic mathematical set operations on the bit set. */
 /**@{*/
 
-/** @brief Return CCC_TRUE if subset is a proper subset of set.
+/** @brief Return CCC_TRUE if subset is a proper subset of set (subset ⊂ set).
 @param [set] the set to check subset against.
 @param [subset] the subset to confirm as a proper subset of set.
 @return CCC_TRUE if all bit positions in subset share the same
@@ -632,7 +632,7 @@ CCC_TRUE. */
 ccc_tribool ccc_bs_is_proper_subset(ccc_bitset const *set,
                                     ccc_bitset const *subset);
 
-/** @brief Return CCC_TRUE if subset is a subset of set.
+/** @brief Return CCC_TRUE if subset is a subset of set (subset ⊆ set).
 @param [set] the set to check subset against.
 @param [subset] the subset to confirm as a subset of set.
 @return CCC_TRUE if all bit positions in subset share the same
