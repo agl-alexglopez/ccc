@@ -218,8 +218,8 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         for (size_t old_i = shifted_blocks; old_i < last_block; ++old_i)
         {
             bs->mem_[old_i - shifted_blocks]
-                = (bs->mem_[old_i] >> partial_shift)
-                  | (bs->mem_[old_i + 1] << remaining_shift);
+                = (bs->mem_[old_i + 1] << remaining_shift)
+                  | (bs->mem_[old_i] >> partial_shift);
         }
         bs->mem_[last_block - shifted_blocks]
             = bs->mem_[last_block] >> partial_shift;
