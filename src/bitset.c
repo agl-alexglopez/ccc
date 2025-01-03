@@ -161,11 +161,10 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
     blockwidth_t const partial_shift = blockwidth_i(left_shifts);
     if (!partial_shift)
     {
-        for (size_t old_i = last_block - shifted_blocks; old_i > 0; --old_i)
+        for (size_t old_i = last_block - shifted_blocks + 1; old_i--;)
         {
             bs->mem_[old_i + shifted_blocks] = bs->mem_[old_i];
         }
-        bs->mem_[shifted_blocks] = bs->mem_[0];
     }
     else
     {
@@ -207,7 +206,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
     blockwidth_t partial_shift = blockwidth_i(right_shifts);
     if (!partial_shift)
     {
-        for (size_t old_i = shifted_blocks; old_i <= last_block; ++old_i)
+        for (size_t old_i = shifted_blocks; old_i < last_block + 1; ++old_i)
         {
             bs->mem_[old_i - shifted_blocks] = bs->mem_[old_i];
         }
@@ -616,7 +615,7 @@ ccc_bs_push_back(ccc_bitset *const bs, ccc_tribool const b)
     {
         return CCC_INPUT_ERR;
     }
-    ccc_result check_resize = maybe_resize(bs, 1);
+    ccc_result const check_resize = maybe_resize(bs, 1);
     if (check_resize != CCC_OK)
     {
         return check_resize;
@@ -978,7 +977,7 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
     size_t cur_block = set_block_i(i);
     size_t cur_end = (cur_block * BLOCK_BITS) + BLOCK_BITS;
     blockwidth_t block_i = blockwidth_i(i);
-    while (bits_start + num_bits <= range_end)
+    do
     {
         /* Clean up some edge cases for the helper function because we allow
            the user to specify any range. What if our range ends before the
@@ -1020,7 +1019,7 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
         block_i = 0;
         ++cur_block;
         cur_end += BLOCK_BITS;
-    }
+    } while (bits_start + num_bits <= range_end);
     return -1;
 }
 
@@ -1186,7 +1185,7 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
     ptrdiff_t cur_block = (ptrdiff_t)set_block_i(i);
     ptrdiff_t cur_end = (ptrdiff_t)((cur_block * BLOCK_BITS) - 1);
     blockwidth_t block_i = blockwidth_i(i);
-    while (bits_start - (ptrdiff_t)num_bits >= range_end)
+    do
     {
         ccc_bitblock_ bits
             = is_one ? bs->mem_[cur_block]
@@ -1220,7 +1219,7 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
         block_i = BLOCK_BITS - 1;
         --cur_block;
         cur_end -= BLOCK_BITS;
-    }
+    } while (bits_start - (ptrdiff_t)num_bits >= range_end);
     return -1;
 }
 
