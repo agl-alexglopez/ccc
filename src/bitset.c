@@ -157,28 +157,28 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
         return CCC_OK;
     }
     size_t const last_block = set_block_i(bs->sz_ - 1);
-    size_t const remaining_start = set_block_i(left_shifts);
-    blockwidth_t shift_start = blockwidth_i(left_shifts);
-    if (!shift_start)
+    size_t const shifted_blocks = set_block_i(left_shifts);
+    blockwidth_t const partial_shift = blockwidth_i(left_shifts);
+    if (!partial_shift)
     {
-        for (size_t i = (last_block - remaining_start) + 1; i--;)
+        for (size_t old_i = last_block - shifted_blocks; old_i > 0; --old_i)
         {
-            bs->mem_[i + remaining_start] = bs->mem_[i];
+            bs->mem_[old_i + shifted_blocks] = bs->mem_[old_i];
         }
-        bs->mem_[remaining_start] = bs->mem_[0];
+        bs->mem_[shifted_blocks] = bs->mem_[0];
     }
     else
     {
-        blockwidth_t const shift_remainder = BLOCK_BITS - shift_start;
-        for (size_t i = (last_block - remaining_start) + 1; i--;)
+        blockwidth_t const remaining_shift = BLOCK_BITS - partial_shift;
+        for (size_t old_i = last_block - shifted_blocks; old_i > 0; --old_i)
         {
-            bs->mem_[i + remaining_start]
-                = (bs->mem_[i] << shift_start)
-                  | (bs->mem_[i - 1] >> shift_remainder);
+            bs->mem_[old_i + shifted_blocks]
+                = (bs->mem_[old_i] << partial_shift)
+                  | (bs->mem_[old_i - 1] >> remaining_shift);
         }
-        bs->mem_[remaining_start] = bs->mem_[0];
+        bs->mem_[shifted_blocks] = bs->mem_[0] << partial_shift;
     }
-    for (size_t i = 0; i < remaining_start; ++i)
+    for (size_t i = 0; i < shifted_blocks; ++i)
     {
         bs->mem_[i] = 0;
     }
@@ -203,29 +203,29 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         return CCC_OK;
     }
     size_t const last_block = set_block_i(bs->sz_ - 1);
-    size_t const remaining_start = set_block_i(right_shifts);
-    blockwidth_t shift_start = blockwidth_i(right_shifts);
-    if (!shift_start)
+    size_t const shifted_blocks = set_block_i(right_shifts);
+    blockwidth_t partial_shift = blockwidth_i(right_shifts);
+    if (!partial_shift)
     {
-        for (size_t i = remaining_start; i <= last_block; ++i)
+        for (size_t old_i = shifted_blocks; old_i <= last_block; ++old_i)
         {
-            bs->mem_[i - remaining_start] = bs->mem_[i];
+            bs->mem_[old_i - shifted_blocks] = bs->mem_[old_i];
         }
     }
     else
     {
-        blockwidth_t shift_remainder = BLOCK_BITS - shift_start;
-        for (size_t i = remaining_start; i < last_block; ++i)
+        blockwidth_t remaining_shift = BLOCK_BITS - partial_shift;
+        for (size_t old_i = shifted_blocks; old_i < last_block; ++old_i)
         {
-            bs->mem_[i - remaining_start]
-                = (bs->mem_[i] >> shift_start)
-                  | (bs->mem_[i + 1] << shift_remainder);
+            bs->mem_[old_i - shifted_blocks]
+                = (bs->mem_[old_i] >> partial_shift)
+                  | (bs->mem_[old_i + 1] << remaining_shift);
         }
-        bs->mem_[last_block - remaining_start]
-            = bs->mem_[last_block] >> shift_start;
+        bs->mem_[last_block - shifted_blocks]
+            = bs->mem_[last_block] >> partial_shift;
     }
     for (ptrdiff_t i = (ptrdiff_t)last_block,
-                   end = (ptrdiff_t)(last_block - remaining_start);
+                   end = (ptrdiff_t)(last_block - shifted_blocks);
          i > end; --i)
     {
         bs->mem_[i] = 0;
