@@ -933,6 +933,50 @@ CHECK_BEGIN_STATIC_FN(bs_test_shiftr)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_subset)
+{
+    ccc_bitset set = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    ccc_bitset subset1 = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                     NULL, NULL, 512);
+    ccc_bitset subset2 = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(244)]){}, 244,
+                                     NULL, NULL, 244);
+    for (size_t i = 0; i < 512; i += 2)
+    {
+        CHECK(ccc_bs_set(&set, i, CCC_TRUE), CCC_FALSE);
+        CHECK(ccc_bs_set(&subset1, i, CCC_TRUE), CCC_FALSE);
+    }
+    for (size_t i = 0; i < 244; i += 2)
+    {
+        CHECK(ccc_bs_set(&subset2, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_is_subset(&set, &subset1), CCC_TRUE);
+    CHECK(ccc_bs_is_subset(&set, &subset2), CCC_TRUE);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_proper_subset)
+{
+    ccc_bitset set = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                 NULL, NULL, 512);
+    ccc_bitset subset1 = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, 512,
+                                     NULL, NULL, 512);
+    ccc_bitset subset2 = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(244)]){}, 244,
+                                     NULL, NULL, 244);
+    for (size_t i = 0; i < 512; i += 2)
+    {
+        CHECK(ccc_bs_set(&set, i, CCC_TRUE), CCC_FALSE);
+        CHECK(ccc_bs_set(&subset1, i, CCC_TRUE), CCC_FALSE);
+    }
+    for (size_t i = 0; i < 244; i += 2)
+    {
+        CHECK(ccc_bs_set(&subset2, i, CCC_TRUE), CCC_FALSE);
+    }
+    CHECK(ccc_bs_is_proper_subset(&set, &subset1), CCC_FALSE);
+    CHECK(ccc_bs_is_subset(&set, &subset2), CCC_TRUE);
+    CHECK_END_FN();
+}
+
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
 ccc_tribool
 validate_sudoku_box(int board[9][9], ccc_bitset *const row_check,
@@ -1084,5 +1128,6 @@ main(void)
         bs_test_or_same_size(), bs_test_or_diff_size(), bs_test_and_same_size(),
         bs_test_and_diff_size(), bs_test_xor_same_size(),
         bs_test_xor_diff_size(), bs_test_shiftl(), bs_test_shiftr(),
-        bs_test_valid_sudoku(), bs_test_invalid_sudoku());
+        bs_test_subset(), bs_test_proper_subset(), bs_test_valid_sudoku(),
+        bs_test_invalid_sudoku());
 }
