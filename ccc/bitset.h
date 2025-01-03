@@ -295,7 +295,7 @@ ccc_result ccc_bs_flip_range(ccc_bitset *bs, size_t i, size_t count);
 
 /**@}*/
 
-/** @name Scan Interface
+/** @name Bit Scan Interface
 Find bits with a specific status. */
 /**@{*/
 
@@ -536,7 +536,7 @@ ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
 /**@}*/
 
 /** @name Bit Operations Interface
-User standard integer width bit operations on the entire set. */
+Use standard integer width bit operations on the entire set. */
 /**@{*/
 
 /** @brief Bitwise OR dst set with src set.
@@ -612,6 +612,36 @@ ccc_result ccc_bs_shiftr(ccc_bitset *bs, size_t right_shifts);
 every position, false if the sets are different sizes ore have mismatched bits.
 A bool error is returned if either pointer is NULL. */
 ccc_tribool ccc_bs_eq(ccc_bitset const *a, ccc_bitset const *b);
+
+/**@}*/
+
+/** @name Set Operations Interface
+Perform basic mathematical set operations on the bit set. */
+/**@{*/
+
+/** @brief Return CCC_TRUE if subset is a proper subset of set.
+@param [set] the set to check subset against.
+@param [subset] the subset to confirm as a proper subset of set.
+@return CCC_TRUE if all bit positions in subset share the same
+value--0 or 1--as the bit positions in set and set is of greater size than
+subset. A CCC_BOOL_ERR is returned if set or subset is NULL.
+
+If set is of size 0 the function returns CCC_FALSE regardless of the size of
+subset. If set is not of size 0 and subset is of size 0 the function returns
+CCC_TRUE. */
+ccc_tribool ccc_bs_is_proper_subset(ccc_bitset const *set,
+                                    ccc_bitset const *subset);
+
+/** @brief Return CCC_TRUE if subset is a subset of set.
+@param [set] the set to check subset against.
+@param [subset] the subset to confirm as a subset of set.
+@return CCC_TRUE if all bit positions in subset share the same
+value--0 or 1--as the bit positions in set. A CCC_BOOL_ERR is returned if set or
+subset is NULL.
+
+If set is size zero subset must also be of size 0 to return CCC_TRUE. If
+subset is size 0 the function returns CCC_TRUE regardless of the size of set. */
+ccc_tribool ccc_bs_is_subset(ccc_bitset const *set, ccc_bitset const *subset);
 
 /**@}*/
 
