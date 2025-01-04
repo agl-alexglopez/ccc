@@ -193,19 +193,23 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
     blockwidth_t const partial_shift = blockwidth_i(left_shifts);
     if (!partial_shift)
     {
-        for (size_t old_i = last_block - shifted_blocks + 1; old_i--;)
+        for (size_t shifted = last_block - shifted_blocks + 1,
+                    overwritten = last_block;
+             shifted--; --overwritten)
         {
-            bs->mem_[old_i + shifted_blocks] = bs->mem_[old_i];
+            bs->mem_[overwritten] = bs->mem_[shifted];
         }
     }
     else
     {
         blockwidth_t const remaining_shift = BLOCK_BITS - partial_shift;
-        for (size_t old_i = last_block - shifted_blocks; old_i > 0; --old_i)
+        for (size_t shifted = last_block - shifted_blocks,
+                    overwritten = last_block;
+             shifted > 0; --shifted, --overwritten)
         {
-            bs->mem_[old_i + shifted_blocks]
-                = (bs->mem_[old_i] << partial_shift)
-                  | (bs->mem_[old_i - 1] >> remaining_shift);
+            bs->mem_[overwritten]
+                = (bs->mem_[shifted] << partial_shift)
+                  | (bs->mem_[shifted - 1] >> remaining_shift);
         }
         bs->mem_[shifted_blocks] = bs->mem_[0] << partial_shift;
     }
@@ -238,19 +242,20 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
     blockwidth_t partial_shift = blockwidth_i(right_shifts);
     if (!partial_shift)
     {
-        for (size_t old_i = shifted_blocks; old_i < last_block + 1; ++old_i)
+        for (size_t shifted = shifted_blocks, overwritten = 0;
+             shifted < last_block + 1; ++shifted, ++overwritten)
         {
-            bs->mem_[old_i - shifted_blocks] = bs->mem_[old_i];
+            bs->mem_[overwritten] = bs->mem_[shifted];
         }
     }
     else
     {
         blockwidth_t remaining_shift = BLOCK_BITS - partial_shift;
-        for (size_t old_i = shifted_blocks; old_i < last_block; ++old_i)
+        for (size_t shifted = shifted_blocks, overwritten = 0;
+             shifted < last_block; ++shifted, ++overwritten)
         {
-            bs->mem_[old_i - shifted_blocks]
-                = (bs->mem_[old_i + 1] << remaining_shift)
-                  | (bs->mem_[old_i] >> partial_shift);
+            bs->mem_[overwritten] = (bs->mem_[shifted + 1] << remaining_shift)
+                                    | (bs->mem_[shifted] >> partial_shift);
         }
         bs->mem_[last_block - shifted_blocks]
             = bs->mem_[last_block] >> partial_shift;
