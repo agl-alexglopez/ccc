@@ -231,13 +231,19 @@ ccc_tribool ccc_bs_set_at(ccc_bitset *bs, size_t i, ccc_tribool b);
 bs is NULL. */
 ccc_result ccc_bs_set_all(ccc_bitset *bs, ccc_tribool b);
 
-/** @brief Set all the bits in the specified range (CCC_TRUE or CCC_FALSE).
+/** @brief Set all the bits in the specified range starting at the Least
+Significant Bit of the range and ending at the Most Significant Bit of the
+range (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
 @param [in] b the value to set (CCC_TRUE or CCC_FALSE).
 @param [in] i the starting index to set.
 @param [in] count the count of bits starting at i to set.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL or the range is invalid by position, count, or both. */
+bs is NULL or the range is invalid by position, count, or both.
+
+Note that a range is defined from i to i + count, where i + count is the
+exclusive end of the range. This is equivalent to moving from Least to Most
+Significant bit in an integer. */
 ccc_result ccc_bs_set_range(ccc_bitset *bs, size_t i, size_t count,
                             ccc_tribool b);
 
@@ -265,12 +271,18 @@ ccc_tribool ccc_bs_reset_at(ccc_bitset *bs, size_t i);
 bs is NULL. */
 ccc_result ccc_bs_reset_all(ccc_bitset *bs);
 
-/** @brief Set all the bits in the range to CCC_FALSE.
+/** @brief Set all the bits in the specified range starting at the Least
+Significant Bit of the range and ending at the Most Significant Bit of the
+range to CCC_FALSE.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to reset.
 @param [in] count the count of bits starting at i to reset.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL or the range is invalid by position, count, or both. */
+bs is NULL or the range is invalid by position, count, or both.
+
+Note that a range is defined from i to i + count, where i + count is the
+exclusive end of the range. This is equivalent to moving from Least to Most
+Significant bit in an integer. */
 ccc_result ccc_bs_reset_range(ccc_bitset *bs, size_t i, size_t count);
 
 /** @brief Toggle the bit at index i.
@@ -297,12 +309,17 @@ ccc_tribool ccc_bs_flip_at(ccc_bitset *bs, size_t i);
 bs is NULL. */
 ccc_result ccc_bs_flip_all(ccc_bitset *bs);
 
-/** @brief Flip all the bits in the range to their opposite value.
+/** @brief Flip all the bits in the range, starting at the Least Significant Bit
+in range and ending at the Most Significant Bit, to their opposite value.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to reset.
 @param [in] count the count of bits starting at i to reset.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL or the range is invalid by position, count, or both. */
+bs is NULL or the range is invalid by position, count, or both.
+
+Note that a range is defined from i to i + count, where i + count is the
+exclusive end of the range. This is equivalent to moving from Least to Most
+Significant Bit in an integer. */
 ccc_result ccc_bs_flip_range(ccc_bitset *bs, size_t i, size_t count);
 
 /**@}*/
@@ -617,11 +634,11 @@ is zeroed out rather than exhibiting undefined behavior as in the equivalent
 integer operation. */
 ccc_result ccc_bs_shiftr(ccc_bitset *bs, size_t right_shifts);
 
-/** @brief Checks two bit sets of the same size for equality.
+/** @brief Checks two bit sets of the same size (not capacity) for equality.
 @param [in] a pointer to a bit set.
 @param [in] b pointer to another bit set of equal size.
 @return true if the bit sets are of equal size with identical bit values at
-every position, false if the sets are different sizes ore have mismatched bits.
+every position, false if the sets are different sizes or have mismatched bits.
 A bool error is returned if either pointer is NULL. */
 ccc_tribool ccc_bs_eq(ccc_bitset const *a, ccc_bitset const *b);
 
@@ -741,7 +758,7 @@ ccc_result ccc_bs_clear_and_free(ccc_bitset *bs);
 Allows adding to and removing from the set. */
 /**@{*/
 
-/** @brief Add a bit value to the set as the new Most Significant Bit.
+/** @brief Append a bit value to the set as the new Most Significant Bit.
 @param [in] bs a pointer to the bit set.
 @param [in] b the value to push at the Most Significant Bit CCC_TRUE/CCC_FALSE.
 @return the result of the operation, ok if successful or an error if bad
