@@ -24,6 +24,130 @@ Currently, this library supports a `FetchContent` or manual installation via CMa
 ## Containers
 
 <details>
+<summary>bitset.h (dropdown)</summary>
+A fixed or dynamic contiguous array of bits for set operations.
+
+```c
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+#define BITSET_USING_NAMESPACE_CCC
+#include "ccc/bitset.h"
+#include "ccc/types.h"
+
+#define DIGITS 9ULL
+#define ROWS DIGITS
+#define COLS DIGITS
+#define BOX_SIZE 3ULL
+
+/* clang-format off */
+static int const valid_board[9][9] =
+{{5,3,0, 0,7,0, 0,0,0}
+,{6,0,0, 1,9,5, 0,0,0}
+,{0,9,8, 0,0,0, 0,6,0}
+
+,{8,0,0, 0,6,0, 0,0,3}
+,{4,0,0, 8,0,3, 0,0,1}
+,{7,0,0, 0,2,0, 0,0,6}
+
+,{0,6,0, 0,0,0, 2,8,0}
+,{0,0,0, 4,1,9, 0,0,5}
+,{0,0,0, 0,8,0, 0,7,9}};
+
+static int const invalid_board[9][9] =
+{{8,3,0, 0,7,0, 0,0,0} /* 8 in first box top left. */
+,{6,0,0, 1,9,5, 0,0,0}
+,{0,9,8, 0,0,0, 0,6,0} /* 8 in first box bottom right. */
+
+,{8,0,0, 0,6,0, 0,0,3} /* 8 also overlaps with 8 in top left by row. */
+,{4,0,0, 8,0,3, 0,0,1}
+,{7,0,0, 0,2,0, 0,0,6}
+
+,{0,6,0, 0,0,0, 2,8,0}
+,{0,0,0, 4,1,9, 0,0,5}
+,{0,0,0, 0,8,0, 0,7,9}};
+/* clang-format on */
+
+/* Returns if the box is valid (CCC_TRUE if valid CCC_FALSE if not). */
+static ccc_tribool
+validate_sudoku_box(int const board[9][9], bitset *const row_check,
+                    bitset *const col_check, size_t const row_start,
+                    size_t const col_start)
+{
+    bitset box_check
+        = bs_init((ccc_bitblock[bs_blocks(DIGITS)]){}, DIGITS, NULL, NULL,
+                  DIGITS);
+    ccc_tribool was_on = CCC_FALSE;
+    for (size_t r = row_start; r < row_start + BOX_SIZE; ++r)
+    {
+        for (size_t c = col_start; c < col_start + BOX_SIZE; ++c)
+        {
+            if (!board[r][c])
+            {
+                continue;
+            }
+            /* Need the zero based digit. */
+            size_t const digit = board[r][c] - 1;
+            was_on = bs_set(&box_check, digit, CCC_TRUE);
+            if (was_on != CCC_FALSE)
+            {
+                return CCC_FALSE;
+            }
+            was_on = bs_set(row_check, (r * DIGITS) + digit, CCC_TRUE);
+            if (was_on != CCC_FALSE)
+            {
+                return CCC_FALSE;
+            }
+            was_on = bs_set(col_check, (c * DIGITS) + digit, CCC_TRUE);
+            if (was_on != CCC_FALSE)
+            {
+                return CCC_FALSE;
+            }
+        }
+    }
+    return CCC_TRUE;
+}
+
+/* A small problem like this is a perfect use case for a stack based bit set.
+   All sizes are known at compile time meaning we get memory management for
+   free and the optimal space and time complexity for this problem. */
+
+static ccc_tribool
+is_valid_sudoku(int const board[9][9])
+{
+    bitset row_check
+        = bs_init((ccc_bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,
+                  NULL, NULL, ROWS * DIGITS);
+    bitset col_check
+        = bs_init((ccc_bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,
+                  NULL, NULL, ROWS * DIGITS);
+    for (size_t row = 0; row < ROWS; row += BOX_SIZE)
+    {
+        for (size_t col = 0; col < COLS; col += BOX_SIZE)
+        {
+            if (!validate_sudoku_box(board, &row_check, &col_check, row, col))
+            {
+                return CCC_FALSE;
+            }
+        }
+    }
+    return CCC_TRUE;
+}
+
+int
+main(void)
+{
+    ccc_tribool result = is_valid_sudoku(valid_board);
+    assert(result == CCC_TRUE);
+    result = is_valid_sudoku(invalid_board);
+    assert(result == CCC_FALSE);
+    return 0;
+}
+```
+</details>
+
+<details>
 <summary>buffer.h (dropdown)</summary>
 A fixed or dynamic contiguous array of a single user defined type.
 
