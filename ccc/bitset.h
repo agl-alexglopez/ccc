@@ -114,7 +114,7 @@ store those bits must occur before use. If capacity is zero the helper macro
 is not needed.
 
 ```
-ccc_bitset bs = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){},...);
+ccc_bitset bs = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){}, 9, NULL, 9);
 ```
 Or, initialize with zero capacity for a dynamic bit set.
 
