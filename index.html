@@ -169,7 +169,7 @@ bitset.h (dropdown)</summary>
 <div class="line">                    <span class="keywordtype">size_t</span> <span class="keyword">const</span> col_start)</div>
 <div class="line">{</div>
 <div class="line">    bitset box_check</div>
-<div class="line">        = bs_init((<a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[bs_blocks(DIGITS)]){}, DIGITS, NULL, NULL,</div>
+<div class="line">        = bs_init((bitblock[bs_blocks(DIGITS)]){}, DIGITS, NULL, NULL,</div>
 <div class="line">                  DIGITS);</div>
 <div class="line">    <a class="code hl_enumeration" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> was_on = CCC_FALSE;</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> r = row_start; r &lt; row_start + BOX_SIZE; ++r)</div>
@@ -210,10 +210,10 @@ bitset.h (dropdown)</summary>
 <div class="line">is_valid_sudoku(<span class="keywordtype">int</span> <span class="keyword">const</span> board[9][9])</div>
 <div class="line">{</div>
 <div class="line">    bitset row_check</div>
-<div class="line">        = bs_init((<a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,</div>
+<div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,</div>
 <div class="line">                  NULL, NULL, ROWS * DIGITS);</div>
 <div class="line">    bitset col_check</div>
-<div class="line">        = bs_init((<a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,</div>
+<div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,</div>
 <div class="line">                  NULL, NULL, ROWS * DIGITS);</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> row = 0; row &lt; ROWS; row += BOX_SIZE)</div>
 <div class="line">    {</div>
@@ -238,7 +238,6 @@ bitset.h (dropdown)</summary>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="abitset_8h_html"><div class="ttname"><a href="bitset_8h.html">bitset.h</a></div><div class="ttdoc">The Bit Set Interface.</div></div>
-<div class="ttc" id="abitset_8h_html_a9c11247557b86b5658723dd9edc58622"><div class="ttname"><a href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock_ ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:65</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">The C Container Collection Fundamental Types.</div></div>
 <div class="ttc" id="atypes_8h_html_a80a7915df3bc36e01a3a0775eebc0938"><div class="ttname"><a href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a></div><div class="ttdeci">ccc_tribool</div><div class="ttdoc">A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1.</div><div class="ttdef"><b>Definition:</b> types.h:68</div></div>
 </div><!-- fragment --> </details>
