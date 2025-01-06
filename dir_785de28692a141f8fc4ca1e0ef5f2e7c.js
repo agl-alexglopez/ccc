@@ -1,5 +1,6 @@
 var dir_785de28692a141f8fc4ca1e0ef5f2e7c =
 [
+    [ "impl_bitset.h", "impl__bitset_8h_source.html", null ],
     [ "impl_buffer.h", "impl__buffer_8h_source.html", null ],
     [ "impl_doubly_linked_list.h", "impl__doubly__linked__list_8h_source.html", null ],
     [ "impl_flat_double_ended_queue.h", "impl__flat__double__ended__queue_8h_source.html", null ],

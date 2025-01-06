@@ -28,6 +28,11 @@ var types_8h =
       [ "CCC_GRT", "types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce", null ],
       [ "CCC_CMP_ERR", "types_8h.html#a9958f3004414182c457c71289303ae57a2975ec57f12b7ce11f4b180af8fec7c5", null ]
     ] ],
+    [ "ccc_tribool", "types_8h.html#a80a7915df3bc36e01a3a0775eebc0938", [
+      [ "CCC_BOOL_ERR", "types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ad795c39ec159a23f2e9f830ab4f7ebed", null ],
+      [ "CCC_FALSE", "types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110", null ],
+      [ "CCC_TRUE", "types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5", null ]
+    ] ],
     [ "ccc_begin_range", "types_8h.html#a50bc0d800c2f2ae79c217e999b47f23a", null ],
     [ "ccc_end_range", "types_8h.html#a93883873561b893b366cc8a68e5bcba1", null ],
     [ "ccc_entry_input_error", "types_8h.html#a9fd223cf4a594565a536ae518174a9b5", null ],

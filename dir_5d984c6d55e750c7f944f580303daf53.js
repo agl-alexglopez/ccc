@@ -1,6 +1,7 @@
 var dir_5d984c6d55e750c7f944f580303daf53 =
 [
     [ "impl", "dir_785de28692a141f8fc4ca1e0ef5f2e7c.html", "dir_785de28692a141f8fc4ca1e0ef5f2e7c" ],
+    [ "bitset.h", "bitset_8h.html", "bitset_8h" ],
     [ "buffer.h", "buffer_8h.html", "buffer_8h" ],
     [ "doubly_linked_list.h", "doubly__linked__list_8h.html", "doubly__linked__list_8h" ],
     [ "flat_double_ended_queue.h", "flat__double__ended__queue_8h.html", "flat__double__ended__queue_8h" ],
