@@ -213,8 +213,8 @@ bitset.h (dropdown)</summary>
 <div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,</div>
 <div class="line">                  NULL, NULL, ROWS * DIGITS);</div>
 <div class="line">    bitset col_check</div>
-<div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,</div>
-<div class="line">                  NULL, NULL, ROWS * DIGITS);</div>
+<div class="line">        = bs_init((bitblock[bs_blocks(COLS * DIGITS)]){}, COLS * DIGITS,</div>
+<div class="line">                  NULL, NULL, COLS * DIGITS);</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> row = 0; row &lt; ROWS; row += BOX_SIZE)</div>
 <div class="line">    {</div>
 <div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> col = 0; col &lt; COLS; col += BOX_SIZE)</div>
