@@ -973,7 +973,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_proper_subset)
         CHECK(ccc_bs_set(&subset2, i, CCC_TRUE), CCC_FALSE);
     }
     CHECK(ccc_bs_is_proper_subset(&set, &subset1), CCC_FALSE);
+    CHECK(ccc_bs_is_subset(&set, &subset1), CCC_TRUE);
     CHECK(ccc_bs_is_subset(&set, &subset2), CCC_TRUE);
+    CHECK(ccc_bs_is_proper_subset(&set, &subset2), CCC_TRUE);
     CHECK_END_FN();
 }
 
