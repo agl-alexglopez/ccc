@@ -774,4 +774,78 @@ ccc_tribool ccc_bs_pop_back(ccc_bitset *bs);
 
 /**@}*/
 
+/** Define this preprocessor macro if shorter names are desired for the bit set
+container. Check for namespace clashes before name shortening. */
+#ifdef BITSET_USING_NAMESPACE_CCC
+typedef ccc_bitset bitset;
+typedef ccc_bitblock bitblock;
+#    define bs_blocks(args...) ccc_bs_blocks(args)
+#    define bs_init(args...) ccc_bs_init(args)
+#    define bs_copy(args...) ccc_bs_copy(args)
+#    define bs_test(args...) ccc_bs_test(args)
+#    define bs_test_at(args...) ccc_bs_test_at(args)
+#    define bs_set(args...) ccc_bs_set(args)
+#    define bs_set_at(args...) ccc_bs_set_at(args)
+#    define bs_set_all(args...) ccc_bs_set_all(args)
+#    define bs_set_range(args...) ccc_bs_set_range(args)
+#    define bs_reset(args...) ccc_bs_reset(args)
+#    define bs_reset_at(args...) ccc_bs_reset_at(args)
+#    define bs_reset_all(args...) ccc_bs_reset_all(args)
+#    define bs_reset_range(args...) ccc_bs_reset_range(args)
+#    define bs_flip(args...) ccc_bs_flip(args)
+#    define bs_flip_at(args...) ccc_bs_flip_at(args)
+#    define bs_flip_all(args...) ccc_bs_flip_all(args)
+#    define bs_flip_range(args...) ccc_bs_flip_range(args)
+#    define bs_any(args...) ccc_bs_any(args)
+#    define bs_any_range(args...) ccc_bs_any_range(args)
+#    define bs_none(args...) ccc_bs_none(args)
+#    define bs_none_range(args...) ccc_bs_none_range(args)
+#    define bs_all(args...) ccc_bs_all(args)
+#    define bs_all_range(args...) ccc_bs_all_range(args)
+#    define bs_first_trailing_one(args...) ccc_bs_first_trailing_one(args)
+#    define bs_first_trailing_one_range(args...)                               \
+        ccc_bs_first_trailing_one_range(args)
+#    define bs_first_trailing_ones(args...) ccc_bs_first_trailing_ones(args)
+#    define bs_first_trailing_ones_range(args...)                              \
+        ccc_bs_first_trailing_ones_range(args)
+#    define bs_first_trailing_zero(args...) ccc_bs_first_trailing_zero(args)
+#    define bs_first_trailing_zero_range(args...)                              \
+        ccc_bs_first_trailing_zero_range(args)
+#    define bs_first_trailing_zeros(args...) ccc_bs_first_trailing_zeros(args)
+#    define bs_first_trailing_zeros_range(args...)                             \
+        ccc_bs_first_trailing_zeros_range(args)
+#    define bs_first_leading_one(args...) ccc_bs_first_leading_one(args)
+#    define bs_first_leading_one_range(args...)                                \
+        ccc_bs_first_leading_one_range(args)
+#    define bs_first_leading_ones(args...) ccc_bs_first_leading_ones(args)
+#    define bs_first_leading_ones_range(args...)                               \
+        ccc_bs_first_leading_ones_range(args)
+#    define bs_first_leading_zero(args...) ccc_bs_first_leading_zero(args)
+#    define bs_first_leading_zero_range(args...)                               \
+        ccc_bs_first_leading_zero_range(args)
+#    define bs_first_leading_zeros(args...) ccc_bs_first_leading_zeros(args)
+#    define bs_first_leading_zeros_range(args...)                              \
+        ccc_bs_first_leading_zeros_range(args)
+#    define bs_or(args...) ccc_bs_or(args)
+#    define bs_and(args...) ccc_bs_and(args)
+#    define bs_xor(args...) ccc_bs_xor(args)
+#    define bs_shiftl(args...) ccc_bs_shiftl(args)
+#    define bs_shiftr(args...) ccc_bs_shiftr(args)
+#    define bs_eq(args...) ccc_bs_eq(args)
+#    define bs_is_proper_subset(args...) ccc_bs_is_proper_subset(args)
+#    define bs_is_subset(args...) ccc_bs_is_subset(args)
+#    define bs_data(args...) ccc_bs_data(args)
+#    define bs_capacity(args...) ccc_bs_capacity(args)
+#    define bs_blocks_capacity(args...) ccc_bs_blocks_capacity(args)
+#    define bs_size(args...) ccc_bs_size(args)
+#    define bs_blocks_size(args...) ccc_bs_blocks_size(args)
+#    define bs_empty(args...) ccc_bs_empty(args)
+#    define bs_popcount(args...) ccc_bs_popcount(args)
+#    define bs_popcount_range(args...) ccc_bs_popcount_range(args)
+#    define bs_clear(args...) ccc_bs_clear(args)
+#    define bs_clear_and_free(args...) ccc_bs_clear_and_free(args)
+#    define bs_push_back(args...) ccc_bs_push_back(args)
+#    define bs_pop_back(args...) ccc_bs_pop_back(args)
+#endif /* BITSET_USING_NAMESPACE_CCC */
+
 #endif /* CCC_BITSET */
