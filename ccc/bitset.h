@@ -74,6 +74,7 @@ Initialize and create containers with memory and permissions. */
 @param [in] bit_cap the number of bits representing this bit set.
 @return the number of blocks needed for the desired bit set.
 @warning bit_cap must be >= 1.
+@note this macro is not needed if capacity is 0 to start.
 
 This method can be used for compile time initialization of bit sets so the user
 need to worry about the underlying bit set representation. For example:
@@ -109,8 +110,19 @@ needed, the optional size parameter should be set equivalent to capacity.
 @warning the user must use the ccc_bs_blocks macro to help determine the size of
 the bitblock array if a fixed size bitblock array is provided at compile time;
 the necessary conversion from bits requested to number of blocks required to
-store those bits must occur before use.
-(e.g. ccc_bitset b = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){},...);). */
+store those bits must occur before use. If capacity is zero the helper macro
+is not needed.
+
+```
+ccc_bitset bs = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){},...);
+```
+Or, initialize with zero capacity for a dynamic bit set.
+
+```
+ccc_bitset bs = ccc_bs_init(NULL, 0, std_alloc, NULL);
+```
+
+See types.h for more on allocation functions. */
 #define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size...)        \
     ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)
 
