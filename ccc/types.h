@@ -66,8 +66,11 @@ additional information while still maintaining the truthy and falsey bool
 behavior one would normally expect. */
 typedef enum : int8_t
 {
+    /** Intended value of CCC_FALSE or CCC_TRUE could not be returned. */
     CCC_BOOL_ERR = -1,
+    /** Equivalent to boolean false, guaranteed to be falsey aka 0. */
     CCC_FALSE,
+    /** Equivalent to boolean true, guaranteed to be truthy aka 1. */
     CCC_TRUE,
 } ccc_tribool;
 
