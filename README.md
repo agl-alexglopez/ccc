@@ -120,8 +120,8 @@ is_valid_sudoku(int const board[9][9])
         = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,
                   NULL, NULL, ROWS * DIGITS);
     bitset col_check
-        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,
-                  NULL, NULL, ROWS * DIGITS);
+        = bs_init((bitblock[bs_blocks(COLS * DIGITS)]){}, COLS * DIGITS,
+                  NULL, NULL, COLS * DIGITS);
     for (size_t row = 0; row < ROWS; row += BOX_SIZE)
     {
         for (size_t col = 0; col < COLS; col += BOX_SIZE)
