@@ -114,12 +114,14 @@ store those bits must occur before use. If capacity is zero the helper macro
 is not needed.
 
 ```
-ccc_bitset bs = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(9)]){}, 9, NULL, 9);
+#define BITSET_USING_NAMESPACE_CCC
+bitset bs = bs_init((bitblock[bs_blocks(9)]){}, 9, NULL, NULL, 9);
 ```
 Or, initialize with zero capacity for a dynamic bit set.
 
 ```
-ccc_bitset bs = ccc_bs_init(NULL, 0, std_alloc, NULL);
+#define BITSET_USING_NAMESPACE_CCC
+bitset bs = bs_init(NULL, 0, std_alloc, NULL);
 ```
 
 See types.h for more on allocation functions. */
