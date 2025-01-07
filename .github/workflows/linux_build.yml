@@ -68,3 +68,10 @@ jobs:
       run: |
         make rtest
 
+    - name: Consume Release
+      run: |
+        cd min
+        cmake --preset=clang-deb
+        cmake --build build
+        ./build/debug/bin/min
+
