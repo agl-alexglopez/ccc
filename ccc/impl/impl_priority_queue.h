@@ -1,11 +1,11 @@
 #ifndef CCC_IMPL_PRIORITY_QUEUE_H
 #define CCC_IMPL_PRIORITY_QUEUE_H
 
-#include "../types.h"
-
 /** @cond */
 #include <stddef.h>
 /** @endcond */
+
+#include "../types.h"
 
 /** @private */
 struct ccc_pq_elem_

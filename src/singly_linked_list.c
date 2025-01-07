@@ -1,11 +1,11 @@
-#include "singly_linked_list.h"
-#include "impl/impl_singly_linked_list.h"
-#include "types.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include "impl/impl_singly_linked_list.h"
+#include "singly_linked_list.h"
+#include "types.h"
 
 /*===========================    Prototypes     =============================*/
 

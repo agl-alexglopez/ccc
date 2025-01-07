@@ -1,12 +1,12 @@
-#include "flat_double_ended_queue.h"
-#include "buffer.h"
-#include "impl/impl_flat_double_ended_queue.h"
-#include "types.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include "buffer.h"
+#include "flat_double_ended_queue.h"
+#include "impl/impl_flat_double_ended_queue.h"
+#include "types.h"
 
 static size_t const start_capacity = 8;
 

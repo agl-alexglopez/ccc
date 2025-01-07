@@ -1,9 +1,9 @@
-#include "buffer.h"
-#include "types.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include "buffer.h"
+#include "types.h"
 
 static size_t const start_capacity = 8;
 

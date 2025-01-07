@@ -27,14 +27,14 @@ the required license at the bottom of the file for BSD-2-Clause compliance.
 Overall a WAVL tree is quite impressive for it's simplicity and purported
 improvements over AVL and Red-Black trees. The rank framework is intuitive
 and flexible in how it can be implemented. */
-#include "realtime_ordered_map.h"
-#include "impl/impl_realtime_ordered_map.h"
-#include "impl/impl_types.h"
-#include "types.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
+
+#include "impl/impl_realtime_ordered_map.h"
+#include "impl/impl_types.h"
+#include "realtime_ordered_map.h"
+#include "types.h"
 
 /** @private */
 enum romap_link_

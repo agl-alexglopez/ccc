@@ -1,12 +1,12 @@
 #ifndef CCC_IMPL_SINGLY_LINKED_LIST_H
 #define CCC_IMPL_SINGLY_LINKED_LIST_H
 
-#include "../types.h"
-
 /** @cond */
 #include <assert.h>
 #include <stddef.h>
 /** @endcond */
+
+#include "../types.h"
 
 /** @private */
 typedef struct ccc_sll_elem_

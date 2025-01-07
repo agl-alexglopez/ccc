@@ -1,10 +1,10 @@
-#include "priority_queue.h"
-#include "impl/impl_priority_queue.h"
-#include "types.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include "impl/impl_priority_queue.h"
+#include "priority_queue.h"
+#include "types.h"
 
 /*=========================  Function Prototypes   ==========================*/
 

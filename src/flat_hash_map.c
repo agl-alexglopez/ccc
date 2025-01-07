@@ -40,16 +40,16 @@ this table we need to consider these points.
 
 Overall, this means any new design needs slightly more consideration than I
 first thought. However, improvements can still be made. */
-#include "flat_hash_map.h"
-#include "buffer.h"
-#include "impl/impl_flat_hash_map.h"
-#include "impl/impl_types.h"
-#include "types.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+#include "buffer.h"
+#include "flat_hash_map.h"
+#include "impl/impl_flat_hash_map.h"
+#include "impl/impl_types.h"
+#include "types.h"
 
 #if defined(__GNUC__) || defined(__clang__)
 #    define unlikely(expr) __builtin_expect(!!(expr), 0)

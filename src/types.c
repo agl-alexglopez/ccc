@@ -1,7 +1,7 @@
-#include "types.h"
-#include "impl/impl_types.h"
-
 #include <stddef.h>
+
+#include "impl/impl_types.h"
+#include "types.h"
 
 /** @private */
 static char const *const result_msgs[CCC_RESULTS_SIZE] = {

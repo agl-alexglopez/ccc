@@ -1,12 +1,12 @@
-#include "flat_priority_queue.h"
-#include "buffer.h"
-#include "impl/impl_flat_priority_queue.h"
-#include "types.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include "buffer.h"
+#include "flat_priority_queue.h"
+#include "impl/impl_flat_priority_queue.h"
+#include "types.h"
 
 static size_t const swap_space = 1;
 

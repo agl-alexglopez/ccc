@@ -1,12 +1,12 @@
 #ifndef CCC_IMPL_FLAT_ORDERED_MAP_H
 #define CCC_IMPL_FLAT_ORDERED_MAP_H
 
-#include "../buffer.h"
-#include "../types.h"
-
 /** @cond */
 #include <stddef.h>
 /** @endcond */
+
+#include "../buffer.h"
+#include "../types.h"
 
 /** @private */
 struct ccc_fomap_elem_

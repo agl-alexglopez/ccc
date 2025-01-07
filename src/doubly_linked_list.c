@@ -1,11 +1,11 @@
-#include "doubly_linked_list.h"
-#include "impl/impl_doubly_linked_list.h"
-#include "types.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include "doubly_linked_list.h"
+#include "impl/impl_doubly_linked_list.h"
+#include "types.h"
 
 /*===========================   Prototypes    ===============================*/
 

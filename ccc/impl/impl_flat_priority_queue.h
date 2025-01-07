@@ -4,13 +4,13 @@
 #ifndef CCC_IMPL_FLAT_PRIORITY_QUEUE_H
 #define CCC_IMPL_FLAT_PRIORITY_QUEUE_H
 
-#include "../buffer.h"
-#include "../types.h"
-
 /** @cond */
 #include <assert.h>
 #include <stddef.h>
 /** @endcond */
+
+#include "../buffer.h"
+#include "../types.h"
 
 /** @private */
 struct ccc_fpq_

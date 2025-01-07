@@ -10,15 +10,15 @@ implementation is based on the following source.
        fun. See the code for a generalizable strategy to eliminate symmetric
        left and right cases for any binary tree code.
        https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
-#include "ordered_multimap.h"
-#include "impl/impl_ordered_multimap.h"
-#include "impl/impl_tree.h"
-#include "impl/impl_types.h"
-#include "types.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
+
+#include "impl/impl_ordered_multimap.h"
+#include "impl/impl_tree.h"
+#include "impl/impl_types.h"
+#include "ordered_multimap.h"
+#include "types.h"
 
 #define LR 2
 

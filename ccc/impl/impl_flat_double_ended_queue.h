@@ -1,11 +1,11 @@
 #ifndef CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H
 #define CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H
 
-#include "../buffer.h"
-
 /** @cond */
 #include <stddef.h>
 /** @endcond */
+
+#include "../buffer.h"
 
 /** @private */
 struct ccc_fdeq_

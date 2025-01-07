@@ -1,11 +1,11 @@
 #ifndef CCC_IMPL_ORDERED_MAP_H
 #define CCC_IMPL_ORDERED_MAP_H
 
-#include "impl_tree.h"
-
 /** @cond */
 #include <stddef.h>
 /** @endcond */
+
+#include "impl_tree.h"
 
 /** @private */
 union ccc_ordered_map_

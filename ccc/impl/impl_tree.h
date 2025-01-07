@@ -10,13 +10,13 @@
 #ifndef CCC_IMPL_TREE_H
 #define CCC_IMPL_TREE_H
 
-#include "../types.h"
-#include "impl_types.h"
-
 /** @cond */
 #include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
+
+#include "../types.h"
+#include "impl_types.h"
 
 /** @private This node type will support more expressive implementations of a
    standard map and multimap. The array of pointers is to support unifying left

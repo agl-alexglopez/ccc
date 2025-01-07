@@ -1,13 +1,13 @@
 #ifndef CCC_IMPL_REALTIME_ORDERED_MAP_H
 #define CCC_IMPL_REALTIME_ORDERED_MAP_H
 
-#include "../types.h"
-#include "impl_types.h"
-
 /** @cond */
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
+
+#include "../types.h"
+#include "impl_types.h"
 
 /** @private */
 typedef struct ccc_romap_elem_

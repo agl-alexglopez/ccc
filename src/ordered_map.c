@@ -9,14 +9,14 @@ based on the following source.
        unite the left and right cases for fun. See the code for a generalizable
        strategy to eliminate symmetric left and right cases for any binary tree
        code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
-#include "ordered_map.h"
+#include <assert.h>
+#include <string.h>
+
 #include "impl/impl_ordered_map.h"
 #include "impl/impl_tree.h"
 #include "impl/impl_types.h"
+#include "ordered_map.h"
 #include "types.h"
-
-#include <assert.h>
-#include <string.h>
 
 #define LR 2
 

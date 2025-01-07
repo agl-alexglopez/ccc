@@ -1,13 +1,13 @@
 #ifndef IMPL_FLAT_REALTIME_ORDERED_MAP_H
 #define IMPL_FLAT_REALTIME_ORDERED_MAP_H
 
-#include "../buffer.h"
-#include "../types.h"
-
 /** @cond */
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
+
+#include "../buffer.h"
+#include "../types.h"
 
 /** @private */
 struct ccc_fromap_elem_
