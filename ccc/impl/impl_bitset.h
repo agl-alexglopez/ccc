@@ -1,8 +1,10 @@
 #ifndef CCC_IMPL_BITSET
 #define CCC_IMPL_BITSET
 
+/** @cond */
 #include <limits.h>
 #include <stddef.h>
+/** @endcond */
 
 #include "../types.h"
 
