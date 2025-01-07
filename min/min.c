@@ -1,4 +1,7 @@
+#include <stddef.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/buffer.h"
 #include "ccc/traits.h"
 
 int
