@@ -1,3 +1,7 @@
+/** This file implements a Bit Set using blocks of platform defined integers
+for speed and efficiency. The implementation aims for constant and linear time
+operations at all times, specifically when implementing more complicated range
+based operations over the set. */
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
