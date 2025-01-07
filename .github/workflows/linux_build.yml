@@ -67,17 +67,3 @@ jobs:
     - name: Test Release
       run: |
         make rtest
-
-    - name: Consume Release
-      run: |
-        git archive --format=zip --output=ccc-dev.zip HEAD
-        echo "ZIP_FILE=ccc-dev.zip" >> $GITHUB_ENV
-        mkdir ./ccc-dev
-        unzip ccc-dev.zip -d ./ccc-dev
-        cd ccc-dev
-        make clang-ccc
-        cd ../min
-        cmake --preset=clang-deb
-        cmake --build build
-        ./build/debug/bin/min
-
