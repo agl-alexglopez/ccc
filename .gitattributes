@@ -2,5 +2,6 @@ tests/ export-ignore
 samples/ export-ignore
 util/ export-ignore
 etc/ export-ignore
+min/ export-ignore
 .github/ export-ignore
 .pre-commit-config.yaml export-ignore
