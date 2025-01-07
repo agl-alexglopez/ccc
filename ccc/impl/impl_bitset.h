@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <stddef.h>
 
-#include "../types.h"
+#include "types.h"
 
 /** @private */
 typedef unsigned ccc_bitblock_;
