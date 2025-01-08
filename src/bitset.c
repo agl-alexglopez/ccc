@@ -1536,20 +1536,15 @@ min(size_t a, size_t b)
     return a < b ? a : b;
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+
 static inline unsigned
 popcount(ccc_bitblock_ const b)
 {
-#if defined(__GNUC__) || defined(__clang__)
     /* There are different pop counts for different integer widths. Be sure to
        catch the use of the wrong one by mistake here at compile time. */
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     return __builtin_popcount(b);
-#else
-    unsigned cnt = 0;
-    for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
-    {}
-    return cnt;
-#endif
 }
 
 static inline ptrdiff_t
@@ -1557,9 +1552,31 @@ countr_0(ccc_bitblock_ const b)
 {
     static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
-#if defined(__GNUC__) || defined(__clang__)
     return b ? __builtin_ctz(b) : (ptrdiff_t)BLOCK_BITS;
+}
+
+static inline ptrdiff_t
+countl_0(ccc_bitblock_ const b)
+{
+    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
+    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
+    return b ? __builtin_clz(b) : (ptrdiff_t)BLOCK_BITS;
+}
+
 #else
+
+static inline unsigned
+popcount(ccc_bitblock_ const b)
+{
+    unsigned cnt = 0;
+    for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
+    {}
+    return cnt;
+}
+
+static inline ptrdiff_t
+countr_0(ccc_bitblock_ const b)
+{
     if (!b)
     {
         return (ptrdiff_t)BLOCK_BITS;
@@ -1568,17 +1585,11 @@ countr_0(ccc_bitblock_ const b)
     for (; !(b & 1U); ++cnt, b >>= 1U)
     {}
     return cnt;
-#endif
 }
 
 static inline ptrdiff_t
 countl_0(ccc_bitblock_ const b)
 {
-    static_assert(BITBLOCK_MSB < ALL_BITS_ON);
-    static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
-#if defined(__GNUC__) || defined(__clang__)
-    return b ? __builtin_clz(b) : (ptrdiff_t)BLOCK_BITS;
-#else
     if (!b)
     {
         return (ptrdiff_t)BLOCK_BITS;
@@ -1587,5 +1598,6 @@ countl_0(ccc_bitblock_ const b)
     for (; !(b & BITBLOCK_MSB); ++cnt, b <<= 1U)
     {}
     return cnt;
-#endif
 }
+
+#endif /* defined(__GNUC__) || defined(__clang__) */
