@@ -1563,7 +1563,7 @@ countl_0(ccc_bitblock_ const b)
     return b ? __builtin_clz(b) : (ptrdiff_t)BLOCK_BITS;
 }
 
-#else
+#else /* !defined(__GNUC__) && !defined(__clang__) */
 
 static inline unsigned
 popcount(ccc_bitblock_ const b)
