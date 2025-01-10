@@ -1045,7 +1045,7 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
         /* Clean up some edge cases for the helper function because we allow
            the user to specify any range. What if our range ends before the
            end of this block? What if it starts after index 0 of the first
-           block? Pretend out of range bits don't exist. */
+           block? Pretend out of range bits are zeros. */
         ccc_bitblock_ bits
             = is_one ? bs->mem_[cur_block] & (ALL_BITS_ON << block_i)
                      : (~bs->mem_[cur_block]) & (ALL_BITS_ON << block_i);
@@ -1075,8 +1075,7 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
         {
             /* Fail but we have largest skip possible to continue our search
                from in order to save double checking unnecessary prefixes. */
-            bits_start
-                = (cur_block * BLOCK_BITS) + (ptrdiff_t)ones.block_start_i;
+            bits_start = (cur_block * BLOCK_BITS) + ones.block_start_i;
             num_found = ones.count;
         }
         block_i = 0;
