@@ -207,9 +207,9 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
     else
     {
         blockwidth_t const remaining_shift = BLOCK_BITS - partial_shift;
-        for (size_t shifted = last_block - shifted_blocks,
+        for (size_t shifted = last_block - shifted_blocks + 1,
                     overwritten = last_block;
-             shifted > 0; --shifted, --overwritten)
+             shifted--; --overwritten)
         {
             bs->mem_[overwritten]
                 = (bs->mem_[shifted] << partial_shift)
