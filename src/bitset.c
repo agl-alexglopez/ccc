@@ -1095,7 +1095,7 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
    next block. This is helpful for the main search loop adding to its start
    index and number of ones found so far. */
 static inline struct group
-max_trailing_ones(ccc_bitblock_ b, size_t const i_in_block,
+max_trailing_ones(ccc_bitblock_ const b, size_t const i_in_block,
                   size_t const ones_remaining)
 {
     /* Easy exit skip to the next block. Helps with sparse sets. */
@@ -1288,7 +1288,7 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
 }
 
 static inline struct group
-max_leading_ones(ccc_bitblock_ b, ptrdiff_t const i_in_block,
+max_leading_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
                  ptrdiff_t const ones_remaining)
 {
     if (!b)
