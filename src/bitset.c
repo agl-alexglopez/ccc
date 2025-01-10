@@ -1109,15 +1109,14 @@ max_trailing_ones(ccc_bitblock_ const b, size_t const i_in_block,
         /* This branch must find a smaller group anywhere in this block which is
            the most work required in this algorithm. We have some tricks to tell
            when to give up on this as soon as possible. */
-        ccc_bitblock_ shifted = b >> i_in_block;
-        ccc_bitblock_ const required_ones
+        ccc_bitblock_ b_check = b >> i_in_block;
+        ccc_bitblock_ const remain
             = ALL_BITS_ON >> (BLOCK_BITS - ones_remaining);
         /* Because of power of 2 rules we can stop early when the shifted
            becomes impossible to match. */
-        for (size_t shifts = 0; shifted >= required_ones;
-             shifted >>= 1, ++shifts)
+        for (size_t shifts = 0; b_check >= remain; b_check >>= 1, ++shifts)
         {
-            if ((required_ones & shifted) == required_ones)
+            if ((remain & b_check) == remain)
             {
                 return (struct group){.block_start_i = i_in_block + shifts,
                                       .count = ones_remaining};
@@ -1130,9 +1129,9 @@ max_trailing_ones(ccc_bitblock_ const b, size_t const i_in_block,
        MSB. The best we could have is a full block of 1's. Otherwise we need
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
-    ptrdiff_t const num_ones_found = countl_0(~b);
-    return (struct group){.block_start_i = BLOCK_BITS - num_ones_found,
-                          .count = num_ones_found};
+    ptrdiff_t const ones_found = countl_0(~b);
+    return (struct group){.block_start_i = BLOCK_BITS - ones_found,
+                          .count = ones_found};
 }
 
 static inline ptrdiff_t
@@ -1298,12 +1297,12 @@ max_leading_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
     if (ones_remaining <= (ptrdiff_t)BLOCK_BITS)
     {
         assert(i_in_block < (ptrdiff_t)BLOCK_BITS);
-        ccc_bitblock_ shifted = b << (BLOCK_BITS - i_in_block - 1);
-        ccc_bitblock_ const required_ones = ALL_BITS_ON
-                                            << (BLOCK_BITS - ones_remaining);
-        for (size_t shifts = 0; shifted; shifted <<= 1, ++shifts)
+        ccc_bitblock_ b_check = b << (BLOCK_BITS - i_in_block - 1);
+        ccc_bitblock_ const required = ALL_BITS_ON
+                                       << (BLOCK_BITS - ones_remaining);
+        for (size_t shifts = 0; b_check; b_check <<= 1, ++shifts)
         {
-            if ((required_ones & shifted) == required_ones)
+            if ((required & b_check) == required)
             {
                 return (struct group){.block_start_i = i_in_block - shifts,
                                       .count = ones_remaining};
