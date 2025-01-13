@@ -183,17 +183,17 @@ bitset.h (dropdown)</summary>
 <div class="line">            <span class="comment">/* Need the zero based digit. */</span></div>
 <div class="line">            <span class="keywordtype">size_t</span> <span class="keyword">const</span> digit = board[r][c] - 1;</div>
 <div class="line">            was_on = bs_set(&amp;box_check, digit, <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>);</div>
-<div class="line">            <span class="keywordflow">if</span> (was_on != <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>)</div>
+<div class="line">            <span class="keywordflow">if</span> (was_on)</div>
 <div class="line">            {</div>
 <div class="line">                <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>;</div>
 <div class="line">            }</div>
 <div class="line">            was_on = bs_set(row_check, (r * DIGITS) + digit, <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>);</div>
-<div class="line">            <span class="keywordflow">if</span> (was_on != <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>)</div>
+<div class="line">            <span class="keywordflow">if</span> (was_on)</div>
 <div class="line">            {</div>
 <div class="line">                <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>;</div>
 <div class="line">            }</div>
 <div class="line">            was_on = bs_set(col_check, (c * DIGITS) + digit, <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>);</div>
-<div class="line">            <span class="keywordflow">if</span> (was_on != <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>)</div>
+<div class="line">            <span class="keywordflow">if</span> (was_on)</div>
 <div class="line">            {</div>
 <div class="line">                <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>;</div>
 <div class="line">            }</div>
