@@ -90,17 +90,17 @@ validate_sudoku_box(int const board[9][9], bitset *const row_check,
             /* Need the zero based digit. */
             size_t const digit = board[r][c] - 1;
             was_on = bs_set(&box_check, digit, CCC_TRUE);
-            if (was_on != CCC_FALSE)
+            if (was_on)
             {
                 return CCC_FALSE;
             }
             was_on = bs_set(row_check, (r * DIGITS) + digit, CCC_TRUE);
-            if (was_on != CCC_FALSE)
+            if (was_on)
             {
                 return CCC_FALSE;
             }
             was_on = bs_set(col_check, (c * DIGITS) + digit, CCC_TRUE);
-            if (was_on != CCC_FALSE)
+            if (was_on)
             {
                 return CCC_FALSE;
             }
