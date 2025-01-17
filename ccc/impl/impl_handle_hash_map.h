@@ -86,4 +86,216 @@ union ccc_hhmap_entry_
         = offsetof(typeof(*(memory_ptr)), hhash_elem_field),                   \
     }
 
+struct ccc_handle_ ccc_impl_hhm_find(struct ccc_hhmap_ const *, void const *key,
+                                     uint64_t hash);
+ccc_handle ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
+                                    size_t cur_i);
+
+struct ccc_hhash_entry_ ccc_impl_hhm_entry(struct ccc_hhmap_ *h,
+                                           void const *key);
+struct ccc_hhash_entry_ *ccc_impl_hhm_and_modify(struct ccc_hhash_entry_ *e,
+                                                 ccc_update_fn *fn);
+struct ccc_hhmap_elem_ *ccc_impl_hhm_in_slot(struct ccc_hhmap_ const *h,
+                                             void const *slot);
+void *ccc_impl_hhm_key_in_slot(struct ccc_hhmap_ const *h, void const *slot);
+uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, size_t i);
+size_t ccc_impl_hhm_distance(size_t capacity, size_t i, size_t j);
+ccc_result ccc_impl_hhm_maybe_resize(struct ccc_hhmap_ *);
+uint64_t ccc_impl_hhm_filter(struct ccc_hhmap_ const *, void const *key);
+void *ccc_impl_hhm_base(struct ccc_hhmap_ const *h);
+size_t ccc_impl_hhm_increment(size_t capacity, size_t i);
+void ccc_impl_hhm_copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
+                               void const *slot_src);
+struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
+                                             size_t i);
+
+/*==================   Helper Macros for Repeated Logic     =================*/
+
+/* Internal helper assumes that swap_entry has already been evaluated once
+   which it must have to make it to this point. */
+#define ccc_impl_hhm_swaps(swap_entry, lazy_key_value...)                      \
+    (__extension__({                                                           \
+        size_t hhm_i_ = (swap_entry)->entry_.i_;                               \
+        struct ccc_hhmap_elem_ *hhm_slot_elem_                                 \
+            = ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_);                  \
+        if (*ccc_impl_hhm_hash_at((swap_entry)->h_, hhm_slot_elem_->meta_i_)   \
+            == CCC_HHM_EMPTY)                                                  \
+        {                                                                      \
+            struct ccc_hhmap_elem_ const save_elem = *hhm_slot_elem_;          \
+            *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),  \
+                                                   hhm_i_))                    \
+                = lazy_key_value;                                              \
+            *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_) = save_elem;       \
+            *ccc_impl_hhm_hash_at((swap_entry)->h_, save_elem.meta_i_)         \
+                = (swap_entry)->hash_;                                         \
+            (void)ccc_buf_size_plus(&(swap_entry)->h_->buf_, 1);               \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            __auto_type hhm_to_insert_ = (lazy_key_value);                     \
+            hhm_i_ = ccc_impl_hhm_insert(                                      \
+                (swap_entry)->h_, &hhm_to_insert_,                             \
+                ccc_impl_hhm_hash_at((swap_entry)->h_,                         \
+                                     hhm_slot_elem_->meta_i_),                 \
+                hhm_slot_elem_->meta_i_);                                      \
+            struct ccc_hhmap_elem_ const save_elem                             \
+                = *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_);             \
+            *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),  \
+                                                   hhm_i_))                    \
+                = lazy_key_value;                                              \
+            *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_) = save_elem;       \
+        }                                                                      \
+        hhm_i_;                                                                \
+    }))
+
+/*=====================     Core Macro Implementations     ==================*/
+
+#define ccc_impl_hhm_and_modify_w(handle_hash_map_entry_ptr, type_name,        \
+                                  closure_over_T...)                           \
+    (__extension__({                                                           \
+        __auto_type hhm_mod_ent_ptr_ = (handle_hash_map_entry_ptr);            \
+        struct ccc_hhash_entry_ hhm_mod_with_ent_                              \
+            = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
+        if (hhm_mod_ent_ptr_)                                                  \
+        {                                                                      \
+            hhm_mod_with_ent_ = hhm_mod_ent_ptr_->impl_;                       \
+            if (hhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)         \
+            {                                                                  \
+                type_name *const T = ccc_buf_at(hhm_mod_with_ent_.h->buf_,     \
+                                                hhm_mod_with_ent_.entry_.i_);  \
+                if (T)                                                         \
+                {                                                              \
+                    closure_over_T                                             \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        hhm_mod_with_ent_;                                                     \
+    }))
+
+#define ccc_impl_hhm_or_insert_w(handle_hash_map_entry_ptr, lazy_key_value...) \
+    (__extension__({                                                           \
+        __auto_type hhm_or_ins_ent_ptr_ = (handle_hash_map_entry_ptr);         \
+        ccc_handle hhm_or_ins_res_ = 0;                                        \
+        if (hhm_or_ins_ent_ptr_)                                               \
+        {                                                                      \
+            struct ccc_hhash_entry_ *hhm_or_ins_entry_                         \
+                = &hhm_or_ins_ent_ptr_->impl_;                                 \
+            if (!(hhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR))  \
+            {                                                                  \
+                if (hhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_OCCUPIED)     \
+                {                                                              \
+                    hhm_or_ins_res_ = hhm_or_ins_entry_->entry_.i_;            \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    hhm_or_ins_res_ = ccc_impl_hhm_swaps(hhm_or_ins_entry_,    \
+                                                         lazy_key_value);      \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        hhm_or_ins_res_;                                                       \
+    }))
+
+#define ccc_impl_hhm_insert_entry_w(handle_hash_map_entry_ptr,                 \
+                                    lazy_key_value...)                         \
+    (__extension__({                                                           \
+        __auto_type hhm_ins_ent_ptr_ = (handle_hash_map_entry_ptr);            \
+        ccc_handle hhm_res_ = 0;                                               \
+        if (hhm_ins_ent_ptr_)                                                  \
+        {                                                                      \
+            struct ccc_hhash_entry_ *hhm_ins_ent_ = &hhm_ins_ent_ptr_->impl_;  \
+            if (!(hhm_ins_ent_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR))       \
+            {                                                                  \
+                if (hhm_ins_ent_->entry_.stats_ & CCC_ENTRY_OCCUPIED)          \
+                {                                                              \
+                    hhm_ins_ent_->entry_.stats_ = CCC_ENTRY_OCCUPIED;          \
+                    struct ccc_hhmap_elem_ save_elem_ = *ccc_impl_hhm_elem_at( \
+                        hhm_ins_ent_->h_, hhm_ins_ent_->entry_.i_);            \
+                    *((typeof(hhm_res_))ccc_buf_at(hhm_ins_ent_->h_->buf_,     \
+                                                   hhm_ins_ent_->entry_.i_))   \
+                        = lazy_key_value;                                      \
+                    *ccc_impl_hhm_elem_at(hhm_ins_ent_->h_,                    \
+                                          hhm_ins_ent_->entry_.i_)             \
+                        = save_elem_;                                          \
+                    hhm_res_ = hhm_ins_ent_->entry_.i_;                        \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    hhm_res_                                                   \
+                        = ccc_impl_hhm_swaps(hhm_ins_ent_, lazy_key_value);    \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        hhm_res_;                                                              \
+    }))
+
+#define ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)     \
+    (__extension__({                                                           \
+        struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
+        struct ccc_ent_ hhm_try_insert_res_                                    \
+            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        if (handle_hash_map_ptr_)                                              \
+        {                                                                      \
+            __auto_type hhm_key_ = key;                                        \
+            struct ccc_hhash_entry_ hhm_try_ins_ent_                           \
+                = ccc_impl_hhm_entry(handle_hash_map_ptr_, (void *)&hhm_key_); \
+            if ((hhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)          \
+                || (hhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR))  \
+            {                                                                  \
+                hhm_try_insert_res_ = hhm_try_ins_ent_.entry_;                 \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                hhm_try_insert_res_ = (struct ccc_ent_){                       \
+                    ccc_impl_hhm_swaps((&hhm_try_ins_ent_), lazy_value),       \
+                    CCC_ENTRY_VACANT,                                          \
+                };                                                             \
+            }                                                                  \
+        }                                                                      \
+        hhm_try_insert_res_;                                                   \
+    }))
+
+#define ccc_impl_hhm_insert_or_assign_w(handle_hash_map_ptr, key,              \
+                                        lazy_value...)                         \
+    (__extension__({                                                           \
+        struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
+        struct ccc_ent_ hhm_ins_or_assign_res_                                 \
+            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        if (handle_hash_map_ptr_)                                              \
+        {                                                                      \
+            __auto_type hhm_key_ = key;                                        \
+            struct ccc_hhash_entry_ hhm_ins_or_assign_ent_                     \
+                = ccc_impl_hhm_entry(handle_hash_map_ptr_, (void *)&hhm_key_); \
+            if (hhm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)     \
+            {                                                                  \
+                struct ccc_hhmap_elem_ const save_elem_                        \
+                    = *ccc_impl_hhm_elem_at(handle_hash_map_ptr_,              \
+                                            hhm_ins_or_assign_ent_.entry_.i_); \
+                hhm_ins_or_assign_res_ = hhm_ins_or_assign_ent_.entry_;        \
+                *((typeof(lazy_value) *)ccc_buf_at(                            \
+                    &handle_hash_map_ptr_->buf_, hhm_ins_or_assign_res_.i_))   \
+                    = lazy_value;                                              \
+                *ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                    \
+                                      hhm_ins_or_assign_ent_.entry_.i_)        \
+                    = save_elem_;                                              \
+            }                                                                  \
+            else if (hhm_ins_or_assign_ent_.entry_.stats_                      \
+                     & CCC_ENTRY_INSERT_ERROR)                                 \
+            {                                                                  \
+                hhm_ins_or_assign_res_.i_ = 0;                                 \
+                hhm_ins_or_assign_res_.stats_ = CCC_ENTRY_INSERT_ERROR;        \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                hhm_ins_or_assign_res_ = (struct ccc_ent_){                    \
+                    ccc_impl_hhm_swaps((&hhm_ins_or_assign_ent_), lazy_value), \
+                    CCC_ENTRY_VACANT,                                          \
+                };                                                             \
+            }                                                                  \
+        }                                                                      \
+        hhm_ins_or_assign_res_;                                                \
+    }))
+
+/* NOLINTEND(readability-identifier-naming) */
+
 #endif /* CCC_IMPL_HANDLE_HASH_MAP_H */
