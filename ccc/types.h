@@ -21,6 +21,18 @@ the allocation function interface. */
 Types used across many containers. */
 /**@{*/
 
+/** @brief A stable index to user data in a container that uses a flat array as
+the underlying storage method.
+
+User data at a handle position in an array remains valid until that element is
+removed from the container. This means that resizing of the underlying array
+may occur, but the handle index remains valid regardless.
+
+This is similar to pointer stability except that pointers would not remain valid
+when the underlying array is resized; a handle remains valid because it is an
+index not a pointer. */
+typedef size_t ccc_handle;
+
 /** @brief The result of a range query on iterable containers.
 
 A range provides a view all elements that fit the equals range criteria

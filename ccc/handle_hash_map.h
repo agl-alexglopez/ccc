@@ -46,14 +46,6 @@ A handle hash map can be initialized on the stack, heap, or data segment at
 runtime or compile time. */
 typedef struct ccc_hhmap_ ccc_handle_hash_map;
 
-/** @brief A stable reference to the user data stored in the map.
-
-A handle is valid until the element in the map is removed. Such a reference can
-be given to the appropriate interface function to obtain a reference the user
-type at that index in the map. Such a function should be used on an as needed
-basis and the handle should be stored for most cases rather than a pointer. */
-typedef size_t ccc_hhmap_handle;
-
 /** @brief An intrusive element for a user provided type.
 
 Because the hash map is flat, data is always copied from the provided type into
@@ -199,8 +191,18 @@ Test membership or obtain references to stored user types directly. */
 @param [in] h the handle hash map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the table entry if it is present, else NULL. */
-[[nodiscard]] ccc_hhmap_handle ccc_hhm_get_key_val(ccc_handle_hash_map *h,
-                                                   void const *key);
+[[nodiscard]] ccc_handle ccc_hhm_get_key_val(ccc_handle_hash_map *h,
+                                             void const *key);
+
+/** @brief Returns a reference to the user data at the provided handle.
+@param [in] h a pointer to the map.
+@param [in] i the stable handle obtained by the user.
+@return a pointer to the user type stored at the specified handle or NULL if
+an out of range handle or handle representing no data is provided.
+@warning this function can only check if the entry at the handle is valid. If a
+handle represents a slot that has been taken by a new element because the old
+one has been removed that new element data will be returned. */
+[[nodiscard]] void *ccc_hhm_at(ccc_handle_hash_map const *h, ccc_handle i);
 
 /**@}*/
 
@@ -467,8 +469,8 @@ Because this functions takes an entry and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
 to resize because no allocation function is provided. */
-[[nodiscard]] ccc_hhmap_handle ccc_hhm_or_insert(ccc_hhmap_entry const *e,
-                                                 ccc_hhmap_elem *elem);
+[[nodiscard]] ccc_handle ccc_hhm_or_insert(ccc_hhmap_entry const *e,
+                                           ccc_hhmap_elem *elem);
 
 /** @brief lazily insert the desired key value into the entry if it is Vacant.
 @param [in] handle_hash_map_entry_ptr a pointer to the obtained entry.
@@ -495,8 +497,8 @@ This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
-[[nodiscard]] ccc_hhmap_handle ccc_hhm_insert_entry(ccc_hhmap_entry const *e,
-                                                    ccc_hhmap_elem *elem);
+[[nodiscard]] ccc_handle ccc_hhm_insert_entry(ccc_hhmap_entry const *e,
+                                              ccc_hhmap_elem *elem);
 
 /** @brief write the contents of the compound literal lazy_key_value to a slot.
 @param [in] handle_hash_map_entry_ptr a pointer to the obtained entry.
@@ -525,7 +527,7 @@ was removed. If Vacant, no prior entry existed to be removed. */
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return an view into the table entry if one is present, or NULL. */
-[[nodiscard]] ccc_hhmap_handle ccc_hhm_unwrap(ccc_hhmap_entry const *e);
+[[nodiscard]] ccc_handle ccc_hhm_unwrap(ccc_hhmap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
@@ -600,7 +602,7 @@ resizing occurs which would lead to undefined behavior. O(capacity).
 
 Iteration starts from index 0 by capacity of the table so iteration order is
 not obvious to the user, nor should any specific order be relied on. */
-[[nodiscard]] void *ccc_hhm_begin(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_handle ccc_hhm_begin(ccc_handle_hash_map const *h);
 
 /** @brief Advances the iterator to the next occupied table slot.
 @param [in] h the table being iterated upon.
@@ -608,14 +610,14 @@ not obvious to the user, nor should any specific order be relied on. */
 @return a pointer that can be cast directly to the user type that is stored.
 @warning erasing or inserting during iteration may invalidate iterators if
 resizing occurs which would lead to undefined behavior. O(capacity). */
-[[nodiscard]] void *ccc_hhm_next(ccc_handle_hash_map const *h,
-                                 ccc_hhmap_elem const *iter);
+[[nodiscard]] ccc_handle ccc_hhm_next(ccc_handle_hash_map const *h,
+                                      ccc_handle iter);
 
 /** @brief Check the current iterator against the end for loop termination.
 @param [in] h the table being iterated upon.
 @return the end address of the hash table.
 @warning It is undefined behavior to access or modify the end address. */
-[[nodiscard]] void *ccc_hhm_end(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_handle ccc_hhm_end(ccc_handle_hash_map const *h);
 
 /**@}*/
 
@@ -663,5 +665,52 @@ within the capacity of the backing buffer. */
 [[nodiscard]] bool ccc_hhm_validate(ccc_handle_hash_map const *h);
 
 /**@}*/
+
+#ifdef HANDLE_HASH_MAP_USING_NAMESPACE_CCC
+typedef ccc_handle_hash_map handle_hash_map;
+typedef ccc_hhmap_elem hhmap_elem;
+typedef ccc_hhmap_entry hhmap_entry;
+#    define hhm_init(args...) ccc_hhm_init(args)
+#    define hhm_copy(args...) ccc_hhm_copy(args)
+#    define hhm_contains(args...) ccc_hhm_contains(args)
+#    define hhm_get_key_val(args...) ccc_hhm_get_key_val(args)
+#    define hhm_at(args...) ccc_hhm_at(args)
+#    define hhm_insert(args...) ccc_hhm_insert(args)
+#    define hhm_insert_r(args...) ccc_hhm_insert_r(args)
+#    define hhm_remove(args...) ccc_hhm_remove(args)
+#    define hhm_remove_r(args...) ccc_hhm_remove_r(args)
+#    define hhm_try_insert(args...) ccc_hhm_try_insert(args)
+#    define hhm_try_insert_r(args...) ccc_hhm_try_insert_r(args)
+#    define hhm_try_insert_w(args...) ccc_hhm_try_insert_w(args)
+#    define hhm_insert_or_assign(args...) ccc_hhm_insert_or_assign(args)
+#    define hhm_insert_or_assign_r(args...) ccc_hhm_insert_or_assign_r(args)
+#    define hhm_insert_or_assign_w(args...) ccc_hhm_insert_or_assign_w(args)
+#    define hhm_entry(args...) ccc_hhm_entry(args)
+#    define hhm_entry_r(args...) ccc_hhm_entry_r(args)
+#    define hhm_and_modify(args...) ccc_hhm_and_modify(args)
+#    define hhm_and_modify_aux(args...) ccc_hhm_and_modify_aux(args)
+#    define hhm_and_modify_w(args...) ccc_hhm_and_modify_w(args)
+#    define hhm_or_insert(args...) ccc_hhm_or_insert(args)
+#    define hhm_or_insert_w(args...) ccc_hhm_or_insert_w(args)
+#    define hhm_insert_entry(args...) ccc_hhm_insert_entry(args)
+#    define hhm_insert_entry_w(args...) ccc_hhm_insert_entry_w(args)
+#    define hhm_remove_entry(args...) ccc_hhm_remove_entry(args)
+#    define hhm_remove_entry_r(args...) ccc_hhm_remove_entry_r(args)
+#    define hhm_unwrap(args...) ccc_hhm_unwrap(args)
+#    define hhm_occupied(args...) ccc_hhm_occupied(args)
+#    define hhm_insert_error(args...) ccc_hhm_insert_error(args)
+#    define hhm_entry_status(args...) ccc_hhm_entry_status(args)
+#    define hhm_clear(args...) ccc_hhm_clear(args)
+#    define hhm_clear_and_free(args...) ccc_hhm_clear_and_free(args)
+#    define hhm_begin(args...) ccc_hhm_begin(args)
+#    define hhm_next(args...) ccc_hhm_next(args)
+#    define hhm_end(args...) ccc_hhm_end(args)
+#    define hhm_is_empty(args...) ccc_hhm_is_empty(args)
+#    define hhm_size(args...) ccc_hhm_size(args)
+#    define hhm_next_prime(args...) ccc_hhm_next_prime(args)
+#    define hhm_capacity(args...) ccc_hhm_capacity(args)
+#    define hhm_data(args...) ccc_hhm_data(args)
+#    define hhm_validate(args...) ccc_hhm_validate(args)
+#endif /* HANDLE_HASH_MAP_USING_NAMESPACE_CCC */
 
 #endif /* CCC_HANDLE_HASH_MAP_H */
