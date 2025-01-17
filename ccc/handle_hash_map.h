@@ -204,6 +204,15 @@ handle represents a slot that has been taken by a new element because the old
 one has been removed that new element data will be returned. */
 [[nodiscard]] void *ccc_hhm_at(ccc_handle_hash_map const *h, ccc_handle i);
 
+/** @brief Returns a reference to the user type in the table at the handle.
+@param [in] handle_hash_map_ptr a pointer to the map.
+@param [in] type_name name of the user type stored in each slot of the map.
+@param [in] handle the index handle obtained from previous map operations.
+@return a reference to the entry at handle in the map as the type the user has
+stored in the map. */
+#define ccc_hhm_as(handle_hash_map_ptr, type_name, handle...)                  \
+    ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle)
+
 /**@}*/
 
 /** @name Entry Interface
@@ -675,6 +684,7 @@ typedef ccc_hhmap_entry hhmap_entry;
 #    define hhm_contains(args...) ccc_hhm_contains(args)
 #    define hhm_get_key_val(args...) ccc_hhm_get_key_val(args)
 #    define hhm_at(args...) ccc_hhm_at(args)
+#    define hhm_as(args...) ccc_hhm_as(args)
 #    define hhm_insert(args...) ccc_hhm_insert(args)
 #    define hhm_insert_r(args...) ccc_hhm_insert_r(args)
 #    define hhm_remove(args...) ccc_hhm_remove(args)

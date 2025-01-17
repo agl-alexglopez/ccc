@@ -86,6 +86,18 @@ union ccc_hhmap_entry_
         = offsetof(typeof(*(memory_ptr)), hhash_elem_field),                   \
     }
 
+#define ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle...)             \
+    (__extension__({                                                           \
+        struct ccc_hhmap_ const *const hhm_ptr_ = (handle_hash_map_ptr);       \
+        typeof(type_name) *hhm_as_ = NULL;                                     \
+        ccc_handle const hhm_handle_ = (handle);                               \
+        if (hhm_ptr_ && hhm_handle_)                                           \
+        {                                                                      \
+            hhm_as_ = ccc_buf_at(&hhm_ptr_->buf_, hhm_handle_);                \
+        }                                                                      \
+        hhm_as_;                                                               \
+    }))
+
 struct ccc_handle_ ccc_impl_hhm_find(struct ccc_hhmap_ const *, void const *key,
                                      uint64_t hash);
 ccc_handle ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
@@ -108,6 +120,7 @@ void ccc_impl_hhm_copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
                                void const *slot_src);
 struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                                              size_t i);
+/* NOLINTBEGIN(readability-identifier-naming) */
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
@@ -132,11 +145,10 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            __auto_type hhm_to_insert_ = (lazy_key_value);                     \
-            hhm_i_ = ccc_impl_hhm_insert(                                      \
-                (swap_entry)->h_, &hhm_to_insert_,                             \
-                ccc_impl_hhm_hash_at((swap_entry)->h_,                         \
-                                     hhm_slot_elem_->meta_i_),                 \
+            hhm_i_ = ccc_impl_hhm_insert_meta(                                 \
+                (swap_entry)->h_,                                              \
+                *ccc_impl_hhm_hash_at((swap_entry)->h_,                        \
+                                      hhm_slot_elem_->meta_i_),                \
                 hhm_slot_elem_->meta_i_);                                      \
             struct ccc_hhmap_elem_ const save_elem                             \
                 = *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_);             \
@@ -161,7 +173,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
             hhm_mod_with_ent_ = hhm_mod_ent_ptr_->impl_;                       \
             if (hhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)         \
             {                                                                  \
-                type_name *const T = ccc_buf_at(hhm_mod_with_ent_.h->buf_,     \
+                type_name *const T = ccc_buf_at(&hhm_mod_with_ent_.h_->buf_,   \
                                                 hhm_mod_with_ent_.entry_.i_);  \
                 if (T)                                                         \
                 {                                                              \

@@ -93,7 +93,7 @@ static size_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
-static void erase(struct ccc_hhmap_ *, size_t e);
+static void erase_meta(struct ccc_hhmap_ *, size_t e);
 static void swap_user_data(struct ccc_hhmap_ *, void *, void *);
 static void swap_meta_data(struct ccc_hhmap_ *h, struct ccc_hhmap_elem_ *a,
                            struct ccc_hhmap_elem_ *b);
@@ -118,7 +118,8 @@ static struct ccc_hhmap_elem_ *elem_at(struct ccc_hhmap_ const *h, size_t i);
 static ccc_result maybe_resize(struct ccc_hhmap_ *h);
 static struct ccc_handle_ find(struct ccc_hhmap_ const *h, void const *key,
                                uint64_t hash);
-static ccc_handle insert_meta(struct ccc_hhmap_ *h, uint64_t hash, size_t i);
+static ccc_handle insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
+                              size_t slot_i);
 static uint64_t *hash_at(struct ccc_hhmap_ const *h, size_t i);
 static uint64_t filter(struct ccc_hhmap_ const *h, void const *key);
 static size_t next_prime(size_t n);
@@ -126,6 +127,16 @@ static void copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
                          void const *user_src);
 
 /*=========================   Interface    ==================================*/
+
+void *
+ccc_hhm_at(ccc_handle_hash_map const *const h, ccc_handle i)
+{
+    if (!h || !i)
+    {
+        return NULL;
+    }
+    return ccc_buf_at(&h->buf_, i);
+}
 
 bool
 ccc_hhm_is_empty(ccc_handle_hash_map const *const h)
@@ -219,7 +230,7 @@ ccc_hhm_remove_entry(ccc_hhmap_entry const *const e)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
     }
-    erase(e->impl_.h_, e->impl_.entry_.i_);
+    erase_meta(e->impl_.h_, elem_at(e->impl_.h_, e->impl_.entry_.i_)->meta_i_);
     return (ccc_entry){{.stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
@@ -334,7 +345,7 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
     {
         (void)memcpy(ret, ccc_buf_at(&h->buf_, ent.i_),
                      ccc_buf_elem_size(&h->buf_));
-        erase(h, ent.i_);
+        erase_meta(h, elem_at(h, ent.i_)->meta_i_);
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
@@ -426,7 +437,7 @@ ccc_hhm_next(ccc_handle_hash_map const *const h, ccc_handle iter)
 {
     if (unlikely(!h))
     {
-        return NULL;
+        return 0;
     }
     if (!iter)
     {
@@ -565,6 +576,11 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
     if (!h || !h->eq_fn_ || !h->hash_fn_)
     {
         return false;
+    }
+    /* Not yet initialized, pass for now. */
+    if (!ccc_buf_size(&h->buf_))
+    {
+        return true;
     }
     size_t empties = 0;
     size_t occupied = 0;
@@ -783,39 +799,40 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
    to for this insert. Be sure not to overwrite the hhmap element field of the
    returned slot as it holds important metadata for another slot elsewhere. */
 static inline ccc_handle
-insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
+insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t slot_i)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     struct ccc_hhmap_elem_ *const floater = elem_at(h, 1);
     floater->meta_.hash_ = hash;
-    floater->meta_.slot_i_ = 0;
-    size_t e_meta = 0;
-    size_t dist = distance(cap, i, to_i(cap, hash));
+    floater->meta_.slot_i_ = slot_i;
+    size_t const e_meta = elem_at(h, slot_i)->meta_i_;
+    floater->meta_i_ = e_meta;
+    size_t dist = distance(cap, slot_i, to_i(cap, hash));
     do
     {
-        struct ccc_hhmap_elem_ *const elem = elem_at(h, i);
-        ccc_handle const slot_i = elem->meta_.slot_i_;
-        void *const slot = ccc_buf_at(&h->buf_, slot_i);
+        struct ccc_hhmap_elem_ *const elem = elem_at(h, slot_i);
+        ccc_handle const elem_slot = elem->meta_.slot_i_;
+        void *const slot = ccc_buf_at(&h->buf_, elem_slot);
         if (elem->meta_.hash_ == CCC_HHM_EMPTY)
         {
             elem_in_slot(h, slot)->meta_i_ = e_meta;
-            elem_at(h, e_meta)->meta_.slot_i_ = slot_i;
+            elem_at(h, elem_slot)->meta_.slot_i_ = elem_slot;
             elem->meta_ = floater->meta_;
-            elem_at(h, floater->meta_.slot_i_)->meta_i_ = i;
+            elem_at(h, floater->meta_.slot_i_)->meta_i_ = slot_i;
             (void)ccc_buf_size_plus(&h->buf_, 1);
             *hash_at(h, 0) = CCC_HHM_EMPTY;
             *hash_at(h, 1) = CCC_HHM_EMPTY;
-            return slot_i;
+            return elem_slot;
         }
-        size_t const slot_dist = distance(cap, i, to_i(cap, elem->meta_.hash_));
+        size_t const slot_dist
+            = distance(cap, slot_i, to_i(cap, elem->meta_.hash_));
         if (dist > slot_dist)
         {
-            e_meta = e_meta ? e_meta : i;
-            elem_at(h, floater->meta_.slot_i_)->meta_i_ = i;
+            elem_at(h, floater->meta_.slot_i_)->meta_i_ = slot_i;
             swap_meta_data(h, floater, elem);
             dist = slot_dist;
         }
-        i = increment(cap, i);
+        slot_i = increment(cap, slot_i);
         ++dist;
     } while (true);
 }
@@ -824,7 +841,7 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
    to allocate. This prevents the need for tombstones which would hurt table
    quality quickly if we can't resize. */
 static void
-erase(struct ccc_hhmap_ *const h, size_t e)
+erase_meta(struct ccc_hhmap_ *const h, size_t e)
 {
     *hash_at(h, e) = CCC_HHM_EMPTY;
     size_t const cap = ccc_buf_capacity(&h->buf_);
@@ -912,10 +929,14 @@ maybe_resize(struct ccc_hhmap_ *const h)
     }
     for (size_t i = 0; i < ccc_buf_capacity(&new_hash.buf_); ++i)
     {
-        struct ccc_hhmap_elem_ *const e = elem_at(h, i);
+        struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, i);
         e->meta_.hash_ = CCC_HHM_EMPTY;
         e->meta_.slot_i_ = i;
         e->meta_i_ = i;
+    }
+    if (!ccc_buf_size(&h->buf_))
+    {
+        (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     }
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
