@@ -291,6 +291,36 @@ add_fhmap_test(test_fhmap_erase)
 add_fhmap_test(test_fhmap_lru)
 add_fhmap_test(test_fhmap_entry)
 
+#############  Handle Hash Map ##########################
+
+add_library(hhmap_util hhmap/hhmap_util.h hhmap/hhmap_util.c)
+target_link_libraries(hhmap_util
+    ccc
+)
+
+macro(add_hhmap_test TEST_NAME)
+  add_executable(${TEST_NAME} hhmap/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      checkers
+      hhmap_util
+      ccc
+      alloc
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
+
+add_hhmap_test(test_hhmap_construct)
+#add_hhmap_test(test_hhmap_insert)
+#add_hhmap_test(test_hhmap_erase)
+#add_hhmap_test(test_hhmap_lru)
+#add_hhmap_test(test_hhmap_entry)
+
 #############  Doubly Linked List ##########################
 
 add_library(dll_util dll/dll_util.h dll/dll_util.c)
