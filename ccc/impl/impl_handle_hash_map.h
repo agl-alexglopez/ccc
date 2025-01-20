@@ -223,8 +223,8 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     hhm_ins_ent_->entry_.stats_ = CCC_ENTRY_OCCUPIED;          \
                     struct ccc_hhmap_elem_ save_elem_ = *ccc_impl_hhm_elem_at( \
                         hhm_ins_ent_->h_, hhm_ins_ent_->entry_.i_);            \
-                    *((typeof(hhm_res_))ccc_buf_at(hhm_ins_ent_->h_->buf_,     \
-                                                   hhm_ins_ent_->entry_.i_))   \
+                    *((typeof(lazy_key_value) *)ccc_buf_at(                    \
+                        &hhm_ins_ent_->h_->buf_, hhm_ins_ent_->entry_.i_))     \
                         = lazy_key_value;                                      \
                     *ccc_impl_hhm_elem_at(hhm_ins_ent_->h_,                    \
                                           hhm_ins_ent_->entry_.i_)             \
@@ -244,8 +244,10 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
 #define ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)     \
     (__extension__({                                                           \
         struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
-        struct ccc_ent_ hhm_try_insert_res_                                    \
+        struct ccc_handle_ hhm_try_insert_res_                                 \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ent_ hhm_pointer_entry_                                     \
+            = {.stats_ = hhm_try_insert_res_.stats_};                          \
         if (handle_hash_map_ptr_)                                              \
         {                                                                      \
             __auto_type hhm_key_ = key;                                        \
@@ -258,21 +260,28 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
             }                                                                  \
             else                                                               \
             {                                                                  \
-                hhm_try_insert_res_ = (struct ccc_ent_){                       \
+                hhm_try_insert_res_ = (struct ccc_handle_){                    \
                     ccc_impl_hhm_swaps((&hhm_try_ins_ent_), lazy_value),       \
                     CCC_ENTRY_VACANT,                                          \
                 };                                                             \
             }                                                                  \
+            if (hhm_try_insert_res_.i_)                                        \
+            {                                                                  \
+                hhm_pointer_entry_.e_ = ccc_buf_at(                            \
+                    &handle_hash_map_ptr_->buf_, hhm_try_insert_res_.i_);      \
+            }                                                                  \
         }                                                                      \
-        hhm_try_insert_res_;                                                   \
+        hhm_pointer_entry_;                                                    \
     }))
 
 #define ccc_impl_hhm_insert_or_assign_w(handle_hash_map_ptr, key,              \
                                         lazy_value...)                         \
     (__extension__({                                                           \
         struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
-        struct ccc_ent_ hhm_ins_or_assign_res_                                 \
+        struct ccc_handle_ hhm_ins_or_assign_res_                              \
             = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ent_ hhm_pointer_entry_                                     \
+            = {.stats_ = hhm_ins_or_assign_res_.stats_};                       \
         if (handle_hash_map_ptr_)                                              \
         {                                                                      \
             __auto_type hhm_key_ = key;                                        \
@@ -299,13 +308,18 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
             }                                                                  \
             else                                                               \
             {                                                                  \
-                hhm_ins_or_assign_res_ = (struct ccc_ent_){                    \
+                hhm_ins_or_assign_res_ = (struct ccc_handle_){                 \
                     ccc_impl_hhm_swaps((&hhm_ins_or_assign_ent_), lazy_value), \
                     CCC_ENTRY_VACANT,                                          \
                 };                                                             \
             }                                                                  \
+            if (hhm_ins_or_assign_res_.i_)                                     \
+            {                                                                  \
+                hhm_pointer_entry_.e_ = ccc_buf_at(                            \
+                    &handle_hash_map_ptr_->buf_, hhm_ins_or_assign_res_.i_);   \
+            }                                                                  \
         }                                                                      \
-        hhm_ins_or_assign_res_;                                                \
+        hhm_pointer_entry_;                                                    \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */
