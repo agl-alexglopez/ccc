@@ -105,8 +105,7 @@ static struct ccc_hhash_entry_ container_entry(struct ccc_hhmap_ *h,
                                                void const *key);
 static struct ccc_hhash_entry_ *and_modify(struct ccc_hhash_entry_ *e,
                                            ccc_update_fn *fn);
-static bool valid_distance_from_home(struct ccc_hhmap_ const *,
-                                     void const *slot);
+static bool valid_distance_from_home(struct ccc_hhmap_ const *, size_t slot);
 static size_t to_i(size_t capacity, uint64_t hash);
 static size_t increment(size_t capacity, size_t i);
 static size_t decrement(size_t capacity, size_t i);
@@ -118,8 +117,7 @@ static struct ccc_hhmap_elem_ *elem_at(struct ccc_hhmap_ const *h, size_t i);
 static ccc_result maybe_resize(struct ccc_hhmap_ *h);
 static struct ccc_handle_ find(struct ccc_hhmap_ const *h, void const *key,
                                uint64_t hash);
-static ccc_handle insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
-                              size_t slot_i);
+static ccc_handle insert_meta(struct ccc_hhmap_ *h, uint64_t hash, size_t i);
 static uint64_t *hash_at(struct ccc_hhmap_ const *h, size_t i);
 static uint64_t filter(struct ccc_hhmap_ const *h, void const *key);
 static size_t next_prime(size_t n);
@@ -155,7 +153,7 @@ ccc_hhm_contains(ccc_handle_hash_map *const h, void const *const key)
     {
         return 0;
     }
-    return entry(h, key, filter(h, key)).i_;
+    return entry(h, key, filter(h, key)).stats_ == CCC_ENTRY_OCCUPIED;
 }
 
 size_t
@@ -201,7 +199,7 @@ ccc_hhm_insert_entry(ccc_hhmap_entry const *const e, ccc_hhmap_elem *const elem)
     ccc_handle const ins
         = insert_meta(e->impl_.h_, e->impl_.hash_, e->impl_.entry_.i_);
     copy_to_slot(e->impl_.h_, ccc_buf_at(&e->impl_.h_->buf_, ins), user_struct);
-    return e->impl_.entry_.i_;
+    return ins;
 }
 
 ccc_handle
@@ -277,8 +275,8 @@ ccc_hhm_insert(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
     }
     ccc_handle const ins = insert_meta(h, ent.hash_, ent.entry_.i_);
     copy_to_slot(h, ccc_buf_at(&h->buf_, ins), user_return);
-    return (ccc_entry){{.e_ = ccc_buf_at(&h->buf_, ent.entry_.i_),
-                        .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){
+        {.e_ = ccc_buf_at(&h->buf_, ins), .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -302,8 +300,8 @@ ccc_hhm_try_insert(ccc_handle_hash_map *const h,
     }
     ccc_handle const ins = insert_meta(h, ent.hash_, ent.entry_.i_);
     copy_to_slot(h, ccc_buf_at(&h->buf_, ins), user_base);
-    return (ccc_entry){{.e_ = ccc_buf_at(&h->buf_, ent.entry_.i_),
-                        .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){
+        {.e_ = ccc_buf_at(&h->buf_, ins), .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -328,7 +326,8 @@ ccc_hhm_insert_or_assign(ccc_handle_hash_map *const h,
     }
     ccc_handle const ins = insert_meta(h, ent.hash_, ent.entry_.i_);
     copy_to_slot(h, ccc_buf_at(&h->buf_, ins), user_base);
-    return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){
+        {.e_ = ccc_buf_at(&h->buf_, ins), .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -370,7 +369,7 @@ ccc_hhm_or_insert(ccc_hhmap_entry const *const e, ccc_hhmap_elem *const elem)
     ccc_handle const ins
         = insert_meta(e->impl_.h_, e->impl_.hash_, e->impl_.entry_.i_);
     copy_to_slot(e->impl_.h_, ccc_buf_at(&e->impl_.h_->buf_, ins), user_struct);
-    return e->impl_.entry_.i_;
+    return ins;
 }
 
 ccc_handle
@@ -584,14 +583,10 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
     }
     size_t empties = 0;
     size_t occupied = 0;
-    size_t index = 0;
-    for (void const *i = ccc_buf_begin(&h->buf_);
-         i != ccc_buf_capacity_end(&h->buf_);
-         i = ccc_buf_next(&h->buf_, i), ++index)
+    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
-        struct ccc_hhmap_elem_ const *const e = elem_in_slot(h, i);
-        if (elem_in_slot(h, ccc_buf_at(&h->buf_, e->meta_.slot_i_))->meta_i_
-            != index)
+        struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
+        if (i >= num_swap_slots && elem_at(h, e->meta_.slot_i_)->meta_i_ != i)
         {
             return false;
         }
@@ -613,15 +608,13 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
 }
 
 static bool
-valid_distance_from_home(struct ccc_hhmap_ const *const h,
-                         void const *const slot)
+valid_distance_from_home(struct ccc_hhmap_ const *const h, size_t const slot)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
-    uint64_t const hash = elem_in_slot(h, slot)->meta_.hash_;
+    uint64_t const hash = elem_at(h, slot)->meta_.hash_;
     size_t const home = to_i(cap, hash);
     size_t const end = decrement(cap, home);
-    for (size_t i = ccc_buf_i(&h->buf_, slot),
-                distance_to_home = distance(cap, i, to_i(cap, hash));
+    for (size_t i = slot, distance_to_home = distance(cap, i, to_i(cap, hash));
          i != end; --distance_to_home, i = decrement(cap, i))
     {
         uint64_t const cur_hash = *hash_at(h, i);
@@ -686,10 +679,9 @@ ccc_impl_hhm_in_slot(struct ccc_hhmap_ const *const h, void const *const slot)
 }
 
 void *
-ccc_impl_hhm_key_in_slot(struct ccc_hhmap_ const *const h,
-                         void const *const slot)
+ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t const i)
 {
-    return key_in_slot(h, slot);
+    return (char *)ccc_buf_at(&h->buf_, i) + h->key_offset_;
 }
 
 size_t
@@ -740,13 +732,13 @@ ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *const h, size_t const i)
 static inline struct ccc_handle_
 entry(struct ccc_hhmap_ *const h, void const *const key, uint64_t const hash)
 {
-    char upcoming_insertion_error = 0;
+    uint8_t future_insert_error = 0;
     if (maybe_resize(h) != CCC_OK)
     {
-        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
+        future_insert_error = CCC_ENTRY_INSERT_ERROR;
     }
     struct ccc_handle_ res = find(h, key, hash);
-    res.stats_ |= upcoming_insertion_error;
+    res.stats_ |= future_insert_error;
     return res;
 }
 
@@ -799,40 +791,41 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
    to for this insert. Be sure not to overwrite the hhmap element field of the
    returned slot as it holds important metadata for another slot elsewhere. */
 static inline ccc_handle
-insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t slot_i)
+insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     struct ccc_hhmap_elem_ *const floater = elem_at(h, 1);
     floater->meta_.hash_ = hash;
-    floater->meta_.slot_i_ = slot_i;
-    size_t const e_meta = elem_at(h, slot_i)->meta_i_;
+    floater->meta_.slot_i_ = i;
+    size_t const e_meta = elem_at(h, i)->meta_i_;
     floater->meta_i_ = e_meta;
-    size_t dist = distance(cap, slot_i, to_i(cap, hash));
+    size_t dist = distance(cap, e_meta, to_i(cap, hash));
+    /* The slot we are given is where the actual data will eventually go. We
+       now need to run the robin hood algo on just the metadata entries. */
+    i = e_meta;
     do
     {
-        struct ccc_hhmap_elem_ *const elem = elem_at(h, slot_i);
-        ccc_handle const elem_slot = elem->meta_.slot_i_;
-        void *const slot = ccc_buf_at(&h->buf_, elem_slot);
+        struct ccc_hhmap_elem_ *const elem = elem_at(h, i);
+        ccc_handle const user_data_slot = elem->meta_.slot_i_;
         if (elem->meta_.hash_ == CCC_HHM_EMPTY)
         {
-            elem_in_slot(h, slot)->meta_i_ = e_meta;
-            elem_at(h, elem_slot)->meta_.slot_i_ = elem_slot;
+            elem_at(h, user_data_slot)->meta_i_ = e_meta;
+            elem_at(h, e_meta)->meta_.slot_i_ = user_data_slot;
             elem->meta_ = floater->meta_;
-            elem_at(h, floater->meta_.slot_i_)->meta_i_ = slot_i;
+            elem_at(h, floater->meta_.slot_i_)->meta_i_ = i;
             (void)ccc_buf_size_plus(&h->buf_, 1);
             *hash_at(h, 0) = CCC_HHM_EMPTY;
             *hash_at(h, 1) = CCC_HHM_EMPTY;
-            return elem_slot;
+            return user_data_slot;
         }
-        size_t const slot_dist
-            = distance(cap, slot_i, to_i(cap, elem->meta_.hash_));
+        size_t const slot_dist = distance(cap, i, to_i(cap, elem->meta_.hash_));
         if (dist > slot_dist)
         {
-            elem_at(h, floater->meta_.slot_i_)->meta_i_ = slot_i;
+            elem_at(h, floater->meta_.slot_i_)->meta_i_ = i;
             swap_meta_data(h, floater, elem);
             dist = slot_dist;
         }
-        slot_i = increment(cap, slot_i);
+        i = increment(cap, i);
         ++dist;
     } while (true);
 }
@@ -894,8 +887,9 @@ maybe_resize(struct ccc_hhmap_ *const h)
 
         for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
         {
+            (void)memset(ccc_buf_at(&h->buf_, i), 0,
+                         ccc_buf_elem_size(&h->buf_));
             struct ccc_hhmap_elem_ *const e = elem_at(h, i);
-            e->meta_.hash_ = CCC_HHM_EMPTY;
             e->meta_.slot_i_ = i;
             e->meta_i_ = i;
         }
@@ -929,15 +923,13 @@ maybe_resize(struct ccc_hhmap_ *const h)
     }
     for (size_t i = 0; i < ccc_buf_capacity(&new_hash.buf_); ++i)
     {
+        (void)memset(ccc_buf_at(&new_hash.buf_, i), 0,
+                     ccc_buf_elem_size(&new_hash.buf_));
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, i);
-        e->meta_.hash_ = CCC_HHM_EMPTY;
         e->meta_.slot_i_ = i;
         e->meta_i_ = i;
     }
-    if (!ccc_buf_size(&h->buf_))
-    {
-        (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
-    }
+    (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
          slot = ccc_buf_next(&h->buf_, slot))
@@ -1066,7 +1058,6 @@ swap_user_data(struct ccc_hhmap_ *const h, void *const a, void *const b)
     (void)memcpy(tmp, a, ccc_buf_elem_size(&h->buf_));
     copy_to_slot(h, a, b);
     copy_to_slot(h, b, tmp);
-    *hash_at(h, 0) = CCC_HHM_EMPTY;
 }
 
 static inline void
@@ -1082,7 +1073,6 @@ swap_meta_data(struct ccc_hhmap_ *const h, struct ccc_hhmap_elem_ *const a,
     tmp->meta_ = a->meta_;
     a->meta_ = b->meta_;
     b->meta_ = tmp->meta_;
-    tmp->meta_.hash_ = CCC_HHM_EMPTY;
 }
 
 /** This function converts a hash to its home index in the table. Because this
