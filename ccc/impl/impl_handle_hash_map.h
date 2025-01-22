@@ -109,7 +109,7 @@ struct ccc_hhash_entry_ *ccc_impl_hhm_and_modify(struct ccc_hhash_entry_ *e,
                                                  ccc_update_fn *fn);
 struct ccc_hhmap_elem_ *ccc_impl_hhm_in_slot(struct ccc_hhmap_ const *h,
                                              void const *slot);
-void *ccc_impl_hhm_key_in_slot(struct ccc_hhmap_ const *h, void const *slot);
+void *ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t i);
 uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, size_t i);
 size_t ccc_impl_hhm_distance(size_t capacity, size_t i, size_t j);
 ccc_result ccc_impl_hhm_maybe_resize(struct ccc_hhmap_ *);
@@ -145,11 +145,8 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            hhm_i_ = ccc_impl_hhm_insert_meta(                                 \
-                (swap_entry)->h_,                                              \
-                *ccc_impl_hhm_hash_at((swap_entry)->h_,                        \
-                                      hhm_slot_elem_->meta_i_),                \
-                hhm_slot_elem_->meta_i_);                                      \
+            hhm_i_ = ccc_impl_hhm_insert_meta((swap_entry)->h_,                \
+                                              (swap_entry)->hash_, hhm_i_);    \
             struct ccc_hhmap_elem_ const save_elem                             \
                 = *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_);             \
             *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),  \
@@ -264,6 +261,9 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     ccc_impl_hhm_swaps((&hhm_try_ins_ent_), lazy_value),       \
                     CCC_ENTRY_VACANT,                                          \
                 };                                                             \
+                *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
+                    handle_hash_map_ptr_, hhm_try_insert_res_.i_))             \
+                    = hhm_key_;                                                \
             }                                                                  \
             if (hhm_try_insert_res_.i_)                                        \
             {                                                                  \
@@ -299,6 +299,9 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                 *ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                    \
                                       hhm_ins_or_assign_ent_.entry_.i_)        \
                     = save_elem_;                                              \
+                *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
+                    handle_hash_map_ptr_, hhm_ins_or_assign_ent_.entry_.i_))   \
+                    = hhm_key_;                                                \
             }                                                                  \
             else if (hhm_ins_or_assign_ent_.entry_.stats_                      \
                      & CCC_ENTRY_INSERT_ERROR)                                 \
@@ -312,6 +315,9 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     ccc_impl_hhm_swaps((&hhm_ins_or_assign_ent_), lazy_value), \
                     CCC_ENTRY_VACANT,                                          \
                 };                                                             \
+                *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
+                    handle_hash_map_ptr_, hhm_ins_or_assign_ent_.entry_.i_))   \
+                    = hhm_key_;                                                \
             }                                                                  \
             if (hhm_ins_or_assign_res_.i_)                                     \
             {                                                                  \
