@@ -395,10 +395,13 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, {}, shuffled_index};
+        bool const contain = contains(&hh, &shuffled_index);
+        CHECK(contain, true);
         ccc_handle h = insert_entry(entry_r(&hh, &swap_slot.key), &swap_slot.e);
         struct val const *const in_table = hhm_at(&hh, h);
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
+        CHECK(size(&hh), to_insert);
     }
     CHECK(hhm_clear_and_free(&hh, NULL), CCC_OK);
     CHECK_END_FN();
