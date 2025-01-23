@@ -111,6 +111,7 @@ static size_t increment(size_t capacity, size_t i);
 static size_t decrement(size_t capacity, size_t i);
 static size_t distance(size_t capacity, size_t i, size_t j);
 static void *key_in_slot(struct ccc_hhmap_ const *h, void const *slot);
+static void *key_at(struct ccc_hhmap_ const *h, size_t i);
 static struct ccc_hhmap_elem_ *elem_in_slot(struct ccc_hhmap_ const *h,
                                             void const *slot);
 static struct ccc_hhmap_elem_ *elem_at(struct ccc_hhmap_ const *h, size_t i);
@@ -820,7 +821,7 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
             (void)ccc_buf_size_plus(&h->buf_, 1);
             *elem_at(h, 0) = (struct ccc_hhmap_elem_){};
             *elem_at(h, 1) = (struct ccc_hhmap_elem_){};
-            return i;
+            return e_meta;
         }
         size_t const slot_dist = distance(cap, i, to_i(cap, elem->hash_));
         if (dist > slot_dist)
@@ -938,9 +939,12 @@ maybe_resize(struct ccc_hhmap_ *const h)
         if (e->hash_ != CCC_HHM_EMPTY)
         {
             struct ccc_handle_ const new_ent
-                = find(&new_hash, key_in_slot(h, slot), e->hash_);
+                = find(&new_hash, key_at(h, e->slot_i_), e->hash_);
             ccc_handle const ins = insert_meta(&new_hash, e->hash_, new_ent.i_);
-            copy_to_slot(&new_hash, ccc_buf_at(&new_hash.buf_, ins), slot);
+            copy_to_slot(
+                &new_hash,
+                ccc_buf_at(&new_hash.buf_, elem_at(&new_hash, ins)->slot_i_),
+                ccc_buf_at(&h->buf_, e->slot_i_));
         }
     }
     if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_OK)
@@ -1019,6 +1023,12 @@ static inline void *
 key_in_slot(struct ccc_hhmap_ const *const h, void const *const slot)
 {
     return (char *)slot + h->key_offset_;
+}
+
+static inline void *
+key_at(struct ccc_hhmap_ const *const h, size_t const i)
+{
+    return (char *)ccc_buf_at(&h->buf_, i) + h->key_offset_;
 }
 
 static inline size_t

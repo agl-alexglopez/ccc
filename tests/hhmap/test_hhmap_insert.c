@@ -389,6 +389,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
         CHECK(v->val, i);
         bool const valid = validate(&hh);
         CHECK(valid, true);
+        bool const contain = contains(&hh, &shuffled_index);
+        CHECK(contain, true);
     }
     CHECK(size(&hh), to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
