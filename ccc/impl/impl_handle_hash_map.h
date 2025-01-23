@@ -171,8 +171,11 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
             hhm_mod_with_ent_ = hhm_mod_ent_ptr_->impl_;                       \
             if (hhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)         \
             {                                                                  \
-                type_name *const T = ccc_buf_at(&hhm_mod_with_ent_.h_->buf_,   \
-                                                hhm_mod_with_ent_.entry_.i_);  \
+                type_name *const T = ccc_buf_at(                               \
+                    &hhm_mod_with_ent_.h_->buf_,                               \
+                    ccc_impl_hhm_elem_at(hhm_mod_with_ent_.h_,                 \
+                                         hhm_mod_with_ent_.entry_.i_)          \
+                        ->slot_i_);                                            \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
