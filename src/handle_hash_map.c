@@ -1,3 +1,23 @@
+/** This is another take on the Robin Hood Hash table that seeks to combine
+the simplicity and benefits of Robin Hood with handle stability. Handle
+stability is like pointer stability except that it can only promise that the
+user's data will remain in the same index slot in the table for its entire
+lifetime and will only be copied in once.
+
+This is a very important guarantee when it can be achieved because it allows
+for better composition of multiple data structures in this collection. If the
+user knows their struct can be placed in an array and be part of a hash table
+without the hash table modifying their data once inserted, they can set up
+long lived structs that are part of many different containers and systems in
+their program safely. The lifetime of the struct as a member of the hash
+table can be the longest lasting.
+
+To achieve this the table runs the round robin hash table algorithm on only the
+intrusive elements in the user struct. With only a single additional data field
+compared to the normal hash table, we move the metadata around the table
+according to the algorithm and leave the user data in the slot to which it is
+first written. Then, as many interfaces as possible expose these handles rather
+then pointers to encourage the user to think in terms of stable indices. */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -792,12 +812,10 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
     } while (true);
 }
 
-/* Assumes that element to be inserted does not already exist in the table.
-   Assumes that the table has room for another insertion. Unexpected results
-   may occur if these assumptions are not accommodated. After managing metadata
-   entries in the table for Round Robin, returns the slot the data may be copied
-   to for this insert. Be sure not to overwrite the hhmap element field of the
-   returned slot as it holds important metadata for another slot elsewhere. */
+/* Assumes the table is prepared for the hash to be inserted at given index i
+   (obtained from a previous search). Manages metadata only for this insertion
+   and the effects it may have on Robin Hood logic. Returns the handle of the
+   metadata for this new hash that has been inserted. */
 static inline ccc_handle
 insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
 {
@@ -854,8 +872,7 @@ erase_meta(struct ccc_hhmap_ *const h, size_t e)
             (void)ccc_buf_size_minus(&h->buf_, 1);
             return;
         }
-        struct ccc_hhmap_elem_ *const i_elem = elem_at(h, i);
-        swap_meta_data(h, i_elem, next_elem);
+        swap_meta_data(h, elem_at(h, i), next_elem);
         i = next;
         next = increment(cap, next);
     } while (true);
