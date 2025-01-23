@@ -29,16 +29,11 @@ struct ccc_hhmap_elem_
 {
     /* The struct that swaps during the robin hood algo. Caching the full hash
        here to avoid using pointer to user data for full comparison callback. */
-    struct
-    {
-        /* The full hash of the user data. Reduces callbacks and rehashing. */
-        uint64_t hash_;
-        /* Index of the permanent home of the data associated with this hash.
-           Does not change once initialized even when an element is removed. */
-        size_t slot_i_;
-    } meta_;
-    /* This field stays at original slot. Updated whenever meta moves. */
-    size_t meta_i_;
+    /* The full hash of the user data. Reduces callbacks and rehashing. */
+    uint64_t hash_;
+    /* Index of the permanent home of the data associated with this hash.
+       Does not change once initialized even when an element is removed. */
+    size_t slot_i_;
 };
 
 /** @private */
@@ -131,15 +126,16 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         size_t hhm_i_ = (swap_entry)->entry_.i_;                               \
         struct ccc_hhmap_elem_ *hhm_slot_elem_                                 \
             = ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_);                  \
-        if (*ccc_impl_hhm_hash_at((swap_entry)->h_, hhm_slot_elem_->meta_i_)   \
-            == CCC_HHM_EMPTY)                                                  \
+        if (hhm_slot_elem_->hash_ == CCC_HHM_EMPTY)                            \
         {                                                                      \
-            struct ccc_hhmap_elem_ const save_elem = *hhm_slot_elem_;          \
+            struct ccc_hhmap_elem_ const save_elem_ = *ccc_impl_hhm_elem_at(   \
+                (swap_entry)->h_, hhm_slot_elem_->slot_i_);                    \
             *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),  \
-                                                   hhm_i_))                    \
+                                                   save_elem_.slot_i_))        \
                 = lazy_key_value;                                              \
-            *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_) = save_elem;       \
-            *ccc_impl_hhm_hash_at((swap_entry)->h_, save_elem.meta_i_)         \
+            *ccc_impl_hhm_elem_at((swap_entry)->h_, save_elem_.slot_i_)        \
+                = save_elem_;                                                  \
+            *ccc_impl_hhm_hash_at((swap_entry)->h_, save_elem_.slot_i_)        \
                 = (swap_entry)->hash_;                                         \
             (void)ccc_buf_size_plus(&(swap_entry)->h_->buf_, 1);               \
         }                                                                      \
@@ -147,12 +143,17 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         {                                                                      \
             hhm_i_ = ccc_impl_hhm_insert_meta((swap_entry)->h_,                \
                                               (swap_entry)->hash_, hhm_i_);    \
-            struct ccc_hhmap_elem_ const save_elem                             \
-                = *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_);             \
-            *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_entry)->h_->buf_),  \
-                                                   hhm_i_))                    \
+            struct ccc_hhmap_elem_ const save_elem_ = *ccc_impl_hhm_elem_at(   \
+                (swap_entry)->h_,                                              \
+                ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_)->slot_i_);      \
+            *((typeof(lazy_key_value) *)ccc_buf_at(                            \
+                &((swap_entry)->h_->buf_),                                     \
+                ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_)->slot_i_))      \
                 = lazy_key_value;                                              \
-            *ccc_impl_hhm_elem_at((swap_entry)->h_, hhm_i_) = save_elem;       \
+            *ccc_impl_hhm_elem_at((swap_entry)->h_, save_elem_.slot_i_)        \
+                = save_elem_;                                                  \
+            *ccc_impl_hhm_hash_at((swap_entry)->h_, save_elem_.slot_i_)        \
+                = (swap_entry)->hash_;                                         \
         }                                                                      \
         hhm_i_;                                                                \
     }))
@@ -219,12 +220,21 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                 {                                                              \
                     hhm_ins_ent_->entry_.stats_ = CCC_ENTRY_OCCUPIED;          \
                     struct ccc_hhmap_elem_ save_elem_ = *ccc_impl_hhm_elem_at( \
-                        hhm_ins_ent_->h_, hhm_ins_ent_->entry_.i_);            \
+                        hhm_ins_ent_->h_,                                      \
+                        ccc_impl_hhm_elem_at(hhm_ins_ent_->h_,                 \
+                                             hhm_ins_ent_->entry_.i_)          \
+                            ->slot_i_);                                        \
                     *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &hhm_ins_ent_->h_->buf_, hhm_ins_ent_->entry_.i_))     \
+                        &hhm_ins_ent_->h_->buf_,                               \
+                        ccc_impl_hhm_elem_at(hhm_ins_ent_->h_,                 \
+                                             hhm_ins_ent_->entry_.i_)          \
+                            ->slot_i_))                                        \
                         = lazy_key_value;                                      \
-                    *ccc_impl_hhm_elem_at(hhm_ins_ent_->h_,                    \
-                                          hhm_ins_ent_->entry_.i_)             \
+                    *ccc_impl_hhm_elem_at(                                     \
+                        hhm_ins_ent_->h_,                                      \
+                        ccc_impl_hhm_elem_at(hhm_ins_ent_->h_,                 \
+                                             hhm_ins_ent_->entry_.i_)          \
+                            ->slot_i_)                                         \
                         = save_elem_;                                          \
                     hhm_res_ = hhm_ins_ent_->entry_.i_;                        \
                 }                                                              \
@@ -253,7 +263,13 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
             if ((hhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)          \
                 || (hhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR))  \
             {                                                                  \
-                hhm_try_insert_res_ = hhm_try_ins_ent_.entry_;                 \
+                hhm_pointer_entry_ = (struct ccc_ent_){                        \
+                    .e_ = ccc_buf_at(                                          \
+                        &handle_hash_map_ptr_->buf_,                           \
+                        ccc_impl_hhm_elem_at(handle_hash_map_ptr_,             \
+                                             hhm_try_ins_ent_.entry_.i_)       \
+                            ->slot_i_),                                        \
+                    .stats_ = hhm_try_ins_ent_.entry_.stats_};                 \
             }                                                                  \
             else                                                               \
             {                                                                  \
@@ -262,7 +278,10 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     CCC_ENTRY_VACANT,                                          \
                 };                                                             \
                 *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
-                    handle_hash_map_ptr_, hhm_try_insert_res_.i_))             \
+                    handle_hash_map_ptr_,                                      \
+                    ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                 \
+                                         hhm_try_insert_res_.i_)               \
+                        ->slot_i_))                                            \
                     = hhm_key_;                                                \
             }                                                                  \
             if (hhm_try_insert_res_.i_)                                        \
@@ -300,7 +319,10 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                                       hhm_ins_or_assign_ent_.entry_.i_)        \
                     = save_elem_;                                              \
                 *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
-                    handle_hash_map_ptr_, hhm_ins_or_assign_ent_.entry_.i_))   \
+                    handle_hash_map_ptr_,                                      \
+                    ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                 \
+                                         hhm_ins_or_assign_ent_.entry_.i_)     \
+                        ->slot_i_))                                            \
                     = hhm_key_;                                                \
             }                                                                  \
             else if (hhm_ins_or_assign_ent_.entry_.stats_                      \
@@ -316,7 +338,10 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     CCC_ENTRY_VACANT,                                          \
                 };                                                             \
                 *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
-                    handle_hash_map_ptr_, hhm_ins_or_assign_ent_.entry_.i_))   \
+                    handle_hash_map_ptr_,                                      \
+                    ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                 \
+                                         hhm_ins_or_assign_ent_.entry_.i_)     \
+                        ->slot_i_))                                            \
                     = hhm_key_;                                                \
             }                                                                  \
             if (hhm_ins_or_assign_res_.i_)                                     \

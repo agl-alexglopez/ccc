@@ -133,7 +133,7 @@ ccc_hhm_at(ccc_handle_hash_map const *const h, ccc_handle i)
     {
         return NULL;
     }
-    return ccc_buf_at(&h->buf_, i);
+    return ccc_buf_at(&h->buf_, elem_at(h, i)->slot_i_);
 }
 
 bool
@@ -151,7 +151,7 @@ ccc_hhm_contains(ccc_handle_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return 0;
+        return false;
     }
     return entry(h, key, filter(h, key)).stats_ == CCC_ENTRY_OCCUPIED;
 }
@@ -187,9 +187,11 @@ ccc_hhm_insert_entry(ccc_hhmap_entry const *const e, ccc_hhmap_elem *const elem)
     void *const user_struct = struct_base(e->impl_.h_, elem);
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        copy_to_slot(e->impl_.h_,
-                     ccc_buf_at(&e->impl_.h_->buf_, e->impl_.entry_.i_),
-                     struct_base(e->impl_.h_, elem));
+        copy_to_slot(
+            e->impl_.h_,
+            ccc_buf_at(&e->impl_.h_->buf_,
+                       elem_at(e->impl_.h_, e->impl_.entry_.i_)->slot_i_),
+            struct_base(e->impl_.h_, elem));
         return e->impl_.entry_.i_;
     }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
@@ -198,14 +200,18 @@ ccc_hhm_insert_entry(ccc_hhmap_entry const *const e, ccc_hhmap_elem *const elem)
     }
     ccc_handle const ins
         = insert_meta(e->impl_.h_, e->impl_.hash_, e->impl_.entry_.i_);
-    copy_to_slot(e->impl_.h_, ccc_buf_at(&e->impl_.h_->buf_, ins), user_struct);
+    copy_to_slot(
+        e->impl_.h_,
+        ccc_buf_at(&e->impl_.h_->buf_, elem_at(e->impl_.h_, ins)->slot_i_),
+        user_struct);
     return ins;
 }
 
 ccc_handle
 ccc_hhm_get_key_val(ccc_handle_hash_map *const h, void const *const key)
 {
-    if (unlikely(!h || !key || !ccc_buf_capacity(&h->buf_)))
+    if (unlikely(!h || !key || !ccc_buf_capacity(&h->buf_)
+                 || maybe_resize(h) != CCC_OK))
     {
         return 0;
     }
@@ -228,7 +234,7 @@ ccc_hhm_remove_entry(ccc_hhmap_entry const *const e)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
     }
-    erase_meta(e->impl_.h_, elem_at(e->impl_.h_, e->impl_.entry_.i_)->meta_i_);
+    erase_meta(e->impl_.h_, e->impl_.entry_.i_);
     return (ccc_entry){{.stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
@@ -248,8 +254,10 @@ ccc_hhm_and_modify_aux(ccc_hhmap_entry *const e, ccc_update_fn *const fn,
     }
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED && fn)
     {
-        fn((ccc_user_type){ccc_buf_at(&e->impl_.h_->buf_, e->impl_.entry_.i_),
-                           aux});
+        fn((ccc_user_type){
+            ccc_buf_at(&e->impl_.h_->buf_,
+                       elem_at(e->impl_.h_, e->impl_.entry_.i_)->slot_i_),
+            aux});
     }
     return e;
 }
@@ -266,7 +274,9 @@ ccc_hhm_insert(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
     struct ccc_hhash_entry_ ent = container_entry(h, key);
     if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        swap_user_data(h, ccc_buf_at(&h->buf_, ent.entry_.i_), user_return);
+        swap_user_data(h,
+                       ccc_buf_at(&h->buf_, elem_at(h, ent.entry_.i_)->slot_i_),
+                       user_return);
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
@@ -274,9 +284,10 @@ ccc_hhm_insert(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
         return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     ccc_handle const ins = insert_meta(h, ent.hash_, ent.entry_.i_);
-    copy_to_slot(h, ccc_buf_at(&h->buf_, ins), user_return);
-    return (ccc_entry){
-        {.e_ = ccc_buf_at(&h->buf_, ins), .stats_ = CCC_ENTRY_VACANT}};
+    copy_to_slot(h, ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_),
+                 user_return);
+    return (ccc_entry){{.e_ = ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_),
+                        .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -291,17 +302,18 @@ ccc_hhm_try_insert(ccc_handle_hash_map *const h,
     struct ccc_hhash_entry_ ent = container_entry(h, key_in_slot(h, user_base));
     if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        return (ccc_entry){{.e_ = ccc_buf_at(&h->buf_, ent.entry_.i_),
-                            .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){
+            {.e_ = ccc_buf_at(&h->buf_, elem_at(h, ent.entry_.i_)->slot_i_),
+             .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     ccc_handle const ins = insert_meta(h, ent.hash_, ent.entry_.i_);
-    copy_to_slot(h, ccc_buf_at(&h->buf_, ins), user_base);
-    return (ccc_entry){
-        {.e_ = ccc_buf_at(&h->buf_, ins), .stats_ = CCC_ENTRY_VACANT}};
+    copy_to_slot(h, ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_), user_base);
+    return (ccc_entry){{.e_ = ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_),
+                        .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -314,7 +326,7 @@ ccc_hhm_insert_or_assign(ccc_handle_hash_map *const h,
     }
     void *const user_base = struct_base(h, key_val_handle);
     struct ccc_hhash_entry_ ent = container_entry(h, key_in_slot(h, user_base));
-    void *const ret = ccc_buf_at(&h->buf_, ent.entry_.i_);
+    void *const ret = ccc_buf_at(&h->buf_, elem_at(h, ent.entry_.i_)->slot_i_);
     if (ent.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         copy_to_slot(h, ret, user_base);
@@ -325,9 +337,9 @@ ccc_hhm_insert_or_assign(ccc_handle_hash_map *const h,
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     ccc_handle const ins = insert_meta(h, ent.hash_, ent.entry_.i_);
-    copy_to_slot(h, ccc_buf_at(&h->buf_, ins), user_base);
-    return (ccc_entry){
-        {.e_ = ccc_buf_at(&h->buf_, ins), .stats_ = CCC_ENTRY_VACANT}};
+    copy_to_slot(h, ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_), user_base);
+    return (ccc_entry){{.e_ = ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_),
+                        .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_entry
@@ -342,9 +354,9 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
     struct ccc_handle_ const ent = find(h, key, filter(h, key));
     if (ent.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        (void)memcpy(ret, ccc_buf_at(&h->buf_, ent.i_),
+        (void)memcpy(ret, ccc_buf_at(&h->buf_, elem_at(h, ent.i_)->slot_i_),
                      ccc_buf_elem_size(&h->buf_));
-        erase_meta(h, elem_at(h, ent.i_)->meta_i_);
+        erase_meta(h, ent.i_);
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
@@ -368,7 +380,10 @@ ccc_hhm_or_insert(ccc_hhmap_entry const *const e, ccc_hhmap_elem *const elem)
     void *user_struct = struct_base(e->impl_.h_, elem);
     ccc_handle const ins
         = insert_meta(e->impl_.h_, e->impl_.hash_, e->impl_.entry_.i_);
-    copy_to_slot(e->impl_.h_, ccc_buf_at(&e->impl_.h_->buf_, ins), user_struct);
+    copy_to_slot(
+        e->impl_.h_,
+        ccc_buf_at(&e->impl_.h_->buf_, elem_at(e->impl_.h_, ins)->slot_i_),
+        user_struct);
     return ins;
 }
 
@@ -421,14 +436,14 @@ ccc_hhm_begin(ccc_handle_hash_map const *const h)
     }
     size_t iter = 0;
     for (; iter < ccc_buf_capacity(&h->buf_)
-           && elem_at(h, iter)->meta_.hash_ == CCC_HHM_EMPTY;
+           && elem_at(h, iter)->hash_ == CCC_HHM_EMPTY;
          ++iter)
     {}
     if (iter >= ccc_buf_capacity(&h->buf_))
     {
         return 0;
     }
-    return elem_at(h, iter)->meta_.slot_i_;
+    return iter;
 }
 
 ccc_handle
@@ -442,16 +457,16 @@ ccc_hhm_next(ccc_handle_hash_map const *const h, ccc_handle iter)
     {
         return 0;
     }
-    iter = elem_at(h, iter)->meta_i_ + 1;
+    ++iter;
     for (; iter < ccc_buf_capacity(&h->buf_)
-           && elem_at(h, iter)->meta_.hash_ == CCC_HHM_EMPTY;
+           && elem_at(h, iter)->hash_ == CCC_HHM_EMPTY;
          ++iter)
     {}
     if (iter >= ccc_buf_capacity(&h->buf_))
     {
         return 0;
     }
-    return elem_at(h, iter)->meta_.slot_i_;
+    return iter;
 }
 
 ccc_handle
@@ -512,14 +527,13 @@ ccc_hhm_clear(ccc_handle_hash_map *const h, ccc_destructor_fn *const fn)
         h->buf_.sz_ = 0;
         return CCC_OK;
     }
-    for (void *slot = ccc_buf_begin(&h->buf_);
-         slot != ccc_buf_capacity_end(&h->buf_);
-         slot = ccc_buf_next(&h->buf_, slot))
+    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
-        struct ccc_hhmap_elem_ *const e = elem_in_slot(h, slot);
-        if (e->meta_.hash_ != CCC_HHM_EMPTY)
+        struct ccc_hhmap_elem_ *const e = elem_at(h, i);
+        if (e->hash_ != CCC_HHM_EMPTY)
         {
-            fn((ccc_user_type){.user_type = ccc_buf_at(&h->buf_, e->meta_i_),
+            fn((ccc_user_type){.user_type
+                               = ccc_buf_at(&h->buf_, elem_at(h, i)->slot_i_),
                                .aux = h->buf_.aux_});
         }
     }
@@ -539,14 +553,13 @@ ccc_hhm_clear_and_free(ccc_handle_hash_map *const h,
         h->buf_.sz_ = 0;
         return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
     }
-    for (void *slot = ccc_buf_begin(&h->buf_);
-         slot != ccc_buf_capacity_end(&h->buf_);
-         slot = ccc_buf_next(&h->buf_, slot))
+    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
-        struct ccc_hhmap_elem_ *const e = elem_in_slot(h, slot);
-        if (e->meta_.hash_ != CCC_HHM_EMPTY)
+        struct ccc_hhmap_elem_ *const e = elem_at(h, i);
+        if (e->hash_ != CCC_HHM_EMPTY)
         {
-            fn((ccc_user_type){.user_type = ccc_buf_at(&h->buf_, e->meta_i_),
+            fn((ccc_user_type){.user_type
+                               = ccc_buf_at(&h->buf_, elem_at(h, i)->slot_i_),
                                .aux = h->buf_.aux_});
         }
     }
@@ -586,11 +599,7 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
     for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
-        if (i >= num_swap_slots && elem_at(h, e->meta_.slot_i_)->meta_i_ != i)
-        {
-            return false;
-        }
-        if (e->meta_.hash_ == CCC_HHM_EMPTY)
+        if (e->hash_ == CCC_HHM_EMPTY)
         {
             ++empties;
         }
@@ -598,7 +607,7 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
         {
             ++occupied;
         }
-        if (e->meta_.hash_ != CCC_HHM_EMPTY && !valid_distance_from_home(h, i))
+        if (e->hash_ != CCC_HHM_EMPTY && !valid_distance_from_home(h, i))
         {
             return false;
         }
@@ -611,7 +620,7 @@ static bool
 valid_distance_from_home(struct ccc_hhmap_ const *const h, size_t const slot)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
-    uint64_t const hash = elem_at(h, slot)->meta_.hash_;
+    uint64_t const hash = elem_at(h, slot)->hash_;
     size_t const home = to_i(cap, hash);
     size_t const end = decrement(cap, home);
     for (size_t i = slot, distance_to_home = distance(cap, i, to_i(cap, hash));
@@ -763,21 +772,19 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
     do
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
-        if (e->meta_.hash_ == CCC_HHM_EMPTY
-            || dist > distance(cap, i, to_i(cap, e->meta_.hash_)))
+        if (e->hash_ == CCC_HHM_EMPTY
+            || dist > distance(cap, i, to_i(cap, e->hash_)))
         {
-            return (struct ccc_handle_){.i_ = e->meta_.slot_i_,
-                                        .stats_ = CCC_ENTRY_VACANT
-                                                  | CCC_ENTRY_NO_UNWRAP};
+            return (struct ccc_handle_){
+                .i_ = i, .stats_ = CCC_ENTRY_VACANT | CCC_ENTRY_NO_UNWRAP};
         }
-        if (hash == e->meta_.hash_
-            && h->eq_fn_((ccc_key_cmp){.key_lhs = key,
-                                       .user_type_rhs
-                                       = ccc_buf_at(&h->buf_, e->meta_.slot_i_),
-                                       .aux = h->buf_.aux_}))
+        if (hash == e->hash_
+            && h->eq_fn_(
+                (ccc_key_cmp){.key_lhs = key,
+                              .user_type_rhs = ccc_buf_at(&h->buf_, e->slot_i_),
+                              .aux = h->buf_.aux_}))
         {
-            return (struct ccc_handle_){.i_ = e->meta_.slot_i_,
-                                        .stats_ = CCC_ENTRY_OCCUPIED};
+            return (struct ccc_handle_){.i_ = i, .stats_ = CCC_ENTRY_OCCUPIED};
         }
         ++dist;
         i = increment(cap, i);
@@ -795,10 +802,9 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     struct ccc_hhmap_elem_ *const floater = elem_at(h, 1);
-    floater->meta_.hash_ = hash;
-    floater->meta_.slot_i_ = i;
-    size_t const e_meta = elem_at(h, i)->meta_i_;
-    floater->meta_i_ = e_meta;
+    size_t const e_meta = i;
+    *floater = *elem_at(h, e_meta);
+    floater->hash_ = hash;
     size_t dist = distance(cap, e_meta, to_i(cap, hash));
     /* The slot we are given is where the actual data will eventually go. We
        now need to run the robin hood algo on just the metadata entries. */
@@ -806,22 +812,19 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
     do
     {
         struct ccc_hhmap_elem_ *const elem = elem_at(h, i);
-        ccc_handle const user_data_slot = elem->meta_.slot_i_;
-        if (elem->meta_.hash_ == CCC_HHM_EMPTY)
+        ccc_handle const user_data_slot = elem->slot_i_;
+        if (elem->hash_ == CCC_HHM_EMPTY)
         {
-            elem_at(h, user_data_slot)->meta_i_ = e_meta;
-            elem_at(h, e_meta)->meta_.slot_i_ = user_data_slot;
-            elem->meta_ = floater->meta_;
-            elem_at(h, floater->meta_.slot_i_)->meta_i_ = i;
+            elem_at(h, e_meta)->slot_i_ = user_data_slot;
+            *elem = *floater;
             (void)ccc_buf_size_plus(&h->buf_, 1);
-            *hash_at(h, 0) = CCC_HHM_EMPTY;
-            *hash_at(h, 1) = CCC_HHM_EMPTY;
-            return user_data_slot;
+            *elem_at(h, 0) = (struct ccc_hhmap_elem_){};
+            *elem_at(h, 1) = (struct ccc_hhmap_elem_){};
+            return i;
         }
-        size_t const slot_dist = distance(cap, i, to_i(cap, elem->meta_.hash_));
+        size_t const slot_dist = distance(cap, i, to_i(cap, elem->hash_));
         if (dist > slot_dist)
         {
-            elem_at(h, floater->meta_.slot_i_)->meta_i_ = i;
             swap_meta_data(h, floater, elem);
             dist = slot_dist;
         }
@@ -843,8 +846,8 @@ erase_meta(struct ccc_hhmap_ *const h, size_t e)
     do
     {
         struct ccc_hhmap_elem_ *const next_elem = elem_at(h, next);
-        if (next_elem->meta_.hash_ == CCC_HHM_EMPTY
-            || !distance(cap, next, to_i(cap, next_elem->meta_.hash_)))
+        if (next_elem->hash_ == CCC_HHM_EMPTY
+            || !distance(cap, next, to_i(cap, next_elem->hash_)))
         {
             *hash_at(h, 0) = CCC_HHM_EMPTY;
             (void)ccc_buf_size_minus(&h->buf_, 1);
@@ -852,7 +855,6 @@ erase_meta(struct ccc_hhmap_ *const h, size_t e)
         }
         struct ccc_hhmap_elem_ *const i_elem = elem_at(h, i);
         swap_meta_data(h, i_elem, next_elem);
-        elem_at(h, i_elem->meta_.slot_i_)->meta_i_ = i;
         i = next;
         next = increment(cap, next);
     } while (true);
@@ -890,8 +892,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
             (void)memset(ccc_buf_at(&h->buf_, i), 0,
                          ccc_buf_elem_size(&h->buf_));
             struct ccc_hhmap_elem_ *const e = elem_at(h, i);
-            e->meta_.slot_i_ = i;
-            e->meta_i_ = i;
+            e->slot_i_ = i;
         }
         (void)ccc_buf_size_set(&h->buf_, num_swap_slots);
     }
@@ -926,8 +927,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
         (void)memset(ccc_buf_at(&new_hash.buf_, i), 0,
                      ccc_buf_elem_size(&new_hash.buf_));
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, i);
-        e->meta_.slot_i_ = i;
-        e->meta_i_ = i;
+        e->slot_i_ = i;
     }
     (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     for (void *slot = ccc_buf_begin(&h->buf_);
@@ -935,12 +935,11 @@ maybe_resize(struct ccc_hhmap_ *const h)
          slot = ccc_buf_next(&h->buf_, slot))
     {
         struct ccc_hhmap_elem_ const *const e = elem_in_slot(h, slot);
-        if (e->meta_.hash_ != CCC_HHM_EMPTY)
+        if (e->hash_ != CCC_HHM_EMPTY)
         {
             struct ccc_handle_ const new_ent
-                = find(&new_hash, key_in_slot(h, slot), e->meta_.hash_);
-            ccc_handle const ins
-                = insert_meta(&new_hash, e->meta_.hash_, new_ent.i_);
+                = find(&new_hash, key_in_slot(h, slot), e->hash_);
+            ccc_handle const ins = insert_meta(&new_hash, e->hash_, new_ent.i_);
             copy_to_slot(&new_hash, ccc_buf_at(&new_hash.buf_, ins), slot);
         }
     }
@@ -992,7 +991,7 @@ hash_at(struct ccc_hhmap_ const *const h, size_t const i)
 {
     return &((struct ccc_hhmap_elem_ *)((char *)ccc_buf_at(&h->buf_, i)
                                         + h->hash_elem_offset_))
-                ->meta_.hash_;
+                ->hash_;
 }
 
 static inline uint64_t
@@ -1044,7 +1043,7 @@ static inline void *
 struct_base(struct ccc_hhmap_ const *const h,
             struct ccc_hhmap_elem_ const *const e)
 {
-    return ((char *)&e->meta_.hash_) - h->hash_elem_offset_;
+    return ((char *)&e->hash_) - h->hash_elem_offset_;
 }
 
 static inline void
@@ -1070,9 +1069,9 @@ swap_meta_data(struct ccc_hhmap_ *const h, struct ccc_hhmap_elem_ *const a,
     }
     struct ccc_hhmap_elem_ *const tmp
         = elem_in_slot(h, ccc_buf_at(&h->buf_, 0));
-    tmp->meta_ = a->meta_;
-    a->meta_ = b->meta_;
-    b->meta_ = tmp->meta_;
+    *tmp = *a;
+    *a = *b;
+    *b = *tmp;
 }
 
 /** This function converts a hash to its home index in the table. Because this
