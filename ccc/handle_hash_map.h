@@ -34,6 +34,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 /** @endcond */
 
 #include "impl/impl_handle_hash_map.h"
+#include "types.h"
 
 /** @name Container Types
 Types available in the container interface. */
