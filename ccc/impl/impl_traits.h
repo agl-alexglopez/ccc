@@ -91,14 +91,12 @@
 #define ccc_impl_remove_entry(container_entry_ptr)                             \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_remove_entry,                               \
-        ccc_hhmap_entry *: ccc_hhm_remove_entry,                               \
         ccc_omap_entry *: ccc_om_remove_entry,                                 \
         ccc_ommap_entry *: ccc_omm_remove_entry,                               \
         ccc_fomap_entry *: ccc_fom_remove_entry,                               \
         ccc_fromap_entry *: ccc_frm_remove_entry,                              \
         ccc_romap_entry *: ccc_rom_remove_entry,                               \
         ccc_fhmap_entry const *: ccc_fhm_remove_entry,                         \
-        ccc_hhmap_entry const *: ccc_hhm_remove_entry,                         \
         ccc_fromap_entry const *: ccc_frm_remove_entry,                        \
         ccc_omap_entry const *: ccc_om_remove_entry,                           \
         ccc_fomap_entry const *: ccc_fom_remove_entry,                         \
@@ -110,12 +108,22 @@
         ccc_impl_remove_entry(container_entry_ptr).impl_                       \
     }
 
+#define ccc_impl_remove_handle(container_handle_ptr)                           \
+    _Generic((container_handle_ptr),                                           \
+        ccc_hhmap_handle *: ccc_hhm_remove_handle,                             \
+        ccc_hhmap_handle const *: ccc_hhm_remove_handle)(                      \
+        (container_handle_ptr))
+
+#define ccc_impl_remove_handle_r(container_handle_ptr)                         \
+    &(ccc_handle)                                                              \
+    {                                                                          \
+        ccc_impl_remove_handle(container_handle_ptr).impl_                     \
+    }
+
 #define ccc_impl_entry(container_ptr, key_ptr...)                              \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_entry,                                    \
         ccc_flat_hash_map const *: ccc_fhm_entry,                              \
-        ccc_handle_hash_map *: ccc_hhm_entry,                                  \
-        ccc_handle_hash_map const *: ccc_hhm_entry,                            \
         ccc_ordered_map *: ccc_om_entry,                                       \
         ccc_ordered_multimap *: ccc_omm_entry,                                 \
         ccc_flat_ordered_map *: ccc_fom_entry,                                 \
@@ -135,16 +143,6 @@
         ccc_flat_hash_map const *: &(                                          \
                  ccc_fhmap_entry){ccc_fhm_entry(                               \
                                       (ccc_flat_hash_map *)(container_ptr),    \
-                                      key_ptr)                                 \
-                                      .impl_},                                 \
-        ccc_handle_hash_map *: &(                                              \
-                 ccc_hhmap_entry){ccc_hhm_entry(                               \
-                                      (ccc_handle_hash_map *)(container_ptr),  \
-                                      key_ptr)                                 \
-                                      .impl_},                                 \
-        ccc_handle_hash_map const *: &(                                        \
-                 ccc_hhmap_entry){ccc_hhm_entry(                               \
-                                      (ccc_handle_hash_map *)(container_ptr),  \
                                       key_ptr)                                 \
                                       .impl_},                                 \
         ccc_ordered_map *: &(                                                  \
@@ -184,17 +182,33 @@
                           key_ptr)                                             \
                 .impl_})
 
+#define ccc_impl_handle(container_ptr, key_ptr...)                             \
+    _Generic((container_ptr),                                                  \
+        ccc_handle_hash_map *: ccc_hhm_handle,                                 \
+        ccc_handle_hash_map const *: ccc_hhm_handle)((container_ptr), key_ptr)
+
+#define ccc_impl_handle_r(container_ptr, key_ptr...)                           \
+    _Generic((container_ptr),                                                  \
+        ccc_handle_hash_map                                                    \
+            *: &(ccc_hhmap_handle){ccc_hhm_handle(                             \
+                                       (ccc_handle_hash_map *)(container_ptr), \
+                                       key_ptr)                                \
+                                       .impl_},                                \
+        ccc_handle_hash_map const *: &(ccc_hhmap_handle){                      \
+            ccc_hhm_handle((ccc_handle_hash_map *)(container_ptr), key_ptr)    \
+                .impl_})
+
 #define ccc_impl_and_modify(container_entry_ptr, mod_fn)                       \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_and_modify,                                 \
-        ccc_hhmap_entry *: ccc_hhm_and_modify,                                 \
+        ccc_hhmap_handle *: ccc_hhm_and_modify,                                \
         ccc_omap_entry *: ccc_om_and_modify,                                   \
         ccc_ommap_entry *: ccc_omm_and_modify,                                 \
         ccc_fomap_entry *: ccc_fom_and_modify,                                 \
         ccc_romap_entry *: ccc_rom_and_modify,                                 \
         ccc_fromap_entry *: ccc_frm_and_modify,                                \
         ccc_fhmap_entry const *: ccc_fhm_and_modify,                           \
-        ccc_hhmap_entry const *: ccc_hhm_and_modify,                           \
+        ccc_hhmap_handle const *: ccc_hhm_and_modify,                          \
         ccc_fromap_entry const *: ccc_frm_and_modify,                          \
         ccc_omap_entry const *: ccc_om_and_modify,                             \
         ccc_ommap_entry const *: ccc_omm_and_modify,                           \
@@ -205,14 +219,14 @@
 #define ccc_impl_and_modify_aux(container_entry_ptr, mod_fn, aux_data_ptr...)  \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_and_modify_aux,                             \
-        ccc_hhmap_entry *: ccc_hhm_and_modify_aux,                             \
+        ccc_hhmap_handle *: ccc_hhm_and_modify_aux,                            \
         ccc_omap_entry *: ccc_om_and_modify_aux,                               \
         ccc_ommap_entry *: ccc_omm_and_modify_aux,                             \
         ccc_fomap_entry *: ccc_fom_and_modify_aux,                             \
         ccc_fromap_entry *: ccc_frm_and_modify_aux,                            \
         ccc_romap_entry *: ccc_rom_and_modify_aux,                             \
         ccc_fhmap_entry const *: ccc_fhm_and_modify_aux,                       \
-        ccc_hhmap_entry const *: ccc_hhm_and_modify_aux,                       \
+        ccc_hhmap_handle const *: ccc_hhm_and_modify_aux,                      \
         ccc_omap_entry const *: ccc_om_and_modify_aux,                         \
         ccc_ommap_entry const *: ccc_omm_and_modify_aux,                       \
         ccc_fromap_entry const *: ccc_frm_and_modify_aux,                      \
@@ -224,14 +238,12 @@
                               key_val_container_handle_ptr...)                 \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_insert_entry,                               \
-        ccc_hhmap_entry *: ccc_hhm_insert_entry,                               \
         ccc_omap_entry *: ccc_om_insert_entry,                                 \
         ccc_ommap_entry *: ccc_omm_insert_entry,                               \
         ccc_fomap_entry *: ccc_fom_insert_entry,                               \
         ccc_romap_entry *: ccc_rom_insert_entry,                               \
         ccc_fromap_entry *: ccc_frm_insert_entry,                              \
         ccc_fhmap_entry const *: ccc_fhm_insert_entry,                         \
-        ccc_hhmap_entry const *: ccc_hhm_insert_entry,                         \
         ccc_omap_entry const *: ccc_om_insert_entry,                           \
         ccc_ommap_entry const *: ccc_omm_insert_entry,                         \
         ccc_fomap_entry const *: ccc_fom_insert_entry,                         \
@@ -239,18 +251,25 @@
         ccc_romap_entry const *: ccc_rom_insert_entry)(                        \
         (container_entry_ptr), key_val_container_handle_ptr)
 
+#define ccc_impl_insert_handle(container_handle_ptr,                           \
+                               key_val_container_handle_ptr...)                \
+    _Generic((container_handle_ptr),                                           \
+        ccc_hhmap_handle *: ccc_hhm_insert_handle,                             \
+        ccc_hhmap_handle const *: ccc_hhm_insert_handle)(                      \
+        (container_handle_ptr), key_val_container_handle_ptr)
+
 #define ccc_impl_or_insert(container_entry_ptr,                                \
                            key_val_container_handle_ptr...)                    \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_or_insert,                                  \
-        ccc_hhmap_entry *: ccc_hhm_or_insert,                                  \
+        ccc_hhmap_handle *: ccc_hhm_or_insert,                                 \
         ccc_omap_entry *: ccc_om_or_insert,                                    \
         ccc_ommap_entry *: ccc_omm_or_insert,                                  \
         ccc_fomap_entry *: ccc_fom_or_insert,                                  \
         ccc_romap_entry *: ccc_rom_or_insert,                                  \
         ccc_fromap_entry *: ccc_frm_or_insert,                                 \
         ccc_fhmap_entry const *: ccc_fhm_or_insert,                            \
-        ccc_hhmap_entry const *: ccc_hhm_or_insert,                            \
+        ccc_hhmap_handle const *: ccc_hhm_or_insert,                           \
         ccc_omap_entry const *: ccc_om_or_insert,                              \
         ccc_ommap_entry const *: ccc_omm_or_insert,                            \
         ccc_fromap_entry const *: ccc_frm_or_insert,                           \
@@ -262,10 +281,12 @@
     _Generic((container_entry_ptr),                                            \
         ccc_entry *: ccc_entry_unwrap,                                         \
         ccc_entry const *: ccc_entry_unwrap,                                   \
+        ccc_handle *: ccc_handle_unwrap,                                       \
+        ccc_handle const *: ccc_handle_unwrap,                                 \
         ccc_fhmap_entry *: ccc_fhm_unwrap,                                     \
         ccc_fhmap_entry const *: ccc_fhm_unwrap,                               \
-        ccc_hhmap_entry *: ccc_hhm_unwrap,                                     \
-        ccc_hhmap_entry const *: ccc_hhm_unwrap,                               \
+        ccc_hhmap_handle *: ccc_hhm_unwrap,                                    \
+        ccc_hhmap_handle const *: ccc_hhm_unwrap,                              \
         ccc_omap_entry *: ccc_om_unwrap,                                       \
         ccc_omap_entry const *: ccc_om_unwrap,                                 \
         ccc_ommap_entry *: ccc_omm_unwrap,                                     \
@@ -281,10 +302,12 @@
     _Generic((container_entry_ptr),                                            \
         ccc_entry *: ccc_entry_occupied,                                       \
         ccc_entry const *: ccc_entry_occupied,                                 \
+        ccc_handle *: ccc_handle_occupied,                                     \
+        ccc_handle const *: ccc_handle_occupied,                               \
         ccc_fhmap_entry *: ccc_fhm_occupied,                                   \
         ccc_fhmap_entry const *: ccc_fhm_occupied,                             \
-        ccc_hhmap_entry *: ccc_hhm_occupied,                                   \
-        ccc_hhmap_entry const *: ccc_hhm_occupied,                             \
+        ccc_hhmap_handle *: ccc_hhm_occupied,                                  \
+        ccc_hhmap_handle const *: ccc_hhm_occupied,                            \
         ccc_omap_entry *: ccc_om_occupied,                                     \
         ccc_omap_entry const *: ccc_om_occupied,                               \
         ccc_ommap_entry *: ccc_omm_occupied,                                   \
@@ -300,10 +323,12 @@
     _Generic((container_entry_ptr),                                            \
         ccc_entry *: ccc_entry_insert_error,                                   \
         ccc_entry const *: ccc_entry_insert_error,                             \
+        ccc_handle *: ccc_handle_insert_error,                                 \
+        ccc_handle const *: ccc_handle_insert_error,                           \
         ccc_fhmap_entry *: ccc_fhm_insert_error,                               \
         ccc_fhmap_entry const *: ccc_fhm_insert_error,                         \
-        ccc_hhmap_entry *: ccc_hhm_insert_error,                               \
-        ccc_hhmap_entry const *: ccc_hhm_insert_error,                         \
+        ccc_hhmap_handle *: ccc_hhm_insert_error,                              \
+        ccc_hhmap_handle const *: ccc_hhm_insert_error,                        \
         ccc_omap_entry *: ccc_om_insert_error,                                 \
         ccc_omap_entry const *: ccc_om_insert_error,                           \
         ccc_ommap_entry *: ccc_omm_insert_error,                               \

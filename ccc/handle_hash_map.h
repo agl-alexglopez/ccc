@@ -53,11 +53,11 @@ Because the hash map is flat, data is always copied from the provided type into
 the table. */
 typedef struct ccc_hhmap_elem_ ccc_hhmap_elem;
 
-/** @brief A container specific entry used to implement the Entry Interface.
+/** @brief A container specific handle used to implement the Handle Interface.
 
-The Entry Interface offers efficient search and subsequent insertion, deletion,
+The Handle Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_hhmap_entry_ ccc_hhmap_entry;
+typedef union ccc_hhmap_handle_ ccc_hhmap_handle;
 
 /**@}*/
 
@@ -188,35 +188,35 @@ Test membership or obtain references to stored user types directly. */
 @return true if the struct containing key is stored, false if not. */
 [[nodiscard]] bool ccc_hhm_contains(ccc_handle_hash_map *h, void const *key);
 
-/** @brief Returns a reference into the table at entry key.
+/** @brief Returns a reference into the table at handle key.
 @param [in] h the handle hash map to search.
 @param [in] key the key to search matching stored key type.
-@return a view of the table entry if it is present, else NULL. */
-[[nodiscard]] ccc_handle ccc_hhm_get_key_val(ccc_handle_hash_map *h,
-                                             void const *key);
+@return a view of the table handle if it is present, else NULL. */
+[[nodiscard]] ccc_handle_i ccc_hhm_get_key_val(ccc_handle_hash_map *h,
+                                               void const *key);
 
 /** @brief Returns a reference to the user data at the provided handle.
 @param [in] h a pointer to the map.
 @param [in] i the stable handle obtained by the user.
 @return a pointer to the user type stored at the specified handle or NULL if
 an out of range handle or handle representing no data is provided.
-@warning this function can only check if the entry at the handle is valid. If a
+@warning this function can only check if the handle at the handle is valid. If a
 handle represents a slot that has been taken by a new element because the old
 one has been removed that new element data will be returned. */
-[[nodiscard]] void *ccc_hhm_at(ccc_handle_hash_map const *h, ccc_handle i);
+[[nodiscard]] void *ccc_hhm_at(ccc_handle_hash_map const *h, ccc_handle_i i);
 
 /** @brief Returns a reference to the user type in the table at the handle.
 @param [in] handle_hash_map_ptr a pointer to the map.
 @param [in] type_name name of the user type stored in each slot of the map.
 @param [in] handle the index handle obtained from previous map operations.
-@return a reference to the entry at handle in the map as the type the user has
+@return a reference to the handle at handle in the map as the type the user has
 stored in the map. */
 #define ccc_hhm_as(handle_hash_map_ptr, type_name, handle...)                  \
     ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle)
 
 /**@}*/
 
-/** @name Entry Interface
+/** @name Handle Interface
 Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
@@ -224,29 +224,29 @@ control flow is needed. */
 /** @brief Invariantly inserts the key value wrapping out_handle.
 @param [in] h the pointer to the handle hash map.
 @param [out] out_handle the handle to the user type wrapping fhash elem.
-@return an entry. If Vacant, no prior element with key existed and the type
+@return an handle. If Vacant, no prior element with key existed and the type
 wrapping out_handle remains unchanged. If Occupied the old value is written
 to the type wrapping out_handle and may be unwrapped to view. If more space
 is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_hhm_insert(ccc_handle_hash_map *h,
-                                       ccc_hhmap_elem *out_handle);
+and wraps it in an handle to provide information about the old value. */
+[[nodiscard]] ccc_handle ccc_hhm_insert(ccc_handle_hash_map *h,
+                                        ccc_hhmap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping out_handle_ptr.
 @param [in] handle_hash_map_ptr the pointer to the handle hash map.
 @param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
-@return a compound literal reference to the entry. If Vacant, no prior element
+@return a compound literal reference to the handle. If Vacant, no prior element
 with key existed and the type wrapping out_handle_ptr remains unchanged. If
 Occupied the old value is written to the type wrapping out_handle_ptr and may
 be unwrapped to view. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
+and wraps it in an handle to provide information about the old value. */
 #define ccc_hhm_insert_r(handle_hash_map_ptr, out_handle_ptr)                  \
-    &(ccc_entry)                                                               \
+    &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hhm_insert((handle_hash_map_ptr), (out_handle_ptr)).impl_          \
     }
@@ -255,27 +255,27 @@ and wraps it in an entry to provide information about the old value. */
 in the struct containing out_handle provided by the user.
 @param [in] h the pointer to the handle hash map.
 @param [out] out_handle the handle to the user type wrapping fhash elem.
-@return the removed entry. If Occupied it may be unwrapped to obtain the old key
-value pair. If Vacant the key value pair was not stored in the map. If bad input
-is provided an input error is set.
+@return the removed handle. If Occupied it may be unwrapped to obtain the old
+key value pair. If Vacant the key value pair was not stored in the map. If bad
+input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_hhm_remove(ccc_handle_hash_map *h,
-                                       ccc_hhmap_elem *out_handle);
+and wraps it in an handle to provide information about the old value. */
+[[nodiscard]] ccc_handle ccc_hhm_remove(ccc_handle_hash_map *h,
+                                        ccc_hhmap_elem *out_handle);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle_ptr provided by the user.
 @param [in] handle_hash_map_ptr the pointer to the handle hash map.
 @param [out] out_handle_ptr the handle to the user type wrapping fhash elem.
-@return a compound literal reference to the removed entry. If Occupied it may
+@return a compound literal reference to the removed handle. If Occupied it may
 be unwrapped to obtain the old key value pair. If Vacant the key value pair
 was not stored in the map. If bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
-and wraps it in an entry to provide information about the old value. */
+and wraps it in an handle to provide information about the old value. */
 #define ccc_hhm_remove_r(handle_hash_map_ptr, out_handle_ptr)                  \
-    &(ccc_entry)                                                               \
+    &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hhm_remove((handle_hash_map_ptr), (out_handle_ptr)).impl_          \
     }
@@ -283,27 +283,27 @@ and wraps it in an entry to provide information about the old value. */
 /** @brief Attempts to insert the key value wrapping key_val_handle
 @param [in] h the pointer to the handle hash map.
 @param [in] key_val_handle the handle to the user type wrapping fhash elem.
-@return an entry. If Occupied, the entry contains a reference to the key value
-user type in the table and may be unwrapped. If Vacant the entry contains a
-reference to the newly inserted entry in the table. If more space is needed but
+@return an handle. If Occupied, the handle contains a reference to the key value
+user type in the table and may be unwrapped. If Vacant the handle contains a
+reference to the newly inserted handle in the table. If more space is needed but
 allocation fails or has been forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
-[[nodiscard]] ccc_entry ccc_hhm_try_insert(ccc_handle_hash_map *h,
-                                           ccc_hhmap_elem *key_val_handle);
+[[nodiscard]] ccc_handle ccc_hhm_try_insert(ccc_handle_hash_map *h,
+                                            ccc_hhmap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle_ptr.
 @param [in] handle_hash_map_ptr the pointer to the handle hash map.
 @param [in] key_val_handle_ptr the handle to the user type wrapping fhash elem.
-@return a compound literal reference to the entry. If Occupied, the entry
+@return a compound literal reference to the handle. If Occupied, the handle
 contains a reference to the key value user type in the table and may be
-unwrapped. If Vacant the entry contains a reference to the newly inserted
-entry in the table. If more space is needed but allocation fails or has been
+unwrapped. If Vacant the handle contains a reference to the newly inserted
+handle in the table. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
 #define ccc_hhm_try_insert_r(handle_hash_map_ptr, key_val_handle_ptr)          \
-    &(ccc_entry)                                                               \
+    &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hhm_try_insert((handle_hash_map_ptr), (key_val_handle_ptr)).impl_  \
     }
@@ -312,7 +312,7 @@ any subsequent insertions or deletions invalidate this reference. */
 @param [in] handle_hash_map_ptr a pointer to the handle hash map.
 @param [in] key the direct key r-value.
 @param [in] lazy_value the compound literal specifying the value.
-@return a compound literal reference to the entry of the existing or newly
+@return a compound literal reference to the handle of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
 was absent. Unwrapping in any case provides the current value unless an error
 occurs that prevents insertion. An insertion error will flag such a case.
@@ -324,7 +324,7 @@ Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
 #define ccc_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)          \
-    &(ccc_entry)                                                               \
+    &(ccc_handle)                                                              \
     {                                                                          \
         ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value)        \
     }
@@ -332,35 +332,35 @@ compound literal matches the searched key. */
 /** @brief Invariantly inserts or overwrites a user struct into the table.
 @param [in] h a pointer to the handle hash map.
 @param [in] key_val_handle the handle to the wrapping user struct key value.
-@return an entry. If Occupied an entry was overwritten by the new key value. If
-Vacant no prior table entry existed.
+@return an handle. If Occupied an handle was overwritten by the new key value.
+If Vacant no prior table handle existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-[[nodiscard]] ccc_entry
+[[nodiscard]] ccc_handle
 ccc_hhm_insert_or_assign(ccc_handle_hash_map *h,
                          ccc_hhmap_elem *key_val_handle);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
 @param [in] handle_hash_map_ptr a pointer to the handle hash map.
 @param [in] key_val_handle_ptr the handle to the wrapping user struct key value.
-@return a compound literal reference to the entry. If Occupied an entry was
-overwritten by the new key value. If Vacant no prior table entry existed.
+@return a compound literal reference to the handle. If Occupied an handle was
+overwritten by the new key value. If Vacant no prior table handle existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
 #define ccc_hhm_insert_or_assign_r(handle_hash_map_ptr, key_val_handle_ptr)    \
-    &(ccc_entry)                                                               \
+    &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hhm_insert_or_assign((handle_hash_map_ptr), (key_val_handle))      \
             .impl_                                                             \
     }
 
-/** @brief Inserts a new key value pair or overwrites the existing entry.
+/** @brief Inserts a new key value pair or overwrites the existing handle.
 @param [in] handle_hash_map_ptr the pointer to the handle hash map.
 @param [in] key the key to be searched in the table.
 @param [in] lazy_value the compound literal to insert or use for overwrite.
-@return a compound literal reference to the entry of the existing or newly
+@return a compound literal reference to the handle of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
 was absent. Unwrapping in any case provides the current value unless an error
 occurs that prevents insertion. An insertion error will flag such a case.
@@ -369,135 +369,135 @@ Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
 #define ccc_hhm_insert_or_assign_w(handle_hash_map_ptr, key, lazy_value...)    \
-    &(ccc_entry)                                                               \
+    &(ccc_handle)                                                              \
     {                                                                          \
         ccc_impl_hhm_insert_or_assign_w(handle_hash_map_ptr, key, lazy_value)  \
     }
 
-/** @brief Obtains an entry for the provided key in the table for future use.
+/** @brief Obtains an handle for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
 @param [in] key the key used to search the table matching the stored key type.
-@return a specialized hash entry for use with other functions in the Entry
+@return a specialized hash handle for use with other functions in the handle
 Interface.
-@warning the contents of an entry should not be examined or modified. Use the
+@warning the contents of an handle should not be examined or modified. Use the
 provided functions, only.
 
-An entry is a search result that provides either an Occupied or Vacant entry
-in the table. An occupied entry signifies that the search was successful. A
-Vacant entry means the search was not successful but we now have a handle to
+An handle is a search result that provides either an Occupied or Vacant handle
+in the table. An occupied handle signifies that the search was successful. A
+Vacant handle means the search was not successful but we now have a handle to
 where in the table such an element should be inserted.
 
-An entry is rarely useful on its own. It should be passed in a functional style
-to subsequent calls in the Entry Interface.*/
-[[nodiscard]] ccc_hhmap_entry ccc_hhm_entry(ccc_handle_hash_map *h,
-                                            void const *key);
+An handle is rarely useful on its own. It should be passed in a functional style
+to subsequent calls in the Handle Interface.*/
+[[nodiscard]] ccc_hhmap_handle ccc_hhm_handle(ccc_handle_hash_map *h,
+                                              void const *key);
 
-/** @brief Obtains an entry for the provided key in the table for future use.
+/** @brief Obtains an handle for the provided key in the table for future use.
 @param [in] handle_hash_map_ptr the hash table to be searched.
 @param [in] key_ptr the key used to search the table matching the stored key
 type.
-@return a compound literal reference to a specialized hash entry for use with
-other functions in the Entry Interface.
-@warning the contents of an entry should not be examined or modified. Use the
+@return a compound literal reference to a specialized hash handle for use with
+other functions in the Handle Interface.
+@warning the contents of an handle should not be examined or modified. Use the
 provided functions, only.
 
-An entry is a search result that provides either an Occupied or Vacant entry
-in the table. An occupied entry signifies that the search was successful. A
-Vacant entry means the search was not successful but we now have a handle to
+An handle is a search result that provides either an Occupied or Vacant handle
+in the table. An occupied handle signifies that the search was successful. A
+Vacant handle means the search was not successful but we now have a handle to
 where in the table such an element should be inserted.
 
-An entry is most often passed in a functional style to subsequent calls in the
-Entry Interface.*/
-#define ccc_hhm_entry_r(handle_hash_map_ptr, key_ptr)                          \
-    &(ccc_hhmap_entry)                                                         \
+An handle is most often passed in a functional style to subsequent calls in the
+Handle Interface.*/
+#define ccc_hhm_handle_r(handle_hash_map_ptr, key_ptr)                         \
+    &(ccc_hhmap_handle)                                                        \
     {                                                                          \
-        ccc_hhm_entry((handle_hash_map_ptr), (key_ptr)).impl_                  \
+        ccc_hhm_handle((handle_hash_map_ptr), (key_ptr)).impl_                 \
     }
 
-/** @brief Modifies the provided entry if it is Occupied.
-@param [in] e the entry obtained from an entry function or macro.
+/** @brief Modifies the provided handle if it is Occupied.
+@param [in] e the handle obtained from an handle function or macro.
 @param [in] fn an update function in which the auxiliary argument is unused.
-@return the updated entry if it was Occupied or the unmodified vacant entry.
+@return the updated handle if it was Occupied or the unmodified vacant handle.
 
-This function is intended to make the function chaining in the Entry Interface
-more succinct if the entry will be modified in place based on its own value
+This function is intended to make the function chaining in the Handle Interface
+more succinct if the handle will be modified in place based on its own value
 without the need of the auxiliary argument a ccc_update_fn can provide. */
-[[nodiscard]] ccc_hhmap_entry *ccc_hhm_and_modify(ccc_hhmap_entry *e,
-                                                  ccc_update_fn *fn);
+[[nodiscard]] ccc_hhmap_handle *ccc_hhm_and_modify(ccc_hhmap_handle *e,
+                                                   ccc_update_fn *fn);
 
-/** @brief Modifies the provided entry if it is Occupied.
-@param [in] e the entry obtained from an entry function or macro.
+/** @brief Modifies the provided handle if it is Occupied.
+@param [in] e the handle obtained from an handle function or macro.
 @param [in] fn an update function that requires auxiliary data.
 @param [in] aux auxiliary data required for the update.
-@return the updated entry if it was Occupied or the unmodified vacant entry.
+@return the updated handle if it was Occupied or the unmodified vacant handle.
 
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
-[[nodiscard]] ccc_hhmap_entry *
-ccc_hhm_and_modify_aux(ccc_hhmap_entry *e, ccc_update_fn *fn, void *aux);
+[[nodiscard]] ccc_hhmap_handle *
+ccc_hhm_and_modify_aux(ccc_hhmap_handle *e, ccc_update_fn *fn, void *aux);
 
-/** @brief Modify an Occupied entry with a closure over user type T.
-@param [in] handle_hash_map_entry_ptr a pointer to the obtained entry.
+/** @brief Modify an Occupied handle with a closure over user type T.
+@param [in] handle_hash_map_handle_ptr a pointer to the obtained handle.
 @param [in] type_name the name of the user type stored in the container.
 @param [in] closure_over_T the code to be run on the reference to user type T,
 if Occupied. This may be a semicolon separated list of statements to execute on
 T or a section of code wrapped in braces {code here} which may be preferred
 for formatting.
-@return a compound literal reference to the modified entry if it was occupied
-or a vacant entry if it was vacant.
-@note T is a reference to the user type stored in the entry guaranteed to be
+@return a compound literal reference to the modified handle if it was occupied
+or a vacant handle if it was vacant.
+@note T is a reference to the user type stored in the handle guaranteed to be
 non-NULL if the closure executes.
 
 ```
 #define handle_hash_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
-hhm_entry *e = hhm_and_modify_w(entry_r(&hhm, &k), word, T->cnt++;);
+hhm_handle *e = hhm_and_modify_w(handle_r(&hhm, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = hhm_or_insert_w(hhm_and_modify_w(entry_r(&hhm, &k), word,
+word *w = hhm_or_insert_w(hhm_and_modify_w(handle_r(&hhm, &k), word,
                                            { T->cnt++; }),
                           (word){.key = k, .cnt = 1});
 ```
 
-Note that any code written is only evaluated if the entry is Occupied and the
+Note that any code written is only evaluated if the handle is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define ccc_hhm_and_modify_w(handle_hash_map_entry_ptr, type_name,             \
+#define ccc_hhm_and_modify_w(handle_hash_map_handle_ptr, type_name,            \
                              closure_over_T...)                                \
-    &(ccc_hhmap_entry)                                                         \
+    &(ccc_hhmap_handle)                                                        \
     {                                                                          \
-        ccc_impl_hhm_and_modify_w(handle_hash_map_entry_ptr, type_name,        \
+        ccc_impl_hhm_and_modify_w(handle_hash_map_handle_ptr, type_name,       \
                                   closure_over_T)                              \
     }
 
-/** @brief Inserts the struct with handle elem if the entry is Vacant.
-@param [in] e the entry obtained via function or macro call.
-@param [in] elem the handle to the struct to be inserted to a Vacant entry.
-@return a pointer to entry in the table invariantly. NULL on error.
+/** @brief Inserts the struct with handle elem if the handle is Vacant.
+@param [in] e the handle obtained via function or macro call.
+@param [in] elem the handle to the struct to be inserted to a Vacant handle.
+@return a pointer to handle in the table invariantly. NULL on error.
 
-Because this functions takes an entry and inserts if it is Vacant, the only
+Because this functions takes an handle and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
 to resize because no allocation function is provided. */
-[[nodiscard]] ccc_handle ccc_hhm_or_insert(ccc_hhmap_entry const *e,
-                                           ccc_hhmap_elem *elem);
+[[nodiscard]] ccc_handle_i ccc_hhm_or_insert(ccc_hhmap_handle const *e,
+                                             ccc_hhmap_elem *elem);
 
-/** @brief lazily insert the desired key value into the entry if it is Vacant.
-@param [in] handle_hash_map_entry_ptr a pointer to the obtained entry.
+/** @brief lazily insert the desired key value into the handle if it is Vacant.
+@param [in] handle_hash_map_handle_ptr a pointer to the obtained handle.
 @param [in] lazy_key_value the compound literal to construct in place if the
-entry is Vacant.
-@return a reference to the unwrapped user type in the entry, either the
-unmodified reference if the entry was Occupied or the newly inserted element
-if the entry was Vacant. NULL is returned if resizing is required but fails or
+handle is Vacant.
+@return a reference to the unwrapped user type in the handle, either the
+unmodified reference if the handle was Occupied or the newly inserted element
+if the handle was Vacant. NULL is returned if resizing is required but fails or
 is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
-or other data, such functions will not be called if the entry is Occupied. */
-#define ccc_hhm_or_insert_w(handle_hash_map_entry_ptr, lazy_key_value...)      \
-    ccc_impl_hhm_or_insert_w(handle_hash_map_entry_ptr, lazy_key_value)
+or other data, such functions will not be called if the handle is Occupied. */
+#define ccc_hhm_or_insert_w(handle_hash_map_handle_ptr, lazy_key_value...)     \
+    ccc_impl_hhm_or_insert_w(handle_hash_map_handle_ptr, lazy_key_value)
 
-/** @brief Inserts the provided entry invariantly.
-@param [in] e the entry returned from a call obtaining an entry.
+/** @brief Inserts the provided handle invariantly.
+@param [in] e the handle returned from a call obtaining an handle.
 @param [in] elem a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon a memory error in which
 the load factor would be exceeded when no allocation policy is defined or
@@ -507,70 +507,71 @@ This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
-[[nodiscard]] ccc_handle ccc_hhm_insert_entry(ccc_hhmap_entry const *e,
-                                              ccc_hhmap_elem *elem);
+[[nodiscard]] ccc_handle_i ccc_hhm_insert_handle(ccc_hhmap_handle const *e,
+                                                 ccc_hhmap_elem *elem);
 
 /** @brief write the contents of the compound literal lazy_key_value to a slot.
-@param [in] handle_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] handle_hash_map_handle_ptr a pointer to the obtained handle.
 @param [in] lazy_key_value the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if resizing is required but fails or is not allowed. */
-#define ccc_hhm_insert_entry_w(handle_hash_map_entry_ptr, lazy_key_value...)   \
-    ccc_impl_hhm_insert_entry_w(handle_hash_map_entry_ptr, lazy_key_value)
+#define ccc_hhm_insert_handle_w(handle_hash_map_handle_ptr, lazy_key_value...) \
+    ccc_impl_hhm_insert_handle_w(handle_hash_map_handle_ptr, lazy_key_value)
 
-/** @brief Remove the entry from the table if Occupied.
-@param [in] e a pointer to the table entry.
-@return an entry containing NULL. If Occupied an entry in the table existed and
-was removed. If Vacant, no prior entry existed to be removed. */
-[[nodiscard]] ccc_entry ccc_hhm_remove_entry(ccc_hhmap_entry const *e);
+/** @brief Remove the handle from the table if Occupied.
+@param [in] e a pointer to the table handle.
+@return an handle containing NULL. If Occupied an handle in the table existed
+and was removed. If Vacant, no prior handle existed to be removed. */
+[[nodiscard]] ccc_handle ccc_hhm_remove_handle(ccc_hhmap_handle const *e);
 
-/** @brief Remove the entry from the table if Occupied.
-@param [in] handle_hash_map_entry_ptr a pointer to the table entry.
-@return an entry containing NULL. If Occupied an entry in the table existed and
-was removed. If Vacant, no prior entry existed to be removed. */
-#define ccc_hhm_remove_entry_r(handle_hash_map_entry_ptr)                      \
-    &(ccc_entry)                                                               \
+/** @brief Remove the handle from the table if Occupied.
+@param [in] handle_hash_map_handle_ptr a pointer to the table handle.
+@return an handle containing NULL. If Occupied an handle in the table existed
+and was removed. If Vacant, no prior handle existed to be removed. */
+#define ccc_hhm_remove_handle_r(handle_hash_map_handle_ptr)                    \
+    &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hhm_remove_entry((handle_hash_map_entry_ptr)).impl_                \
+        ccc_hhm_remove_handle((handle_hash_map_handle_ptr)).impl_              \
     }
 
-/** @brief Unwraps the provided entry to obtain a view into the table element.
-@param [in] e the entry from a query to the table via function or macro.
-@return an view into the table entry if one is present, or NULL. */
-[[nodiscard]] ccc_handle ccc_hhm_unwrap(ccc_hhmap_entry const *e);
+/** @brief Unwraps the provided handle to obtain a view into the table element.
+@param [in] e the handle from a query to the table via function or macro.
+@return an view into the table handle if one is present, or NULL. */
+[[nodiscard]] ccc_handle_i ccc_hhm_unwrap(ccc_hhmap_handle const *e);
 
-/** @brief Returns the Vacant or Occupied status of the entry.
-@param [in] e the entry from a query to the table via function or macro.
-@return true if the entry is occupied, false if not. */
-[[nodiscard]] bool ccc_hhm_occupied(ccc_hhmap_entry const *e);
+/** @brief Returns the Vacant or Occupied status of the handle.
+@param [in] e the handle from a query to the table via function or macro.
+@return true if the handle is occupied, false if not. */
+[[nodiscard]] bool ccc_hhm_occupied(ccc_hhmap_handle const *e);
 
-/** @brief Provides the status of the entry should an insertion follow.
-@param [in] e the entry from a query to the table via function or macro.
+/** @brief Provides the status of the handle should an insertion follow.
+@param [in] e the handle from a query to the table via function or macro.
 @return true if the next insertion of a new element will cause an error.
 
-Table resizing occurs upon calls to entry functions/macros or when trying
+Table resizing occurs upon calls to handle functions/macros or when trying
 to insert a new element directly. This is to provide stable entries from the
 time they are obtained to the time they are used in functions they are passed
-to (i.e. the idiomatic or_insert(entry(...)...)).
+to (i.e. the idiomatic or_insert(handle(...)...)).
 
-However, if a Vacant entry is returned and then a subsequent insertion function
+However, if a Vacant handle is returned and then a subsequent insertion function
 is used, it will not work if resizing has failed and the return of those
 functions will indicate such a failure. One can also confirm an insertion error
-will occur from an entry with this function. For example, leaving this function
+will occur from an handle with this function. For example, leaving this function
 in an assert for debug builds can be a helpful sanity check if the heap should
 correctly resize by default and errors are not usually expected. */
-[[nodiscard]] bool ccc_hhm_insert_error(ccc_hhmap_entry const *e);
+[[nodiscard]] bool ccc_hhm_insert_error(ccc_hhmap_handle const *e);
 
-/** @brief Obtain the entry status from a container entry.
-@param [in] e a pointer to the entry.
-@return the status stored in the entry after the required action on the
-container completes. If e is NULL an entry input error is returned so ensure
+/** @brief Obtain the handle status from a container handle.
+@param [in] e a pointer to the handle.
+@return the status stored in the handle after the required action on the
+container completes. If e is NULL an handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See ccc_entry_status_msg() in
-ccc/types.h for more information on detailed entry statuses. */
-[[nodiscard]] ccc_entry_status ccc_hhm_entry_status(ccc_hhmap_entry const *e);
+messages are needed for logging purposes. See ccc_handle_status_msg() in
+ccc/types.h for more information on detailed handle statuses. */
+[[nodiscard]] ccc_handle_status
+ccc_hhm_handle_status(ccc_hhmap_handle const *e);
 
 /**@}*/
 
@@ -612,7 +613,7 @@ resizing occurs which would lead to undefined behavior. O(capacity).
 
 Iteration starts from index 0 by capacity of the table so iteration order is
 not obvious to the user, nor should any specific order be relied on. */
-[[nodiscard]] ccc_handle ccc_hhm_begin(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_handle_i ccc_hhm_begin(ccc_handle_hash_map const *h);
 
 /** @brief Advances the iterator to the next occupied table slot.
 @param [in] h the table being iterated upon.
@@ -620,14 +621,14 @@ not obvious to the user, nor should any specific order be relied on. */
 @return a pointer that can be cast directly to the user type that is stored.
 @warning erasing or inserting during iteration may invalidate iterators if
 resizing occurs which would lead to undefined behavior. O(capacity). */
-[[nodiscard]] ccc_handle ccc_hhm_next(ccc_handle_hash_map const *h,
-                                      ccc_handle iter);
+[[nodiscard]] ccc_handle_i ccc_hhm_next(ccc_handle_hash_map const *h,
+                                        ccc_handle_i iter);
 
 /** @brief Check the current iterator against the end for loop termination.
 @param [in] h the table being iterated upon.
 @return the end address of the hash table.
 @warning It is undefined behavior to access or modify the end address. */
-[[nodiscard]] ccc_handle ccc_hhm_end(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_handle_i ccc_hhm_end(ccc_handle_hash_map const *h);
 
 /**@}*/
 
@@ -679,7 +680,7 @@ within the capacity of the backing buffer. */
 #ifdef HANDLE_HASH_MAP_USING_NAMESPACE_CCC
 typedef ccc_handle_hash_map handle_hash_map;
 typedef ccc_hhmap_elem hhmap_elem;
-typedef ccc_hhmap_entry hhmap_entry;
+typedef ccc_hhmap_handle hhmap_handle;
 #    define hhm_init(args...) ccc_hhm_init(args)
 #    define hhm_copy(args...) ccc_hhm_copy(args)
 #    define hhm_contains(args...) ccc_hhm_contains(args)
@@ -696,21 +697,21 @@ typedef ccc_hhmap_entry hhmap_entry;
 #    define hhm_insert_or_assign(args...) ccc_hhm_insert_or_assign(args)
 #    define hhm_insert_or_assign_r(args...) ccc_hhm_insert_or_assign_r(args)
 #    define hhm_insert_or_assign_w(args...) ccc_hhm_insert_or_assign_w(args)
-#    define hhm_entry(args...) ccc_hhm_entry(args)
-#    define hhm_entry_r(args...) ccc_hhm_entry_r(args)
+#    define hhm_handle(args...) ccc_hhm_handle(args)
+#    define hhm_handle_r(args...) ccc_hhm_handle_r(args)
 #    define hhm_and_modify(args...) ccc_hhm_and_modify(args)
 #    define hhm_and_modify_aux(args...) ccc_hhm_and_modify_aux(args)
 #    define hhm_and_modify_w(args...) ccc_hhm_and_modify_w(args)
 #    define hhm_or_insert(args...) ccc_hhm_or_insert(args)
 #    define hhm_or_insert_w(args...) ccc_hhm_or_insert_w(args)
-#    define hhm_insert_entry(args...) ccc_hhm_insert_entry(args)
-#    define hhm_insert_entry_w(args...) ccc_hhm_insert_entry_w(args)
-#    define hhm_remove_entry(args...) ccc_hhm_remove_entry(args)
-#    define hhm_remove_entry_r(args...) ccc_hhm_remove_entry_r(args)
+#    define hhm_insert_handle(args...) ccc_hhm_insert_handle(args)
+#    define hhm_insert_handle_w(args...) ccc_hhm_insert_handle_w(args)
+#    define hhm_remove_handle(args...) ccc_hhm_remove_handle(args)
+#    define hhm_remove_handle_r(args...) ccc_hhm_remove_handle_r(args)
 #    define hhm_unwrap(args...) ccc_hhm_unwrap(args)
 #    define hhm_occupied(args...) ccc_hhm_occupied(args)
 #    define hhm_insert_error(args...) ccc_hhm_insert_error(args)
-#    define hhm_entry_status(args...) ccc_hhm_entry_status(args)
+#    define hhm_handle_status(args...) ccc_hhm_handle_status(args)
 #    define hhm_clear(args...) ccc_hhm_clear(args)
 #    define hhm_clear_and_free(args...) ccc_hhm_clear_and_free(args)
 #    define hhm_begin(args...) ccc_hhm_begin(args)

@@ -16,10 +16,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
     ccc_handle_hash_map hh = hhm_init((struct val[10]){}, 10, e, key, NULL,
                                       hhmap_int_zero, hhmap_id_eq, NULL);
 
-    /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = insert(&hh, &(struct val){.key = 137, .val = 99}.e);
+    /* Nothing was there before so nothing is in the handle. */
+    ccc_handle ent = insert(&hh, &(struct val){.key = 137, .val = 99}.e);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent) != NULL, true);
+    CHECK(unwrap(&ent) != 0, true);
     CHECK(size(&hh), 1);
     CHECK_END_FN();
 }
@@ -29,41 +29,45 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_macros)
     ccc_handle_hash_map hh = hhm_init((struct val[10]){}, 10, e, key, NULL,
                                       hhmap_int_zero, hhmap_id_eq, NULL);
 
-    ccc_handle h = ccc_hhm_or_insert_w(entry_r(&hh, &(int){2}),
-                                       (struct val){.key = 2, .val = 0});
+    ccc_handle_i h = ccc_hhm_or_insert_w(handle_r(&hh, &(int){2}),
+                                         (struct val){.key = 2, .val = 0});
     struct val const *ins = hhm_at(&hh, h);
     CHECK(ins != NULL, true);
     CHECK(validate(&hh), true);
     CHECK(size(&hh), 1);
-    h = hhm_insert_entry_w(entry_r(&hh, &(int){2}),
-                           (struct val){.key = 2, .val = 0});
+    h = hhm_insert_handle_w(handle_r(&hh, &(int){2}),
+                            (struct val){.key = 2, .val = 0});
     ins = hhm_at(&hh, h);
     CHECK(validate(&hh), true);
     CHECK(ins != NULL, true);
-    h = hhm_insert_entry_w(entry_r(&hh, &(int){9}),
-                           (struct val){.key = 9, .val = 1});
+    h = hhm_insert_handle_w(handle_r(&hh, &(int){9}),
+                            (struct val){.key = 9, .val = 1});
     ins = hhm_at(&hh, h);
     CHECK(validate(&hh), true);
     CHECK(ins != NULL, true);
-    ins = ccc_entry_unwrap(
+    h = ccc_handle_unwrap(
         hhm_insert_or_assign_w(&hh, 3, (struct val){.val = 99}));
+    ins = hhm_at(&hh, h);
     CHECK(validate(&hh), true);
     CHECK(ins == NULL, false);
     CHECK(validate(&hh), true);
     CHECK(ins->val, 99);
     CHECK(size(&hh), 3);
-    ins = ccc_entry_unwrap(
+    h = ccc_handle_unwrap(
         hhm_insert_or_assign_w(&hh, 3, (struct val){.val = 98}));
+    ins = hhm_at(&hh, h);
     CHECK(validate(&hh), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
     CHECK(size(&hh), 3);
-    ins = ccc_entry_unwrap(hhm_try_insert_w(&hh, 3, (struct val){.val = 100}));
+    h = ccc_handle_unwrap(hhm_try_insert_w(&hh, 3, (struct val){.val = 100}));
+    ins = hhm_at(&hh, h);
     CHECK(ins == NULL, false);
     CHECK(validate(&hh), true);
     CHECK(ins->val, 98);
     CHECK(size(&hh), 3);
-    ins = ccc_entry_unwrap(hhm_try_insert_w(&hh, 4, (struct val){.val = 100}));
+    h = ccc_handle_unwrap(hhm_try_insert_w(&hh, 4, (struct val){.val = 100}));
+    ins = hhm_at(&hh, h);
     CHECK(ins == NULL, false);
     CHECK(validate(&hh), true);
     CHECK(ins->val, 100);
@@ -77,11 +81,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_overwrite)
                                       hhmap_int_zero, hhmap_id_eq, NULL);
 
     struct val q = {.key = 137, .val = 99};
-    ccc_entry ent = insert(&hh, &q.e);
+    ccc_handle ent = insert(&hh, &q.e);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent) != NULL, true);
+    CHECK(unwrap(&ent) != 0, true);
 
-    ccc_handle h = unwrap(entry_r(&hh, &q.key));
+    ccc_handle_i h = unwrap(handle_r(&hh, &q.key));
     struct val const *v = hhm_at(&hh, h);
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
@@ -91,15 +95,16 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_overwrite)
     q = (struct val){.key = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_entry old_ent = insert(&hh, &q.e);
-    CHECK(occupied(&old_ent), true);
+    ent = insert(&hh, &q.e);
+    CHECK(occupied(&ent), true);
 
-    /* The old contents are now in q and the entry is in the table. */
-    v = unwrap(&old_ent);
+    /* The old contents are now in q and the handle is in the table. */
+    h = unwrap(&ent);
+    v = hhm_at(&hh, h);
     CHECK(v != NULL, true);
-    CHECK(v->val, 99);
+    CHECK(v->val, 100);
     CHECK(q.val, 99);
-    h = unwrap(entry_r(&hh, &q.key));
+    h = unwrap(handle_r(&hh, &q.key));
     v = hhm_at(&hh, h);
     CHECK(v != NULL, true);
     CHECK(v->val, 100);
@@ -111,10 +116,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_then_bad_ideas)
     ccc_handle_hash_map hh = hhm_init((struct val[10]){}, 10, e, key, NULL,
                                       hhmap_int_zero, hhmap_id_eq, NULL);
     struct val q = {.key = 137, .val = 99};
-    ccc_entry ent = insert(&hh, &q.e);
+    ccc_handle ent = insert(&hh, &q.e);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent) != NULL, true);
-    ccc_handle h = unwrap(entry_r(&hh, &q.key));
+    CHECK(unwrap(&ent) != 0, true);
+    ccc_handle_i h = unwrap(handle_r(&hh, &q.key));
     struct val const *v = hhm_at(&hh, h);
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
@@ -123,9 +128,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_then_bad_ideas)
 
     ent = insert(&hh, &q.e);
     CHECK(occupied(&ent), true);
-    v = unwrap(&ent);
+    h = unwrap(&ent);
+    v = hhm_at(&hh, h);
     CHECK(v != NULL, true);
-    CHECK(v->val, 99);
+    CHECK(v->val, 100);
     CHECK(q.val, 99);
     q.val -= 9;
 
@@ -137,14 +143,14 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_then_bad_ideas)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_functional)
+CHECK_BEGIN_STATIC_FN(hhmap_test_handle_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_handle_hash_map hh = hhm_init((struct val[200]){}, 200, e, key, NULL,
                                       hhmap_int_last_digit, hhmap_id_eq, NULL);
     size_t const size = 200;
 
-    /* Test entry or insert with for all even values. Default should be
+    /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
@@ -152,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_functional)
     {
         def.key = (int)i;
         def.val = (int)i;
-        ccc_handle h = or_insert(entry_r(&hh, &def.key), &def.e);
+        ccc_handle_i h = or_insert(handle_r(&hh, &def.key), &def.e);
         struct val const *const d = hhm_at(&hh, h);
         CHECK((d != NULL), true);
         CHECK(d->key, i);
@@ -164,8 +170,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_functional)
     {
         def.key = (int)i;
         def.val = (int)i;
-        ccc_handle h = or_insert(
-            and_modify(entry_r(&hh, &def.key), hhmap_modplus), &def.e);
+        ccc_handle_i h = or_insert(
+            and_modify(handle_r(&hh, &def.key), hhmap_modplus), &def.e);
         struct val const *const d = hhm_at(&hh, h);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
@@ -187,7 +193,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_functional)
     {
         def.key = (int)i;
         def.val = (int)i;
-        ccc_handle h = or_insert(entry_r(&hh, &def.key), &def.e);
+        ccc_handle_i h = or_insert(handle_r(&hh, &def.key), &def.e);
         struct val *const in = hhm_at(&hh, h);
         in->val++;
         /* All values in the array should be odd now */
@@ -197,14 +203,14 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_functional)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry)
+CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_handle)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_handle_hash_map hh = hhm_init((struct val[200]){}, 200, e, key, NULL,
                                       hhmap_int_last_digit, hhmap_id_eq, NULL);
 
-    /* Test entry or insert with for all even values. Default should be
+    /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
@@ -212,7 +218,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry)
     {
         def.key = (int)i;
         def.val = (int)i;
-        ccc_handle h = insert_entry(entry_r(&hh, &def.key), &def.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &def.key), &def.e);
         struct val const *const d = hhm_at(&hh, h);
         CHECK((d != NULL), true);
         CHECK(d->key, i);
@@ -224,7 +230,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry)
     {
         def.key = (int)i;
         def.val = (int)i + 1;
-        ccc_handle h = insert_entry(entry_r(&hh, &def.key), &def.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &def.key), &def.e);
         struct val const *const d = hhm_at(&hh, h);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
@@ -242,20 +248,20 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry_macros)
+CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_handle_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_handle_hash_map hh = hhm_init((struct val[200]){}, 200, e, key, NULL,
                                       hhmap_int_last_digit, hhmap_id_eq, NULL);
 
-    /* Test entry or insert with for all even values. Default should be
+    /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     for (size_t i = 0; i < size / 2; i += 2)
     {
-        ccc_handle h
-            = insert_entry(entry_r(&hh, &i), &(struct val){i, {}, i}.e);
+        ccc_handle_i h
+            = insert_handle(handle_r(&hh, &i), &(struct val){i, {}, i}.e);
         struct val const *const d = hhm_at(&hh, h);
         CHECK((d != NULL), true);
         CHECK(d->key, i);
@@ -265,8 +271,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry_macros)
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
-        ccc_handle h
-            = insert_entry(entry_r(&hh, &i), &(struct val){i, {}, i + 1}.e);
+        ccc_handle_i h
+            = insert_handle(handle_r(&hh, &i), &(struct val){i, {}, i + 1}.e);
         struct val const *const d = hhm_at(&hh, h);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
@@ -284,21 +290,21 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_entry_macros)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_macros)
+CHECK_BEGIN_STATIC_FN(hhmap_test_handle_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     ccc_handle_hash_map hh = hhm_init((struct val[200]){}, 200, e, key, NULL,
                                       hhmap_int_last_digit, hhmap_id_eq, NULL);
 
-    /* Test entry or insert with for all even values. Default should be
+    /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     for (int i = 0; i < size / 2; i += 2)
     {
         /* The macros support functions that will only execute if the or
            insert branch executes. */
-        ccc_handle h = hhm_or_insert_w(entry_r(&hh, &i), hhmap_create(i, i));
+        ccc_handle_i h = hhm_or_insert_w(handle_r(&hh, &i), hhmap_create(i, i));
         struct val const *const d = hhm_at(&hh, h);
         CHECK((d != NULL), true);
         CHECK(d->key, i);
@@ -308,8 +314,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_macros)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        ccc_handle h = hhm_or_insert_w(
-            and_modify(entry_r(&hh, &i), hhmap_modplus), hhmap_create(i, i));
+        ccc_handle_i h = hhm_or_insert_w(
+            and_modify(handle_r(&hh, &i), hhmap_modplus), hhmap_create(i, i));
         struct val const *const d = hhm_at(&hh, h);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
@@ -329,7 +335,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_entry_api_macros)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        ccc_handle h = hhm_or_insert_w(entry_r(&hh, &i), (struct val){});
+        ccc_handle_i h = hhm_or_insert_w(handle_r(&hh, &i), (struct val){});
         struct val *v = hhm_at(&hh, h);
         CHECK(v != NULL, true);
         v->val++;
@@ -349,7 +355,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_two_sum)
     int solution_indices[2] = {-1, -1};
     for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
     {
-        ccc_handle h = get_key_val(&hh, &(int){target - addends[i]});
+        ccc_handle_i h = get_key_val(&hh, &(int){target - addends[i]});
         struct val const *const other_addend = hhm_at(&hh, h);
         if (other_addend)
         {
@@ -357,7 +363,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_two_sum)
             solution_indices[1] = other_addend->val;
             break;
         }
-        ccc_entry const e = insert_or_assign(
+        ccc_handle const e = insert_or_assign(
             &hh, &(struct val){.key = addends[i], .val = i}.e);
         CHECK(insert_error(&e), false);
     }
@@ -381,7 +387,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.key = shuffled_index, .val = i};
-        ccc_handle h = insert_entry(entry_r(&hh, &elem.key), &elem.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &elem.key), &elem.e);
         CHECK(size(&hh), i + 1);
         struct val *v = hhm_at(&hh, h);
         CHECK(v != NULL, true);
@@ -399,7 +405,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
         struct val swap_slot = {shuffled_index, {}, shuffled_index};
         bool const contain = contains(&hh, &shuffled_index);
         CHECK(contain, true);
-        ccc_handle h = insert_entry(entry_r(&hh, &swap_slot.key), &swap_slot.e);
+        ccc_handle_i h
+            = insert_handle(handle_r(&hh, &swap_slot.key), &swap_slot.e);
         struct val const *const in_table = hhm_at(&hh, h);
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
@@ -421,15 +428,15 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_handle h = insert_entry(entry_r(&hh, &shuffled_index),
-                                    &(struct val){shuffled_index, {}, i}.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &shuffled_index),
+                                       &(struct val){shuffled_index, {}, i}.e);
         struct val *v = hhm_at(&hh, h);
         bool const valid = validate(&hh);
         CHECK(valid, true);
         CHECK(v != NULL, true);
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
-        ccc_entry e = try_insert(&hh, &(struct val){.key = shuffled_index}.e);
+        ccc_handle e = try_insert(&hh, &(struct val){.key = shuffled_index}.e);
         CHECK(occupied(&e), true);
         bool const contain = contains(&hh, &shuffled_index);
         CHECK(contain, true);
@@ -444,8 +451,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_handle h = hhm_or_insert_w(
-            hhm_and_modify_w(entry_r(&hh, &shuffled_index), struct val,
+        ccc_handle_i h = hhm_or_insert_w(
+            hhm_and_modify_w(handle_r(&hh, &shuffled_index), struct val,
                              { T->val = shuffled_index; }),
             (struct val){});
         bool const valid = validate(&hh);
@@ -454,7 +461,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
         CHECK(in_table != NULL, true);
         CHECK(in_table->key, shuffled_index);
         CHECK(in_table->val, shuffled_index);
-        h = hhm_or_insert_w(entry_r(&hh, &shuffled_index), (struct val){});
+        h = hhm_or_insert_w(handle_r(&hh, &shuffled_index), (struct val){});
         struct val *v = hhm_at(&hh, h);
         CHECK(v == NULL, false);
         v->val = i;
@@ -477,7 +484,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.key = shuffled_index, .val = i};
-        ccc_handle h = insert_entry(entry_r(&hh, &elem.key), &elem.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &elem.key), &elem.e);
         bool const valid = validate(&hh);
         CHECK(valid, true);
         struct val *v = hhm_at(&hh, h);
@@ -490,7 +497,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val swap_slot = {shuffled_index, {}, shuffled_index};
-        ccc_handle h = insert_entry(entry_r(&hh, &swap_slot.key), &swap_slot.e);
+        ccc_handle_i h
+            = insert_handle(handle_r(&hh, &swap_slot.key), &swap_slot.e);
         bool const valid = validate(&hh);
         CHECK(valid, true);
         struct val const *const in_table = hhm_at(&hh, h);
@@ -511,8 +519,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_handle h = insert_entry(entry_r(&hh, &shuffled_index),
-                                    &(struct val){shuffled_index, {}, i}.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &shuffled_index),
+                                       &(struct val){shuffled_index, {}, i}.e);
         struct val *v = hhm_at(&hh, h);
         CHECK(v != NULL, true);
         CHECK(v->key, shuffled_index);
@@ -522,14 +530,14 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_handle h = hhm_or_insert_w(
-            hhm_and_modify_w(entry_r(&hh, &shuffled_index), struct val,
+        ccc_handle_i h = hhm_or_insert_w(
+            hhm_and_modify_w(handle_r(&hh, &shuffled_index), struct val,
                              { T->val = shuffled_index; }),
             (struct val){});
         struct val const *const in_table = hhm_at(&hh, h);
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
-        h = hhm_or_insert_w(entry_r(&hh, &shuffled_index), (struct val){});
+        h = hhm_or_insert_w(handle_r(&hh, &shuffled_index), (struct val){});
         struct val *v = hhm_at(&hh, h);
         CHECK(v == NULL, false);
         v->val = i;
@@ -554,8 +562,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
     for (int i = 0; i < size;
          ++i, shuffled_index = (shuffled_index + larger_prime) % size)
     {
-        ccc_handle h = insert_entry(entry_r(&hh, &shuffled_index),
-                                    &(struct val){shuffled_index, {}, i}.e);
+        ccc_handle_i h = insert_handle(handle_r(&hh, &shuffled_index),
+                                       &(struct val){shuffled_index, {}, i}.e);
         struct val *v = hhm_at(&hh, h);
         if (!v)
         {
@@ -566,23 +574,23 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
         last_index = shuffled_index;
     }
     size_t const final_size = size(&hh);
-    /* The last successful entry is still in the table and is overwritten.
+    /* The last successful handle is still in the table and is overwritten.
      */
     struct val v = {.key = last_index, .val = -1};
-    ccc_entry ent = insert(&hh, &v.e);
-    CHECK(unwrap(&ent) != NULL, true);
+    ccc_handle ent = insert(&hh, &v.e);
+    CHECK(unwrap(&ent) != 0, true);
     CHECK(insert_error(&ent), false);
     CHECK(size(&hh), final_size);
 
     v = (struct val){.key = last_index, .val = -2};
-    ccc_handle h = insert_entry(entry_r(&hh, &v.key), &v.e);
+    ccc_handle_i h = insert_handle(handle_r(&hh, &v.key), &v.e);
     struct val *in_table = hhm_at(&hh, h);
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -2);
     CHECK(size(&hh), final_size);
 
-    h = insert_entry(entry_r(&hh, &last_index),
-                     &(struct val){.key = last_index, .val = -3}.e);
+    h = insert_handle(handle_r(&hh, &last_index),
+                      &(struct val){.key = last_index, .val = -3}.e);
     in_table = hhm_at(&hh, h);
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -3);
@@ -590,19 +598,18 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct val){.key = shuffled_index, .val = -4};
-    h = insert_entry(entry_r(&hh, &v.key), &v.e);
+    h = insert_handle(handle_r(&hh, &v.key), &v.e);
     in_table = hhm_at(&hh, h);
     CHECK(in_table == NULL, true);
     CHECK(size(&hh), final_size);
 
-    h = insert_entry(entry_r(&hh, &shuffled_index),
-                     &(struct val){.key = shuffled_index, .val = -4}.e);
+    h = insert_handle(handle_r(&hh, &shuffled_index),
+                      &(struct val){.key = shuffled_index, .val = -4}.e);
     in_table = hhm_at(&hh, h);
     CHECK(in_table == NULL, true);
     CHECK(size(&hh), final_size);
 
     ent = insert(&hh, &v.e);
-    CHECK(unwrap(&ent) == NULL, true);
     CHECK(insert_error(&ent), true);
     CHECK(size(&hh), final_size);
     CHECK_END_FN();
@@ -616,29 +623,28 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_and_find)
 
     for (int i = 0; i < size; i += 2)
     {
-        ccc_entry e = try_insert(&hh, &(struct val){.key = i, .val = i}.e);
+        ccc_handle e = try_insert(&hh, &(struct val){.key = i, .val = i}.e);
         CHECK(occupied(&e), false);
         bool valid = validate(&hh);
         CHECK(valid, true);
-        e = try_insert(&hh, &(struct val){.key = i, .val = i}.e);
+        struct val v = {.key = i, .val = i};
+        e = try_insert(&hh, &v.e);
         CHECK(occupied(&e), true);
         valid = validate(&hh);
         CHECK(valid, true);
-        struct val const *const v = unwrap(&e);
-        CHECK(v == NULL, false);
-        CHECK(v->key, i);
-        CHECK(v->val, i);
+        CHECK(v.key, i);
+        CHECK(v.val, i);
     }
     for (int i = 0; i < size; i += 2)
     {
         CHECK(contains(&hh, &i), true);
-        CHECK(occupied(entry_r(&hh, &i)), true);
+        CHECK(occupied(handle_r(&hh, &i)), true);
         CHECK(validate(&hh), true);
     }
     for (int i = 1; i < size; i += 2)
     {
         CHECK(contains(&hh, &i), false);
-        CHECK(occupied(entry_r(&hh, &i)), false);
+        CHECK(occupied(handle_r(&hh, &i)), false);
         CHECK(validate(&hh), true);
     }
     CHECK_END_FN();
@@ -650,10 +656,10 @@ main()
     return CHECK_RUN(
         hhmap_test_insert(), hhmap_test_insert_macros(),
         hhmap_test_insert_and_find(), hhmap_test_insert_overwrite(),
-        hhmap_test_insert_then_bad_ideas(), hhmap_test_insert_via_entry(),
-        hhmap_test_insert_via_entry_macros(), hhmap_test_entry_api_functional(),
-        hhmap_test_entry_api_macros(), hhmap_test_two_sum(),
-        hhmap_test_resize(), hhmap_test_resize_macros(),
+        hhmap_test_insert_then_bad_ideas(), hhmap_test_insert_via_handle(),
+        hhmap_test_insert_via_handle_macros(),
+        hhmap_test_handle_api_functional(), hhmap_test_handle_api_macros(),
+        hhmap_test_two_sum(), hhmap_test_resize(), hhmap_test_resize_macros(),
         hhmap_test_resize_from_null(), hhmap_test_resize_from_null_macros(),
         hhmap_test_insert_limit());
 }

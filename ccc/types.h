@@ -21,18 +21,6 @@ the allocation function interface. */
 Types used across many containers. */
 /**@{*/
 
-/** @brief A stable index to user data in a container that uses a flat array as
-the underlying storage method.
-
-User data at a handle position in an array remains valid until that element is
-removed from the container. This means that resizing of the underlying array
-may occur, but the handle index remains valid regardless.
-
-This is similar to pointer stability except that pointers would not remain valid
-when the underlying array is resized; a handle remains valid because it is an
-index not a pointer. */
-typedef size_t ccc_handle;
-
 /** @brief The result of a range query on iterable containers.
 
 A range provides a view all elements that fit the equals range criteria
@@ -67,6 +55,38 @@ information is needed, the status can be passed to the ccc_entry_status_msg()
 function for detailed string messages regarding the entry status. This may
 be helpful for debugging or logging. */
 typedef enum ccc_entry_status_ ccc_entry_status;
+
+/** @brief An Occupied or Vacant handle to a flat searchable container entry.
+
+A handle uses the same semantics as an entry. However, the wrapped value is
+a ccc_handle_i index. When this type is returned the container interface is
+promising that this element will remain at the returned handle index until the
+element is removed by the user. This is similar to pointer stability but offers
+a stronger guarantee that will hold even if the underlying container is
+resized. */
+typedef union ccc_handle_ ccc_handle;
+
+/** @brief A stable index to user data in a container that uses a flat array as
+the underlying storage method.
+
+User data at a handle position in an array remains valid until that element is
+removed from the container. This means that resizing of the underlying array
+may occur, but the handle index remains valid regardless.
+
+This is similar to pointer stability except that pointers would not remain valid
+when the underlying array is resized; a handle remains valid because it is an
+index not a pointer. */
+typedef size_t ccc_handle_i;
+
+/** @brief The status monitoring and handle state once it is obtained.
+
+To manage safe and efficient views into associative containers entries use
+status flags internally. The provided functions in the Handle Interface for
+each container are sufficient to obtain the needed status. However if more
+information is needed, the status can be passed to the ccc_entry_status_msg()
+function for detailed string messages regarding the handle status. This may
+be helpful for debugging or logging. */
+typedef enum ccc_entry_status_ ccc_handle_status;
 
 /** @brief A three state boolean to allow for an error state. Error is -1, False
 is 0, and True is 1.
@@ -320,6 +340,38 @@ container being used to understand what to expect from this function once an
 entry is obtained. */
 void *ccc_entry_unwrap(ccc_entry const *e);
 
+/** @brief Determine if an handle is Occupied in the container.
+@param [in] e the pointer to the handle obtained from a container.
+@return true if Occupied false if Vacant. */
+bool ccc_handle_occupied(ccc_handle const *e);
+
+/** @brief Determine if an insertion error has occurred when a function that
+attempts to insert a value in a container is used.
+@param [in] e the pointer to the handle obtained from a container insert.
+@return true if an insertion error occurred usually meaning a insertion should
+have occurred but the container did not have permission to allocate new memory
+or allocation failed. */
+bool ccc_handle_insert_error(ccc_handle const *e);
+
+/** @brief Determine if an input error has occurred for a function that
+generates an handle.
+@param [in] e the pointer to the handle obtained from a container function.
+@return true if an input error occurred usually meaning an invalid argument such
+as a NULL pointer was provided to a function. */
+bool ccc_handle_input_error(ccc_handle const *e);
+
+/** @brief Unwraps the provided handle providing a reference to the user type
+obtained from the operation that provides the handle.
+@param [in] e the pointer to the handle obtained from an operation.
+@return a reference to the user type stored in the Occupied handle or NULL if
+the handle is Vacant or otherwise cannot be viewed.
+
+The expected return value from unwrapping a value will change depending on the
+container from which the handle is obtained. Read the documentation for the
+container being used to understand what to expect from this function once an
+handle is obtained. */
+ccc_handle_i ccc_handle_unwrap(ccc_handle const *e);
+
 /**@}*/
 
 /** @name Range Interface
@@ -390,6 +442,13 @@ container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned. */
 ccc_entry_status ccc_get_entry_status(ccc_entry const *e);
 
+/** @brief Obtain the handle status from a generic handle.
+@param [in] e a pointer to the handle.
+@return the status stored in the handle after the required action on the
+container completes. If e is NULL an handle input error is returned so ensure
+e is non-NULL to avoid an inaccurate status returned. */
+ccc_handle_status ccc_get_handle_status(ccc_handle const *e);
+
 /** @brief Obtain a string message with a description of the entry status.
 @param [in] status the status obtained from an entry.
 @return a string message with more detailed information regarding the status.
@@ -403,6 +462,19 @@ the provided interface gives all the functions needed to check status but these
 strings can be used when more details are required. */
 char const *ccc_entry_status_msg(ccc_entry_status status);
 
+/** @brief Obtain a string message with a description of the handle status.
+@param [in] status the status obtained from an handle.
+@return a string message with more detailed information regarding the status.
+
+Note that status for an handle is relevant when it is first obtained and when
+an action completes. Obtaining an handle can provide information on whether
+the search yielded an Occupied or Vacant handle or any errors that may have
+occurred. If a function tries to complete an action like insertion or removal
+the status can reflect if any errors occurred in this process as well. Usually,
+the provided interface gives all the functions needed to check status but these
+strings can be used when more details are required. */
+char const *ccc_handle_status_msg(ccc_handle_status status);
+
 /**@}*/
 
 /** Define this directive at the top of a translation unit if shorter names are
@@ -411,6 +483,8 @@ desired. By default the ccc prefix is used to avoid namespace clashes. */
 typedef ccc_range range;
 typedef ccc_rrange rrange;
 typedef ccc_entry entry;
+typedef ccc_handle handle;
+typedef ccc_handle_i handle_i;
 typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
 typedef ccc_cmp cmp;
@@ -427,12 +501,18 @@ typedef ccc_hash_fn hash_fn;
 #    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)
 #    define entry_insert_error(entry_ptr) ccc_entry_insert_error(entry_ptr)
 #    define entry_unwrap(entry_ptr) ccc_entry_unwrap(entry_ptr)
+#    define get_entry_status(entry_ptr) ccc_get_entry_status(entry_ptr)
+#    define entry_status_msg(status) ccc_entry_status_msg(status)
+#    define handle_occupied(handle_ptr) ccc_handle_occupied(handle_ptr)
+#    define handle_insert_error(handle_ptr) ccc_handle_insert_error(handle_ptr)
+#    define handle_unwrap(handle_ptr) ccc_handle_unwrap(handle_ptr)
+#    define get_handle_status(handle_ptr) ccc_get_handle_status(handle_ptr)
+#    define handle_status_msg(status) ccc_handle_status_msg(status)
 #    define begin_range(range_ptr) ccc_begin_range(range_ptr)
 #    define end_range(range_ptr) ccc_end_range(range_ptr)
 #    define rbegin_rrange(range_ptr) ccc_rbegin_rrange(range_ptr)
 #    define rend_rrange(range_ptr) ccc_rend_rrange(range_ptr)
 #    define result_msg(res) ccc_result_msg(res)
-#    define entry_status_msg(status) ccc_entry_status_msg(status)
 #endif /* TYPES_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TYPES_H */
