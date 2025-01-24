@@ -122,7 +122,7 @@ ccc_fom_entry(ccc_flat_ordered_map *const fom, void const *const key)
 {
     if (!fom || !key)
     {
-        return (ccc_fomap_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_fomap_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     return (ccc_fomap_entry){entry(fom, key)};
 }
@@ -134,7 +134,7 @@ ccc_fom_insert_entry(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
     {
         return NULL;
     }
-    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_OCCUPIED)
     {
         *elem = *at(e->impl_.fom_, e->impl_.i_);
         void *const ret = base_at(e->impl_.fom_, e->impl_.i_);
@@ -152,7 +152,7 @@ ccc_fom_and_modify(ccc_fomap_entry *const e, ccc_update_fn *const fn)
     {
         return NULL;
     }
-    if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (fn && e->impl_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){
             .user_type = base_at(e->impl_.fom_, e->impl_.i_),
@@ -170,7 +170,7 @@ ccc_fom_and_modify_aux(ccc_fomap_entry *const e, ccc_update_fn *const fn,
     {
         return NULL;
     }
-    if (fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (fn && e->impl_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){
             .user_type = base_at(e->impl_.fom_, e->impl_.i_),
@@ -187,7 +187,7 @@ ccc_fom_or_insert(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
     {
         return NULL;
     }
-    if (e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ & CCC_OCCUPIED)
     {
         return base_at(e->impl_.fom_, e->impl_.i_);
     }
@@ -200,7 +200,7 @@ ccc_fom_insert(ccc_flat_ordered_map *const fom,
 {
     if (!fom || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const found = find(fom, key_from_node(fom, out_handle));
     if (found)
@@ -211,14 +211,14 @@ ccc_fom_insert(ccc_flat_ordered_map *const fom,
         void *const ret = base_at(fom, fom->root_);
         void *const tmp = ccc_buf_at(&fom->buf_, 0);
         swap(tmp, user_struct, ret, ccc_buf_elem_size(&fom->buf_));
-        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = maybe_alloc_insert(fom, out_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -227,20 +227,20 @@ ccc_fom_try_insert(ccc_flat_ordered_map *const fom,
 {
     if (!fom || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const found = find(fom, key_from_node(fom, key_val_handle));
     if (found)
     {
         assert(fom->root_);
-        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = maybe_alloc_insert(fom, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -249,7 +249,7 @@ ccc_fom_insert_or_assign(ccc_flat_ordered_map *const fom,
 {
     if (!fom || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const found = find(fom, key_from_node(fom, key_val_handle));
     if (found)
@@ -258,14 +258,14 @@ ccc_fom_insert_or_assign(ccc_flat_ordered_map *const fom,
         assert(fom->root_);
         memcpy(found, struct_base(fom, key_val_handle),
                ccc_buf_elem_size(&fom->buf_));
-        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = maybe_alloc_insert(fom, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -274,14 +274,14 @@ ccc_fom_remove(ccc_flat_ordered_map *const fom,
 {
     if (!fom || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const n = erase(fom, key_from_node(fom, out_handle));
     if (!n)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
     }
-    return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{.e_ = n, .stats_ = CCC_OCCUPIED}};
 }
 
 ccc_entry
@@ -289,16 +289,16 @@ ccc_fom_remove_entry(ccc_fomap_entry *const e)
 {
     if (!e)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
-    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_OCCUPIED)
     {
         void *const erased
             = erase(e->impl_.fom_, key_at(e->impl_.fom_, e->impl_.i_));
         assert(erased);
-        return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = erased, .stats_ = CCC_OCCUPIED}};
     }
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
 }
 
 void *
@@ -308,27 +308,26 @@ ccc_fom_unwrap(ccc_fomap_entry const *const e)
     {
         return NULL;
     }
-    return e->impl_.stats_ == CCC_ENTRY_OCCUPIED
-               ? base_at(e->impl_.fom_, e->impl_.i_)
-               : NULL;
+    return e->impl_.stats_ == CCC_OCCUPIED ? base_at(e->impl_.fom_, e->impl_.i_)
+                                           : NULL;
 }
 
 bool
 ccc_fom_insert_error(ccc_fomap_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+    return e ? e->impl_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
 ccc_fom_occupied(ccc_fomap_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
+    return e ? e->impl_.stats_ & CCC_OCCUPIED : false;
 }
 
 ccc_entry_status
 ccc_fom_entry_status(ccc_fomap_entry const *const e)
 {
-    return e ? e->impl_.stats_ : CCC_ENTRY_INPUT_ERROR;
+    return e ? e->impl_.stats_ : CCC_INPUT_ERROR;
 }
 
 bool
@@ -621,13 +620,13 @@ entry(struct ccc_fomap_ *const fom, void const *const key)
         return (struct ccc_ftree_entry_){
             .fom_ = fom,
             .i_ = ccc_buf_i(&fom->buf_, found),
-            .stats_ = CCC_ENTRY_OCCUPIED,
+            .stats_ = CCC_OCCUPIED,
         };
     }
     return (struct ccc_ftree_entry_){
         .fom_ = fom,
         .i_ = 0,
-        .stats_ = CCC_ENTRY_VACANT,
+        .stats_ = CCC_VACANT,
     };
 }
 

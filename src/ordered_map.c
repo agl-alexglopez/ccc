@@ -109,7 +109,7 @@ ccc_om_entry(ccc_ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
-        return (ccc_omap_entry){{.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}}};
+        return (ccc_omap_entry){{.entry_ = {.stats_ = CCC_INPUT_ERROR}}};
     }
     return (ccc_omap_entry){container_entry(&om->impl_, key)};
 }
@@ -121,7 +121,7 @@ ccc_om_insert_entry(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
     {
         return NULL;
     }
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_OCCUPIED)
     {
         elem->impl_ = *elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
         (void)memcpy(e->impl_.entry_.e_, struct_base(e->impl_.t_, &elem->impl_),
@@ -138,7 +138,7 @@ ccc_om_or_insert(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
     {
         return NULL;
     }
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_OCCUPIED)
     {
         return e->impl_.entry_.e_;
     }
@@ -152,7 +152,7 @@ ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
     {
         return NULL;
     }
-    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (fn && e->impl_.entry_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
     }
@@ -163,7 +163,7 @@ ccc_omap_entry *
 ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
                       void *const aux)
 {
-    if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && fn && e->impl_.entry_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
     }
@@ -176,7 +176,7 @@ ccc_om_insert(ccc_ordered_map *const om, ccc_omap_elem *const key_val_handle,
 {
     if (!om || !key_val_handle || !tmp)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const found
         = find(&om->impl_, key_from_node(&om->impl_, &key_val_handle->impl_));
@@ -193,14 +193,14 @@ ccc_om_insert(ccc_ordered_map *const om, ccc_omap_elem *const key_val_handle,
             = key_val_handle->impl_.parent_ = NULL;
         tmp->impl_.branch_[L] = tmp->impl_.branch_[R] = tmp->impl_.parent_
             = NULL;
-        return (ccc_entry){{.e_ = old_val, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = old_val, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = alloc_insert(&om->impl_, &key_val_handle->impl_);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -209,7 +209,7 @@ ccc_om_try_insert(ccc_ordered_map *const om,
 {
     if (!om || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const found
         = find(&om->impl_, key_from_node(&om->impl_, &key_val_handle->impl_));
@@ -217,14 +217,14 @@ ccc_om_try_insert(ccc_ordered_map *const om,
     {
         assert(om->impl_.root_ != &om->impl_.end_);
         return (ccc_entry){{.e_ = struct_base(&om->impl_, om->impl_.root_),
-                            .stats_ = CCC_ENTRY_OCCUPIED}};
+                            .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = alloc_insert(&om->impl_, &key_val_handle->impl_);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -233,7 +233,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const om,
 {
     if (!om || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const found
         = find(&om->impl_, key_from_node(&om->impl_, &key_val_handle->impl_));
@@ -243,14 +243,14 @@ ccc_om_insert_or_assign(ccc_ordered_map *const om,
         assert(om->impl_.root_ != &om->impl_.end_);
         memcpy(found, struct_base(&om->impl_, &key_val_handle->impl_),
                om->impl_.elem_sz_);
-        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = alloc_insert(&om->impl_, &key_val_handle->impl_);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -258,22 +258,22 @@ ccc_om_remove(ccc_ordered_map *const om, ccc_omap_elem *const out_handle)
 {
     if (!om || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     void *const n
         = erase(&om->impl_, key_from_node(&om->impl_, &out_handle->impl_));
     if (!n)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
     }
     if (om->impl_.alloc_)
     {
         void *const user_struct = struct_base(&om->impl_, &out_handle->impl_);
         memcpy(user_struct, n, om->impl_.elem_sz_);
         om->impl_.alloc_(n, 0, om->impl_.aux_);
-        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_OCCUPIED}};
     }
-    return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{.e_ = n, .stats_ = CCC_OCCUPIED}};
 }
 
 ccc_entry
@@ -281,9 +281,9 @@ ccc_om_remove_entry(ccc_omap_entry *const e)
 {
     if (!e)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_OCCUPIED)
     {
         void *const erased
             = erase(e->impl_.t_, key_in_slot(e->impl_.t_, e->impl_.entry_.e_));
@@ -291,11 +291,11 @@ ccc_om_remove_entry(ccc_omap_entry *const e)
         if (e->impl_.t_->alloc_)
         {
             e->impl_.t_->alloc_(erased, 0, e->impl_.t_->aux_);
-            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_OCCUPIED}};
+            return (ccc_entry){{.e_ = NULL, .stats_ = CCC_OCCUPIED}};
         }
-        return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = erased, .stats_ = CCC_OCCUPIED}};
     }
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
 }
 
 void *
@@ -315,26 +315,25 @@ ccc_om_unwrap(ccc_omap_entry const *const e)
     {
         return NULL;
     }
-    return e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED ? e->impl_.entry_.e_
-                                                        : NULL;
+    return e->impl_.entry_.stats_ == CCC_OCCUPIED ? e->impl_.entry_.e_ : NULL;
 }
 
 bool
 ccc_om_insert_error(ccc_omap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+    return e ? e->impl_.entry_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
 ccc_om_occupied(ccc_omap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED : false;
+    return e ? e->impl_.entry_.stats_ & CCC_OCCUPIED : false;
 }
 
 ccc_entry_status
 ccc_om_entry_status(ccc_omap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ : CCC_ENTRY_INPUT_ERROR;
+    return e ? e->impl_.entry_.stats_ : CCC_INPUT_ERROR;
 }
 
 void *
@@ -486,10 +485,10 @@ container_entry(struct ccc_tree_ *const t, void const *const key)
     if (found)
     {
         return (struct ccc_tree_entry_){
-            .t_ = t, .entry_ = {.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+            .t_ = t, .entry_ = {.e_ = found, .stats_ = CCC_OCCUPIED}};
     }
     return (struct ccc_tree_entry_){
-        .t_ = t, .entry_ = {.e_ = found, .stats_ = CCC_ENTRY_VACANT}};
+        .t_ = t, .entry_ = {.e_ = found, .stats_ = CCC_VACANT}};
 }
 
 static inline void *

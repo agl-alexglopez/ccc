@@ -98,7 +98,7 @@ additional information while still maintaining the truthy and falsey bool
 behavior one would normally expect. */
 typedef enum : int8_t
 {
-    /** Intended value of CCC_FALSE or CCC_TRUE could not be returned. */
+    /** Intended value if CCC_FALSE or CCC_TRUE could not be returned. */
     CCC_BOOL_ERR = -1,
     /** Equivalent to boolean false, guaranteed to be falsey aka 0. */
     CCC_FALSE,

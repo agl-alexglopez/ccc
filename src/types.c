@@ -22,19 +22,19 @@ static char const *const result_msgs[CCC_RESULTS_SIZE] = {
 bool
 ccc_entry_occupied(ccc_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
+    return e ? e->impl_.stats_ & CCC_OCCUPIED : false;
 }
 
 bool
 ccc_entry_insert_error(ccc_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+    return e ? e->impl_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
 ccc_entry_input_error(ccc_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_INPUT_ERROR : false;
+    return e ? e->impl_.stats_ & CCC_INPUT_ERROR : false;
 }
 
 void *
@@ -44,25 +44,25 @@ ccc_entry_unwrap(ccc_entry const *const e)
     {
         return NULL;
     }
-    return e->impl_.stats_ & CCC_ENTRY_NO_UNWRAP ? NULL : e->impl_.e_;
+    return e->impl_.stats_ & CCC_NO_UNWRAP ? NULL : e->impl_.e_;
 }
 
 bool
 ccc_handle_occupied(ccc_handle const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
+    return e ? e->impl_.stats_ & CCC_OCCUPIED : false;
 }
 
 bool
 ccc_handle_insert_error(ccc_handle const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+    return e ? e->impl_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
 ccc_handle_input_error(ccc_handle const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_INPUT_ERROR : false;
+    return e ? e->impl_.stats_ & CCC_INPUT_ERROR : false;
 }
 
 ccc_handle_i
@@ -72,7 +72,7 @@ ccc_handle_unwrap(ccc_handle const *const e)
     {
         return 0;
     }
-    return e->impl_.stats_ & CCC_ENTRY_NO_UNWRAP ? 0 : e->impl_.i_;
+    return e->impl_.stats_ & CCC_NO_UNWRAP ? 0 : e->impl_.i_;
 }
 
 void *
@@ -114,7 +114,7 @@ ccc_get_entry_status(ccc_entry const *e)
 {
     if (!e)
     {
-        return CCC_ENTRY_INPUT_ERROR;
+        return CCC_INPUT_ERROR;
     }
     return e->impl_.stats_;
 }
@@ -124,7 +124,7 @@ ccc_get_handle_status(ccc_handle const *e)
 {
     if (!e)
     {
-        return CCC_ENTRY_INPUT_ERROR;
+        return CCC_INPUT_ERROR;
     }
     return e->impl_.stats_;
 }
@@ -140,25 +140,25 @@ ccc_entry_status_msg(ccc_entry_status const status)
 {
     switch (status)
     {
-    case CCC_ENTRY_VACANT:
+    case CCC_VACANT:
         return "Vacant with no errors";
         break;
-    case CCC_ENTRY_OCCUPIED:
+    case CCC_OCCUPIED:
         return "Occupied and non-NULL";
         break;
-    case CCC_ENTRY_INSERT_ERROR:
+    case CCC_INSERT_ERROR:
         return "should have been inserted but encountered an error";
         break;
-    case CCC_ENTRY_SEARCH_ERROR:
+    case CCC_SEARCH_ERROR:
         return "encountered an error while searching for a key";
         break;
-    case CCC_ENTRY_DELETE_ERROR:
+    case CCC_DELETE_ERROR:
         return "encountered an error while trying to delete";
         break;
-    case CCC_ENTRY_INPUT_ERROR:
+    case CCC_INPUT_ERROR:
         return "could not be produced due to bad input to function";
         break;
-    case CCC_ENTRY_NO_UNWRAP:
+    case CCC_NO_UNWRAP:
         return "shall not be unwrapped by user to protect container";
         break;
     default:

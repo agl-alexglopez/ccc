@@ -70,12 +70,11 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
                                   closure_over_T...)                           \
     (__extension__({                                                           \
         __auto_type fom_mod_ent_ptr_ = (flat_ordered_map_entry_ptr);           \
-        struct ccc_ftree_entry_ fom_mod_ent_                                   \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ftree_entry_ fom_mod_ent_ = {.stats_ = CCC_INPUT_ERROR};    \
         if (fom_mod_ent_ptr_)                                                  \
         {                                                                      \
             fom_mod_ent_ = fom_mod_ent_ptr_->impl_;                            \
-            if (fom_mod_ent_.stats_ & CCC_ENTRY_OCCUPIED)                      \
+            if (fom_mod_ent_.stats_ & CCC_OCCUPIED)                            \
             {                                                                  \
                 type_name *const T                                             \
                     = ccc_buf_at(&fom_mod_ent_.fom_->buf_, fom_mod_ent_.i_);   \
@@ -97,7 +96,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
         {                                                                      \
             struct ccc_ftree_entry_ *fom_or_ins_ent_                           \
                 = &fom_or_ins_ent_ptr_->impl_;                                 \
-            if (fom_or_ins_ent_->stats_ == CCC_ENTRY_OCCUPIED)                 \
+            if (fom_or_ins_ent_->stats_ == CCC_OCCUPIED)                       \
             {                                                                  \
                 fom_or_ins_ret_ = ccc_buf_at(&fom_or_ins_ent_->fom_->buf_,     \
                                              fom_or_ins_ent_->i_);             \
@@ -126,7 +125,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
         if (fom_ins_ent_ptr_)                                                  \
         {                                                                      \
             struct ccc_ftree_entry_ *fom_ins_ent_ = &fom_ins_ent_ptr_->impl_;  \
-            if (!(fom_ins_ent_->stats_ & CCC_ENTRY_OCCUPIED))                  \
+            if (!(fom_ins_ent_->stats_ & CCC_OCCUPIED))                        \
             {                                                                  \
                 fom_ins_ent_ret_                                               \
                     = ccc_impl_fom_alloc_back(fom_ins_ent_->fom_);             \
@@ -138,7 +137,7 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
                         ccc_buf_size(&fom_ins_ent_->fom_->buf_) - 1);          \
                 }                                                              \
             }                                                                  \
-            else if (fom_ins_ent_->stats_ == CCC_ENTRY_OCCUPIED)               \
+            else if (fom_ins_ent_->stats_ == CCC_OCCUPIED)                     \
             {                                                                  \
                 fom_ins_ent_ret_                                               \
                     = ccc_buf_at(&fom_ins_ent_->fom_->buf_, fom_ins_ent_->i_); \
@@ -157,18 +156,17 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
 #define ccc_impl_fom_try_insert_w(flat_ordered_map_ptr, key, lazy_value...)    \
     (__extension__({                                                           \
         __auto_type fom_try_ins_map_ptr_ = (flat_ordered_map_ptr);             \
-        struct ccc_ent_ fom_try_ins_ent_ret_                                   \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ent_ fom_try_ins_ent_ret_ = {.stats_ = CCC_INPUT_ERROR};    \
         if (fom_try_ins_map_ptr_)                                              \
         {                                                                      \
             __auto_type fom_key_ = (key);                                      \
             struct ccc_ftree_entry_ fom_try_ins_ent_                           \
                 = ccc_impl_fom_entry(fom_try_ins_map_ptr_, (void *)&fom_key_); \
-            if (!(fom_try_ins_ent_.stats_ & CCC_ENTRY_OCCUPIED))               \
+            if (!(fom_try_ins_ent_.stats_ & CCC_OCCUPIED))                     \
             {                                                                  \
                 fom_try_ins_ent_ret_ = (struct ccc_ent_){                      \
                     .e_ = ccc_impl_fom_alloc_back(fom_try_ins_ent_.fom_),      \
-                    .stats_ = CCC_ENTRY_INSERT_ERROR};                         \
+                    .stats_ = CCC_INSERT_ERROR};                               \
                 if (fom_try_ins_ent_ret_.e_)                                   \
                 {                                                              \
                     *((typeof(lazy_value) *)fom_try_ins_ent_ret_.e_)           \
@@ -180,10 +178,10 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
                         fom_try_ins_ent_.fom_,                                 \
                         ccc_buf_i(&fom_try_ins_ent_.fom_->buf_,                \
                                   fom_try_ins_ent_ret_.e_));                   \
-                    fom_try_ins_ent_ret_.stats_ = CCC_ENTRY_VACANT;            \
+                    fom_try_ins_ent_ret_.stats_ = CCC_VACANT;                  \
                 }                                                              \
             }                                                                  \
-            else if (fom_try_ins_ent_.stats_ == CCC_ENTRY_OCCUPIED)            \
+            else if (fom_try_ins_ent_.stats_ == CCC_OCCUPIED)                  \
             {                                                                  \
                 fom_try_ins_ent_ret_ = (struct ccc_ent_){                      \
                     ccc_buf_at(&fom_try_ins_ent_.fom_->buf_,                   \
@@ -199,19 +197,19 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
     (__extension__({                                                           \
         __auto_type fom_ins_or_assign_map_ptr_ = (flat_ordered_map_ptr);       \
         struct ccc_ent_ fom_ins_or_assign_ent_ret_                             \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+            = {.stats_ = CCC_INPUT_ERROR};                                     \
         if (fom_ins_or_assign_map_ptr_)                                        \
         {                                                                      \
             __auto_type fom_key_ = (key);                                      \
             struct ccc_ftree_entry_ fom_ins_or_assign_ent_                     \
                 = ccc_impl_fom_entry((flat_ordered_map_ptr),                   \
                                      (void *)&fom_key_);                       \
-            if (!(fom_ins_or_assign_ent_.stats_ & CCC_ENTRY_OCCUPIED))         \
+            if (!(fom_ins_or_assign_ent_.stats_ & CCC_OCCUPIED))               \
             {                                                                  \
                 fom_ins_or_assign_ent_ret_                                     \
                     = (struct ccc_ent_){.e_ = ccc_impl_fom_alloc_back(         \
                                             fom_ins_or_assign_ent_.fom_),      \
-                                        .stats_ = CCC_ENTRY_INSERT_ERROR};     \
+                                        .stats_ = CCC_INSERT_ERROR};           \
                 if (fom_ins_or_assign_ent_ret_.e_)                             \
                 {                                                              \
                     *((typeof(lazy_value) *)fom_ins_or_assign_ent_ret_.e_)     \
@@ -224,10 +222,10 @@ void *ccc_impl_fom_alloc_back(struct ccc_fomap_ *fom);
                         fom_ins_or_assign_ent_.fom_,                           \
                         ccc_buf_i(&fom_ins_or_assign_ent_.fom_->buf_,          \
                                   fom_ins_or_assign_ent_ret_.e_));             \
-                    fom_ins_or_assign_ent_ret_.stats_ = CCC_ENTRY_VACANT;      \
+                    fom_ins_or_assign_ent_ret_.stats_ = CCC_VACANT;            \
                 }                                                              \
             }                                                                  \
-            else if (fom_ins_or_assign_ent_.stats_ == CCC_ENTRY_OCCUPIED)      \
+            else if (fom_ins_or_assign_ent_.stats_ == CCC_OCCUPIED)            \
             {                                                                  \
                 void *fom_ins_or_assign_slot_                                  \
                     = ccc_buf_at(&fom_ins_or_assign_ent_.fom_->buf_,           \

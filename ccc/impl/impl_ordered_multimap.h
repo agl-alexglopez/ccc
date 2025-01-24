@@ -74,7 +74,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
             = ccc_impl_omm_new((&omm_insert_entry));                           \
         omm_insert_entry_ret = (struct ccc_ent_){                              \
             .e_ = omm_new_ins_base_,                                           \
-            .stats_ = CCC_ENTRY_INSERT_ERROR,                                  \
+            .stats_ = CCC_INSERT_ERROR,                                        \
         };                                                                     \
         if (omm_new_ins_base_)                                                 \
         {                                                                      \
@@ -96,11 +96,11 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
     (__extension__({                                                           \
         __auto_type omm_ent_ptr_ = (ordered_map_entry_ptr);                    \
         struct ccc_tree_entry_ omm_mod_ent_                                    \
-            = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
+            = {.entry_ = {.stats_ = CCC_INPUT_ERROR}};                         \
         if (omm_ent_ptr_)                                                      \
         {                                                                      \
             omm_mod_ent_ = omm_ent_ptr_->impl_;                                \
-            if (omm_mod_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)               \
+            if (omm_mod_ent_.entry_.stats_ & CCC_OCCUPIED)                     \
             {                                                                  \
                 type_name *const T = omm_mod_ent_.entry_.e_;                   \
                 if (T)                                                         \
@@ -120,7 +120,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
         {                                                                      \
             struct ccc_tree_entry_ *omm_or_ins_ent_                            \
                 = &omm_or_ins_ent_ptr_->impl_;                                 \
-            if (omm_or_ins_ent_->entry_.stats_ == CCC_ENTRY_OCCUPIED)          \
+            if (omm_or_ins_ent_->entry_.stats_ == CCC_OCCUPIED)                \
             {                                                                  \
                 or_ins_ret_ = omm_or_ins_ent_->entry_.e_;                      \
             }                                                                  \
@@ -151,21 +151,20 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_omm_try_insert_w(ordered_map_ptr, key, lazy_value...)         \
     (__extension__({                                                           \
         __auto_type omm_try_ins_ptr_ = (ordered_map_ptr);                      \
-        struct ccc_ent_ omm_try_ins_ent_ret_                                   \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ent_ omm_try_ins_ent_ret_ = {.stats_ = CCC_INPUT_ERROR};    \
         if (omm_try_ins_ptr_)                                                  \
         {                                                                      \
             __auto_type omm_key_ = (key);                                      \
             struct ccc_tree_ *omm_try_ins_map_ptr_ = &omm_try_ins_ptr_->impl_; \
             struct ccc_tree_entry_ omm_try_ins_ent_                            \
                 = ccc_impl_omm_entry(omm_try_ins_map_ptr_, (void *)&omm_key_); \
-            if (!(omm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))        \
+            if (!(omm_try_ins_ent_.entry_.stats_ & CCC_OCCUPIED))              \
             {                                                                  \
                 ccc_impl_omm_insert_and_copy_key(omm_try_ins_ent_,             \
                                                  omm_try_ins_ent_ret_,         \
                                                  omm_key_, lazy_value);        \
             }                                                                  \
-            else if (omm_try_ins_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)     \
+            else if (omm_try_ins_ent_.entry_.stats_ == CCC_OCCUPIED)           \
             {                                                                  \
                 omm_try_ins_ent_ret_ = omm_try_ins_ent_.entry_;                \
             }                                                                  \
@@ -177,7 +176,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
     (__extension__({                                                           \
         __auto_type omm_ins_or_assign_ptr_ = (ordered_map_ptr);                \
         struct ccc_ent_ omm_ins_or_assign_ent_ret_                             \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+            = {.stats_ = CCC_INPUT_ERROR};                                     \
         if (omm_ins_or_assign_ptr_)                                            \
         {                                                                      \
             __auto_type omm_key_ = (key);                                      \
@@ -185,14 +184,13 @@ void *ccc_impl_omm_multimap_insert(struct ccc_tree_ *t, ccc_node_ *n);
                 = &omm_ins_or_assign_ptr_->impl_;                              \
             struct ccc_tree_entry_ omm_ins_or_assign_ent_                      \
                 = ccc_impl_omm_entry(ordered_map_ptr_, (void *)&omm_key_);     \
-            if (!(omm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED))  \
+            if (!(omm_ins_or_assign_ent_.entry_.stats_ & CCC_OCCUPIED))        \
             {                                                                  \
                 ccc_impl_omm_insert_and_copy_key(omm_ins_or_assign_ent_,       \
                                                  omm_ins_or_assign_ent_ret_,   \
                                                  omm_key_, lazy_value);        \
             }                                                                  \
-            else if (omm_ins_or_assign_ent_.entry_.stats_                      \
-                     == CCC_ENTRY_OCCUPIED)                                    \
+            else if (omm_ins_or_assign_ent_.entry_.stats_ == CCC_OCCUPIED)     \
             {                                                                  \
                 struct ccc_node_ ins_ent_saved_                                \
                     = *ccc_impl_ommap_elem_in_slot(                            \
