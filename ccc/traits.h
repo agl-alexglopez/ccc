@@ -108,6 +108,15 @@ See container documentation for specific behavior. */
 #define ccc_entry(container_ptr, key_ptr...)                                   \
     ccc_impl_entry(container_ptr, key_ptr)
 
+/** @brief Obtain a container specific handle for the handle Interface.
+@param [in] container_ptr a pointer to the container.
+@param [in] key_ptr a pointer to the search key.
+@return a container specific handle depending on container specific context.
+
+See container documentation for specific behavior. */
+#define ccc_handle(container_ptr, key_ptr...)                                  \
+    ccc_impl_handle(container_ptr, key_ptr)
+
 /** @brief Obtain a container specific entry for the Entry Interface.
 @param [in] container_ptr a pointer to the container.
 @param [in] key_ptr a pointer to the search key.
@@ -117,6 +126,16 @@ context.
 See container documentation for specific behavior. */
 #define ccc_entry_r(container_ptr, key_ptr...)                                 \
     ccc_impl_entry_r(container_ptr, key_ptr)
+
+/** @brief Obtain a container specific handle for the handle Interface.
+@param [in] container_ptr a pointer to the container.
+@param [in] key_ptr a pointer to the search key.
+@return a container specific handle reference depending on container specific
+context.
+
+See container documentation for specific behavior. */
+#define ccc_handle_r(container_ptr, key_ptr...)                                \
+    ccc_impl_handle_r(container_ptr, key_ptr)
 
 /** @brief Modify an entry if Occupied.
 @param [in] entry_ptr a pointer to the container.
@@ -144,6 +163,15 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_insert_entry(entry_ptr, insert_entry_args...)                      \
     ccc_impl_insert_entry(entry_ptr, insert_entry_args)
+
+/** @brief Insert new element or overwrite old element.
+@param [in] handle_ptr a pointer to the container.
+@param insert_handle_args args depend on container.
+@return an reference to the inserted element.
+
+See container documentation for specific behavior. */
+#define ccc_insert_handle(handle_ptr, insert_handle_args...)                   \
+    ccc_impl_insert_handle(handle_ptr, insert_handle_args)
 
 /** @brief Insert new element if the entry is Vacant.
 @param [in] entry_ptr a pointer to the container.
@@ -483,10 +511,15 @@ See container documentation for specific behavior. */
 #    define remove_r(args...) ccc_remove_r(args)
 #    define remove_entry(args...) ccc_remove_entry(args)
 #    define remove_entry_r(args...) ccc_remove_entry_r(args)
+#    define remove_handle(args...) ccc_remove_handle(args)
+#    define remove_handle_r(args...) ccc_remove_handle_r(args)
 #    define entry(args...) ccc_entry(args)
 #    define entry_r(args...) ccc_entry_r(args)
+#    define handle(args...) ccc_handle(args)
+#    define handle_r(args...) ccc_handle_r(args)
 #    define or_insert(args...) ccc_or_insert(args)
 #    define insert_entry(args...) ccc_insert_entry(args)
+#    define insert_handle(args...) ccc_insert_handle(args)
 #    define and_modify(args...) ccc_and_modify(args)
 #    define and_modify_aux(args...) ccc_and_modify_aux(args)
 #    define occupied(args...) ccc_occupied(args)

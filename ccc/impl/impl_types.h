@@ -2,6 +2,7 @@
 #define CCC_IMPL_TYPES_H
 
 /** @cond */
+#include <stddef.h>
 #include <stdint.h>
 /** @endcond */
 
@@ -28,6 +29,19 @@ struct ccc_ent_
 union ccc_entry_
 {
     struct ccc_ent_ impl_;
+};
+
+/** @private */
+struct ccc_handl_
+{
+    size_t i_;
+    enum ccc_entry_status_ stats_;
+};
+
+/** @private */
+union ccc_handle_
+{
+    struct ccc_handl_ impl_;
 };
 
 /** @private */
