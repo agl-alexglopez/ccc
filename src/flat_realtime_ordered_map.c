@@ -180,7 +180,7 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
 {
     if (!frm || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -191,13 +191,13 @@ ccc_frm_insert(ccc_flat_realtime_ordered_map *const frm,
         void *const tmp = ccc_buf_at(&frm->buf_, 0);
         swap(tmp, user_struct, slot, ccc_buf_elem_size(&frm->buf_));
         elem_in_slot(frm, tmp)->parity_ = 1;
-        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_OCCUPIED}};
     }
     if (!maybe_alloc_insert(frm, q.parent_, q.last_cmp_, out_handle))
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -206,21 +206,21 @@ ccc_frm_try_insert(ccc_flat_realtime_ordered_map *const frm,
 {
     if (!frm || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct frm_query_ const q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
     {
         return (ccc_entry){
-            {.e_ = base_at(frm, q.found_), .stats_ = CCC_ENTRY_OCCUPIED}};
+            {.e_ = base_at(frm, q.found_), .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted
         = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -229,7 +229,7 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
 {
     if (!frm || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct frm_query_ const q = find(frm, key_from_node(frm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -238,21 +238,21 @@ ccc_frm_insert_or_assign(ccc_flat_realtime_ordered_map *const frm,
         *key_val_handle = *elem_in_slot(frm, found);
         (void)ccc_buf_write(&frm->buf_, q.found_,
                             struct_base(frm, key_val_handle));
-        return (ccc_entry){{.e_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = found, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted
         = maybe_alloc_insert(frm, q.parent_, q.last_cmp_, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_INSERT_ERROR}};
     }
-    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = inserted, .stats_ = CCC_VACANT}};
 }
 
 ccc_fromap_entry *
 ccc_frm_and_modify(ccc_fromap_entry *const e, ccc_update_fn *const fn)
 {
-    if (e && fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && fn && e->impl_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){.user_type = base_at(e->impl_.frm_, e->impl_.i_),
                            NULL});
@@ -264,7 +264,7 @@ ccc_fromap_entry *
 ccc_frm_and_modify_aux(ccc_fromap_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (e && fn && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && fn && e->impl_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){.user_type = base_at(e->impl_.frm_, e->impl_.i_),
                            aux});
@@ -279,7 +279,7 @@ ccc_frm_or_insert(ccc_fromap_entry const *const e, ccc_fromap_elem *const elem)
     {
         return NULL;
     }
-    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_OCCUPIED)
     {
         return base_at(e->impl_.frm_, e->impl_.i_);
     }
@@ -295,7 +295,7 @@ ccc_frm_insert_entry(ccc_fromap_entry const *const e,
     {
         return NULL;
     }
-    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_OCCUPIED)
     {
         void *const ret = base_at(e->impl_.frm_, e->impl_.i_);
         *elem = *elem_in_slot(e->impl_.frm_, ret);
@@ -313,7 +313,7 @@ ccc_frm_entry(ccc_flat_realtime_ordered_map const *const frm,
 {
     if (!frm || !key)
     {
-        return (ccc_fromap_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_fromap_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     return (ccc_fromap_entry){entry(frm, key)};
 }
@@ -323,15 +323,15 @@ ccc_frm_remove_entry(ccc_fromap_entry const *const e)
 {
     if (!e)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
-    if (e->impl_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.stats_ == CCC_OCCUPIED)
     {
         void *const erased = remove_fixup(e->impl_.frm_, e->impl_.i_);
         assert(erased);
-        return (ccc_entry){{.e_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = erased, .stats_ = CCC_OCCUPIED}};
     }
-    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
 }
 
 ccc_entry
@@ -340,18 +340,18 @@ ccc_frm_remove(ccc_flat_realtime_ordered_map *const frm,
 {
     if (!frm || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct frm_query_ const q = find(frm, key_from_node(frm, out_handle));
     if (q.last_cmp_ != CCC_EQL)
     {
-        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{.e_ = NULL, .stats_ = CCC_VACANT}};
     }
     void const *const removed = remove_fixup(frm, q.found_);
     assert(removed);
     void *const user_struct = struct_base(frm, out_handle);
     (void)memcpy(user_struct, removed, ccc_buf_elem_size(&frm->buf_));
-    return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_OCCUPIED}};
 }
 
 ccc_range
@@ -380,7 +380,7 @@ ccc_frm_equal_rrange(ccc_flat_realtime_ordered_map const *const frm,
 void *
 ccc_frm_unwrap(ccc_fromap_entry const *const e)
 {
-    if (e && e->impl_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && e->impl_.stats_ & CCC_OCCUPIED)
     {
         return ccc_buf_at(&e->impl_.frm_->buf_, e->impl_.i_);
     }
@@ -390,19 +390,19 @@ ccc_frm_unwrap(ccc_fromap_entry const *const e)
 bool
 ccc_frm_insert_error(ccc_fromap_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR : false;
+    return e ? e->impl_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
 ccc_frm_occupied(ccc_fromap_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_ENTRY_OCCUPIED : false;
+    return e ? e->impl_.stats_ & CCC_OCCUPIED : false;
 }
 
 ccc_entry_status
 ccc_frm_entry_status(ccc_fromap_entry const *const e)
 {
-    return e ? e->impl_.stats_ : CCC_ENTRY_INPUT_ERROR;
+    return e ? e->impl_.stats_ : CCC_INPUT_ERROR;
 }
 
 bool
@@ -683,14 +683,14 @@ entry(struct ccc_fromap_ const *const frm, void const *const key)
             .frm_ = (struct ccc_fromap_ *)frm,
             .last_cmp_ = q.last_cmp_,
             .i_ = q.found_,
-            .stats_ = CCC_ENTRY_OCCUPIED,
+            .stats_ = CCC_OCCUPIED,
         };
     }
     return (struct ccc_frtree_entry_){
         .frm_ = (struct ccc_fromap_ *)frm,
         .last_cmp_ = q.last_cmp_,
         .i_ = q.parent_,
-        .stats_ = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
+        .stats_ = CCC_NO_UNWRAP | CCC_VACANT,
     };
 }
 

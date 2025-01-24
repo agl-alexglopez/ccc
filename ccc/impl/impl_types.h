@@ -9,13 +9,13 @@
 /** @private */
 enum ccc_entry_status_ : uint8_t
 {
-    CCC_ENTRY_VACANT = 0,
-    CCC_ENTRY_OCCUPIED = 0x1,
-    CCC_ENTRY_INSERT_ERROR = 0x2,
-    CCC_ENTRY_SEARCH_ERROR = 0x4,
-    CCC_ENTRY_DELETE_ERROR = 0x8,
-    CCC_ENTRY_INPUT_ERROR = 0x10,
-    CCC_ENTRY_NO_UNWRAP = 0x20,
+    CCC_VACANT = 0,
+    CCC_OCCUPIED = 0x1,
+    CCC_INSERT_ERROR = 0x2,
+    CCC_SEARCH_ERROR = 0x4,
+    CCC_DELETE_ERROR = 0x8,
+    CCC_INPUT_ERROR = 0x10,
+    CCC_NO_UNWRAP = 0x20,
 };
 
 /** @private */

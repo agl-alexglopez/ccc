@@ -125,11 +125,11 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
     (__extension__({                                                           \
         __auto_type fhm_mod_ent_ptr_ = (flat_hash_map_entry_ptr);              \
         struct ccc_fhash_entry_ fhm_mod_with_ent_                              \
-            = {.entry_ = {.stats_ = CCC_ENTRY_INPUT_ERROR}};                   \
+            = {.entry_ = {.stats_ = CCC_INPUT_ERROR}};                         \
         if (fhm_mod_ent_ptr_)                                                  \
         {                                                                      \
             fhm_mod_with_ent_ = fhm_mod_ent_ptr_->impl_;                       \
-            if (fhm_mod_with_ent_.entry_.stats_ == CCC_ENTRY_OCCUPIED)         \
+            if (fhm_mod_with_ent_.entry_.stats_ == CCC_OCCUPIED)               \
             {                                                                  \
                 type_name *const T = fhm_mod_with_ent_.entry_.e_;              \
                 if (T)                                                         \
@@ -149,9 +149,9 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         {                                                                      \
             struct ccc_fhash_entry_ *fhm_or_ins_entry_                         \
                 = &fhm_or_ins_ent_ptr_->impl_;                                 \
-            if (!(fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR))  \
+            if (!(fhm_or_ins_entry_->entry_.stats_ & CCC_INSERT_ERROR))        \
             {                                                                  \
-                if (fhm_or_ins_entry_->entry_.stats_ & CCC_ENTRY_OCCUPIED)     \
+                if (fhm_or_ins_entry_->entry_.stats_ & CCC_OCCUPIED)           \
                 {                                                              \
                     fhm_or_ins_res_ = fhm_or_ins_entry_->entry_.e_;            \
                 }                                                              \
@@ -173,11 +173,11 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
         if (fhm_ins_ent_ptr_)                                                  \
         {                                                                      \
             struct ccc_fhash_entry_ *fhm_ins_ent_ = &fhm_ins_ent_ptr_->impl_;  \
-            if (!(fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_INSERT_ERROR))       \
+            if (!(fhm_ins_ent_->entry_.stats_ & CCC_INSERT_ERROR))             \
             {                                                                  \
-                if (fhm_ins_ent_->entry_.stats_ & CCC_ENTRY_OCCUPIED)          \
+                if (fhm_ins_ent_->entry_.stats_ & CCC_OCCUPIED)                \
                 {                                                              \
-                    fhm_ins_ent_->entry_.stats_ = CCC_ENTRY_OCCUPIED;          \
+                    fhm_ins_ent_->entry_.stats_ = CCC_OCCUPIED;                \
                     *((typeof(fhm_res_))fhm_ins_ent_->entry_.e_)               \
                         = lazy_key_value;                                      \
                     ccc_impl_fhm_in_slot(fhm_ins_ent_->h_,                     \
@@ -199,15 +199,14 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 #define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
     (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
-        struct ccc_ent_ fhm_try_insert_res_                                    \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ent_ fhm_try_insert_res_ = {.stats_ = CCC_INPUT_ERROR};     \
         if (flat_hash_map_ptr_)                                                \
         {                                                                      \
             __auto_type fhm_key_ = key;                                        \
             struct ccc_fhash_entry_ fhm_try_ins_ent_                           \
                 = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);   \
-            if ((fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)          \
-                || (fhm_try_ins_ent_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR))  \
+            if ((fhm_try_ins_ent_.entry_.stats_ & CCC_OCCUPIED)                \
+                || (fhm_try_ins_ent_.entry_.stats_ & CCC_INSERT_ERROR))        \
             {                                                                  \
                 fhm_try_insert_res_ = fhm_try_ins_ent_.entry_;                 \
             }                                                                  \
@@ -215,7 +214,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
             {                                                                  \
                 fhm_try_insert_res_ = (struct ccc_ent_){                       \
                     ccc_impl_fhm_swaps((&fhm_try_ins_ent_), lazy_value),       \
-                    CCC_ENTRY_VACANT,                                          \
+                    CCC_VACANT,                                                \
                 };                                                             \
                 *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                \
                     flat_hash_map_ptr_, fhm_try_insert_res_.e_))               \
@@ -228,14 +227,13 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 #define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
     (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
-        struct ccc_ent_ fhm_ins_or_assign_res_                                 \
-            = {.stats_ = CCC_ENTRY_INPUT_ERROR};                               \
+        struct ccc_ent_ fhm_ins_or_assign_res_ = {.stats_ = CCC_INPUT_ERROR};  \
         if (flat_hash_map_ptr_)                                                \
         {                                                                      \
             __auto_type fhm_key_ = key;                                        \
             struct ccc_fhash_entry_ fhm_ins_or_assign_ent_                     \
                 = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);   \
-            if (fhm_ins_or_assign_ent_.entry_.stats_ & CCC_ENTRY_OCCUPIED)     \
+            if (fhm_ins_or_assign_ent_.entry_.stats_ & CCC_OCCUPIED)           \
             {                                                                  \
                 fhm_ins_or_assign_res_ = fhm_ins_or_assign_ent_.entry_;        \
                 *((typeof(lazy_value) *)fhm_ins_or_assign_res_.e_)             \
@@ -248,17 +246,16 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
                     ->hash_                                                    \
                     = fhm_ins_or_assign_ent_.hash_;                            \
             }                                                                  \
-            else if (fhm_ins_or_assign_ent_.entry_.stats_                      \
-                     & CCC_ENTRY_INSERT_ERROR)                                 \
+            else if (fhm_ins_or_assign_ent_.entry_.stats_ & CCC_INSERT_ERROR)  \
             {                                                                  \
                 fhm_ins_or_assign_res_.e_ = NULL;                              \
-                fhm_ins_or_assign_res_.stats_ = CCC_ENTRY_INSERT_ERROR;        \
+                fhm_ins_or_assign_res_.stats_ = CCC_INSERT_ERROR;              \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 fhm_ins_or_assign_res_ = (struct ccc_ent_){                    \
                     ccc_impl_fhm_swaps((&fhm_ins_or_assign_ent_), lazy_value), \
-                    CCC_ENTRY_VACANT,                                          \
+                    CCC_VACANT,                                                \
                 };                                                             \
                 *((typeof(fhm_key_) *)ccc_impl_fhm_key_in_slot(                \
                     flat_hash_map_ptr_, fhm_ins_or_assign_res_.e_))            \
