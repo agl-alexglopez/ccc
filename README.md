@@ -521,19 +521,17 @@ Amortized O(1) access to elements stored in a flat array by key. Offers handle s
 
 ```c
 /** The leetcode lru problem in C. */
-#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
-#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "doubly_linked_list.h"
-#include "handle_hash_map.h"
-#include "hhmap/hhmap_util.h"
-#include "traits.h"
-#include "types.h"
+#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
+#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/doubly_linked_list.h"
+#include "ccc/handle_hash_map.h"
+#include "ccc/traits.h"
+#include "ccc/types.h"
 
 #define REQS 11
 
@@ -582,6 +580,17 @@ static bool const quiet = true;
             printf(format_string);                                             \
         }                                                                      \
     } while (0)
+
+static uint64_t
+hhmap_int_to_u64(ccc_user_key const k)
+{
+    int const id_int = *((int *)k.user_key);
+    uint64_t x = id_int;
+    x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
+    x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
+    x = x ^ (x >> 31);
+    return x;
+}
 
 static bool
 lru_elem_cmp(ccc_key_cmp const cmp)
