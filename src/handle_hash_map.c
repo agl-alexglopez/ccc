@@ -897,7 +897,9 @@ and_modify(struct ccc_hhash_handle_ *const e, ccc_update_fn *const fn)
 {
     if (e->handle_.stats_ == CCC_OCCUPIED)
     {
-        fn((ccc_user_type){ccc_buf_at(&e->h_->buf_, e->handle_.i_), NULL});
+        fn((ccc_user_type){
+            ccc_buf_at(&e->h_->buf_, elem_at(e->h_, e->handle_.i_)->slot_i_),
+            NULL});
     }
     return e;
 }
@@ -1088,6 +1090,7 @@ swap_user_data(struct ccc_hhmap_ *const h, void *const a, void *const b)
     (void)memcpy(tmp, a, ccc_buf_elem_size(&h->buf_));
     copy_to_slot(h, a, b);
     copy_to_slot(h, b, tmp);
+    *elem_at(h, 0) = (struct ccc_hhmap_elem_){};
 }
 
 static inline void
@@ -1103,6 +1106,7 @@ swap_meta_data(struct ccc_hhmap_ *const h, struct ccc_hhmap_elem_ *const a,
     *tmp = *a;
     *a = *b;
     *b = *tmp;
+    *elem_at(h, 0) = (struct ccc_hhmap_elem_){};
 }
 
 /** This function converts a hash to its home index in the table. Because this
