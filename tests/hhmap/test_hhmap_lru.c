@@ -86,6 +86,10 @@ lru_head(struct lru_cache *const lru)
 
 #define CAP 3
 #define PRIME_HASH_SIZE 11
+/* This should have used the new c23 lifetime initialized compound literals
+   as a static array of structs directly in the initializer like this:
+   (static struct lru_elem)[PRIME_HASH_SIZE]{}, but the github workflow
+   compilers don't support this syntax yet. */
 static struct lru_elem map_buf[PRIME_HASH_SIZE];
 static_assert(PRIME_HASH_SIZE > CAP);
 
