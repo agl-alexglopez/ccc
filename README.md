@@ -328,6 +328,220 @@ main(void)
 </details>
 
 <details>
+<summary>handle_hash_map.h (dropdown)</summary>
+Amortized O(1) access to elements stored in a flat array by key. Offers handle stability to user elements stored in the table. Handles are valid until the user element is removed from the table.
+
+```c
+/** The leetcode lru problem in C. */
+#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
+#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "doubly_linked_list.h"
+#include "handle_hash_map.h"
+#include "hhmap/hhmap_util.h"
+#include "traits.h"
+#include "types.h"
+
+#define REQS 11
+
+struct lru_cache
+{
+    handle_hash_map hh;
+    doubly_linked_list l;
+    size_t cap;
+};
+
+struct lru_elem
+{
+    ccc_hhmap_elem hash_elem;
+    dll_elem list_elem;
+    int key;
+    int val;
+};
+
+enum lru_call
+{
+    PUT,
+    GET,
+    HED,
+};
+
+struct lru_request
+{
+    enum lru_call call;
+    int key;
+    int val;
+    union
+    {
+        void (*putter)(struct lru_cache *, int, int);
+        int (*getter)(struct lru_cache *, int);
+        struct lru_elem *(*header)(struct lru_cache *);
+    };
+};
+
+/* Disable me if tests start failing! */
+static bool const quiet = true;
+#define QUIET_PRINT(format_string...)                                          \
+    do                                                                         \
+    {                                                                          \
+        if (!quiet)                                                            \
+        {                                                                      \
+            printf(format_string);                                             \
+        }                                                                      \
+    } while (0)
+
+static bool
+lru_elem_cmp(ccc_key_cmp const cmp)
+{
+    struct lru_elem const *const lookup = cmp.user_type_rhs;
+    return lookup->key == *((int *)cmp.key_lhs);
+}
+
+static ccc_threeway_cmp
+cmp_by_key(ccc_cmp const cmp)
+{
+    struct lru_elem const *const kv_a = cmp.user_type_lhs;
+    struct lru_elem const *const kv_b = cmp.user_type_rhs;
+    return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
+}
+
+static struct lru_elem *
+lru_head(struct lru_cache *const lru)
+{
+    return dll_front(&lru->l);
+}
+
+#define CAP 3
+#define PRIME_HASH_SIZE 11
+static struct lru_elem map_buf[PRIME_HASH_SIZE];
+static_assert(PRIME_HASH_SIZE > CAP);
+
+static struct lru_cache lru_cache = {
+    .cap = CAP,
+    .l
+    = dll_init(lru_cache.l, struct lru_elem, list_elem, NULL, cmp_by_key, NULL),
+    .hh = hhm_init(map_buf, sizeof(map_buf) / sizeof(map_buf[0]), hash_elem,
+                   key, NULL, hhmap_int_to_u64, lru_elem_cmp, NULL),
+};
+
+void
+lru_put(struct lru_cache *const lru, int const key, int const val)
+{
+    ccc_hhmap_handle *const ent = handle_r(&lru->hh, &key);
+    if (occupied(ent))
+    {
+        struct lru_elem *const found = hhm_at(&lru->hh, unwrap(ent));
+        found->key = key;
+        found->val = val;
+        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                                  &found->list_elem);
+        assert(r == CCC_OK);
+    }
+    else
+    {
+        struct lru_elem *const new = hhm_at(
+            &lru->hh,
+            insert_handle(ent, &(struct lru_elem){.key = key}.hash_elem));
+        assert(new != NULL);
+        struct lru_elem *l_elem = dll_push_front(&lru->l, &new->list_elem);
+        assert(l_elem == new);
+
+        new->val = val;
+        if (size(&lru->l) > lru->cap)
+        {
+            struct lru_elem const *const to_drop = back(&lru->l);
+            assert(to_drop != NULL);
+            (void)pop_back(&lru->l);
+            ccc_handle const e
+                = remove_handle(handle_r(&lru->hh, &to_drop->key));
+            assert(occupied(&e));
+        }
+    }
+}
+
+int
+lru_get(struct lru_cache *const lru, int const key)
+{
+    struct lru_elem *const found
+        = hhm_at(&lru->hh, get_key_val(&lru->hh, &key));
+    if (!found)
+    {
+        return -1;
+    }
+    ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                              &found->list_elem);
+    assert(r == CCC_OK);
+    return found->val;
+}
+
+int
+run_lru_cache(void)
+{
+    QUIET_PRINT("LRU CAPACITY -> %zu\n", lru_cache.cap);
+    struct lru_request requests[REQS] = {
+        {PUT, .key = 1, .val = 1, .putter = lru_put},
+        {PUT, .key = 2, .val = 2, .putter = lru_put},
+        {GET, .key = 1, .val = 1, .getter = lru_get},
+        {PUT, .key = 3, .val = 3, .putter = lru_put},
+        {HED, .key = 3, .val = 3, .header = lru_head},
+        {PUT, .key = 4, .val = 4, .putter = lru_put},
+        {GET, .key = 2, .val = -1, .getter = lru_get},
+        {GET, .key = 3, .val = 3, .getter = lru_get},
+        {GET, .key = 4, .val = 4, .getter = lru_get},
+        {GET, .key = 2, .val = -1, .getter = lru_get},
+        {HED, .key = 4, .val = 4, .header = lru_head},
+    };
+    for (size_t i = 0; i < REQS; ++i)
+    {
+        switch (requests[i].call)
+        {
+        case PUT:
+        {
+            requests[i].putter(&lru_cache, requests[i].key, requests[i].val);
+            QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
+                        requests[i].val);
+        }
+        break;
+        case GET:
+        {
+            QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
+                        requests[i].val);
+            int val = requests[i].getter(&lru_cache, requests[i].key);
+            assert(val == requests[i].val);
+        }
+        break;
+        case HED:
+        {
+            QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
+                        requests[i].val);
+            struct lru_elem const *const kv = requests[i].header(&lru_cache);
+            assert(kv != NULL);
+            assert(kv->key == requests[i].key);
+            assert(kv->val == requests[i].val);
+        }
+        break;
+        default:
+            break;
+        }
+    }
+    return 0;
+}
+
+int
+main()
+{
+    return run_lru_cache();
+}
+```
+
+</details>
+
+<details>
 <summary>flat_ordered_map.h (dropdown)</summary>
 An ordered map implemented in array with an index based self-optimizing tree.
 
