@@ -4,16 +4,16 @@ The leetcode lru problem in C. */
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "handle_hash_map.h"
 #include "hhmap/hhmap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define REQS 11
 
