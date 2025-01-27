@@ -66,10 +66,43 @@
         (container_ptr), insert_or_assign_args)
 
 #define ccc_impl_insert_or_assign_r(container_ptr, insert_or_assign_args...)   \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args).impl_  \
-    }
+    _Generic((container_ptr),                                                  \
+        ccc_flat_hash_map                                                      \
+            *: &(ccc_entry){ccc_fhm_insert_or_assign(                          \
+                                (ccc_flat_hash_map *)container_ptr,            \
+                                (ccc_fhmap_elem *)insert_or_assign_args)       \
+                                .impl_},                                       \
+        ccc_handle_hash_map                                                    \
+            *: &(ccc_handle){ccc_hhm_insert_or_assign(                         \
+                                 (ccc_handle_hash_map *)container_ptr,         \
+                                 (ccc_hhmap_elem *)insert_or_assign_args)      \
+                                 .impl_},                                      \
+        ccc_ordered_map                                                        \
+            *: &(ccc_entry){ccc_om_insert_or_assign(                           \
+                                (ccc_ordered_map *)container_ptr,              \
+                                (ccc_omap_elem *)insert_or_assign_args)        \
+                                .impl_},                                       \
+        ccc_ordered_multimap                                                   \
+            *: &(ccc_entry){ccc_omm_insert_or_assign(                          \
+                                (ccc_ordered_multimap *)container_ptr,         \
+                                (ccc_ommap_elem *)insert_or_assign_args)       \
+                                .impl_},                                       \
+        ccc_flat_ordered_map                                                   \
+            *: &(ccc_entry){ccc_fom_insert_or_assign(                          \
+                                (ccc_flat_ordered_map *)container_ptr,         \
+                                (ccc_fomap_elem *)insert_or_assign_args)       \
+                                .impl_},                                       \
+        ccc_flat_realtime_ordered_map                                          \
+            *: &(                                                              \
+                ccc_entry){ccc_frm_insert_or_assign(                           \
+                               (ccc_flat_realtime_ordered_map *)container_ptr, \
+                               (ccc_fromap_elem *)insert_or_assign_args)       \
+                               .impl_},                                        \
+        ccc_realtime_ordered_map                                               \
+            *: &(ccc_entry){ccc_rom_insert_or_assign(                          \
+                                (ccc_realtime_ordered_map *)container_ptr,     \
+                                (ccc_romap_elem *)insert_or_assign_args)       \
+                                .impl_})
 
 #define ccc_impl_remove(container_ptr, key_val_container_handle_ptr...)        \
     _Generic((container_ptr),                                                  \
@@ -83,10 +116,46 @@
             *: ccc_rom_remove)((container_ptr), key_val_container_handle_ptr)
 
 #define ccc_impl_remove_r(container_ptr, key_val_container_handle_ptr...)      \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_remove(container_ptr, key_val_container_handle_ptr).impl_     \
-    }
+    _Generic((container_ptr),                                                  \
+        ccc_handle_hash_map                                                    \
+            *: &(ccc_handle){ccc_hhm_remove(                                   \
+                                 (ccc_handle_hash_map *)container_ptr,         \
+                                 (ccc_hhmap_elem *)                            \
+                                     key_val_container_handle_ptr)             \
+                                 .impl_},                                      \
+        ccc_flat_hash_map                                                      \
+            *: &(ccc_entry){ccc_fhm_remove((ccc_flat_hash_map *)container_ptr, \
+                                           (ccc_fhmap_elem *)                  \
+                                               key_val_container_handle_ptr)   \
+                                .impl_},                                       \
+        ccc_ordered_map                                                        \
+            *: &(ccc_entry){ccc_om_remove(                                     \
+                                (ccc_ordered_map *)container_ptr,              \
+                                (ccc_omap_elem *)key_val_container_handle_ptr) \
+                                .impl_},                                       \
+        ccc_ordered_multimap                                                   \
+            *: &(                                                              \
+                ccc_entry){ccc_omm_remove(                                     \
+                               (ccc_ordered_multimap *)container_ptr,          \
+                               (ccc_ommap_elem *)key_val_container_handle_ptr) \
+                               .impl_},                                        \
+        ccc_flat_ordered_map                                                   \
+            *: &(                                                              \
+                ccc_entry){ccc_fom_remove(                                     \
+                               (ccc_flat_ordered_map *)container_ptr,          \
+                               (ccc_fomap_elem *)key_val_container_handle_ptr) \
+                               .impl_},                                        \
+        ccc_flat_realtime_ordered_map                                          \
+            *: &(ccc_entry){ccc_frm_remove((ccc_flat_realtime_ordered_map *)   \
+                                               container_ptr,                  \
+                                           (ccc_fromap_elem *)                 \
+                                               key_val_container_handle_ptr)   \
+                                .impl_},                                       \
+        ccc_realtime_ordered_map                                               \
+            *: &(ccc_entry){                                                   \
+                ccc_rom_remove((ccc_realtime_ordered_map *)container_ptr,      \
+                               (ccc_romap_elem *)key_val_container_handle_ptr) \
+                    .impl_})
 
 #define ccc_impl_remove_entry(container_entry_ptr)                             \
     _Generic((container_entry_ptr),                                            \
