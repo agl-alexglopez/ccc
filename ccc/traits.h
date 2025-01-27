@@ -196,6 +196,20 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define ccc_remove_entry_r(entry_ptr) ccc_impl_remove_entry_r(entry_ptr)
 
+/** @brief Remove the element if the handle is Occupied.
+@param [in] handle_ptr a pointer to the container.
+@return an handle depending on container specific context.
+
+See container documentation for specific behavior. */
+#define ccc_remove_handle(handle_ptr) ccc_impl_remove_handle(handle_ptr)
+
+/** @brief Remove the element if the handle is Occupied.
+@param [in] handle_ptr a pointer to the container.
+@return an handle depending on container specific context.
+
+See container documentation for specific behavior. */
+#define ccc_remove_handle_r(handle_ptr) ccc_impl_remove_handle_r(handle_ptr)
+
 /** @brief Unwrap user type in entry.
 @param [in] entry_ptr a pointer to the container.
 @return a valid reference if Occupied or NULL if vacant.
@@ -505,6 +519,7 @@ See container documentation for specific behavior. */
 #    define insert(args...) ccc_insert(args)
 #    define try_insert(args...) ccc_try_insert(args)
 #    define insert_or_assign(args...) ccc_insert_or_assign(args)
+#    define insert_or_assign_r(args...) ccc_insert_or_assign_r(args)
 #    define try_insert_r(args...) ccc_try_insert_r(args)
 #    define insert_r(args...) ccc_insert_r(args)
 #    define remove(args...) ccc_remove(args)

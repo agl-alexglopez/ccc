@@ -115,18 +115,19 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
 #define ccc_impl_hhm_swaps(swap_handle, lazy_key_value...)                     \
     (__extension__({                                                           \
         size_t hhm_i_ = (swap_handle)->handle_.i_;                             \
-        struct ccc_hhmap_elem_ *hhm_slot_elem_                                 \
+        struct ccc_hhmap_elem_ *hhm_elem_                                      \
             = ccc_impl_hhm_elem_at((swap_handle)->h_, hhm_i_);                 \
-        if (hhm_slot_elem_->hash_ == CCC_HHM_EMPTY)                            \
+        if (hhm_elem_->hash_ == CCC_HHM_EMPTY)                                 \
         {                                                                      \
-            struct ccc_hhmap_elem_ const save_elem_ = *ccc_impl_hhm_elem_at(   \
-                (swap_handle)->h_, hhm_slot_elem_->slot_i_);                   \
+            struct ccc_hhmap_elem_ const save_slot_ = *ccc_impl_hhm_elem_at(   \
+                (swap_handle)->h_, hhm_elem_->slot_i_);                        \
+            struct ccc_hhmap_elem_ const save_elem_ = *hhm_elem_;              \
             *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_handle)->h_->buf_), \
                                                    save_elem_.slot_i_))        \
                 = lazy_key_value;                                              \
             *ccc_impl_hhm_elem_at((swap_handle)->h_, save_elem_.slot_i_)       \
-                = save_elem_;                                                  \
-            *ccc_impl_hhm_hash_at((swap_handle)->h_, save_elem_.slot_i_)       \
+                = save_slot_;                                                  \
+            *ccc_impl_hhm_hash_at((swap_handle)->h_, hhm_i_)                   \
                 = (swap_handle)->hash_;                                        \
             (void)ccc_buf_size_plus(&(swap_handle)->h_->buf_, 1);              \
         }                                                                      \
@@ -134,17 +135,16 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         {                                                                      \
             hhm_i_ = ccc_impl_hhm_insert_meta((swap_handle)->h_,               \
                                               (swap_handle)->hash_, hhm_i_);   \
-            struct ccc_hhmap_elem_ const save_elem_ = *ccc_impl_hhm_elem_at(   \
+            struct ccc_hhmap_elem_ const save_slot_ = *ccc_impl_hhm_elem_at(   \
                 (swap_handle)->h_,                                             \
                 ccc_impl_hhm_elem_at((swap_handle)->h_, hhm_i_)->slot_i_);     \
-            *((typeof(lazy_key_value) *)ccc_buf_at(                            \
-                &((swap_handle)->h_->buf_),                                    \
-                ccc_impl_hhm_elem_at((swap_handle)->h_, hhm_i_)->slot_i_))     \
+            struct ccc_hhmap_elem_ const save_elem_                            \
+                = *ccc_impl_hhm_elem_at((swap_handle)->h_, hhm_i_);            \
+            *((typeof(lazy_key_value) *)ccc_buf_at(&((swap_handle)->h_->buf_), \
+                                                   save_elem_.slot_i_))        \
                 = lazy_key_value;                                              \
             *ccc_impl_hhm_elem_at((swap_handle)->h_, save_elem_.slot_i_)       \
-                = save_elem_;                                                  \
-            *ccc_impl_hhm_hash_at((swap_handle)->h_, save_elem_.slot_i_)       \
-                = (swap_handle)->hash_;                                        \
+                = save_slot_;                                                  \
         }                                                                      \
         hhm_i_;                                                                \
     }))
@@ -215,23 +215,19 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                 if (hhm_ins_handl_->handle_.stats_ & CCC_OCCUPIED)             \
                 {                                                              \
                     hhm_ins_handl_->handle_.stats_ = CCC_OCCUPIED;             \
-                    struct ccc_hhmap_elem_ save_elem_ = *ccc_impl_hhm_elem_at( \
+                    struct ccc_hhmap_elem_ save_slot_ = *ccc_impl_hhm_elem_at( \
                         hhm_ins_handl_->h_,                                    \
                         ccc_impl_hhm_elem_at(hhm_ins_handl_->h_,               \
                                              hhm_ins_handl_->handle_.i_)       \
                             ->slot_i_);                                        \
+                    struct ccc_hhmap_elem_ save_elem_ = *ccc_impl_hhm_elem_at( \
+                        hhm_ins_handl_->h_, hhm_ins_handl_->handle_.i_);       \
                     *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &hhm_ins_handl_->h_->buf_,                             \
-                        ccc_impl_hhm_elem_at(hhm_ins_handl_->h_,               \
-                                             hhm_ins_handl_->handle_.i_)       \
-                            ->slot_i_))                                        \
+                        &hhm_ins_handl_->h_->buf_, save_elem_.slot_i_))        \
                         = lazy_key_value;                                      \
-                    *ccc_impl_hhm_elem_at(                                     \
-                        hhm_ins_handl_->h_,                                    \
-                        ccc_impl_hhm_elem_at(hhm_ins_handl_->h_,               \
-                                             hhm_ins_handl_->handle_.i_)       \
-                            ->slot_i_)                                         \
-                        = save_elem_;                                          \
+                    *ccc_impl_hhm_elem_at(hhm_ins_handl_->h_,                  \
+                                          save_elem_.slot_i_)                  \
+                        = save_slot_;                                          \
                     hhm_res_ = hhm_ins_handl_->handle_.i_;                     \
                 }                                                              \
                 else                                                           \
@@ -294,22 +290,22 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                                       (void *)&hhm_key_);                      \
             if (hhm_ins_or_assign_handl_.handle_.stats_ & CCC_OCCUPIED)        \
             {                                                                  \
+                hhm_ins_or_assign_res_ = hhm_ins_or_assign_handl_.handle_;     \
                 struct ccc_hhmap_elem_ const save_elem_                        \
                     = *ccc_impl_hhm_elem_at(                                   \
                         handle_hash_map_ptr_,                                  \
                         hhm_ins_or_assign_handl_.handle_.i_);                  \
-                hhm_ins_or_assign_res_ = hhm_ins_or_assign_handl_.handle_;     \
+                struct ccc_hhmap_elem_ const save_slot_                        \
+                    = *ccc_impl_hhm_elem_at(handle_hash_map_ptr_,              \
+                                            save_elem_.slot_i_);               \
                 *((typeof(lazy_value) *)ccc_buf_at(                            \
-                    &handle_hash_map_ptr_->buf_, hhm_ins_or_assign_res_.i_))   \
+                    &handle_hash_map_ptr_->buf_, save_elem_.slot_i_))          \
                     = lazy_value;                                              \
                 *ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                    \
-                                      hhm_ins_or_assign_handl_.handle_.i_)     \
-                    = save_elem_;                                              \
+                                      save_elem_.slot_i_)                      \
+                    = save_slot_;                                              \
                 *((typeof(hhm_key_) *)ccc_impl_hhm_key_at(                     \
-                    handle_hash_map_ptr_,                                      \
-                    ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                 \
-                                         hhm_ins_or_assign_handl_.handle_.i_)  \
-                        ->slot_i_))                                            \
+                    handle_hash_map_ptr_, save_elem_.slot_i_))                 \
                     = hhm_key_;                                                \
             }                                                                  \
             else if (hhm_ins_or_assign_handl_.handle_.stats_                   \

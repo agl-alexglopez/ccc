@@ -625,10 +625,15 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
         else
         {
             ++occupied;
-        }
-        if (e->hash_ != CCC_HHM_EMPTY && !valid_distance_from_home(h, i))
-        {
-            return false;
+            uint64_t const hash = filter(h, key_at(h, e->slot_i_));
+            if (hash != e->hash_)
+            {
+                return false;
+            }
+            if (!valid_distance_from_home(h, i))
+            {
+                return false;
+            }
         }
     }
     return occupied == ccc_hhm_size(h)
