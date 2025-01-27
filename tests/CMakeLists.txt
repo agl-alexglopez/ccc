@@ -318,7 +318,7 @@ endmacro()
 add_hhmap_test(test_hhmap_construct)
 add_hhmap_test(test_hhmap_insert)
 add_hhmap_test(test_hhmap_erase)
-#add_hhmap_test(test_hhmap_lru)
+add_hhmap_test(test_hhmap_lru)
 add_hhmap_test(test_hhmap_handle)
 
 #############  Doubly Linked List ##########################
