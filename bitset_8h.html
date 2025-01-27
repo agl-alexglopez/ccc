@@ -858,7 +858,7 @@ Include dependency graph for bitset.h:</div>
 <div class="line"><span class="keyword">static</span> bitset src</div>
 <div class="line">    = bs_init((<span class="keyword">static</span> bitblock[bs_blocks(13)]){}, 13, NULL, NULL);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = bs_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:83</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:115</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">static</span> bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);</div>
