@@ -615,19 +615,17 @@ flat_realtime_ordered_map.h (dropdown)</summary>
 handle_hash_map.h (dropdown)</summary>
 <p>Amortized O(1) access to elements stored in a flat array by key. Offers handle stability to user elements stored in the table. Handles are valid until the user element is removed from the table.</p>
 <div class="fragment"><div class="line"> </div>
-<div class="line"><span class="preprocessor">#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
-<div class="line"> </div>
 <div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">doubly_linked_list.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="handle__hash__map_8h.html">handle_hash_map.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;hhmap/hhmap_util.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">traits.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="doubly__linked__list_8h.html">ccc/doubly_linked_list.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="handle__hash__map_8h.html">ccc/handle_hash_map.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="traits_8h.html">ccc/traits.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">ccc/types.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#define REQS 11</span></div>
 <div class="line"> </div>
@@ -676,6 +674,17 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line"><span class="preprocessor">            printf(format_string);                                             \</span></div>
 <div class="line"><span class="preprocessor">        }                                                                      \</span></div>
 <div class="line"><span class="preprocessor">    } while (0)</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> uint64_t</div>
+<div class="line">hhmap_int_to_u64(<a class="code hl_struct" href="structccc__user__key.html">ccc_user_key</a> <span class="keyword">const</span> k)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> id_int = *((<span class="keywordtype">int</span> *)k.<a class="code hl_variable" href="structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35">user_key</a>);</div>
+<div class="line">    uint64_t x = id_int;</div>
+<div class="line">    x = (x ^ (x &gt;&gt; 30)) * UINT64_C(0xbf58476d1ce4e5b9);</div>
+<div class="line">    x = (x ^ (x &gt;&gt; 27)) * UINT64_C(0x94d049bb133111eb);</div>
+<div class="line">    x = x ^ (x &gt;&gt; 31);</div>
+<div class="line">    <span class="keywordflow">return</span> x;</div>
+<div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span></div>
 <div class="line">lru_elem_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
