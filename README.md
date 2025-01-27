@@ -480,7 +480,7 @@ lru_get(struct lru_cache *const lru, int const key)
 }
 
 int
-run_lru_cache(void)
+main(void)
 {
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru_cache.cap);
     struct lru_request requests[REQS] = {
@@ -530,12 +530,6 @@ run_lru_cache(void)
         }
     }
     return 0;
-}
-
-int
-main()
-{
-    return run_lru_cache();
 }
 ```
 
