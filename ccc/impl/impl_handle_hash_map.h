@@ -252,11 +252,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
             if ((hhm_try_ins_handl_.handle_.stats_ & CCC_OCCUPIED)             \
                 || (hhm_try_ins_handl_.handle_.stats_ & CCC_INSERT_ERROR))     \
             {                                                                  \
-                hhm_try_insert_res_ = (struct ccc_handl_){                     \
-                    .i_ = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,           \
-                                               hhm_try_ins_handl_.handle_.i_)  \
-                              ->slot_i_,                                       \
-                    .stats_ = hhm_try_ins_handl_.handle_.stats_};              \
+                hhm_try_insert_res_ = hhm_try_ins_handl_.handle_;              \
             }                                                                  \
             else                                                               \
             {                                                                  \
