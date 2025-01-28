@@ -64,7 +64,7 @@ N + 1 capacity is required. */
 @param [in] size the size <= capacity.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
-@param [in] cmp_fn the user defined comarison function for user types.
+@param [in] cmp_fn the user defined comparison function for user types.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @return the initilialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
@@ -173,6 +173,17 @@ Note that this version of heapify copies elements from the input array. If an
 in place heapify is required use the initializer version of this method. */
 ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
                            size_t input_n, size_t input_elem_size);
+
+/** @brief Order n elements of the underlying fpq buffer as an fpq.
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] n the number n of elements to be ordered. n + 1 must be <= capacity.
+@return the result of the heapify operation, ok if successful or an error if
+fpq is NULL or n is larger than the initialized capacity of the fpq.
+
+This is another method to order a heap that already has all the elements one
+needs sorted. The underlying buffer will be interpreted to have n valid elements
+starting at index 0 to index n - 1. */
+ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t n);
 
 /** @brief Many allocate memory for the fpq.
 @param [in] fpq a pointer to the priority queue.

@@ -21,6 +21,7 @@ then pointers to encourage the user to think in terms of stable indices. */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "buffer.h"
@@ -144,6 +145,9 @@ static uint64_t filter(struct ccc_hhmap_ const *h, void const *key);
 static size_t next_prime(size_t n);
 static void copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
                          void const *user_src);
+static void bubble_down(struct ccc_hhmap_ *h, size_t i, size_t slots);
+static void sort_slots(struct ccc_hhmap_ *, size_t slots);
+static void pop_slot(struct ccc_hhmap_ *, size_t slots);
 
 /*=========================   Interface    ==================================*/
 
@@ -904,6 +908,53 @@ and_modify(struct ccc_hhash_handle_ *const e, ccc_update_fn *const fn)
     return e;
 }
 
+static inline void
+copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
+             void const *const user_src)
+{
+    struct ccc_hhmap_elem_ *const elem = elem_in_slot(h, slot_dst);
+    size_t surrounding_bytes = (char *)elem - (char *)slot_dst;
+    if (surrounding_bytes)
+    {
+        (void)memcpy(slot_dst, user_src, surrounding_bytes);
+    }
+    char *const remain_start
+        = (char *)elem_in_slot(h, user_src) + sizeof(struct ccc_hhmap_elem_);
+    surrounding_bytes = (char *)((char *)user_src + ccc_buf_elem_size(&h->buf_))
+                        - remain_start;
+    if (surrounding_bytes)
+    {
+        (void)memcpy((char *)elem + sizeof(struct ccc_hhmap_elem_),
+                     remain_start, surrounding_bytes);
+    }
+}
+
+/* This is by far the most complex and questionable operation across any
+   container in the collection so far. A handle hash map should support
+   complete handle stability for elements in the hash table, the same as the
+   user would expect when an std::vector resizes in C++; the index at which user
+   data lives should not change when resized. However, to support Robin Hood
+   hashing metadata to the appropriate slot while keeping user data at the
+   same position, the algorithm is hard.
+
+     - First, copy the existing table as is to the larger table. This keeps
+       user data at the same slot.
+     - Then take whatever nonsense slot the new hash table has chosen for the
+       inserted metadata and change it to the appropriate slot from the old
+       table. This is the same index but in the new larger capacity table.
+     - We have created a huge problem by doing this. Empty slots may have had
+       their associated slots stolen by linking metadata to the original user
+       data slots.
+     - Gather all available free slots remaining in the new capacity table and
+       link them to every empty metadata slot in the table ensuring every
+       metadata entry has a unique slot as its backing storage space.
+
+   Best algorithm I could come up with is O(NlgN) time with no auxiliary space.
+   We repurpose the old hash table to help sort and distribute the free slots in
+   the new table. Resizing should occur relatively infrequently, and I deem this
+   an acceptable trade off for the complete handle stability this offers for
+   now, but we can try to improve this in the future. I'm sure there is a
+   better way. */
 static inline ccc_result
 maybe_resize(struct ccc_hhmap_ *const h)
 {
@@ -945,29 +996,72 @@ maybe_resize(struct ccc_hhmap_ *const h)
     {
         return CCC_MEM_ERR;
     }
+    /* The handles shall be stable. Keep user data in the same slot. */
+    if (h->buf_.mem_)
+    {
+        (void)memcpy(new_hash.buf_.mem_, h->buf_.mem_,
+                     ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
+    }
+    /* Hash needs to start empty. Not sure if slot matters. */
     for (size_t i = 0; i < ccc_buf_capacity(&new_hash.buf_); ++i)
     {
-        (void)memset(ccc_buf_at(&new_hash.buf_, i), 0,
-                     ccc_buf_elem_size(&new_hash.buf_));
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, i);
+        e->hash_ = 0;
         e->slot_i_ = i;
     }
     (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
-    for (void *slot = ccc_buf_begin(&h->buf_);
-         slot != ccc_buf_capacity_end(&h->buf_);
-         slot = ccc_buf_next(&h->buf_, slot))
+    /* Run Robin Hood on the hash but instead of copying data to the chosen
+       slot, link to the existing data at the old handle. */
+    for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
     {
-        struct ccc_hhmap_elem_ const *const e = elem_in_slot(h, slot);
+        struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
         if (e->hash_ != CCC_HHM_EMPTY)
         {
             struct ccc_handl_ const new_ent
                 = find(&new_hash, key_at(h, e->slot_i_), e->hash_);
             ccc_handle_i const ins
                 = insert_meta(&new_hash, e->hash_, new_ent.i_);
-            copy_to_slot(
-                &new_hash,
-                ccc_buf_at(&new_hash.buf_, elem_at(&new_hash, ins)->slot_i_),
-                ccc_buf_at(&h->buf_, e->slot_i_));
+            /* Old handle linking. */
+            elem_at(&new_hash, ins)->slot_i_ = e->slot_i_;
+        }
+    }
+    /* Repurpose old hash table to tell us which slots are take in new table. */
+    size_t allocated_slots = 0;
+    for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
+    {
+        struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
+        if (e->hash_ != CCC_HHM_EMPTY)
+        {
+            size_t const taken = e->slot_i_;
+            elem_at(h, allocated_slots)->slot_i_ = taken;
+            ++allocated_slots;
+        }
+    }
+    /* We will use an in place O(n) heapify to tell us where the free slot runs
+       are between allocated slots. Consider what happens if we have N sorted
+       integers each representing an occupied slot. Every integer starting at 0
+       between these sorted integers represents a free slot that can be given to
+       an empty slot in need in the new table. */
+    sort_slots(h, allocated_slots);
+    for (size_t slot = 0, free_slot = 0;
+         slot < ccc_buf_capacity(&new_hash.buf_); ++slot)
+    {
+        struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, slot);
+        if (e->hash_ == CCC_HHM_EMPTY)
+        {
+            /* Continually pop from the heap until the free slot finds a gap
+               between occupied slots or there are no longer taken slots.
+               The taken slots will naturally run out because the new capacity
+               is greater than the old. This is the worst part, an O(lgN)
+               operation in the resizing scheme. */
+            while (allocated_slots && free_slot == elem_at(h, 0)->slot_i_)
+            {
+                ++free_slot;
+                pop_slot(h, allocated_slots);
+                --allocated_slots;
+            }
+            e->slot_i_ = free_slot;
+            ++free_slot;
         }
     }
     if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_OK)
@@ -980,23 +1074,43 @@ maybe_resize(struct ccc_hhmap_ *const h)
 }
 
 static inline void
-copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
-             void const *const user_src)
+sort_slots(struct ccc_hhmap_ *const h, size_t const slots)
 {
-    struct ccc_hhmap_elem_ *const elem = elem_in_slot(h, slot_dst);
-    size_t surrounding_bytes = (char *)elem - (char *)slot_dst;
-    if (surrounding_bytes)
+    if (!slots)
     {
-        (void)memcpy(slot_dst, user_src, surrounding_bytes);
+        return;
     }
-    char *const remain_start
-        = (char *)elem_in_slot(h, user_src) + sizeof(struct ccc_hhmap_elem_);
-    surrounding_bytes = (char *)((char *)user_src + ccc_buf_elem_size(&h->buf_))
-                        - remain_start;
-    if (surrounding_bytes)
+    for (size_t i = (slots / 2) + 1; i--;)
     {
-        (void)memcpy((char *)elem + sizeof(struct ccc_hhmap_elem_),
-                     remain_start, surrounding_bytes);
+        bubble_down(h, i, slots);
+    }
+}
+
+static inline void
+pop_slot(struct ccc_hhmap_ *const h, size_t const slots)
+{
+    elem_at(h, 0)->slot_i_ = elem_at(h, slots - 1)->slot_i_;
+    bubble_down(h, 0, slots - 1);
+}
+
+static inline void
+bubble_down(struct ccc_hhmap_ *const h, size_t i, size_t const slots)
+{
+    struct ccc_hhmap_elem_ *const tmp = elem_at(h, slots);
+    for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < slots;
+         i = next, left = (i * 2) + 1, right = left + 1)
+    {
+        next = (right < slots
+                && elem_at(h, right)->slot_i_ < elem_at(h, left)->slot_i_)
+                   ? right
+                   : left;
+        if (elem_at(h, next)->slot_i_ >= elem_at(h, i)->slot_i_)
+        {
+            return;
+        }
+        tmp->slot_i_ = elem_at(h, next)->slot_i_;
+        elem_at(h, next)->slot_i_ = elem_at(h, i)->slot_i_;
+        elem_at(h, i)->slot_i_ = tmp->slot_i_;
     }
 }
 

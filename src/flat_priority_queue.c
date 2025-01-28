@@ -20,6 +20,7 @@ static void swap(struct ccc_fpq_ *, char tmp[], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
 static size_t bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
 static size_t update_fixup(struct ccc_fpq_ *, void *e);
+static void inplace_heapify(struct ccc_fpq_ *fpq, size_t n);
 
 /*=====================       Interface      ================================*/
 
@@ -58,6 +59,17 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
     {
         (void)bubble_down(fpq, tmp, i);
     }
+    return CCC_OK;
+}
+
+ccc_result
+ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t n)
+{
+    if (!fpq || n + 1 > ccc_buf_capacity(&fpq->buf_))
+    {
+        return CCC_INPUT_ERR;
+    }
+    inplace_heapify(fpq, n);
     return CCC_OK;
 }
 
@@ -360,6 +372,14 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
     {
         return;
     }
+    inplace_heapify(fpq, n);
+}
+
+/*====================     Static Helpers     ===============================*/
+
+static inline void
+inplace_heapify(struct ccc_fpq_ *const fpq, size_t const n)
+{
     (void)ccc_buf_size_set(&fpq->buf_, n);
     void *const tmp = ccc_buf_at(&fpq->buf_, n);
     for (size_t i = (n / 2) + 1; i--;)
@@ -367,8 +387,6 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
         (void)bubble_down(fpq, tmp, i);
     }
 }
-
-/*====================     Static Helpers     ===============================*/
 
 /* Fixes the position of element e after its key value has been changed. */
 static inline size_t
