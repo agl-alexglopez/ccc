@@ -412,8 +412,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
         CHECK(in_table->val, shuffled_index);
         CHECK(size(&hh), to_insert);
     }
-    CHECK(hhm_clear_and_free(&hh, NULL), CCC_OK);
-    CHECK_END_FN();
+    CHECK_END_FN(hhm_clear_and_free(&hh, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
