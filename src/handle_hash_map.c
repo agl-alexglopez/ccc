@@ -1022,6 +1022,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
     (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     /* Run Robin Hood on the hash but instead of copying data to the chosen
        slot, link to the existing data at the old handle. */
+    size_t allocated_slots = 0;
     for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
@@ -1032,20 +1033,10 @@ maybe_resize(struct ccc_hhmap_ *const h)
         struct ccc_handl_ const new_ent
             = find(&new_hash, key_at(h, e->slot_i_), e->hash_);
         ccc_handle_i const ins = insert_meta(&new_hash, e->hash_, new_ent.i_);
-        /* Old handle linking. */
+        /* Old handle linking. Same slot in larger table. */
         elem_at(&new_hash, ins)->slot_i_ = e->slot_i_;
-    }
-    /* Repurpose old hash table to tell us which slots are take in new table. */
-    size_t allocated_slots = 0;
-    for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
-    {
-        struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
-        if (e->hash_ == CCC_HHM_EMPTY)
-        {
-            continue;
-        }
-        size_t const taken = e->slot_i_;
-        elem_at(h, allocated_slots)->slot_i_ = taken;
+        /* Repurpose the old table for allocation sorting as we go. */
+        elem_at(h, allocated_slots)->slot_i_ = e->slot_i_;
         ++allocated_slots;
     }
     /* We will use an in place O(n) heapify to tell us where the free slot runs
