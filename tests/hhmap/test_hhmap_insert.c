@@ -382,12 +382,14 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
     CHECK(size(&hh), 0);
 
     int const to_insert = 1000;
+    ccc_handle_i stable_handles[1000] = {};
     int const larger_prime = (int)hhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct val elem = {.key = shuffled_index, .val = i};
         ccc_handle_i h = insert_handle(handle_r(&hh, &elem.key), &elem.e);
+        stable_handles[i] = h;
         CHECK(size(&hh), i + 1);
         struct val *v = hhm_at(&hh, h);
         CHECK(v != NULL, true);
@@ -407,6 +409,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
         CHECK(contain, true);
         ccc_handle_i h
             = insert_handle(handle_r(&hh, &swap_slot.key), &swap_slot.e);
+        CHECK(h, stable_handles[i]);
         struct val const *const in_table = hhm_at(&hh, h);
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
@@ -423,12 +426,14 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
         key, std_alloc, hhmap_int_to_u64, hhmap_id_eq, NULL);
     CHECK(hhm_data(&hh) != NULL, true);
     int const to_insert = 1000;
+    ccc_handle_i stable_handles[1000] = {};
     int const larger_prime = (int)hhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         ccc_handle_i h = insert_handle(handle_r(&hh, &shuffled_index),
                                        &(struct val){shuffled_index, {}, i}.e);
+        stable_handles[i] = h;
         struct val *v = hhm_at(&hh, h);
         bool const valid = validate(&hh);
         CHECK(valid, true);
@@ -444,16 +449,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        bool const contain = contains(&hh, &shuffled_index);
-        CHECK(contain, true);
-    }
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
         ccc_handle_i h = hhm_or_insert_w(
             hhm_and_modify_w(handle_r(&hh, &shuffled_index), struct val,
                              { T->val = shuffled_index; }),
             (struct val){});
+        CHECK(h, stable_handles[i]);
         bool const valid = validate(&hh);
         CHECK(valid, true);
         struct val const *const in_table = hhm_at(&hh, h);

@@ -60,6 +60,11 @@ union ccc_hhmap_handle_
     struct ccc_hhash_handle_ impl_;
 };
 
+union ccc_hhmap_ref_
+{
+    size_t impl_;
+};
+
 #define ccc_impl_hhm_init(memory_ptr, capacity, hhash_elem_field, key_field,   \
                           alloc_fn, hash_fn, key_eq_fn, aux)                   \
     {                                                                          \
@@ -198,7 +203,8 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        hhm_or_ins_res_;                                                       \
+        ccc_impl_hhm_elem_at(hhm_or_ins_handl_ptr_->impl_.h_, hhm_or_ins_res_) \
+            ->slot_i_;                                                         \
     }))
 
 #define ccc_impl_hhm_insert_handle_w(handle_hash_map_handle_ptr,               \
@@ -237,7 +243,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        hhm_res_;                                                              \
+        ccc_impl_hhm_elem_at(hhm_ins_handl_ptr_->impl_.h_, hhm_res_)->slot_i_; \
     }))
 
 #define ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)     \
@@ -269,6 +275,9 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     = hhm_key_;                                                \
             }                                                                  \
         }                                                                      \
+        hhm_try_insert_res_.i_ = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,    \
+                                                      hhm_try_insert_res_.i_)  \
+                                     ->slot_i_;                                \
         hhm_try_insert_res_;                                                   \
     }))
 
@@ -325,6 +334,10 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     = hhm_key_;                                                \
             }                                                                  \
         }                                                                      \
+        hhm_ins_or_assign_res_.i_                                              \
+            = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                       \
+                                   hhm_ins_or_assign_res_.i_)                  \
+                  ->slot_i_;                                                   \
         hhm_ins_or_assign_res_;                                                \
     }))
 
