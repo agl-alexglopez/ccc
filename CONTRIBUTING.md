@@ -181,5 +181,6 @@ Variable length arrays are prohibited because they could cause hard to find bugs
 
 At least the following would need to happen before `v1.0`.
 
+- The handle hash map should offer index stability for handles given to the user even when resizing occurs. This should be possible because the data remains at the same slot while Robin Hood runs the algorithm on metadata only. However, the algorithm for efficient and correct resizing that keeps user data in the same slot in the new resized table eludes me for now.
 - Examine hash table possibilities. Under first consideration the Robin Hood hash table approach seems somewhat naive. But there are some strengths to the implementation given requirements for non-allocation support, memory being provided by the user from stack, heap, or data segment, and other factors. It may be possible to improve this implementation but see the comment at the top of the source file for the flat hash table for more detailed thoughts.
 - More tests. I added a decent suite of tests to each container with most of the focus on the associative containers, but more thorough testing should be added throughout.
