@@ -454,12 +454,12 @@ ccc_hhm_handle_status(ccc_hhmap_handle const *const e)
     return e->impl_.handle_.stats_;
 }
 
-ccc_handle_i
+ccc_hhmap_handle
 ccc_hhm_begin(ccc_handle_hash_map const *const h)
 {
     if (unlikely(!h || ccc_buf_is_empty(&h->buf_)))
     {
-        return 0;
+        return (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
     size_t iter = 0;
     for (; iter < ccc_buf_capacity(&h->buf_)
@@ -468,38 +468,40 @@ ccc_hhm_begin(ccc_handle_hash_map const *const h)
     {}
     if (iter >= ccc_buf_capacity(&h->buf_))
     {
-        return 0;
+        return (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
-    return iter;
+    return (ccc_hhmap_handle){
+        {.h_ = (ccc_handle_hash_map *)h,
+         .hash_ = elem_at(h, iter)->hash_,
+         .handle_ = {.i_ = iter, .stats_ = CCC_OCCUPIED}}};
 }
 
-ccc_handle_i
-ccc_hhm_next(ccc_handle_hash_map const *const h, ccc_handle_i iter)
+ccc_result
+ccc_hhm_next(ccc_hhmap_handle *const iter)
 {
-    if (unlikely(!h))
+    if (unlikely(!iter))
     {
-        return 0;
+        return CCC_INPUT_ERR;
     }
-    if (!iter)
-    {
-        return 0;
-    }
-    ++iter;
-    for (; iter < ccc_buf_capacity(&h->buf_)
-           && elem_at(h, iter)->hash_ == CCC_HHM_EMPTY;
-         ++iter)
+    ++iter->impl_.handle_.i_;
+    for (; iter->impl_.handle_.i_ < ccc_buf_capacity(&iter->impl_.h_->buf_)
+           && elem_at(iter->impl_.h_, iter->impl_.handle_.i_)->hash_
+                  == CCC_HHM_EMPTY;
+         ++iter->impl_.handle_.i_)
     {}
-    if (iter >= ccc_buf_capacity(&h->buf_))
+    if (iter->impl_.handle_.i_ >= ccc_buf_capacity(&iter->impl_.h_->buf_))
     {
-        return 0;
+        *iter = (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
-    return iter;
+    iter->impl_.hash_ = elem_at(iter->impl_.h_, iter->impl_.handle_.i_)->hash_;
+    iter->impl_.handle_.stats_ = CCC_OCCUPIED;
+    return CCC_OK;
 }
 
-ccc_handle_i
-ccc_hhm_end(ccc_handle_hash_map const *const)
+bool
+ccc_hhm_end(ccc_hhmap_handle const *const iter)
 {
-    return 0;
+    return !iter || iter->impl_.hash_ == CCC_HHM_EMPTY;
 }
 
 size_t

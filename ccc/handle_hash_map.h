@@ -624,30 +624,32 @@ ccc_result ccc_hhm_clear_and_free(ccc_handle_hash_map *h,
 Obtain and manage iterators over the container. */
 /**@{*/
 
-/** @brief Obtains a handle index to the first element in the table.
+/** @brief Obtains a handle to the first element in the table.
 @param [in] h the table to iterate through.
-@return a handle index that can be passed to the at or as function.
+@return a container specific handle that interface functions will accept.
 @warning erasing or inserting during iteration may result in repeating or
-unexpected iteration orders, but the index remains valid for the table.
+unexpected iteration orders.
 
 Iteration starts from index 0 by capacity of the table so iteration order is
 not obvious to the user, nor should any specific order be relied on. */
-[[nodiscard]] ccc_handle_i ccc_hhm_begin(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_hhmap_handle ccc_hhm_begin(ccc_handle_hash_map const *h);
 
-/** @brief Advances the iterator to the next occupied table slot.
-@param [in] h the table being iterated upon.
-@param [in] iter the previous iterator.
-@return a handle index that can be passed to the at or as function.
+/** @brief Advances the iterator to the next occupied table handle.
+@param [out] iter the previous handle that acts as an iterator.
+@return ok if the handle is successfully updated to represent the next element
+or an error if iter is NULL.
 @warning erasing or inserting during iteration may result in repeating or
 unexpected iteration orders, but the index remains valid for the table. */
-[[nodiscard]] ccc_handle_i ccc_hhm_next(ccc_handle_hash_map const *h,
-                                        ccc_handle_i iter);
+[[nodiscard]] ccc_result ccc_hhm_next(ccc_hhmap_handle *iter);
 
-/** @brief Check the current iterator against the end for loop termination.
-@param [in] h the table being iterated upon.
-@return the end address of the hash table.
-@warning passing the end handle index to at or as results in NULL. */
-[[nodiscard]] ccc_handle_i ccc_hhm_end(ccc_handle_hash_map const *h);
+/** @brief Check if the current handle iterator has reached the end.
+@param [in] iter a pointer to the current handle iterator.
+@return true if the handle iterator has reached the end of the table and
+iteration should stop, false if the iterator is valid and iteration should
+continue.
+@warning if iter has reached the end unwrapping it will result in 0 or invalid
+handles and NULL references. */
+[[nodiscard]] bool ccc_hhm_end(ccc_hhmap_handle const *iter);
 
 /**@}*/
 
