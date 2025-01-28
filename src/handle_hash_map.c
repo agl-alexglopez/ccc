@@ -158,7 +158,7 @@ ccc_hhm_at(ccc_handle_hash_map const *const h, ccc_handle_i i)
     {
         return NULL;
     }
-    return ccc_buf_at(&h->buf_, elem_at(h, i)->slot_i_);
+    return ccc_buf_at(&h->buf_, i);
 }
 
 bool
@@ -218,7 +218,7 @@ ccc_hhm_insert_handle(ccc_hhmap_handle const *const e,
             ccc_buf_at(&e->impl_.h_->buf_,
                        elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_),
             struct_base(e->impl_.h_, elem));
-        return e->impl_.handle_.i_;
+        return elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_;
     }
     if (e->impl_.handle_.stats_ & CCC_INSERT_ERROR)
     {
@@ -230,7 +230,7 @@ ccc_hhm_insert_handle(ccc_hhmap_handle const *const e,
         e->impl_.h_,
         ccc_buf_at(&e->impl_.h_->buf_, elem_at(e->impl_.h_, ins)->slot_i_),
         user_struct);
-    return ins;
+    return elem_at(e->impl_.h_, ins)->slot_i_;
 }
 
 ccc_handle_i
@@ -244,7 +244,7 @@ ccc_hhm_get_key_val(ccc_handle_hash_map *const h, void const *const key)
     struct ccc_handl_ e = find(h, key, filter(h, key));
     if (e.stats_ & CCC_OCCUPIED)
     {
-        return e.i_;
+        return elem_at(h, e.i_)->slot_i_;
     }
     return 0;
 }
@@ -303,15 +303,17 @@ ccc_hhm_insert(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
         swap_user_data(
             h, ccc_buf_at(&h->buf_, elem_at(h, ent.handle_.i_)->slot_i_),
             user_data);
-        return (ccc_handle){{.i_ = ent.handle_.i_, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = elem_at(h, ent.handle_.i_)->slot_i_,
+                             .stats_ = CCC_OCCUPIED}};
     }
     if (ent.handle_.stats_ & CCC_INSERT_ERROR)
     {
-        return (ccc_handle){{.i_ = ent.handle_.i_, .stats_ = CCC_INSERT_ERROR}};
+        return (ccc_handle){{.i_ = elem_at(h, ent.handle_.i_)->slot_i_,
+                             .stats_ = CCC_INSERT_ERROR}};
     }
     ccc_handle_i const ins = insert_meta(h, ent.hash_, ent.handle_.i_);
     copy_to_slot(h, ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_), user_data);
-    return (ccc_handle){{.i_ = ins, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = elem_at(h, ins)->slot_i_, .stats_ = CCC_VACANT}};
 }
 
 ccc_handle
@@ -327,7 +329,8 @@ ccc_hhm_try_insert(ccc_handle_hash_map *const h,
         = container_handle(h, key_in_slot(h, user_data));
     if (ent.handle_.stats_ & CCC_OCCUPIED)
     {
-        return (ccc_handle){{.i_ = ent.handle_.i_, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = elem_at(h, ent.handle_.i_)->slot_i_,
+                             .stats_ = CCC_OCCUPIED}};
     }
     if (ent.handle_.stats_ & CCC_INSERT_ERROR)
     {
@@ -335,7 +338,7 @@ ccc_hhm_try_insert(ccc_handle_hash_map *const h,
     }
     ccc_handle_i const ins = insert_meta(h, ent.hash_, ent.handle_.i_);
     copy_to_slot(h, ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_), user_data);
-    return (ccc_handle){{.i_ = ins, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = elem_at(h, ins)->slot_i_, .stats_ = CCC_VACANT}};
 }
 
 ccc_handle
@@ -354,7 +357,8 @@ ccc_hhm_insert_or_assign(ccc_handle_hash_map *const h,
         copy_to_slot(h,
                      ccc_buf_at(&h->buf_, elem_at(h, ent.handle_.i_)->slot_i_),
                      user_base);
-        return (ccc_handle){{.i_ = ent.handle_.i_, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = elem_at(h, ent.handle_.i_)->slot_i_,
+                             .stats_ = CCC_OCCUPIED}};
     }
     if (ent.handle_.stats_ & CCC_INSERT_ERROR)
     {
@@ -362,7 +366,7 @@ ccc_hhm_insert_or_assign(ccc_handle_hash_map *const h,
     }
     ccc_handle_i const ins = insert_meta(h, ent.hash_, ent.handle_.i_);
     copy_to_slot(h, ccc_buf_at(&h->buf_, elem_at(h, ins)->slot_i_), user_base);
-    return (ccc_handle){{.i_ = ins, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = elem_at(h, ins)->slot_i_, .stats_ = CCC_VACANT}};
 }
 
 ccc_handle
@@ -394,7 +398,7 @@ ccc_hhm_or_insert(ccc_hhmap_handle const *const e, ccc_hhmap_elem *const elem)
     }
     if (e->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
-        return e->impl_.handle_.i_;
+        return elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_;
     }
     if (e->impl_.handle_.stats_ & CCC_INSERT_ERROR)
     {
@@ -407,7 +411,7 @@ ccc_hhm_or_insert(ccc_hhmap_handle const *const e, ccc_hhmap_elem *const elem)
         e->impl_.h_,
         ccc_buf_at(&e->impl_.h_->buf_, elem_at(e->impl_.h_, ins)->slot_i_),
         user_struct);
-    return ins;
+    return elem_at(e->impl_.h_, ins)->slot_i_;
 }
 
 ccc_handle_i
@@ -417,7 +421,7 @@ ccc_hhm_unwrap(ccc_hhmap_handle const *const e)
     {
         return 0;
     }
-    return e->impl_.handle_.i_;
+    return elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_;
 }
 
 bool
@@ -948,6 +952,10 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
      - Gather all available free slots remaining in the new capacity table and
        link them to every empty metadata slot in the table ensuring every
        metadata entry has a unique slot as its backing storage space.
+     - By the end of these operations every metadata slot should point to its
+       own unique backing storage slot. All metadata for old data from the old
+       table should point to the same slots as backing stores even if the
+       metadata is now in a different slot itself.
 
    Best algorithm I could come up with is O(NlgN) time with no auxiliary space.
    We repurpose the old hash table to help sort and distribute the free slots in
@@ -1015,27 +1023,28 @@ maybe_resize(struct ccc_hhmap_ *const h)
     for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
-        if (e->hash_ != CCC_HHM_EMPTY)
+        if (e->hash_ == CCC_HHM_EMPTY)
         {
-            struct ccc_handl_ const new_ent
-                = find(&new_hash, key_at(h, e->slot_i_), e->hash_);
-            ccc_handle_i const ins
-                = insert_meta(&new_hash, e->hash_, new_ent.i_);
-            /* Old handle linking. */
-            elem_at(&new_hash, ins)->slot_i_ = e->slot_i_;
+            continue;
         }
+        struct ccc_handl_ const new_ent
+            = find(&new_hash, key_at(h, e->slot_i_), e->hash_);
+        ccc_handle_i const ins = insert_meta(&new_hash, e->hash_, new_ent.i_);
+        /* Old handle linking. */
+        elem_at(&new_hash, ins)->slot_i_ = e->slot_i_;
     }
     /* Repurpose old hash table to tell us which slots are take in new table. */
     size_t allocated_slots = 0;
     for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
-        if (e->hash_ != CCC_HHM_EMPTY)
+        if (e->hash_ == CCC_HHM_EMPTY)
         {
-            size_t const taken = e->slot_i_;
-            elem_at(h, allocated_slots)->slot_i_ = taken;
-            ++allocated_slots;
+            continue;
         }
+        size_t const taken = e->slot_i_;
+        elem_at(h, allocated_slots)->slot_i_ = taken;
+        ++allocated_slots;
     }
     /* We will use an in place O(n) heapify to tell us where the free slot runs
        are between allocated slots. Consider what happens if we have N sorted
@@ -1047,22 +1056,23 @@ maybe_resize(struct ccc_hhmap_ *const h)
          slot < ccc_buf_capacity(&new_hash.buf_); ++slot)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, slot);
-        if (e->hash_ == CCC_HHM_EMPTY)
+        if (e->hash_ != CCC_HHM_EMPTY)
         {
-            /* Continually pop from the heap until the free slot finds a gap
-               between occupied slots or there are no longer taken slots.
-               The taken slots will naturally run out because the new capacity
-               is greater than the old. This is the worst part, an O(lgN)
-               operation in the resizing scheme. */
-            while (allocated_slots && free_slot == elem_at(h, 0)->slot_i_)
-            {
-                ++free_slot;
-                pop_slot(h, allocated_slots);
-                --allocated_slots;
-            }
-            e->slot_i_ = free_slot;
-            ++free_slot;
+            continue;
         }
+        /* Continually pop from the heap until the free slot finds a gap
+           between occupied slots or there are no longer taken slots.
+           The taken slots will naturally run out because the new capacity
+           is greater than the old. This is the worst part, an O(lgN)
+           operation in the resizing scheme. */
+        while (allocated_slots && free_slot == elem_at(h, 0)->slot_i_)
+        {
+            ++free_slot;
+            pop_slot(h, allocated_slots);
+            --allocated_slots;
+        }
+        e->slot_i_ = free_slot;
+        ++free_slot;
     }
     if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_OK)
     {
