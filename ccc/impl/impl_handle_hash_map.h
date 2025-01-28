@@ -201,10 +201,13 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     hhm_or_ins_res_ = ccc_impl_hhm_swaps(hhm_or_ins_handle_,   \
                                                          lazy_key_value);      \
                 }                                                              \
+                hhm_or_ins_res_                                                \
+                    = ccc_impl_hhm_elem_at(hhm_or_ins_handl_ptr_->impl_.h_,    \
+                                           hhm_or_ins_res_)                    \
+                          ->slot_i_;                                           \
             }                                                                  \
         }                                                                      \
-        ccc_impl_hhm_elem_at(hhm_or_ins_handl_ptr_->impl_.h_, hhm_or_ins_res_) \
-            ->slot_i_;                                                         \
+        hhm_or_ins_res_;                                                       \
     }))
 
 #define ccc_impl_hhm_insert_handle_w(handle_hash_map_handle_ptr,               \
@@ -241,9 +244,12 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                     hhm_res_                                                   \
                         = ccc_impl_hhm_swaps(hhm_ins_handl_, lazy_key_value);  \
                 }                                                              \
+                hhm_res_ = ccc_impl_hhm_elem_at(hhm_ins_handl_ptr_->impl_.h_,  \
+                                                hhm_res_)                      \
+                               ->slot_i_;                                      \
             }                                                                  \
         }                                                                      \
-        ccc_impl_hhm_elem_at(hhm_ins_handl_ptr_->impl_.h_, hhm_res_)->slot_i_; \
+        hhm_res_;                                                              \
     }))
 
 #define ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)     \
@@ -274,10 +280,11 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                         ->slot_i_))                                            \
                     = hhm_key_;                                                \
             }                                                                  \
+            hhm_try_insert_res_.i_                                             \
+                = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                   \
+                                       hhm_try_insert_res_.i_)                 \
+                      ->slot_i_;                                               \
         }                                                                      \
-        hhm_try_insert_res_.i_ = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,    \
-                                                      hhm_try_insert_res_.i_)  \
-                                     ->slot_i_;                                \
         hhm_try_insert_res_;                                                   \
     }))
 
@@ -333,11 +340,11 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                         ->slot_i_))                                            \
                     = hhm_key_;                                                \
             }                                                                  \
+            hhm_ins_or_assign_res_.i_                                          \
+                = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                   \
+                                       hhm_ins_or_assign_res_.i_)              \
+                      ->slot_i_;                                               \
         }                                                                      \
-        hhm_ins_or_assign_res_.i_                                              \
-            = ccc_impl_hhm_elem_at(handle_hash_map_ptr_,                       \
-                                   hhm_ins_or_assign_res_.i_)                  \
-                  ->slot_i_;                                                   \
         hhm_ins_or_assign_res_;                                                \
     }))
 
