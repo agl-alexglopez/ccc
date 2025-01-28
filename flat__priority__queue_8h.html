@@ -155,6 +155,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a8ef3dc2632fab0c00dce97c16957beba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ef3dc2632fab0c00dce97c16957beba">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_elem_size)</td></tr>
 <tr class="memdesc:a8ef3dc2632fab0c00dce97c16957beba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
 <tr class="separator:a8ef3dc2632fab0c00dce97c16957beba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f90ef3349b3ec122d044be793a2ba73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0f90ef3349b3ec122d044be793a2ba73">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t n)</td></tr>
+<tr class="memdesc:a0f90ef3349b3ec122d044be793a2ba73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order n elements of the underlying fpq buffer as an fpq.  <br /></td></tr>
+<tr class="separator:a0f90ef3349b3ec122d044be793a2ba73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b186988d4e3b2d9bf01750d6977962f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a5b186988d4e3b2d9bf01750d6977962f">ccc_fpq_alloc</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t new_capacity, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a5b186988d4e3b2d9bf01750d6977962f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Many allocate memory for the fpq.  <br /></td></tr>
 <tr class="separator:a5b186988d4e3b2d9bf01750d6977962f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -384,7 +387,7 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>the size &lt;= capacity. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cmp_order</td><td>CCC_LES or CCC_GRT for min or max heap, respectively. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if no allocation. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the user defined comarison function for user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the user defined comparison function for user types. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for destruction of elements. </td></tr>
   </table>
   </dd>
@@ -1009,6 +1012,45 @@ This graph shows which files directly or indirectly include this file:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>OK if sorting was successful or an input error if bad input is provided. A permission error will occur if no allocation is allowed and the input array is larger than the fixed fpq capacity. A memory error will occur if reallocation is required to fit all elements but reallocation fails.</dd></dl>
 <p>Note that this version of heapify copies elements from the input array. If an in place heapify is required use the initializer version of this method. </p>
+
+</div>
+</div>
+<a id="a0f90ef3349b3ec122d044be793a2ba73" name="a0f90ef3349b3ec122d044be793a2ba73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f90ef3349b3ec122d044be793a2ba73">&#9670;&#160;</a></span>ccc_fpq_heapify_inplace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fpq_heapify_inplace </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Order n elements of the underlying fpq buffer as an fpq. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number n of elements to be ordered. n + 1 must be &lt;= capacity. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the heapify operation, ok if successful or an error if fpq is NULL or n is larger than the initialized capacity of the fpq.</dd></dl>
+<p>This is another method to order a heap that already has all the elements one needs sorted. The underlying buffer will be interpreted to have n valid elements starting at index 0 to index n - 1. </p>
 
 </div>
 </div>
