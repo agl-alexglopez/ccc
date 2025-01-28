@@ -5,10 +5,10 @@ A Handle Hash Map stores elements by hash value and allows the user to retrieve
 them by key in amortized O(1) while offering handle stability. A handle is an
 index into a slot of the table where the user data is originally placed upon
 insertion. It is guaranteed to remain in the same slot until deletion; however
-if resizing is allowed and occurs any pointer to that data may become invalid.
-The handle would remain valid regardless of resizing because it is an index not
-a pointer. This comes at a slight space and implementation complexity cost when
-compared to the standard flat hash map offered in the collection.
+if resizing is allowed and occurs any handle to that data may become invalid.
+This comes at a slight space and implementation complexity cost when compared to
+the standard flat hash map offered in the collection. However, it is more
+beneficial for large structs and fixed table sizes to use this version.
 
 For containers in this collection the user may have a variety of memory sources
 backing the containers. This container aims to be an equivalent stand in for
