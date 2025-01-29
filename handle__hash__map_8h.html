@@ -1303,7 +1303,8 @@ do not try to access data in the table manually with a handle. Always use this p
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of dst fails a memory error is returned. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the stable handles to user data in src will not remain the same as those in dst if dst has a capacity greater than src. However, after the initial copy to dst the handles in dst are now stable at their current positions.</dd></dl>
 <p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
 <p>Manual memory management with no allocation function provided.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define handle_hash_MAP_USING_NAMESPACE_CCC</span></div>
