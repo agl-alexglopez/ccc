@@ -109,6 +109,9 @@ is returned. If resizing is required and resizing of dst fails a memory error
 is returned.
 @note dst must have capacity greater than or equal to src. If dst capacity is
 less than src, an allocation function must be provided with the fn argument.
+@warning the stable handles to user data in src will not remain the same as
+those in dst if dst has a capacity greater than src. However, after the initial
+copy to dst the handles in dst are now stable at their current positions.
 
 Note that there are two ways to copy data from source to destination: provide
 sufficient memory and pass NULL as fn, or allow the copy function to take care
