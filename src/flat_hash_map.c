@@ -507,8 +507,25 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
         }
         dst->buf_.capacity_ = src->buf_.capacity_;
     }
-    (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
-                 src->buf_.capacity_ * src->buf_.elem_sz_);
+    if (dst->buf_.capacity_ == src->buf_.capacity_)
+    {
+        (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
+                     src->buf_.capacity_ * src->buf_.elem_sz_);
+        return CCC_OK;
+    }
+    dst->buf_.sz_ = num_swap_slots;
+    for (void *slot = ccc_buf_begin(&src->buf_);
+         slot != ccc_buf_capacity_end(&src->buf_);
+         slot = ccc_buf_next(&src->buf_, slot))
+    {
+        struct ccc_fhmap_elem_ const *const e = elem_in_slot(src, slot);
+        if (e->hash_ != CCC_FHM_EMPTY)
+        {
+            struct ccc_ent_ const new_ent
+                = find(dst, key_in_slot(src, slot), e->hash_);
+            insert(dst, slot, e->hash_, ccc_buf_i(&dst->buf_, new_ent.e_));
+        }
+    }
     return CCC_OK;
 }
 

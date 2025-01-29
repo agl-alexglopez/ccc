@@ -539,8 +539,32 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
         }
         dst->buf_.capacity_ = src->buf_.capacity_;
     }
-    (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
-                 src->buf_.capacity_ * src->buf_.elem_sz_);
+    if (dst->buf_.capacity_ == src->buf_.capacity_)
+    {
+        (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
+                     src->buf_.capacity_ * src->buf_.elem_sz_);
+        return CCC_OK;
+    }
+    dst->buf_.sz_ = num_swap_slots;
+    for (size_t i = 0; i < ccc_buf_capacity(&dst->buf_); ++i)
+    {
+        struct ccc_hhmap_elem_ *const e = elem_at(dst, i);
+        e->hash_ = CCC_HHM_EMPTY;
+        e->slot_i_ = i;
+    }
+    for (size_t i = 0; i < ccc_buf_capacity(&src->buf_); ++i)
+    {
+        struct ccc_hhmap_elem_ *const e = elem_at(src, i);
+        if (e->hash_ == CCC_HHM_EMPTY)
+        {
+            continue;
+        }
+        struct ccc_handl_ const new_ent
+            = find(dst, key_at(src, e->slot_i_), e->hash_);
+        ccc_handle_i const ins = insert_meta(dst, e->hash_, new_ent.i_);
+        copy_to_slot(dst, ccc_buf_at(&dst->buf_, elem_at(dst, ins)->slot_i_),
+                     ccc_buf_at(&src->buf_, e->slot_i_));
+    }
     return CCC_OK;
 }
 
@@ -628,6 +652,10 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
     for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
+        if (e->slot_i_ >= ccc_buf_capacity(&h->buf_))
+        {
+            return false;
+        }
         if (e->hash_ == CCC_HHM_EMPTY)
         {
             ++empties;
