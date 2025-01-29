@@ -60,11 +60,13 @@ union ccc_hhmap_handle_
     struct ccc_hhash_handle_ impl_;
 };
 
+/** @private */
 union ccc_hhmap_ref_
 {
     size_t impl_;
 };
 
+/** @private */
 #define ccc_impl_hhm_init(memory_ptr, capacity, hhash_elem_field, key_field,   \
                           alloc_fn, hash_fn, key_eq_fn, aux)                   \
     {                                                                          \
@@ -77,6 +79,7 @@ union ccc_hhmap_ref_
         = offsetof(typeof(*(memory_ptr)), hhash_elem_field),                   \
     }
 
+/** @private */
 #define ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle...)             \
     (__extension__({                                                           \
         struct ccc_hhmap_ const *const hhm_ptr_ = (handle_hash_map_ptr);       \
@@ -115,8 +118,8 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
-/* Internal helper assumes that swap_entry has already been evaluated once
-   which it must have to make it to this point. */
+/** @private Internal helper assumes that swap_entry has already been evaluated
+once which it must have to make it to this point. */
 #define ccc_impl_hhm_swaps(swap_handle, lazy_key_value...)                     \
     (__extension__({                                                           \
         size_t hhm_i_ = (swap_handle)->handle_.i_;                             \
@@ -156,6 +159,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
 
 /*=====================     Core Macro Implementations     ==================*/
 
+/** @private */
 #define ccc_impl_hhm_and_modify_w(handle_hash_map_handle_ptr, type_name,       \
                                   closure_over_T...)                           \
     (__extension__({                                                           \
@@ -181,6 +185,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         hhm_mod_with_handl_;                                                   \
     }))
 
+/** @private */
 #define ccc_impl_hhm_or_insert_w(handle_hash_map_handle_ptr,                   \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
@@ -210,6 +215,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         hhm_or_ins_res_;                                                       \
     }))
 
+/** @private */
 #define ccc_impl_hhm_insert_handle_w(handle_hash_map_handle_ptr,               \
                                      lazy_key_value...)                        \
     (__extension__({                                                           \
@@ -252,6 +258,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         hhm_res_;                                                              \
     }))
 
+/** @private */
 #define ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)     \
     (__extension__({                                                           \
         struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
@@ -288,6 +295,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
         hhm_try_insert_res_;                                                   \
     }))
 
+/** @private */
 #define ccc_impl_hhm_insert_or_assign_w(handle_hash_map_ptr, key,              \
                                         lazy_value...)                         \
     (__extension__({                                                           \
