@@ -1,7 +1,6 @@
 var annotated_dup =
 [
     [ "ccc_cmp", "structccc__cmp.html", "structccc__cmp" ],
-    [ "ccc_hhmap_ref_", "unionccc__hhmap__ref__.html", null ],
     [ "ccc_key_cmp", "structccc__key__cmp.html", "structccc__key__cmp" ],
     [ "ccc_user_key", "structccc__user__key.html", "structccc__user__key" ],
     [ "ccc_user_type", "structccc__user__type.html", "structccc__user__type" ]
