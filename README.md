@@ -544,7 +544,7 @@ struct lru_cache
 
 struct lru_elem
 {
-    ccc_hhmap_elem hash_elem;
+    hhmap_elem hash_elem;
     dll_elem list_elem;
     int key;
     int val;
@@ -629,7 +629,7 @@ static struct lru_cache lru_cache = {
 void
 lru_put(struct lru_cache *const lru, int const key, int const val)
 {
-    ccc_hhmap_handle *const ent = handle_r(&lru->hh, &key);
+    hhmap_handle *const ent = handle_r(&lru->hh, &key);
     if (occupied(ent))
     {
         struct lru_elem *const found = hhm_at(&lru->hh, unwrap(ent));

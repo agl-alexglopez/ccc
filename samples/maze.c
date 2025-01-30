@@ -233,7 +233,8 @@ animate_maze(struct maze *maze)
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
 
-    size_t const cap = (((size_t)maze->rows * maze->cols) / 2) + 1;
+    size_t const cap
+        = hhm_next_prime((((size_t)maze->rows * maze->cols) / 2) + 1);
     size_t bytes = cap * sizeof(struct prim_cell);
     /* The priority queue will have its elements in the slots of the hash map
        for each prim cell. No allocation permission so pushing and popping is
