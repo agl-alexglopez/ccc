@@ -638,7 +638,7 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line"> </div>
 <div class="line"><span class="keyword">struct </span>lru_elem</div>
 <div class="line">{</div>
-<div class="line">    <a class="code hl_typedef" href="handle__hash__map_8h.html#a42c4d64e3bc464cbffa19bff2570bc5e">ccc_hhmap_elem</a> hash_elem;</div>
+<div class="line">    hhmap_elem hash_elem;</div>
 <div class="line">    dll_elem list_elem;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
@@ -723,7 +723,7 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line"><span class="keywordtype">void</span></div>
 <div class="line">lru_put(<span class="keyword">struct</span> lru_cache *<span class="keyword">const</span> lru, <span class="keywordtype">int</span> <span class="keyword">const</span> key, <span class="keywordtype">int</span> <span class="keyword">const</span> val)</div>
 <div class="line">{</div>
-<div class="line">    <a class="code hl_typedef" href="handle__hash__map_8h.html#afa704eacdada6f1862c6e8ffd3e5d4b4">ccc_hhmap_handle</a> *<span class="keyword">const</span> ent = handle_r(&amp;lru-&gt;hh, &amp;key);</div>
+<div class="line">    hhmap_handle *<span class="keyword">const</span> ent = handle_r(&amp;lru-&gt;hh, &amp;key);</div>
 <div class="line">    <span class="keywordflow">if</span> (occupied(ent))</div>
 <div class="line">    {</div>
 <div class="line">        <span class="keyword">struct </span>lru_elem *<span class="keyword">const</span> found = hhm_at(&amp;lru-&gt;hh, unwrap(ent));</div>
@@ -823,8 +823,6 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="ahandle__hash__map_8h_html"><div class="ttname"><a href="handle__hash__map_8h.html">handle_hash_map.h</a></div><div class="ttdoc">The Handle Hash Map Interface.</div></div>
-<div class="ttc" id="ahandle__hash__map_8h_html_a42c4d64e3bc464cbffa19bff2570bc5e"><div class="ttname"><a href="handle__hash__map_8h.html#a42c4d64e3bc464cbffa19bff2570bc5e">ccc_hhmap_elem</a></div><div class="ttdeci">struct ccc_hhmap_elem_ ccc_hhmap_elem</div><div class="ttdoc">An intrusive element for a user provided type.</div><div class="ttdef"><b>Definition:</b> handle_hash_map.h:68</div></div>
-<div class="ttc" id="ahandle__hash__map_8h_html_afa704eacdada6f1862c6e8ffd3e5d4b4"><div class="ttname"><a href="handle__hash__map_8h.html#afa704eacdada6f1862c6e8ffd3e5d4b4">ccc_hhmap_handle</a></div><div class="ttdeci">union ccc_hhmap_handle_ ccc_hhmap_handle</div><div class="ttdoc">A container specific handle used to implement the Handle Interface.</div><div class="ttdef"><b>Definition:</b> handle_hash_map.h:74</div></div>
 <div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:115</div></div>
 <div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a></div><div class="ttdeci">@ CCC_OK</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
 <div class="ttc" id="atypes_8h_html_a3802af9257ee4d2f9df5409bae63f0a7"><div class="ttname"><a href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a></div><div class="ttdeci">union ccc_handle_ ccc_handle</div><div class="ttdoc">An Occupied or Vacant handle to a flat searchable container entry.</div><div class="ttdef"><b>Definition:</b> types.h:67</div></div>
