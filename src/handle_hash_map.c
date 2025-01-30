@@ -146,7 +146,7 @@ static size_t next_prime(size_t n);
 static void copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
                          void const *user_src);
 static void bubble_down(struct ccc_hhmap_ *h, size_t i, size_t slots);
-static void sort_slots(struct ccc_hhmap_ *, size_t slots);
+static void heapify_slots(struct ccc_hhmap_ *, size_t slots);
 static void pop_slot(struct ccc_hhmap_ *, size_t slots);
 
 /*=========================   Interface    ==================================*/
@@ -1067,12 +1067,12 @@ maybe_resize(struct ccc_hhmap_ *const h)
         elem_at(h, allocated_slots)->slot_i_ = e->slot_i_;
         ++allocated_slots;
     }
-    /* We will use an in place O(n) heapify to tell us where the free slot runs
+    /* We will use an in place O(N) heapify to tell us where the free slot runs
        are between allocated slots. Consider what happens if we have N sorted
        integers each representing an occupied slot. Every integer starting at 0
        between these sorted integers represents a free slot that can be given to
        an empty slot in need in the new table. */
-    sort_slots(h, allocated_slots);
+    heapify_slots(h, allocated_slots);
     for (size_t slot = 0, free_slot = 0;
          slot < ccc_buf_capacity(&new_hash.buf_); ++slot)
     {
@@ -1084,12 +1084,16 @@ maybe_resize(struct ccc_hhmap_ *const h)
         /* Continually pop from the heap until the free slot finds a gap
            between occupied slots or there are no longer taken slots.
            The taken slots will naturally run out because the new capacity
-           is greater than the old. This is the worst part, an O(lgN)
-           operation in the resizing scheme. */
+           is greater than the old. This is an O(lgN) operation in the resizing
+           scheme. Nested loop but not O(N^2) because we are progressing through
+           free and allocated slot numbers linearly and will not revisit a
+           number after it is passed as we visit each slot in the larger table.
+           Each visited table slot, allocated heap slot, and free slot
+           distribution progress together linearly, so O(NlgN). */
         while (allocated_slots && free_slot == elem_at(h, 0)->slot_i_)
         {
-            ++free_slot;
             pop_slot(h, allocated_slots);
+            ++free_slot;
             --allocated_slots;
         }
         e->slot_i_ = free_slot;
@@ -1105,7 +1109,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
 }
 
 static inline void
-sort_slots(struct ccc_hhmap_ *const h, size_t const slots)
+heapify_slots(struct ccc_hhmap_ *const h, size_t const slots)
 {
     if (!slots)
     {

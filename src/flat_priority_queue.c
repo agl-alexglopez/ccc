@@ -52,13 +52,8 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
             return resize_res;
         }
     }
-    (void)ccc_buf_size_set(&fpq->buf_, n);
     (void)memcpy(ccc_buf_begin(&fpq->buf_), array, n * input_elem_size);
-    void *const tmp = ccc_buf_at(&fpq->buf_, n);
-    for (size_t i = (n / 2) + 1; i--;)
-    {
-        (void)bubble_down(fpq, tmp, i);
-    }
+    inplace_heapify(fpq, n);
     return CCC_OK;
 }
 

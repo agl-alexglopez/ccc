@@ -18,42 +18,40 @@ enum : uint64_t
     CCC_HHM_EMPTY = 0,
 };
 
-/** @private To offer handle "stability," similar to pointer stability except
-with indices rather than pointers, we will run the robin hood hash table
-algorithm with backshift deletions on only the metadata field of the intrusive
-element. The metadata will be swapped across user entries in the table while
-the user meta index tracking stays in the same slot with arbitrary sized user
-data. Both the meta and user fields will need to point to each other so that
-each can be updated on swaps, back shifts, deletions, and insertions. The home
-slot in the table never changes for a metadata entry. However, the metadata
-tracking must be updated every time a back shift or swap occurs. */
+/** @private With only a single additional field compared to the standard flat
+hash map we offer handle stability; handle stability is like pointer stability
+but for an index in a table rather than a pointer in a heap. User data will not
+move from its index regardless of other insertions, deletions, or resizing of
+the table. Cache the full hash for efficient resizing, Robin Hood distance
+calculations, and less reliance on user callbacks. Point back to the home slot
+where the user data is. Because this is an intrusive element we will run Robin
+Hood on just these intrusive metadata entries in the table and leave user data
+where it is. These structs are swapped or backshifted while user data remains
+untouched. */
 struct ccc_hhmap_elem_
 {
-    /* The struct that swaps during the robin hood algo. Caching the full hash
-       here to avoid using pointer to user data for full comparison callback. */
-    /* The full hash of the user data. Reduces callbacks and rehashing. */
+    /** Hash cached for distance, resizing, and callback avoidance. */
     uint64_t hash_;
-    /* Index of the permanent home of the data associated with this hash.
-       Does not change once initialized even when an element is removed. */
+    /** User data remains here until deleted. Callback compare needs this. */
     size_t slot_i_;
 };
 
 /** @private */
 struct ccc_hhmap_
 {
-    ccc_buffer buf_;          /* Buffer of types with size, cap, and aux. */
-    ccc_hash_fn *hash_fn_;    /* Hashing callback. */
-    ccc_key_eq_fn *eq_fn_;    /* Equality callback. */
-    size_t key_offset_;       /* Key in user defined type offset. */
-    size_t hash_elem_offset_; /* Intrusive element offset. */
+    ccc_buffer buf_;          /** Buffer of types with size, cap, and aux. */
+    ccc_hash_fn *hash_fn_;    /** Hashing callback. */
+    ccc_key_eq_fn *eq_fn_;    /** Equality callback. */
+    size_t key_offset_;       /** Key in user defined type offset. */
+    size_t hash_elem_offset_; /** Intrusive element offset. */
 };
 
 /** @private */
 struct ccc_hhash_handle_
 {
-    struct ccc_hhmap_ *h_;
-    uint64_t hash_;
-    struct ccc_handl_ handle_;
+    struct ccc_hhmap_ *h_;     /** Map so no second fn arg needed. */
+    uint64_t hash_;            /** Specific hash for this element. */
+    struct ccc_handl_ handle_; /** Index and a status. */
 };
 
 /** @private */
@@ -110,7 +108,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
-/** @private Internal helper assumes that swap_entry has already been evaluated
+/** @private Internal helper assumes that handle has already been evaluated
 once which it must have to make it to this point. */
 #define ccc_impl_hhm_swaps(swap_handle, lazy_key_value...)                     \
     (__extension__({                                                           \
