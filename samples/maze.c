@@ -1,10 +1,10 @@
 /* Author: Alexander Lopez
 This file provides a simple maze builder that implements Prim's algorithm
 to randomly generate a maze. I chose this algorithm because it can use
-both an ordered and a priority queue to achieve its purpose. Such data
-structures are provided by the library offering a perfect sample program
-opportunity. Also there are some interesting ways to combine allocating and
-non-allocating interfaces. Adding more mazes could be fun.
+both a map and a priority queue to achieve its purpose. Such data structures are
+provided by the library offering a perfect sample program opportunity. Also
+there are some interesting ways to combine allocating and non-allocating
+interfaces. Adding more mazes could be fun.
 
 Maze Builder:
 Builds a Perfect Maze with Prim's Algorithm to demonstrate usage of the priority
@@ -28,8 +28,8 @@ Example:
 #define TYPES_USING_NAMESPACE_CCC
 #define BUFFER_USING_NAMESPACE_CCC
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-#define ORDERED_MAP_USING_NAMESPACE_CCC
-#include "ccc/ordered_map.h"
+#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
+#include "ccc/handle_hash_map.h"
 #include "ccc/priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
@@ -69,25 +69,14 @@ struct maze
 
 /** The intrusive style lets us bundle all the necessary components for a
 problem together. Instead of two containers using a non contiguous heap in
-their own ways, we are able to put these prim cells in a contiguous bump arena
-and have access to the map and priority queue. */
+their own ways, we are able to put these prim cells in a single array and have
+access to the map and priority queue. */
 struct prim_cell
 {
-    omap_elem map_elem;
+    hhmap_elem map_elem;
     pq_elem pq_elem;
     struct point cell;
     int cost;
-};
-
-/** Rather than ask the heap for nodes as a memory managing container would do
-we will ask the heap for one slab/arena and force the containers to use this
-as the allocator. Then, the memory allocation part of the problem becomes O(1)
-optimal. There is only one malloc and one free for the entire program. */
-struct prim_cell_arena
-{
-    struct prim_cell *arena;
-    size_t next_free;
-    size_t capacity;
 };
 
 /*======================   Maze Constants   =================================*/
@@ -150,9 +139,10 @@ static bool can_build_new_square(struct maze const *, int r, int c);
 static void help(void);
 static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_priority_cells(cmp);
-static threeway_cmp cmp_priority_pos(key_cmp);
 static struct int_conversion parse_digits(str_view);
-static void *arena_bump_alloc(void *ptr, size_t size, void *arena);
+static bool prim_cell_eq(ccc_key_cmp);
+static uint64_t point_hash_fn(ccc_user_key);
+static uint64_t hash_64_bits(uint64_t);
 
 /*======================  Main Arg Handling  ===============================*/
 
@@ -230,15 +220,12 @@ main(int argc, char **argv)
 
 /*======================      Maze Animation      ===========================*/
 
-/* This function aims to demonstrate how to compose various containers when
-   taking advantage of the flexible allocating or non-allocating options.
-   There are better ways to run Prim's algorithm, but this is just to show
-   how we can tailor allocations to the scope of this function by combining
-   a priority queue that does not allocate, with a map uses an arena allocator.
-   In fact, the composition allows us to present the arena as if it is an
-   allocator to the map; all the while we benefit from one contiguous arena
-   of our data type. The priority queue and map also share the same memory
-   as intrusive struct fields, further simplifying locality of reference. */
+/* This problem needs both a map and a priority queue. So, we compose them
+   together in the same struct. The handle hash map promises handle stability
+   and if we allocate the entire capacity for the map ahead of time and do not
+   allow resizing this equates to the pointer stability the priority queue
+   elements need. Then we have tightly coupled data in the same location for
+   the two data structures running this algorithm. */
 static void
 animate_maze(struct maze *maze)
 {
@@ -246,40 +233,31 @@ animate_maze(struct maze *maze)
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
 
-    /* The arena holds enough space for use to bump all cells into it,
-       eliminating the need for a non-contiguous allocator. In this type of
-       maze only odd squares can be paths, which is what we are building here
-       so that is half of the squares. */
     size_t const cap = (((size_t)maze->rows * maze->cols) / 2) + 1;
     size_t bytes = cap * sizeof(struct prim_cell);
-    /* Calling malloc like this is kind of nice to get rid of a dangling ref
-       but we need to have some kind of sanity check. */
-    struct prim_cell_arena bump_arena
-        = {.arena = malloc(bytes), .next_free = 0, .capacity = cap};
-    assert(bump_arena.arena != NULL);
-    /* Priority queue elements will not participate in allocation. They piggy
-       back on the ordered map memory because the relationship is 1-to-1. */
+    /* The priority queue will have its elements in the slots of the hash map
+       for each prim cell. No allocation permission so pushing and popping is
+       harmless to any other data structures or fields of the struct. */
     priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES, NULL,
                                    cmp_priority_cells, NULL);
-    /* The ordered map uses a wrapper around the bump allocator as its backing
-       store making allocation speed optimal for the given problem. We use the
-       ordered map because it offers pointer stability which the priority queue
-       elements will need. A hash map does not offer pointer stability. */
-    ordered_map costs
-        = om_init(costs, struct prim_cell, map_elem, cell, arena_bump_alloc,
-                  cmp_priority_pos, &bump_arena);
+    /* Encapsulating malloc like this is OK. We just need a quick sanity check
+       of some sort after. No allocation permission is given to the map so it
+       cannot resize which would invalidate the priority queue. */
+    handle_hash_map costs
+        = hhm_init((struct prim_cell *)malloc(bytes), cap, map_elem, cell, NULL,
+                   point_hash_fn, prim_cell_eq, NULL);
+    assert(hhm_data(&costs) != NULL);
     struct point s = rand_point(maze);
-    struct prim_cell *const first = om_insert_entry_w(
-        entry_r(&costs, &s),
+    ccc_handle_i first = hhm_insert_handle_w(
+        handle_r(&costs, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
     assert(first);
-    (void)push(&cells, &first->pq_elem);
-    assert(bump_arena.next_free == 1);
+    (void)push(&cells, &hhm_as(&costs, struct prim_cell, first)->pq_elem);
     while (!is_empty(&cells))
     {
         struct prim_cell const *const c = front(&cells);
         *maze_at_r(maze, c->cell.r, c->cell.c) |= cached_bit;
-        struct prim_cell *min_cell = NULL;
+        ccc_handle_i min_handle = 0;
         int min = INT_MAX;
         for (size_t i = 0; i < dir_offsets_size; ++i)
         {
@@ -287,24 +265,26 @@ animate_maze(struct maze *maze)
                                     .c = c->cell.c + dir_offsets[i].c};
             if (can_build_new_square(maze, n.r, n.c))
             {
-                /* The Entry Interface helps make what would be an if else
-                   branch a simple lazily evaluated insertion. If the entry is
+                /* The Handle Interface helps make what would be an if else
+                   branch a simple lazily evaluated insertion. If the handle is
                    Occupied rand_range is never called. This technique also
                    means cells can be given weights lazily as we go rather than
                    all at once before the main algorithm starts. */
-                struct prim_cell *const cell = om_or_insert_w(
-                    entry_r(&costs, &n),
+                ccc_handle_i h = hhm_or_insert_w(
+                    handle_r(&costs, &n),
                     (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
-                assert(cell);
+                assert(h);
+                struct prim_cell *const cell = hhm_at(&costs, h);
                 if (cell->cost < min)
                 {
                     min = cell->cost;
-                    min_cell = cell;
+                    min_handle = h;
                 }
             }
         }
-        if (min_cell)
+        if (min_handle)
         {
+            struct prim_cell *const min_cell = hhm_at(&costs, min_handle);
             join_squares_animated(maze, c->cell, min_cell->cell, speed);
             (void)push(&cells, &min_cell->pq_elem);
         }
@@ -313,31 +293,35 @@ animate_maze(struct maze *maze)
             (void)pop(&cells);
         }
     }
-    /* Thanks to how the containers worked together there was only a single
-       allocation and free from the heap's perspective. */
-    free(bump_arena.arena);
+    free(hhm_data(&costs));
 }
 
 /*===================     Container Support Code     ========================*/
 
-static void *
-arena_bump_alloc(void *const ptr, size_t const size, void *const prim_arena)
+static bool
+prim_cell_eq(ccc_key_cmp const c)
 {
-    if (!ptr && !size)
-    {
-        return NULL;
-    }
-    if (!ptr)
-    {
-        struct prim_cell_arena *const a = prim_arena;
-        if (a->next_free >= a->capacity)
-        {
-            return NULL;
-        }
-        return &a->arena[a->next_free++];
-    }
-    assert(!"You can't free nodes in a bump arena allocator!");
-    return NULL;
+    struct point const *const lhs = c.key_lhs;
+    struct prim_cell const *const rhs = c.user_type_rhs;
+    return lhs->r == rhs->cell.r && lhs->c == rhs->cell.c;
+}
+
+static uint64_t
+point_hash_fn(ccc_user_key const k)
+{
+    struct point const *const p = k.user_key;
+    uint64_t const wr = p->r;
+    static_assert(sizeof((struct point){}.r) * CHAR_BIT == 32);
+    return hash_64_bits((wr << 31) | p->c);
+}
+
+static inline uint64_t
+hash_64_bits(uint64_t x)
+{
+    x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
+    x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
+    x = x ^ (x >> 31);
+    return x;
 }
 
 static threeway_cmp
@@ -346,22 +330,6 @@ cmp_priority_cells(cmp const cmp_cells)
     struct prim_cell const *const lhs = cmp_cells.user_type_lhs;
     struct prim_cell const *const rhs = cmp_cells.user_type_rhs;
     return (lhs->cost > rhs->cost) - (lhs->cost < rhs->cost);
-}
-
-static threeway_cmp
-cmp_priority_pos(key_cmp const cmp_points)
-{
-    struct point const *const key_lhs = cmp_points.key_lhs;
-    struct prim_cell const *const a_rhs = cmp_points.user_type_rhs;
-    if (a_rhs->cell.r == key_lhs->r && a_rhs->cell.c == key_lhs->c)
-    {
-        return CCC_EQL;
-    }
-    if (a_rhs->cell.r == key_lhs->r)
-    {
-        return (key_lhs->c > a_rhs->cell.c) - (key_lhs->c < a_rhs->cell.c);
-    }
-    return (key_lhs->r > a_rhs->cell.r) - (key_lhs->r < a_rhs->cell.r);
 }
 
 /*=========================   Maze Support Code   ===========================*/

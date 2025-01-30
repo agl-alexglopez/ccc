@@ -10,6 +10,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 enum : uint64_t
 {
@@ -81,16 +83,7 @@ union ccc_hhmap_ref_
 
 /** @private */
 #define ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle...)             \
-    (__extension__({                                                           \
-        struct ccc_hhmap_ const *const hhm_ptr_ = (handle_hash_map_ptr);       \
-        typeof(type_name) *hhm_as_ = NULL;                                     \
-        ccc_handle_i const hhm_handle_ = (handle);                             \
-        if (hhm_ptr_ && hhm_handle_)                                           \
-        {                                                                      \
-            hhm_as_ = ccc_buf_at(&hhm_ptr_->buf_, hhm_handle_);                \
-        }                                                                      \
-        hhm_as_;                                                               \
-    }))
+    ((type_name *)ccc_buf_at(&(handle_hash_map_ptr)->buf_, (handle)))
 
 struct ccc_handl_ ccc_impl_hhm_find(struct ccc_hhmap_ const *, void const *key,
                                     uint64_t hash);
@@ -114,7 +107,6 @@ void ccc_impl_hhm_copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
                                void const *slot_src);
 struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                                              size_t i);
-/* NOLINTBEGIN(readability-identifier-naming) */
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
