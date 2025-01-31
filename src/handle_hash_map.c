@@ -813,6 +813,12 @@ handle(struct ccc_hhmap_ *const h, void const *const key, uint64_t const hash)
     return res;
 }
 
+/* Finds and returns a handle to the metadata (NOT the home slot with user data)
+   for the specified query. If the data cannot be found the slot at which the
+   data SHOULD have its metadata inserted is returned. This could be an empty
+   slot or a slot with an element that is already using it. In the second case
+   this is where Robin Hood would start swapping should we choose to follow
+   through with an insert. Metadata slots point to the backing storage slot. */
 static inline struct ccc_handl_
 find(struct ccc_hhmap_ const *const h, void const *const key,
      uint64_t const hash)
@@ -895,7 +901,8 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
 
 /* Backshift deletion is important in for this table because it may not be able
    to allocate. This prevents the need for tombstones which would hurt table
-   quality quickly if we can't resize. */
+   quality quickly if we can't resize. Only metadata is moved. User data remains
+   in the same slot for handle stability. */
 static void
 erase_meta(struct ccc_hhmap_ *const h, size_t e)
 {
@@ -942,6 +949,11 @@ and_modify(struct ccc_hhash_handle_ *const e, ccc_update_fn *const fn)
     return e;
 }
 
+/* A simple memcpy will not work for this table because important metadata for
+   a user slot elsewhere could be occupying this slot. Because only metadata
+   is swapped and moved during Robin Hood, metadata and the user data in a slot
+   may be completely unrelated. The intrusive element we are using could also
+   be anywhere in the provided user struct so we need careful copy. */
 static inline void
 copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
              void const *const user_src)
