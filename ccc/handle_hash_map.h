@@ -10,8 +10,9 @@ occur. This comes at a slight space and implementation complexity cost when
 compared to the standard flat hash map offered in the collection, especially
 during resizing operations. However, it is more beneficial for large structs and
 fixed table sizes to use this version. The benefits are that when the handles
-exposed in the interface are saved by the user they offer the same guarantees as
-pointer stability except with the benefits of tightly grouped data in one array.
+exposed in the interface are saved by the user they offer the similar guarantees
+as pointer stability except with the benefits of tightly grouped data in one
+array accessed via index.
 
 For containers in this collection the user may have a variety of memory sources
 backing the containers. This container aims to be an equivalent stand in for
@@ -22,7 +23,9 @@ same location, this container will ensure any inserted element remains at the
 same index in the table allowing complex container compositions and any
 underlying source of memory specified at compile time or runtime. This container
 therefore exposes an interface that mainly returns stable handle indices and
-these should be what the user stores and accesses when needed.
+these should be what the user stores and accesses when needed. Only expose the
+underlying pointer to data with the provided access function when needed and
+store the handle for all other purposes.
 
 A handle hash map requires the user to provide a struct with known key and
 handle hash element fields as well as a hash function and key comparator
@@ -204,7 +207,7 @@ Test membership or obtain references to stored user types directly. */
 @param [in] i the stable handle obtained by the user.
 @return a pointer to the user type stored at the specified handle or NULL if
 an out of range handle or handle representing no data is provided.
-@warning this function can only check if the handle at the handle is valid. If a
+@warning this function can only check if the handle value is in range. If a
 handle represents a slot that has been taken by a new element because the old
 one has been removed that new element data will be returned.
 @warning do not try to access data in the table manually with a handle. Always
@@ -237,7 +240,10 @@ stored in the map. */
 
 /** @name Handle Interface
 Obtain and operate on container entries for efficient queries when non-trivial
-control flow is needed. */
+control flow is needed. A handle is a stable index to data in the table. For
+the handle hash map a valid handle will always be non-zero. This allows for
+the user to rely on truthy/falsey logic if needed: this is similar to valid
+pointers vs the NULL pointer. */
 /**@{*/
 
 /** @brief Invariantly inserts the key value wrapping out_handle.
@@ -643,7 +649,7 @@ not obvious to the user, nor should any specific order be relied on. */
 or an error if iter is NULL.
 @warning erasing or inserting during iteration may result in repeating or
 unexpected iteration orders, but the index remains valid for the table. */
-[[nodiscard]] ccc_result ccc_hhm_next(ccc_hhmap_handle *iter);
+ccc_result ccc_hhm_next(ccc_hhmap_handle *iter);
 
 /** @brief Check if the current handle iterator has reached the end.
 @param [in] iter a pointer to the current handle iterator.
