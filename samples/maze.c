@@ -26,7 +26,6 @@ Example:
 
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#define BUFFER_USING_NAMESPACE_CCC
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
 #include "ccc/handle_hash_map.h"
@@ -140,8 +139,8 @@ static void help(void);
 static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_priority_cells(cmp);
 static struct int_conversion parse_digits(str_view);
-static bool prim_cell_eq(ccc_key_cmp);
-static uint64_t point_hash_fn(ccc_user_key);
+static bool prim_cell_eq(key_cmp);
+static uint64_t point_hash_fn(user_key);
 static uint64_t hash_64_bits(uint64_t);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -249,7 +248,7 @@ animate_maze(struct maze *maze)
                    point_hash_fn, prim_cell_eq, NULL);
     assert(hhm_data(&costs) != NULL);
     struct point s = rand_point(maze);
-    ccc_handle_i first = hhm_insert_handle_w(
+    handle_i first = hhm_insert_handle_w(
         handle_r(&costs, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
     assert(first);
@@ -258,7 +257,7 @@ animate_maze(struct maze *maze)
     {
         struct prim_cell const *const c = front(&cells);
         *maze_at_r(maze, c->cell.r, c->cell.c) |= cached_bit;
-        ccc_handle_i min_handle = 0;
+        handle_i min_handle = 0;
         int min = INT_MAX;
         for (size_t i = 0; i < dir_offsets_size; ++i)
         {
@@ -271,7 +270,7 @@ animate_maze(struct maze *maze)
                    Occupied rand_range is never called. This technique also
                    means cells can be given weights lazily as we go rather than
                    all at once before the main algorithm starts. */
-                ccc_handle_i h = hhm_or_insert_w(
+                handle_i h = hhm_or_insert_w(
                     handle_r(&costs, &n),
                     (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
                 assert(h);
@@ -300,7 +299,7 @@ animate_maze(struct maze *maze)
 /*===================     Container Support Code     ========================*/
 
 static bool
-prim_cell_eq(ccc_key_cmp const c)
+prim_cell_eq(key_cmp const c)
 {
     struct point const *const lhs = c.key_lhs;
     struct prim_cell const *const rhs = c.user_type_rhs;
@@ -308,7 +307,7 @@ prim_cell_eq(ccc_key_cmp const c)
 }
 
 static uint64_t
-point_hash_fn(ccc_user_key const k)
+point_hash_fn(user_key const k)
 {
     struct point const *const p = k.user_key;
     uint64_t const wr = p->r;
