@@ -20,9 +20,9 @@ been some major adjustments and simplifications. Namely, the allocation has
 been adjusted to accommodate this library's ability to be an allocating or
 non-allocating container. All left-right symmetric cases have been united
 into one and I chose to tackle rotations and deletions slightly differently,
-shortening the code significantly. Finally, a few other changes and
-improvements suggested by the authors of the original paper are implemented. See
-the required license at the bottom of the file for BSD-2-Clause compliance.
+shortening the code significantly. A few other changes and improvements
+suggested by the authors of the original paper are implemented. See the required
+license at the bottom of the file for BSD-2-Clause compliance.
 
 Overall a WAVL tree is quite impressive for it's simplicity and purported
 improvements over AVL and Red-Black trees. The rank framework is intuitive
