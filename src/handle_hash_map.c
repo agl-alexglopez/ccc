@@ -992,7 +992,11 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
    the new table. Resizing should occur relatively infrequently, and I deem this
    an acceptable trade off for the complete handle stability this offers for
    now, but we can try to improve this in the future. I'm sure there is a
-   better way. */
+   better way.
+
+   We could be faster if we ran a free list with extra fields in intrusive
+   elems, but it would cost one or two fields just to optimize ideally
+   infrequent operations of resizing. That space cost would be too high. */
 static inline ccc_result
 maybe_resize(struct ccc_hhmap_ *const h)
 {
