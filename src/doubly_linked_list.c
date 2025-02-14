@@ -112,7 +112,10 @@ ccc_dll_pop_back(ccc_doubly_linked_list *const l)
     struct ccc_dll_elem_ *remove = l->sentinel_.p_;
     remove->p_->n_ = &l->sentinel_;
     l->sentinel_.p_ = remove->p_;
-    remove->n_ = remove->p_ = NULL;
+    if (remove != &l->sentinel_)
+    {
+        remove->n_ = remove->p_ = NULL;
+    }
     if (l->alloc_)
     {
         (void)l->alloc_(struct_base(l, remove), 0, l->aux_);
@@ -221,7 +224,10 @@ ccc_dll_extract(ccc_doubly_linked_list *const l,
     struct ccc_dll_elem_ const *const ret = elem_in_list->n_;
     elem_in_list->n_->p_ = elem_in_list->p_;
     elem_in_list->p_->n_ = elem_in_list->n_;
-    elem_in_list->n_ = elem_in_list->p_ = NULL;
+    if (elem_in_list != &l->sentinel_)
+    {
+        elem_in_list->n_ = elem_in_list->p_ = NULL;
+    }
     --l->sz_;
     return ret == &l->sentinel_ ? NULL : struct_base(l, ret);
 }
@@ -470,7 +476,10 @@ pop_front(struct ccc_dll_ *const dll)
     struct ccc_dll_elem_ *ret = dll->sentinel_.n_;
     dll->sentinel_.n_->p_ = &dll->sentinel_;
     dll->sentinel_.n_ = ret->n_;
-    ret->n_ = ret->p_ = NULL;
+    if (ret != &dll->sentinel_)
+    {
+        ret->n_ = ret->p_ = NULL;
+    }
     --dll->sz_;
     return ret;
 }
@@ -486,10 +495,15 @@ static inline size_t
 extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
               struct ccc_dll_elem_ *begin, struct ccc_dll_elem_ *const end)
 {
-    begin->p_ = NULL;
+    if (begin != &l->sentinel_)
+    {
+        begin->p_ = NULL;
+    }
     size_t sz = len(l, begin, end);
-    assert(end != &l->sentinel_);
-    end->n_ = NULL;
+    if (end != &l->sentinel_)
+    {
+        end->n_ = NULL;
+    }
     return sz;
 }
 
@@ -497,12 +511,17 @@ static inline size_t
 erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
             struct ccc_dll_elem_ *const end)
 {
-    begin->p_ = NULL;
+    if (begin != &l->sentinel_)
+    {
+        begin->p_ = NULL;
+    }
     if (!l->alloc_)
     {
         size_t const sz = len(l, begin, end);
-        assert(end != &l->sentinel_);
-        end->n_ = NULL;
+        if (end != &l->sentinel_)
+        {
+            end->n_ = NULL;
+        }
         return sz;
     }
     size_t sz = 1;
