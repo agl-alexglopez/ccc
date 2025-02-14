@@ -151,7 +151,10 @@ ccc_sll_erase(ccc_singly_linked_list *const sll, ccc_sll_elem *const elem)
     }
     struct ccc_sll_elem_ const *const ret = elem->n_;
     before(sll, elem)->n_ = elem->n_;
-    elem->n_ = NULL;
+    if (elem != &sll->sentinel_)
+    {
+        elem->n_ = NULL;
+    }
     if (sll->alloc_)
     {
         (void)sll->alloc_(struct_base(sll, elem), 0, sll->aux_);
@@ -186,7 +189,10 @@ ccc_sll_extract(ccc_singly_linked_list *const sll, ccc_sll_elem *const elem)
     }
     struct ccc_sll_elem_ const *const ret = elem->n_;
     before(sll, elem)->n_ = elem->n_;
-    elem->n_ = NULL;
+    if (elem != &sll->sentinel_)
+    {
+        elem->n_ = NULL;
+    }
     --sll->sz_;
     return ret == &sll->sentinel_ ? NULL : struct_base(sll, ret);
 }
@@ -312,7 +318,10 @@ pop_front(struct ccc_sll_ *const sll)
 {
     struct ccc_sll_elem_ *remove = sll->sentinel_.n_;
     sll->sentinel_.n_ = remove->n_;
-    remove->n_ = NULL;
+    if (remove != &sll->sentinel_)
+    {
+        remove->n_ = NULL;
+    }
     --sll->sz_;
     return remove;
 }
@@ -332,7 +341,10 @@ extract_range([[maybe_unused]] struct ccc_sll_ *const sll,
               struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
 {
     size_t const sz = len(sll, begin, end);
-    end->n_ = NULL;
+    if (end != &sll->sentinel_)
+    {
+        end->n_ = NULL;
+    }
     return sz;
 }
 
@@ -343,7 +355,10 @@ erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
     if (!sll->alloc_)
     {
         size_t const sz = len(sll, begin, end);
-        end->n_ = NULL;
+        if (end != &sll->sentinel_)
+        {
+            end->n_ = NULL;
+        }
         return sz;
     }
     size_t sz = 1;

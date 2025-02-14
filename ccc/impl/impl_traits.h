@@ -49,10 +49,43 @@
                                                         try_insert_args)
 
 #define ccc_impl_try_insert_r(container_ptr, try_insert_args...)               \
-    &(ccc_entry)                                                               \
-    {                                                                          \
-        ccc_impl_try_insert(container_ptr, try_insert_args).impl_              \
-    }
+    _Generic((container_ptr),                                                  \
+        ccc_flat_hash_map                                                      \
+            *: &(ccc_entry){ccc_fhm_try_insert(                                \
+                                (ccc_flat_hash_map *)container_ptr,            \
+                                (ccc_fhmap_elem *)try_insert_args)             \
+                                .impl_},                                       \
+        ccc_handle_hash_map                                                    \
+            *: &(ccc_handle){ccc_hhm_try_insert(                               \
+                                 (ccc_handle_hash_map *)container_ptr,         \
+                                 (ccc_hhmap_elem *)try_insert_args)            \
+                                 .impl_},                                      \
+        ccc_ordered_map                                                        \
+            *: &(                                                              \
+                ccc_entry){ccc_om_try_insert((ccc_ordered_map *)container_ptr, \
+                                             (ccc_omap_elem *)try_insert_args) \
+                               .impl_},                                        \
+        ccc_ordered_multimap                                                   \
+            *: &(ccc_entry){ccc_omm_try_insert(                                \
+                                (ccc_ordered_multimap *)container_ptr,         \
+                                (ccc_ommap_elem *)try_insert_args)             \
+                                .impl_},                                       \
+        ccc_flat_ordered_map                                                   \
+            *: &(ccc_entry){ccc_fom_try_insert(                                \
+                                (ccc_flat_ordered_map *)container_ptr,         \
+                                (ccc_fomap_elem *)try_insert_args)             \
+                                .impl_},                                       \
+        ccc_flat_realtime_ordered_map                                          \
+            *: &(                                                              \
+                ccc_entry){ccc_frm_try_insert(                                 \
+                               (ccc_flat_realtime_ordered_map *)container_ptr, \
+                               (ccc_fromap_elem *)try_insert_args)             \
+                               .impl_},                                        \
+        ccc_realtime_ordered_map                                               \
+            *: &(ccc_entry){                                                   \
+                ccc_rom_try_insert((ccc_realtime_ordered_map *)container_ptr,  \
+                                   (ccc_romap_elem *)try_insert_args)          \
+                    .impl_})
 
 #define ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args...)     \
     _Generic((container_ptr),                                                  \
