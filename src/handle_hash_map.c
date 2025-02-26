@@ -1012,21 +1012,21 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
 static inline ccc_result
 maybe_resize(struct ccc_hhmap_ *const h)
 {
-    if (ccc_buf_capacity(&h->buf_) && ccc_buf_size(&h->buf_) < num_swap_slots)
+    size_t const h_cap = ccc_buf_capacity(&h->buf_);
+    size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
+    if (h_cap && ccc_buf_size(&h->buf_) < num_swap_slots)
     {
 
-        for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
+        for (size_t i = 0; i < h_cap; ++i)
         {
-            (void)memset(ccc_buf_at(&h->buf_, i), 0,
-                         ccc_buf_elem_size(&h->buf_));
+            (void)memset(ccc_buf_at(&h->buf_, i), 0, elem_sz);
             struct ccc_hhmap_elem_ *const e = elem_at(h, i);
             e->slot_i_ = i;
         }
         (void)ccc_buf_size_set(&h->buf_, num_swap_slots);
     }
-    if (ccc_buf_capacity(&h->buf_)
-        && (double)(ccc_buf_size(&h->buf_)) / (double)ccc_buf_capacity(&h->buf_)
-               <= load_factor)
+    if (h_cap
+        && (double)(ccc_buf_size(&h->buf_)) / (double)h_cap <= load_factor)
     {
         return CCC_OK;
     }
@@ -1044,8 +1044,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
         return CCC_MEM_ERR;
     }
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
-        NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_,
-        h->buf_.aux_);
+        NULL, elem_sz * new_hash.buf_.capacity_, h->buf_.aux_);
     if (!new_hash.buf_.mem_)
     {
         return CCC_MEM_ERR;
@@ -1053,21 +1052,20 @@ maybe_resize(struct ccc_hhmap_ *const h)
     /* The handles shall be stable. Keep user data in the same slot. */
     if (h->buf_.mem_)
     {
-        (void)memcpy(new_hash.buf_.mem_, h->buf_.mem_,
-                     ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));
+        (void)memcpy(new_hash.buf_.mem_, h->buf_.mem_, h_cap * elem_sz);
     }
     /* Hash needs to start empty. Not sure if slot matters. */
-    for (size_t i = 0; i < ccc_buf_capacity(&new_hash.buf_); ++i)
+    for (size_t i = 0; i < new_hash.buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, i);
-        e->hash_ = 0;
+        e->hash_ = CCC_HHM_EMPTY;
         e->slot_i_ = i;
     }
     (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     /* Run Robin Hood on the hash but instead of copying data to the chosen
        slot, link to the existing data at the old handle. */
     size_t allocated_slots = 0;
-    for (size_t slot = 0; slot < ccc_buf_capacity(&h->buf_); ++slot)
+    for (size_t slot = 0; slot < h_cap; ++slot)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
         if (e->hash_ == CCC_HHM_EMPTY)
@@ -1089,8 +1087,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
        between these sorted integers represents a free slot that can be given to
        an empty slot in need in the new table. */
     heapify_slots(h, allocated_slots);
-    for (size_t slot = 0, free_slot = 0;
-         slot < ccc_buf_capacity(&new_hash.buf_); ++slot)
+    for (size_t slot = 0, free_slot = 0; slot < new_hash.buf_.capacity_; ++slot)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, slot);
         if (e->hash_ != CCC_HHM_EMPTY)
