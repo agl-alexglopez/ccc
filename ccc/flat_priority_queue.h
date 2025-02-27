@@ -55,8 +55,8 @@ operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
 Note that to avoid temporary or unpredictable allocation the fpq requires one
 slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
-#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
-    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
+#define ccc_fpq_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data, capacity) \
+    ccc_impl_fpq_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data, capacity)
 
 /** @brief Order an existing array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
