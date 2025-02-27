@@ -48,8 +48,8 @@ union ccc_fhmap_entry_
     struct ccc_fhash_entry_ impl_;
 };
 
-#define ccc_impl_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,   \
-                          alloc_fn, hash_fn, key_eq_fn, aux)                   \
+#define ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, alloc_fn,   \
+                          hash_fn, key_eq_fn, aux, capacity)                   \
     {                                                                          \
         .buf_                                                                  \
         = (ccc_buffer)ccc_buf_init((memory_ptr), (alloc_fn), (aux), capacity), \

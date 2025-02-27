@@ -413,8 +413,8 @@ static bool
 found_dst(struct graph *const graph, struct vertex *const src)
 {
     flat_hash_map parent_map
-        = fhm_init((struct path_backtrack_cell *)NULL, 0, elem, current,
-                   std_alloc, hash_parent_cells, eq_parent_cells, NULL);
+        = fhm_init((struct path_backtrack_cell *)NULL, elem, current, std_alloc,
+                   hash_parent_cells, eq_parent_cells, NULL, 0);
     flat_double_ended_queue bfs
         = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
     entry *e = fhm_insert_or_assign_w(

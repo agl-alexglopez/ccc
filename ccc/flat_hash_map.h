@@ -64,7 +64,6 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] memory_ptr the pointer to the backing buffer array of user types.
 May be NULL if the user provides a allocation function. The buffer will be
 interpreted in units of type size that the user intends to store.
-@param [in] capacity the starting capacity of the provided buffer or 0 if no
 buffer is provided and an allocation function is given.
 @param [in] fhash_elem_field the name of the fhmap_elem field.
 @param [in] key_field the field of the struct used for key storage.
@@ -73,12 +72,13 @@ resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
+@param [in] capacity the starting capacity of the provided buffer or 0 if no
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
-#define ccc_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,        \
-                     alloc_fn, hash_fn, key_eq_fn, aux_data)                   \
-    ccc_impl_fhm_init(memory_ptr, capacity, fhash_elem_field, key_field,       \
-                      alloc_fn, hash_fn, key_eq_fn, aux_data)
+#define ccc_fhm_init(memory_ptr, fhash_elem_field, key_field, alloc_fn,        \
+                     hash_fn, key_eq_fn, aux_data, capacity)                   \
+    ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, alloc_fn,       \
+                      hash_fn, key_eq_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
