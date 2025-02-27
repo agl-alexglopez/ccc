@@ -331,7 +331,7 @@ print_top_n(FILE *const f, int n)
        space approach to sorting may beat the slower pop operation but strict
        O(lgN) runtime for heap pop is pretty good. */
     flat_priority_queue fpq = fpq_heapify_init(
-        freqs.arr, freqs.cap, size(&map), CCC_GRT, std_alloc, cmp_freqs, &a);
+        freqs.arr, CCC_GRT, std_alloc, cmp_freqs, &a, freqs.cap, size(&map));
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
     {
@@ -353,7 +353,7 @@ print_last_n(FILE *const f, int n)
     struct frequency_alloc freqs = copy_frequencies(&map);
     PROG_ASSERT(freqs.cap);
     flat_priority_queue fpq = fpq_heapify_init(
-        freqs.arr, freqs.cap, size(&map), CCC_LES, std_alloc, cmp_freqs, &a);
+        freqs.arr, CCC_LES, std_alloc, cmp_freqs, &a, freqs.cap, size(&map));
     PROG_ASSERT(size(&fpq) == size(&map));
     if (!n)
     {

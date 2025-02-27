@@ -64,7 +64,7 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     struct val *copy_buf = malloc(sizeof(struct val) * (ccc_fpq_size(fpq) + 1));
     CHECK(copy_buf == NULL, false);
     ccc_flat_priority_queue fpq_copy = ccc_fpq_init(
-        copy_buf, ccc_fpq_size(fpq) + 1, CCC_LES, NULL, val_cmp, NULL);
+        copy_buf, CCC_LES, NULL, val_cmp, NULL, ccc_fpq_size(fpq) + 1);
     while (!ccc_fpq_is_empty(fpq) && i < size)
     {
         struct val *const front = front(fpq);
