@@ -3,7 +3,7 @@ var handle__hash__map_8h =
     [ "ccc_hhm_and_modify_w", "handle__hash__map_8h.html#a0a6f10e3f241a9194a688ad6c4e5bc89", null ],
     [ "ccc_hhm_as", "handle__hash__map_8h.html#a0cf2374e80d0919551b45d172f9f6a6f", null ],
     [ "ccc_hhm_handle_r", "handle__hash__map_8h.html#a873b0cce8cba4b257558cb0c1a9e6403", null ],
-    [ "ccc_hhm_init", "handle__hash__map_8h.html#aabd500778aaed9f422bcadd46c91097f", null ],
+    [ "ccc_hhm_init", "handle__hash__map_8h.html#abb335cd1387ba74f9dcaeec52ac2d524", null ],
     [ "ccc_hhm_insert_handle_w", "handle__hash__map_8h.html#a31b37fa085ccc5d4ba7ffa87ff03422f", null ],
     [ "ccc_hhm_insert_or_assign_r", "handle__hash__map_8h.html#a96bb8759d32ffc1074f6b18f01dcb1cb", null ],
     [ "ccc_hhm_insert_or_assign_w", "handle__hash__map_8h.html#af7999fd5b09a212593b97ceee5d3e40d", null ],

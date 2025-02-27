@@ -125,9 +125,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a50ff4422f52bc1a5c2c926dc88a01e3e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">ccc_dll_init</a>(list_name,  struct_name,  list_elem_field,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:a50ff4422f52bc1a5c2c926dc88a01e3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a doubly linked list with its l-value name, type containing the dll elems, the field of the dll elem, allocation function, compare function and any auxilliary data needed for comparison, printing, or destructors.  <br /></td></tr>
-<tr class="separator:a50ff4422f52bc1a5c2c926dc88a01e3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3feb131e732c936d5090258b08fe308f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a3feb131e732c936d5090258b08fe308f">ccc_dll_init</a>(list_name,  struct_name,  list_elem_field,  cmp_fn,  alloc_fn,  aux_data)</td></tr>
+<tr class="memdesc:a3feb131e732c936d5090258b08fe308f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a doubly linked list with its l-value name, type containing the dll elems, the field of the dll elem, allocation function, compare function and any auxilliary data needed for comparison, printing, or destructors.  <br /></td></tr>
+<tr class="separator:a3feb131e732c936d5090258b08fe308f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Add or remove elements from the doubly linked list. </p>
@@ -325,8 +325,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a50ff4422f52bc1a5c2c926dc88a01e3e" name="a50ff4422f52bc1a5c2c926dc88a01e3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50ff4422f52bc1a5c2c926dc88a01e3e">&#9670;&#160;</a></span>ccc_dll_init</h2>
+<a id="a3feb131e732c936d5090258b08fe308f" name="a3feb131e732c936d5090258b08fe308f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3feb131e732c936d5090258b08fe308f">&#9670;&#160;</a></span>ccc_dll_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -353,13 +353,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">cmp_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">cmp_fn, </td>
+          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -374,8 +374,8 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \</div>
-<div class="line">                      cmp_fn, aux_data)</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_dll_init(list_name, struct_name, list_elem_field, cmp_fn,         \</div>
+<div class="line">                      alloc_fn, aux_data)</div>
 </div><!-- fragment -->
 <p>Initialize a doubly linked list with its l-value name, type containing the dll elems, the field of the dll elem, allocation function, compare function and any auxilliary data needed for comparison, printing, or destructors. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -383,13 +383,13 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">list_name</td><td>the name of the list being initialized. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the type containing the intrusive dll element. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">list_elem_field</td><td>name of the dll element in the containing type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the optional allocation function or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the ccc_cmp_fn used to compare list elements. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxilliary data that will be needed for comparison, printing, or destruction of elements. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the optional allocation function or NULL. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized list. Assign to the list directly on the right hand side of an equality operator. Initialization can occur at runtime or compile time (e.g. ccc_doubly_linked l = <a class="el" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e" title="Initialize a doubly linked list with its l-value name, type containing the dll elems,...">ccc_dll_init(...)</a>;). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized list. Assign to the list directly on the right hand side of an equality operator. Initialization can occur at runtime or compile time (e.g. ccc_doubly_linked l = <a class="el" href="doubly__linked__list_8h.html#a3feb131e732c936d5090258b08fe308f" title="Initialize a doubly linked list with its l-value name, type containing the dll elems,...">ccc_dll_init(...)</a>;). </dd></dl>
 
 </div>
 </div>

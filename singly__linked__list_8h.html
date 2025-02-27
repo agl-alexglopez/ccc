@@ -125,9 +125,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a76fa7a679858852029b6ac191b9868b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a76fa7a679858852029b6ac191b9868b4">ccc_sll_init</a>(list_name,  struct_name,  list_elem_field,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:a76fa7a679858852029b6ac191b9868b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a singly linked list at compile or runtime.  <br /></td></tr>
-<tr class="separator:a76fa7a679858852029b6ac191b9868b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8174fe3f20bc2352f7b7eff866f6fd96"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a8174fe3f20bc2352f7b7eff866f6fd96">ccc_sll_init</a>(list_name,  struct_name,  list_elem_field,  cmp_fn,  alloc_fn,  aux_data)</td></tr>
+<tr class="memdesc:a8174fe3f20bc2352f7b7eff866f6fd96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a singly linked list at compile or runtime.  <br /></td></tr>
+<tr class="separator:a8174fe3f20bc2352f7b7eff866f6fd96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Add or remove elements from the container. </p>
@@ -259,8 +259,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a76fa7a679858852029b6ac191b9868b4" name="a76fa7a679858852029b6ac191b9868b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76fa7a679858852029b6ac191b9868b4">&#9670;&#160;</a></span>ccc_sll_init</h2>
+<a id="a8174fe3f20bc2352f7b7eff866f6fd96" name="a8174fe3f20bc2352f7b7eff866f6fd96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8174fe3f20bc2352f7b7eff866f6fd96">&#9670;&#160;</a></span>ccc_sll_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -287,13 +287,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">cmp_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">cmp_fn, </td>
+          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -308,8 +308,8 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_sll_init(list_name, struct_name, list_elem_field, alloc_fn,       \</div>
-<div class="line">                      cmp_fn, aux_data)</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_sll_init(list_name, struct_name, list_elem_field, cmp_fn,         \</div>
+<div class="line">                      alloc_fn, aux_data)</div>
 </div><!-- fragment -->
 <p>Initialize a singly linked list at compile or runtime. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -317,13 +317,13 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">list_name</td><td>the name the user has chosen for the list. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the user type wrapping the intrusive sll elem. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">list_elem_field</td><td>the name of the field in the user type storing the intrusive list elem. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>an allocation function if allocation is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>a comparison function for searching or sorting the list. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>an allocation function if allocation is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>a pointer to any auxiliary data needed for comparison or destruction. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a stuct initializer for the singly linked list to be assigned (e.g. ccc_singly_linked_list l = <a class="el" href="singly__linked__list_8h.html#a76fa7a679858852029b6ac191b9868b4" title="Initialize a singly linked list at compile or runtime.">ccc_sll_init(...)</a>;). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a stuct initializer for the singly linked list to be assigned (e.g. ccc_singly_linked_list l = <a class="el" href="singly__linked__list_8h.html#a8174fe3f20bc2352f7b7eff866f6fd96" title="Initialize a singly linked list at compile or runtime.">ccc_sll_init(...)</a>;). </dd></dl>
 
 </div>
 </div>

@@ -116,8 +116,8 @@ $(document).ready(function(){initNavTree('impl__singly__linked__list_8h_source.h
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">void</span> *aux_;</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>};</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, alloc_fn,     \</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">                          cmp_fn, aux_data)                                    \</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, cmp_fn,       \</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">                          alloc_fn, aux_data)                                  \</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">    {                                                                          \</span></div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">        .sentinel_.n_ = &amp;(sll_name).sentinel_,                                 \</span></div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">        .elem_sz_ = sizeof(struct_name),                                       \</span></div>

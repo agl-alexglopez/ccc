@@ -125,9 +125,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a">ccc_pq_init</a>(struct_name,  pq_elem_field,  pq_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime or compile time.  <br /></td></tr>
-<tr class="separator:aa7e8b96d45a5f0ea4b9b6e128746111a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac151ad453261b727302345e17c07ba3c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ac151ad453261b727302345e17c07ba3c">ccc_pq_init</a>(struct_name,  pq_elem_field,  pq_order,  cmp_fn,  alloc_fn,  aux_data)</td></tr>
+<tr class="memdesc:ac151ad453261b727302345e17c07ba3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime or compile time.  <br /></td></tr>
+<tr class="separator:ac151ad453261b727302345e17c07ba3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Insert and remove elements from the priority queue. </p>
@@ -363,8 +363,8 @@ N). The cost of a pop operation is O(lg N).</p>
 
 </div>
 </div>
-<a id="aa7e8b96d45a5f0ea4b9b6e128746111a" name="aa7e8b96d45a5f0ea4b9b6e128746111a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7e8b96d45a5f0ea4b9b6e128746111a">&#9670;&#160;</a></span>ccc_pq_init</h2>
+<a id="ac151ad453261b727302345e17c07ba3c" name="ac151ad453261b727302345e17c07ba3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac151ad453261b727302345e17c07ba3c">&#9670;&#160;</a></span>ccc_pq_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -391,13 +391,13 @@ N). The cost of a pop operation is O(lg N).</p>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">cmp_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">cmp_fn, </td>
+          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -412,7 +412,7 @@ N). The cost of a pop operation is O(lg N).</p>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn, alloc_fn,   \</div>
 <div class="line">                     aux_data)</div>
 </div><!-- fragment -->
 <p>Initialize a priority queue at runtime or compile time. </p>
@@ -421,13 +421,13 @@ N). The cost of a pop operation is O(lg N).</p>
     <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the name of the user type wrapping pq elems. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pq_elem_field</td><td>the name of the field for the pq elem. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pq_order</td><td>CCC_LES for a min pq or CCC_GRT for a max pq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if allocation is banned. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the function used to compare two user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if allocation is banned. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>auxiliary data needed for comparison or destruction. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized pq on the right side of an equality operator (e.g. ccc_priority_queue pq = <a class="el" href="priority__queue_8h.html#aa7e8b96d45a5f0ea4b9b6e128746111a" title="Initialize a priority queue at runtime or compile time.">ccc_pq_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized pq on the right side of an equality operator (e.g. ccc_priority_queue pq = <a class="el" href="priority__queue_8h.html#ac151ad453261b727302345e17c07ba3c" title="Initialize a priority queue at runtime or compile time.">ccc_pq_init(...)</a>;) </dd></dl>
 
 </div>
 </div>

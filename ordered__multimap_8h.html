@@ -126,9 +126,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab0a4874d3d0e1c089b8a11e37a3167f6">ccc_omm_init</a>(omm_name,  user_struct_name,  ommap_elem_field,  key_field,  alloc_fn,  key_cmp_fn,  aux)</td></tr>
-<tr class="memdesc:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a ordered multimap of the user specified type.  <br /></td></tr>
-<tr class="separator:ab0a4874d3d0e1c089b8a11e37a3167f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a752ee2af97ca560c67b5d9b64e7d745f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a752ee2af97ca560c67b5d9b64e7d745f">ccc_omm_init</a>(omm_name,  user_struct_name,  ommap_elem_field,  key_field,  key_cmp_fn,  alloc_fn,  aux)</td></tr>
+<tr class="memdesc:a752ee2af97ca560c67b5d9b64e7d745f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a ordered multimap of the user specified type.  <br /></td></tr>
+<tr class="separator:a752ee2af97ca560c67b5d9b64e7d745f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
@@ -504,8 +504,8 @@ N).  <br /></td></tr>
 
 </div>
 </div>
-<a id="ab0a4874d3d0e1c089b8a11e37a3167f6" name="ab0a4874d3d0e1c089b8a11e37a3167f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0a4874d3d0e1c089b8a11e37a3167f6">&#9670;&#160;</a></span>ccc_omm_init</h2>
+<a id="a752ee2af97ca560c67b5d9b64e7d745f" name="a752ee2af97ca560c67b5d9b64e7d745f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a752ee2af97ca560c67b5d9b64e7d745f">&#9670;&#160;</a></span>ccc_omm_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -538,13 +538,13 @@ N).  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">key_cmp_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_cmp_fn, </td>
+          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -560,7 +560,7 @@ N).  <br /></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ccc_impl_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field, \</div>
-<div class="line">                      alloc_fn, key_cmp_fn, aux)</div>
+<div class="line">                      key_cmp_fn, alloc_fn, aux)</div>
 </div><!-- fragment -->
 <p>Initialize a ordered multimap of the user specified type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -569,13 +569,13 @@ N).  <br /></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">user_struct_name</td><td>the struct the user intends to store. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">ommap_elem_field</td><td>the name of the field with the intrusive element. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the name of the field used as the multimap key. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the ccc_alloc_fn (<a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>) used to allocate nodes or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_cmp_fn</td><td>the ccc_key_cmp_fn (<a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>) used to compare the key to the current stored element under considertion during a map operation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the ccc_alloc_fn (<a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>) used to allocate nodes or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any aux data needed for compare, print, or destruction. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized ordered multimap. Use this initializer on the right hand side of the variable at compile or run time (e.g. ccc_ordered_multimap m = <a class="el" href="ordered__multimap_8h.html#ab0a4874d3d0e1c089b8a11e37a3167f6" title="Initialize a ordered multimap of the user specified type.">ccc_omm_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized ordered multimap. Use this initializer on the right hand side of the variable at compile or run time (e.g. ccc_ordered_multimap m = <a class="el" href="ordered__multimap_8h.html#a752ee2af97ca560c67b5d9b64e7d745f" title="Initialize a ordered multimap of the user specified type.">ccc_omm_init(...)</a>;) </dd></dl>
 
 </div>
 </div>

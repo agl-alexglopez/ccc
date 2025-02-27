@@ -147,8 +147,8 @@ $(document).ready(function(){initNavTree('impl__flat__realtime__ordered__map_8h_
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment">/*=========================      Initialization     =========================*/</span></div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#define ccc_impl_frm_init(memory_ptr, capacity, node_elem_field,               \</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#define ccc_impl_frm_init(memory_ptr, node_elem_field, key_elem_field,         \</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">                          key_cmp_fn, alloc_fn, aux_data, capacity)            \</span></div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">    {                                                                          \</span></div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">        .buf_ = ccc_buf_init(memory_ptr, alloc_fn, aux_data, capacity),        \</span></div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">        .root_ = 0,                                                            \</span></div>

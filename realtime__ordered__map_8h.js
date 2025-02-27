@@ -4,7 +4,7 @@ var realtime__ordered__map_8h =
     [ "ccc_rom_entry_r", "realtime__ordered__map_8h.html#a16d9c6fe21548604fb01acf0a3891338", null ],
     [ "ccc_rom_equal_range_r", "realtime__ordered__map_8h.html#ab6cf44294f69648967a45e0593ff653c", null ],
     [ "ccc_rom_equal_rrange_r", "realtime__ordered__map_8h.html#a4d25635d101da4e84fa04694f493f6d3", null ],
-    [ "ccc_rom_init", "realtime__ordered__map_8h.html#a7dd816319f62ee38e5c1e265b2a15143", null ],
+    [ "ccc_rom_init", "realtime__ordered__map_8h.html#abbcf8144412dba28a373aa9e39ce3f32", null ],
     [ "ccc_rom_insert_entry_w", "realtime__ordered__map_8h.html#a98db32e16197156c1d8a9d70c8ca20d1", null ],
     [ "ccc_rom_insert_or_assign_w", "realtime__ordered__map_8h.html#ab2800eb072e33638ec62ce4b6b66507f", null ],
     [ "ccc_rom_insert_r", "realtime__ordered__map_8h.html#a8aae80d0ac0a3e63bcd72ecdb5f8a39a", null ],

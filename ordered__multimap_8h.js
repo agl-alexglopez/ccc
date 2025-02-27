@@ -4,7 +4,7 @@ var ordered__multimap_8h =
     [ "ccc_omm_entry_r", "ordered__multimap_8h.html#a6b0cb99173678a3dd75b9cb1517ef40d", null ],
     [ "ccc_omm_equal_range_r", "ordered__multimap_8h.html#a620fad51c394d2a0a27bc641bdeb74f7", null ],
     [ "ccc_omm_equal_rrange_r", "ordered__multimap_8h.html#a2a97a7ca1b8dc4559529da0845e8ba59", null ],
-    [ "ccc_omm_init", "ordered__multimap_8h.html#ab0a4874d3d0e1c089b8a11e37a3167f6", null ],
+    [ "ccc_omm_init", "ordered__multimap_8h.html#a752ee2af97ca560c67b5d9b64e7d745f", null ],
     [ "ccc_omm_insert_entry_w", "ordered__multimap_8h.html#ae62bdbb6605efeb5abbbda3a6f1ca54c", null ],
     [ "ccc_omm_insert_or_assign_w", "ordered__multimap_8h.html#ac253833cbe0f1b91687067f36fd196e8", null ],
     [ "ccc_omm_or_insert_w", "ordered__multimap_8h.html#ae93bb13a6d30e0cf569764cc004e85b3", null ],

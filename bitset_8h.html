@@ -118,9 +118,9 @@ Include dependency graph for bitset.h:</div>
 <tr class="memitem:a1099f64c2982ed888e26a6edb6b13734"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(bit_cap)&#160;&#160;&#160;ccc_impl_bs_blocks(bit_cap)</td></tr>
 <tr class="memdesc:a1099f64c2982ed888e26a6edb6b13734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bit blocks needed for the desired bit set capacity.  <br /></td></tr>
 <tr class="separator:a1099f64c2982ed888e26a6edb6b13734"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83afa4099065f3a736e5556b0df785c1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a83afa4099065f3a736e5556b0df785c1">ccc_bs_init</a>(bitblock_ptr,  cap,  alloc_fn,  aux,  optional_size...)&#160;&#160;&#160;    ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)</td></tr>
-<tr class="memdesc:a83afa4099065f3a736e5556b0df785c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with memory and allocation permissions.  <br /></td></tr>
-<tr class="separator:a83afa4099065f3a736e5556b0df785c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(bitblock_ptr,  alloc_fn,  aux,  cap,  optional_size...)&#160;&#160;&#160;    ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size)</td></tr>
+<tr class="memdesc:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with memory and allocation permissions.  <br /></td></tr>
+<tr class="separator:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac59dec5a5534159a7030c9077618c486"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac59dec5a5534159a7030c9077618c486">ccc_bs_copy</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *dst, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ac59dec5a5534159a7030c9077618c486"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the bit set at source to destination.  <br /></td></tr>
 <tr class="separator:ac59dec5a5534159a7030c9077618c486"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,20 +373,20 @@ Include dependency graph for bitset.h:</div>
 <dl class="section note"><dt>Note</dt><dd>this macro is not needed if capacity is 0 to start.</dd></dl>
 <p>This method can be used for compile time initialization of bit sets so the user need to worry about the underlying bit set representation. For example:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b</div>
-<div class="line">    = <a class="code hl_define" href="bitset_8h.html#a83afa4099065f3a736e5556b0df785c1">ccc_bs_init</a>((<span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)]){}, 256, NULL, NULL);</div>
+<div class="line">    = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>((<span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)]){}, 256, NULL, NULL);</div>
 <div class="ttc" id="abitset_8h_html_a1099f64c2982ed888e26a6edb6b13734"><div class="ttname"><a href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a></div><div class="ttdeci">#define ccc_bs_blocks(bit_cap)</div><div class="ttdoc">Get the number of bit blocks needed for the desired bit set capacity.</div><div class="ttdef"><b>Definition:</b> bitset.h:101</div></div>
-<div class="ttc" id="abitset_8h_html_a83afa4099065f3a736e5556b0df785c1"><div class="ttname"><a href="bitset_8h.html#a83afa4099065f3a736e5556b0df785c1">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:130</div></div>
+<div class="ttc" id="abitset_8h_html_a98aee1dcbd78e1eb644babc2d3c629e4"><div class="ttname"><a href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:130</div></div>
 <div class="ttc" id="abitset_8h_html_a9c11247557b86b5658723dd9edc58622"><div class="ttname"><a href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock_ ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:67</div></div>
 <div class="ttc" id="abitset_8h_html_a9e5e8a0511fe3def848af70344c5b9f3"><div class="ttname"><a href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></div><div class="ttdeci">struct ccc_bitset_ ccc_bitset</div><div class="ttdoc">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile ti...</div><div class="ttdef"><b>Definition:</b> bitset.h:59</div></div>
 </div><!-- fragment --><p>The above example also illustrates the benefits of a static compound literal to encapsulate the bits within the bit set array to prevent dangling references. If your compiler has not implemented storage duration of compound literals the more traditional example would look like this.</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a> blocks[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)];</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a83afa4099065f3a736e5556b0df785c1">ccc_bs_init</a>(blocks, 256, NULL, NULL);</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(blocks, 256, NULL, NULL);</div>
 </div><!-- fragment --><p>This macro is required for any initialization where the bit block memory comes from the stack or data segment as determined by the user. </p>
 
 </div>
 </div>
-<a id="a83afa4099065f3a736e5556b0df785c1" name="a83afa4099065f3a736e5556b0df785c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a83afa4099065f3a736e5556b0df785c1">&#9670;&#160;</a></span>ccc_bs_init</h2>
+<a id="a98aee1dcbd78e1eb644babc2d3c629e4" name="a98aee1dcbd78e1eb644babc2d3c629e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98aee1dcbd78e1eb644babc2d3c629e4">&#9670;&#160;</a></span>ccc_bs_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -396,12 +396,6 @@ Include dependency graph for bitset.h:</div>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">bitblock_ptr, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">cap, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -419,12 +413,18 @@ Include dependency graph for bitset.h:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
+          <td class="paramname">cap, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
           <td class="paramname">optional_size...&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -433,9 +433,9 @@ Include dependency graph for bitset.h:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">bitblock_ptr</td><td>the pointer to existing blocks or NULL. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cap</td><td>the number of bits that will be stored in this bit set. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for a dynamic bit set or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>auxiliary data needed for allocation of the bit set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cap</td><td>the number of bits that will be stored in this bit set. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>an optional starting size &lt;= capacity. If the bitset is of fixed size with no allocation permission, and dynamic push and pop are not needed, the optional size parameter should be set equivalent to capacity. </td></tr>
   </table>
   </dd>

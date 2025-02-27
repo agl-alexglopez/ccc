@@ -141,8 +141,8 @@ $(document).ready(function(){initNavTree('impl__handle__hash__map_8h_source.html
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">size_t</span> impl_;</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>};</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#define ccc_impl_hhm_init(memory_ptr, capacity, hhash_elem_field, key_field,   \</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">                          alloc_fn, hash_fn, key_eq_fn, aux)                   \</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#define ccc_impl_hhm_init(memory_ptr, hhash_elem_field, key_field, hash_fn,    \</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">                          key_eq_fn, alloc_fn, aux, capacity)                  \</span></div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">    {                                                                          \</span></div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="preprocessor">        .buf_                                                                  \</span></div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">        = (ccc_buffer)ccc_buf_init((memory_ptr), (alloc_fn), (aux), capacity), \</span></div>

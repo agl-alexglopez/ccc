@@ -127,12 +127,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf">ccc_fpq_init</a>(mem_ptr,  capacity,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</td></tr>
-<tr class="memdesc:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fpq as a min or max heap.  <br /></td></tr>
-<tr class="separator:aef56a4bcfd5a33aeb767c177d43c51bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4ba72083dbab502b7392a44619f2f07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab4ba72083dbab502b7392a44619f2f07">ccc_fpq_heapify_init</a>(mem_ptr,  capacity,  size,  cmp_order,  alloc_fn,  cmp_fn,  aux_data)</td></tr>
-<tr class="memdesc:ab4ba72083dbab502b7392a44619f2f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order an existing array of elements as a min or max heap. O(N).  <br /></td></tr>
-<tr class="separator:ab4ba72083dbab502b7392a44619f2f07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2db0f718884bbad1a53a4a6ae763c507"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a2db0f718884bbad1a53a4a6ae763c507">ccc_fpq_init</a>(mem_ptr,  cmp_order,  cmp_fn,  alloc_fn,  aux_data,  capacity)&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity)</td></tr>
+<tr class="memdesc:a2db0f718884bbad1a53a4a6ae763c507"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fpq as a min or max heap.  <br /></td></tr>
+<tr class="separator:a2db0f718884bbad1a53a4a6ae763c507"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7915b0dc8d16f99709d35b483d02a3e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a7915b0dc8d16f99709d35b483d02a3e1">ccc_fpq_heapify_init</a>(mem_ptr,  cmp_order,  cmp_fn,  alloc_fn,  aux_data,  capacity,  size)</td></tr>
+<tr class="memdesc:a7915b0dc8d16f99709d35b483d02a3e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order an existing array of elements as a min or max heap. O(N).  <br /></td></tr>
+<tr class="separator:a7915b0dc8d16f99709d35b483d02a3e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0765c008f4ab6a8a59a0d5f8282a4572">ccc_fpq_copy</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *dst, <a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fpq from src to newly initialized dst.  <br /></td></tr>
 <tr class="separator:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -321,8 +321,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ab4ba72083dbab502b7392a44619f2f07" name="ab4ba72083dbab502b7392a44619f2f07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4ba72083dbab502b7392a44619f2f07">&#9670;&#160;</a></span>ccc_fpq_heapify_init</h2>
+<a id="a7915b0dc8d16f99709d35b483d02a3e1" name="a7915b0dc8d16f99709d35b483d02a3e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7915b0dc8d16f99709d35b483d02a3e1">&#9670;&#160;</a></span>ccc_fpq_heapify_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -337,25 +337,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">capacity, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">size, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
           <td class="paramname">cmp_order, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -367,7 +349,25 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">aux_data&#160;</td>
+          <td class="paramname">alloc_fn, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">aux_data, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">capacity, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">size&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -376,23 +376,23 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,    \</div>
-<div class="line">                              cmp_fn, aux_data)</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,  \</div>
+<div class="line">                              capacity, size)</div>
 </div><!-- fragment -->
 <p>Order an existing array of elements as a min or max heap. O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>a pointer to an array of user types or ((T *)NULL). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_order</td><td>CCC_LES or CCC_GRT for min or max heap, respectively. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the user defined comparison function for user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if no allocation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for destruction of elements. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of contiguous elements at mem_ptr. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>the size &lt;= capacity. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_order</td><td>CCC_LES or CCC_GRT for min or max heap, respectively. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if no allocation. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the user defined comparison function for user types. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for destruction of elements. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initilialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#ab4ba72083dbab502b7392a44619f2f07" title="Order an existing array of elements as a min or max heap. O(N).">ccc_fpq_heapify_init(...)</a>;).</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initilialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#a7915b0dc8d16f99709d35b483d02a3e1" title="Order an existing array of elements as a min or max heap. O(N).">ccc_fpq_heapify_init(...)</a>;).</dd></dl>
 <p>Note that to avoid temporary or unpredictable allocation the fpq requires one slot for swapping. Therefore if the user wants a fixed size fpq of size N, N + 1 capacity is required. </p>
 
 </div>
@@ -448,8 +448,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="aef56a4bcfd5a33aeb767c177d43c51bf" name="aef56a4bcfd5a33aeb767c177d43c51bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef56a4bcfd5a33aeb767c177d43c51bf">&#9670;&#160;</a></span>ccc_fpq_init</h2>
+<a id="a2db0f718884bbad1a53a4a6ae763c507" name="a2db0f718884bbad1a53a4a6ae763c507"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2db0f718884bbad1a53a4a6ae763c507">&#9670;&#160;</a></span>ccc_fpq_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -464,19 +464,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">capacity, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
           <td class="paramname">cmp_order, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -488,12 +476,24 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">aux_data&#160;</td>
+          <td class="paramname">alloc_fn, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">aux_data, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">capacity&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -502,15 +502,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>a pointer to an array of user types or ((T *)NULL). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of contiguous elements at mem_ptr. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cmp_order</td><td>CCC_LES or CCC_GRT for min or max heap, respectively. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if no allocation. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the user defined comarison function for user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if no allocation. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for destruction of elements. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of contiguous elements at mem_ptr. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initilialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#aef56a4bcfd5a33aeb767c177d43c51bf" title="Initialize a fpq as a min or max heap.">ccc_fpq_init(...)</a>;).</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initilialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#a2db0f718884bbad1a53a4a6ae763c507" title="Initialize a fpq as a min or max heap.">ccc_fpq_init(...)</a>;).</dd></dl>
 <p>Note that to avoid temporary or unpredictable allocation the fpq requires one slot for swapping. Therefore if the user wants a fixed size fpq of size N, N + 1 capacity is required. </p>
 
 </div>
@@ -785,28 +785,28 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Manual memory management with no allocation function provided.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue src</div>
-<div class="line">    = fpq_init((<span class="keywordtype">int</span>[10]){}, 10, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span>[10]){}, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL, 10);</div>
 <div class="line">push_rand_ints(&amp;src);</div>
 <div class="line">flat_priority_queue dst</div>
-<div class="line">    = fpq_init((<span class="keywordtype">int</span>[11]){}, 11, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span>[11]){}, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL, 11);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, NULL);</div>
 <div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:115</div></div>
 <div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a></div><div class="ttdeci">@ CCC_LES</div><div class="ttdef"><b>Definition:</b> types.h:136</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue src</div>
-<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL, 0);</div>
 <div class="line">push_rand_ints(&amp;src);</div>
 <div class="line">flat_priority_queue dst</div>
-<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size fpq.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_priority_queue src</div>
-<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL);</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, std_alloc, int_cmp, NULL, 0);</div>
 <div class="line">push_rand_ints(&amp;src);</div>
 <div class="line">flat_priority_queue dst</div>
-<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, 0, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL);</div>
+<div class="line">    = fpq_init((<span class="keywordtype">int</span> *)NULL, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, NULL, int_cmp, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fpq_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic fpq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>

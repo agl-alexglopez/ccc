@@ -126,9 +126,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a336a7a16e6d316294fe1756c6f40bd99"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a336a7a16e6d316294fe1756c6f40bd99">ccc_om_init</a>(om_name,  struct_name,  om_elem_field,  key_elem_field,  alloc_fn,  key_cmp,  aux)</td></tr>
-<tr class="memdesc:a336a7a16e6d316294fe1756c6f40bd99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the ordered map at runtime or compile time.  <br /></td></tr>
-<tr class="separator:a336a7a16e6d316294fe1756c6f40bd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b893794d5b1a345070bfbf51322c6c7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a0b893794d5b1a345070bfbf51322c6c7">ccc_om_init</a>(om_name,  struct_name,  om_elem_field,  key_elem_field,  key_cmp,  alloc_fn,  aux)</td></tr>
+<tr class="memdesc:a0b893794d5b1a345070bfbf51322c6c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the ordered map at runtime or compile time.  <br /></td></tr>
+<tr class="separator:a0b893794d5b1a345070bfbf51322c6c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
@@ -482,8 +482,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a336a7a16e6d316294fe1756c6f40bd99" name="a336a7a16e6d316294fe1756c6f40bd99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a336a7a16e6d316294fe1756c6f40bd99">&#9670;&#160;</a></span>ccc_om_init</h2>
+<a id="a0b893794d5b1a345070bfbf51322c6c7" name="a0b893794d5b1a345070bfbf51322c6c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b893794d5b1a345070bfbf51322c6c7">&#9670;&#160;</a></span>ccc_om_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -516,13 +516,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">key_cmp, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_cmp, </td>
+          <td class="paramname">alloc_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -538,7 +538,7 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ccc_impl_om_init(om_name, struct_name, om_elem_field, key_elem_field,      \</div>
-<div class="line">                     alloc_fn, key_cmp, aux)</div>
+<div class="line">                     key_cmp, alloc_fn, aux)</div>
 </div><!-- fragment -->
 <p>Initializes the ordered map at runtime or compile time. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -547,13 +547,13 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the user type wrapping the intrusive element. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">om_elem_field</td><td>the name of the intrusive map elem field. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_elem_field</td><td>the name of the field in user type used as key. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if allocation is banned. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_cmp</td><td>the key comparison function (see <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if allocation is banned. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>a pointer to any auxiliary data for comparison or destruction. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the struct initialized ordered map for direct assignment (i.e. ccc_ordered_map m = <a class="el" href="ordered__map_8h.html#a336a7a16e6d316294fe1756c6f40bd99" title="Initializes the ordered map at runtime or compile time.">ccc_om_init(...)</a>;). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the struct initialized ordered map for direct assignment (i.e. ccc_ordered_map m = <a class="el" href="ordered__map_8h.html#a0b893794d5b1a345070bfbf51322c6c7" title="Initializes the ordered map at runtime or compile time.">ccc_om_init(...)</a>;). </dd></dl>
 
 </div>
 </div>

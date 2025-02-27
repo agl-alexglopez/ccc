@@ -4,7 +4,7 @@ var flat__ordered__map_8h =
     [ "ccc_fom_entry_r", "flat__ordered__map_8h.html#af7eaea1824b6624d5342dd1849449433", null ],
     [ "ccc_fom_equal_range_r", "flat__ordered__map_8h.html#a4cd242139245aa52324c1c2ee97cbcd1", null ],
     [ "ccc_fom_equal_rrange_r", "flat__ordered__map_8h.html#a271cfcdf1465dae8a93f3e06ea77a8a3", null ],
-    [ "ccc_fom_init", "flat__ordered__map_8h.html#a5d7b831a2ac2a4e9097112cd31fa18b0", null ],
+    [ "ccc_fom_init", "flat__ordered__map_8h.html#a07848069c3f1ad79f2e9805c819894d4", null ],
     [ "ccc_fom_insert_entry_w", "flat__ordered__map_8h.html#a83bd4eea4b4efbd9738acaec0acb5b4c", null ],
     [ "ccc_fom_insert_or_assign_w", "flat__ordered__map_8h.html#a9a9f2fba98df5621e0b0b4c7b487cb31", null ],
     [ "ccc_fom_insert_r", "flat__ordered__map_8h.html#a3ba86635263de97e66004fe1968ea1a1", null ],

@@ -105,10 +105,10 @@ $(document).ready(function(){initNavTree('doubly__linked__list_8h_source.html','
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">   55</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>ccc_dll_elem_ <a class="code hl_typedef" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a>;</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="doubly__linked__list_8h.html#a50ff4422f52bc1a5c2c926dc88a01e3e">   77</a></span><span class="preprocessor">#define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn,        \</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="preprocessor">                     cmp_fn, aux_data)                                         \</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">    ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">                      cmp_fn, aux_data)</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="doubly__linked__list_8h.html#a3feb131e732c936d5090258b08fe308f">   77</a></span><span class="preprocessor">#define ccc_dll_init(list_name, struct_name, list_elem_field, cmp_fn,          \</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="preprocessor">                     alloc_fn, aux_data)                                       \</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">    ccc_impl_dll_init(list_name, struct_name, list_elem_field, cmp_fn,         \</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">                      alloc_fn, aux_data)</span></div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="doubly__linked__list_8h.html#a67936dadaece25c50d68e3dae247f686">  101</a></span><span class="preprocessor">#define ccc_dll_emplace_back(list_ptr, type_initializer...)                    \</span></div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="preprocessor">    ccc_impl_dll_emplace_back(list_ptr, type_initializer)</span></div>
