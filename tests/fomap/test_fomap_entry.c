@@ -65,7 +65,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_flat_ordered_map *const fom, size_t const n,
 CHECK_BEGIN_STATIC_FN(fomap_test_validate)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[3]){}, 3, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[3]){}, elem, id, NULL, id_cmp, NULL, 3);
     ccc_entry ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
@@ -86,7 +86,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert)
 {
     int size = 30;
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     ccc_entry ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert)
 CHECK_BEGIN_STATIC_FN(fomap_test_remove)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_entry ent = remove(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
@@ -211,7 +211,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_remove)
 CHECK_BEGIN_STATIC_FN(fomap_test_try_insert)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_entry ent = try_insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
@@ -267,7 +267,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_try_insert)
 CHECK_BEGIN_STATIC_FN(fomap_test_try_insert_with)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_entry *ent = fom_try_insert_w(&fom, -1, val(-1));
     CHECK(validate(&fom), true);
@@ -324,7 +324,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_try_insert_with)
 CHECK_BEGIN_STATIC_FN(fomap_test_insert_or_assign)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_entry ent
         = insert_or_assign(&fom, &(struct val){.id = -1, .val = -1}.elem);
@@ -381,7 +381,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_or_assign)
 CHECK_BEGIN_STATIC_FN(fomap_test_insert_or_assign_with)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_entry *ent = fom_insert_or_assign_w(&fom, -1, val(-1));
     CHECK(validate(&fom), true);
@@ -437,7 +437,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_or_assign_with)
 CHECK_BEGIN_STATIC_FN(fomap_test_entry_and_modify)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_fomap_entry *ent = entry_r(&fom, &(int){-1});
     CHECK(validate(&fom), true);
@@ -506,7 +506,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_entry_and_modify)
 CHECK_BEGIN_STATIC_FN(fomap_test_entry_and_modify_aux)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     int aux = 1;
     ccc_fomap_entry *ent = entry_r(&fom, &(int){-1});
@@ -572,7 +572,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_entry_and_modify_aux)
 CHECK_BEGIN_STATIC_FN(fomap_test_entry_and_modify_with)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     ccc_fomap_entry *ent = entry_r(&fom, &(int){-1});
     ent = fom_and_modify_w(ent, struct val, { T->val++; });
@@ -637,7 +637,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_entry_and_modify_with)
 CHECK_BEGIN_STATIC_FN(fomap_test_or_insert)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     struct val *v = or_insert(entry_r(&fom, &(int){-1}),
                               &(struct val){.id = -1, .val = -1}.elem);
@@ -690,7 +690,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_or_insert)
 CHECK_BEGIN_STATIC_FN(fomap_test_or_insert_with)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     struct val *v = fom_or_insert_w(entry_r(&fom, &(int){-1}), idval(-1, -1));
     CHECK(validate(&fom), true);
@@ -741,7 +741,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_or_insert_with)
 CHECK_BEGIN_STATIC_FN(fomap_test_insert_entry)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     struct val *v = insert_entry(entry_r(&fom, &(int){-1}),
                                  &(struct val){.id = -1, .val = -1}.elem);
@@ -796,7 +796,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_entry)
 CHECK_BEGIN_STATIC_FN(fomap_test_insert_entry_with)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     struct val *v
         = fom_insert_entry_w(entry_r(&fom, &(int){-1}), idval(-1, -1));
@@ -848,7 +848,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_entry_with)
 CHECK_BEGIN_STATIC_FN(fomap_test_remove_entry)
 {
     ccc_flat_ordered_map fom
-        = fom_init((struct val[33]){}, 33, elem, id, NULL, id_cmp, NULL);
+        = fom_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
     int size = 30;
     struct val *v = or_insert(entry_r(&fom, &(int){-1}),
                               &(struct val){.id = -1, .val = -1}.elem);

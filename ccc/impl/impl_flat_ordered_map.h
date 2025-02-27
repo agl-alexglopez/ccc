@@ -42,8 +42,8 @@ union ccc_fomap_entry_
     struct ccc_ftree_entry_ impl_;
 };
 
-#define ccc_impl_fom_init(mem_ptr, capacity, node_elem_field, key_elem_field,  \
-                          alloc_fn, key_cmp_fn, aux_data)                      \
+#define ccc_impl_fom_init(mem_ptr, node_elem_field, key_elem_field, alloc_fn,  \
+                          key_cmp_fn, aux_data, capacity)                      \
     {                                                                          \
         .buf_ = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity),           \
         .root_ = 0,                                                            \
