@@ -91,7 +91,7 @@ lru_head(struct lru_cache *const lru)
    of the hash table and list. */
 static struct lru_cache lru_cache = {
     .cap = 3,
-    .l = dll_init(lru_cache.l, struct lru_elem, list_elem, NULL, cmp_list_elems,
+    .l = dll_init(lru_cache.l, struct lru_elem, list_elem, cmp_list_elems, NULL,
                   NULL),
     .map = om_init(lru_cache.map, struct lru_elem, map_elem, key, cmp_by_key,
                    std_alloc, NULL),
