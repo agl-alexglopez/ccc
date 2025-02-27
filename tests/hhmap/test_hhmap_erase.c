@@ -13,8 +13,8 @@
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_erase)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[10]){}, 10, e, key, NULL,
-                                      hhmap_int_zero, hhmap_id_eq, NULL);
+    ccc_handle_hash_map hh = hhm_init((struct val[10]){}, e, key, NULL,
+                                      hhmap_int_zero, hhmap_id_eq, NULL, 10);
 
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the handle. */
@@ -43,8 +43,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_erase)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_shuffle_insert_erase)
 {
-    ccc_handle_hash_map h = hhm_init((struct val *)NULL, 0, e, key, std_alloc,
-                                     hhmap_int_to_u64, hhmap_id_eq, NULL);
+    ccc_handle_hash_map h = hhm_init((struct val *)NULL, e, key, std_alloc,
+                                     hhmap_int_to_u64, hhmap_id_eq, NULL, 0);
 
     int const to_insert = 100;
     int const larger_prime = (int)hhm_next_prime(to_insert);

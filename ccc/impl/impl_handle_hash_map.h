@@ -67,8 +67,8 @@ union ccc_hhmap_ref_
 };
 
 /** @private */
-#define ccc_impl_hhm_init(memory_ptr, capacity, hhash_elem_field, key_field,   \
-                          alloc_fn, hash_fn, key_eq_fn, aux)                   \
+#define ccc_impl_hhm_init(memory_ptr, hhash_elem_field, key_field, alloc_fn,   \
+                          hash_fn, key_eq_fn, aux, capacity)                   \
     {                                                                          \
         .buf_                                                                  \
         = (ccc_buffer)ccc_buf_init((memory_ptr), (alloc_fn), (aux), capacity), \
