@@ -244,8 +244,8 @@ animate_maze(struct maze *maze)
        of some sort after. No allocation permission is given to the map so it
        cannot resize which would invalidate the priority queue. */
     handle_hash_map costs
-        = hhm_init((struct prim_cell *)malloc(bytes), map_elem, cell, NULL,
-                   point_hash_fn, prim_cell_eq, NULL, cap);
+        = hhm_init((struct prim_cell *)malloc(bytes), map_elem, cell,
+                   point_hash_fn, prim_cell_eq, NULL, NULL, cap);
     assert(hhm_data(&costs) != NULL);
     struct point s = rand_point(maze);
     handle_i first = hhm_insert_handle_w(
