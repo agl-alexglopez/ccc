@@ -28,7 +28,7 @@ omap_modplus(ccc_user_type const t)
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert)
 {
-    ccc_ordered_map om = om_init(om, struct val, elem, key, NULL, id_cmp, NULL);
+    ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
 
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&om, &(struct val){.key = 137, .val = 99}.elem,
@@ -42,7 +42,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
 CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
 {
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     struct val const *ins = ccc_om_or_insert_w(
         entry_r(&om, &(int){2}), (struct val){.key = 2, .val = 0});
@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_overwrite)
 {
-    ccc_ordered_map om = om_init(om, struct val, elem, key, NULL, id_cmp, NULL);
+    ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
 
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = insert(&om, &q.elem, &(struct val){}.elem);
@@ -117,7 +117,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_overwrite)
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_then_bad_ideas)
 {
-    ccc_ordered_map om = om_init(om, struct val, elem, key, NULL, id_cmp, NULL);
+    ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = insert(&om, &q.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), false);
@@ -147,7 +147,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
     size_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
@@ -210,7 +210,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -255,7 +255,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -295,7 +295,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -347,7 +347,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_macros)
 CHECK_BEGIN_STATIC_FN(omap_test_two_sum)
 {
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -373,7 +373,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_two_sum)
 CHECK_BEGIN_STATIC_FN(omap_test_resize)
 {
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -404,7 +404,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize)
 CHECK_BEGIN_STATIC_FN(omap_test_resize_macros)
 {
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -443,7 +443,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_macros)
 CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null)
 {
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -472,7 +472,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null)
 CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null_macros)
 {
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -512,7 +512,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_and_find)
 {
     int const size = 101;
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     for (int i = 0; i < size; i += 2)
     {
@@ -545,7 +545,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_and_find)
 CHECK_BEGIN_STATIC_FN(omap_test_insert_shuffle)
 {
     size_t const size = 50;
-    ccc_ordered_map om = om_init(om, struct val, elem, key, NULL, id_cmp, NULL);
+    ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
     struct val vals[50] = {};
     CHECK(size > 1, true);
     int const prime = 53;
@@ -563,7 +563,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_weak_srand)
 {
     int const num_nodes = 1000;
     ccc_ordered_map om
-        = om_init(om, struct val, elem, key, std_alloc, id_cmp, NULL);
+        = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {

@@ -71,7 +71,7 @@ struct ccc_tree_entry_
 };
 
 #define ccc_tree_init(tree_name, struct_name, node_elem_field, key_elem_field, \
-                      alloc_fn, key_cmp_fn, aux_data)                          \
+                      key_cmp_fn, alloc_fn, aux_data)                          \
     {                                                                          \
         .impl_ = {                                                             \
             .root_ = &(tree_name).impl_.end_,                                  \

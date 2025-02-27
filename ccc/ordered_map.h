@@ -67,15 +67,15 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] struct_name the user type wrapping the intrusive element.
 @param [in] om_elem_field the name of the intrusive map elem field.
 @param [in] key_elem_field the name of the field in user type used as key.
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] key_cmp the key comparison function (see types.h).
+@param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] aux a pointer to any auxiliary data for comparison or destruction.
 @return the struct initialized ordered map for direct assignment
 (i.e. ccc_ordered_map m = ccc_om_init(...);). */
 #define ccc_om_init(om_name, struct_name, om_elem_field, key_elem_field,       \
-                    alloc_fn, key_cmp, aux)                                    \
+                    key_cmp, alloc_fn, aux)                                    \
     ccc_impl_om_init(om_name, struct_name, om_elem_field, key_elem_field,      \
-                     alloc_fn, key_cmp, aux)
+                     key_cmp, alloc_fn, aux)
 
 /**@}*/
 

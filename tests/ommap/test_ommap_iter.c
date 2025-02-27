@@ -153,7 +153,7 @@ CHECK_BEGIN_STATIC_FN(iterator_check, ordered_multimap *const omm)
 CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_unique_vals)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&omm); e != end(&omm);
@@ -186,7 +186,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_unique_vals)
 CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_all_vals)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *i = begin(&omm); i != end(&omm);
@@ -224,7 +224,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_all_vals)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -257,7 +257,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
 CHECK_BEGIN_STATIC_FN(ommap_test_priority_removal)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -291,7 +291,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_removal)
 CHECK_BEGIN_STATIC_FN(ommap_test_priority_update)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -328,7 +328,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_update)
 CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -358,7 +358,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range)
 CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range_equals)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -388,7 +388,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range_equals)
 CHECK_BEGIN_STATIC_FN(ommap_test_priority_invalid_range)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -418,7 +418,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_invalid_range)
 CHECK_BEGIN_STATIC_FN(ommap_test_priority_empty_range)
 {
     ordered_multimap omm
-        = omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];

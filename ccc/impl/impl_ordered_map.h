@@ -26,9 +26,9 @@ union ccc_omap_entry_
 };
 
 #define ccc_impl_om_init(tree_name, struct_name, node_elem_field,              \
-                         key_elem_field, alloc_fn, key_cmp_fn, aux_data)       \
+                         key_elem_field, key_cmp_fn, alloc_fn, aux_data)       \
     ccc_tree_init(tree_name, struct_name, node_elem_field, key_elem_field,     \
-                  alloc_fn, key_cmp_fn, aux_data)
+                  key_cmp_fn, alloc_fn, aux_data)
 
 void *ccc_impl_om_key_in_slot(struct ccc_tree_ const *t, void const *slot);
 ccc_node_ *ccc_impl_omap_elem_in_slot(struct ccc_tree_ const *t,
