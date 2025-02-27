@@ -15,7 +15,7 @@
 CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -43,7 +43,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -73,7 +73,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -105,7 +105,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -137,7 +137,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -175,7 +175,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -213,7 +213,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_GRT, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -251,7 +251,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_GRT, NULL, val_cmp, NULL);
+        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

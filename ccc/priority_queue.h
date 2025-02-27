@@ -58,14 +58,14 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] struct_name the name of the user type wrapping pq elems.
 @param [in] pq_elem_field the name of the field for the pq elem.
 @param [in] pq_order CCC_LES for a min pq or CCC_GRT for a max pq.
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] cmp_fn the function used to compare two user types.
+@param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] aux_data auxiliary data needed for comparison or destruction.
 @return the initialized pq on the right side of an equality operator
 (e.g. ccc_priority_queue pq = ccc_pq_init(...);) */
-#define ccc_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,    \
+#define ccc_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn, alloc_fn,    \
                     aux_data)                                                  \
-    ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn, cmp_fn,   \
+    ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn, alloc_fn,   \
                      aux_data)
 
 /**@}*/

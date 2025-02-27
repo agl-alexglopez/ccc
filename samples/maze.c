@@ -238,8 +238,8 @@ animate_maze(struct maze *maze)
     /* The priority queue will have its elements in the slots of the hash map
        for each prim cell. No allocation permission so pushing and popping is
        harmless to any other data structures or fields of the struct. */
-    priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES, NULL,
-                                   cmp_priority_cells, NULL);
+    priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES,
+                                   cmp_priority_cells, NULL, NULL);
     /* Encapsulating malloc like this is OK. We just need a quick sanity check
        of some sort after. No allocation permission is given to the map so it
        cannot resize which would invalidate the priority queue. */

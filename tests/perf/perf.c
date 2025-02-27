@@ -102,7 +102,7 @@ test_push(void)
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
-            = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
+            = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -142,7 +142,7 @@ test_pop(void)
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
-            = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
+            = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)insert(&omm, &val_array[i].ommap_elem);
@@ -194,7 +194,7 @@ test_push_pop(void)
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
-            = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
+            = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -246,7 +246,7 @@ test_push_intermittent_pop(void)
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
-            = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
+            = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
@@ -298,7 +298,7 @@ test_pop_intermittent_push(void)
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
-            = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
+            = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)insert(&omm, &val_array[i].ommap_elem);
@@ -367,7 +367,7 @@ test_update(void)
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, NULL, val_key_cmp, NULL);
         ccc_priority_queue pq
-            = ccc_pq_init(struct val, pq_elem, CCC_LES, NULL, val_cmp, NULL);
+            = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (size_t i = 0; i < n; ++i)
         {
             (void)insert(&omm, &val_array[i].ommap_elem);

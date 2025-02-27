@@ -31,8 +31,8 @@ struct ccc_pq_
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-#define ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, alloc_fn,       \
-                         cmp_fn, aux_data)                                     \
+#define ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn,         \
+                         alloc_fn, aux_data)                                   \
     {                                                                          \
         .root_ = NULL,                                                         \
         .sz_ = 0,                                                              \

@@ -704,7 +704,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
        to be small [A-Z] so provide memory on the stack for speed and safety. */
     struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     priority_queue distances = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
-                                       NULL, cmp_pq_costs, NULL);
+                                       cmp_pq_costs, NULL, NULL);
     for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
     {
         *map_pq_at(map_pq, (char)vx) = (struct dijkstra_vertex){
