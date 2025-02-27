@@ -455,7 +455,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     size_t len = 0;
     ptrdiff_t read = 0;
     flat_ordered_map fom
-        = fom_init((word *)NULL, e, ofs, std_alloc, cmp_string_keys, a, 0);
+        = fom_init((word *)NULL, e, ofs, cmp_string_keys, std_alloc, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};
