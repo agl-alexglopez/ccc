@@ -65,7 +65,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_flat_realtime_ordered_map *const frm,
 CHECK_BEGIN_STATIC_FN(fromap_test_validate)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[3]){}, elem, id, NULL, id_cmp, NULL, 3);
+        = frm_init((struct val[3]){}, elem, id, id_cmp, NULL, NULL, 3);
     ccc_entry ent = insert(&frm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&frm), true);
     CHECK(occupied(&ent), false);
@@ -86,7 +86,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert)
 {
     int size = 30;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     ccc_entry ent = insert(&frm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&frm), true);
     CHECK(occupied(&ent), false);
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert)
 CHECK_BEGIN_STATIC_FN(fromap_test_remove)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_entry ent = remove(&frm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&frm), true);
@@ -211,7 +211,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_remove)
 CHECK_BEGIN_STATIC_FN(fromap_test_try_insert)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_entry ent = try_insert(&frm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&frm), true);
@@ -267,7 +267,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_try_insert)
 CHECK_BEGIN_STATIC_FN(fromap_test_try_insert_with)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_entry *ent = frm_try_insert_w(&frm, -1, val(-1));
     CHECK(validate(&frm), true);
@@ -324,7 +324,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_try_insert_with)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_or_assign)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_entry ent
         = insert_or_assign(&frm, &(struct val){.id = -1, .val = -1}.elem);
@@ -381,7 +381,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_or_assign)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_or_assign_with)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_entry *ent = frm_insert_or_assign_w(&frm, -1, val(-1));
     CHECK(validate(&frm), true);
@@ -437,7 +437,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_or_assign_with)
 CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_fromap_entry *ent = entry_r(&frm, &(int){-1});
     CHECK(validate(&frm), true);
@@ -506,7 +506,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify)
 CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_aux)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     int aux = 1;
     ccc_fromap_entry *ent = entry_r(&frm, &(int){-1});
@@ -572,7 +572,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_aux)
 CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_with)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     ccc_fromap_entry *ent = entry_r(&frm, &(int){-1});
     ent = frm_and_modify_w(ent, struct val, { T->val++; });
@@ -637,7 +637,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_and_modify_with)
 CHECK_BEGIN_STATIC_FN(fromap_test_or_insert)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     struct val *v = or_insert(entry_r(&frm, &(int){-1}),
                               &(struct val){.id = -1, .val = -1}.elem);
@@ -690,7 +690,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_or_insert)
 CHECK_BEGIN_STATIC_FN(fromap_test_or_insert_with)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     struct val *v = frm_or_insert_w(entry_r(&frm, &(int){-1}), idval(-1, -1));
     CHECK(validate(&frm), true);
@@ -741,7 +741,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_or_insert_with)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_entry)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     struct val *v = insert_entry(entry_r(&frm, &(int){-1}),
                                  &(struct val){.id = -1, .val = -1}.elem);
@@ -796,7 +796,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_entry)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_entry_with)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     struct val *v
         = frm_insert_entry_w(entry_r(&frm, &(int){-1}), idval(-1, -1));
@@ -848,7 +848,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_entry_with)
 CHECK_BEGIN_STATIC_FN(fromap_test_remove_entry)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[33]){}, elem, id, NULL, id_cmp, NULL, 33);
+        = frm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
     struct val *v = or_insert(entry_r(&frm, &(int){-1}),
                               &(struct val){.id = -1, .val = -1}.elem);
