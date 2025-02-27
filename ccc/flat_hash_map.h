@@ -106,12 +106,12 @@ struct val
     int val;
 };
 static flat_hash_map src
-    = fhm_init((static struct val[11]){}, 11, e, key, fhmap_int_to_u64,
-               fhmap_id_eq, NULL);
+    = fhm_init((static struct val[11]){}, e, key, fhmap_int_to_u64,
+               fhmap_id_eq, NULL, 11);
 insert_rand_vals(&src);
 static flat_hash_map dst
-    = fhm_init((static struct val[13]){}, 13, e, key, fhmap_int_to_u64,
-               fhmap_id_eq, NULL);
+    = fhm_init((static struct val[13]){}, e, key, fhmap_int_to_u64,
+               fhmap_id_eq, NULL, 13);
 ccc_result res = fhm_copy(&dst, &src, NULL);
 ```
 
@@ -127,12 +127,12 @@ struct val
     int val;
 };
 static flat_hash_map src
-    = fhm_init((struct val*)NULL, 0, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL);
+    = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
+               NULL, 0);
 insert_rand_vals(&src);
 static flat_hash_map dst
-    = fhm_init((struct val*)NULL, 0, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL);
+    = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
+               NULL, 0);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
@@ -150,12 +150,12 @@ struct val
     int val;
 };
 static flat_hash_map src
-    = fhm_init((struct val*)NULL, 0, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL);
+    = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
+               NULL, 0);
 insert_rand_vals(&src);
 static flat_hash_map dst
-    = fhm_init((struct val*)NULL, 0, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL);
+    = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
+               NULL, 0);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 

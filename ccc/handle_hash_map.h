@@ -131,12 +131,12 @@ struct val
     int val;
 };
 static handle_hash_map src
-    = hhm_init((static struct val[11]){}, 11, e, key, hhmap_int_to_u64,
-               hhmap_id_eq, NULL);
+    = hhm_init((static struct val[11]){}, e, key, hhmap_int_to_u64,
+               hhmap_id_eq, NULL, 11);
 insert_rand_vals(&src);
 static handle_hash_map dst
-    = hhm_init((static struct val[13]){}, 13, e, key, hhmap_int_to_u64,
-               hhmap_id_eq, NULL);
+    = hhm_init((static struct val[13]){}, e, key, hhmap_int_to_u64,
+               hhmap_id_eq, NULL, 13);
 ccc_result res = hhm_copy(&dst, &src, NULL);
 ```
 
@@ -152,12 +152,12 @@ struct val
     int val;
 };
 static handle_hash_map src
-    = hhm_init((struct val*)NULL, 0, e, key, hhmap_int_to_u64, hhmap_id_eq,
-               NULL);
+    = hhm_init((struct val*)NULL, e, key, hhmap_int_to_u64, hhmap_id_eq,
+               NULL, 0);
 insert_rand_vals(&src);
 static handle_hash_map dst
-    = hhm_init((struct val*)NULL, 0, e, key, hhmap_int_to_u64, hhmap_id_eq,
-               NULL);
+    = hhm_init((struct val*)NULL, e, key, hhmap_int_to_u64, hhmap_id_eq,
+               NULL, 0);
 ccc_result res = hhm_copy(&dst, &src, std_alloc);
 ```
 
@@ -175,12 +175,12 @@ struct val
     int val;
 };
 static handle_hash_map src
-    = hhm_init((struct val*)NULL, 0, e, key, hhmap_int_to_u64, hhmap_id_eq,
-               NULL);
+    = hhm_init((struct val*)NULL, e, key, hhmap_int_to_u64, hhmap_id_eq,
+               NULL, 0);
 insert_rand_vals(&src);
 static handle_hash_map dst
-    = hhm_init((struct val*)NULL, 0, e, key, hhmap_int_to_u64, hhmap_id_eq,
-               NULL);
+    = hhm_init((struct val*)NULL, e, key, hhmap_int_to_u64, hhmap_id_eq,
+               NULL, 0);
 ccc_result res = hhm_copy(&dst, &src, std_alloc);
 ```
 
