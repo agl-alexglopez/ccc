@@ -29,7 +29,7 @@ fromap_modplus(ccc_user_type const t)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[10]){}, 10, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[10]){}, elem, id, NULL, id_cmp, NULL, 10);
 
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = insert(&frm, &(struct val){.id = 137, .val = 99}.elem);
@@ -42,7 +42,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_macros)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[10]){}, 10, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[10]){}, elem, id, NULL, id_cmp, NULL, 10);
 
     struct val const *ins = ccc_frm_or_insert_w(
         entry_r(&frm, &(int){2}), (struct val){.id = 2, .val = 0});
@@ -86,7 +86,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_macros)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_overwrite)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[10]){}, 10, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[10]){}, elem, id, NULL, id_cmp, NULL, 10);
 
     struct val q = {.id = 137, .val = 99};
     ccc_entry ent = insert(&frm, &q.elem);
@@ -119,7 +119,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_overwrite)
 CHECK_BEGIN_STATIC_FN(fromap_test_insert_then_bad_ideas)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[10]){}, 10, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[10]){}, elem, id, NULL, id_cmp, NULL, 10);
     struct val q = {.id = 137, .val = 99};
     ccc_entry ent = insert(&frm, &q.elem);
     CHECK(occupied(&ent), false);
@@ -149,7 +149,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[200]){}, 200, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[200]){}, elem, id, NULL, id_cmp, NULL, 200);
     size_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
@@ -212,7 +212,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_via_entry)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[200]){}, 200, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[200]){}, elem, id, NULL, id_cmp, NULL, 200);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -257,7 +257,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_via_entry_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[200]){}, 200, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[200]){}, elem, id, NULL, id_cmp, NULL, 200);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -297,7 +297,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_api_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[200]){}, 200, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[200]){}, elem, id, NULL, id_cmp, NULL, 200);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -349,7 +349,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_entry_api_macros)
 CHECK_BEGIN_STATIC_FN(fromap_test_two_sum)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[20]){}, 20, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[20]){}, elem, id, NULL, id_cmp, NULL, 20);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -376,8 +376,8 @@ CHECK_BEGIN_STATIC_FN(fromap_test_resize)
 {
     size_t const prime_start = 11;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val *)malloc(sizeof(struct val) * prime_start),
-                   prime_start, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)malloc(sizeof(struct val) * prime_start), elem,
+                   id, std_alloc, id_cmp, NULL, prime_start);
     CHECK(frm_data(&frm) != NULL, true);
 
     int const to_insert = 1000;
@@ -410,8 +410,8 @@ CHECK_BEGIN_STATIC_FN(fromap_test_resize_macros)
 {
     size_t const prime_start = 11;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val *)malloc(sizeof(struct val) * prime_start),
-                   prime_start, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)malloc(sizeof(struct val) * prime_start), elem,
+                   id, std_alloc, id_cmp, NULL, prime_start);
     CHECK(frm_data(&frm) != NULL, true);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -451,7 +451,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_resize_macros)
 CHECK_BEGIN_STATIC_FN(fromap_test_resize_from_null)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)NULL, elem, id, std_alloc, id_cmp, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -480,7 +480,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_resize_from_null)
 CHECK_BEGIN_STATIC_FN(fromap_test_resize_from_null_macros)
 {
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)NULL, elem, id, std_alloc, id_cmp, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -520,7 +520,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_limit)
 {
     int const size = 101;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[101]){}, 101, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[101]){}, elem, id, NULL, id_cmp, NULL, 101);
 
     int const larger_prime = 103;
     int last_index = 0;
@@ -581,7 +581,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_and_find)
 {
     int const size = 101;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[101]){}, 101, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[101]){}, elem, id, NULL, id_cmp, NULL, 101);
 
     for (int i = 0; i < size; i += 2)
     {
@@ -615,7 +615,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_shuffle)
 {
     size_t const size = 50;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[51]){}, 51, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[51]){}, elem, id, NULL, id_cmp, NULL, 51);
     CHECK(size > 1, true);
     int const prime = 53;
     CHECK(insert_shuffled(&frm, size, prime), PASS);
@@ -632,7 +632,7 @@ CHECK_BEGIN_STATIC_FN(fromap_test_insert_weak_srand)
 {
     int const num_nodes = 1000;
     ccc_flat_realtime_ordered_map frm
-        = frm_init((struct val[1001]){}, 1001, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[1001]){}, elem, id, NULL, id_cmp, NULL, 1001);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {

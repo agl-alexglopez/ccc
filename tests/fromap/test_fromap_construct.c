@@ -13,7 +13,7 @@
 CHECK_BEGIN_STATIC_FN(fromap_test_empty)
 {
     flat_realtime_ordered_map s
-        = frm_init((struct val[3]){}, 3, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[3]){}, elem, id, NULL, id_cmp, NULL, 3);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }
@@ -21,9 +21,9 @@ CHECK_BEGIN_STATIC_FN(fromap_test_empty)
 CHECK_BEGIN_STATIC_FN(fromap_test_copy_no_alloc)
 {
     flat_realtime_ordered_map src
-        = frm_init((struct val[11]){}, 11, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[11]){}, elem, id, NULL, id_cmp, NULL, 11);
     flat_realtime_ordered_map dst
-        = frm_init((struct val[11]){}, 11, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[11]){}, elem, id, NULL, id_cmp, NULL, 11);
     (void)insert(&src, &(struct val){.id = 0}.elem);
     (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
@@ -52,9 +52,9 @@ CHECK_BEGIN_STATIC_FN(fromap_test_copy_no_alloc)
 CHECK_BEGIN_STATIC_FN(fromap_test_copy_no_alloc_fail)
 {
     flat_realtime_ordered_map src
-        = frm_init((struct val[11]){}, 11, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[11]){}, elem, id, NULL, id_cmp, NULL, 11);
     flat_realtime_ordered_map dst
-        = frm_init((struct val[7]){}, 7, elem, id, NULL, id_cmp, NULL);
+        = frm_init((struct val[7]){}, elem, id, NULL, id_cmp, NULL, 7);
     (void)insert(&src, &(struct val){.id = 0}.elem);
     (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
@@ -68,9 +68,9 @@ CHECK_BEGIN_STATIC_FN(fromap_test_copy_no_alloc_fail)
 CHECK_BEGIN_STATIC_FN(fromap_test_copy_alloc)
 {
     flat_realtime_ordered_map src
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)NULL, elem, id, std_alloc, id_cmp, NULL, 0);
     flat_realtime_ordered_map dst
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)NULL, elem, id, std_alloc, id_cmp, NULL, 0);
     (void)insert(&src, &(struct val){.id = 0}.elem);
     (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
@@ -102,9 +102,9 @@ CHECK_BEGIN_STATIC_FN(fromap_test_copy_alloc)
 CHECK_BEGIN_STATIC_FN(fromap_test_copy_alloc_fail)
 {
     flat_realtime_ordered_map src
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)NULL, elem, id, std_alloc, id_cmp, NULL, 0);
     flat_realtime_ordered_map dst
-        = frm_init((struct val *)NULL, 0, elem, id, std_alloc, id_cmp, NULL);
+        = frm_init((struct val *)NULL, elem, id, std_alloc, id_cmp, NULL, 0);
     (void)insert(&src, &(struct val){.id = 0}.elem);
     (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);

@@ -59,8 +59,8 @@ void *ccc_impl_frm_alloc_back(struct ccc_fromap_ *frm);
 
 /*=========================      Initialization     =========================*/
 
-#define ccc_impl_frm_init(memory_ptr, capacity, node_elem_field,               \
-                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \
+#define ccc_impl_frm_init(memory_ptr, node_elem_field, key_elem_field,         \
+                          alloc_fn, key_cmp_fn, aux_data, capacity)            \
     {                                                                          \
         .buf_ = ccc_buf_init(memory_ptr, alloc_fn, aux_data, capacity),        \
         .root_ = 0,                                                            \

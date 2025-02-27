@@ -66,19 +66,19 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initializes the map at runtime or compile time.
 @param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
-@param [in] capacity the capacity at mem_ptr or 0 if ((T *)NULL).
 @param [in] frm_elem_field the name of the intrusive map elem field.
 @param [in] key_elem_field the name of the field in user type used as key.
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] key_cmp_fn the key comparison function (see types.h).
 @param [in] aux_data a pointer to any auxiliary data for comparison or
 destruction.
+@param [in] capacity the capacity at mem_ptr or 0 if ((T *)NULL).
 @return the struct initialized ordered map for direct assignment
 (i.e. ccc_flat_realtime_ordered_map m = ccc_frm_init(...);). */
-#define ccc_frm_init(memory_ptr, capacity, frm_elem_field, key_elem_field,     \
-                     alloc_fn, key_cmp_fn, aux_data)                           \
-    ccc_impl_frm_init(memory_ptr, capacity, frm_elem_field, key_elem_field,    \
-                      alloc_fn, key_cmp_fn, aux_data)
+#define ccc_frm_init(memory_ptr, frm_elem_field, key_elem_field, alloc_fn,     \
+                     key_cmp_fn, aux_data, capacity)                           \
+    ccc_impl_frm_init(memory_ptr, frm_elem_field, key_elem_field, alloc_fn,    \
+                      key_cmp_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
@@ -106,10 +106,10 @@ struct val
     int val;
 };
 static flat_ordered_map src
-    = frm_init((static struct val[11]){}, 11, e, key, NULL, key_cmp, NULL);
+    = frm_init((static struct val[11]){}, e, key, NULL, key_cmp, NULL, 11);
 insert_rand_vals(&src);
 static flat_ordered_map dst
-    = frm_init((static struct val[13]){}, 13, e, key, NULL, key_cmp, NULL);
+    = frm_init((static struct val[13]){}, e, key, NULL, key_cmp, NULL, 13);
 ccc_result res = frm_copy(&dst, &src, NULL);
 ```
 
@@ -125,10 +125,10 @@ struct val
     int val;
 };
 static flat_ordered_map src
-    = frm_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+    = frm_init((struct val *)NULL, e, key, std_alloc, key_cmp, NULL, 0);
 insert_rand_vals(&src);
 static flat_ordered_map dst
-    = frm_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+    = frm_init((struct val *)NULL, e, key, std_alloc, key_cmp, NULL, 0);
 ccc_result res = frm_copy(&dst, &src, std_alloc);
 ```
 
@@ -146,10 +146,10 @@ struct val
     int val;
 };
 static flat_ordered_map src
-    = frm_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+    = frm_init((struct val *)NULL, e, key, std_alloc, key_cmp, NULL, 0);
 insert_rand_vals(&src);
 static flat_ordered_map dst
-    = frm_init((struct val *)NULL, 0, e, key, NULL, key_cmp, NULL);
+    = frm_init((struct val *)NULL, e, key, NULL, key_cmp, NULL, 0);
 ccc_result res = frm_copy(&dst, &src, std_alloc);
 ```
 
