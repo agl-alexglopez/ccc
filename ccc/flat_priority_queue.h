@@ -45,8 +45,8 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a fpq as a min or max heap.
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
-@param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] cmp_fn the user defined comarison function for user types.
+@param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @return the initilialized priority queue on the right hand side of an equality
@@ -55,14 +55,14 @@ operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
 Note that to avoid temporary or unpredictable allocation the fpq requires one
 slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
-#define ccc_fpq_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data, capacity) \
-    ccc_impl_fpq_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data, capacity)
+#define ccc_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity) \
+    ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity)
 
 /** @brief Order an existing array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
-@param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] cmp_fn the user defined comparison function for user types.
+@param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] size the size <= capacity.
@@ -72,9 +72,9 @@ operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
 Note that to avoid temporary or unpredictable allocation the fpq requires one
 slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
-#define ccc_fpq_heapify_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data,   \
+#define ccc_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,   \
                              capacity, size)                                   \
-    ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data,  \
+    ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,  \
                               capacity, size)
 
 /** @brief Copy the fpq from src to newly initialized dst.
