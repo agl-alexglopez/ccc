@@ -64,8 +64,9 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_hash_map *const hh, size_t const n,
    the user on insert. Leave this test here to always catch this. */
 CHECK_BEGIN_STATIC_FN(hhmap_test_validate)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
 
     ccc_handle ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
@@ -85,8 +86,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_validate)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_handle ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
@@ -139,8 +141,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
 CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_handle ent = remove(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
@@ -201,8 +204,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
 CHECK_BEGIN_STATIC_FN(hhmap_test_try_insert)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_handle ent = try_insert(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
@@ -254,8 +258,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_try_insert)
 CHECK_BEGIN_STATIC_FN(hhmap_test_try_insert_with)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_handle *ent = hhm_try_insert_w(&hh, -1, val(-1));
     CHECK(validate(&hh), true);
     CHECK(occupied(ent), false);
@@ -308,8 +313,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_try_insert_with)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_or_assign)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_handle ent
         = insert_or_assign(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
@@ -362,8 +368,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_or_assign)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_or_assign_with)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_handle *ent = hhm_insert_or_assign_w(&hh, -1, val(-1));
     CHECK(validate(&hh), true);
     CHECK(occupied(ent), false);
@@ -415,8 +422,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_or_assign_with)
 CHECK_BEGIN_STATIC_FN(hhmap_test_handle_and_modify)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_hhmap_handle *ent = handle_r(&hh, &(int){-1});
     CHECK(validate(&hh), true);
     CHECK(occupied(ent), false);
@@ -480,8 +488,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_handle_and_modify)
 CHECK_BEGIN_STATIC_FN(hhmap_test_handle_and_modify_aux)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     int aux = 1;
     ccc_hhmap_handle *ent = handle_r(&hh, &(int){-1});
     ent = and_modify_aux(ent, plusaux, &aux);
@@ -543,8 +552,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_handle_and_modify_aux)
 CHECK_BEGIN_STATIC_FN(hhmap_test_handle_and_modify_with)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     ccc_hhmap_handle *ent = handle_r(&hh, &(int){-1});
     ent = hhm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(size(&hh), 0);
@@ -605,8 +615,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_handle_and_modify_with)
 CHECK_BEGIN_STATIC_FN(hhmap_test_or_insert)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     struct val *v
         = hhm_at(&hh, or_insert(handle_r(&hh, &(int){-1}),
                                 &(struct val){.key = -1, .val = -1}.e));
@@ -663,8 +674,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_or_insert)
 CHECK_BEGIN_STATIC_FN(hhmap_test_or_insert_with)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     struct val *v = hhm_at(
         &hh, hhm_or_insert_w(handle_r(&hh, &(int){-1}), idval(-1, -1)));
     CHECK(validate(&hh), true);
@@ -715,8 +727,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_or_insert_with)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_handle)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     struct val *v
         = hhm_at(&hh, insert_handle(handle_r(&hh, &(int){-1}),
                                     &(struct val){.key = -1, .val = -1}.e));
@@ -773,8 +786,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_handle)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_handle_with)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     struct val *v = hhm_at(
         &hh, hhm_insert_handle_w(handle_r(&hh, &(int){-1}), idval(-1, -1)));
     CHECK(validate(&hh), true);
@@ -826,8 +840,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_handle_with)
 CHECK_BEGIN_STATIC_FN(hhmap_test_remove_handle)
 {
     int size = 30;
-    ccc_handle_hash_map hh = hhm_init((struct val[50]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 50);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 50);
     struct val *v
         = hhm_at(&hh, or_insert(handle_r(&hh, &(int){-1}),
                                 &(struct val){.key = -1, .val = -1}.e));

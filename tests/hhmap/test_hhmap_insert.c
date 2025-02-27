@@ -13,8 +13,9 @@
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[10]){}, e, key, NULL,
-                                      hhmap_int_zero, hhmap_id_eq, NULL, 10);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[10]){}, e, key, hhmap_int_zero, hhmap_id_eq,
+                   NULL, NULL, 10);
 
     /* Nothing was there before so nothing is in the handle. */
     ccc_handle ent = insert(&hh, &(struct val){.key = 137, .val = 99}.e);
@@ -26,8 +27,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_macros)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[10]){}, e, key, NULL,
-                                      hhmap_int_zero, hhmap_id_eq, NULL, 10);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[10]){}, e, key, hhmap_int_zero, hhmap_id_eq,
+                   NULL, NULL, 10);
 
     ccc_handle_i h = ccc_hhm_or_insert_w(handle_r(&hh, &(int){2}),
                                          (struct val){.key = 2, .val = 0});
@@ -77,8 +79,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_macros)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_overwrite)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[10]){}, e, key, NULL,
-                                      hhmap_int_zero, hhmap_id_eq, NULL, 10);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[10]){}, e, key, hhmap_int_zero, hhmap_id_eq,
+                   NULL, NULL, 10);
 
     struct val q = {.key = 137, .val = 99};
     ccc_handle ent = insert(&hh, &q.e);
@@ -113,8 +116,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_overwrite)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_then_bad_ideas)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[10]){}, e, key, NULL,
-                                      hhmap_int_zero, hhmap_id_eq, NULL, 10);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[10]){}, e, key, hhmap_int_zero, hhmap_id_eq,
+                   NULL, NULL, 10);
     struct val q = {.key = 137, .val = 99};
     ccc_handle ent = insert(&hh, &q.e);
     CHECK(occupied(&ent), false);
@@ -147,8 +151,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_handle_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_handle_hash_map hh
-        = hhm_init((struct val[200]){}, e, key, NULL, hhmap_int_last_digit,
-                   hhmap_id_eq, NULL, 200);
+        = hhm_init((struct val[200]){}, e, key, hhmap_int_last_digit,
+                   hhmap_id_eq, NULL, NULL, 200);
     size_t const size = 200;
 
     /* Test handle or insert with for all even values. Default should be
@@ -209,8 +213,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_handle)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_handle_hash_map hh
-        = hhm_init((struct val[200]){}, e, key, NULL, hhmap_int_last_digit,
-                   hhmap_id_eq, NULL, 200);
+        = hhm_init((struct val[200]){}, e, key, hhmap_int_last_digit,
+                   hhmap_id_eq, NULL, NULL, 200);
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -255,8 +259,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_via_handle_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
     ccc_handle_hash_map hh
-        = hhm_init((struct val[200]){}, e, key, NULL, hhmap_int_last_digit,
-                   hhmap_id_eq, NULL, 200);
+        = hhm_init((struct val[200]){}, e, key, hhmap_int_last_digit,
+                   hhmap_id_eq, NULL, NULL, 200);
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -298,8 +302,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_handle_api_macros)
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
     ccc_handle_hash_map hh
-        = hhm_init((struct val[200]){}, e, key, NULL, hhmap_int_last_digit,
-                   hhmap_id_eq, NULL, 200);
+        = hhm_init((struct val[200]){}, e, key, hhmap_int_last_digit,
+                   hhmap_id_eq, NULL, NULL, 200);
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -352,8 +356,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_handle_api_macros)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_two_sum)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val[20]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 20);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[20]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 20);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -381,7 +386,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize)
     size_t const prime_start = 11;
     ccc_handle_hash_map hh = hhm_init(
         (struct val *)malloc(sizeof(struct val) * prime_start), e, key,
-        std_alloc, hhmap_int_to_u64, hhmap_id_eq, NULL, prime_start);
+        hhmap_int_to_u64, hhmap_id_eq, std_alloc, NULL, prime_start);
     CHECK(hhm_data(&hh) != NULL, true);
     CHECK(size(&hh), 0);
 
@@ -427,7 +432,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
     size_t const prime_start = 11;
     ccc_handle_hash_map hh = hhm_init(
         (struct val *)malloc(sizeof(struct val) * prime_start), e, key,
-        std_alloc, hhmap_int_to_u64, hhmap_id_eq, NULL, prime_start);
+        hhmap_int_to_u64, hhmap_id_eq, std_alloc, NULL, prime_start);
     CHECK(hhm_data(&hh) != NULL, true);
     int const to_insert = 1000;
     ccc_handle_i stable_handles[1000] = {};
@@ -479,8 +484,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_macros)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val *)NULL, e, key, std_alloc,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 0);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val *)NULL, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = (int)hhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -515,8 +521,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null_macros)
 {
-    ccc_handle_hash_map hh = hhm_init((struct val *)NULL, e, key, std_alloc,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 0);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val *)NULL, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = (int)hhm_next_prime(to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -556,8 +563,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_resize_from_null_macros)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
 {
     int const size = 101;
-    ccc_handle_hash_map hh = hhm_init((struct val[101]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 101);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[101]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 101);
 
     int const larger_prime = (int)hhm_next_prime(size);
     int last_index = 0;
@@ -621,8 +629,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
 CHECK_BEGIN_STATIC_FN(hhmap_test_insert_and_find)
 {
     int const size = 101;
-    ccc_handle_hash_map hh = hhm_init((struct val[101]){}, e, key, NULL,
-                                      hhmap_int_to_u64, hhmap_id_eq, NULL, 101);
+    ccc_handle_hash_map hh
+        = hhm_init((struct val[101]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
+                   NULL, NULL, 101);
 
     for (int i = 0; i < size; i += 2)
     {
