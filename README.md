@@ -76,8 +76,7 @@ validate_sudoku_box(int const board[9][9], bitset *const row_check,
                     size_t const col_start)
 {
     bitset box_check
-        = bs_init((bitblock[bs_blocks(DIGITS)]){}, DIGITS, NULL, NULL,
-                  DIGITS);
+        = bs_init((bitblock[bs_blocks(DIGITS)]){}, NULL, NULL, DIGITS, DIGITS);
     ccc_tribool was_on = CCC_FALSE;
     for (size_t r = row_start; r < row_start + BOX_SIZE; ++r)
     {
@@ -117,11 +116,11 @@ static ccc_tribool
 is_valid_sudoku(int const board[9][9])
 {
     bitset row_check
-        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, ROWS * DIGITS,
-                  NULL, NULL, ROWS * DIGITS);
+        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, NULL, NULL,
+                  ROWS * DIGITS, ROWS * DIGITS);
     bitset col_check
-        = bs_init((bitblock[bs_blocks(COLS * DIGITS)]){}, COLS * DIGITS,
-                  NULL, NULL, COLS * DIGITS);
+        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, NULL, NULL,
+                  COLS * DIGITS, COLS * DIGITS);
     for (size_t row = 0; row < ROWS; row += BOX_SIZE)
     {
         for (size_t col = 0; col < COLS; col += BOX_SIZE)
@@ -204,7 +203,7 @@ main(void)
 {
     /* doubly linked list l, list elem field e, no allocation permission,
        comparing integers, no auxiliary data. */
-    doubly_linked_list l = dll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
+    doubly_linked_list l = dll_init(l, struct int_elem, e, int_cmp, NULL, NULL);
     struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
     (void)push_back(&l, &elems[0].e);
     (void)push_front(&l, &elems[1].e);
@@ -297,8 +296,8 @@ main(void)
     /* stack array backed, key field named key, intrusive field e, no
        allocation permission, a hash function, an equality function, no aux. */
     ccc_flat_hash_map fh;
-        = fhm_init((struct val[20]){}, 20, key, e, NULL, fhmap_int_to_u64,
-                    fhmap_id_eq, NULL);
+        = fhm_init((struct val[20]){}, 20, key, e, fhmap_int_to_u64,
+                    fhmap_id_eq, NULL, NULL);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -362,7 +361,7 @@ main(void)
        named elem, key field named key, no allocation permission, key comparison
        function, no aux data. */
     flat_ordered_map s
-        = fom_init((struct kval[26]){}, 26, elem, key, NULL, kval_cmp, NULL);
+        = fom_init((struct kval[26]){}, 26, elem, key, kval_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -426,7 +425,7 @@ main(void)
     /* Heapify existing array of values, with capacity, size one less than
        capacity for swap space, min priority queue, no allocation, no aux. */
     flat_priority_queue pq = fpq_heapify_init(
-        heap, (sizeof(heap) / sizeof(int)), 19, CCC_LES, NULL, int_cmp, NULL);
+        heap, CCC_LES, int_cmp, NULL, NULL, (sizeof(heap) / sizeof(int)), 19);
     (void)fpq_update_w(&pq, &heap[5], { heap[5] -= 4; });
     int prev = *((int *)front(&pq));
     (void)pop(&pq);
@@ -478,7 +477,7 @@ main(void)
        named elem, key field named key, no allocation permission, key comparison
        function, no aux data. */
     flat_realtime_ordered_map s
-        = frm_init((struct kval[26]){}, 26, elem, key, NULL, kval_cmp, NULL);
+        = frm_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -621,9 +620,9 @@ static_assert(PRIME_HASH_SIZE > CAP);
 static struct lru_cache lru_cache = {
     .cap = CAP,
     .l
-    = dll_init(lru_cache.l, struct lru_elem, list_elem, NULL, cmp_by_key, NULL),
-    .hh = hhm_init(map_buf, sizeof(map_buf) / sizeof(map_buf[0]), hash_elem,
-                   key, NULL, hhmap_int_to_u64, lru_elem_cmp, NULL),
+    = dll_init(lru_cache.l, struct lru_elem, list_elem, cmp_by_key, NULL, NULL),
+    .hh = hhm_init(map_buf, hash_elem, key, hhmap_int_to_u64, lru_elem_cmp,
+                   NULL, NULL, sizeof(map_buf) / sizeof(map_buf[0])),
 };
 
 void
@@ -773,7 +772,7 @@ main(void)
     struct name nodes[5];
     /* ordered_map named om, stores struct name, intrusive field e, key field
        name, no allocation permission, comparison fn, no aux */
-    ordered_map om = om_init(om, struct name, e, name, NULL, kval_cmp, NULL);
+    ordered_map om = om_init(om, struct name, e, name, kval_cmp, NULL, NULL);
     char const *const sorted_names[5]
         = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
     size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
@@ -843,7 +842,7 @@ main(void)
     /* ordered_map named om, stores struct name, intrusive field e, key field
        name, no allocation permission, comparison fn, no aux */
     ordered_multimap om
-        = omm_init(om, struct name, e, name, NULL, kval_cmp, NULL);
+        = omm_init(om, struct name, e, name, kval_cmp, NULL, NULL);
     char const *const sorted_repeat_names[10]
         = {"Ferris", "Ferris", "Glenda", "Glenda", "Rocky",
            "Rocky",  "Tux",    "Tux",    "Ziggy",  "Ziggy"};
@@ -907,7 +906,7 @@ main(void)
 {
     struct val elems[5]
         = {{.val = 3}, {.val = 3}, {.val = 7}, {.val = -1}, {.val = 5}};
-    priority_queue pq = pq_init(struct val, elem, CCC_LES, NULL, val_cmp, NULL);
+    priority_queue pq = pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     for (size_t i = 0; i < sizeof(elems) / sizeof(elems[0]); ++i)
     {
         struct val const *const v = push(&pq, &elems[i].elem);
@@ -959,7 +958,7 @@ main(void)
        named elem, key field named key, no allocation permission, key comparison
        function, no aux data. */
     realtime_ordered_map s
-        = rom_init(s, struct kval, elem, key, NULL, kval_cmp, NULL);
+        = rom_init(s, struct kval, elem, key, kval_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -1028,7 +1027,7 @@ main(void)
 {
     /* singly linked list l, list elem field e, no allocation permission,
        comparing integers, no auxiliary data. */
-    singly_linked_list l = sll_init(l, struct int_elem, e, NULL, int_cmp, NULL);
+    singly_linked_list l = sll_init(l, struct int_elem, e, int_cmp, NULL, NULL);
     struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
     (void)push_front(&l, &elems[0].e);
     (void)push_front(&l, &elems[1].e);
@@ -1079,13 +1078,13 @@ Here, the user is trying to insert a new key and value into the hash map which i
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
-#define ccc_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data) \
-    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn, aux_data)
+#define ccc_fpq_init(mem_ptr, capacity, cmp_order, cmp_fn, alloc_fn, aux_data) \
+    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, cmp_fn, alloc_fn, aux_data)
 
 /* For example: */
 
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, 40, CCC_LES, NULL, int_cmp, NULL);
+    = ccc_fpq_init((int[40]){}, 40, CCC_LES, int_cmp, NULL, NULL);
 
 ```
 
@@ -1093,7 +1092,7 @@ Here a small min priority queue of integers with a maximum capacity of 40 has be
 
 ```c
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+    = ccc_fpq_init((int *)NULL, 0, CCC_LES, int_cmp, std_alloc, NULL);
 ```
 
 Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.
@@ -1110,7 +1109,7 @@ As was mentioned in the previous section, all containers can be forbidden from a
 
 ```c
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, 40, CCC_LES, NULL, int_cmp, NULL);
+    = ccc_fpq_init((int[40]){}, 40, CCC_LES, int_cmp, NULL, NULL);
 ```
 
 For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used.
@@ -1126,7 +1125,7 @@ struct id_val
 };
 
 ccc_doubly_linked_list dll
-    = ccc_dll_init(dll, struct id_val, e, NULL, val_cmp, NULL);
+    = ccc_dll_init(dll, struct id_val, e, val_cmp, NULL, NULL);
 ```
 
 All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs.
@@ -1164,8 +1163,8 @@ struct val
     int val;
 };
 static flat_hash_map val_map
-    = fhm_init((static struct val[2999]){}, 2999, key, e, NULL,
-               fhmap_int_to_u64, fhmap_id_eq, NULL);
+    = fhm_init((static struct val[2999]){}, 2999, key, e, fhmap_int_to_u64,
+               fhmap_id_eq, NULL, NULL);
 ```
 
 A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see [allocation](#allocation) for more on `std_alloc`).
@@ -1179,8 +1178,8 @@ struct val
     int val;
 };
 static flat_hash_map val_map
-    = fhm_init((struct val *)NULL, 0, key, e, std_alloc, fhmap_int_to_u64,
-               fhmap_id_eq, NULL);
+    = fhm_init((struct val *)NULL, 0, key, e, fhmap_int_to_u64, fhmap_id_eq,
+               std_alloc, NULL);
 ```
 
 All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
@@ -1245,7 +1244,7 @@ struct id
 };
 /* ... */
 static ccc_doubly_linked_list id_list
-    = ccc_dll_init(id_list, struct id, id_elem, NULL, id_cmp, NULL);
+    = ccc_dll_init(id_list, struct id, id_elem, id_cmp, NULL, NULL);
 /* ... */
 struct id *front = ccc_dll_front(&id_list);
 struct id *new_id = generate_id();
