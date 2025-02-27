@@ -28,21 +28,21 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 
 /*=======================    Convenience Macros    ======================== */
 
-#define ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, alloc_fn, cmp_fn,      \
-                          aux_data)                                            \
+#define ccc_impl_fpq_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data,      \
+                          capacity)                                            \
     {                                                                          \
         .buf_ = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity),           \
         .cmp_ = (cmp_fn),                                                      \
         .order_ = (cmp_order),                                                 \
     }
 
-#define ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order,          \
-                                  alloc_fn, cmp_fn, aux_data)                  \
+#define ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, alloc_fn, cmp_fn,        \
+                                  aux_data, capacity, size)                    \
     (__extension__({                                                           \
         __auto_type fpq_heapify_mem_ = (mem_ptr);                              \
         struct ccc_fpq_ fpq_heapify_res_                                       \
-            = ccc_impl_fpq_init(fpq_heapify_mem_, capacity, cmp_order,         \
-                                alloc_fn, cmp_fn, aux_data);                   \
+            = ccc_impl_fpq_init(fpq_heapify_mem_, cmp_order, alloc_fn, cmp_fn, \
+                                aux_data, capacity);                           \
         ccc_impl_fpq_in_place_heapify(&fpq_heapify_res_, (size));              \
         fpq_heapify_res_;                                                      \
     }))

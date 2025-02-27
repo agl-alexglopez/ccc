@@ -44,11 +44,11 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a fpq as a min or max heap.
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
-@param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] cmp_fn the user defined comarison function for user types.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
+@param [in] capacity the capacity of contiguous elements at mem_ptr.
 @return the initilialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
 
@@ -60,22 +60,22 @@ N + 1 capacity is required. */
 
 /** @brief Order an existing array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
-@param [in] capacity the capacity of contiguous elements at mem_ptr.
-@param [in] size the size <= capacity.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] cmp_fn the user defined comparison function for user types.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
+@param [in] capacity the capacity of contiguous elements at mem_ptr.
+@param [in] size the size <= capacity.
 @return the initilialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
 
 Note that to avoid temporary or unpredictable allocation the fpq requires one
 slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
-#define ccc_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,     \
-                             cmp_fn, aux_data)                                 \
-    ccc_impl_fpq_heapify_init(mem_ptr, capacity, size, cmp_order, alloc_fn,    \
-                              cmp_fn, aux_data)
+#define ccc_fpq_heapify_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data,   \
+                             capacity, size)                                   \
+    ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, alloc_fn, cmp_fn, aux_data,  \
+                              capacity, size)
 
 /** @brief Copy the fpq from src to newly initialized dst.
 @param [in] dst the destination that will copy the source fpq.
@@ -97,10 +97,10 @@ Manual memory management with no allocation function provided.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue src
-    = fpq_init((int[10]){}, 10, CCC_LES, NULL, int_cmp, NULL);
+    = fpq_init((int[10]){}, CCC_LES, NULL, int_cmp, NULL, 10);
 push_rand_ints(&src);
 flat_priority_queue dst
-    = fpq_init((int[11]){}, 11, CCC_LES, NULL, int_cmp, NULL);
+    = fpq_init((int[11]){}, CCC_LES, NULL, int_cmp, NULL, 11);
 ccc_result res = fpq_copy(&dst, &src, NULL);
 ```
 
@@ -110,10 +110,10 @@ is memory management handed over to the copy function.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue src
-    = fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+    = fpq_init((int *)NULL, CCC_LES, std_alloc, int_cmp, NULL, 0);
 push_rand_ints(&src);
 flat_priority_queue dst
-    = fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+    = fpq_init((int *)NULL, CCC_LES, std_alloc, int_cmp, NULL, 0);
 ccc_result res = fpq_copy(&dst, &src, std_alloc);
 ```
 
@@ -125,10 +125,10 @@ size fpq.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue src
-    = fpq_init((int *)NULL, 0, CCC_LES, std_alloc, int_cmp, NULL);
+    = fpq_init((int *)NULL, CCC_LES, std_alloc, int_cmp, NULL, 0);
 push_rand_ints(&src);
 flat_priority_queue dst
-    = fpq_init((int *)NULL, 0, CCC_LES, NULL, int_cmp, NULL);
+    = fpq_init((int *)NULL, CCC_LES, NULL, int_cmp, NULL, 0);
 ccc_result res = fpq_copy(&dst, &src, std_alloc);
 ```
 
