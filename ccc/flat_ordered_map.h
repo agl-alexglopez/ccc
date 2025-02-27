@@ -113,10 +113,10 @@ struct val
     int val;
 };
 static flat_ordered_map src
-    = fom_init((static struct val[11]){}, 11, e, key, NULL, key_cmp, NULL);
+    = fom_init((static struct val[11]){}, e, key, NULL, key_cmp, NULL, 11);
 insert_rand_vals(&src);
 static flat_ordered_map dst
-    = fom_init((static struct val[13]){}, 13, e, key, NULL, key_cmp, NULL);
+    = fom_init((static struct val[13]){}, e, key, NULL, key_cmp, NULL, 13);
 ccc_result res = fom_copy(&dst, &src, NULL);
 ```
 
@@ -132,10 +132,10 @@ struct val
     int val;
 };
 static flat_ordered_map src
-    = fom_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+    = fom_init((struct val *)NULL, e, key, std_alloc, key_cmp, NULL, 0);
 insert_rand_vals(&src);
 static flat_ordered_map dst
-    = fom_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+    = fom_init((struct val *)NULL, e, key, std_alloc, key_cmp, NULL, 0);
 ccc_result res = fom_copy(&dst, &src, std_alloc);
 ```
 
@@ -153,10 +153,10 @@ struct val
     int val;
 };
 static flat_ordered_map src
-    = fom_init((struct val *)NULL, 0, e, key, std_alloc, key_cmp, NULL);
+    = fom_init((struct val *)NULL, e, key, std_alloc, key_cmp, NULL);
 insert_rand_vals(&src);
 static flat_ordered_map dst
-    = fom_init((struct val *)NULL, 0, e, key, NULL, key_cmp, NULL);
+    = fom_init((struct val *)NULL, e, key, NULL, key_cmp, NULL, 0);
 ccc_result res = fom_copy(&dst, &src, std_alloc);
 ```
 
