@@ -15,7 +15,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_one)
 {
     struct val single[2] = {};
     ccc_flat_priority_queue fpq
-        = ccc_fpq_init(single, CCC_LES, NULL, val_cmp, NULL,
+        = ccc_fpq_init(single, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(single) / sizeof(single[0])));
     single[0].val = 0;
     (void)push(&fpq, &single[0]);
@@ -28,7 +28,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three)
     size_t size = 3;
     struct val three_vals[4] = {};
     ccc_flat_priority_queue fpq
-        = ccc_fpq_init(three_vals, CCC_LES, NULL, val_cmp, NULL,
+        = ccc_fpq_init(three_vals, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(three_vals) / sizeof(three_vals[0])));
     for (size_t i = 0; i < size; ++i)
     {
@@ -46,10 +46,10 @@ CHECK_BEGIN_STATIC_FN(fpq_test_struct_getter)
     size_t const size = 10;
     struct val vals[10 + 1];
     ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, NULL, val_cmp, NULL, (sizeof(vals) / sizeof(vals[0])));
+        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
     struct val tester_clone[10 + 1];
     ccc_flat_priority_queue fpq_clone
-        = ccc_fpq_init(tester_clone, CCC_LES, NULL, val_cmp, NULL,
+        = ccc_fpq_init(tester_clone, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < size; ++i)
     {
@@ -74,7 +74,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three_dups)
 {
     struct val three_vals[3 + 1];
     ccc_flat_priority_queue fpq
-        = ccc_fpq_init(three_vals, CCC_LES, NULL, val_cmp, NULL,
+        = ccc_fpq_init(three_vals, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(three_vals) / sizeof(three_vals[0])));
     for (int i = 0; i < 3; ++i)
     {
@@ -94,7 +94,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
     int const prime = 53;
     struct val vals[50 + 1];
     ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, NULL, val_cmp, NULL, (sizeof(vals) / sizeof(vals[0])));
+        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
 
     struct val const *min = front(&fpq);
@@ -115,7 +115,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)
     size_t const size = 10;
     struct val vals[10 + 1];
     ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, NULL, val_cmp, NULL, (sizeof(vals) / sizeof(vals[0])));
+        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)i;
