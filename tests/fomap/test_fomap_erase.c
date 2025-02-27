@@ -17,7 +17,7 @@
 CHECK_BEGIN_STATIC_FN(fomap_test_insert_erase_shuffled)
 {
     struct val vals[51];
-    ccc_flat_ordered_map s = fom_init(vals, 51, elem, id, NULL, id_cmp, NULL);
+    ccc_flat_ordered_map s = fom_init(vals, elem, id, NULL, id_cmp, NULL, 51);
     size_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -42,7 +42,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_erase_shuffled)
 CHECK_BEGIN_STATIC_FN(fomap_test_prime_shuffle)
 {
     struct val vals[51];
-    ccc_flat_ordered_map s = fom_init(vals, 51, elem, id, NULL, id_cmp, NULL);
+    ccc_flat_ordered_map s = fom_init(vals, elem, id, NULL, id_cmp, NULL, 51);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -76,7 +76,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_weak_srand)
 {
     struct val vals[1001];
     ccc_flat_ordered_map s
-        = fom_init(vals, 10001, elem, id, NULL, id_cmp, NULL);
+        = fom_init(vals, elem, id, NULL, id_cmp, NULL, 10001);
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
