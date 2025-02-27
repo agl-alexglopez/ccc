@@ -64,16 +64,16 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] struct_name the user type wrapping the intrusive element.
 @param [in] rom_elem_field the name of the intrusive map elem field.
 @param [in] key_elem_field the name of the field in user type used as key.
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] key_cmp_fn the key comparison function (see types.h).
+@param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] aux_data a pointer to any auxiliary data for comparison or
 destruction.
 @return the struct initialized ordered map for direct assignment
 (i.e. ccc_realtime_ordered_map m = ccc_rom_init(...);). */
 #define ccc_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,    \
-                     alloc_fn, key_cmp_fn, aux_data)                           \
+                     key_cmp_fn, alloc_fn, aux_data)                           \
     ccc_impl_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,   \
-                      alloc_fn, key_cmp_fn, aux_data)
+                      key_cmp_fn, alloc_fn, aux_data)
 
 /**@}*/
 

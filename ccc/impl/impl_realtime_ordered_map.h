@@ -46,7 +46,7 @@ union ccc_romap_entry_
 };
 
 #define ccc_impl_rom_init(map_name, struct_name, node_elem_field,              \
-                          key_elem_field, alloc_fn, key_cmp_fn, aux_data)      \
+                          key_elem_field, key_cmp_fn, alloc_fn, aux_data)      \
     {                                                                          \
         .root_ = &(map_name).end_,                                             \
         .end_ = {.parity_ = 1,                                                 \

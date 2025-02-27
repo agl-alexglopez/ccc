@@ -69,7 +69,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_validate)
     struct val_pool vals
         = {.vals = (struct val[3]){}, .next_free = 0, .capacity = 3};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     ccc_entry ent = insert(&rom, &(struct val){.key = -1, .val = -1}.elem,
                            &(struct val){}.elem);
     CHECK(validate(&rom), true);
@@ -93,7 +93,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_entry ent = insert(&rom, &(struct val){.key = -1, .val = -1}.elem,
                            &(struct val){}.elem);
@@ -158,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_entry ent = remove(&rom, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&rom), true);
@@ -232,7 +232,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_try_insert)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_entry ent = try_insert(&rom, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&rom), true);
@@ -290,7 +290,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_try_insert_with)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_entry *ent = rom_try_insert_w(&rom, -1, val(-1));
     CHECK(validate(&rom), true);
@@ -349,7 +349,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_or_assign)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_entry ent
         = insert_or_assign(&rom, &(struct val){.key = -1, .val = -1}.elem);
@@ -408,7 +408,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_or_assign_with)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_entry *ent = rom_insert_or_assign_w(&rom, -1, val(-1));
     CHECK(validate(&rom), true);
@@ -466,7 +466,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_and_modify)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_romap_entry *ent = entry_r(&rom, &(int){-1});
     CHECK(validate(&rom), true);
@@ -537,7 +537,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_and_modify_aux)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     int aux = 1;
     ccc_romap_entry *ent = entry_r(&rom, &(int){-1});
@@ -605,7 +605,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_and_modify_with)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     ccc_romap_entry *ent = entry_r(&rom, &(int){-1});
     ent = rom_and_modify_w(ent, struct val, { T->val++; });
@@ -672,7 +672,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_or_insert)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     struct val *v = or_insert(entry_r(&rom, &(int){-1}),
                               &(struct val){.key = -1, .val = -1}.elem);
@@ -729,7 +729,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_or_insert_with)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     struct val *v = rom_or_insert_w(entry_r(&rom, &(int){-1}), idval(-1, -1));
     CHECK(validate(&rom), true);
@@ -782,7 +782,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_entry)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     struct val *v = insert_entry(entry_r(&rom, &(int){-1}),
                                  &(struct val){.key = -1, .val = -1}.elem);
@@ -839,7 +839,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_entry_with)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     struct val *v
         = rom_insert_entry_w(entry_r(&rom, &(int){-1}), idval(-1, -1));
@@ -893,7 +893,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove_entry)
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ccc_realtime_ordered_map rom
-        = rom_init(rom, struct val, elem, key, val_bump_alloc, id_cmp, &vals);
+        = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     struct val *v = or_insert(entry_r(&rom, &(int){-1}),
                               &(struct val){.key = -1, .val = -1}.elem);
