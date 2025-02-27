@@ -9,7 +9,7 @@
 CHECK_BEGIN_STATIC_FN(bs_test_push_back_no_realloc)
 {
     ccc_bitset bs
-        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(16)]){}, 16, NULL, NULL);
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(16)]){}, NULL, NULL, 16);
     CHECK(ccc_bs_capacity(&bs), 16);
     CHECK(ccc_bs_size(&bs), 0);
     ccc_result push_status = CCC_OK;
@@ -39,7 +39,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_back_no_realloc)
 
 CHECK_BEGIN_STATIC_FN(bs_test_push_back_alloc)
 {
-    ccc_bitset bs = ccc_bs_init(NULL, 0, std_alloc, NULL);
+    ccc_bitset bs = ccc_bs_init(NULL, std_alloc, NULL, 0);
     CHECK(ccc_bs_capacity(&bs), 0);
     CHECK(ccc_bs_size(&bs), 0);
     for (size_t i = 0; ccc_bs_size(&bs) < 16ULL; ++i)

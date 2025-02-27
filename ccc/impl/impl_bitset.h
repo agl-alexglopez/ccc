@@ -35,7 +35,7 @@ struct ccc_bitset_
     __VA_OPT__(IMPL_BS_NON_)##IMPL_BS_DEFAULT_SIZE(__VA_ARGS__)
 
 /** @private */
-#define ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, ...)                \
+#define ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, ...)                \
     {                                                                          \
         .mem_ = (bitblock_ptr),                                                \
         .sz_ = IMPL_BS_OPTIONAL_SIZE(__VA_ARGS__),                             \
