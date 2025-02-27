@@ -15,7 +15,7 @@
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_remove_four_dups)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
@@ -39,7 +39,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_remove_four_dups)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_erase_shuffled)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -67,7 +67,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_erase_shuffled)
 CHECK_BEGIN_STATIC_FN(ommap_test_pop_max)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -95,7 +95,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_pop_max)
 CHECK_BEGIN_STATIC_FN(ommap_test_pop_min)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -123,7 +123,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_pop_min)
 CHECK_BEGIN_STATIC_FN(ommap_test_max_round_robin)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     int const size = 6;
     struct val vals[6];
     struct val const order[6] = {
@@ -160,7 +160,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_max_round_robin)
 CHECK_BEGIN_STATIC_FN(ommap_test_min_round_robin)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     int const size = 6;
     struct val vals[6];
     struct val const order[6] = {
@@ -197,7 +197,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_min_round_robin)
 CHECK_BEGIN_STATIC_FN(ommap_test_delete_prime_shuffle_duplicates)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -233,7 +233,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_delete_prime_shuffle_duplicates)
 CHECK_BEGIN_STATIC_FN(ommap_test_prime_shuffle)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -265,7 +265,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(ommap_test_weak_srand)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));

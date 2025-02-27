@@ -93,8 +93,8 @@ static struct lru_cache lru_cache = {
     .cap = 3,
     .l = dll_init(lru_cache.l, struct lru_elem, list_elem, NULL, cmp_list_elems,
                   NULL),
-    .map = om_init(lru_cache.map, struct lru_elem, map_elem, key, std_alloc,
-                   cmp_by_key, NULL),
+    .map = om_init(lru_cache.map, struct lru_elem, map_elem, key, cmp_by_key,
+                   std_alloc, NULL),
 };
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
