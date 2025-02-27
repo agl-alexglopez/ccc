@@ -11,7 +11,7 @@
 
 CHECK_BEGIN_STATIC_FN(sll_test_insert_three)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val v0 = (struct val){};
     CHECK(push_front(&sll, &v0.e) != NULL, true);
     struct val *v = front(&sll);
@@ -37,7 +37,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_insert_three)
 
 CHECK_BEGIN_STATIC_FN(sll_push_and_splice)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&sll, 4, vals);
     CHECK(t, PASS);
@@ -56,7 +56,7 @@ CHECK_BEGIN_STATIC_FN(sll_push_and_splice)
 
 CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&sll, 5, vals);
@@ -83,7 +83,7 @@ CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range)
 
 CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range_no_ops)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&sll, 5, vals);

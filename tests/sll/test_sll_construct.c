@@ -10,7 +10,7 @@
 
 CHECK_BEGIN_STATIC_FN(sll_test_construct)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     CHECK(is_empty(&sll), true);
     CHECK_END_FN();
 }

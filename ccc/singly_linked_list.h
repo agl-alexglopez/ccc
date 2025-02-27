@@ -65,16 +65,16 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] struct_name the user type wrapping the intrusive sll elem.
 @param [in] list_elem_field the name of the field in the user type storing the
 intrusive list elem.
-@param [in] alloc_fn an allocation function if allocation is allowed.
 @param [in] cmp_fn a comparison function for searching or sorting the list.
+@param [in] alloc_fn an allocation function if allocation is allowed.
 @param [in] aux_data a pointer to any auxiliary data needed for comparison or
 destruction.
 @return a stuct initializer for the singly linked list to be assigned
 (e.g. ccc_singly_linked_list l = ccc_sll_init(...);). */
-#define ccc_sll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
-                     cmp_fn, aux_data)                                         \
-    ccc_impl_sll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
-                      cmp_fn, aux_data)
+#define ccc_sll_init(list_name, struct_name, list_elem_field, cmp_fn,          \
+                     alloc_fn, aux_data)                                       \
+    ccc_impl_sll_init(list_name, struct_name, list_elem_field, cmp_fn,         \
+                      alloc_fn, aux_data)
 
 /**@}*/
 
