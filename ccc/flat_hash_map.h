@@ -67,18 +67,18 @@ interpreted in units of type size that the user intends to store.
 buffer is provided and an allocation function is given.
 @param [in] fhash_elem_field the name of the fhmap_elem field.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] alloc_fn the allocation function for resizing or NULL if no
-resizing is allowed.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
 @param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
+@param [in] alloc_fn the allocation function for resizing or NULL if no
+resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @param [in] capacity the starting capacity of the provided buffer or 0 if no
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
-#define ccc_fhm_init(memory_ptr, fhash_elem_field, key_field, alloc_fn,        \
-                     hash_fn, key_eq_fn, aux_data, capacity)                   \
-    ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, alloc_fn,       \
-                      hash_fn, key_eq_fn, aux_data, capacity)
+#define ccc_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,         \
+                     key_eq_fn, alloc_fn, aux_data, capacity)                  \
+    ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,        \
+                      key_eq_fn, alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
@@ -107,11 +107,11 @@ struct val
 };
 static flat_hash_map src
     = fhm_init((static struct val[11]){}, e, key, fhmap_int_to_u64,
-               fhmap_id_eq, NULL, 11);
+               fhmap_id_eq, NULL, NULL, 11);
 insert_rand_vals(&src);
 static flat_hash_map dst
     = fhm_init((static struct val[13]){}, e, key, fhmap_int_to_u64,
-               fhmap_id_eq, NULL, 13);
+               fhmap_id_eq, NULL, NULL, 13);
 ccc_result res = fhm_copy(&dst, &src, NULL);
 ```
 
@@ -128,11 +128,11 @@ struct val
 };
 static flat_hash_map src
     = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, 0);
+               NULL, NULL, 0);
 insert_rand_vals(&src);
 static flat_hash_map dst
     = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, 0);
+               NULL, NULL, 0);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
@@ -151,11 +151,11 @@ struct val
 };
 static flat_hash_map src
     = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, 0);
+               NULL, NULL, 0);
 insert_rand_vals(&src);
 static flat_hash_map dst
     = fhm_init((struct val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, 0);
+               NULL, NULL, 0);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
