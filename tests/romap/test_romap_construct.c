@@ -8,7 +8,7 @@
 CHECK_BEGIN_STATIC_FN(romap_test_empty)
 {
     ccc_realtime_ordered_map s
-        = ccc_rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = ccc_rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     CHECK(ccc_rom_is_empty(&s), true);
     CHECK_END_FN();
 }

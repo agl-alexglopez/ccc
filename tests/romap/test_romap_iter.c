@@ -155,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(iterator_check, realtime_ordered_map *s)
 CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -187,7 +187,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
 CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -218,7 +218,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
 CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -255,7 +255,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
 CHECK_BEGIN_STATIC_FN(romap_test_valid_range)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -285,7 +285,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_valid_range)
 CHECK_BEGIN_STATIC_FN(romap_test_valid_range_equals)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -314,7 +314,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_valid_range_equals)
 CHECK_BEGIN_STATIC_FN(romap_test_invalid_range)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -343,7 +343,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_invalid_range)
 CHECK_BEGIN_STATIC_FN(romap_test_empty_range)
 {
     realtime_ordered_map s
-        = rom_init(s, struct val, elem, key, NULL, id_cmp, NULL);
+        = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
