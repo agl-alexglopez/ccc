@@ -102,9 +102,9 @@ from the stack or data segment as determined by the user. */
 
 /** @brief Initialize the bit set with memory and allocation permissions.
 @param [in] bitblock_ptr the pointer to existing blocks or NULL.
-@param [in] cap the number of bits that will be stored in this bit set.
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
 @param [in] aux auxiliary data needed for allocation of the bit set.
+@param [in] cap the number of bits that will be stored in this bit set.
 @param [in] optional_size an optional starting size <= capacity. If the bitset
 is of fixed size with no allocation permission, and dynamic push and pop are not
 needed, the optional size parameter should be set equivalent to capacity.
@@ -127,8 +127,8 @@ bitset bs = bs_init(NULL, 0, std_alloc, NULL);
 ```
 
 See types.h for more on allocation functions. */
-#define ccc_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size...)        \
-    ccc_impl_bs_init(bitblock_ptr, cap, alloc_fn, aux, optional_size)
+#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)        \
+    ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size)
 
 /** @brief Copy the bit set at source to destination.
 @param [in] dst the initialized destination for the copy of the src set.
