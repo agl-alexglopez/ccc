@@ -11,7 +11,7 @@
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
@@ -27,7 +27,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_extract_middle)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
@@ -46,7 +46,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_extract_middle)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_extract_range)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, NULL, val_cmp, NULL);
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&sll, 5, vals);
@@ -67,13 +67,13 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_extract_range)
 CHECK_BEGIN_STATIC_FN(sll_test_splice_two_lists)
 {
     singly_linked_list to_lose
-        = sll_init(to_lose, struct val, e, NULL, val_cmp, NULL);
+        = sll_init(to_lose, struct val, e, val_cmp, NULL, NULL);
     struct val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result t = create_list(&to_lose, 5, to_lose_vals);
     CHECK(t, PASS);
     singly_linked_list to_gain
-        = sll_init(to_gain, struct val, e, NULL, val_cmp, NULL);
+        = sll_init(to_gain, struct val, e, val_cmp, NULL, NULL);
     struct val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
     t = create_list(&to_gain, 2, to_gain_vals);
     CHECK(t, PASS);

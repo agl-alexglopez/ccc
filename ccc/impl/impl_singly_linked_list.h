@@ -26,8 +26,8 @@ struct ccc_sll_
     void *aux_;
 };
 
-#define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, alloc_fn,     \
-                          cmp_fn, aux_data)                                    \
+#define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, cmp_fn,       \
+                          alloc_fn, aux_data)                                  \
     {                                                                          \
         .sentinel_.n_ = &(sll_name).sentinel_,                                 \
         .elem_sz_ = sizeof(struct_name),                                       \
