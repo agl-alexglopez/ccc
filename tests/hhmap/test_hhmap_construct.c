@@ -39,8 +39,8 @@ gen(int *to_affect)
 
 static struct val s_vals[10];
 static handle_hash_map static_fh
-    = hhm_init(s_vals, sizeof(s_vals) / sizeof(s_vals[0]), e, key, NULL,
-               hhmap_int_to_u64, hhmap_id_eq, NULL);
+    = hhm_init(s_vals, e, key, NULL, hhmap_int_to_u64, hhmap_id_eq, NULL,
+               sizeof(s_vals) / sizeof(s_vals[0]));
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_static_init)
 {
@@ -91,10 +91,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_static_init)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc)
 {
-    handle_hash_map src = hhm_init((struct val[11]){}, 11, e, key, NULL,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
-    handle_hash_map dst = hhm_init((struct val[13]){}, 13, e, key, NULL,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map src = hhm_init((struct val[11]){}, e, key, NULL,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 11);
+    handle_hash_map dst = hhm_init((struct val[13]){}, e, key, NULL,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 13);
     (void)hhm_insert(&src, &(struct val){.key = 0}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
     (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
@@ -122,10 +122,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc_fail)
 {
-    handle_hash_map src = hhm_init((struct val[11]){}, 11, e, key, NULL,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
-    handle_hash_map dst = hhm_init((struct val[7]){}, 7, e, key, NULL,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map src = hhm_init((struct val[11]){}, e, key, NULL,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 11);
+    handle_hash_map dst = hhm_init((struct val[7]){}, e, key, NULL,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 7);
     (void)hhm_insert(&src, &(struct val){.key = 0}.e);
     (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)hhm_insert(&src, &(struct val){.key = 2, .val = 2}.e);
@@ -138,10 +138,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc_fail)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc)
 {
-    handle_hash_map src = hhm_init((struct val *)NULL, 0, e, key, std_alloc,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
-    handle_hash_map dst = hhm_init((struct val *)NULL, 0, e, key, std_alloc,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map src = hhm_init((struct val *)NULL, e, key, std_alloc,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 0);
+    handle_hash_map dst = hhm_init((struct val *)NULL, e, key, std_alloc,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 0);
     (void)hhm_insert(&src, &(struct val){.key = 0}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
     (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
@@ -172,10 +172,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc_fail)
 {
-    handle_hash_map src = hhm_init((struct val *)NULL, 0, e, key, std_alloc,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
-    handle_hash_map dst = hhm_init((struct val *)NULL, 0, e, key, std_alloc,
-                                   hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map src = hhm_init((struct val *)NULL, e, key, std_alloc,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 0);
+    handle_hash_map dst = hhm_init((struct val *)NULL, e, key, std_alloc,
+                                   hhmap_int_zero, hhmap_id_eq, NULL, 0);
     (void)hhm_insert(&src, &(struct val){.key = 0}.e);
     (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)hhm_insert(&src, &(struct val){.key = 2, .val = 2}.e);
@@ -189,16 +189,17 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc_fail)
 CHECK_BEGIN_STATIC_FN(hhmap_test_empty)
 {
     struct val vals[5] = {};
-    handle_hash_map fh = hhm_init(vals, sizeof(vals) / sizeof(vals[0]), key, e,
-                                  NULL, hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map fh
+        = hhm_init(vals, key, e, NULL, hhmap_int_zero, hhmap_id_eq, NULL,
+                   sizeof(vals) / sizeof(vals[0]));
     CHECK(hhm_is_empty(&fh), true);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_functional)
 {
-    handle_hash_map fh = hhm_init((struct val[5]){}, 5, e, key, NULL,
-                                  hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map fh = hhm_init((struct val[5]){}, e, key, NULL,
+                                  hhmap_int_zero, hhmap_id_eq, NULL, 5);
     CHECK(hhm_is_empty(&fh), true);
     struct val def = {.key = 137, .val = 0};
     hhmap_handle ent = hhm_handle(&fh, &def.key);
@@ -221,8 +222,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_functional)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_macros)
 {
-    handle_hash_map fh = hhm_init((struct val[5]){}, 5, e, key, NULL,
-                                  hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map fh = hhm_init((struct val[5]){}, e, key, NULL,
+                                  hhmap_int_zero, hhmap_id_eq, NULL, 5);
     CHECK(hhm_is_empty(&fh), true);
     CHECK(hhm_get_key_val(&fh, &(int){137}), false);
     int const key = 137;
@@ -247,8 +248,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_macros)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_hhm_and_modify_functional)
 {
-    handle_hash_map fh = hhm_init((struct val[5]){}, 5, e, key, NULL,
-                                  hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map fh = hhm_init((struct val[5]){}, e, key, NULL,
+                                  hhmap_int_zero, hhmap_id_eq, NULL, 5);
     CHECK(hhm_is_empty(&fh), true);
     struct val def = {.key = 137, .val = 0};
 
@@ -291,8 +292,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_hhm_and_modify_functional)
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_hhm_handle_hhm_and_modify_macros)
 {
-    handle_hash_map fh = hhm_init((struct val[5]){}, 5, e, key, NULL,
-                                  hhmap_int_zero, hhmap_id_eq, NULL);
+    handle_hash_map fh = hhm_init((struct val[5]){}, e, key, NULL,
+                                  hhmap_int_zero, hhmap_id_eq, NULL, 5);
     CHECK(hhm_is_empty(&fh), true);
 
     /* Returning a vacant hhm_handle is possible when modification is attempted.
