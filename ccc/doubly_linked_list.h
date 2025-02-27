@@ -67,17 +67,17 @@ destructors.
 @param [in] list_name the name of the list being initialized.
 @param [in] struct_name the type containing the intrusive dll element.
 @param [in] list_elem_field name of the dll element in the containing type.
-@param [in] alloc_fn the optional allocation function or NULL.
 @param [in] cmp_fn the ccc_cmp_fn used to compare list elements.
 @param [in] aux_data any auxilliary data that will be needed for comparison,
 printing, or destruction of elements.
+@param [in] alloc_fn the optional allocation function or NULL.
 @return the initialized list. Assign to the list directly on the right hand
 side of an equality operator. Initialization can occur at runtime or compile
 time (e.g. ccc_doubly_linked l = ccc_dll_init(...);). */
-#define ccc_dll_init(list_name, struct_name, list_elem_field, alloc_fn,        \
-                     cmp_fn, aux_data)                                         \
-    ccc_impl_dll_init(list_name, struct_name, list_elem_field, alloc_fn,       \
-                      cmp_fn, aux_data)
+#define ccc_dll_init(list_name, struct_name, list_elem_field, cmp_fn,          \
+                     alloc_fn, aux_data)                                       \
+    ccc_impl_dll_init(list_name, struct_name, list_elem_field, cmp_fn,         \
+                      alloc_fn, aux_data)
 
 /**@}*/
 

@@ -98,7 +98,7 @@ static_assert(PRIME_HASH_SIZE > CAP);
 static struct lru_cache lru_cache = {
     .cap = CAP,
     .l
-    = dll_init(lru_cache.l, struct lru_elem, list_elem, NULL, cmp_by_key, NULL),
+    = dll_init(lru_cache.l, struct lru_elem, list_elem, cmp_by_key, NULL, NULL),
     .hh = hhm_init(map_buf, hash_elem, key, hhmap_int_to_u64, lru_elem_cmp,
                    NULL, NULL, sizeof(map_buf) / sizeof(map_buf[0])),
 };

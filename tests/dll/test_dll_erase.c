@@ -11,7 +11,7 @@
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_pop_front)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
     CHECK(t, PASS);
@@ -36,7 +36,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_front)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_pop_back)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
     CHECK(t, PASS);
@@ -61,7 +61,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_back)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
@@ -82,7 +82,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle_range)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 5, vals);
@@ -100,14 +100,14 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle_range)
 CHECK_BEGIN_STATIC_FN(dll_test_splice_two_lists)
 {
     doubly_linked_list to_lose
-        = dll_init(to_lose, struct val, e, NULL, val_cmp, NULL);
+        = dll_init(to_lose, struct val, e, val_cmp, NULL, NULL);
     struct val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result t
         = create_list(&to_lose, UTIL_PUSH_BACK, 5, to_lose_vals);
     CHECK(t, PASS);
     doubly_linked_list to_gain
-        = dll_init(to_gain, struct val, e, NULL, val_cmp, NULL);
+        = dll_init(to_gain, struct val, e, val_cmp, NULL, NULL);
     struct val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
     t = create_list(&to_gain, UTIL_PUSH_BACK, 2, to_gain_vals);
     CHECK(t, PASS);

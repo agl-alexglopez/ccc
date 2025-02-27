@@ -32,8 +32,8 @@ void ccc_impl_dll_push_front(struct ccc_dll_ *, struct ccc_dll_elem_ *);
 struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
                                            void const *user_struct);
 
-#define ccc_impl_dll_init(dll_name, struct_name, dll_elem_field, alloc_fn,     \
-                          cmp_fn, aux_data)                                    \
+#define ccc_impl_dll_init(dll_name, struct_name, dll_elem_field, cmp_fn,       \
+                          alloc_fn, aux_data)                                  \
     {                                                                          \
         .sentinel_.n_ = &(dll_name).sentinel_,                                 \
         .sentinel_.p_ = &(dll_name).sentinel_,                                 \

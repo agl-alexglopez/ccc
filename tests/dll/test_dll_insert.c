@@ -11,7 +11,7 @@
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_three_front)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val v0 = {};
     CHECK(push_front(&dll, &v0.e) != NULL, true);
     CHECK(validate(&dll), true);
@@ -33,7 +33,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_three_front)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_three_back)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val v0 = {};
     CHECK(push_back(&dll, &v0.e) != NULL, true);
     CHECK(validate(&dll), true);
@@ -55,7 +55,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_three_back)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
@@ -70,7 +70,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_range)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
@@ -92,7 +92,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_range)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_no_ops)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, NULL, val_cmp, NULL);
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
