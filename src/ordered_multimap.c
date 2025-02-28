@@ -1093,7 +1093,7 @@ splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
        as our helper tree because we don't need its Left Right fields. */
     t->end_.branch_[L] = t->end_.branch_[R] = t->end_.parent_ = &t->end_;
     struct ccc_node_ *l_r_subtrees[LR] = {&t->end_, &t->end_};
-    for (;;)
+    do
     {
         ccc_threeway_cmp const root_cmp = cmp(t, key, root, cmp_fn);
         enum tree_link_ const dir = CCC_GRT == root_cmp;
@@ -1120,7 +1120,7 @@ splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
         link_trees(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = root->branch_[dir];
-    }
+    } while (true);
     link_trees(t, l_r_subtrees[L], R, root->branch_[L]);
     link_trees(t, l_r_subtrees[R], L, root->branch_[R]);
     link_trees(t, root, L, t->end_.branch_[R]);

@@ -768,7 +768,7 @@ splay(struct ccc_fomap_ *const t, size_t root, void const *const key,
     struct ccc_fomap_elem_ *const nil = at(t, 0);
     nil->branch_[L] = nil->branch_[R] = nil->parent_ = 0;
     size_t l_r_subtrees[LR] = {0, 0};
-    for (;;)
+    do
     {
         ccc_threeway_cmp const root_cmp = cmp_elems(t, key, root, cmp_fn);
         enum fom_branch_ const dir = CCC_GRT == root_cmp;
@@ -795,7 +795,7 @@ splay(struct ccc_fomap_ *const t, size_t root, void const *const key,
         link_trees(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = branch_i(t, root, dir);
-    }
+    } while (true);
     link_trees(t, l_r_subtrees[L], R, branch_i(t, root, L));
     link_trees(t, l_r_subtrees[R], L, branch_i(t, root, R));
     link_trees(t, root, L, nil->branch_[R]);
