@@ -9,6 +9,17 @@
 
 #include <stddef.h>
 
+CHECK_BEGIN_STATIC_FN(sll_test_pop_empty)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    CHECK(is_empty(&sll), true);
+    CHECK(sll_pop_front(&sll), CCC_INPUT_ERR);
+    CHECK(sll_validate(&sll), true);
+    CHECK(sll_front(&sll), NULL);
+    CHECK(is_empty(&sll), true);
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
@@ -98,7 +109,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_splice_two_lists)
 int
 main()
 {
-    return CHECK_RUN(sll_test_push_pop_three(), sll_test_push_extract_middle(),
+    return CHECK_RUN(sll_test_pop_empty(), sll_test_push_pop_three(),
+                     sll_test_push_extract_middle(),
                      sll_test_push_extract_range(),
                      sll_test_splice_two_lists());
 }

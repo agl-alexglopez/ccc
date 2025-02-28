@@ -9,6 +9,20 @@
 
 #include <stddef.h>
 
+CHECK_BEGIN_STATIC_FN(dll_test_pop_empty)
+{
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    CHECK(is_empty(&dll), true);
+    CHECK(dll_pop_front(&dll), CCC_INPUT_ERR);
+    CHECK(dll_validate(&dll), true);
+    CHECK(dll_pop_back(&dll), CCC_INPUT_ERR);
+    CHECK(dll_validate(&dll), true);
+    CHECK(dll_front(&dll), NULL);
+    CHECK(dll_back(&dll), NULL);
+    CHECK(is_empty(&dll), true);
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(dll_test_push_pop_front)
 {
     doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
@@ -136,8 +150,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_splice_two_lists)
 int
 main()
 {
-    return CHECK_RUN(dll_test_push_pop_front(), dll_test_push_pop_back(),
-                     dll_test_push_pop_middle(),
+    return CHECK_RUN(dll_test_pop_empty(), dll_test_push_pop_front(),
+                     dll_test_push_pop_back(), dll_test_push_pop_middle(),
                      dll_test_push_pop_middle_range(),
                      dll_test_splice_two_lists());
 }
