@@ -39,7 +39,8 @@ ccc_result
 ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
                 size_t const n, size_t const input_elem_size)
 {
-    if (!fpq || !array || input_elem_size != ccc_buf_elem_size(&fpq->buf_))
+    if (!fpq || !array || array == ccc_buf_begin(&fpq->buf_)
+        || input_elem_size != ccc_buf_elem_size(&fpq->buf_))
     {
         return CCC_INPUT_ERR;
     }
@@ -247,7 +248,8 @@ ccc_result
 ccc_fpq_copy(ccc_flat_priority_queue *const dst,
              ccc_flat_priority_queue const *const src, ccc_alloc_fn *const fn)
 {
-    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    if (!dst || !src || src == dst
+        || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
         return CCC_INPUT_ERR;
     }

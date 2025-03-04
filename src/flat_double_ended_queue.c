@@ -43,7 +43,7 @@ ccc_fdeq_push_back(ccc_flat_double_ended_queue *const fdeq,
         return NULL;
     }
     void *const slot = alloc_back(fdeq);
-    if (slot)
+    if (slot && slot != elem)
     {
         (void)memcpy(slot, elem, ccc_buf_elem_size(&fdeq->buf_));
     }
@@ -59,7 +59,7 @@ ccc_fdeq_push_front(ccc_flat_double_ended_queue *const fdeq,
         return NULL;
     }
     void *const slot = alloc_front(fdeq);
-    if (slot)
+    if (slot && slot != elem)
     {
         (void)memcpy(slot, elem, ccc_buf_elem_size(&fdeq->buf_));
     }
@@ -259,7 +259,8 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
               ccc_flat_double_ended_queue const *const src,
               ccc_alloc_fn *const fn)
 {
-    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    if (!dst || !src || src == dst
+        || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
         return CCC_INPUT_ERR;
     }

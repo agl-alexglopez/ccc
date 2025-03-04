@@ -1,18 +1,24 @@
 /** @file
-@brief The Flat Realtime Ordered Map Interface
+@brief The Handle Realtime Ordered Map Interface
 
 A handle realtime ordered map offers storage and retrieval by key. This map is
 suitable for realtime applications if resizing can be well controlled. Insert
 operations may cause resizing if allocation is allowed.
 
 The handle variant of the ordered map promises contiguous storage and random
-access if needed. Also, all elements in the map track their relationships via
-indices in the buffer. Therefore, this data structure can be relocated, copied,
+access if needed. Handles are stable and the user can use them to refer to an
+element until that element is removed from the map. Handles remain valid even if
+resizing of the table, insertions of other elements, or removals of other
+elements occur. Active user elements may not be contiguous from index [0, N)
+where N is the size of map; there may be gaps between active elements in the
+buffer and it is only guaranteed that N elements are stored between index [0,
+Capacity). Also, all elements in the map track their relationships via indices
+in the buffer. Therefore, this data structure can be relocated, copied,
 serialized, or written to disk and all internal data structure references will
 remain valid. Insertion may invoke an O(N) operation if resizing occurs.
-Finally, if allocation is prohibited upon initialization and the user intends
-to store a fixed size N nodes in the map N + 1 capacity is needed for the
-sentinel node in the buffer.
+Finally, if allocation is prohibited upon initialization and the user intends to
+store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel
+node in the buffer.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
@@ -55,7 +61,10 @@ typedef struct ccc_hromap_elem_ ccc_hromap_elem;
 @warning it is undefined behavior to access an uninitialized container.
 
 The Handle Interface offers efficient search and subsequent insertion, deletion,
-or value update based on the needs of the user. */
+or value update based on the needs of the user. Handles obtained via the Handle
+Interface are stable until the user removes the element at the provided handle.
+Insertions and deletions of other elements do not affect handle stability.
+Resizing of the table does not affect handle stability. */
 typedef union ccc_hromap_handle_ ccc_hromap_handle;
 
 /**@}*/
@@ -219,13 +228,13 @@ control flow is needed. */
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] hrm the pointer to the ordered map.
 @param [out] out_handle the handle to the user type wrapping map elem.
-@return an handle. If Vacant, no prior element with key existed and the type
-wrapping out_handle remains unchanged. If Occupied the old value is written
-to the type wrapping out_handle and may be unwrapped to view. If more space
-is needed but allocation fails or has been forbidden, an insert error is set.
+@return a handle to the element in the table. If Vacant, no prior element with
+key existed and the type wrapping out_handle remains unchanged. If Occupied the
+old value is written to the type wrapping out_handle. If more space is needed
+but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
-it in an handle to provide information about the old value. */
+it in a handle to provide information about the old value. */
 [[nodiscard]] ccc_handle
 ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *hrm,
                     ccc_hromap_elem *out_handle);
@@ -233,14 +242,14 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *hrm,
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the ordered map.
 @param [out] out_handle_ptr the handle to the user type wrapping map elem.
-@return a compound literal reference to an handle. If Vacant, no prior element
-with key existed and the type wrapping out_handle remains unchanged. If Occupied
-the old value is written to the type wrapping out_handle and may be unwrapped to
-view. If more space is needed but allocation fails or has been forbidden, an
-insert error is set.
+@return a compound literal reference to a handle to the element in the table. If
+Vacant, no prior element with key existed and the type wrapping out_handle
+remains unchanged. If Occupied the old value is written to the type wrapping
+out_handle. If more space is needed but allocation fails or has been forbidden,
+an insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
-it in an handle to provide information about the old value. */
+it in a handle to provide information about the old value. */
 #define ccc_hrm_swap_handle_r(handle_realtime_ordered_map_ptr, out_handle_ptr) \
     &(ccc_handle)                                                              \
     {                                                                          \
@@ -252,7 +261,7 @@ it in an handle to provide information about the old value. */
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] hrm the pointer to the map.
 @param [in] key_val_handle the handle to the user type wrapping map elem.
-@return an handle. If Occupied, the handle contains a reference to the key value
+@return a handle. If Occupied, the handle contains a reference to the key value
 user type in the map and may be unwrapped. If Vacant the handle contains a
 reference to the newly inserted handle in the map. If more space is needed but
 allocation fails, an insert error is set. */
@@ -263,7 +272,7 @@ ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *hrm,
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the map.
 @param [in] key_val_handle_ptr the handle to the user type wrapping map elem.
-@return a compound literal reference to an handle. If Occupied, the handle
+@return a compound literal reference to a handle. If Occupied, the handle
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
@@ -299,7 +308,7 @@ compound literal matches the searched key. */
 /** @brief Invariantly inserts or overwrites a user struct into the map.
 @param [in] hrm a pointer to the handle hash map.
 @param [in] key_val_handle the handle to the wrapping user struct key value.
-@return an handle. If Occupied an handle was overwritten by the new key value.
+@return a handle. If Occupied a handle was overwritten by the new key value.
 If Vacant no prior map handle existed.
 
 Note that this function can be used when the old user type is not needed but
@@ -332,12 +341,12 @@ compound literal matches the searched key. */
 in the struct containing out_handle provided by the user.
 @param [in] hrm the pointer to the ordered map.
 @param [out] out_handle the handle to the user type wrapping map elem.
-@return the removed handle. If Occupied it may be unwrapped to obtain the old
-key value pair. If Vacant the key value pair was not stored in the map. If bad
-input is provided an input error is set.
+@return the removed handle. If Occupied out_handle holds the old key value pair.
+If Vacant the key value pair was not stored in the map. If bad input is provided
+an input error is set.
 
 Note that this function may write to the struct containing the second parameter
-and wraps it in an handle to provide information about the old value. */
+and wraps it in a handle to provide information about the old value. */
 [[nodiscard]] ccc_handle ccc_hrm_remove(ccc_handle_realtime_ordered_map *hrm,
                                         ccc_hromap_elem *out_handle);
 
@@ -345,12 +354,12 @@ and wraps it in an handle to provide information about the old value. */
 in the struct containing out_handle provided by the user.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the ordered map.
 @param [out] out_handle_ptr the handle to the user type wrapping map elem.
-@return a compound literal reference to the removed handle. If Occupied it may
-be unwrapped to obtain the old key value pair. If Vacant the key value pair was
+@return a compound literal reference to the removed handle. If Occupied
+out_handle_ptr holds the old key value pair.. If Vacant the key value pair was
 not stored in the map. If bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
-and wraps it in an handle to provide information about the old value. */
+and wraps it in a handle to provide information about the old value. */
 #define ccc_hrm_remove_r(handle_realtime_ordered_map_ptr, out_handle_ptr)      \
     &(ccc_handle)                                                              \
     {                                                                          \
@@ -358,38 +367,38 @@ and wraps it in an handle to provide information about the old value. */
             .impl_                                                             \
     }
 
-/** @brief Obtains an handle for the provided key in the map for future use.
+/** @brief Obtains a handle for the provided key in the map for future use.
 @param [in] hrm the map to be searched.
 @param [in] key the key used to search the map matching the stored key type.
 @return a specialized handle for use with other functions in the Handle
 Interface.
-@warning the contents of an handle should not be examined or modified. Use the
+@warning the contents of a handle should not be examined or modified. Use the
 provided functions, only.
 
-An handle is a search result that provides either an Occupied or Vacant handle
+A handle is a search result that provides either an Occupied or Vacant handle
 in the map. An occupied handle signifies that the search was successful. A
 Vacant handle means the search was not successful but a handle is gained to
 where in the map such an element should be inserted.
 
-An handle is rarely useful on its own. It should be passed in a functional style
+A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
 [[nodiscard]] ccc_hromap_handle
 ccc_hrm_handle(ccc_handle_realtime_ordered_map const *hrm, void const *key);
 
-/** @brief Obtains an handle for the provided key in the map for future use.
+/** @brief Obtains a handle for the provided key in the map for future use.
 @param [in] handle_realtime_ordered_map_ptr the map to be searched.
 @param [in] key_ptr the key used to search the map matching the stored key type.
 @return a compound literal reference to a specialized handle for use with other
 functions in the Handle Interface.
-@warning the contents of an handle should not be examined or modified. Use the
+@warning the contents of a handle should not be examined or modified. Use the
 provided functions, only.
 
-An handle is a search result that provides either an Occupied or Vacant handle
+A handle is a search result that provides either an Occupied or Vacant handle
 in the map. An occupied handle signifies that the search was successful. A
 Vacant handle means the search was not successful but a handle is gained to
 where in the map such an element should be inserted.
 
-An handle is rarely useful on its own. It should be passed in a functional style
+A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
 #define ccc_hrm_handle_r(handle_realtime_ordered_map_ptr, key_ptr)             \
     &(ccc_hromap_handle)                                                       \
@@ -398,7 +407,7 @@ to subsequent calls in the Handle Interface. */
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
-@param [in] e the handle obtained from an handle function or macro.
+@param [in] e the handle obtained from a handle function or macro.
 @param [in] fn an update function in which the auxiliary argument is unused.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
@@ -409,7 +418,7 @@ without the need of the auxiliary argument a ccc_update_fn can provide. */
                                                     ccc_update_fn *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
-@param [in] e the handle obtained from an handle function or macro.
+@param [in] e the handle obtained from a handle function or macro.
 @param [in] fn an update function that requires auxiliary data.
 @param [in] aux auxiliary data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
@@ -459,7 +468,7 @@ evaluated in the closure scope. */
 @param [in] elem the handle to the struct to be inserted to a Vacant handle.
 @return a pointer to handle in the map invariantly. NULL on error.
 
-Because this functions takes an handle and inserts if it is Vacant, the only
+Because this functions takes a handle and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error occurs, usually due to
 a user struct allocation failure.
 
@@ -486,7 +495,7 @@ or other data, such functions will not be called if the handle is Occupied. */
                              lazy_key_value)
 
 /** @brief Inserts the provided handle invariantly.
-@param [in] e the handle returned from a call obtaining an handle.
+@param [in] e the handle returned from a call obtaining a handle.
 @param [in] elem a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
@@ -508,8 +517,8 @@ returned if allocation failed or is not allowed when required. */
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] e a pointer to the map handle.
-@return an handle containing NULL or a reference to the old handle. If Occupied
-an handle in the map existed and was removed. If Vacant, no prior handle existed
+@return a handle containing NULL or a reference to the old handle. If Occupied
+a handle in the map existed and was removed. If Vacant, no prior handle existed
 to be removed.
 @warning the reference to the removed handle is invalidated upon any further
 insertions. */
@@ -517,8 +526,8 @@ ccc_handle ccc_hrm_remove_handle(ccc_hromap_handle const *e);
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the map handle.
-@return a compound literal reference to an handle containing NULL or a reference
-to the old handle. If Occupied an handle in the map existed and was removed. If
+@return a compound literal reference to a handle containing NULL or a reference
+to the old handle. If Occupied a handle in the map existed and was removed. If
 Vacant, no prior handle existed to be removed.
 
 Note that the reference to the removed handle is invalidated upon any further
@@ -541,14 +550,14 @@ insertions. */
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] e the handle from a query to the table via function or macro.
-@return true if an handle obtained from an insertion attempt failed to insert
+@return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
 [[nodiscard]] bool ccc_hrm_insert_error(ccc_hromap_handle const *e);
 
 /** @brief Obtain the handle status from a container handle.
 @param [in] e a pointer to the handle.
 @return the status stored in the handle after the required action on the
-container completes. If e is NULL an handle input error is returned so ensure
+container completes. If e is NULL a handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed

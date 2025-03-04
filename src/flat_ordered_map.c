@@ -138,8 +138,11 @@ ccc_fom_insert_entry(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
     {
         *elem = *at(e->impl_.fom_, e->impl_.i_);
         void *const ret = base_at(e->impl_.fom_, e->impl_.i_);
-        memcpy(ret, struct_base(e->impl_.fom_, elem),
-               ccc_buf_elem_size(&e->impl_.fom_->buf_));
+        void const *const e_base = struct_base(e->impl_.fom_, elem);
+        if (e_base != ret)
+        {
+            memcpy(ret, e_base, ccc_buf_elem_size(&e->impl_.fom_->buf_));
+        }
         return ret;
     }
     return maybe_alloc_insert(e->impl_.fom_, elem);
@@ -256,8 +259,11 @@ ccc_fom_insert_or_assign(ccc_flat_ordered_map *const fom,
     {
         *key_val_handle = *elem_in_slot(fom, found);
         assert(fom->root_);
-        memcpy(found, struct_base(fom, key_val_handle),
-               ccc_buf_elem_size(&fom->buf_));
+        void const *const e_base = struct_base(fom, key_val_handle);
+        if (e_base != found)
+        {
+            memcpy(found, e_base, ccc_buf_elem_size(&fom->buf_));
+        }
         return (ccc_entry){{.e_ = found, .stats_ = CCC_OCCUPIED}};
     }
     void *const inserted = maybe_alloc_insert(fom, key_val_handle);
@@ -457,7 +463,8 @@ ccc_result
 ccc_fom_copy(ccc_flat_ordered_map *const dst,
              ccc_flat_ordered_map const *const src, ccc_alloc_fn *const fn)
 {
-    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    if (!dst || !src || src == dst
+        || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
         return CCC_INPUT_ERR;
     }
