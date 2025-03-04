@@ -195,7 +195,7 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, out_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -212,8 +212,7 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
         = maybe_alloc_insert(hrm, q.parent_, q.last_cmp_, out_handle);
     if (!i)
     {
-        return (ccc_handle){
-            {.i_ = 0, .stats_ = CCC_INSERT_ERROR | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_INSERT_ERROR}};
     }
     return (ccc_handle){{.i_ = i, .stats_ = CCC_VACANT}};
 }
@@ -224,7 +223,7 @@ ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -235,8 +234,7 @@ ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *const hrm,
         = maybe_alloc_insert(hrm, q.parent_, q.last_cmp_, key_val_handle);
     if (!i)
     {
-        return (ccc_handle){
-            {.i_ = 0, .stats_ = CCC_INSERT_ERROR | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_INSERT_ERROR}};
     }
     return (ccc_handle){{.i_ = i, .stats_ = CCC_VACANT}};
 }
@@ -247,7 +245,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -262,8 +260,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
         = maybe_alloc_insert(hrm, q.parent_, q.last_cmp_, key_val_handle);
     if (!i)
     {
-        return (ccc_handle){
-            {.i_ = 0, .stats_ = CCC_INSERT_ERROR | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_INSERT_ERROR}};
     }
     return (ccc_handle){{.i_ = i, .stats_ = CCC_VACANT}};
 }
@@ -332,8 +329,7 @@ ccc_hrm_handle(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !key)
     {
-        return (ccc_hromap_handle){
-            {.handle_ = {.stats_ = CCC_INPUT_ERROR | CCC_NO_UNWRAP}}};
+        return (ccc_hromap_handle){{.handle_ = {.stats_ = CCC_INPUT_ERROR}}};
     }
     return (ccc_hromap_handle){handle(hrm, key)};
 }
@@ -352,7 +348,7 @@ ccc_hrm_remove_handle(ccc_hromap_handle const *const e)
         return (ccc_handle){
             {.i_ = e->impl_.handle_.i_, .stats_ = CCC_OCCUPIED}};
     }
-    return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT | CCC_NO_UNWRAP}};
+    return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
 }
 
 ccc_handle
@@ -366,13 +362,13 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, out_handle));
     if (q.last_cmp_ != CCC_EQL)
     {
-        return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT | CCC_NO_UNWRAP}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
     }
     void const *const removed = remove_fixup(hrm, q.found_);
     assert(removed);
     void *const user_struct = struct_base(hrm, out_handle);
     (void)memcpy(user_struct, removed, ccc_buf_elem_size(&hrm->buf_));
-    return (ccc_handle){{.i_ = 0, .stats_ = CCC_OCCUPIED | CCC_NO_UNWRAP}};
+    return (ccc_handle){{.i_ = 0, .stats_ = CCC_OCCUPIED}};
 }
 
 ccc_range
