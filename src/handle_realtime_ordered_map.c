@@ -22,7 +22,7 @@ non-allocating container. All left-right symmetric cases have been united
 into one and I chose to tackle rotations and deletions slightly differently,
 shortening the code significantly. A few other changes and improvements
 suggested by the authors of the original paper are implemented. Finally, the
-data structure has been handletened into a buffer with relative indices rather
+data structure has been placed into a buffer with relative indices rather
 than pointers. See the required license at the bottom of the file for
 BSD-2-Clause compliance.
 
@@ -315,8 +315,11 @@ ccc_hrm_insert_handle(ccc_hromap_handle const *const e,
     {
         void *const slot = base_at(e->impl_.hrm_, e->impl_.handle_.i_);
         *elem = *elem_in_slot(e->impl_.hrm_, slot);
-        (void)memcpy(slot, struct_base(e->impl_.hrm_, elem),
-                     ccc_buf_elem_size(&e->impl_.hrm_->buf_));
+        void const *const e_base = struct_base(e->impl_.hrm_, elem);
+        if (slot != e_base)
+        {
+            (void)memcpy(slot, e_base, ccc_buf_elem_size(&e->impl_.hrm_->buf_));
+        }
         return e->impl_.handle_.i_;
     }
     return maybe_alloc_insert(e->impl_.hrm_, e->impl_.handle_.i_,
@@ -367,7 +370,10 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     void const *const removed = remove_fixup(hrm, q.found_);
     assert(removed);
     void *const user_struct = struct_base(hrm, out_handle);
-    (void)memcpy(user_struct, removed, ccc_buf_elem_size(&hrm->buf_));
+    if (user_struct != removed)
+    {
+        (void)memcpy(user_struct, removed, ccc_buf_elem_size(&hrm->buf_));
+    }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_OCCUPIED}};
 }
 
@@ -526,7 +532,8 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
              ccc_handle_realtime_ordered_map const *const src,
              ccc_alloc_fn *const fn)
 {
-    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    if (!dst || !src || src == dst
+        || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
         return CCC_INPUT_ERR;
     }

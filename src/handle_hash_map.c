@@ -382,8 +382,12 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
     struct ccc_handl_ const ent = find(h, key, filter(h, key));
     if (ent.stats_ & CCC_OCCUPIED)
     {
-        (void)memcpy(data, ccc_buf_at(&h->buf_, elem_at(h, ent.i_)->slot_i_),
-                     ccc_buf_elem_size(&h->buf_));
+        void const *const hndl_data
+            = ccc_buf_at(&h->buf_, elem_at(h, ent.i_)->slot_i_);
+        if (data != hndl_data)
+        {
+            (void)memcpy(data, hndl_data, ccc_buf_elem_size(&h->buf_));
+        }
         erase_meta(h, ent.i_);
         return (ccc_handle){{.stats_ = CCC_OCCUPIED}};
     }
@@ -515,7 +519,8 @@ ccc_result
 ccc_hhm_copy(ccc_handle_hash_map *const dst,
              ccc_handle_hash_map const *const src, ccc_alloc_fn *const fn)
 {
-    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    if (!dst || !src || src == dst
+        || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
         return CCC_INPUT_ERR;
     }
@@ -959,6 +964,10 @@ static inline void
 copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
              void const *const user_src)
 {
+    if (slot_dst == user_src)
+    {
+        return;
+    }
     struct ccc_hhmap_elem_ *const elem = elem_in_slot(h, slot_dst);
     size_t surrounding_bytes = (char *)elem - (char *)slot_dst;
     if (surrounding_bytes)

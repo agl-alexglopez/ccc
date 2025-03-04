@@ -217,8 +217,11 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
     if (e->impl_.entry_.stats_ & CCC_OCCUPIED)
     {
         elem->hash_ = e->impl_.hash_;
-        (void)memcpy(e->impl_.entry_.e_, user_struct,
-                     ccc_buf_elem_size(&e->impl_.h_->buf_));
+        if (e->impl_.entry_.e_ != user_struct)
+        {
+            (void)memcpy(e->impl_.entry_.e_, user_struct,
+                         ccc_buf_elem_size(&e->impl_.h_->buf_));
+        }
         return e->impl_.entry_.e_;
     }
     if (e->impl_.entry_.stats_ & CCC_INSERT_ERROR)
@@ -343,7 +346,10 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h,
     if (ent.entry_.stats_ & CCC_OCCUPIED)
     {
         key_val_handle->hash_ = ent.hash_;
-        (void)memcpy(ent.entry_.e_, user_base, ccc_buf_elem_size(&h->buf_));
+        if (ent.entry_.e_ != user_base)
+        {
+            (void)memcpy(ent.entry_.e_, user_base, ccc_buf_elem_size(&h->buf_));
+        }
         return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_OCCUPIED}};
     }
     if (ent.entry_.stats_ & CCC_INSERT_ERROR)
@@ -366,7 +372,10 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
     struct ccc_ent_ const ent = find(h, key, filter(h, key));
     if (ent.stats_ & CCC_OCCUPIED)
     {
-        (void)memcpy(ret, ent.e_, ccc_buf_elem_size(&h->buf_));
+        if (ret != ent.e_)
+        {
+            (void)memcpy(ret, ent.e_, ccc_buf_elem_size(&h->buf_));
+        }
         erase(h, ent.e_);
         return (ccc_entry){{.e_ = ret, .stats_ = CCC_OCCUPIED}};
     }
@@ -482,7 +491,8 @@ ccc_result
 ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
              ccc_alloc_fn *const fn)
 {
-    if (!dst || !src || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
+    if (!dst || !src || src == dst
+        || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
         return CCC_INPUT_ERR;
     }
@@ -798,7 +808,10 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
     size_t const cap = ccc_buf_capacity(&h->buf_);
     void *const tmp = ccc_buf_at(&h->buf_, 1);
     void *const floater = ccc_buf_at(&h->buf_, 0);
-    (void)memcpy(floater, e, elem_sz);
+    if (floater != e)
+    {
+        (void)memcpy(floater, e, elem_sz);
+    }
 
     /* This function cannot modify e and e may be copied over to new
        insertion from old table. So should this function invariantly assign
@@ -811,7 +824,10 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
         uint64_t const slot_hash = elem_in_slot(h, slot)->hash_;
         if (slot_hash == CCC_FHM_EMPTY)
         {
-            (void)memcpy(slot, floater, elem_sz);
+            if (slot != floater)
+            {
+                (void)memcpy(slot, floater, elem_sz);
+            }
             (void)ccc_buf_size_plus(&h->buf_, 1);
             elem_in_slot(h, floater)->hash_ = CCC_FHM_EMPTY;
             elem_in_slot(h, tmp)->hash_ = CCC_FHM_EMPTY;
