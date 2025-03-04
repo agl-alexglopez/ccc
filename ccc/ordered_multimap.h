@@ -134,8 +134,8 @@ Note that if allocation has been prohibited the address of the key_val_handle
 is used directly. This means the container assumes the memory provided for the
 user type containing key_val_handle has been allocated with appropriate lifetime
 by the user, for the user's intended use case. */
-[[nodiscard]] ccc_entry ccc_omm_insert(ccc_ordered_multimap *mm,
-                                       ccc_ommap_elem *key_val_handle);
+[[nodiscard]] ccc_entry ccc_omm_swap_entry(ccc_ordered_multimap *mm,
+                                           ccc_ommap_elem *key_val_handle);
 
 /** @brief Inserts a new key-value into the multimap only if none exists.
 Amortized O(lg N).
@@ -738,7 +738,7 @@ typedef ccc_ommap_entry ommap_entry;
 #    define omm_try_insert_w(args...) ccc_omm_try_insert_w(args)
 #    define omm_insert_or_assign_w(args...) ccc_omm_insert_or_assign_w(args)
 #    define omm_init(args...) ccc_omm_init(args)
-#    define omm_insert(args...) ccc_omm_insert(args)
+#    define omm_swap_entry(args...) ccc_omm_swap_entry(args)
 #    define omm_try_insert(args...) ccc_omm_try_insert(args)
 #    define omm_insert_or_assign(args...) ccc_omm_insert_or_assign(args)
 #    define omm_remove(args...) ccc_omm_remove(args)

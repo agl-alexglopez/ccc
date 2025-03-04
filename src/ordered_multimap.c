@@ -202,8 +202,8 @@ ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_omm_insert(ccc_ordered_multimap *const mm,
-               ccc_ommap_elem *const key_val_handle)
+ccc_omm_swap_entry(ccc_ordered_multimap *const mm,
+                   ccc_ommap_elem *const key_val_handle)
 {
     if (!mm || !key_val_handle)
     {

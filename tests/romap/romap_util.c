@@ -24,8 +24,8 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
     {
         vals[shuffled_index].key = (int)shuffled_index;
         vals[shuffled_index].val = (int)i;
-        (void)ccc_rom_insert(m, &vals[shuffled_index].elem,
-                             &(struct val){}.elem);
+        (void)ccc_rom_swap_entry(m, &vals[shuffled_index].elem,
+                                 &(struct val){}.elem);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }

@@ -31,8 +31,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
 
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = insert(&om, &(struct val){.key = 137, .val = 99}.elem,
-                           &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&om, &(struct val){.key = 137, .val = 99}.elem,
+                               &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), 1);
@@ -88,7 +88,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_overwrite)
     ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
 
     struct val q = {.key = 137, .val = 99};
-    ccc_entry ent = insert(&om, &q.elem, &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&om, &q.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
 
@@ -101,7 +101,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_overwrite)
     struct val r = (struct val){.key = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_entry old_ent = insert(&om, &r.elem, &(struct val){}.elem);
+    ccc_entry old_ent = swap_entry(&om, &r.elem, &(struct val){}.elem);
     CHECK(occupied(&old_ent), true);
 
     /* The old contents are now in q and the entry is in the table. */
@@ -119,7 +119,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_then_bad_ideas)
 {
     ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
     struct val q = {.key = 137, .val = 99};
-    ccc_entry ent = insert(&om, &q.elem, &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&om, &q.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     struct val const *v = unwrap(entry_r(&om, &q.key));
@@ -128,7 +128,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_then_bad_ideas)
 
     struct val r = (struct val){.key = 137, .val = 100};
 
-    ent = insert(&om, &r.elem, &(struct val){}.elem);
+    ent = swap_entry(&om, &r.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), true);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -567,7 +567,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_weak_srand)
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_entry const e = insert(
+        ccc_entry const e = swap_entry(
             &om, &(struct val){.key = rand() /* NOLINT */, .val = i}.elem,
             &(struct val){}.elem);
         CHECK(insert_error(&e), false);

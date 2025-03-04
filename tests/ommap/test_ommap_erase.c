@@ -20,7 +20,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].key = 0;
-        CHECK(unwrap(insert_r(&omm, &three_vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         size_t const size = i + 1;
         CHECK(size(&omm), size);
@@ -141,7 +141,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_max_round_robin)
             vals[i].key = 99;
         }
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* Now let's make sure we pop round robin. */
@@ -178,7 +178,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_min_round_robin)
             vals[i].key = 1;
         }
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* Now let's make sure we pop round robin. */
@@ -208,7 +208,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_delete_prime_shuffle_duplicates)
     {
         vals[i].key = shuffled_index;
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         size_t const s = i + 1;
         CHECK(size(&omm), s);
@@ -245,7 +245,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_prime_shuffle)
     {
         vals[i].key = shuffled_index;
         vals[i].val = shuffled_index;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -275,7 +275,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_weak_srand)
     {
         vals[i].key = rand(); // NOLINT
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     for (int i = 0; i < num_nodes; ++i)

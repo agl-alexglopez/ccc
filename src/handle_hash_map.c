@@ -289,7 +289,8 @@ ccc_hhm_and_modify_aux(ccc_hhmap_handle *const e, ccc_update_fn *const fn,
 }
 
 ccc_handle
-ccc_hhm_insert(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
+ccc_hhm_swap_handle(ccc_handle_hash_map *const h,
+                    ccc_hhmap_elem *const out_handle)
 {
     if (unlikely(!h || !out_handle))
     {

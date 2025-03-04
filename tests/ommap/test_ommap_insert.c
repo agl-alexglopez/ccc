@@ -19,7 +19,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_one)
         = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     struct val single;
     single.key = 0;
-    CHECK(unwrap(insert_r(&omm, &single.elem)) != NULL, true);
+    CHECK(unwrap(swap_entry_r(&omm, &single.elem)) != NULL, true);
     CHECK(is_empty(&omm), false);
     CHECK_END_FN();
 }
@@ -32,7 +32,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].key = i;
-        CHECK(unwrap(insert_r(&omm, &three_vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         CHECK(size(&omm), (size_t)i + 1);
     }
@@ -97,8 +97,8 @@ CHECK_BEGIN_STATIC_FN(ommap_test_struct_getter)
     {
         vals[i].key = i;
         tester_clone[i].key = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
-        CHECK(unwrap(insert_r(&omm_tester_clone, &tester_clone[i].elem))
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm_tester_clone, &tester_clone[i].elem))
                   != NULL,
               true);
         CHECK(validate(&omm), true);
@@ -120,7 +120,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three_dups)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].key = 0;
-        CHECK(unwrap(insert_r(&omm, &three_vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         CHECK(size(&omm), (size_t)i + 1);
     }
@@ -158,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_read_max_min)
     for (int i = 0; i < 10; ++i)
     {
         vals[i].key = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         CHECK(size(&omm), (size_t)i + 1);
     }

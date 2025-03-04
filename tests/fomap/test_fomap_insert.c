@@ -32,7 +32,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert)
         = fom_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
 
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = insert(&fom, &(struct val){.id = 137, .val = 99}.elem);
+    ccc_entry ent = swap_entry(&fom, &(struct val){.id = 137, .val = 99}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fom), 1);
@@ -89,7 +89,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_overwrite)
         = fom_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
 
     struct val q = {.id = 137, .val = 99};
-    ccc_entry ent = insert(&fom, &q.elem);
+    ccc_entry ent = swap_entry(&fom, &q.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
 
@@ -102,7 +102,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_overwrite)
     q = (struct val){.id = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_entry old_ent = insert(&fom, &q.elem);
+    ccc_entry old_ent = swap_entry(&fom, &q.elem);
     CHECK(occupied(&old_ent), true);
 
     /* The old contents are now in q and the entry is in the table. */
@@ -121,7 +121,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_then_bad_ideas)
     ccc_flat_ordered_map fom
         = fom_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
     struct val q = {.id = 137, .val = 99};
-    ccc_entry ent = insert(&fom, &q.elem);
+    ccc_entry ent = swap_entry(&fom, &q.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     struct val const *v = unwrap(entry_r(&fom, &q.id));
@@ -130,7 +130,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_then_bad_ideas)
 
     q = (struct val){.id = 137, .val = 100};
 
-    ent = insert(&fom, &q.elem);
+    ent = swap_entry(&fom, &q.elem);
     CHECK(occupied(&ent), true);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -541,7 +541,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_limit)
     size_t const final_size = size(&fom);
     /* The last successful entry is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
-    ccc_entry ent = insert(&fom, &v.elem);
+    ccc_entry ent = swap_entry(&fom, &v.elem);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(insert_error(&ent), false);
     CHECK(size(&fom), final_size);
@@ -570,7 +570,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_limit)
     CHECK(in_table == NULL, true);
     CHECK(size(&fom), final_size);
 
-    ent = insert(&fom, &v.elem);
+    ent = swap_entry(&fom, &v.elem);
     CHECK(unwrap(&ent) == NULL, true);
     CHECK(insert_error(&ent), true);
     CHECK(size(&fom), final_size);
@@ -636,7 +636,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_weak_srand)
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_entry const e = insert(
+        ccc_entry const e = swap_entry(
             &s, &(struct val){.id = rand() /* NOLINT */, .val = i}.elem);
         CHECK(insert_error(&e), false);
         CHECK(validate(&s), true);

@@ -226,8 +226,9 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
 it in an handle to provide information about the old value. */
-[[nodiscard]] ccc_handle ccc_hrm_insert(ccc_handle_realtime_ordered_map *hrm,
-                                        ccc_hromap_elem *out_handle);
+[[nodiscard]] ccc_handle
+ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *hrm,
+                    ccc_hromap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the ordered map.
@@ -240,10 +241,11 @@ insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
 it in an handle to provide information about the old value. */
-#define ccc_hrm_insert_r(handle_realtime_ordered_map_ptr, out_handle_ptr)      \
+#define ccc_hrm_swap_handle_r(handle_realtime_ordered_map_ptr, out_handle_ptr) \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hrm_insert((handle_realtime_ordered_map_ptr), (out_handle_ptr))    \
+        ccc_hrm_swap_handle((handle_realtime_ordered_map_ptr),                 \
+                            (out_handle_ptr))                                  \
             .impl_                                                             \
     }
 
@@ -757,7 +759,8 @@ typedef ccc_hromap_handle hromap_handle;
 #    define hrm_copy(args...) ccc_hrm_copy(args)
 #    define hrm_contains(args...) ccc_hrm_contains(args)
 #    define hrm_get_key_val(args...) ccc_hrm_get_key_val(args)
-#    define hrm_insert(args...) ccc_hrm_insert(args)
+#    define hrm_swap_handle(args...) ccc_hrm_swap_handle(args)
+#    define hrm_swap_handle_r(args...) ccc_hrm_swap_handle_r(args)
 #    define hrm_begin(args...) ccc_hrm_begin(args)
 #    define hrm_rbegin(args...) ccc_hrm_rbegin(args)
 #    define hrm_next(args...) ccc_hrm_next(args)

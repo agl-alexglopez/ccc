@@ -32,8 +32,8 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert)
         = rom_init(rom, struct val, elem, key, id_cmp, NULL, NULL);
 
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = insert(&rom, &(struct val){.key = 137, .val = 99}.elem,
-                           &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&rom, &(struct val){.key = 137, .val = 99}.elem,
+                               &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&rom), 1);
@@ -90,7 +90,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_overwrite)
         = rom_init(rom, struct val, elem, key, id_cmp, NULL, NULL);
 
     struct val q = {.key = 137, .val = 99};
-    ccc_entry ent = insert(&rom, &q.elem, &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&rom, &q.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
 
@@ -103,7 +103,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_overwrite)
     struct val r = (struct val){.key = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_entry old_ent = insert(&rom, &r.elem, &(struct val){}.elem);
+    ccc_entry old_ent = swap_entry(&rom, &r.elem, &(struct val){}.elem);
     CHECK(occupied(&old_ent), true);
 
     /* The old contents are now in q and the entry is in the table. */
@@ -122,7 +122,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_then_bad_ideas)
     ccc_realtime_ordered_map rom
         = rom_init(rom, struct val, elem, key, id_cmp, NULL, NULL);
     struct val q = {.key = 137, .val = 99};
-    ccc_entry ent = insert(&rom, &q.elem, &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&rom, &q.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     struct val const *v = unwrap(entry_r(&rom, &q.key));
@@ -131,7 +131,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_then_bad_ideas)
 
     struct val r = (struct val){.key = 137, .val = 100};
 
-    ent = insert(&rom, &r.elem, &(struct val){}.elem);
+    ent = swap_entry(&rom, &r.elem, &(struct val){}.elem);
     CHECK(occupied(&ent), true);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -571,7 +571,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_entry const e = insert(
+        ccc_entry const e = swap_entry(
             &rom, &(struct val){.key = rand() /* NOLINT */, .val = i}.elem,
             &(struct val){}.elem);
         CHECK(insert_error(&e), false);

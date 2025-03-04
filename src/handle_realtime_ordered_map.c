@@ -190,8 +190,8 @@ ccc_hrm_get_key_val(ccc_handle_realtime_ordered_map const *const hrm,
 }
 
 ccc_handle
-ccc_hrm_insert(ccc_handle_realtime_ordered_map *const hrm,
-               ccc_hromap_elem *const out_handle)
+ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
+                    ccc_hromap_elem *const out_handle)
 {
     if (!hrm || !out_handle)
     {

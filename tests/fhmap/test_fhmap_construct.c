@@ -88,9 +88,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
                                  fhmap_id_eq, NULL, NULL, 11);
     flat_hash_map dst = fhm_init((struct val[13]){}, e, key, fhmap_int_zero,
                                  fhmap_id_eq, NULL, NULL, 13);
-    (void)insert(&src, &(struct val){.key = 0}.e);
-    (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
-    (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_entry(&src, &(struct val){.key = 0}.e);
+    (void)swap_entry(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_entry(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, NULL);
@@ -113,9 +113,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
                                  fhmap_id_eq, NULL, NULL, 11);
     flat_hash_map dst = fhm_init((struct val[7]){}, e, key, fhmap_int_zero,
                                  fhmap_id_eq, NULL, NULL, 7);
-    (void)insert(&src, &(struct val){.key = 0}.e);
-    (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
-    (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_entry(&src, &(struct val){.key = 0}.e);
+    (void)swap_entry(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_entry(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, NULL);
@@ -129,9 +129,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
                                  fhmap_id_eq, std_alloc, NULL, 0);
     flat_hash_map dst = fhm_init((struct val *)NULL, e, key, fhmap_int_zero,
                                  fhmap_id_eq, std_alloc, NULL, 0);
-    (void)insert(&src, &(struct val){.key = 0}.e);
-    (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
-    (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_entry(&src, &(struct val){.key = 0}.e);
+    (void)swap_entry(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_entry(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, std_alloc);
@@ -157,9 +157,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc_fail)
                                  fhmap_id_eq, std_alloc, NULL, 0);
     flat_hash_map dst = fhm_init((struct val *)NULL, e, key, fhmap_int_zero,
                                  fhmap_id_eq, std_alloc, NULL, 0);
-    (void)insert(&src, &(struct val){.key = 0}.e);
-    (void)insert(&src, &(struct val){.key = 1, .val = 1}.e);
-    (void)insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_entry(&src, &(struct val){.key = 0}.e);
+    (void)swap_entry(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_entry(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, NULL);

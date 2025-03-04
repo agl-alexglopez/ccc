@@ -52,7 +52,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ordered_map *const om, size_t const n,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_entry ent = insert(
+        ccc_entry ent = swap_entry(
             om, &(struct val){.key = id_and_val, .val = id_and_val}.elem,
             &(struct val){}.elem);
         CHECK(insert_error(&ent), false);
@@ -70,14 +70,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_validate)
         = {.vals = (struct val[3]){}, .next_free = 0, .capacity = 3};
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
-    ccc_entry ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem,
-                           &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+                               &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), 1);
-    ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), 1);
@@ -95,14 +95,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem,
-                           &(struct val){}.elem);
+    ccc_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+                               &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), 1);
-    ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), 1);
@@ -115,14 +115,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     CHECK(fill_n(&om, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), i + 2);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), i + 2);
@@ -135,14 +135,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     CHECK(fill_n(&om, size - i, i), PASS);
 
     i = size;
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), i + 2);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), i + 2);
@@ -165,8 +165,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), 0);
-    ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -188,8 +188,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&om), i);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -210,8 +210,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&om), i);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem,
-                 &(struct val){}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
+                     &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
