@@ -182,7 +182,7 @@ handle represents a slot that has been taken by a new element because the old
 one has been removed that new element data will be returned.
 @warning do not try to access data in the table manually with a handle. Always
 use this provided interface function when a reference to data is needed. */
-[[nodiscard]] void *ccc_hhm_at(ccc_handle_realtime_ordered_map const *h,
+[[nodiscard]] void *ccc_hrm_at(ccc_handle_realtime_ordered_map const *h,
                                ccc_handle_i i);
 
 /** @brief Returns a reference to the user type in the table at the handle.
@@ -668,21 +668,20 @@ enclosing scope. This reference is always non-NULL. */
 /** @brief Return the start of an inorder traversal of the map. O(lg N).
 @param [in] hrm a pointer to the map.
 @return the oldest minimum element of the map. */
-[[nodiscard]] ccc_hromap_handle
-ccc_hrm_begin(ccc_handle_realtime_ordered_map const *hrm);
+[[nodiscard]] void *ccc_hrm_begin(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Return the start of a reverse inorder traversal of the map. O(lg N).
 @param [in] hrm a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] ccc_hromap_handle
-ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *hrm);
+[[nodiscard]] void *ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] hrm a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-[[nodiscard]] ccc_result ccc_hrm_next(ccc_hromap_handle *iter);
+[[nodiscard]] void *ccc_hrm_next(ccc_handle_realtime_ordered_map const *hrm,
+                                 ccc_hromap_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -690,17 +689,18 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-[[nodiscard]] ccc_result ccc_hrm_rnext(ccc_hromap_handle *iter);
+[[nodiscard]] void *ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *hrm,
+                                  ccc_hromap_elem const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] hrm a pointer to the map.
 @return the newest maximum element of the map. */
-[[nodiscard]] bool ccc_hrm_end(ccc_hromap_handle const *iter);
+[[nodiscard]] void *ccc_hrm_end(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Return the rend of a reverse inorder traversal of the map. O(1).
 @param [in] hrm a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] bool ccc_hrm_rend(ccc_hromap_handle const *iter);
+[[nodiscard]] void *ccc_hrm_rend(ccc_handle_realtime_ordered_map const *hrm);
 
 /**@}*/
 
@@ -746,6 +746,8 @@ within the capacity of the backing buffer. */
 typedef ccc_hromap_elem hromap_elem;
 typedef ccc_handle_realtime_ordered_map handle_realtime_ordered_map;
 typedef ccc_hromap_handle hromap_handle;
+#    define hrm_at(args...) ccc_hrm_at(args)
+#    define hrm_as(args...) ccc_hrm_as(args)
 #    define hrm_and_modify_w(args...) ccc_hrm_and_modify_w(args)
 #    define hrm_or_insert_w(args...) ccc_hrm_or_insert_w(args)
 #    define hrm_insert_handle_w(args...) ccc_hrm_insert_handle_w(args)

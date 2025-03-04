@@ -156,6 +156,16 @@ static size_t max(size_t, size_t);
 
 /*==============================  Interface    ==============================*/
 
+void *
+ccc_hrm_at(ccc_handle_realtime_ordered_map const *const h, ccc_handle_i const i)
+{
+    if (!h || !i)
+    {
+        return 0;
+    }
+    return ccc_buf_at(&h->buf_, i);
+}
+
 bool
 ccc_hrm_contains(ccc_handle_realtime_ordered_map const *const hrm,
                  void const *const key)
@@ -449,76 +459,70 @@ ccc_hrm_data(ccc_handle_realtime_ordered_map const *const hrm)
     return hrm ? ccc_buf_begin(&hrm->buf_) : NULL;
 }
 
-ccc_hromap_handle
+void *
 ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || ccc_buf_is_empty(&hrm->buf_))
     {
-        return (ccc_hromap_handle){
-            {.handle_ = {.stats_ = CCC_INPUT_ERR | CCC_NO_UNWRAP}}};
+        return NULL;
     }
     size_t const n = min_max_from(hrm, hrm->root_, mindir);
-    return (ccc_hromap_handle){{.hrm_ = (ccc_handle_realtime_ordered_map *)hrm,
-                                .last_cmp_ = CCC_EQL,
-                                .handle_ = {.i_ = n, .stats_ = CCC_OCCUPIED}}};
+    return base_at(hrm, n);
 }
 
-ccc_hromap_handle
+void *
 ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || ccc_buf_is_empty(&hrm->buf_))
     {
-        return (ccc_hromap_handle){
-            {.handle_ = {.stats_ = CCC_INPUT_ERR | CCC_NO_UNWRAP}}};
+        return NULL;
     }
     size_t const n = min_max_from(hrm, hrm->root_, maxdir);
-    return (ccc_hromap_handle){{.hrm_ = (ccc_handle_realtime_ordered_map *)hrm,
-                                .last_cmp_ = CCC_EQL,
-                                .handle_ = {.i_ = n, .stats_ = CCC_OCCUPIED}}};
+    return base_at(hrm, n);
 }
 
-ccc_result
-ccc_hrm_next(ccc_hromap_handle *const iter)
+void *
+ccc_hrm_next(ccc_handle_realtime_ordered_map const *const hrm,
+             ccc_hromap_elem const *const e)
 {
-    if (!iter || !iter->impl_.hrm_)
+    if (!hrm || !e || ccc_buf_is_empty(&hrm->buf_))
     {
-        return CCC_INPUT_ERR;
+        return NULL;
     }
-    iter->impl_.handle_.i_
-        = next(iter->impl_.hrm_, iter->impl_.handle_.i_, inorder_traversal);
-    if (!iter->impl_.handle_.i_)
-    {
-        iter->impl_.handle_.stats_ = CCC_VACANT | CCC_NO_UNWRAP;
-    }
-    return CCC_OK;
+    size_t const n = next(hrm, index_of(hrm, e), inorder_traversal);
+    return base_at(hrm, n);
 }
 
-ccc_result
-ccc_hrm_rnext(ccc_hromap_handle *const iter)
+void *
+ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
+              ccc_hromap_elem const *const e)
 {
-    if (!iter || !iter->impl_.hrm_)
+    if (!hrm || !e || ccc_buf_is_empty(&hrm->buf_))
     {
-        return CCC_INPUT_ERR;
+        return NULL;
     }
-    iter->impl_.handle_.i_ = next(iter->impl_.hrm_, iter->impl_.handle_.i_,
-                                  reverse_inorder_traversal);
-    if (!iter->impl_.handle_.i_)
-    {
-        iter->impl_.handle_.stats_ = CCC_VACANT | CCC_NO_UNWRAP;
-    }
-    return CCC_OK;
+    size_t const n = next(hrm, index_of(hrm, e), reverse_inorder_traversal);
+    return base_at(hrm, n);
 }
 
-bool
-ccc_hrm_end(ccc_hromap_handle const *const iter)
+void *
+ccc_hrm_end(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    return !iter || !iter->impl_.handle_.i_;
+    if (!hrm || ccc_buf_is_empty(&hrm->buf_))
+    {
+        return NULL;
+    }
+    return base_at(hrm, 0);
 }
 
-bool
-ccc_hrm_rend(ccc_hromap_handle const *const iter)
+void *
+ccc_hrm_rend(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    return !iter || !iter->impl_.handle_.i_;
+    if (!hrm || ccc_buf_is_empty(&hrm->buf_))
+    {
+        return NULL;
+    }
+    return base_at(hrm, 0);
 }
 
 ccc_result

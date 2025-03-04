@@ -255,7 +255,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
                         hrm_ins_or_assign_hndl_.hrm_,                          \
                         hrm_ins_or_assign_hndl_.handle_.i_);                   \
                 *((typeof(lazy_value) *)ccc_buf_at(                            \
-                    hrm_ins_or_assign_hndl_.hrm_,                              \
+                    &hrm_ins_or_assign_hndl_.hrm_->buf_,                       \
                     hrm_ins_or_assign_hndl_.handle_.i_))                       \
                     = lazy_value;                                              \
                 *ccc_impl_hrm_elem_at(hrm_ins_or_assign_hndl_.hrm_,            \
@@ -263,7 +263,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
                     = ins_hndl_saved_;                                         \
                 hrm_ins_or_assign_hndl_ret_ = (struct ccc_handl_){             \
                     .i_ = hrm_ins_or_assign_hndl_.handle_.i_,                  \
-                    .stats_ = hrm_ins_or_assign_hndl_.stats_};                 \
+                    .stats_ = hrm_ins_or_assign_hndl_.handle_.stats_};         \
                 *((typeof(hrm_key_) *)ccc_impl_hrm_key_at(                     \
                     hrm_ins_or_assign_hndl_.hrm_,                              \
                     hrm_ins_or_assign_hndl_.handle_.i_))                       \
