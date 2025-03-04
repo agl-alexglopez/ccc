@@ -17,7 +17,7 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
         ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
         ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/flat_realtime_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/handle_realtime_ordered_map.c
         ${PROJECT_SOURCE_DIR}/src/bitset.c
     PUBLIC 
         FILE_SET public_headers
@@ -34,7 +34,7 @@ target_sources(${PROJECT_NAME}
               impl/impl_singly_linked_list.h
               impl/impl_doubly_linked_list.h
               impl/impl_realtime_ordered_map.h
-              impl/impl_flat_realtime_ordered_map.h
+              impl/impl_handle_realtime_ordered_map.h
               impl/impl_traits.h
               impl/impl_flat_double_ended_queue.h
               impl/impl_flat_hash_map.h
@@ -51,7 +51,7 @@ target_sources(${PROJECT_NAME}
               ordered_map.h
               flat_ordered_map.h
               realtime_ordered_map.h
-              flat_realtime_ordered_map.h
+              handle_realtime_ordered_map.h
               ordered_multimap.h
               priority_queue.h
               singly_linked_list.h
