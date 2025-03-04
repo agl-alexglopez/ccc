@@ -34,15 +34,13 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_no_alloc)
     CHECK(size(&dst), size(&src));
     for (int i = 0; i < 3; ++i)
     {
-        ccc_handle src_e = remove(&src, &(struct val){.id = i}.elem);
-        ccc_handle dst_e = remove(&dst, &(struct val){.id = i}.elem);
+        struct val src_v = {.id = i};
+        struct val dst_v = {.id = i};
+        ccc_handle src_e = remove(&src, &src_v.elem);
+        ccc_handle dst_e = remove(&dst, &dst_v.elem);
         CHECK(occupied(&src_e), occupied(&dst_e));
-        struct val *src_v = hrm_at(&src, unwrap(&src_e));
-        struct val *dst_v = hrm_at(&dst, unwrap(&dst_e));
-        CHECK(src_v != NULL, true);
-        CHECK(dst_v != NULL, true);
-        CHECK(src_v->id, dst_v->id);
-        CHECK(src_v->val, dst_v->val);
+        CHECK(src_v.id, dst_v.id);
+        CHECK(src_v.val, dst_v.val);
     }
     CHECK(is_empty(&src), is_empty(&dst));
     CHECK(is_empty(&dst), true);
@@ -81,15 +79,13 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_alloc)
     CHECK(size(&dst), size(&src));
     for (int i = 0; i < 3; ++i)
     {
-        ccc_handle src_e = remove(&src, &(struct val){.id = i}.elem);
-        ccc_handle dst_e = remove(&dst, &(struct val){.id = i}.elem);
+        struct val src_v = {.id = i};
+        struct val dst_v = {.id = i};
+        ccc_handle src_e = remove(&src, &src_v.elem);
+        ccc_handle dst_e = remove(&dst, &dst_v.elem);
         CHECK(occupied(&src_e), occupied(&dst_e));
-        struct val *src_v = hrm_at(&src, unwrap(&src_e));
-        struct val *dst_v = hrm_at(&dst, unwrap(&dst_e));
-        CHECK(src_v != NULL, true);
-        CHECK(dst_v != NULL, true);
-        CHECK(src_v->id, dst_v->id);
-        CHECK(src_v->val, dst_v->val);
+        CHECK(src_v.id, dst_v.id);
+        CHECK(src_v.val, dst_v.val);
     }
     CHECK(is_empty(&src), is_empty(&dst));
     CHECK(is_empty(&dst), true);
