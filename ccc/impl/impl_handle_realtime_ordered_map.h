@@ -9,35 +9,43 @@
 #include "../buffer.h"
 #include "../types.h"
 
-/** @private */
+/** @private Runs the standard WAVL tree algorithms with the addition of
+a free list. The parent field tracks the parent for an allocated node in the
+tree that the user has inserted into the array. When the user removes a node
+it is added to the front of a free list. The map will track the first free
+node. The list is push to front LIFO stack. */
 struct ccc_hromap_elem_
 {
-    size_t branch_[2];
+    size_t branch_[2]; /** Child nodes in array to unify Left and Right. */
     union
     {
-        size_t parent_;
-        size_t next_;
+        size_t parent_;    /** Parent of WAVL node when allocated. */
+        size_t next_free_; /** Points to next free when not allocated. */
     };
-    uint8_t parity_;
+    uint8_t parity_; /** WAVL logic. Instead of rank integer, use 0 or 1. */
 };
 
-/** @private */
+/** @private A realtime ordered map providing handle stability. Once elements
+are inserted into the map they will not move slots even when the array resizes.
+The free slots are tracked in a singly linked list that uses indices instead
+of pointers so that it remains valid even when the table resizes. The 0th
+index of the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_hromap_
 {
-    ccc_buffer buf_;
-    size_t root_;
-    size_t free_;
-    size_t key_offset_;
-    size_t node_elem_offset_;
-    ccc_key_cmp_fn *cmp_;
+    ccc_buffer buf_;          /** The buffer wrapping user memory. */
+    size_t root_;             /** The root node of the WAVL tree. */
+    size_t free_list_;        /** The start of the free singly linked list. */
+    size_t key_offset_;       /** Where user key can be found in type. */
+    size_t node_elem_offset_; /** Where intrusive elem is found in type. */
+    ccc_key_cmp_fn *cmp_;     /** The provided key comparison function. */
 };
 
 /** @private */
 struct ccc_hrtree_handle_
 {
-    struct ccc_hromap_ *hrm_;
-    ccc_threeway_cmp last_cmp_;
-    struct ccc_handl_ handle_; /** Index and a status. */
+    struct ccc_hromap_ *hrm_;   /** Map associated with this handle. */
+    ccc_threeway_cmp last_cmp_; /** Saves last comparison direction. */
+    struct ccc_handl_ handle_;  /** Index and a status. */
 };
 
 /** @private */
@@ -66,7 +74,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
     {                                                                          \
         .buf_ = ccc_buf_init(memory_ptr, alloc_fn, aux_data, capacity),        \
         .root_ = 0,                                                            \
-        .free_ = 0,                                                            \
+        .free_list_ = 0,                                                       \
         .key_offset_ = offsetof(typeof(*(memory_ptr)), key_elem_field),        \
         .node_elem_offset_ = offsetof(typeof(*(memory_ptr)), node_elem_field), \
         .cmp_ = (key_cmp_fn),                                                  \
