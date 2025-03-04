@@ -35,7 +35,6 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     ccc_handle *ent
         = swap_handle_r(&hrm, &(struct val){.id = 137, .val = 99}.elem);
     CHECK(occupied(ent), false);
-    CHECK(unwrap(ent), 0);
     CHECK(size(&hrm), 1);
     CHECK_END_FN();
 }
@@ -95,7 +94,6 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_overwrite)
     struct val q = {.id = 137, .val = 99};
     ccc_handle ent = swap_handle(&hrm, &q.elem);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), 0);
 
     struct val const *v = hrm_at(&hrm, unwrap(handle_r(&hrm, &q.id)));
     CHECK(v != NULL, true);
@@ -106,13 +104,13 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_overwrite)
     q = (struct val){.id = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_handle old_ent = swap_handle(&hrm, &q.elem);
-    CHECK(occupied(&old_ent), true);
+    ccc_handle in_table = swap_handle(&hrm, &q.elem);
+    CHECK(occupied(&in_table), true);
 
     /* The old contents are now in q and the handle is in the table. */
-    v = hrm_at(&hrm, unwrap(&old_ent));
+    v = hrm_at(&hrm, unwrap(&in_table));
     CHECK(v != NULL, true);
-    CHECK(v->val, 99);
+    CHECK(v->val, 100);
     CHECK(q.val, 99);
     v = hrm_at(&hrm, unwrap(handle_r(&hrm, &q.id)));
     CHECK(v != NULL, true);
@@ -125,20 +123,19 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_then_bad_ideas)
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
     struct val q = {.id = 137, .val = 99};
-    ccc_handle ent = swap_handle(&hrm, &q.elem);
-    CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), 0);
+    ccc_handle hndl = swap_handle(&hrm, &q.elem);
+    CHECK(occupied(&hndl), false);
     struct val const *v = hrm_at(&hrm, unwrap(handle_r(&hrm, &q.id)));
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
 
     q = (struct val){.id = 137, .val = 100};
 
-    ent = swap_handle(&hrm, &q.elem);
-    CHECK(occupied(&ent), true);
-    v = hrm_at(&hrm, unwrap(&ent));
+    hndl = swap_handle(&hrm, &q.elem);
+    CHECK(occupied(&hndl), true);
+    v = hrm_at(&hrm, unwrap(&hndl));
     CHECK(v != NULL, true);
-    CHECK(v->val, 99);
+    CHECK(v->val, 100);
     CHECK(q.val, 99);
     q.val -= 9;
 
