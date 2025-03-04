@@ -183,7 +183,7 @@ ccc_hrm_get_key_val(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !key)
     {
-        return NULL;
+        return 0;
     }
     struct hrm_query_ const q = find(hrm, key);
     return (CCC_EQL == q.last_cmp_) ? q.found_ : 0;
@@ -296,7 +296,7 @@ ccc_hrm_or_insert(ccc_hromap_handle const *const e, ccc_hromap_elem *const elem)
 {
     if (!e || !elem)
     {
-        return NULL;
+        return 0;
     }
     if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
@@ -312,7 +312,7 @@ ccc_hrm_insert_handle(ccc_hromap_handle const *const e,
 {
     if (!e || !elem)
     {
-        return NULL;
+        return 0;
     }
     if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
@@ -669,7 +669,7 @@ maybe_alloc_insert(struct ccc_hromap_ *const hrm, size_t const parent,
     size_t const node = alloc_slot(hrm);
     if (!node)
     {
-        return NULL;
+        return 0;
     }
     (void)ccc_buf_write(&hrm->buf_, node, struct_base(hrm, elem));
     insert(hrm, parent, last_cmp, node);

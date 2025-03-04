@@ -32,9 +32,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
         = hrm_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
 
     /* Nothing was there before so nothing is in the handle. */
-    ccc_handle ent = insert(&hrm, &(struct val){.id = 137, .val = 99}.elem);
-    CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), 0);
+    ccc_handle *ent = insert_r(&hrm, &(struct val){.id = 137, .val = 99}.elem);
+    CHECK(occupied(ent), false);
+    CHECK(unwrap(ent), 0);
     CHECK(size(&hrm), 1);
     CHECK_END_FN();
 }
