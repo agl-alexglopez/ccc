@@ -685,6 +685,7 @@ insert(struct ccc_hromap_ *const hrm, size_t const parent_i,
     if (ccc_buf_size(&hrm->buf_) == single_tree_node)
     {
         hrm->root_ = elem_i;
+        return;
     }
     assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
     struct ccc_hromap_elem_ *parent = at(hrm, parent_i);
@@ -812,16 +813,19 @@ alloc_slot(struct ccc_hromap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    size_t const old_cap = ccc_buf_capacity(&t->buf_);
-    size_t const old_sz = ccc_buf_capacity(&t->buf_);
-    if (old_sz == old_cap)
+    size_t const old_sz = ccc_buf_size(&t->buf_);
+    size_t old_cap = ccc_buf_capacity(&t->buf_);
+    if (!old_sz || old_sz == old_cap)
     {
         assert(!t->free_);
-        if (ccc_buf_alloc(&t->buf_, old_cap ? old_cap * 2 : 8, t->buf_.alloc_)
-            != CCC_OK)
+        if (old_sz == old_cap
+            && ccc_buf_alloc(&t->buf_, old_cap ? old_cap * 2 : 8,
+                             t->buf_.alloc_)
+                   != CCC_OK)
         {
             return 0;
         }
+        old_cap = old_sz ? old_cap : 0;
         size_t const new_cap = ccc_buf_capacity(&t->buf_);
         size_t prev = 0;
         for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
@@ -1044,6 +1048,8 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
     at(t, remove)->next_ = t->free_;
     at(t, remove)->parity_ = IN_FREE_LIST;
     t->free_ = remove;
+    [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf_, 1);
+    assert(r == CCC_OK);
     return base_at(t, remove);
 }
 
@@ -1357,7 +1363,7 @@ sibling_of(struct ccc_hromap_ const *const t, size_t const x)
 static inline size_t
 max(size_t const a, size_t const b)
 {
-    return a < b ? a : b;
+    return a > b ? a : b;
 }
 
 /*===========================   Validation   ===============================*/
