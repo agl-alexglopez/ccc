@@ -32,9 +32,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
         = hrm_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
 
     /* Nothing was there before so nothing is in the handle. */
-    ccc_handle *ent
+    ccc_handle *hndl
         = swap_handle_r(&hrm, &(struct val){.id = 137, .val = 99}.elem);
-    CHECK(occupied(ent), false);
+    CHECK(occupied(hndl), false);
     CHECK(size(&hrm), 1);
     CHECK_END_FN();
 }
@@ -92,8 +92,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_overwrite)
         = hrm_init((struct val[10]){}, elem, id, id_cmp, NULL, NULL, 10);
 
     struct val q = {.id = 137, .val = 99};
-    ccc_handle ent = swap_handle(&hrm, &q.elem);
-    CHECK(occupied(&ent), false);
+    ccc_handle hndl = swap_handle(&hrm, &q.elem);
+    CHECK(occupied(&hndl), false);
 
     struct val const *v = hrm_at(&hrm, unwrap(handle_r(&hrm, &q.id)));
     CHECK(v != NULL, true);
@@ -554,9 +554,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_limit)
     size_t const final_size = size(&hrm);
     /* The last successful handle is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
-    ccc_handle ent = swap_handle(&hrm, &v.elem);
-    CHECK(unwrap(&ent) != 0, true);
-    CHECK(insert_error(&ent), false);
+    ccc_handle hndl = swap_handle(&hrm, &v.elem);
+    CHECK(unwrap(&hndl) != 0, true);
+    CHECK(insert_error(&hndl), false);
     CHECK(size(&hrm), final_size);
 
     v = (struct val){.id = last_index, .val = -2};
@@ -586,9 +586,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_limit)
     CHECK(in_table == NULL, true);
     CHECK(size(&hrm), final_size);
 
-    ent = swap_handle(&hrm, &v.elem);
-    CHECK(unwrap(&ent) == 0, true);
-    CHECK(insert_error(&ent), true);
+    hndl = swap_handle(&hrm, &v.elem);
+    CHECK(unwrap(&hndl) == 0, true);
+    CHECK(insert_error(&hndl), true);
     CHECK(size(&hrm), final_size);
     CHECK_END_FN();
 }
