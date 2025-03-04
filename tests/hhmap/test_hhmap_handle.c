@@ -51,8 +51,8 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_hash_map *const hh, size_t const n,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_handle ent
-            = insert(hh, &(struct val){.key = id_and_val, .val = id_and_val}.e);
+        ccc_handle ent = swap_handle(
+            hh, &(struct val){.key = id_and_val, .val = id_and_val}.e);
         CHECK(insert_error(&ent), false);
         CHECK(occupied(&ent), false);
         CHECK(validate(hh), true);
@@ -68,11 +68,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_validate)
         = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
                    NULL, NULL, 50);
 
-    ccc_handle ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
+    ccc_handle ent = swap_handle(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 1);
-    ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
+    ent = swap_handle(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), 1);
@@ -89,11 +89,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
     ccc_handle_hash_map hh
         = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
                    NULL, NULL, 50);
-    ccc_handle ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
+    ccc_handle ent = swap_handle(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 1);
-    ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
+    ent = swap_handle(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), 1);
@@ -106,11 +106,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
     CHECK(fill_n(&hh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_handle(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i + 2);
-    ent = insert(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_handle(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), i + 2);
@@ -123,11 +123,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
     CHECK(fill_n(&hh, size - i, i), PASS);
 
     i = size;
-    ent = insert(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_handle(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i + 2);
-    ent = insert(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_handle(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), i + 2);
@@ -148,7 +148,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 0);
-    ent = insert(&hh, &(struct val){.key = -1, .val = -1}.e);
+    ent = swap_handle(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 1);
@@ -168,7 +168,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i);
-    ent = insert(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_handle(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i + 1);
@@ -187,7 +187,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i);
-    ent = insert(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_handle(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i + 1);

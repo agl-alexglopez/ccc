@@ -175,8 +175,9 @@ ccc_rom_get_key_val(ccc_realtime_ordered_map const *const rom,
 }
 
 ccc_entry
-ccc_rom_insert(ccc_realtime_ordered_map *const rom,
-               ccc_romap_elem *const key_val_handle, ccc_romap_elem *const tmp)
+ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
+                   ccc_romap_elem *const key_val_handle,
+                   ccc_romap_elem *const tmp)
 {
     if (!rom || !key_val_handle || !tmp)
     {

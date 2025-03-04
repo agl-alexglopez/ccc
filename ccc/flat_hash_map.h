@@ -108,7 +108,7 @@ struct val
 static flat_hash_map src
     = fhm_init((static struct val[11]){}, e, key, fhmap_int_to_u64,
                fhmap_id_eq, NULL, NULL, 11);
-insert_rand_vals(&src);
+swap_entry_rand_vals(&src);
 static flat_hash_map dst
     = fhm_init((static struct val[13]){}, e, key, fhmap_int_to_u64,
                fhmap_id_eq, NULL, NULL, 13);
@@ -206,8 +206,8 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_fhm_insert(ccc_flat_hash_map *h,
-                                       ccc_fhmap_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_fhm_swap_entry(ccc_flat_hash_map *h,
+                                           ccc_fhmap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping out_handle_ptr.
 @param [in] flat_hash_map_ptr the pointer to the flat hash map.
@@ -220,10 +220,10 @@ forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-#define ccc_fhm_insert_r(flat_hash_map_ptr, out_handle_ptr)                    \
+#define ccc_fhm_swap_entry_r(flat_hash_map_ptr, out_handle_ptr)                \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_insert((flat_hash_map_ptr), (out_handle_ptr)).impl_            \
+        ccc_fhm_swap_entry((flat_hash_map_ptr), (out_handle_ptr)).impl_        \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -666,12 +666,12 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_contains(args...) ccc_fhm_contains(args)
 #    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
 #    define fhm_remove_r(args...) ccc_fhm_remove_r(args)
-#    define fhm_insert_r(args...) ccc_fhm_insert_r(args)
+#    define fhm_swap_entry_r(args...) ccc_fhm_swap_entry_r(args)
 #    define fhm_try_insert_r(args...) ccc_fhm_try_insert_r(args)
 #    define fhm_insert_or_assign_r(args...) ccc_fhm_insert_or_assign_r(args)
 #    define fhm_remove_entry_r(args...) ccc_fhm_remove_entry_r(args)
 #    define fhm_remove(args...) ccc_fhm_remove(args)
-#    define fhm_insert(args...) ccc_fhm_insert(args)
+#    define fhm_swap_entry(args...) ccc_fhm_swap_entry(args)
 #    define fhm_try_insert(args...) ccc_fhm_try_insert(args)
 #    define fhm_insert_or_assign(args...) ccc_fhm_insert_or_assign(args)
 #    define fhm_remove_entry(args...) ccc_fhm_remove_entry(args)

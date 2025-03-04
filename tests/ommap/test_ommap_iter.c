@@ -168,7 +168,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_unique_vals)
     {
         vals[i].key = shuffled_index; // NOLINT
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -197,7 +197,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_all_vals)
     struct val vals[33];
     vals[0].val = 0; // NOLINT
     vals[0].key = 0;
-    CHECK(unwrap(insert_r(&omm, &vals[0].elem)) != NULL, true);
+    CHECK(unwrap(swap_entry_r(&omm, &vals[0].elem)) != NULL, true);
     /* This will test iterating through every possible length list. */
     for (int i = 1, key = 1; i < num_nodes; i += i, ++key)
     {
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_all_vals)
         {
             vals[index].key = key; // NOLINT
             vals[index].val = index;
-            CHECK(unwrap(insert_r(&omm, &vals[index].elem)) != NULL, true);
+            CHECK(unwrap(swap_entry_r(&omm, &vals[index].elem)) != NULL, true);
             CHECK(validate(&omm), true);
         }
     }
@@ -235,7 +235,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
         vals[i].val = (int)i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     CHECK(iterator_check(&omm), PASS);
@@ -268,7 +268,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_removal)
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
         vals[i].val = (int)i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     CHECK(iterator_check(&omm), PASS);
@@ -302,7 +302,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_update)
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
         vals[i].val = (int)i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     CHECK(iterator_check(&omm), PASS);
@@ -337,7 +337,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range)
     {
         vals[i].key = val; // NOLINT
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -367,7 +367,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_valid_range_equals)
     {
         vals[i].key = val; // NOLINT
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -397,7 +397,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_invalid_range)
     {
         vals[i].key = val; // NOLINT
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -427,7 +427,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_empty_range)
     {
         vals[i].key = val; // NOLINT
         vals[i].val = i;
-        CHECK(unwrap(insert_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions

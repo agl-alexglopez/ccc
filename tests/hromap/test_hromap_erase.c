@@ -88,7 +88,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
     {
         /* NOLINTNEXTLINE */
         int const rand_i = rand();
-        (void)insert(&s, &(struct val){.id = rand_i, .val = i}.elem);
+        (void)swap_handle(&s, &(struct val){.id = rand_i, .val = i}.elem);
         id_keys[i] = rand_i;
         CHECK(validate(&s), true);
     }

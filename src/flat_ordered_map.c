@@ -195,8 +195,8 @@ ccc_fom_or_insert(ccc_fomap_entry const *const e, ccc_fomap_elem *const elem)
 }
 
 ccc_entry
-ccc_fom_insert(ccc_flat_ordered_map *const fom,
-               ccc_fomap_elem *const out_handle)
+ccc_fom_swap_entry(ccc_flat_ordered_map *const fom,
+                   ccc_fomap_elem *const out_handle)
 {
     if (!fom || !out_handle)
     {

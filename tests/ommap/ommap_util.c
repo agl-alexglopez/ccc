@@ -36,7 +36,8 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].key = (int)shuffled_index;
-        CHECK(unwrap(insert_r(pq, &vals[shuffled_index].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(pq, &vals[shuffled_index].elem)) != NULL,
+              true);
         CHECK(validate(pq), true);
         CHECK(size(pq), i + 1);
         shuffled_index = (shuffled_index + larger_prime) % size;

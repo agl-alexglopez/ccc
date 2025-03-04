@@ -24,9 +24,9 @@ CHECK_BEGIN_STATIC_FN(fomap_test_copy_no_alloc)
         = fom_init((struct val[11]){}, elem, id, id_cmp, NULL, NULL, 11);
     flat_ordered_map dst
         = fom_init((struct val[11]){}, elem, id, id_cmp, NULL, NULL, 11);
-    (void)insert(&src, &(struct val){.id = 0}.elem);
-    (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
-    (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 0}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 1, .val = 1}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fom_copy(&dst, &src, NULL);
@@ -55,9 +55,9 @@ CHECK_BEGIN_STATIC_FN(fomap_test_copy_no_alloc_fail)
         = fom_init((struct val[11]){}, elem, id, id_cmp, NULL, NULL, 11);
     flat_ordered_map dst
         = fom_init((struct val[7]){}, elem, id, id_cmp, NULL, NULL, 7);
-    (void)insert(&src, &(struct val){.id = 0}.elem);
-    (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
-    (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 0}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 1, .val = 1}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fom_copy(&dst, &src, NULL);
@@ -71,9 +71,9 @@ CHECK_BEGIN_STATIC_FN(fomap_test_copy_alloc)
         = fom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
     flat_ordered_map dst
         = fom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
-    (void)insert(&src, &(struct val){.id = 0}.elem);
-    (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
-    (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 0}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 1, .val = 1}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fom_copy(&dst, &src, std_alloc);
@@ -105,9 +105,9 @@ CHECK_BEGIN_STATIC_FN(fomap_test_copy_alloc_fail)
         = fom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
     flat_ordered_map dst
         = fom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
-    (void)insert(&src, &(struct val){.id = 0}.elem);
-    (void)insert(&src, &(struct val){.id = 1, .val = 1}.elem);
-    (void)insert(&src, &(struct val){.id = 2, .val = 2}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 0}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 1, .val = 1}.elem);
+    (void)swap_entry(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fom_copy(&dst, &src, NULL);

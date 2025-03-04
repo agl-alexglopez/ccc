@@ -114,9 +114,9 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing tmp and wraps it in
 an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_om_insert(ccc_ordered_map *om,
-                                      ccc_omap_elem *key_val_handle,
-                                      ccc_omap_elem *tmp);
+[[nodiscard]] ccc_entry ccc_om_swap_entry(ccc_ordered_map *om,
+                                          ccc_omap_elem *key_val_handle,
+                                          ccc_omap_elem *tmp);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle_ptr.
 @param [in] ordered_map_ptr the pointer to the ordered map.
@@ -131,10 +131,10 @@ insert error is set.
 
 Note that this function may write to the struct containing tmp_ptr and wraps it
 in an entry to provide information about the old value. */
-#define ccc_om_insert_r(ordered_map_ptr, key_val_handle_ptr, tmp_ptr)          \
+#define ccc_om_swap_entry_r(ordered_map_ptr, key_val_handle_ptr, tmp_ptr)      \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_insert((ordered_map_ptr), (key_val_handle_ptr), (tmp_ptr))      \
+        ccc_om_swap_entry((ordered_map_ptr), (key_val_handle_ptr), (tmp_ptr))  \
             .impl_                                                             \
     }
 
@@ -618,7 +618,7 @@ typedef ccc_omap_entry omap_entry;
 #    define om_insert_entry_w(args...) ccc_om_insert_entry_w(args)
 #    define om_try_insert_w(args...) ccc_om_try_insert_w(args)
 #    define om_insert_or_assign_w(args...) ccc_om_insert_or_assign_w(args)
-#    define om_insert_r(args...) ccc_om_insert_r(args)
+#    define om_swap_entry_r(args...) ccc_om_swap_entry_r(args)
 #    define om_remove_r(args...) ccc_om_remove_r(args)
 #    define om_remove_entry_r(args...) ccc_om_remove_entry_r(args)
 #    define om_entry_r(args...) ccc_om_entry_r(args)
@@ -627,7 +627,7 @@ typedef ccc_omap_entry omap_entry;
 #    define om_contains(args...) ccc_om_contains(args)
 #    define om_get_key_val(args...) ccc_om_get_key_val(args)
 #    define om_get_mut(args...) ccc_om_get_mut(args)
-#    define om_insert(args...) ccc_om_insert(args)
+#    define om_swap_entry(args...) ccc_om_swap_entry(args)
 #    define om_remove(args...) ccc_om_remove(args)
 #    define om_entry(args...) ccc_om_entry(args)
 #    define om_remove_entry(args...) ccc_om_remove_entry(args)

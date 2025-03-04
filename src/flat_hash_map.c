@@ -282,7 +282,7 @@ ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_fhm_insert(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
+ccc_fhm_swap_entry(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
 {
     if (unlikely(!h || !out_handle))
     {

@@ -150,8 +150,8 @@ CHECK_BEGIN_STATIC_FN(fomap_test_forward_iter)
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
-        (void)insert(&s,
-                     &(struct val){.id = (int)shuffled_index, .val = i}.elem);
+        (void)swap_entry(
+            &s, &(struct val){.id = (int)shuffled_index, .val = i}.elem);
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -177,7 +177,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_iterate_removal)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. NOLINTNEXTLINE */
-        (void)insert(
+        (void)swap_entry(
             &s,
             &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem);
         CHECK(validate(&s), true);
@@ -207,7 +207,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_iterate_remove_reinsert)
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. NOLINTNEXTLINE */
-        (void)insert(
+        (void)swap_entry(
             &s,
             &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem);
         CHECK(validate(&s), true);

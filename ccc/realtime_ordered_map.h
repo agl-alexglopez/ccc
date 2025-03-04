@@ -114,9 +114,9 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing tmp and wraps it in
 an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_rom_insert(ccc_realtime_ordered_map *rom,
-                                       ccc_romap_elem *key_val_handle,
-                                       ccc_romap_elem *tmp);
+[[nodiscard]] ccc_entry ccc_rom_swap_entry(ccc_realtime_ordered_map *rom,
+                                           ccc_romap_elem *key_val_handle,
+                                           ccc_romap_elem *tmp);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle_ptr.
 @param [in] realtime_ordered_map_ptr the pointer to the ordered map.
@@ -131,12 +131,12 @@ insert error is set.
 
 Note that this function may write to the struct containing tmp_ptr and wraps it
 in an entry to provide information about the old value. */
-#define ccc_rom_insert_r(realtime_ordered_map_ptr, key_val_handle_ptr,         \
-                         tmp_ptr)                                              \
+#define ccc_rom_swap_entry_r(realtime_ordered_map_ptr, key_val_handle_ptr,     \
+                             tmp_ptr)                                          \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_rom_insert((realtime_ordered_map_ptr), (key_val_handle_ptr),       \
-                       (tmp_ptr))                                              \
+        ccc_rom_swap_entry((realtime_ordered_map_ptr), (key_val_handle_ptr),   \
+                           (tmp_ptr))                                          \
             .impl_                                                             \
     }
 
@@ -629,7 +629,7 @@ typedef ccc_romap_entry romap_entry;
 #    define rom_insert_entry_w(args...) ccc_rom_insert_entry_w(args)
 #    define rom_try_insert_w(args...) ccc_rom_try_insert_w(args)
 #    define rom_insert_or_assign_w(args...) ccc_rom_insert_or_assign_w(args)
-#    define rom_insert_r(args...) ccc_rom_insert_r(args)
+#    define rom_swap_entry_r(args...) ccc_rom_swap_entry_r(args)
 #    define rom_remove_r(args...) ccc_rom_remove_r(args)
 #    define rom_remove_entry_r(args...) ccc_rom_remove_entry_r(args)
 #    define rom_entry_r(args...) ccc_rom_entry_r(args)
@@ -638,7 +638,7 @@ typedef ccc_romap_entry romap_entry;
 #    define rom_contains(args...) ccc_rom_contains(args)
 #    define rom_get_key_val(args...) ccc_rom_get_key_val(args)
 #    define rom_get_mut(args...) ccc_rom_get_mut(args)
-#    define rom_insert(args...) ccc_rom_insert(args)
+#    define rom_swap_entry(args...) ccc_rom_swap_entry(args)
 #    define rom_remove(args...) ccc_rom_remove(args)
 #    define rom_entry(args...) ccc_rom_entry(args)
 #    define rom_remove_entry(args...) ccc_rom_remove_entry(args)

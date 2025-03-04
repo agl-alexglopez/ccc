@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = insert(&fh, &query.e);
+    ccc_entry ent = swap_entry(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);

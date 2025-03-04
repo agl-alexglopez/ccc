@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert)
                    NULL, NULL, 10);
 
     /* Nothing was there before so nothing is in the handle. */
-    ccc_handle ent = insert(&hh, &(struct val){.key = 137, .val = 99}.e);
+    ccc_handle ent = swap_handle(&hh, &(struct val){.key = 137, .val = 99}.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != 0, true);
     CHECK(size(&hh), 1);
@@ -84,7 +84,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_overwrite)
                    NULL, NULL, 10);
 
     struct val q = {.key = 137, .val = 99};
-    ccc_handle ent = insert(&hh, &q.e);
+    ccc_handle ent = swap_handle(&hh, &q.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != 0, true);
 
@@ -98,7 +98,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_overwrite)
     q = (struct val){.key = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ent = insert(&hh, &q.e);
+    ent = swap_handle(&hh, &q.e);
     CHECK(occupied(&ent), true);
 
     /* The old contents are now in q and the handle is in the table. */
@@ -120,7 +120,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_then_bad_ideas)
         = hhm_init((struct val[10]){}, e, key, hhmap_int_zero, hhmap_id_eq,
                    NULL, NULL, 10);
     struct val q = {.key = 137, .val = 99};
-    ccc_handle ent = insert(&hh, &q.e);
+    ccc_handle ent = swap_handle(&hh, &q.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != 0, true);
     ccc_handle_i h = unwrap(handle_r(&hh, &q.key));
@@ -130,7 +130,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_then_bad_ideas)
 
     q = (struct val){.key = 137, .val = 100};
 
-    ent = insert(&hh, &q.e);
+    ent = swap_handle(&hh, &q.e);
     CHECK(occupied(&ent), true);
     h = unwrap(&ent);
     v = hhm_at(&hh, h);
@@ -588,7 +588,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
     /* The last successful handle is still in the table and is overwritten.
      */
     struct val v = {.key = last_index, .val = -1};
-    ccc_handle ent = insert(&hh, &v.e);
+    ccc_handle ent = swap_handle(&hh, &v.e);
     CHECK(unwrap(&ent) != 0, true);
     CHECK(insert_error(&ent), false);
     CHECK(size(&hh), final_size);
@@ -620,7 +620,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_insert_limit)
     CHECK(in_table == NULL, true);
     CHECK(size(&hh), final_size);
 
-    ent = insert(&hh, &v.e);
+    ent = swap_handle(&hh, &v.e);
     CHECK(insert_error(&ent), true);
     CHECK(size(&hh), final_size);
     CHECK_END_FN();

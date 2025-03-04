@@ -256,8 +256,8 @@ has been forbidden, an insert error is set. Unwrap to view the current table
 element.
 
 @note this function may write to the struct containing the second parameter. */
-[[nodiscard]] ccc_handle ccc_hhm_insert(ccc_handle_hash_map *h,
-                                        ccc_hhmap_elem *out_handle);
+[[nodiscard]] ccc_handle ccc_hhm_swap_handle(ccc_handle_hash_map *h,
+                                             ccc_hhmap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping out_handle_ptr.
 @param [in] handle_hash_map_ptr the pointer to the handle hash map.
@@ -269,10 +269,10 @@ space is needed but allocation fails or has been forbidden, an insert error is
 set.
 
 @note this function may write to the struct containing the second parameter. */
-#define ccc_hhm_insert_r(handle_hash_map_ptr, out_handle_ptr)                  \
+#define ccc_hhm_swap_handle_r(handle_hash_map_ptr, out_handle_ptr)             \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hhm_insert((handle_hash_map_ptr), (out_handle_ptr)).impl_          \
+        ccc_hhm_swap_handle((handle_hash_map_ptr), (out_handle_ptr)).impl_     \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -719,8 +719,8 @@ typedef ccc_hhmap_handle hhmap_handle;
 #    define hhm_get_key_val(args...) ccc_hhm_get_key_val(args)
 #    define hhm_at(args...) ccc_hhm_at(args)
 #    define hhm_as(args...) ccc_hhm_as(args)
-#    define hhm_insert(args...) ccc_hhm_insert(args)
-#    define hhm_insert_r(args...) ccc_hhm_insert_r(args)
+#    define hhm_swap_entry(args...) ccc_hhm_swap_entry(args)
+#    define hhm_swap_entry_r(args...) ccc_hhm_swap_entry_r(args)
 #    define hhm_remove(args...) ccc_hhm_remove(args)
 #    define hhm_remove_r(args...) ccc_hhm_remove_r(args)
 #    define hhm_try_insert(args...) ccc_hhm_try_insert(args)

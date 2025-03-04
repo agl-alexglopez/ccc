@@ -51,7 +51,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_flat_ordered_map *const fom, size_t const n,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_entry ent = insert(
+        ccc_entry ent = swap_entry(
             fom, &(struct val){.id = id_and_val, .val = id_and_val}.elem);
         CHECK(insert_error(&ent), false);
         CHECK(occupied(&ent), false);
@@ -66,12 +66,12 @@ CHECK_BEGIN_STATIC_FN(fomap_test_validate)
 {
     ccc_flat_ordered_map fom
         = fom_init((struct val[3]){}, elem, id, id_cmp, NULL, NULL, 3);
-    ccc_entry ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_entry ent = swap_entry(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fom), 1);
-    ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fom), 1);
@@ -87,12 +87,12 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert)
     int size = 30;
     ccc_flat_ordered_map fom
         = fom_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
-    ccc_entry ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_entry ent = swap_entry(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fom), 1);
-    ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fom), 1);
@@ -105,12 +105,12 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert)
     CHECK(fill_n(&fom, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert(&fom, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fom), i + 2);
-    ent = insert(&fom, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fom), i + 2);
@@ -123,12 +123,12 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert)
     CHECK(fill_n(&fom, size - i, i), PASS);
 
     i = size;
-    ent = insert(&fom, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fom), i + 2);
-    ent = insert(&fom, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fom), i + 2);
@@ -149,7 +149,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fom), 0);
-    ent = insert(&fom, &(struct val){.id = -1, .val = -1}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_remove)
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&fom), i);
-    ent = insert(&fom, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -192,7 +192,7 @@ CHECK_BEGIN_STATIC_FN(fomap_test_remove)
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&fom), i);
-    ent = insert(&fom, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_entry(&fom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&fom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);

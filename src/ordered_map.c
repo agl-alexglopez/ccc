@@ -171,8 +171,8 @@ ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
 }
 
 ccc_entry
-ccc_om_insert(ccc_ordered_map *const om, ccc_omap_elem *const key_val_handle,
-              ccc_omap_elem *const tmp)
+ccc_om_swap_entry(ccc_ordered_map *const om,
+                  ccc_omap_elem *const key_val_handle, ccc_omap_elem *const tmp)
 {
     if (!om || !key_val_handle || !tmp)
     {

@@ -95,12 +95,12 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc)
                                    hhmap_id_eq, NULL, NULL, 11);
     handle_hash_map dst = hhm_init((struct val[13]){}, e, key, hhmap_int_zero,
                                    hhmap_id_eq, NULL, NULL, 13);
-    (void)hhm_insert(&src, &(struct val){.key = 0}.e);
+    (void)swap_handle(&src, &(struct val){.key = 0}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
-    (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_handle(&src, &(struct val){.key = 1, .val = 1}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
     CHECK(hhm_contains(&src, &(int){1}), true);
-    (void)hhm_insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_handle(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
     CHECK(hhm_contains(&src, &(int){1}), true);
     CHECK(hhm_contains(&src, &(int){2}), true);
@@ -126,9 +126,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc_fail)
                                    hhmap_id_eq, NULL, NULL, 11);
     handle_hash_map dst = hhm_init((struct val[7]){}, e, key, hhmap_int_zero,
                                    hhmap_id_eq, NULL, NULL, 7);
-    (void)hhm_insert(&src, &(struct val){.key = 0}.e);
-    (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
-    (void)hhm_insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_handle(&src, &(struct val){.key = 0}.e);
+    (void)swap_handle(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_handle(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(hhm_size(&src), 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
@@ -142,12 +142,12 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc)
                                    hhmap_id_eq, std_alloc, NULL, 0);
     handle_hash_map dst = hhm_init((struct val *)NULL, e, key, hhmap_int_zero,
                                    hhmap_id_eq, std_alloc, NULL, 0);
-    (void)hhm_insert(&src, &(struct val){.key = 0}.e);
+    (void)swap_handle(&src, &(struct val){.key = 0}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
-    (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_handle(&src, &(struct val){.key = 1, .val = 1}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
     CHECK(hhm_contains(&src, &(int){1}), true);
-    (void)hhm_insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_handle(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(hhm_contains(&src, &(int){0}), true);
     CHECK(hhm_contains(&src, &(int){1}), true);
     CHECK(hhm_contains(&src, &(int){2}), true);
@@ -176,9 +176,9 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc_fail)
                                    hhmap_id_eq, std_alloc, NULL, 0);
     handle_hash_map dst = hhm_init((struct val *)NULL, e, key, hhmap_int_zero,
                                    hhmap_id_eq, std_alloc, NULL, 0);
-    (void)hhm_insert(&src, &(struct val){.key = 0}.e);
-    (void)hhm_insert(&src, &(struct val){.key = 1, .val = 1}.e);
-    (void)hhm_insert(&src, &(struct val){.key = 2, .val = 2}.e);
+    (void)swap_handle(&src, &(struct val){.key = 0}.e);
+    (void)swap_handle(&src, &(struct val){.key = 1, .val = 1}.e);
+    (void)swap_handle(&src, &(struct val){.key = 2, .val = 2}.e);
     CHECK(hhm_size(&src), 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);

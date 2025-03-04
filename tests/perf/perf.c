@@ -106,7 +106,7 @@ test_push(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)insert(&omm, &val_array[i].ommap_elem);
+            (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -145,7 +145,7 @@ test_pop(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            (void)insert(&omm, &val_array[i].ommap_elem);
+            (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -198,7 +198,7 @@ test_push_pop(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)insert(&omm, &val_array[i].ommap_elem);
+            (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         for (size_t i = 0; i < n; ++i)
         {
@@ -250,7 +250,7 @@ test_push_intermittent_pop(void)
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
         {
-            (void)insert(&omm, &val_array[i].ommap_elem);
+            (void)swap_entry(&omm, &val_array[i].ommap_elem);
             if (i % 10 == 0)
             {
                 (void)ccc_omm_pop_min(&omm);
@@ -301,7 +301,7 @@ test_pop_intermittent_push(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            (void)insert(&omm, &val_array[i].ommap_elem);
+            (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)
@@ -311,7 +311,7 @@ test_pop_intermittent_push(void)
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
-                (void)insert(&omm, &v->ommap_elem);
+                (void)swap_entry(&omm, &v->ommap_elem);
             }
         }
         clock_t end = clock();
@@ -370,7 +370,7 @@ test_update(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (size_t i = 0; i < n; ++i)
         {
-            (void)insert(&omm, &val_array[i].ommap_elem);
+            (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
         for (size_t i = 0; i < n; ++i)

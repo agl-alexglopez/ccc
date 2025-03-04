@@ -208,8 +208,8 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
 it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_fom_insert(ccc_flat_ordered_map *fom,
-                                       ccc_fomap_elem *out_handle);
+[[nodiscard]] ccc_entry ccc_fom_swap_entry(ccc_flat_ordered_map *fom,
+                                           ccc_fomap_elem *out_handle);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] flat_ordered_map_ptr the pointer to the ordered map.
@@ -222,10 +222,10 @@ insert error is set.
 
 Note that this function may write to the struct containing out_handle and wraps
 it in an entry to provide information about the old value. */
-#define ccc_fom_insert_r(flat_ordered_map_ptr, out_handle_ptr)                 \
+#define ccc_fom_swap_entry_r(flat_ordered_map_ptr, out_handle_ptr)             \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fom_insert((flat_ordered_map_ptr), (out_handle_ptr)).impl_         \
+        ccc_fom_swap_entry((flat_ordered_map_ptr), (out_handle_ptr)).impl_     \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -722,11 +722,11 @@ typedef ccc_fomap_entry fomap_entry;
 #    define fom_copy(args...) ccc_fom_copy(args)
 #    define fom_contains(args...) ccc_fom_contains(args)
 #    define fom_get_key_val(args...) ccc_fom_get_key_val(args)
-#    define fom_insert_r(args...) ccc_fom_insert_r(args)
+#    define fom_swap_entry_r(args...) ccc_fom_swap_entry_r(args)
 #    define fom_try_insert_r(args...) ccc_fom_try_insert_r(args)
 #    define fom_remove_r(args...) ccc_fom_remove_r(args)
 #    define fom_remove_entry_r(args...) ccc_fom_remove_entry_r(args)
-#    define fom_insert(args...) ccc_fom_insert(args)
+#    define fom_swap_entry(args...) ccc_fom_swap_entry(args)
 #    define fom_try_insert(args...) ccc_fom_try_insert(args)
 #    define fom_insert_or_assign(args...) ccc_fom_insert_or_assign(args)
 #    define fom_remove(args...) ccc_fom_remove(args)

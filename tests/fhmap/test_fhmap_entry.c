@@ -51,8 +51,8 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_flat_hash_map *const fh, size_t const n,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_entry ent
-            = insert(fh, &(struct val){.key = id_and_val, .val = id_and_val}.e);
+        ccc_entry ent = swap_entry(
+            fh, &(struct val){.key = id_and_val, .val = id_and_val}.e);
         CHECK(insert_error(&ent), false);
         CHECK(occupied(&ent), false);
         CHECK(validate(fh), true);
@@ -68,12 +68,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_validate)
         = fhm_init((struct val[50]){}, e, key, fhmap_int_to_u64, fhmap_id_eq,
                    NULL, NULL, 50);
 
-    ccc_entry ent = insert(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ccc_entry ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
-    ent = insert(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), 1);
@@ -90,12 +90,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     ccc_flat_hash_map fh
         = fhm_init((struct val[50]){}, e, key, fhmap_int_to_u64, fhmap_id_eq,
                    NULL, NULL, 50);
-    ccc_entry ent = insert(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ccc_entry ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
-    ent = insert(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), 1);
@@ -108,12 +108,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_entry(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), i + 2);
-    ent = insert(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_entry(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), i + 2);
@@ -126,12 +126,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    ent = insert(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_entry(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), i + 2);
-    ent = insert(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_entry(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), i + 2);
@@ -153,7 +153,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 0);
-    ent = insert(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -175,7 +175,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), i);
-    ent = insert(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_entry(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -196,7 +196,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), i);
-    ent = insert(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = swap_entry(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);

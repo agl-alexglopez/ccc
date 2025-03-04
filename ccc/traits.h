@@ -29,21 +29,39 @@ control flow is needed. */
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
-@param insert_args args depend on container.
+@param swap_args args depend on container.
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define ccc_insert(container_ptr, insert_args...)                              \
-    ccc_impl_insert(container_ptr, insert_args)
+#define ccc_swap_entry(container_ptr, swap_args...)                            \
+    ccc_impl_swap_entry(container_ptr, swap_args)
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
-@param insert_args args depend on container.
+@param swap_args args depend on container.
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define ccc_insert_r(container_ptr, insert_args...)                            \
-    ccc_impl_insert_r(container_ptr, insert_args)
+#define ccc_swap_entry_r(container_ptr, swap_args...)                          \
+    ccc_impl_swap_entry_r(container_ptr, swap_args)
+
+/** @brief Insert an element and obtain the old value if Occupied.
+@param [in] container_ptr a pointer to the container.
+@param swap_args args depend on container.
+@return a handle depending on container specific context.
+
+See container documentation for specific behavior. */
+#define ccc_swap_handle(container_ptr, swap_args...)                           \
+    ccc_impl_swap_handle(container_ptr, swap_args)
+
+/** @brief Insert an element and obtain the old value if Occupied.
+@param [in] container_ptr a pointer to the container.
+@param swap_args args depend on container.
+@return a handle depending on container specific context.
+
+See container documentation for specific behavior. */
+#define ccc_swap_handle_r(container_ptr, swap_args...)                         \
+    ccc_impl_swap_handle_r(container_ptr, swap_args)
 
 /** @brief Insert an element if the entry is Vacant.
 @param [in] container_ptr a pointer to the container.
@@ -516,12 +534,14 @@ See container documentation for specific behavior. */
 
 /** Define this preprocessor directive to shorten trait names. */
 #ifdef TRAITS_USING_NAMESPACE_CCC
-#    define insert(args...) ccc_insert(args)
+#    define swap_entry(args...) ccc_swap_entry(args)
+#    define swap_entry_r(args...) ccc_swap_entry_r(args)
+#    define swap_handle(args...) ccc_swap_handle(args)
+#    define swap_handle_r(args...) ccc_swap_handle_r(args)
 #    define try_insert(args...) ccc_try_insert(args)
 #    define insert_or_assign(args...) ccc_insert_or_assign(args)
 #    define insert_or_assign_r(args...) ccc_insert_or_assign_r(args)
 #    define try_insert_r(args...) ccc_try_insert_r(args)
-#    define insert_r(args...) ccc_insert_r(args)
 #    define remove(args...) ccc_remove(args)
 #    define remove_r(args...) ccc_remove_r(args)
 #    define remove_entry(args...) ccc_remove_entry(args)

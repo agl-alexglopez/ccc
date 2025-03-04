@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].key = (int)shuffled_index;
-        if (occupied(insert_r(&s, &vals[i].elem, &(struct val){}.elem)))
+        if (occupied(swap_entry_r(&s, &vals[i].elem, &(struct val){}.elem)))
         {
             repeats[i] = true;
         }
@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_weak_srand)
     {
         vals[i].key = rand(); /* NOLINT */
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)

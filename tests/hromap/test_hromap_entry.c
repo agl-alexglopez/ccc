@@ -51,7 +51,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_realtime_ordered_map *const hrm,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_handle ent = insert(
+        ccc_handle ent = swap_handle(
             hrm, &(struct val){.id = id_and_val, .val = id_and_val}.elem);
         CHECK(insert_error(&ent), false);
         CHECK(occupied(&ent), false);
@@ -66,12 +66,12 @@ CHECK_BEGIN_STATIC_FN(hromap_test_validate)
 {
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[3]){}, elem, id, id_cmp, NULL, NULL, 3);
-    ccc_handle ent = insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_handle ent = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
     CHECK(size(&hrm), 1);
-    ent = insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hrm), 1);
@@ -87,12 +87,12 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     int size = 30;
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
-    ccc_handle ent = insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_handle ent = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
     CHECK(size(&hrm), 1);
-    ent = insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hrm), 1);
@@ -105,12 +105,12 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
     CHECK(size(&hrm), i + 2);
-    ent = insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hrm), i + 2);
@@ -123,12 +123,12 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    ent = insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
     CHECK(size(&hrm), i + 2);
-    ent = insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hrm), i + 2);
@@ -149,7 +149,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
     CHECK(size(&hrm), 0);
-    ent = insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hrm), i);
-    ent = insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);
@@ -192,7 +192,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hrm), i);
-    ent = insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    ent = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), 0);

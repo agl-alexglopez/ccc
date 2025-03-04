@@ -169,7 +169,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_forward_iter)
     {
         vals[i].key = (int)shuffled_index;
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -198,7 +198,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_removal)
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
         vals[i].val = (int)i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -229,7 +229,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_iterate_remove_reinsert)
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
         vals[i].val = (int)i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -264,7 +264,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_valid_range)
     {
         vals[i].key = id; // NOLINT
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -294,7 +294,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_valid_range_equals)
     {
         vals[i].key = id; // NOLINT
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* This should be the following range [5,50). 5 should stay at the start,
@@ -322,7 +322,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_invalid_range)
     {
         vals[i].key = id; // NOLINT
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -351,7 +351,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_empty_range)
     {
         vals[i].key = id; // NOLINT
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.

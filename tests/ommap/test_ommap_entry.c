@@ -52,7 +52,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ordered_multimap *const om, size_t const n,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_entry ent = insert(
+        ccc_entry ent = swap_entry(
             om, &(struct val){.key = id_and_val, .val = id_and_val}.elem);
         CHECK(insert_error(&ent), false);
         CHECK(occupied(&ent), false);
@@ -69,12 +69,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_validate)
         = {.vals = (struct val[3]){}, .next_free = 0, .capacity = 3};
     ordered_multimap om
         = omm_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
-    ccc_entry ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ccc_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);
     CHECK(size(&om), 1);
-    ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), 2);
@@ -92,12 +92,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert)
     ordered_multimap om
         = omm_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ccc_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);
     CHECK(size(&om), 1);
-    ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), 2);
@@ -110,12 +110,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert)
     CHECK(fill_n(&om, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);
     CHECK(size(&om), i + 3);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), i + 4);
@@ -128,12 +128,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert)
     CHECK(fill_n(&om, size - i, i), PASS);
 
     i = size;
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);
     CHECK(size(&om), i + 4);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), i + 5);
@@ -156,7 +156,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), 0);
-    ent = insert(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);
@@ -178,7 +178,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_remove)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&om), i);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);
@@ -199,7 +199,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_remove)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&om), i);
-    ent = insert(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) == NULL, false);

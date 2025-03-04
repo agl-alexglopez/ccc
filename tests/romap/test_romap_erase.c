@@ -57,7 +57,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].key = (int)shuffled_index;
-        ccc_entry e = insert(&s, &vals[i].elem, &(struct val){}.elem);
+        ccc_entry e = swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         if (unwrap(&e))
         {
             repeats[i] = true;
@@ -89,7 +89,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
     {
         vals[i].key = rand(); // NOLINT
         vals[i].val = i;
-        (void)insert(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
