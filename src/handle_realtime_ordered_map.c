@@ -636,17 +636,15 @@ ccc_impl_hrm_key_from_node(struct ccc_hromap_ const *const hrm,
 }
 
 void *
-ccc_impl_hrm_key_in_slot(struct ccc_hromap_ const *const hrm,
-                         void const *const slot)
+ccc_impl_hrm_key_at(struct ccc_hromap_ const *const hrm, size_t const slot)
 {
-    return (char *)slot + hrm->key_offset_;
+    return key_at(hrm, slot);
 }
 
 struct ccc_hromap_elem_ *
-ccc_impl_hrm_elem_in_slot(struct ccc_hromap_ const *const hrm,
-                          void const *const slot)
+ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm, size_t const i)
 {
-    return elem_in_slot(hrm, slot);
+    return at(hrm, i);
 }
 
 size_t
