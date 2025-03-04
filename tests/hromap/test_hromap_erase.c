@@ -31,10 +31,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *const v
-            = hrm_at(&s, unwrap(remove_r(&s, &(struct val){.id = i}.elem)));
-        CHECK(v != NULL, true);
-        CHECK(v->id, i);
+        ccc_handle const *const h
+            = remove_r(&s, &(struct val){.id = (int)i}.elem);
+        CHECK(occupied(h), true);
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
@@ -78,8 +77,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
 {
     struct val vals[1001];
-    ccc_handle_realtime_ordered_map s
-        = hrm_init(vals, elem, id, id_cmp, NULL, NULL, 10001);
+    ccc_handle_realtime_ordered_map s = hrm_init(
+        vals, elem, id, id_cmp, NULL, NULL, sizeof(vals) / sizeof(vals[0]));
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
@@ -94,10 +93,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle_i const h
-            = unwrap(remove_r(&s, &(struct val){.id = id_keys[i]}.elem));
-        struct val *v = hrm_at(&s, h);
-        CHECK(v == NULL, false);
+        ccc_handle const h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);

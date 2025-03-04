@@ -75,8 +75,8 @@ CHECK_BEGIN_STATIC_FN(fomap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(fomap_test_weak_srand)
 {
     struct val vals[1001];
-    ccc_flat_ordered_map s
-        = fom_init(vals, elem, id, id_cmp, NULL, NULL, 10001);
+    ccc_flat_ordered_map s = fom_init(vals, elem, id, id_cmp, NULL, NULL,
+                                      sizeof(vals) / sizeof(vals[0]));
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;

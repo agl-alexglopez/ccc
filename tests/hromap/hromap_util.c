@@ -21,7 +21,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_handle_realtime_ordered_map *m,
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        (void)swap_handle(
+        (void)insert_or_assign(
             m, &(struct val){.id = (int)shuffled_index, .val = (int)i}.elem);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
