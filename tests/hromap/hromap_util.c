@@ -1,7 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
-#include "fromap_util.h"
+#include "hromap_util.h"
 #include "checkers.h"
-#include "flat_realtime_ordered_map.h"
+#include "handle_realtime_ordered_map.h"
 #include "traits.h"
 #include "types.h"
 
@@ -15,7 +15,7 @@ id_cmp(ccc_key_cmp const cmp)
     return (key > c->id) - (key < c->id);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, ccc_flat_realtime_ordered_map *m,
+CHECK_BEGIN_FN(insert_shuffled, ccc_handle_realtime_ordered_map *m,
                size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -33,9 +33,9 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_realtime_ordered_map *m,
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
 inorder_fill(int vals[], size_t size,
-             ccc_flat_realtime_ordered_map const *const m)
+             ccc_handle_realtime_ordered_map const *const m)
 {
-    if (ccc_frm_size(m) != size)
+    if (ccc_hrm_size(m) != size)
     {
         return 0;
     }

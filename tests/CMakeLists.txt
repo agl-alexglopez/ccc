@@ -230,20 +230,20 @@ add_romap_test(test_romap_iter)
 add_romap_test(test_romap_entry)
 add_romap_test(test_romap_lru)
 
-#############  Flat Realtime Map  ##########################
-add_library(fromap_util fromap/fromap_util.h fromap/fromap_util.c)
-target_link_libraries(fromap_util
+#############  Handle Realtime Map  ##########################
+add_library(hromap_util hromap/hromap_util.h hromap/hromap_util.c)
+target_link_libraries(hromap_util
   PRIVATE
     ccc
     checkers
 )
 
-macro(add_fromap_test TEST_NAME)
-  add_executable(${TEST_NAME} fromap/${TEST_NAME}.c)
+macro(add_hromap_test TEST_NAME)
+  add_executable(${TEST_NAME} hromap/${TEST_NAME}.c)
   target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      fromap_util
+      hromap_util
       ccc
       checkers
       alloc
@@ -255,11 +255,11 @@ macro(add_fromap_test TEST_NAME)
   )
 endmacro()
 
-add_fromap_test(test_fromap_construct)
-add_fromap_test(test_fromap_insert)
-add_fromap_test(test_fromap_erase)
-add_fromap_test(test_fromap_iter)
-add_fromap_test(test_fromap_entry)
+add_hromap_test(test_hromap_construct)
+add_hromap_test(test_hromap_insert)
+add_hromap_test(test_hromap_erase)
+add_hromap_test(test_hromap_iter)
+add_hromap_test(test_hromap_entry)
 
 #############  Flat Hash Map ##########################
 
