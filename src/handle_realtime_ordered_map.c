@@ -813,7 +813,7 @@ alloc_slot(struct ccc_hromap_ *const t)
     size_t old_cap = ccc_buf_capacity(&t->buf_);
     if (!old_sz || old_sz == old_cap)
     {
-        assert(!t->free_);
+        assert(!t->free_list_);
         if (old_sz == old_cap
             && ccc_buf_alloc(&t->buf_, old_cap ? old_cap * 2 : 8,
                              t->buf_.alloc_)
@@ -827,21 +827,21 @@ alloc_slot(struct ccc_hromap_ *const t)
         for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
         {
             at(t, i)->parity_ = IN_FREE_LIST;
-            at(t, i)->next_ = prev;
+            at(t, i)->next_free_ = prev;
         }
-        t->free_ = prev;
+        t->free_list_ = prev;
         if (ccc_buf_size_set(&t->buf_, max(old_sz, 1)) != CCC_OK)
         {
             return 0;
         }
         at(t, 0)->parity_ = 1;
     }
-    if (!t->free_ || ccc_buf_size_plus(&t->buf_, 1) != CCC_OK)
+    if (!t->free_list_ || ccc_buf_size_plus(&t->buf_, 1) != CCC_OK)
     {
         return 0;
     }
-    size_t const slot = t->free_;
-    t->free_ = at(t, slot)->next_;
+    size_t const slot = t->free_list_;
+    t->free_list_ = at(t, slot)->next_free_;
     return slot;
 }
 
@@ -1041,9 +1041,9 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
         }
         assert(!is_leaf(t, p) || !parity(t, p));
     }
-    at(t, remove)->next_ = t->free_;
+    at(t, remove)->next_free_ = t->free_list_;
     at(t, remove)->parity_ = IN_FREE_LIST;
-    t->free_ = remove;
+    t->free_list_ = remove;
     [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf_, 1);
     assert(r == CCC_OK);
     return base_at(t, remove);
@@ -1446,8 +1446,9 @@ is_free_list_valid(struct ccc_hromap_ const *const t)
         return false;
     }
     size_t list_check2 = 0;
-    for (size_t cur = t->free_; cur && list_check2 < ccc_buf_capacity(&t->buf_);
-         cur = at(t, cur)->next_, ++list_check2)
+    for (size_t cur = t->free_list_;
+         cur && list_check2 < ccc_buf_capacity(&t->buf_);
+         cur = at(t, cur)->next_free_, ++list_check2)
     {}
     return list_check2 == list_check1;
 }
