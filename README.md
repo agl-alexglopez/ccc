@@ -1078,13 +1078,13 @@ Here, the user is trying to insert a new key and value into the hash map which i
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
-#define ccc_fpq_init(mem_ptr, capacity, cmp_order, cmp_fn, alloc_fn, aux_data) \
-    ccc_impl_fpq_init(mem_ptr, capacity, cmp_order, cmp_fn, alloc_fn, aux_data)
+#define ccc_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity) \
+    ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity)
 
 /* For example: */
 
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, 40, CCC_LES, int_cmp, NULL, NULL);
+    = ccc_fpq_init((int[40]){}, CCC_LES, int_cmp, NULL, NULL, 40);
 
 ```
 
@@ -1092,7 +1092,7 @@ Here a small min priority queue of integers with a maximum capacity of 40 has be
 
 ```c
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int *)NULL, 0, CCC_LES, int_cmp, std_alloc, NULL);
+    = ccc_fpq_init((int *)NULL, CCC_LES, int_cmp, std_alloc, NULL, 0);
 ```
 
 Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.
@@ -1109,7 +1109,7 @@ As was mentioned in the previous section, all containers can be forbidden from a
 
 ```c
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, 40, CCC_LES, int_cmp, NULL, NULL);
+    = ccc_fpq_init((int[40]){}, CCC_LES, int_cmp, NULL, NULL, 40);
 ```
 
 For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used.
@@ -1163,8 +1163,8 @@ struct val
     int val;
 };
 static flat_hash_map val_map
-    = fhm_init((static struct val[2999]){}, 2999, key, e, fhmap_int_to_u64,
-               fhmap_id_eq, NULL, NULL);
+    = fhm_init((static struct val[2999]){}, key, e, fhmap_int_to_u64,
+               fhmap_id_eq, NULL, NULL, 2999);
 ```
 
 A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see [allocation](#allocation) for more on `std_alloc`).
@@ -1178,8 +1178,8 @@ struct val
     int val;
 };
 static flat_hash_map val_map
-    = fhm_init((struct val *)NULL, 0, key, e, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL);
+    = fhm_init((struct val *)NULL, key, e, fhmap_int_to_u64, fhmap_id_eq,
+               std_alloc, NULL, 0);
 ```
 
 All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
@@ -1283,12 +1283,12 @@ typedef struct
 {
     str_ofs str_arena_offset;
     int cnt;
-    fomap_elem e;
+    homap_elem e;
 } word;
 /* Increment a found word or insert a default count of 1. */
-word *w =
-fom_or_insert_w(
-    fom_and_modify_w(entry_r(&fom, &ofs), word, { T->cnt++; }),
+ccc_handle_i const h =
+hom_or_insert_w(
+    hom_and_modify_w(handle_r(&hom, &ofs), word, { T->cnt++; }),
     (word){.str_arena_offset = ofs, .cnt = 1}
 );
 ```
@@ -1371,11 +1371,12 @@ typedef struct
 {
     str_ofs str_arena_offset;
     int cnt;
-    fomap_elem e;
+    homap_elem e;
 } word;
 /* ... Elsewhere generate offset ofs as key. */
 word default = {.str_arena_offset = ofs, .cnt = 1};
-word *w = or_insert(and_modify(entry_r(&fom, &ofs), increment), &default.e);
+ccc_handle_i const h =
+    or_insert(and_modify(handle_r(&hom, &ofs), increment), &default.e);
 ```
 
 Or the following.
@@ -1386,13 +1387,13 @@ typedef struct
 {
     str_ofs str_arena_offset;
     int cnt;
-    fomap_elem e;
+    homap_elem e;
 } word;
 /* ... Elsewhere generate offset ofs as key. */
 word default = {.str_arena_offset = ofs, .cnt = 1};
-fomap_entry *e = entry_r(&fom, &ofs);
-e = and_modify(e, increment)
-word *w = or_insert(e, &default.e);
+homap_handle *h = handle_r(&hom, &ofs);
+h = and_modify(h, increment)
+word *w = hom_at(&hom, or_insert(h, &default.e));
 ```
 
 Using the first method in your code may expand the code evaluated in different `_Generic` cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the `traits.h` header.
@@ -1447,7 +1448,7 @@ Another concern for the programmer related to allocation may be constructors and
 Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).
 
 ```c
-void *insert(container *c, container_elem *e);
+void *insert_or_assign(container *c, container_elem *e);
 ```
 
 Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
