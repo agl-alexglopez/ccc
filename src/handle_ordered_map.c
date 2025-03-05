@@ -515,10 +515,12 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom, ccc_destructor_fn *const fn)
         hom->root_ = 0;
         return CCC_OK;
     }
-    for (void *e = ccc_buf_at(&hom->buf_, 1); e != ccc_buf_end(&hom->buf_);
-         e = ccc_buf_next(&hom->buf_, e))
+    while (!ccc_hom_is_empty(hom))
     {
-        fn((ccc_user_type){.user_type = e, .aux = hom->buf_.aux_});
+        size_t const i = remove_from_tree(hom, hom->root_);
+        assert(i);
+        fn((ccc_user_type){.user_type = ccc_buf_at(&hom->buf_, i),
+                           .aux = hom->buf_.aux_});
     }
     (void)ccc_buf_size_set(&hom->buf_, 1);
     hom->root_ = 0;
@@ -538,10 +540,12 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
         hom->root_ = 0;
         return ccc_buf_alloc(&hom->buf_, 0, hom->buf_.alloc_);
     }
-    for (void *e = ccc_buf_at(&hom->buf_, 1); e != ccc_buf_end(&hom->buf_);
-         e = ccc_buf_next(&hom->buf_, e))
+    while (!ccc_hom_is_empty(hom))
     {
-        fn((ccc_user_type){.user_type = e, .aux = hom->buf_.aux_});
+        size_t const i = remove_from_tree(hom, hom->root_);
+        assert(i);
+        fn((ccc_user_type){.user_type = ccc_buf_at(&hom->buf_, i),
+                           .aux = hom->buf_.aux_});
     }
     hom->root_ = 0;
     return ccc_buf_alloc(&hom->buf_, 0, hom->buf_.alloc_);
@@ -691,10 +695,6 @@ erase(struct ccc_homap_ *const t, void const *const key)
         return 0;
     }
     ret = remove_from_tree(t, ret);
-    at(t, ret)->next_free_ = t->free_list_;
-    t->free_list_ = ret;
-    [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf_, 1);
-    assert(r == CCC_OK);
     return ret;
 }
 
@@ -712,6 +712,10 @@ remove_from_tree(struct ccc_homap_ *const t, size_t const ret)
                          t->cmp_);
         link_trees(t, t->root_, R, branch_i(t, ret, R));
     }
+    at(t, ret)->next_free_ = t->free_list_;
+    t->free_list_ = ret;
+    [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf_, 1);
+    assert(r == CCC_OK);
     return ret;
 }
 
