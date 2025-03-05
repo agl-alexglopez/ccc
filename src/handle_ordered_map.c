@@ -135,74 +135,74 @@ ccc_hom_handle(ccc_handle_ordered_map *const hom, void const *const key)
 }
 
 ccc_handle_i
-ccc_hom_insert_handle(ccc_homap_handle const *const e,
+ccc_hom_insert_handle(ccc_homap_handle const *const h,
                       ccc_homap_elem *const elem)
 {
-    if (!e || !elem)
+    if (!h || !elem)
     {
         return 0;
     }
-    if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
-        *elem = *at(e->impl_.hom_, e->impl_.handle_.i_);
-        void *const ret = base_at(e->impl_.hom_, e->impl_.handle_.i_);
-        void const *const e_base = struct_base(e->impl_.hom_, elem);
+        *elem = *at(h->impl_.hom_, h->impl_.handle_.i_);
+        void *const ret = base_at(h->impl_.hom_, h->impl_.handle_.i_);
+        void const *const e_base = struct_base(h->impl_.hom_, elem);
         if (e_base != ret)
         {
-            memcpy(ret, e_base, ccc_buf_elem_size(&e->impl_.hom_->buf_));
+            memcpy(ret, e_base, ccc_buf_elem_size(&h->impl_.hom_->buf_));
         }
-        return e->impl_.handle_.i_;
+        return h->impl_.handle_.i_;
     }
-    return maybe_alloc_insert(e->impl_.hom_, elem);
+    return maybe_alloc_insert(h->impl_.hom_, elem);
 }
 
 ccc_homap_handle *
-ccc_hom_and_modify(ccc_homap_handle *const e, ccc_update_fn *const fn)
+ccc_hom_and_modify(ccc_homap_handle *const h, ccc_update_fn *const fn)
 {
-    if (!e)
+    if (!h)
     {
         return NULL;
     }
-    if (fn && e->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (fn && h->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){
-            .user_type = base_at(e->impl_.hom_, e->impl_.handle_.i_),
+            .user_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
             .aux = NULL,
         });
     }
-    return e;
+    return h;
 }
 
 ccc_homap_handle *
-ccc_hom_and_modify_aux(ccc_homap_handle *const e, ccc_update_fn *const fn,
+ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (!e)
+    if (!h)
     {
         return NULL;
     }
-    if (fn && e->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (fn && h->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){
-            .user_type = base_at(e->impl_.hom_, e->impl_.handle_.i_),
+            .user_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
             .aux = aux,
         });
     }
-    return e;
+    return h;
 }
 
 ccc_handle_i
-ccc_hom_or_insert(ccc_homap_handle const *const e, ccc_homap_elem *const elem)
+ccc_hom_or_insert(ccc_homap_handle const *const h, ccc_homap_elem *const elem)
 {
-    if (!e || !elem)
+    if (!h || !elem)
     {
         return 0;
     }
-    if (e->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
-        return e->impl_.handle_.i_;
+        return h->impl_.handle_.i_;
     }
-    return maybe_alloc_insert(e->impl_.hom_, elem);
+    return maybe_alloc_insert(h->impl_.hom_, elem);
 }
 
 ccc_handle
@@ -300,16 +300,16 @@ ccc_hom_remove(ccc_handle_ordered_map *const hom,
 }
 
 ccc_handle
-ccc_hom_remove_handle(ccc_homap_handle *const e)
+ccc_hom_remove_handle(ccc_homap_handle *const h)
 {
-    if (!e)
+    if (!h)
     {
         return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
     }
-    if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
         size_t const erased
-            = erase(e->impl_.hom_, key_at(e->impl_.hom_, e->impl_.handle_.i_));
+            = erase(h->impl_.hom_, key_at(h->impl_.hom_, h->impl_.handle_.i_));
         assert(erased);
         return (ccc_handle){{.i_ = erased, .stats_ = CCC_OCCUPIED}};
     }
@@ -317,31 +317,31 @@ ccc_hom_remove_handle(ccc_homap_handle *const e)
 }
 
 ccc_handle_i
-ccc_hom_unwrap(ccc_homap_handle const *const e)
+ccc_hom_unwrap(ccc_homap_handle const *const h)
 {
-    if (!e)
+    if (!h)
     {
         return 0;
     }
-    return e->impl_.handle_.stats_ == CCC_OCCUPIED ? e->impl_.handle_.i_ : 0;
+    return h->impl_.handle_.stats_ == CCC_OCCUPIED ? h->impl_.handle_.i_ : 0;
 }
 
 bool
-ccc_hom_insert_error(ccc_homap_handle const *const e)
+ccc_hom_insert_error(ccc_homap_handle const *const h)
 {
-    return e ? e->impl_.handle_.stats_ & CCC_INSERT_ERROR : false;
+    return h ? h->impl_.handle_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
-ccc_hom_occupied(ccc_homap_handle const *const e)
+ccc_hom_occupied(ccc_homap_handle const *const h)
 {
-    return e ? e->impl_.handle_.stats_ & CCC_OCCUPIED : false;
+    return h ? h->impl_.handle_.stats_ & CCC_OCCUPIED : false;
 }
 
 ccc_handle_status
-ccc_hom_handle_status(ccc_homap_handle const *const e)
+ccc_hom_handle_status(ccc_homap_handle const *const h)
 {
-    return e ? e->impl_.handle_.stats_ : CCC_INPUT_ERROR;
+    return h ? h->impl_.handle_.stats_ : CCC_INPUT_ERROR;
 }
 
 bool

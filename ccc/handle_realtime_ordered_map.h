@@ -407,18 +407,18 @@ to subsequent calls in the Handle Interface. */
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
-@param [in] e the handle obtained from a handle function or macro.
+@param [in] h the handle obtained from a handle function or macro.
 @param [in] fn an update function in which the auxiliary argument is unused.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
 This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
 without the need of the auxiliary argument a ccc_update_fn can provide. */
-[[nodiscard]] ccc_hromap_handle *ccc_hrm_and_modify(ccc_hromap_handle *e,
+[[nodiscard]] ccc_hromap_handle *ccc_hrm_and_modify(ccc_hromap_handle *h,
                                                     ccc_update_fn *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
-@param [in] e the handle obtained from a handle function or macro.
+@param [in] h the handle obtained from a handle function or macro.
 @param [in] fn an update function that requires auxiliary data.
 @param [in] aux auxiliary data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
@@ -426,7 +426,7 @@ without the need of the auxiliary argument a ccc_update_fn can provide. */
 This function makes full use of a ccc_update_fn capability, meaning a complete
 ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_hromap_handle *
-ccc_hrm_and_modify_aux(ccc_hromap_handle *e, ccc_update_fn *fn, void *aux);
+ccc_hrm_and_modify_aux(ccc_hromap_handle *h, ccc_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -464,7 +464,7 @@ evaluated in the closure scope. */
     }
 
 /** @brief Inserts the struct with handle elem if the handle is Vacant.
-@param [in] e the handle obtained via function or macro call.
+@param [in] h the handle obtained via function or macro call.
 @param [in] elem the handle to the struct to be inserted to a Vacant handle.
 @return a pointer to handle in the map invariantly. NULL on error.
 
@@ -474,7 +474,7 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-[[nodiscard]] ccc_handle_i ccc_hrm_or_insert(ccc_hromap_handle const *e,
+[[nodiscard]] ccc_handle_i ccc_hrm_or_insert(ccc_hromap_handle const *h,
                                              ccc_hromap_elem *elem);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
@@ -495,13 +495,13 @@ or other data, such functions will not be called if the handle is Occupied. */
                              lazy_key_value)
 
 /** @brief Inserts the provided handle invariantly.
-@param [in] e the handle returned from a call obtaining a handle.
+@param [in] h the handle returned from a call obtaining a handle.
 @param [in] elem a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] ccc_handle_i ccc_hrm_insert_handle(ccc_hromap_handle const *e,
+[[nodiscard]] ccc_handle_i ccc_hrm_insert_handle(ccc_hromap_handle const *h,
                                                  ccc_hromap_elem *elem);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
@@ -516,13 +516,13 @@ returned if allocation failed or is not allowed when required. */
                                  lazy_key_value)
 
 /** @brief Remove the handle from the map if Occupied.
-@param [in] e a pointer to the map handle.
+@param [in] h a pointer to the map handle.
 @return a handle containing NULL or a reference to the old handle. If Occupied
 a handle in the map existed and was removed. If Vacant, no prior handle existed
 to be removed.
 @warning the reference to the removed handle is invalidated upon any further
 insertions. */
-ccc_handle ccc_hrm_remove_handle(ccc_hromap_handle const *e);
+ccc_handle ccc_hrm_remove_handle(ccc_hromap_handle const *h);
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the map handle.
@@ -539,32 +539,32 @@ insertions. */
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
-@param [in] e the handle from a query to the map via function or macro.
+@param [in] h the handle from a query to the map via function or macro.
 @return a view into the table handle if one is present, or NULL. */
-[[nodiscard]] ccc_handle_i ccc_hrm_unwrap(ccc_hromap_handle const *e);
+[[nodiscard]] ccc_handle_i ccc_hrm_unwrap(ccc_hromap_handle const *h);
 
 /** @brief Returns the Vacant or Occupied status of the handle.
-@param [in] e the handle from a query to the map via function or macro.
+@param [in] h the handle from a query to the map via function or macro.
 @return true if the handle is occupied, false if not. */
-[[nodiscard]] bool ccc_hrm_occupied(ccc_hromap_handle const *e);
+[[nodiscard]] bool ccc_hrm_occupied(ccc_hromap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
-@param [in] e the handle from a query to the table via function or macro.
+@param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
-[[nodiscard]] bool ccc_hrm_insert_error(ccc_hromap_handle const *e);
+[[nodiscard]] bool ccc_hrm_insert_error(ccc_hromap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
-@param [in] e a pointer to the handle.
+@param [in] h a pointer to the handle.
 @return the status stored in the handle after the required action on the
-container completes. If e is NULL a handle input error is returned so ensure
+container completes. If h is NULL a handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See ccc_handle_status_msg() in
 ccc/types.h for more information on detailed handle statuses. */
 [[nodiscard]] ccc_handle_status
-ccc_hrm_handle_status(ccc_hromap_handle const *e);
+ccc_hrm_handle_status(ccc_hromap_handle const *h);
 
 /**@}*/
 

@@ -266,64 +266,64 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 }
 
 ccc_hromap_handle *
-ccc_hrm_and_modify(ccc_hromap_handle *const e, ccc_update_fn *const fn)
+ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_update_fn *const fn)
 {
-    if (e && fn && e->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (h && fn && h->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){
-            .user_type = base_at(e->impl_.hrm_, e->impl_.handle_.i_), NULL});
+            .user_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), NULL});
     }
-    return e;
+    return h;
 }
 
 ccc_hromap_handle *
-ccc_hrm_and_modify_aux(ccc_hromap_handle *const e, ccc_update_fn *const fn,
+ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (e && fn && e->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (h && fn && h->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
         fn((ccc_user_type){
-            .user_type = base_at(e->impl_.hrm_, e->impl_.handle_.i_), aux});
+            .user_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), aux});
     }
-    return e;
+    return h;
 }
 
 ccc_handle_i
-ccc_hrm_or_insert(ccc_hromap_handle const *const e, ccc_hromap_elem *const elem)
+ccc_hrm_or_insert(ccc_hromap_handle const *const h, ccc_hromap_elem *const elem)
 {
-    if (!e || !elem)
+    if (!h || !elem)
     {
         return 0;
     }
-    if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
-        return e->impl_.handle_.i_;
+        return h->impl_.handle_.i_;
     }
-    return maybe_alloc_insert(e->impl_.hrm_, e->impl_.handle_.i_,
-                              e->impl_.last_cmp_, elem);
+    return maybe_alloc_insert(h->impl_.hrm_, h->impl_.handle_.i_,
+                              h->impl_.last_cmp_, elem);
 }
 
 ccc_handle_i
-ccc_hrm_insert_handle(ccc_hromap_handle const *const e,
+ccc_hrm_insert_handle(ccc_hromap_handle const *const h,
                       ccc_hromap_elem *const elem)
 {
-    if (!e || !elem)
+    if (!h || !elem)
     {
         return 0;
     }
-    if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
-        void *const slot = base_at(e->impl_.hrm_, e->impl_.handle_.i_);
-        *elem = *elem_in_slot(e->impl_.hrm_, slot);
-        void const *const e_base = struct_base(e->impl_.hrm_, elem);
+        void *const slot = base_at(h->impl_.hrm_, h->impl_.handle_.i_);
+        *elem = *elem_in_slot(h->impl_.hrm_, slot);
+        void const *const e_base = struct_base(h->impl_.hrm_, elem);
         if (slot != e_base)
         {
-            (void)memcpy(slot, e_base, ccc_buf_elem_size(&e->impl_.hrm_->buf_));
+            (void)memcpy(slot, e_base, ccc_buf_elem_size(&h->impl_.hrm_->buf_));
         }
-        return e->impl_.handle_.i_;
+        return h->impl_.handle_.i_;
     }
-    return maybe_alloc_insert(e->impl_.hrm_, e->impl_.handle_.i_,
-                              e->impl_.last_cmp_, elem);
+    return maybe_alloc_insert(h->impl_.hrm_, h->impl_.handle_.i_,
+                              h->impl_.last_cmp_, elem);
 }
 
 ccc_hromap_handle
@@ -338,15 +338,15 @@ ccc_hrm_handle(ccc_handle_realtime_ordered_map const *const hrm,
 }
 
 ccc_handle
-ccc_hrm_remove_handle(ccc_hromap_handle const *const e)
+ccc_hrm_remove_handle(ccc_hromap_handle const *const h)
 {
-    if (!e)
+    if (!h)
     {
         return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
     }
-    if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
-        size_t const ret = remove_fixup(e->impl_.hrm_, e->impl_.handle_.i_);
+        size_t const ret = remove_fixup(h->impl_.hrm_, h->impl_.handle_.i_);
         return (ccc_handle){{.i_ = ret, .stats_ = CCC_OCCUPIED}};
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
@@ -400,31 +400,31 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
 }
 
 ccc_handle_i
-ccc_hrm_unwrap(ccc_hromap_handle const *const e)
+ccc_hrm_unwrap(ccc_hromap_handle const *const h)
 {
-    if (e && e->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (h && h->impl_.handle_.stats_ & CCC_OCCUPIED)
     {
-        return e->impl_.handle_.i_;
+        return h->impl_.handle_.i_;
     }
     return 0;
 }
 
 bool
-ccc_hrm_insert_error(ccc_hromap_handle const *const e)
+ccc_hrm_insert_error(ccc_hromap_handle const *const h)
 {
-    return e ? e->impl_.handle_.stats_ & CCC_INSERT_ERROR : false;
+    return h ? h->impl_.handle_.stats_ & CCC_INSERT_ERROR : false;
 }
 
 bool
-ccc_hrm_occupied(ccc_hromap_handle const *const e)
+ccc_hrm_occupied(ccc_hromap_handle const *const h)
 {
-    return e ? e->impl_.handle_.stats_ & CCC_OCCUPIED : false;
+    return h ? h->impl_.handle_.stats_ & CCC_OCCUPIED : false;
 }
 
 ccc_handle_status
-ccc_hrm_handle_status(ccc_hromap_handle const *const e)
+ccc_hrm_handle_status(ccc_hromap_handle const *const h)
 {
-    return e ? e->impl_.handle_.stats_ : CCC_INPUT_ERROR;
+    return h ? h->impl_.handle_.stats_ : CCC_INPUT_ERROR;
 }
 
 bool
