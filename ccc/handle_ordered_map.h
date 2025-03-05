@@ -12,13 +12,14 @@ the same value yield an O(1) access and many other frequently searched values
 will remain close to the root of the map.
 
 The handle variant of the ordered map promises contiguous storage and random
-access if needed. Handles remain valid until an element is removed. All elements
-in the map track their relationships via indices in the buffer. Therefore, this
-data structure can be relocated, copied, serialized, or written to disk and all
-internal data structure references will remain valid. Insertion may invoke an
-O(N) operation if resizing occurs. Finally, if allocation is prohibited upon
-initialization and the user intends to store a fixed size N nodes in the map N +
-1 capacity is needed for the sentinel node in the buffer.
+access if needed. Handles remain valid until an element is removed even if other
+elements are inserted, other elements are removed, or resizing occurs. All
+elements in the map track their relationships via indices in the buffer.
+Therefore, this data structure can be relocated, copied, serialized, or written
+to disk and all internal data structure references will remain valid. Insertion
+may invoke an O(N) operation if resizing occurs. Finally, if allocation is
+prohibited upon initialization and the user intends to store a fixed size N
+nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
