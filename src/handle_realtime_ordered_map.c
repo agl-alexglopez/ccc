@@ -49,7 +49,7 @@ enum hrm_branch_
 
 enum : uint8_t
 {
-    IN_FREE_LIST = ~0,
+    IN_FREE_LIST = (uint8_t)~0,
 };
 
 /** @private */
