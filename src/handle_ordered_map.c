@@ -87,8 +87,8 @@ static bool validate(struct ccc_homap_ const *hom);
 /* Returning void as miscellaneous helpers. */
 static void init_node(struct ccc_homap_elem_ *e);
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
-static void link_trees(struct ccc_homap_ *t, size_t parent,
-                       enum hom_branch_ dir, size_t subtree);
+static void link(struct ccc_homap_ *t, size_t parent, enum hom_branch_ dir,
+                 size_t subtree);
 static size_t max(size_t, size_t);
 
 /*==============================  Interface    ==============================*/
@@ -704,13 +704,13 @@ remove_from_tree(struct ccc_homap_ *const t, size_t const ret)
     if (!branch_i(t, ret, L))
     {
         t->root_ = branch_i(t, ret, R);
-        link_trees(t, 0, 0, t->root_);
+        link(t, 0, 0, t->root_);
     }
     else
     {
         t->root_ = splay(t, branch_i(t, ret, L), key_from_node(t, at(t, ret)),
                          t->cmp_);
-        link_trees(t, t->root_, R, branch_i(t, ret, R));
+        link(t, t->root_, R, branch_i(t, ret, R));
     }
     at(t, ret)->next_free_ = t->free_list_;
     t->free_list_ = ret;
@@ -723,13 +723,13 @@ static inline size_t
 connect_new_root(struct ccc_homap_ *const t, size_t const new_root,
                  ccc_threeway_cmp const cmp_result)
 {
-    enum hom_branch_ const link = CCC_GRT == cmp_result;
-    link_trees(t, new_root, link, branch_i(t, t->root_, link));
-    link_trees(t, new_root, !link, t->root_);
-    *branch_ref(t, t->root_, link) = 0;
+    enum hom_branch_ const dir = CCC_GRT == cmp_result;
+    link(t, new_root, dir, branch_i(t, t->root_, dir));
+    link(t, new_root, !dir, t->root_);
+    *branch_ref(t, t->root_, dir) = 0;
     t->root_ = new_root;
     /* The direction from end node is arbitrary. Need root to update parent. */
-    link_trees(t, 0, 0, t->root_);
+    link(t, 0, 0, t->root_);
     return new_root;
 }
 
@@ -770,30 +770,30 @@ splay(struct ccc_homap_ *const t, size_t root, void const *const key,
         if (CCC_EQL != child_cmp && dir == dir_from_child)
         {
             size_t const pivot = branch_i(t, root, dir);
-            link_trees(t, root, dir, branch_i(t, pivot, !dir));
-            link_trees(t, pivot, !dir, root);
+            link(t, root, dir, branch_i(t, pivot, !dir));
+            link(t, pivot, !dir, root);
             root = pivot;
             if (!branch_i(t, root, dir))
             {
                 break;
             }
         }
-        link_trees(t, l_r_subtrees[!dir], dir, root);
+        link(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = branch_i(t, root, dir);
     } while (true);
-    link_trees(t, l_r_subtrees[L], R, branch_i(t, root, L));
-    link_trees(t, l_r_subtrees[R], L, branch_i(t, root, R));
-    link_trees(t, root, L, nil->branch_[R]);
-    link_trees(t, root, R, nil->branch_[L]);
+    link(t, l_r_subtrees[L], R, branch_i(t, root, L));
+    link(t, l_r_subtrees[R], L, branch_i(t, root, R));
+    link(t, root, L, nil->branch_[R]);
+    link(t, root, R, nil->branch_[L]);
     t->root_ = root;
-    link_trees(t, 0, 0, t->root_);
+    link(t, 0, 0, t->root_);
     return root;
 }
 
 static inline void
-link_trees(struct ccc_homap_ *const t, size_t const parent,
-           enum hom_branch_ const dir, size_t const subtree)
+link(struct ccc_homap_ *const t, size_t const parent,
+     enum hom_branch_ const dir, size_t const subtree)
 {
     *branch_ref(t, parent, dir) = subtree;
     *parent_ref(t, subtree) = parent;
