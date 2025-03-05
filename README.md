@@ -327,78 +327,6 @@ main(void)
 </details>
 
 <details>
-<summary>handle_ordered_map.h (dropdown)</summary>
-An ordered map implemented in array with an index based self-optimizing tree.
-
-```c
-#include <assert.h>
-#include <stdbool.h>
-#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-#define TYPES_USING_NAMESPACE_CCC
-#include "ccc/handle_ordered_map.h"
-#include "ccc/traits.h"
-
-struct kval
-{
-    homap_elem elem;
-    int key;
-    int val;
-};
-
-static ccc_threeway_cmp
-kval_cmp(ccc_key_cmp const cmp)
-{
-    struct kval const *const rhs = cmp.user_type_rhs;
-    int const key_lhs = *((int *)cmp.key_lhs);
-    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
-}
-
-int
-main(void)
-{
-    /* stack array of 25 elements with one slot for sentinel, intrusive field
-       named elem, key field named key, no allocation permission, key comparison
-       function, no aux data. */
-    handle_ordered_map s
-        = hom_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
-    int const num_nodes = 25;
-    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
-    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
-    {
-        (void)insert_or_assign(&s, &(struct kval){.key = id, .val = i}.elem);
-    }
-    /* This should be the following range [6,44). 6 should raise to
-       next value not less than 6, 10 and 44 should be the first
-       value greater than 44, 45. */
-    int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    range r = equal_range(&s, &(int){6}, &(int){44});
-    int index = 0;
-    for (struct kval *i = begin_range(&r); i != end_range(&r);
-         i = next(&s, &i->elem))
-    {
-        assert(i->key == range_keys[index]);
-        ++index;
-    }
-    /* This should be the following range [119,84). 119 should be
-       dropped to first value not greater than 119 and last should
-       be dropped to first value less than 84. */
-    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
-    index = 0;
-    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
-         i = rnext(&s, &i->elem))
-    {
-        assert(i->key == rrange_keys[index]);
-        ++index;
-    }
-    return 0;
-}
-```
-
-</details>
-
-<details>
 <summary>flat_priority_queue.h (dropdown)</summary>
 
 ```c
@@ -435,78 +363,6 @@ main(void)
         (void)pop(&pq);
         assert(cur >= prev);
         prev = cur;
-    }
-    return 0;
-}
-```
-
-</details>
-
-<details>
-<summary>handle_realtime_ordered_map.h (dropdown)</summary>
-An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.
-
-```c
-#include <assert.h>
-#include <stdbool.h>
-#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-#define TYPES_USING_NAMESPACE_CCC
-#include "ccc/handle_realtime_ordered_map.h"
-#include "ccc/traits.h"
-
-struct kval
-{
-    fromap_elem elem;
-    int key;
-    int val;
-};
-
-static ccc_threeway_cmp
-kval_cmp(ccc_key_cmp const cmp)
-{
-    struct kval const *const rhs = cmp.user_type_rhs;
-    int const key_lhs = *((int *)cmp.key_lhs);
-    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
-}
-
-int
-main(void)
-{
-    /* stack array of 25 elements with one slot for sentinel, intrusive field
-       named elem, key field named key, no allocation permission, key comparison
-       function, no aux data. */
-    handle_realtime_ordered_map s
-        = hrm_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
-    int const num_nodes = 25;
-    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
-    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
-    {
-        (void)insert_or_assign(&s, &(struct kval){.key = id, .val = i}.elem);
-    }
-    /* This should be the following range [6,44). 6 should raise to
-       next value not less than 6, 10 and 44 should be the first
-       value greater than 44, 45. */
-    int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    range r = equal_range(&s, &(int){6}, &(int){44});
-    int index = 0;
-    for (struct kval *i = begin_range(&r); i != end_range(&r);
-         i = next(&s, &i->elem))
-    {
-        assert(i->key == range_keys[index]);
-        ++index;
-    }
-    /* This should be the following range [119,84). 119 should be
-       dropped to first value not greater than 119 and last should
-       be dropped to first value less than 84. */
-    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
-    index = 0;
-    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
-         i = rnext(&s, &i->elem))
-    {
-        assert(i->key == rrange_keys[index]);
-        ++index;
     }
     return 0;
 }
@@ -724,6 +580,150 @@ main(void)
         default:
             break;
         }
+    }
+    return 0;
+}
+```
+
+</details>
+
+<details>
+<summary>handle_ordered_map.h (dropdown)</summary>
+An ordered map implemented in array with an index based self-optimizing tree.
+
+```c
+#include <assert.h>
+#include <stdbool.h>
+#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#include "ccc/handle_ordered_map.h"
+#include "ccc/traits.h"
+
+struct kval
+{
+    homap_elem elem;
+    int key;
+    int val;
+};
+
+static ccc_threeway_cmp
+kval_cmp(ccc_key_cmp const cmp)
+{
+    struct kval const *const rhs = cmp.user_type_rhs;
+    int const key_lhs = *((int *)cmp.key_lhs);
+    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
+}
+
+int
+main(void)
+{
+    /* stack array of 25 elements with one slot for sentinel, intrusive field
+       named elem, key field named key, no allocation permission, key comparison
+       function, no aux data. */
+    handle_ordered_map s
+        = hom_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
+    int const num_nodes = 25;
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
+    {
+        (void)insert_or_assign(&s, &(struct kval){.key = id, .val = i}.elem);
+    }
+    /* This should be the following range [6,44). 6 should raise to
+       next value not less than 6, 10 and 44 should be the first
+       value greater than 44, 45. */
+    int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    range r = equal_range(&s, &(int){6}, &(int){44});
+    int index = 0;
+    for (struct kval *i = begin_range(&r); i != end_range(&r);
+         i = next(&s, &i->elem))
+    {
+        assert(i->key == range_keys[index]);
+        ++index;
+    }
+    /* This should be the following range [119,84). 119 should be
+       dropped to first value not greater than 119 and last should
+       be dropped to first value less than 84. */
+    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
+    index = 0;
+    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
+         i = rnext(&s, &i->elem))
+    {
+        assert(i->key == rrange_keys[index]);
+        ++index;
+    }
+    return 0;
+}
+```
+
+</details>
+
+<details>
+<summary>handle_realtime_ordered_map.h (dropdown)</summary>
+An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.
+
+```c
+#include <assert.h>
+#include <stdbool.h>
+#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+#define TYPES_USING_NAMESPACE_CCC
+#include "ccc/handle_realtime_ordered_map.h"
+#include "ccc/traits.h"
+
+struct kval
+{
+    fromap_elem elem;
+    int key;
+    int val;
+};
+
+static ccc_threeway_cmp
+kval_cmp(ccc_key_cmp const cmp)
+{
+    struct kval const *const rhs = cmp.user_type_rhs;
+    int const key_lhs = *((int *)cmp.key_lhs);
+    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
+}
+
+int
+main(void)
+{
+    /* stack array of 25 elements with one slot for sentinel, intrusive field
+       named elem, key field named key, no allocation permission, key comparison
+       function, no aux data. */
+    handle_realtime_ordered_map s
+        = hrm_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
+    int const num_nodes = 25;
+    /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
+    for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
+    {
+        (void)insert_or_assign(&s, &(struct kval){.key = id, .val = i}.elem);
+    }
+    /* This should be the following range [6,44). 6 should raise to
+       next value not less than 6, 10 and 44 should be the first
+       value greater than 44, 45. */
+    int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
+    range r = equal_range(&s, &(int){6}, &(int){44});
+    int index = 0;
+    for (struct kval *i = begin_range(&r); i != end_range(&r);
+         i = next(&s, &i->elem))
+    {
+        assert(i->key == range_keys[index]);
+        ++index;
+    }
+    /* This should be the following range [119,84). 119 should be
+       dropped to first value not greater than 119 and last should
+       be dropped to first value less than 84. */
+    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
+    index = 0;
+    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
+         i = rnext(&s, &i->elem))
+    {
+        assert(i->key == rrange_keys[index]);
+        ++index;
     }
     return 0;
 }
