@@ -9,34 +9,42 @@
 #include "../types.h"
 #include "impl_types.h"
 
-/** @private */
+/** @private Runs the top down splay tree algorithm with the addition of a free
+list for providing new nodes within the buffer. The parent field normally
+tracks parent when in the tree for iteration purposes. When a node is removed
+from the tree it is added to the free singly linked list. The free list is a
+LIFO push to front stack. */
 struct ccc_homap_elem_
 {
-    size_t branch_[2];
+    size_t branch_[2]; /** Child nodes in array to unify Left and Right. */
     union
     {
-        size_t parent_;
-        size_t next_free_;
+        size_t parent_;    /** Parent of splay tree node when allocated. */
+        size_t next_free_; /** Points to next free when not allocated. */
     };
 };
 
-/** @private */
+/** @private A ordered map providing handle stability. Once elements are
+inserted into the map they will not move slots even when the array resizes. The
+free slots are tracked in a singly linked list that uses indices instead of
+pointers so that it remains valid even when the table resizes. The 0th index of
+the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_homap_
 {
-    ccc_buffer buf_;
-    size_t root_;
-    size_t free_list_;
-    size_t key_offset_;
-    size_t node_elem_offset_;
-    ccc_key_cmp_fn *cmp_;
+    ccc_buffer buf_;          /** Buffer wrapping user provided memory. */
+    size_t root_;             /** The root node of the Splay Tree. */
+    size_t free_list_;        /** The start of the free singly linked list. */
+    size_t key_offset_;       /** Where user key can be found in type. */
+    size_t node_elem_offset_; /** Where intrusive elem is found in type. */
+    ccc_key_cmp_fn *cmp_;     /** The provided key comparison function. */
 };
 
 /** @private */
 struct ccc_htree_handle_
 {
-    struct ccc_homap_ *hom_;
-    ccc_threeway_cmp last_cmp_;
-    struct ccc_handl_ handle_;
+    struct ccc_homap_ *hom_;    /** Map associated with this handle. */
+    ccc_threeway_cmp last_cmp_; /** Saves last comparison direction. */
+    struct ccc_handl_ handle_;  /** Index and a status. */
 };
 
 /** @private */
@@ -44,6 +52,20 @@ union ccc_homap_handle_
 {
     struct ccc_htree_handle_ impl_;
 };
+
+void ccc_impl_hom_insert(struct ccc_homap_ *hom, size_t elem_i);
+struct ccc_htree_handle_ ccc_impl_hom_handle(struct ccc_homap_ *hom,
+                                             void const *key);
+void *ccc_impl_hom_key_from_node(struct ccc_homap_ const *hom,
+                                 struct ccc_homap_elem_ const *elem);
+void *ccc_impl_hom_key_at(struct ccc_homap_ const *hom, size_t slot);
+struct ccc_homap_elem_ *ccc_impl_homap_elem_at(struct ccc_homap_ const *hom,
+                                               size_t slot);
+size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
+
+/* NOLINTBEGIN(readability-identifier-naming) */
+
+/*========================     Initialization       =========================*/
 
 #define ccc_impl_hom_init(mem_ptr, node_elem_field, key_elem_field,            \
                           key_cmp_fn, alloc_fn, aux_data, capacity)            \
@@ -58,18 +80,6 @@ union ccc_homap_handle_
 
 #define ccc_impl_hom_as(handle_ordered_map_ptr, type_name, handle...)          \
     ((type_name *)ccc_buf_at(&(handle_ordered_map_ptr)->buf_, (handle)))
-
-void ccc_impl_hom_insert(struct ccc_homap_ *hom, size_t elem_i);
-struct ccc_htree_handle_ ccc_impl_hom_handle(struct ccc_homap_ *hom,
-                                             void const *key);
-void *ccc_impl_hom_key_from_node(struct ccc_homap_ const *hom,
-                                 struct ccc_homap_elem_ const *elem);
-void *ccc_impl_hom_key_at(struct ccc_homap_ const *hom, size_t slot);
-struct ccc_homap_elem_ *ccc_impl_homap_elem_at(struct ccc_homap_ const *hom,
-                                               size_t slot);
-size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
-
-/* NOLINTBEGIN(readability-identifier-naming) */
 
 /*==================     Core Macro Implementations     =====================*/
 
