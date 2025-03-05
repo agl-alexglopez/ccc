@@ -41,7 +41,7 @@ static struct ccc_tree_entry_ container_entry(struct ccc_tree_ *t,
 
 static void init_node(struct ccc_tree_ *, struct ccc_node_ *);
 static void swap(char tmp[], void *, void *, size_t);
-static void link_trees(struct ccc_node_ *, om_branch_, struct ccc_node_ *);
+static void link(struct ccc_node_ *, om_branch_, struct ccc_node_ *);
 
 /* Boolean returns */
 
@@ -685,13 +685,13 @@ static inline void *
 connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *const new_root,
                  ccc_threeway_cmp const cmp_result)
 {
-    om_branch_ const link = CCC_GRT == cmp_result;
-    link_trees(new_root, link, t->root_->branch_[link]);
-    link_trees(new_root, !link, t->root_);
-    t->root_->branch_[link] = &t->end_;
+    om_branch_ const dir = CCC_GRT == cmp_result;
+    link(new_root, dir, t->root_->branch_[dir]);
+    link(new_root, !dir, t->root_);
+    t->root_->branch_[dir] = &t->end_;
     t->root_ = new_root;
     /* The direction from end node is arbitrary. Need root to update parent. */
-    link_trees(&t->end_, 0, t->root_);
+    link(&t->end_, 0, t->root_);
     return struct_base(t, new_root);
 }
 
@@ -720,12 +720,12 @@ remove_from_tree(struct ccc_tree_ *const t, struct ccc_node_ *const ret)
     if (ret->branch_[L] == &t->end_)
     {
         t->root_ = ret->branch_[R];
-        link_trees(&t->end_, 0, t->root_);
+        link(&t->end_, 0, t->root_);
     }
     else
     {
         t->root_ = splay(t, ret->branch_[L], key_from_node(t, ret), t->cmp_);
-        link_trees(t->root_, R, ret->branch_[R]);
+        link(t->root_, R, ret->branch_[R]);
     }
     return ret;
 }
@@ -755,24 +755,24 @@ splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
         if (CCC_EQL != child_cmp && dir == dir_from_child)
         {
             struct ccc_node_ *const pivot = root->branch_[dir];
-            link_trees(root, dir, pivot->branch_[!dir]);
-            link_trees(pivot, !dir, root);
+            link(root, dir, pivot->branch_[!dir]);
+            link(pivot, !dir, root);
             root = pivot;
             if (root->branch_[dir] == &t->end_)
             {
                 break;
             }
         }
-        link_trees(l_r_subtrees[!dir], dir, root);
+        link(l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = root->branch_[dir];
     } while (true);
-    link_trees(l_r_subtrees[L], R, root->branch_[L]);
-    link_trees(l_r_subtrees[R], L, root->branch_[R]);
-    link_trees(root, L, t->end_.branch_[R]);
-    link_trees(root, R, t->end_.branch_[L]);
+    link(l_r_subtrees[L], R, root->branch_[L]);
+    link(l_r_subtrees[R], L, root->branch_[R]);
+    link(root, L, t->end_.branch_[R]);
+    link(root, R, t->end_.branch_[L]);
     t->root_ = root;
-    link_trees(&t->end_, 0, t->root_);
+    link(&t->end_, 0, t->root_);
     return root;
 }
 
@@ -809,8 +809,8 @@ swap(char tmp[], void *const a, void *const b, size_t elem_sz)
 }
 
 static inline void
-link_trees(struct ccc_node_ *const parent, om_branch_ const dir,
-           struct ccc_node_ *const subtree)
+link(struct ccc_node_ *const parent, om_branch_ const dir,
+     struct ccc_node_ *const subtree)
 {
     parent->branch_[dir] = subtree;
     subtree->parent_ = parent;
