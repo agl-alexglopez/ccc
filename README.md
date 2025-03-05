@@ -296,8 +296,8 @@ main(void)
     /* stack array backed, key field named key, intrusive field e, no
        allocation permission, a hash function, an equality function, no aux. */
     ccc_flat_hash_map fh;
-        = fhm_init((struct val[20]){}, 20, key, e, fhmap_int_to_u64,
-                    fhmap_id_eq, NULL, NULL);
+        = fhm_init((struct val[20]){}, key, e, fhmap_int_to_u64, fhmap_id_eq,
+                   NULL, NULL, 20);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -327,21 +327,21 @@ main(void)
 </details>
 
 <details>
-<summary>flat_ordered_map.h (dropdown)</summary>
+<summary>handle_ordered_map.h (dropdown)</summary>
 An ordered map implemented in array with an index based self-optimizing tree.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/flat_ordered_map.h"
+#include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
 
 struct kval
 {
-    fomap_elem elem;
+    homap_elem elem;
     int key;
     int val;
 };
@@ -360,8 +360,8 @@ main(void)
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
        function, no aux data. */
-    flat_ordered_map s
-        = fom_init((struct kval[26]){}, 26, elem, key, kval_cmp, NULL, NULL);
+    handle_ordered_map s
+        = hom_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -443,16 +443,16 @@ main(void)
 </details>
 
 <details>
-<summary>flat_realtime_ordered_map.h (dropdown)</summary>
+<summary>handle_realtime_ordered_map.h (dropdown)</summary>
 An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define FLAT_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/flat_realtime_ordered_map.h"
+#include "ccc/handle_realtime_ordered_map.h"
 #include "ccc/traits.h"
 
 struct kval
@@ -476,8 +476,8 @@ main(void)
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
        function, no aux data. */
-    flat_realtime_ordered_map s
-        = frm_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
+    handle_realtime_ordered_map s
+        = hrm_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -1276,7 +1276,7 @@ Other Rust Interface functions like `get_key_val`, `insert`, and `remove` are in
 
 Each container offers it's own C version of "closures" for the `and_modify_w` macro, short for and modify "with". Here is an example from the `samples/words.c` program.
 
-- `and_modify_w(flat_ordered_map_entry_ptr, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
+- `and_modify_w(handle_ordered_map_entry_ptr, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
 
 ```c
 typedef struct
