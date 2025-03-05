@@ -575,13 +575,12 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
         hrm->root_ = 0;
         return ccc_buf_size_set(&hrm->buf_, 1);
     }
-    for (void *e = ccc_buf_at(&hrm->buf_, 1); e != ccc_buf_end(&hrm->buf_);
-         e = ccc_buf_next(&hrm->buf_, e))
+    while (!ccc_hrm_is_empty(hrm))
     {
-        if (elem_in_slot(hrm, e)->parity_ != IN_FREE_LIST)
-        {
-            fn((ccc_user_type){.user_type = e, .aux = hrm->buf_.aux_});
-        }
+        size_t const i = remove_fixup(hrm, hrm->root_);
+        assert(i);
+        fn((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
+                           .aux = hrm->buf_.aux_});
     }
     (void)ccc_buf_size_set(&hrm->buf_, 1);
     hrm->root_ = 0;
@@ -601,13 +600,12 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
         hrm->root_ = 0;
         return ccc_buf_alloc(&hrm->buf_, 0, hrm->buf_.alloc_);
     }
-    for (void *e = ccc_buf_at(&hrm->buf_, 1); e != ccc_buf_end(&hrm->buf_);
-         e = ccc_buf_next(&hrm->buf_, e))
+    while (!ccc_hrm_is_empty(hrm))
     {
-        if (elem_in_slot(hrm, e)->parity_ != IN_FREE_LIST)
-        {
-            fn((ccc_user_type){.user_type = e, .aux = hrm->buf_.aux_});
-        }
+        size_t const i = remove_fixup(hrm, hrm->root_);
+        assert(i);
+        fn((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
+                           .aux = hrm->buf_.aux_});
     }
     hrm->root_ = 0;
     return ccc_buf_alloc(&hrm->buf_, 0, hrm->buf_.alloc_);
