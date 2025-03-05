@@ -589,7 +589,7 @@ main(void)
 
 <details>
 <summary>handle_ordered_map.h (dropdown)</summary>
-An ordered map implemented in array with an index based self-optimizing tree.
+An ordered map implemented in array with an index based self-optimizing tree. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
@@ -661,7 +661,7 @@ main(void)
 
 <details>
 <summary>handle_realtime_ordered_map.h (dropdown)</summary>
-An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.
+An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
