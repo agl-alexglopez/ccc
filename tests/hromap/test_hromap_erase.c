@@ -1,6 +1,7 @@
 #define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "checkers.h"
 #include "handle_realtime_ordered_map.h"
 #include "hromap_util.h"
@@ -101,9 +102,90 @@ CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_no_alloc)
+{
+    struct val vals[1001];
+    ccc_handle_realtime_ordered_map s = hrm_init(
+        vals, elem, id, id_cmp, NULL, NULL, sizeof(vals) / sizeof(vals[0]));
+    /* NOLINTNEXTLINE */
+    srand(time(NULL));
+    int const num_nodes = 1000;
+    int id_keys[1000];
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        /* NOLINTNEXTLINE */
+        int const rand_i = rand();
+        (void)insert_or_assign(&s, &(struct val){.id = rand_i, .val = i}.elem);
+        id_keys[i] = rand_i;
+        CHECK(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes / 2; ++i)
+    {
+        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), true);
+        CHECK(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes / 2; ++i)
+    {
+        ccc_handle h
+            = insert_or_assign(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), false);
+        CHECK(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), true);
+        CHECK(validate(&s), true);
+    }
+    CHECK(is_empty(&s), true);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_alloc)
+{
+    ccc_handle_realtime_ordered_map s
+        = hrm_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
+    /* NOLINTNEXTLINE */
+    srand(time(NULL));
+    int const num_nodes = 1000;
+    int id_keys[1000];
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        /* NOLINTNEXTLINE */
+        int const rand_i = rand();
+        (void)insert_or_assign(&s, &(struct val){.id = rand_i, .val = i}.elem);
+        id_keys[i] = rand_i;
+        CHECK(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes / 2; ++i)
+    {
+        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), true);
+        CHECK(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes / 2; ++i)
+    {
+        ccc_handle h
+            = insert_or_assign(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), false);
+        CHECK(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), true);
+        CHECK(validate(&s), true);
+    }
+    CHECK(is_empty(&s), true);
+    CHECK_END_FN(hrm_clear_and_free(&s, NULL););
+}
+
 int
 main()
 {
     return CHECK_RUN(hromap_test_insert_erase_shuffled(),
-                     hromap_test_prime_shuffle(), hromap_test_weak_srand());
+                     hromap_test_prime_shuffle(), hromap_test_weak_srand(),
+                     hromap_test_insert_erase_cycles_no_alloc(),
+                     hromap_test_insert_erase_cycles_alloc());
 }
