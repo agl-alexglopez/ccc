@@ -818,7 +818,7 @@ insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
     }
 }
 
-static void *
+static inline void *
 remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
 {
     assert(remove->branch_[R] && remove->branch_[L]);
