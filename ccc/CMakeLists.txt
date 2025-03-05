@@ -11,7 +11,7 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/flat_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/src/handle_ordered_map.c
         ${PROJECT_SOURCE_DIR}/src/ordered_multimap.c
         ${PROJECT_SOURCE_DIR}/src/priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
@@ -29,7 +29,7 @@ target_sources(${PROJECT_NAME}
               impl/impl_tree.h
               impl/impl_priority_queue.h
               impl/impl_ordered_map.h
-              impl/impl_flat_ordered_map.h
+              impl/impl_handle_ordered_map.h
               impl/impl_ordered_multimap.h
               impl/impl_singly_linked_list.h
               impl/impl_doubly_linked_list.h
@@ -49,7 +49,7 @@ target_sources(${PROJECT_NAME}
               flat_double_ended_queue.h
               flat_priority_queue.h
               ordered_map.h
-              flat_ordered_map.h
+              handle_ordered_map.h
               realtime_ordered_map.h
               handle_realtime_ordered_map.h
               ordered_multimap.h

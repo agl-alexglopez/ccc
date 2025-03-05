@@ -21,13 +21,13 @@ Please specify a command as follows:
 #include <stdlib.h>
 #include <string.h>
 
-#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 #include "alloc.h"
-#include "ccc/flat_ordered_map.h"
 #include "ccc/flat_priority_queue.h"
+#include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
@@ -73,7 +73,7 @@ struct frequency
 typedef struct
 {
     /* Map element for logging frequencies by string key, freq value. */
-    fomap_elem e;
+    homap_elem e;
     str_ofs ofs;
     int cnt;
 } word;
@@ -151,7 +151,7 @@ static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
-static struct frequency_alloc copy_frequencies(flat_ordered_map const *map);
+static struct frequency_alloc copy_frequencies(handle_ordered_map const *map);
 static void print_n(flat_priority_queue *, struct str_arena const *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
@@ -172,7 +172,7 @@ static void str_arena_free(struct str_arena *);
 static char *str_arena_at(struct str_arena const *, str_ofs);
 
 /* Container Functions */
-static flat_ordered_map create_frequency_map(struct str_arena *, FILE *);
+static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
 static threeway_cmp cmp_string_keys(key_cmp);
 static threeway_cmp cmp_freqs(cmp);
 
@@ -300,19 +300,19 @@ print_found(FILE *const f, str_view w)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    flat_ordered_map map = create_frequency_map(&a, f);
+    handle_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     struct clean_word wc = clean_word(&a, w);
     if (wc.stat == WC_CLEAN_WORD)
     {
-        word const *const found_w = get_key_val(&map, &wc.str);
+        word const *const found_w = hom_at(&map, get_key_val(&map, &wc.str));
         if (found_w)
         {
             printf("%s %d\n", str_arena_at(&a, found_w->ofs), found_w->cnt);
         }
     }
     str_arena_free(&a);
-    (void)fom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -320,7 +320,7 @@ print_top_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    flat_ordered_map map = create_frequency_map(&a, f);
+    handle_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     /* O(n) copy */
     struct frequency_alloc freqs = copy_frequencies(&map);
@@ -340,7 +340,7 @@ print_top_n(FILE *const f, int n)
     print_n(&fpq, &a, n);
     str_arena_free(&a);
     (void)fpq_clear_and_free(&fpq, NULL);
-    (void)fom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -348,7 +348,7 @@ print_last_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    flat_ordered_map map = create_frequency_map(&a, f);
+    handle_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
     PROG_ASSERT(freqs.cap);
@@ -362,7 +362,7 @@ print_last_n(FILE *const f, int n)
     print_n(&fpq, &a, n);
     str_arena_free(&a);
     (void)fpq_clear_and_free(&fpq, NULL);
-    (void)fom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -370,7 +370,7 @@ print_alpha_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    flat_ordered_map map = create_frequency_map(&a, f);
+    handle_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     if (!n)
     {
@@ -384,7 +384,7 @@ print_alpha_n(FILE *const f, int n)
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
     str_arena_free(&a);
-    (void)fom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, NULL);
 }
 
 static void
@@ -392,7 +392,7 @@ print_ralpha_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
     PROG_ASSERT(a.arena);
-    flat_ordered_map map = create_frequency_map(&a, f);
+    handle_ordered_map map = create_frequency_map(&a, f);
     PROG_ASSERT(!is_empty(&map));
     if (!n)
     {
@@ -406,11 +406,11 @@ print_ralpha_n(FILE *const f, int n)
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
     str_arena_free(&a);
-    (void)fom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, NULL);
 }
 
 static struct frequency_alloc
-copy_frequencies(flat_ordered_map const *const map)
+copy_frequencies(handle_ordered_map const *const map)
 {
     PROG_ASSERT(!is_empty(map));
     size_t const cap = sizeof(struct frequency) * (size(map) + 1);
@@ -448,14 +448,14 @@ print_n(flat_priority_queue *const fpq, struct str_arena const *const a,
 
 /*=====================    Container Construction     =======================*/
 
-static flat_ordered_map
+static handle_ordered_map
 create_frequency_map(struct str_arena *const a, FILE *const f)
 {
     char *lineptr = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
-    flat_ordered_map fom
-        = fom_init((word *)NULL, e, ofs, cmp_string_keys, std_alloc, a, 0);
+    handle_ordered_map hom
+        = hom_init((word *)NULL, e, ofs, cmp_string_keys, std_alloc, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};
@@ -472,22 +472,24 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
                    and modify with macro. The and modify macro gives a closure
                    over the user type T if the entry is Occupied. If the entry
                    is Vacant the closure does not execute. You can uncomment
-                   the below code if you prefer a more sequential style. */
+                   the below code if you prefer a different style. */
                 /*
-                fomap_entry *e = entry_r(&fom, &cw.str);
-                e = fom_and_modify_w(e, word, { T->cnt++; });
-                word *w = fom_or_insert_w(e, (word){.ofs = cw.str, .cnt = 1});
-                */
-                word *w
-                    = fom_or_insert_w(fom_and_modify_w(entry_r(&fom, &cw.str),
-                                                       word, { T->cnt++; }),
-                                      (word){.ofs = cw.str, .cnt = 1});
+                word const *const w = hom_at(
+                    &hom,
+                    hom_or_insert_w(hom_and_modify_w(handle_r(&hom, &cw.str),
+                                                     word, { T->cnt++; }),
+                                    (word){.ofs = cw.str, .cnt = 1}));
+                 */
+                homap_handle *e = handle_r(&hom, &cw.str);
+                e = hom_and_modify_w(e, word, { T->cnt++; });
+                word const *const w = hom_at(
+                    &hom, hom_or_insert_w(e, (word){.ofs = cw.str, .cnt = 1}));
                 PROG_ASSERT(w);
             }
         }
     }
     free(lineptr);
-    return fom;
+    return hom;
 }
 
 static struct clean_word

@@ -1,9 +1,9 @@
-#define FLAT_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "checkers.h"
-#include "flat_ordered_map.h"
-#include "fomap_util.h"
+#include "handle_ordered_map.h"
+#include "homap_util.h"
 #include "traits.h"
 #include "types.h"
 
@@ -14,10 +14,10 @@
 #include <string.h>
 #include <time.h>
 
-CHECK_BEGIN_STATIC_FN(fomap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_shuffled)
 {
     struct val vals[51];
-    ccc_flat_ordered_map s = fom_init(vals, elem, id, id_cmp, NULL, NULL, 51);
+    ccc_handle_ordered_map s = hom_init(vals, elem, id, id_cmp, NULL, NULL, 51);
     size_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -30,19 +30,20 @@ CHECK_BEGIN_STATIC_FN(fomap_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = unwrap(remove_r(&s, &(struct val){.id = i}.elem));
-        CHECK(v != NULL, true);
-        CHECK(v->id, i);
+        struct val v = {.id = (int)i};
+        ccc_handle *h = remove_r(&s, &v.elem);
+        CHECK(occupied(h), true);
+        CHECK(v.id, i);
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fomap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(homap_test_prime_shuffle)
 {
     struct val vals[51];
-    ccc_flat_ordered_map s = fom_init(vals, elem, id, id_cmp, NULL, NULL, 51);
+    ccc_handle_ordered_map s = hom_init(vals, elem, id, id_cmp, NULL, NULL, 51);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -62,21 +63,21 @@ CHECK_BEGIN_STATIC_FN(fomap_test_prime_shuffle)
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    CHECK(fom_size(&s) < size, true);
+    CHECK(hom_size(&s) < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_entry const *const e = remove_entry_r(entry_r(&s, &i));
+        ccc_handle const *const e = remove_handle_r(handle_r(&s, &i));
         CHECK(occupied(e) || repeats[i], true);
         CHECK(validate(&s), true);
     }
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fomap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(homap_test_weak_srand)
 {
     struct val vals[1001];
-    ccc_flat_ordered_map s = fom_init(vals, elem, id, id_cmp, NULL, NULL,
-                                      sizeof(vals) / sizeof(vals[0]));
+    ccc_handle_ordered_map s = hom_init(vals, elem, id, id_cmp, NULL, NULL,
+                                        sizeof(vals) / sizeof(vals[0]));
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
@@ -85,15 +86,14 @@ CHECK_BEGIN_STATIC_FN(fomap_test_weak_srand)
     {
         /* NOLINTNEXTLINE */
         int const rand_i = rand();
-        (void)swap_entry(&s, &(struct val){.id = rand_i, .val = i}.elem);
+        (void)swap_handle(&s, &(struct val){.id = rand_i, .val = i}.elem);
         id_keys[i] = rand_i;
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        struct val *v
-            = unwrap(remove_r(&s, &(struct val){.id = id_keys[i]}.elem));
-        CHECK(v == NULL, false);
+        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
@@ -103,6 +103,6 @@ CHECK_BEGIN_STATIC_FN(fomap_test_weak_srand)
 int
 main()
 {
-    return CHECK_RUN(fomap_test_insert_erase_shuffled(),
-                     fomap_test_prime_shuffle(), fomap_test_weak_srand());
+    return CHECK_RUN(homap_test_insert_erase_shuffled(),
+                     homap_test_prime_shuffle(), homap_test_weak_srand());
 }
