@@ -690,7 +690,7 @@ handle_hash_map.h (dropdown)</summary>
 <details >
 <summary >
 handle_ordered_map.h (dropdown)</summary>
-<p>An ordered map implemented in array with an index based self-optimizing tree.</p>
+<p>An ordered map implemented in array with an index based self-optimizing tree. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
@@ -760,7 +760,7 @@ handle_ordered_map.h (dropdown)</summary>
 <details >
 <summary >
 handle_realtime_ordered_map.h (dropdown)</summary>
-<p>An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure.</p>
+<p>An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
