@@ -151,9 +151,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ae62bdbb6605efeb5abbbda3a6f1ca54c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae62bdbb6605efeb5abbbda3a6f1ca54c">ccc_omm_insert_entry_w</a>(ordered_multimap_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_omm_insert_entry_w(ordered_multimap_entry_ptr, lazy_key_value)</td></tr>
 <tr class="memdesc:ae62bdbb6605efeb5abbbda3a6f1ca54c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly writes the specified compound literal directly to the existing or newly allocated entry. O(1).  <br /></td></tr>
 <tr class="separator:ae62bdbb6605efeb5abbbda3a6f1ca54c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf">ccc_omm_insert</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle)</td></tr>
-<tr class="memdesc:a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an entry pointing to the newly inserted element and a status indicating if the map has already been Occupied at the given key. Amortized O(lg N).  <br /></td></tr>
-<tr class="separator:a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c9762b1829080b63eeeb15c1708bf63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a9c9762b1829080b63eeeb15c1708bf63">ccc_omm_swap_entry</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle)</td></tr>
+<tr class="memdesc:a9c9762b1829080b63eeeb15c1708bf63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an entry pointing to the newly inserted element and a status indicating if the map has already been Occupied at the given key. Amortized O(lg N).  <br /></td></tr>
+<tr class="separator:a9c9762b1829080b63eeeb15c1708bf63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e43551d709dfd5300936783bbc92e32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a9e43551d709dfd5300936783bbc92e32">ccc_omm_try_insert</a> (<a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *key_val_handle)</td></tr>
 <tr class="memdesc:a9e43551d709dfd5300936783bbc92e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a new key-value into the multimap only if none exists. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a9e43551d709dfd5300936783bbc92e32"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -654,7 +654,7 @@ N).  <br /></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_omm_insert_or_assign_w(ordered_multimap_ptr, key, lazy_value) \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:108</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:126</div></div>
 </div><!-- fragment -->
 <p>Invariantly inserts the key value pair into the multimap either as the first entry or overwriting the oldest existing entry at key. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1403,45 +1403,6 @@ N). </p>
 
 </div>
 </div>
-<a id="a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf" name="a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bd4e9fa3bd0e6c9510b8a0d32e3dbcf">&#9670;&#160;</a></span>ccc_omm_insert()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> ccc_omm_insert </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *&#160;</td>
-          <td class="paramname"><em>mm</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *&#160;</td>
-          <td class="paramname"><em>key_val_handle</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns an entry pointing to the newly inserted element and a status indicating if the map has already been Occupied at the given key. Amortized O(lg N). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">mm</td><td>a pointer to the multimap. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle</td><td>a handle to the new key value to be inserted. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>an entry that can be unwrapped to view the inserted element. The status will be Occupied if this element is a duplicate added to a duplicate list or Vacant if this key is the first of its value inserted into the multimap. If the element cannot be added due to an allocator error, an insert error is set.</dd></dl>
-<p>Note that if allocation has been prohibited the address of the key_val_handle is used directly. This means the container assumes the memory provided for the user type containing key_val_handle has been allocated with appropriate lifetime by the user, for the user's intended use case. </p>
-
-</div>
-</div>
 <a id="a629cde21e7bb2d5977952dc456185560" name="a629cde21e7bb2d5977952dc456185560"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a629cde21e7bb2d5977952dc456185560">&#9670;&#160;</a></span>ccc_omm_insert_entry()</h2>
 
@@ -1976,6 +1937,45 @@ N). </p>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the size of the container or 0 if empty or mm is NULL. </dd></dl>
+
+</div>
+</div>
+<a id="a9c9762b1829080b63eeeb15c1708bf63" name="a9c9762b1829080b63eeeb15c1708bf63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c9762b1829080b63eeeb15c1708bf63">&#9670;&#160;</a></span>ccc_omm_swap_entry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> ccc_omm_swap_entry </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a2689cf9c610ca8b3a6b680ae2cf39a54">ccc_ordered_multimap</a> *&#160;</td>
+          <td class="paramname"><em>mm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a193ca25836d1807cc92289c600a40673">ccc_ommap_elem</a> *&#160;</td>
+          <td class="paramname"><em>key_val_handle</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns an entry pointing to the newly inserted element and a status indicating if the map has already been Occupied at the given key. Amortized O(lg N). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mm</td><td>a pointer to the multimap. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle</td><td>a handle to the new key value to be inserted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>an entry that can be unwrapped to view the inserted element. The status will be Occupied if this element is a duplicate added to a duplicate list or Vacant if this key is the first of its value inserted into the multimap. If the element cannot be added due to an allocator error, an insert error is set.</dd></dl>
+<p>Note that if allocation has been prohibited the address of the key_val_handle is used directly. This means the container assumes the memory provided for the user type containing key_val_handle has been allocated with appropriate lifetime by the user, for the user's intended use case. </p>
 
 </div>
 </div>
