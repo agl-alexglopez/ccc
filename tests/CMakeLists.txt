@@ -167,20 +167,20 @@ add_omap_test(test_omap_iter)
 add_omap_test(test_omap_entry)
 add_omap_test(test_omap_lru)
 
-#############  Flat Map  ##########################
-add_library(fomap_util fomap/fomap_util.h fomap/fomap_util.c)
-target_link_libraries(fomap_util
+#############  Handle Map  ##########################
+add_library(homap_util homap/homap_util.h homap/homap_util.c)
+target_link_libraries(homap_util
   PRIVATE
     ccc
     checkers
 )
 
-macro(add_fomap_test TEST_NAME)
-  add_executable(${TEST_NAME} fomap/${TEST_NAME}.c)
+macro(add_homap_test TEST_NAME)
+  add_executable(${TEST_NAME} homap/${TEST_NAME}.c)
   target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      fomap_util
+      homap_util
       ccc
       checkers
       alloc
@@ -192,11 +192,11 @@ macro(add_fomap_test TEST_NAME)
   )
 endmacro()
 
-add_fomap_test(test_fomap_construct)
-add_fomap_test(test_fomap_insert)
-add_fomap_test(test_fomap_erase)
-add_fomap_test(test_fomap_iter)
-add_fomap_test(test_fomap_entry)
+add_homap_test(test_homap_construct)
+add_homap_test(test_homap_insert)
+add_homap_test(test_homap_erase)
+add_homap_test(test_homap_iter)
+add_homap_test(test_homap_entry)
 
 #############  Realtime Map  ##########################
 add_library(romap_util romap/romap_util.h romap/romap_util.c)

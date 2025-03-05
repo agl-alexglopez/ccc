@@ -8,6 +8,7 @@
 
 #include "../buffer.h"
 #include "../types.h"
+#include "impl_types.h"
 
 /** @private Runs the standard WAVL tree algorithms with the addition of
 a free list. The parent field tracks the parent for an allocated node in the
