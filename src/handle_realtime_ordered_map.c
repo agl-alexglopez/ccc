@@ -81,7 +81,7 @@ static void *struct_base(struct ccc_hromap_ const *,
 static size_t maybe_alloc_insert(struct ccc_hromap_ *hrm, size_t parent,
                                  ccc_threeway_cmp last_cmp,
                                  struct ccc_hromap_elem_ *elem);
-static void *remove_fixup(struct ccc_hromap_ *t, size_t remove);
+static size_t remove_fixup(struct ccc_hromap_ *t, size_t remove);
 static void *base_at(struct ccc_hromap_ const *, size_t);
 static size_t alloc_slot(struct ccc_hromap_ *t);
 /* Returning the user key with stored offsets. */
@@ -346,10 +346,8 @@ ccc_hrm_remove_handle(ccc_hromap_handle const *const e)
     }
     if (e->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
-        void *const erased = remove_fixup(e->impl_.hrm_, e->impl_.handle_.i_);
-        assert(erased);
-        return (ccc_handle){
-            {.i_ = e->impl_.handle_.i_, .stats_ = CCC_OCCUPIED}};
+        size_t const ret = remove_fixup(e->impl_.hrm_, e->impl_.handle_.i_);
+        return (ccc_handle){{.i_ = ret, .stats_ = CCC_OCCUPIED}};
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
 }
@@ -367,12 +365,13 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     {
         return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
     }
-    void const *const removed = remove_fixup(hrm, q.found_);
+    size_t const removed = remove_fixup(hrm, q.found_);
     assert(removed);
     void *const user_struct = struct_base(hrm, out_handle);
-    if (user_struct != removed)
+    void const *const r = ccc_buf_at(&hrm->buf_, removed);
+    if (user_struct != r)
     {
-        (void)memcpy(user_struct, removed, ccc_buf_elem_size(&hrm->buf_));
+        (void)memcpy(user_struct, r, ccc_buf_elem_size(&hrm->buf_));
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_OCCUPIED}};
 }
@@ -990,7 +989,7 @@ insert_fixup(struct ccc_hromap_ *const t, size_t z, size_t x)
     }
 }
 
-static void *
+static inline size_t
 remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
 {
     size_t y = 0;
@@ -1053,7 +1052,7 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
     t->free_list_ = remove;
     [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf_, 1);
     assert(r == CCC_OK);
-    return base_at(t, remove);
+    return remove;
 }
 
 static inline void
