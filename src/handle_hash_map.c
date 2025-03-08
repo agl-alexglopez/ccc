@@ -114,7 +114,7 @@ static size_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
-static void erase_meta(struct ccc_hhmap_ *, size_t e);
+static void erase_meta(struct ccc_hhmap_ *, size_t i);
 static void swap_user_data(struct ccc_hhmap_ *, void *, void *);
 static void swap_meta_data(struct ccc_hhmap_ *h, struct ccc_hhmap_elem_ *a,
                            struct ccc_hhmap_elem_ *b);
@@ -139,7 +139,8 @@ static struct ccc_hhmap_elem_ *elem_at(struct ccc_hhmap_ const *h, size_t i);
 static ccc_result maybe_resize(struct ccc_hhmap_ *h);
 static struct ccc_handl_ find(struct ccc_hhmap_ const *h, void const *key,
                               uint64_t hash);
-static ccc_handle_i insert_meta(struct ccc_hhmap_ *h, uint64_t hash, size_t i);
+static ccc_handle_i insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
+                                size_t e_meta);
 static uint64_t *hash_at(struct ccc_hhmap_ const *h, size_t i);
 static uint64_t filter(struct ccc_hhmap_ const *h, void const *key);
 static size_t next_prime(size_t n);
@@ -870,23 +871,28 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
    and the effects it may have on Robin Hood logic. Returns the handle of the
    metadata for this new hash that has been inserted. */
 static inline ccc_handle_i
-insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
+insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
+            size_t const e_meta)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
     struct ccc_hhmap_elem_ *const floater = elem_at(h, 1);
-    size_t const e_meta = i;
     *floater = *elem_at(h, e_meta);
     floater->hash_ = hash;
     size_t dist = distance(cap, e_meta, to_i(cap, hash));
-    /* The slot we are given is where the actual data will eventually go. We
-       now need to run the robin hood algo on just the metadata entries. */
-    i = e_meta;
+    /* Finding the appropriate slot storage to back this metadata might be a
+       delayed process until we find an empty slot. */
+    size_t i = e_meta;
     do
     {
         struct ccc_hhmap_elem_ *const elem = elem_at(h, i);
         ccc_handle_i const user_data_slot = elem->slot_i_;
         if (elem->hash_ == CCC_HHM_EMPTY)
         {
+            /* CRITICAL! Storage is found for newest element inserted. It is
+               possible another element's metadata has been swapped along to
+               eventually land here, in which case it already has a slot
+               elsewhere. But the newest element being inserted needs this
+               storage even if its metadata is left behind during swaps. */
             elem_at(h, e_meta)->slot_i_ = user_data_slot;
             *elem = *floater;
             (void)ccc_buf_size_plus(&h->buf_, 1);
@@ -897,6 +903,8 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
         size_t const slot_dist = distance(cap, i, to_i(cap, elem->hash_));
         if (dist > slot_dist)
         {
+            /* The first swap means the newest element metadata is left behind
+               and we must remember to eventually find storage for its data. */
             swap_meta_data(h, floater, elem);
             dist = slot_dist;
         }
@@ -905,16 +913,15 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash, size_t i)
     } while (true);
 }
 
-/* Backshift deletion is important in for this table because it may not be able
+/* Backshift deletion is important for this table because it may not be able
    to allocate. This prevents the need for tombstones which would hurt table
    quality quickly if we can't resize. Only metadata is moved. User data remains
    in the same slot for handle stability. */
 static void
-erase_meta(struct ccc_hhmap_ *const h, size_t e)
+erase_meta(struct ccc_hhmap_ *const h, size_t i)
 {
-    *hash_at(h, e) = CCC_HHM_EMPTY;
+    *hash_at(h, i) = CCC_HHM_EMPTY;
     size_t const cap = ccc_buf_capacity(&h->buf_);
-    size_t i = e;
     size_t next = increment(cap, i);
     do
     {
