@@ -12,7 +12,7 @@ long lived structs that are part of many different containers and systems in
 their program safely. The lifetime of the struct as a member of the hash
 table can be the longest lasting.
 
-To achieve this the table runs the round robin hash table algorithm on only the
+To achieve this the table runs the Robinhood hash table algorithm on only the
 intrusive elements in the user struct. With only a single additional data field
 compared to the normal hash table, we move the metadata around the table
 according to the algorithm and leave the user data in the slot to which it is
