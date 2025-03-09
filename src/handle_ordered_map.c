@@ -10,6 +10,7 @@ based on the following source.
        strategy to eliminate symmetric left and right cases for any binary tree
        code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "buffer.h"
@@ -82,7 +83,7 @@ static size_t *branch_ref(struct ccc_homap_ const *t, size_t node,
                           enum hom_branch_ branch);
 static size_t *parent_ref(struct ccc_homap_ const *t, size_t node);
 
-static bool validate(struct ccc_homap_ const *hom);
+static ccc_tribool validate(struct ccc_homap_ const *hom);
 
 /* Returning void as miscellaneous helpers. */
 static void init_node(struct ccc_homap_elem_ *e);
@@ -103,12 +104,12 @@ ccc_hom_at(ccc_handle_ordered_map const *const h, ccc_handle_i const i)
     return ccc_buf_at(&h->buf_, i);
 }
 
-bool
+ccc_tribool
 ccc_hom_contains(ccc_handle_ordered_map *const hom, void const *const key)
 {
     if (!hom || !key)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     hom->root_ = splay(hom, hom->root_, key, hom->cmp_);
     return cmp_elems(hom, key, hom->root_, hom->cmp_) == CCC_EQL;
@@ -326,16 +327,24 @@ ccc_hom_unwrap(ccc_homap_handle const *const h)
     return h->impl_.handle_.stats_ == CCC_OCCUPIED ? h->impl_.handle_.i_ : 0;
 }
 
-bool
+ccc_tribool
 ccc_hom_insert_error(ccc_homap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ & CCC_INSERT_ERROR : false;
+    if (!h)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (h->impl_.handle_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_hom_occupied(ccc_homap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ & CCC_OCCUPIED : false;
+    if (!h)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (h->impl_.handle_.stats_ & CCC_OCCUPIED) != 0;
 }
 
 ccc_handle_status
@@ -344,9 +353,13 @@ ccc_hom_handle_status(ccc_homap_handle const *const h)
     return h ? h->impl_.handle_.stats_ : CCC_INPUT_ERROR;
 }
 
-bool
+ccc_tribool
 ccc_hom_is_empty(ccc_handle_ordered_map const *const hom)
 {
+    if (!hom)
+    {
+        return CCC_BOOL_ERR;
+    }
     return !ccc_hom_size(hom);
 }
 
@@ -551,10 +564,14 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
     return ccc_buf_alloc(&hom->buf_, 0, hom->buf_.alloc_);
 }
 
-bool
+ccc_tribool
 ccc_hom_validate(ccc_handle_ordered_map const *const hom)
 {
-    return hom ? validate(hom) : false;
+    if (!hom)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return validate(hom);
 }
 
 /*===========================   Private Interface ===========================*/
@@ -781,7 +798,7 @@ splay(struct ccc_homap_ *const t, size_t root, void const *const key,
         link(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = branch_i(t, root, dir);
-    } while (true);
+    } while (1);
     link(t, l_r_subtrees[L], R, branch_i(t, root, L));
     link(t, l_r_subtrees[R], L, branch_i(t, root, R));
     link(t, root, L, nil->branch_[R]);
@@ -993,7 +1010,7 @@ struct tree_range_
     size_t high;
 };
 
-static size_t
+static inline size_t
 recursive_size(struct ccc_homap_ const *const t, size_t const r)
 {
     if (!r)
@@ -1004,20 +1021,20 @@ recursive_size(struct ccc_homap_ const *const t, size_t const r)
            + recursive_size(t, branch_i(t, r, L));
 }
 
-static bool
+static inline ccc_tribool
 are_subtrees_valid(struct ccc_homap_ const *t, struct tree_range_ const r)
 {
     if (!r.root)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (r.low && cmp_elems(t, key_at(t, r.low), r.root, t->cmp_) != CCC_LES)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (r.high && cmp_elems(t, key_at(t, r.high), r.root, t->cmp_) != CCC_GRT)
     {
-        return false;
+        return CCC_FALSE;
     }
     return are_subtrees_valid(
                t, (struct tree_range_){.low = r.low,
@@ -1029,28 +1046,28 @@ are_subtrees_valid(struct ccc_homap_ const *t, struct tree_range_ const r)
                                        .high = r.high});
 }
 
-static bool
+static inline ccc_tribool
 is_storing_parent(struct ccc_homap_ const *const t, size_t const p,
                   size_t const root)
 {
     if (!root)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (parent_i(t, root) != p)
     {
-        return false;
+        return CCC_FALSE;
     }
     return is_storing_parent(t, root, branch_i(t, root, L))
            && is_storing_parent(t, root, branch_i(t, root, R));
 }
 
-static inline bool
+static inline ccc_tribool
 is_free_list_valid(struct ccc_homap_ const *const t)
 {
     if (!ccc_buf_size(&t->buf_))
     {
-        return true;
+        return CCC_TRUE;
     }
     size_t list_check = 0;
     for (size_t cur = t->free_list_;
@@ -1060,27 +1077,27 @@ is_free_list_valid(struct ccc_homap_ const *const t)
     return (list_check + ccc_buf_size(&t->buf_) == ccc_buf_capacity(&t->buf_));
 }
 
-static bool
+static inline ccc_tribool
 validate(struct ccc_homap_ const *const hom)
 {
     if (!are_subtrees_valid(hom, (struct tree_range_){.root = hom->root_}))
     {
-        return false;
+        return CCC_FALSE;
     }
     size_t const size = recursive_size(hom, hom->root_);
     if (size && size != ccc_buf_size(&hom->buf_) - 1)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!is_storing_parent(hom, 0, hom->root_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!is_free_list_valid(hom))
     {
-        return false;
+        return CCC_FALSE;
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /* NOLINTEND(*misc-no-recursion) */
