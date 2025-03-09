@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -263,20 +262,24 @@ ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
     return CCC_OK;
 }
 
-bool
+ccc_tribool
 ccc_sll_validate(ccc_singly_linked_list const *const sll)
 {
+    if (!sll)
+    {
+        return CCC_BOOL_ERR;
+    }
     size_t size = 0;
     for (struct ccc_sll_elem_ *e = sll->sentinel_.n_; e != &sll->sentinel_;
          e = e->n_, ++size)
     {
         if (size >= sll->sz_)
         {
-            return false;
+            return CCC_FALSE;
         }
         if (!e || !e->n_ || e->n_ == e)
         {
-            return false;
+            return CCC_FALSE;
         }
     }
     return size == sll->sz_;
@@ -288,10 +291,14 @@ ccc_sll_size(ccc_singly_linked_list const *const sll)
     return sll ? sll->sz_ : 0;
 }
 
-bool
+ccc_tribool
 ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 {
-    return sll ? !sll->sz_ : true;
+    if (!sll)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return !sll->sz_;
 }
 
 /*=========================    Private Interface   ==========================*/

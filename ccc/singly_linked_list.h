@@ -274,13 +274,13 @@ ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 
 /** @brief Return true if the list is empty. O(1).
 @param [in] sll a pointer to the singly linked list.
-@return true if the size is 0 or sll is NULL otherwise false. */
-[[nodiscard]] bool ccc_sll_is_empty(ccc_singly_linked_list const *sll);
+@return true if size is 0 otherwise false. Error returned if sll is NULL. */
+[[nodiscard]] ccc_tribool ccc_sll_is_empty(ccc_singly_linked_list const *sll);
 
 /** @brief Returns true if the invariants of the list hold.
 @param [in] sll a pointer to the singly linked list.
-@return true if the list is valid, else false. */
-[[nodiscard]] bool ccc_sll_validate(ccc_singly_linked_list const *sll);
+@return true if list is valid, else false. Error returned if sll is NULL. */
+[[nodiscard]] ccc_tribool ccc_sll_validate(ccc_singly_linked_list const *sll);
 
 /**@}*/
 
