@@ -77,12 +77,12 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
 #define ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T...)    \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
-        bool pq_update_res_ = false;                                           \
+        ccc_tribool pq_update_res_ = CCC_FALSE;                                \
         struct ccc_pq_elem_ *const pq_elem_ptr_ = (pq_elem_ptr);               \
         if (pq_ && pq_elem_ptr_ && pq_elem_ptr_->next_sibling_                 \
             && pq_elem_ptr_->prev_sibling_)                                    \
         {                                                                      \
-            pq_update_res_ = true;                                             \
+            pq_update_res_ = CCC_TRUE;                                         \
             {update_closure_over_T} ccc_impl_pq_update_fixup(pq_,              \
                                                              pq_elem_ptr_);    \
         }                                                                      \
@@ -93,12 +93,12 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
                                increase_closure_over_T...)                     \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
-        bool pq_increase_res_ = false;                                         \
+        ccc_tribool pq_increase_res_ = CCC_FALSE;                              \
         struct ccc_pq_elem_ *const pq_elem_ptr_ = (pq_elem_ptr);               \
         if (pq_ && pq_elem_ptr_ && pq_elem_ptr_->next_sibling_                 \
             && pq_elem_ptr_->prev_sibling_)                                    \
         {                                                                      \
-            pq_increase_res_ = true;                                           \
+            pq_increase_res_ = CCC_TRUE;                                       \
             {increase_closure_over_T} ccc_impl_pq_increase_fixup(              \
                 pq_, pq_elem_ptr_);                                            \
         }                                                                      \
@@ -109,12 +109,12 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
                                decrease_closure_over_T...)                     \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
-        bool pq_decrease_res_ = false;                                         \
+        ccc_tribool pq_decrease_res_ = CCC_FALSE;                              \
         struct ccc_pq_elem_ *const pq_elem_ptr_ = (pq_elem_ptr);               \
         if (pq_ && pq_elem_ptr_ && pq_elem_ptr_->next_sibling_                 \
             && pq_elem_ptr_->prev_sibling_)                                    \
         {                                                                      \
-            pq_decrease_res_ = true;                                           \
+            pq_decrease_res_ = CCC_TRUE;                                       \
             {decrease_closure_over_T} ccc_impl_pq_decrease_fixup(              \
                 pq_, pq_elem_ptr_);                                            \
         }                                                                      \
