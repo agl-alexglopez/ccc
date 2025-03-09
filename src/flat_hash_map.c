@@ -40,7 +40,6 @@ this table we need to consider these points.
 
 Overall, this means any new design needs slightly more consideration than I
 first thought. However, improvements can still be made. */
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -145,8 +144,8 @@ static struct ccc_fhash_entry_ container_entry(struct ccc_fhmap_ *h,
                                                void const *key);
 static struct ccc_fhash_entry_ *and_modify(struct ccc_fhash_entry_ *e,
                                            ccc_update_fn *fn);
-static bool valid_distance_from_home(struct ccc_fhmap_ const *,
-                                     void const *slot);
+static ccc_tribool valid_distance_from_home(struct ccc_fhmap_ const *,
+                                            void const *slot);
 static size_t to_i(size_t capacity, uint64_t hash);
 static size_t increment(size_t capacity, size_t i);
 static size_t decrement(size_t capacity, size_t i);
@@ -165,24 +164,24 @@ static size_t next_prime(size_t n);
 
 /*=========================   Interface    ==================================*/
 
-bool
+ccc_tribool
 ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 {
     if (unlikely(!h))
     {
-        return true;
+        return CCC_BOOL_ERR;
     }
     return !ccc_fhm_size(h);
 }
 
-bool
+ccc_tribool
 ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
-    return entry(h, key, filter(h, key)).stats_ & CCC_OCCUPIED;
+    return (entry(h, key, filter(h, key)).stats_ & CCC_OCCUPIED) != 0;
 }
 
 size_t
@@ -414,24 +413,24 @@ ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
     return e->impl_.entry_.e_;
 }
 
-bool
+ccc_tribool
 ccc_fhm_occupied(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
-    return e->impl_.entry_.stats_ & CCC_OCCUPIED;
+    return (e->impl_.entry_.stats_ & CCC_OCCUPIED) != 0;
 }
 
-bool
+ccc_tribool
 ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
-    return e->impl_.entry_.stats_ & CCC_INSERT_ERROR;
+    return (e->impl_.entry_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
 ccc_entry_status
@@ -603,12 +602,12 @@ ccc_fhm_data(ccc_flat_hash_map const *const h)
     return h ? ccc_buf_begin(&h->buf_) : NULL;
 }
 
-bool
+ccc_tribool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
     if (!h || !h->eq_fn_ || !h->hash_fn_)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     size_t empties = 0;
     size_t occupied = 0;
@@ -626,14 +625,14 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         if (elem_in_slot(h, i)->hash_ != CCC_FHM_EMPTY
             && !valid_distance_from_home(h, i))
         {
-            return false;
+            return CCC_FALSE;
         }
     }
     return occupied == ccc_fhm_size(h)
            && empties == (ccc_buf_capacity(&h->buf_) - occupied);
 }
 
-static bool
+static inline ccc_tribool
 valid_distance_from_home(struct ccc_fhmap_ const *const h,
                          void const *const slot)
 {
@@ -652,17 +651,17 @@ valid_distance_from_home(struct ccc_fhmap_ const *const h,
            to shuffle closer to home. */
         if (cur_hash == CCC_FHM_EMPTY)
         {
-            return false;
+            return CCC_FALSE;
         }
         /* This shouldn't happen either. The whole point of Robin Hood is
            taking from the close and giving to the far. If this happens
            we have made our algorithm greedy not altruistic. */
         if (distance_to_home > distance(cap, i, to_i(cap, cur_hash)))
         {
-            return false;
+            return CCC_FALSE;
         }
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /*=======================   Private Interface   =============================*/
@@ -794,7 +793,7 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
         }
         ++dist;
         i = increment(cap, i);
-    } while (true);
+    } while (1);
 }
 
 /* Assumes that element to be inserted does not already exist in the table.
@@ -841,7 +840,7 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
         }
         i = increment(cap, i);
         ++dist;
-    } while (true);
+    } while (1);
 }
 
 /* Backshift deletion is important in for this table because it may not be able
@@ -870,7 +869,7 @@ erase(struct ccc_fhmap_ *const h, void *const e)
         swap(tmp, next_slot, ccc_buf_at(&h->buf_, i), elem_sz);
         i = next;
         next = increment(cap, next);
-    } while (true);
+    } while (1);
 }
 
 static inline struct ccc_fhash_entry_
