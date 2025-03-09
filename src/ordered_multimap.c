@@ -11,7 +11,6 @@ implementation is based on the following source.
        left and right cases for any binary tree code.
        https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
 #include <assert.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "impl/impl_ordered_multimap.h"
@@ -54,10 +53,10 @@ static void add_duplicate(struct ccc_tree_ *, struct ccc_node_ *,
 
 /* Boolean returns */
 
-static bool empty(struct ccc_tree_ const *);
-static bool contains(struct ccc_tree_ *, void const *);
-static bool has_dups(struct ccc_node_ const *, struct ccc_node_ const *);
-static bool ccc_tree_validate(struct ccc_tree_ const *t);
+static ccc_tribool empty(struct ccc_tree_ const *);
+static ccc_tribool contains(struct ccc_tree_ *, void const *);
+static ccc_tribool has_dups(struct ccc_node_ const *, struct ccc_node_ const *);
+static ccc_tribool ccc_tree_validate(struct ccc_tree_ const *t);
 
 /* Returning the user type that is stored in data structure. */
 
@@ -125,12 +124,12 @@ ccc_omm_get_key_val(ccc_ordered_multimap *const mm, void const *const key)
     return find(&mm->impl_, key);
 }
 
-bool
+ccc_tribool
 ccc_omm_is_empty(ccc_ordered_multimap const *const mm)
 {
     if (!mm)
     {
-        return true;
+        return CCC_BOOL_ERR;
     }
     return empty(&mm->impl_);
 }
@@ -434,7 +433,7 @@ ccc_omm_extract(ccc_ordered_multimap *const mm,
     return multimap_erase_node(&mm->impl_, &key_val_handle->impl_);
 }
 
-bool
+ccc_tribool
 ccc_omm_update(ccc_ordered_multimap *const mm,
                ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
                void *const aux)
@@ -442,19 +441,19 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
     if (!mm || !key_val_handle || !fn || !key_val_handle->impl_.branch_[L]
         || !key_val_handle->impl_.branch_[R])
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     void *const e = multimap_erase_node(&mm->impl_, &key_val_handle->impl_);
     if (!e)
     {
-        return false;
+        return CCC_FALSE;
     }
     fn((ccc_user_type){e, aux});
     (void)multimap_insert(&mm->impl_, &key_val_handle->impl_);
-    return true;
+    return CCC_TRUE;
 }
 
-bool
+ccc_tribool
 ccc_omm_increase(ccc_ordered_multimap *const mm,
                  ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
                  void *const aux)
@@ -462,7 +461,7 @@ ccc_omm_increase(ccc_ordered_multimap *const mm,
     return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
 
-bool
+ccc_tribool
 ccc_omm_decrease(ccc_ordered_multimap *const mm,
                  ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
                  void *const aux)
@@ -470,12 +469,12 @@ ccc_omm_decrease(ccc_ordered_multimap *const mm,
     return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
 
-bool
+ccc_tribool
 ccc_omm_contains(ccc_ordered_multimap *const mm, void const *const key)
 {
     if (!mm || !key)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     return contains(&mm->impl_, key);
 }
@@ -530,22 +529,34 @@ ccc_omm_unwrap(ccc_ommap_entry const *const e)
     return ccc_entry_unwrap(&(ccc_entry){e->impl_.entry_});
 }
 
-bool
+ccc_tribool
 ccc_omm_insert_error(ccc_ommap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_INSERT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.entry_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_omm_input_error(ccc_ommap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_INPUT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.entry_.stats_ & CCC_INPUT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_omm_occupied(ccc_ommap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_OCCUPIED : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.entry_.stats_ & CCC_OCCUPIED) != 0;
 }
 
 ccc_entry_status
@@ -554,12 +565,12 @@ ccc_omm_entry_status(ccc_ommap_entry const *const e)
     return e ? e->impl_.entry_.stats_ : CCC_INPUT_ERROR;
 }
 
-bool
+ccc_tribool
 ccc_omm_validate(ccc_ordered_multimap const *const mm)
 {
     if (!mm)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     return ccc_tree_validate(&mm->impl_);
 }
@@ -651,7 +662,7 @@ find(struct ccc_tree_ *const t, void const *const key)
                                                      : NULL;
 }
 
-static void
+static inline void
 init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)
 {
     n->branch_[L] = &t->end_;
@@ -659,13 +670,13 @@ init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)
     n->parent_ = &t->end_;
 }
 
-static bool
+static inline ccc_tribool
 empty(struct ccc_tree_ const *const t)
 {
     return !t->size_;
 }
 
-static void *
+static inline void *
 max(struct ccc_tree_ const *const t)
 {
     if (!t->size_)
@@ -678,7 +689,7 @@ max(struct ccc_tree_ const *const t)
     return struct_base(t, m);
 }
 
-static void *
+static inline void *
 min(struct ccc_tree_ const *const t)
 {
     if (!t->size_)
@@ -691,31 +702,31 @@ min(struct ccc_tree_ const *const t)
     return struct_base(t, m);
 }
 
-static void *
+static inline void *
 pop_max(struct ccc_tree_ *const t)
 {
     return multimap_erase_max_or_min(t, force_find_grt);
 }
 
-static void *
+static inline void *
 pop_min(struct ccc_tree_ *const t)
 {
     return multimap_erase_max_or_min(t, force_find_les);
 }
 
-static inline bool
+static inline ccc_tribool
 is_dup_head_next(struct ccc_node_ const *const i)
 {
     return i->link_[R]->parent_ != NULL;
 }
 
-static inline bool
+static inline ccc_tribool
 is_dup_head(struct ccc_node_ const *const end, struct ccc_node_ const *const i)
 {
     return i != end && i->link_[P] != end && i->link_[P]->link_[N] == i;
 }
 
-static struct ccc_node_ const *
+static inline struct ccc_node_ const *
 multimap_next(struct ccc_tree_ const *const t, struct ccc_node_ const *const i,
               enum tree_link_ const traversal)
 {
@@ -767,7 +778,7 @@ next_tree_node(struct ccc_tree_ const *const t,
     return &t->end_;
 }
 
-static struct ccc_node_ const *
+static inline struct ccc_node_ const *
 next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
      enum tree_link_ const traversal)
 {
@@ -793,7 +804,7 @@ next(struct ccc_tree_ const *const t, struct ccc_node_ const *n,
     return p;
 }
 
-static struct ccc_range_u_
+static inline struct ccc_range_u_
 equal_range(struct ccc_tree_ *const t, void const *const begin_key,
             void const *const end_key, enum tree_link_ const traversal)
 {
@@ -823,7 +834,7 @@ equal_range(struct ccc_tree_ *const t, void const *const begin_key,
     };
 }
 
-static bool
+static inline ccc_tribool
 contains(struct ccc_tree_ *const t, void const *const key)
 {
     t->root_ = splay(t, t->root_, key, t->cmp_);
@@ -856,7 +867,7 @@ multimap_insert(struct ccc_tree_ *const t, struct ccc_node_ *const out_handle)
                              .stats_ = CCC_VACANT};
 }
 
-static void *
+static inline void *
 connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *const new_root,
                  ccc_threeway_cmp const cmp_result)
 {
@@ -870,7 +881,7 @@ connect_new_root(struct ccc_tree_ *const t, struct ccc_node_ *const new_root,
     return struct_base(t, new_root);
 }
 
-static void
+static inline void
 add_duplicate(struct ccc_tree_ *const t, struct ccc_node_ *const tree_node,
               struct ccc_node_ *const add, struct ccc_node_ *const parent)
 {
@@ -932,7 +943,7 @@ multimap_erase(struct ccc_tree_ *const t, void const *const key)
    simply grabs the first node available in the tree for round robin.
    This function expects to be passed the t->impl_il as the node and a
    comparison function that forces either the max or min to be searched. */
-static void *
+static inline void *
 multimap_erase_max_or_min(struct ccc_tree_ *const t,
                           ccc_key_cmp_fn *const force_max_or_min)
 {
@@ -963,7 +974,7 @@ multimap_erase_max_or_min(struct ccc_tree_ *const t,
    taken to only delete that node, especially if a different node with
    the same size is splayed to the root and we are a duplicate in the
    list. */
-static void *
+static inline void *
 multimap_erase_node(struct ccc_tree_ *const t, struct ccc_node_ *const node)
 {
     /* This is what we set removed nodes to so this is a mistaken query */
@@ -1007,7 +1018,7 @@ multimap_erase_node(struct ccc_tree_ *const t, struct ccc_node_ *const node)
 }
 
 /* This function assumes that splayed is the new root of the tree */
-static struct ccc_node_ *
+static inline struct ccc_node_ *
 pop_dup_node(struct ccc_tree_ *const t, struct ccc_node_ *const dup,
              struct ccc_node_ *const splayed)
 {
@@ -1031,7 +1042,7 @@ pop_dup_node(struct ccc_tree_ *const t, struct ccc_node_ *const dup,
     return dup;
 }
 
-static struct ccc_node_ *
+static inline struct ccc_node_ *
 pop_front_dup(struct ccc_tree_ *const t, struct ccc_node_ *const old,
               void const *const old_key)
 {
@@ -1050,7 +1061,8 @@ pop_front_dup(struct ccc_tree_ *const t, struct ccc_node_ *const old,
 
     struct ccc_node_ *const new_list_head = old->dup_head_->link_[N];
     struct ccc_node_ *const list_tail = old->dup_head_->link_[P];
-    bool const circular_list_empty = new_list_head->link_[N] == new_list_head;
+    ccc_tribool const circular_list_empty
+        = new_list_head->link_[N] == new_list_head;
 
     new_list_head->link_[P] = list_tail;
     new_list_head->parent_ = parent;
@@ -1084,7 +1096,7 @@ remove_from_tree(struct ccc_tree_ *const t, struct ccc_node_ *const ret)
     return ret;
 }
 
-static struct ccc_node_ *
+static inline struct ccc_node_ *
 splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
       ccc_key_cmp_fn *const cmp_fn)
 {
@@ -1120,7 +1132,7 @@ splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
         link_trees(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = root->branch_[dir];
-    } while (true);
+    } while (1);
     link_trees(t, l_r_subtrees[L], R, root->branch_[L]);
     link_trees(t, l_r_subtrees[R], L, root->branch_[R]);
     link_trees(t, root, L, t->end_.branch_[R]);
@@ -1179,7 +1191,7 @@ link_trees(struct ccc_tree_ *const t, struct ccc_node_ *const parent,
    tree node that stores duplicates. By extension this means we can
    also identify if we ARE a duplicate but that check is not part
    of this function. */
-static inline bool
+static inline ccc_tribool
 has_dups(struct ccc_node_ const *const end, struct ccc_node_ const *const n)
 {
     return n != end && n->dup_head_ != end && n->dup_head_->link_[P] != end
@@ -1235,13 +1247,13 @@ elem_in_slot(struct ccc_tree_ const *const t, void const *const slot)
    comparison to decide which branch to take in the tree or if we
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min */
-static ccc_threeway_cmp
+static inline ccc_threeway_cmp
 force_find_grt(ccc_key_cmp const)
 {
     return CCC_GRT;
 }
 
-static ccc_threeway_cmp
+static inline ccc_threeway_cmp
 force_find_les(ccc_key_cmp const)
 {
     return CCC_LES;
@@ -1265,11 +1277,11 @@ struct tree_range_
 /** @private */
 struct parent_status_
 {
-    bool correct;
+    ccc_tribool correct;
     struct ccc_node_ const *parent;
 };
 
-static size_t
+static inline size_t
 count_dups(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
 {
     if (!has_dups(&t->end_, n))
@@ -1285,7 +1297,7 @@ count_dups(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
     return dups;
 }
 
-static size_t
+static inline size_t
 recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 {
     if (r == &t->end_)
@@ -1297,27 +1309,27 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
            + recursive_size(t, r->branch_[L]);
 }
 
-static bool
+static inline ccc_tribool
 are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (r.root == nil)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (r.low != nil
         && cmp(t, key_from_node(t, r.low), r.root, t->cmp_) != CCC_LES)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (r.high != nil
         && cmp(t, key_from_node(t, r.high), r.root, t->cmp_) != CCC_GRT)
     {
-        return false;
+        return CCC_FALSE;
     }
     return are_subtrees_valid(t,
                               (struct tree_range_){
@@ -1335,7 +1347,7 @@ are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                                  nil);
 }
 
-static struct parent_status_
+static inline struct parent_status_
 child_tracks_parent(struct ccc_tree_ const *const t,
                     struct ccc_node_ const *const parent,
                     struct ccc_node_ const *const root)
@@ -1345,29 +1357,29 @@ child_tracks_parent(struct ccc_tree_ const *const t,
         struct ccc_node_ *p = root->dup_head_->parent_;
         if (p != parent)
         {
-            return (struct parent_status_){false, p};
+            return (struct parent_status_){CCC_FALSE, p};
         }
     }
     else if (root->parent_ != parent)
     {
         struct ccc_node_ *p = root->dup_head_->parent_;
-        return (struct parent_status_){false, p};
+        return (struct parent_status_){CCC_FALSE, p};
     }
-    return (struct parent_status_){true, parent};
+    return (struct parent_status_){CCC_TRUE, parent};
 }
 
-static bool
+static inline ccc_tribool
 is_duplicate_storing_parent(struct ccc_tree_ const *const t,
                             struct ccc_node_ const *const parent,
                             struct ccc_node_ const *const root)
 {
     if (root == &t->end_)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (!child_tracks_parent(t, parent, root).correct)
     {
-        return false;
+        return CCC_FALSE;
     }
     return is_duplicate_storing_parent(t, root, root->branch_[L])
            && is_duplicate_storing_parent(t, root, root->branch_[R]);
@@ -1379,7 +1391,7 @@ is_duplicate_storing_parent(struct ccc_tree_ const *const t,
    sure that the implementation is correct because it follows the
    truth of the provided pointers with its own stack as backtracking
    information. */
-static bool
+static inline ccc_tribool
 ccc_tree_validate(struct ccc_tree_ const *const t)
 {
     if (!are_subtrees_valid(t,
@@ -1390,17 +1402,17 @@ ccc_tree_validate(struct ccc_tree_ const *const t)
                             },
                             &t->end_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!is_duplicate_storing_parent(t, &t->end_, t->root_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (recursive_size(t, t->root_) != t->size_)
     {
-        return false;
+        return CCC_FALSE;
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /* NOLINTEND(*misc-no-recursion) */

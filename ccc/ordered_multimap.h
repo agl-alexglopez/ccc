@@ -33,7 +33,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_ORDERED_MULTIMAP_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -103,7 +102,8 @@ Test membership or obtain references to stored user types directly. */
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
 @return true if the multimap contains at least one entry at key, else false. */
-[[nodiscard]] bool ccc_omm_contains(ccc_ordered_multimap *mm, void const *key);
+[[nodiscard]] ccc_tribool ccc_omm_contains(ccc_ordered_multimap *mm,
+                                           void const *key);
 
 /** @brief Returns a reference to the user type stored at key. Amortized O(lg
 N).
@@ -383,7 +383,7 @@ freed by the user. */
 /** @brief Indicates if an entry is Occupied or Vacant.
 @param [in] e a pointer to the multimap entry.
 @return true if the entry is Occupied, false if it is Vacant. */
-[[nodiscard]] bool ccc_omm_occupied(ccc_ommap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_omm_occupied(ccc_ommap_entry const *e);
 
 /** @brief Unwraps the provided entry. An Occupied entry will point to the user
 type stored in the map, a Vacant entry will be NULL.
@@ -398,7 +398,7 @@ Interface series of operations.
 
 Note that this will most commonly occur if the container is permitted to
 allocate but the allocation has failed. */
-[[nodiscard]] bool ccc_omm_insert_error(ccc_ommap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_omm_insert_error(ccc_ommap_entry const *e);
 
 /** @brief Indicates if a function used to generate the provided entry
 encountered bad arguments that prevented the operation of the function.
@@ -407,7 +407,7 @@ encountered bad arguments that prevented the operation of the function.
 
 Note bad arguments usually mean NULL pointers were passed to functions expecting
 non-NULL arguments. */
-[[nodiscard]] bool ccc_omm_input_error(ccc_ommap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_omm_input_error(ccc_ommap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -503,9 +503,9 @@ but NULL is possible if aux is not needed.
 @return true if the key update was successful, false if bad arguments are
 provided, it is possible to prove the key_val_handle is not tracked by the map,
 or the map is empty. */
-[[nodiscard]] bool ccc_omm_update(ccc_ordered_multimap *mm,
-                                  ccc_ommap_elem *key_val_handle,
-                                  ccc_update_fn *fn, void *aux);
+[[nodiscard]] ccc_tribool ccc_omm_update(ccc_ordered_multimap *mm,
+                                         ccc_ommap_elem *key_val_handle,
+                                         ccc_update_fn *fn, void *aux);
 
 /** @brief Increases an element key that is currently tracked directly as a
 member of the map. Amortized O(lg N).
@@ -518,9 +518,9 @@ value but NULL is possible if aux is not needed.
 @return true if the key increase was successful, false if bad arguments are
 provided, it is possible to prove the key_val_handle is not tracked by the map,
 or the map is empty. */
-[[nodiscard]] bool ccc_omm_increase(ccc_ordered_multimap *mm,
-                                    ccc_ommap_elem *key_val_handle,
-                                    ccc_update_fn *fn, void *aux);
+[[nodiscard]] ccc_tribool ccc_omm_increase(ccc_ordered_multimap *mm,
+                                           ccc_ommap_elem *key_val_handle,
+                                           ccc_update_fn *fn, void *aux);
 
 /** @brief Decreases an element key that is currently tracked directly as a
 member of the map. Amortized O(lg N).
@@ -533,9 +533,9 @@ value but NULL is possible if aux is not needed.
 @return true if the key decrease was successful, false if bad arguments are
 provided, it is possible to prove the key_val_handle is not tracked by the map,
 or the map is empty. */
-[[nodiscard]] bool ccc_omm_decrease(ccc_ordered_multimap *mm,
-                                    ccc_ommap_elem *key_val_handle,
-                                    ccc_update_fn *fn, void *aux);
+[[nodiscard]] ccc_tribool ccc_omm_decrease(ccc_ordered_multimap *mm,
+                                           ccc_ommap_elem *key_val_handle,
+                                           ccc_update_fn *fn, void *aux);
 
 /**@}*/
 
@@ -712,7 +712,7 @@ Obtain the container state. */
 /** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
 @return true if empty, false if mm is NULL or mm is empty. */
-[[nodiscard]] bool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
+[[nodiscard]] ccc_tribool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
 /** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
@@ -722,7 +722,7 @@ Obtain the container state. */
 /** @brief Returns true if the multimap is empty.
 @param [in] mm a pointer to the multimap.
 @return true if invariants of the data structure are preserved, else false. */
-[[nodiscard]] bool ccc_omm_validate(ccc_ordered_multimap const *mm);
+[[nodiscard]] ccc_tribool ccc_omm_validate(ccc_ordered_multimap const *mm);
 
 /**@}*/
 
