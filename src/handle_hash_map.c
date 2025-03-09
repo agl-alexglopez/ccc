@@ -18,7 +18,6 @@ compared to the normal hash table, we move the metadata around the table
 according to the algorithm and leave the user data in the slot to which it is
 first written. Then, as many interfaces as possible expose these handles rather
 then pointers to encourage the user to think in terms of stable indices. */
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -126,7 +125,8 @@ static struct ccc_hhash_handle_ container_handle(struct ccc_hhmap_ *h,
                                                  void const *key);
 static struct ccc_hhash_handle_ *and_modify(struct ccc_hhash_handle_ *e,
                                             ccc_update_fn *fn);
-static bool valid_distance_from_home(struct ccc_hhmap_ const *, size_t slot);
+static ccc_tribool valid_distance_from_home(struct ccc_hhmap_ const *,
+                                            size_t slot);
 static size_t to_i(size_t capacity, uint64_t hash);
 static size_t increment(size_t capacity, size_t i);
 static size_t decrement(size_t capacity, size_t i);
@@ -162,22 +162,22 @@ ccc_hhm_at(ccc_handle_hash_map const *const h, ccc_handle_i i)
     return ccc_buf_at(&h->buf_, i);
 }
 
-bool
+ccc_tribool
 ccc_hhm_is_empty(ccc_handle_hash_map const *const h)
 {
     if (unlikely(!h))
     {
-        return true;
+        return CCC_BOOL_ERR;
     }
     return !ccc_hhm_size(h);
 }
 
-bool
+ccc_tribool
 ccc_hhm_contains(ccc_handle_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     return handle(h, key, filter(h, key)).stats_ == CCC_OCCUPIED;
 }
@@ -430,24 +430,24 @@ ccc_hhm_unwrap(ccc_hhmap_handle const *const e)
     return elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_;
 }
 
-bool
+ccc_tribool
 ccc_hhm_occupied(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e))
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
-    return e->impl_.handle_.stats_ & CCC_OCCUPIED;
+    return (e->impl_.handle_.stats_ & CCC_OCCUPIED) != 0;
 }
 
-bool
+ccc_tribool
 ccc_hhm_insert_error(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e))
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
-    return e->impl_.handle_.stats_ & CCC_INSERT_ERROR;
+    return (e->impl_.handle_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
 ccc_handle_status
@@ -504,10 +504,14 @@ ccc_hhm_next(ccc_hhmap_handle *const iter)
     return CCC_OK;
 }
 
-bool
+ccc_tribool
 ccc_hhm_end(ccc_hhmap_handle const *const iter)
 {
-    return !iter || iter->impl_.hash_ == CCC_HHM_EMPTY;
+    if (!iter)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return iter->impl_.hash_ == CCC_HHM_EMPTY;
 }
 
 size_t
@@ -642,17 +646,17 @@ ccc_hhm_data(ccc_handle_hash_map const *const h)
     return h ? ccc_buf_begin(&h->buf_) : NULL;
 }
 
-bool
+ccc_tribool
 ccc_hhm_validate(ccc_handle_hash_map const *const h)
 {
     if (!h || !h->eq_fn_ || !h->hash_fn_)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     /* Not yet initialized, pass for now. */
     if (!ccc_buf_size(&h->buf_))
     {
-        return true;
+        return CCC_TRUE;
     }
     size_t empties = 0;
     size_t occupied = 0;
@@ -661,7 +665,7 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
         if (e->slot_i_ >= ccc_buf_capacity(&h->buf_))
         {
-            return false;
+            return CCC_FALSE;
         }
         if (e->hash_ == CCC_HHM_EMPTY)
         {
@@ -673,11 +677,11 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
             uint64_t const hash = filter(h, key_at(h, e->slot_i_));
             if (hash != e->hash_)
             {
-                return false;
+                return CCC_FALSE;
             }
             if (!valid_distance_from_home(h, i))
             {
-                return false;
+                return CCC_FALSE;
             }
         }
     }
@@ -685,7 +689,7 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
            && empties == (ccc_buf_capacity(&h->buf_) - occupied);
 }
 
-static bool
+static ccc_tribool
 valid_distance_from_home(struct ccc_hhmap_ const *const h, size_t const slot)
 {
     size_t const cap = ccc_buf_capacity(&h->buf_);
@@ -702,17 +706,17 @@ valid_distance_from_home(struct ccc_hhmap_ const *const h, size_t const slot)
            to shuffle closer to home. */
         if (cur_hash == CCC_HHM_EMPTY)
         {
-            return false;
+            return CCC_FALSE;
         }
         /* This shouldn't happen either. The whole point of Robin Hood is
            taking from the close and giving to the far. If this happens
            we have made our algorithm greedy not altruistic. */
         if (distance_to_home > distance(cap, i, to_i(cap, cur_hash)))
         {
-            return false;
+            return CCC_FALSE;
         }
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /*=======================   Private Interface   =============================*/
@@ -863,7 +867,7 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
         }
         ++dist;
         i = increment(cap, i);
-    } while (true);
+    } while (1);
 }
 
 /* Assumes the table is prepared for the hash to be inserted at given index i
@@ -910,7 +914,7 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
         }
         i = increment(cap, i);
         ++dist;
-    } while (true);
+    } while (1);
 }
 
 /* Backshift deletion is important for this table because it may not be able
@@ -936,7 +940,7 @@ erase_meta(struct ccc_hhmap_ *const h, size_t i)
         swap_meta_data(h, elem_at(h, i), next_elem);
         i = next;
         next = increment(cap, next);
-    } while (true);
+    } while (1);
 }
 
 static inline struct ccc_hhash_handle_
