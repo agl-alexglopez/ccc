@@ -352,7 +352,8 @@ empty. */
 /** @brief Return true if the size of the fdeq is 0. O(1).
 @param [in] fdeq a pointer to the fdeq.
 @return true if the size is 0 or fdeq is NULL or false. */
-[[nodiscard]] bool ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
+[[nodiscard]] ccc_tribool
+ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the size of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
@@ -379,7 +380,8 @@ the array may not point to valid data in terms of organization of the fdeq. */
 /** @brief Return true if the internal invariants of the fdeq.
 @param [in] fdeq a pointer to the fdeq.
 @return true if the internal invariants of the fdeq are held, else false. */
-[[nodiscard]] bool ccc_fdeq_validate(ccc_flat_double_ended_queue const *fdeq);
+[[nodiscard]] ccc_tribool
+ccc_fdeq_validate(ccc_flat_double_ended_queue const *fdeq);
 
 /**@}*/
 

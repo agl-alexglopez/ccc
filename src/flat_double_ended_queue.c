@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -159,10 +158,14 @@ ccc_fdeq_back(ccc_flat_double_ended_queue const *const fdeq)
     return ccc_buf_at(&fdeq->buf_, last_elem_index(fdeq));
 }
 
-bool
+ccc_tribool
 ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *const fdeq)
 {
-    return !fdeq || !ccc_buf_size(&fdeq->buf_);
+    if (!fdeq)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return !ccc_buf_size(&fdeq->buf_);
 }
 
 size_t
@@ -356,42 +359,46 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
     return ccc_buf_alloc(&fdeq->buf_, 0, fdeq->buf_.alloc_);
 }
 
-bool
+ccc_tribool
 ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
 {
+    if (!fdeq)
+    {
+        return CCC_BOOL_ERR;
+    }
     if (ccc_fdeq_is_empty(fdeq))
     {
-        return true;
+        return CCC_TRUE;
     }
     void *iter = ccc_fdeq_begin(fdeq);
     if (ccc_buf_i(&fdeq->buf_, iter) != (ptrdiff_t)fdeq->front_)
     {
-        return false;
+        return CCC_FALSE;
     }
     size_t size = 0;
     for (; iter != ccc_fdeq_end(fdeq); iter = ccc_fdeq_next(fdeq, iter), ++size)
     {
         if (size >= ccc_fdeq_size(fdeq))
         {
-            return false;
+            return CCC_FALSE;
         }
     }
     if (size != ccc_fdeq_size(fdeq))
     {
-        return false;
+        return CCC_FALSE;
     }
     size = 0;
     iter = ccc_fdeq_rbegin(fdeq);
     if (ccc_buf_i(&fdeq->buf_, iter) != (ptrdiff_t)last_elem_index(fdeq))
     {
-        return false;
+        return CCC_FALSE;
     }
     for (; iter != ccc_fdeq_rend(fdeq);
          iter = ccc_fdeq_rnext(fdeq, iter), ++size)
     {
         if (size >= ccc_fdeq_size(fdeq))
         {
-            return false;
+            return CCC_FALSE;
         }
     }
     return size == ccc_fdeq_size(fdeq);
@@ -416,7 +423,7 @@ ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *const fdeq)
 static inline void *
 alloc_front(struct ccc_fdeq_ *const fdeq)
 {
-    bool const full = maybe_resize(fdeq, 0) != CCC_OK;
+    ccc_tribool const full = maybe_resize(fdeq, 0) != CCC_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
@@ -434,7 +441,7 @@ alloc_front(struct ccc_fdeq_ *const fdeq)
 static inline void *
 alloc_back(struct ccc_fdeq_ *const fdeq)
 {
-    bool const full = maybe_resize(fdeq, 0) != CCC_OK;
+    ccc_tribool const full = maybe_resize(fdeq, 0) != CCC_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
@@ -457,7 +464,7 @@ static inline ccc_result
 push_back_range(struct ccc_fdeq_ *const fdeq, size_t const n, char const *elems)
 {
     size_t const elem_sz = ccc_buf_elem_size(&fdeq->buf_);
-    bool const full = maybe_resize(fdeq, n) != CCC_OK;
+    ccc_tribool const full = maybe_resize(fdeq, n) != CCC_OK;
     size_t const cap = ccc_buf_capacity(&fdeq->buf_);
     if (fdeq->buf_.alloc_ && full)
     {
@@ -498,7 +505,7 @@ push_front_range(struct ccc_fdeq_ *const fdeq, size_t const n,
                  char const *elems)
 {
     size_t const elem_sz = ccc_buf_elem_size(&fdeq->buf_);
-    bool const full = maybe_resize(fdeq, n) != CCC_OK;
+    ccc_tribool const full = maybe_resize(fdeq, n) != CCC_OK;
     size_t const cap = ccc_buf_capacity(&fdeq->buf_);
     if (fdeq->buf_.alloc_ && full)
     {
@@ -536,7 +543,7 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
            char const *elems)
 {
     size_t const elem_sz = ccc_buf_elem_size(&fdeq->buf_);
-    bool const full = maybe_resize(fdeq, n) != CCC_OK;
+    ccc_tribool const full = maybe_resize(fdeq, n) != CCC_OK;
     if (fdeq->buf_.alloc_ && full)
     {
         return NULL;
