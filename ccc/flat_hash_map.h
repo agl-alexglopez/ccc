@@ -180,7 +180,8 @@ Test membership or obtain references to stored user types directly. */
 /** @brief Searches the table for the presence of key.
 @param [in] h the flat hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
-@return true if the struct containing key is stored, false if not. */
+@return true if the struct containing key is stored, false if not. Error if h or
+key is NULL. */
 [[nodiscard]] ccc_tribool ccc_fhm_contains(ccc_flat_hash_map *h,
                                            void const *key);
 
@@ -515,12 +516,13 @@ was removed. If Vacant, no prior entry existed to be removed. */
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
-@return true if the entry is occupied, false if not. */
+@return true if the entry is occupied, false if not. Error if e is NULL. */
 [[nodiscard]] ccc_tribool ccc_fhm_occupied(ccc_fhmap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
-@return true if the next insertion of a new element will cause an error.
+@return true if the next insertion of a new element will cause an error. Error
+if e is null.
 
 Table resizing occurs upon calls to entry functions/macros or when trying
 to insert a new element directly. This is to provide stable entries from the
@@ -531,8 +533,7 @@ However, if a Vacant entry is returned and then a subsequent insertion function
 is used, it will not work if resizing has failed and the return of those
 functions will indicate such a failure. One can also confirm an insertion error
 will occur from an entry with this function. For example, leaving this function
-in an assert for debug builds can be a helpful sanity check if the heap should
-correctly resize by default and errors are not usually expected. */
+in an assert for debug builds can be a helpful sanity check. */
 [[nodiscard]] ccc_tribool ccc_fhm_insert_error(ccc_fhmap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
@@ -610,7 +611,7 @@ Obtain the container state. */
 
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
-@return true if empty else false. */
+@return true if empty else false. Error if h is NULL. */
 [[nodiscard]] ccc_tribool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
 
 /** @brief Returns the size of the table.
@@ -644,7 +645,8 @@ within the capacity of the backing buffer. */
 
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
-@return true if all invariants hold, false if corruption occurs. */
+@return true if all invariants hold, false if corruption occurs. Error if h is
+NULL. */
 [[nodiscard]] ccc_tribool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
 /**@}*/

@@ -16,7 +16,7 @@ fhmap_int_last_digit(ccc_user_key const n)
     return *((int *)n.user_key) % 10;
 }
 
-bool
+ccc_tribool
 fhmap_id_eq(ccc_key_cmp const cmp)
 {
     struct val const *const va = cmp.user_type_rhs;

@@ -284,7 +284,7 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
 static threeway_cmp cmp_pq_costs(cmp);
-static bool eq_parent_cells(key_cmp);
+static ccc_tribool eq_parent_cells(key_cmp);
 static uint64_t hash_parent_cells(user_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -1040,7 +1040,7 @@ build_path_outline(struct graph *graph)
 
 /*====================    Data Structure Helpers    =========================*/
 
-static bool
+static ccc_tribool
 eq_parent_cells(key_cmp const c)
 {
     struct path_backtrack_cell const *const pc = c.user_type_rhs;

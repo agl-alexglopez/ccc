@@ -202,7 +202,8 @@ stored in the map. */
 /** @brief Searches the map for the presence of key.
 @param [in] hom the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
-@return true if the struct containing key is stored, false if not. */
+@return true if the struct containing key is stored, false if not. Error if hom
+or key is NULL. */
 [[nodiscard]] ccc_tribool ccc_hom_contains(ccc_handle_ordered_map *hom,
                                            void const *key);
 
@@ -519,13 +520,14 @@ was removed. If Vacant, no prior handle existed to be removed. */
 
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] h the handle from a query to the map via function or macro.
-@return true if the handle is occupied, false if not. */
+@return true if the handle is occupied, false if not. Error if h is NULL. */
 [[nodiscard]] ccc_tribool ccc_hom_occupied(ccc_homap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
-due to an allocation failure when allocation success was expected. */
+due to an allocation failure when allocation success was expected. Error if h is
+NULL. */
 [[nodiscard]] ccc_tribool ccc_hom_insert_error(ccc_homap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
@@ -719,12 +721,13 @@ within the capacity of the backing buffer. */
 
 /** @brief Returns the size status of the map.
 @param [in] hom the map.
-@return true if empty else false. */
+@return true if empty else false. Error if hom is NULL. */
 [[nodiscard]] ccc_tribool ccc_hom_is_empty(ccc_handle_ordered_map const *hom);
 
 /** @brief Validation of invariants for the map.
 @param [in] hom the map to validate.
-@return true if all invariants hold, false if corruption occurs. */
+@return true if all invariants hold, false if corruption occurs. Error if home
+is NULL.  */
 [[nodiscard]] ccc_tribool ccc_hom_validate(ccc_handle_ordered_map const *hom);
 
 /**@}*/

@@ -70,7 +70,7 @@ static bool const quiet = true;
         }                                                                      \
     } while (0)
 
-static bool
+static ccc_tribool
 lru_lookup_cmp(ccc_key_cmp const cmp)
 {
     struct lru_lookup const *const lookup = cmp.user_type_rhs;

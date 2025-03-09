@@ -125,7 +125,7 @@ ccc_result ccc_pq_erase(ccc_priority_queue *pq, ccc_pq_elem *elem);
 @param [in] elem a pointer to the intrusive element in the user type.
 @param [in] fn the update function to act on the type wrapping elem.
 @param [in] aux any auxiliary data needed for the update function.
-@return true if the update occurred false if parameters were invalid or the
+@return true if the update occurred. Error if parameters were invalid or the
 function can deduce elem is not in the pq.
 @warning the user must ensure elem is in the pq.
 
@@ -142,7 +142,7 @@ ccc_tribool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem,
 on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
 track the user element's priority in the priority queue.
-@return true if the update occurred false if parameters were invalid or the
+@return true if the update occurred. Error if parameters were invalid or the
 function can deduce elem is not in the pq.
 @warning the user must ensure elem is in the pq and pq_elem_ptr points to the
 intrusive element in the same user type that is being updated.
@@ -170,7 +170,7 @@ operations. O(1) best case, O(lgN) worst case. */
 @param [in] elem a pointer to the intrusive element in the user type.
 @param [in] fn the update function to act on the type wrapping elem.
 @param [in] aux any auxiliary data needed for the update function.
-@return true if the increase occurred false if parameters were invalid or the
+@return true if the increase occurred. Error if parameters were invalid or the
 function can deduce elem is not in the pq.
 @warning the data structure will be in an invalid state if the user decreases
 the priority by mistake in this function.
@@ -191,7 +191,7 @@ ccc_tribool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
 execute on the user type which wraps pq_elem_ptr (optionally wrapping {code
 here} in braces may help with formatting). This closure may safely increase the
 key used to track the user element's priority in the priority queue.
-@return true if the increase occurred false if parameters were invalid or the
+@return true if the increase occurred. Error if parameters were invalid or the
 function can deduce elem is not in the pq.
 @warning the user must ensure elem is in the pq and pq_elem_ptr points to the
 intrusive element in the same user type that is being increased. The data
@@ -224,7 +224,7 @@ from the pq creates an amortized o(lgN) runtime for this function. */
 @param [in] elem a pointer to the intrusive element in the user type.
 @param [in] fn the update function to act on the type wrapping elem.
 @param [in] aux any auxiliary data needed for the update function.
-@return true if the decrease occurred false if parameters were invalid or the
+@return true if the decrease occurred. Error if parameters were invalid or the
 function can deduce elem is not in the pq.
 
 Note that this is optimal update technique if the priority queue has been
@@ -243,7 +243,7 @@ ccc_tribool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
 execute on the user type which wraps pq_elem_ptr (optionally wrapping {code
 here} in braces may help with formatting). This closure may safely decrease the
 key used to track the user element's priority in the priority queue.
-@return true if the decrease occurred false if parameters were invalid or the
+@return true if the decrease occurred. Error if parameters were invalid or the
 function can deduce elem is not in the pq.
 @warning the user must ensure elem is in the pq and pq_elem_ptr points to the
 intrusive element in the same user type that is being decreased. The data
@@ -304,7 +304,7 @@ Obtain state from the container. */
 
 /** @brief Returns true if the priority queue is empty false if not. O(1).
 @param [in] pq a pointer to the priority queue.
-@return true if the size is 0 or pq is NULL, false if not empty.  */
+@return true if the size is 0, false if not empty. Error if pq is NULL. */
 [[nodiscard]] ccc_tribool ccc_pq_is_empty(ccc_priority_queue const *pq);
 
 /** @brief Returns the size of the priority queue.
@@ -314,7 +314,7 @@ Obtain state from the container. */
 
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.
-@return true if the pq is valid false if pq is NULL or invalid. */
+@return true if the pq is valid false if pq is invalid. Error if pq is NULL. */
 [[nodiscard]] ccc_tribool ccc_pq_validate(ccc_priority_queue const *pq);
 
 /** @brief Return the order used to initialize the pq.

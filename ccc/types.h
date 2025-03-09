@@ -10,7 +10,6 @@ the allocation function interface. */
 #define CCC_TYPES_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
@@ -285,9 +284,11 @@ typedef void ccc_destructor_fn(ccc_user_type);
 
 /** @brief A callback function to determining equality between two stored keys.
 
-The function should return true if the key and key field in the user type are
-equivalent, else false. */
-typedef bool ccc_key_eq_fn(ccc_key_cmp);
+The function should return CCC_TRUE if the key and key field in the user type
+are equivalent, else CCC_FALSE.
+@note a callback need not return CCC_BOOL_ERR as the container code always
+provides data to the arguments of the function invariantly. */
+typedef ccc_tribool ccc_key_eq_fn(ccc_key_cmp);
 
 /** @brief A callback function for three-way comparing two stored keys.
 
@@ -310,23 +311,23 @@ The generic interface for associative container entries. */
 
 /** @brief Determine if an entry is Occupied in the container.
 @param [in] e the pointer to the entry obtained from a container.
-@return true if Occupied false if Vacant. */
-bool ccc_entry_occupied(ccc_entry const *e);
+@return true if Occupied false if Vacant. Error if e is NULL. */
+ccc_tribool ccc_entry_occupied(ccc_entry const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
 @param [in] e the pointer to the entry obtained from a container insert.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
-or allocation failed. */
-bool ccc_entry_insert_error(ccc_entry const *e);
+or allocation failed. Error if e is NULL. */
+ccc_tribool ccc_entry_insert_error(ccc_entry const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an entry.
 @param [in] e the pointer to the entry obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
-as a NULL pointer was provided to a function. */
-bool ccc_entry_input_error(ccc_entry const *e);
+as a NULL pointer was provided to a function. Error if e is NULL. */
+ccc_tribool ccc_entry_input_error(ccc_entry const *e);
 
 /** @brief Unwraps the provided entry providing a reference to the user type
 obtained from the operation that provides the entry.
@@ -342,23 +343,23 @@ void *ccc_entry_unwrap(ccc_entry const *e);
 
 /** @brief Determine if an handle is Occupied in the container.
 @param [in] e the pointer to the handle obtained from a container.
-@return true if Occupied false if Vacant. */
-bool ccc_handle_occupied(ccc_handle const *e);
+@return true if Occupied false if Vacant. Error if e is NULL. */
+ccc_tribool ccc_handle_occupied(ccc_handle const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
 @param [in] e the pointer to the handle obtained from a container insert.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
-or allocation failed. */
-bool ccc_handle_insert_error(ccc_handle const *e);
+or allocation failed. Error if e is NULL. */
+ccc_tribool ccc_handle_insert_error(ccc_handle const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an handle.
 @param [in] e the pointer to the handle obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
-as a NULL pointer was provided to a function. */
-bool ccc_handle_input_error(ccc_handle const *e);
+as a NULL pointer was provided to a function. Error if e is NULL. */
+ccc_tribool ccc_handle_input_error(ccc_handle const *e);
 
 /** @brief Unwraps the provided handle providing a reference to the user type
 obtained from the operation that provides the handle.

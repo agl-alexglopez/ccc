@@ -101,7 +101,8 @@ Test membership or obtain references to stored user types directly. */
 /** @brief Returns the membership of key in the multimap. Amortized O(lg N).
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
-@return true if the multimap contains at least one entry at key, else false. */
+@return true if the multimap contains at least one entry at key, else false.
+Error if mm or key is NULL. */
 [[nodiscard]] ccc_tribool ccc_omm_contains(ccc_ordered_multimap *mm,
                                            void const *key);
 
@@ -382,7 +383,8 @@ freed by the user. */
 
 /** @brief Indicates if an entry is Occupied or Vacant.
 @param [in] e a pointer to the multimap entry.
-@return true if the entry is Occupied, false if it is Vacant. */
+@return true if the entry is Occupied, false if it is Vacant. Error if e is
+NULL. */
 [[nodiscard]] ccc_tribool ccc_omm_occupied(ccc_ommap_entry const *e);
 
 /** @brief Unwraps the provided entry. An Occupied entry will point to the user
@@ -394,7 +396,7 @@ type stored in the map, a Vacant entry will be NULL.
 /** @brief Indicates if an insertion error occurs.
 @param [in] e a pointer to the multimap entry.
 @return true if an insertion error occured preventing completing of an Entry
-Interface series of operations.
+Interface series of operations. Error if e is NULL.
 
 Note that this will most commonly occur if the container is permitted to
 allocate but the allocation has failed. */
@@ -403,7 +405,8 @@ allocate but the allocation has failed. */
 /** @brief Indicates if a function used to generate the provided entry
 encountered bad arguments that prevented the operation of the function.
 @param [in] e a pointer to the multimap entry.
-@return true if bad function arguments were provided, otherwise false.
+@return true if bad function arguments were provided, otherwise false. Error if
+e is NULL.
 
 Note bad arguments usually mean NULL pointers were passed to functions expecting
 non-NULL arguments. */
@@ -500,9 +503,9 @@ user type that the user knows is currently in the map.
 @param [in] fn the function used to update an element key in the map.
 @param [in] aux any auxiliary data needed for the update. Usually a new value
 but NULL is possible if aux is not needed.
-@return true if the key update was successful, false if bad arguments are
-provided, it is possible to prove the key_val_handle is not tracked by the map,
-or the map is empty. */
+@return true if the key update was successful. Error is returned if bad
+arguments are provided or it can be deduced that key_val_handle is not a member
+of the container. */
 [[nodiscard]] ccc_tribool ccc_omm_update(ccc_ordered_multimap *mm,
                                          ccc_ommap_elem *key_val_handle,
                                          ccc_update_fn *fn, void *aux);
@@ -515,9 +518,9 @@ user type that the user knows is currently in the map.
 @param [in] fn the function used to increase an element key in the map.
 @param [in] aux any auxiliary data needed for the key increase. Usually a new
 value but NULL is possible if aux is not needed.
-@return true if the key increase was successful, false if bad arguments are
-provided, it is possible to prove the key_val_handle is not tracked by the map,
-or the map is empty. */
+@return true if the key increase was successful. Error is returned if bad
+arguments are provided or it can be deduced that key_val_handle is not a member
+of the container. */
 [[nodiscard]] ccc_tribool ccc_omm_increase(ccc_ordered_multimap *mm,
                                            ccc_ommap_elem *key_val_handle,
                                            ccc_update_fn *fn, void *aux);
@@ -530,9 +533,9 @@ user type that the user knows is currently in the map.
 @param [in] fn the function used to decrease an element key in the map.
 @param [in] aux any auxiliary data needed for the key decrease. Usually a new
 value but NULL is possible if aux is not needed.
-@return true if the key decrease was successful, false if bad arguments are
-provided, it is possible to prove the key_val_handle is not tracked by the map,
-or the map is empty. */
+@return true if the key decrease was successful. Error is returned if bad
+arguments are provided or it can be deduced that key_val_handle is not a member
+of the container. */
 [[nodiscard]] ccc_tribool ccc_omm_decrease(ccc_ordered_multimap *mm,
                                            ccc_ommap_elem *key_val_handle,
                                            ccc_update_fn *fn, void *aux);
@@ -711,7 +714,7 @@ Obtain the container state. */
 
 /** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
-@return true if empty, false if mm is NULL or mm is empty. */
+@return true if empty, false if mm is not empty. Error if mm is NULL. */
 [[nodiscard]] ccc_tribool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
 /** @brief Returns true if the multimap is empty. O(1).
@@ -721,7 +724,8 @@ Obtain the container state. */
 
 /** @brief Returns true if the multimap is empty.
 @param [in] mm a pointer to the multimap.
-@return true if invariants of the data structure are preserved, else false. */
+@return true if invariants of the data structure are preserved, else false.
+Error if mm is NULL. */
 [[nodiscard]] ccc_tribool ccc_omm_validate(ccc_ordered_multimap const *mm);
 
 /**@}*/

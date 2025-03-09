@@ -205,7 +205,8 @@ stored in the map. */
 /** @brief Searches the map for the presence of key.
 @param [in] hrm the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
-@return true if the struct containing key is stored, false if not. */
+@return true if the struct containing key is stored, false if not. Error if hrm
+or key is NULL. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_contains(ccc_handle_realtime_ordered_map const *hrm, void const *key);
 
@@ -544,13 +545,14 @@ insertions. */
 
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] h the handle from a query to the map via function or macro.
-@return true if the handle is occupied, false if not. */
+@return true if the handle is occupied, false if not. Error if h is NULL. */
 [[nodiscard]] ccc_tribool ccc_hrm_occupied(ccc_hromap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
-due to an allocation failure when allocation success was expected. */
+due to an allocation failure when allocation success was expected. Error if h is
+NULL. */
 [[nodiscard]] ccc_tribool ccc_hrm_insert_error(ccc_hromap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
@@ -720,7 +722,7 @@ Obtain the container state. */
 
 /** @brief Returns the size status of the map.
 @param [in] hrm the map.
-@return true if empty else false. */
+@return true if empty else false. Error if hrm is NULL. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *hrm);
 
@@ -746,7 +748,8 @@ within the capacity of the backing buffer. */
 
 /** @brief Validation of invariants for the map.
 @param [in] hrm the map to validate.
-@return true if all invariants hold, false if corruption occurs. */
+@return true if all invariants hold, false if corruption occurs. Error if hrm is
+NULL. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_validate(ccc_handle_realtime_ordered_map const *hrm);
 

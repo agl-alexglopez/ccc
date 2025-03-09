@@ -19,22 +19,34 @@ static char const *const result_msgs[CCC_RESULTS_SIZE] = {
 
 /*============================   Interface    ===============================*/
 
-bool
+ccc_tribool
 ccc_entry_occupied(ccc_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_OCCUPIED : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.stats_ & CCC_OCCUPIED) != 0;
 }
 
-bool
+ccc_tribool
 ccc_entry_insert_error(ccc_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_INSERT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_entry_input_error(ccc_entry const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_INPUT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.stats_ & CCC_INPUT_ERROR) != 0;
 }
 
 void *
@@ -47,22 +59,34 @@ ccc_entry_unwrap(ccc_entry const *const e)
     return e->impl_.stats_ & CCC_NO_UNWRAP ? NULL : e->impl_.e_;
 }
 
-bool
+ccc_tribool
 ccc_handle_occupied(ccc_handle const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_OCCUPIED : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.stats_ & CCC_OCCUPIED) != 0;
 }
 
-bool
+ccc_tribool
 ccc_handle_insert_error(ccc_handle const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_INSERT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_handle_input_error(ccc_handle const *const e)
 {
-    return e ? e->impl_.stats_ & CCC_INPUT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.stats_ & CCC_INPUT_ERROR) != 0;
 }
 
 ccc_handle_i
