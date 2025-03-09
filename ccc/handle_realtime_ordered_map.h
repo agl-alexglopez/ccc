@@ -32,7 +32,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_HANDLE_REALTIME_ORDERED_MAP_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -207,8 +206,8 @@ stored in the map. */
 @param [in] hrm the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-[[nodiscard]] bool ccc_hrm_contains(ccc_handle_realtime_ordered_map const *hrm,
-                                    void const *key);
+[[nodiscard]] ccc_tribool
+ccc_hrm_contains(ccc_handle_realtime_ordered_map const *hrm, void const *key);
 
 /** @brief Returns a reference into the map at handle key.
 @param [in] hrm the ordered map to search.
@@ -546,13 +545,13 @@ insertions. */
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] h the handle from a query to the map via function or macro.
 @return true if the handle is occupied, false if not. */
-[[nodiscard]] bool ccc_hrm_occupied(ccc_hromap_handle const *h);
+[[nodiscard]] ccc_tribool ccc_hrm_occupied(ccc_hromap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
-[[nodiscard]] bool ccc_hrm_insert_error(ccc_hromap_handle const *h);
+[[nodiscard]] ccc_tribool ccc_hrm_insert_error(ccc_hromap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
 @param [in] h a pointer to the handle.
@@ -722,7 +721,8 @@ Obtain the container state. */
 /** @brief Returns the size status of the map.
 @param [in] hrm the map.
 @return true if empty else false. */
-[[nodiscard]] bool ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *hrm);
+[[nodiscard]] ccc_tribool
+ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Returns the size of the map
 @param [in] hrm the map.
@@ -747,7 +747,8 @@ within the capacity of the backing buffer. */
 /** @brief Validation of invariants for the map.
 @param [in] hrm the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
-[[nodiscard]] bool ccc_hrm_validate(ccc_handle_realtime_ordered_map const *hrm);
+[[nodiscard]] ccc_tribool
+ccc_hrm_validate(ccc_handle_realtime_ordered_map const *hrm);
 
 /**@}*/
 

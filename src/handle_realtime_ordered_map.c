@@ -30,7 +30,6 @@ Overall a WAVL tree is quite impressive for it's simplicity and purported
 improvements over AVL and Red-Black trees. The rank framework is intuitive
 and flexible in how it can be implemented. */
 #include <assert.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -120,21 +119,21 @@ static size_t *branch_r(struct ccc_hromap_ const *t, size_t node,
                         enum hrm_branch_ branch);
 static size_t *parent_r(struct ccc_hromap_ const *t, size_t node);
 /* Returning WAVL tree status. */
-static bool is_0_child(struct ccc_hromap_ const *, size_t p, size_t x);
-static bool is_1_child(struct ccc_hromap_ const *, size_t p, size_t x);
-static bool is_2_child(struct ccc_hromap_ const *, size_t p, size_t x);
-static bool is_3_child(struct ccc_hromap_ const *, size_t p, size_t x);
-static bool is_01_parent(struct ccc_hromap_ const *, size_t x, size_t p,
-                         size_t y);
-static bool is_11_parent(struct ccc_hromap_ const *, size_t x, size_t p,
-                         size_t y);
-static bool is_02_parent(struct ccc_hromap_ const *, size_t x, size_t p,
-                         size_t y);
-static bool is_22_parent(struct ccc_hromap_ const *, size_t x, size_t p,
-                         size_t y);
-static bool is_leaf(struct ccc_hromap_ const *t, size_t x);
+static ccc_tribool is_0_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_1_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_2_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_3_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_01_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_11_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_02_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_22_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_leaf(struct ccc_hromap_ const *t, size_t x);
 static uint8_t parity(struct ccc_hromap_ const *t, size_t node);
-static bool validate(struct ccc_hromap_ const *hrm);
+static ccc_tribool validate(struct ccc_hromap_ const *hrm);
 /* Returning void and maintaining the WAVL tree. */
 static void init_node(struct ccc_hromap_elem_ *e);
 static void insert_fixup(struct ccc_hromap_ *t, size_t z, size_t x);
@@ -166,13 +165,13 @@ ccc_hrm_at(ccc_handle_realtime_ordered_map const *const h, ccc_handle_i const i)
     return ccc_buf_at(&h->buf_, i);
 }
 
-bool
+ccc_tribool
 ccc_hrm_contains(ccc_handle_realtime_ordered_map const *const hrm,
                  void const *const key)
 {
     if (!hrm || !key)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     return CCC_EQL == find(hrm, key).last_cmp_;
 }
@@ -409,16 +408,24 @@ ccc_hrm_unwrap(ccc_hromap_handle const *const h)
     return 0;
 }
 
-bool
+ccc_tribool
 ccc_hrm_insert_error(ccc_hromap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ & CCC_INSERT_ERROR : false;
+    if (!h)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (h->impl_.handle_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_hrm_occupied(ccc_hromap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ & CCC_OCCUPIED : false;
+    if (!h)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (h->impl_.handle_.stats_ & CCC_OCCUPIED) != 0;
 }
 
 ccc_handle_status
@@ -427,9 +434,13 @@ ccc_hrm_handle_status(ccc_hromap_handle const *const h)
     return h ? h->impl_.handle_.stats_ : CCC_INPUT_ERROR;
 }
 
-bool
+ccc_tribool
 ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *const hrm)
 {
+    if (!hrm)
+    {
+        return CCC_BOOL_ERR;
+    }
     return !ccc_hrm_size(hrm);
 }
 
@@ -611,10 +622,14 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
     return ccc_buf_alloc(&hrm->buf_, 0, hrm->buf_.alloc_);
 }
 
-bool
+ccc_tribool
 ccc_hrm_validate(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    return hrm ? validate(hrm) : false;
+    if (!hrm)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return validate(hrm);
 }
 
 /*========================  Private Interface  ==============================*/
@@ -689,7 +704,8 @@ insert(struct ccc_hromap_ *const hrm, size_t const parent_i,
     }
     assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
     struct ccc_hromap_elem_ *parent = at(hrm, parent_i);
-    bool const rank_rule_break = !parent->branch_[L] && !parent->branch_[R];
+    ccc_tribool const rank_rule_break
+        = !parent->branch_[L] && !parent->branch_[R];
     parent->branch_[CCC_GRT == last_cmp] = elem_i;
     elem->parent_ = parent_i;
     if (rank_rule_break)
@@ -993,7 +1009,7 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
     size_t y = 0;
     size_t x = 0;
     size_t p = 0;
-    bool two_child = false;
+    ccc_tribool two_child = CCC_FALSE;
     if (!branch_i(t, remove, R) || !branch_i(t, remove, L))
     {
         y = remove;
@@ -1036,7 +1052,8 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
         else if (!x && branch_i(t, p, L) == branch_i(t, p, R))
         {
             assert(p);
-            bool const demote_makes_3_child = is_2_child(t, parent_i(t, p), p);
+            ccc_tribool const demote_makes_3_child
+                = is_2_child(t, parent_i(t, p), p);
             demote(t, p);
             if (demote_makes_3_child)
             {
@@ -1082,7 +1099,7 @@ static inline void
 rebalance_3_child(struct ccc_hromap_ *const t, size_t z, size_t x)
 {
     assert(z);
-    bool made_3_child = false;
+    ccc_tribool made_3_child = CCC_FALSE;
     do
     {
         size_t const g = parent_i(t, z);
@@ -1225,7 +1242,7 @@ double_rotate(struct ccc_hromap_ *const t, size_t const z, size_t const x,
          p
       0╭─╯
        x */
-[[maybe_unused]] static inline bool
+[[maybe_unused]] static inline ccc_tribool
 is_0_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) == parity(t, x);
@@ -1235,7 +1252,7 @@ is_0_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
          p
       1╭─╯
        x */
-static inline bool
+static inline ccc_tribool
 is_1_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) != parity(t, x);
@@ -1245,7 +1262,7 @@ is_1_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
          p
       2╭─╯
        x */
-static inline bool
+static inline ccc_tribool
 is_2_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) == parity(t, x);
@@ -1255,7 +1272,7 @@ is_2_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
          p
       3╭─╯
        x */
-[[maybe_unused]] static inline bool
+[[maybe_unused]] static inline ccc_tribool
 is_3_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) != parity(t, x);
@@ -1266,7 +1283,7 @@ is_3_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
          p
       0╭─┴─╮1
        x   y */
-static inline bool
+static inline ccc_tribool
 is_01_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
              size_t const y)
 {
@@ -1280,7 +1297,7 @@ is_01_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
          p
       1╭─┴─╮1
        x   y */
-static inline bool
+static inline ccc_tribool
 is_11_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
              size_t const y)
 {
@@ -1294,7 +1311,7 @@ is_11_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
          p
       0╭─┴─╮2
        x   y */
-static inline bool
+static inline ccc_tribool
 is_02_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
              size_t const y)
 {
@@ -1310,7 +1327,7 @@ is_02_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
          p
       2╭─┴─╮2
        x   y */
-static inline bool
+static inline ccc_tribool
 is_22_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
              size_t const y)
 {
@@ -1345,7 +1362,7 @@ static inline void
 double_demote(struct ccc_hromap_ const *const, size_t const)
 {}
 
-static inline bool
+static inline ccc_tribool
 is_leaf(struct ccc_hromap_ const *const t, size_t const x)
 {
     return !branch_i(t, x, L) && !branch_i(t, x, R);
@@ -1389,20 +1406,20 @@ recursive_size(struct ccc_hromap_ const *const t, size_t const r)
            + recursive_size(t, branch_i(t, r, L));
 }
 
-static bool
+static ccc_tribool
 are_subtrees_valid(struct ccc_hromap_ const *t, struct tree_range_ const r)
 {
     if (!r.root)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (r.low && cmp_elems(t, key_at(t, r.low), r.root, t->cmp_) != CCC_LES)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (r.high && cmp_elems(t, key_at(t, r.high), r.root, t->cmp_) != CCC_GRT)
     {
-        return false;
+        return CCC_FALSE;
     }
     return are_subtrees_valid(
                t, (struct tree_range_){.low = r.low,
@@ -1414,28 +1431,28 @@ are_subtrees_valid(struct ccc_hromap_ const *t, struct tree_range_ const r)
                                        .high = r.high});
 }
 
-static bool
+static ccc_tribool
 is_storing_parent(struct ccc_hromap_ const *const t, size_t const p,
                   size_t const root)
 {
     if (!root)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (parent_i(t, root) != p)
     {
-        return false;
+        return CCC_FALSE;
     }
     return is_storing_parent(t, root, branch_i(t, root, L))
            && is_storing_parent(t, root, branch_i(t, root, R));
 }
 
-static inline bool
+static inline ccc_tribool
 is_free_list_valid(struct ccc_hromap_ const *const t)
 {
     if (!ccc_buf_size(&t->buf_))
     {
-        return true;
+        return CCC_TRUE;
     }
     size_t list_check1 = 0;
     for (size_t i = 0; i < ccc_buf_capacity(&t->buf_); ++i)
@@ -1447,7 +1464,7 @@ is_free_list_valid(struct ccc_hromap_ const *const t)
     }
     if (list_check1 + ccc_buf_size(&t->buf_) != ccc_buf_capacity(&t->buf_))
     {
-        return false;
+        return CCC_FALSE;
     }
     size_t list_check2 = 0;
     for (size_t cur = t->free_list_;
@@ -1457,31 +1474,31 @@ is_free_list_valid(struct ccc_hromap_ const *const t)
     return list_check2 == list_check1;
 }
 
-static bool
+static ccc_tribool
 validate(struct ccc_hromap_ const *const hrm)
 {
     if (!ccc_buf_is_empty(&hrm->buf_) && !at(hrm, 0)->parity_)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!are_subtrees_valid(hrm, (struct tree_range_){.root = hrm->root_}))
     {
-        return false;
+        return CCC_FALSE;
     }
     size_t const size = recursive_size(hrm, hrm->root_);
     if (size && size != ccc_buf_size(&hrm->buf_) - 1)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!is_storing_parent(hrm, 0, hrm->root_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!is_free_list_valid(hrm))
     {
-        return false;
+        return CCC_FALSE;
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /* NOLINTEND(*misc-no-recursion) */
