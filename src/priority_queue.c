@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -13,9 +12,9 @@ static struct ccc_pq_elem_ *merge(struct ccc_pq_ *, struct ccc_pq_elem_ *old,
 static void link_child(struct ccc_pq_elem_ *parent, struct ccc_pq_elem_ *child);
 static void init_node(struct ccc_pq_elem_ *);
 static size_t traversal_size(struct ccc_pq_elem_ const *);
-static bool has_valid_links(struct ccc_pq_ const *,
-                            struct ccc_pq_elem_ const *parent,
-                            struct ccc_pq_elem_ const *child);
+static ccc_tribool has_valid_links(struct ccc_pq_ const *,
+                                   struct ccc_pq_elem_ const *parent,
+                                   struct ccc_pq_elem_ const *child);
 static struct ccc_pq_elem_ *delete_node(struct ccc_pq_ *,
                                         struct ccc_pq_elem_ *);
 static struct ccc_pq_elem_ *delete_min(struct ccc_pq_ *, struct ccc_pq_elem_ *);
@@ -132,10 +131,14 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
     return CCC_OK;
 }
 
-bool
+ccc_tribool
 ccc_pq_is_empty(ccc_priority_queue const *const pq)
 {
-    return pq ? !pq->sz_ : true;
+    if (!pq)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return !pq->sz_;
 }
 
 size_t
@@ -150,65 +153,65 @@ ccc_pq_size(ccc_priority_queue const *const pq)
    to check if the value has exceeded the value of the first left child as
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
-bool
+ccc_tribool
 ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
               ccc_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
     update_fixup(pq, e);
-    return true;
+    return CCC_TRUE;
 }
 
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
-bool
+ccc_tribool
 ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
                 ccc_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
     increase_fixup(pq, e);
-    return true;
+    return CCC_TRUE;
 }
 
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
-bool
+ccc_tribool
 ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
                 ccc_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
     decrease_fixup(pq, e);
-    return true;
+    return CCC_TRUE;
 }
 
-bool
+ccc_tribool
 ccc_pq_validate(ccc_priority_queue const *const pq)
 {
     if (!pq || (pq->root_ && pq->root_->parent_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!has_valid_links(pq, NULL, pq->root_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (traversal_size(pq->root_) != pq->sz_)
     {
-        return false;
+        return CCC_FALSE;
     }
-    return true;
+    return CCC_TRUE;
 }
 
 ccc_threeway_cmp
@@ -443,14 +446,14 @@ traversal_size(struct ccc_pq_elem_ const *const root)
     return sz;
 }
 
-static bool
+static ccc_tribool
 has_valid_links(struct ccc_pq_ const *const pq,
                 struct ccc_pq_elem_ const *const parent,
                 struct ccc_pq_elem_ const *const child)
 {
     if (!child)
     {
-        return true;
+        return CCC_TRUE;
     }
     struct ccc_pq_elem_ const *cur = child;
     ccc_threeway_cmp const wrong_order
@@ -461,31 +464,31 @@ has_valid_links(struct ccc_pq_ const *const pq,
            makes it easier to find the problem when stepping through gdb. */
         if (!cur)
         {
-            return false;
+            return CCC_FALSE;
         }
         if (parent && child->parent_ != parent)
         {
-            return false;
+            return CCC_FALSE;
         }
         if (parent && parent->left_child_ != child->parent_->left_child_)
         {
-            return false;
+            return CCC_FALSE;
         }
         if (child->next_sibling_->prev_sibling_ != child
             || child->prev_sibling_->next_sibling_ != child)
         {
-            return false;
+            return CCC_FALSE;
         }
         if (parent && (cmp(pq, parent, cur) == wrong_order))
         {
-            return false;
+            return CCC_FALSE;
         }
         if (!has_valid_links(pq, cur, cur->left_child_)) /* ! RECURSE ! */
         {
-            return false;
+            return CCC_FALSE;
         }
     } while ((cur = cur->next_sibling_) != child);
-    return true;
+    return CCC_TRUE;
 }
 
 /* NOLINTEND(*misc-no-recursion) */

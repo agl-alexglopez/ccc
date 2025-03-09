@@ -19,7 +19,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_PRIORITY_QUEUE_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -133,8 +132,8 @@ function can deduce elem is not in the pq.
 Note that this operation may incur unnecessary overhead if the user can't
 deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
-bool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem, ccc_update_fn *fn,
-                   void *aux);
+ccc_tribool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem,
+                          ccc_update_fn *fn, void *aux);
 
 /** @brief Update the priority in the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -182,8 +181,8 @@ value. If this is a max heap O(1), otherwise O(lgN).
 
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
-bool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
-                     ccc_update_fn *fn, void *aux);
+ccc_tribool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
+                            ccc_update_fn *fn, void *aux);
 
 /** @brief Increases the priority of the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -234,8 +233,8 @@ value. If this is a min heap O(1), otherwise O(lgN).
 
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
-bool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
-                     ccc_update_fn *fn, void *aux);
+ccc_tribool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
+                            ccc_update_fn *fn, void *aux);
 
 /** @brief Decreases the priority of the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -306,7 +305,7 @@ Obtain state from the container. */
 /** @brief Returns true if the priority queue is empty false if not. O(1).
 @param [in] pq a pointer to the priority queue.
 @return true if the size is 0 or pq is NULL, false if not empty.  */
-[[nodiscard]] bool ccc_pq_is_empty(ccc_priority_queue const *pq);
+[[nodiscard]] ccc_tribool ccc_pq_is_empty(ccc_priority_queue const *pq);
 
 /** @brief Returns the size of the priority queue.
 @param [in] pq a pointer to the priority queue.
@@ -316,7 +315,7 @@ Obtain state from the container. */
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.
 @return true if the pq is valid false if pq is NULL or invalid. */
-[[nodiscard]] bool ccc_pq_validate(ccc_priority_queue const *pq);
+[[nodiscard]] ccc_tribool ccc_pq_validate(ccc_priority_queue const *pq);
 
 /** @brief Return the order used to initialize the pq.
 @param [in] pq a pointer to the priority queue.
