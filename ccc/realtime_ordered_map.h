@@ -85,8 +85,8 @@ Test membership or obtain references to stored user types directly. */
 @param [in] rom the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-[[nodiscard]] bool ccc_rom_contains(ccc_realtime_ordered_map const *rom,
-                                    void const *key);
+[[nodiscard]] ccc_tribool ccc_rom_contains(ccc_realtime_ordered_map const *rom,
+                                           void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] rom the ordered map to search.
@@ -431,13 +431,13 @@ free or use as needed. */
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. */
-[[nodiscard]] bool ccc_rom_insert_error(ccc_romap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_rom_insert_error(ccc_romap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
-[[nodiscard]] bool ccc_rom_occupied(ccc_romap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_rom_occupied(ccc_romap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -608,12 +608,12 @@ Obtain the container state. */
 /** @brief Returns the size status of the map.
 @param [in] rom the map.
 @return true if empty else false. */
-[[nodiscard]] bool ccc_rom_is_empty(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] ccc_tribool ccc_rom_is_empty(ccc_realtime_ordered_map const *rom);
 
 /** @brief Validation of invariants for the map.
 @param [in] rom the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
-[[nodiscard]] bool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] ccc_tribool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 
 /**@}*/
 
