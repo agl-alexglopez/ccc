@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -375,10 +374,10 @@ ccc_dll_size(ccc_doubly_linked_list const *const l)
     return l ? l->sz_ : 0;
 }
 
-bool
+ccc_tribool
 ccc_dll_is_empty(ccc_doubly_linked_list const *const l)
 {
-    return l ? !l->sz_ : true;
+    return l ? !l->sz_ : CCC_TRUE;
 }
 
 ccc_result
@@ -403,12 +402,12 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
     return CCC_OK;
 }
 
-bool
+ccc_tribool
 ccc_dll_validate(ccc_doubly_linked_list const *const l)
 {
     if (!l)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     size_t size = 0;
     for (struct ccc_dll_elem_ const *e = l->sentinel_.n_; e != &l->sentinel_;
@@ -416,11 +415,11 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     {
         if (size >= l->sz_)
         {
-            return false;
+            return CCC_FALSE;
         }
         if (!e || !e->n_ || !e->p_ || e->n_ == e || e->p_ == e)
         {
-            return false;
+            return CCC_FALSE;
         }
     }
     return size == l->sz_;

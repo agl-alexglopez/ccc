@@ -342,12 +342,12 @@ ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
 /** @brief Return if the size of the list is equal to 0. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return true if the size is 0 or l is NULL, else false. */
-[[nodiscard]] bool ccc_dll_is_empty(ccc_doubly_linked_list const *l);
+[[nodiscard]] ccc_tribool ccc_dll_is_empty(ccc_doubly_linked_list const *l);
 
 /** @brief Validates internal state of the list.
 @param [in] l a pointer to the doubly linked list.
 @return true if invariants hold, false if not. */
-[[nodiscard]] bool ccc_dll_validate(ccc_doubly_linked_list const *l);
+[[nodiscard]] ccc_tribool ccc_dll_validate(ccc_doubly_linked_list const *l);
 
 /**@}*/
 
