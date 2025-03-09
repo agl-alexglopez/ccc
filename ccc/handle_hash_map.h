@@ -46,7 +46,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_HANDLE_HASH_MAP_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -227,7 +226,8 @@ stored in the map. */
 @param [in] h the handle hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-[[nodiscard]] bool ccc_hhm_contains(ccc_handle_hash_map *h, void const *key);
+[[nodiscard]] ccc_tribool ccc_hhm_contains(ccc_handle_hash_map *h,
+                                           void const *key);
 
 /** @brief Returns a handle to the element stored at key if present.
 @param [in] h the handle hash map to search.
@@ -570,7 +570,7 @@ If the old table element is needed see the remove method. */
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] e the handle from a query to the table via function or macro.
 @return true if the handle is occupied, false if not. */
-[[nodiscard]] bool ccc_hhm_occupied(ccc_hhmap_handle const *e);
+[[nodiscard]] ccc_tribool ccc_hhm_occupied(ccc_hhmap_handle const *e);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] e the handle from a query to the table via function or macro.
@@ -587,7 +587,7 @@ functions will indicate such a failure. One can also confirm an insertion error
 will occur from a handle with this function. For example, leaving this function
 in an assert for debug builds can be a helpful sanity check if the heap should
 correctly resize by default and errors are not usually expected. */
-[[nodiscard]] bool ccc_hhm_insert_error(ccc_hhmap_handle const *e);
+[[nodiscard]] ccc_tribool ccc_hhm_insert_error(ccc_hhmap_handle const *e);
 
 /** @brief Obtain the handle status from a container handle.
 @param [in] e a pointer to the handle.
@@ -658,7 +658,7 @@ iteration should stop, false if the iterator is valid and iteration should
 continue.
 @warning if iter has reached the end unwrapping it will result in 0 or invalid
 handles and NULL references. */
-[[nodiscard]] bool ccc_hhm_end(ccc_hhmap_handle const *iter);
+[[nodiscard]] ccc_tribool ccc_hhm_end(ccc_hhmap_handle const *iter);
 
 /**@}*/
 
@@ -669,7 +669,7 @@ Obtain the container state. */
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. */
-[[nodiscard]] bool ccc_hhm_is_empty(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_tribool ccc_hhm_is_empty(ccc_handle_hash_map const *h);
 
 /** @brief Returns the size of the table.
 @param [in] h the hash table.
@@ -703,7 +703,7 @@ within the capacity of the backing buffer. */
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
-[[nodiscard]] bool ccc_hhm_validate(ccc_handle_hash_map const *h);
+[[nodiscard]] ccc_tribool ccc_hhm_validate(ccc_handle_hash_map const *h);
 
 /**@}*/
 
