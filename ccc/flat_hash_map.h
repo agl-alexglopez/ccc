@@ -181,7 +181,8 @@ Test membership or obtain references to stored user types directly. */
 @param [in] h the flat hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-[[nodiscard]] bool ccc_fhm_contains(ccc_flat_hash_map *h, void const *key);
+[[nodiscard]] ccc_tribool ccc_fhm_contains(ccc_flat_hash_map *h,
+                                           void const *key);
 
 /** @brief Returns a reference into the table at entry key.
 @param [in] h the flat hash map to search.
@@ -515,7 +516,7 @@ was removed. If Vacant, no prior entry existed to be removed. */
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if the entry is occupied, false if not. */
-[[nodiscard]] bool ccc_fhm_occupied(ccc_fhmap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_fhm_occupied(ccc_fhmap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
@@ -532,7 +533,7 @@ functions will indicate such a failure. One can also confirm an insertion error
 will occur from an entry with this function. For example, leaving this function
 in an assert for debug builds can be a helpful sanity check if the heap should
 correctly resize by default and errors are not usually expected. */
-[[nodiscard]] bool ccc_fhm_insert_error(ccc_fhmap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_fhm_insert_error(ccc_fhmap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -610,7 +611,7 @@ Obtain the container state. */
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. */
-[[nodiscard]] bool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
+[[nodiscard]] ccc_tribool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
 
 /** @brief Returns the size of the table.
 @param [in] h the hash table.
@@ -644,7 +645,7 @@ within the capacity of the backing buffer. */
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. */
-[[nodiscard]] bool ccc_fhm_validate(ccc_flat_hash_map const *h);
+[[nodiscard]] ccc_tribool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
 /**@}*/
 
