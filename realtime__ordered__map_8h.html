@@ -195,12 +195,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a6737f9b1c9980fb717d69be0d84b2aba"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a6737f9b1c9980fb717d69be0d84b2aba">ccc_rom_unwrap</a> (<a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *e)</td></tr>
 <tr class="memdesc:a6737f9b1c9980fb717d69be0d84b2aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided entry to obtain a view into the map element.  <br /></td></tr>
 <tr class="separator:a6737f9b1c9980fb717d69be0d84b2aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09ca91dcbcf642c5e2b78c252a702880"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a09ca91dcbcf642c5e2b78c252a702880">ccc_rom_insert_error</a> (<a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *e)</td></tr>
-<tr class="memdesc:a09ca91dcbcf642c5e2b78c252a702880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Vacant or Occupied status of the entry.  <br /></td></tr>
-<tr class="separator:a09ca91dcbcf642c5e2b78c252a702880"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99f950abda9eb85984991d7ca3150e08"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a99f950abda9eb85984991d7ca3150e08">ccc_rom_occupied</a> (<a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *e)</td></tr>
-<tr class="memdesc:a99f950abda9eb85984991d7ca3150e08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the status of the entry should an insertion follow.  <br /></td></tr>
-<tr class="separator:a99f950abda9eb85984991d7ca3150e08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acab5706434949721dec7ec29c6a3259b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#acab5706434949721dec7ec29c6a3259b">ccc_rom_insert_error</a> (<a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *e)</td></tr>
+<tr class="memdesc:acab5706434949721dec7ec29c6a3259b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Vacant or Occupied status of the entry.  <br /></td></tr>
+<tr class="separator:acab5706434949721dec7ec29c6a3259b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae663861fbf8ce188e3351ea242454b83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#ae663861fbf8ce188e3351ea242454b83">ccc_rom_occupied</a> (<a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *e)</td></tr>
+<tr class="memdesc:ae663861fbf8ce188e3351ea242454b83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the status of the entry should an insertion follow.  <br /></td></tr>
+<tr class="separator:ae663861fbf8ce188e3351ea242454b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcad91b2ffccc366d506ab88d70a9713"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#adcad91b2ffccc366d506ab88d70a9713">ccc_rom_entry_status</a> (<a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *e)</td></tr>
 <tr class="memdesc:adcad91b2ffccc366d506ab88d70a9713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the entry status from a container entry.  <br /></td></tr>
 <tr class="separator:adcad91b2ffccc366d506ab88d70a9713"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -255,9 +255,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
 </td></tr>
-<tr class="memitem:ae404d3b06ae63a4f6e94ac43f82a0dff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#ae404d3b06ae63a4f6e94ac43f82a0dff">ccc_rom_contains</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom, void const *key)</td></tr>
-<tr class="memdesc:ae404d3b06ae63a4f6e94ac43f82a0dff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the map for the presence of key.  <br /></td></tr>
-<tr class="separator:ae404d3b06ae63a4f6e94ac43f82a0dff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61469b8efd88c9f0e4b90eb0712cf468"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a61469b8efd88c9f0e4b90eb0712cf468">ccc_rom_contains</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom, void const *key)</td></tr>
+<tr class="memdesc:a61469b8efd88c9f0e4b90eb0712cf468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the map for the presence of key.  <br /></td></tr>
+<tr class="separator:a61469b8efd88c9f0e4b90eb0712cf468"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac7dd87eacfd4c71677ee7510c6f61bb"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#aac7dd87eacfd4c71677ee7510c6f61bb">ccc_rom_get_key_val</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom, void const *key)</td></tr>
 <tr class="memdesc:aac7dd87eacfd4c71677ee7510c6f61bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the map at entry key.  <br /></td></tr>
 <tr class="separator:aac7dd87eacfd4c71677ee7510c6f61bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -275,12 +275,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a9f48f729d955f8c205673ef3146a2b19"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a9f48f729d955f8c205673ef3146a2b19">ccc_rom_size</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
 <tr class="memdesc:a9f48f729d955f8c205673ef3146a2b19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
 <tr class="separator:a9f48f729d955f8c205673ef3146a2b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a327a05131bf936d395d867a0ad5d73d7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a327a05131bf936d395d867a0ad5d73d7">ccc_rom_is_empty</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
-<tr class="memdesc:a327a05131bf936d395d867a0ad5d73d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
-<tr class="separator:a327a05131bf936d395d867a0ad5d73d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefb2cb8f72aa33260f0aef01e64fa399"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#aefb2cb8f72aa33260f0aef01e64fa399">ccc_rom_validate</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
-<tr class="memdesc:aefb2cb8f72aa33260f0aef01e64fa399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
-<tr class="separator:aefb2cb8f72aa33260f0aef01e64fa399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76ecd3f9123633f58c0cc7d00226b710"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a76ecd3f9123633f58c0cc7d00226b710">ccc_rom_is_empty</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
+<tr class="memdesc:a76ecd3f9123633f58c0cc7d00226b710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
+<tr class="separator:a76ecd3f9123633f58c0cc7d00226b710"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60d82ff1341f98f8ccfb53138b25abf6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a60d82ff1341f98f8ccfb53138b25abf6">ccc_rom_validate</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
+<tr class="memdesc:a60d82ff1341f98f8ccfb53138b25abf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
+<tr class="separator:a60d82ff1341f98f8ccfb53138b25abf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Realtime Ordered Map Interface. </p>
@@ -426,7 +426,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">                            (begin_and_end_key_ptrs))                          \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:30</div></div>
+<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired range. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -471,7 +471,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">                             (rbegin_and_rend_key_ptrs))                       \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:38</div></div>
+<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:37</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired rrange. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1116,14 +1116,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ae404d3b06ae63a4f6e94ac43f82a0dff" name="ae404d3b06ae63a4f6e94ac43f82a0dff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae404d3b06ae63a4f6e94ac43f82a0dff">&#9670;&#160;</a></span>ccc_rom_contains()</h2>
+<a id="a61469b8efd88c9f0e4b90eb0712cf468" name="a61469b8efd88c9f0e4b90eb0712cf468"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61469b8efd88c9f0e4b90eb0712cf468">&#9670;&#160;</a></span>ccc_rom_contains()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_rom_contains </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_rom_contains </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *&#160;</td>
           <td class="paramname"><em>rom</em>, </td>
@@ -1150,7 +1150,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the struct containing key is stored, false if not. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the struct containing key is stored, false if not. Error if rom or key is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1423,14 +1423,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a09ca91dcbcf642c5e2b78c252a702880" name="a09ca91dcbcf642c5e2b78c252a702880"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09ca91dcbcf642c5e2b78c252a702880">&#9670;&#160;</a></span>ccc_rom_insert_error()</h2>
+<a id="acab5706434949721dec7ec29c6a3259b" name="acab5706434949721dec7ec29c6a3259b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acab5706434949721dec7ec29c6a3259b">&#9670;&#160;</a></span>ccc_rom_insert_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_rom_insert_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_rom_insert_error </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -1446,7 +1446,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the entry is occupied, false if not. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the entry is occupied, false if not. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1489,14 +1489,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a327a05131bf936d395d867a0ad5d73d7" name="a327a05131bf936d395d867a0ad5d73d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a327a05131bf936d395d867a0ad5d73d7">&#9670;&#160;</a></span>ccc_rom_is_empty()</h2>
+<a id="a76ecd3f9123633f58c0cc7d00226b710" name="a76ecd3f9123633f58c0cc7d00226b710"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76ecd3f9123633f58c0cc7d00226b710">&#9670;&#160;</a></span>ccc_rom_is_empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_rom_is_empty </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_rom_is_empty </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *&#160;</td>
           <td class="paramname"><em>rom</em></td><td>)</td>
@@ -1512,7 +1512,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if empty else false. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if empty else false. Error if rom is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1554,14 +1554,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a99f950abda9eb85984991d7ca3150e08" name="a99f950abda9eb85984991d7ca3150e08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99f950abda9eb85984991d7ca3150e08">&#9670;&#160;</a></span>ccc_rom_occupied()</h2>
+<a id="ae663861fbf8ce188e3351ea242454b83" name="ae663861fbf8ce188e3351ea242454b83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae663861fbf8ce188e3351ea242454b83">&#9670;&#160;</a></span>ccc_rom_occupied()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_rom_occupied </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_rom_occupied </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#aa12b57bbf811c5ceaddb04be774bf662">ccc_romap_entry</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -1577,7 +1577,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an entry obtained from an insertion attempt failed to insert due to an allocation failure when allocation success was expected. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an entry obtained from an insertion attempt failed to insert due to an allocation failure when allocation success was expected. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1919,14 +1919,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="aefb2cb8f72aa33260f0aef01e64fa399" name="aefb2cb8f72aa33260f0aef01e64fa399"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefb2cb8f72aa33260f0aef01e64fa399">&#9670;&#160;</a></span>ccc_rom_validate()</h2>
+<a id="a60d82ff1341f98f8ccfb53138b25abf6" name="a60d82ff1341f98f8ccfb53138b25abf6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60d82ff1341f98f8ccfb53138b25abf6">&#9670;&#160;</a></span>ccc_rom_validate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_rom_validate </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_rom_validate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *&#160;</td>
           <td class="paramname"><em>rom</em></td><td>)</td>
@@ -1942,7 +1942,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if all invariants hold, false if corruption occurs. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if all invariants hold, false if corruption occurs. Error if rom is NULL. </dd></dl>
 
 </div>
 </div>

@@ -18,7 +18,7 @@ var doubly__linked__list_8h =
     [ "ccc_dll_extract_range", "doubly__linked__list_8h.html#a2764a280b24c06ad3d0c10c20f095576", null ],
     [ "ccc_dll_front", "doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff", null ],
     [ "ccc_dll_insert", "doubly__linked__list_8h.html#aee123c04ee8e032cb1b7888bdfcbb049", null ],
-    [ "ccc_dll_is_empty", "doubly__linked__list_8h.html#a413ff34f19dbeebcacad61d3a8ef389e", null ],
+    [ "ccc_dll_is_empty", "doubly__linked__list_8h.html#a26fadbf1179184c38de32f7f34388784", null ],
     [ "ccc_dll_next", "doubly__linked__list_8h.html#a9a97c4b1eb78dbb1056f83726a32fec5", null ],
     [ "ccc_dll_pop_back", "doubly__linked__list_8h.html#a387ada0e3dcfb0df8d4fc3a8845cb536", null ],
     [ "ccc_dll_pop_front", "doubly__linked__list_8h.html#a89eabf4c75464bc9e78f470fa7e942a3", null ],
@@ -30,5 +30,5 @@ var doubly__linked__list_8h =
     [ "ccc_dll_size", "doubly__linked__list_8h.html#afe0c0cfacb09e26c29cb9652a5dc2eb5", null ],
     [ "ccc_dll_splice", "doubly__linked__list_8h.html#a286ba34e3d6237153d0bb9ab293706f3", null ],
     [ "ccc_dll_splice_range", "doubly__linked__list_8h.html#a3f1e8eb64e99bab7cf3892a8683f30b0", null ],
-    [ "ccc_dll_validate", "doubly__linked__list_8h.html#a0946ef0b3b52c324fbb3438f77d3dd50", null ]
+    [ "ccc_dll_validate", "doubly__linked__list_8h.html#a7603b3f5a98979777ba2f000d0e0b32e", null ]
 ];

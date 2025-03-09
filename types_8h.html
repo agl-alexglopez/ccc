@@ -225,9 +225,9 @@ Data Structures</h2></td></tr>
 <tr class="memitem:aa2bb6262f220473dc47f4c73711a6ec5"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a>(<a class="el" href="structccc__user__type.html">ccc_user_type</a>)</td></tr>
 <tr class="memdesc:aa2bb6262f220473dc47f4c73711a6ec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for destroying an element in the container.  <br /></td></tr>
 <tr class="separator:aa2bb6262f220473dc47f4c73711a6ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad08b6b1d54268f3f739a22fea39e2c2d"><td class="memItemLeft" align="right" valign="top">typedef bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ad08b6b1d54268f3f739a22fea39e2c2d">ccc_key_eq_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
-<tr class="memdesc:ad08b6b1d54268f3f739a22fea39e2c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to determining equality between two stored keys.  <br /></td></tr>
-<tr class="separator:ad08b6b1d54268f3f739a22fea39e2c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9748f72f95727528cdc40d9e9672a0f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
+<tr class="memdesc:aa9748f72f95727528cdc40d9e9672a0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to determining equality between two stored keys.  <br /></td></tr>
+<tr class="separator:aa9748f72f95727528cdc40d9e9672a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8097dd574e739c360d2fa2d3e5de70db"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
 <tr class="memdesc:a8097dd574e739c360d2fa2d3e5de70db"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for three-way comparing two stored keys.  <br /></td></tr>
 <tr class="separator:a8097dd574e739c360d2fa2d3e5de70db"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -238,27 +238,27 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>The generic interface for associative container entries. </p>
 </td></tr>
-<tr class="memitem:ac0847e7b4ff4901c016fc1e06142364f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac0847e7b4ff4901c016fc1e06142364f">ccc_entry_occupied</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:ac0847e7b4ff4901c016fc1e06142364f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an entry is Occupied in the container.  <br /></td></tr>
-<tr class="separator:ac0847e7b4ff4901c016fc1e06142364f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a10c6e74f36faa343419f01df2da690"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a7a10c6e74f36faa343419f01df2da690">ccc_entry_insert_error</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:a7a10c6e74f36faa343419f01df2da690"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
-<tr class="separator:a7a10c6e74f36faa343419f01df2da690"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fd223cf4a594565a536ae518174a9b5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a9fd223cf4a594565a536ae518174a9b5">ccc_entry_input_error</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:a9fd223cf4a594565a536ae518174a9b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an entry.  <br /></td></tr>
-<tr class="separator:a9fd223cf4a594565a536ae518174a9b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f097a692aef02acd9f71a70dee77ec7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0f097a692aef02acd9f71a70dee77ec7">ccc_entry_occupied</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
+<tr class="memdesc:a0f097a692aef02acd9f71a70dee77ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an entry is Occupied in the container.  <br /></td></tr>
+<tr class="separator:a0f097a692aef02acd9f71a70dee77ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac36a4a4eb542c0ad14813b3c0b42b013"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac36a4a4eb542c0ad14813b3c0b42b013">ccc_entry_insert_error</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
+<tr class="memdesc:ac36a4a4eb542c0ad14813b3c0b42b013"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
+<tr class="separator:ac36a4a4eb542c0ad14813b3c0b42b013"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f54efc6d8b0301249ce2ff62714a439"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a7f54efc6d8b0301249ce2ff62714a439">ccc_entry_input_error</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
+<tr class="memdesc:a7f54efc6d8b0301249ce2ff62714a439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an entry.  <br /></td></tr>
+<tr class="separator:a7f54efc6d8b0301249ce2ff62714a439"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a013507ec0883722ec0d986ce1f51ee37"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a013507ec0883722ec0d986ce1f51ee37">ccc_entry_unwrap</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
 <tr class="memdesc:a013507ec0883722ec0d986ce1f51ee37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided entry providing a reference to the user type obtained from the operation that provides the entry.  <br /></td></tr>
 <tr class="separator:a013507ec0883722ec0d986ce1f51ee37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a87022c026e18a164e2097bf8a2ec2a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a7a87022c026e18a164e2097bf8a2ec2a">ccc_handle_occupied</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:a7a87022c026e18a164e2097bf8a2ec2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an handle is Occupied in the container.  <br /></td></tr>
-<tr class="separator:a7a87022c026e18a164e2097bf8a2ec2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d8d59ea0bb6d94c92d391ee81a76f32"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a4d8d59ea0bb6d94c92d391ee81a76f32">ccc_handle_insert_error</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:a4d8d59ea0bb6d94c92d391ee81a76f32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
-<tr class="separator:a4d8d59ea0bb6d94c92d391ee81a76f32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab04714d6316aeee8817521ab4808f1e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aab04714d6316aeee8817521ab4808f1e">ccc_handle_input_error</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:aab04714d6316aeee8817521ab4808f1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an handle.  <br /></td></tr>
-<tr class="separator:aab04714d6316aeee8817521ab4808f1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad333a89e65d8cd738a79b24831b3406d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ad333a89e65d8cd738a79b24831b3406d">ccc_handle_occupied</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
+<tr class="memdesc:ad333a89e65d8cd738a79b24831b3406d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an handle is Occupied in the container.  <br /></td></tr>
+<tr class="separator:ad333a89e65d8cd738a79b24831b3406d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a290f67e0bfc5e1ea0df7c533a2e0665f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a290f67e0bfc5e1ea0df7c533a2e0665f">ccc_handle_insert_error</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
+<tr class="memdesc:a290f67e0bfc5e1ea0df7c533a2e0665f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
+<tr class="separator:a290f67e0bfc5e1ea0df7c533a2e0665f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a44a8e92eafb1e9f3e1b10827ccd89a36">ccc_handle_input_error</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
+<tr class="memdesc:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an handle.  <br /></td></tr>
+<tr class="separator:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65515660962ba0e6e82a63a8b80eade9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a65515660962ba0e6e82a63a8b80eade9">ccc_handle_unwrap</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
 <tr class="memdesc:a65515660962ba0e6e82a63a8b80eade9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided handle providing a reference to the user type obtained from the operation that provides the handle.  <br /></td></tr>
 <tr class="separator:a65515660962ba0e6e82a63a8b80eade9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -500,20 +500,20 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="ad08b6b1d54268f3f739a22fea39e2c2d" name="ad08b6b1d54268f3f739a22fea39e2c2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad08b6b1d54268f3f739a22fea39e2c2d">&#9670;&#160;</a></span>ccc_key_eq_fn</h2>
+<a id="aa9748f72f95727528cdc40d9e9672a0f" name="aa9748f72f95727528cdc40d9e9672a0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9748f72f95727528cdc40d9e9672a0f">&#9670;&#160;</a></span>ccc_key_eq_fn</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef bool ccc_key_eq_fn(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td>
+          <td class="memname">typedef <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_key_eq_fn(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>A callback function to determining equality between two stored keys. </p>
-<p>The function should return true if the key and key field in the user type are equivalent, else false. </p>
+<p>The function should return CCC_TRUE if the key and key field in the user type are equivalent, else CCC_FALSE. </p><dl class="section note"><dt>Note</dt><dd>a callback need not return CCC_BOOL_ERR as the container code always provides data to the arguments of the function invariantly. </dd></dl>
 
 </div>
 </div>
@@ -707,14 +707,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a9fd223cf4a594565a536ae518174a9b5" name="a9fd223cf4a594565a536ae518174a9b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9fd223cf4a594565a536ae518174a9b5">&#9670;&#160;</a></span>ccc_entry_input_error()</h2>
+<a id="a7f54efc6d8b0301249ce2ff62714a439" name="a7f54efc6d8b0301249ce2ff62714a439"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f54efc6d8b0301249ce2ff62714a439">&#9670;&#160;</a></span>ccc_entry_input_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_entry_input_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_entry_input_error </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -730,18 +730,18 @@ Data Structures</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a7a10c6e74f36faa343419f01df2da690" name="a7a10c6e74f36faa343419f01df2da690"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a10c6e74f36faa343419f01df2da690">&#9670;&#160;</a></span>ccc_entry_insert_error()</h2>
+<a id="ac36a4a4eb542c0ad14813b3c0b42b013" name="ac36a4a4eb542c0ad14813b3c0b42b013"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac36a4a4eb542c0ad14813b3c0b42b013">&#9670;&#160;</a></span>ccc_entry_insert_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_entry_insert_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_entry_insert_error </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -757,18 +757,18 @@ Data Structures</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="ac0847e7b4ff4901c016fc1e06142364f" name="ac0847e7b4ff4901c016fc1e06142364f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0847e7b4ff4901c016fc1e06142364f">&#9670;&#160;</a></span>ccc_entry_occupied()</h2>
+<a id="a0f097a692aef02acd9f71a70dee77ec7" name="a0f097a692aef02acd9f71a70dee77ec7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f097a692aef02acd9f71a70dee77ec7">&#9670;&#160;</a></span>ccc_entry_occupied()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_entry_occupied </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_entry_occupied </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -784,7 +784,7 @@ Data Structures</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
@@ -898,14 +898,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="aab04714d6316aeee8817521ab4808f1e" name="aab04714d6316aeee8817521ab4808f1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab04714d6316aeee8817521ab4808f1e">&#9670;&#160;</a></span>ccc_handle_input_error()</h2>
+<a id="a44a8e92eafb1e9f3e1b10827ccd89a36" name="a44a8e92eafb1e9f3e1b10827ccd89a36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44a8e92eafb1e9f3e1b10827ccd89a36">&#9670;&#160;</a></span>ccc_handle_input_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_handle_input_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_handle_input_error </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -921,18 +921,18 @@ Data Structures</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a4d8d59ea0bb6d94c92d391ee81a76f32" name="a4d8d59ea0bb6d94c92d391ee81a76f32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d8d59ea0bb6d94c92d391ee81a76f32">&#9670;&#160;</a></span>ccc_handle_insert_error()</h2>
+<a id="a290f67e0bfc5e1ea0df7c533a2e0665f" name="a290f67e0bfc5e1ea0df7c533a2e0665f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a290f67e0bfc5e1ea0df7c533a2e0665f">&#9670;&#160;</a></span>ccc_handle_insert_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_handle_insert_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_handle_insert_error </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -948,18 +948,18 @@ Data Structures</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. Error if e is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a7a87022c026e18a164e2097bf8a2ec2a" name="a7a87022c026e18a164e2097bf8a2ec2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a87022c026e18a164e2097bf8a2ec2a">&#9670;&#160;</a></span>ccc_handle_occupied()</h2>
+<a id="ad333a89e65d8cd738a79b24831b3406d" name="ad333a89e65d8cd738a79b24831b3406d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad333a89e65d8cd738a79b24831b3406d">&#9670;&#160;</a></span>ccc_handle_occupied()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ccc_handle_occupied </td>
+          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_handle_occupied </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -975,7 +975,7 @@ Data Structures</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. Error if e is NULL. </dd></dl>
 
 </div>
 </div>

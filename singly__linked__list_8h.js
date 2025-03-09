@@ -14,12 +14,12 @@ var singly__linked__list_8h =
     [ "ccc_sll_extract", "singly__linked__list_8h.html#a792d38a075b9f51c29886193fea53f8f", null ],
     [ "ccc_sll_extract_range", "singly__linked__list_8h.html#aebdb50adbf99f6a07b531a6d962a7f83", null ],
     [ "ccc_sll_front", "singly__linked__list_8h.html#a9925c8fe46e4b260e72377bb5bb7e4bc", null ],
-    [ "ccc_sll_is_empty", "singly__linked__list_8h.html#a7be8bf3d55e3e7bc9baff68a14c3ffe0", null ],
+    [ "ccc_sll_is_empty", "singly__linked__list_8h.html#a4dbfd58e30f0bad9bf9c2df30adfe74d", null ],
     [ "ccc_sll_next", "singly__linked__list_8h.html#ab4724b83877b5582774c6f5d138edf6a", null ],
     [ "ccc_sll_pop_front", "singly__linked__list_8h.html#a2924476c4e07b64703ba579e9126ff7b", null ],
     [ "ccc_sll_push_front", "singly__linked__list_8h.html#a20652f3d5f4e73dd77b3490c7534a54b", null ],
     [ "ccc_sll_size", "singly__linked__list_8h.html#a85a9baed75df4fea03f0be097e4e5699", null ],
     [ "ccc_sll_splice", "singly__linked__list_8h.html#afbf05230243224dbf4d344e852f1cce9", null ],
     [ "ccc_sll_splice_range", "singly__linked__list_8h.html#a0a78d6739651c7609a0dc73b7e367062", null ],
-    [ "ccc_sll_validate", "singly__linked__list_8h.html#a4eb65ff8b957b2dd2c4ef6ef33e85b33", null ]
+    [ "ccc_sll_validate", "singly__linked__list_8h.html#a3c21cb36d9902c7db16a4ecf8c23a6e7", null ]
 ];
