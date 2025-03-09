@@ -85,7 +85,8 @@ Test membership or obtain references to stored user types directly. */
 /** @brief Searches the map for the presence of key.
 @param [in] om the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
-@return true if the struct containing key is stored, false if not. */
+@return true if the struct containing key is stored, false if not. Error if om
+or key is NULL. */
 [[nodiscard]] ccc_tribool ccc_om_contains(ccc_ordered_map *om, void const *key);
 
 /** @brief Returns a reference into the map at entry key.
@@ -421,13 +422,14 @@ free or use as needed. */
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
-@return true if the entry is occupied, false if not. */
+@return true if the entry is occupied, false if not. Error if e is NULL. */
 [[nodiscard]] ccc_tribool ccc_om_occupied(ccc_omap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
-due to an allocation failure when allocation success was expected. */
+due to an allocation failure when allocation success was expected. Error if e is
+NULL. */
 [[nodiscard]] ccc_tribool ccc_om_insert_error(ccc_omap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
@@ -590,7 +592,7 @@ Obtain the container state. */
 
 /** @brief Returns the size status of the map.
 @param [in] om the map.
-@return true if empty else false. */
+@return true if empty else false. Error if om is NULL. */
 [[nodiscard]] ccc_tribool ccc_om_is_empty(ccc_ordered_map const *om);
 
 /** @brief Returns the size of the map
@@ -600,7 +602,8 @@ Obtain the container state. */
 
 /** @brief Validation of invariants for the map.
 @param [in] om the map to validate.
-@return true if all invariants hold, false if corruption occurs. */
+@return true if all invariants hold, false if corruption occurs. Error if om is
+NULL. */
 [[nodiscard]] ccc_tribool ccc_om_validate(ccc_ordered_map const *om);
 
 /**@}*/

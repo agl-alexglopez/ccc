@@ -370,7 +370,7 @@ range of the fpq. */
 
 /** @brief Returns true if the fpq is empty false if not. O(1).
 @param [in] fpq a pointer to the flat priority queue.
-@return true if the size is 0 or fpq is NULL, false if not empty.  */
+@return true if the size is 0, false if not empty. Error if fpq is NULL. */
 [[nodiscard]] ccc_tribool ccc_fpq_is_empty(ccc_flat_priority_queue const *fpq);
 
 /** @brief Returns the size of the fpq.
@@ -394,7 +394,7 @@ within the capacity of the backing buffer. */
 
 /** @brief Verifies the internal invariants of the fpq hold.
 @param [in] fpq a pointer to the flat priority queue.
-@return true if the fpq is valid false if fpq is NULL or invalid. */
+@return true if the fpq is valid false if invalid. Error if fpq is NULL. */
 [[nodiscard]] ccc_tribool ccc_fpq_validate(ccc_flat_priority_queue const *fpq);
 
 /** @brief Return the order used to initialize the fpq.

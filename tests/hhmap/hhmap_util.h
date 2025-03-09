@@ -16,7 +16,7 @@ struct val
 uint64_t hhmap_int_zero(ccc_user_key);
 uint64_t hhmap_int_last_digit(ccc_user_key);
 uint64_t hhmap_int_to_u64(ccc_user_key);
-bool hhmap_id_eq(ccc_key_cmp);
+ccc_tribool hhmap_id_eq(ccc_key_cmp);
 
 void hhmap_modplus(ccc_user_type);
 struct val hhmap_create(int id, int val);

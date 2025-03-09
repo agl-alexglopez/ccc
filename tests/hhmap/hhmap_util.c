@@ -1,7 +1,6 @@
 #include "hhmap_util.h"
 #include "types.h"
 
-#include <stdbool.h>
 #include <stdint.h>
 
 uint64_t
@@ -16,7 +15,7 @@ hhmap_int_last_digit(ccc_user_key const n)
     return *((int *)n.user_key) % 10;
 }
 
-bool
+ccc_tribool
 hhmap_id_eq(ccc_key_cmp const cmp)
 {
     struct val const *const va = cmp.user_type_rhs;

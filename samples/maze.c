@@ -139,7 +139,7 @@ static void help(void);
 static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_priority_cells(cmp);
 static struct int_conversion parse_digits(str_view);
-static bool prim_cell_eq(key_cmp);
+static ccc_tribool prim_cell_eq(key_cmp);
 static uint64_t point_hash_fn(user_key);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -298,7 +298,7 @@ animate_maze(struct maze *maze)
 
 /*===================     Container Support Code     ========================*/
 
-static bool
+static ccc_tribool
 prim_cell_eq(key_cmp const c)
 {
     struct point const *const lhs = c.key_lhs;
