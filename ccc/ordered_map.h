@@ -22,7 +22,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_ORDERED_MAP_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -87,7 +86,7 @@ Test membership or obtain references to stored user types directly. */
 @param [in] om the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. */
-[[nodiscard]] bool ccc_om_contains(ccc_ordered_map *om, void const *key);
+[[nodiscard]] ccc_tribool ccc_om_contains(ccc_ordered_map *om, void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] om the ordered map to search.
@@ -423,13 +422,13 @@ free or use as needed. */
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. */
-[[nodiscard]] bool ccc_om_occupied(ccc_omap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_om_occupied(ccc_omap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. */
-[[nodiscard]] bool ccc_om_insert_error(ccc_omap_entry const *e);
+[[nodiscard]] ccc_tribool ccc_om_insert_error(ccc_omap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -592,7 +591,7 @@ Obtain the container state. */
 /** @brief Returns the size status of the map.
 @param [in] om the map.
 @return true if empty else false. */
-[[nodiscard]] bool ccc_om_is_empty(ccc_ordered_map const *om);
+[[nodiscard]] ccc_tribool ccc_om_is_empty(ccc_ordered_map const *om);
 
 /** @brief Returns the size of the map
 @param [in] om the map.
@@ -602,7 +601,7 @@ Obtain the container state. */
 /** @brief Validation of invariants for the map.
 @param [in] om the map to validate.
 @return true if all invariants hold, false if corruption occurs. */
-[[nodiscard]] bool ccc_om_validate(ccc_ordered_map const *om);
+[[nodiscard]] ccc_tribool ccc_om_validate(ccc_ordered_map const *om);
 
 /**@}*/
 
