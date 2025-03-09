@@ -45,9 +45,9 @@ static void link(struct ccc_node_ *, om_branch_, struct ccc_node_ *);
 
 /* Boolean returns */
 
-static bool empty(struct ccc_tree_ const *);
-static bool contains(struct ccc_tree_ *, void const *);
-static bool ccc_tree_validate(struct ccc_tree_ const *);
+static ccc_tribool empty(struct ccc_tree_ const *);
+static ccc_tribool contains(struct ccc_tree_ *, void const *);
+static ccc_tribool ccc_tree_validate(struct ccc_tree_ const *);
 
 /* Returning the user type that is stored in data structure. */
 
@@ -82,10 +82,14 @@ static ccc_threeway_cmp cmp(struct ccc_tree_ const *, void const *key,
 
 /* ======================        Map Interface      ====================== */
 
-bool
+ccc_tribool
 ccc_om_is_empty(ccc_ordered_map const *const om)
 {
-    return om ? empty(&om->impl_) : true;
+    if (!om)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return empty(&om->impl_);
 }
 
 size_t
@@ -94,12 +98,12 @@ ccc_om_size(ccc_ordered_map const *const om)
     return om ? om->impl_.size_ : 0;
 }
 
-bool
+ccc_tribool
 ccc_om_contains(ccc_ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     return contains(&om->impl_, key);
 }
@@ -318,16 +322,24 @@ ccc_om_unwrap(ccc_omap_entry const *const e)
     return e->impl_.entry_.stats_ == CCC_OCCUPIED ? e->impl_.entry_.e_ : NULL;
 }
 
-bool
+ccc_tribool
 ccc_om_insert_error(ccc_omap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_INSERT_ERROR : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.entry_.stats_ & CCC_INSERT_ERROR) != 0;
 }
 
-bool
+ccc_tribool
 ccc_om_occupied(ccc_omap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ & CCC_OCCUPIED : false;
+    if (!e)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return (e->impl_.entry_.stats_ & CCC_OCCUPIED) != 0;
 }
 
 ccc_entry_status
@@ -432,12 +444,12 @@ ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
     return CCC_OK;
 }
 
-bool
+ccc_tribool
 ccc_om_validate(ccc_ordered_map const *const om)
 {
     if (!om)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     return ccc_tree_validate(&om->impl_);
 }
@@ -518,7 +530,7 @@ init_node(struct ccc_tree_ *const t, struct ccc_node_ *const n)
     n->parent_ = &t->end_;
 }
 
-static inline bool
+static inline ccc_tribool
 empty(struct ccc_tree_ const *const t)
 {
     return !t->size_ || !t->root_ || t->root_ == &t->end_;
@@ -617,8 +629,8 @@ find(struct ccc_tree_ *const t, void const *const key)
                                                      : NULL;
 }
 
-static inline bool
-contains(struct ccc_tree_ *const t, void const *key)
+static inline ccc_tribool
+contains(struct ccc_tree_ *const t, void const *const key)
 {
     t->root_ = splay(t, t->root_, key, t->cmp_);
     return cmp(t, key, t->root_, t->cmp_) == CCC_EQL;
@@ -766,7 +778,7 @@ splay(struct ccc_tree_ *const t, struct ccc_node_ *root, void const *const key,
         link(l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = root->branch_[dir];
-    } while (true);
+    } while (1);
     link(l_r_subtrees[L], R, root->branch_[L]);
     link(l_r_subtrees[R], L, root->branch_[R]);
     link(root, L, t->end_.branch_[R]);
@@ -834,7 +846,7 @@ struct tree_range_
 /** @private */
 struct parent_status_
 {
-    bool correct;
+    ccc_tribool correct;
     struct ccc_node_ const *parent;
 };
 
@@ -849,29 +861,29 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
            + recursive_size(t, r->branch_[L]);
 }
 
-static bool
+static ccc_tribool
 are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                    struct ccc_node_ const *const nil)
 {
     if (!r.root)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (r.root == nil)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (r.low != nil
         && cmp(t, ccc_impl_om_key_from_node(t, r.low), r.root, t->cmp_)
                != CCC_LES)
     {
-        return false;
+        return CCC_FALSE;
     }
     if (r.high != nil
         && cmp(t, ccc_impl_om_key_from_node(t, r.high), r.root, t->cmp_)
                != CCC_GRT)
     {
-        return false;
+        return CCC_FALSE;
     }
     return are_subtrees_valid(t,
                               (struct tree_range_){.low = r.low,
@@ -892,23 +904,23 @@ child_tracks_parent(struct ccc_node_ const *const parent,
     if (root->parent_ != parent)
     {
         struct ccc_node_ *p = root->parent_->parent_;
-        return (struct parent_status_){false, p};
+        return (struct parent_status_){CCC_FALSE, p};
     }
-    return (struct parent_status_){true, parent};
+    return (struct parent_status_){CCC_TRUE, parent};
 }
 
-static bool
+static ccc_tribool
 is_duplicate_storing_parent(struct ccc_tree_ const *const t,
                             struct ccc_node_ const *const parent,
                             struct ccc_node_ const *const root)
 {
     if (root == &t->end_)
     {
-        return true;
+        return CCC_TRUE;
     }
     if (!child_tracks_parent(parent, root).correct)
     {
-        return false;
+        return CCC_FALSE;
     }
     return is_duplicate_storing_parent(t, root, root->branch_[L])
            && is_duplicate_storing_parent(t, root, root->branch_[R]);
@@ -920,7 +932,7 @@ is_duplicate_storing_parent(struct ccc_tree_ const *const t,
    sure that the implementation is correct because it follows the
    truth of the provided pointers with its own stack as backtracking
    information. */
-static bool
+static ccc_tribool
 ccc_tree_validate(struct ccc_tree_ const *const t)
 {
     if (!are_subtrees_valid(t,
@@ -931,17 +943,17 @@ ccc_tree_validate(struct ccc_tree_ const *const t)
                             },
                             &t->end_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (!is_duplicate_storing_parent(t, &t->end_, t->root_))
     {
-        return false;
+        return CCC_FALSE;
     }
     if (recursive_size(t, t->root_) != t->size_)
     {
-        return false;
+        return CCC_FALSE;
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /* NOLINTEND(*misc-no-recursion) */
