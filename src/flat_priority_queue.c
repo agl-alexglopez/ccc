@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -14,8 +13,8 @@ static size_t const swap_space = 1;
 
 static void *at(struct ccc_fpq_ const *, size_t);
 static size_t index_of(struct ccc_fpq_ const *, void const *);
-static bool wins(struct ccc_fpq_ const *, void const *winner,
-                 void const *loser);
+static ccc_tribool wins(struct ccc_fpq_ const *, void const *winner,
+                        void const *loser);
 static void swap(struct ccc_fpq_ *, char tmp[], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], size_t i);
 static size_t bubble_down(struct ccc_fpq_ *, char tmp[], size_t);
@@ -214,10 +213,14 @@ ccc_fpq_i(ccc_flat_priority_queue const *const fpq, void const *const e)
     return ccc_buf_i(&fpq->buf_, e);
 }
 
-bool
+ccc_tribool
 ccc_fpq_is_empty(ccc_flat_priority_queue const *const fpq)
 {
-    return fpq ? ccc_buf_is_empty(&fpq->buf_) : true;
+    if (!fpq)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return ccc_buf_is_empty(&fpq->buf_);
 }
 
 size_t
@@ -316,17 +319,17 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
     return ccc_buf_alloc(&fpq->buf_, 0, fpq->buf_.alloc_);
 }
 
-bool
+ccc_tribool
 ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
 {
     if (!fpq)
     {
-        return false;
+        return CCC_BOOL_ERR;
     }
     size_t const sz = ccc_buf_size(&fpq->buf_);
     if (sz <= 1)
     {
-        return true;
+        return CCC_TRUE;
     }
     for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2;
          i <= (sz - 2) / 2; ++i, left = (i * 2) + 1, right = (i * 2) + 2)
@@ -338,14 +341,14 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
            has gone wrong. */
         if (left < sz && wins(fpq, at(fpq, left), cur))
         {
-            return false;
+            return CCC_FALSE;
         }
         if (right < sz && wins(fpq, at(fpq, right), cur))
         {
-            return false;
+            return CCC_FALSE;
         }
     }
-    return true;
+    return CCC_TRUE;
 }
 
 /*===================     Private Interface     =============================*/
@@ -484,7 +487,7 @@ index_of(struct ccc_fpq_ const *const fpq, void const *const slot)
    priority queue. So, there is no winner if the elements are equal and this
    function would return false. If the winner is in the wrong order, thus
    losing the total order comparison, the function also returns false. */
-static inline bool
+static inline ccc_tribool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {

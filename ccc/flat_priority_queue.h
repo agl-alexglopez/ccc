@@ -17,7 +17,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_FLAT_PRIORITY_QUEUE_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -372,7 +371,7 @@ range of the fpq. */
 /** @brief Returns true if the fpq is empty false if not. O(1).
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the size is 0 or fpq is NULL, false if not empty.  */
-[[nodiscard]] bool ccc_fpq_is_empty(ccc_flat_priority_queue const *fpq);
+[[nodiscard]] ccc_tribool ccc_fpq_is_empty(ccc_flat_priority_queue const *fpq);
 
 /** @brief Returns the size of the fpq.
 @param [in] fpq a pointer to the flat priority queue.
@@ -396,7 +395,7 @@ within the capacity of the backing buffer. */
 /** @brief Verifies the internal invariants of the fpq hold.
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the fpq is valid false if fpq is NULL or invalid. */
-[[nodiscard]] bool ccc_fpq_validate(ccc_flat_priority_queue const *fpq);
+[[nodiscard]] ccc_tribool ccc_fpq_validate(ccc_flat_priority_queue const *fpq);
 
 /** @brief Return the order used to initialize the fpq.
 @param [in] fpq a pointer to the flat priority queue.
