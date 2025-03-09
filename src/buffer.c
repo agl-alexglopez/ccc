@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -205,16 +204,28 @@ ccc_buf_elem_size(ccc_buffer const *const buf)
     return buf ? buf->elem_sz_ : 0;
 }
 
-bool
-ccc_buf_full(ccc_buffer const *const buf)
-{
-    return buf ? buf->sz_ == buf->capacity_ : false;
-}
-
-bool
+ccc_tribool
 ccc_buf_is_empty(ccc_buffer const *const buf)
 {
-    return buf ? !buf->sz_ : true;
+    if (!buf)
+    {
+        return CCC_BOOL_ERR;
+    }
+    return !buf->sz_;
+}
+
+ccc_tribool
+ccc_buf_is_full(ccc_buffer const *const buf)
+{
+    if (!buf)
+    {
+        return CCC_BOOL_ERR;
+    }
+    if (!buf->capacity_)
+    {
+        return CCC_FALSE;
+    }
+    return buf->sz_ == buf->capacity_ ? CCC_TRUE : CCC_FALSE;
 }
 
 void *

@@ -32,7 +32,6 @@ Then, the `ccc_` prefix can be dropped from all types and functions. */
 #define CCC_BUFFER_H
 
 /** @cond */
-#include <stdbool.h>
 #include <stddef.h>
 /** @endcond */
 
@@ -376,12 +375,12 @@ Note that size must be less than or equal to capacity. */
 /** @brief return true if the size of the buffer is 0.
 @param [in] buf the pointer to the buffer.
 @return true if the size is 0 false if not. */
-[[nodiscard]] bool ccc_buf_is_empty(ccc_buffer const *buf);
+[[nodiscard]] ccc_tribool ccc_buf_is_empty(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer equals capacity.
 @param [in] buf the pointer to the buffer.
 @return true if the size equals the capacity. */
-[[nodiscard]] bool ccc_buf_is_full(ccc_buffer const *buf);
+[[nodiscard]] ccc_tribool ccc_buf_is_full(ccc_buffer const *buf);
 
 /**@}*/
 
