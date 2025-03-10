@@ -14,8 +14,8 @@ static size_t const start_capacity = 8;
 static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t);
 static size_t index_of(struct ccc_fdeq_ const *, void const *);
 static void *at(struct ccc_fdeq_ const *, size_t i);
-size_t increment(struct ccc_fdeq_ const *, size_t i);
-size_t decrement(struct ccc_fdeq_ const *, size_t i);
+static size_t increment(struct ccc_fdeq_ const *, size_t i);
+static size_t decrement(struct ccc_fdeq_ const *, size_t i);
 static size_t distance(struct ccc_fdeq_ const *, size_t, size_t);
 static size_t rdistance(struct ccc_fdeq_ const *, size_t, size_t);
 static ccc_result push_front_range(struct ccc_fdeq_ *fdeq, size_t n,
@@ -677,20 +677,20 @@ index_of(struct ccc_fdeq_ const *const fdeq, void const *const pos)
            / ccc_buf_elem_size(&fdeq->buf_);
 }
 
-static void *
+static inline void *
 at(struct ccc_fdeq_ const *const fdeq, size_t const i)
 {
     return ccc_buf_at(&fdeq->buf_,
                       (fdeq->front_ + i) % ccc_buf_capacity(&fdeq->buf_));
 }
 
-size_t
+static inline size_t
 increment(struct ccc_fdeq_ const *const fdeq, size_t const i)
 {
     return i == (ccc_buf_capacity(&fdeq->buf_) - 1) ? 0 : i + 1;
 }
 
-size_t
+static inline size_t
 decrement(struct ccc_fdeq_ const *const fdeq, size_t const i)
 {
     return i ? i - 1 : ccc_buf_capacity(&fdeq->buf_) - 1;

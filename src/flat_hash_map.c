@@ -846,7 +846,7 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
 /* Backshift deletion is important in for this table because it may not be able
    to allocate. This prevents the need for tombstones which would hurt table
    quality quickly if we can't resize. */
-static void
+static inline void
 erase(struct ccc_fhmap_ *const h, void *const e)
 {
     *hash_at(h, ccc_buf_i(&h->buf_, e)) = CCC_FHM_EMPTY;

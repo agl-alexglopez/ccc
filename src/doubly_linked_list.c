@@ -447,6 +447,13 @@ ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
     push_front(l, e);
 }
 
+struct ccc_dll_elem_ *
+ccc_impl_dll_elem_in(struct ccc_dll_ const *const l,
+                     void const *const user_struct)
+{
+    return elem_in(l, user_struct);
+}
+
 /*=======================       Static Helpers    ===========================*/
 
 static inline void
@@ -481,13 +488,6 @@ pop_front(struct ccc_dll_ *const dll)
     }
     --dll->sz_;
     return ret;
-}
-
-struct ccc_dll_elem_ *
-ccc_impl_dll_elem_in(struct ccc_dll_ const *const l,
-                     void const *const user_struct)
-{
-    return elem_in(l, user_struct);
 }
 
 static inline size_t

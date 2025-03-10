@@ -887,7 +887,7 @@ add_duplicate(struct ccc_tree_ *const t, struct ccc_node_ *const tree_node,
 {
     /* This is a circular doubly linked list with O(1) append to back
        to maintain round robin fairness for any use of this queue.
-       the oldest duplicate should be in the tree so we will add new dup
+       The oldest duplicate should be in the tree so we will add new dup
        to the back. The head then needs to point to new tail and new
        tail points to already in place head that tree points to.
        This operation still works if we previously had size 1 list. */
@@ -997,6 +997,7 @@ multimap_erase_node(struct ccc_tree_ *const t, struct ccc_node_ *const node)
                && node->link_[P]->link_[N] == node);
         node->link_[P]->link_[N] = node->link_[N];
         node->link_[N]->link_[P] = node->link_[P];
+        node->link_[N] = node->link_[P] = node->parent_ = NULL;
         return struct_base(t, node);
     }
     void const *const key = key_from_node(t, node);
@@ -1042,19 +1043,22 @@ pop_dup_node(struct ccc_tree_ *const t, struct ccc_node_ *const dup,
     return dup;
 }
 
+/* A node is in the tree and has a trailing list of duplicates. Many updates
+must occur to remove the first duplicate from the list and make it part of the
+splay tree to replace the old node to be deleted. */
 static inline struct ccc_node_ *
 pop_front_dup(struct ccc_tree_ *const t, struct ccc_node_ *const old,
               void const *const old_key)
 {
     struct ccc_node_ *const parent = old->dup_head_->parent_;
     struct ccc_node_ *const tree_replacement = old->dup_head_;
+    /* Comparing sizes with the root's parent is undefined. */
     if (old == t->root_)
     {
         t->root_ = tree_replacement;
     }
     else
     {
-        /* Comparing sizes with the root's parent is undefined. */
         parent->branch_[CCC_GRT == cmp(t, old_key, parent, t->cmp_)]
             = tree_replacement;
     }
@@ -1178,19 +1182,18 @@ link_trees(struct ccc_tree_ *const t, struct ccc_node_ *const parent,
    careful not to access the end helper because it can store any pointers
    in its fields that should not be accessed for directions.
 
-                             *────┐
-                           ┌─┴─┐  ├──┐
-                           *   *──*──*
-                          ┌┴┐ ┌┴┐ └──┘
-                          * * * *
+                             A<────┐
+                           ┌─┴─┐   ├──┐
+                           B   C──>D──E
+                          ┌┴┐ ┌┴┐  └──┘
+                          F G H I
 
-   Consider the above tree where one node is tracking duplicates. It
-   sacrifices its parent field to track a duplicate. The head duplicate
-   tracks the parent and uses its left/right fields to track previous/next
-   in a circular list. So, we always know via pointers if we find a
-   tree node that stores duplicates. By extension this means we can
-   also identify if we ARE a duplicate but that check is not part
-   of this function. */
+   Consider the above tree where C is tracking duplicates. It sacrifices its
+   parent field to track D. D tracks C's parent, A, and uses its left/right
+   fields to track previous/next in a circular list. D's next and previous field
+   are E and E's next and previous fields are D. So, D has a path back to itself
+   and we can identify duplicates this way. This also means we can also identify
+   if we ARE a duplicate but that check is not part of this function. */
 static inline ccc_tribool
 has_dups(struct ccc_node_ const *const end, struct ccc_node_ const *const n)
 {
@@ -1297,7 +1300,7 @@ count_dups(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
     return dups;
 }
 
-static inline size_t
+static size_t
 recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 {
     if (r == &t->end_)
@@ -1309,7 +1312,7 @@ recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
            + recursive_size(t, r->branch_[L]);
 }
 
-static inline ccc_tribool
+static ccc_tribool
 are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                    struct ccc_node_ const *const nil)
 {
@@ -1347,28 +1350,7 @@ are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
                                  nil);
 }
 
-static inline struct parent_status_
-child_tracks_parent(struct ccc_tree_ const *const t,
-                    struct ccc_node_ const *const parent,
-                    struct ccc_node_ const *const root)
-{
-    if (has_dups(&t->end_, root))
-    {
-        struct ccc_node_ *p = root->dup_head_->parent_;
-        if (p != parent)
-        {
-            return (struct parent_status_){CCC_FALSE, p};
-        }
-    }
-    else if (root->parent_ != parent)
-    {
-        struct ccc_node_ *p = root->dup_head_->parent_;
-        return (struct parent_status_){CCC_FALSE, p};
-    }
-    return (struct parent_status_){CCC_TRUE, parent};
-}
-
-static inline ccc_tribool
+static ccc_tribool
 is_duplicate_storing_parent(struct ccc_tree_ const *const t,
                             struct ccc_node_ const *const parent,
                             struct ccc_node_ const *const root)
@@ -1377,7 +1359,14 @@ is_duplicate_storing_parent(struct ccc_tree_ const *const t,
     {
         return CCC_TRUE;
     }
-    if (!child_tracks_parent(t, parent, root).correct)
+    if (has_dups(&t->end_, root))
+    {
+        if (root->dup_head_->parent_ != parent)
+        {
+            return CCC_FALSE;
+        }
+    }
+    else if (root->parent_ != parent)
     {
         return CCC_FALSE;
     }
