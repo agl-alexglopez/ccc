@@ -301,40 +301,6 @@ decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
     pq->root_ = merge(pq, pq->root_, e);
 }
 
-static inline ccc_threeway_cmp
-cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
-    struct ccc_pq_elem_ const *const b)
-{
-    return pq->cmp_((ccc_cmp){.user_type_lhs = struct_base(pq, a),
-                              .user_type_rhs = struct_base(pq, b),
-                              .aux = pq->aux_});
-}
-
-static inline void *
-struct_base(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const e)
-{
-    return ((char *)&(e->left_child_)) - pq->pq_elem_offset_;
-}
-
-static inline void *
-elem_in(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const e)
-{
-    return ((char *)&(e->left_child_)) + pq->pq_elem_offset_;
-}
-
-static inline void
-init_node(struct ccc_pq_elem_ *const e)
-{
-    e->left_child_ = e->parent_ = NULL;
-    e->next_sibling_ = e->prev_sibling_ = e;
-}
-
-static inline void
-clear_node(struct ccc_pq_elem_ *const e)
-{
-    e->left_child_ = e->next_sibling_ = e->prev_sibling_ = e->parent_ = NULL;
-}
-
 static inline void
 cut_child(struct ccc_pq_elem_ *const child)
 {
@@ -424,6 +390,40 @@ link_child(struct ccc_pq_elem_ *const parent, struct ccc_pq_elem_ *const child)
     }
     parent->left_child_ = child;
     child->parent_ = parent;
+}
+
+static inline ccc_threeway_cmp
+cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
+    struct ccc_pq_elem_ const *const b)
+{
+    return pq->cmp_((ccc_cmp){.user_type_lhs = struct_base(pq, a),
+                              .user_type_rhs = struct_base(pq, b),
+                              .aux = pq->aux_});
+}
+
+static inline void *
+struct_base(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const e)
+{
+    return ((char *)&(e->left_child_)) - pq->pq_elem_offset_;
+}
+
+static inline void *
+elem_in(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const e)
+{
+    return ((char *)&(e->left_child_)) + pq->pq_elem_offset_;
+}
+
+static inline void
+init_node(struct ccc_pq_elem_ *const e)
+{
+    e->left_child_ = e->parent_ = NULL;
+    e->next_sibling_ = e->prev_sibling_ = e;
+}
+
+static inline void
+clear_node(struct ccc_pq_elem_ *const e)
+{
+    e->left_child_ = e->next_sibling_ = e->prev_sibling_ = e->parent_ = NULL;
 }
 
 /*========================     Validation    ================================*/

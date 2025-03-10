@@ -662,7 +662,7 @@ handle(struct ccc_homap_ *const hom, void const *const key)
     };
 }
 
-static size_t
+static inline size_t
 maybe_alloc_insert(struct ccc_homap_ *const hom,
                    struct ccc_homap_elem_ *const elem)
 {
@@ -1010,7 +1010,7 @@ struct tree_range_
     size_t high;
 };
 
-static inline size_t
+static size_t
 recursive_size(struct ccc_homap_ const *const t, size_t const r)
 {
     if (!r)
@@ -1021,7 +1021,7 @@ recursive_size(struct ccc_homap_ const *const t, size_t const r)
            + recursive_size(t, branch_i(t, r, L));
 }
 
-static inline ccc_tribool
+static ccc_tribool
 are_subtrees_valid(struct ccc_homap_ const *t, struct tree_range_ const r)
 {
     if (!r.root)
@@ -1046,7 +1046,7 @@ are_subtrees_valid(struct ccc_homap_ const *t, struct tree_range_ const r)
                                        .high = r.high});
 }
 
-static inline ccc_tribool
+static ccc_tribool
 is_storing_parent(struct ccc_homap_ const *const t, size_t const p,
                   size_t const root)
 {
@@ -1062,7 +1062,7 @@ is_storing_parent(struct ccc_homap_ const *const t, size_t const p,
            && is_storing_parent(t, root, branch_i(t, root, R));
 }
 
-static inline ccc_tribool
+static ccc_tribool
 is_free_list_valid(struct ccc_homap_ const *const t)
 {
     if (!ccc_buf_size(&t->buf_))

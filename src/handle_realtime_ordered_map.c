@@ -777,7 +777,7 @@ next(struct ccc_hromap_ const *const t, size_t n,
     return p;
 }
 
-static struct ccc_range_u_
+static inline struct ccc_range_u_
 equal_range(struct ccc_hromap_ const *const t, void const *const begin_key,
             void const *const end_key, enum hrm_branch_ const traversal)
 {
@@ -966,7 +966,7 @@ key_at(struct ccc_hromap_ const *const t, size_t const i)
 
 /*=======================   WAVL Tree Maintenance   =========================*/
 
-static void
+static inline void
 insert_fixup(struct ccc_hromap_ *const t, size_t z, size_t x)
 {
     do
@@ -1474,7 +1474,7 @@ is_free_list_valid(struct ccc_hromap_ const *const t)
     return list_check2 == list_check1;
 }
 
-static ccc_tribool
+static inline ccc_tribool
 validate(struct ccc_hromap_ const *const hrm)
 {
     if (!ccc_buf_is_empty(&hrm->buf_) && !at(hrm, 0)->parity_)

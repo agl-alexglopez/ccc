@@ -59,9 +59,6 @@ struct romap_query_
 static enum romap_link_ const inorder_traversal = R;
 static enum romap_link_ const reverse_inorder_traversal = L;
 
-static enum romap_link_ const min = L;
-static enum romap_link_ const max = R;
-
 /*==============================  Prototypes   ==============================*/
 
 static void init_node(struct ccc_romap_ *, struct ccc_romap_elem_ *);
@@ -412,7 +409,7 @@ ccc_rom_begin(ccc_realtime_ordered_map const *rom)
     {
         return NULL;
     }
-    struct ccc_romap_elem_ *const m = min_max_from(rom, rom->root_, min);
+    struct ccc_romap_elem_ *const m = min_max_from(rom, rom->root_, L);
     return m == &rom->end_ ? NULL : struct_base(rom, m);
 }
 
@@ -439,7 +436,7 @@ ccc_rom_rbegin(ccc_realtime_ordered_map const *const rom)
     {
         return NULL;
     }
-    struct ccc_romap_elem_ *const m = min_max_from(rom, rom->root_, max);
+    struct ccc_romap_elem_ *const m = min_max_from(rom, rom->root_, R);
     return m == &rom->end_ ? NULL : struct_base(rom, m);
 }
 
@@ -686,7 +683,7 @@ find(struct ccc_romap_ const *const rom, void const *const key)
     return q;
 }
 
-static struct ccc_romap_elem_ *
+static inline struct ccc_romap_elem_ *
 next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
      enum romap_link_ const traversal)
 {
@@ -710,7 +707,7 @@ next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
     return n->parent_;
 }
 
-static struct ccc_range_u_
+static inline struct ccc_range_u_
 equal_range(struct ccc_romap_ const *const rom, void const *const begin_key,
             void const *const end_key, enum romap_link_ const traversal)
 {
@@ -795,7 +792,7 @@ elem_in_slot(struct ccc_romap_ const *const rom, void const *const slot)
 
 /*=======================   WAVL Tree Maintenance   =========================*/
 
-static void
+static inline void
 insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
              struct ccc_romap_elem_ *x)
 {
@@ -856,7 +853,7 @@ remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
     }
     else
     {
-        y = min_max_from(rom, remove->branch_[R], min);
+        y = min_max_from(rom, remove->branch_[R], L);
         p_of_xy = y->parent_;
         x = y->branch_[y->branch_[L] == &rom->end_];
         x->parent_ = y->parent_;
@@ -1232,7 +1229,7 @@ struct tree_range_
     struct ccc_romap_elem_ const *high;
 };
 
-static inline size_t
+static size_t
 recursive_size(struct ccc_romap_ const *const rom,
                struct ccc_romap_elem_ const *const r)
 {
@@ -1244,7 +1241,7 @@ recursive_size(struct ccc_romap_ const *const rom,
            + recursive_size(rom, r->branch_[L]);
 }
 
-static inline ccc_tribool
+static ccc_tribool
 are_subtrees_valid(struct ccc_romap_ const *t, struct tree_range_ const r,
                    struct ccc_romap_elem_ const *const nil)
 {
@@ -1282,7 +1279,7 @@ are_subtrees_valid(struct ccc_romap_ const *t, struct tree_range_ const r,
                                  nil);
 }
 
-static inline ccc_tribool
+static ccc_tribool
 is_storing_parent(struct ccc_romap_ const *const t,
                   struct ccc_romap_elem_ const *const parent,
                   struct ccc_romap_elem_ const *const root)

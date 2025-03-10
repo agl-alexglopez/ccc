@@ -1501,7 +1501,7 @@ on(size_t bit_i)
    those bits which are in use according to the bit set capacity. The remaining
    higher order bits in the last block will be set to 0 because they are not
    used. If the capacity is zero a block with all bits on is returned. */
-static ccc_bitblock_
+static inline ccc_bitblock_
 last_on(struct ccc_bitset_ const *const bs)
 {
     /* Remember, we fill from LSB to MSB so we want the mask to start at lower

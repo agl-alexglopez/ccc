@@ -921,7 +921,7 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
    to allocate. This prevents the need for tombstones which would hurt table
    quality quickly if we can't resize. Only metadata is moved. User data remains
    in the same slot for handle stability. */
-static void
+static inline void
 erase_meta(struct ccc_hhmap_ *const h, size_t i)
 {
     *hash_at(h, i) = CCC_HHM_EMPTY;
