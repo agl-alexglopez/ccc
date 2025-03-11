@@ -83,26 +83,19 @@ union ccc_hhmap_ref_
 #define ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle...)             \
     ((type_name *)ccc_buf_at(&(handle_hash_map_ptr)->buf_, (handle)))
 
-struct ccc_handl_ ccc_impl_hhm_find(struct ccc_hhmap_ const *, void const *key,
-                                    uint64_t hash);
+/*===============   Wrappers for Macros to Access Internals     =============*/
+
+/** @private */
 ccc_handle_i ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
                                       size_t cur_i);
-
+/** @private */
 struct ccc_hhash_handle_ ccc_impl_hhm_handle(struct ccc_hhmap_ *h,
                                              void const *key);
-struct ccc_hhash_handle_ *ccc_impl_hhm_and_modify(struct ccc_hhash_handle_ *e,
-                                                  ccc_update_fn *fn);
-struct ccc_hhmap_elem_ *ccc_impl_hhm_in_slot(struct ccc_hhmap_ const *h,
-                                             void const *slot);
+/** @private */
 void *ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t i);
+/** @private */
 uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, size_t i);
-size_t ccc_impl_hhm_distance(size_t capacity, size_t i, size_t j);
-ccc_result ccc_impl_hhm_maybe_resize(struct ccc_hhmap_ *);
-uint64_t ccc_impl_hhm_filter(struct ccc_hhmap_ const *, void const *key);
-void *ccc_impl_hhm_base(struct ccc_hhmap_ const *h);
-size_t ccc_impl_hhm_increment(size_t capacity, size_t i);
-void ccc_impl_hhm_copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
-                               void const *slot_src);
+/** @private */
 struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
                                              size_t i);
 
