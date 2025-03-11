@@ -12,6 +12,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 enum : uint64_t
 {
@@ -60,26 +62,23 @@ union ccc_fhmap_entry_
         = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
     }
 
-struct ccc_ent_ ccc_impl_fhm_find(struct ccc_fhmap_ const *, void const *key,
-                                  uint64_t hash);
+/*===============   Wrappers for Macros to Access Internals     =============*/
+
+/** @private */
 void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
                          size_t cur_i);
-
+/** @private */
 struct ccc_fhash_entry_ ccc_impl_fhm_entry(struct ccc_fhmap_ *h,
                                            void const *key);
-struct ccc_fhash_entry_ *ccc_impl_fhm_and_modify(struct ccc_fhash_entry_ *e,
-                                                 ccc_update_fn *fn);
+/** @private */
 struct ccc_fhmap_elem_ *ccc_impl_fhm_in_slot(struct ccc_fhmap_ const *h,
                                              void const *slot);
+/** @private */
 void *ccc_impl_fhm_key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
+/** @private */
 uint64_t *ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *h, size_t i);
-size_t ccc_impl_fhm_distance(size_t capacity, size_t i, size_t j);
-ccc_result ccc_impl_fhm_maybe_resize(struct ccc_fhmap_ *);
-uint64_t ccc_impl_fhm_filter(struct ccc_fhmap_ const *, void const *key);
-void *ccc_impl_fhm_base(struct ccc_fhmap_ const *h);
+/** @private */
 size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
-
-/* NOLINTBEGIN(readability-identifier-naming) */
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 

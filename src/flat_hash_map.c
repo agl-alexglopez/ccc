@@ -672,31 +672,11 @@ ccc_impl_fhm_entry(struct ccc_fhmap_ *const h, void const *const key)
     return container_entry(h, key);
 }
 
-struct ccc_fhash_entry_ *
-ccc_impl_fhm_and_modify(struct ccc_fhash_entry_ *const e,
-                        ccc_update_fn *const fn)
-{
-    return and_modify(e, fn);
-}
-
-struct ccc_ent_
-ccc_impl_fhm_find(struct ccc_fhmap_ const *const h, void const *const key,
-                  uint64_t const hash)
-{
-    return find(h, key, hash);
-}
-
 void
 ccc_impl_fhm_insert(struct ccc_fhmap_ *const h, void const *const e,
                     uint64_t const hash, size_t cur_i)
 {
     insert(h, e, hash, cur_i);
-}
-
-ccc_result
-ccc_impl_fhm_maybe_resize(struct ccc_fhmap_ *const h)
-{
-    return maybe_resize(h);
 }
 
 struct ccc_fhmap_elem_ *
@@ -713,33 +693,15 @@ ccc_impl_fhm_key_in_slot(struct ccc_fhmap_ const *const h,
 }
 
 size_t
-ccc_impl_fhm_distance(size_t const capacity, size_t const i, size_t const j)
-{
-    return distance(capacity, i, j);
-}
-
-size_t
 ccc_impl_fhm_increment(size_t const capacity, size_t const i)
 {
     return increment(capacity, i);
-}
-
-void *
-ccc_impl_fhm_base(struct ccc_fhmap_ const *const h)
-{
-    return ccc_buf_begin(&h->buf_);
 }
 
 uint64_t *
 ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *const h, size_t const i)
 {
     return hash_at(h, i);
-}
-
-uint64_t
-ccc_impl_fhm_filter(struct ccc_fhmap_ const *const h, void const *const key)
-{
-    return filter(h, key);
 }
 
 /*=======================     Static Helpers    =============================*/
