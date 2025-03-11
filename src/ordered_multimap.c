@@ -621,13 +621,6 @@ ccc_impl_omm_key_in_slot(struct ccc_tree_ const *const t,
     return key_in_slot(t, slot);
 }
 
-void *
-ccc_impl_omm_key_from_node(struct ccc_tree_ const *const t,
-                           struct ccc_node_ const *const n)
-{
-    return key_from_node(t, n);
-}
-
 struct ccc_node_ *
 ccc_impl_ommap_elem_in_slot(struct ccc_tree_ const *const t,
                             void const *const slot)
