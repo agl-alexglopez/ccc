@@ -7,6 +7,8 @@
 
 #include "../types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 struct ccc_pq_elem_
 {
@@ -29,8 +31,22 @@ struct ccc_pq_
     void *aux_;
 };
 
-/* NOLINTBEGIN(readability-identifier-naming) */
+/*=========================  Private Interface     ==========================*/
 
+/** @private */
+void ccc_impl_pq_push(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+/** @private */
+struct ccc_pq_elem_ *ccc_impl_pq_elem_in(struct ccc_pq_ const *, void const *);
+/** @private */
+void ccc_impl_pq_update_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+/** @private */
+void ccc_impl_pq_increase_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+/** @private */
+void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+
+/*=========================  Macro Implementations     ======================*/
+
+/** @private */
 #define ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn,         \
                          alloc_fn, aux_data)                                   \
     {                                                                          \
@@ -44,12 +60,7 @@ struct ccc_pq_
         .aux_ = (aux_data),                                                    \
     }
 
-void ccc_impl_pq_push(struct ccc_pq_ *, struct ccc_pq_elem_ *);
-struct ccc_pq_elem_ *ccc_impl_pq_elem_in(struct ccc_pq_ const *, void const *);
-void ccc_impl_pq_update_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
-void ccc_impl_pq_increase_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
-void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
-
+/** @private */
 #define ccc_impl_pq_emplace(pq_ptr, lazy_value...)                             \
     (__extension__({                                                           \
         typeof(lazy_value) *pq_res_ = NULL;                                    \
@@ -74,6 +85,7 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
         pq_res_;                                                               \
     }))
 
+/** @private */
 #define ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T...)    \
     (__extension__({                                                           \
         struct ccc_pq_ *const pq_ = (pq_ptr);                                  \
@@ -89,6 +101,7 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
         pq_update_res_;                                                        \
     }))
 
+/** @private */
 #define ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr,                            \
                                increase_closure_over_T...)                     \
     (__extension__({                                                           \
@@ -105,6 +118,7 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
         pq_increase_res_;                                                      \
     }))
 
+/** @private */
 #define ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr,                            \
                                decrease_closure_over_T...)                     \
     (__extension__({                                                           \
