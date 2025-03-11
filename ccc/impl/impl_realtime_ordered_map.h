@@ -9,6 +9,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 typedef struct ccc_romap_elem_
 {
@@ -45,6 +47,25 @@ union ccc_romap_entry_
     struct ccc_rtree_entry_ impl_;
 };
 
+/*=========================   Private Interface  ============================*/
+
+/** @private */
+void *ccc_impl_rom_key_in_slot(struct ccc_romap_ const *rom, void const *slot);
+/** @private */
+struct ccc_romap_elem_ *
+ccc_impl_romap_elem_in_slot(struct ccc_romap_ const *rom, void const *slot);
+/** @private */
+struct ccc_rtree_entry_ ccc_impl_rom_entry(struct ccc_romap_ const *rom,
+                                           void const *key);
+/** @private */
+void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
+                          struct ccc_romap_elem_ *parent,
+                          ccc_threeway_cmp last_cmp,
+                          struct ccc_romap_elem_ *out_handle);
+
+/*==========================   Initialization     ===========================*/
+
+/** @private */
 #define ccc_impl_rom_init(map_name, struct_name, node_elem_field,              \
                           key_elem_field, key_cmp_fn, alloc_fn, aux_data)      \
     {                                                                          \
@@ -61,22 +82,9 @@ union ccc_romap_entry_
         .aux_ = (aux_data),                                                    \
     }
 
-void *ccc_impl_rom_key_from_node(struct ccc_romap_ const *rom,
-                                 struct ccc_romap_elem_ const *elem);
-void *ccc_impl_rom_key_in_slot(struct ccc_romap_ const *rom, void const *slot);
-struct ccc_romap_elem_ *
-ccc_impl_romap_elem_in_slot(struct ccc_romap_ const *rom, void const *slot);
-struct ccc_rtree_entry_ ccc_impl_rom_entry(struct ccc_romap_ const *rom,
-                                           void const *key);
-void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
-                          struct ccc_romap_elem_ *parent,
-                          ccc_threeway_cmp last_cmp,
-                          struct ccc_romap_elem_ *out_handle);
-
-/* NOLINTBEGIN(readability-identifier-naming) */
-
 /*==================   Helper Macros for Repeated Logic     =================*/
 
+/** @private */
 #define ccc_impl_rom_new(realtime_ordered_map_entry)                           \
     (__extension__({                                                           \
         void *rom_ins_alloc_ret_ = NULL;                                       \
@@ -91,6 +99,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         rom_ins_alloc_ret_;                                                    \
     }))
 
+/** @private */
 #define ccc_impl_rom_insert_key_val(realtime_ordered_map_entry, new_mem,       \
                                     lazy_key_value...)                         \
     (__extension__({                                                           \
@@ -108,6 +117,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         }                                                                      \
     }))
 
+/** @private */
 #define ccc_impl_rom_insert_and_copy_key(                                      \
     rom_insert_entry, rom_insert_entry_ret, key, lazy_value...)                \
     (__extension__({                                                           \
@@ -135,6 +145,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
 
 /*==================     Core Macro Implementations     =====================*/
 
+/** @private */
 #define ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,   \
                                   closure_over_T...)                           \
     (__extension__({                                                           \
@@ -156,6 +167,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         rom_mod_ent_;                                                          \
     }))
 
+/** @private */
 #define ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr,               \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
@@ -179,6 +191,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         rom_or_ins_ret_;                                                       \
     }))
 
+/** @private */
 #define ccc_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr,            \
                                     lazy_key_value...)                         \
     (__extension__({                                                           \
@@ -209,6 +222,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         rom_ins_ent_ret_;                                                      \
     }))
 
+/** @private */
 #define ccc_impl_rom_try_insert_w(realtime_ordered_map_ptr, key,               \
                                   lazy_value...)                               \
     (__extension__({                                                           \
@@ -233,6 +247,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         rom_try_ins_ent_ret_;                                                  \
     }))
 
+/** @private */
 #define ccc_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
                                         lazy_value...)                         \
     (__extension__({                                                           \

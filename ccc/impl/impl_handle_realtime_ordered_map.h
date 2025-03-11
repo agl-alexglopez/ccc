@@ -10,6 +10,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private Runs the standard WAVL tree algorithms with the addition of
 a free list. The parent field tracks the parent for an allocated node in the
 tree that the user has inserted into the array. When the user removes a node
@@ -55,21 +57,25 @@ union ccc_hromap_handle_
     struct ccc_hrtree_handle_ impl_;
 };
 
-void *ccc_impl_hrm_key_from_node(struct ccc_hromap_ const *hrm,
-                                 struct ccc_hromap_elem_ const *elem);
+/*========================  Private Interface  ==============================*/
+
+/** @private */
 void *ccc_impl_hrm_key_at(struct ccc_hromap_ const *hrm, size_t slot);
+/** @private */
 struct ccc_hromap_elem_ *ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm,
                                               size_t i);
+/** @private */
 struct ccc_hrtree_handle_ ccc_impl_hrm_handle(struct ccc_hromap_ const *hrm,
                                               void const *key);
+/** @private */
 void ccc_impl_hrm_insert(struct ccc_hromap_ *hrm, size_t parent_i,
                          ccc_threeway_cmp last_cmp, size_t elem_i);
+/** @private */
 size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
-
-/* NOLINTBEGIN(readability-identifier-naming) */
 
 /*=========================      Initialization     =========================*/
 
+/** @private */
 #define ccc_impl_hrm_init(memory_ptr, node_elem_field, key_elem_field,         \
                           key_cmp_fn, alloc_fn, aux_data, capacity)            \
     {                                                                          \
@@ -81,12 +87,14 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
         .cmp_ = (key_cmp_fn),                                                  \
     }
 
+/** @private */
 #define ccc_impl_hrm_as(handle_realtime_ordered_map_ptr, type_name, handle...) \
     ((type_name *)ccc_buf_at(&(handle_realtime_ordered_map_ptr)->buf_,         \
                              (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
+/** @private */
 #define ccc_impl_hrm_and_modify_w(handle_realtime_ordered_map_handle_ptr,      \
                                   type_name, closure_over_T...)                \
     (__extension__({                                                           \
@@ -109,6 +117,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
         hrm_mod_hndl_;                                                         \
     }))
 
+/** @private */
 #define ccc_impl_hrm_or_insert_w(handle_realtime_ordered_map_handle_ptr,       \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
@@ -141,6 +150,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
         hrm_or_ins_ret_;                                                       \
     }))
 
+/** @private */
 #define ccc_impl_hrm_insert_handle_w(handle_realtime_ordered_map_handle_ptr,   \
                                      lazy_key_value...)                        \
     (__extension__({                                                           \
@@ -181,6 +191,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
         hrm_ins_hndl_ret_;                                                     \
     }))
 
+/** @private */
 #define ccc_impl_hrm_try_insert_w(handle_realtime_ordered_map_ptr, key,        \
                                   lazy_value...)                               \
     (__extension__({                                                           \
@@ -221,6 +232,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
         hrm_try_ins_hndl_ret_;                                                 \
     }))
 
+/** @private */
 #define ccc_impl_hrm_insert_or_assign_w(handle_realtime_ordered_map_ptr, key,  \
                                         lazy_value...)                         \
     (__extension__({                                                           \
