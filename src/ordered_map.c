@@ -474,13 +474,6 @@ ccc_impl_om_key_in_slot(struct ccc_tree_ const *const t, void const *const slot)
     return key_in_slot(t, slot);
 }
 
-void *
-ccc_impl_om_key_from_node(struct ccc_tree_ const *const t,
-                          struct ccc_node_ const *const n)
-{
-    return key_from_node(t, n);
-}
-
 struct ccc_node_ *
 ccc_impl_omap_elem_in_slot(struct ccc_tree_ const *const t, void const *slot)
 {
@@ -874,14 +867,12 @@ are_subtrees_valid(struct ccc_tree_ const *const t, struct tree_range_ const r,
         return CCC_TRUE;
     }
     if (r.low != nil
-        && cmp(t, ccc_impl_om_key_from_node(t, r.low), r.root, t->cmp_)
-               != CCC_LES)
+        && cmp(t, key_from_node(t, r.low), r.root, t->cmp_) != CCC_LES)
     {
         return CCC_FALSE;
     }
     if (r.high != nil
-        && cmp(t, ccc_impl_om_key_from_node(t, r.high), r.root, t->cmp_)
-               != CCC_GRT)
+        && cmp(t, key_from_node(t, r.high), r.root, t->cmp_) != CCC_GRT)
     {
         return CCC_FALSE;
     }
