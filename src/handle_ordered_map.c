@@ -589,13 +589,6 @@ ccc_impl_hom_handle(struct ccc_homap_ *const hom, void const *const key)
 }
 
 void *
-ccc_impl_hom_key_from_node(struct ccc_homap_ const *const hom,
-                           struct ccc_homap_elem_ const *const elem)
-{
-    return key_from_node(hom, elem);
-}
-
-void *
 ccc_impl_hom_key_at(struct ccc_homap_ const *const hom, size_t const slot)
 {
     return key_at(hom, slot);

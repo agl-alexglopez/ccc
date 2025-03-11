@@ -9,6 +9,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private Runs the top down splay tree algorithm with the addition of a free
 list for providing new nodes within the buffer. The parent field normally
 tracks parent when in the tree for iteration purposes. When a node is removed
@@ -53,20 +55,24 @@ union ccc_homap_handle_
     struct ccc_htree_handle_ impl_;
 };
 
+/*===========================   Private Interface ===========================*/
+
+/** @private */
 void ccc_impl_hom_insert(struct ccc_homap_ *hom, size_t elem_i);
+/** @private */
 struct ccc_htree_handle_ ccc_impl_hom_handle(struct ccc_homap_ *hom,
                                              void const *key);
-void *ccc_impl_hom_key_from_node(struct ccc_homap_ const *hom,
-                                 struct ccc_homap_elem_ const *elem);
+/** @private */
 void *ccc_impl_hom_key_at(struct ccc_homap_ const *hom, size_t slot);
+/** @private */
 struct ccc_homap_elem_ *ccc_impl_homap_elem_at(struct ccc_homap_ const *hom,
                                                size_t slot);
+/** @private */
 size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
-
-/* NOLINTBEGIN(readability-identifier-naming) */
 
 /*========================     Initialization       =========================*/
 
+/** @private */
 #define ccc_impl_hom_init(mem_ptr, node_elem_field, key_elem_field,            \
                           key_cmp_fn, alloc_fn, aux_data, capacity)            \
     {                                                                          \
@@ -78,11 +84,13 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
         .cmp_ = (key_cmp_fn),                                                  \
     }
 
+/** @private */
 #define ccc_impl_hom_as(handle_ordered_map_ptr, type_name, handle...)          \
     ((type_name *)ccc_buf_at(&(handle_ordered_map_ptr)->buf_, (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
+/** @private */
 #define ccc_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \
                                   closure_over_T...)                           \
     (__extension__({                                                           \
@@ -105,6 +113,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
         hom_mod_hndl_;                                                         \
     }))
 
+/** @private */
 #define ccc_impl_hom_or_insert_w(handle_ordered_map_handle_ptr,                \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
@@ -135,6 +144,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
         hom_or_ins_ret_;                                                       \
     }))
 
+/** @private */
 #define ccc_impl_hom_insert_handle_w(handle_ordered_map_handle_ptr,            \
                                      lazy_key_value...)                        \
     (__extension__({                                                           \
@@ -174,6 +184,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
         hom_ins_hndl_ret_;                                                     \
     }))
 
+/** @private */
 #define ccc_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)  \
     (__extension__({                                                           \
         __auto_type hom_try_ins_map_ptr_ = (handle_ordered_map_ptr);           \
@@ -212,6 +223,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
         hom_try_ins_hndl_ret_;                                                 \
     }))
 
+/** @private */
 #define ccc_impl_hom_insert_or_assign_w(handle_ordered_map_ptr, key,           \
                                         lazy_value...)                         \
     (__extension__({                                                           \
