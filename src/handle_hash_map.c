@@ -727,37 +727,11 @@ ccc_impl_hhm_handle(struct ccc_hhmap_ *const h, void const *const key)
     return container_handle(h, key);
 }
 
-struct ccc_hhash_handle_ *
-ccc_impl_hhm_and_modify(struct ccc_hhash_handle_ *const e,
-                        ccc_update_fn *const fn)
-{
-    return and_modify(e, fn);
-}
-
-struct ccc_handl_
-ccc_impl_hhm_find(struct ccc_hhmap_ const *const h, void const *const key,
-                  uint64_t const hash)
-{
-    return find(h, key, hash);
-}
-
 ccc_handle_i
 ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
                          size_t cur_i)
 {
     return insert_meta(h, hash, cur_i);
-}
-
-ccc_result
-ccc_impl_hhm_maybe_resize(struct ccc_hhmap_ *const h)
-{
-    return maybe_resize(h);
-}
-
-struct ccc_hhmap_elem_ *
-ccc_impl_hhm_in_slot(struct ccc_hhmap_ const *const h, void const *const slot)
-{
-    return elem_in_slot(h, slot);
 }
 
 void *
@@ -766,41 +740,10 @@ ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t const i)
     return (char *)ccc_buf_at(&h->buf_, i) + h->key_offset_;
 }
 
-size_t
-ccc_impl_hhm_distance(size_t const capacity, size_t const i, size_t const j)
-{
-    return distance(capacity, i, j);
-}
-
-size_t
-ccc_impl_hhm_increment(size_t const capacity, size_t const i)
-{
-    return increment(capacity, i);
-}
-
-void *
-ccc_impl_hhm_base(struct ccc_hhmap_ const *const h)
-{
-    return ccc_buf_begin(&h->buf_);
-}
-
 uint64_t *
 ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *const h, size_t const i)
 {
     return hash_at(h, i);
-}
-
-uint64_t
-ccc_impl_hhm_filter(struct ccc_hhmap_ const *const h, void const *const key)
-{
-    return filter(h, key);
-}
-
-void
-ccc_impl_hhm_copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
-                          void const *const slot_src)
-{
-    copy_to_slot(h, slot_dst, slot_src);
 }
 
 struct ccc_hhmap_elem_ *
