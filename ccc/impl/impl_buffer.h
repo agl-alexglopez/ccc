@@ -8,6 +8,8 @@
 
 #include "../types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 struct ccc_buf_
 {
@@ -19,11 +21,15 @@ struct ccc_buf_
     void *aux_;
 };
 
+/** @private */
 #define IMPL_BUF_NON_IMPL_BUF_DEFAULT_SIZE(...) __VA_ARGS__
+/** @private */
 #define IMPL_BUF_DEFAULT_SIZE(...) 0
+/** @private */
 #define IMPL_BUF_OPTIONAL_SIZE(...)                                            \
     __VA_OPT__(IMPL_BUF_NON_)##IMPL_BUF_DEFAULT_SIZE(__VA_ARGS__)
 
+/** @private */
 #define ccc_impl_buf_init(mem, alloc_fn, aux_data, capacity, ...)              \
     {                                                                          \
         .mem_ = (mem),                                                         \
@@ -34,8 +40,7 @@ struct ccc_buf_
         .aux_ = (aux_data),                                                    \
     }
 
-/* NOLINTBEGIN(readability-identifier-naming) */
-
+/** @private */
 #define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \
     (__extension__({                                                           \
         typeof(type_initializer) *buf_res_ = NULL;                             \
@@ -51,6 +56,7 @@ struct ccc_buf_
         buf_res_;                                                              \
     }))
 
+/** @private */
 #define ccc_impl_buf_emplace_back(ccc_buf_ptr, type_initializer...)            \
     (__extension__({                                                           \
         typeof(type_initializer) *buf_res_ = NULL;                             \

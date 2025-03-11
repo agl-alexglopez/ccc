@@ -7,6 +7,8 @@
 
 #include "../buffer.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 struct ccc_fdeq_
 {
@@ -14,9 +16,15 @@ struct ccc_fdeq_
     size_t front_;
 };
 
+/*=======================    Private Interface   ============================*/
+/** @private */
 void *ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *);
+/** @private */
 void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
 
+/*=======================  Macro Implementations   ==========================*/
+
+/** @private */
 #define ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity,              \
                            optional_size...)                                   \
     {                                                                          \
@@ -25,8 +33,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
         .front_ = 0,                                                           \
     }
 
-/* NOLINTBEGIN(readability-identifier-naming) */
-
+/** @private */
 #define ccc_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
     (__extension__({                                                           \
         __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
@@ -43,6 +50,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
         fdeq_emplace_ret_;                                                     \
     }))
 
+/** @private */
 #define ccc_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
     (__extension__({                                                           \
         __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \

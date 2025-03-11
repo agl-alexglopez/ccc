@@ -18,7 +18,7 @@
 #include "../types.h"
 /* NOLINTEND */
 
-/*======================     Entry Interface   ==============================*/
+/*====================     Entry/Handle Interface   =========================*/
 
 #define ccc_impl_swap_entry(container_ptr, swap_args...)                       \
     _Generic((container_ptr),                                                  \

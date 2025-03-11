@@ -66,6 +66,24 @@ union ccc_hhmap_ref_
     size_t impl_;
 };
 
+/*======================       Private Interface    =========================*/
+
+/** @private */
+ccc_handle_i ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
+                                      size_t cur_i);
+/** @private */
+struct ccc_hhash_handle_ ccc_impl_hhm_handle(struct ccc_hhmap_ *h,
+                                             void const *key);
+/** @private */
+void *ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t i);
+/** @private */
+uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, size_t i);
+/** @private */
+struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
+                                             size_t i);
+
+/*======================    Macro Implementations     =======================*/
+
 /** @private */
 #define ccc_impl_hhm_init(memory_ptr, hhash_elem_field, key_field, hash_fn,    \
                           key_eq_fn, alloc_fn, aux, capacity)                  \
@@ -82,24 +100,6 @@ union ccc_hhmap_ref_
 /** @private */
 #define ccc_impl_hhm_as(handle_hash_map_ptr, type_name, handle...)             \
     ((type_name *)ccc_buf_at(&(handle_hash_map_ptr)->buf_, (handle)))
-
-/*===============   Wrappers for Macros to Access Internals     =============*/
-
-/** @private */
-ccc_handle_i ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
-                                      size_t cur_i);
-/** @private */
-struct ccc_hhash_handle_ ccc_impl_hhm_handle(struct ccc_hhmap_ *h,
-                                             void const *key);
-/** @private */
-void *ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t i);
-/** @private */
-uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, size_t i);
-/** @private */
-struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
-                                             size_t i);
-
-/*==================   Helper Macros for Repeated Logic     =================*/
 
 /** @private Internal helper assumes that handle has already been evaluated
 once which it must have to make it to this point. */

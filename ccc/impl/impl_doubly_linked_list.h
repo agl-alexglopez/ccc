@@ -8,6 +8,8 @@
 
 #include "../types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 typedef struct ccc_dll_elem_
 {
@@ -27,11 +29,19 @@ struct ccc_dll_
     void *aux_;
 };
 
+/*=======================     Private Interface   ===========================*/
+
+/** @private */
 void ccc_impl_dll_push_back(struct ccc_dll_ *, struct ccc_dll_elem_ *);
+/** @private */
 void ccc_impl_dll_push_front(struct ccc_dll_ *, struct ccc_dll_elem_ *);
+/** @private */
 struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
                                            void const *user_struct);
 
+/*=======================     Macro Implementations   =======================*/
+
+/** @private */
 #define ccc_impl_dll_init(dll_name, struct_name, dll_elem_field, cmp_fn,       \
                           alloc_fn, aux_data)                                  \
     {                                                                          \
@@ -45,8 +55,7 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
         .aux_ = (aux_data),                                                    \
     }
 
-/* NOLINTBEGIN(readability-identifier-naming) */
-
+/** @private */
 #define ccc_impl_dll_emplace_back(dll_ptr, struct_initializer...)              \
     (__extension__({                                                           \
         typeof(struct_initializer) *dll_res_ = NULL;                           \
@@ -67,6 +76,7 @@ struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
         dll_res_;                                                              \
     }))
 
+/** @private */
 #define ccc_impl_dll_emplace_front(dll_ptr, struct_initializer...)             \
     (__extension__({                                                           \
         typeof(struct_initializer) *dll_res_;                                  \
