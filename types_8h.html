@@ -639,8 +639,12 @@ Data Structures</h2></td></tr>
 
 <p>A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1. </p>
 <p>Some containers conceptually take or return a boolean value as part of their operations. However, booleans cannot indicate errors and this library offers no errno or C++ throw-like behavior. Therefore, a three state value can offer additional information while still maintaining the truthy and falsey bool behavior one would normally expect. The chosen values also allow the user to implement Three-valued Logic if desired as follows:</p>
-<p>LOGIC IMPLEMENTATION NOT(A) = NEG(A) AND(A,B) = MIN(A,B) OR(A,B) = MAX(A,B) XOR(A,B) = MIN(MAX(A,B), NEG(MIN(A,B)))</p>
-<p>When interacting with multiple containers the user is free to implement this logic for the values they return. However, a three branch coding pattern usually suffice: <code>if (result &lt; 0) {} else if (result) {} else {}</code>. </p>
+<div class="fragment"><div class="line">LOGIC      IMPLEMENTATION</div>
+<div class="line">NOT(A)   = NEG(A)</div>
+<div class="line">AND(A,B) = MIN(A,B)</div>
+<div class="line">OR(A,B)  = MAX(A,B)</div>
+<div class="line">XOR(A,B) = MIN(MAX(A,B), NEG(MIN(A,B)))</div>
+</div><!-- fragment --><p>When interacting with multiple containers the user is free to implement this logic for the values they return. However, a three branch coding pattern usually suffice: <code>if (result &lt; 0) {} else if (result) {} else {}</code>. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938ad795c39ec159a23f2e9f830ab4f7ebed" name="a80a7915df3bc36e01a3a0775eebc0938ad795c39ec159a23f2e9f830ab4f7ebed"></a>CCC_BOOL_ERR&#160;</td><td class="fielddoc"><p>Intended value if CCC_FALSE or CCC_TRUE could not be returned. </p>
 </td></tr>
