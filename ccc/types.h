@@ -92,9 +92,20 @@ is 0, and True is 1.
 
 Some containers conceptually take or return a boolean value as part of their
 operations. However, booleans cannot indicate errors and this library offers
-no errno or C++ throw-like behavior. Therefore, a three state boolean can offer
+no errno or C++ throw-like behavior. Therefore, a three state value can offer
 additional information while still maintaining the truthy and falsey bool
-behavior one would normally expect. */
+behavior one would normally expect. The chosen values also allow the user to
+implement Three-valued Logic if desired as follows:
+
+LOGIC      IMPLEMENTATION
+NOT(A)   = NEG(A)
+AND(A,B) = MIN(A,B)
+OR(A,B)  = MAX(A,B)
+XOR(A,B) = MIN(MAX(A,B), NEG(MIN(A,B)))
+
+When interacting with multiple containers the user is free to implement this
+logic for the values they return. However, a three branch coding pattern usually
+suffice: `if (result < 0) {} else if (result) {} else {}`. */
 typedef enum : int8_t
 {
     /** Intended value if CCC_FALSE or CCC_TRUE could not be returned. */
