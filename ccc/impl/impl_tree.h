@@ -18,6 +18,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private This node type will support more expressive implementations of a
    standard map and multimap. The array of pointers is to support unifying left
    and right symmetric cases. The union is only relevant to the multimap.
@@ -70,6 +72,7 @@ struct ccc_tree_entry_
     struct ccc_ent_ entry_;
 };
 
+/** @private */
 #define ccc_tree_init(tree_name, struct_name, node_elem_field, key_elem_field, \
                       key_cmp_fn, alloc_fn, aux_data)                          \
     {                                                                          \
@@ -87,5 +90,7 @@ struct ccc_tree_entry_
             .key_offset_ = offsetof(struct_name, key_elem_field),              \
         },                                                                     \
     }
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_TREE_H */

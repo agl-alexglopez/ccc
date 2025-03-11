@@ -50,20 +50,7 @@ union ccc_fhmap_entry_
     struct ccc_fhash_entry_ impl_;
 };
 
-/** @private */
-#define ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,    \
-                          key_eq_fn, alloc_fn, aux, capacity)                  \
-    {                                                                          \
-        .buf_                                                                  \
-        = (ccc_buffer)ccc_buf_init((memory_ptr), (alloc_fn), (aux), capacity), \
-        .hash_fn_ = (hash_fn),                                                 \
-        .eq_fn_ = (key_eq_fn),                                                 \
-        .key_offset_ = offsetof(typeof(*(memory_ptr)), key_field),             \
-        .hash_elem_offset_                                                     \
-        = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
-    }
-
-/*===============   Wrappers for Macros to Access Internals     =============*/
+/*======================    Private Interface    ============================*/
 
 /** @private */
 void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
@@ -81,7 +68,20 @@ uint64_t *ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *h, size_t i);
 /** @private */
 size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 
-/*==================   Helper Macros for Repeated Logic     =================*/
+/*=====================   Macro Implementations     =========================*/
+
+/** @private */
+#define ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,    \
+                          key_eq_fn, alloc_fn, aux, capacity)                  \
+    {                                                                          \
+        .buf_                                                                  \
+        = (ccc_buffer)ccc_buf_init((memory_ptr), (alloc_fn), (aux), capacity), \
+        .hash_fn_ = (hash_fn),                                                 \
+        .eq_fn_ = (key_eq_fn),                                                 \
+        .key_offset_ = offsetof(typeof(*(memory_ptr)), key_field),             \
+        .hash_elem_offset_                                                     \
+        = offsetof(typeof(*(memory_ptr)), fhash_elem_field),                   \
+    }
 
 /** @private Internal helper assumes that swap_entry has already been evaluated
 once which it must have to make it to this point. */

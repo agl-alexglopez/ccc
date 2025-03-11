@@ -8,6 +8,8 @@
 
 #include "../types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 typedef struct ccc_sll_elem_
 {
@@ -26,6 +28,14 @@ struct ccc_sll_
     void *aux_;
 };
 
+/*=========================   Private Interface  ============================*/
+
+/** @private */
+void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
+
+/*======================   Macro Implementations     ========================*/
+
+/** @private */
 #define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, cmp_fn,       \
                           alloc_fn, aux_data)                                  \
     {                                                                          \
@@ -38,10 +48,7 @@ struct ccc_sll_
         .aux_ = (aux_data),                                                    \
     }
 
-void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
-
-/* NOLINTBEGIN(readability-identifier-naming) */
-
+/** @private */
 #define ccc_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
     (__extension__({                                                           \
         typeof(struct_initializer) *sll_res_ = NULL;                           \

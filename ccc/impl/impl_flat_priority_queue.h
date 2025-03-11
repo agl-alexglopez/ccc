@@ -1,6 +1,3 @@
-/* Author: Alexander Lopez
-   File: impl_flat_pqueue.h
-   ------------------------ */
 #ifndef CCC_IMPL_FLAT_PRIORITY_QUEUE_H
 #define CCC_IMPL_FLAT_PRIORITY_QUEUE_H
 
@@ -12,6 +9,8 @@
 #include "../buffer.h"
 #include "../types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private */
 struct ccc_fpq_
 {
@@ -20,14 +19,18 @@ struct ccc_fpq_
     ccc_threeway_cmp order_;
 };
 
+/*========================    Private Interface     =========================*/
+
+/** @private */
 size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
+/** @private */
 void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
+/** @private */
 void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 
-/* NOLINTBEGIN(readability-identifier-naming) */
+/*======================    Macro Implementations    ========================*/
 
-/*=======================    Convenience Macros    ======================== */
-
+/** @private */
 #define ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,      \
                           capacity)                                            \
     {                                                                          \
@@ -36,6 +39,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         .order_ = (cmp_order),                                                 \
     }
 
+/** @private */
 #define ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn,        \
                                   aux_data, capacity, size)                    \
     (__extension__({                                                           \
@@ -47,9 +51,9 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         fpq_heapify_res_;                                                      \
     }))
 
-/* This macro "returns" a value thanks to clang and gcc statement expressions.
-   See documentation in the flat pqueue header for usage. The ugly details
-   of the macro are hidden here in the impl header. */
+/** @private This macro "returns" a value thanks to clang and gcc statement
+   expressions. See documentation in the flat pqueue header for usage. The ugly
+   details of the macro are hidden here in the impl header. */
 #define ccc_impl_fpq_emplace(fpq, type_initializer...)                         \
     (__extension__({                                                           \
         typeof(type_initializer) *fpq_res_;                                    \
@@ -87,8 +91,8 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         fpq_res_;                                                              \
     }))
 
-/* Only one update fn is needed because there is no advantage to updates if
-   it is known they are min/max increase/decrease etc. */
+/** @private Only one update fn is needed because there is no advantage to
+   updates if it is known they are min/max increase/decrease etc. */
 #define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
         struct ccc_fpq_ *const fpq_ = (fpq_ptr);                               \
@@ -102,9 +106,11 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         fpq_update_res_;                                                       \
     }))
 
+/** @private */
 #define ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)    \
     ccc_impl_fpq_update_w(fpq_ptr, T_ptr, increase_closure_over_T)
 
+/** @private */
 #define ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)    \
     ccc_impl_fpq_update_w(fpq_ptr, T_ptr, decrease_closure_over_T)
 
