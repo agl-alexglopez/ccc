@@ -648,13 +648,6 @@ ccc_impl_hrm_handle(struct ccc_hromap_ const *const hrm, void const *const key)
 }
 
 void *
-ccc_impl_hrm_key_from_node(struct ccc_hromap_ const *const hrm,
-                           struct ccc_hromap_elem_ const *const elem)
-{
-    return key_from_node(hrm, elem);
-}
-
-void *
 ccc_impl_hrm_key_at(struct ccc_hromap_ const *const hrm, size_t const slot)
 {
     return key_at(hrm, slot);

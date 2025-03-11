@@ -559,13 +559,6 @@ ccc_impl_rom_insert(struct ccc_romap_ *const rom,
 }
 
 void *
-ccc_impl_rom_key_from_node(struct ccc_romap_ const *const rom,
-                           struct ccc_romap_elem_ const *const elem)
-{
-    return key_from_node(rom, elem);
-}
-
-void *
 ccc_impl_rom_key_in_slot(struct ccc_romap_ const *const rom,
                          void const *const slot)
 {
