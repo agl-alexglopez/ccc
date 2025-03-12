@@ -69,7 +69,7 @@ ccc_result
 ccc_fdeq_push_front_range(ccc_flat_double_ended_queue *const fdeq,
                           ptrdiff_t const n, void const *const elems)
 {
-    if (!fdeq || !elems)
+    if (!fdeq || !elems || n < 0)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -80,7 +80,7 @@ ccc_result
 ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *const fdeq,
                          ptrdiff_t const n, void const *elems)
 {
-    if (!fdeq || !elems)
+    if (!fdeq || !elems || n < 0)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -91,7 +91,7 @@ void *
 ccc_fdeq_insert_range(ccc_flat_double_ended_queue *const fdeq, void *const pos,
                       ptrdiff_t const n, void const *elems)
 {
-    if (!fdeq)
+    if (!fdeq || n < 0 || !elems)
     {
         return NULL;
     }
@@ -184,7 +184,7 @@ ccc_fdeq_capacity(ccc_flat_double_ended_queue const *const fdeq)
 void *
 ccc_fdeq_at(ccc_flat_double_ended_queue const *const fdeq, ptrdiff_t const i)
 {
-    if (!fdeq || i >= ccc_buf_capacity(&fdeq->buf_))
+    if (!fdeq || i < 0 || i >= ccc_buf_capacity(&fdeq->buf_))
     {
         return NULL;
     }

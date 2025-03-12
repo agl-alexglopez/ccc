@@ -139,7 +139,7 @@ ccc_handle_i
 ccc_hom_insert_handle(ccc_homap_handle const *const h,
                       ccc_homap_elem *const elem)
 {
-    if (!h || !elem)
+    if (!h || !elem || h->impl_.handle_.i_ < 0)
     {
         return 0;
     }
@@ -160,7 +160,7 @@ ccc_hom_insert_handle(ccc_homap_handle const *const h,
 ccc_homap_handle *
 ccc_hom_and_modify(ccc_homap_handle *const h, ccc_update_fn *const fn)
 {
-    if (!h)
+    if (!h || h->impl_.handle_.i_ < 0)
     {
         return NULL;
     }
@@ -178,7 +178,7 @@ ccc_homap_handle *
 ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (!h)
+    if (!h || h->impl_.handle_.i_ < 0)
     {
         return NULL;
     }
@@ -195,7 +195,7 @@ ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_update_fn *const fn,
 ccc_handle_i
 ccc_hom_or_insert(ccc_homap_handle const *const h, ccc_homap_elem *const elem)
 {
-    if (!h || !elem)
+    if (!h || !elem || h->impl_.handle_.i_ < 0)
     {
         return 0;
     }

@@ -153,7 +153,7 @@ static void pop_slot(struct ccc_hhmap_ *, ptrdiff_t slots);
 void *
 ccc_hhm_at(ccc_handle_hash_map const *const h, ccc_handle_i i)
 {
-    if (!h || !i)
+    if (!h || i <= 0)
     {
         return NULL;
     }
@@ -205,7 +205,7 @@ ccc_handle_i
 ccc_hhm_insert_handle(ccc_hhmap_handle const *const e,
                       ccc_hhmap_elem *const elem)
 {
-    if (unlikely(!e || !elem))
+    if (unlikely(!e || !elem || e->impl_.handle_.i_ < 0))
     {
         return 0;
     }
@@ -251,7 +251,7 @@ ccc_hhm_get_key_val(ccc_handle_hash_map *const h, void const *const key)
 ccc_handle
 ccc_hhm_remove_handle(ccc_hhmap_handle const *const e)
 {
-    if (unlikely(!e))
+    if (unlikely(!e || e->impl_.handle_.i_ < 0))
     {
         return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
@@ -273,7 +273,7 @@ ccc_hhmap_handle *
 ccc_hhm_and_modify_aux(ccc_hhmap_handle *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (unlikely(!e))
+    if (unlikely(!e || e->impl_.handle_.i_ < 0))
     {
         return NULL;
     }
@@ -399,7 +399,7 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
 ccc_handle_i
 ccc_hhm_or_insert(ccc_hhmap_handle const *const e, ccc_hhmap_elem *const elem)
 {
-    if (unlikely(!e || !elem))
+    if (unlikely(!e || !elem || e->impl_.handle_.i_ < 0))
     {
         return 0;
     }
@@ -424,7 +424,8 @@ ccc_hhm_or_insert(ccc_hhmap_handle const *const e, ccc_hhmap_elem *const elem)
 ccc_handle_i
 ccc_hhm_unwrap(ccc_hhmap_handle const *const e)
 {
-    if (unlikely(!e) || !(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))
+    if (unlikely(!e || !(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+                 || e->impl_.handle_.i_ < 0))
     {
         return 0;
     }
@@ -486,7 +487,7 @@ ccc_hhm_begin(ccc_handle_hash_map const *const h)
 ccc_result
 ccc_hhm_next(ccc_hhmap_handle *const iter)
 {
-    if (unlikely(!iter))
+    if (unlikely(!iter || iter->impl_.handle_.i_ < 0))
     {
         return CCC_RESULT_ARG_ERROR;
     }

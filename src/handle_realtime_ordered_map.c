@@ -272,7 +272,8 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 ccc_hromap_handle *
 ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_update_fn *const fn)
 {
-    if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
+        && h->impl_.handle_.i_ > 0)
     {
         fn((ccc_user_type){
             .user_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), NULL});
@@ -284,7 +285,8 @@ ccc_hromap_handle *
 ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
+        && h->impl_.handle_.stats_ > 0)
     {
         fn((ccc_user_type){
             .user_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), aux});
@@ -295,7 +297,7 @@ ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_update_fn *const fn,
 ccc_handle_i
 ccc_hrm_or_insert(ccc_hromap_handle const *const h, ccc_hromap_elem *const elem)
 {
-    if (!h || !elem)
+    if (!h || !elem || h->impl_.handle_.i_ < 0)
     {
         return 0;
     }
@@ -311,7 +313,7 @@ ccc_handle_i
 ccc_hrm_insert_handle(ccc_hromap_handle const *const h,
                       ccc_hromap_elem *const elem)
 {
-    if (!h || !elem)
+    if (!h || !elem || h->impl_.handle_.i_ < 0)
     {
         return 0;
     }
@@ -345,7 +347,7 @@ ccc_hrm_handle(ccc_handle_realtime_ordered_map const *const hrm,
 ccc_handle
 ccc_hrm_remove_handle(ccc_hromap_handle const *const h)
 {
-    if (!h)
+    if (!h || h->impl_.handle_.i_ < 0)
     {
         return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
@@ -407,7 +409,8 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
 ccc_handle_i
 ccc_hrm_unwrap(ccc_hromap_handle const *const h)
 {
-    if (h && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (h && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
+        && h->impl_.handle_.i_ > 0)
     {
         return h->impl_.handle_.i_;
     }
@@ -644,6 +647,10 @@ void
 ccc_impl_hrm_insert(struct ccc_hromap_ *const hrm, ptrdiff_t const parent_i,
                     ccc_threeway_cmp const last_cmp, ptrdiff_t const elem_i)
 {
+    if (parent_i < 0 || elem_i < 0)
+    {
+        return;
+    }
     insert(hrm, parent_i, last_cmp, elem_i);
 }
 
@@ -656,12 +663,20 @@ ccc_impl_hrm_handle(struct ccc_hromap_ const *const hrm, void const *const key)
 void *
 ccc_impl_hrm_key_at(struct ccc_hromap_ const *const hrm, ptrdiff_t const slot)
 {
+    if (slot < 0)
+    {
+        return NULL;
+    }
     return key_at(hrm, slot);
 }
 
 struct ccc_hromap_elem_ *
 ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm, ptrdiff_t const i)
 {
+    if (i < 0)
+    {
+        return NULL;
+    }
     return at(hrm, i);
 }
 
