@@ -130,7 +130,7 @@ ccc_hom_handle(ccc_handle_ordered_map *const hom, void const *const key)
 {
     if (!hom || !key)
     {
-        return (ccc_homap_handle){{.handle_ = {.stats_ = CCC_ARG_ERROR}}};
+        return (ccc_homap_handle){{.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}}};
     }
     return (ccc_homap_handle){handle(hom, key)};
 }
@@ -143,7 +143,7 @@ ccc_hom_insert_handle(ccc_homap_handle const *const h,
     {
         return 0;
     }
-    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         *elem = *at(h->impl_.hom_, h->impl_.handle_.i_);
         void *const ret = base_at(h->impl_.hom_, h->impl_.handle_.i_);
@@ -164,7 +164,7 @@ ccc_hom_and_modify(ccc_homap_handle *const h, ccc_update_fn *const fn)
     {
         return NULL;
     }
-    if (fn && h->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type){
             .user_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
@@ -182,7 +182,7 @@ ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_update_fn *const fn,
     {
         return NULL;
     }
-    if (fn && h->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_user_type){
             .user_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
@@ -199,7 +199,7 @@ ccc_hom_or_insert(ccc_homap_handle const *const h, ccc_homap_elem *const elem)
     {
         return 0;
     }
-    if (h->impl_.handle_.stats_ & CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         return h->impl_.handle_.i_;
     }
@@ -212,7 +212,7 @@ ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
     size_t const found = find(hom, key_from_node(hom, out_handle));
     if (found)
@@ -223,14 +223,14 @@ ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
         void *const ret = base_at(hom, hom->root_);
         void *const tmp = ccc_buf_at(&hom->buf_, 0);
         swap(tmp, user_struct, ret, ccc_buf_elem_size(&hom->buf_));
-        return (ccc_handle){{.i_ = found, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     size_t const inserted = maybe_alloc_insert(hom, out_handle);
     if (!inserted)
     {
-        return (ccc_handle){{.i_ = 0, .stats_ = CCC_INSERT_ERROR}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
-    return (ccc_handle){{.i_ = inserted, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_handle
@@ -239,20 +239,20 @@ ccc_hom_try_insert(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
     size_t const found = find(hom, key_from_node(hom, key_val_handle));
     if (found)
     {
         assert(hom->root_);
-        return (ccc_handle){{.i_ = found, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     size_t const inserted = maybe_alloc_insert(hom, key_val_handle);
     if (!inserted)
     {
-        return (ccc_handle){{.i_ = 0, .stats_ = CCC_INSERT_ERROR}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
-    return (ccc_handle){{.i_ = inserted, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_handle
@@ -261,7 +261,7 @@ ccc_hom_insert_or_assign(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
     size_t const found = find(hom, key_from_node(hom, key_val_handle));
     if (found)
@@ -274,14 +274,14 @@ ccc_hom_insert_or_assign(ccc_handle_ordered_map *const hom,
         {
             memcpy(f_base, e_base, ccc_buf_elem_size(&hom->buf_));
         }
-        return (ccc_handle){{.i_ = found, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     size_t const inserted = maybe_alloc_insert(hom, key_val_handle);
     if (!inserted)
     {
-        return (ccc_handle){{.i_ = 0, .stats_ = CCC_INSERT_ERROR}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
-    return (ccc_handle){{.i_ = inserted, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = inserted, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_handle
@@ -290,14 +290,14 @@ ccc_hom_remove(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
     size_t const n = erase(hom, key_from_node(hom, out_handle));
     if (!n)
     {
-        return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
+        return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_VACANT}};
     }
-    return (ccc_handle){{.i_ = n, .stats_ = CCC_OCCUPIED}};
+    return (ccc_handle){{.i_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
 ccc_handle
@@ -305,16 +305,16 @@ ccc_hom_remove_handle(ccc_homap_handle *const h)
 {
     if (!h)
     {
-        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
-    if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
+    if (h->impl_.handle_.stats_ == CCC_ENTRY_OCCUPIED)
     {
         size_t const erased
             = erase(h->impl_.hom_, key_at(h->impl_.hom_, h->impl_.handle_.i_));
         assert(erased);
-        return (ccc_handle){{.i_ = erased, .stats_ = CCC_OCCUPIED}};
+        return (ccc_handle){{.i_ = erased, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    return (ccc_handle){{.i_ = 0, .stats_ = CCC_VACANT}};
+    return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_VACANT}};
 }
 
 ccc_handle_i
@@ -324,7 +324,8 @@ ccc_hom_unwrap(ccc_homap_handle const *const h)
     {
         return 0;
     }
-    return h->impl_.handle_.stats_ == CCC_OCCUPIED ? h->impl_.handle_.i_ : 0;
+    return h->impl_.handle_.stats_ == CCC_ENTRY_OCCUPIED ? h->impl_.handle_.i_
+                                                         : 0;
 }
 
 ccc_tribool
@@ -334,7 +335,7 @@ ccc_hom_insert_error(ccc_homap_handle const *const h)
     {
         return CCC_BOOL_ERR;
     }
-    return (h->impl_.handle_.stats_ & CCC_INSERT_ERROR) != 0;
+    return (h->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 ccc_tribool
@@ -344,13 +345,13 @@ ccc_hom_occupied(ccc_homap_handle const *const h)
     {
         return CCC_BOOL_ERR;
     }
-    return (h->impl_.handle_.stats_ & CCC_OCCUPIED) != 0;
+    return (h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_handle_status
 ccc_hom_handle_status(ccc_homap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ : CCC_ARG_ERROR;
+    return h ? h->impl_.handle_.stats_ : CCC_ENTRY_ARG_ERROR;
 }
 
 ccc_tribool
@@ -646,12 +647,12 @@ handle(struct ccc_homap_ *const hom, void const *const key)
     {
         return (struct ccc_htree_handle_){
             .hom_ = hom,
-            .handle_ = {.i_ = found, .stats_ = CCC_OCCUPIED},
+            .handle_ = {.i_ = found, .stats_ = CCC_ENTRY_OCCUPIED},
         };
     }
     return (struct ccc_htree_handle_){
         .hom_ = hom,
-        .handle_ = {.i_ = 0, .stats_ = CCC_VACANT},
+        .handle_ = {.i_ = 0, .stats_ = CCC_ENTRY_VACANT},
     };
 }
 

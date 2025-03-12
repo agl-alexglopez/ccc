@@ -9,11 +9,11 @@
 /** @private */
 enum ccc_entry_status_ : uint8_t
 {
-    CCC_VACANT = 0,
-    CCC_OCCUPIED = 0x1,
-    CCC_INSERT_ERROR = 0x2,
-    CCC_ARG_ERROR = 0x4,
-    CCC_NO_UNWRAP = 0x8,
+    CCC_ENTRY_VACANT = 0,
+    CCC_ENTRY_OCCUPIED = 0x1,
+    CCC_ENTRY_INSERT_ERROR = 0x2,
+    CCC_ENTRY_ARG_ERROR = 0x4,
+    CCC_ENTRY_NO_UNWRAP = 0x8,
 };
 
 /** @private */
