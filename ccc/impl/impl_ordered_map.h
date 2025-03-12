@@ -105,7 +105,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
     (__extension__({                                                           \
         __auto_type om_ent_ptr_ = (ordered_map_entry_ptr);                     \
         struct ccc_tree_entry_ om_mod_ent_                                     \
-            = {.entry_ = {.stats_ = CCC_INPUT_ERROR}};                         \
+            = {.entry_ = {.stats_ = CCC_ARG_ERROR}};                           \
         if (om_ent_ptr_)                                                       \
         {                                                                      \
             om_mod_ent_ = om_ent_ptr_->impl_;                                  \
@@ -177,7 +177,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_om_try_insert_w(ordered_map_ptr, key, lazy_value...)          \
     (__extension__({                                                           \
         __auto_type try_ins_map_ptr_ = (ordered_map_ptr);                      \
-        struct ccc_ent_ om_try_ins_ent_ret_ = {.stats_ = CCC_INPUT_ERROR};     \
+        struct ccc_ent_ om_try_ins_ent_ret_ = {.stats_ = CCC_ARG_ERROR};       \
         if (try_ins_map_ptr_)                                                  \
         {                                                                      \
             __auto_type om_key_ = (key);                                       \
@@ -202,8 +202,7 @@ void *ccc_impl_om_insert(struct ccc_tree_ *t, ccc_node_ *n);
 #define ccc_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)    \
     (__extension__({                                                           \
         __auto_type ins_or_assign_map_ptr_ = (ordered_map_ptr);                \
-        struct ccc_ent_ om_ins_or_assign_ent_ret_                              \
-            = {.stats_ = CCC_INPUT_ERROR};                                     \
+        struct ccc_ent_ om_ins_or_assign_ent_ret_ = {.stats_ = CCC_ARG_ERROR}; \
         if (ins_or_assign_map_ptr_)                                            \
         {                                                                      \
             __auto_type om_key_ = (key);                                       \

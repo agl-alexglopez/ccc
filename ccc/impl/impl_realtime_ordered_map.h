@@ -151,7 +151,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
     (__extension__({                                                           \
         __auto_type rom_ent_ptr_ = (realtime_ordered_map_entry_ptr);           \
         struct ccc_rtree_entry_ rom_mod_ent_                                   \
-            = {.entry_ = {.stats_ = CCC_INPUT_ERROR}};                         \
+            = {.entry_ = {.stats_ = CCC_ARG_ERROR}};                           \
         if (rom_ent_ptr_)                                                      \
         {                                                                      \
             rom_mod_ent_ = rom_ent_ptr_->impl_;                                \
@@ -228,7 +228,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
     (__extension__({                                                           \
         struct ccc_romap_ *const try_ins_map_ptr_                              \
             = (realtime_ordered_map_ptr);                                      \
-        struct ccc_ent_ rom_try_ins_ent_ret_ = {.stats_ = CCC_INPUT_ERROR};    \
+        struct ccc_ent_ rom_try_ins_ent_ret_ = {.stats_ = CCC_ARG_ERROR};      \
         if (try_ins_map_ptr_)                                                  \
         {                                                                      \
             __auto_type rom_key_ = (key);                                      \
@@ -254,7 +254,7 @@ void *ccc_impl_rom_insert(struct ccc_romap_ *rom,
         struct ccc_romap_ *const ins_or_assign_map_ptr_                        \
             = (realtime_ordered_map_ptr);                                      \
         struct ccc_ent_ rom_ins_or_assign_ent_ret_                             \
-            = {.stats_ = CCC_INPUT_ERROR};                                     \
+            = {.stats_ = CCC_ARG_ERROR};                                       \
         if (ins_or_assign_map_ptr_)                                            \
         {                                                                      \
             __auto_type rom_key_ = (key);                                      \

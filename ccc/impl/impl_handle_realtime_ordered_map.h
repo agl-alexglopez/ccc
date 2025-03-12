@@ -100,7 +100,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
     (__extension__({                                                           \
         __auto_type hrm_hndl_ptr_ = (handle_realtime_ordered_map_handle_ptr);  \
         struct ccc_hrtree_handle_ hrm_mod_hndl_                                \
-            = {.handle_ = {.stats_ = CCC_INPUT_ERROR}};                        \
+            = {.handle_ = {.stats_ = CCC_ARG_ERROR}};                          \
         if (hrm_hndl_ptr_)                                                     \
         {                                                                      \
             hrm_mod_hndl_ = hrm_hndl_ptr_->impl_;                              \
@@ -196,7 +196,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
                                   lazy_value...)                               \
     (__extension__({                                                           \
         __auto_type try_ins_map_ptr_ = (handle_realtime_ordered_map_ptr);      \
-        struct ccc_handl_ hrm_try_ins_hndl_ret_ = {.stats_ = CCC_INPUT_ERROR}; \
+        struct ccc_handl_ hrm_try_ins_hndl_ret_ = {.stats_ = CCC_ARG_ERROR};   \
         if (try_ins_map_ptr_)                                                  \
         {                                                                      \
             __auto_type hrm_key_ = (key);                                      \
@@ -239,7 +239,7 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
         __auto_type ins_or_assign_map_ptr_                                     \
             = (handle_realtime_ordered_map_ptr);                               \
         struct ccc_handl_ hrm_ins_or_assign_hndl_ret_                          \
-            = {.stats_ = CCC_INPUT_ERROR};                                     \
+            = {.stats_ = CCC_ARG_ERROR};                                       \
         if (ins_or_assign_map_ptr_)                                            \
         {                                                                      \
             __auto_type hrm_key_ = (key);                                      \

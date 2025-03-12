@@ -126,7 +126,7 @@ once which it must have to make it to this point. */
     (__extension__({                                                           \
         __auto_type fhm_mod_ent_ptr_ = (flat_hash_map_entry_ptr);              \
         struct ccc_fhash_entry_ fhm_mod_with_ent_                              \
-            = {.entry_ = {.stats_ = CCC_INPUT_ERROR}};                         \
+            = {.entry_ = {.stats_ = CCC_ARG_ERROR}};                           \
         if (fhm_mod_ent_ptr_)                                                  \
         {                                                                      \
             fhm_mod_with_ent_ = fhm_mod_ent_ptr_->impl_;                       \
@@ -203,7 +203,7 @@ once which it must have to make it to this point. */
 #define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
     (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
-        struct ccc_ent_ fhm_try_insert_res_ = {.stats_ = CCC_INPUT_ERROR};     \
+        struct ccc_ent_ fhm_try_insert_res_ = {.stats_ = CCC_ARG_ERROR};       \
         if (flat_hash_map_ptr_)                                                \
         {                                                                      \
             __auto_type fhm_key_ = key;                                        \
@@ -232,7 +232,7 @@ once which it must have to make it to this point. */
 #define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
     (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
-        struct ccc_ent_ fhm_ins_or_assign_res_ = {.stats_ = CCC_INPUT_ERROR};  \
+        struct ccc_ent_ fhm_ins_or_assign_res_ = {.stats_ = CCC_ARG_ERROR};    \
         if (flat_hash_map_ptr_)                                                \
         {                                                                      \
             __auto_type fhm_key_ = key;                                        \

@@ -198,7 +198,7 @@ ccc_hhm_handle(ccc_handle_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return (ccc_hhmap_handle){{.handle_ = {.stats_ = CCC_INPUT_ERROR}}};
+        return (ccc_hhmap_handle){{.handle_ = {.stats_ = CCC_ARG_ERROR}}};
     }
     return (ccc_hhmap_handle){container_handle(h, key)};
 }
@@ -255,7 +255,7 @@ ccc_hhm_remove_handle(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e))
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     if (e->impl_.handle_.stats_ != CCC_OCCUPIED)
     {
@@ -295,7 +295,7 @@ ccc_hhm_swap_handle(ccc_handle_hash_map *const h,
 {
     if (unlikely(!h || !out_handle))
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const user_data = struct_base(h, out_handle);
     void *const key = key_in_slot(h, user_data);
@@ -324,7 +324,7 @@ ccc_hhm_try_insert(ccc_handle_hash_map *const h,
 {
     if (unlikely(!h || !key_val_handle))
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const user_data = struct_base(h, key_val_handle);
     struct ccc_hhash_handle_ ent
@@ -349,7 +349,7 @@ ccc_hhm_insert_or_assign(ccc_handle_hash_map *const h,
 {
     if (unlikely(!h || !key_val_handle))
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const user_base = struct_base(h, key_val_handle);
     struct ccc_hhash_handle_ ent
@@ -376,7 +376,7 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
 {
     if (unlikely(!h || !out_handle))
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const data = struct_base(h, out_handle);
     void *const key = key_in_slot(h, data);
@@ -455,7 +455,7 @@ ccc_hhm_handle_status(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_INPUT_ERROR;
+        return CCC_ARG_ERROR;
     }
     return e->impl_.handle_.stats_;
 }
@@ -787,7 +787,7 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
     }
     if (unlikely(ccc_buf_size(&h->buf_) >= ccc_buf_capacity(&h->buf_)))
     {
-        return (struct ccc_handl_){.i_ = 0, .stats_ = CCC_INPUT_ERROR};
+        return (struct ccc_handl_){.i_ = 0, .stats_ = CCC_ARG_ERROR};
     }
     size_t i = to_i(cap, hash);
     size_t dist = 0;

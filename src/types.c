@@ -46,7 +46,7 @@ ccc_entry_input_error(ccc_entry const *const e)
     {
         return CCC_BOOL_ERR;
     }
-    return (e->impl_.stats_ & CCC_INPUT_ERROR) != 0;
+    return (e->impl_.stats_ & CCC_ARG_ERROR) != 0;
 }
 
 void *
@@ -86,7 +86,7 @@ ccc_handle_input_error(ccc_handle const *const e)
     {
         return CCC_BOOL_ERR;
     }
-    return (e->impl_.stats_ & CCC_INPUT_ERROR) != 0;
+    return (e->impl_.stats_ & CCC_ARG_ERROR) != 0;
 }
 
 ccc_handle_i
@@ -138,7 +138,7 @@ ccc_get_entry_status(ccc_entry const *e)
 {
     if (!e)
     {
-        return CCC_INPUT_ERROR;
+        return CCC_ARG_ERROR;
     }
     return e->impl_.stats_;
 }
@@ -148,7 +148,7 @@ ccc_get_handle_status(ccc_handle const *e)
 {
     if (!e)
     {
-        return CCC_INPUT_ERROR;
+        return CCC_ARG_ERROR;
     }
     return e->impl_.stats_;
 }
@@ -165,25 +165,19 @@ ccc_entry_status_msg(ccc_entry_status const status)
     switch (status)
     {
     case CCC_VACANT:
-        return "Vacant with no errors";
+        return "vacant with no errors";
         break;
     case CCC_OCCUPIED:
-        return "Occupied and non-NULL";
+        return "occupied and non-NULL";
         break;
     case CCC_INSERT_ERROR:
-        return "should have been inserted but encountered an error";
+        return "insert error has or will occur when insert is attempted";
         break;
-    case CCC_SEARCH_ERROR:
-        return "encountered an error while searching for a key";
-        break;
-    case CCC_DELETE_ERROR:
-        return "encountered an error while trying to delete";
-        break;
-    case CCC_INPUT_ERROR:
-        return "could not be produced due to bad input to function";
+    case CCC_ARG_ERROR:
+        return "could not proceed due to bad input to function";
         break;
     case CCC_NO_UNWRAP:
-        return "shall not be unwrapped by user to protect container";
+        return "unwrap denied in order to protect container";
         break;
     default:
         return "error: encountered an unknown combination of flags";

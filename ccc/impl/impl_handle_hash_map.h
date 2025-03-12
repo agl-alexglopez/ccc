@@ -148,7 +148,7 @@ once which it must have to make it to this point. */
     (__extension__({                                                           \
         __auto_type hhm_mod_handl_ptr_ = (handle_hash_map_handle_ptr);         \
         struct ccc_hhash_handle_ hhm_mod_with_handl_                           \
-            = {.handle_ = {.stats_ = CCC_INPUT_ERROR}};                        \
+            = {.handle_ = {.stats_ = CCC_ARG_ERROR}};                          \
         if (hhm_mod_handl_ptr_)                                                \
         {                                                                      \
             hhm_mod_with_handl_ = hhm_mod_handl_ptr_->impl_;                   \
@@ -245,7 +245,7 @@ once which it must have to make it to this point. */
 #define ccc_impl_hhm_try_insert_w(handle_hash_map_ptr, key, lazy_value...)     \
     (__extension__({                                                           \
         struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
-        struct ccc_handl_ hhm_try_insert_res_ = {.stats_ = CCC_INPUT_ERROR};   \
+        struct ccc_handl_ hhm_try_insert_res_ = {.stats_ = CCC_ARG_ERROR};     \
         if (handle_hash_map_ptr_)                                              \
         {                                                                      \
             __auto_type hhm_key_ = key;                                        \
@@ -283,8 +283,7 @@ once which it must have to make it to this point. */
                                         lazy_value...)                         \
     (__extension__({                                                           \
         struct ccc_hhmap_ *handle_hash_map_ptr_ = (handle_hash_map_ptr);       \
-        struct ccc_handl_ hhm_ins_or_assign_res_                               \
-            = {.stats_ = CCC_INPUT_ERROR};                                     \
+        struct ccc_handl_ hhm_ins_or_assign_res_ = {.stats_ = CCC_ARG_ERROR};  \
         if (handle_hash_map_ptr_)                                              \
         {                                                                      \
             __auto_type hhm_key_ = key;                                        \
