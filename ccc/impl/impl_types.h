@@ -32,7 +32,7 @@ union ccc_entry_
 /** @private */
 struct ccc_handl_
 {
-    size_t i_;
+    ptrdiff_t i_;
     enum ccc_entry_status_ stats_;
 };
 

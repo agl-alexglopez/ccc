@@ -15,8 +15,8 @@ struct ccc_buf_
 {
     void *mem_;
     size_t elem_sz_;
-    size_t sz_;
-    size_t capacity_;
+    ptrdiff_t sz_;
+    ptrdiff_t capacity_;
     ccc_alloc_fn *alloc_;
     void *aux_;
 };

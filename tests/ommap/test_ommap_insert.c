@@ -34,9 +34,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three)
         three_vals[i].key = i;
         CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
-        CHECK(size(&omm), (size_t)i + 1);
+        CHECK(size(&omm), (ptrdiff_t)i + 1);
     }
-    CHECK(size(&omm), (size_t)3);
+    CHECK(size(&omm), (ptrdiff_t)3);
     CHECK_END_FN();
 }
 
@@ -108,7 +108,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_struct_getter)
         struct val const *get = &tester_clone[i];
         CHECK(get->key, vals[i].key);
     }
-    CHECK(size(&omm), (size_t)10);
+    CHECK(size(&omm), (ptrdiff_t)10);
     CHECK_END_FN();
 }
 
@@ -122,9 +122,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three_dups)
         three_vals[i].key = 0;
         CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
-        CHECK(size(&omm), (size_t)i + 1);
+        CHECK(size(&omm), (ptrdiff_t)i + 1);
     }
-    CHECK(size(&omm), (size_t)3);
+    CHECK(size(&omm), (ptrdiff_t)3);
     CHECK_END_FN();
 }
 
@@ -133,7 +133,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* Math magic ahead... */
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&omm, vals, size, prime), PASS);
@@ -143,7 +143,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
     CHECK(min->key, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &omm), size);
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         CHECK(vals[i].key, sorted_check[i]);
     }
@@ -160,9 +160,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_read_max_min)
         vals[i].key = i;
         CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
-        CHECK(size(&omm), (size_t)i + 1);
+        CHECK(size(&omm), (ptrdiff_t)i + 1);
     }
-    CHECK(size(&omm), (size_t)10);
+    CHECK(size(&omm), (ptrdiff_t)10);
     struct val const *max = ccc_omm_max(&omm);
     CHECK(max->key, 9);
     struct val const *min = ccc_omm_min(&omm);

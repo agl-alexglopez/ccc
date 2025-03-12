@@ -22,9 +22,9 @@ struct ccc_fpq_
 /*========================    Private Interface     =========================*/
 
 /** @private */
-size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
+ptrdiff_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], ptrdiff_t);
 /** @private */
-void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
+void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, ptrdiff_t n);
 /** @private */
 void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 

@@ -28,6 +28,7 @@ Overall a WAVL tree is quite impressive for it's simplicity and purported
 improvements over AVL and Red-Black trees. The rank framework is intuitive
 and flexible in how it can be implemented. */
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "impl/impl_realtime_ordered_map.h"
@@ -488,7 +489,7 @@ ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
         equal_range(rom, rbegin_key, rend_key, reverse_inorder_traversal)};
 }
 
-size_t
+ptrdiff_t
 ccc_rom_size(ccc_realtime_ordered_map const *const rom)
 {
     return rom ? rom->sz_ : 0;
@@ -1222,7 +1223,7 @@ struct tree_range_
     struct ccc_romap_elem_ const *high;
 };
 
-static size_t
+static ptrdiff_t
 recursive_size(struct ccc_romap_ const *const rom,
                struct ccc_romap_elem_ const *const r)
 {

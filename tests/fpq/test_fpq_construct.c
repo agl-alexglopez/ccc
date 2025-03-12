@@ -75,8 +75,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_heapify_init)
 {
     srand(time(NULL)); /* NOLINT */
     int heap[100] = {};
-    size_t const size = 99;
-    for (size_t i = 0; i < size; ++i)
+    ptrdiff_t const size = 99;
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         heap[i] = rand_range(-99, size); /* NOLINT */
     }
@@ -101,7 +101,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_heapify_copy)
     flat_priority_queue pq = fpq_init(heap, CCC_LES, int_cmp, NULL, NULL,
                                       (sizeof(heap) / sizeof(int)));
     int input[99] = {};
-    for (size_t i = 0; i < sizeof(input) / sizeof(int); ++i)
+    for (ptrdiff_t i = 0; i < (ptrdiff_t)(sizeof(input) / sizeof(int)); ++i)
     {
         input[i] = rand_range(-99, 99); /* NOLINT */
     }

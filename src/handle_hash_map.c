@@ -41,8 +41,8 @@ then pointers to encourage the user to think in terms of stable indices. */
    prime so we will stop there as max size if we ever get there. Not likely.
    The last prime is closer to the second to last because doubling breaks down
    at the end. */
-#define PRIMES_SIZE 58ULL
-static size_t const primes[PRIMES_SIZE] = {
+#define PRIMES_SIZE ((ptrdiff_t)56)
+static ptrdiff_t const primes[PRIMES_SIZE] = {
     11ULL,
     37ULL,
     79ULL,
@@ -99,8 +99,6 @@ static size_t const primes[PRIMES_SIZE] = {
     1203721378684243091ULL,
     2502450294306576181ULL,
     5202414434410211531ULL,
-    10815445968671840317ULL,
-    17617221824571301183ULL,
 };
 
 /* Some claim that Robin Hood tables can support a much higher load factor. I
@@ -108,12 +106,12 @@ static size_t const primes[PRIMES_SIZE] = {
    tables can quickly rise. Mitigating with a lower load factor and prime
    table sizes is a decent approach. Measure. */
 static double const load_factor = 0.8;
-static size_t const last_swap_slot = 1;
-static size_t const num_swap_slots = 2;
+static ptrdiff_t const last_swap_slot = 1;
+static ptrdiff_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
-static void erase_meta(struct ccc_hhmap_ *, size_t i);
+static void erase_meta(struct ccc_hhmap_ *, ptrdiff_t i);
 static void swap_user_data(struct ccc_hhmap_ *, void *, void *);
 static void swap_meta_data(struct ccc_hhmap_ *h, struct ccc_hhmap_elem_ *a,
                            struct ccc_hhmap_elem_ *b);
@@ -126,29 +124,29 @@ static struct ccc_hhash_handle_ container_handle(struct ccc_hhmap_ *h,
 static struct ccc_hhash_handle_ *and_modify(struct ccc_hhash_handle_ *e,
                                             ccc_update_fn *fn);
 static ccc_tribool valid_distance_from_home(struct ccc_hhmap_ const *,
-                                            size_t slot);
-static size_t to_i(size_t capacity, uint64_t hash);
-static size_t increment(size_t capacity, size_t i);
-static size_t decrement(size_t capacity, size_t i);
-static size_t distance(size_t capacity, size_t i, size_t j);
+                                            ptrdiff_t slot);
+static ptrdiff_t to_i(ptrdiff_t capacity, uint64_t hash);
+static ptrdiff_t increment(ptrdiff_t capacity, ptrdiff_t i);
+static ptrdiff_t decrement(ptrdiff_t capacity, ptrdiff_t i);
+static ptrdiff_t distance(ptrdiff_t capacity, ptrdiff_t i, ptrdiff_t j);
 static void *key_in_slot(struct ccc_hhmap_ const *h, void const *slot);
-static void *key_at(struct ccc_hhmap_ const *h, size_t i);
+static void *key_at(struct ccc_hhmap_ const *h, ptrdiff_t i);
 static struct ccc_hhmap_elem_ *elem_in_slot(struct ccc_hhmap_ const *h,
                                             void const *slot);
-static struct ccc_hhmap_elem_ *elem_at(struct ccc_hhmap_ const *h, size_t i);
+static struct ccc_hhmap_elem_ *elem_at(struct ccc_hhmap_ const *h, ptrdiff_t i);
 static ccc_result maybe_resize(struct ccc_hhmap_ *h);
 static struct ccc_handl_ find(struct ccc_hhmap_ const *h, void const *key,
                               uint64_t hash);
 static ccc_handle_i insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
-                                size_t e_meta);
-static uint64_t *hash_at(struct ccc_hhmap_ const *h, size_t i);
+                                ptrdiff_t e_meta);
+static uint64_t *hash_at(struct ccc_hhmap_ const *h, ptrdiff_t i);
 static uint64_t filter(struct ccc_hhmap_ const *h, void const *key);
-static size_t next_prime(size_t n);
+static ptrdiff_t next_prime(ptrdiff_t n);
 static void copy_to_slot(struct ccc_hhmap_ *h, void *slot_dst,
                          void const *user_src);
-static void bubble_down(struct ccc_hhmap_ *h, size_t i, size_t slots);
-static void heapify_slots(struct ccc_hhmap_ *, size_t slots);
-static void pop_slot(struct ccc_hhmap_ *, size_t slots);
+static void bubble_down(struct ccc_hhmap_ *h, ptrdiff_t i, ptrdiff_t slots);
+static void heapify_slots(struct ccc_hhmap_ *, ptrdiff_t slots);
+static void pop_slot(struct ccc_hhmap_ *, ptrdiff_t slots);
 
 /*=========================   Interface    ==================================*/
 
@@ -182,14 +180,14 @@ ccc_hhm_contains(ccc_handle_hash_map *const h, void const *const key)
     return handle(h, key, filter(h, key)).stats_ == CCC_ENTRY_OCCUPIED;
 }
 
-size_t
+ptrdiff_t
 ccc_hhm_size(ccc_handle_hash_map const *const h)
 {
     if (unlikely(!h))
     {
         return 0;
     }
-    size_t const size = ccc_buf_size(&h->buf_);
+    ptrdiff_t const size = ccc_buf_size(&h->buf_);
     return size ? size - num_swap_slots : 0;
 }
 
@@ -470,7 +468,7 @@ ccc_hhm_begin(ccc_handle_hash_map const *const h)
     {
         return (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
-    size_t iter = 0;
+    ptrdiff_t iter = 0;
     for (; iter < ccc_buf_capacity(&h->buf_)
            && elem_at(h, iter)->hash_ == CCC_HHM_EMPTY;
          ++iter)
@@ -517,8 +515,8 @@ ccc_hhm_end(ccc_hhmap_handle const *const iter)
     return iter->impl_.hash_ == CCC_HHM_EMPTY;
 }
 
-size_t
-ccc_hhm_next_prime(size_t const n)
+ptrdiff_t
+ccc_hhm_next_prime(ptrdiff_t const n)
 {
     return next_prime(n);
 }
@@ -537,7 +535,7 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
        memory in case it has already been allocated. Alloc will remain the
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf_.mem_;
-    size_t const dst_cap = dst->buf_.capacity_;
+    ptrdiff_t const dst_cap = dst->buf_.capacity_;
     ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
@@ -560,13 +558,13 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
         return CCC_RESULT_OK;
     }
     dst->buf_.sz_ = num_swap_slots;
-    for (size_t i = 0; i < ccc_buf_capacity(&dst->buf_); ++i)
+    for (ptrdiff_t i = 0; i < ccc_buf_capacity(&dst->buf_); ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(dst, i);
         e->hash_ = CCC_HHM_EMPTY;
         e->slot_i_ = i;
     }
-    for (size_t i = 0; i < ccc_buf_capacity(&src->buf_); ++i)
+    for (ptrdiff_t i = 0; i < ccc_buf_capacity(&src->buf_); ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(src, i);
         if (e->hash_ == CCC_HHM_EMPTY)
@@ -594,7 +592,7 @@ ccc_hhm_clear(ccc_handle_hash_map *const h, ccc_destructor_fn *const fn)
         h->buf_.sz_ = 0;
         return CCC_RESULT_OK;
     }
-    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
+    for (ptrdiff_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(h, i);
         if (e->hash_ != CCC_HHM_EMPTY)
@@ -620,7 +618,7 @@ ccc_hhm_clear_and_free(ccc_handle_hash_map *const h,
         h->buf_.sz_ = 0;
         return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
     }
-    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
+    for (ptrdiff_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(h, i);
         if (e->hash_ != CCC_HHM_EMPTY)
@@ -633,7 +631,7 @@ ccc_hhm_clear_and_free(ccc_handle_hash_map *const h,
     return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
 }
 
-size_t
+ptrdiff_t
 ccc_hhm_capacity(ccc_handle_hash_map const *const h)
 {
     if (unlikely(!h))
@@ -661,9 +659,9 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
     {
         return CCC_TRUE;
     }
-    size_t empties = 0;
-    size_t occupied = 0;
-    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
+    ptrdiff_t empties = 0;
+    ptrdiff_t occupied = 0;
+    for (ptrdiff_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
         if (e->slot_i_ >= ccc_buf_capacity(&h->buf_))
@@ -693,13 +691,14 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
 }
 
 static ccc_tribool
-valid_distance_from_home(struct ccc_hhmap_ const *const h, size_t const slot)
+valid_distance_from_home(struct ccc_hhmap_ const *const h, ptrdiff_t const slot)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     uint64_t const hash = elem_at(h, slot)->hash_;
-    size_t const home = to_i(cap, hash);
-    size_t const end = decrement(cap, home);
-    for (size_t i = slot, distance_to_home = distance(cap, i, to_i(cap, hash));
+    ptrdiff_t const home = to_i(cap, hash);
+    ptrdiff_t const end = decrement(cap, home);
+    for (ptrdiff_t i = slot,
+                   distance_to_home = distance(cap, i, to_i(cap, hash));
          i != end; --distance_to_home, i = decrement(cap, i))
     {
         uint64_t const cur_hash = *hash_at(h, i);
@@ -732,25 +731,25 @@ ccc_impl_hhm_handle(struct ccc_hhmap_ *const h, void const *const key)
 
 ccc_handle_i
 ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
-                         size_t cur_i)
+                         ptrdiff_t cur_i)
 {
     return insert_meta(h, hash, cur_i);
 }
 
 void *
-ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t const i)
+ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, ptrdiff_t const i)
 {
     return (char *)ccc_buf_at(&h->buf_, i) + h->key_offset_;
 }
 
 uint64_t *
-ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *const h, size_t const i)
+ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 {
     return hash_at(h, i);
 }
 
 struct ccc_hhmap_elem_ *
-ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *const h, size_t const i)
+ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 {
     return elem_at(h, i);
 }
@@ -780,7 +779,7 @@ static inline struct ccc_handl_
 find(struct ccc_hhmap_ const *const h, void const *const key,
      uint64_t const hash)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     /* A few sanity checks. The load factor should be managed a full table is
        never allowed even under no allocation permission because that could
        lead to an infinite loop and illustrates a degenerate table anyway. */
@@ -792,8 +791,8 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
     {
         return (struct ccc_handl_){.i_ = 0, .stats_ = CCC_ENTRY_ARG_ERROR};
     }
-    size_t i = to_i(cap, hash);
-    size_t dist = 0;
+    ptrdiff_t i = to_i(cap, hash);
+    ptrdiff_t dist = 0;
     do
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
@@ -822,16 +821,16 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
    metadata for this new hash that has been inserted. */
 static inline ccc_handle_i
 insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
-            size_t const e_meta)
+            ptrdiff_t const e_meta)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     struct ccc_hhmap_elem_ *const floater = elem_at(h, 1);
     *floater = *elem_at(h, e_meta);
     floater->hash_ = hash;
-    size_t dist = distance(cap, e_meta, to_i(cap, hash));
+    ptrdiff_t dist = distance(cap, e_meta, to_i(cap, hash));
     /* Finding the appropriate slot storage to back this metadata might be a
        delayed process until we find an empty slot. */
-    size_t i = e_meta;
+    ptrdiff_t i = e_meta;
     do
     {
         struct ccc_hhmap_elem_ *const elem = elem_at(h, i);
@@ -850,7 +849,7 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
             *elem_at(h, 1) = (struct ccc_hhmap_elem_){};
             return e_meta;
         }
-        size_t const slot_dist = distance(cap, i, to_i(cap, elem->hash_));
+        ptrdiff_t const slot_dist = distance(cap, i, to_i(cap, elem->hash_));
         if (dist > slot_dist)
         {
             /* The first swap means the newest element metadata is left behind
@@ -868,11 +867,11 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
    quality quickly if we can't resize. Only metadata is moved. User data remains
    in the same slot for handle stability. */
 static inline void
-erase_meta(struct ccc_hhmap_ *const h, size_t i)
+erase_meta(struct ccc_hhmap_ *const h, ptrdiff_t i)
 {
     *hash_at(h, i) = CCC_HHM_EMPTY;
-    size_t const cap = ccc_buf_capacity(&h->buf_);
-    size_t next = increment(cap, i);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t next = increment(cap, i);
     do
     {
         struct ccc_hhmap_elem_ *const next_elem = elem_at(h, next);
@@ -926,7 +925,7 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
         return;
     }
     struct ccc_hhmap_elem_ *const elem = elem_in_slot(h, slot_dst);
-    size_t surrounding_bytes = (char *)elem - (char *)slot_dst;
+    ptrdiff_t surrounding_bytes = (char *)elem - (char *)slot_dst;
     if (surrounding_bytes)
     {
         (void)memcpy(slot_dst, user_src, surrounding_bytes);
@@ -979,12 +978,12 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
 static inline ccc_result
 maybe_resize(struct ccc_hhmap_ *const h)
 {
-    size_t const h_cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const h_cap = ccc_buf_capacity(&h->buf_);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
     if (h_cap && ccc_buf_size(&h->buf_) < num_swap_slots)
     {
 
-        for (size_t i = 0; i < h_cap; ++i)
+        for (ptrdiff_t i = 0; i < h_cap; ++i)
         {
             (void)memset(ccc_buf_at(&h->buf_, i), 0, elem_sz);
             struct ccc_hhmap_elem_ *const e = elem_at(h, i);
@@ -1022,7 +1021,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
         (void)memcpy(new_hash.buf_.mem_, h->buf_.mem_, h_cap * elem_sz);
     }
     /* Hash needs to start empty. Not sure if slot matters. */
-    for (size_t i = 0; i < new_hash.buf_.capacity_; ++i)
+    for (ptrdiff_t i = 0; i < new_hash.buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, i);
         e->hash_ = CCC_HHM_EMPTY;
@@ -1031,8 +1030,8 @@ maybe_resize(struct ccc_hhmap_ *const h)
     (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
     /* Run Robin Hood on the hash but instead of copying data to the chosen
        slot, link to the existing data at the old handle. */
-    size_t allocated_slots = 0;
-    for (size_t slot = 0; slot < h_cap; ++slot)
+    ptrdiff_t allocated_slots = 0;
+    for (ptrdiff_t slot = 0; slot < h_cap; ++slot)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, slot);
         if (e->hash_ == CCC_HHM_EMPTY)
@@ -1054,7 +1053,8 @@ maybe_resize(struct ccc_hhmap_ *const h)
        between these sorted integers represents a free slot that can be given to
        an empty slot in need in the new table. */
     heapify_slots(h, allocated_slots);
-    for (size_t slot = 0, free_slot = 0; slot < new_hash.buf_.capacity_; ++slot)
+    for (ptrdiff_t slot = 0, free_slot = 0; slot < new_hash.buf_.capacity_;
+         ++slot)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(&new_hash, slot);
         if (e->hash_ != CCC_HHM_EMPTY)
@@ -1089,30 +1089,30 @@ maybe_resize(struct ccc_hhmap_ *const h)
 }
 
 static inline void
-heapify_slots(struct ccc_hhmap_ *const h, size_t const slots)
+heapify_slots(struct ccc_hhmap_ *const h, ptrdiff_t const slots)
 {
     if (!slots)
     {
         return;
     }
-    for (size_t i = (slots / 2) + 1; i--;)
+    for (ptrdiff_t i = (slots / 2) + 1; i--;)
     {
         bubble_down(h, i, slots);
     }
 }
 
 static inline void
-pop_slot(struct ccc_hhmap_ *const h, size_t const slots)
+pop_slot(struct ccc_hhmap_ *const h, ptrdiff_t const slots)
 {
     elem_at(h, 0)->slot_i_ = elem_at(h, slots - 1)->slot_i_;
     bubble_down(h, 0, slots - 1);
 }
 
 static inline void
-bubble_down(struct ccc_hhmap_ *const h, size_t i, size_t const slots)
+bubble_down(struct ccc_hhmap_ *const h, ptrdiff_t i, ptrdiff_t const slots)
 {
     struct ccc_hhmap_elem_ *const tmp = elem_at(h, slots);
-    for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < slots;
+    for (ptrdiff_t next = i, left = (i * 2) + 1, right = left + 1; left < slots;
          i = next, left = (i * 2) + 1, right = left + 1)
     {
         next = (right < slots
@@ -1129,10 +1129,10 @@ bubble_down(struct ccc_hhmap_ *const h, size_t i, size_t const slots)
     }
 }
 
-static inline size_t
-next_prime(size_t const n)
+static inline ptrdiff_t
+next_prime(ptrdiff_t const n)
 {
-    for (size_t i = 0; i < PRIMES_SIZE; ++i)
+    for (ptrdiff_t i = 0; i < PRIMES_SIZE; ++i)
     {
         if (primes[i] > n)
         {
@@ -1143,7 +1143,7 @@ next_prime(size_t const n)
 }
 
 static inline uint64_t *
-hash_at(struct ccc_hhmap_ const *const h, size_t const i)
+hash_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 {
     return &((struct ccc_hhmap_elem_ *)((char *)ccc_buf_at(&h->buf_, i)
                                         + h->hash_elem_offset_))
@@ -1165,7 +1165,7 @@ elem_in_slot(struct ccc_hhmap_ const *const h, void const *const slot)
 }
 
 static inline struct ccc_hhmap_elem_ *
-elem_at(struct ccc_hhmap_ const *const h, size_t const i)
+elem_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 {
     return (struct ccc_hhmap_elem_ *)((char *)ccc_buf_at(&h->buf_, i)
                                       + h->hash_elem_offset_);
@@ -1178,25 +1178,25 @@ key_in_slot(struct ccc_hhmap_ const *const h, void const *const slot)
 }
 
 static inline void *
-key_at(struct ccc_hhmap_ const *const h, size_t const i)
+key_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 {
     return (char *)ccc_buf_at(&h->buf_, i) + h->key_offset_;
 }
 
-static inline size_t
-distance(size_t const capacity, size_t const i, size_t const j)
+static inline ptrdiff_t
+distance(ptrdiff_t const capacity, ptrdiff_t const i, ptrdiff_t const j)
 {
     return i < j ? (capacity - j) + i - num_swap_slots : i - j;
 }
 
-static inline size_t
-increment(size_t const capacity, size_t const i)
+static inline ptrdiff_t
+increment(ptrdiff_t const capacity, ptrdiff_t const i)
 {
     return (i + 1) >= capacity ? last_swap_slot + 1 : i + 1;
 }
 
-static inline size_t
-decrement(size_t const capacity, size_t const i)
+static inline ptrdiff_t
+decrement(ptrdiff_t const capacity, ptrdiff_t const i)
 {
     return i <= num_swap_slots ? capacity - 1 : i - 1;
 }
@@ -1248,15 +1248,15 @@ primary clustering of Robin Hood hash tables make efficient modulo calculations
 more difficult than power of two table capacities. The appropriate license for
 this technique is included immediately following this function and only applies
 to this function in this source file. */
-static inline size_t
-to_i(size_t const capacity, uint64_t hash)
+static inline ptrdiff_t
+to_i(ptrdiff_t const capacity, uint64_t hash)
 {
 #ifdef __SIZEOF_INT128__
     hash = (uint64_t)(((__uint128_t)hash * (__uint128_t)capacity) >> 64);
 #else
     hash %= capacity;
 #endif
-    return hash <= last_swap_slot ? last_swap_slot + 1 : hash;
+    return (ptrdiff_t)(hash <= last_swap_slot ? last_swap_slot + 1 : hash);
 }
 
 /** The following Apache License applies only to the above function. This

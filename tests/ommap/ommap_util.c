@@ -25,15 +25,15 @@ val_update(ccc_user_type const u)
 }
 
 CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
-               size_t const size, int const larger_prime)
+               ptrdiff_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
        random but a repeatable sequence that makes it
        easier to debug if something goes wrong. Think
        of the prime number as a random seed, kind of. */
-    size_t shuffled_index = larger_prime % size;
-    for (size_t i = 0; i < size; ++i)
+    ptrdiff_t shuffled_index = larger_prime % size;
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].key = (int)shuffled_index;
         CHECK(unwrap(swap_entry_r(pq, &vals[shuffled_index].elem)) != NULL,
@@ -47,14 +47,14 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-size_t
-inorder_fill(int vals[], size_t size, ccc_ordered_multimap *pq)
+ptrdiff_t
+inorder_fill(int vals[], ptrdiff_t size, ccc_ordered_multimap *pq)
 {
     if (size(pq) != size)
     {
         return 0;
     }
-    size_t i = 0;
+    ptrdiff_t i = 0;
     for (struct val *e = rbegin(pq); e != rend(pq); e = rnext(pq, &e->elem))
     {
         vals[i++] = e->key;

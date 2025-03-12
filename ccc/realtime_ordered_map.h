@@ -602,10 +602,10 @@ current iterator.
 Obtain the container state. */
 /**@{*/
 
-/** @brief Returns the size of the map
+/** @brief Returns the size of the map.
 @param [in] rom the map.
-@return the size_t size. */
-[[nodiscard]] size_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
+@return the size or -1 if rom is NULL. */
+[[nodiscard]] ptrdiff_t ccc_rom_size(ccc_realtime_ordered_map const *rom);
 
 /** @brief Returns the size status of the map.
 @param [in] rom the map.

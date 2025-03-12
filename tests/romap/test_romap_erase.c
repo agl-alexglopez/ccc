@@ -18,18 +18,18 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 {
     ccc_realtime_ordered_map s
         = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         CHECK(vals[i].key, sorted_check[i]);
     }
     /* Now let's delete everything with no errors. */
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         struct val *v = unwrap(remove_r(&s, &vals[i].elem));
         CHECK(v != NULL, true);
@@ -44,16 +44,16 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
 {
     ccc_realtime_ordered_map s
         = rom_init(s, struct val, elem, key, id_cmp, NULL, NULL);
-    size_t const size = 50;
-    size_t const prime = 53;
-    size_t const less = 10;
+    ptrdiff_t const size = 50;
+    ptrdiff_t const prime = 53;
+    ptrdiff_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
-    size_t shuffled_index = prime % (size - less);
+    ptrdiff_t shuffled_index = prime % (size - less);
     struct val vals[50];
     bool repeats[50];
     memset(repeats, false, sizeof(bool) * size);
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].key = (int)shuffled_index;
@@ -67,7 +67,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
     }
     /* One test can use our printer function as test output */
     CHECK(rom_size(&s) < size, true);
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],
               true);

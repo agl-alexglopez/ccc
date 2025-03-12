@@ -205,14 +205,14 @@ Test for the presence of bits. */
 @return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
 see ccc_bs_test_at(). */
-ccc_tribool ccc_bs_test(ccc_bitset const *bs, size_t i);
+ccc_tribool ccc_bs_test(ccc_bitset const *bs, ptrdiff_t i);
 
 /** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
 @return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_test_at(ccc_bitset const *bs, size_t i);
+ccc_tribool ccc_bs_test_at(ccc_bitset const *bs, ptrdiff_t i);
 
 /**@}*/
 
@@ -228,7 +228,7 @@ Set and flip bits in the set. */
 previously true, false if it was previously false, or error if bs is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
 see ccc_bs_set_at(). */
-ccc_tribool ccc_bs_set(ccc_bitset *bs, size_t i, ccc_tribool b);
+ccc_tribool ccc_bs_set(ccc_bitset *bs, ptrdiff_t i, ccc_tribool b);
 
 /** @brief Set the bit at valid index i to value b (true or false).
 @param [in] bs a pointer to the bit set.
@@ -238,7 +238,7 @@ ccc_tribool ccc_bs_set(ccc_bitset *bs, size_t i, ccc_tribool b);
 previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_set_at(ccc_bitset *bs, size_t i, ccc_tribool b);
+ccc_tribool ccc_bs_set_at(ccc_bitset *bs, ptrdiff_t i, ccc_tribool b);
 
 /** @brief Set all the bits to the provided value (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
@@ -260,7 +260,7 @@ bs is NULL or the range is invalid by position, count, or both.
 Note that a range is defined from i to i + count, where i + count is the
 exclusive end of the range. This is equivalent to moving from Least to Most
 Significant bit in an integer. */
-ccc_result ccc_bs_set_range(ccc_bitset *bs, size_t i, size_t count,
+ccc_result ccc_bs_set_range(ccc_bitset *bs, ptrdiff_t i, ptrdiff_t count,
                             ccc_tribool b);
 
 /** @brief Set the bit at index i to CCC_FALSE.
@@ -270,7 +270,7 @@ ccc_result ccc_bs_set_range(ccc_bitset *bs, size_t i, size_t count,
 previously true, false if it was previously false, or error if bss is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
 see ccc_bs_set_at(). */
-ccc_tribool ccc_bs_reset(ccc_bitset *bs, size_t i);
+ccc_tribool ccc_bs_reset(ccc_bitset *bs, ptrdiff_t i);
 
 /** @brief Set the bit at valid index i to boolean value b (true or false).
 @param [in] bs a pointer to the bit set.
@@ -279,7 +279,7 @@ ccc_tribool ccc_bs_reset(ccc_bitset *bs, size_t i);
 previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_reset_at(ccc_bitset *bs, size_t i);
+ccc_tribool ccc_bs_reset_at(ccc_bitset *bs, ptrdiff_t i);
 
 /** @brief Set all the bits to CCC_FALSE.
 @param [in] bs a pointer to the bit set.
@@ -299,7 +299,7 @@ bs is NULL or the range is invalid by position, count, or both.
 Note that a range is defined from i to i + count, where i + count is the
 exclusive end of the range. This is equivalent to moving from Least to Most
 Significant bit in an integer. */
-ccc_result ccc_bs_reset_range(ccc_bitset *bs, size_t i, size_t count);
+ccc_result ccc_bs_reset_range(ccc_bitset *bs, ptrdiff_t i, ptrdiff_t count);
 
 /** @brief Toggle the bit at index i.
 @param [in] bs a pointer to the bit set.
@@ -308,7 +308,7 @@ ccc_result ccc_bs_reset_range(ccc_bitset *bs, size_t i, size_t count);
 previously true, false if it was previously false, or error if bss is NULL.
 @warning no bounds checking occurs in the release target. For bounds checking,
 see ccc_bs_set_at(). */
-ccc_tribool ccc_bs_flip(ccc_bitset *bs, size_t i);
+ccc_tribool ccc_bs_flip(ccc_bitset *bs, ptrdiff_t i);
 
 /** @brief Toggle the bit at index i.
 @param [in] bs a pointer to the bit set.
@@ -317,7 +317,7 @@ ccc_tribool ccc_bs_flip(ccc_bitset *bs, size_t i);
 previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_flip_at(ccc_bitset *bs, size_t i);
+ccc_tribool ccc_bs_flip_at(ccc_bitset *bs, ptrdiff_t i);
 
 /** @brief Toggle all of the bits to their opposing boolean value.
 @param [in] bs a pointer to the bit set.
@@ -336,7 +336,7 @@ bs is NULL or the range is invalid by position, count, or both.
 Note that a range is defined from i to i + count, where i + count is the
 exclusive end of the range. This is equivalent to moving from Least to Most
 Significant Bit in an integer. */
-ccc_result ccc_bs_flip_range(ccc_bitset *bs, size_t i, size_t count);
+ccc_result ccc_bs_flip_range(ccc_bitset *bs, ptrdiff_t i, ptrdiff_t count);
 
 /**@}*/
 
@@ -357,7 +357,8 @@ ccc_tribool ccc_bs_any(ccc_bitset const *bs);
 @return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR
 if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
-ccc_tribool ccc_bs_any_range(ccc_bitset const *bs, size_t i, size_t count);
+ccc_tribool ccc_bs_any_range(ccc_bitset const *bs, ptrdiff_t i,
+                             ptrdiff_t count);
 
 /** @brief Return true if all bits are set to 0.
 @param [in] bs a pointer to the bit set.
@@ -372,7 +373,8 @@ ccc_tribool ccc_bs_none(ccc_bitset const *bs);
 @return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR
 if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
-ccc_tribool ccc_bs_none_range(ccc_bitset const *bs, size_t i, size_t count);
+ccc_tribool ccc_bs_none_range(ccc_bitset const *bs, ptrdiff_t i,
+                              ptrdiff_t count);
 
 /** @brief Return true if all bits in set are 1.
 @param [in] bs a pointer to the bit set.
@@ -387,7 +389,8 @@ ccc_tribool ccc_bs_all(ccc_bitset const *bs);
 @return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR
 if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
-ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, size_t i, size_t count);
+ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, ptrdiff_t i,
+                             ptrdiff_t count);
 
 /** @brief Return the index of the first trailing bit set to 1 in the set.
 @param [in] bs a pointer to the bit set.
@@ -406,8 +409,8 @@ bs is NULL, or the range is invalid.
 invalid range therefore -1 is returned. To distinguish a valid negative result
 signifying not found and a negative result indicating a range error the user
 must check their input. */
-ptrdiff_t ccc_bs_first_trailing_one_range(ccc_bitset const *bs, size_t i,
-                                          size_t count);
+ptrdiff_t ccc_bs_first_trailing_one_range(ccc_bitset const *bs, ptrdiff_t i,
+                                          ptrdiff_t count);
 
 /** @brief Returns the index of the start of the first trailing num_ones
 contiguous 1 bits.
@@ -419,7 +422,7 @@ or such a sequence cannot be found -1 is returned.
 @warning the user must validate that bs is non-NULL and num_ones is less than
 the size of the set in order to distinguish -1 returned as a result of a failed
 search or bad input. */
-ptrdiff_t ccc_bs_first_trailing_ones(ccc_bitset const *bs, size_t num_ones);
+ptrdiff_t ccc_bs_first_trailing_ones(ccc_bitset const *bs, ptrdiff_t num_ones);
 
 /** @brief Returns the index of the start of the first trailing num_ones
 contiguous 1 bits in the specified range.
@@ -434,8 +437,8 @@ or such a sequence cannot be found -1 is returned.
 in an invalid range therefore -1 is returned. To distinguish a valid negative
 result signifying not found and a negative result indicating a range error the
 user must check their input. */
-ptrdiff_t ccc_bs_first_trailing_ones_range(ccc_bitset const *bs, size_t i,
-                                           size_t count, size_t num_ones);
+ptrdiff_t ccc_bs_first_trailing_ones_range(ccc_bitset const *bs, ptrdiff_t i,
+                                           ptrdiff_t count, ptrdiff_t num_ones);
 
 /** @brief Return the index of the first bit set to 0 in the set.
 @param [in] bs a pointer to the bit set.
@@ -453,8 +456,8 @@ NULL, or the range is invalid.
 invalid range therefore -1 is returned. To distinguish a valid negative result
 signifying not found and a negative result indicating a range error the user
 must check their input. */
-ptrdiff_t ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
-                                           size_t count);
+ptrdiff_t ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, ptrdiff_t i,
+                                           ptrdiff_t count);
 
 /** @brief Returns the index of the start of the first trailing num_zeros
 contiguous 0 bits.
@@ -466,7 +469,8 @@ or such a sequence cannot be found -1 is returned.
 @warning the user must validate that bs is non-NULL and num_zeros is less than
 the size of the set in order to distinguish -1 returned as a result of a failed
 search or bad input. */
-ptrdiff_t ccc_bs_first_trailing_zeros(ccc_bitset const *bs, size_t num_zeros);
+ptrdiff_t ccc_bs_first_trailing_zeros(ccc_bitset const *bs,
+                                      ptrdiff_t num_zeros);
 
 /** @brief Returns the index of the start of the first trailing num_zeros
 contiguous 0 bits in the specified range.
@@ -481,8 +485,9 @@ or such a sequence cannot be found -1 is returned.
 in an invalid range therefore -1 is returned. To distinguish a valid negative
 result signifying not found and a negative result indicating a range error the
 user must check their input. */
-ptrdiff_t ccc_bs_first_trailing_zeros_range(ccc_bitset const *bs, size_t i,
-                                            size_t count, size_t num_zeros);
+ptrdiff_t ccc_bs_first_trailing_zeros_range(ccc_bitset const *bs, ptrdiff_t i,
+                                            ptrdiff_t count,
+                                            ptrdiff_t num_zeros);
 
 /** @brief Return the index of the first leading bit set to 1 in the set,
 starting from the Most Significant Bit at index size - 1.
@@ -502,8 +507,8 @@ bs is NULL, or the range is invalid.
 invalid range therefore -1 is returned. To distinguish a valid negative result
 signifying not found and a negative result indicating a range error the user
 must check their input. */
-ptrdiff_t ccc_bs_first_leading_one_range(ccc_bitset const *bs, size_t i,
-                                         size_t count);
+ptrdiff_t ccc_bs_first_leading_one_range(ccc_bitset const *bs, ptrdiff_t i,
+                                         ptrdiff_t count);
 
 /** @brief Returns the index of the start of the first leading num_ones
 contiguous 1 bits.
@@ -515,7 +520,7 @@ or such a sequence cannot be found -1 is returned.
 @warning the user must validate that bs is non-NULL and num_ones is less than
 the size of the set in order to distinguish -1 returned as a result of a failed
 search or bad input. */
-ptrdiff_t ccc_bs_first_leading_ones(ccc_bitset const *bs, size_t num_ones);
+ptrdiff_t ccc_bs_first_leading_ones(ccc_bitset const *bs, ptrdiff_t num_ones);
 
 /** @brief Returns the index of the start of the first leading num_ones
 contiguous 1 bits in the specified range.
@@ -530,8 +535,8 @@ or such a sequence cannot be found -1 is returned.
 in an invalid range therefore -1 is returned. To distinguish a valid negative
 result signifying not found and a negative result indicating a range error the
 user must check their input. */
-ptrdiff_t ccc_bs_first_leading_ones_range(ccc_bitset const *bs, size_t i,
-                                          size_t count, size_t num_ones);
+ptrdiff_t ccc_bs_first_leading_ones_range(ccc_bitset const *bs, ptrdiff_t i,
+                                          ptrdiff_t count, ptrdiff_t num_ones);
 
 /** @brief Return the index of the first leading bit set to 0 in the set,
 starting from the Most Significant Bit at index size - 1.
@@ -547,8 +552,8 @@ starting from the Most Significant Bit at index size - 1.
 @param [in] count size to search from Most Significant Bit to Least in range.
 @return the index of the first bit set to 0 or -1 if no 0 bit is found or bs in
 NULL. */
-ptrdiff_t ccc_bs_first_leading_zero_range(ccc_bitset const *bs, size_t i,
-                                          size_t count);
+ptrdiff_t ccc_bs_first_leading_zero_range(ccc_bitset const *bs, ptrdiff_t i,
+                                          ptrdiff_t count);
 
 /** @brief Returns the index of the start of the first leading num_zeros
 contiguous 0 bits.
@@ -560,7 +565,7 @@ or such a sequence cannot be found -1 is returned.
 @warning the user must validate that bs is non-NULL and num_zeros is less than
 the size of the set in order to distinguish -1 returned as a result of a failed
 search or bad input. */
-ptrdiff_t ccc_bs_first_leading_zeros(ccc_bitset const *bs, size_t num_zeros);
+ptrdiff_t ccc_bs_first_leading_zeros(ccc_bitset const *bs, ptrdiff_t num_zeros);
 
 /** @brief Returns the index of the start of the first leading num_zeros
 contiguous 0 bits in the specified range.
@@ -575,8 +580,9 @@ or such a sequence cannot be found -1 is returned.
 in an invalid range therefore -1 is returned. To distinguish a valid negative
 result signifying not found and a negative result indicating a range error the
 user must check their input. */
-ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
-                                           size_t count, size_t num_zeros);
+ptrdiff_t ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, ptrdiff_t i,
+                                           ptrdiff_t count,
+                                           ptrdiff_t num_zeros);
 
 /**@}*/
 
@@ -637,7 +643,7 @@ is NULL.
 Note that if the number of shifts is greater than the bit set size the bit set
 is zeroed out rather than exhibiting undefined behavior as in the equivalent
 integer operation. */
-ccc_result ccc_bs_shiftl(ccc_bitset *bs, size_t left_shifts);
+ccc_result ccc_bs_shiftl(ccc_bitset *bs, ptrdiff_t left_shifts);
 
 /** @brief Shift the bit set right by right_shifts amount.
 @param [in] bs a pointer to the bit set.
@@ -648,7 +654,7 @@ is NULL.
 Note that if the number of shifts is greater than the bit set size the bit set
 is zeroed out rather than exhibiting undefined behavior as in the equivalent
 integer operation. */
-ccc_result ccc_bs_shiftr(ccc_bitset *bs, size_t right_shifts);
+ccc_result ccc_bs_shiftr(ccc_bitset *bs, ptrdiff_t right_shifts);
 
 /** @brief Checks two bit sets of the same size (not capacity) for equality.
 @param [in] a pointer to a bit set.
@@ -705,26 +711,31 @@ ccc_bitblock *ccc_bs_data(ccc_bitset const *bs);
 
 /** @brief Return total number of bits the capacity of the set can hold.
 @param [in] bs a pointer to the bit set.
-@return capacity of bits capable of being stored in the current set. */
-size_t ccc_bs_capacity(ccc_bitset const *bs);
+@return capacity of bits capable of being stored in the current set. -1 if bs is
+NULL. */
+ptrdiff_t ccc_bs_capacity(ccc_bitset const *bs);
 
 /** @brief Return number of ccc_bitblocks used by bit set for capacity bits.
 @param [in] bs a pointer to the bit set.
 @return capacity in number of bit blocks used to hold the entire capacity of
-bits in the set. Capacity may be greater than or equal to size. */
-size_t ccc_bs_blocks_capacity(ccc_bitset const *bs);
+bits in the set. -1 if bs is NULL.
+
+Capacity may be greater than or equal to size. */
+ptrdiff_t ccc_bs_blocks_capacity(ccc_bitset const *bs);
 
 /** @brief Return total number of bits actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
 @return the total number of bits currently tracked by the set regardless of
-true or false state of each. 0 is returned if bs is NULL. */
-size_t ccc_bs_size(ccc_bitset const *bs);
+true or false state of each. -1 is returned if bs is NULL. */
+ptrdiff_t ccc_bs_size(ccc_bitset const *bs);
 
 /** @brief Return number of ccc_bitblocks used by the bit set for size bits.
 @param [in] bs a pointer to the bit set.
 @return size in number of bit blocks used to hold the current size of bits in
-the set. Size may be less than or equal to capacity. */
-size_t ccc_bs_blocks_size(ccc_bitset const *bs);
+the set. -1 if bs is NULL.
+
+Size may be less than or equal to capacity. */
+ptrdiff_t ccc_bs_blocks_size(ccc_bitset const *bs);
 
 /** @brief Return true if no bits are actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
@@ -735,9 +746,9 @@ ccc_tribool ccc_bs_empty(ccc_bitset const *bs);
 
 /** @brief Return the number of bits set to CCC_TRUE. O(n).
 @param [in] bs a pointer to the bit set.
-@return the total number of bits currently set to CCC_TRUE. 0 is returned if
+@return the total number of bits currently set to CCC_TRUE. -1 is returned if
 bs is NULL. */
-size_t ccc_bs_popcount(ccc_bitset const *bs);
+ptrdiff_t ccc_bs_popcount(ccc_bitset const *bs);
 
 /** @brief Return the number of bits set to CCC_TRUE in the range. O(n).
 @param [in] bs a pointer to the bit set.
@@ -746,7 +757,8 @@ size_t ccc_bs_popcount(ccc_bitset const *bs);
 @return the total number of bits currently set in the range to CCC_TRUE. A -1 is
 returned if bs is NULL, i is invalid, count is invalid, or both i and count are
 invalid. */
-ptrdiff_t ccc_bs_popcount_range(ccc_bitset const *bs, size_t i, size_t count);
+ptrdiff_t ccc_bs_popcount_range(ccc_bitset const *bs, ptrdiff_t i,
+                                ptrdiff_t count);
 
 /**@}*/
 

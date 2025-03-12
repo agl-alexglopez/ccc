@@ -33,7 +33,7 @@ struct ccc_hhmap_elem_
     /** Hash cached for distance, resizing, and callback avoidance. */
     uint64_t hash_;
     /** User data remains here until deleted. Callback compare needs this. */
-    size_t slot_i_;
+    ptrdiff_t slot_i_;
 };
 
 /** @private */
@@ -60,27 +60,21 @@ union ccc_hhmap_handle_
     struct ccc_hhash_handle_ impl_;
 };
 
-/** @private */
-union ccc_hhmap_ref_
-{
-    size_t impl_;
-};
-
 /*======================       Private Interface    =========================*/
 
 /** @private */
 ccc_handle_i ccc_impl_hhm_insert_meta(struct ccc_hhmap_ *h, uint64_t hash,
-                                      size_t cur_i);
+                                      ptrdiff_t cur_i);
 /** @private */
 struct ccc_hhash_handle_ ccc_impl_hhm_handle(struct ccc_hhmap_ *h,
                                              void const *key);
 /** @private */
-void *ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, size_t i);
+void *ccc_impl_hhm_key_at(struct ccc_hhmap_ const *h, ptrdiff_t i);
 /** @private */
-uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, size_t i);
+uint64_t *ccc_impl_hhm_hash_at(struct ccc_hhmap_ const *h, ptrdiff_t i);
 /** @private */
 struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
-                                             size_t i);
+                                             ptrdiff_t i);
 
 /*======================    Macro Implementations     =======================*/
 
@@ -105,7 +99,7 @@ struct ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *h,
 once which it must have to make it to this point. */
 #define ccc_impl_hhm_swaps(swap_handle, lazy_key_value...)                     \
     (__extension__({                                                           \
-        size_t hhm_i_ = (swap_handle)->handle_.i_;                             \
+        ptrdiff_t hhm_i_ = (swap_handle)->handle_.i_;                          \
         struct ccc_hhmap_elem_ *hhm_elem_                                      \
             = ccc_impl_hhm_elem_at((swap_handle)->h_, hhm_i_);                 \
         if (hhm_elem_->hash_ == CCC_HHM_EMPTY)                                 \

@@ -726,15 +726,16 @@ Obtain the container state. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *hrm);
 
-/** @brief Returns the size of the map
+/** @brief Returns the size of the map representing active slots.
 @param [in] hrm the map.
-@return the size_t size. */
-[[nodiscard]] size_t ccc_hrm_size(ccc_handle_realtime_ordered_map const *hrm);
+@return the size of the map or -1 if hrm is NULL. */
+[[nodiscard]] ptrdiff_t
+ccc_hrm_size(ccc_handle_realtime_ordered_map const *hrm);
 
-/** @brief Returns the capacity of the map
+/** @brief Returns the capacity of the map representing total available slots.
 @param [in] hrm the map.
-@return the size_t capacity. */
-[[nodiscard]] size_t
+@return the capacity or -1 if hrm is NULL. */
+[[nodiscard]] ptrdiff_t
 ccc_hrm_capacity(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Return a reference to the base of backing array. O(1).

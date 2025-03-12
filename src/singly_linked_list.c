@@ -11,14 +11,14 @@
 static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);
 static struct ccc_sll_elem_ *before(struct ccc_sll_ const *,
                                     struct ccc_sll_elem_ const *to_find);
-static size_t len(struct ccc_sll_ const *, struct ccc_sll_elem_ const *begin,
-                  struct ccc_sll_elem_ const *end);
+static ptrdiff_t len(struct ccc_sll_ const *, struct ccc_sll_elem_ const *begin,
+                     struct ccc_sll_elem_ const *end);
 
 static void push_front(struct ccc_sll_ *sll, struct ccc_sll_elem_ *elem);
-static size_t extract_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
-                            struct ccc_sll_elem_ *end);
-static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
-                          struct ccc_sll_elem_ *end);
+static ptrdiff_t extract_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
+                               struct ccc_sll_elem_ *end);
+static ptrdiff_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
+                             struct ccc_sll_elem_ *end);
 static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 static struct ccc_sll_elem_ *elem_in(struct ccc_sll_ const *,
                                      void const *user_struct);
@@ -134,7 +134,7 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
     pos->n_ = begin;
     if (pos_sll != splice_sll)
     {
-        size_t const sz = len(splice_sll, begin, end);
+        ptrdiff_t const sz = len(splice_sll, begin, end);
         splice_sll->sz_ -= sz;
         pos_sll->sz_ += sz;
     }
@@ -173,7 +173,7 @@ ccc_sll_erase_range(ccc_singly_linked_list *const sll,
     }
     struct ccc_sll_elem_ const *const ret = end->n_;
     before(sll, begin)->n_ = end->n_;
-    size_t const deleted = erase_range(sll, begin, end);
+    ptrdiff_t const deleted = erase_range(sll, begin, end);
     assert(deleted <= sll->sz_);
     sll->sz_ -= deleted;
     return ret == &sll->sentinel_ ? NULL : struct_base(sll, ret);
@@ -207,7 +207,7 @@ ccc_sll_extract_range(ccc_singly_linked_list *const sll,
     }
     struct ccc_sll_elem_ const *const ret = end->n_;
     before(sll, begin)->n_ = end->n_;
-    size_t const deleted = extract_range(sll, begin, end);
+    ptrdiff_t const deleted = extract_range(sll, begin, end);
     assert(deleted <= sll->sz_);
     sll->sz_ -= deleted;
     return ret == &sll->sentinel_ ? NULL : struct_base(sll, ret);
@@ -269,7 +269,7 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     {
         return CCC_BOOL_ERR;
     }
-    size_t size = 0;
+    ptrdiff_t size = 0;
     for (struct ccc_sll_elem_ *e = sll->sentinel_.n_; e != &sll->sentinel_;
          e = e->n_, ++size)
     {
@@ -285,7 +285,7 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
     return size == sll->sz_;
 }
 
-size_t
+ptrdiff_t
 ccc_sll_size(ccc_singly_linked_list const *const sll)
 {
     return sll ? sll->sz_ : 0;
@@ -343,11 +343,11 @@ before(struct ccc_sll_ const *const sll,
     return (struct ccc_sll_elem_ *)i;
 }
 
-static inline size_t
+static inline ptrdiff_t
 extract_range([[maybe_unused]] struct ccc_sll_ *const sll,
               struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
 {
-    size_t const sz = len(sll, begin, end);
+    ptrdiff_t const sz = len(sll, begin, end);
     if (end != &sll->sentinel_)
     {
         end->n_ = NULL;
@@ -355,20 +355,20 @@ extract_range([[maybe_unused]] struct ccc_sll_ *const sll,
     return sz;
 }
 
-static inline size_t
+static inline ptrdiff_t
 erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
             struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
 {
     if (!sll->alloc_)
     {
-        size_t const sz = len(sll, begin, end);
+        ptrdiff_t const sz = len(sll, begin, end);
         if (end != &sll->sentinel_)
         {
             end->n_ = NULL;
         }
         return sz;
     }
-    size_t sz = 1;
+    ptrdiff_t sz = 1;
     for (struct ccc_sll_elem_ *next = NULL; begin != end; begin = next, ++sz)
     {
         assert(sz <= sll->sz_);
@@ -379,11 +379,11 @@ erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
     return sz;
 }
 
-static inline size_t
+static inline ptrdiff_t
 len([[maybe_unused]] struct ccc_sll_ const *const sll,
     struct ccc_sll_elem_ const *begin, struct ccc_sll_elem_ const *const end)
 {
-    size_t s = 1;
+    ptrdiff_t s = 1;
     for (; begin != end; begin = begin->n_, ++s)
     {
         assert(s <= sll->sz_);

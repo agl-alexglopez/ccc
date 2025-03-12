@@ -10,6 +10,7 @@ based on the following source.
        strategy to eliminate symmetric left and right cases for any binary tree
        code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "impl/impl_ordered_map.h"
@@ -92,7 +93,7 @@ ccc_om_is_empty(ccc_ordered_map const *const om)
     return empty(&om->impl_);
 }
 
-size_t
+ptrdiff_t
 ccc_om_size(ccc_ordered_map const *const om)
 {
     return om ? om->impl_.size_ : 0;
@@ -844,7 +845,7 @@ struct parent_status_
     struct ccc_node_ const *parent;
 };
 
-static size_t
+static ptrdiff_t
 recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 {
     if (r == &t->end_)

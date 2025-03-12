@@ -15,10 +15,10 @@
 #include <time.h>
 
 CHECK_BEGIN_STATIC_FN(check_range, handle_realtime_ordered_map const *const hrm,
-                      range const *const r, size_t const n,
+                      range const *const r, ptrdiff_t const n,
                       int const expect_range[])
 {
-    size_t index = 0;
+    ptrdiff_t index = 0;
     struct val *iter = begin_range(r);
     for (; iter != end_range(r) && index < n;
          iter = next(hrm, &iter->elem), ++index)
@@ -33,14 +33,14 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_realtime_ordered_map const *const hrm,
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
-        for (size_t j = 0; j < n; ++j)
+        for (ptrdiff_t j = 0; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", expect_range[j]);
         }
         (void)fprintf(stderr, "}\n%s", NONE);
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         iter = begin_range(r);
-        for (size_t j = 0; j < n && iter != end_range(r);
+        for (ptrdiff_t j = 0; j < n && iter != end_range(r);
              ++j, iter = next(hrm, &iter->elem))
         {
             if (iter == end(hrm) || !iter)
@@ -66,11 +66,11 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_realtime_ordered_map const *const hrm,
 
 CHECK_BEGIN_STATIC_FN(check_rrange,
                       handle_realtime_ordered_map const *const hrm,
-                      rrange const *const r, size_t const n,
+                      rrange const *const r, ptrdiff_t const n,
                       int const expect_rrange[])
 {
     struct val *iter = rbegin_rrange(r);
-    size_t index = 0;
+    ptrdiff_t index = 0;
     for (; iter != rend_rrange(r); iter = rnext(hrm, &iter->elem))
     {
         int const cur_id = iter->id;
@@ -84,7 +84,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange,
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
-        size_t j = 0;
+        ptrdiff_t j = 0;
         for (; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", expect_rrange[j]);
@@ -119,8 +119,8 @@ CHECK_BEGIN_STATIC_FN(check_rrange,
 
 CHECK_BEGIN_STATIC_FN(iterator_check, handle_realtime_ordered_map *s)
 {
-    size_t const size = size(s);
-    size_t iter_count = 0;
+    ptrdiff_t const size = size(s);
+    ptrdiff_t iter_count = 0;
     for (struct val *e = begin(s); e != end(s); e = next(s, &e->elem))
     {
         ++iter_count;
@@ -148,7 +148,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_forward_iter)
     CHECK(j, 0);
     int const num_nodes = 33;
     int const prime = 37;
-    size_t shuffled_index = prime % num_nodes;
+    ptrdiff_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
         (void)swap_handle(
@@ -174,8 +174,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_iterate_removal)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
-    for (size_t i = 0; i < num_nodes; ++i)
+    ptrdiff_t const num_nodes = 1000;
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. NOLINTNEXTLINE */
         (void)swap_handle(
@@ -204,8 +204,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_iterate_remove_reinsert)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
-    for (size_t i = 0; i < num_nodes; ++i)
+    ptrdiff_t const num_nodes = 1000;
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. NOLINTNEXTLINE */
         (void)swap_handle(
@@ -214,7 +214,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_iterate_remove_reinsert)
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
-    size_t const old_size = size(&s);
+    ptrdiff_t const old_size = size(&s);
     int const limit = 400;
     int new_unique_handle_id = 1001;
     for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)

@@ -26,8 +26,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
-    size_t const end = size(&sll);
-    for (size_t i = 0; i < end; ++i)
+    ptrdiff_t const end = size(&sll);
+    for (ptrdiff_t i = 0; i < end; ++i)
     {
         (void)pop_front(&sll);
         CHECK(validate(&sll), true);

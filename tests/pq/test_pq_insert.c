@@ -31,9 +31,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_three)
         three_vals[i].val = i;
         CHECK(push(&pq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
-        CHECK(ccc_pq_size(&pq), (size_t)i + 1);
+        CHECK(ccc_pq_size(&pq), (ptrdiff_t)i + 1);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)3);
+    CHECK(ccc_pq_size(&pq), (ptrdiff_t)3);
     CHECK_END_FN();
 }
 
@@ -58,7 +58,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_struct_getter)
         struct val const *get = &tester_clone[i];
         CHECK(get->val, vals[i].val);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)10);
+    CHECK(ccc_pq_size(&pq), (ptrdiff_t)10);
     CHECK_END_FN();
 }
 
@@ -72,9 +72,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_three_dups)
         three_vals[i].val = 0;
         CHECK(push(&pq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
-        CHECK(ccc_pq_size(&pq), (size_t)i + 1);
+        CHECK(ccc_pq_size(&pq), (ptrdiff_t)i + 1);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)3);
+    CHECK(ccc_pq_size(&pq), (ptrdiff_t)3);
     CHECK_END_FN();
 }
 
@@ -83,7 +83,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_shuffle)
     ccc_priority_queue pq
         = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Math magic ahead... */
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&pq, vals, size, prime), PASS);
@@ -104,9 +104,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_read_max_min)
         vals[i].val = i;
         CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
-        CHECK(ccc_pq_size(&pq), (size_t)i + 1);
+        CHECK(ccc_pq_size(&pq), (ptrdiff_t)i + 1);
     }
-    CHECK(ccc_pq_size(&pq), (size_t)10);
+    CHECK(ccc_pq_size(&pq), (ptrdiff_t)10);
     struct val const *min = front(&pq);
     CHECK(min->val, 0);
     CHECK_END_FN();

@@ -1,3 +1,8 @@
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "cli.h"
@@ -9,11 +14,6 @@
 #include "traits.h"
 #include "types.h"
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
 struct val
 {
     int val;
@@ -21,8 +21,8 @@ struct val
     ccc_pq_elem pq_elem;
 };
 
-size_t const step = 100000;
-size_t const end_size = 1100000;
+ptrdiff_t const step = 100000;
+ptrdiff_t const end_size = 1100000;
 int const max_rand_range = RAND_MAX;
 
 typedef void (*perf_fn)(void);
@@ -35,12 +35,12 @@ static void test_pop_intermittent_push(void);
 static void test_update(void);
 
 static void *valid_malloc(size_t bytes);
-static struct val *create_rand_vals(size_t);
+static struct val *create_rand_vals(ptrdiff_t);
 static ccc_threeway_cmp val_key_cmp(ccc_key_cmp);
 static ccc_threeway_cmp val_cmp(ccc_cmp);
 static void val_update(ccc_user_type);
 
-#define NUM_TESTS (size_t)6
+#define NUM_TESTS (ptrdiff_t)6
 static perf_fn const perf_tests[NUM_TESTS] = {test_push,
                                               test_pop,
                                               test_push_pop,
@@ -84,7 +84,7 @@ main(int argc, char **argv)
         }
         return 0;
     }
-    for (size_t i = 0; i < NUM_TESTS; ++i)
+    for (ptrdiff_t i = 0; i < NUM_TESTS; ++i)
     {
         perf_tests[i]();
     }
@@ -96,7 +96,7 @@ static void
 test_push(void)
 {
     printf("push N elements, pq, vs omm, vs fpq \n");
-    for (size_t n = step; n < end_size; n += step)
+    for (ptrdiff_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
@@ -104,14 +104,14 @@ test_push(void)
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         clock_t begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
         }
@@ -120,7 +120,7 @@ test_push(void)
         ccc_flat_priority_queue fpq
             = ccc_fpq_init(val_array, CCC_LES, val_cmp, NULL, NULL, n + 1);
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
         }
@@ -136,30 +136,30 @@ static void
 test_pop(void)
 {
     printf("pop N elements, pq, vs omm, vs fpq \n");
-    for (size_t n = step; n < end_size; n += step)
+    for (ptrdiff_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, val_key_cmp, NULL, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)ccc_omm_pop_min(&omm);
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
         }
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)pop(&pq);
         }
@@ -167,12 +167,12 @@ test_pop(void)
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq
             = ccc_fpq_init(val_array, CCC_LES, val_cmp, NULL, NULL, n + 1);
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
         }
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)pop(&fpq);
         }
@@ -188,7 +188,7 @@ static void
 test_push_pop(void)
 {
     printf("push N elements then pop N elements, pq, vs omm, vs fpq \n");
-    for (size_t n = step; n < end_size; n += step)
+    for (ptrdiff_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
@@ -196,22 +196,22 @@ test_push_pop(void)
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         clock_t begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)ccc_omm_pop_min(&omm);
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
         }
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)pop(&pq);
         }
@@ -220,11 +220,11 @@ test_push_pop(void)
         ccc_flat_priority_queue fpq
             = ccc_fpq_init(val_array, CCC_LES, val_cmp, NULL, NULL, n + 1);
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
         }
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)pop(&fpq);
         }
@@ -240,7 +240,7 @@ static void
 test_push_intermittent_pop(void)
 {
     printf("push N elements pop every 10, pq, vs omm, vs fpq \n");
-    for (size_t n = step; n < end_size; n += step)
+    for (ptrdiff_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
@@ -248,7 +248,7 @@ test_push_intermittent_pop(void)
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         clock_t begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)swap_entry(&omm, &val_array[i].ommap_elem);
             if (i % 10 == 0)
@@ -259,7 +259,7 @@ test_push_intermittent_pop(void)
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
             if (i % 10 == 0)
@@ -272,7 +272,7 @@ test_push_intermittent_pop(void)
         ccc_flat_priority_queue fpq
             = ccc_fpq_init(val_array, CCC_LES, val_cmp, NULL, NULL, n + 1);
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
             if (i % 10 == 0)
@@ -292,19 +292,19 @@ static void
 test_pop_intermittent_push(void)
 {
     printf("pop N elements push every 10, pq, vs omm, vs fpq \n");
-    for (size_t n = step; n < end_size; n += step)
+    for (ptrdiff_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, val_key_cmp, NULL, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             struct val *v = ccc_omm_min(&omm);
             (void)ccc_omm_pop_min(&omm);
@@ -316,12 +316,12 @@ test_pop_intermittent_push(void)
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
         }
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             struct val *v = front(&pq);
             (void)pop(&pq);
@@ -335,12 +335,12 @@ test_pop_intermittent_push(void)
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq
             = ccc_fpq_init(val_array, CCC_LES, val_cmp, NULL, NULL, n + 1);
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
         }
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)pop(&fpq);
             if (i % 10 == 0)
@@ -361,19 +361,19 @@ static void
 test_update(void)
 {
     printf("push N elements update N elements, pq, vs omm, vs fpq \n");
-    for (size_t n = step; n < end_size; n += step)
+    for (ptrdiff_t n = step; n < end_size; n += step)
     {
         struct val *val_array = create_rand_vals(n + 1);
         ccc_ordered_multimap omm = ccc_omm_init(omm, struct val, ommap_elem,
                                                 val, val_key_cmp, NULL, NULL);
         ccc_priority_queue pq
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)swap_entry(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             int new_val = rand_range(0, max_rand_range);
             (void)ccc_omm_update(&omm, &val_array[i].ommap_elem, val_update,
@@ -381,12 +381,12 @@ test_update(void)
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&pq, &val_array[i].pq_elem);
         }
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             int new_val
                 = rand_range(0, val_array[i].val - (val_array[i].val != 0));
@@ -397,12 +397,12 @@ test_update(void)
         double const pq_time = (double)(end - begin) / CLOCKS_PER_SEC;
         ccc_flat_priority_queue fpq
             = ccc_fpq_init(val_array, CCC_LES, val_cmp, NULL, NULL, n + 1);
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             (void)push(&fpq, &val_array[i]);
         }
         begin = clock();
-        for (size_t i = 0; i < n; ++i)
+        for (ptrdiff_t i = 0; i < n; ++i)
         {
             int new_val = rand_range(0, max_rand_range);
             (void)ccc_fpq_update(&fpq, &val_array[i], val_update, &new_val);
@@ -418,7 +418,7 @@ test_update(void)
 /*=======================  Static Helpers  =================================*/
 
 static struct val *
-create_rand_vals(size_t n)
+create_rand_vals(ptrdiff_t n)
 {
     struct val *vals = valid_malloc(n * sizeof(struct val));
     while (n--)

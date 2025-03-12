@@ -19,9 +19,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
         CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
     }
-    size_t pop_count = 0;
+    ptrdiff_t pop_count = 0;
     while (!ccc_pq_is_empty(&pq))
     {
         CHECK(pop(&pq), CCC_RESULT_OK);
@@ -47,9 +47,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -58,7 +58,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *i = &vals[val];
         if (i->val > limit)
@@ -77,9 +77,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -88,7 +88,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *i = &vals[val];
         int backoff = i->val / 2;
@@ -109,9 +109,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -120,7 +120,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *i = &vals[val];
         int backoff = i->val / 2;
@@ -141,9 +141,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -152,7 +152,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *const i = &vals[val];
         int inc = limit * 2;
@@ -179,9 +179,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -190,7 +190,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *const i = &vals[val];
         int inc = limit * 2;
@@ -217,9 +217,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -228,7 +228,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *const i = &vals[val];
         int inc = limit * 2;
@@ -255,9 +255,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
+    ptrdiff_t const num_nodes = 1000;
     struct val vals[1000];
-    for (size_t i = 0; i < num_nodes; ++i)
+    for (ptrdiff_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
@@ -266,7 +266,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
-    for (size_t val = 0; val < num_nodes; ++val)
+    for (ptrdiff_t val = 0; val < num_nodes; ++val)
     {
         struct val *const i = &vals[val];
         int inc = limit * 2;

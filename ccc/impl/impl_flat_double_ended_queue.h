@@ -13,7 +13,7 @@
 struct ccc_fdeq_
 {
     ccc_buffer buf_;
-    size_t front_;
+    ptrdiff_t front_;
 };
 
 /*=======================    Private Interface   ============================*/

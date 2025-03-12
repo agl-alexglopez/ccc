@@ -75,7 +75,7 @@ may occur, but the handle index remains valid regardless.
 This is similar to pointer stability except that pointers would not remain valid
 when the underlying array is resized; a handle remains valid because it is an
 index not a pointer. */
-typedef size_t ccc_handle_i;
+typedef ptrdiff_t ccc_handle_i;
 
 /** @brief The status monitoring and handle state once it is obtained.
 
