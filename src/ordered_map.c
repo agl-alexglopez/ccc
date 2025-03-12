@@ -113,7 +113,7 @@ ccc_om_entry(ccc_ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
-        return (ccc_omap_entry){{.entry_ = {.stats_ = CCC_INPUT_ERROR}}};
+        return (ccc_omap_entry){{.entry_ = {.stats_ = CCC_ARG_ERROR}}};
     }
     return (ccc_omap_entry){container_entry(&om->impl_, key)};
 }
@@ -180,7 +180,7 @@ ccc_om_swap_entry(ccc_ordered_map *const om,
 {
     if (!om || !key_val_handle || !tmp)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const found
         = find(&om->impl_, key_from_node(&om->impl_, &key_val_handle->impl_));
@@ -213,7 +213,7 @@ ccc_om_try_insert(ccc_ordered_map *const om,
 {
     if (!om || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const found
         = find(&om->impl_, key_from_node(&om->impl_, &key_val_handle->impl_));
@@ -237,7 +237,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const om,
 {
     if (!om || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const found
         = find(&om->impl_, key_from_node(&om->impl_, &key_val_handle->impl_));
@@ -262,7 +262,7 @@ ccc_om_remove(ccc_ordered_map *const om, ccc_omap_elem *const out_handle)
 {
     if (!om || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const n
         = erase(&om->impl_, key_from_node(&om->impl_, &out_handle->impl_));
@@ -285,7 +285,7 @@ ccc_om_remove_entry(ccc_omap_entry *const e)
 {
     if (!e)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     if (e->impl_.entry_.stats_ == CCC_OCCUPIED)
     {
@@ -345,7 +345,7 @@ ccc_om_occupied(ccc_omap_entry const *const e)
 ccc_entry_status
 ccc_om_entry_status(ccc_omap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ : CCC_INPUT_ERROR;
+    return e ? e->impl_.entry_.stats_ : CCC_ARG_ERROR;
 }
 
 void *

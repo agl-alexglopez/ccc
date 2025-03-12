@@ -177,7 +177,7 @@ ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
 {
     if (!rom || !key_val_handle || !tmp)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     struct romap_query_ const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -205,7 +205,7 @@ ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
 {
     if (!rom || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     struct romap_query_ const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -228,7 +228,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
 {
     if (!rom || !key_val_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     struct romap_query_ const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -252,7 +252,7 @@ ccc_rom_entry(ccc_realtime_ordered_map const *const rom, void const *const key)
 {
     if (!rom || !key)
     {
-        return (ccc_romap_entry){{.entry_ = {.stats_ = CCC_INPUT_ERROR}}};
+        return (ccc_romap_entry){{.entry_ = {.stats_ = CCC_ARG_ERROR}}};
     }
     return (ccc_romap_entry){entry(rom, key)};
 }
@@ -297,7 +297,7 @@ ccc_rom_remove_entry(ccc_romap_entry const *const e)
 {
     if (!e)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     if (e->impl_.entry_.stats_ == CCC_OCCUPIED)
     {
@@ -320,7 +320,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
 {
     if (!rom || !out_handle)
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     struct romap_query_ const q = find(rom, key_from_node(rom, out_handle));
     if (q.last_cmp_ != CCC_EQL)
@@ -399,7 +399,7 @@ ccc_rom_insert_error(ccc_romap_entry const *const e)
 ccc_entry_status
 ccc_rom_entry_status(ccc_romap_entry const *const e)
 {
-    return e ? e->impl_.entry_.stats_ : CCC_INPUT_ERROR;
+    return e ? e->impl_.entry_.stats_ : CCC_ARG_ERROR;
 }
 
 void *

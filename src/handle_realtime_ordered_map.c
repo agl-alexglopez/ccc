@@ -194,7 +194,7 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, out_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -222,7 +222,7 @@ ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -244,7 +244,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, key_val_handle));
     if (CCC_EQL == q.last_cmp_)
@@ -331,7 +331,7 @@ ccc_hrm_handle(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !key)
     {
-        return (ccc_hromap_handle){{.handle_ = {.stats_ = CCC_INPUT_ERROR}}};
+        return (ccc_hromap_handle){{.handle_ = {.stats_ = CCC_ARG_ERROR}}};
     }
     return (ccc_hromap_handle){handle(hrm, key)};
 }
@@ -341,7 +341,7 @@ ccc_hrm_remove_handle(ccc_hromap_handle const *const h)
 {
     if (!h)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
@@ -357,7 +357,7 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     struct hrm_query_ const q = find(hrm, key_from_node(hrm, out_handle));
     if (q.last_cmp_ != CCC_EQL)
@@ -431,7 +431,7 @@ ccc_hrm_occupied(ccc_hromap_handle const *const h)
 ccc_handle_status
 ccc_hrm_handle_status(ccc_hromap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ : CCC_INPUT_ERROR;
+    return h ? h->impl_.handle_.stats_ : CCC_ARG_ERROR;
 }
 
 ccc_tribool

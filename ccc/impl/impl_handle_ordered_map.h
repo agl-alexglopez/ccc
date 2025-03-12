@@ -96,7 +96,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
     (__extension__({                                                           \
         __auto_type hom_mod_hndl_ptr_ = (handle_ordered_map_handle_ptr);       \
         struct ccc_htree_handle_ hom_mod_hndl_                                 \
-            = {.handle_ = {.stats_ = CCC_INPUT_ERROR}};                        \
+            = {.handle_ = {.stats_ = CCC_ARG_ERROR}};                          \
         if (hom_mod_hndl_ptr_)                                                 \
         {                                                                      \
             hom_mod_hndl_ = hom_mod_hndl_ptr_->impl_;                          \
@@ -188,7 +188,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
 #define ccc_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)  \
     (__extension__({                                                           \
         __auto_type hom_try_ins_map_ptr_ = (handle_ordered_map_ptr);           \
-        struct ccc_handl_ hom_try_ins_hndl_ret_ = {.stats_ = CCC_INPUT_ERROR}; \
+        struct ccc_handl_ hom_try_ins_hndl_ret_ = {.stats_ = CCC_ARG_ERROR};   \
         if (hom_try_ins_map_ptr_)                                              \
         {                                                                      \
             __auto_type hom_key_ = (key);                                      \
@@ -229,7 +229,7 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
     (__extension__({                                                           \
         __auto_type hom_ins_or_assign_map_ptr_ = (handle_ordered_map_ptr);     \
         struct ccc_handl_ hom_ins_or_assign_hndl_ret_                          \
-            = {.stats_ = CCC_INPUT_ERROR};                                     \
+            = {.stats_ = CCC_ARG_ERROR};                                       \
         if (hom_ins_or_assign_map_ptr_)                                        \
         {                                                                      \
             __auto_type hom_key_ = (key);                                      \

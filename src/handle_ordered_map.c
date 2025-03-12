@@ -130,7 +130,7 @@ ccc_hom_handle(ccc_handle_ordered_map *const hom, void const *const key)
 {
     if (!hom || !key)
     {
-        return (ccc_homap_handle){{.handle_ = {.stats_ = CCC_INPUT_ERROR}}};
+        return (ccc_homap_handle){{.handle_ = {.stats_ = CCC_ARG_ERROR}}};
     }
     return (ccc_homap_handle){handle(hom, key)};
 }
@@ -212,7 +212,7 @@ ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     size_t const found = find(hom, key_from_node(hom, out_handle));
     if (found)
@@ -239,7 +239,7 @@ ccc_hom_try_insert(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     size_t const found = find(hom, key_from_node(hom, key_val_handle));
     if (found)
@@ -261,7 +261,7 @@ ccc_hom_insert_or_assign(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !key_val_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     size_t const found = find(hom, key_from_node(hom, key_val_handle));
     if (found)
@@ -290,7 +290,7 @@ ccc_hom_remove(ccc_handle_ordered_map *const hom,
 {
     if (!hom || !out_handle)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     size_t const n = erase(hom, key_from_node(hom, out_handle));
     if (!n)
@@ -305,7 +305,7 @@ ccc_hom_remove_handle(ccc_homap_handle *const h)
 {
     if (!h)
     {
-        return (ccc_handle){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_handle){{.stats_ = CCC_ARG_ERROR}};
     }
     if (h->impl_.handle_.stats_ == CCC_OCCUPIED)
     {
@@ -350,7 +350,7 @@ ccc_hom_occupied(ccc_homap_handle const *const h)
 ccc_handle_status
 ccc_hom_handle_status(ccc_homap_handle const *const h)
 {
-    return h ? h->impl_.handle_.stats_ : CCC_INPUT_ERROR;
+    return h ? h->impl_.handle_.stats_ : CCC_ARG_ERROR;
 }
 
 ccc_tribool

@@ -200,7 +200,7 @@ ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return (ccc_fhmap_entry){{.entry_ = {.stats_ = CCC_INPUT_ERROR}}};
+        return (ccc_fhmap_entry){{.entry_ = {.stats_ = CCC_ARG_ERROR}}};
     }
     return (ccc_fhmap_entry){container_entry(h, key)};
 }
@@ -252,7 +252,7 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     if (e->impl_.entry_.stats_ != CCC_OCCUPIED)
     {
@@ -288,7 +288,7 @@ ccc_fhm_swap_entry(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
 {
     if (unlikely(!h || !out_handle))
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const user_return = struct_base(h, out_handle);
     void *const key = key_in_slot(h, user_return);
@@ -316,7 +316,7 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h,
 {
     if (unlikely(!h || !key_val_handle))
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const user_base = struct_base(h, key_val_handle);
     struct ccc_fhash_entry_ ent = container_entry(h, key_in_slot(h, user_base));
@@ -338,7 +338,7 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h,
 {
     if (unlikely(!h || !key_val_handle))
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const user_base = struct_base(h, key_val_handle);
     struct ccc_fhash_entry_ ent = container_entry(h, key_in_slot(h, user_base));
@@ -364,7 +364,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
 {
     if (unlikely(!h || !out_handle))
     {
-        return (ccc_entry){{.stats_ = CCC_INPUT_ERROR}};
+        return (ccc_entry){{.stats_ = CCC_ARG_ERROR}};
     }
     void *const ret = struct_base(h, out_handle);
     void *const key = key_in_slot(h, ret);
@@ -438,7 +438,7 @@ ccc_fhm_entry_status(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_INPUT_ERROR;
+        return CCC_ARG_ERROR;
     }
     return e->impl_.entry_.stats_;
 }
@@ -733,7 +733,7 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
     }
     if (unlikely(ccc_buf_size(&h->buf_) >= ccc_buf_capacity(&h->buf_)))
     {
-        return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_INPUT_ERROR};
+        return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_ARG_ERROR};
     }
     size_t i = to_i(cap, hash);
     size_t dist = 0;
