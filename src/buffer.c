@@ -202,7 +202,7 @@ ccc_buf_capacity(ccc_buffer const *const buf)
 size_t
 ccc_buf_elem_size(ccc_buffer const *const buf)
 {
-    return buf ? buf->elem_sz_ : -1;
+    return buf ? buf->elem_sz_ : 0;
 }
 
 ccc_tribool
