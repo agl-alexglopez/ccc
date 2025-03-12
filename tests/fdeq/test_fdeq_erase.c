@@ -79,15 +79,15 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_ranges)
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_back_n(&q, 4), PASS);
     ccc_result res = fdeq_push_front_range(&q, 4, (int[4]){6, 7, 8, 9});
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(check_order(&q, 6, (int[]){6, 7, 8, 9, 0, 1}), PASS);
     CHECK(pop_back_n(&q, 2), PASS);
     res = fdeq_push_front_range(&q, 6, (int[6]){10, 11, 12, 13, 14, 15});
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(check_order(&q, 10, (int[10]){10, 11, 12, 13, 14, 15, 6, 7, 8, 9}),
           PASS);
     res = fdeq_push_front_range(&q, 4, (int[4]){16, 17, 18, 19});
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(
         check_order(&q, 10, (int[10]){16, 17, 18, 19, 10, 11, 12, 13, 14, 15}),
         PASS);
@@ -100,15 +100,15 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_back_ranges)
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_front_n(&q, 4), PASS);
     ccc_result res = fdeq_push_back_range(&q, 4, (int[4]){6, 7, 8, 9});
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(check_order(&q, 6, (int[6]){4, 5, 6, 7, 8, 9}), PASS);
     CHECK(pop_front_n(&q, 2), PASS);
     res = fdeq_push_back_range(&q, 6, (int[6]){10, 11, 12, 13, 14, 15});
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(check_order(&q, 10, (int[10]){6, 7, 8, 9, 10, 11, 12, 13, 14, 15}),
           PASS);
     res = fdeq_push_back_range(&q, 4, (int[4]){16, 17, 18, 19});
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(
         check_order(&q, 10, (int[10]){10, 11, 12, 13, 14, 15, 16, 17, 18, 19}),
         PASS);

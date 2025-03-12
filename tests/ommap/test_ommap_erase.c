@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].key = 0;
-        CHECK(ccc_omm_pop_max(&omm), CCC_OK);
+        CHECK(ccc_omm_pop_max(&omm), CCC_RESULT_OK);
         CHECK(validate(&omm), true);
     }
     CHECK(size(&omm), (size_t)0);
@@ -86,7 +86,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_pop_max)
     for (size_t i = size - 1; i != (size_t)-1; --i)
     {
         CHECK(((struct val *)ccc_omm_max(&omm))->key, vals[i].key);
-        CHECK(ccc_omm_pop_max(&omm), CCC_OK);
+        CHECK(ccc_omm_pop_max(&omm), CCC_RESULT_OK);
     }
     CHECK(is_empty(&omm), true);
     CHECK_END_FN();
@@ -114,7 +114,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_pop_min)
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(((struct val *)ccc_omm_min(&omm))->key, vals[i].key);
-        CHECK(ccc_omm_pop_min(&omm), CCC_OK);
+        CHECK(ccc_omm_pop_min(&omm), CCC_RESULT_OK);
     }
     CHECK(is_empty(&omm), true);
     CHECK_END_FN();
@@ -151,7 +151,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_max_round_robin)
         struct val const *front = ccc_omm_max(&omm);
         CHECK(front->key, order[i].key);
         CHECK(front->val, order[i].val);
-        CHECK(ccc_omm_pop_max(&omm), CCC_OK);
+        CHECK(ccc_omm_pop_max(&omm), CCC_RESULT_OK);
         ++i;
     }
     CHECK_END_FN();
@@ -188,7 +188,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_min_round_robin)
         struct val const *front = ccc_omm_min(&omm);
         CHECK(front->key, order[i].key);
         CHECK(front->val, order[i].val);
-        CHECK(ccc_omm_pop_min(&omm), CCC_OK);
+        CHECK(ccc_omm_pop_min(&omm), CCC_RESULT_OK);
         ++i;
     }
     CHECK_END_FN();

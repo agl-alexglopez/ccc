@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(pop(&ppq), CCC_OK);
+        CHECK(pop(&ppq), CCC_RESULT_OK);
         CHECK(validate(&ppq), true);
     }
     CHECK(ccc_pq_size(&ppq), (size_t)0);
@@ -75,7 +75,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_max)
     {
         struct val const *front = front(&ppq);
         CHECK(front->val, vals[i].val);
-        CHECK(pop(&ppq), CCC_OK);
+        CHECK(pop(&ppq), CCC_RESULT_OK);
     }
     CHECK(ccc_pq_is_empty(&ppq), true);
     CHECK_END_FN();
@@ -98,7 +98,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_min)
     {
         struct val const *front = front(&ppq);
         CHECK(front->val, vals[i].val);
-        CHECK(pop(&ppq), CCC_OK);
+        CHECK(pop(&ppq), CCC_RESULT_OK);
     }
     CHECK(ccc_pq_is_empty(&ppq), true);
     CHECK_END_FN();

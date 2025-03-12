@@ -106,7 +106,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_heapify_copy)
         input[i] = rand_range(-99, 99); /* NOLINT */
     }
     CHECK(fpq_heapify(&pq, input, sizeof(input) / sizeof(int), sizeof(int)),
-          CCC_OK);
+          CCC_RESULT_OK);
     CHECK(fpq_size(&pq), sizeof(input) / sizeof(int));
     int prev = *((int *)fpq_front(&pq));
     (void)pop(&pq);
@@ -133,7 +133,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_no_alloc)
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
     ccc_result res = fpq_copy(&dst, &src, NULL);
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(size(&dst), 3);
     while (!is_empty(&src) && !is_empty(&dst))
     {
@@ -160,7 +160,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_no_alloc_fail)
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
     ccc_result res = fpq_copy(&dst, &src, NULL);
-    CHECK(res != CCC_OK, true);
+    CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
 
@@ -176,7 +176,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_alloc)
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
     ccc_result res = fpq_copy(&dst, &src, std_alloc);
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(size(&dst), 3);
     while (!is_empty(&src) && !is_empty(&dst))
     {
@@ -205,7 +205,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_alloc_fail)
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
     ccc_result res = fpq_copy(&dst, &src, NULL);
-    CHECK(res != CCC_OK, true);
+    CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN({ (void)fpq_clear_and_free(&src, NULL); });
 }
 

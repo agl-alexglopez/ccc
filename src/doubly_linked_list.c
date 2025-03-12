@@ -91,14 +91,14 @@ ccc_dll_pop_front(ccc_doubly_linked_list *const l)
 {
     if (!l || !l->sz_)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     struct ccc_dll_elem_ *remove = pop_front(l);
     if (l->alloc_)
     {
         (void)l->alloc_(struct_base(l, remove), 0, l->aux_);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -106,7 +106,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *const l)
 {
     if (!l || !l->sz_)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     struct ccc_dll_elem_ *remove = l->sentinel_.p_;
     remove->p_->n_ = &l->sentinel_;
@@ -120,7 +120,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *const l)
         (void)l->alloc_(struct_base(l, remove), 0, l->aux_);
     }
     --l->sz_;
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 void *
@@ -263,11 +263,11 @@ ccc_dll_splice(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
 {
     if (!to_cut || !pos || !pos_sll || !to_cut_sll)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (pos == to_cut || to_cut->n_ == pos || to_cut == &to_cut_sll->sentinel_)
     {
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     to_cut->n_->p_ = to_cut->p_;
     to_cut->p_->n_ = to_cut->n_;
@@ -281,7 +281,7 @@ ccc_dll_splice(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
         ++pos_sll->sz_;
         --to_cut_sll->sz_;
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -291,12 +291,12 @@ ccc_dll_splice_range(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
 {
     if (!begin || !end || !pos || !pos_sll || !to_cut_sll)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (pos == begin || pos == end || begin == end
         || begin == &to_cut_sll->sentinel_ || end->p_ == &to_cut_sll->sentinel_)
     {
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     end = end->p_;
     end->n_->p_ = begin->p_;
@@ -313,7 +313,7 @@ ccc_dll_splice_range(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
         pos_sll->sz_ += sz;
         to_cut_sll->sz_ -= sz;
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 void *
@@ -385,7 +385,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
 {
     if (!l)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     while (!ccc_dll_is_empty(l))
     {
@@ -399,7 +399,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
             (void)l->alloc_(node, 0, l->aux_);
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_tribool

@@ -107,7 +107,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc)
     CHECK(hhm_size(&src), 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(hhm_size(&dst), hhm_size(&src));
     for (int i = 0; i < 3; ++i)
     {
@@ -132,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc_fail)
     CHECK(hhm_size(&src), 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
-    CHECK(res != CCC_OK, true);
+    CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
 
@@ -154,7 +154,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc)
     CHECK(hhm_size(&src), 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, std_alloc);
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(hhm_size(&dst), hhm_size(&src));
     for (int i = 0; i < 3; ++i)
     {
@@ -182,7 +182,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc_fail)
     CHECK(hhm_size(&src), 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
-    CHECK(res != CCC_OK, true);
+    CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN({ (void)hhm_clear_and_free(&src, NULL); });
 }
 

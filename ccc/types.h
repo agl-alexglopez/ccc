@@ -126,15 +126,15 @@ that uses this type. */
 typedef enum
 {
     /** The operation has occurred without error. */
-    CCC_OK = 0,
+    CCC_RESULT_OK = 0,
     /** Memory is needed but the container lacks allocation permission. */
-    CCC_NO_ALLOC,
+    CCC_RESULT_NO_ALLOC,
     /** The container has allocation permission, but allocation failed. */
-    CCC_MEM_ERR,
+    CCC_RESULT_MEM_ERR,
     /** Bad arguments have been provided to an operation. */
-    CCC_INPUT_ERR,
+    CCC_RESULT_ARG_ERROR,
     /** Internal helper, never returned to user. Always last result. */
-    CCC_RESULTS_SIZE,
+    CCC_RESULT_SIZE,
 } ccc_result;
 
 /** @brief A three-way comparison for comparison functions.
@@ -442,8 +442,8 @@ Functions for obtaining more descriptive status information. */
 /** @brief Obtain a string message with a description of the error returned
 from a container operation, possible causes, and possible fixes to such error.
 @param [in] res the result obtained from a container operation.
-@return a string message of the result. A CCC_OK result is an empty string,
-the falsey NULL terminator. All other results have a string message.
+@return a string message of the result. A CCC_RESULT_OK result is an empty
+string, the falsey NULL terminator. All other results have a string message.
 
 These messages can be used for logging or to help with debugging by providing
 more information for why such a result might be obtained from a container. */

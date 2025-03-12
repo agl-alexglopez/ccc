@@ -59,10 +59,10 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice)
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
-    CHECK(splice(&dll, dll_begin_elem(&dll), &dll, &vals[3].e), CCC_OK);
+    CHECK(splice(&dll, dll_begin_elem(&dll), &dll, &vals[3].e), CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){3, 0, 1, 2}), PASS);
-    CHECK(splice(&dll, &vals[2].e, &dll, &vals[3].e), CCC_OK);
+    CHECK(splice(&dll, &vals[2].e, &dll, &vals[3].e), CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 3, 2}), PASS);
     CHECK_END_FN();
@@ -76,15 +76,16 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_range)
     CHECK(t, PASS);
     CHECK(splice_range(&dll, dll_begin_elem(&dll), &dll, &vals[1].e,
                        dll_end_sentinel(&dll)),
-          CCC_OK);
+          CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){1, 2, 3, 0}), PASS);
     CHECK(splice_range(&dll, dll_begin_elem(&dll), &dll, &vals[2].e,
                        dll_end_sentinel(&dll)),
-          CCC_OK);
+          CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){2, 3, 0, 1}), PASS);
-    CHECK(splice_range(&dll, &vals[2].e, &dll, &vals[3].e, &vals[1].e), CCC_OK);
+    CHECK(splice_range(&dll, &vals[2].e, &dll, &vals[3].e, &vals[1].e),
+          CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){3, 0, 2, 1}), PASS);
     CHECK_END_FN();
@@ -98,10 +99,11 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_no_ops)
     CHECK(t, PASS);
     CHECK(splice_range(&dll, &vals[0].e, &dll, &vals[0].e,
                        dll_end_sentinel(&dll)),
-          CCC_OK);
+          CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 2, 3}), PASS);
-    CHECK(splice_range(&dll, &vals[3].e, &dll, &vals[1].e, &vals[3].e), CCC_OK);
+    CHECK(splice_range(&dll, &vals[3].e, &dll, &vals[1].e, &vals[3].e),
+          CCC_RESULT_OK);
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 4, (int[]){0, 1, 2, 3}), PASS);
     CHECK_END_FN();

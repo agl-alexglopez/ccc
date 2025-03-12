@@ -43,7 +43,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_shuffled)
 CHECK_BEGIN_STATIC_FN(bs_test_set_all)
 {
     bitset bs = bs_init((bitblock[bs_blocks(10)]){}, NULL, NULL, 10, 10);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 10);
     for (size_t i = 0; i < 10; ++i)
     {
@@ -61,10 +61,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_range)
     for (size_t i = 0; i < 512; ++i)
     {
         size_t const count = 512 - i;
-        CHECK(bs_set_range(&bs, 0, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, 0, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, 0, count), count);
         CHECK(bs_popcount(&bs), count);
-        CHECK(bs_set_range(&bs, 0, count, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, 0, count, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, 0, count), 0);
         CHECK(bs_popcount(&bs), 0);
     }
@@ -72,10 +72,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_range)
     for (size_t i = 0; i < 512; ++i)
     {
         size_t const count = 512 - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
-        CHECK(bs_set_range(&bs, i, count, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
     }
@@ -83,10 +83,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_range)
     for (size_t i = 0, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
-        CHECK(bs_set_range(&bs, i, count, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
     }
@@ -114,9 +114,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_all)
 {
     bitset bs = bs_init((bitblock[bs_blocks(10)]){}, NULL, NULL, 10, 10);
     CHECK(bs_capacity(&bs), 10);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 10);
-    CHECK(bs_reset_all(&bs), CCC_OK);
+    CHECK(bs_reset_all(&bs), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 0);
     CHECK_END_FN();
 }
@@ -128,10 +128,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_range)
     for (size_t i = 0; i < 512; ++i)
     {
         size_t const count = 512 - i;
-        CHECK(bs_set_range(&bs, 0, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, 0, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, 0, count), count);
         CHECK(bs_popcount(&bs), count);
-        CHECK(bs_reset_range(&bs, 0, count), CCC_OK);
+        CHECK(bs_reset_range(&bs, 0, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, 0, count), 0);
         CHECK(bs_popcount(&bs), 0);
     }
@@ -139,10 +139,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_range)
     for (size_t i = 0; i < 512; ++i)
     {
         size_t const count = 512 - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
-        CHECK(bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(bs_reset_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
     }
@@ -150,10 +150,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset_range)
     for (size_t i = 0, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
-        CHECK(bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(bs_reset_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
     }
@@ -164,7 +164,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip)
 {
     bitset bs = bs_init((bitblock[bs_blocks(10)]){}, NULL, NULL, 10, 10);
     CHECK(bs_capacity(&bs), 10);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 10);
     CHECK(bs_flip(&bs, 9), CCC_TRUE);
     CHECK(bs_popcount(&bs), 9);
@@ -182,7 +182,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_all)
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
     }
     CHECK(bs_popcount(&bs), 5);
-    CHECK(bs_flip_all(&bs), CCC_OK);
+    CHECK(bs_flip_all(&bs), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 5);
     for (size_t i = 0; i < 10; ++i)
     {
@@ -203,16 +203,16 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_all)
 CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const orignal_popcount = bs_popcount(&bs);
     /* Start with a full range and reduce from the end. */
     for (size_t i = 0; i < 512; ++i)
     {
         size_t const count = 512 - i;
-        CHECK(bs_flip_range(&bs, 0, count), CCC_OK);
+        CHECK(bs_flip_range(&bs, 0, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, 0, count), 0);
         CHECK(bs_popcount(&bs), orignal_popcount - count);
-        CHECK(bs_flip_range(&bs, 0, count), CCC_OK);
+        CHECK(bs_flip_range(&bs, 0, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, 0, count), count);
         CHECK(bs_popcount(&bs), orignal_popcount);
     }
@@ -220,10 +220,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
     for (size_t i = 0; i < 512; ++i)
     {
         size_t const count = 512 - i;
-        CHECK(bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(bs_flip_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), orignal_popcount - count);
-        CHECK(bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(bs_flip_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), orignal_popcount);
     }
@@ -231,10 +231,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
     for (size_t i = 0, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
-        CHECK(bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(bs_flip_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), orignal_popcount - count);
-        CHECK(bs_flip_range(&bs, i, count), CCC_OK);
+        CHECK(bs_flip_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), orignal_popcount);
     }
@@ -244,18 +244,18 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_range)
 CHECK_BEGIN_STATIC_FN(bs_test_any)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const cap = bs_capacity(&bs);
     /* Start with a full range and reduce by moving start forward. */
     for (size_t i = 0, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
         CHECK(bs_any(&bs), CCC_TRUE);
         CHECK(bs_any_range(&bs, 0, cap), CCC_TRUE);
-        CHECK(bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(bs_reset_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
         CHECK(bs_any(&bs), CCC_FALSE);
@@ -267,18 +267,18 @@ CHECK_BEGIN_STATIC_FN(bs_test_any)
 CHECK_BEGIN_STATIC_FN(bs_test_none)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const cap = bs_capacity(&bs);
     /* Start with a full range and reduce by moving start forward. */
     for (size_t i = 0, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
         CHECK(bs_none(&bs), CCC_FALSE);
         CHECK(bs_none_range(&bs, 0, cap), CCC_FALSE);
-        CHECK(bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(bs_reset_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
         CHECK(bs_none(&bs), CCC_TRUE);
@@ -291,20 +291,20 @@ CHECK_BEGIN_STATIC_FN(bs_test_all)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
     size_t const cap = bs_capacity(&bs);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_all(&bs), CCC_TRUE);
     CHECK(bs_all_range(&bs, 0, cap), CCC_TRUE);
-    CHECK(bs_reset_all(&bs), CCC_OK);
+    CHECK(bs_reset_all(&bs), CCC_RESULT_OK);
     /* Start with an almost full range and reduce by moving start forward. */
     for (size_t i = 1, end = 512; i < end; ++i, --end)
     {
         size_t const count = end - i;
-        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, count, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), count);
         CHECK(bs_popcount(&bs), count);
         CHECK(bs_all(&bs), CCC_FALSE);
         CHECK(bs_all_range(&bs, i, count), CCC_TRUE);
-        CHECK(bs_reset_range(&bs, i, count), CCC_OK);
+        CHECK(bs_reset_range(&bs, i, count), CCC_RESULT_OK);
         CHECK(bs_popcount_range(&bs, i, count), 0);
         CHECK(bs_popcount(&bs), 0);
         CHECK(bs_all(&bs), CCC_FALSE);
@@ -316,7 +316,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_all)
 CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_one)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     /* Start with an almost full range and reduce by moving start forward. */
     for (size_t i = 0, end = 512; i < end - 1; ++i)
     {
@@ -335,7 +335,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
     /* Slide a group of int size as a window across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
-        CHECK(bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, window, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_first_trailing_ones(&bs, window), i);
         CHECK(bs_first_trailing_ones(&bs, window - 1), i);
         CHECK(bs_first_trailing_ones(&bs, window + 1), -1);
@@ -345,12 +345,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }
-    CHECK(bs_reset_all(&bs), CCC_OK);
+    CHECK(bs_reset_all(&bs), CCC_RESULT_OK);
     window /= 4;
     /* Slide a very small group across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
-        CHECK(bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, window, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_first_trailing_ones(&bs, window), i);
         CHECK(bs_first_trailing_ones(&bs, window - 1), i);
         CHECK(bs_first_trailing_ones(&bs, window + 1), -1);
@@ -360,12 +360,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }
-    CHECK(bs_reset_all(&bs), CCC_OK);
+    CHECK(bs_reset_all(&bs), CCC_RESULT_OK);
     window *= 8;
     /* Slide a very large group across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
-        CHECK(bs_set_range(&bs, i, window, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, window, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_first_trailing_ones(&bs, window), i);
         CHECK(bs_first_trailing_ones(&bs, window - 1), i);
         CHECK(bs_first_trailing_ones(&bs, window + 1), -1);
@@ -391,9 +391,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
     for (size_t block = 0, i = 0; block < end;
          ++block, i = block * bits_in_block)
     {
-        CHECK(bs_set_range(&bs, i, first_half, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, first_half, CCC_TRUE), CCC_RESULT_OK);
         CHECK(bs_set_range(&bs, i + first_half + 1, second_half, CCC_TRUE),
-              CCC_OK);
+              CCC_RESULT_OK);
         CHECK(
             bs_first_trailing_ones_range(&bs, i, bits_in_block, first_half + 1),
             -1);
@@ -433,12 +433,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zero)
 CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t window = sizeof(bitblock) * CHAR_BIT;
     /* Slide a group of int size as a window across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
-        CHECK(bs_set_range(&bs, i, window, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, window, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_first_trailing_zeros(&bs, window), i);
         CHECK(bs_first_trailing_zeros(&bs, window - 1), i);
         CHECK(bs_first_trailing_zeros(&bs, window + 1), -1);
@@ -448,12 +448,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
     }
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     window /= 4;
     /* Slide a very small group across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
-        CHECK(bs_set_range(&bs, i, window, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, window, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_first_trailing_zeros(&bs, window), i);
         CHECK(bs_first_trailing_zeros(&bs, window - 1), i);
         CHECK(bs_first_trailing_zeros(&bs, window + 1), -1);
@@ -463,12 +463,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
     }
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     window *= 8;
     /* Slide a very large group across the set. */
     for (size_t i = 0; i < (512 - window - 1); ++i)
     {
-        CHECK(bs_set_range(&bs, i, window, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, window, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_first_trailing_zeros(&bs, window), i);
         CHECK(bs_first_trailing_zeros(&bs, window - 1), i);
         CHECK(bs_first_trailing_zeros(&bs, window + 1), -1);
@@ -484,7 +484,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros)
 CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros_fail)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const end = bs_blocks(512);
     size_t const bits_in_block = sizeof(bitblock) * CHAR_BIT;
     size_t const first_half = bits_in_block / 2;
@@ -495,9 +495,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros_fail)
     for (size_t block = 0, i = 0; block < end;
          ++block, i = block * bits_in_block)
     {
-        CHECK(bs_set_range(&bs, i, first_half, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i, first_half, CCC_FALSE), CCC_RESULT_OK);
         CHECK(bs_set_range(&bs, i + first_half + 1, second_half, CCC_FALSE),
-              CCC_OK);
+              CCC_RESULT_OK);
         CHECK(bs_first_trailing_zeros_range(&bs, i, bits_in_block,
                                             first_half + 1),
               -1);
@@ -523,7 +523,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros_fail)
 CHECK_BEGIN_STATIC_FN(bs_test_first_leading_one)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const last_i = 511;
     /* Start with an almost full range and reduce by moving start backwards. */
     for (size_t i = last_i; i > 1; --i)
@@ -543,7 +543,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones)
     /* Slide a group of int size as a window across the set. */
     for (size_t i = 511; i > window + 1; --i)
     {
-        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_TRUE),
+              CCC_RESULT_OK);
         CHECK(bs_first_leading_ones(&bs, window), i);
         CHECK(bs_first_leading_ones(&bs, window - 1), i);
         CHECK(bs_first_leading_ones(&bs, window + 1), -1);
@@ -553,12 +554,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }
-    CHECK(bs_reset_all(&bs), CCC_OK);
+    CHECK(bs_reset_all(&bs), CCC_RESULT_OK);
     window /= 4;
     /* Slide a very small group across the set. */
     for (size_t i = 511; i > window + 1; --i)
     {
-        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_TRUE),
+              CCC_RESULT_OK);
         CHECK(bs_first_leading_ones(&bs, window), i);
         CHECK(bs_first_leading_ones(&bs, window - 1), i);
         CHECK(bs_first_leading_ones(&bs, window + 1), -1);
@@ -568,12 +570,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_FALSE), CCC_TRUE);
     }
-    CHECK(bs_reset_all(&bs), CCC_OK);
+    CHECK(bs_reset_all(&bs), CCC_RESULT_OK);
     window *= 8;
     /* Slide a very large group across the set. */
     for (size_t i = 511; i > window + 1; --i)
     {
-        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_TRUE), CCC_OK);
+        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_TRUE),
+              CCC_RESULT_OK);
         CHECK(bs_first_leading_ones(&bs, window), i);
         CHECK(bs_first_leading_ones(&bs, window - 1), i);
         CHECK(bs_first_leading_ones(&bs, window + 1), -1);
@@ -599,10 +602,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones_fail)
          --block, i -= bits_in_block)
     {
         CHECK(bs_set_range(&bs, (block * bits_in_block), first_half, CCC_TRUE),
-              CCC_OK);
+              CCC_RESULT_OK);
         CHECK(bs_set_range(&bs, (block * bits_in_block) + first_half + 1,
                            second_half, CCC_TRUE),
-              CCC_OK);
+              CCC_RESULT_OK);
         CHECK(
             bs_first_leading_ones_range(&bs, i, bits_in_block, first_half + 1),
             -1);
@@ -643,12 +646,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zero)
 CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t window = sizeof(bitblock) * CHAR_BIT;
     /* Slide a group of int size as a window across the set. */
     for (size_t i = 511; i > window + 1; --i)
     {
-        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_FALSE),
+              CCC_RESULT_OK);
         CHECK(bs_first_leading_zeros(&bs, window), i);
         CHECK(bs_first_leading_zeros(&bs, window - 1), i);
         CHECK(bs_first_leading_zeros(&bs, window + 1), -1);
@@ -658,12 +662,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
     }
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     window /= 4;
     /* Slide a very small group across the set. */
     for (size_t i = 511; i > window + 1; --i)
     {
-        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_FALSE),
+              CCC_RESULT_OK);
         CHECK(bs_first_leading_zeros(&bs, window), i);
         CHECK(bs_first_leading_zeros(&bs, window - 1), i);
         CHECK(bs_first_leading_zeros(&bs, window + 1), -1);
@@ -673,12 +678,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros)
         /* Cleanup behind as we go. */
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
     }
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     window *= 8;
     /* Slide a very large group across the set. */
     for (size_t i = 511; i > window + 1; --i)
     {
-        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_FALSE), CCC_OK);
+        CHECK(bs_set_range(&bs, i - window + 1, window, CCC_FALSE),
+              CCC_RESULT_OK);
         CHECK(bs_first_leading_zeros(&bs, window), i);
         CHECK(bs_first_leading_zeros(&bs, window - 1), i);
         CHECK(bs_first_leading_zeros(&bs, window + 1), -1);
@@ -694,7 +700,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros)
 CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros_fail)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     ptrdiff_t const bits_in_block = sizeof(bitblock) * CHAR_BIT;
     size_t const first_half = bits_in_block / 2;
     size_t const second_half = first_half - 1;
@@ -705,10 +711,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros_fail)
          --block, i -= bits_in_block)
     {
         CHECK(bs_set_range(&bs, (block * bits_in_block), first_half, CCC_FALSE),
-              CCC_OK);
+              CCC_RESULT_OK);
         CHECK(bs_set_range(&bs, (block * bits_in_block) + first_half + 1,
                            second_half, CCC_FALSE),
-              CCC_OK);
+              CCC_RESULT_OK);
         CHECK(
             bs_first_leading_zeros_range(&bs, i, bits_in_block, first_half + 1),
             -1);
@@ -746,7 +752,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_or_same_size)
     }
     CHECK(bs_popcount(&src), size / 2);
     CHECK(bs_popcount(&dst), size / 2);
-    CHECK(bs_or(&dst, &src), CCC_OK);
+    CHECK(bs_or(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), size);
     CHECK_END_FN();
 }
@@ -756,10 +762,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_or_diff_size)
     bitset dst = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
     /* Make it slightly harder by not ending on a perfect block boundary. */
     bitset src = bs_init((bitblock[bs_blocks(244)]){}, NULL, NULL, 244, 244);
-    CHECK(bs_set_all(&src, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&src, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&src), 244);
     CHECK(bs_popcount(&dst), 0);
-    CHECK(bs_or(&dst, &src), CCC_OK);
+    CHECK(bs_or(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), 244);
     CHECK_END_FN();
 }
@@ -779,7 +785,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_and_same_size)
     }
     CHECK(bs_popcount(&src), size / 2);
     CHECK(bs_popcount(&dst), size / 2);
-    CHECK(bs_and(&dst, &src), CCC_OK);
+    CHECK(bs_and(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), 0);
     CHECK_END_FN();
 }
@@ -789,11 +795,11 @@ CHECK_BEGIN_STATIC_FN(bs_test_and_diff_size)
     bitset dst = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
     /* Make it slightly harder by not ending on a perfect block boundary. */
     bitset src = bs_init((bitblock[bs_blocks(244)]){}, NULL, NULL, 244, 244);
-    CHECK(bs_set_all(&dst, CCC_TRUE), CCC_OK);
-    CHECK(bs_set_all(&src, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&dst, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(bs_set_all(&src, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), 512);
     CHECK(bs_popcount(&src), 244);
-    CHECK(bs_and(&dst, &src), CCC_OK);
+    CHECK(bs_and(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), 244);
     CHECK(bs_size(&dst), 512);
     CHECK_END_FN();
@@ -814,7 +820,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_xor_same_size)
     }
     CHECK(bs_popcount(&src), size / 2);
     CHECK(bs_popcount(&dst), size / 2);
-    CHECK(bs_xor(&dst, &src), CCC_OK);
+    CHECK(bs_xor(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), size);
     CHECK_END_FN();
 }
@@ -824,11 +830,11 @@ CHECK_BEGIN_STATIC_FN(bs_test_xor_diff_size)
     bitset dst = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
     /* Make it slightly harder by not ending on a perfect block boundary. */
     bitset src = bs_init((bitblock[bs_blocks(244)]){}, NULL, NULL, 244, 244);
-    CHECK(bs_set_all(&dst, CCC_TRUE), CCC_OK);
-    CHECK(bs_set_all(&src, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&dst, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(bs_set_all(&src, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), 512);
     CHECK(bs_popcount(&src), 244);
-    CHECK(bs_xor(&dst, &src), CCC_OK);
+    CHECK(bs_xor(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst), 512 - 244);
     CHECK(bs_size(&dst), 512);
     CHECK_END_FN();
@@ -837,23 +843,23 @@ CHECK_BEGIN_STATIC_FN(bs_test_xor_diff_size)
 CHECK_BEGIN_STATIC_FN(bs_test_shiftl)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 512);
-    CHECK(bs_shiftl(&bs, 512), CCC_OK);
+    CHECK(bs_shiftl(&bs, 512), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 0);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const bits_in_block = sizeof(bitblock) * CHAR_BIT;
     size_t ones = 512;
-    CHECK(bs_shiftl(&bs, bits_in_block), CCC_OK);
+    CHECK(bs_shiftl(&bs, bits_in_block), CCC_RESULT_OK);
     ones -= bits_in_block;
     CHECK(bs_popcount(&bs), ones);
-    CHECK(bs_shiftl(&bs, bits_in_block / 2), CCC_OK);
+    CHECK(bs_shiftl(&bs, bits_in_block / 2), CCC_RESULT_OK);
     ones -= (bits_in_block / 2);
     CHECK(bs_popcount(&bs), ones);
-    CHECK(bs_shiftl(&bs, bits_in_block * 2), CCC_OK);
+    CHECK(bs_shiftl(&bs, bits_in_block * 2), CCC_RESULT_OK);
     ones -= (bits_in_block * 2);
     CHECK(bs_popcount(&bs), ones);
-    CHECK(bs_shiftl(&bs, (bits_in_block - 3) * 3), CCC_OK);
+    CHECK(bs_shiftl(&bs, (bits_in_block - 3) * 3), CCC_RESULT_OK);
     ones -= ((bits_in_block - 3) * 3);
     CHECK(bs_popcount(&bs), ones);
     CHECK_END_FN();
@@ -862,23 +868,23 @@ CHECK_BEGIN_STATIC_FN(bs_test_shiftl)
 CHECK_BEGIN_STATIC_FN(bs_test_shiftr)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512, 512);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 512);
-    CHECK(bs_shiftr(&bs, 512), CCC_OK);
+    CHECK(bs_shiftr(&bs, 512), CCC_RESULT_OK);
     CHECK(bs_popcount(&bs), 0);
-    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_OK);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t const bits_in_block = sizeof(bitblock) * CHAR_BIT;
     size_t ones = 512;
-    CHECK(bs_shiftr(&bs, bits_in_block), CCC_OK);
+    CHECK(bs_shiftr(&bs, bits_in_block), CCC_RESULT_OK);
     ones -= bits_in_block;
     CHECK(bs_popcount(&bs), ones);
-    CHECK(bs_shiftr(&bs, bits_in_block / 2), CCC_OK);
+    CHECK(bs_shiftr(&bs, bits_in_block / 2), CCC_RESULT_OK);
     ones -= (bits_in_block / 2);
     CHECK(bs_popcount(&bs), ones);
-    CHECK(bs_shiftr(&bs, bits_in_block * 2), CCC_OK);
+    CHECK(bs_shiftr(&bs, bits_in_block * 2), CCC_RESULT_OK);
     ones -= (bits_in_block * 2);
     CHECK(bs_popcount(&bs), ones);
-    CHECK(bs_shiftr(&bs, (bits_in_block - 3) * 3), CCC_OK);
+    CHECK(bs_shiftr(&bs, (bits_in_block - 3) * 3), CCC_RESULT_OK);
     ones -= ((bits_in_block - 3) * 3);
     CHECK(bs_popcount(&bs), ones);
     CHECK_END_FN();

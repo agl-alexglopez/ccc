@@ -242,7 +242,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
     size_t pop_count = 0;
     while (!is_empty(&omm))
     {
-        CHECK(omm_pop_max(&omm), CCC_OK);
+        CHECK(omm_pop_max(&omm), CCC_RESULT_OK);
         ++pop_count;
         CHECK(validate(&omm), true);
         if (pop_count % 200)

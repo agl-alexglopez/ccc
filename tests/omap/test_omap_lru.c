@@ -108,7 +108,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         found->val = val;
         ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
                                   &found->list_elem);
-        CHECK(r, CCC_OK);
+        CHECK(r, CCC_RESULT_OK);
     }
     else
     {
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
     {
         ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
                                   &found->list_elem);
-        CHECK(r, CCC_OK);
+        CHECK(r, CCC_RESULT_OK);
         *val = found->val;
     }
     CHECK_END_FN();

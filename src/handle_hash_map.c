@@ -238,7 +238,7 @@ ccc_handle_i
 ccc_hhm_get_key_val(ccc_handle_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key || !ccc_buf_capacity(&h->buf_)
-                 || maybe_resize(h) != CCC_OK))
+                 || maybe_resize(h) != CCC_RESULT_OK))
     {
         return 0;
     }
@@ -487,7 +487,7 @@ ccc_hhm_next(ccc_hhmap_handle *const iter)
 {
     if (unlikely(!iter))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     ++iter->impl_.handle_.i_;
     for (; iter->impl_.handle_.i_ < ccc_buf_capacity(&iter->impl_.h_->buf_)
@@ -501,7 +501,7 @@ ccc_hhm_next(ccc_hhmap_handle *const iter)
     }
     iter->impl_.hash_ = elem_at(iter->impl_.h_, iter->impl_.handle_.i_)->hash_;
     iter->impl_.handle_.stats_ = CCC_OCCUPIED;
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_tribool
@@ -527,7 +527,7 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
@@ -544,7 +544,7 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
     {
         ccc_result resize_res
             = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
-        if (resize_res != CCC_OK)
+        if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
@@ -554,7 +554,7 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
     {
         (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
                      src->buf_.capacity_ * src->buf_.elem_sz_);
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     dst->buf_.sz_ = num_swap_slots;
     for (size_t i = 0; i < ccc_buf_capacity(&dst->buf_); ++i)
@@ -576,7 +576,7 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
         copy_to_slot(dst, ccc_buf_at(&dst->buf_, elem_at(dst, ins)->slot_i_),
                      ccc_buf_at(&src->buf_, e->slot_i_));
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -584,12 +584,12 @@ ccc_hhm_clear(ccc_handle_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (unlikely(!h))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (!fn)
     {
         h->buf_.sz_ = 0;
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     for (size_t i = 0; i < ccc_buf_capacity(&h->buf_); ++i)
     {
@@ -601,7 +601,7 @@ ccc_hhm_clear(ccc_handle_hash_map *const h, ccc_destructor_fn *const fn)
                                .aux = h->buf_.aux_});
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -610,7 +610,7 @@ ccc_hhm_clear_and_free(ccc_handle_hash_map *const h,
 {
     if (unlikely(!h))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (!fn)
     {
@@ -758,7 +758,7 @@ static inline struct ccc_handl_
 handle(struct ccc_hhmap_ *const h, void const *const key, uint64_t const hash)
 {
     uint8_t future_insert_error = 0;
-    if (maybe_resize(h) != CCC_OK)
+    if (maybe_resize(h) != CCC_RESULT_OK)
     {
         future_insert_error = CCC_INSERT_ERROR;
     }
@@ -992,11 +992,11 @@ maybe_resize(struct ccc_hhmap_ *const h)
     if (h_cap
         && (double)(ccc_buf_size(&h->buf_)) / (double)h_cap <= load_factor)
     {
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     if (!h->buf_.alloc_)
     {
-        return CCC_NO_ALLOC;
+        return CCC_RESULT_NO_ALLOC;
     }
     struct ccc_hhmap_ new_hash = *h;
     new_hash.buf_.sz_ = 0;
@@ -1005,13 +1005,13 @@ maybe_resize(struct ccc_hhmap_ *const h)
                                   : primes[0];
     if (new_hash.buf_.capacity_ <= h->buf_.capacity_)
     {
-        return CCC_MEM_ERR;
+        return CCC_RESULT_MEM_ERR;
     }
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
         NULL, elem_sz * new_hash.buf_.capacity_, h->buf_.aux_);
     if (!new_hash.buf_.mem_)
     {
-        return CCC_MEM_ERR;
+        return CCC_RESULT_MEM_ERR;
     }
     /* The handles shall be stable. Keep user data in the same slot. */
     if (h->buf_.mem_)
@@ -1076,13 +1076,13 @@ maybe_resize(struct ccc_hhmap_ *const h)
         e->slot_i_ = free_slot;
         ++free_slot;
     }
-    if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_OK)
+    if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_RESULT_OK)
     {
         *h = new_hash;
-        return CCC_MEM_ERR;
+        return CCC_RESULT_MEM_ERR;
     }
     *h = new_hash;
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 static inline void

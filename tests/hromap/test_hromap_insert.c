@@ -410,7 +410,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_OK);
+    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -453,7 +453,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize_macros)
         CHECK(v != NULL, true);
         CHECK(v->val, i);
     }
-    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_OK);
+    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -484,7 +484,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize_from_null)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_OK);
+    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -524,7 +524,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize_from_null_macros)
         CHECK(v == NULL, false);
         CHECK(v->val, i);
     }
-    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_OK);
+    CHECK(hrm_clear_and_free(&hrm, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 

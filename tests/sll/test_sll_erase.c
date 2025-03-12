@@ -13,7 +13,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_pop_empty)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     CHECK(is_empty(&sll), true);
-    CHECK(sll_pop_front(&sll), CCC_INPUT_ERR);
+    CHECK(sll_pop_front(&sll), CCC_RESULT_ARG_ERROR);
     CHECK(sll_validate(&sll), true);
     CHECK(sll_front(&sll), NULL);
     CHECK(is_empty(&sll), true);
@@ -92,14 +92,14 @@ CHECK_BEGIN_STATIC_FN(sll_test_splice_two_lists)
     CHECK(check_order(&to_gain, 2, (int[2]){1, 0}), PASS);
     CHECK(splice(&to_gain, sll_begin_elem(&to_gain), &to_lose,
                  sll_begin_elem(&to_lose)),
-          CCC_OK);
+          CCC_RESULT_OK);
     CHECK(size(&to_gain), 3);
     CHECK(size(&to_lose), 4);
     CHECK(check_order(&to_lose, 4, (int[4]){3, 2, 1, 0}), PASS);
     CHECK(check_order(&to_gain, 3, (int[3]){1, 4, 0}), PASS);
     CHECK(splice_range(&to_gain, sll_begin_elem(&to_gain), &to_lose,
                        sll_begin_elem(&to_lose), &to_lose_vals[0].e),
-          CCC_OK);
+          CCC_RESULT_OK);
     CHECK(size(&to_gain), 7);
     CHECK(is_empty(&to_lose), true);
     CHECK(check_order(&to_gain, 7, (int[7]){1, 3, 2, 1, 0, 4, 0}), PASS);

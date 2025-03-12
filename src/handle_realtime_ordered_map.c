@@ -545,7 +545,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
@@ -562,7 +562,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
     {
         ccc_result const resize_res
             = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
-        if (resize_res != CCC_OK)
+        if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
@@ -570,7 +570,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
     }
     (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
                  src->buf_.capacity_ * src->buf_.elem_sz_);
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -579,7 +579,7 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (!fn)
     {
@@ -595,7 +595,7 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
     }
     (void)ccc_buf_size_set(&hrm->buf_, 1);
     hrm->root_ = 0;
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -604,7 +604,7 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
 {
     if (!hrm)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (!fn)
     {
@@ -830,7 +830,7 @@ alloc_slot(struct ccc_hromap_ *const t)
         if (old_sz == old_cap
             && ccc_buf_alloc(&t->buf_, old_cap ? old_cap * 2 : 8,
                              t->buf_.alloc_)
-                   != CCC_OK)
+                   != CCC_RESULT_OK)
         {
             return 0;
         }
@@ -843,13 +843,13 @@ alloc_slot(struct ccc_hromap_ *const t)
             at(t, i)->next_free_ = prev;
         }
         t->free_list_ = prev;
-        if (ccc_buf_size_set(&t->buf_, max(old_sz, 1)) != CCC_OK)
+        if (ccc_buf_size_set(&t->buf_, max(old_sz, 1)) != CCC_RESULT_OK)
         {
             return 0;
         }
         at(t, 0)->parity_ = 1;
     }
-    if (!t->free_list_ || ccc_buf_size_plus(&t->buf_, 1) != CCC_OK)
+    if (!t->free_list_ || ccc_buf_size_plus(&t->buf_, 1) != CCC_RESULT_OK)
     {
         return 0;
     }
@@ -1059,7 +1059,7 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
     at(t, remove)->parity_ = IN_FREE_LIST;
     t->free_list_ = remove;
     [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf_, 1);
-    assert(r == CCC_OK);
+    assert(r == CCC_RESULT_OK);
     return remove;
 }
 

@@ -520,13 +520,13 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
 {
     if (!rom)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     while (!ccc_rom_is_empty(rom))
     {
         if (!rom->root_->branch_[L] || !rom->root_->branch_[R])
         {
-            return CCC_INPUT_ERR;
+            return CCC_RESULT_ARG_ERROR;
         }
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
@@ -538,7 +538,7 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
             (void)rom->alloc_(deleted, 0, rom->aux_);
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 /*=========================   Private Interface  ============================*/
