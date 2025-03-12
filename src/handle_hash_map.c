@@ -1256,7 +1256,8 @@ to_i(ptrdiff_t const capacity, uint64_t hash)
 #else
     hash %= capacity;
 #endif
-    return (ptrdiff_t)(hash <= last_swap_slot ? last_swap_slot + 1 : hash);
+    return (ptrdiff_t)hash <= last_swap_slot ? last_swap_slot + 1
+                                             : (ptrdiff_t)hash;
 }
 
 /** The following Apache License applies only to the above function. This

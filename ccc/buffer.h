@@ -363,7 +363,8 @@ value remains the same until a resize occurs. -1 if buf is NULL. */
 
 /** @brief the size of the type being stored contiguously in the buffer.
 @param [in] buf the pointer to the buffer.
-@return the size of the type being stored in the buffer. -1 if buf is NULL. */
+@return the size of the type being stored in the buffer. 0 if buf is NULL as a
+zero sized object is not possible for a buffer. */
 [[nodiscard]] size_t ccc_buf_elem_size(ccc_buffer const *buf);
 
 /** @brief obtain the size of the buffer representing active slots.
