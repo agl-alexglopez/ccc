@@ -738,7 +738,7 @@ init_node(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const e)
 static inline void
 swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
 {
-    if (a == b)
+    if (a == b || !a || !b)
     {
         return;
     }

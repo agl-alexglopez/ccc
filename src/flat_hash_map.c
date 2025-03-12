@@ -214,7 +214,7 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         elem->hash_ = e->impl_.hash_;
-        if (e->impl_.entry_.e_ != user_struct)
+        if (e->impl_.entry_.e_ != user_struct && e->impl_.entry_.e_)
         {
             (void)memcpy(e->impl_.entry_.e_, user_struct,
                          ccc_buf_elem_size(&e->impl_.h_->buf_));
@@ -987,7 +987,7 @@ struct_base(struct ccc_fhmap_ const *const h,
 static inline void
 swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
 {
-    if (a == b)
+    if (a == b || !a || !b)
     {
         return;
     }

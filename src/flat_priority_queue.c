@@ -1,5 +1,7 @@
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "buffer.h"
@@ -20,6 +22,7 @@ static ptrdiff_t bubble_up(struct ccc_fpq_ *fpq, char tmp[], ptrdiff_t i);
 static ptrdiff_t bubble_down(struct ccc_fpq_ *, char tmp[], ptrdiff_t);
 static ptrdiff_t update_fixup(struct ccc_fpq_ *, void *e);
 static void inplace_heapify(struct ccc_fpq_ *fpq, ptrdiff_t n);
+static ccc_tribool add_overflow(ptrdiff_t, ptrdiff_t);
 
 /*=====================       Interface      ================================*/
 
@@ -27,7 +30,7 @@ ccc_result
 ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, ptrdiff_t const new_capacity,
               ccc_alloc_fn *const fn)
 {
-    if (!fpq || !fn)
+    if (!fpq || !fn || new_capacity < 0)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -38,7 +41,8 @@ ccc_result
 ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
                 ptrdiff_t const n, size_t const input_elem_size)
 {
-    if (!fpq || !array || array == ccc_buf_begin(&fpq->buf_)
+    if (!fpq || !array || n < 0 || add_overflow(n, 1)
+        || array == ccc_buf_begin(&fpq->buf_)
         || input_elem_size != ccc_buf_elem_size(&fpq->buf_))
     {
         return CCC_RESULT_ARG_ERROR;
@@ -58,9 +62,10 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
 }
 
 ccc_result
-ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, ptrdiff_t n)
+ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, ptrdiff_t const n)
 {
-    if (!fpq || n + 1 > ccc_buf_capacity(&fpq->buf_))
+    if (!fpq || n < 0 || add_overflow(n, 1)
+        || n + 1 > ccc_buf_capacity(&fpq->buf_))
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -354,7 +359,7 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
 /*===================     Private Interface     =============================*/
 
 ptrdiff_t
-ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, char tmp[], ptrdiff_t i)
+ccc_impl_fpq_bubble_up(struct ccc_fpq_ *const fpq, char tmp[const], ptrdiff_t i)
 {
     return bubble_up(fpq, tmp, i);
 }
@@ -494,4 +499,10 @@ wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {
     return fpq->cmp_((ccc_cmp){winner, loser, fpq->buf_.aux_}) == fpq->order_;
+}
+
+static inline ccc_tribool
+add_overflow(ptrdiff_t const a, ptrdiff_t const b)
+{
+    return b > PTRDIFF_MAX - a;
 }

@@ -5,6 +5,7 @@ based operations over the set. */
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "bitset.h"
@@ -72,6 +73,7 @@ static void set_all(struct ccc_bitset_ *bs, ccc_tribool b);
 static blockwidth_t blockwidth_i(ptrdiff_t bit_i);
 static ccc_tribool is_subset_of(struct ccc_bitset_ const *set,
                                 struct ccc_bitset_ const *subset);
+static ccc_tribool add_overflow(ptrdiff_t a, ptrdiff_t b);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -181,7 +183,7 @@ ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src)
 ccc_result
 ccc_bs_shiftl(ccc_bitset *const bs, ptrdiff_t const left_shifts)
 {
-    if (!bs)
+    if (!bs || left_shifts < 0)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -230,11 +232,11 @@ ccc_bs_shiftl(ccc_bitset *const bs, ptrdiff_t const left_shifts)
 ccc_result
 ccc_bs_shiftr(ccc_bitset *const bs, ptrdiff_t const right_shifts)
 {
-    if (!bs)
+    if (!bs || right_shifts < 0)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (!bs->sz_)
+    if (!bs->sz_ || !right_shifts)
     {
         return CCC_RESULT_OK;
     }
@@ -278,7 +280,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, ptrdiff_t const right_shifts)
 ccc_tribool
 ccc_bs_test(ccc_bitset const *const bs, ptrdiff_t const i)
 {
-    if (!bs)
+    if (!bs || i < 0)
     {
         return CCC_BOOL_ERR;
     }
@@ -288,8 +290,12 @@ ccc_bs_test(ccc_bitset const *const bs, ptrdiff_t const i)
 ccc_tribool
 ccc_bs_test_at(ccc_bitset const *const bs, ptrdiff_t const i)
 {
+    if (!bs || i < 0)
+    {
+        return CCC_BOOL_ERR;
+    }
     ptrdiff_t const b_i = set_block_i(i);
-    if (!bs || b_i >= bs->sz_)
+    if (b_i >= bs->sz_)
     {
         return CCC_BOOL_ERR;
     }
@@ -299,7 +305,7 @@ ccc_bs_test_at(ccc_bitset const *const bs, ptrdiff_t const i)
 ccc_tribool
 ccc_bs_set(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
 {
-    if (!bs)
+    if (!bs || i < 0)
     {
         return CCC_BOOL_ERR;
     }
@@ -312,8 +318,12 @@ ccc_bs_set(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
 ccc_tribool
 ccc_bs_set_at(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
 {
+    if (!bs || i < 0)
+    {
+        return CCC_BOOL_ERR;
+    }
     ptrdiff_t const b_i = set_block_i(i);
-    if (!bs || b_i >= bs->sz_)
+    if (b_i >= bs->sz_)
     {
         return CCC_BOOL_ERR;
     }
@@ -346,9 +356,13 @@ ccc_result
 ccc_bs_set_range(ccc_bitset *const bs, ptrdiff_t const i, ptrdiff_t const count,
                  ccc_tribool const b)
 {
+    if (!bs || b <= CCC_BOOL_ERR || b > CCC_TRUE || i < 0 || count < 0
+        || i >= bs->sz_ || add_overflow(i, count))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || b <= CCC_BOOL_ERR || b > CCC_TRUE || i >= bs->sz_
-        || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -397,7 +411,7 @@ ccc_bs_set_range(ccc_bitset *const bs, ptrdiff_t const i, ptrdiff_t const count,
 ccc_tribool
 ccc_bs_reset(ccc_bitset *const bs, ptrdiff_t const i)
 {
-    if (!bs)
+    if (!bs || i < 0)
     {
         return CCC_BOOL_ERR;
     }
@@ -410,8 +424,12 @@ ccc_bs_reset(ccc_bitset *const bs, ptrdiff_t const i)
 ccc_tribool
 ccc_bs_reset_at(ccc_bitset *const bs, ptrdiff_t const i)
 {
+    if (!bs || i < 0)
+    {
+        return CCC_BOOL_ERR;
+    }
     ptrdiff_t const b_i = set_block_i(i);
-    if (!bs || b_i >= bs->sz_)
+    if (b_i >= bs->sz_)
     {
         return CCC_BOOL_ERR;
     }
@@ -442,8 +460,12 @@ ccc_result
 ccc_bs_reset_range(ccc_bitset *const bs, ptrdiff_t const i,
                    ptrdiff_t const count)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -477,7 +499,7 @@ ccc_bs_reset_range(ccc_bitset *const bs, ptrdiff_t const i,
 ccc_tribool
 ccc_bs_flip(ccc_bitset *const bs, ptrdiff_t const i)
 {
-    if (!bs)
+    if (!bs || i < 0)
     {
         return CCC_BOOL_ERR;
     }
@@ -490,8 +512,12 @@ ccc_bs_flip(ccc_bitset *const bs, ptrdiff_t const i)
 ccc_tribool
 ccc_bs_flip_at(ccc_bitset *const bs, ptrdiff_t const i)
 {
+    if (!bs || i < 0)
+    {
+        return CCC_BOOL_ERR;
+    }
     ptrdiff_t const b_i = set_block_i(i);
-    if (!bs || b_i >= bs->sz_)
+    if (b_i >= bs->sz_)
     {
         return CCC_BOOL_ERR;
     }
@@ -528,8 +554,12 @@ ccc_result
 ccc_bs_flip_range(ccc_bitset *const bs, ptrdiff_t const i,
                   ptrdiff_t const count)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -631,8 +661,12 @@ ptrdiff_t
 ccc_bs_popcount_range(ccc_bitset const *const bs, ptrdiff_t const i,
                       ptrdiff_t const count)
 {
+    if (!bs || i < 0 || i >= bs->sz_ || count < 0 || add_overflow(i, count))
+    {
+        return -1;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return -1;
     }
@@ -991,8 +1025,12 @@ static inline ptrdiff_t
 first_trailing_one_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                          ptrdiff_t const count)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
+    {
+        return -1;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return -1;
     }
@@ -1043,9 +1081,13 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                           ptrdiff_t const count, ptrdiff_t const num_bits,
                           ccc_tribool const is_one)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count)
+        || num_bits <= 0 || num_bits > count)
+    {
+        return -1;
+    }
     ptrdiff_t const range_end = i + count;
-    if (!bs || i >= bs->sz_ || range_end > bs->sz_ || range_end < i || !num_bits
-        || num_bits > count)
+    if (range_end > bs->sz_)
     {
         return -1;
     }
@@ -1152,8 +1194,12 @@ static inline ptrdiff_t
 first_trailing_zero_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                           ptrdiff_t const count)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
+    {
+        return -1;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return -1;
     }
@@ -1199,11 +1245,15 @@ static inline ptrdiff_t
 first_leading_one_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                         ptrdiff_t const count)
 {
-    if (!bs || i >= bs->sz_ || count > bs->sz_ || (i - count) < -1)
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || count > bs->sz_)
     {
         return -1;
     }
     ptrdiff_t const end = (i - count);
+    if (end < -1)
+    {
+        return -1;
+    }
     blockwidth_t const final_block_i = blockwidth_i(i - count + 1);
     ptrdiff_t start_block = set_block_i(i);
     blockwidth_t const start_i = blockwidth_i(i);
@@ -1248,9 +1298,13 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                          ptrdiff_t const count, ptrdiff_t const num_bits,
                          ccc_tribool const is_one)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || !num_bits
+        || num_bits > count)
+    {
+        return -1;
+    }
     ptrdiff_t const range_end = (i - count);
-    if (!bs || i >= bs->sz_ || range_end > bs->sz_ || range_end < -1
-        || !num_bits || num_bits > count)
+    if (range_end < -1)
     {
         return -1;
     }
@@ -1328,11 +1382,15 @@ static inline ptrdiff_t
 first_leading_zero_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                          ptrdiff_t const count)
 {
-    if (!bs || i >= bs->sz_ || count > bs->sz_ || (i - count) < -1)
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || count > bs->sz_)
     {
         return -1;
     }
     ptrdiff_t const end = (i - count);
+    if (end < -1)
+    {
+        return -1;
+    }
     ptrdiff_t start_block = set_block_i(i);
     blockwidth_t const start_i = blockwidth_i(i);
     ccc_bitblock_ first_block_on = ALL_BITS_ON >> ((BLOCK_BITS - start_i) - 1);
@@ -1379,8 +1437,13 @@ static inline ccc_tribool
 any_or_none_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                   ptrdiff_t const count, ccc_tribool const ret)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || ret < CCC_FALSE
+        || ret > CCC_TRUE || add_overflow(i, count))
+    {
+        return CCC_BOOL_ERR;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return CCC_BOOL_ERR;
     }
@@ -1425,8 +1488,12 @@ static inline ccc_tribool
 all_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
           ptrdiff_t const count)
 {
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
+    {
+        return CCC_BOOL_ERR;
+    }
     ptrdiff_t const end = i + count;
-    if (!bs || i >= bs->sz_ || end > bs->sz_ || end < i)
+    if (end > bs->sz_)
     {
         return CCC_BOOL_ERR;
     }
@@ -1464,10 +1531,9 @@ all_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
 }
 
 static inline void
-set_all(struct ccc_bitset_ *const bs, ccc_tribool b)
+set_all(struct ccc_bitset_ *const bs, ccc_tribool const b)
 {
-    int const v = b ? ~0 : 0;
-    (void)memset(bs->mem_, v, blocks(bs->sz_) * sizeof(ccc_bitblock_));
+    (void)memset(bs->mem_, b ? ~0 : 0, blocks(bs->sz_) * sizeof(ccc_bitblock_));
     bs->mem_[set_block_i(bs->sz_ - 1)] &= last_on(bs);
 }
 
@@ -1541,6 +1607,12 @@ min(ptrdiff_t a, ptrdiff_t b)
     return a < b ? a : b;
 }
 
+static inline ccc_tribool
+add_overflow(ptrdiff_t const a, ptrdiff_t const b)
+{
+    return PTRDIFF_MAX - b < a;
+}
+
 #if defined(__GNUC__) || defined(__clang__)
 
 static inline ptrdiff_t
@@ -1574,7 +1646,7 @@ static inline unsigned
 popcount(ccc_bitblock_ const b)
 {
     unsigned cnt = 0;
-    for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
+    for (; b; cnt += !!(b & 1U), b >>= 1U)
     {}
     return cnt;
 }
