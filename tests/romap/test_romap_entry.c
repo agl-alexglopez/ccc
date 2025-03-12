@@ -48,9 +48,9 @@ plusaux(ccc_user_type const t)
    value and incrementing by 1 until n is reached. Assumes id_and_val are
    not present by key in the table and all subsequent inserts are unique. */
 CHECK_BEGIN_STATIC_FN(fill_n, ccc_realtime_ordered_map *const rom,
-                      size_t const n, int id_and_val)
+                      ptrdiff_t const n, int id_and_val)
 {
-    for (size_t i = 0; i < n; ++i, ++id_and_val)
+    for (ptrdiff_t i = 0; i < n; ++i, ++id_and_val)
     {
         ccc_entry ent = swap_entry(
             rom, &(struct val){.key = id_and_val, .val = id_and_val}.elem,

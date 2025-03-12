@@ -18,14 +18,14 @@ val_cmp(ccc_cmp const c)
     return (a->val > b->val) - (a->val < b->val);
 }
 
-CHECK_BEGIN_FN(check_order, doubly_linked_list const *const dll, size_t const n,
-               int const order[])
+CHECK_BEGIN_FN(check_order, doubly_linked_list const *const dll,
+               ptrdiff_t const n, int const order[])
 {
     if (!n)
     {
         return PASS;
     }
-    size_t i = 0;
+    ptrdiff_t i = 0;
     struct val *v = begin(dll);
     for (; v != end(dll) && i < n; v = next(dll, &v->e), ++i)
     {
@@ -40,14 +40,14 @@ CHECK_BEGIN_FN(check_order, doubly_linked_list const *const dll, size_t const n,
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
-        for (size_t j = 0; j < n; ++j)
+        for (ptrdiff_t j = 0; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", order[j]);
         }
         (void)fprintf(stderr, "}\n%s", NONE);
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         v = begin(dll);
-        for (size_t j = 0; j < n && v != end(dll); ++j, v = next(dll, &v->e))
+        for (ptrdiff_t j = 0; j < n && v != end(dll); ++j, v = next(dll, &v->e))
         {
             if (!v)
             {
@@ -71,9 +71,9 @@ CHECK_BEGIN_FN(check_order, doubly_linked_list const *const dll, size_t const n,
 }
 
 CHECK_BEGIN_FN(create_list, ccc_doubly_linked_list *const dll,
-               enum push_end const dir, size_t const n, struct val vals[])
+               enum push_end const dir, ptrdiff_t const n, struct val vals[])
 {
-    for (size_t i = 0; i < n; ++i)
+    for (ptrdiff_t i = 0; i < n; ++i)
     {
         if (dir == UTIL_PUSH_FRONT)
         {

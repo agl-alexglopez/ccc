@@ -511,10 +511,17 @@ Obtain the container state. */
 
 /** @brief Return the size of the container.
 @param [in] container_ptr a pointer to the container.
-@return the size or zero if container_ptr is NULL.
+@return the size or -1 if container_ptr is NULL.
 
 See container documentation for specific behavior. */
 #define ccc_size(container_ptr) ccc_impl_size(container_ptr)
+
+/** @brief Return the capacity of the container.
+@param [in] container_ptr a pointer to the container.
+@return the capacity or -1 if container_ptr is NULL.
+
+See container documentation for specific behavior. */
+#define ccc_capacity(container_ptr) ccc_impl_capacity(container_ptr)
 
 /** @brief Return the size status of a container.
 @param [in] container_ptr a pointer to the container.
@@ -595,6 +602,7 @@ See container documentation for specific behavior. */
 #    define splice_range(args...) ccc_splice_range(args)
 
 #    define size(args...) ccc_size(args)
+#    define capacity(args...) ccc_capacity(args)
 #    define is_empty(args...) ccc_is_empty(args)
 #    define validate(args...) ccc_validate(args)
 #endif /* CCC_USING_NAMESPACE_CCC */

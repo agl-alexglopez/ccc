@@ -1,5 +1,10 @@
 /** File: lru.c
 The leetcode lru problem in C. */
+#include <assert.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define ORDERED_MAP_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
@@ -11,17 +16,13 @@ The leetcode lru problem in C. */
 #include "traits.h"
 #include "types.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #define REQS 11
 
 struct lru_cache
 {
     ccc_ordered_map map;
     ccc_doubly_linked_list l;
-    size_t cap;
+    ptrdiff_t cap;
 };
 
 /* This map is pointer stable allowing us to have the lru cache represented
@@ -164,7 +165,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         {GET, .key = 2, .val = -1, .getter = lru_get},
         {HED, .key = 4, .val = 4, .header = lru_head},
     };
-    for (size_t i = 0; i < REQS; ++i)
+    for (ptrdiff_t i = 0; i < REQS; ++i)
     {
         switch (requests[i].call)
         {

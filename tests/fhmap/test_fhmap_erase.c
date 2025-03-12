@@ -59,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         CHECK(validate(&h), true);
     }
     CHECK(size(&h), to_insert);
-    size_t cur_size = size(&h);
+    ptrdiff_t cur_size = size(&h);
     int i = 0;
     while (!is_empty(&h) && cur_size)
     {

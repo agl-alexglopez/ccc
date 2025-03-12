@@ -151,13 +151,13 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_realtime_ordered_map rom
         = rom_init(rom, struct val, elem, key, id_cmp, std_alloc, NULL);
-    size_t const size = 200;
+    ptrdiff_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
-    for (size_t i = 0; i < size / 2; i += 2)
+    for (ptrdiff_t i = 0; i < size / 2; i += 2)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -169,7 +169,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
     }
     CHECK(size(&rom), (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -195,7 +195,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
     CHECK(size(&rom), (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -211,7 +211,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
 CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    size_t const size = 200;
+    ptrdiff_t const size = 200;
     ccc_realtime_ordered_map rom
         = rom_init(rom, struct val, elem, key, id_cmp, std_alloc, NULL);
 
@@ -219,7 +219,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry)
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {};
-    for (size_t i = 0; i < size / 2; i += 2)
+    for (ptrdiff_t i = 0; i < size / 2; i += 2)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -231,7 +231,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry)
     }
     CHECK(size(&rom), (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         def.key = (int)i;
         def.val = (int)i + 1;
@@ -256,14 +256,14 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry)
 CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    size_t const size = 200;
+    ptrdiff_t const size = 200;
     ccc_realtime_ordered_map rom
         = rom_init(rom, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
-    for (size_t i = 0; i < size / 2; i += 2)
+    for (ptrdiff_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
             = insert_entry(entry_r(&rom, &i), &(struct val){i, i, {}}.elem);
@@ -273,7 +273,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry_macros)
     }
     CHECK(size(&rom), (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
             = insert_entry(entry_r(&rom, &i), &(struct val){i, i + 1, {}}.elem);
@@ -354,7 +354,8 @@ CHECK_BEGIN_STATIC_FN(romap_test_two_sum)
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
-    for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
+    for (ptrdiff_t i = 0; i < (ptrdiff_t)(sizeof(addends) / sizeof(addends[0]));
+         ++i)
     {
         struct val const *const other_addend
             = get_key_val(&rom, &(int){target - addends[i]});
@@ -547,7 +548,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_and_find)
 
 CHECK_BEGIN_STATIC_FN(romap_test_insert_shuffle)
 {
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     ccc_realtime_ordered_map rom
         = rom_init(rom, struct val, elem, key, id_cmp, NULL, NULL);
     struct val vals[50] = {};
@@ -556,7 +557,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_shuffle)
     CHECK(insert_shuffled(&rom, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &rom), size);
-    for (size_t i = 1; i < size; ++i)
+    for (ptrdiff_t i = 1; i < size; ++i)
     {
         CHECK(sorted_check[i - 1] <= sorted_check[i], true);
     }
@@ -577,7 +578,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
         CHECK(insert_error(&e), false);
         CHECK(validate(&rom), true);
     }
-    CHECK(size(&rom), (size_t)num_nodes);
+    CHECK(size(&rom), (ptrdiff_t)num_nodes);
     CHECK_END_FN(rom_clear(&rom, NULL););
 }
 

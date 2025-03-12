@@ -20,17 +20,17 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
     struct val vals[51];
     ccc_handle_realtime_ordered_map s
         = hrm_init(vals, elem, id, id_cmp, NULL, NULL, 51);
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
-    for (size_t i = 0; i + 1 < size; ++i)
+    for (ptrdiff_t i = 0; i + 1 < size; ++i)
     {
         CHECK(sorted_check[i] <= sorted_check[i + 1], true);
     }
     /* Now let's delete everything with no errors. */
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         ccc_handle const *const h
             = remove_r(&s, &(struct val){.id = (int)i}.elem);
@@ -46,15 +46,15 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
     struct val vals[51];
     ccc_handle_realtime_ordered_map s
         = hrm_init(vals, elem, id, id_cmp, NULL, NULL, 51);
-    size_t const size = 50;
-    size_t const prime = 53;
-    size_t const less = 10;
+    ptrdiff_t const size = 50;
+    ptrdiff_t const prime = 53;
+    ptrdiff_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
-    size_t shuffled_index = prime % (size - less);
+    ptrdiff_t shuffled_index = prime % (size - less);
     bool repeats[50];
     memset(repeats, false, sizeof(bool) * size);
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         if (occupied(try_insert_r(&s, &(struct val){.id = (int)shuffled_index,
                                                     .val = (int)shuffled_index}
@@ -66,7 +66,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     CHECK(hrm_size(&s) < size, true);
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         ccc_handle const *const e = remove_handle_r(handle_r(&s, &i));
         CHECK(occupied(e) || repeats[i], true);

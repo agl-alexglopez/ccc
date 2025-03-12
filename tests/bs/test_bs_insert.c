@@ -13,7 +13,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_back_no_realloc)
     CHECK(ccc_bs_capacity(&bs), 16);
     CHECK(ccc_bs_size(&bs), 0);
     ccc_result push_status = CCC_RESULT_OK;
-    for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
+    for (ptrdiff_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
@@ -42,7 +42,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_back_alloc)
     ccc_bitset bs = ccc_bs_init(NULL, std_alloc, NULL, 0);
     CHECK(ccc_bs_capacity(&bs), 0);
     CHECK(ccc_bs_size(&bs), 0);
-    for (size_t i = 0; ccc_bs_size(&bs) < 16ULL; ++i)
+    for (ptrdiff_t i = 0; ccc_bs_size(&bs) < 16; ++i)
     {
         if (i % 2)
         {

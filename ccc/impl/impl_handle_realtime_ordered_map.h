@@ -19,11 +19,11 @@ it is added to the front of a free list. The map will track the first free
 node. The list is push to front LIFO stack. */
 struct ccc_hromap_elem_
 {
-    size_t branch_[2]; /** Child nodes in array to unify Left and Right. */
+    ptrdiff_t branch_[2]; /** Child nodes in array to unify Left and Right. */
     union
     {
-        size_t parent_;    /** Parent of WAVL node when allocated. */
-        size_t next_free_; /** Points to next free when not allocated. */
+        ptrdiff_t parent_;    /** Parent of WAVL node when allocated. */
+        ptrdiff_t next_free_; /** Points to next free when not allocated. */
     };
     uint8_t parity_; /** WAVL logic. Instead of rank integer, use 0 or 1. */
 };
@@ -36,8 +36,8 @@ index of the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_hromap_
 {
     ccc_buffer buf_;          /** The buffer wrapping user memory. */
-    size_t root_;             /** The root node of the WAVL tree. */
-    size_t free_list_;        /** The start of the free singly linked list. */
+    ptrdiff_t root_;          /** The root node of the WAVL tree. */
+    ptrdiff_t free_list_;     /** The start of the free singly linked list. */
     size_t key_offset_;       /** Where user key can be found in type. */
     size_t node_elem_offset_; /** Where intrusive elem is found in type. */
     ccc_key_cmp_fn *cmp_;     /** The provided key comparison function. */
@@ -60,18 +60,18 @@ union ccc_hromap_handle_
 /*========================  Private Interface  ==============================*/
 
 /** @private */
-void *ccc_impl_hrm_key_at(struct ccc_hromap_ const *hrm, size_t slot);
+void *ccc_impl_hrm_key_at(struct ccc_hromap_ const *hrm, ptrdiff_t slot);
 /** @private */
 struct ccc_hromap_elem_ *ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm,
-                                              size_t i);
+                                              ptrdiff_t i);
 /** @private */
 struct ccc_hrtree_handle_ ccc_impl_hrm_handle(struct ccc_hromap_ const *hrm,
                                               void const *key);
 /** @private */
-void ccc_impl_hrm_insert(struct ccc_hromap_ *hrm, size_t parent_i,
-                         ccc_threeway_cmp last_cmp, size_t elem_i);
+void ccc_impl_hrm_insert(struct ccc_hromap_ *hrm, ptrdiff_t parent_i,
+                         ccc_threeway_cmp last_cmp, ptrdiff_t elem_i);
 /** @private */
-size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
+ptrdiff_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
 
 /*=========================      Initialization     =========================*/
 

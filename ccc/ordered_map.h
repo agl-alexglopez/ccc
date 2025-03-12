@@ -595,10 +595,10 @@ Obtain the container state. */
 @return true if empty else false. Error if om is NULL. */
 [[nodiscard]] ccc_tribool ccc_om_is_empty(ccc_ordered_map const *om);
 
-/** @brief Returns the size of the map
+/** @brief Returns the size of the map.
 @param [in] om the map.
-@return the size_t size. */
-[[nodiscard]] size_t ccc_om_size(ccc_ordered_map const *om);
+@return the size or -1 if om is NULL. */
+[[nodiscard]] ptrdiff_t ccc_om_size(ccc_ordered_map const *om);
 
 /** @brief Validation of invariants for the map.
 @param [in] om the map to validate.

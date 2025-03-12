@@ -11,6 +11,7 @@ implementation is based on the following source.
        left and right cases for any binary tree code.
        https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "impl/impl_ordered_multimap.h"
@@ -518,7 +519,7 @@ ccc_omm_pop_min(ccc_ordered_multimap *const mm)
     return CCC_RESULT_OK;
 }
 
-size_t
+ptrdiff_t
 ccc_omm_size(ccc_ordered_multimap const *const mm)
 {
     return mm ? mm->impl_.size_ : 0;
@@ -1278,14 +1279,14 @@ struct parent_status_
     struct ccc_node_ const *parent;
 };
 
-static inline size_t
+static inline ptrdiff_t
 count_dups(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
 {
     if (!has_dups(&t->end_, n))
     {
         return 0;
     }
-    size_t dups = 1;
+    ptrdiff_t dups = 1;
     for (struct ccc_node_ *cur = n->dup_head_->link_[N]; cur != n->dup_head_;
          cur = cur->link_[N])
     {
@@ -1294,14 +1295,14 @@ count_dups(struct ccc_tree_ const *const t, struct ccc_node_ const *const n)
     return dups;
 }
 
-static size_t
+static ptrdiff_t
 recursive_size(struct ccc_tree_ const *const t, struct ccc_node_ const *const r)
 {
     if (r == &t->end_)
     {
         return 0;
     }
-    size_t s = count_dups(t, r) + 1;
+    ptrdiff_t s = count_dups(t, r) + 1;
     return s + recursive_size(t, r->branch_[R])
            + recursive_size(t, r->branch_[L]);
 }

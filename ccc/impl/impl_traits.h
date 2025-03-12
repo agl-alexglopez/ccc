@@ -795,6 +795,24 @@
         ccc_handle_realtime_ordered_map const *: ccc_hrm_size,                 \
         ccc_realtime_ordered_map const *: ccc_rom_size)((container_ptr))
 
+#define ccc_impl_capacity(container_ptr)                                       \
+    _Generic((container_ptr),                                                  \
+        ccc_buffer *: ccc_buf_capacity,                                        \
+        ccc_flat_hash_map *: ccc_fhm_capacity,                                 \
+        ccc_handle_hash_map *: ccc_hhm_capacity,                               \
+        ccc_handle_ordered_map *: ccc_hom_capacity,                            \
+        ccc_flat_priority_queue *: ccc_fpq_capacity,                           \
+        ccc_flat_double_ended_queue *: ccc_fdeq_capacity,                      \
+        ccc_handle_realtime_ordered_map *: ccc_hrm_capacity,                   \
+        ccc_buffer const *: ccc_buf_capacity,                                  \
+        ccc_flat_hash_map const *: ccc_fhm_capacity,                           \
+        ccc_handle_hash_map const *: ccc_hhm_capacity,                         \
+        ccc_handle_ordered_map const *: ccc_hom_capacity,                      \
+        ccc_flat_priority_queue const *: ccc_fpq_capacity,                     \
+        ccc_flat_double_ended_queue const *: ccc_fdeq_capacity,                \
+        ccc_handle_realtime_ordered_map const *: ccc_hrm_capacity)(            \
+        (container_ptr))
+
 #define ccc_impl_is_empty(container_ptr)                                       \
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_is_empty,                                        \

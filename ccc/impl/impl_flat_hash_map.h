@@ -54,7 +54,7 @@ union ccc_fhmap_entry_
 
 /** @private */
 void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
-                         size_t cur_i);
+                         ptrdiff_t cur_i);
 /** @private */
 struct ccc_fhash_entry_ ccc_impl_fhm_entry(struct ccc_fhmap_ *h,
                                            void const *key);
@@ -64,9 +64,9 @@ struct ccc_fhmap_elem_ *ccc_impl_fhm_in_slot(struct ccc_fhmap_ const *h,
 /** @private */
 void *ccc_impl_fhm_key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
 /** @private */
-uint64_t *ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *h, size_t i);
+uint64_t *ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *h, ptrdiff_t i);
 /** @private */
-size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
+ptrdiff_t ccc_impl_fhm_increment(ptrdiff_t capacity, ptrdiff_t i);
 
 /*=====================   Macro Implementations     =========================*/
 
@@ -87,7 +87,7 @@ size_t ccc_impl_fhm_increment(size_t capacity, size_t i);
 once which it must have to make it to this point. */
 #define ccc_impl_fhm_swaps(swap_entry, lazy_key_value...)                      \
     (__extension__({                                                           \
-        size_t fhm_i_                                                          \
+        ptrdiff_t fhm_i_                                                       \
             = ccc_buf_i(&((swap_entry)->h_->buf_), (swap_entry)->entry_.e_);   \
         if (*ccc_impl_fhm_hash_at((swap_entry)->h_, fhm_i_) == CCC_FHM_EMPTY)  \
         {                                                                      \

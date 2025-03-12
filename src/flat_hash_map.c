@@ -62,8 +62,8 @@ first thought. However, improvements can still be made. */
    prime so we will stop there as max size if we ever get there. Not likely.
    The last prime is closer to the second to last because doubling breaks down
    at the end. */
-#define PRIMES_SIZE 58ULL
-static size_t const primes[PRIMES_SIZE] = {
+#define PRIMES_SIZE ((ptrdiff_t)56)
+static ptrdiff_t const primes[PRIMES_SIZE] = {
     11ULL,
     37ULL,
     79ULL,
@@ -120,8 +120,6 @@ static size_t const primes[PRIMES_SIZE] = {
     1203721378684243091ULL,
     2502450294306576181ULL,
     5202414434410211531ULL,
-    10815445968671840317ULL,
-    17617221824571301183ULL,
 };
 
 /* Some claim that Robin Hood tables can support a much higher load factor. I
@@ -129,8 +127,8 @@ static size_t const primes[PRIMES_SIZE] = {
    tables can quickly rise. Mitigating with a lower load factor and prime
    table sizes is a decent approach. Measure. */
 static double const load_factor = 0.8;
-static size_t const last_swap_slot = 1;
-static size_t const num_swap_slots = 2;
+static ptrdiff_t const last_swap_slot = 1;
+static ptrdiff_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
@@ -146,10 +144,10 @@ static struct ccc_fhash_entry_ *and_modify(struct ccc_fhash_entry_ *e,
                                            ccc_update_fn *fn);
 static ccc_tribool valid_distance_from_home(struct ccc_fhmap_ const *,
                                             void const *slot);
-static size_t to_i(size_t capacity, uint64_t hash);
-static size_t increment(size_t capacity, size_t i);
-static size_t decrement(size_t capacity, size_t i);
-static size_t distance(size_t capacity, size_t i, size_t j);
+static ptrdiff_t to_i(ptrdiff_t capacity, uint64_t hash);
+static ptrdiff_t increment(ptrdiff_t capacity, ptrdiff_t i);
+static ptrdiff_t decrement(ptrdiff_t capacity, ptrdiff_t i);
+static ptrdiff_t distance(ptrdiff_t capacity, ptrdiff_t i, ptrdiff_t j);
 static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
 static struct ccc_fhmap_elem_ *elem_in_slot(struct ccc_fhmap_ const *h,
                                             void const *slot);
@@ -157,10 +155,10 @@ static ccc_result maybe_resize(struct ccc_fhmap_ *h);
 static struct ccc_ent_ find(struct ccc_fhmap_ const *h, void const *key,
                             uint64_t hash);
 static void insert(struct ccc_fhmap_ *h, void const *e, uint64_t hash,
-                   size_t i);
-static uint64_t *hash_at(struct ccc_fhmap_ const *h, size_t i);
+                   ptrdiff_t i);
+static uint64_t *hash_at(struct ccc_fhmap_ const *h, ptrdiff_t i);
 static uint64_t filter(struct ccc_fhmap_ const *h, void const *key);
-static size_t next_prime(size_t n);
+static ptrdiff_t next_prime(ptrdiff_t n);
 
 /*=========================   Interface    ==================================*/
 
@@ -184,14 +182,14 @@ ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
     return (entry(h, key, filter(h, key)).stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
 
-size_t
+ptrdiff_t
 ccc_fhm_size(ccc_flat_hash_map const *const h)
 {
     if (unlikely(!h))
     {
         return 0;
     }
-    size_t const size = ccc_buf_size(&h->buf_);
+    ptrdiff_t const size = ccc_buf_size(&h->buf_);
     return size ? size - num_swap_slots : 0;
 }
 
@@ -480,8 +478,8 @@ ccc_fhm_end(ccc_flat_hash_map const *const)
     return NULL;
 }
 
-size_t
-ccc_fhm_next_prime(size_t const n)
+ptrdiff_t
+ccc_fhm_next_prime(ptrdiff_t const n)
 {
     return next_prime(n);
 }
@@ -500,7 +498,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
        memory in case it has already been allocated. Alloc will remain the
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf_.mem_;
-    size_t const dst_cap = dst->buf_.capacity_;
+    ptrdiff_t const dst_cap = dst->buf_.capacity_;
     ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
@@ -586,7 +584,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
 }
 
-size_t
+ptrdiff_t
 ccc_fhm_capacity(ccc_flat_hash_map const *const h)
 {
     if (unlikely(!h))
@@ -609,8 +607,8 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     {
         return CCC_BOOL_ERR;
     }
-    size_t empties = 0;
-    size_t occupied = 0;
+    ptrdiff_t empties = 0;
+    ptrdiff_t occupied = 0;
     for (void const *i = ccc_buf_begin(&h->buf_);
          i != ccc_buf_capacity_end(&h->buf_); i = ccc_buf_next(&h->buf_, i))
     {
@@ -636,12 +634,12 @@ static inline ccc_tribool
 valid_distance_from_home(struct ccc_fhmap_ const *const h,
                          void const *const slot)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     uint64_t const hash = elem_in_slot(h, slot)->hash_;
-    size_t const home = to_i(cap, hash);
-    size_t const end = decrement(cap, home);
-    for (size_t i = ccc_buf_i(&h->buf_, slot),
-                distance_to_home = distance(cap, i, to_i(cap, hash));
+    ptrdiff_t const home = to_i(cap, hash);
+    ptrdiff_t const end = decrement(cap, home);
+    for (ptrdiff_t i = ccc_buf_i(&h->buf_, slot),
+                   distance_to_home = distance(cap, i, to_i(cap, hash));
          i != end; --distance_to_home, i = decrement(cap, i))
     {
         uint64_t const cur_hash = *hash_at(h, i);
@@ -674,7 +672,7 @@ ccc_impl_fhm_entry(struct ccc_fhmap_ *const h, void const *const key)
 
 void
 ccc_impl_fhm_insert(struct ccc_fhmap_ *const h, void const *const e,
-                    uint64_t const hash, size_t cur_i)
+                    uint64_t const hash, ptrdiff_t cur_i)
 {
     insert(h, e, hash, cur_i);
 }
@@ -692,14 +690,14 @@ ccc_impl_fhm_key_in_slot(struct ccc_fhmap_ const *const h,
     return key_in_slot(h, slot);
 }
 
-size_t
-ccc_impl_fhm_increment(size_t const capacity, size_t const i)
+ptrdiff_t
+ccc_impl_fhm_increment(ptrdiff_t const capacity, ptrdiff_t const i)
 {
     return increment(capacity, i);
 }
 
 uint64_t *
-ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *const h, size_t const i)
+ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *const h, ptrdiff_t const i)
 {
     return hash_at(h, i);
 }
@@ -723,7 +721,7 @@ static inline struct ccc_ent_
 find(struct ccc_fhmap_ const *const h, void const *const key,
      uint64_t const hash)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     /* A few sanity checks. The load factor should be managed a full table is
        never allowed even under no allocation permission because that could
        lead to an infinite loop and illustrates a degenerate table anyway. */
@@ -735,8 +733,8 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
     {
         return (struct ccc_ent_){.e_ = NULL, .stats_ = CCC_ENTRY_ARG_ERROR};
     }
-    size_t i = to_i(cap, hash);
-    size_t dist = 0;
+    ptrdiff_t i = to_i(cap, hash);
+    ptrdiff_t dist = 0;
     do
     {
         void *const slot = ccc_buf_at(&h->buf_, i);
@@ -763,10 +761,10 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
    may occur if these assumptions are not accommodated. */
 static inline void
 insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
-       size_t i)
+       ptrdiff_t i)
 {
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     void *const tmp = ccc_buf_at(&h->buf_, 1);
     void *const floater = ccc_buf_at(&h->buf_, 0);
     if (floater != e)
@@ -778,7 +776,7 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
        insertion from old table. So should this function invariantly assign
        starting hash to this slot copy for insertion? I think yes so far. */
     elem_in_slot(h, floater)->hash_ = hash;
-    size_t dist = distance(cap, i, to_i(cap, hash));
+    ptrdiff_t dist = distance(cap, i, to_i(cap, hash));
     do
     {
         void *const slot = ccc_buf_at(&h->buf_, i);
@@ -794,7 +792,7 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
             elem_in_slot(h, tmp)->hash_ = CCC_FHM_EMPTY;
             return;
         }
-        size_t const slot_dist = distance(cap, i, to_i(cap, slot_hash));
+        ptrdiff_t const slot_dist = distance(cap, i, to_i(cap, slot_hash));
         if (dist > slot_dist)
         {
             swap(tmp, floater, slot, elem_sz);
@@ -812,11 +810,11 @@ static inline void
 erase(struct ccc_fhmap_ *const h, void *const e)
 {
     *hash_at(h, ccc_buf_i(&h->buf_, e)) = CCC_FHM_EMPTY;
-    size_t const cap = ccc_buf_capacity(&h->buf_);
+    ptrdiff_t const cap = ccc_buf_capacity(&h->buf_);
     size_t const elem_sz = ccc_buf_elem_size(&h->buf_);
     void *const tmp = ccc_buf_at(&h->buf_, 0);
-    size_t i = ccc_buf_i(&h->buf_, e);
-    size_t next = increment(cap, i);
+    ptrdiff_t i = ccc_buf_i(&h->buf_, e);
+    ptrdiff_t next = increment(cap, i);
     do
     {
         void *const next_slot = ccc_buf_at(&h->buf_, next);
@@ -918,12 +916,12 @@ maybe_resize(struct ccc_fhmap_ *const h)
     return CCC_RESULT_OK;
 }
 
-static inline size_t
-next_prime(size_t const n)
+static inline ptrdiff_t
+next_prime(ptrdiff_t const n)
 {
     /* Compiler should help us out here. No fancy binary search/tricks to
        tell how far along the list we are. The table is small already. */
-    for (size_t i = 0; i < PRIMES_SIZE; ++i)
+    for (ptrdiff_t i = 0; i < PRIMES_SIZE; ++i)
     {
         if (primes[i] > n)
         {
@@ -934,7 +932,7 @@ next_prime(size_t const n)
 }
 
 static inline uint64_t *
-hash_at(struct ccc_fhmap_ const *const h, size_t const i)
+hash_at(struct ccc_fhmap_ const *const h, ptrdiff_t const i)
 {
     return &((struct ccc_fhmap_elem_ *)((char *)ccc_buf_at(&h->buf_, i)
                                         + h->hash_elem_offset_))
@@ -961,20 +959,20 @@ key_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
     return (char *)slot + h->key_offset_;
 }
 
-static inline size_t
-distance(size_t const capacity, size_t const i, size_t const j)
+static inline ptrdiff_t
+distance(ptrdiff_t const capacity, ptrdiff_t const i, ptrdiff_t const j)
 {
     return i < j ? (capacity - j) + i - num_swap_slots : i - j;
 }
 
-static inline size_t
-increment(size_t const capacity, size_t const i)
+static inline ptrdiff_t
+increment(ptrdiff_t const capacity, ptrdiff_t const i)
 {
     return (i + 1) >= capacity ? last_swap_slot + 1 : i + 1;
 }
 
-static inline size_t
-decrement(size_t const capacity, size_t const i)
+static inline ptrdiff_t
+decrement(ptrdiff_t const capacity, ptrdiff_t const i)
 {
     return i <= num_swap_slots ? capacity - 1 : i - 1;
 }
@@ -1008,15 +1006,15 @@ primary clustering of Robin Hood hash tables make efficient modulo calculations
 more difficult than power of two table capacities. The appropriate license for
 this technique is included immediately following this function and only applies
 to this function in this source file. */
-static inline size_t
-to_i(size_t const capacity, uint64_t hash)
+static inline ptrdiff_t
+to_i(ptrdiff_t const capacity, uint64_t hash)
 {
 #ifdef __SIZEOF_INT128__
     hash = (uint64_t)(((__uint128_t)hash * (__uint128_t)capacity) >> 64);
 #else
     hash %= capacity;
 #endif
-    return hash <= last_swap_slot ? last_swap_slot + 1 : hash;
+    return (ptrdiff_t)(hash <= last_swap_slot ? last_swap_slot + 1 : hash);
 }
 
 /** The following Apache License applies only to the above function. This

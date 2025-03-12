@@ -717,10 +717,10 @@ Obtain the container state. */
 @return true if empty, false if mm is not empty. Error if mm is NULL. */
 [[nodiscard]] ccc_tribool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
-/** @brief Returns true if the multimap is empty. O(1).
+/** @brief Returns the size of the multimap. O(1).
 @param [in] mm a pointer to the multimap.
-@return the size of the container or 0 if empty or mm is NULL. */
-[[nodiscard]] size_t ccc_omm_size(ccc_ordered_multimap const *mm);
+@return the size of the container or -1 if mm is NULL. */
+[[nodiscard]] ptrdiff_t ccc_omm_size(ccc_ordered_multimap const *mm);
 
 /** @brief Returns true if the multimap is empty.
 @param [in] mm a pointer to the multimap.

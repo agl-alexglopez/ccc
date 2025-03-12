@@ -336,8 +336,8 @@ ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
 
 /** @brief Return the size of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
-@return the size of the list or 0 if empty or l is NULL. */
-[[nodiscard]] size_t ccc_dll_size(ccc_doubly_linked_list const *l);
+@return the size of the list. -1 if l is NULL. */
+[[nodiscard]] ptrdiff_t ccc_dll_size(ccc_doubly_linked_list const *l);
 
 /** @brief Return if the size of the list is equal to 0. O(1).
 @param [in] l a pointer to the doubly linked list.

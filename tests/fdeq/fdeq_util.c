@@ -10,8 +10,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
-               int const vals[])
+CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q,
+               ptrdiff_t const n, int const vals[])
 {
     if (n)
     {
@@ -23,9 +23,9 @@ CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
 }
 
 CHECK_BEGIN_FN(check_order, flat_double_ended_queue const *const q,
-               size_t const n, int const order[])
+               ptrdiff_t const n, int const order[])
 {
-    size_t i = 0;
+    ptrdiff_t i = 0;
     int *v = begin(q);
     for (; v != end(q) && i < n; v = next(q, v), ++i)
     {
@@ -41,14 +41,14 @@ CHECK_BEGIN_FN(check_order, flat_double_ended_queue const *const q,
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
-        for (size_t j = 0; j < n; ++j)
+        for (ptrdiff_t j = 0; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", order[j]);
         }
         (void)fprintf(stderr, "}\n%s", NONE);
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         v = begin(q);
-        for (size_t j = 0; j < n && v != end(q); ++j, v = next(q, v))
+        for (ptrdiff_t j = 0; j < n && v != end(q); ++j, v = next(q, v))
         {
             if (!v)
             {

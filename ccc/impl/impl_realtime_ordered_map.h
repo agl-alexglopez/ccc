@@ -24,7 +24,7 @@ struct ccc_romap_
 {
     struct ccc_romap_elem_ *root_;
     struct ccc_romap_elem_ end_;
-    size_t sz_;
+    ptrdiff_t sz_;
     size_t key_offset_;
     size_t node_elem_offset_;
     size_t elem_sz_;

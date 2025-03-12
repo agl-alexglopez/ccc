@@ -99,7 +99,7 @@ allocation function has been provided upon initialization and the user is
 managing allocations and resizing directly. If an allocation function has
 been provided than the use of this function should be rare as the buffer
 will reallocate more memory when necessary. */
-[[nodiscard]] ccc_result ccc_buf_alloc(ccc_buffer *buf, size_t capacity,
+[[nodiscard]] ccc_result ccc_buf_alloc(ccc_buffer *buf, ptrdiff_t capacity,
                                        ccc_alloc_fn *fn);
 
 /** @brief allocates a new slot from the buffer at the end of the contiguous
@@ -143,7 +143,8 @@ is allowed.
 Note that this function assumes elements must be maintained contiguously
 according to size of the buffer meaning a bulk move of elements sliding down
 to accommodate i will occur. */
-[[nodiscard]] void *ccc_buf_insert(ccc_buffer *buf, size_t i, void const *data);
+[[nodiscard]] void *ccc_buf_insert(ccc_buffer *buf, ptrdiff_t i,
+                                   void const *data);
 
 /** @brief pop the back element from the buffer according to size.
 @param [in] buf the pointer to the buffer.
@@ -160,7 +161,7 @@ n is within the bounds of size. If the buffer does not exist an input error is
 returned. If n is greater than the size of the buffer size is set to zero
 and input error is returned.
 @note this function modifies the size of the container. */
-ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, size_t n);
+ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, ptrdiff_t n);
 
 /** @brief erase element at slot i according to size of the buffer maintaining
 contiguous storage of elements between 0 and size.
@@ -173,7 +174,7 @@ i is out of range of size then an input error is returned.
 Note that this function assumes elements must be maintained contiguously
 according to size meaning a bulk copy of elements sliding down to fill the
 space left by i will occur. */
-ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
+ccc_result ccc_buf_erase(ccc_buffer *buf, ptrdiff_t i);
 
 /**@}*/
 
@@ -193,7 +194,7 @@ Note that as long as the index is valid within the capacity of the buffer a
 valid pointer is returned, which may result in a slot of old or uninitialized
 data. It is up to the user to ensure the index provided is within the current
 size of the buffer. */
-[[nodiscard]] void *ccc_buf_at(ccc_buffer const *buf, size_t i);
+[[nodiscard]] void *ccc_buf_at(ccc_buffer const *buf, ptrdiff_t i);
 
 /** @brief return the index of an element known to be in the buffer.
 @param [in] buf the pointer to the buffer.
@@ -224,7 +225,7 @@ or is empty. */
 Note that destination and source are only required to be valid within bounds
 of capacity of the buffer. It is up to the user to ensure destination and
 source are within the size bounds of the buffer. */
-void *ccc_buf_copy(ccc_buffer *buf, size_t dst, size_t src);
+void *ccc_buf_copy(ccc_buffer *buf, ptrdiff_t dst, ptrdiff_t src);
 
 /** @brief write data to buffer at slot at index i according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -239,7 +240,7 @@ Note that data will be written to the slot at index i, according to the
 capacity of the buffer. It is up to the user to ensure i is within size
 of the buffer if such behavior is desired. No elements are moved to be
 preserved meaning any data at i is overwritten. */
-ccc_result ccc_buf_write(ccc_buffer *buf, size_t i, void const *data);
+ccc_result ccc_buf_write(ccc_buffer *buf, ptrdiff_t i, void const *data);
 
 /** @brief swap elements at i and j according to capacity of the bufer.
 @param [in] buf the pointer to the buffer.
@@ -255,7 +256,7 @@ range, an input error is returned.
 Note that i and j are only checked to be within capacity range of the buffer.
 It is the user's responsibility to check for i and j within bounds of size
 if such behavior is needed. */
-ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t i, size_t j);
+ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], ptrdiff_t i, ptrdiff_t j);
 
 /**@}*/
 
@@ -332,7 +333,7 @@ indicating bad input has been provided.
 
 If n would exceed the current capacity of the buffer the size is set to
 capacity and the input error status is returned. */
-ccc_result ccc_buf_size_plus(ccc_buffer *buf, size_t n);
+ccc_result ccc_buf_size_plus(ccc_buffer *buf, ptrdiff_t n);
 
 /** @brief subtract n from the size of the buffer.
 @param [in] buf the pointer to the buffer.
@@ -342,7 +343,7 @@ indicating bad input has been provided.
 
 If n would reduce the size to less than 0, the buffer size is set to 0 and the
 input error status is returned. */
-ccc_result ccc_buf_size_minus(ccc_buffer *buf, size_t n);
+ccc_result ccc_buf_size_minus(ccc_buffer *buf, ptrdiff_t n);
 
 /** @brief set the buffer size to n.
 @param [in] buf the pointer to the buffer.
@@ -352,25 +353,25 @@ error indicating bad input has been provided.
 
 If n is larger than the capacity of the buffer the size is set equal to the
 capacity and an error is returned. */
-ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
+ccc_result ccc_buf_size_set(ccc_buffer *buf, ptrdiff_t n);
 
-/** @brief return the current capacity of the buffer.
+/** @brief return the current capacity of total possible slots.
 @param [in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
-value remains the same until a resize occurs. */
-[[nodiscard]] size_t ccc_buf_capacity(ccc_buffer const *buf);
+value remains the same until a resize occurs. -1 if buf is NULL. */
+[[nodiscard]] ptrdiff_t ccc_buf_capacity(ccc_buffer const *buf);
 
 /** @brief the size of the type being stored contiguously in the buffer.
 @param [in] buf the pointer to the buffer.
-@return the size of the type being stored in the buffer. */
+@return the size of the type being stored in the buffer. -1 if buf is NULL. */
 [[nodiscard]] size_t ccc_buf_elem_size(ccc_buffer const *buf);
 
-/** @brief obtain the size of the buffer.
+/** @brief obtain the size of the buffer representing active slots.
 @param [in] buf the pointer to the buffer.
-@return the quantity of elements stored in the buffer.
+@return the quantity of elements stored in the buffer. -1 if buf is NULL.
 
 Note that size must be less than or equal to capacity. */
-[[nodiscard]] size_t ccc_buf_size(ccc_buffer const *buf);
+[[nodiscard]] ptrdiff_t ccc_buf_size(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer is 0.
 @param [in] buf the pointer to the buffer.

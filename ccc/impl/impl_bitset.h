@@ -15,8 +15,8 @@ typedef unsigned ccc_bitblock_;
 struct ccc_bitset_
 {
     ccc_bitblock_ *mem_;
-    size_t sz_;
-    size_t cap_;
+    ptrdiff_t sz_;
+    ptrdiff_t cap_;
     ccc_alloc_fn *alloc_;
     void *aux_;
 };

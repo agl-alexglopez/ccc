@@ -309,8 +309,8 @@ Obtain state from the container. */
 
 /** @brief Returns the size of the priority queue.
 @param [in] pq a pointer to the priority queue.
-@return the size of the pq or 0 if pq is NULL or pq is empty. */
-[[nodiscard]] size_t ccc_pq_size(ccc_priority_queue const *pq);
+@return the size of the pq or -1 if pq is NULL. */
+[[nodiscard]] ptrdiff_t ccc_pq_size(ccc_priority_queue const *pq);
 
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.

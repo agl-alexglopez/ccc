@@ -13,6 +13,7 @@ The leetcode lru problem in C. */
 #include "types.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,7 +23,7 @@ struct lru_cache
 {
     ccc_flat_hash_map fh;
     ccc_doubly_linked_list l;
-    size_t cap;
+    ptrdiff_t cap;
 };
 
 struct key_val
@@ -174,7 +175,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         {GET, .key = 2, .val = -1, .getter = lru_get},
         {HED, .key = 4, .val = 4, .header = lru_head},
     };
-    for (size_t i = 0; i < REQS; ++i)
+    for (ptrdiff_t i = 0; i < REQS; ++i)
     {
         switch (requests[i].call)
         {

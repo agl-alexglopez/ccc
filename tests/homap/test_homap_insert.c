@@ -151,13 +151,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_handle_ordered_map hom
         = hom_init((struct val[200]){}, elem, id, id_cmp, NULL, NULL, 200);
-    size_t const size = 200;
+    ptrdiff_t const size = 200;
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
-    for (size_t i = 0; i < size / 2; i += 2)
+    for (ptrdiff_t i = 0; i < size / 2; i += 2)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -169,7 +169,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
     }
     CHECK(size(&hom), (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -196,7 +196,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
     CHECK(size(&hom), (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -213,7 +213,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    size_t const size = 200;
+    ptrdiff_t const size = 200;
     ccc_handle_ordered_map hom
         = hom_init((struct val[200]){}, elem, id, id_cmp, NULL, NULL, 200);
 
@@ -221,7 +221,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
-    for (size_t i = 0; i < size / 2; i += 2)
+    for (ptrdiff_t i = 0; i < size / 2; i += 2)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -233,7 +233,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
     }
     CHECK(size(&hom), (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         def.id = (int)i;
         def.val = (int)i + 1;
@@ -258,14 +258,14 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    size_t const size = 200;
+    ptrdiff_t const size = 200;
     ccc_handle_ordered_map hom
         = hom_init((struct val[200]){}, elem, id, id_cmp, NULL, NULL, 200);
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
-    for (size_t i = 0; i < size / 2; i += 2)
+    for (ptrdiff_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
             = hom_at(&hom, insert_handle(handle_r(&hom, &i),
@@ -276,7 +276,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle_macros)
     }
     CHECK(size(&hom), (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (size_t i = 0; i < size / 2; ++i)
+    for (ptrdiff_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
             = hom_at(&hom, insert_handle(handle_r(&hom, &i),
@@ -360,7 +360,8 @@ CHECK_BEGIN_STATIC_FN(homap_test_two_sum)
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
-    for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
+    for (ptrdiff_t i = 0; i < (ptrdiff_t)(sizeof(addends) / sizeof(addends[0]));
+         ++i)
     {
         struct val const *const other_addend
             = hom_at(&hom, get_key_val(&hom, &(int){target - addends[i]}));
@@ -381,7 +382,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_two_sum)
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize)
 {
-    size_t const prime_start = 11;
+    ptrdiff_t const prime_start = 11;
     ccc_handle_ordered_map hom
         = hom_init((struct val *)malloc(sizeof(struct val) * prime_start), elem,
                    id, id_cmp, std_alloc, NULL, prime_start);
@@ -417,7 +418,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize)
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
 {
-    size_t const prime_start = 11;
+    ptrdiff_t const prime_start = 11;
     ccc_handle_ordered_map hom
         = hom_init((struct val *)malloc(sizeof(struct val) * prime_start), elem,
                    id, id_cmp, std_alloc, NULL, prime_start);
@@ -558,7 +559,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_limit)
         CHECK(v->val, i);
         last_index = shuffled_index;
     }
-    size_t const final_size = size(&hom);
+    ptrdiff_t const final_size = size(&hom);
     /* The last successful handle is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
     ccc_handle ent = swap_handle(&hom, &v.elem);
@@ -634,7 +635,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_and_find)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_shuffle)
 {
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     ccc_handle_ordered_map s
         = hom_init((struct val[51]){}, elem, id, id_cmp, NULL, NULL, 51);
     CHECK(size > 1, true);
@@ -642,7 +643,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_shuffle)
     CHECK(insert_shuffled(&s, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
-    for (size_t i = 1; i < size; ++i)
+    for (ptrdiff_t i = 1; i < size; ++i)
     {
         CHECK(sorted_check[i - 1] <= sorted_check[i], true);
     }
@@ -662,7 +663,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_weak_srand)
         CHECK(insert_error(&e), false);
         CHECK(validate(&s), true);
     }
-    CHECK(size(&s), (size_t)num_nodes);
+    CHECK(size(&s), (ptrdiff_t)num_nodes);
     CHECK_END_FN();
 }
 

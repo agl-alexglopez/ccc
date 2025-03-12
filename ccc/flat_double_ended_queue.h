@@ -173,8 +173,8 @@ error is returned.
 Note that if no allocation is permitted the fdeq behaves as a ring buffer.
 Therefore, pushing a range that will exceed capacity will overwrite elements
 at the beginning of the fdeq. */
-ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq, size_t n,
-                                    void const *elems);
+ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq,
+                                    ptrdiff_t n, void const *elems);
 
 /** @brief Push the user type to the front of the fdeq. O(1) if no
 allocation permission amortized O(1) if allocation permission is given and a
@@ -197,7 +197,7 @@ Note that if no allocation is permitted the fdeq behaves as a ring buffer.
 Therefore, pushing a range that will exceed capacity will overwrite elements
 at the back of the fdeq. */
 ccc_result ccc_fdeq_push_front_range(ccc_flat_double_ended_queue *fdeq,
-                                     size_t n, void const *elems);
+                                     ptrdiff_t n, void const *elems);
 
 /** @brief Push the range of user types before pos of the fdeq. O(N).
 @param [in] fdeq a pointer to the fdeq.
@@ -237,7 +237,7 @@ the range itself is too large for the capacity. For example, push a range
 
 Notice that the start of the range, {0,0,3,...}, is overwritten. */
 [[nodiscard]] void *ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fdeq,
-                                          void *pos, size_t n,
+                                          void *pos, ptrdiff_t n,
                                           void const *elems);
 
 /** @brief Pop an element from the front of the fdeq. O(1).
@@ -335,7 +335,7 @@ Interact with the state of the FDEQ. */
 Note that the front of the fdeq is considered index 0, so the user need not
 worry about where the front is for indexing purposes. */
 [[nodiscard]] void *ccc_fdeq_at(ccc_flat_double_ended_queue const *fdeq,
-                                size_t i);
+                                ptrdiff_t i);
 
 /** @brief Return a reference to the front of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
@@ -355,15 +355,16 @@ empty. */
 [[nodiscard]] ccc_tribool
 ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
 
-/** @brief Return the size of the fdeq. O(1).
+/** @brief Return the size of the fdeq representing active slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return the size of the fdeq or 0 if fdeq is NULL. */
-[[nodiscard]] size_t ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
+@return the size of the fdeq or -1 if fdeq is NULL. */
+[[nodiscard]] ptrdiff_t ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
 
-/** @brief Return the capacity of the fdeq. O(1).
+/** @brief Return the capacity representing total possible slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return the capacity of the fdeq or 0 if fdeq is NULL. */
-[[nodiscard]] size_t ccc_fdeq_capacity(ccc_flat_double_ended_queue const *fdeq);
+@return the capacity of the fdeq or -1 if fdeq is NULL. */
+[[nodiscard]] ptrdiff_t
+ccc_fdeq_capacity(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return a reference to the base of backing array. O(1).
 @param [in] fdeq a pointer to the fdeq.

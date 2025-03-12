@@ -1,13 +1,14 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "fpq_util.h"
-#include "checkers.h"
-#include "flat_priority_queue.h"
-#include "traits.h"
-#include "types.h"
-
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "checkers.h"
+#include "flat_priority_queue.h"
+#include "fpq_util.h"
+#include "traits.h"
+#include "types.h"
 
 ccc_threeway_cmp
 val_cmp(ccc_cmp const cmp)
@@ -24,23 +25,23 @@ val_update(ccc_user_type const u)
     old->val = *(int *)u.aux;
 }
 
-size_t
-rand_range(size_t const min, size_t const max)
+ptrdiff_t
+rand_range(ptrdiff_t const min, ptrdiff_t const max)
 {
     /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
     return min + (rand() / (RAND_MAX / (max - min + 1) + 1));
 }
 
 CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
-               size_t const size, int const larger_prime)
+               ptrdiff_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
        random but a repeatable sequence that makes it
        easier to debug if something goes wrong. Think
        of the prime number as a random seed, kind of. */
-    size_t shuffled_index = larger_prime % size;
-    for (size_t i = 0; i < size; ++i)
+    ptrdiff_t shuffled_index = larger_prime % size;
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
         (void)push(pq, &vals[i]);
@@ -53,14 +54,14 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
+CHECK_BEGIN_FN(inorder_fill, int vals[], ptrdiff_t size,
                ccc_flat_priority_queue *fpq)
 {
     if (ccc_fpq_size(fpq) != size)
     {
         return FAIL;
     }
-    size_t i = 0;
+    ptrdiff_t i = 0;
     struct val *copy_buf = malloc(sizeof(struct val) * (ccc_fpq_size(fpq) + 1));
     CHECK(copy_buf == NULL, false);
     ccc_flat_priority_queue fpq_copy = ccc_fpq_init(
@@ -69,7 +70,7 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     {
         struct val *const front = front(fpq);
         vals[i++] = front->val;
-        size_t const prev = ccc_fpq_size(&fpq_copy);
+        ptrdiff_t const prev = ccc_fpq_size(&fpq_copy);
         struct val *v = ccc_fpq_emplace(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
         CHECK(v != NULL, true);
@@ -80,7 +81,7 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     while (!ccc_fpq_is_empty(&fpq_copy) && i < size)
     {
         struct val *const v = front(&fpq_copy);
-        size_t const prev = ccc_fpq_size(fpq);
+        ptrdiff_t const prev = ccc_fpq_size(fpq);
         struct val *e
             = ccc_fpq_emplace(fpq, (struct val){.id = v->id, .val = v->val});
         CHECK(e != NULL, true);

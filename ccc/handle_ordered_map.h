@@ -698,15 +698,15 @@ ccc_result ccc_hom_clear_and_free(ccc_handle_ordered_map *hom,
 Obtain the container state. */
 /**@{*/
 
-/** @brief Returns the size of the map
+/** @brief Returns the size of the map representing active slots.
 @param [in] hom the map.
-@return the size_t size. */
-[[nodiscard]] size_t ccc_hom_size(ccc_handle_ordered_map const *hom);
+@return the size of the map or -1 if hom is NULL. */
+[[nodiscard]] ptrdiff_t ccc_hom_size(ccc_handle_ordered_map const *hom);
 
-/** @brief Returns the capacity of the map
+/** @brief Returns the capacity of the map representing total possible slots.
 @param [in] hom the map.
-@return the size_t capacity. */
-[[nodiscard]] size_t ccc_hom_capacity(ccc_handle_ordered_map const *hom);
+@return the capacity or -1 if hom is NULL. */
+[[nodiscard]] ptrdiff_t ccc_hom_capacity(ccc_handle_ordered_map const *hom);
 
 /** @brief Return a reference to the base of backing array. O(1).
 @param [in] hom a pointer to the map.

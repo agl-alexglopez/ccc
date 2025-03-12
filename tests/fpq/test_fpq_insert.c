@@ -25,12 +25,12 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_one)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_insert_three)
 {
-    size_t size = 3;
+    ptrdiff_t size = 3;
     struct val three_vals[4] = {};
     ccc_flat_priority_queue fpq
         = ccc_fpq_init(three_vals, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(three_vals) / sizeof(three_vals[0])));
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         three_vals[i].val = (int)i;
         (void)push(&fpq, &three_vals[i]);
@@ -43,7 +43,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_struct_getter)
 {
-    size_t const size = 10;
+    ptrdiff_t const size = 10;
     struct val vals[10 + 1];
     ccc_flat_priority_queue fpq = ccc_fpq_init(
         vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
@@ -51,7 +51,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_struct_getter)
     ccc_flat_priority_queue fpq_clone
         = ccc_fpq_init(tester_clone, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(vals) / sizeof(vals[0])));
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         struct val const *res1
             = ccc_fpq_emplace(&fpq, (struct val){.id = (int)i, .val = (int)i});
@@ -66,7 +66,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_struct_getter)
         struct val const *get = &tester_clone[i];
         CHECK(get->val, vals[i].val);
     }
-    CHECK(ccc_fpq_size(&fpq), (size_t)10);
+    CHECK(ccc_fpq_size(&fpq), (ptrdiff_t)10);
     CHECK_END_FN();
 }
 
@@ -81,16 +81,16 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three_dups)
         three_vals[i].val = 0;
         (void)push(&fpq, &three_vals[i]);
         CHECK(validate(&fpq), true);
-        CHECK(ccc_fpq_size(&fpq), (size_t)i + 1);
+        CHECK(ccc_fpq_size(&fpq), (ptrdiff_t)i + 1);
     }
-    CHECK(ccc_fpq_size(&fpq), (size_t)3);
+    CHECK(ccc_fpq_size(&fpq), (ptrdiff_t)3);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
 {
     /* Math magic ahead... */
-    size_t const size = 50;
+    ptrdiff_t const size = 50;
     int const prime = 53;
     struct val vals[50 + 1];
     ccc_flat_priority_queue fpq = ccc_fpq_init(
@@ -102,7 +102,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
     int prev = sorted_check[0];
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         CHECK(prev <= sorted_check[i], true);
         prev = sorted_check[i];
@@ -112,18 +112,18 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)
 {
-    size_t const size = 10;
+    ptrdiff_t const size = 10;
     struct val vals[10 + 1];
     ccc_flat_priority_queue fpq = ccc_fpq_init(
         vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
-    for (size_t i = 0; i < size; ++i)
+    for (ptrdiff_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)i;
         (void)push(&fpq, &vals[i]);
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_size(&fpq), i + 1);
     }
-    CHECK(ccc_fpq_size(&fpq), (size_t)10);
+    CHECK(ccc_fpq_size(&fpq), (ptrdiff_t)10);
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);
     CHECK_END_FN();
