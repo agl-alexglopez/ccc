@@ -4,15 +4,15 @@
 #include "types.h"
 
 /** @private */
-static char const *const result_msgs[CCC_RESULTS_SIZE] = {
-    [CCC_OK] = "",
-    [CCC_NO_ALLOC]
+static char const *const result_msgs[CCC_RESULT_SIZE] = {
+    [CCC_RESULT_OK] = "",
+    [CCC_RESULT_NO_ALLOC]
     = "A container performed an operation requiring new allocation of "
       "memory, but no allocation function was provided upon initialization.",
-    [CCC_MEM_ERR]
+    [CCC_RESULT_MEM_ERR]
     = "A container performed an operation requiring new allocation of memory, "
       "but the allocator function provided on initialization failed.",
-    [CCC_INPUT_ERR]
+    [CCC_RESULT_ARG_ERROR]
     = "A container function received bad arguments such as NULL pointers or "
       "arguments that cannot be processed in the context of an operation.",
 };
@@ -126,7 +126,7 @@ ccc_rend_rrange(ccc_rrange const *const r)
 char const *
 ccc_result_msg(ccc_result const res)
 {
-    if (res >= CCC_RESULTS_SIZE)
+    if (res >= CCC_RESULT_SIZE)
     {
         return "error: invalid result provided no message exists";
     }

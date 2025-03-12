@@ -493,7 +493,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
@@ -510,7 +510,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         ccc_result resize_res
             = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
-        if (resize_res != CCC_OK)
+        if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
@@ -520,7 +520,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
                      src->buf_.capacity_ * src->buf_.elem_sz_);
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     dst->buf_.sz_ = num_swap_slots;
     for (void *slot = ccc_buf_begin(&src->buf_);
@@ -535,7 +535,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
             insert(dst, slot, e->hash_, ccc_buf_i(&dst->buf_, new_ent.e_));
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -543,12 +543,12 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (unlikely(!h))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (!fn)
     {
         h->buf_.sz_ = 0;
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
@@ -559,7 +559,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn((ccc_user_type){.user_type = slot, .aux = h->buf_.aux_});
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -567,7 +567,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
     if (unlikely(!h))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (!fn)
     {
@@ -710,7 +710,7 @@ static inline struct ccc_ent_
 entry(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
 {
     char upcoming_insertion_error = 0;
-    if (maybe_resize(h) != CCC_OK)
+    if (maybe_resize(h) != CCC_RESULT_OK)
     {
         upcoming_insertion_error = CCC_INSERT_ERROR;
     }
@@ -868,11 +868,11 @@ maybe_resize(struct ccc_fhmap_ *const h)
         && (double)(ccc_buf_size(&h->buf_)) / (double)ccc_buf_capacity(&h->buf_)
                <= load_factor)
     {
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     if (!h->buf_.alloc_)
     {
-        return CCC_NO_ALLOC;
+        return CCC_RESULT_NO_ALLOC;
     }
     struct ccc_fhmap_ new_hash = *h;
     new_hash.buf_.sz_ = 0;
@@ -881,14 +881,14 @@ maybe_resize(struct ccc_fhmap_ *const h)
                                   : primes[0];
     if (new_hash.buf_.capacity_ <= h->buf_.capacity_)
     {
-        return CCC_MEM_ERR;
+        return CCC_RESULT_MEM_ERR;
     }
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
         NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_,
         h->buf_.aux_);
     if (!new_hash.buf_.mem_)
     {
-        return CCC_MEM_ERR;
+        return CCC_RESULT_MEM_ERR;
     }
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
@@ -909,13 +909,13 @@ maybe_resize(struct ccc_fhmap_ *const h)
                    ccc_buf_i(&new_hash.buf_, new_ent.e_));
         }
     }
-    if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_OK)
+    if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_RESULT_OK)
     {
         *h = new_hash;
-        return CCC_MEM_ERR;
+        return CCC_RESULT_MEM_ERR;
     }
     *h = new_hash;
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 static inline size_t

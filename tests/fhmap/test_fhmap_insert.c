@@ -387,7 +387,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -429,7 +429,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
         CHECK(v != NULL, true);
         CHECK(v->val, i);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -459,7 +459,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -499,7 +499,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
         CHECK(v == NULL, false);
         CHECK(v->val, i);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_OK);
+    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 

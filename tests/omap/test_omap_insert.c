@@ -397,7 +397,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(om_clear(&om, NULL), CCC_OK);
+    CHECK(om_clear(&om, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -436,7 +436,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_macros)
         CHECK(v != NULL, true);
         CHECK(v->val, i);
     }
-    CHECK(om_clear(&om, NULL), CCC_OK);
+    CHECK(om_clear(&om, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -465,7 +465,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(om_clear(&om, NULL), CCC_OK);
+    CHECK(om_clear(&om, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -504,7 +504,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null_macros)
         CHECK(v == NULL, false);
         CHECK(v->val, i);
     }
-    CHECK(om_clear(&om, NULL), CCC_OK);
+    CHECK(om_clear(&om, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 

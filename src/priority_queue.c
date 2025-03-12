@@ -71,7 +71,7 @@ ccc_pq_pop(ccc_priority_queue *const pq)
 {
     if (!pq || !pq->root_)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     struct ccc_pq_elem_ *const popped = pq->root_;
     pq->root_ = delete_min(pq, pq->root_);
@@ -81,7 +81,7 @@ ccc_pq_pop(ccc_priority_queue *const pq)
     {
         (void)pq->alloc_(struct_base(pq, popped), 0, pq->aux_);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 void *
@@ -102,7 +102,7 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 {
     if (!pq || !e || !pq->root_ || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     pq->root_ = delete_node(pq, e);
     pq->sz_--;
@@ -110,7 +110,7 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
     {
         (void)pq->alloc_(struct_base(pq, e), 0, pq->aux_);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -118,7 +118,7 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
 {
     if (!pq)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     while (!ccc_pq_is_empty(pq))
     {
@@ -128,7 +128,7 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
         }
         (void)ccc_pq_pop(pq);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_tribool

@@ -170,7 +170,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_OK, true);
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_RESULT_OK, true);
         CHECK(validate(&fpq), true);
         --cur_size;
         CHECK(ccc_fpq_size(&fpq), cur_size);
@@ -197,7 +197,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_weak_srand)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index = rand_range(0, (int)ccc_fpq_size(&fpq) - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_OK, true);
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_RESULT_OK, true);
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);

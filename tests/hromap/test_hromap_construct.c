@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_no_alloc)
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hrm_copy(&dst, &src, NULL);
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(size(&dst), size(&src));
     for (int i = 0; i < 3; ++i)
     {
@@ -59,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_no_alloc_fail)
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hrm_copy(&dst, &src, NULL);
-    CHECK(res != CCC_OK, true);
+    CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
 
@@ -75,7 +75,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_alloc)
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hrm_copy(&dst, &src, std_alloc);
-    CHECK(res, CCC_OK);
+    CHECK(res, CCC_RESULT_OK);
     CHECK(size(&dst), size(&src));
     for (int i = 0; i < 3; ++i)
     {
@@ -107,7 +107,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_alloc_fail)
     CHECK(size(&src), 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hrm_copy(&dst, &src, NULL);
-    CHECK(res != CCC_OK, true);
+    CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN({ (void)hrm_clear_and_free(&src, NULL); });
 }
 

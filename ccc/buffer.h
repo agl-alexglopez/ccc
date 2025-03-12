@@ -147,16 +147,16 @@ to accommodate i will occur. */
 
 /** @brief pop the back element from the buffer according to size.
 @param [in] buf the pointer to the buffer.
-@return the result of the attempted pop. CCC_OK upon success or an input error
-if bad input is provided.
+@return the result of the attempted pop. CCC_RESULT_OK upon success or an input
+error if bad input is provided.
 @note this function modifies the size of the container. */
 ccc_result ccc_buf_pop_back(ccc_buffer *buf);
 
 /** @brief pop n elements from the back of the buffer according to size.
 @param [in] buf the pointer to the buffer.
 @param [in] n the number of elements to pop.
-@return the result of the attempted pop. CCC_OK if the buffer exists and n
-is within the bounds of size. If the buffer does not exist an input error is
+@return the result of the attempted pop. CCC_RESULT_OK if the buffer exists and
+n is within the bounds of size. If the buffer does not exist an input error is
 returned. If n is greater than the size of the buffer size is set to zero
 and input error is returned.
 @note this function modifies the size of the container. */
@@ -166,8 +166,8 @@ ccc_result ccc_buf_pop_back_n(ccc_buffer *buf, size_t n);
 contiguous storage of elements between 0 and size.
 @param [in] buf the pointer to the buffer.
 @param [in] i the index of the element to be erased.
-@return the result, CCC_OK if the input is valid. If no buffer exists or i is
-out of range of size then an input error is returned.
+@return the result, CCC_RESULT_OK if the input is valid. If no buffer exists or
+i is out of range of size then an input error is returned.
 @note this function modifies the size of the container.
 
 Note that this function assumes elements must be maintained contiguously
@@ -230,7 +230,7 @@ void *ccc_buf_copy(ccc_buffer *buf, size_t dst, size_t src);
 @param [in] buf the pointer to the buffer.
 @param [in] i the index within bounds of capacity of the buffer.
 @param [in] data the data that will be written to slot at i.
-@return the result of the write, CCC_OK if success. If no buffer or data
+@return the result of the write, CCC_RESULT_OK if success. If no buffer or data
 exists input error is returned. If i is outside of the range of capacity
 input error is returned.
 @note this function does NOT modify the size of the container.
@@ -247,9 +247,9 @@ ccc_result ccc_buf_write(ccc_buffer *buf, size_t i, void const *data);
 element stored in the buffer.
 @param [in] i the index of an element in the buffer.
 @param [in] j the index of an element in the buffer.
-@return the result of the swap, CCC_OK if no error occurs. If no buffer exists,
-no tmp exists, i is out of capacity range, or j is out of capacity range, an
-input error is returned.
+@return the result of the swap, CCC_RESULT_OK if no error occurs. If no buffer
+exists, no tmp exists, i is out of capacity range, or j is out of capacity
+range, an input error is returned.
 @note this function does NOT modify the size of the container.
 
 Note that i and j are only checked to be within capacity range of the buffer.
@@ -327,7 +327,7 @@ These functions help manage or obtain state of the buffer. */
 /** @brief add n to the size of the buffer.
 @param [in] buf the pointer to the buffer.
 @param [in] n the quantity to add to the current buffer size.
-@return the result of resizing. CCC_OK if no errors occur or an error
+@return the result of resizing. CCC_RESULT_OK if no errors occur or an error
 indicating bad input has been provided.
 
 If n would exceed the current capacity of the buffer the size is set to
@@ -337,7 +337,7 @@ ccc_result ccc_buf_size_plus(ccc_buffer *buf, size_t n);
 /** @brief subtract n from the size of the buffer.
 @param [in] buf the pointer to the buffer.
 @param [in] n the quantity to subtract from the current buffer size.
-@return the result of resizing. CCC_OK if no errors occur or an error
+@return the result of resizing. CCC_RESULT_OK if no errors occur or an error
 indicating bad input has been provided.
 
 If n would reduce the size to less than 0, the buffer size is set to 0 and the
@@ -347,8 +347,8 @@ ccc_result ccc_buf_size_minus(ccc_buffer *buf, size_t n);
 /** @brief set the buffer size to n.
 @param [in] buf the pointer to the buffer.
 @param [in] n the new size of the buffer.
-@return the result of setting the size. CCC_OK if no errors occur or an error
-indicating bad input has been provided.
+@return the result of setting the size. CCC_RESULT_OK if no errors occur or an
+error indicating bad input has been provided.
 
 If n is larger than the capacity of the buffer the size is set equal to the
 capacity and an error is returned. */

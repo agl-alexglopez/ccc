@@ -484,18 +484,18 @@ ccc_omm_pop_max(ccc_ordered_multimap *const mm)
 {
     if (!mm)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     void *const n = pop_max(&mm->impl_);
     if (!n)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (mm->impl_.alloc_)
     {
         mm->impl_.alloc_(n, 0, mm->impl_.aux_);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -503,18 +503,18 @@ ccc_omm_pop_min(ccc_ordered_multimap *const mm)
 {
     if (!mm)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     struct ccc_node_ *const n = pop_min(&mm->impl_);
     if (!n)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (mm->impl_.alloc_)
     {
         mm->impl_.alloc_(struct_base(&mm->impl_, n), 0, mm->impl_.aux_);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 size_t
@@ -581,7 +581,7 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
 {
     if (!mm)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     while (!ccc_omm_is_empty(mm))
     {
@@ -596,7 +596,7 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
             (void)mm->impl_.alloc_(popped, 0, mm->impl_.aux_);
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 /*==========================  Private Interface  ============================*/

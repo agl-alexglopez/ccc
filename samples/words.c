@@ -550,7 +550,7 @@ str_arena_create(size_t const cap)
 static ptrdiff_t
 str_arena_alloc(struct str_arena *const a, size_t const bytes)
 {
-    if (str_arena_maybe_resize(a, bytes) != CCC_OK)
+    if (str_arena_maybe_resize(a, bytes) != CCC_RESULT_OK)
     {
         return -1;
     }
@@ -571,7 +571,7 @@ str_arena_push_back(struct str_arena *const a, str_ofs const str,
                     size_t const str_len, char const c)
 {
     size_t const new_pos = str + str_len + 1;
-    if (str_arena_maybe_resize_pos(a, new_pos) != CCC_OK)
+    if (str_arena_maybe_resize_pos(a, new_pos) != CCC_RESULT_OK)
     {
         return false;
     }
@@ -591,7 +591,7 @@ str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
 {
     if (!a)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     return str_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
 }
@@ -601,7 +601,7 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
 {
     if (!a)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (furthest_pos >= a->cap)
     {
@@ -609,13 +609,13 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
         void *const moved_arena = std_alloc(a->arena, new_cap, NULL);
         if (!moved_arena)
         {
-            return CCC_MEM_ERR;
+            return CCC_RESULT_MEM_ERR;
         }
         memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
         a->arena = moved_arena;
         a->cap = new_cap;
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 /* Returns the last given out position to the arena. The only fine grained

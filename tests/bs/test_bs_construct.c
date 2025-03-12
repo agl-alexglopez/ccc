@@ -24,8 +24,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, NULL, NULL, 512);
     CHECK(ccc_bs_capacity(&src), 512);
     CHECK(ccc_bs_size(&src), 0);
-    ccc_result push_status = CCC_OK;
-    for (size_t i = 0; push_status == CCC_OK; ++i)
+    ccc_result push_status = CCC_RESULT_OK;
+    for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
@@ -36,11 +36,11 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
             push_status = ccc_bs_push_back(&src, CCC_FALSE);
         }
     }
-    CHECK(push_status, CCC_NO_ALLOC);
+    CHECK(push_status, CCC_RESULT_NO_ALLOC);
     ccc_bitset dst
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(513)]){}, NULL, NULL, 513);
     ccc_result r = ccc_bs_copy(&dst, &src, NULL);
-    CHECK(r, CCC_OK);
+    CHECK(r, CCC_RESULT_OK);
     CHECK(ccc_bs_popcount(&src), ccc_bs_popcount(&dst));
     CHECK(ccc_bs_size(&src), ccc_bs_size(&dst));
     while (!ccc_bs_empty(&src) && !ccc_bs_empty(&dst))
@@ -69,16 +69,16 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_alloc)
     {
         if (i % 2)
         {
-            CHECK(ccc_bs_push_back(&src, CCC_TRUE), CCC_OK);
+            CHECK(ccc_bs_push_back(&src, CCC_TRUE), CCC_RESULT_OK);
         }
         else
         {
-            CHECK(ccc_bs_push_back(&src, CCC_FALSE), CCC_OK);
+            CHECK(ccc_bs_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
         }
     }
     ccc_bitset dst = ccc_bs_init((ccc_bitblock *)NULL, std_alloc, NULL, 0);
     ccc_result r = ccc_bs_copy(&dst, &src, std_alloc);
-    CHECK(r, CCC_OK);
+    CHECK(r, CCC_RESULT_OK);
     CHECK(ccc_bs_popcount(&src), ccc_bs_popcount(&dst));
     CHECK(ccc_bs_size(&src), ccc_bs_size(&dst));
     while (!ccc_bs_empty(&src) && !ccc_bs_empty(&dst))

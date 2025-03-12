@@ -32,7 +32,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
     size_t pop_count = 0;
     while (!ccc_pq_is_empty(&pq))
     {
-        CHECK(pop(&pq), CCC_OK);
+        CHECK(pop(&pq), CCC_RESULT_OK);
         ++pop_count;
         CHECK(validate(&pq), true);
     }

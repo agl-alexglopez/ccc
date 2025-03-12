@@ -12,8 +12,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_pop_back_no_realloc)
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(16)]){}, NULL, NULL, 16);
     CHECK(ccc_bs_capacity(&bs), 16);
     CHECK(ccc_bs_size(&bs), 0);
-    ccc_result push_status = CCC_OK;
-    for (size_t i = 0; push_status == CCC_OK; ++i)
+    ccc_result push_status = CCC_RESULT_OK;
+    for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
@@ -24,7 +24,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_pop_back_no_realloc)
             push_status = ccc_bs_push_back(&bs, CCC_FALSE);
         }
     }
-    CHECK(push_status, CCC_NO_ALLOC);
+    CHECK(push_status, CCC_RESULT_NO_ALLOC);
     CHECK(ccc_bs_size(&bs), 16);
     CHECK(ccc_bs_popcount(&bs), 16 / 2);
     while (!ccc_bs_empty(&bs))
@@ -42,9 +42,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_pop_back_no_realloc)
     CHECK(ccc_bs_size(&bs), 0);
     CHECK(ccc_bs_popcount(&bs), 0);
     CHECK(ccc_bs_capacity(&bs), 16);
-    CHECK(ccc_bs_clear(&bs), CCC_OK);
+    CHECK(ccc_bs_clear(&bs), CCC_RESULT_OK);
     CHECK(ccc_bs_capacity(&bs), 16);
-    CHECK(ccc_bs_clear_and_free(&bs), CCC_NO_ALLOC);
+    CHECK(ccc_bs_clear_and_free(&bs), CCC_RESULT_NO_ALLOC);
     CHECK(ccc_bs_capacity(&bs), 16);
     CHECK(ccc_bs_size(&bs), 0);
     CHECK_END_FN();
@@ -59,11 +59,11 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_pop_back_alloc)
     {
         if (i % 2)
         {
-            CHECK(ccc_bs_push_back(&bs, CCC_TRUE), CCC_OK);
+            CHECK(ccc_bs_push_back(&bs, CCC_TRUE), CCC_RESULT_OK);
         }
         else
         {
-            CHECK(ccc_bs_push_back(&bs, CCC_FALSE), CCC_OK);
+            CHECK(ccc_bs_push_back(&bs, CCC_FALSE), CCC_RESULT_OK);
         }
     }
     CHECK(ccc_bs_size(&bs), 16);
@@ -84,9 +84,9 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_pop_back_alloc)
     CHECK(ccc_bs_size(&bs), 0);
     CHECK(ccc_bs_popcount(&bs), 0);
     CHECK(ccc_bs_capacity(&bs) != 0, true);
-    CHECK(ccc_bs_clear(&bs), CCC_OK);
+    CHECK(ccc_bs_clear(&bs), CCC_RESULT_OK);
     CHECK(ccc_bs_capacity(&bs) != 0, true);
-    CHECK(ccc_bs_clear_and_free(&bs), CCC_OK);
+    CHECK(ccc_bs_clear_and_free(&bs), CCC_RESULT_OK);
     CHECK(ccc_bs_capacity(&bs), 0);
     CHECK(ccc_bs_size(&bs), 0);
     CHECK_END_FN();

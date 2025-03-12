@@ -66,7 +66,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
             ccc_result const extra_space_ = ccc_buf_alloc(                     \
                 &fpq_->buf_, ccc_buf_capacity(&fpq_->buf_) * 2,                \
                 fpq_->buf_.alloc_);                                            \
-            if (extra_space_ == CCC_OK)                                        \
+            if (extra_space_ == CCC_RESULT_OK)                                 \
             {                                                                  \
                 fpq_res_ = ccc_buf_back(&fpq_->buf_);                          \
             }                                                                  \

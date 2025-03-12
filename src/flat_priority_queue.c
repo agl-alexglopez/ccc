@@ -29,7 +29,7 @@ ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
 {
     if (!fpq || !fn)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     return ccc_buf_alloc(&fpq->buf_, new_capacity, fn);
 }
@@ -41,20 +41,20 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
     if (!fpq || !array || array == ccc_buf_begin(&fpq->buf_)
         || input_elem_size != ccc_buf_elem_size(&fpq->buf_))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (n + 1 > ccc_buf_capacity(&fpq->buf_))
     {
         ccc_result const resize_res
             = ccc_buf_alloc(&fpq->buf_, n + 1, fpq->buf_.alloc_);
-        if (resize_res != CCC_OK)
+        if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
     }
     (void)memcpy(ccc_buf_begin(&fpq->buf_), array, n * input_elem_size);
     inplace_heapify(fpq, n);
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -62,10 +62,10 @@ ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t n)
 {
     if (!fpq || n + 1 > ccc_buf_capacity(&fpq->buf_))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     inplace_heapify(fpq, n);
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 void *
@@ -79,7 +79,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         ccc_result const extra_space = ccc_buf_alloc(
             &fpq->buf_, ccc_buf_capacity(&fpq->buf_) * 2, fpq->buf_.alloc_);
-        if (extra_space != CCC_OK)
+        if (extra_space != CCC_RESULT_OK)
         {
             return NULL;
         }
@@ -112,18 +112,18 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 {
     if (!fpq || ccc_buf_is_empty(&fpq->buf_))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (ccc_buf_size(&fpq->buf_) == 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf_);
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, 0, ccc_buf_size(&fpq->buf_) - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
     (void)bubble_down(fpq, tmp, 0);
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -131,12 +131,12 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 {
     if (!fpq || !e || ccc_buf_is_empty(&fpq->buf_))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (ccc_buf_size(&fpq->buf_) == 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf_);
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     /* Important to remember this key now to avoid confusion later once the
        elements are swapped and we lose access to original handle index. */
@@ -144,7 +144,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     if (swap_location == ccc_buf_size(&fpq->buf_) - 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf_);
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
     swap(fpq, tmp, swap_location, ccc_buf_size(&fpq->buf_) - 1);
@@ -161,7 +161,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
         (void)bubble_down(fpq, tmp, swap_location);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 void *
@@ -254,7 +254,7 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
@@ -271,7 +271,7 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
     {
         ccc_result resize_res
             = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
-        if (resize_res != CCC_OK)
+        if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
@@ -279,7 +279,7 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
     }
     (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
                  src->buf_.capacity_ * src->buf_.elem_sz_);
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -287,7 +287,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
 {
     if (!fpq)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (fn)
     {
@@ -306,7 +306,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
 {
     if (!fpq)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (fn)
     {
@@ -456,7 +456,7 @@ swap(struct ccc_fpq_ *const fpq, char tmp[const], size_t const i,
      size_t const j)
 {
     [[maybe_unused]] ccc_result const res = ccc_buf_swap(&fpq->buf_, tmp, i, j);
-    assert(res == CCC_OK);
+    assert(res == CCC_RESULT_OK);
 }
 
 /* Thin wrapper just for sanity checking in debug mode as index should always

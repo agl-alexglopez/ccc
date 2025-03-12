@@ -425,7 +425,7 @@ ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
 {
     if (!om)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     while (!ccc_om_is_empty(om))
     {
@@ -441,7 +441,7 @@ ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
             (void)om->impl_.alloc_(popped, 0, om->impl_.aux_);
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_tribool

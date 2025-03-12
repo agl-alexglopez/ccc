@@ -400,7 +400,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(rom_clear(&rom, NULL), CCC_OK);
+    CHECK(rom_clear(&rom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -439,7 +439,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize_macros)
         CHECK(v != NULL, true);
         CHECK(v->val, i);
     }
-    CHECK(rom_clear(&rom, NULL), CCC_OK);
+    CHECK(rom_clear(&rom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -468,7 +468,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize_from_null)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(rom_clear(&rom, NULL), CCC_OK);
+    CHECK(rom_clear(&rom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -507,7 +507,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize_from_null_macros)
         CHECK(v == NULL, false);
         CHECK(v->val, i);
     }
-    CHECK(rom_clear(&rom, NULL), CCC_OK);
+    CHECK(rom_clear(&rom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 

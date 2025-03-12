@@ -73,14 +73,14 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
 {
     if (!sll || !sll->sz_)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     struct ccc_sll_elem_ *const remove = pop_front(sll);
     if (sll->alloc_)
     {
         (void)sll->alloc_(struct_base(sll, remove), 0, sll->aux_);
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -91,11 +91,11 @@ ccc_sll_splice(ccc_singly_linked_list *const pos_sll,
 {
     if (!pos_sll || !pos_before || !to_splice || !to_splice_sll)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (to_splice == pos_before || pos_before->n_ == to_splice)
     {
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     before(to_splice_sll, to_splice)->n_ = to_splice->n_;
     to_splice->n_ = pos_before->n_;
@@ -105,7 +105,7 @@ ccc_sll_splice(ccc_singly_linked_list *const pos_sll,
         --to_splice_sll->sz_;
         ++pos_sll->sz_;
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -116,16 +116,16 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
 {
     if (!pos_sll || !pos || !begin || !end || !splice_sll)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     if (begin == pos || end == pos || pos->n_ == begin)
     {
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     if (begin == end)
     {
         (void)ccc_sll_splice(pos_sll, pos, splice_sll, begin);
-        return CCC_OK;
+        return CCC_RESULT_OK;
     }
     struct ccc_sll_elem_ *const found = before(splice_sll, begin);
     found->n_ = end->n_;
@@ -138,7 +138,7 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
         splice_sll->sz_ -= sz;
         pos_sll->sz_ += sz;
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 void *
@@ -245,7 +245,7 @@ ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
 {
     if (!sll)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARG_ERROR;
     }
     while (!ccc_sll_is_empty(sll))
     {
@@ -259,7 +259,7 @@ ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
             (void)sll->alloc_(mem, 0, sll->aux_);
         }
     }
-    return CCC_OK;
+    return CCC_RESULT_OK;
 }
 
 ccc_tribool
