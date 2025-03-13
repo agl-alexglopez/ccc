@@ -36,10 +36,10 @@ A fixed or dynamic contiguous array of bits for set operations.
 #include "ccc/bitset.h"
 #include "ccc/types.h"
 
-#define DIGITS 9ULL
+#define DIGITS 9L
 #define ROWS DIGITS
 #define COLS DIGITS
-#define BOX_SIZE 3ULL
+#define BOX_SIZE 3L
 
 /* clang-format off */
 static int const valid_board[9][9] =
@@ -72,22 +72,22 @@ static int const invalid_board[9][9] =
 /* Returns if the box is valid (CCC_TRUE if valid CCC_FALSE if not). */
 static ccc_tribool
 validate_sudoku_box(int const board[9][9], bitset *const row_check,
-                    bitset *const col_check, size_t const row_start,
-                    size_t const col_start)
+                    bitset *const col_check, ptrdiff_t const row_start,
+                    ptrdiff_t const col_start)
 {
     bitset box_check
         = bs_init((bitblock[bs_blocks(DIGITS)]){}, NULL, NULL, DIGITS, DIGITS);
     ccc_tribool was_on = CCC_FALSE;
-    for (size_t r = row_start; r < row_start + BOX_SIZE; ++r)
+    for (ptrdiff_t r = row_start; r < row_start + BOX_SIZE; ++r)
     {
-        for (size_t c = col_start; c < col_start + BOX_SIZE; ++c)
+        for (ptrdiff_t c = col_start; c < col_start + BOX_SIZE; ++c)
         {
             if (!board[r][c])
             {
                 continue;
             }
             /* Need the zero based digit. */
-            size_t const digit = board[r][c] - 1;
+            ptrdiff_t const digit = board[r][c] - 1;
             was_on = bs_set(&box_check, digit, CCC_TRUE);
             if (was_on)
             {
@@ -121,9 +121,9 @@ is_valid_sudoku(int const board[9][9])
     bitset col_check
         = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, NULL, NULL,
                   COLS * DIGITS, COLS * DIGITS);
-    for (size_t row = 0; row < ROWS; row += BOX_SIZE)
+    for (ptrdiff_t row = 0; row < ROWS; row += BOX_SIZE)
     {
-        for (size_t col = 0; col < COLS; col += BOX_SIZE)
+        for (ptrdiff_t col = 0; col < COLS; col += BOX_SIZE)
         {
             if (!validate_sudoku_box(board, &row_check, &col_check, row, col))
             {
@@ -301,7 +301,9 @@ main(void)
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
-    for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
+    for (ptrdiff_t i = 0;
+         i < (ptrdiff_t)(sizeof(addends) / sizeof(addends[0]));
+         ++i)
     {
         /* Functions take keys and structs by reference. */
         struct key_val const *const other_addend
@@ -394,7 +396,7 @@ struct lru_cache
 {
     handle_hash_map hh;
     doubly_linked_list l;
-    size_t cap;
+    ptrdiff_t cap;
 };
 
 struct lru_elem
@@ -548,7 +550,7 @@ main(void)
         {GET, .key = 2, .val = -1, .getter = lru_get},
         {HED, .key = 4, .val = 4, .header = lru_head},
     };
-    for (size_t i = 0; i < REQS; ++i)
+    for (ptrdiff_t i = 0; i < REQS; ++i)
     {
         switch (requests[i].call)
         {
@@ -775,9 +777,9 @@ main(void)
     ordered_map om = om_init(om, struct name, e, name, kval_cmp, NULL, NULL);
     char const *const sorted_names[5]
         = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
-    size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
-    size_t j = 7 % size;
-    for (size_t i = 0; i < size; ++i, j = (j + 7) % size)
+    ptrdiff_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
+    ptrdiff_t j = 7 % size;
+    for (ptrdiff_t i = 0; i < size; ++i, j = (j + 7) % size)
     {
         nodes[size(&om)].name = sorted_names[j];
         ccc_entry e = insert_or_assign(&om, &nodes[size(&om)].e);
@@ -846,10 +848,11 @@ main(void)
     char const *const sorted_repeat_names[10]
         = {"Ferris", "Ferris", "Glenda", "Glenda", "Rocky",
            "Rocky",  "Tux",    "Tux",    "Ziggy",  "Ziggy"};
-    size_t const size
-        = sizeof(sorted_repeat_names) / sizeof(sorted_repeat_names[0]);
-    size_t j = 11 % size;
-    for (size_t i = 0; i < size; ++i, j = (j + 11) % size)
+    ptrdiff_t const size =
+        (ptrdiff_t)(sizeof(sorted_repeat_names)
+                    / sizeof(sorted_repeat_names[0]));
+    ptrdiff_t j = 11 % size;
+    for (ptrdiff_t i = 0; i < size; ++i, j = (j + 11) % size)
     {
         nodes[size(&om)].name = sorted_repeat_names[j];
         ccc_entry e = insert(&om, &nodes[size(&om)].e);
@@ -907,7 +910,9 @@ main(void)
     struct val elems[5]
         = {{.val = 3}, {.val = 3}, {.val = 7}, {.val = -1}, {.val = 5}};
     priority_queue pq = pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
-    for (size_t i = 0; i < sizeof(elems) / sizeof(elems[0]); ++i)
+    for (ptrdiff_t i = 0;
+         i < (ptrdiff_t)(sizeof(elems) / sizeof(elems[0]));
+         ++i)
     {
         struct val const *const v = push(&pq, &elems[i].elem);
         assert(v && v->val == elems[i].val);
