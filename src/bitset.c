@@ -313,7 +313,7 @@ ccc_bs_set(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
 ccc_result
 ccc_bs_set_all(ccc_bitset *const bs, ccc_tribool const b)
 {
-    if (!bs || b <= CCC_BOOL_ERR || b > CCC_TRUE)
+    if (!bs)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -333,8 +333,7 @@ ccc_result
 ccc_bs_set_range(ccc_bitset *const bs, ptrdiff_t const i, ptrdiff_t const count,
                  ccc_tribool const b)
 {
-    if (!bs || b <= CCC_BOOL_ERR || b > CCC_TRUE || i < 0 || count < 0
-        || i >= bs->sz_ || add_overflow(i, count))
+    if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
     {
         return CCC_RESULT_ARG_ERROR;
     }
