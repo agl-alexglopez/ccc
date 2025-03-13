@@ -261,7 +261,7 @@ ccc_rom_entry(ccc_realtime_ordered_map const *const rom, void const *const key)
 void *
 ccc_rom_or_insert(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
 {
-    if (!e || !elem)
+    if (!e || !elem || !e->impl_.entry_.e_)
     {
         return NULL;
     }
@@ -277,7 +277,7 @@ ccc_rom_or_insert(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
 void *
 ccc_rom_insert_entry(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
 {
-    if (!e || !elem)
+    if (!e || !elem || !e->impl_.entry_.e_)
     {
         return NULL;
     }
@@ -296,7 +296,7 @@ ccc_rom_insert_entry(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
 ccc_entry
 ccc_rom_remove_entry(ccc_romap_entry const *const e)
 {
-    if (!e)
+    if (!e || !e->impl_.entry_.e_)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
@@ -346,7 +346,7 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn)
     {
         return NULL;
     }
-    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, NULL});
     }
@@ -360,7 +360,7 @@ ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_update_fn *fn, void *aux)
     {
         return NULL;
     }
-    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, aux});
     }
@@ -660,7 +660,7 @@ maybe_alloc_insert(struct ccc_romap_ *const rom,
 static inline struct romap_query_
 find(struct ccc_romap_ const *const rom, void const *const key)
 {
-    struct ccc_romap_elem_ *parent = (struct ccc_romap_elem_ *)&rom->end_;
+    struct ccc_romap_elem_ const *parent = &rom->end_;
     struct romap_query_ q = {.last_cmp_ = CCC_CMP_ERR, .found_ = rom->root_};
     for (; q.found_ != &rom->end_;
          parent = q.found_,
@@ -673,7 +673,7 @@ find(struct ccc_romap_ const *const rom, void const *const key)
         }
     }
     /* Type punning here OK as both union members have same type and size. */
-    q.parent_ = parent;
+    q.parent_ = (struct ccc_romap_elem_ *)parent;
     return q;
 }
 
