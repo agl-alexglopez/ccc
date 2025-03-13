@@ -325,6 +325,47 @@ delete_node(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const root)
     return merge(pq, pq->root_, delete_min(pq, root));
 }
 
+/* Uses Fredman et al. oldest to youngest pairing method mentioned on pg 124 of
+the paper to pair nodes in one pass. A non-trivial example for min heap.
+
+< = next_sibling_
+> = prev_sibling_
+
+   ┌<1>┐
+   └───┘
+   /
+┌<9>─<1>─<9>─<7>─<8>┐
+└───────────────────┘
+        |
+        v
+┌<9>─<1>─<7>─<8>┐
+└────────/──────┘
+      ┌<9>┐
+      └───┘
+        |
+        v
+┌<9>─<1>─<7>┐
+└────────/──┘
+      ┌<8>─<9>┐
+      └───────┘
+        |
+        v
+  ┌<1>─<7>┐
+  └/────/─┘
+┌<9>┐┌<8>─<9>┐
+└───┘└───────┘
+        |
+        v
+     ┌<1>┐
+     └───┘
+     /
+  ┌<7>─<9>┐
+  └/──────┘
+┌<8>─<9>┐
+└───────┘
+
+Delete min is the slowest operation offered by the priority queue and in part
+contributes to the amortized o(lg n) runtime of the decrease key operation. */
 static inline struct ccc_pq_elem_ *
 delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
 {
@@ -369,11 +410,21 @@ merge(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const old,
     return old;
 }
 
-/* Oldest nodes shuffle down, new drops in to replace.
-         a       a       a
-        ╱   ->  ╱   ->  ╱
-      ┌b┐     ┌c─b┐   ┌d─c─b┐
-      └─┘     └───┘   └─────┘ */
+/* Oldest nodes shuffle down, new drops in to replace. This supports the ring
+representation from Fredman et al., pg 125, fig 14 where the left child's next
+pointer wraps to the last element in the list. The previous pointer is to
+support faster deletes and decrease key operations.
+
+< = next_sibling_
+> = prev_sibling_
+
+         A        A            A
+        ╱        ╱            ╱
+    ┌─<B>─┐  ┌─<C>──<B>─┐ ┌─<D>──<C>──<B>─┐
+    └─────┘  └──────────┘ └───────────────┘
+
+Pairing in the delete min phase would then start B in this example and work
+towards D. That is the oldest to youngest order mentioned in the paper. */
 static inline void
 link_child(struct ccc_pq_elem_ *const parent, struct ccc_pq_elem_ *const child)
 {
