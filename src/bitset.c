@@ -284,16 +284,6 @@ ccc_bs_test(ccc_bitset const *const bs, ptrdiff_t const i)
     {
         return CCC_BOOL_ERR;
     }
-    return status(&bs->mem_[set_block_i(i)], i);
-}
-
-ccc_tribool
-ccc_bs_test_at(ccc_bitset const *const bs, ptrdiff_t const i)
-{
-    if (!bs || i < 0)
-    {
-        return CCC_BOOL_ERR;
-    }
     ptrdiff_t const b_i = set_block_i(i);
     if (b_i >= bs->sz_)
     {
@@ -304,19 +294,6 @@ ccc_bs_test_at(ccc_bitset const *const bs, ptrdiff_t const i)
 
 ccc_tribool
 ccc_bs_set(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
-{
-    if (!bs || i < 0)
-    {
-        return CCC_BOOL_ERR;
-    }
-    ccc_bitblock_ *const block = &bs->mem_[set_block_i(i)];
-    ccc_tribool const was = status(block, i);
-    set(block, i, b);
-    return was;
-}
-
-ccc_tribool
-ccc_bs_set_at(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
 {
     if (!bs || i < 0)
     {
@@ -415,19 +392,6 @@ ccc_bs_reset(ccc_bitset *const bs, ptrdiff_t const i)
     {
         return CCC_BOOL_ERR;
     }
-    ccc_bitblock_ *const block = &bs->mem_[set_block_i(i)];
-    ccc_tribool const was = status(block, i);
-    *block &= ~on(i);
-    return was;
-}
-
-ccc_tribool
-ccc_bs_reset_at(ccc_bitset *const bs, ptrdiff_t const i)
-{
-    if (!bs || i < 0)
-    {
-        return CCC_BOOL_ERR;
-    }
     ptrdiff_t const b_i = set_block_i(i);
     if (b_i >= bs->sz_)
     {
@@ -498,19 +462,6 @@ ccc_bs_reset_range(ccc_bitset *const bs, ptrdiff_t const i,
 
 ccc_tribool
 ccc_bs_flip(ccc_bitset *const bs, ptrdiff_t const i)
-{
-    if (!bs || i < 0)
-    {
-        return CCC_BOOL_ERR;
-    }
-    ccc_bitblock_ *const block = &bs->mem_[set_block_i(i)];
-    ccc_tribool const was = status(block, i);
-    *block ^= on(i);
-    return was;
-}
-
-ccc_tribool
-ccc_bs_flip_at(ccc_bitset *const bs, ptrdiff_t const i)
 {
     if (!bs || i < 0)
     {

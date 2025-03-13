@@ -203,32 +203,14 @@ Test for the presence of bits. */
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
 @return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
-@warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_bs_test_at(). */
-ccc_tribool ccc_bs_test(ccc_bitset const *bs, ptrdiff_t i);
-
-/** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
-@param [in] bs a pointer to the bit set.
-@param [in] i the index identifying the bit to set.
-@return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_test_at(ccc_bitset const *bs, ptrdiff_t i);
+ccc_tribool ccc_bs_test(ccc_bitset const *bs, ptrdiff_t i);
 
 /**@}*/
 
 /** @name Bit Modification Interface
 Set and flip bits in the set. */
 /**@{*/
-
-/** @brief Set the bit at index i to value b (CCC_TRUE or CCC_FALSE).
-@param [in] bs a pointer to the bit set.
-@param [in] i the index identifying the bit to set.
-@param [in] b the value to set at position i (CCC_TRUE or CCC_FALSE).
-@return the state of the bit before the set operation, true if it was
-previously true, false if it was previously false, or error if bs is NULL.
-@warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_bs_set_at(). */
-ccc_tribool ccc_bs_set(ccc_bitset *bs, ptrdiff_t i, ccc_tribool b);
 
 /** @brief Set the bit at valid index i to value b (true or false).
 @param [in] bs a pointer to the bit set.
@@ -238,7 +220,7 @@ ccc_tribool ccc_bs_set(ccc_bitset *bs, ptrdiff_t i, ccc_tribool b);
 previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_set_at(ccc_bitset *bs, ptrdiff_t i, ccc_tribool b);
+ccc_tribool ccc_bs_set(ccc_bitset *bs, ptrdiff_t i, ccc_tribool b);
 
 /** @brief Set all the bits to the provided value (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
@@ -263,15 +245,6 @@ Significant bit in an integer. */
 ccc_result ccc_bs_set_range(ccc_bitset *bs, ptrdiff_t i, ptrdiff_t count,
                             ccc_tribool b);
 
-/** @brief Set the bit at index i to CCC_FALSE.
-@param [in] bs a pointer to the bit set.
-@param [in] i the index identifying the bit to reset.
-@return the state of the bit before the reset operation, true if it was
-previously true, false if it was previously false, or error if bss is NULL.
-@warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_bs_set_at(). */
-ccc_tribool ccc_bs_reset(ccc_bitset *bs, ptrdiff_t i);
-
 /** @brief Set the bit at valid index i to boolean value b (true or false).
 @param [in] bs a pointer to the bit set.
 @param [in] i the valid index identifying the bit to set.
@@ -279,7 +252,7 @@ ccc_tribool ccc_bs_reset(ccc_bitset *bs, ptrdiff_t i);
 previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_reset_at(ccc_bitset *bs, ptrdiff_t i);
+ccc_tribool ccc_bs_reset(ccc_bitset *bs, ptrdiff_t i);
 
 /** @brief Set all the bits to CCC_FALSE.
 @param [in] bs a pointer to the bit set.
@@ -305,19 +278,10 @@ ccc_result ccc_bs_reset_range(ccc_bitset *bs, ptrdiff_t i, ptrdiff_t count);
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to toggle
 @return the state of the bit before the toggle operation, true if it was
-previously true, false if it was previously false, or error if bss is NULL.
-@warning no bounds checking occurs in the release target. For bounds checking,
-see ccc_bs_set_at(). */
-ccc_tribool ccc_bs_flip(ccc_bitset *bs, ptrdiff_t i);
-
-/** @brief Toggle the bit at index i.
-@param [in] bs a pointer to the bit set.
-@param [in] i the index identifying the bit to toggle
-@return the state of the bit before the toggle operation, true if it was
 previously true, false if it was previously false, or error if bs is NULL or
 i is out of range.
 @note this function performs bounds checking in the release target. */
-ccc_tribool ccc_bs_flip_at(ccc_bitset *bs, ptrdiff_t i);
+ccc_tribool ccc_bs_flip(ccc_bitset *bs, ptrdiff_t i);
 
 /** @brief Toggle all of the bits to their opposing boolean value.
 @param [in] bs a pointer to the bit set.
@@ -811,17 +775,13 @@ typedef ccc_bitblock bitblock;
 #    define bs_init(args...) ccc_bs_init(args)
 #    define bs_copy(args...) ccc_bs_copy(args)
 #    define bs_test(args...) ccc_bs_test(args)
-#    define bs_test_at(args...) ccc_bs_test_at(args)
 #    define bs_set(args...) ccc_bs_set(args)
-#    define bs_set_at(args...) ccc_bs_set_at(args)
 #    define bs_set_all(args...) ccc_bs_set_all(args)
 #    define bs_set_range(args...) ccc_bs_set_range(args)
 #    define bs_reset(args...) ccc_bs_reset(args)
-#    define bs_reset_at(args...) ccc_bs_reset_at(args)
 #    define bs_reset_all(args...) ccc_bs_reset_all(args)
 #    define bs_reset_range(args...) ccc_bs_reset_range(args)
 #    define bs_flip(args...) ccc_bs_flip(args)
-#    define bs_flip_at(args...) ccc_bs_flip_at(args)
 #    define bs_flip_all(args...) ccc_bs_flip_all(args)
 #    define bs_flip_range(args...) ccc_bs_flip_range(args)
 #    define bs_any(args...) ccc_bs_any(args)

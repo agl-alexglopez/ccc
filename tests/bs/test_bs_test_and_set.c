@@ -13,10 +13,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_one)
     CHECK(bs_capacity(&bs), 10);
     /* Was false before. */
     CHECK(bs_set(&bs, 5, CCC_TRUE), CCC_FALSE);
-    CHECK(bs_set_at(&bs, 5, CCC_TRUE), CCC_TRUE);
+    CHECK(bs_set(&bs, 5, CCC_TRUE), CCC_TRUE);
     CHECK(bs_popcount(&bs), 1);
     CHECK(bs_set(&bs, 5, CCC_FALSE), CCC_TRUE);
-    CHECK(bs_set_at(&bs, 5, CCC_FALSE), CCC_FALSE);
+    CHECK(bs_set(&bs, 5, CCC_FALSE), CCC_FALSE);
     CHECK_END_FN();
 }
 
@@ -28,13 +28,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_shuffled)
          ++i, shuf_i = (shuf_i + larger_prime) % 10)
     {
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
-        CHECK(bs_set_at(&bs, i, CCC_TRUE), CCC_TRUE);
+        CHECK(bs_set(&bs, i, CCC_TRUE), CCC_TRUE);
     }
     CHECK(bs_popcount(&bs), 10);
     for (ptrdiff_t i = 0; i < 10; ++i)
     {
         CHECK(bs_test(&bs, i), CCC_TRUE);
-        CHECK(bs_test_at(&bs, i), CCC_TRUE);
+        CHECK(bs_test(&bs, i), CCC_TRUE);
     }
     CHECK(bs_capacity(&bs), 10);
     CHECK_END_FN();
@@ -48,7 +48,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_set_all)
     for (ptrdiff_t i = 0; i < 10; ++i)
     {
         CHECK(bs_test(&bs, i), CCC_TRUE);
-        CHECK(bs_test_at(&bs, i), CCC_TRUE);
+        CHECK(bs_test(&bs, i), CCC_TRUE);
     }
     CHECK(bs_capacity(&bs), 10);
     CHECK_END_FN();
@@ -101,7 +101,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_reset)
          ++i, shuf_i = (shuf_i + larger_prime) % 10)
     {
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
-        CHECK(bs_set_at(&bs, i, CCC_TRUE), CCC_TRUE);
+        CHECK(bs_set(&bs, i, CCC_TRUE), CCC_TRUE);
     }
     CHECK(bs_reset(&bs, 9), CCC_TRUE);
     CHECK(bs_reset(&bs, 9), CCC_FALSE);
@@ -168,7 +168,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip)
     CHECK(bs_popcount(&bs), 10);
     CHECK(bs_flip(&bs, 9), CCC_TRUE);
     CHECK(bs_popcount(&bs), 9);
-    CHECK(bs_flip_at(&bs, 9), CCC_FALSE);
+    CHECK(bs_flip(&bs, 9), CCC_FALSE);
     CHECK(bs_popcount(&bs), 10);
     CHECK_END_FN();
 }
@@ -189,12 +189,12 @@ CHECK_BEGIN_STATIC_FN(bs_test_flip_all)
         if (i % 2)
         {
             CHECK(bs_test(&bs, i), CCC_TRUE);
-            CHECK(bs_test_at(&bs, i), CCC_TRUE);
+            CHECK(bs_test(&bs, i), CCC_TRUE);
         }
         else
         {
             CHECK(bs_test(&bs, i), CCC_FALSE);
-            CHECK(bs_test_at(&bs, i), CCC_FALSE);
+            CHECK(bs_test(&bs, i), CCC_FALSE);
         }
     }
     CHECK_END_FN();
@@ -402,7 +402,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
        thanks to the off bit embedded in each block. */
     CHECK(bs_first_trailing_ones(&bs, bits_in_block), -1);
     /* Now fix the last group and we should pass. */
-    CHECK(bs_set_at(&bs, ((end - 1) * bits_in_block) + first_half, CCC_TRUE),
+    CHECK(bs_set(&bs, ((end - 1) * bits_in_block) + first_half, CCC_TRUE),
           CCC_FALSE);
     /* Now the solution crosses the block border from second to last to last
        block. */
@@ -410,7 +410,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_ones_fail)
           (((end - 2) * bits_in_block) + first_half + 1));
     (void)bs_reset_all(&bs);
     (void)bs_set_range(&bs, 0, bits_in_block * 3, CCC_TRUE);
-    CHECK(bs_set_at(&bs, first_half, CCC_FALSE), CCC_TRUE);
+    CHECK(bs_set(&bs, first_half, CCC_FALSE), CCC_TRUE);
     CHECK(bs_first_trailing_ones_range(&bs, 0, bits_in_block, bits_in_block),
           -1);
     CHECK_END_FN();
@@ -506,7 +506,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros_fail)
        thanks to the off bit embedded in each block. */
     CHECK(bs_first_trailing_zeros(&bs, bits_in_block), -1);
     /* Now fix the last group and we should pass. */
-    CHECK(bs_set_at(&bs, ((end - 1) * bits_in_block) + first_half, CCC_FALSE),
+    CHECK(bs_set(&bs, ((end - 1) * bits_in_block) + first_half, CCC_FALSE),
           CCC_TRUE);
     /* Now the solution crosses the block border from second to last to last
        block. */
@@ -514,7 +514,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_trailing_zeros_fail)
           (((end - 2) * bits_in_block) + first_half + 1));
     (void)bs_reset_all(&bs);
     (void)bs_set_range(&bs, 0, bits_in_block * 3, CCC_FALSE);
-    CHECK(bs_set_at(&bs, first_half, CCC_TRUE), CCC_FALSE);
+    CHECK(bs_set(&bs, first_half, CCC_TRUE), CCC_FALSE);
     CHECK(bs_first_trailing_zeros_range(&bs, 0, bits_in_block, bits_in_block),
           -1);
     CHECK_END_FN();
@@ -614,7 +614,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones_fail)
        thanks to the off bit embedded in each block. */
     CHECK(bs_first_leading_ones(&bs, bits_in_block), -1);
     /* Now fix the last group and we should pass. */
-    CHECK(bs_set_at(&bs, first_half, CCC_TRUE), CCC_FALSE);
+    CHECK(bs_set(&bs, first_half, CCC_TRUE), CCC_FALSE);
     /* Now the solution crosses the block border from second to last to last
        block. */
     CHECK(bs_first_leading_ones(&bs, bits_in_block),
@@ -622,7 +622,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_ones_fail)
     (void)bs_reset_all(&bs);
     (void)bs_set_range(&bs, 512 - (bits_in_block * 3), bits_in_block * 3,
                        CCC_TRUE);
-    CHECK(bs_set_at(&bs, 512 - first_half, CCC_FALSE), CCC_TRUE);
+    CHECK(bs_set(&bs, 512 - first_half, CCC_FALSE), CCC_TRUE);
     CHECK(bs_first_leading_ones_range(&bs, 511, bits_in_block, bits_in_block),
           -1);
     CHECK_END_FN();
@@ -723,7 +723,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros_fail)
        thanks to the off bit embedded in each block. */
     CHECK(bs_first_leading_zeros(&bs, bits_in_block), -1);
     /* Now fix the last group and we should pass. */
-    CHECK(bs_set_at(&bs, first_half, CCC_FALSE), CCC_TRUE);
+    CHECK(bs_set(&bs, first_half, CCC_FALSE), CCC_TRUE);
     /* Now the solution crosses the block border from second to last to last
        block. */
     CHECK(bs_first_leading_zeros(&bs, bits_in_block),
@@ -731,7 +731,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zeros_fail)
     (void)bs_reset_all(&bs);
     (void)bs_set_range(&bs, 512 - (bits_in_block * 3), bits_in_block * 3,
                        CCC_FALSE);
-    CHECK(bs_set_at(&bs, 512 - first_half, CCC_TRUE), CCC_FALSE);
+    CHECK(bs_set(&bs, 512 - first_half, CCC_TRUE), CCC_FALSE);
     CHECK(bs_first_leading_zeros_range(&bs, 511, bits_in_block, bits_in_block),
           -1);
     CHECK_END_FN();

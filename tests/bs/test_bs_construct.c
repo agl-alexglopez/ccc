@@ -13,7 +13,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_construct)
     for (ptrdiff_t i = 0; i < ccc_bs_capacity(&bs); ++i)
     {
         CHECK(ccc_bs_test(&bs, i), CCC_FALSE);
-        CHECK(ccc_bs_test_at(&bs, i), CCC_FALSE);
+        CHECK(ccc_bs_test(&bs, i), CCC_FALSE);
     }
     CHECK_END_FN();
 }
