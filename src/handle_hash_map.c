@@ -767,7 +767,7 @@ ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 
 /*=======================     Static Helpers    =============================*/
 
-static inline struct ccc_handl_
+static struct ccc_handl_
 handle(struct ccc_hhmap_ *const h, void const *const key, uint64_t const hash)
 {
     uint8_t future_insert_error = 0;
@@ -786,7 +786,7 @@ handle(struct ccc_hhmap_ *const h, void const *const key, uint64_t const hash)
    slot or a slot with an element that is already using it. In the second case
    this is where Robin Hood would start swapping should we choose to follow
    through with an insert. Metadata slots point to the backing storage slot. */
-static inline struct ccc_handl_
+static struct ccc_handl_
 find(struct ccc_hhmap_ const *const h, void const *const key,
      uint64_t const hash)
 {
@@ -830,7 +830,7 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
    (obtained from a previous search). Manages metadata only for this insertion
    and the effects it may have on Robin Hood logic. Returns the handle of the
    metadata for this new hash that has been inserted. */
-static inline ccc_handle_i
+static ccc_handle_i
 insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
             ptrdiff_t const e_meta)
 {
@@ -877,7 +877,7 @@ insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
    to allocate. This prevents the need for tombstones which would hurt table
    quality quickly if we can't resize. Only metadata is moved. User data remains
    in the same slot for handle stability. */
-static inline void
+static void
 erase_meta(struct ccc_hhmap_ *const h, ptrdiff_t i)
 {
     *hash_at(h, i) = CCC_HHM_EMPTY;
@@ -899,7 +899,7 @@ erase_meta(struct ccc_hhmap_ *const h, ptrdiff_t i)
     } while (1);
 }
 
-static inline struct ccc_hhash_handle_
+static struct ccc_hhash_handle_
 container_handle(struct ccc_hhmap_ *const h, void const *const key)
 {
     uint64_t const hash = filter(h, key);
@@ -915,7 +915,7 @@ container_handle(struct ccc_hhmap_ *const h, void const *const key)
    is swapped and moved during Robin Hood, metadata and the user data in a slot
    may be completely unrelated. The intrusive element we are using could also
    be anywhere in the provided user struct so we need careful copy. */
-static inline void
+static void
 copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
              void const *const user_src)
 {
@@ -974,7 +974,7 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
    We could be faster if we ran a free list with extra fields in intrusive
    elems, but it would cost one or two fields just to optimize ideally
    infrequent operations of resizing. That space cost would be too high. */
-static inline ccc_result
+static ccc_result
 maybe_resize(struct ccc_hhmap_ *const h)
 {
     ptrdiff_t const h_cap = ccc_buf_capacity(&h->buf_);
@@ -1087,7 +1087,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
     return CCC_RESULT_OK;
 }
 
-static inline void
+static void
 heapify_slots(struct ccc_hhmap_ *const h, ptrdiff_t const slots)
 {
     if (!slots)
@@ -1100,14 +1100,14 @@ heapify_slots(struct ccc_hhmap_ *const h, ptrdiff_t const slots)
     }
 }
 
-static inline void
+static void
 pop_slot(struct ccc_hhmap_ *const h, ptrdiff_t const slots)
 {
     elem_at(h, 0)->slot_i_ = elem_at(h, slots - 1)->slot_i_;
     bubble_down(h, 0, slots - 1);
 }
 
-static inline void
+static void
 bubble_down(struct ccc_hhmap_ *const h, ptrdiff_t i, ptrdiff_t const slots)
 {
     struct ccc_hhmap_elem_ *const tmp = elem_at(h, slots);
@@ -1128,7 +1128,7 @@ bubble_down(struct ccc_hhmap_ *const h, ptrdiff_t i, ptrdiff_t const slots)
     }
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 next_prime(ptrdiff_t const n)
 {
     for (ptrdiff_t i = 0; i < PRIMES_SIZE; ++i)

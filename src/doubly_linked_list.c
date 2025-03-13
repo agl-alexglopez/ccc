@@ -507,7 +507,7 @@ extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
     return sz;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
             struct ccc_dll_elem_ *const end)
 {
@@ -536,7 +536,7 @@ erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
     return sz;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 len([[maybe_unused]] struct ccc_dll_ const *const sll,
     struct ccc_dll_elem_ const *begin, struct ccc_dll_elem_ const *const end)
 {

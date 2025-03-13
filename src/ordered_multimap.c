@@ -632,7 +632,7 @@ ccc_impl_ommap_elem_in_slot(struct ccc_ommap_ const *const t,
 
 /*======================  Static Splay Tree Helpers  ========================*/
 
-static inline struct ccc_omultimap_entry_
+static struct ccc_omultimap_entry_
 container_entry(struct ccc_ommap_ *const t, void const *const key)
 {
     void *const found = find(t, key);
@@ -645,7 +645,7 @@ container_entry(struct ccc_ommap_ *const t, void const *const key)
         .t_ = t, .entry_ = {.e_ = NULL, .stats_ = CCC_ENTRY_VACANT}};
 }
 
-static inline void *
+static void *
 find(struct ccc_ommap_ *const t, void const *const key)
 {
     if (t->root_ == &t->end_)
@@ -665,13 +665,13 @@ init_node(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const n)
     n->parent_ = &t->end_;
 }
 
-static inline ccc_tribool
+static ccc_tribool
 empty(struct ccc_ommap_ const *const t)
 {
     return !t->size_;
 }
 
-static inline void *
+static void *
 max(struct ccc_ommap_ const *const t)
 {
     if (!t->size_)
@@ -684,7 +684,7 @@ max(struct ccc_ommap_ const *const t)
     return struct_base(t, m);
 }
 
-static inline void *
+static void *
 min(struct ccc_ommap_ const *const t)
 {
     if (!t->size_)
@@ -722,7 +722,7 @@ is_dup_head(struct ccc_ommap_elem_ const *const end,
     return i != end && i->link_[P] != end && i->link_[P]->link_[N] == i;
 }
 
-static inline struct ccc_ommap_elem_ const *
+static struct ccc_ommap_elem_ const *
 multimap_next(struct ccc_ommap_ const *const t,
               struct ccc_ommap_elem_ const *const i,
               enum tree_link_ const traversal)
@@ -754,7 +754,7 @@ multimap_next(struct ccc_ommap_ const *const t,
     return next(t, i, traversal);
 }
 
-static inline struct ccc_ommap_elem_ const *
+static struct ccc_ommap_elem_ const *
 next_tree_node(struct ccc_ommap_ const *const t,
                struct ccc_ommap_elem_ const *const head,
                enum tree_link_ const traversal)
@@ -775,7 +775,7 @@ next_tree_node(struct ccc_ommap_ const *const t,
     return &t->end_;
 }
 
-static inline struct ccc_ommap_elem_ const *
+static struct ccc_ommap_elem_ const *
 next(struct ccc_ommap_ const *const t, struct ccc_ommap_elem_ const *n,
      enum tree_link_ const traversal)
 {
@@ -801,7 +801,7 @@ next(struct ccc_ommap_ const *const t, struct ccc_ommap_elem_ const *n,
     return p;
 }
 
-static inline struct ccc_range_u_
+static struct ccc_range_u_
 equal_range(struct ccc_ommap_ *const t, void const *const begin_key,
             void const *const end_key, enum tree_link_ const traversal)
 {
@@ -838,7 +838,7 @@ contains(struct ccc_ommap_ *const t, void const *const key)
     return cmp(t, key, t->root_, t->cmp_) == CCC_EQL;
 }
 
-static inline struct ccc_ent_
+static struct ccc_ent_
 multimap_insert(struct ccc_ommap_ *const t,
                 struct ccc_ommap_elem_ *const out_handle)
 {
@@ -865,7 +865,7 @@ multimap_insert(struct ccc_ommap_ *const t,
                              .stats_ = CCC_ENTRY_VACANT};
 }
 
-static inline void *
+static void *
 connect_new_root(struct ccc_ommap_ *const t,
                  struct ccc_ommap_elem_ *const new_root,
                  ccc_threeway_cmp const cmp_result)
@@ -880,7 +880,7 @@ connect_new_root(struct ccc_ommap_ *const t,
     return struct_base(t, new_root);
 }
 
-static inline void
+static void
 add_duplicate(struct ccc_ommap_ *const t,
               struct ccc_ommap_elem_ *const tree_node,
               struct ccc_ommap_elem_ *const add,
@@ -909,7 +909,7 @@ add_duplicate(struct ccc_ommap_ *const t,
     add->link_[P] = tail;
 }
 
-static inline void *
+static void *
 multimap_erase(struct ccc_ommap_ *const t, void const *const key)
 {
     if (!t || !key)
@@ -944,7 +944,7 @@ multimap_erase(struct ccc_ommap_ *const t, void const *const key)
    simply grabs the first node available in the tree for round robin.
    This function expects to be passed the t->impl_il as the node and a
    comparison function that forces either the max or min to be searched. */
-static inline void *
+static void *
 multimap_erase_max_or_min(struct ccc_ommap_ *const t,
                           ccc_key_cmp_fn *const force_max_or_min)
 {
@@ -975,7 +975,7 @@ multimap_erase_max_or_min(struct ccc_ommap_ *const t,
    taken to only delete that node, especially if a different node with
    the same size is splayed to the root and we are a duplicate in the
    list. */
-static inline void *
+static void *
 multimap_erase_node(struct ccc_ommap_ *const t,
                     struct ccc_ommap_elem_ *const node)
 {
@@ -1021,7 +1021,7 @@ multimap_erase_node(struct ccc_ommap_ *const t,
 }
 
 /* This function assumes that splayed is the new root of the tree */
-static inline struct ccc_ommap_elem_ *
+static struct ccc_ommap_elem_ *
 pop_dup_node(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const dup,
              struct ccc_ommap_elem_ *const splayed)
 {
@@ -1048,7 +1048,7 @@ pop_dup_node(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const dup,
 /* A node is in the tree and has a trailing list of duplicates. Many updates
 must occur to remove the first duplicate from the list and make it part of the
 splay tree to replace the old node to be deleted. */
-static inline struct ccc_ommap_elem_ *
+static struct ccc_ommap_elem_ *
 pop_front_dup(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const old,
               void const *const old_key)
 {
@@ -1086,7 +1086,7 @@ pop_front_dup(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const old,
     return old;
 }
 
-static inline struct ccc_ommap_elem_ *
+static struct ccc_ommap_elem_ *
 remove_from_tree(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const ret)
 {
     if (ret->branch_[L] == &t->end_)
@@ -1102,7 +1102,7 @@ remove_from_tree(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const ret)
     return ret;
 }
 
-static inline struct ccc_ommap_elem_ *
+static struct ccc_ommap_elem_ *
 splay(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *root,
       void const *const key, ccc_key_cmp_fn *const cmp_fn)
 {
@@ -1155,7 +1155,7 @@ splay(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *root,
    to a subtree updating the parents child pointer in the direction specified
    and updating the subtree parent field to point back to parent. This last
    step is critical and easy to miss or mess up. */
-static inline void
+static void
 link_trees(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const parent,
            enum tree_link_ const dir, struct ccc_ommap_elem_ *const subtree)
 {
@@ -1290,7 +1290,7 @@ struct parent_status_
     struct ccc_ommap_elem_ const *parent;
 };
 
-static inline ptrdiff_t
+static ptrdiff_t
 count_dups(struct ccc_ommap_ const *const t,
            struct ccc_ommap_elem_ const *const n)
 {
@@ -1388,7 +1388,7 @@ is_duplicate_storing_parent(struct ccc_ommap_ const *const t,
    sure that the implementation is correct because it follows the
    truth of the provided pointers with its own stack as backtracking
    information. */
-static inline ccc_tribool
+static ccc_tribool
 ccc_ommap_validate(struct ccc_ommap_ const *const t)
 {
     if (!are_subtrees_valid(t,

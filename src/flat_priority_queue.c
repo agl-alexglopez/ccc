@@ -371,7 +371,7 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, ptrdiff_t const n)
 
 /*====================     Static Helpers     ===============================*/
 
-static inline void
+static void
 inplace_heapify(struct ccc_fpq_ *const fpq, ptrdiff_t const n)
 {
     (void)ccc_buf_size_set(&fpq->buf_, n);
@@ -383,7 +383,7 @@ inplace_heapify(struct ccc_fpq_ *const fpq, ptrdiff_t const n)
 }
 
 /* Fixes the position of element e after its key value has been changed. */
-static inline ptrdiff_t
+static ptrdiff_t
 update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 {
     void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_));
@@ -407,7 +407,7 @@ update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 }
 
 /* Returns the sorted position of the element starting at position i. */
-static inline ptrdiff_t
+static ptrdiff_t
 bubble_up(struct ccc_fpq_ *const fpq, char tmp[const], ptrdiff_t i)
 {
     for (ptrdiff_t parent = (i - 1) / 2; i;
@@ -424,7 +424,7 @@ bubble_up(struct ccc_fpq_ *const fpq, char tmp[const], ptrdiff_t i)
 }
 
 /* Returns the sorted position of the element starting at position i. */
-static inline ptrdiff_t
+static ptrdiff_t
 bubble_down(struct ccc_fpq_ *const fpq, char tmp[const], ptrdiff_t i)
 {
     ptrdiff_t const sz = ccc_buf_size(&fpq->buf_);

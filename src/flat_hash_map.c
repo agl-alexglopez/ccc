@@ -630,7 +630,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
            && empties == (ccc_buf_capacity(&h->buf_) - occupied);
 }
 
-static inline ccc_tribool
+static ccc_tribool
 valid_distance_from_home(struct ccc_fhmap_ const *const h,
                          void const *const slot)
 {
@@ -704,7 +704,7 @@ ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *const h, ptrdiff_t const i)
 
 /*=======================     Static Helpers    =============================*/
 
-static inline struct ccc_ent_
+static struct ccc_ent_
 entry(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
 {
     char upcoming_insertion_error = 0;
@@ -717,7 +717,7 @@ entry(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
     return res;
 }
 
-static inline struct ccc_ent_
+static struct ccc_ent_
 find(struct ccc_fhmap_ const *const h, void const *const key,
      uint64_t const hash)
 {
@@ -759,7 +759,7 @@ find(struct ccc_fhmap_ const *const h, void const *const key,
 /* Assumes that element to be inserted does not already exist in the table.
    Assumes that the table has room for another insertion. Unexpected results
    may occur if these assumptions are not accommodated. */
-static inline void
+static void
 insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
        ptrdiff_t i)
 {
@@ -806,7 +806,7 @@ insert(struct ccc_fhmap_ *const h, void const *const e, uint64_t const hash,
 /* Backshift deletion is important in for this table because it may not be able
    to allocate. This prevents the need for tombstones which would hurt table
    quality quickly if we can't resize. */
-static inline void
+static void
 erase(struct ccc_fhmap_ *const h, void *const e)
 {
     *hash_at(h, ccc_buf_i(&h->buf_, e)) = CCC_FHM_EMPTY;
@@ -832,7 +832,7 @@ erase(struct ccc_fhmap_ *const h, void *const e)
     } while (1);
 }
 
-static inline struct ccc_fhash_entry_
+static struct ccc_fhash_entry_
 container_entry(struct ccc_fhmap_ *const h, void const *const key)
 {
     uint64_t const hash = filter(h, key);
@@ -843,7 +843,7 @@ container_entry(struct ccc_fhmap_ *const h, void const *const key)
     };
 }
 
-static inline ccc_result
+static ccc_result
 maybe_resize(struct ccc_fhmap_ *const h)
 {
     if (ccc_buf_capacity(&h->buf_) && ccc_buf_size(&h->buf_) < num_swap_slots)
@@ -906,7 +906,7 @@ maybe_resize(struct ccc_fhmap_ *const h)
     return CCC_RESULT_OK;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 next_prime(ptrdiff_t const n)
 {
     /* Compiler should help us out here. No fancy binary search/tricks to

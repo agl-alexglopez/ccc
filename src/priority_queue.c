@@ -257,7 +257,7 @@ ccc_impl_pq_decrease_fixup(struct ccc_pq_ *const pq,
 
 /*========================   Static Helpers   ================================*/
 
-static inline void
+static void
 update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
 {
     if (e->parent_ && cmp(pq, e, e->parent_) == pq->order_)
@@ -271,7 +271,7 @@ update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
     pq->root_ = merge(pq, pq->root_, e);
 }
 
-static inline void
+static void
 increase_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
 {
     if (pq->order_ == CCC_GRT)
@@ -286,7 +286,7 @@ increase_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
     pq->root_ = merge(pq, pq->root_, e);
 }
 
-static inline void
+static void
 decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
 {
     if (pq->order_ == CCC_LES)
@@ -301,7 +301,7 @@ decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
     pq->root_ = merge(pq, pq->root_, e);
 }
 
-static inline void
+static void
 cut_child(struct ccc_pq_elem_ *const child)
 {
     child->next_sibling_->prev_sibling_ = child->prev_sibling_;
@@ -314,7 +314,7 @@ cut_child(struct ccc_pq_elem_ *const child)
     child->parent_ = NULL;
 }
 
-static inline struct ccc_pq_elem_ *
+static struct ccc_pq_elem_ *
 delete_node(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const root)
 {
     if (pq->root_ == root)
@@ -366,7 +366,7 @@ the paper to pair nodes in one pass. A non-trivial example for min heap.
 
 Delete min is the slowest operation offered by the priority queue and in part
 contributes to the amortized o(lg n) runtime of the decrease key operation. */
-static inline struct ccc_pq_elem_ *
+static struct ccc_pq_elem_ *
 delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
 {
     if (!root->left_child_)
@@ -393,7 +393,7 @@ delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
     return root;
 }
 
-static inline struct ccc_pq_elem_ *
+static struct ccc_pq_elem_ *
 merge(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const old,
       struct ccc_pq_elem_ *const new)
 {
@@ -425,7 +425,7 @@ support faster deletes and decrease key operations.
 
 Pairing in the delete min phase would then start B in this example and work
 towards D. That is the oldest to youngest order mentioned in the paper. */
-static inline void
+static void
 link_child(struct ccc_pq_elem_ *const parent, struct ccc_pq_elem_ *const child)
 {
     if (parent->left_child_)

@@ -609,7 +609,7 @@ ccc_impl_hom_alloc_slot(struct ccc_homap_ *const hom)
 
 /*===========================   Static Helpers    ===========================*/
 
-static inline struct ccc_range_u_
+static struct ccc_range_u_
 equal_range(struct ccc_homap_ *const t, void const *const begin_key,
             void const *const end_key, enum hom_branch_ const traversal)
 {
@@ -639,7 +639,7 @@ equal_range(struct ccc_homap_ *const t, void const *const begin_key,
     };
 }
 
-static inline struct ccc_htree_handle_
+static struct ccc_htree_handle_
 handle(struct ccc_homap_ *const hom, void const *const key)
 {
     ptrdiff_t const found = find(hom, key);
@@ -656,7 +656,7 @@ handle(struct ccc_homap_ *const hom, void const *const key)
     };
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 maybe_alloc_insert(struct ccc_homap_ *const hom,
                    struct ccc_homap_elem_ *const elem)
 {
@@ -672,7 +672,7 @@ maybe_alloc_insert(struct ccc_homap_ *const hom,
     return node;
 }
 
-static inline void
+static void
 insert(struct ccc_homap_ *const t, ptrdiff_t const n)
 {
     struct ccc_homap_elem_ *const node = at(t, n);
@@ -692,7 +692,7 @@ insert(struct ccc_homap_ *const t, ptrdiff_t const n)
     (void)connect_new_root(t, n, root_cmp);
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 erase(struct ccc_homap_ *const t, void const *const key)
 {
     if (ccc_hom_is_empty(t))
@@ -709,7 +709,7 @@ erase(struct ccc_homap_ *const t, void const *const key)
     return ret;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 remove_from_tree(struct ccc_homap_ *const t, ptrdiff_t const ret)
 {
     if (!branch_i(t, ret, L))
@@ -730,7 +730,7 @@ remove_from_tree(struct ccc_homap_ *const t, ptrdiff_t const ret)
     return ret;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 connect_new_root(struct ccc_homap_ *const t, ptrdiff_t const new_root,
                  ccc_threeway_cmp const cmp_result)
 {
@@ -744,7 +744,7 @@ connect_new_root(struct ccc_homap_ *const t, ptrdiff_t const new_root,
     return new_root;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 find(struct ccc_homap_ *const t, void const *const key)
 {
     if (!t->root_)
@@ -755,7 +755,7 @@ find(struct ccc_homap_ *const t, void const *const key)
     return cmp_elems(t, key, t->root_, t->cmp_) == CCC_EQL ? t->root_ : 0;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 splay(struct ccc_homap_ *const t, ptrdiff_t root, void const *const key,
       ccc_key_cmp_fn *const cmp_fn)
 {
@@ -810,7 +810,7 @@ link(struct ccc_homap_ *const t, ptrdiff_t const parent,
     *parent_ref(t, subtree) = parent;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 min_max_from(struct ccc_homap_ const *const t, ptrdiff_t start,
              enum hom_branch_ const dir)
 {
@@ -823,7 +823,7 @@ min_max_from(struct ccc_homap_ const *const t, ptrdiff_t start,
     return start;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 next(struct ccc_homap_ const *const t, ptrdiff_t n,
      enum hom_branch_ const traversal)
 {
@@ -857,7 +857,7 @@ cmp_elems(struct ccc_homap_ const *const hom, void const *const key,
                             .aux = hom->buf_.aux_});
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 alloc_slot(struct ccc_homap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
@@ -1071,7 +1071,7 @@ is_free_list_valid(struct ccc_homap_ const *const t)
     return (list_check + ccc_buf_size(&t->buf_) == ccc_buf_capacity(&t->buf_));
 }
 
-static inline ccc_tribool
+static ccc_tribool
 validate(struct ccc_homap_ const *const hom)
 {
     if (!are_subtrees_valid(hom, (struct tree_range_){.root = hom->root_}))
