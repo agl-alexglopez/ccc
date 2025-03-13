@@ -890,63 +890,81 @@ $(document).ready(function(){initNavTree('impl__traits_8h_source.html',''); init
 <div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_size,                 \</span></div>
 <div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_size)((container_ptr))</span></div>
 <div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span> </div>
-<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span><span class="preprocessor">#define ccc_impl_is_empty(container_ptr)                                       \</span></div>
+<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span><span class="preprocessor">#define ccc_impl_capacity(container_ptr)                                       \</span></div>
 <div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span><span class="preprocessor">    _Generic((container_ptr),                                                  \</span></div>
-<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span><span class="preprocessor">        ccc_buffer *: ccc_buf_is_empty,                                        \</span></div>
-<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_is_empty,                                 \</span></div>
-<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span><span class="preprocessor">        ccc_handle_hash_map *: ccc_hhm_is_empty,                               \</span></div>
-<div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span><span class="preprocessor">        ccc_ordered_map *: ccc_om_is_empty,                                    \</span></div>
-<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_is_empty,                            \</span></div>
-<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_is_empty,                           \</span></div>
-<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_is_empty,                      \</span></div>
-<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span><span class="preprocessor">        ccc_ordered_multimap *: ccc_omm_is_empty,                              \</span></div>
-<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span><span class="preprocessor">        ccc_priority_queue *: ccc_pq_is_empty,                                 \</span></div>
-<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span><span class="preprocessor">        ccc_singly_linked_list *: ccc_sll_is_empty,                            \</span></div>
-<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span><span class="preprocessor">        ccc_doubly_linked_list *: ccc_dll_is_empty,                            \</span></div>
-<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span><span class="preprocessor">        ccc_realtime_ordered_map *: ccc_rom_is_empty,                          \</span></div>
-<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_is_empty,                   \</span></div>
-<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span><span class="preprocessor">        ccc_buffer const *: ccc_buf_is_empty,                                  \</span></div>
-<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_is_empty,                           \</span></div>
-<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span><span class="preprocessor">        ccc_handle_hash_map const *: ccc_hhm_is_empty,                         \</span></div>
-<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span><span class="preprocessor">        ccc_ordered_map const *: ccc_om_is_empty,                              \</span></div>
-<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_is_empty,                      \</span></div>
-<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_is_empty,                     \</span></div>
-<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_is_empty,                \</span></div>
-<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span><span class="preprocessor">        ccc_ordered_multimap const *: ccc_omm_is_empty,                        \</span></div>
-<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span><span class="preprocessor">        ccc_priority_queue const *: ccc_pq_is_empty,                           \</span></div>
-<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span><span class="preprocessor">        ccc_singly_linked_list const *: ccc_sll_is_empty,                      \</span></div>
-<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span><span class="preprocessor">        ccc_doubly_linked_list const *: ccc_dll_is_empty,                      \</span></div>
-<div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_is_empty,             \</span></div>
-<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_is_empty)((container_ptr))</span></div>
-<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span> </div>
-<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span><span class="preprocessor">#define ccc_impl_validate(container_ptr)                                       \</span></div>
-<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span><span class="preprocessor">    _Generic((container_ptr),                                                  \</span></div>
-<div class="line"><a id="l00829" name="l00829"></a><span class="lineno">  829</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_validate,                                 \</span></div>
-<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span><span class="preprocessor">        ccc_handle_hash_map *: ccc_hhm_validate,                               \</span></div>
-<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span><span class="preprocessor">        ccc_ordered_map *: ccc_om_validate,                                    \</span></div>
-<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_validate,                            \</span></div>
-<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_validate,                           \</span></div>
-<div class="line"><a id="l00834" name="l00834"></a><span class="lineno">  834</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_validate,                      \</span></div>
-<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span><span class="preprocessor">        ccc_ordered_multimap *: ccc_omm_validate,                              \</span></div>
-<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span><span class="preprocessor">        ccc_priority_queue *: ccc_pq_validate,                                 \</span></div>
-<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span><span class="preprocessor">        ccc_singly_linked_list *: ccc_sll_validate,                            \</span></div>
-<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span><span class="preprocessor">        ccc_doubly_linked_list *: ccc_dll_validate,                            \</span></div>
-<div class="line"><a id="l00839" name="l00839"></a><span class="lineno">  839</span><span class="preprocessor">        ccc_realtime_ordered_map *: ccc_rom_validate,                          \</span></div>
-<div class="line"><a id="l00840" name="l00840"></a><span class="lineno">  840</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_validate,                   \</span></div>
-<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_validate,                           \</span></div>
-<div class="line"><a id="l00842" name="l00842"></a><span class="lineno">  842</span><span class="preprocessor">        ccc_handle_hash_map const *: ccc_hhm_validate,                         \</span></div>
-<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span><span class="preprocessor">        ccc_ordered_map const *: ccc_om_validate,                              \</span></div>
-<div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_validate,                      \</span></div>
-<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_validate,                     \</span></div>
-<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_validate,                \</span></div>
-<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span><span class="preprocessor">        ccc_ordered_multimap const *: ccc_omm_validate,                        \</span></div>
-<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span><span class="preprocessor">        ccc_priority_queue const *: ccc_pq_validate,                           \</span></div>
-<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span><span class="preprocessor">        ccc_singly_linked_list const *: ccc_sll_validate,                      \</span></div>
-<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span><span class="preprocessor">        ccc_doubly_linked_list const *: ccc_dll_validate,                      \</span></div>
-<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_validate,             \</span></div>
-<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_validate)((container_ptr))</span></div>
-<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span> </div>
-<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_TRAITS_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span><span class="preprocessor">        ccc_buffer *: ccc_buf_capacity,                                        \</span></div>
+<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_capacity,                                 \</span></div>
+<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span><span class="preprocessor">        ccc_handle_hash_map *: ccc_hhm_capacity,                               \</span></div>
+<div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_capacity,                            \</span></div>
+<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_capacity,                           \</span></div>
+<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_capacity,                      \</span></div>
+<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_capacity,                   \</span></div>
+<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span><span class="preprocessor">        ccc_buffer const *: ccc_buf_capacity,                                  \</span></div>
+<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_capacity,                           \</span></div>
+<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span><span class="preprocessor">        ccc_handle_hash_map const *: ccc_hhm_capacity,                         \</span></div>
+<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_capacity,                      \</span></div>
+<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_capacity,                     \</span></div>
+<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_capacity,                \</span></div>
+<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_capacity)(            \</span></div>
+<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span><span class="preprocessor">        (container_ptr))</span></div>
+<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span> </div>
+<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span><span class="preprocessor">#define ccc_impl_is_empty(container_ptr)                                       \</span></div>
+<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span><span class="preprocessor">    _Generic((container_ptr),                                                  \</span></div>
+<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span><span class="preprocessor">        ccc_buffer *: ccc_buf_is_empty,                                        \</span></div>
+<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_is_empty,                                 \</span></div>
+<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span><span class="preprocessor">        ccc_handle_hash_map *: ccc_hhm_is_empty,                               \</span></div>
+<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span><span class="preprocessor">        ccc_ordered_map *: ccc_om_is_empty,                                    \</span></div>
+<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_is_empty,                            \</span></div>
+<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_is_empty,                           \</span></div>
+<div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_is_empty,                      \</span></div>
+<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span><span class="preprocessor">        ccc_ordered_multimap *: ccc_omm_is_empty,                              \</span></div>
+<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span><span class="preprocessor">        ccc_priority_queue *: ccc_pq_is_empty,                                 \</span></div>
+<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span><span class="preprocessor">        ccc_singly_linked_list *: ccc_sll_is_empty,                            \</span></div>
+<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span><span class="preprocessor">        ccc_doubly_linked_list *: ccc_dll_is_empty,                            \</span></div>
+<div class="line"><a id="l00829" name="l00829"></a><span class="lineno">  829</span><span class="preprocessor">        ccc_realtime_ordered_map *: ccc_rom_is_empty,                          \</span></div>
+<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_is_empty,                   \</span></div>
+<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span><span class="preprocessor">        ccc_buffer const *: ccc_buf_is_empty,                                  \</span></div>
+<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_is_empty,                           \</span></div>
+<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span><span class="preprocessor">        ccc_handle_hash_map const *: ccc_hhm_is_empty,                         \</span></div>
+<div class="line"><a id="l00834" name="l00834"></a><span class="lineno">  834</span><span class="preprocessor">        ccc_ordered_map const *: ccc_om_is_empty,                              \</span></div>
+<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_is_empty,                      \</span></div>
+<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_is_empty,                     \</span></div>
+<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_is_empty,                \</span></div>
+<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span><span class="preprocessor">        ccc_ordered_multimap const *: ccc_omm_is_empty,                        \</span></div>
+<div class="line"><a id="l00839" name="l00839"></a><span class="lineno">  839</span><span class="preprocessor">        ccc_priority_queue const *: ccc_pq_is_empty,                           \</span></div>
+<div class="line"><a id="l00840" name="l00840"></a><span class="lineno">  840</span><span class="preprocessor">        ccc_singly_linked_list const *: ccc_sll_is_empty,                      \</span></div>
+<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span><span class="preprocessor">        ccc_doubly_linked_list const *: ccc_dll_is_empty,                      \</span></div>
+<div class="line"><a id="l00842" name="l00842"></a><span class="lineno">  842</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_is_empty,             \</span></div>
+<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_is_empty)((container_ptr))</span></div>
+<div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span> </div>
+<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span><span class="preprocessor">#define ccc_impl_validate(container_ptr)                                       \</span></div>
+<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span><span class="preprocessor">    _Generic((container_ptr),                                                  \</span></div>
+<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_validate,                                 \</span></div>
+<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span><span class="preprocessor">        ccc_handle_hash_map *: ccc_hhm_validate,                               \</span></div>
+<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span><span class="preprocessor">        ccc_ordered_map *: ccc_om_validate,                                    \</span></div>
+<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_validate,                            \</span></div>
+<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_validate,                           \</span></div>
+<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_validate,                      \</span></div>
+<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span><span class="preprocessor">        ccc_ordered_multimap *: ccc_omm_validate,                              \</span></div>
+<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span><span class="preprocessor">        ccc_priority_queue *: ccc_pq_validate,                                 \</span></div>
+<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span><span class="preprocessor">        ccc_singly_linked_list *: ccc_sll_validate,                            \</span></div>
+<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span><span class="preprocessor">        ccc_doubly_linked_list *: ccc_dll_validate,                            \</span></div>
+<div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span><span class="preprocessor">        ccc_realtime_ordered_map *: ccc_rom_validate,                          \</span></div>
+<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_validate,                   \</span></div>
+<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_validate,                           \</span></div>
+<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span><span class="preprocessor">        ccc_handle_hash_map const *: ccc_hhm_validate,                         \</span></div>
+<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span><span class="preprocessor">        ccc_ordered_map const *: ccc_om_validate,                              \</span></div>
+<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_validate,                      \</span></div>
+<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_validate,                     \</span></div>
+<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_validate,                \</span></div>
+<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span><span class="preprocessor">        ccc_ordered_multimap const *: ccc_omm_validate,                        \</span></div>
+<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span><span class="preprocessor">        ccc_priority_queue const *: ccc_pq_validate,                           \</span></div>
+<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span><span class="preprocessor">        ccc_singly_linked_list const *: ccc_sll_validate,                      \</span></div>
+<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span><span class="preprocessor">        ccc_doubly_linked_list const *: ccc_dll_validate,                      \</span></div>
+<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_validate,             \</span></div>
+<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_validate)((container_ptr))</span></div>
+<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span> </div>
+<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_TRAITS_H */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

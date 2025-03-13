@@ -15,6 +15,5 @@ var dir_785de28692a141f8fc4ca1e0ef5f2e7c =
     [ "impl_realtime_ordered_map.h", "impl__realtime__ordered__map_8h_source.html", null ],
     [ "impl_singly_linked_list.h", "impl__singly__linked__list_8h_source.html", null ],
     [ "impl_traits.h", "impl__traits_8h_source.html", null ],
-    [ "impl_tree.h", "impl__tree_8h_source.html", null ],
     [ "impl_types.h", "impl__types_8h_source.html", null ]
 ];

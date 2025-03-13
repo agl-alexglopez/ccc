@@ -1,5 +1,5 @@
 <map id="ccc/types.h" name="ccc/types.h">
-<area shape="rect" id="node1" title="The C Container Collection Fundamental Types." alt="" coords="1253,5,1347,31"/>
+<area shape="rect" id="node1" title="The C Container Collection Fundamental Types." alt="" coords="1278,5,1373,31"/>
 <area shape="rect" id="node2" href="$bitset_8h.html" title="The Bit Set Interface." alt="" coords="5,174,101,199"/>
 <area shape="rect" id="node3" href="$buffer_8h.html" title="The Buffer Interface." alt="" coords="916,174,1012,199"/>
 <area shape="rect" id="node5" href="$flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface." alt="" coords="757,343,923,383"/>
@@ -18,17 +18,16 @@
 <area shape="rect" id="node19" href="$impl__bitset_8h_source.html" title=" " alt="" coords="31,86,196,111"/>
 <area shape="rect" id="node20" href="$impl__buffer_8h_source.html" title=" " alt="" coords="945,86,1111,111"/>
 <area shape="rect" id="node21" href="$impl__doubly__linked__list_8h_source.html" title=" " alt="" coords="1489,79,1649,119"/>
-<area shape="rect" id="node22" href="$impl__priority__queue_8h_source.html" title=" " alt="" coords="1724,79,1887,119"/>
-<area shape="rect" id="node23" href="$priority__queue_8h.html" title="The Priority Queue Interface." alt="" coords="1702,174,1855,199"/>
-<area shape="rect" id="node24" href="$impl__realtime__ordered__map_8h_source.html" title=" " alt="" coords="1961,79,2132,119"/>
-<area shape="rect" id="node25" href="$realtime__ordered__map_8h.html" title="The Realtime Ordered Map Interface." alt="" coords="1879,167,2038,207"/>
-<area shape="rect" id="node26" href="$impl__singly__linked__list_8h_source.html" title=" " alt="" coords="2207,79,2361,119"/>
-<area shape="rect" id="node27" href="$singly__linked__list_8h.html" title="The Singly Linked List Interface." alt="" coords="2084,174,2255,199"/>
-<area shape="rect" id="node28" href="$impl__tree_8h_source.html" title=" " alt="" coords="2439,86,2593,111"/>
-<area shape="rect" id="node30" href="$ordered__map_8h.html" title="The Ordered Map Interface." alt="" coords="2322,262,2467,287"/>
-<area shape="rect" id="node32" href="$ordered__multimap_8h.html" title="The Ordered Multimap Interface." alt="" coords="2617,262,2796,287"/>
+<area shape="rect" id="node22" href="$impl__ordered__map_8h_source.html" title=" " alt="" coords="1725,79,1891,119"/>
+<area shape="rect" id="node23" href="$ordered__map_8h.html" title="The Ordered Map Interface." alt="" coords="1702,174,1847,199"/>
+<area shape="rect" id="node24" href="$impl__ordered__multimap_8h_source.html" title=" " alt="" coords="1967,79,2134,119"/>
+<area shape="rect" id="node25" href="$ordered__multimap_8h.html" title="The Ordered Multimap Interface." alt="" coords="1872,174,2051,199"/>
+<area shape="rect" id="node26" href="$impl__priority__queue_8h_source.html" title=" " alt="" coords="2209,79,2372,119"/>
+<area shape="rect" id="node27" href="$priority__queue_8h.html" title="The Priority Queue Interface." alt="" coords="2095,174,2249,199"/>
+<area shape="rect" id="node28" href="$impl__realtime__ordered__map_8h_source.html" title=" " alt="" coords="2447,79,2617,119"/>
+<area shape="rect" id="node29" href="$realtime__ordered__map_8h.html" title="The Realtime Ordered Map Interface." alt="" coords="2330,167,2489,207"/>
+<area shape="rect" id="node30" href="$impl__singly__linked__list_8h_source.html" title=" " alt="" coords="2692,79,2847,119"/>
+<area shape="rect" id="node31" href="$singly__linked__list_8h.html" title="The Singly Linked List Interface." alt="" coords="2569,174,2740,199"/>
 <area shape="rect" id="node4" href="$impl__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="748,255,927,295"/>
 <area shape="rect" id="node7" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="1452,504,1545,529"/>
-<area shape="rect" id="node29" href="$impl__ordered__map_8h_source.html" title=" " alt="" coords="2433,167,2599,207"/>
-<area shape="rect" id="node31" href="$impl__ordered__multimap_8h_source.html" title=" " alt="" coords="2623,167,2790,207"/>
 </map>

@@ -229,9 +229,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a5bcc2bddcba3de980eff5c3142ba3687"><td class="memItemLeft" align="right" valign="top"><a class="el" href="doubly__linked__list_8h.html#ae6ab05fc0a5ac5f5d8ff31103209edf0">ccc_dll_elem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a5bcc2bddcba3de980eff5c3142ba3687">ccc_dll_end_sentinel</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a5bcc2bddcba3de980eff5c3142ba3687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a handle to the sentinel at the back of the list. O(1).  <br /></td></tr>
 <tr class="separator:a5bcc2bddcba3de980eff5c3142ba3687"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe0c0cfacb09e26c29cb9652a5dc2eb5"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#afe0c0cfacb09e26c29cb9652a5dc2eb5">ccc_dll_size</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
-<tr class="memdesc:afe0c0cfacb09e26c29cb9652a5dc2eb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the list. O(1).  <br /></td></tr>
-<tr class="separator:afe0c0cfacb09e26c29cb9652a5dc2eb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53088ade0cead779d52b6d18ab756dfc"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a53088ade0cead779d52b6d18ab756dfc">ccc_dll_size</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
+<tr class="memdesc:a53088ade0cead779d52b6d18ab756dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the list. O(1).  <br /></td></tr>
+<tr class="separator:a53088ade0cead779d52b6d18ab756dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26fadbf1179184c38de32f7f34388784"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a26fadbf1179184c38de32f7f34388784">ccc_dll_is_empty</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a26fadbf1179184c38de32f7f34388784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return if the size of the list is equal to 0. O(1).  <br /></td></tr>
 <tr class="separator:a26fadbf1179184c38de32f7f34388784"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1159,14 +1159,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="afe0c0cfacb09e26c29cb9652a5dc2eb5" name="afe0c0cfacb09e26c29cb9652a5dc2eb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe0c0cfacb09e26c29cb9652a5dc2eb5">&#9670;&#160;</a></span>ccc_dll_size()</h2>
+<a id="a53088ade0cead779d52b6d18ab756dfc" name="a53088ade0cead779d52b6d18ab756dfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53088ade0cead779d52b6d18ab756dfc">&#9670;&#160;</a></span>ccc_dll_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ccc_dll_size </td>
+          <td class="memname">ptrdiff_t ccc_dll_size </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> const *&#160;</td>
           <td class="paramname"><em>l</em></td><td>)</td>
@@ -1182,7 +1182,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the list or 0 if empty or l is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the list. -1 if l is NULL. </dd></dl>
 
 </div>
 </div>

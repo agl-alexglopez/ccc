@@ -112,8 +112,8 @@ $(document).ready(function(){initNavTree('impl__flat__priority__queue_8h_source.
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment">/*========================    Private Interface     =========================*/</span></div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keywordtype">size_t</span> ccc_impl_fpq_bubble_up(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">char</span>[], <span class="keywordtype">size_t</span>);</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keywordtype">void</span> ccc_impl_fpq_in_place_heapify(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">size_t</span> n);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>ptrdiff_t ccc_impl_fpq_bubble_up(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">char</span>[], ptrdiff_t);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keywordtype">void</span> ccc_impl_fpq_in_place_heapify(<span class="keyword">struct</span> ccc_fpq_ *, ptrdiff_t n);</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keywordtype">void</span> *ccc_impl_fpq_update_fixup(<span class="keyword">struct</span> ccc_fpq_ *, <span class="keywordtype">void</span> *);</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment">/*======================    Macro Implementations    ========================*/</span></div>
@@ -149,7 +149,7 @@ $(document).ready(function(){initNavTree('impl__flat__priority__queue_8h_source.
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">            ccc_result const extra_space_ = ccc_buf_alloc(                     \</span></div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">                &amp;fpq_-&gt;buf_, ccc_buf_capacity(&amp;fpq_-&gt;buf_) * 2,                \</span></div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">                fpq_-&gt;buf_.alloc_);                                            \</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">            if (extra_space_ == CCC_OK)                                        \</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">            if (extra_space_ == CCC_RESULT_OK)                                 \</span></div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">            {                                                                  \</span></div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">                fpq_res_ = ccc_buf_back(&amp;fpq_-&gt;buf_);                          \</span></div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">            }                                                                  \</span></div>

@@ -246,77 +246,80 @@ $(document).ready(function(){initNavTree('traits_8h_source.html',''); initResiza
 <div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span> </div>
 <div class="line"><a id="l00517" name="l00517"></a><span class="lineno"><a class="line" href="traits_8h.html#a8ea3c5bf94e993a25b0e7a81ed27e6f2">  517</a></span><span class="preprocessor">#define ccc_size(container_ptr) ccc_impl_size(container_ptr)</span></div>
 <div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span> </div>
-<div class="line"><a id="l00524" name="l00524"></a><span class="lineno"><a class="line" href="traits_8h.html#a51b0dfe6f76dc41c8dda1731608fb926">  524</a></span><span class="preprocessor">#define ccc_is_empty(container_ptr) ccc_impl_is_empty(container_ptr)</span></div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno"><a class="line" href="traits_8h.html#aae688bdaa0dcc56b89e62081bcca734b">  524</a></span><span class="preprocessor">#define ccc_capacity(container_ptr) ccc_impl_capacity(container_ptr)</span></div>
 <div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span> </div>
-<div class="line"><a id="l00531" name="l00531"></a><span class="lineno"><a class="line" href="traits_8h.html#a0f910a1f06c9cfbef6da895928ef325e">  531</a></span><span class="preprocessor">#define ccc_validate(container_ptr) ccc_impl_validate(container_ptr)</span></div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno"><a class="line" href="traits_8h.html#a51b0dfe6f76dc41c8dda1731608fb926">  531</a></span><span class="preprocessor">#define ccc_is_empty(container_ptr) ccc_impl_is_empty(container_ptr)</span></div>
 <div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span> </div>
-<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span><span class="preprocessor">#ifdef TRAITS_USING_NAMESPACE_CCC</span></div>
-<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span><span class="preprocessor">#    define swap_entry(args...) ccc_swap_entry(args)</span></div>
-<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span><span class="preprocessor">#    define swap_entry_r(args...) ccc_swap_entry_r(args)</span></div>
-<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span><span class="preprocessor">#    define swap_handle(args...) ccc_swap_handle(args)</span></div>
-<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span><span class="preprocessor">#    define swap_handle_r(args...) ccc_swap_handle_r(args)</span></div>
-<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span><span class="preprocessor">#    define try_insert(args...) ccc_try_insert(args)</span></div>
-<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span><span class="preprocessor">#    define insert_or_assign(args...) ccc_insert_or_assign(args)</span></div>
-<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span><span class="preprocessor">#    define insert_or_assign_r(args...) ccc_insert_or_assign_r(args)</span></div>
-<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span><span class="preprocessor">#    define try_insert_r(args...) ccc_try_insert_r(args)</span></div>
-<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span><span class="preprocessor">#    define remove(args...) ccc_remove(args)</span></div>
-<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span><span class="preprocessor">#    define remove_r(args...) ccc_remove_r(args)</span></div>
-<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span><span class="preprocessor">#    define remove_entry(args...) ccc_remove_entry(args)</span></div>
-<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span><span class="preprocessor">#    define remove_entry_r(args...) ccc_remove_entry_r(args)</span></div>
-<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span><span class="preprocessor">#    define remove_handle(args...) ccc_remove_handle(args)</span></div>
-<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span><span class="preprocessor">#    define remove_handle_r(args...) ccc_remove_handle_r(args)</span></div>
-<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span><span class="preprocessor">#    define entry(args...) ccc_entry(args)</span></div>
-<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span><span class="preprocessor">#    define entry_r(args...) ccc_entry_r(args)</span></div>
-<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span><span class="preprocessor">#    define handle(args...) ccc_handle(args)</span></div>
-<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span><span class="preprocessor">#    define handle_r(args...) ccc_handle_r(args)</span></div>
-<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span><span class="preprocessor">#    define or_insert(args...) ccc_or_insert(args)</span></div>
-<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span><span class="preprocessor">#    define insert_entry(args...) ccc_insert_entry(args)</span></div>
-<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span><span class="preprocessor">#    define insert_handle(args...) ccc_insert_handle(args)</span></div>
-<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span><span class="preprocessor">#    define and_modify(args...) ccc_and_modify(args)</span></div>
-<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span><span class="preprocessor">#    define and_modify_aux(args...) ccc_and_modify_aux(args)</span></div>
-<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span><span class="preprocessor">#    define occupied(args...) ccc_occupied(args)</span></div>
-<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span><span class="preprocessor">#    define insert_error(args...) ccc_insert_error(args)</span></div>
-<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span><span class="preprocessor">#    define unwrap(args...) ccc_unwrap(args)</span></div>
-<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span> </div>
-<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span><span class="preprocessor">#    define push(args...) ccc_push(args)</span></div>
-<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span><span class="preprocessor">#    define push_back(args...) ccc_push_back(args)</span></div>
-<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span><span class="preprocessor">#    define push_front(args...) ccc_push_front(args)</span></div>
-<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span><span class="preprocessor">#    define pop(args...) ccc_pop(args)</span></div>
-<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span><span class="preprocessor">#    define pop_front(args...) ccc_pop_front(args)</span></div>
-<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span><span class="preprocessor">#    define pop_back(args...) ccc_pop_back(args)</span></div>
-<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span><span class="preprocessor">#    define front(args...) ccc_front(args)</span></div>
-<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span><span class="preprocessor">#    define back(args...) ccc_back(args)</span></div>
-<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span><span class="preprocessor">#    define update(args...) ccc_update(args)</span></div>
-<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span><span class="preprocessor">#    define increase(args...) ccc_increase(args)</span></div>
-<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span><span class="preprocessor">#    define decrease(args...) ccc_decrease(args)</span></div>
-<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span><span class="preprocessor">#    define erase(args...) ccc_erase(args)</span></div>
-<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span><span class="preprocessor">#    define extract(args...) ccc_extract(args)</span></div>
-<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span><span class="preprocessor">#    define extract_range(args...) ccc_extract_range(args)</span></div>
-<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span> </div>
-<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span><span class="preprocessor">#    define get_key_val(args...) ccc_get_key_val(args)</span></div>
-<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span><span class="preprocessor">#    define get_mut(args...) ccc_get_key_val_mut(args)</span></div>
-<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span><span class="preprocessor">#    define contains(args...) ccc_contains(args)</span></div>
-<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span> </div>
-<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span><span class="preprocessor">#    define begin(args...) ccc_begin(args)</span></div>
-<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span><span class="preprocessor">#    define rbegin(args...) ccc_rbegin(args)</span></div>
-<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span><span class="preprocessor">#    define next(args...) ccc_next(args)</span></div>
-<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span><span class="preprocessor">#    define rnext(args...) ccc_rnext(args)</span></div>
-<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span><span class="preprocessor">#    define end(args...) ccc_end(args)</span></div>
-<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span><span class="preprocessor">#    define rend(args...) ccc_rend(args)</span></div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno"><a class="line" href="traits_8h.html#a0f910a1f06c9cfbef6da895928ef325e">  538</a></span><span class="preprocessor">#define ccc_validate(container_ptr) ccc_impl_validate(container_ptr)</span></div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span> </div>
+<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span><span class="preprocessor">#ifdef TRAITS_USING_NAMESPACE_CCC</span></div>
+<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span><span class="preprocessor">#    define swap_entry(args...) ccc_swap_entry(args)</span></div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span><span class="preprocessor">#    define swap_entry_r(args...) ccc_swap_entry_r(args)</span></div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span><span class="preprocessor">#    define swap_handle(args...) ccc_swap_handle(args)</span></div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span><span class="preprocessor">#    define swap_handle_r(args...) ccc_swap_handle_r(args)</span></div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span><span class="preprocessor">#    define try_insert(args...) ccc_try_insert(args)</span></div>
+<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span><span class="preprocessor">#    define insert_or_assign(args...) ccc_insert_or_assign(args)</span></div>
+<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span><span class="preprocessor">#    define insert_or_assign_r(args...) ccc_insert_or_assign_r(args)</span></div>
+<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span><span class="preprocessor">#    define try_insert_r(args...) ccc_try_insert_r(args)</span></div>
+<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span><span class="preprocessor">#    define remove(args...) ccc_remove(args)</span></div>
+<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span><span class="preprocessor">#    define remove_r(args...) ccc_remove_r(args)</span></div>
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span><span class="preprocessor">#    define remove_entry(args...) ccc_remove_entry(args)</span></div>
+<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span><span class="preprocessor">#    define remove_entry_r(args...) ccc_remove_entry_r(args)</span></div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span><span class="preprocessor">#    define remove_handle(args...) ccc_remove_handle(args)</span></div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span><span class="preprocessor">#    define remove_handle_r(args...) ccc_remove_handle_r(args)</span></div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span><span class="preprocessor">#    define entry(args...) ccc_entry(args)</span></div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span><span class="preprocessor">#    define entry_r(args...) ccc_entry_r(args)</span></div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span><span class="preprocessor">#    define handle(args...) ccc_handle(args)</span></div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span><span class="preprocessor">#    define handle_r(args...) ccc_handle_r(args)</span></div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span><span class="preprocessor">#    define or_insert(args...) ccc_or_insert(args)</span></div>
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span><span class="preprocessor">#    define insert_entry(args...) ccc_insert_entry(args)</span></div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span><span class="preprocessor">#    define insert_handle(args...) ccc_insert_handle(args)</span></div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span><span class="preprocessor">#    define and_modify(args...) ccc_and_modify(args)</span></div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span><span class="preprocessor">#    define and_modify_aux(args...) ccc_and_modify_aux(args)</span></div>
+<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span><span class="preprocessor">#    define occupied(args...) ccc_occupied(args)</span></div>
+<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span><span class="preprocessor">#    define insert_error(args...) ccc_insert_error(args)</span></div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span><span class="preprocessor">#    define unwrap(args...) ccc_unwrap(args)</span></div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span> </div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span><span class="preprocessor">#    define push(args...) ccc_push(args)</span></div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span><span class="preprocessor">#    define push_back(args...) ccc_push_back(args)</span></div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span><span class="preprocessor">#    define push_front(args...) ccc_push_front(args)</span></div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span><span class="preprocessor">#    define pop(args...) ccc_pop(args)</span></div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span><span class="preprocessor">#    define pop_front(args...) ccc_pop_front(args)</span></div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span><span class="preprocessor">#    define pop_back(args...) ccc_pop_back(args)</span></div>
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span><span class="preprocessor">#    define front(args...) ccc_front(args)</span></div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span><span class="preprocessor">#    define back(args...) ccc_back(args)</span></div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span><span class="preprocessor">#    define update(args...) ccc_update(args)</span></div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span><span class="preprocessor">#    define increase(args...) ccc_increase(args)</span></div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span><span class="preprocessor">#    define decrease(args...) ccc_decrease(args)</span></div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span><span class="preprocessor">#    define erase(args...) ccc_erase(args)</span></div>
+<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span><span class="preprocessor">#    define extract(args...) ccc_extract(args)</span></div>
+<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span><span class="preprocessor">#    define extract_range(args...) ccc_extract_range(args)</span></div>
+<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span> </div>
+<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span><span class="preprocessor">#    define get_key_val(args...) ccc_get_key_val(args)</span></div>
+<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span><span class="preprocessor">#    define get_mut(args...) ccc_get_key_val_mut(args)</span></div>
+<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span><span class="preprocessor">#    define contains(args...) ccc_contains(args)</span></div>
 <div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span> </div>
-<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span><span class="preprocessor">#    define equal_range(args...) ccc_equal_range(args)</span></div>
-<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span><span class="preprocessor">#    define equal_rrange(args...) ccc_equal_rrange(args)</span></div>
-<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span><span class="preprocessor">#    define equal_range_r(args...) ccc_equal_range_r(args)</span></div>
-<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span><span class="preprocessor">#    define equal_rrange_r(args...) ccc_equal_rrange_r(args)</span></div>
-<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span><span class="preprocessor">#    define splice(args...) ccc_splice(args)</span></div>
-<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span><span class="preprocessor">#    define splice_range(args...) ccc_splice_range(args)</span></div>
+<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span><span class="preprocessor">#    define begin(args...) ccc_begin(args)</span></div>
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span><span class="preprocessor">#    define rbegin(args...) ccc_rbegin(args)</span></div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span><span class="preprocessor">#    define next(args...) ccc_next(args)</span></div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span><span class="preprocessor">#    define rnext(args...) ccc_rnext(args)</span></div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span><span class="preprocessor">#    define end(args...) ccc_end(args)</span></div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span><span class="preprocessor">#    define rend(args...) ccc_rend(args)</span></div>
 <div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span> </div>
-<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span><span class="preprocessor">#    define size(args...) ccc_size(args)</span></div>
-<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span><span class="preprocessor">#    define is_empty(args...) ccc_is_empty(args)</span></div>
-<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span><span class="preprocessor">#    define validate(args...) ccc_validate(args)</span></div>
-<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_USING_NAMESPACE_CCC */</span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span> </div>
-<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_TRAITS_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span><span class="preprocessor">#    define equal_range(args...) ccc_equal_range(args)</span></div>
+<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span><span class="preprocessor">#    define equal_rrange(args...) ccc_equal_rrange(args)</span></div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span><span class="preprocessor">#    define equal_range_r(args...) ccc_equal_range_r(args)</span></div>
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span><span class="preprocessor">#    define equal_rrange_r(args...) ccc_equal_rrange_r(args)</span></div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span><span class="preprocessor">#    define splice(args...) ccc_splice(args)</span></div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span><span class="preprocessor">#    define splice_range(args...) ccc_splice_range(args)</span></div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span> </div>
+<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span><span class="preprocessor">#    define size(args...) ccc_size(args)</span></div>
+<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span><span class="preprocessor">#    define capacity(args...) ccc_capacity(args)</span></div>
+<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span><span class="preprocessor">#    define is_empty(args...) ccc_is_empty(args)</span></div>
+<div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span><span class="preprocessor">#    define validate(args...) ccc_validate(args)</span></div>
+<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_USING_NAMESPACE_CCC */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span> </div>
+<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_TRAITS_H */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

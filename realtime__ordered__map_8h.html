@@ -272,9 +272,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
 </td></tr>
-<tr class="memitem:a9f48f729d955f8c205673ef3146a2b19"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a9f48f729d955f8c205673ef3146a2b19">ccc_rom_size</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
-<tr class="memdesc:a9f48f729d955f8c205673ef3146a2b19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
-<tr class="separator:a9f48f729d955f8c205673ef3146a2b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad154ef69c0db54a8908122224b005b63"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#ad154ef69c0db54a8908122224b005b63">ccc_rom_size</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
+<tr class="memdesc:ad154ef69c0db54a8908122224b005b63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
+<tr class="separator:ad154ef69c0db54a8908122224b005b63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76ecd3f9123633f58c0cc7d00226b710"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a76ecd3f9123633f58c0cc7d00226b710">ccc_rom_is_empty</a> (<a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *rom)</td></tr>
 <tr class="memdesc:a76ecd3f9123633f58c0cc7d00226b710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
 <tr class="separator:a76ecd3f9123633f58c0cc7d00226b710"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1781,14 +1781,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a9f48f729d955f8c205673ef3146a2b19" name="a9f48f729d955f8c205673ef3146a2b19"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f48f729d955f8c205673ef3146a2b19">&#9670;&#160;</a></span>ccc_rom_size()</h2>
+<a id="ad154ef69c0db54a8908122224b005b63" name="ad154ef69c0db54a8908122224b005b63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad154ef69c0db54a8908122224b005b63">&#9670;&#160;</a></span>ccc_rom_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ccc_rom_size </td>
+          <td class="memname">ptrdiff_t ccc_rom_size </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#af95aa6d6e35234cabe7b3f7c4101175c">ccc_realtime_ordered_map</a> const *&#160;</td>
           <td class="paramname"><em>rom</em></td><td>)</td>
@@ -1804,7 +1804,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size_t size. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size or -1 if rom is NULL. </dd></dl>
 
 </div>
 </div>

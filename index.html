@@ -129,10 +129,10 @@ bitset.h (dropdown)</summary>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="bitset_8h.html">ccc/bitset.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">ccc/types.h</a>&quot;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="preprocessor">#define DIGITS 9ULL</span></div>
+<div class="line"><span class="preprocessor">#define DIGITS 9L</span></div>
 <div class="line"><span class="preprocessor">#define ROWS DIGITS</span></div>
 <div class="line"><span class="preprocessor">#define COLS DIGITS</span></div>
-<div class="line"><span class="preprocessor">#define BOX_SIZE 3ULL</span></div>
+<div class="line"><span class="preprocessor">#define BOX_SIZE 3L</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* clang-format off */</span></div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">int</span> <span class="keyword">const</span> valid_board[9][9] =</div>
@@ -165,22 +165,22 @@ bitset.h (dropdown)</summary>
 <div class="line"><span class="comment">/* Returns if the box is valid (CCC_TRUE if valid CCC_FALSE if not). */</span></div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a></div>
 <div class="line">validate_sudoku_box(<span class="keywordtype">int</span> <span class="keyword">const</span> board[9][9], bitset *<span class="keyword">const</span> row_check,</div>
-<div class="line">                    bitset *<span class="keyword">const</span> col_check, <span class="keywordtype">size_t</span> <span class="keyword">const</span> row_start,</div>
-<div class="line">                    <span class="keywordtype">size_t</span> <span class="keyword">const</span> col_start)</div>
+<div class="line">                    bitset *<span class="keyword">const</span> col_check, ptrdiff_t <span class="keyword">const</span> row_start,</div>
+<div class="line">                    ptrdiff_t <span class="keyword">const</span> col_start)</div>
 <div class="line">{</div>
 <div class="line">    bitset box_check</div>
 <div class="line">        = bs_init((bitblock[bs_blocks(DIGITS)]){}, NULL, NULL, DIGITS, DIGITS);</div>
 <div class="line">    <a class="code hl_enumeration" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> was_on = <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> r = row_start; r &lt; row_start + BOX_SIZE; ++r)</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t r = row_start; r &lt; row_start + BOX_SIZE; ++r)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> c = col_start; c &lt; col_start + BOX_SIZE; ++c)</div>
+<div class="line">        <span class="keywordflow">for</span> (ptrdiff_t c = col_start; c &lt; col_start + BOX_SIZE; ++c)</div>
 <div class="line">        {</div>
 <div class="line">            <span class="keywordflow">if</span> (!board[r][c])</div>
 <div class="line">            {</div>
 <div class="line">                <span class="keywordflow">continue</span>;</div>
 <div class="line">            }</div>
 <div class="line">            <span class="comment">/* Need the zero based digit. */</span></div>
-<div class="line">            <span class="keywordtype">size_t</span> <span class="keyword">const</span> digit = board[r][c] - 1;</div>
+<div class="line">            ptrdiff_t <span class="keyword">const</span> digit = board[r][c] - 1;</div>
 <div class="line">            was_on = bs_set(&amp;box_check, digit, <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>);</div>
 <div class="line">            <span class="keywordflow">if</span> (was_on)</div>
 <div class="line">            {</div>
@@ -214,9 +214,9 @@ bitset.h (dropdown)</summary>
 <div class="line">    bitset col_check</div>
 <div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, NULL, NULL,</div>
 <div class="line">                  COLS * DIGITS, COLS * DIGITS);</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> row = 0; row &lt; ROWS; row += BOX_SIZE)</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t row = 0; row &lt; ROWS; row += BOX_SIZE)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> col = 0; col &lt; COLS; col += BOX_SIZE)</div>
+<div class="line">        <span class="keywordflow">for</span> (ptrdiff_t col = 0; col &lt; COLS; col += BOX_SIZE)</div>
 <div class="line">        {</div>
 <div class="line">            <span class="keywordflow">if</span> (!validate_sudoku_box(board, &amp;row_check, &amp;col_check, row, col))</div>
 <div class="line">            {</div>
@@ -395,7 +395,9 @@ flat_hash_map.h (dropdown)</summary>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> target = 15;</div>
 <div class="line">    <span class="keywordtype">int</span> solution_indices[2] = {-1, -1};</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; (<span class="keyword">sizeof</span>(addends) / <span class="keyword">sizeof</span>(addends[0])); ++i)</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t i = 0;</div>
+<div class="line">         i &lt; (ptrdiff_t)(<span class="keyword">sizeof</span>(addends) / <span class="keyword">sizeof</span>(addends[0]));</div>
+<div class="line">         ++i)</div>
 <div class="line">    {</div>
 <div class="line">        <span class="comment">/* Functions take keys and structs by reference. */</span></div>
 <div class="line">        <span class="keyword">struct </span>key_val const *<span class="keyword">const</span> other_addend</div>
@@ -492,7 +494,7 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line">{</div>
 <div class="line">    handle_hash_map hh;</div>
 <div class="line">    doubly_linked_list l;</div>
-<div class="line">    <span class="keywordtype">size_t</span> cap;</div>
+<div class="line">    ptrdiff_t cap;</div>
 <div class="line">};</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">struct </span>lru_elem</div>
@@ -590,7 +592,7 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line">        found-&gt;val = val;</div>
 <div class="line">        <a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> r = dll_splice(&amp;lru-&gt;l, dll_begin_elem(&amp;lru-&gt;l), &amp;lru-&gt;l,</div>
 <div class="line">                                  &amp;found-&gt;list_elem);</div>
-<div class="line">        assert(r == <a class="code hl_enumvalue" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a>);</div>
+<div class="line">        assert(r == CCC_OK);</div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">else</span></div>
 <div class="line">    {</div>
@@ -625,7 +627,7 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line">    }</div>
 <div class="line">    <a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> r = dll_splice(&amp;lru-&gt;l, dll_begin_elem(&amp;lru-&gt;l), &amp;lru-&gt;l,</div>
 <div class="line">                              &amp;found-&gt;list_elem);</div>
-<div class="line">    assert(r == <a class="code hl_enumvalue" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a>);</div>
+<div class="line">    assert(r == CCC_OK);</div>
 <div class="line">    <span class="keywordflow">return</span> found-&gt;val;</div>
 <div class="line">}</div>
 <div class="line"> </div>
@@ -646,7 +648,7 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line">        {GET, .key = 2, .val = -1, .getter = lru_get},</div>
 <div class="line">        {HED, .key = 4, .val = 4, .header = lru_head},</div>
 <div class="line">    };</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; REQS; ++i)</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t i = 0; i &lt; REQS; ++i)</div>
 <div class="line">    {</div>
 <div class="line">        <span class="keywordflow">switch</span> (requests[i].call)</div>
 <div class="line">        {</div>
@@ -683,7 +685,6 @@ handle_hash_map.h (dropdown)</summary>
 <div class="line">}</div>
 <div class="ttc" id="ahandle__hash__map_8h_html"><div class="ttname"><a href="handle__hash__map_8h.html">handle_hash_map.h</a></div><div class="ttdoc">The Handle Hash Map Interface.</div></div>
 <div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:127</div></div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846">CCC_OK</a></div><div class="ttdeci">@ CCC_OK</div><div class="ttdef"><b>Definition:</b> types.h:129</div></div>
 <div class="ttc" id="atypes_8h_html_a3802af9257ee4d2f9df5409bae63f0a7"><div class="ttname"><a href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a></div><div class="ttdeci">union ccc_handle_ ccc_handle</div><div class="ttdoc">An Occupied or Vacant handle to a flat searchable container entry.</div><div class="ttdef"><b>Definition:</b> types.h:66</div></div>
 </div><!-- fragment --><p></p>
 </details>
@@ -870,9 +871,9 @@ ordered_map.h (dropdown)</summary>
 <div class="line">    ordered_map om = om_init(om, <span class="keyword">struct</span> name, e, name, kval_cmp, NULL, NULL);</div>
 <div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> sorted_names[5]</div>
 <div class="line">        = {<span class="stringliteral">&quot;Ferris&quot;</span>, <span class="stringliteral">&quot;Glenda&quot;</span>, <span class="stringliteral">&quot;Rocky&quot;</span>, <span class="stringliteral">&quot;Tux&quot;</span>, <span class="stringliteral">&quot;Ziggy&quot;</span>};</div>
-<div class="line">    <span class="keywordtype">size_t</span> <span class="keyword">const</span> size = <span class="keyword">sizeof</span>(sorted_names) / <span class="keyword">sizeof</span>(sorted_names[0]);</div>
-<div class="line">    <span class="keywordtype">size_t</span> j = 7 % size;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size; ++i, j = (j + 7) % size)</div>
+<div class="line">    ptrdiff_t <span class="keyword">const</span> size = <span class="keyword">sizeof</span>(sorted_names) / <span class="keyword">sizeof</span>(sorted_names[0]);</div>
+<div class="line">    ptrdiff_t j = 7 % size;</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t i = 0; i &lt; size; ++i, j = (j + 7) % size)</div>
 <div class="line">    {</div>
 <div class="line">        nodes[size(&amp;om)].name = sorted_names[j];</div>
 <div class="line">        <a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = insert_or_assign(&amp;om, &amp;nodes[size(&amp;om)].e);</div>
@@ -942,10 +943,11 @@ ordered_multimap.h (dropdown)</summary>
 <div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> sorted_repeat_names[10]</div>
 <div class="line">        = {<span class="stringliteral">&quot;Ferris&quot;</span>, <span class="stringliteral">&quot;Ferris&quot;</span>, <span class="stringliteral">&quot;Glenda&quot;</span>, <span class="stringliteral">&quot;Glenda&quot;</span>, <span class="stringliteral">&quot;Rocky&quot;</span>,</div>
 <div class="line">           <span class="stringliteral">&quot;Rocky&quot;</span>,  <span class="stringliteral">&quot;Tux&quot;</span>,    <span class="stringliteral">&quot;Tux&quot;</span>,    <span class="stringliteral">&quot;Ziggy&quot;</span>,  <span class="stringliteral">&quot;Ziggy&quot;</span>};</div>
-<div class="line">    <span class="keywordtype">size_t</span> <span class="keyword">const</span> size</div>
-<div class="line">        = <span class="keyword">sizeof</span>(sorted_repeat_names) / <span class="keyword">sizeof</span>(sorted_repeat_names[0]);</div>
-<div class="line">    <span class="keywordtype">size_t</span> j = 11 % size;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size; ++i, j = (j + 11) % size)</div>
+<div class="line">    ptrdiff_t <span class="keyword">const</span> size =</div>
+<div class="line">        (ptrdiff_t)(<span class="keyword">sizeof</span>(sorted_repeat_names)</div>
+<div class="line">                    / <span class="keyword">sizeof</span>(sorted_repeat_names[0]));</div>
+<div class="line">    ptrdiff_t j = 11 % size;</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t i = 0; i &lt; size; ++i, j = (j + 11) % size)</div>
 <div class="line">    {</div>
 <div class="line">        nodes[size(&amp;om)].name = sorted_repeat_names[j];</div>
 <div class="line">        <a class="code hl_typedef" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> e = insert(&amp;om, &amp;nodes[size(&amp;om)].e);</div>
@@ -1001,7 +1003,9 @@ priority_queue.h (dropdown)</summary>
 <div class="line">    <span class="keyword">struct </span>val elems[5]</div>
 <div class="line">        = {{.val = 3}, {.val = 3}, {.val = 7}, {.val = -1}, {.val = 5}};</div>
 <div class="line">    priority_queue pq = pq_init(<span class="keyword">struct</span> val, elem, <a class="code hl_enumvalue" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a>, val_cmp, NULL, NULL);</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <span class="keyword">sizeof</span>(elems) / <span class="keyword">sizeof</span>(elems[0]); ++i)</div>
+<div class="line">    <span class="keywordflow">for</span> (ptrdiff_t i = 0;</div>
+<div class="line">         i &lt; (ptrdiff_t)(<span class="keyword">sizeof</span>(elems) / <span class="keyword">sizeof</span>(elems[0]));</div>
+<div class="line">         ++i)</div>
 <div class="line">    {</div>
 <div class="line">        <span class="keyword">struct </span>val const *<span class="keyword">const</span> v = push(&amp;pq, &amp;elems[i].elem);</div>
 <div class="line">        assert(v &amp;&amp; v-&gt;val == elems[i].val);</div>
@@ -1317,12 +1321,12 @@ Rust's Entry Interface</h2>
 <div class="line">    homap_elem e;</div>
 <div class="line">} word;</div>
 <div class="line"><span class="comment">/* Increment a found word or insert a default count of 1. */</span></div>
-<div class="line"><a class="code hl_typedef" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a> <span class="keyword">const</span> h =</div>
+<div class="line"><a class="code hl_typedef" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a> <span class="keyword">const</span> h =</div>
 <div class="line">hom_or_insert_w(</div>
 <div class="line">    hom_and_modify_w(handle_r(&amp;hom, &amp;ofs), word, { T-&gt;cnt++; }),</div>
 <div class="line">    (word){.str_arena_offset = ofs, .cnt = 1}</div>
 <div class="line">);</div>
-<div class="ttc" id="atypes_8h_html_a39d707127c6bb25cb76587203582743c"><div class="ttname"><a href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a></div><div class="ttdeci">size_t ccc_handle_i</div><div class="ttdoc">A stable index to user data in a container that uses a flat array as the underlying storage method.</div><div class="ttdef"><b>Definition:</b> types.h:78</div></div>
+<div class="ttc" id="atypes_8h_html_a76289e01c10817251a059f5aeac79fa5"><div class="ttname"><a href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a></div><div class="ttdeci">ptrdiff_t ccc_handle_i</div><div class="ttdoc">A stable index to user data in a container that uses a flat array as the underlying storage method.</div><div class="ttdef"><b>Definition:</b> types.h:78</div></div>
 </div><!-- fragment --><p>This is possible because of the details discussed in the previous section. Containers can always provide the user type stored in the container directly. However, there are other options to achieve the same result.</p>
 <p>Some C++ associative container interfaces have also been adapted to the Entry Interface.</p>
 <ul>
@@ -1379,7 +1383,7 @@ Traits</h2>
 <div class="line">} word;</div>
 <div class="line"><span class="comment">/* ... Elsewhere generate offset ofs as key. */</span></div>
 <div class="line">word <span class="keywordflow">default</span> = {.str_arena_offset = ofs, .cnt = 1};</div>
-<div class="line"><a class="code hl_typedef" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a> <span class="keyword">const</span> h =</div>
+<div class="line"><a class="code hl_typedef" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a> <span class="keyword">const</span> h =</div>
 <div class="line">    or_insert(and_modify(handle_r(&amp;hom, &amp;ofs), increment), &amp;<span class="keywordflow">default</span>.e);</div>
 </div><!-- fragment --><p>Or the following.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define TRAITS_USING_NAMESPACE_CCC</span></div>

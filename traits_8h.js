@@ -4,6 +4,7 @@ var traits_8h =
     [ "ccc_and_modify_aux", "traits_8h.html#a25c5c848da545831e1efa54645aae2dd", null ],
     [ "ccc_back", "traits_8h.html#ac17e62a101d2b926824c550ccc83b347", null ],
     [ "ccc_begin", "traits_8h.html#a504d84577ccbf965001b0707cc67cc57", null ],
+    [ "ccc_capacity", "traits_8h.html#aae688bdaa0dcc56b89e62081bcca734b", null ],
     [ "ccc_contains", "traits_8h.html#a9be78791f2812eee308106b818fa506f", null ],
     [ "ccc_decrease", "traits_8h.html#aa4903300ff492bcc09cb717a7d212fc1", null ],
     [ "ccc_end", "traits_8h.html#ab4f380e9b8de6a32e0f62f7a4ac0cf16", null ],

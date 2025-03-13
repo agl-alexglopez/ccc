@@ -10,7 +10,7 @@ var types_8h =
     [ "ccc_entry", "types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389", null ],
     [ "ccc_entry_status", "types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859", null ],
     [ "ccc_handle", "types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7", null ],
-    [ "ccc_handle_i", "types_8h.html#a39d707127c6bb25cb76587203582743c", null ],
+    [ "ccc_handle_i", "types_8h.html#a76289e01c10817251a059f5aeac79fa5", null ],
     [ "ccc_handle_status", "types_8h.html#a546d4339d75e7b144c85d3e54a841c1b", null ],
     [ "ccc_hash_fn", "types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e", null ],
     [ "ccc_key_cmp_fn", "types_8h.html#a8097dd574e739c360d2fa2d3e5de70db", null ],
@@ -19,11 +19,11 @@ var types_8h =
     [ "ccc_rrange", "types_8h.html#abbe513ff2fb6678559bcbe22e5faca65", null ],
     [ "ccc_update_fn", "types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0", null ],
     [ "ccc_result", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1", [
-      [ "CCC_OK", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a853ea7c8fbdc75323b7f4367105e9846", null ],
-      [ "CCC_NO_ALLOC", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1ad1f0a157e4e58b4362d6bbd1527b57f4", null ],
-      [ "CCC_MEM_ERR", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a85205e3308cd6ef0e0263764938d5d73", null ],
-      [ "CCC_INPUT_ERR", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a87ab32ec108400309c80cdc95a9c1386", null ],
-      [ "CCC_RESULTS_SIZE", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1affeda2cbcf7e1e7ce8748ab587bf969b", null ]
+      [ "CCC_RESULT_OK", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1afbd97cad5eb71401d7341ce5039ceb55", null ],
+      [ "CCC_RESULT_NO_ALLOC", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f", null ],
+      [ "CCC_RESULT_MEM_ERR", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a250ce587ccecccb3fe8d691f0f59b54c", null ],
+      [ "CCC_RESULT_ARG_ERROR", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3", null ],
+      [ "CCC_RESULT_SIZE", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1ac252acd054776d456a9c120df6952c28", null ]
     ] ],
     [ "ccc_threeway_cmp", "types_8h.html#a9958f3004414182c457c71289303ae57", [
       [ "CCC_LES", "types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8", null ],

@@ -152,15 +152,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:adcfa93d4f2921229a42a494adbfc0921"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#adcfa93d4f2921229a42a494adbfc0921">ccc_fpq_decrease_w</a>(fpq_ptr,  T_ptr,  decrease_closure_over_T...)&#160;&#160;&#160;    ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)</td></tr>
 <tr class="memdesc:adcfa93d4f2921229a42a494adbfc0921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the user type stored in the priority queue directly. O(lgN).  <br /></td></tr>
 <tr class="separator:adcfa93d4f2921229a42a494adbfc0921"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ef3dc2632fab0c00dce97c16957beba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ef3dc2632fab0c00dce97c16957beba">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_elem_size)</td></tr>
-<tr class="memdesc:a8ef3dc2632fab0c00dce97c16957beba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
-<tr class="separator:a8ef3dc2632fab0c00dce97c16957beba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f90ef3349b3ec122d044be793a2ba73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0f90ef3349b3ec122d044be793a2ba73">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t n)</td></tr>
-<tr class="memdesc:a0f90ef3349b3ec122d044be793a2ba73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order n elements of the underlying fpq buffer as an fpq.  <br /></td></tr>
-<tr class="separator:a0f90ef3349b3ec122d044be793a2ba73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b186988d4e3b2d9bf01750d6977962f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a5b186988d4e3b2d9bf01750d6977962f">ccc_fpq_alloc</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t new_capacity, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
-<tr class="memdesc:a5b186988d4e3b2d9bf01750d6977962f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Many allocate memory for the fpq.  <br /></td></tr>
-<tr class="separator:a5b186988d4e3b2d9bf01750d6977962f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a855e6b7fc441a40deed6d049130c79cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a855e6b7fc441a40deed6d049130c79cf">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *input_array, ptrdiff_t input_n, size_t input_elem_size)</td></tr>
+<tr class="memdesc:a855e6b7fc441a40deed6d049130c79cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
+<tr class="separator:a855e6b7fc441a40deed6d049130c79cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04d7a5b20d6c6fc3ecd188e3bff2e850"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a04d7a5b20d6c6fc3ecd188e3bff2e850">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, ptrdiff_t n)</td></tr>
+<tr class="memdesc:a04d7a5b20d6c6fc3ecd188e3bff2e850"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order n elements of the underlying fpq buffer as an fpq.  <br /></td></tr>
+<tr class="separator:a04d7a5b20d6c6fc3ecd188e3bff2e850"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f8bcf6c830cd7b6d883d67eddc75de0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a1f8bcf6c830cd7b6d883d67eddc75de0">ccc_fpq_alloc</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, ptrdiff_t new_capacity, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a1f8bcf6c830cd7b6d883d67eddc75de0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Many allocate memory for the fpq.  <br /></td></tr>
+<tr class="separator:a1f8bcf6c830cd7b6d883d67eddc75de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3629428e2a5117d810852fc70c283c8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void const *e)</td></tr>
 <tr class="memdesc:af3629428e2a5117d810852fc70c283c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pushes element pointed to at e into fpq. O(lgN).  <br /></td></tr>
 <tr class="separator:af3629428e2a5117d810852fc70c283c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,18 +203,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a51c6495321c6d46093b06ef01f0c6360"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51c6495321c6d46093b06ef01f0c6360">ccc_fpq_front</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a51c6495321c6d46093b06ef01f0c6360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the front (min or max) element in the fpq. O(1).  <br /></td></tr>
 <tr class="separator:a51c6495321c6d46093b06ef01f0c6360"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2a8298ef1ba25297c29e5705743ac53"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ae2a8298ef1ba25297c29e5705743ac53">ccc_fpq_i</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq, void const *e)</td></tr>
-<tr class="memdesc:ae2a8298ef1ba25297c29e5705743ac53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of an element known to be in the fpq. O(1).  <br /></td></tr>
-<tr class="separator:ae2a8298ef1ba25297c29e5705743ac53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0c76f3d7e3ed207ff526c07b759ce4c5">ccc_fpq_is_empty</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the fpq is empty false if not. O(1).  <br /></td></tr>
 <tr class="separator:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a604abe9e7144e462970f0b2ac8aaa818"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a604abe9e7144e462970f0b2ac8aaa818">ccc_fpq_size</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
-<tr class="memdesc:a604abe9e7144e462970f0b2ac8aaa818"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the fpq.  <br /></td></tr>
-<tr class="separator:a604abe9e7144e462970f0b2ac8aaa818"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fb1a7f6a119f88bce5af506ff95e652"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a5fb1a7f6a119f88bce5af506ff95e652">ccc_fpq_capacity</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
-<tr class="memdesc:a5fb1a7f6a119f88bce5af506ff95e652"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the fpq.  <br /></td></tr>
-<tr class="separator:a5fb1a7f6a119f88bce5af506ff95e652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40453288e18055aa19eca5988c6ad861"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a40453288e18055aa19eca5988c6ad861">ccc_fpq_size</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memdesc:a40453288e18055aa19eca5988c6ad861"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the fpq representing active slots.  <br /></td></tr>
+<tr class="separator:a40453288e18055aa19eca5988c6ad861"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d518efe9ace88fcd6b4c7ddb45c8f50"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a9d518efe9ace88fcd6b4c7ddb45c8f50">ccc_fpq_capacity</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memdesc:a9d518efe9ace88fcd6b4c7ddb45c8f50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the fpq representing total possible slots.  <br /></td></tr>
+<tr class="separator:a9d518efe9ace88fcd6b4c7ddb45c8f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a005d37789d5cc821356252292cba646b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a005d37789d5cc821356252292cba646b">ccc_fpq_data</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a005d37789d5cc821356252292cba646b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the base of the backing array. O(1).  <br /></td></tr>
 <tr class="separator:a005d37789d5cc821356252292cba646b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -586,8 +583,8 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a5b186988d4e3b2d9bf01750d6977962f" name="a5b186988d4e3b2d9bf01750d6977962f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b186988d4e3b2d9bf01750d6977962f">&#9670;&#160;</a></span>ccc_fpq_alloc()</h2>
+<a id="a1f8bcf6c830cd7b6d883d67eddc75de0" name="a1f8bcf6c830cd7b6d883d67eddc75de0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f8bcf6c830cd7b6d883d67eddc75de0">&#9670;&#160;</a></span>ccc_fpq_alloc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -601,7 +598,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">ptrdiff_t&#160;</td>
           <td class="paramname"><em>new_capacity</em>, </td>
         </tr>
         <tr>
@@ -622,7 +619,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">new_capacity</td><td>the desirect capacity for the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_capacity</td><td>the desired capacity for the fpq. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function. May be the same as used on init. </td></tr>
   </table>
   </dd>
@@ -631,14 +628,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a5fb1a7f6a119f88bce5af506ff95e652" name="a5fb1a7f6a119f88bce5af506ff95e652"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fb1a7f6a119f88bce5af506ff95e652">&#9670;&#160;</a></span>ccc_fpq_capacity()</h2>
+<a id="a9d518efe9ace88fcd6b4c7ddb45c8f50" name="a9d518efe9ace88fcd6b4c7ddb45c8f50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d518efe9ace88fcd6b4c7ddb45c8f50">&#9670;&#160;</a></span>ccc_fpq_capacity()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ccc_fpq_capacity </td>
+          <td class="memname">ptrdiff_t ccc_fpq_capacity </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
@@ -647,14 +644,14 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the capacity of the fpq. </p>
+<p>Returns the capacity of the fpq representing total possible slots. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the capacity of the fpq or 0 if fpq is NULL or fpq is empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the capacity of the fpq or -1 if fpq is NULL. </dd></dl>
 
 </div>
 </div>
@@ -962,8 +959,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a8ef3dc2632fab0c00dce97c16957beba" name="a8ef3dc2632fab0c00dce97c16957beba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ef3dc2632fab0c00dce97c16957beba">&#9670;&#160;</a></span>ccc_fpq_heapify()</h2>
+<a id="a855e6b7fc441a40deed6d049130c79cf" name="a855e6b7fc441a40deed6d049130c79cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a855e6b7fc441a40deed6d049130c79cf">&#9670;&#160;</a></span>ccc_fpq_heapify()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -983,7 +980,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">ptrdiff_t&#160;</td>
           <td class="paramname"><em>input_n</em>, </td>
         </tr>
         <tr>
@@ -1015,8 +1012,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a0f90ef3349b3ec122d044be793a2ba73" name="a0f90ef3349b3ec122d044be793a2ba73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f90ef3349b3ec122d044be793a2ba73">&#9670;&#160;</a></span>ccc_fpq_heapify_inplace()</h2>
+<a id="a04d7a5b20d6c6fc3ecd188e3bff2e850" name="a04d7a5b20d6c6fc3ecd188e3bff2e850"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04d7a5b20d6c6fc3ecd188e3bff2e850">&#9670;&#160;</a></span>ccc_fpq_heapify_inplace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1030,7 +1027,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">ptrdiff_t&#160;</td>
           <td class="paramname"><em>n</em>&#160;</td>
         </tr>
         <tr>
@@ -1045,50 +1042,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number n of elements to be ordered. n + 1 must be &lt;= capacity. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number n of elements where 0 &lt; (n + 1) &lt;= capacity. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the heapify operation, ok if successful or an error if fpq is NULL or n is larger than the initialized capacity of the fpq.</dd></dl>
 <p>This is another method to order a heap that already has all the elements one needs sorted. The underlying buffer will be interpreted to have n valid elements starting at index 0 to index n - 1. </p>
-
-</div>
-</div>
-<a id="ae2a8298ef1ba25297c29e5705743ac53" name="ae2a8298ef1ba25297c29e5705743ac53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2a8298ef1ba25297c29e5705743ac53">&#9670;&#160;</a></span>ccc_fpq_i()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ptrdiff_t ccc_fpq_i </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fpq</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>e</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return the index of an element known to be in the fpq. O(1). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>an element known to be in the fpq. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the index of the element known to be in the fpq or -1 if e is out of range of the fpq. </dd></dl>
 
 </div>
 </div>
@@ -1264,14 +1223,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a604abe9e7144e462970f0b2ac8aaa818" name="a604abe9e7144e462970f0b2ac8aaa818"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a604abe9e7144e462970f0b2ac8aaa818">&#9670;&#160;</a></span>ccc_fpq_size()</h2>
+<a id="a40453288e18055aa19eca5988c6ad861" name="a40453288e18055aa19eca5988c6ad861"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40453288e18055aa19eca5988c6ad861">&#9670;&#160;</a></span>ccc_fpq_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ccc_fpq_size </td>
+          <td class="memname">ptrdiff_t ccc_fpq_size </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
@@ -1280,14 +1239,14 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the size of the fpq. </p>
+<p>Returns the size of the fpq representing active slots. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the fpq or 0 if fpq is NULL or fpq is empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the fpq or -1 if fpq is NULL. </dd></dl>
 
 </div>
 </div>
