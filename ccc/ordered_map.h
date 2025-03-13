@@ -38,7 +38,7 @@ insert, and erase and pointer stability.
 
 An ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef union ccc_ordered_map_ ccc_ordered_map;
+typedef struct ccc_omap_ ccc_ordered_map;
 
 /** @brief The intrusive element for the user defined struct being stored in the
 map.
@@ -47,7 +47,7 @@ Note that if allocation is not permitted, insertions functions accepting this
 type as an argument assume it to exist in pre-allocated memory that will exist
 with the appropriate lifetime and scope for the user's needs; the container does
 not allocate or free in this case. */
-typedef union ccc_omap_elem_ ccc_omap_elem;
+typedef struct ccc_omap_elem_ ccc_omap_elem;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
