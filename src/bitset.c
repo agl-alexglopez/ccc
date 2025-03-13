@@ -932,7 +932,7 @@ ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
 /*=======================    Static Helpers    ==============================*/
 
 /* Assumes set size is greater than or equal to subset size. */
-static inline ccc_tribool
+static ccc_tribool
 is_subset_of(struct ccc_bitset_ const *const set,
              struct ccc_bitset_ const *const subset)
 {
@@ -948,9 +948,13 @@ is_subset_of(struct ccc_bitset_ const *const set,
     return CCC_TRUE;
 }
 
-static inline ccc_result
+static ccc_result
 maybe_resize(struct ccc_bitset_ *const bs, ptrdiff_t const to_add)
 {
+    if (to_add < 0 || bs->sz_ < 0 || add_overflow(bs->sz_, to_add))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
     if (bs->sz_ + to_add <= bs->cap_)
     {
         return CCC_RESULT_OK;
@@ -971,7 +975,7 @@ maybe_resize(struct ccc_bitset_ *const bs, ptrdiff_t const to_add)
     return CCC_RESULT_OK;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 first_trailing_one_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                          ptrdiff_t const count)
 {
@@ -1026,7 +1030,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
    linear time. The algorithm aims to efficiently skip as many bits as possible
    while searching for the desired group. This avoids both an O(N^2) runtime and
    the use of any unnecessary modulo or division operations in a hot loop. */
-static inline ptrdiff_t
+static ptrdiff_t
 first_trailing_bits_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                           ptrdiff_t const count, ptrdiff_t const num_bits,
                           ccc_tribool const is_one)
@@ -1100,7 +1104,7 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
    group size of 0 meaning the search for ones will need to continue in the
    next block. This is helpful for the main search loop adding to its start
    index and number of ones found so far. */
-static inline struct group
+static struct group
 max_trailing_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
                   ptrdiff_t const ones_remaining)
 {
@@ -1140,7 +1144,7 @@ max_trailing_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
                           .count = ones_found};
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 first_trailing_zero_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                           ptrdiff_t const count)
 {
@@ -1191,7 +1195,7 @@ first_trailing_zero_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
     return -1;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 first_leading_one_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                         ptrdiff_t const count)
 {
@@ -1243,7 +1247,7 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
     return -1;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 first_leading_bits_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                          ptrdiff_t const count, ptrdiff_t const num_bits,
                          ccc_tribool const is_one)
@@ -1300,7 +1304,7 @@ first_leading_bits_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
     return -1;
 }
 
-static inline struct group
+static struct group
 max_leading_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
                  ptrdiff_t const ones_remaining)
 {
@@ -1328,7 +1332,7 @@ max_leading_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
                           .count = num_ones_found};
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 first_leading_zero_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                          ptrdiff_t const count)
 {
@@ -1383,7 +1387,7 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
    difference between the operations is the return value. Specify the desired
    tribool value to return upon encountering an on bit. For any this is
    CCC_TRUE. For none this is CCC_FALSE. Saves writing two identical fns. */
-static inline ccc_tribool
+static ccc_tribool
 any_or_none_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
                   ptrdiff_t const count, ccc_tribool const ret)
 {
@@ -1434,7 +1438,7 @@ any_or_none_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
 
 /* Check for all on is slightly different from the any or none checks so we
    need a painfully repetitive function. */
-static inline ccc_tribool
+static ccc_tribool
 all_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
           ptrdiff_t const count)
 {

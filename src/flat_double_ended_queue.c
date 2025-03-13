@@ -1,5 +1,7 @@
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "buffer.h"
@@ -30,6 +32,7 @@ static void *push_range(struct ccc_fdeq_ *fdeq, char const *pos, ptrdiff_t n,
 static void *alloc_front(struct ccc_fdeq_ *fdeq);
 static void *alloc_back(struct ccc_fdeq_ *fdeq);
 static ptrdiff_t min(ptrdiff_t a, ptrdiff_t b);
+static ccc_tribool add_overflow(ptrdiff_t a, ptrdiff_t b);
 
 /*==========================     Interface    ===============================*/
 
@@ -421,7 +424,7 @@ ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *const fdeq)
 
 /*======================     Static Helpers    ==============================*/
 
-static inline void *
+static void *
 alloc_front(struct ccc_fdeq_ *const fdeq)
 {
     ccc_tribool const full = maybe_resize(fdeq, 0) != CCC_RESULT_OK;
@@ -439,7 +442,7 @@ alloc_front(struct ccc_fdeq_ *const fdeq)
     return new_slot;
 }
 
-static inline void *
+static void *
 alloc_back(struct ccc_fdeq_ *const fdeq)
 {
     ccc_tribool const full = maybe_resize(fdeq, 0) != CCC_RESULT_OK;
@@ -461,7 +464,7 @@ alloc_back(struct ccc_fdeq_ *const fdeq)
     return new_slot;
 }
 
-static inline ccc_result
+static ccc_result
 push_back_range(struct ccc_fdeq_ *const fdeq, ptrdiff_t const n,
                 char const *elems)
 {
@@ -502,7 +505,7 @@ push_back_range(struct ccc_fdeq_ *const fdeq, ptrdiff_t const n,
     return CCC_RESULT_OK;
 }
 
-static inline ccc_result
+static ccc_result
 push_front_range(struct ccc_fdeq_ *const fdeq, ptrdiff_t const n,
                  char const *elems)
 {
@@ -540,7 +543,7 @@ push_front_range(struct ccc_fdeq_ *const fdeq, ptrdiff_t const n,
     return CCC_RESULT_OK;
 }
 
-static inline void *
+static void *
 push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, ptrdiff_t n,
            char const *elems)
 {
@@ -611,9 +614,14 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, ptrdiff_t n,
     return ccc_buf_at(&fdeq->buf_, pos_i);
 }
 
-static inline ccc_result
+static ccc_result
 maybe_resize(struct ccc_fdeq_ *const q, ptrdiff_t const additional_elems_to_add)
 {
+    if (ccc_buf_size(&q->buf_) < 0 || additional_elems_to_add < 0
+        || add_overflow(ccc_buf_size(&q->buf_), additional_elems_to_add))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
     if (ccc_buf_size(&q->buf_) + additional_elems_to_add
         < ccc_buf_capacity(&q->buf_))
     {
@@ -723,4 +731,10 @@ static inline ptrdiff_t
 min(ptrdiff_t const a, ptrdiff_t const b)
 {
     return a < b ? a : b;
+}
+
+static inline ccc_tribool
+add_overflow(ptrdiff_t const a, ptrdiff_t const b)
+{
+    return PTRDIFF_MAX - b < a;
 }

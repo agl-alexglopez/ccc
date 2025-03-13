@@ -575,7 +575,7 @@ ccc_impl_romap_elem_in_slot(struct ccc_romap_ const *const rom,
 
 /*=========================    Static Helpers    ============================*/
 
-static inline struct ccc_romap_elem_ *
+static struct ccc_romap_elem_ *
 min_max_from(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ *start,
              enum romap_link_ const dir)
 {
@@ -588,7 +588,7 @@ min_max_from(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ *start,
     return start;
 }
 
-static inline struct ccc_rtree_entry_
+static struct ccc_rtree_entry_
 entry(struct ccc_romap_ const *const rom, void const *const key)
 {
     struct romap_query_ const q = find(rom, key);
@@ -613,7 +613,7 @@ entry(struct ccc_romap_ const *const rom, void const *const key)
     };
 }
 
-static inline void *
+static void *
 insert(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const parent,
        ccc_threeway_cmp const last_cmp,
        struct ccc_romap_elem_ *const out_handle)
@@ -638,7 +638,7 @@ insert(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const parent,
     return struct_base(rom, out_handle);
 }
 
-static inline void *
+static void *
 maybe_alloc_insert(struct ccc_romap_ *const rom,
                    struct ccc_romap_elem_ *const parent,
                    ccc_threeway_cmp const last_cmp,
@@ -657,7 +657,7 @@ maybe_alloc_insert(struct ccc_romap_ *const rom,
     return insert(rom, parent, last_cmp, out_handle);
 }
 
-static inline struct romap_query_
+static struct romap_query_
 find(struct ccc_romap_ const *const rom, void const *const key)
 {
     struct ccc_romap_elem_ const *parent = &rom->end_;
@@ -677,7 +677,7 @@ find(struct ccc_romap_ const *const rom, void const *const key)
     return q;
 }
 
-static inline struct ccc_romap_elem_ *
+static struct ccc_romap_elem_ *
 next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
      enum romap_link_ const traversal)
 {
@@ -701,7 +701,7 @@ next(struct ccc_romap_ const *const rom, struct ccc_romap_elem_ const *n,
     return n->parent_;
 }
 
-static inline struct ccc_range_u_
+static struct ccc_range_u_
 equal_range(struct ccc_romap_ const *const rom, void const *const begin_key,
             void const *const end_key, enum romap_link_ const traversal)
 {
@@ -786,7 +786,7 @@ elem_in_slot(struct ccc_romap_ const *const rom, void const *const slot)
 
 /*=======================   WAVL Tree Maintenance   =========================*/
 
-static inline void
+static void
 insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
              struct ccc_romap_elem_ *x)
 {
@@ -824,7 +824,7 @@ insert_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
     }
 }
 
-static inline void *
+static void *
 remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
 {
     assert(remove->branch_[R] && remove->branch_[L]);
@@ -890,7 +890,7 @@ remove_fixup(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove)
     return struct_base(rom, remove);
 }
 
-static inline void
+static void
 rebalance_3_child(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
                   struct ccc_romap_elem_ *x)
 {
@@ -959,7 +959,7 @@ rebalance_3_child(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *z,
     } while (z != &rom->end_ && made_3_child);
 }
 
-static inline void
+static void
 transplant(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const remove,
            struct ccc_romap_elem_ *const replacement)
 {
@@ -991,7 +991,7 @@ and uppercase are arbitrary subtrees.
    A   y              y   C
        │              │
        B              B*/
-static inline void
+static void
 rotate(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const z,
        struct ccc_romap_elem_ *const x, struct ccc_romap_elem_ *const y,
        enum romap_link_ dir)
@@ -1024,7 +1024,7 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
    A   y        A   B C   D
      ╭─┴─╮
      B   C */
-static inline void
+static void
 double_rotate(struct ccc_romap_ *const rom, struct ccc_romap_elem_ *const z,
               struct ccc_romap_elem_ *const x, struct ccc_romap_elem_ *const y,
               enum romap_link_ dir)
@@ -1290,7 +1290,7 @@ is_storing_parent(struct ccc_romap_ const *const t,
            && is_storing_parent(t, root, root->branch_[R]);
 }
 
-static inline ccc_tribool
+static ccc_tribool
 validate(struct ccc_romap_ const *const rom)
 {
     if (!rom->end_.parity_)

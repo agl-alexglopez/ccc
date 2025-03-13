@@ -478,7 +478,7 @@ ccc_impl_omap_elem_in_slot(struct ccc_omap_ const *const t, void const *slot)
 
 /*======================  Static Splay Tree Helpers  ========================*/
 
-static inline struct ccc_otree_entry_
+static struct ccc_otree_entry_
 container_entry(struct ccc_omap_ *const t, void const *const key)
 {
     void *const found = find(t, key);
@@ -524,7 +524,7 @@ empty(struct ccc_omap_ const *const t)
     return !t->size_ || !t->root_ || t->root_ == &t->end_;
 }
 
-static inline void *
+static void *
 max(struct ccc_omap_ const *const t)
 {
     if (!t->size_)
@@ -537,7 +537,7 @@ max(struct ccc_omap_ const *const t)
     return struct_base(t, m);
 }
 
-static inline void *
+static void *
 min(struct ccc_omap_ const *t)
 {
     if (!t->size_)
@@ -550,7 +550,7 @@ min(struct ccc_omap_ const *t)
     return struct_base(t, m);
 }
 
-static inline struct ccc_omap_elem_ const *
+static struct ccc_omap_elem_ const *
 next(struct ccc_omap_ const *const t, struct ccc_omap_elem_ const *n,
      om_branch_ const traversal)
 {
@@ -575,7 +575,7 @@ next(struct ccc_omap_ const *const t, struct ccc_omap_elem_ const *n,
     return p;
 }
 
-static inline struct ccc_range_u_
+static struct ccc_range_u_
 equal_range(struct ccc_omap_ *const t, void const *const begin_key,
             void const *const end_key, om_branch_ const traversal)
 {
@@ -605,7 +605,7 @@ equal_range(struct ccc_omap_ *const t, void const *const begin_key,
     };
 }
 
-static inline void *
+static void *
 find(struct ccc_omap_ *const t, void const *const key)
 {
     if (t->root_ == &t->end_)
@@ -617,14 +617,14 @@ find(struct ccc_omap_ *const t, void const *const key)
                                                      : NULL;
 }
 
-static inline ccc_tribool
+static ccc_tribool
 contains(struct ccc_omap_ *const t, void const *const key)
 {
     t->root_ = splay(t, t->root_, key, t->cmp_);
     return cmp(t, key, t->root_, t->cmp_) == CCC_EQL;
 }
 
-static inline void *
+static void *
 alloc_insert(struct ccc_omap_ *const t, struct ccc_omap_elem_ *out_handle)
 {
     init_node(t, out_handle);
@@ -660,7 +660,7 @@ alloc_insert(struct ccc_omap_ *const t, struct ccc_omap_elem_ *out_handle)
     return connect_new_root(t, out_handle, root_cmp);
 }
 
-static inline void *
+static void *
 insert(struct ccc_omap_ *const t, struct ccc_omap_elem_ *const n)
 {
     init_node(t, n);
@@ -681,7 +681,7 @@ insert(struct ccc_omap_ *const t, struct ccc_omap_elem_ *const n)
     return connect_new_root(t, n, root_cmp);
 }
 
-static inline void *
+static void *
 connect_new_root(struct ccc_omap_ *const t,
                  struct ccc_omap_elem_ *const new_root,
                  ccc_threeway_cmp const cmp_result)
@@ -696,7 +696,7 @@ connect_new_root(struct ccc_omap_ *const t,
     return struct_base(t, new_root);
 }
 
-static inline void *
+static void *
 erase(struct ccc_omap_ *const t, void const *const key)
 {
     if (empty(t))
@@ -715,7 +715,7 @@ erase(struct ccc_omap_ *const t, void const *const key)
     return struct_base(t, ret);
 }
 
-static inline struct ccc_omap_elem_ *
+static struct ccc_omap_elem_ *
 remove_from_tree(struct ccc_omap_ *const t, struct ccc_omap_elem_ *const ret)
 {
     if (ret->branch_[L] == &t->end_)
@@ -731,7 +731,7 @@ remove_from_tree(struct ccc_omap_ *const t, struct ccc_omap_elem_ *const ret)
     return ret;
 }
 
-static inline struct ccc_omap_elem_ *
+static struct ccc_omap_elem_ *
 splay(struct ccc_omap_ *const t, struct ccc_omap_elem_ *root,
       void const *const key, ccc_key_cmp_fn *const cmp_fn)
 {

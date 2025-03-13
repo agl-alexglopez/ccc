@@ -355,7 +355,7 @@ extract_range([[maybe_unused]] struct ccc_sll_ *const sll,
     return sz;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
             struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
 {
@@ -379,7 +379,7 @@ erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
     return sz;
 }
 
-static inline ptrdiff_t
+static ptrdiff_t
 len([[maybe_unused]] struct ccc_sll_ const *const sll,
     struct ccc_sll_elem_ const *begin, struct ccc_sll_elem_ const *const end)
 {
