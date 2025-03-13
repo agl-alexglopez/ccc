@@ -140,8 +140,6 @@ static struct ccc_ent_ entry(struct ccc_fhmap_ *, void const *key,
                              uint64_t hash);
 static struct ccc_fhash_entry_ container_entry(struct ccc_fhmap_ *h,
                                                void const *key);
-static struct ccc_fhash_entry_ *and_modify(struct ccc_fhash_entry_ *e,
-                                           ccc_update_fn *fn);
 static ccc_tribool valid_distance_from_home(struct ccc_fhmap_ const *,
                                             void const *slot);
 static ptrdiff_t to_i(ptrdiff_t capacity, uint64_t hash);
@@ -263,18 +261,20 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
 ccc_fhmap_entry *
 ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_update_fn *const fn)
 {
-    return (ccc_fhmap_entry *)and_modify(&e->impl_, fn);
+    if (e && fn && e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED
+        && e->impl_.entry_.e_)
+    {
+        fn((ccc_user_type){e->impl_.entry_.e_, NULL});
+    }
+    return e;
 }
 
 ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (unlikely(!e))
-    {
-        return NULL;
-    }
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED && fn)
+    if (fn && e && e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED
+        && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){e->impl_.entry_.e_, aux});
     }
@@ -300,7 +300,7 @@ ccc_fhm_swap_entry(ccc_flat_hash_map *const h, ccc_fhmap_elem *const out_handle)
         *hash_at(h, 0) = CCC_FHM_EMPTY;
         return (ccc_entry){{.e_ = user_return, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR || !ent.entry_.e_)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -322,7 +322,7 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h,
     {
         return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR || !ent.entry_.e_)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -349,7 +349,7 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h,
         }
         return (ccc_entry){{.e_ = ent.entry_.e_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (ent.entry_.stats_ & CCC_ENTRY_INSERT_ERROR || !ent.entry_.e_)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
@@ -390,7 +390,7 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, ccc_fhmap_elem *const elem)
     {
         return e->impl_.entry_.e_;
     }
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR || !e->impl_.entry_.e_)
     {
         return NULL;
     }
@@ -841,16 +841,6 @@ container_entry(struct ccc_fhmap_ *const h, void const *const key)
         .hash_ = hash,
         .entry_ = entry(h, key, hash),
     };
-}
-
-static inline struct ccc_fhash_entry_ *
-and_modify(struct ccc_fhash_entry_ *const e, ccc_update_fn *const fn)
-{
-    if (e->entry_.stats_ == CCC_ENTRY_OCCUPIED)
-    {
-        fn((ccc_user_type){e->entry_.e_, NULL});
-    }
-    return e;
 }
 
 static inline ccc_result

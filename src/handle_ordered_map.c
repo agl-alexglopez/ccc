@@ -87,7 +87,7 @@ static ccc_tribool validate(struct ccc_homap_ const *hom);
 
 /* Returning void as miscellaneous helpers. */
 static void init_node(struct ccc_homap_elem_ *e);
-static void swap(char tmp[], void *a, void *b, size_t elem_sz);
+static void swap(char tmp[const], void *a, void *b, size_t elem_sz);
 static void link(struct ccc_homap_ *t, ptrdiff_t parent, enum hom_branch_ dir,
                  ptrdiff_t subtree);
 static ptrdiff_t max(ptrdiff_t, ptrdiff_t);
