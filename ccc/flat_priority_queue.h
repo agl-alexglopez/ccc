@@ -175,7 +175,7 @@ ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
 
 /** @brief Order n elements of the underlying fpq buffer as an fpq.
 @param [in] fpq a pointer to the flat priority queue.
-@param [in] n the number n of elements to be ordered. n + 1 must be <= capacity.
+@param [in] n the number n of elements where  0 < (n + 1) <= capacity.
 @return the result of the heapify operation, ok if successful or an error if
 fpq is NULL or n is larger than the initialized capacity of the fpq.
 
@@ -186,7 +186,7 @@ ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, ptrdiff_t n);
 
 /** @brief Many allocate memory for the fpq.
 @param [in] fpq a pointer to the priority queue.
-@param [in] new_capacity the desirect capacity for the fpq.
+@param [in] new_capacity the desired capacity for the fpq.
 @param [in] fn the allocation function. May be the same as used on init.
 @return OK if allocation was successful or a memory error on failure. */
 ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, ptrdiff_t new_capacity,
@@ -359,14 +359,6 @@ Obtain state from the container. */
 @param [in] fpq a pointer to the priority queue.
 @return A pointer to the front element or NULL if empty or fpq is NULL. */
 [[nodiscard]] void *ccc_fpq_front(ccc_flat_priority_queue const *fpq);
-
-/** @brief Return the index of an element known to be in the fpq. O(1).
-@param [in] fpq a pointer to the priority queue.
-@param [in] e an element known to be in the fpq.
-@return the index of the element known to be in the fpq or -1 if e is out of
-range of the fpq. */
-[[nodiscard]] ptrdiff_t ccc_fpq_i(ccc_flat_priority_queue const *fpq,
-                                  void const *e);
 
 /** @brief Returns true if the fpq is empty false if not. O(1).
 @param [in] fpq a pointer to the flat priority queue.
