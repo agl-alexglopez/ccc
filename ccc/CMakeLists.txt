@@ -26,7 +26,6 @@ target_sources(${PROJECT_NAME}
             FILES 
               impl/impl_types.h
               impl/impl_flat_priority_queue.h
-              impl/impl_tree.h
               impl/impl_priority_queue.h
               impl/impl_ordered_map.h
               impl/impl_handle_ordered_map.h

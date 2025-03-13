@@ -49,7 +49,7 @@ keys.
 
 A ordered multimap may be stored on the stack, heap, or data segment. It can
 be initialized at compile time or runtime.*/
-typedef union ccc_ordered_multimap_ ccc_ordered_multimap;
+typedef struct ccc_ommap_ ccc_ordered_multimap;
 
 /** @brief The intrusive element for the user defined type stored in the
 multimap.
@@ -59,7 +59,7 @@ struct. Note that if allocation is not permitted, insertions functions accepting
 this type as an argument assume it to exist in pre-allocated memory that will
 exist with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. */
-typedef union ccc_ommap_elem_ ccc_ommap_elem;
+typedef struct ccc_ommap_elem_ ccc_ommap_elem;
 
 /** @brief The container specific type to support the Entry Interface.
 
