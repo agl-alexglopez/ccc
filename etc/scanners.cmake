@@ -1,6 +1,7 @@
 file (GLOB PROJ_C_FILES 
   ${CMAKE_SOURCE_DIR}/ccc/*.c 
   ${CMAKE_SOURCE_DIR}/ccc/*.h 
+  ${CMAKE_SOURCE_DIR}/ccc/impl/*.h 
   ${CMAKE_SOURCE_DIR}/src/*.c 
   ${CMAKE_SOURCE_DIR}/src/*.h 
   ${CMAKE_SOURCE_DIR}/samples/*.c 
