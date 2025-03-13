@@ -83,7 +83,7 @@ need to worry about the underlying bit set representation. For example:
 
 ```
 static ccc_bitset b
-    = ccc_bs_init((static ccc_bitblock[ccc_bs_blocks(256)]){}, 256, NULL, NULL);
+    = ccc_bs_init((static ccc_bitblock[ccc_bs_blocks(256)]){}, NULL, NULL, 256);
 ```
 
 The above example also illustrates the benefits of a static compound literal
@@ -93,7 +93,7 @@ more traditional example would look like this.
 
 ```
 static ccc_bitblock blocks[ccc_bs_blocks(256)];
-static ccc_bitset b = ccc_bs_init(blocks, 256, NULL, NULL);
+static ccc_bitset b = ccc_bs_init(blocks, NULL, NULL, 256);
 ```
 
 This macro is required for any initialization where the bit block memory comes
@@ -123,7 +123,7 @@ Or, initialize with zero capacity for a dynamic bit set.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init(NULL, 0, std_alloc, NULL);
+bitset bs = bs_init(NULL, std_alloc, NULL, 0);
 ```
 
 See types.h for more on allocation functions. */
@@ -150,10 +150,10 @@ Manual memory management with no allocation function provided.
 ```
 #define BITSET_USING_NAMESPACE_CCC
 static bitset src
-    = bs_init((static bitblock[bs_blocks(11)]){}, 11, NULL, NULL);
+    = bs_init((static bitblock[bs_blocks(11)]){}, NULL, NULL, 11);
 set_rand_bits(&src);
 static bitset src
-    = bs_init((static bitblock[bs_blocks(13)]){}, 13, NULL, NULL);
+    = bs_init((static bitblock[bs_blocks(13)]){}, NULL, NULL, 13);
 ccc_result res = bs_copy(&dst, &src, NULL);
 ```
 
@@ -162,9 +162,9 @@ is memory management handed over to the copy function.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);
+static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
 push_rand_bits(&src);
-static bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);
+static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
 ccc_result res = bs_copy(&dst, &src, std_alloc);
 ```
 
@@ -175,9 +175,9 @@ size map.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bs_init((bitblock *)NULL, 0, std_alloc, NULL);
+static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
 push_rand_bits(&src);
-static bitset src = bs_init((bitblock *)NULL, 0, NULL, NULL);
+static bitset src = bs_init((bitblock *)NULL, NULL, NULL, 0);
 ccc_result res = bs_copy(&dst, &src, std_alloc);
 ```
 

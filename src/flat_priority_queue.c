@@ -207,17 +207,6 @@ ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
     return at(fpq, 0);
 }
 
-ptrdiff_t
-ccc_fpq_i(ccc_flat_priority_queue const *const fpq, void const *const e)
-{
-    if (!fpq || !e || e < ccc_buf_begin(&fpq->buf_)
-        || e >= ccc_buf_end(&fpq->buf_))
-    {
-        return -1;
-    }
-    return ccc_buf_i(&fpq->buf_, e);
-}
-
 ccc_tribool
 ccc_fpq_is_empty(ccc_flat_priority_queue const *const fpq)
 {
