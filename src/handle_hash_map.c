@@ -121,8 +121,6 @@ static struct ccc_handl_ handle(struct ccc_hhmap_ *, void const *key,
                                 uint64_t hash);
 static struct ccc_hhash_handle_ container_handle(struct ccc_hhmap_ *h,
                                                  void const *key);
-static struct ccc_hhash_handle_ *and_modify(struct ccc_hhash_handle_ *e,
-                                            ccc_update_fn *fn);
 static ccc_tribool valid_distance_from_home(struct ccc_hhmap_ const *,
                                             ptrdiff_t slot);
 static ptrdiff_t to_i(ptrdiff_t capacity, uint64_t hash);
@@ -205,12 +203,12 @@ ccc_handle_i
 ccc_hhm_insert_handle(ccc_hhmap_handle const *const e,
                       ccc_hhmap_elem *const elem)
 {
-    if (unlikely(!e || !elem || e->impl_.handle_.i_ < 0))
+    if (unlikely(!e || !elem || e->impl_.handle_.i_ <= 0))
     {
         return 0;
     }
     void *const user_struct = struct_base(e->impl_.h_, elem);
-    if (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.handle_.i_ > 0)
     {
         copy_to_slot(
             e->impl_.h_,
@@ -219,7 +217,8 @@ ccc_hhm_insert_handle(ccc_hhmap_handle const *const e,
             struct_base(e->impl_.h_, elem));
         return elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_;
     }
-    if (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR
+        || e->impl_.handle_.i_ <= 0)
     {
         return 0;
     }
@@ -251,7 +250,7 @@ ccc_hhm_get_key_val(ccc_handle_hash_map *const h, void const *const key)
 ccc_handle
 ccc_hhm_remove_handle(ccc_hhmap_handle const *const e)
 {
-    if (unlikely(!e || e->impl_.handle_.i_ < 0))
+    if (unlikely(!e || e->impl_.handle_.i_ <= 0))
     {
         return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
@@ -266,14 +265,25 @@ ccc_hhm_remove_handle(ccc_hhmap_handle const *const e)
 ccc_hhmap_handle *
 ccc_hhm_and_modify(ccc_hhmap_handle *const e, ccc_update_fn *const fn)
 {
-    return (ccc_hhmap_handle *)and_modify(&e->impl_, fn);
+    if (unlikely(!e || e->impl_.handle_.i_ <= 0))
+    {
+        return NULL;
+    }
+    if (e->impl_.handle_.stats_ == CCC_ENTRY_OCCUPIED && fn)
+    {
+        fn((ccc_user_type){
+            ccc_buf_at(&e->impl_.h_->buf_,
+                       elem_at(e->impl_.h_, e->impl_.handle_.i_)->slot_i_),
+            NULL});
+    }
+    return e;
 }
 
 ccc_hhmap_handle *
 ccc_hhm_and_modify_aux(ccc_hhmap_handle *const e, ccc_update_fn *const fn,
                        void *const aux)
 {
-    if (unlikely(!e || e->impl_.handle_.i_ < 0))
+    if (unlikely(!e || e->impl_.handle_.i_ <= 0))
     {
         return NULL;
     }
@@ -399,7 +409,7 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
 ccc_handle_i
 ccc_hhm_or_insert(ccc_hhmap_handle const *const e, ccc_hhmap_elem *const elem)
 {
-    if (unlikely(!e || !elem || e->impl_.handle_.i_ < 0))
+    if (unlikely(!e || !elem || e->impl_.handle_.i_ <= 0))
     {
         return 0;
     }
@@ -425,7 +435,7 @@ ccc_handle_i
 ccc_hhm_unwrap(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e || !(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
-                 || e->impl_.handle_.i_ < 0))
+                 || e->impl_.handle_.i_ <= 0))
     {
         return 0;
     }
@@ -487,7 +497,7 @@ ccc_hhm_begin(ccc_handle_hash_map const *const h)
 ccc_result
 ccc_hhm_next(ccc_hhmap_handle *const iter)
 {
-    if (unlikely(!iter || iter->impl_.handle_.i_ < 0))
+    if (unlikely(!iter || iter->impl_.handle_.i_ <= 0))
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -898,18 +908,6 @@ container_handle(struct ccc_hhmap_ *const h, void const *const key)
         .hash_ = hash,
         .handle_ = handle(h, key, hash),
     };
-}
-
-static inline struct ccc_hhash_handle_ *
-and_modify(struct ccc_hhash_handle_ *const e, ccc_update_fn *const fn)
-{
-    if (e->handle_.stats_ == CCC_ENTRY_OCCUPIED)
-    {
-        fn((ccc_user_type){
-            ccc_buf_at(&e->h_->buf_, elem_at(e->h_, e->handle_.i_)->slot_i_),
-            NULL});
-    }
-    return e;
 }
 
 /* A simple memcpy will not work for this table because important metadata for

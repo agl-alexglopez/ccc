@@ -41,7 +41,7 @@ static struct ccc_tree_entry_ container_entry(struct ccc_tree_ *t,
 /* No return value. */
 
 static void init_node(struct ccc_tree_ *, struct ccc_node_ *);
-static void swap(char tmp[], void *, void *, size_t);
+static void swap(char tmp[const], void *, void *, size_t);
 static void link(struct ccc_node_ *, om_branch_, struct ccc_node_ *);
 
 /* Boolean returns */
@@ -128,9 +128,13 @@ ccc_om_insert_entry(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
     }
     if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        elem->impl_ = *elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
-        (void)memcpy(e->impl_.entry_.e_, struct_base(e->impl_.t_, &elem->impl_),
-                     e->impl_.t_->elem_sz_);
+        if (e->impl_.entry_.e_)
+        {
+            elem->impl_ = *elem_in_slot(e->impl_.t_, e->impl_.entry_.e_);
+            (void)memcpy(e->impl_.entry_.e_,
+                         struct_base(e->impl_.t_, &elem->impl_),
+                         e->impl_.t_->elem_sz_);
+        }
         return e->impl_.entry_.e_;
     }
     return alloc_insert(e->impl_.t_, &elem->impl_);
@@ -157,7 +161,7 @@ ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
     {
         return NULL;
     }
-    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
     }
@@ -168,7 +172,8 @@ ccc_omap_entry *
 ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
                       void *const aux)
 {
-    if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED
+        && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
     }
@@ -288,7 +293,7 @@ ccc_om_remove_entry(ccc_omap_entry *const e)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         void *const erased
             = erase(e->impl_.t_, key_in_slot(e->impl_.t_, e->impl_.entry_.e_));
@@ -804,9 +809,9 @@ cmp(struct ccc_tree_ const *const t, void const *const key,
 }
 
 static inline void
-swap(char tmp[], void *const a, void *const b, size_t elem_sz)
+swap(char tmp[const], void *const a, void *const b, size_t elem_sz)
 {
-    if (a == b)
+    if (a == b || !a || !b)
     {
         return;
     }

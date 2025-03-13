@@ -180,7 +180,7 @@ ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_update_fn *const fn)
     {
         return NULL;
     }
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
     }
@@ -195,7 +195,7 @@ ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_update_fn *const fn,
     {
         return NULL;
     }
-    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
     }
@@ -295,7 +295,7 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
     {
         return (ccc_entry){{.e_ = NULL, .stats_ = CCC_ENTRY_ARG_ERROR}};
     }
-    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED)
+    if (e->impl_.entry_.stats_ == CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
         void *const erased = multimap_erase(
             e->impl_.t_, key_in_slot(e->impl_.t_, e->impl_.entry_.e_));
