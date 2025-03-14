@@ -140,7 +140,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     ccc_handle_ordered_map hom
         = hom_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
-    ccc_handle ent = remove(&hom, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_handle ent = ccc_remove(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hom), 0);
@@ -148,7 +148,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hom), 1);
-    ent = remove(&hom, &(struct val){.id = -1, .val = -1}.elem);
+    ent = ccc_remove(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hom), 0);
@@ -161,7 +161,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(fill_n(&hom, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = remove(&hom, &(struct val){.id = i, .val = i}.elem);
+    ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hom), i);
@@ -169,7 +169,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hom), i + 1);
-    ent = remove(&hom, &(struct val){.id = i, .val = i}.elem);
+    ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hom), i);
@@ -181,7 +181,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(fill_n(&hom, size - i, i), PASS);
 
     i = size;
-    ent = remove(&hom, &(struct val){.id = i, .val = i}.elem);
+    ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hom), i);
@@ -189,7 +189,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hom), i + 1);
-    ent = remove(&hom, &(struct val){.id = i, .val = i}.elem);
+    ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hom), i);

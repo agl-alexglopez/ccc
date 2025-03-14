@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
     int size = 30;
-    ccc_handle hndl = remove(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_handle hndl = ccc_remove(&hrm, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm), 0);
@@ -151,7 +151,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm), 1);
     struct val old = {.id = -1};
-    hndl = remove(&hrm, &old.elem);
+    hndl = ccc_remove(&hrm, &old.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm), 0);
@@ -161,7 +161,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    hndl = remove(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = ccc_remove(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm), i);
@@ -170,7 +170,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm), i + 1);
     old = (struct val){.id = i};
-    hndl = remove(&hrm, &old.elem);
+    hndl = ccc_remove(&hrm, &old.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm), i);
@@ -180,7 +180,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    hndl = remove(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = ccc_remove(&hrm, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm), i);
@@ -189,7 +189,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm), i + 1);
     old = (struct val){.id = i};
-    hndl = remove(&hrm, &old.elem);
+    hndl = ccc_remove(&hrm, &old.elem);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm), i);

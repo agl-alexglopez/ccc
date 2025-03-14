@@ -10,7 +10,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -93,7 +92,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]}.elem);
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -120,7 +119,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_no_alloc)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]}.elem);
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -133,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_no_alloc)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]}.elem);
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -159,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_alloc)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]}.elem);
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -172,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_alloc)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle h = remove(&s, &(struct val){.id = id_keys[i]}.elem);
+        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]}.elem);
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }

@@ -1,7 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "checkers.h"

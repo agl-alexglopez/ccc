@@ -144,7 +144,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     ccc_handle_hash_map hh
         = hhm_init((struct val[50]){}, e, key, hhmap_int_to_u64, hhmap_id_eq,
                    NULL, NULL, 50);
-    ccc_handle ent = remove(&hh, &(struct val){.key = -1, .val = -1}.e);
+    ccc_handle ent = ccc_remove(&hh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 0);
@@ -153,7 +153,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 1);
     struct val rem = {.key = -1, .val = -1};
-    ent = remove(&hh, &rem.e);
+    ent = ccc_remove(&hh, &rem.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), 0);
@@ -164,7 +164,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(fill_n(&hh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = remove(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = ccc_remove(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i);
@@ -173,7 +173,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i + 1);
     rem = (struct val){.key = i, .val = i};
-    ent = remove(&hh, &rem.e);
+    ent = ccc_remove(&hh, &rem.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), i);
@@ -183,7 +183,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(fill_n(&hh, size - i, i), PASS);
 
     i = size;
-    ent = remove(&hh, &(struct val){.key = i, .val = i}.e);
+    ent = ccc_remove(&hh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i);
@@ -192,7 +192,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), i + 1);
     rem = (struct val){.key = i, .val = i};
-    ent = remove(&hh, &rem.e);
+    ent = ccc_remove(&hh, &rem.e);
     CHECK(validate(&hh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&hh), i);

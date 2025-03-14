@@ -8,7 +8,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_one)
 {

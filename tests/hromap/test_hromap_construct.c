@@ -36,8 +36,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_no_alloc)
     {
         struct val src_v = {.id = i};
         struct val dst_v = {.id = i};
-        ccc_handle src_e = remove(&src, &src_v.elem);
-        ccc_handle dst_e = remove(&dst, &dst_v.elem);
+        ccc_handle src_e = ccc_remove(&src, &src_v.elem);
+        ccc_handle dst_e = ccc_remove(&dst, &dst_v.elem);
         CHECK(occupied(&src_e), occupied(&dst_e));
         CHECK(src_v.id, dst_v.id);
         CHECK(src_v.val, dst_v.val);
@@ -81,8 +81,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_copy_alloc)
     {
         struct val src_v = {.id = i};
         struct val dst_v = {.id = i};
-        ccc_handle src_e = remove(&src, &src_v.elem);
-        ccc_handle dst_e = remove(&dst, &dst_v.elem);
+        ccc_handle src_e = ccc_remove(&src, &src_v.elem);
+        ccc_handle dst_e = ccc_remove(&dst, &dst_v.elem);
         CHECK(occupied(&src_e), occupied(&dst_e));
         CHECK(src_v.id, dst_v.id);
         CHECK(src_v.val, dst_v.val);

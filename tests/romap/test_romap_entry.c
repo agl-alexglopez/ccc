@@ -160,7 +160,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     ccc_realtime_ordered_map rom
         = rom_init(rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = remove(&rom, &(struct val){.key = -1, .val = -1}.elem);
+    ccc_entry ent = ccc_remove(&rom, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&rom), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&rom), 1);
-    ent = remove(&rom, &(struct val){.key = -1, .val = -1}.elem);
+    ent = ccc_remove(&rom, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&rom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&rom), 0);
@@ -184,7 +184,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     CHECK(fill_n(&rom, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = remove(&rom, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&rom, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&rom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&rom), i);
@@ -194,7 +194,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&rom), i + 1);
-    ent = remove(&rom, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&rom, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&rom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&rom), i);
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     CHECK(fill_n(&rom, size - i, i), PASS);
 
     i = size;
-    ent = remove(&rom, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&rom, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&rom), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&rom), i);
@@ -216,7 +216,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&rom), i + 1);
-    ent = remove(&rom, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&rom, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&rom), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&rom), i);
