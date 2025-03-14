@@ -288,6 +288,20 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
     {
         return CCC_RESULT_OK;
     }
+    if (dst->buf_.capacity_ < src->buf_.capacity_)
+    {
+        ccc_result resize_res
+            = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
+        if (resize_res != CCC_RESULT_OK)
+        {
+            return resize_res;
+        }
+        dst->buf_.capacity_ = src->buf_.capacity_;
+    }
+    if (!dst->buf_.mem_ || !src->buf_.mem_)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
     if (dst->buf_.capacity_ > src->buf_.capacity_)
     {
         ptrdiff_t const first_chunk
@@ -303,16 +317,6 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
         }
         dst->front_ = 0;
         return CCC_RESULT_OK;
-    }
-    if (dst->buf_.capacity_ < src->buf_.capacity_)
-    {
-        ccc_result resize_res
-            = ccc_buf_alloc(&dst->buf_, src->buf_.capacity_, fn);
-        if (resize_res != CCC_RESULT_OK)
-        {
-            return resize_res;
-        }
-        dst->buf_.capacity_ = src->buf_.capacity_;
     }
     (void)memcpy(dst->buf_.mem_, src->buf_.mem_,
                  src->buf_.capacity_ * src->buf_.elem_sz_);

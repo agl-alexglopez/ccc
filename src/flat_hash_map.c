@@ -504,6 +504,10 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     dst->buf_.mem_ = dst_mem;
     dst->buf_.capacity_ = dst_cap;
     dst->buf_.alloc_ = dst_alloc;
+    if (!src->buf_.capacity_)
+    {
+        return CCC_RESULT_OK;
+    }
     if (dst->buf_.capacity_ < src->buf_.capacity_)
     {
         ccc_result resize_res
@@ -513,6 +517,10 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
             return resize_res;
         }
         dst->buf_.capacity_ = src->buf_.capacity_;
+    }
+    if (!dst->buf_.mem_ || !src->buf_.mem_)
+    {
+        return CCC_RESULT_ARG_ERROR;
     }
     if (dst->buf_.capacity_ == src->buf_.capacity_)
     {
