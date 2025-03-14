@@ -83,7 +83,7 @@ ccc_bs_is_proper_subset(ccc_bitset const *const set,
 {
     if (!set || !subset)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     if (set->sz_ <= subset->sz_)
     {
@@ -97,7 +97,7 @@ ccc_bs_is_subset(ccc_bitset const *const set, ccc_bitset const *const subset)
 {
     if (!set || !subset)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     if (set->sz_ < subset->sz_)
     {
@@ -282,12 +282,12 @@ ccc_bs_test(ccc_bitset const *const bs, ptrdiff_t const i)
 {
     if (!bs || i < 0)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const b_i = set_block_i(i);
     if (b_i >= bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return status(&bs->mem_[b_i], i);
 }
@@ -297,12 +297,12 @@ ccc_bs_set(ccc_bitset *const bs, ptrdiff_t const i, ccc_tribool const b)
 {
     if (!bs || i < 0)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const b_i = set_block_i(i);
     if (b_i >= bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ccc_bitblock_ *const block = &bs->mem_[b_i];
     ccc_tribool const was = status(block, i);
@@ -389,12 +389,12 @@ ccc_bs_reset(ccc_bitset *const bs, ptrdiff_t const i)
 {
     if (!bs || i < 0)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const b_i = set_block_i(i);
     if (b_i >= bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ccc_bitblock_ *const block = &bs->mem_[b_i];
     ccc_tribool const was = status(block, i);
@@ -464,12 +464,12 @@ ccc_bs_flip(ccc_bitset *const bs, ptrdiff_t const i)
 {
     if (!bs || i < 0)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const b_i = set_block_i(i);
     if (b_i >= bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ccc_bitblock_ *const block = &bs->mem_[b_i];
     ccc_tribool const was = status(block, i);
@@ -584,7 +584,7 @@ ccc_bs_empty(ccc_bitset const *const bs)
 {
     if (!bs)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !bs->sz_;
 }
@@ -667,7 +667,7 @@ ccc_bs_pop_back(ccc_bitset *const bs)
 {
     if (!bs || !bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ccc_tribool const was
         = status(&bs->mem_[set_block_i(bs->sz_ - 1)], bs->sz_ - 1);
@@ -897,7 +897,7 @@ ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
             dst->mem_, blocks(src->cap_) * sizeof(ccc_bitblock_), dst->aux_);
         if (!new_mem)
         {
-            return CCC_RESULT_MEM_ERR;
+            return CCC_RESULT_MEM_ERROR;
         }
         dst->mem_ = new_mem;
         dst->cap_ = src->cap_;
@@ -927,7 +927,7 @@ ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
 {
     if (!a || !b)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     if (a->sz_ != b->sz_)
     {
@@ -976,7 +976,7 @@ maybe_resize(struct ccc_bitset_ *const bs, ptrdiff_t const to_add)
         bs->mem_, blocks(new_cap) * sizeof(ccc_bitblock_), bs->aux_);
     if (!new_mem)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     bs->cap_ = new_cap;
     bs->mem_ = new_mem;
@@ -1402,12 +1402,12 @@ any_or_none_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
     if (!bs || i < 0 || count < 0 || i >= bs->sz_ || ret < CCC_FALSE
         || ret > CCC_TRUE || add_overflow(i, count))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const end = i + count;
     if (end > bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t start_block = set_block_i(i);
     blockwidth_t const start_i = blockwidth_i(i);
@@ -1452,12 +1452,12 @@ all_range(struct ccc_bitset_ const *const bs, ptrdiff_t const i,
 {
     if (!bs || i < 0 || count < 0 || i >= bs->sz_ || add_overflow(i, count))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const end = i + count;
     if (end > bs->sz_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t start_block = set_block_i(i);
     blockwidth_t const start_i = blockwidth_i(i);

@@ -267,7 +267,7 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
 {
     if (!sll)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t size = 0;
     for (struct ccc_sll_elem_ *e = sll->sentinel_.n_; e != &sll->sentinel_;
@@ -296,7 +296,7 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 {
     if (!sll)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !sll->sz_;
 }

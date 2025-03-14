@@ -163,7 +163,7 @@ ccc_hhm_is_empty(ccc_handle_hash_map const *const h)
 {
     if (unlikely(!h))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !ccc_hhm_size(h);
 }
@@ -173,7 +173,7 @@ ccc_hhm_contains(ccc_handle_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return handle(h, key, filter(h, key)).stats_ == CCC_ENTRY_OCCUPIED;
 }
@@ -447,7 +447,7 @@ ccc_hhm_occupied(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -457,7 +457,7 @@ ccc_hhm_insert_error(ccc_hhmap_handle const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -521,7 +521,7 @@ ccc_hhm_end(ccc_hhmap_handle const *const iter)
 {
     if (!iter)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return iter->impl_.hash_ == CCC_HHM_EMPTY;
 }
@@ -671,7 +671,7 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
 {
     if (!h || !h->eq_fn_ || !h->hash_fn_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     /* Not yet initialized, pass for now. */
     if (!ccc_buf_size(&h->buf_))
@@ -1014,13 +1014,13 @@ maybe_resize(struct ccc_hhmap_ *const h)
                                   : primes[0];
     if (new_hash.buf_.capacity_ <= h->buf_.capacity_)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
         NULL, elem_sz * new_hash.buf_.capacity_, h->buf_.aux_);
     if (!new_hash.buf_.mem_)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     /* The handles shall be stable. Keep user data in the same slot. */
     if (h->buf_.mem_)
@@ -1089,7 +1089,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
     if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_RESULT_OK)
     {
         *h = new_hash;
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     *h = new_hash;
     return CCC_RESULT_OK;

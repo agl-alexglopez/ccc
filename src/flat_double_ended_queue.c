@@ -167,7 +167,7 @@ ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !ccc_buf_size(&fdeq->buf_);
 }
@@ -372,7 +372,7 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     if (ccc_fdeq_is_empty(fdeq))
     {
@@ -477,7 +477,7 @@ push_back_range(struct ccc_fdeq_ *const fdeq, ptrdiff_t const n,
     ptrdiff_t const cap = ccc_buf_capacity(&fdeq->buf_);
     if (fdeq->buf_.alloc_ && full)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     /* If a range is too large we can make various simplifications to preserve
        the final capacity elements. */
@@ -518,7 +518,7 @@ push_front_range(struct ccc_fdeq_ *const fdeq, ptrdiff_t const n,
     ptrdiff_t const cap = ccc_buf_capacity(&fdeq->buf_);
     if (fdeq->buf_.alloc_ && full)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     /* If a range is too large we can make various simplifications to preserve
        the final capacity elements. */
@@ -644,7 +644,7 @@ maybe_resize(struct ccc_fdeq_ *const q, ptrdiff_t const additional_elems_to_add)
         NULL, ccc_buf_elem_size(&q->buf_) * new_cap, q->buf_.aux_);
     if (!new_mem)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     if (ccc_buf_size(&q->buf_))
     {

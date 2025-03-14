@@ -202,7 +202,7 @@ Test for the presence of bits. */
 /** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
-@return the state of the bit, or CCC_BOOL_ERR if bs is NULL.
+@return the state of the bit, or CCC_TRIBOOL_ERROR if bs is NULL.
 @note this function performs bounds checking in the release target. */
 ccc_tribool ccc_bs_test(ccc_bitset const *bs, ptrdiff_t i);
 
@@ -310,49 +310,49 @@ Find bits with a specific status. */
 
 /** @brief Return true if any bits in set are 1.
 @param [in] bs a pointer to the bit set.
-@return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR
-if bs is NULL. */
+@return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1,
+CCC_TRIBOOL_ERROR if bs is NULL. */
 ccc_tribool ccc_bs_any(ccc_bitset const *bs);
 
 /** @brief Return true if any bits are 1 in the specified range.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
-@return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR
-if bs is NULL, i is invalid, count is invalid, or both i and count are
-invalid. */
+@return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1,
+CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and
+count are invalid. */
 ccc_tribool ccc_bs_any_range(ccc_bitset const *bs, ptrdiff_t i,
                              ptrdiff_t count);
 
 /** @brief Return true if all bits are set to 0.
 @param [in] bs a pointer to the bit set.
-@return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR
-if bs is NULL. */
+@return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1,
+CCC_TRIBOOL_ERROR if bs is NULL. */
 ccc_tribool ccc_bs_none(ccc_bitset const *bs);
 
 /** @brief Return true if all bits are 0 in the specified range.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
-@return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR
-if bs is NULL, i is invalid, count is invalid, or both i and count are
-invalid. */
+@return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1,
+CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and
+count are invalid. */
 ccc_tribool ccc_bs_none_range(ccc_bitset const *bs, ptrdiff_t i,
                               ptrdiff_t count);
 
 /** @brief Return true if all bits in set are 1.
 @param [in] bs a pointer to the bit set.
-@return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR
-if bs is NULL. */
+@return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0,
+CCC_TRIBOOL_ERROR if bs is NULL. */
 ccc_tribool ccc_bs_all(ccc_bitset const *bs);
 
 /** @brief Return true if all bits are set to 1 in the specified range.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
-@return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR
-if bs is NULL, i is invalid, count is invalid, or both i and count are
-invalid. */
+@return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0,
+CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and
+count are invalid. */
 ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, ptrdiff_t i,
                              ptrdiff_t count);
 
@@ -639,7 +639,7 @@ Perform basic mathematical set operations on the bit set. */
 @param [subset] the subset to confirm as a proper subset of set.
 @return CCC_TRUE if all bit positions in subset share the same
 value--0 or 1--as the bit positions in set and set is of greater size than
-subset. A CCC_BOOL_ERR is returned if set or subset is NULL.
+subset. A CCC_TRIBOOL_ERROR is returned if set or subset is NULL.
 
 If set is of size 0 the function returns CCC_FALSE regardless of the size of
 subset. If set is not of size 0 and subset is of size 0 the function returns
@@ -651,8 +651,8 @@ ccc_tribool ccc_bs_is_proper_subset(ccc_bitset const *set,
 @param [set] the set to check subset against.
 @param [subset] the subset to confirm as a subset of set.
 @return CCC_TRUE if all bit positions in subset share the same
-value--0 or 1--as the bit positions in set. A CCC_BOOL_ERR is returned if set or
-subset is NULL.
+value--0 or 1--as the bit positions in set. A CCC_TRIBOOL_ERROR is returned if
+set or subset is NULL.
 
 If set is size zero subset must also be of size 0 to return CCC_TRUE. If
 subset is size 0 the function returns CCC_TRUE regardless of the size of set. */
@@ -704,7 +704,8 @@ ptrdiff_t ccc_bs_blocks_size(ccc_bitset const *bs);
 /** @brief Return true if no bits are actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
 @return CCC_TRUE if the size of the set is 0 meaning no bits, regardless of
-0 or 1 status, are tracked by the set. CCC_BOOL_ERR is returned if bs is NULL.
+0 or 1 status, are tracked by the set. CCC_TRIBOOL_ERROR is returned if bs is
+NULL.
 @warning if the number of bits set to 1 is desired see ccc_bs_popcount. */
 ccc_tribool ccc_bs_empty(ccc_bitset const *bs);
 

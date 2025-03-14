@@ -165,7 +165,7 @@ ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 {
     if (unlikely(!h))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !ccc_fhm_size(h);
 }
@@ -175,7 +175,7 @@ ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (entry(h, key, filter(h, key)).stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -416,7 +416,7 @@ ccc_fhm_occupied(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -426,7 +426,7 @@ ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -613,7 +613,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
     if (!h || !h->eq_fn_ || !h->hash_fn_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t empties = 0;
     ptrdiff_t occupied = 0;
@@ -877,14 +877,14 @@ maybe_resize(struct ccc_fhmap_ *const h)
                                   : primes[0];
     if (new_hash.buf_.capacity_ <= h->buf_.capacity_)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     new_hash.buf_.mem_ = new_hash.buf_.alloc_(
         NULL, ccc_buf_elem_size(&h->buf_) * new_hash.buf_.capacity_,
         h->buf_.aux_);
     if (!new_hash.buf_.mem_)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     /* Empty is intentionally chosen as zero so every byte is just set to
        0 in this new array. */
@@ -908,7 +908,7 @@ maybe_resize(struct ccc_fhmap_ *const h)
     if (ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_) != CCC_RESULT_OK)
     {
         *h = new_hash;
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     *h = new_hash;
     return CCC_RESULT_OK;

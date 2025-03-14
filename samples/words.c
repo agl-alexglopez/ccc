@@ -609,7 +609,7 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
         void *const moved_arena = std_alloc(a->arena, new_cap, NULL);
         if (!moved_arena)
         {
-            return CCC_RESULT_MEM_ERR;
+            return CCC_RESULT_MEM_ERROR;
         }
         memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
         a->arena = moved_arena;

@@ -94,24 +94,14 @@ Some containers conceptually take or return a boolean value as part of their
 operations. However, booleans cannot indicate errors and this library offers
 no errno or C++ throw-like behavior. Therefore, a three state value can offer
 additional information while still maintaining the truthy and falsey bool
-behavior one would normally expect. The chosen values also allow the user to
-implement Three-valued Logic if desired as follows:
+behavior one would normally expect.
 
-```
-LOGIC      IMPLEMENTATION
-NOT(A)   = NEG(A)
-AND(A,B) = MIN(A,B)
-OR(A,B)  = MAX(A,B)
-XOR(A,B) = MIN(MAX(A,B), NEG(MIN(A,B)))
-```
-
-When interacting with multiple containers the user is free to implement this
-logic for the values they return. However, a three branch coding pattern usually
-suffice: `if (result < 0) {} else if (result) {} else {}`. */
+A third branch can be added while otherwise using simple true(1) and false(0).
+`if (result < 0) {} else if (result) {} else {}`. */
 typedef enum : int8_t
 {
     /** Intended value if CCC_FALSE or CCC_TRUE could not be returned. */
-    CCC_BOOL_ERR = -1,
+    CCC_TRIBOOL_ERROR = -1,
     /** Equivalent to boolean false, guaranteed to be falsey aka 0. */
     CCC_FALSE,
     /** Equivalent to boolean true, guaranteed to be truthy aka 1. */
@@ -130,7 +120,7 @@ typedef enum
     /** Memory is needed but the container lacks allocation permission. */
     CCC_RESULT_NO_ALLOC,
     /** The container has allocation permission, but allocation failed. */
-    CCC_RESULT_MEM_ERR,
+    CCC_RESULT_MEM_ERROR,
     /** Bad arguments have been provided to an operation. */
     CCC_RESULT_ARG_ERROR,
     /** Internal helper, never returned to user. Always last result. */
@@ -151,7 +141,7 @@ typedef enum
     /** The left hand side is greater than the right hand side. */
     CCC_GRT,
     /** Comparison is not possible or other error has occurred. */
-    CCC_CMP_ERR,
+    CCC_CMP_ERROR,
 } ccc_threeway_cmp;
 
 /** @brief An element comparison helper.
@@ -299,7 +289,7 @@ typedef void ccc_destructor_fn(ccc_user_type);
 
 The function should return CCC_TRUE if the key and key field in the user type
 are equivalent, else CCC_FALSE.
-@note a callback need not return CCC_BOOL_ERR as the container code always
+@note a callback need not return CCC_TRIBOOL_ERROR as the container code always
 provides data to the arguments of the function invariantly. */
 typedef ccc_tribool ccc_key_eq_fn(ccc_key_cmp);
 
