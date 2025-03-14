@@ -97,7 +97,7 @@ additional information while still maintaining the truthy and falsey bool
 behavior one would normally expect.
 
 A third branch can be added while otherwise using simple true(1) and false(0).
-`if (result < 0) {} else if (result) {} else {}`. */
+`if (result == CCC_TRIBOOL_ERROR) {} else if (result) {} else {}`. */
 typedef enum : int8_t
 {
     /** Intended value if CCC_FALSE or CCC_TRUE could not be returned. */
