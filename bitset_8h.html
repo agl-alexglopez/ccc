@@ -498,7 +498,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR if bs is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_TRIBOOL_ERROR if bs is NULL. </dd></dl>
 
 </div>
 </div>
@@ -543,7 +543,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_BOOL_ERR if bs is NULL, i is invalid, count is invalid, or both i and count are invalid. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0, CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and count are invalid. </dd></dl>
 
 </div>
 </div>
@@ -610,7 +610,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR if bs is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_TRIBOOL_ERROR if bs is NULL. </dd></dl>
 
 </div>
 </div>
@@ -655,7 +655,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_BOOL_ERR if bs is NULL, i is invalid, count is invalid, or both i and count are invalid. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1, CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and count are invalid. </dd></dl>
 
 </div>
 </div>
@@ -848,7 +848,7 @@ Include dependency graph for bitset.h:</div>
 <div class="line"><span class="keyword">static</span> bitset src</div>
 <div class="line">    = bs_init((<span class="keyword">static</span> bitblock[bs_blocks(13)]){}, NULL, NULL, 13);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = bs_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:127</div></div>
+<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">static</span> bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);</div>
@@ -917,7 +917,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if the size of the set is 0 meaning no bits, regardless of 0 or 1 status, are tracked by the set. CCC_BOOL_ERR is returned if bs is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if the size of the set is 0 meaning no bits, regardless of 0 or 1 status, are tracked by the set. CCC_TRIBOOL_ERROR is returned if bs is NULL. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>if the number of bits set to 1 is desired see ccc_bs_popcount. </dd></dl>
 
 </div>
@@ -1765,7 +1765,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bit positions in subset share the same value&ndash;0 or 1&ndash;as the bit positions in set and set is of greater size than subset. A CCC_BOOL_ERR is returned if set or subset is NULL.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bit positions in subset share the same value&ndash;0 or 1&ndash;as the bit positions in set and set is of greater size than subset. A CCC_TRIBOOL_ERROR is returned if set or subset is NULL.</dd></dl>
 <p>If set is of size 0 the function returns CCC_FALSE regardless of the size of subset. If set is not of size 0 and subset is of size 0 the function returns CCC_TRUE. </p>
 
 </div>
@@ -1804,7 +1804,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bit positions in subset share the same value&ndash;0 or 1&ndash;as the bit positions in set. A CCC_BOOL_ERR is returned if set or subset is NULL.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bit positions in subset share the same value&ndash;0 or 1&ndash;as the bit positions in set. A CCC_TRIBOOL_ERROR is returned if set or subset is NULL.</dd></dl>
 <p>If set is size zero subset must also be of size 0 to return CCC_TRUE. If subset is size 0 the function returns CCC_TRUE regardless of the size of set. </p>
 
 </div>
@@ -1832,7 +1832,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR if bs is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_TRIBOOL_ERROR if bs is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1877,7 +1877,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_BOOL_ERR if bs is NULL, i is invalid, count is invalid, or both i and count are invalid. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1, CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and count are invalid. </dd></dl>
 
 </div>
 </div>
@@ -2445,7 +2445,7 @@ Include dependency graph for bitset.h:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the state of the bit, or CCC_BOOL_ERR if bs is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the state of the bit, or CCC_TRIBOOL_ERROR if bs is NULL. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>this function performs bounds checking in the release target. </dd></dl>
 
 </div>

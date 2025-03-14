@@ -167,7 +167,7 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types used across many containers. </p>
 </td></tr>
-<tr class="memitem:a80a7915df3bc36e01a3a0775eebc0938"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> : int8_t { <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ad795c39ec159a23f2e9f830ab4f7ebed">CCC_BOOL_ERR</a> = -1
+<tr class="memitem:a80a7915df3bc36e01a3a0775eebc0938"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> : int8_t { <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187">CCC_TRIBOOL_ERROR</a> = -1
 , <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>
 , <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>
  }</td></tr>
@@ -176,7 +176,7 @@ Data Structures</h2></td></tr>
 <tr class="memitem:a1493dc76581f8c71eb96202fb1671ae1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> { <br />
 &#160;&#160;<a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1afbd97cad5eb71401d7341ce5039ceb55">CCC_RESULT_OK</a> = 0
 , <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f">CCC_RESULT_NO_ALLOC</a>
-, <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a250ce587ccecccb3fe8d691f0f59b54c">CCC_RESULT_MEM_ERR</a>
+, <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29">CCC_RESULT_MEM_ERROR</a>
 , <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3">CCC_RESULT_ARG_ERROR</a>
 , <br />
 &#160;&#160;<a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1ac252acd054776d456a9c120df6952c28">CCC_RESULT_SIZE</a>
@@ -187,7 +187,7 @@ Data Structures</h2></td></tr>
 <tr class="memitem:a9958f3004414182c457c71289303ae57"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> { <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a> = -1
 , <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a>
 , <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a>
-, <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a2975ec57f12b7ce11f4b180af8fec7c5">CCC_CMP_ERR</a>
+, <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c">CCC_CMP_ERROR</a>
  }</td></tr>
 <tr class="memdesc:a9958f3004414182c457c71289303ae57"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three-way comparison for comparison functions.  <a href="types_8h.html#a9958f3004414182c457c71289303ae57">More...</a><br /></td></tr>
 <tr class="separator:a9958f3004414182c457c71289303ae57"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -512,7 +512,7 @@ Data Structures</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A callback function to determining equality between two stored keys. </p>
-<p>The function should return CCC_TRUE if the key and key field in the user type are equivalent, else CCC_FALSE. </p><dl class="section note"><dt>Note</dt><dd>a callback need not return CCC_BOOL_ERR as the container code always provides data to the arguments of the function invariantly. </dd></dl>
+<p>The function should return CCC_TRUE if the key and key field in the user type are equivalent, else CCC_FALSE. </p><dl class="section note"><dt>Note</dt><dd>a callback need not return CCC_TRIBOOL_ERROR as the container code always provides data to the arguments of the function invariantly. </dd></dl>
 
 </div>
 </div>
@@ -587,7 +587,7 @@ Data Structures</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f" name="a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f"></a>CCC_RESULT_NO_ALLOC&#160;</td><td class="fielddoc"><p>Memory is needed but the container lacks allocation permission. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1a250ce587ccecccb3fe8d691f0f59b54c" name="a1493dc76581f8c71eb96202fb1671ae1a250ce587ccecccb3fe8d691f0f59b54c"></a>CCC_RESULT_MEM_ERR&#160;</td><td class="fielddoc"><p>The container has allocation permission, but allocation failed. </p>
+<tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29" name="a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29"></a>CCC_RESULT_MEM_ERROR&#160;</td><td class="fielddoc"><p>The container has allocation permission, but allocation failed. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3" name="a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3"></a>CCC_RESULT_ARG_ERROR&#160;</td><td class="fielddoc"><p>Bad arguments have been provided to an operation. </p>
 </td></tr>
@@ -618,7 +618,7 @@ Data Structures</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce" name="a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce"></a>CCC_GRT&#160;</td><td class="fielddoc"><p>The left hand side is greater than the right hand side. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57a2975ec57f12b7ce11f4b180af8fec7c5" name="a9958f3004414182c457c71289303ae57a2975ec57f12b7ce11f4b180af8fec7c5"></a>CCC_CMP_ERR&#160;</td><td class="fielddoc"><p>Comparison is not possible or other error has occurred. </p>
+<tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c" name="a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c"></a>CCC_CMP_ERROR&#160;</td><td class="fielddoc"><p>Comparison is not possible or other error has occurred. </p>
 </td></tr>
 </table>
 
@@ -637,15 +637,10 @@ Data Structures</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1. </p>
-<p>Some containers conceptually take or return a boolean value as part of their operations. However, booleans cannot indicate errors and this library offers no errno or C++ throw-like behavior. Therefore, a three state value can offer additional information while still maintaining the truthy and falsey bool behavior one would normally expect. The chosen values also allow the user to implement Three-valued Logic if desired as follows:</p>
-<div class="fragment"><div class="line">LOGIC      IMPLEMENTATION</div>
-<div class="line">NOT(A)   = NEG(A)</div>
-<div class="line">AND(A,B) = MIN(A,B)</div>
-<div class="line">OR(A,B)  = MAX(A,B)</div>
-<div class="line">XOR(A,B) = MIN(MAX(A,B), NEG(MIN(A,B)))</div>
-</div><!-- fragment --><p>When interacting with multiple containers the user is free to implement this logic for the values they return. However, a three branch coding pattern usually suffice: <code>if (result &lt; 0) {} else if (result) {} else {}</code>. </p>
+<p>Some containers conceptually take or return a boolean value as part of their operations. However, booleans cannot indicate errors and this library offers no errno or C++ throw-like behavior. Therefore, a three state value can offer additional information while still maintaining the truthy and falsey bool behavior one would normally expect.</p>
+<p>A third branch can be added while otherwise using simple true(1) and false(0). <code>if (result == CCC_TRIBOOL_ERROR) {} else if (result) {} else {}</code>. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938ad795c39ec159a23f2e9f830ab4f7ebed" name="a80a7915df3bc36e01a3a0775eebc0938ad795c39ec159a23f2e9f830ab4f7ebed"></a>CCC_BOOL_ERR&#160;</td><td class="fielddoc"><p>Intended value if CCC_FALSE or CCC_TRUE could not be returned. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187" name="a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187"></a>CCC_TRIBOOL_ERROR&#160;</td><td class="fielddoc"><p>Intended value if CCC_FALSE or CCC_TRUE could not be returned. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110" name="a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110"></a>CCC_FALSE&#160;</td><td class="fielddoc"><p>Equivalent to boolean false, guaranteed to be falsey aka 0. </p>
 </td></tr>
