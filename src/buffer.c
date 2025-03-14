@@ -27,7 +27,7 @@ ccc_buf_alloc(ccc_buffer *const buf, ptrdiff_t const capacity,
     void *const new_mem = fn(buf->mem_, buf->elem_sz_ * capacity, buf->aux_);
     if (capacity && !new_mem)
     {
-        return CCC_RESULT_MEM_ERR;
+        return CCC_RESULT_MEM_ERROR;
     }
     buf->mem_ = new_mem;
     buf->capacity_ = capacity;
@@ -212,7 +212,7 @@ ccc_buf_is_empty(ccc_buffer const *const buf)
 {
     if (!buf)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !buf->sz_;
 }
@@ -222,7 +222,7 @@ ccc_buf_is_full(ccc_buffer const *const buf)
 {
     if (!buf)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     if (!buf->capacity_)
     {

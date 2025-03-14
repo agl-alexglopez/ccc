@@ -176,7 +176,7 @@ ccc_hrm_contains(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !key)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return CCC_EQL == find(hrm, key).last_cmp_;
 }
@@ -422,7 +422,7 @@ ccc_hrm_insert_error(ccc_hromap_handle const *const h)
 {
     if (!h)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (h->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -432,7 +432,7 @@ ccc_hrm_occupied(ccc_hromap_handle const *const h)
 {
     if (!h)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -448,7 +448,7 @@ ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !ccc_hrm_size(hrm);
 }
@@ -644,7 +644,7 @@ ccc_hrm_validate(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return validate(hrm);
 }
@@ -760,7 +760,7 @@ static struct hrm_query_
 find(struct ccc_hromap_ const *const hrm, void const *const key)
 {
     ptrdiff_t parent = 0;
-    struct hrm_query_ q = {.last_cmp_ = CCC_CMP_ERR, .found_ = hrm->root_};
+    struct hrm_query_ q = {.last_cmp_ = CCC_CMP_ERROR, .found_ = hrm->root_};
     for (; q.found_; parent = q.found_,
                      q.found_ = branch_i(hrm, q.found_, CCC_GRT == q.last_cmp_))
     {

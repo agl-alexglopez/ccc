@@ -408,7 +408,7 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
 {
     if (!l)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t size = 0;
     for (struct ccc_dll_elem_ const *e = l->sentinel_.n_; e != &l->sentinel_;

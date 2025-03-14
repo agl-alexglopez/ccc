@@ -88,7 +88,7 @@ ccc_om_is_empty(ccc_ordered_map const *const om)
 {
     if (!om)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return empty(om);
 }
@@ -104,7 +104,7 @@ ccc_om_contains(ccc_ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return contains(om, key);
 }
@@ -326,7 +326,7 @@ ccc_om_insert_error(ccc_omap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -336,7 +336,7 @@ ccc_om_occupied(ccc_omap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -444,7 +444,7 @@ ccc_om_validate(ccc_ordered_map const *const om)
 {
     if (!om)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return ccc_omap_validate(om);
 }
@@ -628,7 +628,7 @@ static void *
 alloc_insert(struct ccc_omap_ *const t, struct ccc_omap_elem_ *out_handle)
 {
     init_node(t, out_handle);
-    ccc_threeway_cmp root_cmp = CCC_CMP_ERR;
+    ccc_threeway_cmp root_cmp = CCC_CMP_ERROR;
     if (!empty(t))
     {
         void const *const key = key_from_node(t, out_handle);
@@ -655,7 +655,7 @@ alloc_insert(struct ccc_omap_ *const t, struct ccc_omap_elem_ *out_handle)
         t->size_ = 1;
         return struct_base(t, out_handle);
     }
-    assert(root_cmp != CCC_CMP_ERR);
+    assert(root_cmp != CCC_CMP_ERROR);
     t->size_++;
     return connect_new_root(t, out_handle, root_cmp);
 }

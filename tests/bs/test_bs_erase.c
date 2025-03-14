@@ -80,7 +80,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_pop_back_alloc)
             CHECK(msb_was, CCC_FALSE);
         }
     }
-    CHECK(ccc_bs_pop_back(&bs), (ccc_tribool)CCC_BOOL_ERR);
+    CHECK(ccc_bs_pop_back(&bs), (ccc_tribool)CCC_TRIBOOL_ERROR);
     CHECK(ccc_bs_size(&bs), 0);
     CHECK(ccc_bs_popcount(&bs), 0);
     CHECK(ccc_bs_capacity(&bs) != 0, true);

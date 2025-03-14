@@ -109,7 +109,7 @@ ccc_hom_contains(ccc_handle_ordered_map *const hom, void const *const key)
 {
     if (!hom || !key)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     hom->root_ = splay(hom, hom->root_, key, hom->cmp_);
     return cmp_elems(hom, key, hom->root_, hom->cmp_) == CCC_EQL;
@@ -333,7 +333,7 @@ ccc_hom_insert_error(ccc_homap_handle const *const h)
 {
     if (!h)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (h->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -343,7 +343,7 @@ ccc_hom_occupied(ccc_homap_handle const *const h)
 {
     if (!h)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -359,7 +359,7 @@ ccc_hom_is_empty(ccc_handle_ordered_map const *const hom)
 {
     if (!hom)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !ccc_hom_size(hom);
 }
@@ -578,7 +578,7 @@ ccc_hom_validate(ccc_handle_ordered_map const *const hom)
 {
     if (!hom)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return validate(hom);
 }

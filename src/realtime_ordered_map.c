@@ -154,7 +154,7 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
 {
     if (!rom || !key)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return CCC_EQL == find(rom, key).last_cmp_;
 }
@@ -382,7 +382,7 @@ ccc_rom_occupied(ccc_romap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -392,7 +392,7 @@ ccc_rom_insert_error(ccc_romap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -500,7 +500,7 @@ ccc_rom_is_empty(ccc_realtime_ordered_map const *const rom)
 {
     if (!rom)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !rom->sz_;
 }
@@ -510,7 +510,7 @@ ccc_rom_validate(ccc_realtime_ordered_map const *rom)
 {
     if (!rom)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return validate(rom);
 }
@@ -661,7 +661,7 @@ static struct romap_query_
 find(struct ccc_romap_ const *const rom, void const *const key)
 {
     struct ccc_romap_elem_ const *parent = &rom->end_;
-    struct romap_query_ q = {.last_cmp_ = CCC_CMP_ERR, .found_ = rom->root_};
+    struct romap_query_ q = {.last_cmp_ = CCC_CMP_ERROR, .found_ = rom->root_};
     for (; q.found_ != &rom->end_;
          parent = q.found_,
          q.found_ = q.found_->branch_[CCC_GRT == q.last_cmp_])

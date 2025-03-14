@@ -212,7 +212,7 @@ ccc_fpq_is_empty(ccc_flat_priority_queue const *const fpq)
 {
     if (!fpq)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return ccc_buf_is_empty(&fpq->buf_);
 }
@@ -238,7 +238,7 @@ ccc_fpq_data(ccc_flat_priority_queue const *const fpq)
 ccc_threeway_cmp
 ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 {
-    return fpq ? fpq->order_ : CCC_CMP_ERR;
+    return fpq ? fpq->order_ : CCC_CMP_ERROR;
 }
 
 ccc_result
@@ -326,7 +326,7 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
 {
     if (!fpq)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     ptrdiff_t const sz = ccc_buf_size(&fpq->buf_);
     if (sz <= 1)

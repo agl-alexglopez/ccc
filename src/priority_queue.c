@@ -136,7 +136,7 @@ ccc_pq_is_empty(ccc_priority_queue const *const pq)
 {
     if (!pq)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return !pq->sz_;
 }
@@ -159,7 +159,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
     update_fixup(pq, e);
@@ -174,7 +174,7 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
     increase_fixup(pq, e);
@@ -189,7 +189,7 @@ ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     fn((ccc_user_type){struct_base(pq, e), aux});
     decrease_fixup(pq, e);
@@ -217,7 +217,7 @@ ccc_pq_validate(ccc_priority_queue const *const pq)
 ccc_threeway_cmp
 ccc_pq_order(ccc_priority_queue const *const pq)
 {
-    return pq ? pq->order_ : CCC_CMP_ERR;
+    return pq ? pq->order_ : CCC_CMP_ERROR;
 }
 
 /*=========================  Private Interface     ==========================*/

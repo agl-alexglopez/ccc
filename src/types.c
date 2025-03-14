@@ -9,7 +9,7 @@ static char const *const result_msgs[CCC_RESULT_SIZE] = {
     [CCC_RESULT_NO_ALLOC]
     = "A container performed an operation requiring new allocation of "
       "memory, but no allocation function was provided upon initialization.",
-    [CCC_RESULT_MEM_ERR]
+    [CCC_RESULT_MEM_ERROR]
     = "A container performed an operation requiring new allocation of memory, "
       "but the allocator function provided on initialization failed.",
     [CCC_RESULT_ARG_ERROR]
@@ -24,7 +24,7 @@ ccc_entry_occupied(ccc_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -34,7 +34,7 @@ ccc_entry_insert_error(ccc_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -44,7 +44,7 @@ ccc_entry_input_error(ccc_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.stats_ & CCC_ENTRY_ARG_ERROR) != 0;
 }
@@ -64,7 +64,7 @@ ccc_handle_occupied(ccc_handle const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -74,7 +74,7 @@ ccc_handle_insert_error(ccc_handle const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -84,7 +84,7 @@ ccc_handle_input_error(ccc_handle const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.stats_ & CCC_ENTRY_ARG_ERROR) != 0;
 }

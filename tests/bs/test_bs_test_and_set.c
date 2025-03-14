@@ -978,11 +978,11 @@ done:
     case CCC_FALSE:
         return CCC_TRUE;
         break;
-    case CCC_BOOL_ERR:
-        return CCC_BOOL_ERR;
+    case CCC_TRIBOOL_ERROR:
+        return CCC_TRIBOOL_ERROR;
         break;
     default:
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
 }
 
@@ -1051,7 +1051,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_invalid_sudoku)
         {
             pass = validate_sudoku_box(invalid_board, &row_check, &col_check,
                                        row, col);
-            CHECK(pass != CCC_BOOL_ERR, true);
+            CHECK(pass != CCC_TRIBOOL_ERROR, true);
             if (!pass)
             {
                 goto done;

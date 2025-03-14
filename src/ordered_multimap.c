@@ -136,7 +136,7 @@ ccc_omm_is_empty(ccc_ordered_multimap const *const mm)
 {
     if (!mm)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return empty(mm);
 }
@@ -444,7 +444,7 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
     if (!mm || !key_val_handle || !fn || !key_val_handle->branch_[L]
         || !key_val_handle->branch_[R])
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     void *const e = multimap_erase_node(mm, key_val_handle);
     if (!e)
@@ -477,7 +477,7 @@ ccc_omm_contains(ccc_ordered_multimap *const mm, void const *const key)
 {
     if (!mm || !key)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return contains(mm, key);
 }
@@ -537,7 +537,7 @@ ccc_omm_insert_error(ccc_ommap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
 }
@@ -547,7 +547,7 @@ ccc_omm_input_error(ccc_ommap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_ARG_ERROR) != 0;
 }
@@ -557,7 +557,7 @@ ccc_omm_occupied(ccc_ommap_entry const *const e)
 {
     if (!e)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
 }
@@ -573,7 +573,7 @@ ccc_omm_validate(ccc_ordered_multimap const *const mm)
 {
     if (!mm)
     {
-        return CCC_BOOL_ERR;
+        return CCC_TRIBOOL_ERROR;
     }
     return ccc_ommap_validate(mm);
 }
