@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -91,7 +90,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_weak_srand)
     for (int i = 0; i < num_nodes; ++i)
     {
         CHECK(contains(&s, &vals[i].key), true);
-        (void)remove(&s, &vals[i].elem);
+        (void)ccc_remove(&s, &vals[i].elem);
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);

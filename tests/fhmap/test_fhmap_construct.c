@@ -98,8 +98,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
     CHECK(size(&dst), size(&src));
     for (int i = 0; i < 3; ++i)
     {
-        ccc_entry src_e = remove(&src, &(struct val){.key = i}.e);
-        ccc_entry dst_e = remove(&dst, &(struct val){.key = i}.e);
+        ccc_entry src_e = ccc_remove(&src, &(struct val){.key = i}.e);
+        ccc_entry dst_e = ccc_remove(&dst, &(struct val){.key = i}.e);
         CHECK(occupied(&src_e), occupied(&dst_e));
     }
     CHECK(is_empty(&src), is_empty(&dst));
@@ -139,8 +139,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
     CHECK(size(&dst), size(&src));
     for (int i = 0; i < 3; ++i)
     {
-        ccc_entry src_e = remove(&src, &(struct val){.key = i}.e);
-        ccc_entry dst_e = remove(&dst, &(struct val){.key = i}.e);
+        ccc_entry src_e = ccc_remove(&src, &(struct val){.key = i}.e);
+        ccc_entry dst_e = ccc_remove(&dst, &(struct val){.key = i}.e);
         CHECK(occupied(&src_e), occupied(&dst_e));
     }
     CHECK(is_empty(&src), is_empty(&dst));

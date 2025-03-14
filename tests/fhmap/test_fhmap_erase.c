@@ -22,7 +22,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
-    ent = remove(&fh, &query.e);
+    ent = ccc_remove(&fh, &query.e);
     CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     CHECK(v->val, 99);
     CHECK(size(&fh), 0);
     query.key = 101;
-    ent = remove(&fh, &query.e);
+    ent = ccc_remove(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), 0);
     ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),

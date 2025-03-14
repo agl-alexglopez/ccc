@@ -7,7 +7,6 @@ The leetcode lru problem in C. */
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "checkers.h"
 #include "doubly_linked_list.h"

@@ -3,7 +3,6 @@ The leetcode lru problem in C. */
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC

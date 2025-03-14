@@ -148,7 +148,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     ccc_flat_hash_map fh
         = fhm_init((struct val[50]){}, e, key, fhmap_int_to_u64, fhmap_id_eq,
                    NULL, NULL, 50);
-    ccc_entry ent = remove(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ccc_entry ent = ccc_remove(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -158,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), 1);
-    ent = remove(&fh, &(struct val){.key = -1, .val = -1}.e);
+    ent = ccc_remove(&fh, &(struct val){.key = -1, .val = -1}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), 0);
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = remove(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = ccc_remove(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), i);
@@ -180,7 +180,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), i + 1);
-    ent = remove(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = ccc_remove(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), i);
@@ -192,7 +192,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    ent = remove(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = ccc_remove(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh), i);
@@ -201,7 +201,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh), i + 1);
-    ent = remove(&fh, &(struct val){.key = i, .val = i}.e);
+    ent = ccc_remove(&fh, &(struct val){.key = i, .val = i}.e);
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&fh), i);

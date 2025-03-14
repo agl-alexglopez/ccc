@@ -23,7 +23,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_erase)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != 0, true);
     CHECK(size(&hh), 1);
-    ent = remove(&hh, &query.e);
+    ent = ccc_remove(&hh, &query.e);
     CHECK(occupied(&ent), true);
     struct val *v = hhm_at(&hh, unwrap(&ent));
     CHECK(v == NULL, true);
@@ -31,7 +31,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_erase)
     CHECK(query.val, 99);
     CHECK(size(&hh), 0);
     query.key = 101;
-    ent = remove(&hh, &query.e);
+    ent = ccc_remove(&hh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(size(&hh), 0);
     ccc_hhm_insert_handle_w(handle_r(&hh, &(int){137}),

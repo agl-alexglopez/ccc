@@ -160,7 +160,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = remove(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ccc_entry ent = ccc_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), 1);
-    ent = remove(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ent = ccc_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), 0);
@@ -184,7 +184,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(fill_n(&om, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&om), i);
@@ -194,7 +194,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), i + 1);
-    ent = remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), i);
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(fill_n(&om, size - i, i), PASS);
 
     i = size;
-    ent = remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(size(&om), i);
@@ -216,7 +216,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&om), i + 1);
-    ent = remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(size(&om), i);
