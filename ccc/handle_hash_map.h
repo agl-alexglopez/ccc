@@ -472,7 +472,7 @@ or a vacant handle if it was vacant.
 non-NULL if the closure executes.
 
 ```
-#define handle_hash_MAP_USING_NAMESPACE_CCC
+#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
 // Increment the key k if found otherwise do nothing.
 hhmap_handle *e = hhm_and_modify_w(handle_r(&hhm, &k), word, T->cnt++;);
 

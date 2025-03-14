@@ -447,9 +447,9 @@ non-NULL if the closure executes.
 hrm_handle *e = hrm_and_modify_w(handle_r(&hrm, &k), word, T->cnt++;);
 
 // Increment the key k if found otherwise insert a default value.
-word *w = hrm_or_insert_w(hrm_and_modify_w(handle_r(&hrm, &k), word,
-                                           { T->cnt++; }),
-                          (word){.key = k, .cnt = 1});
+handle_i w = hrm_or_insert_w(hrm_and_modify_w(handle_r(&hrm, &k), word,
+                                              { T->cnt++; }),
+                             (word){.key = k, .cnt = 1});
 ```
 
 Note that any code written is only evaluated if the handle is Occupied and the
