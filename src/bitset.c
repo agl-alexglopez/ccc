@@ -887,6 +887,10 @@ ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
     dst->mem_ = dst_mem;
     dst->cap_ = dst_cap;
     dst->alloc_ = dst_alloc;
+    if (!src->cap_)
+    {
+        return CCC_RESULT_OK;
+    }
     if (dst->cap_ < src->cap_)
     {
         ccc_bitblock *const new_mem = fn(
@@ -897,6 +901,10 @@ ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
         }
         dst->mem_ = new_mem;
         dst->cap_ = src->cap_;
+    }
+    if (!src->mem_ || !dst->mem_)
+    {
+        return CCC_RESULT_ARG_ERROR;
     }
     (void)memcpy(dst->mem_, src->mem_,
                  blocks(src->cap_) * sizeof(ccc_bitblock_));
