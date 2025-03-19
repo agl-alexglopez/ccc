@@ -16,9 +16,9 @@
 
 struct val
 {
-    int val;
     ccc_ommap_elem ommap_elem;
     ccc_pq_elem pq_elem;
+    int val;
 };
 
 ptrdiff_t const step = 100000;
@@ -51,43 +51,44 @@ static perf_fn const perf_tests[NUM_TESTS] = {test_push,
 int
 main(int argc, char **argv)
 {
-    if (argc > 1)
+    if (argc <= 1)
     {
-        str_view arg = sv(argv[1]);
-        if (sv_cmp(arg, SV("push")) == SV_EQL)
+        for (ptrdiff_t i = 0; i < NUM_TESTS; ++i)
         {
-            test_push();
-        }
-        else if (sv_cmp(arg, SV("pop")) == SV_EQL)
-        {
-            test_pop();
-        }
-        else if (sv_cmp(arg, SV("push-pop")) == SV_EQL)
-        {
-            test_push_pop();
-        }
-        else if (sv_cmp(arg, SV("push-intermittent-pop")) == SV_EQL)
-        {
-            test_push_intermittent_pop();
-        }
-        else if (sv_cmp(arg, SV("pop-intermittent-push")) == SV_EQL)
-        {
-            test_pop_intermittent_push();
-        }
-        else if (sv_cmp(arg, SV("update")) == SV_EQL)
-        {
-            test_update();
-        }
-        else
-        {
-            quit("Unknown test request\n", 1);
+            perf_tests[i]();
         }
         return 0;
     }
-    for (ptrdiff_t i = 0; i < NUM_TESTS; ++i)
+    str_view arg = sv(argv[1]);
+    if (sv_cmp(arg, SV("push")) == SV_EQL)
     {
-        perf_tests[i]();
+        test_push();
     }
+    else if (sv_cmp(arg, SV("pop")) == SV_EQL)
+    {
+        test_pop();
+    }
+    else if (sv_cmp(arg, SV("push-pop")) == SV_EQL)
+    {
+        test_push_pop();
+    }
+    else if (sv_cmp(arg, SV("push-intermittent-pop")) == SV_EQL)
+    {
+        test_push_intermittent_pop();
+    }
+    else if (sv_cmp(arg, SV("pop-intermittent-push")) == SV_EQL)
+    {
+        test_pop_intermittent_push();
+    }
+    else if (sv_cmp(arg, SV("update")) == SV_EQL)
+    {
+        test_update();
+    }
+    else
+    {
+        quit("Unknown test request\n", 1);
+    }
+    return 0;
 }
 
 /*=======================    Test Cases     =================================*/
@@ -106,7 +107,7 @@ test_push(void)
         clock_t begin = clock();
         for (ptrdiff_t i = 0; i < n; ++i)
         {
-            (void)swap_entry(&omm, &val_array[i].ommap_elem);
+            (void)insert_or_assign(&omm, &val_array[i].ommap_elem);
         }
         clock_t end = clock();
         double const omm_time = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -145,7 +146,7 @@ test_pop(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (ptrdiff_t i = 0; i < n; ++i)
         {
-            (void)swap_entry(&omm, &val_array[i].ommap_elem);
+            (void)insert_or_assign(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
         for (ptrdiff_t i = 0; i < n; ++i)
@@ -198,7 +199,7 @@ test_push_pop(void)
         clock_t begin = clock();
         for (ptrdiff_t i = 0; i < n; ++i)
         {
-            (void)swap_entry(&omm, &val_array[i].ommap_elem);
+            (void)insert_or_assign(&omm, &val_array[i].ommap_elem);
         }
         for (ptrdiff_t i = 0; i < n; ++i)
         {
@@ -250,7 +251,7 @@ test_push_intermittent_pop(void)
         clock_t begin = clock();
         for (ptrdiff_t i = 0; i < n; ++i)
         {
-            (void)swap_entry(&omm, &val_array[i].ommap_elem);
+            (void)insert_or_assign(&omm, &val_array[i].ommap_elem);
             if (i % 10 == 0)
             {
                 (void)ccc_omm_pop_min(&omm);
@@ -301,7 +302,7 @@ test_pop_intermittent_push(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (ptrdiff_t i = 0; i < n; ++i)
         {
-            (void)swap_entry(&omm, &val_array[i].ommap_elem);
+            (void)insert_or_assign(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
         for (ptrdiff_t i = 0; i < n; ++i)
@@ -311,7 +312,7 @@ test_pop_intermittent_push(void)
             if (i % 10 == 0)
             {
                 v->val = rand_range(0, max_rand_range);
-                (void)swap_entry(&omm, &v->ommap_elem);
+                (void)insert_or_assign(&omm, &v->ommap_elem);
             }
         }
         clock_t end = clock();
@@ -370,7 +371,7 @@ test_update(void)
             = ccc_pq_init(struct val, pq_elem, CCC_LES, val_cmp, NULL, NULL);
         for (ptrdiff_t i = 0; i < n; ++i)
         {
-            (void)swap_entry(&omm, &val_array[i].ommap_elem);
+            (void)insert_or_assign(&omm, &val_array[i].ommap_elem);
         }
         clock_t begin = clock();
         for (ptrdiff_t i = 0; i < n; ++i)
@@ -421,9 +422,9 @@ static struct val *
 create_rand_vals(ptrdiff_t n)
 {
     struct val *vals = valid_malloc(n * sizeof(struct val));
-    while (n--)
+    while (n >= 0)
     {
-        vals[n].val = rand_range(0, max_rand_range);
+        vals[n--].val = rand_range(0, max_rand_range);
     }
     return vals;
 }
