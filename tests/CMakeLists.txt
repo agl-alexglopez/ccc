@@ -406,17 +406,28 @@ add_fdeq_test(test_fdeq_insert)
 add_fdeq_test(test_fdeq_erase)
 
 ################### Performance Testing #################
-add_executable(perf perf/perf.c)
-target_include_directories(perf PRIVATE "../util")
-target_link_libraries(perf 
-  PRIVATE 
-    ccc
-    random
-    str_view
-    cli
-    alloc
-)
+macro(add_perf_test TEST_NAME)
+  add_executable(${TEST_NAME} perf/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      ccc
+        random
+        str_view
+        cli
+        alloc
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+endmacro()
 
+add_perf_test(pq_perf)
+add_perf_test(hmap_perf)
+
+####################  Final Target   ##############################
 # Create a custom target that will depend on all targets in the subdirectory
 add_custom_target(tests)
 # Function to add dependencies on all targets from the subdirectory

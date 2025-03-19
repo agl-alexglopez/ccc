@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+void
+random_seed(unsigned int const seed)
+{
+    srand(seed);
+}
+
 int
 rand_range(int const min, int const max)
 {
@@ -15,7 +21,7 @@ rand_range(int const min, int const max)
 
 void
 rand_shuffle(size_t const elem_size, void *const elems, size_t const n,
-             void *tmp)
+             void *const tmp)
 {
     if (n <= 1)
     {
