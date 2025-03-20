@@ -462,18 +462,38 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Initialize a map with a buffer of types at compile time or runtime. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">memory_ptr</td><td>the pointer to the backing buffer array of user types. May be NULL if the user provides a allocation function. The buffer will be interpreted in units of type size that the user intends to store. buffer is provided and an allocation function is given. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">memory_ptr</td><td>the pointer to the backing buffer array of user types. May be NULL if the user provides a allocation function. The buffer will be interpreted in units of type size that the user intends to store. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fhash_elem_field</td><td>the name of the fhmap_elem field. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hash_fn</td><td>the ccc_hash_fn function the user desires for the table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_eq_fn</td><td>the ccc_key_eq_fn the user intends to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for resizing or NULL if no resizing is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>auxiliary data that is needed for hashing or comparison. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the starting capacity of the provided buffer or 0 if no </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the starting capacity of the provided buffer or 0. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a1b4c379aff04eb239f15349f58d17b50" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>if initializing with a fixed size table choose a prime number for the table capacity for improved performance.</dd></dl>
+<p>Initialize a static fixed size hash map at compile time that has no allocation permission or auxiliary data needed.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> e;</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Hash and equality functions are defined by the user.</span></div>
+<div class="line"><span class="keyword">static</span> flat_hash_map map</div>
+<div class="line">    = fhm_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[2999]){}, e, key, fhmap_int_to_u64,</div>
+<div class="line">               fhmap_id_eq, NULL, NULL, 2999);</div>
+<div class="ttc" id="aflat__hash__map_8h_html_ada2d334ae54ac456f5ff1a37ac546994"><div class="ttname"><a href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></div><div class="ttdeci">struct ccc_fhmap_elem_ ccc_fhmap_elem</div><div class="ttdoc">An intrusive element for a user provided type.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:49</div></div>
+</div><!-- fragment --><p>Initialize a dynamic hash table at compile time with allocation permission and no auxiliary data. Use the same type as the previous example.</p>
+<div class="fragment"><div class="line"><span class="comment">// Hash, equality, and allocation functions are defined by the user.</span></div>
+<div class="line"><span class="keyword">static</span> flat_hash_map map</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, e, key, fhmap_int_to_u64,</div>
+<div class="line">               fhmap_id_eq, std_alloc, NULL, 0);</div>
+</div><!-- fragment --><p>Initialization at runtime is also possible. Stack-based or dynamic maps are identical to the provided examples, except without the <code>static</code> keyword in a runtime context. </p>
 
 </div>
 </div>
