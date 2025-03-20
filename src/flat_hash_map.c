@@ -31,7 +31,7 @@ this table we need to consider these points.
 
     - The hash table must support a non-allocating mode without the ability to
       resize to correct from any type of tombstone overload; an in-place
-      compaction and rehash would be the only option (not sure if possible).
+      rehash would be the only option (not sure how to implement this).
     - It must work with the user choosing where the memory comes from for the
       table. This is the other side of non-allocating mode. The user should
       be able to give us memory coming from the stack, heap, or data segment.
@@ -62,8 +62,7 @@ first thought. However, improvements can still be made. */
    prime so we will stop there as max size if we ever get there. Not likely.
    The last prime is closer to the second to last because doubling breaks down
    at the end. */
-#define PRIMES_SIZE ((ptrdiff_t)56)
-static ptrdiff_t const primes[PRIMES_SIZE] = {
+static ptrdiff_t const primes[] = {
     11ULL,
     37ULL,
     79ULL,
@@ -121,11 +120,12 @@ static ptrdiff_t const primes[PRIMES_SIZE] = {
     2502450294306576181ULL,
     5202414434410211531ULL,
 };
+#define PRIMES_SIZE ((ptrdiff_t)(sizeof(primes) / sizeof(primes[0])))
 
 /* Some claim that Robin Hood tables can support a much higher load factor. I
-   would not be so sure. The primary clustering effect in these types of
-   tables can quickly rise. Mitigating with a lower load factor and prime
-   table sizes is a decent approach. Measure. */
+would not be so sure. The primary clustering effect in these types of tables can
+quickly rise. Try to mitigate with a lower load factor and prime table sizes.
+Measure. */
 static double const load_factor = 0.8;
 static ptrdiff_t const last_swap_slot = 1;
 static ptrdiff_t const num_swap_slots = 2;
@@ -133,7 +133,7 @@ static ptrdiff_t const num_swap_slots = 2;
 /*=========================   Prototypes   ==================================*/
 
 static void erase(struct ccc_fhmap_ *, void *);
-static void swap(char tmp[], void *, void *, size_t);
+static void swap(char tmp[const], void *, void *, size_t);
 static void *struct_base(struct ccc_fhmap_ const *,
                          struct ccc_fhmap_elem_ const *);
 static struct ccc_ent_ entry(struct ccc_fhmap_ *, void const *key,
@@ -712,10 +712,21 @@ ccc_impl_fhm_hash_at(struct ccc_fhmap_ const *const h, ptrdiff_t const i)
 
 /*=======================     Static Helpers    =============================*/
 
+static struct ccc_fhash_entry_
+container_entry(struct ccc_fhmap_ *const h, void const *const key)
+{
+    uint64_t const hash = filter(h, key);
+    return (struct ccc_fhash_entry_){
+        .h_ = h,
+        .hash_ = hash,
+        .entry_ = entry(h, key, hash),
+    };
+}
+
 static struct ccc_ent_
 entry(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
 {
-    char upcoming_insertion_error = 0;
+    ccc_entry_status upcoming_insertion_error = 0;
     if (maybe_resize(h) != CCC_RESULT_OK)
     {
         upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
@@ -840,21 +851,11 @@ erase(struct ccc_fhmap_ *const h, void *const e)
     } while (1);
 }
 
-static struct ccc_fhash_entry_
-container_entry(struct ccc_fhmap_ *const h, void const *const key)
-{
-    uint64_t const hash = filter(h, key);
-    return (struct ccc_fhash_entry_){
-        .h_ = h,
-        .hash_ = hash,
-        .entry_ = entry(h, key, hash),
-    };
-}
-
 static ccc_result
 maybe_resize(struct ccc_fhmap_ *const h)
 {
-    if (ccc_buf_capacity(&h->buf_) && ccc_buf_size(&h->buf_) < num_swap_slots)
+    if (unlikely(ccc_buf_capacity(&h->buf_)
+                 && ccc_buf_size(&h->buf_) < num_swap_slots))
     {
         (void)memset(h->buf_.mem_, CCC_FHM_EMPTY,
                      ccc_buf_capacity(&h->buf_) * ccc_buf_elem_size(&h->buf_));

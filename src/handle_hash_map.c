@@ -775,10 +775,21 @@ ccc_impl_hhm_elem_at(struct ccc_hhmap_ const *const h, ptrdiff_t const i)
 
 /*=======================     Static Helpers    =============================*/
 
+static struct ccc_hhash_handle_
+container_handle(struct ccc_hhmap_ *const h, void const *const key)
+{
+    uint64_t const hash = filter(h, key);
+    return (struct ccc_hhash_handle_){
+        .h_ = h,
+        .hash_ = hash,
+        .handle_ = handle(h, key, hash),
+    };
+}
+
 static struct ccc_handl_
 handle(struct ccc_hhmap_ *const h, void const *const key, uint64_t const hash)
 {
-    uint8_t future_insert_error = 0;
+    ccc_entry_status future_insert_error = 0;
     if (maybe_resize(h) != CCC_RESULT_OK)
     {
         future_insert_error = CCC_ENTRY_INSERT_ERROR;
@@ -905,17 +916,6 @@ erase_meta(struct ccc_hhmap_ *const h, ptrdiff_t i)
         i = next;
         next = increment(cap, next);
     } while (1);
-}
-
-static struct ccc_hhash_handle_
-container_handle(struct ccc_hhmap_ *const h, void const *const key)
-{
-    uint64_t const hash = filter(h, key);
-    return (struct ccc_hhash_handle_){
-        .h_ = h,
-        .hash_ = hash,
-        .handle_ = handle(h, key, hash),
-    };
 }
 
 /* A simple memcpy will not work for this table because important metadata for

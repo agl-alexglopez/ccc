@@ -64,7 +64,6 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] memory_ptr the pointer to the backing buffer array of user types.
 May be NULL if the user provides a allocation function. The buffer will be
 interpreted in units of type size that the user intends to store.
-buffer is provided and an allocation function is given.
 @param [in] fhash_elem_field the name of the fhmap_elem field.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the ccc_hash_fn function the user desires for the table.
@@ -72,9 +71,42 @@ buffer is provided and an allocation function is given.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
-@param [in] capacity the starting capacity of the provided buffer or 0 if no
+@param [in] capacity the starting capacity of the provided buffer or 0.
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);) */
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
+@warning if initializing with a fixed size table choose a prime number for the
+table capacity for improved performance.
+
+Initialize a static fixed size hash map at compile time that has
+no allocation permission or auxiliary data needed.
+
+```
+struct val
+{
+    ccc_fhmap_elem e;
+    int key;
+    int val;
+};
+
+// Hash and equality functions are defined by the user.
+static flat_hash_map map
+    = fhm_init((static struct val[2999]){}, e, key, fhmap_int_to_u64,
+               fhmap_id_eq, NULL, NULL, 2999);
+```
+
+Initialize a dynamic hash table at compile time with allocation permission and
+no auxiliary data. Use the same type as the previous example.
+
+```
+// Hash, equality, and allocation functions are defined by the user.
+static flat_hash_map map
+    = fhm_init((struct val *)NULL, e, key, fhmap_int_to_u64,
+               fhmap_id_eq, std_alloc, NULL, 0);
+```
+
+Initialization at runtime is also possible. Stack-based or dynamic maps are
+identical to the provided examples, except without the `static` keyword in a
+runtime context. */
 #define ccc_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,         \
                      key_eq_fn, alloc_fn, aux_data, capacity)                  \
     ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,        \
