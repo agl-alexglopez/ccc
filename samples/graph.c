@@ -368,12 +368,10 @@ main(int argc, char **argv)
 /*========================   Graph Building    ==============================*/
 
 /* The undirected graphs produced are randomly generated graphs where each
-   vertex is placed on the grid of terminal cells. Each vertex then tries
-   to connect a random number of out edges to vertices that can accept an
-   in edge. The search for another vertex chooses the shortest path from two
-   options: the shortest existing route between src and dst among vertices or
-   the cost of building a new edge in the terminal. The number of cells taken to
-   connect the edge to another other vertex is the cost/weight of that edge. */
+   vertex is placed on the grid of terminal cells. Each vertex then tries to
+   connect a random number of out edges to vertices that can accept an in edge.
+   The number of cells taken to connect the edge to another other vertex is the
+   cost/weight of that edge. */
 static void
 build_graph(struct graph *const graph)
 {
