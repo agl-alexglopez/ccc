@@ -357,12 +357,12 @@ ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the size of the fdeq representing active slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return the size of the fdeq or -1 if fdeq is NULL. */
+@return the size of the fdeq or an argument error is set if fdeq is NULL. */
 [[nodiscard]] ccc_ucount ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the capacity representing total possible slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return the capacity of the fdeq or -1 if fdeq is NULL. */
+@return the capacity of the fdeq or an argument error is set if fdeq is NULL. */
 [[nodiscard]] ccc_ucount
 ccc_fdeq_capacity(ccc_flat_double_ended_queue const *fdeq);
 

@@ -648,7 +648,7 @@ Obtain the container state. */
 
 /** @brief Returns the size of the table representing active slots.
 @param [in] h the hash table.
-@return the size of the map or -1 if h is NULL. */
+@return the size of the map or an argument error is set if h is NULL. */
 [[nodiscard]] ccc_ucount ccc_fhm_size(ccc_flat_hash_map const *h);
 
 /** @brief Helper to find a prime number if needed.
@@ -663,7 +663,7 @@ size to mitigate hash collisions. */
 
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
-@return the capacity of the map or -1 if h is NULL. */
+@return the capacity of the map or an argument error is set if h is NULL. */
 [[nodiscard]] ccc_ucount ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
 /** @brief Return a reference to the base of backing array. O(1).
