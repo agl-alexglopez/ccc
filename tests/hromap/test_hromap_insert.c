@@ -34,7 +34,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     ccc_handle *hndl
         = swap_handle_r(&hrm, &(struct val){.id = 137, .val = 99}.elem);
     CHECK(occupied(hndl), false);
-    CHECK(size(&hrm), 1);
+    CHECK(size(&hrm).count, 1);
     CHECK_END_FN();
 }
 
@@ -48,7 +48,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_macros)
                                            (struct val){.id = 2, .val = 0}));
     CHECK(ins != NULL, true);
     CHECK(validate(&hrm), true);
-    CHECK(size(&hrm), 1);
+    CHECK(size(&hrm).count, 1);
     ins = hrm_at(&hrm, hrm_insert_handle_w(handle_r(&hrm, &(int){2}),
                                            (struct val){.id = 2, .val = 0}));
     CHECK(validate(&hrm), true);
@@ -63,25 +63,25 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_macros)
     CHECK(ins == NULL, false);
     CHECK(validate(&hrm), true);
     CHECK(ins->val, 99);
-    CHECK(size(&hrm), 3);
+    CHECK(size(&hrm).count, 3);
     ins = hrm_at(&hrm, ccc_handle_unwrap(hrm_insert_or_assign_w(
                            &hrm, 3, (struct val){.val = 98})));
     CHECK(validate(&hrm), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
-    CHECK(size(&hrm), 3);
+    CHECK(size(&hrm).count, 3);
     ins = hrm_at(&hrm,
                  unwrap(hrm_try_insert_w(&hrm, 3, (struct val){.val = 100})));
     CHECK(ins == NULL, false);
     CHECK(validate(&hrm), true);
     CHECK(ins->val, 98);
-    CHECK(size(&hrm), 3);
+    CHECK(size(&hrm).count, 3);
     ins = hrm_at(&hrm, ccc_handle_unwrap(hrm_try_insert_w(
                            &hrm, 4, (struct val){.val = 100})));
     CHECK(ins == NULL, false);
     CHECK(validate(&hrm), true);
     CHECK(ins->val, 100);
-    CHECK(size(&hrm), 4);
+    CHECK(size(&hrm).count, 4);
     CHECK_END_FN(ccc_hrm_clear_and_free(&hrm, NULL););
 }
 
@@ -150,13 +150,13 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_functional)
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[200]){}, elem, id, id_cmp, NULL, NULL, 200);
-    ptrdiff_t const size = 200;
+    size_t const size = 200;
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
-    for (ptrdiff_t i = 0; i < size / 2; i += 2)
+    for (size_t i = 0; i < size / 2; i += 2)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -166,9 +166,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_functional)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hrm), (size / 2) / 2);
+    CHECK(size(&hrm).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -190,10 +190,10 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_functional)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&hrm), (size / 2));
+    CHECK(size(&hrm).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -203,14 +203,14 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_functional)
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true);
     }
-    CHECK(size(&hrm), (size / 2));
+    CHECK(size(&hrm).count, (size / 2));
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ptrdiff_t const size = 200;
+    size_t const size = 200;
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[200]){}, elem, id, id_cmp, NULL, NULL, 200);
 
@@ -218,7 +218,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle)
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
-    for (ptrdiff_t i = 0; i < size / 2; i += 2)
+    for (size_t i = 0; i < size / 2; i += 2)
     {
         def.id = (int)i;
         def.val = (int)i;
@@ -228,9 +228,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hrm), (size / 2) / 2);
+    CHECK(size(&hrm).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         def.id = (int)i;
         def.val = (int)i + 1;
@@ -248,21 +248,21 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&hrm), (size / 2));
+    CHECK(size(&hrm).count, (size / 2));
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ptrdiff_t const size = 200;
+    size_t const size = 200;
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[200]){}, elem, id, id_cmp, NULL, NULL, 200);
 
     /* Test handle or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
-    for (ptrdiff_t i = 0; i < size / 2; i += 2)
+    for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
             = hrm_at(&hrm, insert_handle(handle_r(&hrm, &i),
@@ -271,9 +271,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle_macros)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hrm), (size / 2) / 2);
+    CHECK(size(&hrm).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
             = hrm_at(&hrm, insert_handle(handle_r(&hrm, &i),
@@ -290,7 +290,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_via_handle_macros)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&hrm), (size / 2));
+    CHECK(size(&hrm).count, (size / 2));
     CHECK_END_FN();
 }
 
@@ -314,7 +314,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_macros)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hrm), (size / 2) / 2);
+    CHECK(size(&hrm).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
@@ -335,7 +335,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_macros)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&hrm), (size / 2));
+    CHECK(size(&hrm).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
@@ -347,7 +347,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_api_macros)
         /* All values in the array should be odd now */
         CHECK(v->val % 2 == 0, true);
     }
-    CHECK(size(&hrm), (size / 2));
+    CHECK(size(&hrm).count, (size / 2));
     CHECK_END_FN();
 }
 
@@ -358,8 +358,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_two_sum)
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
-    for (ptrdiff_t i = 0; i < (ptrdiff_t)(sizeof(addends) / sizeof(addends[0]));
-         ++i)
+    for (size_t i = 0; i < (size_t)(sizeof(addends) / sizeof(addends[0])); ++i)
     {
         struct val const *const other_addend
             = hrm_at(&hrm, get_key_val(&hrm, &(int){target - addends[i]}));
@@ -380,7 +379,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_two_sum)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_resize)
 {
-    ptrdiff_t const prime_start = 11;
+    size_t const prime_start = 11;
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val *)malloc(sizeof(struct val) * prime_start), elem,
                    id, id_cmp, std_alloc, NULL, prime_start);
@@ -399,7 +398,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize)
         CHECK(v->val, i);
         CHECK(validate(&hrm), true);
     }
-    CHECK(size(&hrm), to_insert);
+    CHECK(size(&hrm).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -416,7 +415,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_resize_macros)
 {
-    ptrdiff_t const prime_start = 11;
+    size_t const prime_start = 11;
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val *)malloc(sizeof(struct val) * prime_start), elem,
                    id, id_cmp, std_alloc, NULL, prime_start);
@@ -433,7 +432,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize_macros)
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&hrm), to_insert);
+    CHECK(size(&hrm).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -473,7 +472,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize_from_null)
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&hrm), to_insert);
+    CHECK(size(&hrm).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -504,7 +503,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize_from_null_macros)
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&hrm), to_insert);
+    CHECK(size(&hrm).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -551,45 +550,45 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_limit)
         CHECK(v->val, i);
         last_index = shuffled_index;
     }
-    ptrdiff_t const final_size = size(&hrm);
+    size_t const final_size = size(&hrm).count;
     /* The last successful handle is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
     ccc_handle hndl = swap_handle(&hrm, &v.elem);
     CHECK(unwrap(&hndl) != 0, true);
     CHECK(insert_error(&hndl), false);
-    CHECK(size(&hrm), final_size);
+    CHECK(size(&hrm).count, final_size);
 
     v = (struct val){.id = last_index, .val = -2};
     struct val *in_table
         = hrm_at(&hrm, insert_handle(handle_r(&hrm, &v.id), &v.elem));
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -2);
-    CHECK(size(&hrm), final_size);
+    CHECK(size(&hrm).count, final_size);
 
     in_table = hrm_at(
         &hrm, insert_handle(handle_r(&hrm, &last_index),
                             &(struct val){.id = last_index, .val = -3}.elem));
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -3);
-    CHECK(size(&hrm), final_size);
+    CHECK(size(&hrm).count, final_size);
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct val){.id = shuffled_index, .val = -4};
     in_table = hrm_at(&hrm, insert_handle(handle_r(&hrm, &v.id), &v.elem));
     CHECK(in_table == NULL, true);
-    CHECK(size(&hrm), final_size);
+    CHECK(size(&hrm).count, final_size);
 
     in_table = hrm_at(
         &hrm,
         insert_handle(handle_r(&hrm, &shuffled_index),
                       &(struct val){.id = shuffled_index, .val = -4}.elem));
     CHECK(in_table == NULL, true);
-    CHECK(size(&hrm), final_size);
+    CHECK(size(&hrm).count, final_size);
 
     hndl = swap_handle(&hrm, &v.elem);
     CHECK(unwrap(&hndl) == 0, true);
     CHECK(insert_error(&hndl), true);
-    CHECK(size(&hrm), final_size);
+    CHECK(size(&hrm).count, final_size);
     CHECK_END_FN();
 }
 
@@ -629,7 +628,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_and_find)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_shuffle)
 {
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     ccc_handle_realtime_ordered_map hrm
         = hrm_init((struct val[51]){}, elem, id, id_cmp, NULL, NULL, 51);
     CHECK(size > 1, true);
@@ -637,7 +636,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_shuffle)
     CHECK(insert_shuffled(&hrm, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &hrm), size);
-    for (ptrdiff_t i = 1; i < size; ++i)
+    for (size_t i = 1; i < size; ++i)
     {
         CHECK(sorted_check[i - 1] <= sorted_check[i], true);
     }
@@ -657,7 +656,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_weak_srand)
         CHECK(insert_error(&e), false);
         CHECK(validate(&hrm), true);
     }
-    CHECK(size(&hrm), (ptrdiff_t)num_nodes);
+    CHECK(size(&hrm).count, (size_t)num_nodes);
     CHECK_END_FN();
 }
 

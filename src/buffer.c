@@ -4,19 +4,19 @@
 #include "buffer.h"
 #include "types.h"
 
-static ptrdiff_t const start_capacity = 8;
+static size_t const start_capacity = 8;
 
 /*==========================   Prototypes    ================================*/
 
-static void *at(ccc_buffer const *, ptrdiff_t);
+static void *at(ccc_buffer const *, size_t);
 
 /*==========================    Interface    ================================*/
 
 ccc_result
-ccc_buf_alloc(ccc_buffer *const buf, ptrdiff_t const capacity,
+ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
               ccc_alloc_fn *const fn)
 {
-    if (!buf || capacity < 0)
+    if (!buf)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -35,9 +35,9 @@ ccc_buf_alloc(ccc_buffer *const buf, ptrdiff_t const capacity,
 }
 
 void *
-ccc_buf_at(ccc_buffer const *const buf, ptrdiff_t const i)
+ccc_buf_at(ccc_buffer const *const buf, size_t const i)
 {
-    if (!buf || i < 0 || i >= buf->capacity_)
+    if (!buf || i >= buf->capacity_)
     {
         return NULL;
     }
@@ -88,11 +88,10 @@ ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
 }
 
 ccc_result
-ccc_buf_swap(ccc_buffer *const buf, char tmp[const], ptrdiff_t const i,
-             ptrdiff_t const j)
+ccc_buf_swap(ccc_buffer *const buf, char tmp[const], size_t const i,
+             size_t const j)
 {
-    if (!buf || !tmp || i < 0 || j < 0 || i >= buf->capacity_
-        || j >= buf->capacity_ || j == i)
+    if (!buf || !tmp || i >= buf->capacity_ || j >= buf->capacity_ || j == i)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -103,10 +102,9 @@ ccc_buf_swap(ccc_buffer *const buf, char tmp[const], ptrdiff_t const i,
 }
 
 void *
-ccc_buf_copy(ccc_buffer *const buf, ptrdiff_t const dst, ptrdiff_t const src)
+ccc_buf_copy(ccc_buffer *const buf, size_t const dst, size_t const src)
 {
-    if (!buf || dst < 0 || src < 0 || dst >= buf->capacity_
-        || src >= buf->capacity_)
+    if (!buf || dst >= buf->capacity_ || src >= buf->capacity_)
     {
         return NULL;
     }
@@ -118,9 +116,9 @@ ccc_buf_copy(ccc_buffer *const buf, ptrdiff_t const dst, ptrdiff_t const src)
 }
 
 ccc_result
-ccc_buf_write(ccc_buffer *const buf, ptrdiff_t const i, void const *const data)
+ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
 {
-    if (!buf || !buf->mem_ || i < 0 || !data)
+    if (!buf || !buf->mem_ || !data)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -134,9 +132,9 @@ ccc_buf_write(ccc_buffer *const buf, ptrdiff_t const i, void const *const data)
 }
 
 ccc_result
-ccc_buf_erase(ccc_buffer *const buf, ptrdiff_t const i)
+ccc_buf_erase(ccc_buffer *const buf, size_t const i)
 {
-    if (!buf || !buf->sz_ || i >= buf->sz_ || i < 0)
+    if (!buf || !buf->sz_ || i >= buf->sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -157,9 +155,9 @@ ccc_buf_erase(ccc_buffer *const buf, ptrdiff_t const i)
 }
 
 void *
-ccc_buf_insert(ccc_buffer *const buf, ptrdiff_t const i, void const *const data)
+ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
 {
-    if (!buf || !buf->mem_ || i < 0 || i > buf->sz_)
+    if (!buf || !buf->mem_ || i > buf->sz_)
     {
         return NULL;
     }
@@ -173,9 +171,9 @@ ccc_buf_insert(ccc_buffer *const buf, ptrdiff_t const i, void const *const data)
 }
 
 ccc_result
-ccc_buf_pop_back_n(ccc_buffer *const buf, ptrdiff_t n)
+ccc_buf_pop_back_n(ccc_buffer *const buf, size_t n)
 {
-    if (!buf || n > buf->sz_ || n < 0)
+    if (!buf || n > buf->sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -189,22 +187,34 @@ ccc_buf_pop_back(ccc_buffer *const buf)
     return ccc_buf_pop_back_n(buf, 1);
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_buf_size(ccc_buffer const *const buf)
 {
-    return buf ? buf->sz_ : -1;
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->sz_};
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_buf_capacity(ccc_buffer const *const buf)
 {
-    return buf ? buf->capacity_ : -1;
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->capacity_};
 }
 
-size_t
+ccc_ucount
 ccc_buf_elem_size(ccc_buffer const *const buf)
 {
-    return buf ? buf->elem_sz_ : 0;
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->elem_sz_};
 }
 
 ccc_tribool
@@ -305,26 +315,27 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
     return (char *)buf->mem_ + (buf->elem_sz_ * buf->capacity_);
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_buf_i(ccc_buffer const *const buf, void const *const slot)
 {
     if (!buf || !buf->mem_ || !slot || slot < buf->mem_
         || (char *)slot
                >= ((char *)buf->mem_ + (buf->capacity_ * buf->elem_sz_)))
     {
-        return -1;
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ptrdiff_t)(((char *)slot - ((char *)buf->mem_)) / buf->elem_sz_);
+    return (ccc_ucount){
+        .count = (((char *)slot - ((char *)buf->mem_)) / buf->elem_sz_)};
 }
 
 ccc_result
-ccc_buf_size_plus(ccc_buffer *const buf, ptrdiff_t const n)
+ccc_buf_size_plus(ccc_buffer *const buf, size_t const n)
 {
-    if (!buf || n < 0)
+    if (!buf)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    ptrdiff_t const new_sz = buf->sz_ + n;
+    size_t const new_sz = buf->sz_ + n;
     if (new_sz > buf->capacity_)
     {
         buf->sz_ = buf->capacity_;
@@ -335,9 +346,9 @@ ccc_buf_size_plus(ccc_buffer *const buf, ptrdiff_t const n)
 }
 
 ccc_result
-ccc_buf_size_minus(ccc_buffer *const buf, ptrdiff_t const n)
+ccc_buf_size_minus(ccc_buffer *const buf, size_t const n)
 {
-    if (!buf || n < 0)
+    if (!buf)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -351,9 +362,9 @@ ccc_buf_size_minus(ccc_buffer *const buf, ptrdiff_t const n)
 }
 
 ccc_result
-ccc_buf_size_set(ccc_buffer *const buf, ptrdiff_t const n)
+ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
 {
-    if (!buf || n < 0)
+    if (!buf)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -369,7 +380,7 @@ ccc_buf_size_set(ccc_buffer *const buf, ptrdiff_t const n)
 /*======================  Static Helpers  ==================================*/
 
 static inline void *
-at(ccc_buffer const *const buf, ptrdiff_t const i)
+at(ccc_buffer const *const buf, size_t const i)
 {
     return ((char *)buf->mem_ + (i * buf->elem_sz_));
 }

@@ -15,7 +15,7 @@
 #include <time.h>
 
 CHECK_BEGIN_STATIC_FN(check_range, ordered_multimap const *const rom,
-                      range const *const r, ptrdiff_t const n,
+                      range const *const r, size_t const n,
                       int const expect_range[])
 {
     if (begin_range(r))
@@ -26,7 +26,7 @@ CHECK_BEGIN_STATIC_FN(check_range, ordered_multimap const *const rom,
     {
         CHECK(((struct val *)end_range(r))->key, expect_range[n - 1]);
     }
-    ptrdiff_t index = 0;
+    size_t index = 0;
     struct val *iter = begin_range(r);
     for (; iter != end_range(r) && index < n;
          iter = next(rom, &iter->elem), ++index)
@@ -41,14 +41,14 @@ CHECK_BEGIN_STATIC_FN(check_range, ordered_multimap const *const rom,
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
-        for (ptrdiff_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", expect_range[j]);
         }
         (void)fprintf(stderr, "}\n%s", NONE);
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         iter = begin_range(r);
-        for (ptrdiff_t j = 0; j < n && iter != end_range(r);
+        for (size_t j = 0; j < n && iter != end_range(r);
              ++j, iter = next(rom, &iter->elem))
         {
             if (!iter)
@@ -73,7 +73,7 @@ CHECK_BEGIN_STATIC_FN(check_range, ordered_multimap const *const rom,
 }
 
 CHECK_BEGIN_STATIC_FN(check_rrange, ordered_multimap const *const rom,
-                      rrange const *const r, ptrdiff_t const n,
+                      rrange const *const r, size_t const n,
                       int const expect_rrange[])
 {
     if (rbegin_rrange(r))
@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, ordered_multimap const *const rom,
         CHECK(((struct val *)rend_rrange(r))->key, expect_rrange[n - 1]);
     }
     struct val *iter = rbegin_rrange(r);
-    ptrdiff_t index = 0;
+    size_t index = 0;
     for (; iter != rend_rrange(r); iter = rnext(rom, &iter->elem))
     {
         int const cur_key = iter->key;
@@ -99,7 +99,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, ordered_multimap const *const rom,
     }
     CHECK_END_FN_FAIL({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
-        ptrdiff_t j = 0;
+        size_t j = 0;
         for (; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", expect_rrange[j]);
@@ -134,8 +134,8 @@ CHECK_BEGIN_STATIC_FN(check_rrange, ordered_multimap const *const rom,
 
 CHECK_BEGIN_STATIC_FN(iterator_check, ordered_multimap *const omm)
 {
-    ptrdiff_t const size = size(omm);
-    ptrdiff_t iter_count = 0;
+    size_t const size = size(omm).count;
+    size_t iter_count = 0;
     for (struct val *e = begin(omm); e != end(omm); e = next(omm, &e->elem))
     {
         ++iter_count;
@@ -163,7 +163,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_unique_vals)
     int const num_nodes = 33;
     int const prime = 37;
     struct val vals[33];
-    ptrdiff_t shuffled_index = prime % num_nodes;
+    size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
         vals[i].key = shuffled_index; // NOLINT
@@ -173,7 +173,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_forward_iter_unique_vals)
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[33];
-    CHECK(inorder_fill(val_keys_inorder, num_nodes, &omm), size(&omm));
+    CHECK(inorder_fill(val_keys_inorder, num_nodes, &omm), size(&omm).count);
     j = num_nodes - 1;
     for (struct val *e = begin(&omm); e && j >= 0;
          e = next(&omm, &e->elem), --j)
@@ -228,9 +228,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    ptrdiff_t const num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[1000];
-    for (ptrdiff_t i = 0; i < num_nodes; ++i)
+    for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
@@ -239,7 +239,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_iterate_pop)
         CHECK(validate(&omm), true);
     }
     CHECK(iterator_check(&omm), PASS);
-    ptrdiff_t pop_count = 0;
+    size_t pop_count = 0;
     while (!is_empty(&omm))
     {
         CHECK(omm_pop_max(&omm), CCC_RESULT_OK);
@@ -261,9 +261,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_removal)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    ptrdiff_t const num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[1000];
-    for (ptrdiff_t i = 0; i < num_nodes; ++i)
+    for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
@@ -295,9 +295,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_update)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    ptrdiff_t const num_nodes = 1000;
+    size_t const num_nodes = 1000;
     struct val vals[1000];
-    for (ptrdiff_t i = 0; i < num_nodes; ++i)
+    for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].key = rand() % (num_nodes + 1); // NOLINT
@@ -321,7 +321,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_priority_update)
             i = next(&omm, &i->elem);
         }
     }
-    CHECK(size(&omm), num_nodes);
+    CHECK(size(&omm).count, num_nodes);
     CHECK_END_FN();
 }
 

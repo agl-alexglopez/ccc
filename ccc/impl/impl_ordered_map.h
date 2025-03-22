@@ -25,7 +25,7 @@ struct ccc_omap_
     ccc_alloc_fn *alloc_;
     ccc_key_cmp_fn *cmp_;
     void *aux_;
-    ptrdiff_t size_;
+    size_t size_;
     size_t elem_sz_;
     size_t node_elem_offset_;
     size_t key_offset_;

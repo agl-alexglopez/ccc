@@ -598,7 +598,7 @@ Obtain the container state. */
 /** @brief Returns the size of the map.
 @param [in] om the map.
 @return the size or -1 if om is NULL. */
-[[nodiscard]] ptrdiff_t ccc_om_size(ccc_ordered_map const *om);
+[[nodiscard]] ccc_ucount ccc_om_size(ccc_ordered_map const *om);
 
 /** @brief Validation of invariants for the map.
 @param [in] om the map to validate.

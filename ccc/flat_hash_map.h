@@ -649,7 +649,7 @@ Obtain the container state. */
 /** @brief Returns the size of the table representing active slots.
 @param [in] h the hash table.
 @return the size of the map or -1 if h is NULL. */
-[[nodiscard]] ptrdiff_t ccc_fhm_size(ccc_flat_hash_map const *h);
+[[nodiscard]] ccc_ucount ccc_fhm_size(ccc_flat_hash_map const *h);
 
 /** @brief Helper to find a prime number if needed.
 @param [in] n the input that may or may not be prime.
@@ -659,12 +659,12 @@ It is possible to use this hash table without an allocator by providing the
 buffer to be used for the underlying storage and preventing allocation.
 If such a backing store is used it would be best to ensure it is a prime number
 size to mitigate hash collisions. */
-[[nodiscard]] ptrdiff_t ccc_fhm_next_prime(ptrdiff_t n);
+[[nodiscard]] ccc_ucount ccc_fhm_next_prime(size_t n);
 
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
 @return the capacity of the map or -1 if h is NULL. */
-[[nodiscard]] ptrdiff_t ccc_fhm_capacity(ccc_flat_hash_map const *h);
+[[nodiscard]] ccc_ucount ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
 /** @brief Return a reference to the base of backing array. O(1).
 @param [in] h a pointer to the map.

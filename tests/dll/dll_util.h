@@ -22,9 +22,9 @@ enum push_end
 
 ccc_threeway_cmp val_cmp(ccc_cmp);
 
-enum check_result check_order(ccc_doubly_linked_list const *, ptrdiff_t n,
+enum check_result check_order(ccc_doubly_linked_list const *, size_t n,
                               int const order[]);
-enum check_result create_list(ccc_doubly_linked_list *, enum push_end,
-                              ptrdiff_t n, struct val vals[]);
+enum check_result create_list(ccc_doubly_linked_list *, enum push_end, size_t n,
+                              struct val vals[]);
 
 #endif /* DLL_UTIL_H */

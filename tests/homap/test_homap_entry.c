@@ -46,10 +46,10 @@ plusaux(ccc_user_type const t)
 /* Fills the container with n elements with id and val starting at the provided
    value and incrementing by 1 until n is reached. Assumes id_and_val are
    not present by key in the table and all subsequent inserts are unique. */
-CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_ordered_map *const hom,
-                      ptrdiff_t const n, int id_and_val)
+CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_ordered_map *const hom, size_t const n,
+                      int id_and_val)
 {
-    for (ptrdiff_t i = 0; i < n; ++i, ++id_and_val)
+    for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
         ccc_handle ent = swap_handle(
             hom, &(struct val){.id = id_and_val, .val = id_and_val}.elem);
@@ -69,11 +69,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_validate)
     ccc_handle ent = swap_handle(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = swap_handle(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -89,11 +89,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert)
     ccc_handle ent = swap_handle(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = swap_handle(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -106,11 +106,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert)
     ent = swap_handle(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = swap_handle(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -123,11 +123,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert)
     ent = swap_handle(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = swap_handle(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -143,15 +143,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     ccc_handle ent = ccc_remove(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     ent = swap_handle(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = ccc_remove(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     struct val *v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -164,15 +164,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i);
+    CHECK(size(&hom).count, i);
     ent = swap_handle(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i);
+    CHECK(size(&hom).count, i);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -184,15 +184,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i);
+    CHECK(size(&hom).count, i);
     ent = swap_handle(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     ent = ccc_remove(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i);
+    CHECK(size(&hom).count, i);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -208,11 +208,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert)
     ccc_handle ent = try_insert(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = try_insert(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -225,11 +225,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert)
     ent = try_insert(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = try_insert(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -242,10 +242,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert)
     ent = try_insert(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = try_insert(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -261,11 +261,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert_with)
     ccc_handle *ent = hom_try_insert_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = hom_try_insert_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -278,11 +278,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert_with)
     ent = hom_try_insert_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = hom_try_insert_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -295,11 +295,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert_with)
     ent = hom_try_insert_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = hom_try_insert_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -316,11 +316,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign)
         = insert_or_assign(&hom, &(struct val){.id = -1, .val = -1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = insert_or_assign(&hom, &(struct val){.id = -1, .val = -2}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -333,10 +333,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign)
     ent = insert_or_assign(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = insert_or_assign(&hom, &(struct val){.id = i, .val = i + 1}.elem);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -349,11 +349,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign)
     ent = insert_or_assign(&hom, &(struct val){.id = i, .val = i}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = insert_or_assign(&hom, &(struct val){.id = i, .val = i + 1}.elem);
     CHECK(validate(&hom), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(&ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -369,11 +369,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign_with)
     ccc_handle *ent = hom_insert_or_assign_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ent = hom_insert_or_assign_w(&hom, -1, val(-2));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -386,10 +386,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign_with)
     ent = hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = hom_insert_or_assign_w(&hom, i, val(i + 1));
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -402,11 +402,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign_with)
     ent = hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = hom_insert_or_assign_w(&hom, i, val(i + 1));
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -422,15 +422,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify)
     ccc_homap_handle *ent = handle_r(&hom, &(int){-1});
     CHECK(validate(&hom), true);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     ent = and_modify(ent, plus);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     (void)hom_insert_or_assign_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &(int){-1});
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -447,12 +447,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify)
     i += (size / 2);
     ent = handle_r(&hom, &i);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     (void)hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &i);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = and_modify(ent, plus);
     v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
@@ -465,12 +465,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify)
     i = size;
     ent = handle_r(&hom, &i);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     (void)hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &i);
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ent = and_modify(ent, plus);
     v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
@@ -488,12 +488,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
     ccc_homap_handle *ent = handle_r(&hom, &(int){-1});
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     (void)hom_insert_or_assign_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &(int){-1});
     CHECK(occupied(ent), true);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     struct val *v = hom_at(&hom, unwrap(ent));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -511,7 +511,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
     ent = handle_r(&hom, &i);
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     (void)hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &i);
@@ -520,7 +520,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->id, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ++i;
 
     CHECK(fill_n(&hom, size - i, i), PASS);
@@ -529,7 +529,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
     ent = handle_r(&hom, &i);
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     (void)hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &i);
@@ -538,7 +538,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->id, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -549,9 +549,9 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
     int size = 30;
     ccc_homap_handle *ent = handle_r(&hom, &(int){-1});
     ent = hom_and_modify_w(ent, struct val, { T->val++; });
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     (void)hom_insert_or_assign_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &(int){-1});
@@ -564,7 +564,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, 0);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     int i = 0;
 
     CHECK(fill_n(&hom, size / 2, i), PASS);
@@ -573,7 +573,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
     ent = handle_r(&hom, &i);
     ent = hom_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     (void)hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &i);
@@ -582,7 +582,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->id, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ++i;
 
     CHECK(fill_n(&hom, size - i, i), PASS);
@@ -591,7 +591,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
     ent = handle_r(&hom, &i);
     ent = hom_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     (void)hom_insert_or_assign_w(&hom, i, val(i));
     CHECK(validate(&hom), true);
     ent = handle_r(&hom, &i);
@@ -600,7 +600,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->id, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -616,13 +616,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     v = hom_at(&hom, or_insert(handle_r(&hom, &(int){-1}),
                                &(struct val){.id = -1, .val = -2}.elem));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     int i = 0;
 
     CHECK(fill_n(&hom, size / 2, i), PASS);
@@ -634,13 +634,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, or_insert(handle_r(&hom, &i),
                                &(struct val){.id = i, .val = i + 1}.elem));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ++i;
 
     CHECK(fill_n(&hom, size - i, i), PASS);
@@ -652,13 +652,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, or_insert(handle_r(&hom, &i),
                                &(struct val){.id = i, .val = i + 1}.elem));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -673,13 +673,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     v = hom_at(&hom,
                hom_or_insert_w(handle_r(&hom, &(int){-1}), idval(-1, -2)));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     int i = 0;
 
     CHECK(fill_n(&hom, size / 2, i), PASS);
@@ -690,12 +690,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, hom_or_insert_w(handle_r(&hom, &i), idval(i, i + 1)));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ++i;
 
     CHECK(fill_n(&hom, size - i, i), PASS);
@@ -706,12 +706,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, hom_or_insert_w(handle_r(&hom, &i), idval(i, i + 1)));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -727,13 +727,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     v = hom_at(&hom, insert_handle(handle_r(&hom, &(int){-1}),
                                    &(struct val){.id = -1, .val = -2}.elem));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -2);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     int i = 0;
 
     CHECK(fill_n(&hom, size / 2, i), PASS);
@@ -745,13 +745,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, insert_handle(handle_r(&hom, &i),
                                    &(struct val){.id = i, .val = i + 1}.elem));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ++i;
 
     CHECK(fill_n(&hom, size - i, i), PASS);
@@ -763,13 +763,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, insert_handle(handle_r(&hom, &i),
                                    &(struct val){.id = i, .val = i + 1}.elem));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -784,13 +784,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle_with)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     v = hom_at(&hom,
                hom_insert_handle_w(handle_r(&hom, &(int){-1}), idval(-1, -2)));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -2);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     int i = 0;
 
     CHECK(fill_n(&hom, size / 2, i), PASS);
@@ -801,12 +801,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle_with)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, hom_insert_handle_w(handle_r(&hom, &i), idval(i, i + 1)));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     ++i;
 
     CHECK(fill_n(&hom, size - i, i), PASS);
@@ -817,12 +817,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle_with)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     v = hom_at(&hom, hom_insert_handle_w(handle_r(&hom, &i), idval(i, i + 1)));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&hom), i + 2);
+    CHECK(size(&hom).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -838,7 +838,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 1);
+    CHECK(size(&hom).count, 1);
     ccc_handle *e = remove_handle_r(handle_r(&hom, &(int){-1}));
     CHECK(validate(&hom), true);
     CHECK(occupied(e), true);
@@ -846,7 +846,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
-    CHECK(size(&hom), 0);
+    CHECK(size(&hom).count, 0);
     int i = 0;
 
     CHECK(fill_n(&hom, size / 2, i), PASS);
@@ -858,7 +858,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     e = remove_handle_r(handle_r(&hom, &i));
     CHECK(validate(&hom), true);
     CHECK(occupied(e), true);
@@ -866,7 +866,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i);
+    CHECK(size(&hom).count, i);
 
     CHECK(fill_n(&hom, size - i, i), PASS);
 
@@ -877,7 +877,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i + 1);
+    CHECK(size(&hom).count, i + 1);
     e = remove_handle_r(handle_r(&hom, &i));
     CHECK(validate(&hom), true);
     CHECK(occupied(e), true);
@@ -885,7 +885,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
-    CHECK(size(&hom), i);
+    CHECK(size(&hom).count, i);
     CHECK_END_FN();
 }
 

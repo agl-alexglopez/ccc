@@ -520,10 +520,14 @@ ccc_omm_pop_min(ccc_ordered_multimap *const mm)
     return CCC_RESULT_OK;
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_omm_size(ccc_ordered_multimap const *const mm)
 {
-    return mm ? mm->size_ : 0;
+    if (!mm)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = mm->size_};
 }
 
 void *
@@ -1290,7 +1294,7 @@ struct parent_status_
     struct ccc_ommap_elem_ const *parent;
 };
 
-static ptrdiff_t
+static size_t
 count_dups(struct ccc_ommap_ const *const t,
            struct ccc_ommap_elem_ const *const n)
 {
@@ -1298,7 +1302,7 @@ count_dups(struct ccc_ommap_ const *const t,
     {
         return 0;
     }
-    ptrdiff_t dups = 1;
+    size_t dups = 1;
     for (struct ccc_ommap_elem_ *cur = n->dup_head_->link_[N];
          cur != n->dup_head_; cur = cur->link_[N])
     {
@@ -1307,7 +1311,7 @@ count_dups(struct ccc_ommap_ const *const t,
     return dups;
 }
 
-static ptrdiff_t
+static size_t
 recursive_size(struct ccc_ommap_ const *const t,
                struct ccc_ommap_elem_ const *const r)
 {
@@ -1315,7 +1319,7 @@ recursive_size(struct ccc_ommap_ const *const t,
     {
         return 0;
     }
-    ptrdiff_t s = count_dups(t, r) + 1;
+    size_t s = count_dups(t, r) + 1;
     return s + recursive_size(t, r->branch_[R])
            + recursive_size(t, r->branch_[L]);
 }

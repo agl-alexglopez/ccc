@@ -75,7 +75,7 @@ may occur, but the handle index remains valid regardless.
 This is similar to pointer stability except that pointers would not remain valid
 when the underlying array is resized; a handle remains valid because it is an
 index not a pointer. */
-typedef ptrdiff_t ccc_handle_i;
+typedef size_t ccc_handle_i;
 
 /** @brief The status monitoring and handle state once it is obtained.
 
@@ -113,15 +113,17 @@ typedef enum : int8_t
 A result indicates the status of the requested operation. Each container
 provides status messages according to the result type returned from a operation
 that uses this type. */
-typedef enum
+typedef enum : uint8_t
 {
-    /** The operation has occurred without error. */
+    /** The operation has occurred successfully. */
     CCC_RESULT_OK = 0,
+    /** An operation ran but could not return the intended result. */
+    CCC_RESULT_FAIL,
     /** Memory is needed but the container lacks allocation permission. */
     CCC_RESULT_NO_ALLOC,
     /** The container has allocation permission, but allocation failed. */
     CCC_RESULT_MEM_ERROR,
-    /** Bad arguments have been provided to an operation. */
+    /** Bad arguments have been provided and operation returned early. */
     CCC_RESULT_ARG_ERROR,
     /** Internal helper, never returned to user. Always last result. */
     CCC_RESULT_SIZE,
@@ -132,7 +134,7 @@ typedef enum
 A C style three way comparison value (e.g. ((a > b) - (a < b))). CCC_LES if
 left hand side is less than right hand side, CCC_EQL if they are equal, and
 CCC_GRT if left hand side is greater than right hand side. */
-typedef enum
+typedef enum : int8_t
 {
     /** The left hand side is less than the right hand side. */
     CCC_LES = -1,
@@ -143,6 +145,36 @@ typedef enum
     /** Comparison is not possible or other error has occurred. */
     CCC_CMP_ERROR,
 } ccc_threeway_cmp;
+
+/** @brief A type for returning an unsigned integer from a container for
+counting. Intended to count sizes, capacities, and 0-based indices.
+
+Access the fields of this struct directly to check for errors and then use the
+returned index. If an error has occurred, the index is invalid. An error will be
+indicated by any non-zero value in the error field.
+
+```
+ccc_ucount res = ccc_bs_first_trailing_one(&my_bitset);
+if (!res.error)
+{
+    (void)ccc_bs_set(&my_bitset, res.count, CCC_TRUE);
+}
+else
+{
+    // handle errors...
+}
+```
+
+Errors follow truthy and falsey principles. The index i can be used as valid if
+there is no error status (error is CCC_RESULT_OK = 0). Any non-zero error
+indicates the index i is invalid. */
+typedef struct
+{
+    /** The error that occurred indicated by a status. 0 (falsey) means OK. */
+    ccc_result error;
+    /** The count returned by the operation. */
+    size_t count;
+} ccc_ucount;
 
 /** @brief An element comparison helper.
 

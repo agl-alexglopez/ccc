@@ -33,9 +33,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three)
         three_vals[i].key = i;
         CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
-        CHECK(size(&omm), (ptrdiff_t)i + 1);
+        CHECK(size(&omm).count, (size_t)i + 1);
     }
-    CHECK(size(&omm), (ptrdiff_t)3);
+    CHECK(size(&omm).count, (size_t)3);
     CHECK_END_FN();
 }
 
@@ -47,40 +47,40 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_macros)
         entry_r(&omm, &(int){2}), (struct val){.val = 0, .key = 2});
     CHECK(ins != NULL, true);
     CHECK(validate(&omm), true);
-    CHECK(size(&omm), 1);
+    CHECK(size(&omm).count, 1);
     ins = omm_insert_entry_w(entry_r(&omm, &(int){2}),
                              (struct val){.val = 0, .key = 2});
     CHECK(ins != NULL, true);
     CHECK(validate(&omm), true);
-    CHECK(size(&omm), 2);
+    CHECK(size(&omm).count, 2);
     ins = omm_insert_entry_w(entry_r(&omm, &(int){9}),
                              (struct val){.val = 1, .key = 9});
     CHECK(ins != NULL, true);
     CHECK(validate(&omm), true);
-    CHECK(size(&omm), 3);
+    CHECK(size(&omm).count, 3);
     ins = ccc_entry_unwrap(
         omm_insert_or_assign_w(&omm, 3, (struct val){.val = 99}));
     CHECK(validate(&omm), true);
     CHECK(ins == NULL, false);
     CHECK(validate(&omm), true);
     CHECK(ins->val, 99);
-    CHECK(size(&omm), 4);
+    CHECK(size(&omm).count, 4);
     ins = ccc_entry_unwrap(
         omm_insert_or_assign_w(&omm, 3, (struct val){.val = 98}));
     CHECK(validate(&omm), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
-    CHECK(size(&omm), 4);
+    CHECK(size(&omm).count, 4);
     ins = ccc_entry_unwrap(omm_try_insert_w(&omm, 3, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&omm), true);
     CHECK(ins->val, 98);
-    CHECK(size(&omm), 4);
+    CHECK(size(&omm).count, 4);
     ins = ccc_entry_unwrap(omm_try_insert_w(&omm, 4, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&omm), true);
     CHECK(ins->val, 100);
-    CHECK(size(&omm), 5);
+    CHECK(size(&omm).count, 5);
     CHECK_END_FN(omm_clear(&omm, NULL););
 }
 
@@ -107,7 +107,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_struct_getter)
         struct val const *get = &tester_clone[i];
         CHECK(get->key, vals[i].key);
     }
-    CHECK(size(&omm), (ptrdiff_t)10);
+    CHECK(size(&omm).count, (size_t)10);
     CHECK_END_FN();
 }
 
@@ -121,9 +121,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three_dups)
         three_vals[i].key = 0;
         CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
-        CHECK(size(&omm), (ptrdiff_t)i + 1);
+        CHECK(size(&omm).count, (size_t)i + 1);
     }
-    CHECK(size(&omm), (ptrdiff_t)3);
+    CHECK(size(&omm).count, (size_t)3);
     CHECK_END_FN();
 }
 
@@ -132,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
     ccc_ordered_multimap omm
         = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
     /* Math magic ahead... */
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&omm, vals, size, prime), PASS);
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
     CHECK(min->key, 0);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &omm), size);
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         CHECK(vals[i].key, sorted_check[i]);
     }
@@ -159,9 +159,9 @@ CHECK_BEGIN_STATIC_FN(ommap_test_read_max_min)
         vals[i].key = i;
         CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
         CHECK(validate(&omm), true);
-        CHECK(size(&omm), (ptrdiff_t)i + 1);
+        CHECK(size(&omm).count, (size_t)i + 1);
     }
-    CHECK(size(&omm), (ptrdiff_t)10);
+    CHECK(size(&omm).count, (size_t)10);
     struct val const *max = ccc_omm_max(&omm);
     CHECK(max->key, 9);
     struct val const *min = ccc_omm_min(&omm);

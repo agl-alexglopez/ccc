@@ -270,7 +270,7 @@ ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 /** @brief Return the size of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return the size or -1 if sll is NULL. */
-[[nodiscard]] ptrdiff_t ccc_sll_size(ccc_singly_linked_list const *sll);
+[[nodiscard]] ccc_ucount ccc_sll_size(ccc_singly_linked_list const *sll);
 
 /** @brief Return true if the list is empty. O(1).
 @param [in] sll a pointer to the singly linked list.
