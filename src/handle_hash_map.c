@@ -239,7 +239,7 @@ ccc_hhm_insert_handle(ccc_hhmap_handle const *const e,
 ccc_handle_i
 ccc_hhm_get_key_val(ccc_handle_hash_map *const h, void const *const key)
 {
-    if (unlikely(!h || !key || !ccc_buf_capacity(&h->buf_).count
+    if (unlikely(!h || !key || !h->buf_.capacity_
                  || maybe_resize(h) != CCC_RESULT_OK))
     {
         return 0;
@@ -403,7 +403,7 @@ ccc_hhm_remove(ccc_handle_hash_map *const h, ccc_hhmap_elem *const out_handle)
             = ccc_buf_at(&h->buf_, elem_at(h, ent.i_)->slot_i_);
         if (data != hndl_data)
         {
-            (void)memcpy(data, hndl_data, ccc_buf_elem_size(&h->buf_).count);
+            (void)memcpy(data, hndl_data, h->buf_.elem_sz_);
         }
         erase_meta(h, ent.i_);
         return (ccc_handle){{.stats_ = CCC_ENTRY_OCCUPIED}};
@@ -485,11 +485,10 @@ ccc_hhm_begin(ccc_handle_hash_map const *const h)
         return (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
     size_t iter = 0;
-    for (; iter < ccc_buf_capacity(&h->buf_).count
-           && elem_at(h, iter)->hash_ == CCC_HHM_EMPTY;
+    for (; iter < h->buf_.capacity_ && elem_at(h, iter)->hash_ == CCC_HHM_EMPTY;
          ++iter)
     {}
-    if (iter >= ccc_buf_capacity(&h->buf_).count)
+    if (iter >= h->buf_.capacity_)
     {
         return (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
@@ -507,13 +506,12 @@ ccc_hhm_next(ccc_hhmap_handle *const iter)
         return CCC_RESULT_ARG_ERROR;
     }
     ++iter->impl_.handle_.i_;
-    for (;
-         iter->impl_.handle_.i_ < ccc_buf_capacity(&iter->impl_.h_->buf_).count
-         && elem_at(iter->impl_.h_, iter->impl_.handle_.i_)->hash_
-                == CCC_HHM_EMPTY;
+    for (; iter->impl_.handle_.i_ < iter->impl_.h_->buf_.capacity_
+           && elem_at(iter->impl_.h_, iter->impl_.handle_.i_)->hash_
+                  == CCC_HHM_EMPTY;
          ++iter->impl_.handle_.i_)
     {}
-    if (iter->impl_.handle_.i_ >= ccc_buf_capacity(&iter->impl_.h_->buf_).count)
+    if (iter->impl_.handle_.i_ >= iter->impl_.h_->buf_.capacity_)
     {
         *iter = (ccc_hhmap_handle){{.hash_ = CCC_HHM_EMPTY}};
     }
@@ -588,13 +586,13 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
         return CCC_RESULT_OK;
     }
     dst->buf_.sz_ = num_swap_slots;
-    for (size_t i = 0; i < ccc_buf_capacity(&dst->buf_).count; ++i)
+    for (size_t i = 0; i < dst->buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(dst, i);
         e->hash_ = CCC_HHM_EMPTY;
         e->slot_i_ = i;
     }
-    for (size_t i = 0; i < ccc_buf_capacity(&src->buf_).count; ++i)
+    for (size_t i = 0; i < src->buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(src, i);
         if (e->hash_ == CCC_HHM_EMPTY)
@@ -622,7 +620,7 @@ ccc_hhm_clear(ccc_handle_hash_map *const h, ccc_destructor_fn *const fn)
         h->buf_.sz_ = 0;
         return CCC_RESULT_OK;
     }
-    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_).count; ++i)
+    for (size_t i = 0; i < h->buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(h, i);
         if (e->hash_ != CCC_HHM_EMPTY)
@@ -648,7 +646,7 @@ ccc_hhm_clear_and_free(ccc_handle_hash_map *const h,
         h->buf_.sz_ = 0;
         return ccc_buf_alloc(&h->buf_, 0, h->buf_.alloc_);
     }
-    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_).count; ++i)
+    for (size_t i = 0; i < h->buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(h, i);
         if (e->hash_ != CCC_HHM_EMPTY)
@@ -685,16 +683,16 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
         return CCC_TRIBOOL_ERROR;
     }
     /* Not yet initialized, pass for now. */
-    if (!ccc_buf_size(&h->buf_).count)
+    if (!h->buf_.sz_)
     {
         return CCC_TRUE;
     }
     size_t empties = 0;
     size_t occupied = 0;
-    for (size_t i = 0; i < ccc_buf_capacity(&h->buf_).count; ++i)
+    for (size_t i = 0; i < h->buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ const *const e = elem_at(h, i);
-        if (e->slot_i_ >= ccc_buf_capacity(&h->buf_).count)
+        if (e->slot_i_ >= h->buf_.capacity_)
         {
             return CCC_FALSE;
         }
@@ -717,13 +715,13 @@ ccc_hhm_validate(ccc_handle_hash_map const *const h)
         }
     }
     return occupied == ccc_hhm_size(h).count
-           && empties == (ccc_buf_capacity(&h->buf_).count - occupied);
+           && empties == (h->buf_.capacity_ - occupied);
 }
 
 static ccc_tribool
 valid_distance_from_home(struct ccc_hhmap_ const *const h, size_t const slot)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_).count;
+    size_t const cap = h->buf_.capacity_;
     uint64_t const hash = elem_at(h, slot)->hash_;
     size_t const home = to_i(cap, hash);
     size_t const end = decrement(cap, home);
@@ -819,7 +817,7 @@ static struct ccc_handl_
 find(struct ccc_hhmap_ const *const h, void const *const key,
      uint64_t const hash)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_).count;
+    size_t const cap = h->buf_.capacity_;
     /* A few sanity checks. The load factor should be managed a full table is
        never allowed even under no allocation permission because that could
        lead to an infinite loop and illustrates a degenerate table anyway. */
@@ -827,7 +825,7 @@ find(struct ccc_hhmap_ const *const h, void const *const key,
     {
         return (struct ccc_handl_){.i_ = 0, .stats_ = CCC_ENTRY_VACANT};
     }
-    if (unlikely(ccc_buf_size(&h->buf_).count >= cap))
+    if (unlikely(h->buf_.sz_ >= cap))
     {
         return (struct ccc_handl_){.i_ = 0, .stats_ = CCC_ENTRY_ARG_ERROR};
     }
@@ -863,7 +861,7 @@ static ccc_handle_i
 insert_meta(struct ccc_hhmap_ *const h, uint64_t const hash,
             size_t const e_meta)
 {
-    size_t const cap = ccc_buf_capacity(&h->buf_).count;
+    size_t const cap = h->buf_.capacity_;
     struct ccc_hhmap_elem_ *const floater = elem_at(h, 1);
     *floater = *elem_at(h, e_meta);
     floater->hash_ = hash;
@@ -910,7 +908,7 @@ static void
 erase_meta(struct ccc_hhmap_ *const h, size_t i)
 {
     *hash_at(h, i) = CCC_HHM_EMPTY;
-    size_t const cap = ccc_buf_capacity(&h->buf_).count;
+    size_t const cap = h->buf_.capacity_;
     size_t next = increment(cap, i);
     do
     {
@@ -950,8 +948,7 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
     char *const remain_start
         = (char *)elem_in_slot(h, user_src) + sizeof(struct ccc_hhmap_elem_);
     surrounding_bytes
-        = (char *)((char *)user_src + ccc_buf_elem_size(&h->buf_).count)
-          - remain_start;
+        = (char *)((char *)user_src + h->buf_.elem_sz_) - remain_start;
     if (surrounding_bytes)
     {
         (void)memcpy((char *)elem + sizeof(struct ccc_hhmap_elem_),
@@ -996,9 +993,9 @@ copy_to_slot(struct ccc_hhmap_ *const h, void *const slot_dst,
 static ccc_result
 maybe_resize(struct ccc_hhmap_ *const h)
 {
-    size_t const h_cap = ccc_buf_capacity(&h->buf_).count;
-    size_t const elem_sz = ccc_buf_elem_size(&h->buf_).count;
-    if (h_cap && ccc_buf_size(&h->buf_).count < num_swap_slots)
+    size_t const h_cap = h->buf_.capacity_;
+    size_t const elem_sz = h->buf_.elem_sz_;
+    if (h_cap && h->buf_.sz_ < num_swap_slots)
     {
 
         for (size_t i = 0; i < h_cap; ++i)
@@ -1009,9 +1006,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
         }
         (void)ccc_buf_size_set(&h->buf_, num_swap_slots);
     }
-    if (h_cap
-        && (double)(ccc_buf_size(&h->buf_).count) / (double)h_cap
-               <= load_factor)
+    if (h_cap && (double)(h->buf_.sz_) / (double)h_cap <= load_factor)
     {
         return CCC_RESULT_OK;
     }
@@ -1021,9 +1016,8 @@ maybe_resize(struct ccc_hhmap_ *const h)
     }
     struct ccc_hhmap_ new_hash = *h;
     new_hash.buf_.sz_ = 0;
-    new_hash.buf_.capacity_ = new_hash.buf_.capacity_
-                                  ? next_prime(ccc_buf_size(&h->buf_).count * 2)
-                                  : primes[0];
+    new_hash.buf_.capacity_
+        = new_hash.buf_.capacity_ ? next_prime(h->buf_.sz_ * 2) : primes[0];
     if (new_hash.buf_.capacity_ <= h->buf_.capacity_)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -1234,7 +1228,7 @@ swap_user_data(struct ccc_hhmap_ *const h, void *const a, void *const b)
         return;
     }
     void *const tmp = ccc_buf_at(&h->buf_, 0);
-    (void)memcpy(tmp, a, ccc_buf_elem_size(&h->buf_).count);
+    (void)memcpy(tmp, a, h->buf_.elem_sz_);
     copy_to_slot(h, a, b);
     copy_to_slot(h, b, tmp);
     *elem_at(h, 0) = (struct ccc_hhmap_elem_){};

@@ -204,7 +204,7 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
         *out_handle = *elem_in_slot(hrm, slot);
         void *const user_struct = struct_base(hrm, out_handle);
         void *const tmp = ccc_buf_at(&hrm->buf_, 0);
-        swap(tmp, user_struct, slot, ccc_buf_elem_size(&hrm->buf_).count);
+        swap(tmp, user_struct, slot, hrm->buf_.elem_sz_);
         elem_in_slot(hrm, tmp)->parity_ = 1;
         return (ccc_handle){{.i_ = q.found_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -320,8 +320,7 @@ ccc_hrm_insert_handle(ccc_hromap_handle const *const h,
         void const *const e_base = struct_base(h->impl_.hrm_, elem);
         if (slot != e_base)
         {
-            (void)memcpy(slot, e_base,
-                         ccc_buf_elem_size(&h->impl_.hrm_->buf_).count);
+            (void)memcpy(slot, e_base, h->impl_.hrm_->buf_.elem_sz_);
         }
         return h->impl_.handle_.i_;
     }
@@ -375,7 +374,7 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     void const *const r = ccc_buf_at(&hrm->buf_, removed);
     if (user_struct != r)
     {
-        (void)memcpy(user_struct, r, ccc_buf_elem_size(&hrm->buf_).count);
+        (void)memcpy(user_struct, r, hrm->buf_.elem_sz_);
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -710,7 +709,7 @@ insert(struct ccc_hromap_ *const hrm, size_t const parent_i,
 {
     struct ccc_hromap_elem_ *elem = at(hrm, elem_i);
     init_node(elem);
-    if (ccc_buf_size(&hrm->buf_).count == single_tree_node)
+    if (hrm->buf_.sz_ == single_tree_node)
     {
         hrm->root_ = elem_i;
         return;
@@ -843,8 +842,8 @@ alloc_slot(struct ccc_hromap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    size_t const old_sz = ccc_buf_size(&t->buf_).count;
-    size_t old_cap = ccc_buf_capacity(&t->buf_).count;
+    size_t const old_sz = t->buf_.sz_;
+    size_t old_cap = t->buf_.capacity_;
     if (!old_sz || old_sz == old_cap)
     {
         assert(!t->free_list_);
@@ -856,7 +855,7 @@ alloc_slot(struct ccc_hromap_ *const t)
             return 0;
         }
         old_cap = old_sz ? old_cap : 0;
-        size_t const new_cap = ccc_buf_capacity(&t->buf_).count;
+        size_t const new_cap = t->buf_.capacity_;
         size_t prev = 0;
         for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
         {
@@ -1464,26 +1463,24 @@ is_storing_parent(struct ccc_hromap_ const *const t, size_t const p,
 static ccc_tribool
 is_free_list_valid(struct ccc_hromap_ const *const t)
 {
-    if (!ccc_buf_size(&t->buf_).count)
+    if (!t->buf_.sz_)
     {
         return CCC_TRUE;
     }
     size_t list_check1 = 0;
-    for (size_t i = 0; i < ccc_buf_capacity(&t->buf_).count; ++i)
+    for (size_t i = 0; i < t->buf_.capacity_; ++i)
     {
         if (at(t, i)->parity_ == IN_FREE_LIST)
         {
             ++list_check1;
         }
     }
-    if (list_check1 + ccc_buf_size(&t->buf_).count
-        != ccc_buf_capacity(&t->buf_).count)
+    if (list_check1 + t->buf_.sz_ != t->buf_.capacity_)
     {
         return CCC_FALSE;
     }
     size_t list_check2 = 0;
-    for (size_t cur = t->free_list_;
-         cur && list_check2 < ccc_buf_capacity(&t->buf_).count;
+    for (size_t cur = t->free_list_; cur && list_check2 < t->buf_.capacity_;
          cur = at(t, cur)->next_free_, ++list_check2)
     {}
     return list_check2 == list_check1;
@@ -1501,7 +1498,7 @@ validate(struct ccc_hromap_ const *const hrm)
         return CCC_FALSE;
     }
     size_t const size = recursive_size(hrm, hrm->root_);
-    if (size && size != ccc_buf_size(&hrm->buf_).count - 1)
+    if (size && size != hrm->buf_.sz_ - 1)
     {
         return CCC_FALSE;
     }

@@ -624,12 +624,12 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
 static ccc_result
 maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
 {
-    size_t const old_size = ccc_buf_size(&q->buf_).count;
+    size_t const old_size = q->buf_.sz_;
     if (old_size + additional_elems_to_add < old_size)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (old_size + additional_elems_to_add < ccc_buf_capacity(&q->buf_).count)
+    if (old_size + additional_elems_to_add < q->buf_.capacity_)
     {
         return CCC_RESULT_OK;
     }
@@ -639,9 +639,8 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     }
     size_t const elem_sz = q->buf_.elem_sz_;
     size_t const new_cap
-        = ccc_buf_capacity(&q->buf_).count
-              ? ((ccc_buf_capacity(&q->buf_).count + additional_elems_to_add)
-                 * 2)
+        = q->buf_.capacity_
+              ? ((q->buf_.capacity_ + additional_elems_to_add) * 2)
               : start_capacity;
     void *const new_mem
         = q->buf_.alloc_(NULL, q->buf_.elem_sz_ * new_cap, q->buf_.aux_);
@@ -649,19 +648,17 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    if (ccc_buf_size(&q->buf_).count)
+    if (q->buf_.sz_)
     {
         size_t const first_chunk
-            = min(ccc_buf_size(&q->buf_).count,
-                  ccc_buf_capacity(&q->buf_).count - q->front_);
+            = min(q->buf_.sz_, q->buf_.capacity_ - q->front_);
         (void)memcpy(new_mem, ccc_buf_at(&q->buf_, q->front_),
                      elem_sz * first_chunk);
-        if (first_chunk < ccc_buf_size(&q->buf_).count)
+        if (first_chunk < q->buf_.sz_)
         {
             (void)memcpy((char *)new_mem + (elem_sz * first_chunk),
                          ccc_buf_begin(&q->buf_),
-                         elem_sz
-                             * (ccc_buf_size(&q->buf_).count - first_chunk));
+                         elem_sz * (q->buf_.sz_ - first_chunk));
         }
     }
     (void)ccc_buf_alloc(&q->buf_, 0, q->buf_.alloc_);
