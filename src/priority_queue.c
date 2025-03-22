@@ -11,7 +11,7 @@ static struct ccc_pq_elem_ *merge(struct ccc_pq_ *, struct ccc_pq_elem_ *old,
                                   struct ccc_pq_elem_ *new);
 static void link_child(struct ccc_pq_elem_ *parent, struct ccc_pq_elem_ *child);
 static void init_node(struct ccc_pq_elem_ *);
-static ptrdiff_t traversal_size(struct ccc_pq_elem_ const *);
+static size_t traversal_size(struct ccc_pq_elem_ const *);
 static ccc_tribool has_valid_links(struct ccc_pq_ const *,
                                    struct ccc_pq_elem_ const *parent,
                                    struct ccc_pq_elem_ const *child);
@@ -141,10 +141,14 @@ ccc_pq_is_empty(ccc_priority_queue const *const pq)
     return !pq->sz_;
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_pq_size(ccc_priority_queue const *const pq)
 {
-    return pq ? pq->sz_ : 0;
+    if (!pq)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = pq->sz_};
 }
 
 /* This is a difficult function. Without knowing if this new value is greater
@@ -481,14 +485,14 @@ clear_node(struct ccc_pq_elem_ *const e)
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-static ptrdiff_t
+static size_t
 traversal_size(struct ccc_pq_elem_ const *const root)
 {
     if (!root)
     {
         return 0;
     }
-    ptrdiff_t sz = 0;
+    size_t sz = 0;
     struct ccc_pq_elem_ const *cur = root;
     do
     {

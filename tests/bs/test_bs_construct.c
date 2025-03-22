@@ -9,8 +9,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_construct)
 {
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(10)]){}, NULL, NULL, 10, 10);
-    CHECK(ccc_bs_popcount(&bs), 0);
-    for (ptrdiff_t i = 0; i < ccc_bs_capacity(&bs); ++i)
+    CHECK(ccc_bs_popcount(&bs).count, 0);
+    for (size_t i = 0; i < ccc_bs_capacity(&bs).count; ++i)
     {
         CHECK(ccc_bs_test(&bs, i), CCC_FALSE);
         CHECK(ccc_bs_test(&bs, i), CCC_FALSE);
@@ -22,10 +22,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
 {
     ccc_bitset src
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, NULL, NULL, 512);
-    CHECK(ccc_bs_capacity(&src), 512);
-    CHECK(ccc_bs_size(&src), 0);
+    CHECK(ccc_bs_capacity(&src).count, 512);
+    CHECK(ccc_bs_size(&src).count, 0);
     ccc_result push_status = CCC_RESULT_OK;
-    for (ptrdiff_t i = 0; push_status == CCC_RESULT_OK; ++i)
+    for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
@@ -41,13 +41,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(513)]){}, NULL, NULL, 513);
     ccc_result r = ccc_bs_copy(&dst, &src, NULL);
     CHECK(r, CCC_RESULT_OK);
-    CHECK(ccc_bs_popcount(&src), ccc_bs_popcount(&dst));
-    CHECK(ccc_bs_size(&src), ccc_bs_size(&dst));
+    CHECK(ccc_bs_popcount(&src).count, ccc_bs_popcount(&dst).count);
+    CHECK(ccc_bs_size(&src).count, ccc_bs_size(&dst).count);
     while (!ccc_bs_empty(&src) && !ccc_bs_empty(&dst))
     {
         ccc_tribool const src_msb = ccc_bs_pop_back(&src);
         ccc_tribool const dst_msb = ccc_bs_pop_back(&dst);
-        if (ccc_bs_size(&src) % 2)
+        if (ccc_bs_size(&src).count % 2)
         {
             CHECK(src_msb, CCC_TRUE);
             CHECK(src_msb, dst_msb);
@@ -65,7 +65,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
 CHECK_BEGIN_STATIC_FN(bs_test_copy_alloc)
 {
     ccc_bitset src = ccc_bs_init((ccc_bitblock *)NULL, std_alloc, NULL, 0);
-    for (ptrdiff_t i = 0; i < 512; ++i)
+    for (size_t i = 0; i < 512; ++i)
     {
         if (i % 2)
         {
@@ -79,13 +79,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_alloc)
     ccc_bitset dst = ccc_bs_init((ccc_bitblock *)NULL, std_alloc, NULL, 0);
     ccc_result r = ccc_bs_copy(&dst, &src, std_alloc);
     CHECK(r, CCC_RESULT_OK);
-    CHECK(ccc_bs_popcount(&src), ccc_bs_popcount(&dst));
-    CHECK(ccc_bs_size(&src), ccc_bs_size(&dst));
+    CHECK(ccc_bs_popcount(&src).count, ccc_bs_popcount(&dst).count);
+    CHECK(ccc_bs_size(&src).count, ccc_bs_size(&dst).count);
     while (!ccc_bs_empty(&src) && !ccc_bs_empty(&dst))
     {
         ccc_tribool const src_msb = ccc_bs_pop_back(&src);
         ccc_tribool const dst_msb = ccc_bs_pop_back(&dst);
-        if (ccc_bs_size(&src) % 2)
+        if (ccc_bs_size(&src).count % 2)
         {
             CHECK(src_msb, CCC_TRUE);
             CHECK(src_msb, dst_msb);

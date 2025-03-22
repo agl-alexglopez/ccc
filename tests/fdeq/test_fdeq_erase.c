@@ -9,8 +9,7 @@
 
 #include <stddef.h>
 
-CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q,
-                      ptrdiff_t n)
+CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q, size_t n)
 {
     for (; n-- && !is_empty(q); (void)pop_front(q))
     {
@@ -19,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q,
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pop_back_n, flat_double_ended_queue *const q, ptrdiff_t n)
+CHECK_BEGIN_STATIC_FN(pop_back_n, flat_double_ended_queue *const q, size_t n)
 {
     for (; n-- && !is_empty(q); (void)pop_back(q))
     {
@@ -60,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_back)
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     while (!is_empty(&q))
     {
-        if (size(&q) % 2)
+        if (size(&q).count % 2)
         {
             (void)pop_front(&q);
         }

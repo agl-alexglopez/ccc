@@ -21,17 +21,17 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
         three_vals[i].val = 0;
         CHECK(push(&ppq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
-        ptrdiff_t const size = i + 1;
-        CHECK(ccc_pq_size(&ppq), size);
+        size_t const size = i + 1;
+        CHECK(ccc_pq_size(&ppq).count, size);
     }
-    CHECK(ccc_pq_size(&ppq), (ptrdiff_t)4);
+    CHECK(ccc_pq_size(&ppq).count, (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         CHECK(pop(&ppq), CCC_RESULT_OK);
         CHECK(validate(&ppq), true);
     }
-    CHECK(ccc_pq_size(&ppq), (ptrdiff_t)0);
+    CHECK(ccc_pq_size(&ppq).count, (size_t)0);
     CHECK_END_FN();
 }
 
@@ -39,7 +39,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_extract_shuffled)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
@@ -48,12 +48,12 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_extract_shuffled)
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's delete everything with no errors. */
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
     }
-    CHECK(ccc_pq_size(&ppq), (ptrdiff_t)0);
+    CHECK(ccc_pq_size(&ppq).count, (size_t)0);
     CHECK_END_FN();
 }
 
@@ -61,7 +61,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_max)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
@@ -70,7 +70,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_max)
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         struct val const *front = front(&ppq);
         CHECK(front->val, vals[i].val);
@@ -84,7 +84,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_min)
 {
     ccc_priority_queue ppq
         = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&ppq, vals, size, prime), PASS);
@@ -93,7 +93,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_min)
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &ppq), PASS);
     /* Now let's pop from the front of the queue until empty. */
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         struct val const *front = front(&ppq);
         CHECK(front->val, vals[i].val);
@@ -119,20 +119,20 @@ CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
         vals[i].id = i;
         CHECK(push(&ppq, &vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
-        ptrdiff_t const s = i + 1;
-        CHECK(ccc_pq_size(&ppq), s);
+        size_t const s = i + 1;
+        CHECK(ccc_pq_size(&ppq).count, s);
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
 
     shuffled_index = prime % (size - less);
-    ptrdiff_t cur_size = size;
+    size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
         (void)ccc_pq_extract(&ppq, &vals[shuffled_index].elem);
         CHECK(validate(&ppq), true);
         --cur_size;
-        CHECK(ccc_pq_size(&ppq), cur_size);
+        CHECK(ccc_pq_size(&ppq).count, cur_size);
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
@@ -160,13 +160,13 @@ CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
     }
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
-    ptrdiff_t cur_size = size;
+    size_t cur_size = size;
     for (int i = 0; i < size; ++i)
     {
         (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
         --cur_size;
-        CHECK(ccc_pq_size(&ppq), cur_size);
+        CHECK(ccc_pq_size(&ppq).count, cur_size);
     }
     CHECK_END_FN();
 }

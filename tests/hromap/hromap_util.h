@@ -17,8 +17,8 @@ struct val
 ccc_threeway_cmp id_cmp(ccc_key_cmp);
 
 enum check_result insert_shuffled(ccc_handle_realtime_ordered_map *m,
-                                  ptrdiff_t size, int larger_prime);
-ptrdiff_t inorder_fill(int vals[], ptrdiff_t size,
-                       ccc_handle_realtime_ordered_map const *m);
+                                  size_t size, int larger_prime);
+size_t inorder_fill(int vals[], size_t size,
+                    ccc_handle_realtime_ordered_map const *m);
 
 #endif /* CCC_HROMAP_UTIL_H */

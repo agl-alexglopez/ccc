@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_front)
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
     CHECK(t, PASS);
-    CHECK(size(&dll), 3);
+    CHECK(size(&dll).count, 3);
     struct val *v = dll_front(&dll);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
@@ -54,7 +54,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_back)
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 3, vals);
     CHECK(t, PASS);
-    CHECK(size(&dll), 3);
+    CHECK(size(&dll).count, 3);
     struct val *v = dll_back(&dll);
     CHECK(v == NULL, false);
     CHECK(v->val, 2);
@@ -103,11 +103,11 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_pop_middle_range)
     CHECK(t, PASS);
     (void)dll_extract_range(&dll, &vals[1].e, &vals[4].e);
     CHECK(validate(&dll), true);
-    CHECK(size(&dll), 2);
+    CHECK(size(&dll).count, 2);
     CHECK(check_order(&dll, 2, (int[2]){0, 4}), PASS);
     (void)dll_extract_range(&dll, &vals[0].e, dll_end_sentinel(&dll));
     CHECK(validate(&dll), true);
-    CHECK(size(&dll), 0);
+    CHECK(size(&dll).count, 0);
     CHECK_END_FN();
 }
 
@@ -131,8 +131,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_splice_two_lists)
           CCC_RESULT_OK);
     CHECK(validate(&to_gain), true);
     CHECK(validate(&to_lose), true);
-    CHECK(size(&to_gain), 3);
-    CHECK(size(&to_lose), 4);
+    CHECK(size(&to_gain).count, 3);
+    CHECK(size(&to_lose).count, 4);
     CHECK(check_order(&to_gain, 3, (int[3]){0, 1, 0}), PASS);
     CHECK(check_order(&to_lose, 4, (int[4]){1, 2, 3, 4}), PASS);
     CHECK(dll_splice_range(&to_gain, dll_end_elem(&to_gain), &to_lose,
@@ -141,8 +141,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_splice_two_lists)
           CCC_RESULT_OK);
     CHECK(validate(&to_gain), true);
     CHECK(validate(&to_lose), true);
-    CHECK(size(&to_gain), 7);
-    CHECK(size(&to_lose), 0);
+    CHECK(size(&to_gain).count, 7);
+    CHECK(size(&to_lose).count, 0);
     CHECK(check_order(&to_gain, 7, (int[7]){0, 1, 1, 2, 3, 4, 0}), PASS);
     CHECK_END_FN();
 }

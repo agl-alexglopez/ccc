@@ -9,14 +9,13 @@
 /*===========================   Prototypes    ===============================*/
 
 static void *struct_base(struct ccc_dll_ const *, struct ccc_dll_elem_ const *);
-static ptrdiff_t extract_range(struct ccc_dll_ const *l,
-                               struct ccc_dll_elem_ *begin,
-                               struct ccc_dll_elem_ *end);
-static ptrdiff_t erase_range(struct ccc_dll_ const *l,
-                             struct ccc_dll_elem_ *begin,
-                             struct ccc_dll_elem_ *end);
-static ptrdiff_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
-                     struct ccc_dll_elem_ const *end);
+static size_t extract_range(struct ccc_dll_ const *l,
+                            struct ccc_dll_elem_ *begin,
+                            struct ccc_dll_elem_ *end);
+static size_t erase_range(struct ccc_dll_ const *l, struct ccc_dll_elem_ *begin,
+                          struct ccc_dll_elem_ *end);
+static size_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
+                  struct ccc_dll_elem_ const *end);
 static struct ccc_dll_elem_ *pop_front(struct ccc_dll_ *);
 static void push_front(struct ccc_dll_ *l, struct ccc_dll_elem_ *e);
 static struct ccc_dll_elem_ *elem_in(ccc_doubly_linked_list const *,
@@ -187,7 +186,7 @@ ccc_dll_erase_range(ccc_doubly_linked_list *const l,
     elem_end->n_->p_ = elem_begin->p_;
     elem_begin->p_->n_ = elem_end->n_;
 
-    ptrdiff_t const deleted = erase_range(l, elem_begin, elem_end);
+    size_t const deleted = erase_range(l, elem_begin, elem_end);
 
     assert(deleted <= l->sz_);
     l->sz_ -= deleted;
@@ -250,7 +249,7 @@ ccc_dll_extract_range(ccc_doubly_linked_list *const l,
     elem_end->n_->p_ = elem_begin->p_;
     elem_begin->p_->n_ = elem_end->n_;
 
-    ptrdiff_t const deleted = extract_range(l, elem_begin, elem_end);
+    size_t const deleted = extract_range(l, elem_begin, elem_end);
 
     assert(deleted <= l->sz_);
     l->sz_ -= deleted;
@@ -309,7 +308,7 @@ ccc_dll_splice_range(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
     pos->p_ = end;
     if (pos_sll != to_cut_sll)
     {
-        ptrdiff_t const sz = len(pos_sll, begin, end);
+        size_t const sz = len(pos_sll, begin, end);
         assert(sz <= to_cut_sll->sz_);
         pos_sll->sz_ += sz;
         to_cut_sll->sz_ -= sz;
@@ -369,10 +368,14 @@ ccc_dll_rnext(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
     return struct_base(l, e->p_);
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_dll_size(ccc_doubly_linked_list const *const l)
 {
-    return l ? (ptrdiff_t)l->sz_ : -1;
+    if (!l)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = l->sz_};
 }
 
 ccc_tribool
@@ -410,7 +413,7 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    ptrdiff_t size = 0;
+    size_t size = 0;
     for (struct ccc_dll_elem_ const *e = l->sentinel_.n_; e != &l->sentinel_;
          e = e->n_, ++size)
     {
@@ -491,7 +494,7 @@ pop_front(struct ccc_dll_ *const dll)
     return ret;
 }
 
-static inline ptrdiff_t
+static inline size_t
 extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
               struct ccc_dll_elem_ *begin, struct ccc_dll_elem_ *const end)
 {
@@ -499,7 +502,7 @@ extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
     {
         begin->p_ = NULL;
     }
-    ptrdiff_t sz = len(l, begin, end);
+    size_t sz = len(l, begin, end);
     if (end != &l->sentinel_)
     {
         end->n_ = NULL;
@@ -507,7 +510,7 @@ extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
     return sz;
 }
 
-static ptrdiff_t
+static size_t
 erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
             struct ccc_dll_elem_ *const end)
 {
@@ -517,14 +520,14 @@ erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
     }
     if (!l->alloc_)
     {
-        ptrdiff_t const sz = len(l, begin, end);
+        size_t const sz = len(l, begin, end);
         if (end != &l->sentinel_)
         {
             end->n_ = NULL;
         }
         return sz;
     }
-    ptrdiff_t sz = 1;
+    size_t sz = 1;
     for (; begin != end; ++sz)
     {
         assert(sz <= l->sz_);
@@ -536,11 +539,11 @@ erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
     return sz;
 }
 
-static ptrdiff_t
+static size_t
 len([[maybe_unused]] struct ccc_dll_ const *const sll,
     struct ccc_dll_elem_ const *begin, struct ccc_dll_elem_ const *const end)
 {
-    ptrdiff_t s = 1;
+    size_t s = 1;
     for (; begin != end; begin = begin->n_, ++s)
     {
         assert(s <= sll->sz_);

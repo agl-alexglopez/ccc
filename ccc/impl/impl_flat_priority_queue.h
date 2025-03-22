@@ -22,9 +22,9 @@ struct ccc_fpq_
 /*========================    Private Interface     =========================*/
 
 /** @private */
-ptrdiff_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], ptrdiff_t);
+size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
 /** @private */
-void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, ptrdiff_t n);
+void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
 /** @private */
 void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
 
@@ -58,13 +58,14 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
     (__extension__({                                                           \
         typeof(type_initializer) *fpq_res_;                                    \
         struct ccc_fpq_ *fpq_ = (fpq);                                         \
-        assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf_));           \
+        assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf_).count);     \
         fpq_res_ = ccc_buf_alloc_back(&fpq_->buf_);                            \
-        if (ccc_buf_size(&fpq_->buf_) == ccc_buf_capacity(&fpq_->buf_))        \
+        if (ccc_buf_size(&fpq_->buf_).count                                    \
+            == ccc_buf_capacity(&fpq_->buf_).count)                            \
         {                                                                      \
             fpq_res_ = NULL;                                                   \
             ccc_result const extra_space_ = ccc_buf_alloc(                     \
-                &fpq_->buf_, ccc_buf_capacity(&fpq_->buf_) * 2,                \
+                &fpq_->buf_, ccc_buf_capacity(&fpq_->buf_).count * 2,          \
                 fpq_->buf_.alloc_);                                            \
             if (extra_space_ == CCC_RESULT_OK)                                 \
             {                                                                  \
@@ -74,14 +75,14 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
         if (fpq_res_)                                                          \
         {                                                                      \
             *fpq_res_ = type_initializer;                                      \
-            if (ccc_buf_size(&fpq_->buf_) > 1)                                 \
+            if (ccc_buf_size(&fpq_->buf_).count > 1)                           \
             {                                                                  \
-                void *fpq_tmp_                                                 \
-                    = ccc_buf_at(&fpq_->buf_, ccc_buf_size(&fpq_->buf_));      \
+                void *fpq_tmp_ = ccc_buf_at(&fpq_->buf_,                       \
+                                            ccc_buf_size(&fpq_->buf_).count);  \
                 fpq_res_ = ccc_buf_at(                                         \
                     &fpq_->buf_,                                               \
-                    ccc_impl_fpq_bubble_up(fpq_, fpq_tmp_,                     \
-                                           ccc_buf_size(&fpq_->buf_) - 1));    \
+                    ccc_impl_fpq_bubble_up(                                    \
+                        fpq_, fpq_tmp_, ccc_buf_size(&fpq_->buf_).count - 1)); \
             }                                                                  \
             else                                                               \
             {                                                                  \

@@ -21,7 +21,7 @@ struct lru_cache
 {
     ccc_realtime_ordered_map map;
     ccc_doubly_linked_list l;
-    ptrdiff_t cap;
+    size_t cap;
 };
 
 /* This map is pointer stable allowing us to have the lru cache represented
@@ -117,7 +117,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         CHECK(new == NULL, false);
         new = dll_push_front(&lru->l, &new->list_elem);
         CHECK(new == NULL, false);
-        if (size(&lru->l) > lru->cap)
+        if (size(&lru->l).count > lru->cap)
         {
             struct lru_elem const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);
@@ -164,7 +164,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         {GET, .key = 2, .val = -1, .getter = lru_get},
         {HED, .key = 4, .val = 4, .header = lru_head},
     };
-    for (ptrdiff_t i = 0; i < REQS; ++i)
+    for (size_t i = 0; i < REQS; ++i)
     {
         switch (requests[i].call)
         {

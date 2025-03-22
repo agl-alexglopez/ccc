@@ -21,9 +21,9 @@ a heap allocated array of vals or a ccc_buffer would work too. I'm hesitant
 to bring the buffer into another container test as a dependency for now. */
 struct val_pool
 {
-    struct val *vals;    /* Stack, heap, or data segment. */
-    ptrdiff_t next_free; /* Starts at 0, bumps up by one on each alloc. */
-    ptrdiff_t capacity;  /* Total. Exhausted when next_free == capacity. */
+    struct val *vals; /* Stack, heap, or data segment. */
+    size_t next_free; /* Starts at 0, bumps up by one on each alloc. */
+    size_t capacity;  /* Total. Exhausted when next_free == capacity. */
 };
 
 /** The bump allocator will point to the val pool as its auxiliary data. It
@@ -33,9 +33,8 @@ void *val_bump_alloc(void *ptr, size_t size, void *aux);
 ccc_threeway_cmp id_cmp(ccc_key_cmp);
 
 enum check_result insert_shuffled(ccc_realtime_ordered_map *m,
-                                  struct val vals[], ptrdiff_t size,
+                                  struct val vals[], size_t size,
                                   int larger_prime);
-ptrdiff_t inorder_fill(int vals[], ptrdiff_t size,
-                       ccc_realtime_ordered_map const *m);
+size_t inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map const *m);
 
 #endif /* CCC_ROMAP_UTIL_H */

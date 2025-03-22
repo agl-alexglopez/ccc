@@ -21,23 +21,23 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     ccc_entry ent = swap_entry(&fh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&fh), 1);
+    CHECK(size(&fh).count, 1);
     ent = ccc_remove(&fh, &query.e);
     CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->key, 137);
     CHECK(v->val, 99);
-    CHECK(size(&fh), 0);
+    CHECK(size(&fh).count, 0);
     query.key = 101;
     ent = ccc_remove(&fh, &query.e);
     CHECK(occupied(&ent), false);
-    CHECK(size(&fh), 0);
+    CHECK(size(&fh).count, 0);
     ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
                            (struct val){.key = 137, .val = 99});
-    CHECK(size(&fh), 1);
+    CHECK(size(&fh).count, 1);
     CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
-    CHECK(size(&fh), 0);
+    CHECK(size(&fh).count, 0);
     CHECK_END_FN();
 }
 
@@ -47,7 +47,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
                                    fhmap_id_eq, std_alloc, NULL, 0);
 
     int const to_insert = 100;
-    int const larger_prime = (int)fhm_next_prime(to_insert);
+    int const larger_prime = (int)fhm_next_prime(to_insert).count;
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
          ++i, shuffle = (shuffle + larger_prime) % to_insert)
     {
@@ -58,8 +58,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         CHECK(v->val, i);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h), to_insert);
-    ptrdiff_t cur_size = size(&h);
+    CHECK(size(&h).count, to_insert);
+    size_t cur_size = size(&h).count;
     int i = 0;
     while (!is_empty(&h) && cur_size)
     {
@@ -78,10 +78,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         }
         --cur_size;
         ++i;
-        CHECK(size(&h), cur_size);
+        CHECK(size(&h).count, cur_size);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h), 0);
+    CHECK(size(&h).count, 0);
     CHECK_END_FN(fhm_clear_and_free(&h, NULL););
 }
 

@@ -44,8 +44,8 @@ static handle_hash_map static_fh
 
 CHECK_BEGIN_STATIC_FN(hhmap_test_static_init)
 {
-    CHECK(hhm_capacity(&static_fh), sizeof(s_vals) / sizeof(s_vals[0]));
-    CHECK(hhm_size(&static_fh), 0);
+    CHECK(hhm_capacity(&static_fh).count, sizeof(s_vals) / sizeof(s_vals[0]));
+    CHECK(hhm_size(&static_fh).count, 0);
     CHECK(hhm_validate(&static_fh), true);
     CHECK(hhm_is_empty(&static_fh), true);
     struct val def = {.key = 137, .val = 0};
@@ -104,11 +104,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc)
     CHECK(hhm_contains(&src, &(int){0}), true);
     CHECK(hhm_contains(&src, &(int){1}), true);
     CHECK(hhm_contains(&src, &(int){2}), true);
-    CHECK(hhm_size(&src), 3);
+    CHECK(hhm_size(&src).count, 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
-    CHECK(hhm_size(&dst), hhm_size(&src));
+    CHECK(hhm_size(&dst).count, hhm_size(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         ccc_handle src_e = hhm_remove(&src, &(struct val){.key = i}.e);
@@ -129,7 +129,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_no_alloc_fail)
     (void)swap_handle(&src, &(struct val){.key = 0}.e);
     (void)swap_handle(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)swap_handle(&src, &(struct val){.key = 2, .val = 2}.e);
-    CHECK(hhm_size(&src), 3);
+    CHECK(hhm_size(&src).count, 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
@@ -151,11 +151,11 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc)
     CHECK(hhm_contains(&src, &(int){0}), true);
     CHECK(hhm_contains(&src, &(int){1}), true);
     CHECK(hhm_contains(&src, &(int){2}), true);
-    CHECK(hhm_size(&src), 3);
+    CHECK(hhm_size(&src).count, 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
-    CHECK(hhm_size(&dst), hhm_size(&src));
+    CHECK(hhm_size(&dst).count, hhm_size(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         ccc_handle src_e = hhm_remove(&src, &(struct val){.key = i}.e);
@@ -179,7 +179,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_copy_alloc_fail)
     (void)swap_handle(&src, &(struct val){.key = 0}.e);
     (void)swap_handle(&src, &(struct val){.key = 1, .val = 1}.e);
     (void)swap_handle(&src, &(struct val){.key = 2, .val = 2}.e);
-    CHECK(hhm_size(&src), 3);
+    CHECK(hhm_size(&src).count, 3);
     CHECK(hhm_is_empty(&dst), true);
     ccc_result res = hhm_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);

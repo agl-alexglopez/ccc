@@ -20,7 +20,7 @@ typedef struct ccc_sll_elem_
 struct ccc_sll_
 {
     struct ccc_sll_elem_ sentinel_;
-    ptrdiff_t sz_;
+    size_t sz_;
     size_t elem_sz_;
     size_t sll_elem_offset_;
     ccc_alloc_fn *alloc_;

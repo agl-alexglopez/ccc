@@ -23,7 +23,7 @@ struct ccc_dll_
     struct ccc_dll_elem_ sentinel_;
     size_t elem_sz_;
     size_t dll_elem_offset_;
-    ptrdiff_t sz_;
+    size_t sz_;
     ccc_alloc_fn *alloc_;
     ccc_cmp_fn *cmp_;
     void *aux_;

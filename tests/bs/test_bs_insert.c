@@ -10,10 +10,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_back_no_realloc)
 {
     ccc_bitset bs
         = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(16)]){}, NULL, NULL, 16);
-    CHECK(ccc_bs_capacity(&bs), 16);
-    CHECK(ccc_bs_size(&bs), 0);
+    CHECK(ccc_bs_capacity(&bs).count, 16);
+    CHECK(ccc_bs_size(&bs).count, 0);
     ccc_result push_status = CCC_RESULT_OK;
-    for (ptrdiff_t i = 0; push_status == CCC_RESULT_OK; ++i)
+    for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
@@ -25,24 +25,24 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_back_no_realloc)
         }
     }
     CHECK(push_status, CCC_RESULT_NO_ALLOC);
-    CHECK(ccc_bs_size(&bs), 16);
-    CHECK(ccc_bs_popcount(&bs), 16 / 2);
+    CHECK(ccc_bs_size(&bs).count, 16);
+    CHECK(ccc_bs_popcount(&bs).count, 16 / 2);
     CHECK(ccc_bs_clear(&bs), CCC_RESULT_OK);
-    CHECK(ccc_bs_size(&bs), 0);
-    CHECK(ccc_bs_popcount(&bs), 0);
-    CHECK(ccc_bs_capacity(&bs), 16);
+    CHECK(ccc_bs_size(&bs).count, 0);
+    CHECK(ccc_bs_popcount(&bs).count, 0);
+    CHECK(ccc_bs_capacity(&bs).count, 16);
     CHECK(ccc_bs_clear_and_free(&bs), CCC_RESULT_NO_ALLOC);
-    CHECK(ccc_bs_capacity(&bs), 16);
-    CHECK(ccc_bs_size(&bs), 0);
+    CHECK(ccc_bs_capacity(&bs).count, 16);
+    CHECK(ccc_bs_size(&bs).count, 0);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_push_back_alloc)
 {
     ccc_bitset bs = ccc_bs_init(NULL, std_alloc, NULL, 0);
-    CHECK(ccc_bs_capacity(&bs), 0);
-    CHECK(ccc_bs_size(&bs), 0);
-    for (ptrdiff_t i = 0; ccc_bs_size(&bs) < 16; ++i)
+    CHECK(ccc_bs_capacity(&bs).count, 0);
+    CHECK(ccc_bs_size(&bs).count, 0);
+    for (size_t i = 0; ccc_bs_size(&bs).count < 16; ++i)
     {
         if (i % 2)
         {
@@ -53,15 +53,15 @@ CHECK_BEGIN_STATIC_FN(bs_test_push_back_alloc)
             CHECK(ccc_bs_push_back(&bs, CCC_FALSE), CCC_RESULT_OK);
         }
     }
-    CHECK(ccc_bs_size(&bs), 16);
-    CHECK(ccc_bs_popcount(&bs), 16 / 2);
+    CHECK(ccc_bs_size(&bs).count, 16);
+    CHECK(ccc_bs_popcount(&bs).count, 16 / 2);
     CHECK(ccc_bs_clear(&bs), CCC_RESULT_OK);
-    CHECK(ccc_bs_size(&bs), 0);
-    CHECK(ccc_bs_popcount(&bs), 0);
-    CHECK(ccc_bs_capacity(&bs) != 0, true);
+    CHECK(ccc_bs_size(&bs).count, 0);
+    CHECK(ccc_bs_popcount(&bs).count, 0);
+    CHECK(ccc_bs_capacity(&bs).count != 0, true);
     CHECK(ccc_bs_clear_and_free(&bs), CCC_RESULT_OK);
-    CHECK(ccc_bs_capacity(&bs), 0);
-    CHECK(ccc_bs_size(&bs), 0);
+    CHECK(ccc_bs_capacity(&bs).count, 0);
+    CHECK(ccc_bs_size(&bs).count, 0);
     CHECK_END_FN();
 }
 

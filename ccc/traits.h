@@ -511,14 +511,14 @@ Obtain the container state. */
 
 /** @brief Return the size of the container.
 @param [in] container_ptr a pointer to the container.
-@return the size or -1 if container_ptr is NULL.
+@return the size or an argument error is set if container_ptr is NULL.
 
 See container documentation for specific behavior. */
 #define ccc_size(container_ptr) ccc_impl_size(container_ptr)
 
 /** @brief Return the capacity of the container.
 @param [in] container_ptr a pointer to the container.
-@return the capacity or -1 if container_ptr is NULL.
+@return the capacity or an argument error is set if container_ptr is NULL.
 
 See container documentation for specific behavior. */
 #define ccc_capacity(container_ptr) ccc_impl_capacity(container_ptr)

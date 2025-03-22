@@ -34,7 +34,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
                                &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om), 1);
+    CHECK(size(&om).count, 1);
     CHECK_END_FN();
 }
 
@@ -47,7 +47,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
         entry_r(&om, &(int){2}), (struct val){.key = 2, .val = 0});
     CHECK(ins != NULL, true);
     CHECK(validate(&om), true);
-    CHECK(size(&om), 1);
+    CHECK(size(&om).count, 1);
     ins = om_insert_entry_w(entry_r(&om, &(int){2}),
                             (struct val){.key = 2, .val = 0});
     CHECK(validate(&om), true);
@@ -62,23 +62,23 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
     CHECK(ins == NULL, false);
     CHECK(validate(&om), true);
     CHECK(ins->val, 99);
-    CHECK(size(&om), 3);
+    CHECK(size(&om).count, 3);
     ins = ccc_entry_unwrap(
         om_insert_or_assign_w(&om, 3, (struct val){.val = 98}));
     CHECK(validate(&om), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
-    CHECK(size(&om), 3);
+    CHECK(size(&om).count, 3);
     ins = ccc_entry_unwrap(om_try_insert_w(&om, 3, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&om), true);
     CHECK(ins->val, 98);
-    CHECK(size(&om), 3);
+    CHECK(size(&om).count, 3);
     ins = ccc_entry_unwrap(om_try_insert_w(&om, 4, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&om), true);
     CHECK(ins->val, 100);
-    CHECK(size(&om), 4);
+    CHECK(size(&om).count, 4);
     CHECK_END_FN(ccc_om_clear(&om, NULL););
 }
 
@@ -147,13 +147,13 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_functional)
     /* Over allocate size now because we don't want to worry about resizing. */
     ccc_ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
-    ptrdiff_t const size = 200;
+    size_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {0};
-    for (ptrdiff_t i = 0; i < size / 2; i += 2)
+    for (size_t i = 0; i < size / 2; i += 2)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -163,9 +163,9 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_functional)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&om), (size / 2) / 2);
+    CHECK(size(&om).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -188,10 +188,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_functional)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&om), (size / 2));
+    CHECK(size(&om).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -200,14 +200,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_functional)
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true);
     }
-    CHECK(size(&om), (size / 2));
+    CHECK(size(&om).count, (size / 2));
     CHECK_END_FN(om_clear(&om, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ptrdiff_t const size = 200;
+    size_t const size = 200;
     ccc_ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
@@ -215,7 +215,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry)
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
     struct val def = {};
-    for (ptrdiff_t i = 0; i < size / 2; i += 2)
+    for (size_t i = 0; i < size / 2; i += 2)
     {
         def.key = (int)i;
         def.val = (int)i;
@@ -225,9 +225,9 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&om), (size / 2) / 2);
+    CHECK(size(&om).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         def.key = (int)i;
         def.val = (int)i + 1;
@@ -245,21 +245,21 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&om), (size / 2));
+    CHECK(size(&om).count, (size / 2));
     CHECK_END_FN(om_clear(&om, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ptrdiff_t const size = 200;
+    size_t const size = 200;
     ccc_ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
        collisions. */
-    for (ptrdiff_t i = 0; i < size / 2; i += 2)
+    for (size_t i = 0; i < size / 2; i += 2)
     {
         struct val const *const d
             = insert_entry(entry_r(&om, &i), &(struct val){i, i, {}}.elem);
@@ -267,9 +267,9 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry_macros)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&om), (size / 2) / 2);
+    CHECK(size(&om).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
-    for (ptrdiff_t i = 0; i < size / 2; ++i)
+    for (size_t i = 0; i < size / 2; ++i)
     {
         struct val const *const d
             = insert_entry(entry_r(&om, &i), &(struct val){i, i + 1, {}}.elem);
@@ -285,7 +285,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_via_entry_macros)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&om), (size / 2));
+    CHECK(size(&om).count, (size / 2));
     CHECK_END_FN(om_clear(&om, NULL););
 }
 
@@ -309,7 +309,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_macros)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&om), (size / 2) / 2);
+    CHECK(size(&om).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
@@ -328,7 +328,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_macros)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&om), (size / 2));
+    CHECK(size(&om).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
@@ -339,7 +339,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_api_macros)
         /* All values in the array should be odd now */
         CHECK(v->val % 2 == 0, true);
     }
-    CHECK(size(&om), (size / 2));
+    CHECK(size(&om).count, (size / 2));
     CHECK_END_FN(om_clear(&om, NULL););
 }
 
@@ -350,8 +350,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_two_sum)
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
-    for (ptrdiff_t i = 0; i < (ptrdiff_t)(sizeof(addends) / sizeof(addends[0]));
-         ++i)
+    for (size_t i = 0; i < (size_t)(sizeof(addends) / sizeof(addends[0])); ++i)
     {
         struct val const *const other_addend
             = get_key_val(&om, &(int){target - addends[i]});
@@ -387,7 +386,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize)
         CHECK(v->val, i);
         CHECK(validate(&om), true);
     }
-    CHECK(size(&om), to_insert);
+    CHECK(size(&om).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -416,7 +415,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_macros)
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&om), to_insert);
+    CHECK(size(&om).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -455,7 +454,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null)
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&om), to_insert);
+    CHECK(size(&om).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -484,7 +483,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_resize_fom_null_macros)
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&om), to_insert);
+    CHECK(size(&om).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -544,7 +543,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_and_find)
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_shuffle)
 {
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     ccc_ordered_map om = om_init(om, struct val, elem, key, id_cmp, NULL, NULL);
     struct val vals[50] = {};
     CHECK(size > 1, true);
@@ -552,7 +551,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_shuffle)
     CHECK(insert_shuffled(&om, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &om), size);
-    for (ptrdiff_t i = 1; i < size; ++i)
+    for (size_t i = 1; i < size; ++i)
     {
         CHECK(sorted_check[i - 1] <= sorted_check[i], true);
     }
@@ -573,7 +572,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_weak_srand)
         CHECK(insert_error(&e), false);
         CHECK(validate(&om), true);
     }
-    CHECK(size(&om), (ptrdiff_t)num_nodes);
+    CHECK(size(&om).count, (size_t)num_nodes);
     CHECK_END_FN(om_clear(&om, NULL););
 }
 

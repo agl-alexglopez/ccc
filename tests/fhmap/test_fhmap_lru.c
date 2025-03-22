@@ -23,7 +23,7 @@ struct lru_cache
 {
     ccc_flat_hash_map fh;
     ccc_doubly_linked_list l;
-    ptrdiff_t cap;
+    size_t cap;
 };
 
 struct key_val
@@ -128,7 +128,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         new->kv_in_list = dll_emplace_front(
             &lru->l, (struct key_val){.key = key, .val = val});
         CHECK(new->kv_in_list == NULL, false);
-        if (size(&lru->l) > lru->cap)
+        if (size(&lru->l).count > lru->cap)
         {
             struct key_val const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);
@@ -175,7 +175,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         {GET, .key = 2, .val = -1, .getter = lru_get},
         {HED, .key = 4, .val = 4, .header = lru_head},
     };
-    for (ptrdiff_t i = 0; i < REQS; ++i)
+    for (size_t i = 0; i < REQS; ++i)
     {
         switch (requests[i].call)
         {

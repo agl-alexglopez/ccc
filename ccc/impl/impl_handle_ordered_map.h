@@ -18,11 +18,11 @@ from the tree it is added to the free singly linked list. The free list is a
 LIFO push to front stack. */
 struct ccc_homap_elem_
 {
-    ptrdiff_t branch_[2]; /** Child nodes in array to unify Left and Right. */
+    size_t branch_[2]; /** Child nodes in array to unify Left and Right. */
     union
     {
-        ptrdiff_t parent_;    /** Parent of splay tree node when allocated. */
-        ptrdiff_t next_free_; /** Points to next free when not allocated. */
+        size_t parent_;    /** Parent of splay tree node when allocated. */
+        size_t next_free_; /** Points to next free when not allocated. */
     };
 };
 
@@ -34,8 +34,8 @@ the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_homap_
 {
     ccc_buffer buf_;          /** Buffer wrapping user provided memory. */
-    ptrdiff_t root_;          /** The root node of the Splay Tree. */
-    ptrdiff_t free_list_;     /** The start of the free singly linked list. */
+    size_t root_;             /** The root node of the Splay Tree. */
+    size_t free_list_;        /** The start of the free singly linked list. */
     size_t key_offset_;       /** Where user key can be found in type. */
     size_t node_elem_offset_; /** Where intrusive elem is found in type. */
     ccc_key_cmp_fn *cmp_;     /** The provided key comparison function. */
@@ -58,17 +58,17 @@ union ccc_homap_handle_
 /*===========================   Private Interface ===========================*/
 
 /** @private */
-void ccc_impl_hom_insert(struct ccc_homap_ *hom, ptrdiff_t elem_i);
+void ccc_impl_hom_insert(struct ccc_homap_ *hom, size_t elem_i);
 /** @private */
 struct ccc_htree_handle_ ccc_impl_hom_handle(struct ccc_homap_ *hom,
                                              void const *key);
 /** @private */
-void *ccc_impl_hom_key_at(struct ccc_homap_ const *hom, ptrdiff_t slot);
+void *ccc_impl_hom_key_at(struct ccc_homap_ const *hom, size_t slot);
 /** @private */
 struct ccc_homap_elem_ *ccc_impl_homap_elem_at(struct ccc_homap_ const *hom,
-                                               ptrdiff_t slot);
+                                               size_t slot);
 /** @private */
-ptrdiff_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
+size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
 
 /*========================     Initialization       =========================*/
 

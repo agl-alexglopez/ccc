@@ -719,8 +719,8 @@ Obtain the container state. */
 
 /** @brief Returns the size of the multimap. O(1).
 @param [in] mm a pointer to the multimap.
-@return the size of the container or -1 if mm is NULL. */
-[[nodiscard]] ptrdiff_t ccc_omm_size(ccc_ordered_multimap const *mm);
+@return the size of the container or an argument error is set if mm is NULL. */
+[[nodiscard]] ccc_ucount ccc_omm_size(ccc_ordered_multimap const *mm);
 
 /** @brief Returns true if the multimap is empty.
 @param [in] mm a pointer to the multimap.

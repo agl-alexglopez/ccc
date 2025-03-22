@@ -6,6 +6,9 @@
 /** @private */
 static char const *const result_msgs[CCC_RESULT_SIZE] = {
     [CCC_RESULT_OK] = "",
+    [CCC_RESULT_FAIL]
+    = "An operation ran on a container but the desired result could not be "
+      "returned, meaning no valid value can be given to the user.",
     [CCC_RESULT_NO_ALLOC]
     = "A container performed an operation requiring new allocation of "
       "memory, but no allocation function was provided upon initialization.",
@@ -13,8 +16,9 @@ static char const *const result_msgs[CCC_RESULT_SIZE] = {
     = "A container performed an operation requiring new allocation of memory, "
       "but the allocator function provided on initialization failed.",
     [CCC_RESULT_ARG_ERROR]
-    = "A container function received bad arguments such as NULL pointers or "
-      "arguments that cannot be processed in the context of an operation.",
+    = "A container function received bad arguments such as NULL pointers, out "
+      "of range values, or arguments that cannot be processed in the context "
+      "of an operation.",
 };
 
 /*============================   Interface    ===============================*/

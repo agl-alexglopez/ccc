@@ -93,10 +93,14 @@ ccc_om_is_empty(ccc_ordered_map const *const om)
     return empty(om);
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_om_size(ccc_ordered_map const *const om)
 {
-    return om ? om->size_ : 0;
+    if (!om)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = om->size_};
 }
 
 ccc_tribool
@@ -840,7 +844,7 @@ struct parent_status_
     struct ccc_omap_elem_ const *parent;
 };
 
-static ptrdiff_t
+static size_t
 recursive_size(struct ccc_omap_ const *const t,
                struct ccc_omap_elem_ const *const r)
 {
