@@ -41,11 +41,11 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
                 size_t const n, size_t const input_elem_size)
 {
     if (!fpq || !array || array == ccc_buf_begin(&fpq->buf_)
-        || input_elem_size != ccc_buf_elem_size(&fpq->buf_).count)
+        || input_elem_size != fpq->buf_.elem_sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (n + 1 > ccc_buf_capacity(&fpq->buf_).count)
+    if (n + 1 > fpq->buf_.capacity_)
     {
         ccc_result const resize_res
             = ccc_buf_alloc(&fpq->buf_, n + 1, fpq->buf_.alloc_);
@@ -62,7 +62,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
 ccc_result
 ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t const n)
 {
-    if (!fpq || n + 1 > ccc_buf_capacity(&fpq->buf_).count)
+    if (!fpq || n + 1 > fpq->buf_.capacity_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -77,12 +77,10 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         return NULL;
     }
-    if (ccc_buf_size(&fpq->buf_).count + swap_space
-        >= ccc_buf_capacity(&fpq->buf_).count)
+    if (fpq->buf_.sz_ + swap_space >= fpq->buf_.capacity_)
     {
-        ccc_result const extra_space
-            = ccc_buf_alloc(&fpq->buf_, ccc_buf_capacity(&fpq->buf_).count * 2,
-                            fpq->buf_.alloc_);
+        ccc_result const extra_space = ccc_buf_alloc(
+            &fpq->buf_, fpq->buf_.capacity_ * 2, fpq->buf_.alloc_);
         if (extra_space != CCC_RESULT_OK)
         {
             return NULL;
@@ -95,14 +93,13 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     }
     if (new != e)
     {
-        (void)memcpy(new, e, ccc_buf_elem_size(&fpq->buf_).count);
+        (void)memcpy(new, e, fpq->buf_.elem_sz_);
     }
-    size_t const buf_sz = ccc_buf_size(&fpq->buf_).count;
+    size_t const buf_sz = fpq->buf_.sz_;
     size_t i = buf_sz - 1;
     if (buf_sz > 1)
     {
-        void *const tmp
-            = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_).count);
+        void *const tmp = ccc_buf_at(&fpq->buf_, fpq->buf_.sz_);
         i = bubble_up(fpq, tmp, i);
     }
     else
@@ -119,13 +116,13 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (ccc_buf_size(&fpq->buf_).count == 1)
+    if (fpq->buf_.sz_ == 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf_);
         return CCC_RESULT_OK;
     }
-    void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_).count);
-    swap(fpq, tmp, 0, ccc_buf_size(&fpq->buf_).count - 1);
+    void *const tmp = ccc_buf_at(&fpq->buf_, fpq->buf_.sz_);
+    swap(fpq, tmp, 0, fpq->buf_.sz_ - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
     (void)bubble_down(fpq, tmp, 0);
     return CCC_RESULT_OK;
@@ -138,7 +135,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (ccc_buf_size(&fpq->buf_).count == 1)
+    if (fpq->buf_.sz_ == 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf_);
         return CCC_RESULT_OK;
@@ -146,14 +143,14 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     /* Important to remember this key now to avoid confusion later once the
        elements are swapped and we lose access to original handle index. */
     size_t const swap_location = index_of(fpq, e);
-    if (swap_location == ccc_buf_size(&fpq->buf_).count - 1)
+    if (swap_location == fpq->buf_.sz_ - 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf_);
         return CCC_RESULT_OK;
     }
-    void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_).count);
-    swap(fpq, tmp, swap_location, ccc_buf_size(&fpq->buf_).count - 1);
-    void *const erased = at(fpq, ccc_buf_size(&fpq->buf_).count - 1);
+    void *const tmp = ccc_buf_at(&fpq->buf_, fpq->buf_.sz_);
+    swap(fpq, tmp, swap_location, fpq->buf_.sz_ - 1);
+    void *const erased = at(fpq, fpq->buf_.sz_ - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
     ccc_threeway_cmp const erased_cmp
         = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->buf_.aux_});
@@ -301,7 +298,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
     }
     if (fn)
     {
-        size_t const sz = ccc_buf_size(&fpq->buf_).count;
+        size_t const sz = fpq->buf_.sz_;
         for (size_t i = 0; i < sz; ++i)
         {
             fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->buf_.aux_});
@@ -320,7 +317,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
     }
     if (fn)
     {
-        size_t const sz = ccc_buf_size(&fpq->buf_).count;
+        size_t const sz = fpq->buf_.sz_;
         for (size_t i = 0; i < sz; ++i)
         {
             fn((ccc_user_type){.user_type = at(fpq, i), .aux = fpq->buf_.aux_});
@@ -336,7 +333,7 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    size_t const sz = ccc_buf_size(&fpq->buf_).count;
+    size_t const sz = fpq->buf_.sz_;
     if (sz <= 1)
     {
         return CCC_TRUE;
@@ -378,7 +375,7 @@ ccc_impl_fpq_update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 void
 ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *const fpq, size_t const n)
 {
-    if (!fpq || ccc_buf_capacity(&fpq->buf_).count < n + 1)
+    if (!fpq || fpq->buf_.capacity_ < n + 1)
     {
         return;
     }
@@ -402,7 +399,7 @@ inplace_heapify(struct ccc_fpq_ *const fpq, size_t const n)
 static size_t
 update_fixup(struct ccc_fpq_ *const fpq, void *const e)
 {
-    void *const tmp = ccc_buf_at(&fpq->buf_, ccc_buf_size(&fpq->buf_).count);
+    void *const tmp = ccc_buf_at(&fpq->buf_, fpq->buf_.sz_);
     size_t const i = index_of(fpq, e);
     if (!i)
     {
@@ -442,7 +439,7 @@ bubble_up(struct ccc_fpq_ *const fpq, char tmp[const], size_t i)
 static size_t
 bubble_down(struct ccc_fpq_ *const fpq, char tmp[const], size_t i)
 {
-    size_t const sz = ccc_buf_size(&fpq->buf_).count;
+    size_t const sz = fpq->buf_.sz_;
     for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < sz;
          i = next, left = (i * 2) + 1, right = left + 1)
     {
@@ -488,8 +485,8 @@ index_of(struct ccc_fpq_ const *const fpq, void const *const slot)
     assert(slot >= ccc_buf_begin(&fpq->buf_));
     size_t const i
         = (size_t)((((char *)slot) - ((char *)ccc_buf_begin(&fpq->buf_)))
-                   / ccc_buf_elem_size(&fpq->buf_).count);
-    assert(i < ccc_buf_size(&fpq->buf_).count);
+                   / fpq->buf_.elem_sz_);
+    assert(i < fpq->buf_.sz_);
     return i;
 }
 
